@@ -1,0 +1,20 @@
+# CT329 — Original F103 BSGS source-primitive boundary audit (prospective)
+
+2026-11-23 UTC; [pcc:unverified]. Follow-up to the live draft [crypto #4973](https://github.com/isogeny-labs/crypto/pull/4973), with original CT327 protocol and unchanged source blob `234e14f2aea35b8ef3203065a5e2468aae9eb71f`. Existing CT327 standalone success [#45127563790](https://github.com/isogeny-labs/crypto/actions/runs/45127563790) is **rho-only**. This audit changes neither the original source, frozen CT241 rows, CT327 timer/arm schedule, external 695/701 objects, nor active cost16/norm-reuse lane.
+
+## Falsifiable finding from original source inspection, not an observed run
+
+The original `direct_bsgs(g,q)` reports `ops` counting **baby-table** and **giant-loop** `ec_add` calls. However, its executed `ec_mul(n,-g)` giant-step construction and executed `ec_mul(scalar,g)` verification also call `ec_add`, without contributing to `ops`. Thus this reported `ops` is not the full count of *executed group-law additions* within this BSGS function; it remains a valid explicitly partial count, and the enclosing elapsed clock already includes those operations. The original code must remain unmodified.
+
+For the original public F103 model `E:y^2=x^3+x+24`, `r=109`, `G=(1,51)`, `Q73=(42,71)`, `n=11`: the original branch is predicted to count 11 baby-table additions and six giant additions (`ops=17`). Its `ec_mul(11,-G)` has four doubles plus three conditional additions (=7); verification `ec_mul(73,G)` has seven doubles and three conditional additions (=10). The *predicted* complete in-function group-add count is therefore `11+6+7+10=34` (no source validation beyond the existing function). This algebra is an expectation and **not a measured timing or executed Rust result**.
+
+## Bound test and independence requirements
+
+1. Compile a temporary Rust translation unit using the *unchanged pinned* original five F103 `ec_*` helpers and CT327 rho test, and the exact unchanged original `direct_bsgs` function obtained from Git blob `234e14f2aea35b8ef3203065a5e2468aae9eb71f`. Reuse the source-pinned CT328 extractor. Append a separate, new, instrumented BSGS copy **without editing the original**. The new copy wraps all executed `ec_add` in baby-table, giant-step scalar multiplication, giant loop and final scalar verification. Do not instrument fixture generation.
+2. For **all 109 public subgroup targets**, execute the exact original BSGS and the instrumented comparison; require their solved scalars equal every `k` and independent `[k]G=Q`. Require `total=baby+step+giant+verify`, `total >= original_ops` in all rows, and `Q73:(original_ops,baby,step,giant,verify,total)=(17,11,7,6,10,34)`. Check wrong-subgroup/off-curve input is rejected by an explicit precondition gate in a separate guard, not by inventing behavior of original `direct_bsgs`.
+3. Include an exact-source Git-blob gate, a deliberately source-mutated negative case, compile with hosted `rustc --edition=2021 -O --test`, run both Rust native tests once in a bounded **one-job, <=10 minute** GitHub Actions workflow. No root crate, paid compute, other PR ownership, external identities or S3.
+4. A separately authored Python finite-field oracle must reproduce the subgroup order, the Q73 count 34, and 109 recovered logs, distinguishing different-language same-producer checking from signed PCC. Keep raw test output, compiler failures, source digests and exact commands.
+
+## Limits and next action
+
+This is **correctness/accounting at the original F103 BSGS group-add boundary**, not a changed BSGS algorithm, new fast IC implementation, complete calibrated group/field/memory price, physical C169/C13a/C13b/N2_actual/D pricing or an ECDLP advantage. The actual original CT327 Q73 cold triplets require the unrelated root parser repair by its owner; the authenticated original norm-reuse fixture remains held. Existing [crypto #3904](https://github.com/isogeny-labs/crypto/issues/3904) is the research queue. Research-KB MCP and local wrapper unavailable in this connector-only execution; relevant primary internal source and earlier CT241/326 records inspected. No novelty claim.
