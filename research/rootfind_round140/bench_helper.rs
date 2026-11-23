@@ -101,7 +101,7 @@ pub fn round140_oracle() {
                         let actual=field.roots(&poly);
                         let expected:Vec<u64>=(0..p).filter(|&x| {
                             let mut t=0;
-                            for &c in poly.iter().rev(){t=field.add(field.mul(t,x),c);}
+                            for &c in poly.iter().rev(){let product=field.mul(t,x);t=field.add(product,c);}
                             t==0
                         }).collect();
                         assert_eq!(actual,expected,"scaled quadratic p={p} r={r} s={s}");
