@@ -1,0 +1,23 @@
+digraph tower {
+  graph [rankdir=BT, bgcolor="white", margin=0.15, nodesep=0.55, ranksep=0.75,
+         label="H116 quadratic function-field sandwich", labelloc=t, fontsize=18];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11,
+        color="#244a73", fillcolor="#eef5fb", penwidth=1.4];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#244a73", penwidth=1.4];
+
+  B [label="B\npulled-back target x-line"];
+  Xs [label="Xs\nsource x-line"];
+  Xt [label="Xt\npulled-back target curve field"];
+  E [label="E\nsource curve field", fillcolor="#e7f7ec", color="#277443"];
+
+  {rank=same; Xs; Xt}
+  B -> Xs [label="[Xs:B] = d\nreduced rational-map degree"];
+  Xs -> E [label="[E:Xs] = 2\nsource x projection"];
+  B -> Xt [label="[Xt:B] = 2\ntarget x projection"];
+  Xt -> E [label="[E:Xt] = ?\ncurve-map degree"];
+
+  good [shape=note, label="Tower equality:\nd · 2 = 2 · [E:Xt]\ntherefore [E:Xt] = d", fillcolor="#fff8d8", color="#9a7410"];
+  bad [shape=note, label="Control if projections differ:\n4 · 3 = 2 · 6 but 4 ≠ 6", fillcolor="#fdecec", color="#a33b3b"];
+  E -> good [style=dashed, arrowhead=none, color="#9a7410"];
+  good -> bad [style=dotted, arrowhead=none, color="#777777"];
+}
