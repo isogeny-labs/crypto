@@ -234,5 +234,79 @@ class ReplayChecks(unittest.TestCase):
             with self.assertRaises(ValueError):
                 checker.canonicalized_extraction(bad,1,0,len(self.base),"poison")
 
+
+    def test_splitmix_source_exact_query_schedule(self):
+        # These four independent known-answer words come from the native u64
+        # SplitMix64 constants and modulo-n reduction, not target logs.
+        state = 42
+        labels = []
+        for _ in range(4):
+            state, value = checker.splitmix_next(state)
+            labels.append(value)
+        self.assertEqual(labels, [49979948, 1033465976, 1897459893, 556465603])
+        manifest = {"curve":"ordinary_prime31","p":checker.P,"n":checker.N,
+                    "a":checker.A,"b":checker.B,"g":list(checker.G),
+                    "base":[list(p) for p in self.base]}
+        attempts = []
+        for a, b in ((labels[0], labels[1]), (labels[2], labels[3])):
+            qpt = checker.add(checker.scale(a, checker.G),
+                              checker.scale(b, self.q))
+            attempts.append({"a":a, "b":b, "point":list(qpt) if qpt else None,
+                             "extraction":{"relations":[]}, "receipts":[]})
+        record = {"target":list(self.q), "attempts":attempts, "rank":0,
+                  "scalar":None, "status":"query_limit",
+                  "final_replay_passed":False}
+        with tempfile.TemporaryDirectory() as td:
+            base_path = Path(td)/"base.json"
+            record_path = Path(td)/"record.json"
+            base_path.write_text(json.dumps(manifest))
+            command = [sys.executable, str(HERE/"independent_rr5_replay.py"),
+                       "--record", str(record_path), "--base", str(base_path),
+                       "--seed", "42", "--max-queries", "2"]
+            def run(data, options=command):
+                record_path.write_text(json.dumps(data))
+                return subprocess.run(options, capture_output=True, text=True, check=False)
+            good = run(record)
+            self.assertEqual(good.returncode, 0, good.stderr)
+            out = json.loads(good.stdout)
+            self.assertTrue(out["query_schedule_checked"])
+            self.assertEqual(out["source_exact_scheduled_queries"], 2)
+            self.assertEqual((out["authenticated_rows"],out["independent_rank"]), (0,0))
+
+            # Point equality alone does not bind an attempt to the announced
+            # reproducible query stream: all three mutations must fail closed.
+            tampered = copy.deepcopy(record)
+            tampered["attempts"][1]["a"] = (tampered["attempts"][1]["a"] + 1) % checker.N
+            newpt = checker.add(checker.scale(tampered["attempts"][1]["a"], checker.G),
+                                checker.scale(tampered["attempts"][1]["b"], self.q))
+            tampered["attempts"][1]["point"] = list(newpt) if newpt else None
+            denied = run(tampered)
+            self.assertNotEqual(denied.returncode, 0)
+            self.assertIn("SplitMix64 query schedule", denied.stderr)
+
+            reordered = copy.deepcopy(record)
+            reordered["attempts"].reverse()
+            denied = run(reordered)
+            self.assertNotEqual(denied.returncode, 0)
+            self.assertIn("SplitMix64 query schedule", denied.stderr)
+
+            omitted = copy.deepcopy(record)
+            omitted["attempts"] = omitted["attempts"][1:]
+            denied = run(omitted)
+            self.assertNotEqual(denied.returncode, 0)
+            self.assertIn("query_limit omits public attempts", denied.stderr)
+
+            # A deadline can legitimately end a retained prefix early.
+            prefix = copy.deepcopy(record)
+            prefix["attempts"] = prefix["attempts"][:1]
+            prefix["status"] = "deadline"
+            accepted = run(prefix)
+            self.assertEqual(accepted.returncode, 0, accepted.stderr)
+            self.assertEqual(json.loads(accepted.stdout)["source_exact_scheduled_queries"], 1)
+
+            denied = run(record, command[:-2]) # --seed without its paired cap
+            self.assertNotEqual(denied.returncode, 0)
+
+
 if __name__=="__main__":
     unittest.main()
