@@ -379,3 +379,22 @@ unknown-index Prime31 RR5 record with its full extraction/attempt stream;
 then check actual rank, independent target replay and all-cost comparisons.
 The [B677 owner #4974](https://github.com/isogeny-labs/crypto/pull/4974)
 still has not supplied admitted accepted natural B677 relations.
+
+
+## Source-exact public-query schedule reproducibility gate (2026-11-23, follow-up)
+
+The native producer at [RR5 #4970 source `95e5062`](https://github.com/isogeny-labs/crypto/blob/95e5062573e24d124235756c062e2ab8178aac4c/research/prime31_rr5_public_relations_20261123/native/solver.rs) uses unsigned 64-bit SplitMix64, advancing **twice per public query** to produce `(a,b)` modulo the ordinary curve's prime subgroup order. This branch now adds an **opt-in** read-only sequence audit to [`independent_rr5_replay.py`](independent_rr5_replay.py), requiring a separately supplied seed and maximum number of queries:
+
+```sh
+python3 research/cheap_ecdlp_cold_gate_20261123/independent_rr5_replay.py \
+  --record frozen-solve-record.json --base frozen-public-base.json \
+  --seed 42 --max-queries 2
+```
+
+Only use the example seed/cap for a record actually produced with that seed and cap. The checker now reproduces every public RHS label in order, rejects skipped or reordered public queries or changed `a,b`, refuses attempts beyond the declared cap, and requires exactly the declared number of attempts for `query_limit`. A `deadline` status may legitimately retain a shorter **prefix**, not an arbitrary subsequence. Its output distinguishes `query_schedule_checked`, `source_exact_scheduled_queries`, and `declared_max_queries` from genuine relation/rank admission. The new audit never sees a private target scalar; it reuses the point, group, signed-extractor-prefix, authenticated-row and rank checks already present.
+
+An independently written BigInt calculation of the native arithmetic constants gave seed 42's first four reduced words `[49979948, 1033465976, 1897459893, 556465603]`. These are a **development arithmetic cross-check**, not a Rust/Python source-exact execution or PCC verdict. The Python source has one newly authored test method with seeded normal, mutated label, reversed attempts, omitted query, deadline prefix and missing paired flag controls; the suite is now **14 authored tests, not executed in this environment**. No new Rust tests, builds, timed runs or extra F4 queries were made. [pcc:unverified]
+
+This closes one *record-level schedule consistency* gap only if the seed and cap have independently frozen provenance. The producer does **not** serialize its seed, the audit does not independently attest that the natural F4 run happened, and the producer's `complete_cost_accounting=false` remains unchanged. It does not verify wall time, resource usage, hidden skipped compute before seeding, seed selection after observing results, factor-base generation or unreported external attempts. The native B677 unknown-index extractor/target-span/cold-cost experiment is still owned by #4974/#4970 and remains unfinished; no gain or asymptotic change is claimed. Preserve the fixed B8 true row's **rank-gap zero** outcome.
+
+To qualify a future blind B677 run, precommit the public target derivation, exact source/toolchain hashes, seed, max-query cap, factor-base manifest, all limits and complete attempt transcript **before** the measurement; replay both original Rust and this consumer after freezing the record, then match cold T=1 fully charged timings against best maintained IC, source-exact WZ negation rho and fresh BSGS with reservations respected. Do not use this optional seed audit to relabel prior records whose seed was not frozen.
