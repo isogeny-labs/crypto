@@ -1,0 +1,62 @@
+GHS rho composition gate deterministic receipt
+status: implemented-and-deterministically-validated; admitted timing not run
+standing: pcc-unverified
+
+compiler:
+  rustc 1.100.0 (0ef1bc386 2026-11-09)
+  host x86_64-unknown-linux-gnu
+  LLVM 23.1.5
+
+source_sha256:
+  composition_gate.rs af76cf942738efaaca749334189602a678b706ad741b6515dc0171d8d85cb071
+  arms.json ffaa800d992a344ab094054cb1b7e6f9d6dd7bf95da6b1cf5d5ea1b7589ee997
+  PROTOCOL.md c2c498275dacbe4f4c7e9c955073b06b4d2d677bd27b85831eca1ae6d55807dc
+  COST_CHAIN.md 916bd92ebfdeb592034da27b79f15f1d84bf76bb0a3206026372433c535242a4
+
+build_command:
+  rustc --edition 2021 -D warnings research/ghs_frontier_3_7_20261119/ws4_composition/composition_gate.rs -o /tmp/ghs-composition-gate
+binary_sha256:
+  9a417ad9fee20f4e02dfa0eb2dea5edea654b39bccd68e2095a88461a3e85969
+
+fixture_materialization:
+  fixture_root=$(mktemp -d)
+  git archive HEAD research/quartic_ghs_r0_r99_20261119/receipts/commit_bound_q223.jsonl | tar -x -C "$fixture_root"
+
+selftest_command:
+  /tmp/ghs-composition-gate selftest "$fixture_root/research/quartic_ghs_r0_r99_20261119/receipts/commit_bound_q223.jsonl"
+selftest_output:
+  composition gate selftest PASS
+  valid_fixtures=2 corruptions_rejected=5
+  timing_observations=0 performance_claims=0
+
+corruptions_rejected:
+  1. expected source revision differs from the instance record
+  2. expected binary digest differs from the actual validator executable bytes
+  3. one required arm is renamed to an unregistered arm
+  4. one arm's step count differs from the common trajectory
+  5. one counted arm falsely marks field counters non-authoritative
+
+valid_fixtures:
+  1. the exact committed eight-arm q=223 capsule
+  2. a fourteen-arm authority-mode expansion synthesized only for validator
+     control from those exact counted records; it is not a new rho run
+
+plan_commands:
+  /tmp/ghs-composition-gate plan correctness 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  /tmp/ghs-composition-gate plan development 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  /tmp/ghs-composition-gate plan holdout 0123456789abcdef0123456789abcdef01234567 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef R17+R36
+
+plan_receipts:
+  correctness: 5 data rows, 7b4963cd1c17e727045d22a795a79240dfcaff34c45c7546ade60396ff69178b
+  development: 621 data rows, 7499200e7080f33823f973520b2c04721d5b8a73016a5482553390cfb0750240
+  selected holdout: 225 data rows, 2d945a37ef1be212bdcf793cfa1298bb9b31a9705d5120538ab7b72d13cae4d8
+
+manifest_check:
+  jq -e '.schema == "ghs-rho-composition-arms/v1" and (.primary_arms|length)==14 and .development.target_policy=="sequence" and .holdout.target_policy=="ic-repeat" and .execution_binding==null' research/ghs_frontier_3_7_20261119/ws4_composition/arms.json
+  result: true
+
+evidence_boundary:
+  The test reuses the exact committed q=223 correctness/count fixture and
+  deliberately excludes every retained clock. No local or admitted timing was
+  performed. The placeholder source and binary digests exercise plan
+  serialization only and are not launch bindings.

@@ -25,7 +25,8 @@ use serde_json::{json, Value};
 use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
-    curve25519_family_instance, find_prime_order_curve, generic_floor_ops, koblitz_floor_instance,
+    curve25519_family_instance, find_prime_order_curve, fp_p31_subexp_mersenne_instance,
+    generic_floor_ops, koblitz_floor_instance,
     koblitz_instance, random_binary_instance, rho_reference, rho_reference_negation,
     roster_prime_instance, signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration,
     CountedGroup, GroupOps, PinOutcome, PrimeInstance, RhoResult,
@@ -43,6 +44,8 @@ use crypto_lib::cryptanalysis::ic_framework::plugins::{
     SymmetrisedOracle,
 };
 use crypto_lib::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
+use crypto_lib::cryptanalysis::ic_framework::rootfind_floor::RootfindFloorOracle;
+use crypto_lib::cryptanalysis::ic_framework::rootfind_kmitm::RootfindKMitmOracle;
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
 };
@@ -97,6 +100,8 @@ pub struct BenchArgs {
     /// automorphism group to fold by.  `curve25519` takes the committed
     /// Curve25519-family miniature at that size (20, 24, 28, 32 bits):
     /// `p ≡ 5 (mod 8)`, `#E = 8r`, `#E' = 4r'`, smallest Montgomery `A`.
+    /// `p31-subexp` is the frozen ordinary Mersenne p = 2³¹−1 curve for the
+    /// exponent-lead gate (`--bits 31` only).
     #[arg(long, default_value = "generic")]
     pub family: String,
     /// EFD model for the prime instance (`montgom`, `edwards`, `twisted`,
@@ -773,6 +778,8 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
+        let mut rootfind_floor = RootfindFloorOracle::new(m, inst);
+        let mut rootfind_kmitm = RootfindKMitmOracle::new_prime(m, inst);
         let mut rootfind_gpu =
             crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(
                 m, inst,
@@ -791,6 +798,8 @@ fn run_prime(
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
+            "rootfind-floor" => &mut rootfind_floor,
+            "rootfind-kmitm" => &mut rootfind_kmitm,
             "rootfind-subtract-gpu" => &mut rootfind_gpu,
             "hashed-tensor" => &mut hashed,
             "genroot" => &mut genroot,
@@ -886,7 +895,8 @@ fn run_binary(
             }
         }
         let mut subtract = SubtractOracle;
-        let mut subtract_binary = crypto_lib::cryptanalysis::ic_framework::binary_subtract::BinarySubtractOracle::new();
+        let mut subtract_binary =
+            crypto_lib::cryptanalysis::ic_framework::binary_subtract::BinarySubtractOracle::new();
         let mut mitm = MitmOracle::new(m);
         let mut frob = FrobeniusMitmOracle::new(m, inst);
         let mut frob_counted = FrobeniusMitmOracle::new_counted(m, inst);
@@ -1181,6 +1191,12 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
                 ArchiveInstance::Prime(i) => Instance::Prime(i),
                 ArchiveInstance::Binary(i) => Instance::Binary(*i),
             }
+        }
+        "prime" if args.family == "p31-subexp" => {
+            if degree != 31 {
+                return Err("--family p31-subexp requires --bits 31".into());
+            }
+            Instance::Prime(fp_p31_subexp_mersenne_instance())
         }
         "prime" if args.efd_model.is_some() => {
             let model = args.efd_model.as_deref().ok_or("--efd-model required")?;

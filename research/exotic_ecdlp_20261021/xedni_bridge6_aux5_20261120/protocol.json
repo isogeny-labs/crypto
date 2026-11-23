@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-bridge6-aux5-protocol-v1",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "source_law": "all 1722 ordered nonidentity distinct-point pairs on E(F47): y^2=x^3-x-2 of order 43, with the frozen integer point lifts",
+  "post_run_feasibility_filter": "enumerate all pairs with P+6Q=O at F47; among those, retain candidates with equal lifted x coordinates modulo 11, necessary if P+6Q=O on a group of order 5 at 11; retain all 1722 source statuses",
+  "coefficient_box": "for each surviving pair, k1,k2,k3 in {-2,-1,0,1,2} in lexicographic order; set a1,a2,a3=47*k_i and solve the two rational point equations for a4,a6",
+  "local_gate": "at 7 require good reduction, #E(F7)=4 and P+6Q=O; at 11 require good reduction, #E(F11)=5 and P+6Q=O; retain nonintegral, bad-reduction, order-mismatch and relation-mismatch statuses",
+  "rational_check": "on every nonsingular constructed curve, calculate P+6Q over Q and retain its exact truth value",
+  "resource": "1722 finite-field source checks and at most 250 rational curve constructions; no wall-time comparison",
+  "claim_boundary": "post-run reduced-compatible feasibility screen, not an input-independent unknown-target selector; no rank or one-target speedup inference"
+}
