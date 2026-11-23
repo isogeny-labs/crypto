@@ -1,0 +1,6 @@
+Trigger the existing hourly relation-finding benchmark.
+UTC requested: 2026-11-23T04:24Z
+Target: frozen synthetic Koblitz GF(2^23), a=0, m=2; 256 natural trials, 64 planted-SAT and 64 proven-UNSAT controls.
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json; alert when absolute deviation > 20%.
+Record: results/hourly_log.csv; commit and push to hourly-runs; open issue on anomaly or failure.
