@@ -1,7 +1,16 @@
 # Independent admission and larger-cohort continuation
 
 Follow-up tracking: PR5065, after merged PR5046. Classical/native/local only;
-S3 remains excluded. No new admission or solver experiment has started here.
+S3 remains excluded. The independent C/OpenSSL admission replay is complete;
+no larger solver cohort has started here.
+[pcc:unverified]
+
+The frozen census returned the expected classifications for199control rows
+and certified all12recorded public targets across6prime-order domains.
+All6domains passed the recorded exceptional-class screen. These are unsigned
+producer observations, recorded before citation; independent reviewer execution
+and signed standing remain open. See [report](REPORT.md), [PDF](REPORT.pdf),
+[source](native/admission.c) and [result receipt](evidence/ADMISSION-RESULT.json).
 [pcc:unverified]
 
 The merged-source check at main da777709 compares315 tracked port/leaf paths:
@@ -65,10 +74,37 @@ clearance. Conductor is unavailable127; no reservation is asserted.
 
 ## Next action
 
-Implement and qualify the [draft independent-admission check](DRAFT-ADMISSION-PLAN.md)
-before expanding inputs. Then prospectively update worker, auditor, collector
+The [draft independent-admission check](DRAFT-ADMISSION-PLAN.md) and
+[prospective addendum](ADMISSION-ADDENDUM-01.md) are preserved unchanged.
+Prospectively update worker, auditor, collector
 and canonical export identity rules together, test synthetic metadata controls,
 freeze/publish/checkpoint the new protocol and only then execute new targets.
 Keep original360 calls,324seed-table export findings,84-case tensor panel and
 all failed attempts unchanged. The new branch inherits the merged main ledger;
 it does not overwrite/rebase the earlier producer histories. [pcc:unverified]
+
+## Reproduce the admission census
+
+Check `sha256sum -c runs.tar.xz.sha256`, then `tar -xJf runs.tar.xz`.
+The policy-required archive contains the full original control rows and build,
+pre-call and post-call logs. The72,728-byte raw JSONL remains byte-identical
+inside `runs/native01/rows.jsonl`; its SHA256 is pinned in the result receipt.
+The loose receipts remain resolvable by PCC paths. [pcc:unverified]
+
+With a64-bit C compiler and OpenSSL development package, compile the source
+below. Supply the extracted public inputs and a new output path. The checker
+refuses replacement. Keep the original archived results unchanged.
+
+```sh
+TASK_REPLAY=$(mktemp -d)
+cc -std=c11 -O2 -Wall -Wextra -Wshadow -Wconversion -Werror \
+  native/admission.c -o "$TASK_REPLAY/admission" -lcrypto
+timeout --signal=TERM --kill-after=5 60 "$TASK_REPLAY/admission" \
+  runs/inputs/targets.tsv "$TASK_REPLAY/new-rows.jsonl"
+```
+
+Use the frozen whole-cgroup15032385536-byte sampled stop when reproducing
+the recorded resource envelope; the archived wrapper records that policy.
+Diagnostic operation counts are not bit-operation costs. No benchmark or
+canonical performance chart is changed: this study measured correctness and
+classification, with no timing/ranking comparison. [pcc:unverified]
