@@ -912,6 +912,84 @@ fn forest_witness_reuses_edge_inverses_on_long_repeated_cycles() {
 }
 
 #[test]
+fn forest_witness_reuses_root_anchor_and_invalidates_after_join() {
+    // Exact F3/F7/F101/F1000003 controls. A full-rank three-vertex component
+    // receives many dependent closing rows; the original anchor's source
+    // expansion must be reused, then recomputed after a forest join.
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    for p in [3u64, 7, 101, 1_000_003] {
+        let mut f = ForestWitnessExtractor::new(4, p).unwrap();
+        let mut equations: Vec<Vec<(usize, u64)>> = vec![
+            vec![(0, 1), (1, 1)],
+            vec![(1, 1), (2, 1)],
+            vec![(0, 1), (2, 1)], // unbalanced: pins the three-vertex tree
+        ];
+        for row in &equations {
+            assert!(f.add_row(row).unwrap().is_none());
+        }
+        assert_eq!(f.rank(), 3);
+        assert_eq!(f.stats().inverse_calls, 3);
+        let mut witnesses = Vec::new();
+        for _ in 0..48 {
+            let row = vec![(0, 1), (2, 1)];
+            let w = f.add_row(&row).unwrap().unwrap();
+            // Identical anchored rows cancel without changing any tree edge.
+            assert_eq!(w.sources, vec![(2, p - 1), (equations.len(), 1)]);
+            witnesses.push(w);
+            equations.push(row);
+        }
+        let s = f.stats();
+        assert_eq!(s.anchor_cache_misses, 1);
+        assert_eq!(s.anchor_cache_hits, 47);
+        assert_eq!(s.inverse_calls, 3 + 48 + 1); // old 3+48+48
+        assert_eq!(f.rank(), 3);
+
+        // Joining an unanchored singleton extends the equation tree and
+        // invalidates the root-normalized anchor cache exactly once.
+        let join = vec![(2, 1), (3, 1)];
+        assert!(f.add_row(&join).unwrap().is_none());
+        equations.push(join);
+        let closing = vec![(3, 1)];
+        let w = f.add_row(&closing).unwrap().unwrap();
+        witnesses.push(w);
+        equations.push(closing);
+        let s = f.stats();
+        assert_eq!(s.anchor_cache_misses, 2);
+        assert_eq!(s.anchor_cache_hits, 47);
+        assert_eq!(s.inverse_calls, 3 + 48 + 1 + 1 + 1 + 1);
+        assert_eq!(f.rank(), 4);
+        assert_eq!(s.dependent_rows, 49);
+        assert_eq!(s.rows, equations.len());
+
+        let unchanged = f.stats();
+        assert!(matches!(
+            f.add_row(&[(3, 1), (3, 1)]),
+            Err(LpGraphError::NonCanonicalRow { .. })
+        ));
+        assert_eq!(f.stats(), unchanged); // atomic refusal with a warm cache
+        let inputs: Vec<PartialRelation> = equations.iter().enumerate().map(|(i, row)| {
+            PartialRelation {
+                id: i as u64,
+                small: vec![(i as u32, 1)],
+                large: row.iter().map(|&(j, a)| (3000 + j as u64, a)).collect(),
+                rhs: i as u64 % p,
+            }
+        }).collect();
+        let index = LpIndex::build(&inputs, p).unwrap();
+        assert_eq!(index.rows, equations);
+        assert_eq!(f.rank(), dense_rank(&index.rows, index.num_columns(), p).unwrap());
+        for w in &witnesses {
+            assert!(witness_cancels_lp(&index, w), "invalid cached witness p={p}");
+        }
+        let batch = collect_witnesses(&index).unwrap();
+        assert_eq!(batch.witnesses, witnesses);
+        let materialized = materialize_complete_relations(&index, &batch, &inputs, 64, 64)
+            .expect("complete source-by-source replay");
+        assert_eq!(materialized.len(), 49);
+    }
+}
+
+#[test]
 fn forest_witness_batches_endpoint_inverses_and_keeps_nonunit_refusal_atomic() {
     // One inversion per admitted arity-1 or arity-2 row, never per endpoint.
     // The exact LP witnesses remain valid when the second edge orientation
