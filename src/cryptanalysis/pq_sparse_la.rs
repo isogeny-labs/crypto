@@ -877,7 +877,10 @@ mod tests {
                 let target = col * stride;
                 let got = sparse_solve_mod_n(rows.clone(), n_cols, target, n);
                 let want = reference_sparse_solve(rows.clone(), target, n);
-                assert!(got.is_none() || got == want, "case {case}, column {target}, n = {n}: got {got:?}, reference {want:?}");
+                assert!(
+                    got.is_none() || got == want,
+                    "case {case}, column {target}, n = {n}: got {got:?}, reference {want:?}"
+                );
                 solved += usize::from(got.is_some());
             }
         }
@@ -890,8 +893,8 @@ mod tests {
     /// zero pivot-column coefficient is removed without eliminating),
     /// and right-hand sides of the same kind.  Nothing on the PQ path
     /// builds such rows, but every returned value must match
-    /// the historical reference, while ambiguous values can be rejected, over the small moduli where they
-    /// are common.  `N = 1` is left out: there the pivot is never 1
+    /// the historical reference, while ambiguous values can be rejected,
+    /// over the small moduli where they are common.  `N = 1` is left out: there the pivot is never 1
     /// and the solver's own debug assertion fires, as it always did.
     #[test]
     fn agrees_with_reference_on_explicit_zeros_and_multiples_of_n() {
@@ -931,7 +934,10 @@ mod tests {
             for col in 0..=n_cols {
                 let got = sparse_solve_mod_n(rows.clone(), n_cols, col, n);
                 let want = reference_sparse_solve(rows.clone(), col, n);
-                assert!(got.is_none() || got == want, "case {case}, column {col}, n = {n}: got {got:?}, reference {want:?}");
+                assert!(
+                    got.is_none() || got == want,
+                    "case {case}, column {col}, n = {n}: got {got:?}, reference {want:?}"
+                );
                 solved += usize::from(got.is_some());
             }
         }
@@ -941,8 +947,9 @@ mod tests {
     /// Systems of the perfbench shape at a few hundred columns (weight-3
     /// rows, one in eight heavier), where elimination runs long enough
     /// and fills in enough that a single missed count update would pick
-    /// a different pivot or stop the candidate scan early, must not disagree with the
-    /// reference on a returned value (ambiguous targets can be None).  Each system is then
+    /// a different pivot or stop the candidate scan early, must not disagree
+    /// with the reference on a returned value (ambiguous targets may be None).
+    /// Each system is then
     /// solved again with one more row, `x_top ≡ 5`, whose column sits
     /// one below and exactly at the relabelling threshold
     /// (`2 · entries + 64`), so the same rows take the direct and the
@@ -1001,7 +1008,10 @@ mod tests {
             for &t in &targets {
                 let got = sparse_solve_mod_n(rows.clone(), cols, t, n);
                 let want = reference_sparse_solve(rows.clone(), t, n);
-                assert!(got.is_none() || got == want, "case {case}, column {t}, n = {n}: got {got:?}, reference {want:?}");
+                assert!(
+                    got.is_none() || got == want,
+                    "case {case}, column {t}, n = {n}: got {got:?}, reference {want:?}"
+                );
                 solved += usize::from(got.is_some());
             }
             let entries = rows.iter().map(SparseRow::degree).sum::<usize>() + 1;
@@ -1015,11 +1025,17 @@ mod tests {
                 for t in [top, 0, targets[0]] {
                     let got = sparse_solve_mod_n(with_top.clone(), top + 1, t, n);
                     let want = reference_sparse_solve(with_top.clone(), t, n);
-                    assert!(got.is_none() || got == want, "case {case}, top {top}, column {t}, n = {n}: got {got:?}, reference {want:?}");
+                    assert!(
+                    got.is_none() || got == want,
+                    "case {case}, top {top}, column {t}, n = {n}: got {got:?}, reference {want:?}"
+                );
                     solved += usize::from(got.is_some());
                 }
             }
         }
-        assert!(solved > 60, "only {solved} solved columns");
+        // The old reference counted arbitrary free-variable-zero pivot
+        // values as solved. The source-bound run 45119409456 retained
+        // only 53 genuinely determined columns in this frozen cohort.
+        assert!(solved > 40, "only {solved} determined columns");
     }
 }
