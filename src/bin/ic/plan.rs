@@ -113,6 +113,8 @@ pub fn profile_of(inst: &Instance) -> CurveProfile {
         Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
         | Instance::Fp4(_)
+        | Instance::Fp3(_)
+        | Instance::PrimeMont4(_)
         | Instance::ThreeLeads(_)
         | Instance::Ext(_)
         | Instance::Hec(_)

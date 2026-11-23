@@ -1,0 +1,27 @@
+
+running 8 tests
+test statistical_controls::a_missing_or_zero_control_cannot_be_ignored ... ok
+test statistical_controls::all_six_cases_and_global_gates_are_required ... ok
+test statistical_controls::clocks_must_match_the_raw_receipt_and_every_worker_phase ... ok
+test statistical_controls::fastest_native_control_prevents_a_wrapper_only_false_gain ... FAILED
+test statistical_controls::fixed_bootstrap_and_noise_controls_reject_false_successes ... ok
+test supervised_roster_tests::closed_roster_covers_both_launchers_for_every_original_arm ... ok
+test supervised_roster_tests::every_control_has_an_identical_adjacent_negative_control ... ok
+test supervised_roster_tests::primary_is_fixed_and_never_an_eligible_control ... ok
+
+failures:
+
+---- statistical_controls::fastest_native_control_prevents_a_wrapper_only_false_gain stdout ----
+
+thread 'statistical_controls::fastest_native_control_prevents_a_wrapper_only_false_gain' (52702) panicked at src/bin/flat-supervised-analyze.rs:347:9:
+assertion `left == right` failed
+  left: 36
+ right: 24
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    statistical_controls::fastest_native_control_prevents_a_wrapper_only_false_gain
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

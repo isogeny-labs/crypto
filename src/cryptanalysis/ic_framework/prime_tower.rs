@@ -1251,7 +1251,7 @@ mod tests {
             .unwrap();
         let p = inst.curve.p;
         let mut tower_ops = GroupOps::default();
-        let tower = isogeny_tower(p, t, 2, &mut tower_ops).unwrap();
+        let tower = isogeny_tower(p, t, 2, AuxFamily::Any, &mut tower_ops).unwrap();
         let mut prebuilt_ops = GroupOps::default();
         let prebuilt = PrebuiltPrimeIsogenyBase {
             instance: &inst,

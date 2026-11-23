@@ -42,18 +42,10 @@ fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
 #[derive(Clone, Copy)]
 pub(crate) struct Fp {
     pub p: u64,
-    // floor(2^64 / p): quotient estimate for canonical 32-bit products.
-    // Calculated once per field rather than dividing on every multiply.
-    reciprocal_64: u64,
 }
 impl Fp {
     pub fn new(p: u64) -> Self {
-        let reciprocal_64 = if p >= 2 && p <= u32::MAX as u64 {
-            ((1u128 << 64) / p as u128) as u64
-        } else {
-            0
-        };
-        Fp { p, reciprocal_64 }
+        Fp { p }
     }
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
@@ -106,15 +98,8 @@ impl Fp {
                 folded
             }
         } else if self.p <= u32::MAX as u64 && a < self.p && b < self.p {
-            // Division-free 64-bit Barrett reduction. Let x=a*b < 2^64
-            // and mu=floor(2^64/p). Then floor(x*mu/2^64) differs
-            // from floor(x/p) by at most one (and never exceeds it).
-            // The remainder is in [0,2p), so one subtraction suffices.
-            // This uses a u128 widening multiply instead of integer div.
-            let product = a * b;
-            let quotient = ((product as u128 * self.reciprocal_64 as u128) >> 64) as u64;
-            let remainder = product - quotient * self.p;
-            if remainder >= self.p { remainder - self.p } else { remainder }
+            // Canonical 32-bit operands fit in a native 64-bit product.
+            (a * b) % self.p
         } else {
             ((a as u128 * b as u128) % self.p as u128) as u64
         }
@@ -122,29 +107,6 @@ impl Fp {
     #[inline]
     pub fn sqr(&self, a: u64) -> u64 {
         self.mul(a, a)
-    }
-    // For p=2^32-5, sqrt exponent (p+1)/4 = 2^30-1.
-    // Addition chain 1,3,15,63,4095,2^24-1,2^30-1:
-    // 29 squarings + 6 products versus 29 squarings + 30 products.
-    // Only public canonical coefficients use this path.
-    #[inline]
-    fn sqrt_power_4294967291(&self, a: u64) -> u64 {
-        debug_assert!(self.p == 4_294_967_291 && a < self.p);
-        let a3 = self.mul(self.sqr(a), a);
-        let mut a15 = a3;
-        for _ in 0..2 { a15 = self.sqr(a15); }
-        a15 = self.mul(a15, a3);
-        let mut a63 = a15;
-        for _ in 0..2 { a63 = self.sqr(a63); }
-        a63 = self.mul(a63, a3);
-        let mut a4095 = a63;
-        for _ in 0..6 { a4095 = self.sqr(a4095); }
-        a4095 = self.mul(a4095, a63);
-        let mut a16777215 = a4095;
-        for _ in 0..12 { a16777215 = self.sqr(a16777215); }
-        a16777215 = self.mul(a16777215, a4095);
-        for _ in 0..6 { a16777215 = self.sqr(a16777215); }
-        self.mul(a16777215, a63)
     }
     #[inline]
     pub fn half(&self, a: u64) -> u64 {
@@ -158,16 +120,6 @@ impl Fp {
         // regresses at the 61-bit Mersenne modulus. Keep the original
         // binary Fp path there; Fp2 still benefits from adaptive rpow.
         if self.p == MAX_PRIME {
-            // For p = 2^61-1, sqrt(a) = a^((p+1)/4) = a^(2^59).
-            // Avoid binary-power bit tests and the identity multiply.
-            // This is public root-finding arithmetic, never secret data.
-            if e == (1u64 << 59) {
-                let mut root = if a < MAX_PRIME { a } else { a % MAX_PRIME };
-                for _ in 0..59 {
-                    root = self.sqr(root);
-                }
-                return root;
-            }
             let mut b = a % self.p;
             let mut exponent = e;
             let mut acc = 1u64;
@@ -196,33 +148,6 @@ impl Fp {
         let mut r1 = if a < self.p { a } else { a % self.p };
         if r1 == 0 {
             return 0; // preserve powm(0, p-2)
-        }
-        // Unit/half-unit inverses recur in monic normalization and radicals.
-        // The formulas hold in every supported odd prime field.
-        if r1 == 1 { return 1; }
-        if r1 == self.p - 1 { return self.p - 1; }
-        if r1 == 2 { return (self.p + 1) / 2; }
-        if r1 == self.p - 2 { return (self.p - 1) / 2; }
-        // Narrow Euclidean remainders for 32-bit prime fields. A u32
-        // quotient/remainder needs no 64-bit div; keep i64 Bezout
-        // coefficients, which may grow up to p. Inputs are public.
-        if self.p <= u32::MAX as u64 {
-            let (mut u, mut v) = (self.p as u32, r1 as u32);
-            let (mut x, mut y) = (0i64, 1i64);
-            while v != 0 {
-                let q = u / v;
-                let rem = u - q * v;
-                let next = x - (q as i64) * y;
-                u = v;
-                v = rem;
-                x = y;
-                y = next;
-            }
-            return if x < 0 {
-                (x + self.p as i64) as u64
-            } else {
-                x as u64
-            };
         }
         let (mut t0, mut t1) = (0i64, 1i64);
         while r1 != 0 {
@@ -354,25 +279,6 @@ impl Ring for Fq2 {
     }
     fn mul(&self, x: (u64, u64), y: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
-        // Multiplication by an Fp scalar takes two base-field products.
-        // Preserve the fast dense Karatsuba formula for generic inputs.
-        if x.1 == 0 {
-            return (f.mul(x.0, y.0), f.mul(x.0, y.1));
-        }
-        if y.1 == 0 {
-            return (f.mul(x.0, y.0), f.mul(x.1, y.0));
-        }
-        // Pure-imaginary factors require just one or two Fp products
-        // instead of three Karatsuba products. This is public-input,
-        // variable-time arithmetic. Keep both real-scalar paths above.
-        if x.0 == 0 || y.0 == 0 {
-            let real = self.mul_nonresidue(f.mul(x.1, y.1));
-            if x.0 == 0 {
-                return if y.0 == 0 { (real, 0) }
-                       else { (real, f.mul(x.1, y.0)) };
-            }
-            return (real, f.mul(x.0, y.1));
-        }
         let ac = f.mul(x.0, y.0);
         let bd = f.mul(x.1, y.1);
         // The first quadratic non-residue is commonly 2 or 3.
@@ -391,13 +297,6 @@ impl Ring for Fq2 {
     // Saves additions/subtractions versus generic Karatsuba multiply.
     fn sqr(&self, x: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
-        // Sparse squares lie in Fp. Avoid three full products.
-        if x.1 == 0 {
-            return (f.sqr(x.0), 0);
-        }
-        if x.0 == 0 {
-            return (self.mul_nonresidue(f.sqr(x.1)), 0);
-        }
         let aa = f.sqr(x.0);
         let bb = f.sqr(x.1);
         let nbb = match self.n {
@@ -412,12 +311,6 @@ impl Ring for Fq2 {
     // Uses four Fp products, versus six for squaring then multiplying.
     fn cube(&self, x: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
-        // Pure Fp elements cube with only one square and one product.
-        // Do not branch on imaginary-only elements: local dense controls
-        // showed worse throughput with that additional check.
-        if x.1 == 0 {
-            return (f.mul(f.sqr(x.0), x.0), 0);
-        }
         let aa = f.sqr(x.0);
         let nbb = self.mul_nonresidue(f.sqr(x.1));
         let three_nbb = f.add(nbb, f.add(nbb, nbb));
@@ -596,10 +489,6 @@ pub(crate) fn rpow<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
 pub(crate) struct Cube<R: Ring> {
     pub r: R,
     n: u128,
-    // Reuse the 3-coprime cofactor instead of dividing u128 group orders
-    // on each AMM root query. Computed once during field initialization.
-    cofactor: u128,
-    cofactor_mod3_eq1: bool,
     s: u32,
     e3: u128,
     #[cfg(test)]
@@ -634,8 +523,6 @@ impl<R: Ring> Cube<R> {
             return Cube {
                 r,
                 n,
-                cofactor: t,
-                cofactor_mod3_eq1: t % 3 == 1,
                 s,
                 e3,
                 #[cfg(test)]
@@ -688,8 +575,6 @@ impl<R: Ring> Cube<R> {
         Cube {
             r,
             n,
-            cofactor: t,
-            cofactor_mod3_eq1: t % 3 == 1,
             s,
             e3,
             #[cfg(test)]
@@ -730,7 +615,7 @@ impl<R: Ring> Cube<R> {
         // test (a^t)^(3^(s-1)) and the Sylow correction h.
         // Since 3*e3-1 is either t or 2*t, this removes one
         // full-length exponentiation from the AMM hot path.
-        let t = self.cofactor;
+        let t = self.n / self.p3s;
         // R66_AMM_INVERSE_SYLOW_BEGIN
         // Keep the old residuosity-first path for base fields and generic
         // Rings: their inversions can be slower than exponentiation.
@@ -749,7 +634,7 @@ impl<R: Ring> Cube<R> {
             }
             if residue != r.one() { return None; }
             let x0 = r.pow(a, self.e3);
-            (x0, if self.cofactor_mod3_eq1 { r.mul(g, g) } else { g })
+            (x0, if t % 3 == 1 { r.mul(g, g) } else { g })
         };
         // R66_AMM_INVERSE_SYLOW_END
         // For s=1, a cube has h=1 and x0 is already a root.
@@ -937,9 +822,6 @@ pub struct RadicalRootCtx {
     inv4: u64,
     inv27: u64,
     inv_n: u64,
-    // Small public leading-coefficient inverses. A single range check
-    // avoids repeated Euclidean inversion for 3..=7.
-    small_leading_inverse: [u64; 8],
     #[cfg(test)]
     n: u64, // quadratic non-residue
     s2: u32,
@@ -968,11 +850,6 @@ impl RadicalRootCtx {
         // Inverses 2,3,4,27,n are fixed per prime and only require
         // two products plus, at most, one Euclidean inversion.
         let (_i2, i3, i4, i27, in_) = f.small_inverses(n);
-        // Entries are indexed only by canonical, nonzero leading coefficients.
-        // Values for a >= p never participate in a root query.
-        let small_leading_inverse = [
-            0, 1, _i2, i3, i4, f.inv(5), f.inv(6), f.inv(7),
-        ];
         Ok(RadicalRootCtx {
             f,
             #[cfg(test)]
@@ -981,7 +858,6 @@ impl RadicalRootCtx {
             inv4: i4,
             inv27: i27,
             inv_n: in_,
-            small_leading_inverse,
             #[cfg(test)]
             n,
             s2,
@@ -1000,11 +876,7 @@ impl RadicalRootCtx {
             return Some(0);
         }
         if p % 4 == 3 {
-            let r = if p == 4_294_967_291 && a < p {
-                f.sqrt_power_4294967291(a)
-            } else {
-                f.powm(a, (p + 1) / 4)
-            };
+            let r = f.powm(a, (p + 1) / 4);
             return if f.sqr(r) == a { Some(r) } else { None };
         }
         // p = 5 (mod 8): one exponentiation and one optional multiplication
@@ -1084,96 +956,32 @@ impl RadicalRootCtx {
     #[inline]
     fn sqrt_discriminant(&self, a: u64) -> Option<u64> {
         let p = self.f.p;
-        // For p = 2^61-1, the square-root power is 2^59.
-        // Squaring 59 times and checking r^2=a beats running the
-        // variable-time Jacobi prefilter first, especially for residues.
-        // Noncanonical inputs retain the prior standalone sqrt behavior.
-        // For p = 2^61-1, the square-root power is 2^59.
-        // Squaring 59 times and checking r^2=a beats running the
-        // variable-time Jacobi prefilter first, especially for residues.
-        // Noncanonical inputs retain the prior standalone sqrt behavior.
-        if p == MAX_PRIME && a < p {
-            return self.sqrt(a);
-        }
-        // For large p == 5 (mod 8), the ordinary square-root power is
-        // expensive even for nonresidues. A binary Jacobi filter rejects
-        // roughly half of uniformly distributed discriminants before any
-        // field exponentiation. Its extra cost on known squares is measured
-        // separately: use only in the discriminant API, not sqrt().
-        if p >= (1u64 << 20) && (p & 3 == 3 || p & 7 == 5)
-            && a != 0 && a < p
-        {
-            // Use narrow Euclidean remainders for every 32-bit modulus,
-            // not only p=2^32-5. For larger primes, retain u64 arithmetic.
-            // Both branches operate exclusively on canonical public inputs.
-            let positive = if p <= u32::MAX as u64 {
-                let (mut v, mut n) = (a as u32, p as u32);
-                let mut negative = false;
-                while v != 0 {
-                    let twos = v.trailing_zeros();
-                    v >>= twos;
-                    if twos & 1 != 0 && (n & 7 == 3 || n & 7 == 5) {
-                        negative = !negative;
-                    }
-                    if v & 3 == 3 && n & 3 == 3 {
-                        negative = !negative;
-                    }
-                    let next = n % v;
-                    n = v;
-                    v = next;
+        if p >= (1u64 << 20) && p & 3 == 3 && a != 0 && a < p {
+            let (mut v, mut n) = (a, p);
+            let mut negative = false;
+            while v != 0 {
+                let twos = v.trailing_zeros();
+                v >>= twos;
+                if twos & 1 != 0 && (n & 7 == 3 || n & 7 == 5) {
+                    negative = !negative;
                 }
-                n == 1 && !negative
-            } else {
-                let (mut v, mut n) = (a, p);
-                let mut negative = false;
-                while v != 0 {
-                    let twos = v.trailing_zeros();
-                    v >>= twos;
-                    if twos & 1 != 0 && (n & 7 == 3 || n & 7 == 5) {
-                        negative = !negative;
-                    }
-                    if v & 3 == 3 && n & 3 == 3 {
-                        negative = !negative;
-                    }
-                    let next = n % v;
-                    n = v;
-                    v = next;
+                if v & 3 == 3 && n & 3 == 3 {
+                    negative = !negative;
                 }
-                n == 1 && !negative
-            };
-            if !positive {
+                let next = n % v;
+                n = v;
+                v = next;
+            }
+            if n != 1 || negative {
                 return None;
             }
-            // The special square-root chain remains selected for p=2^32-5.
-            if p == 4_294_967_291 {
-                return Some(self.f.sqrt_power_4294967291(a));
-            }
-            // For p == 5 (mod 8), a^(p+3)/8 squares to a or -a
-            // precisely when a is a quadratic residue. Jacobi already
-            // proved residuosity, so at most one verification square and
-            // one conditional correction by sqrt(-1) are required.
-            if p & 7 == 5 {
-                let root = self.f.powm(a, (p + 3) / 8);
-                return if self.f.sqr(root) == a {
-                    Some(root)
-                } else {
-                    Some(self.f.mul(root, self.zc))
-                };
-            }
-            // p = 3 (mod 4): Jacobi proves that the power is a root.
+            // The prime-field Jacobi character +1 proves that a is a
+            // quadratic residue. For p = 3 (mod 4), r=a^((p+1)/4) is
+            // necessarily a square root. Skip sqrt()'s redundant r*r check.
+            // Only public, canonical inputs take this variable-time branch.
             return Some(self.f.powm(a, (p + 1) / 4));
         }
         self.sqrt(a)
-    }
-
-    // Cardano/Ferrari setup already caches these small inverses.
-    // Reuse them for common nonmonic polynomial leading coefficients.
-    #[inline]
-    fn inv_leading(&self, a: u64) -> u64 {
-        match a {
-            2..=7 => self.small_leading_inverse[a as usize],
-            _ => self.f.inv(a),
-        }
     }
 
     /// Distinct roots of monic y^2 + b y + c.
@@ -1223,7 +1031,7 @@ impl RadicalRootCtx {
             return if b == 0 {
                 vec![0]
             } else {
-                vec![0, f.mul(f.neg(b), self.inv_leading(a))]
+                vec![0, f.mul(f.neg(b), f.inv(a))]
             };
         }
         // Test b^2-4ac before inverting 2a. For a nonresidue
@@ -1488,7 +1296,7 @@ impl RadicalRootCtx {
             let mut roots = if a == 1 {
                 self.cubic_monic(b, c, d)
             } else {
-                let ia = self.inv_leading(a);
+                let ia = f.inv(a);
                 self.cubic_monic(f.mul(b, ia), f.mul(c, ia), f.mul(d, ia))
             };
             roots.push(0);
@@ -1500,7 +1308,7 @@ impl RadicalRootCtx {
         let (b1, c1, d1, e1) = if a == 1 {
             (b, c, d, e)
         } else {
-            let ia = self.inv_leading(a);
+            let ia = f.inv(a);
             (f.mul(b, ia), f.mul(c, ia), f.mul(d, ia), f.mul(e, ia))
         };
         // x divides the quartic when e1=0. Solve the cubic cofactor,
@@ -1600,42 +1408,19 @@ impl RadicalRootCtx {
     /// Degrees 1..=4 are supported; the zero polynomial and constants return an error / no roots.
     pub fn roots(&self, f: &[u64]) -> Result<RadicalRoots, String> {
         let fp = &self.f;
-        // The canonical-input optimization targets degree >= 2.
-        // Preserve the original short-poly normalization, which avoids a
-        // 6-15% end-to-end regression observed in native Rust trials.
+        // Polynomials of degree <=4 fit in a stack buffer. Scan trailing
+        // zeroes first (including coefficients congruent to 0 mod p) so
+        // arbitrarily padded input remains accepted without a heap Vec.
         let mut n = f.len();
-        // Canonical leading coefficients are the common case. Testing
-        // x < p first avoids a 64-bit remainder in the degree scan.
-        // Noncanonical multiples of p remain polynomial zeros.
-        while n > 0 {
-            let x = f[n - 1];
-            if x == 0 || (x >= fp.p && x % fp.p == 0) {
-                n -= 1;
-            } else {
-                break;
-            }
+        while n > 0 && f[n - 1].is_multiple_of(fp.p) {
+            n -= 1;
         }
         if n > 5 {
             return Err("radical root finder supports degree <= 4".into());
         }
         let mut c = [0u64; 5];
-        if n <= 2 {
-            while n > 0 && f[n - 1] % fp.p == 0 {
-                n -= 1;
-            }
-            for j in 0..n {
-                c[j] = f[j] % fp.p;
-            }
-        } else {
-            // The first scan already proved that the leading coefficient
-            // is nonzero modulo p. Recheck neither its degree nor its value.
-            // Canonical inputs still avoid remainder division throughout.
-            let leading = f[n - 1];
-            c[n - 1] = if leading < fp.p { leading } else { leading % fp.p };
-            for j in 0..n - 1 {
-                let x = f[j];
-                c[j] = if x < fp.p { x } else { x % fp.p };
-            }
+        for j in 0..n {
+            c[j] = f[j] % fp.p;
         }
         let ok = |roots: Vec<u64>| {
             Ok(RadicalRoots {
@@ -1648,23 +1433,9 @@ impl RadicalRootCtx {
             1 => ok(vec![]),
             2 => {
                 // x + c0 and a*x have roots without an inversion.
-                // The context already holds inverses of 3 and 4 for
-                // Cardano/Ferrari. Cache hits beat Euclid at large primes;
-                // native Rust tests rejected the halving shortcut at a=2,
-                // and showed regressions on smaller prime fields.
                 let root = if c[0] == 0 { 0 }
                     else if c[1] == 1 { fp.neg(c[0]) }
-                    else {
-                        let neg_c0 = fp.neg(c[0]);
-                        let inverse = if fp.p >= (1u64 << 20)
-                            && (3..=7).contains(&c[1])
-                        {
-                            self.small_leading_inverse[c[1] as usize]
-                        } else {
-                            fp.inv(c[1])
-                        };
-                        fp.mul(neg_c0, inverse)
-                    };
+                    else { fp.mul(fp.neg(c[0]), fp.inv(c[1])) };
                 ok(vec![root])
             },
             3 => ok(self.quad_roots(c[2], c[1], c[0])),
@@ -1682,7 +1453,7 @@ impl RadicalRootCtx {
                 let mut v = if c[3] == 1 {
                     self.cubic_monic(c[2], c[1], c[0])
                 } else {
-                    let ia = self.inv_leading(c[3]);
+                    let ia = fp.inv(c[3]);
                     self.cubic_monic(fp.mul(c[2], ia), fp.mul(c[1], ia), fp.mul(c[0], ia))
                 };
                 v.sort_unstable();
@@ -1704,62 +1475,6 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn round126_small_leading_linear_roots_match_independent_field_inverse() {
-        for p in [5u64, 7, 101, 65_521, 1_000_000_007, 4_294_967_291, MAX_PRIME] {
-            let ctx = RadicalRootCtx::new(p).unwrap();
-            let f = &ctx.f;
-            for a in [1u64, 2, 3, 4] {
-                for b in [0u64, 1, 2, p / 2, p - 1] {
-                    let expected = if b == 0 { 0 } else { f.mul(f.neg(b), f.inv(a)) };
-                    for coeffs in [[b, a], [b + p, a + p]] {
-                        let result = ctx.roots(&coeffs).unwrap();
-                        assert_eq!(result.roots, vec![expected],
-                            "p={p} a={a} b={b} input={coeffs:?}");
-                        assert_eq!(f.add(f.mul(a, expected), b), 0);
-                    }
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn round72_imaginary_fp2_mul_matches_reference() {
-        // Independently expand (a+bi)(c+di) for canonical and zero
-        // components. The same arithmetic works for small and 61-bit p.
-        for p in [5u64, 7, 11, 17, 97, 998_244_353,
-                  1_000_000_007, MAX_PRIME] {
-            let f = Fp::new(p);
-            let q = Fq2 { f, n: f.first_quadratic_nonresidue() };
-            let mut state = p ^ 0x72ac_6c6e_34fc_0017u64;
-            for i in 0..512usize {
-                state = state.wrapping_mul(6364136223846793005)
-                    .wrapping_add(1442695040888963407);
-                let mut x = (state % p, state.rotate_left(19) % p);
-                state = state.wrapping_mul(6364136223846793005)
-                    .wrapping_add(1442695040888963407);
-                let mut y = (state % p, state.rotate_left(37) % p);
-                match i % 8 {
-                    0 => x.0 = 0,
-                    1 => y.0 = 0,
-                    2 => { x.0 = 0; y.0 = 0; },
-                    3 => x.1 = 0,
-                    4 => y.1 = 0,
-                    5 => { x.0 = 0; x.1 = 0; },
-                    _ => {}
-                }
-                let ac = f.mul(x.0, y.0);
-                let bd = f.mul(x.1, y.1);
-                let expected = (
-                    f.add(ac, q.mul_nonresidue(bd)),
-                    f.add(f.mul(x.0, y.1), f.mul(x.1, y.0)),
-                );
-                assert_eq!(q.mul(x, y), expected,
-                    "p={p} n={} i={i} x={x:?} y={y:?}", q.n);
-            }
-        }
-    }
 
     #[test]
     fn round70_frobenius_reduction_matches_independent_binary_power() {
@@ -2722,8 +2437,7 @@ mod tests {
     }
     fn cube_before_frobenius(ctx: &RadicalRootCtx) -> Cube<Fq2BeforePower> {
         let c = &ctx.cube_q;
-        Cube { r: Fq2BeforePower(c.r), n: c.n, cofactor: c.cofactor,
-               cofactor_mod3_eq1: c.cofactor_mod3_eq1, s: c.s, e3: c.e3,
+        Cube { r: Fq2BeforePower(c.r), n: c.n, s: c.s, e3: c.e3,
                c: c.c, c_inv: c.c_inv, inverse_powers: c.inverse_powers.clone(),
                inverse_squares: c.inverse_squares.clone(), w: c.w, w_squared: c.w_squared,
                c_inv_squared: c.c_inv_squared, p3s: c.p3s }
@@ -5379,8 +5093,9 @@ mod round37_frobenius_tests {
     }
 }
 
+
 #[cfg(test)]
-mod round114_mersenne_sqrt_and_unit_inverse {
+mod round73_mersenne_single_fold {
     use super::*;
 
     #[test]
@@ -5401,6 +5116,7 @@ mod round114_mersenne_sqrt_and_unit_inverse {
         }
     }
 
+    #[test]
     fn mersenne_jacobi_bypass_matches_complete_sqrt() {
         let ctx = RadicalRootCtx::new(MAX_PRIME).expect("Mersenne context");
         let p = MAX_PRIME;
@@ -5415,40 +5131,66 @@ mod round114_mersenne_sqrt_and_unit_inverse {
             }))
         {
             assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a), "a={a}");
+        }
+    }
 
+    #[test]
     fn mersenne_sqrt_power_matches_independent_wide_reference() {
+        let p = MAX_PRIME;
         let f = Fp::new(p);
         let mut state = 0x917a_c5db_7102_637du64;
         for a in [0, 1, 2, p - 1, p, p + 1, u64::MAX]
+            .into_iter()
+            .chain((0..2048).map(|_| {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
                 state
+            }))
+        {
             let mut expected = a % p;
             for _ in 0..59 {
                 expected = ((expected as u128 * expected as u128) % p as u128) as u64;
+            }
             assert_eq!(f.powm(a, 1u64 << 59), expected, "a={a}");
+        }
+    }
 }
 
+#[cfg(test)]
 mod round115_barrett_regressions {
     use super::Fp;
+    #[test]
     fn canonical_products_match_independent_wide_remainder() {
         let primes = [5u64, 7, 11, 31, 257, 65_521, 1_000_000_007, 4_294_967_291];
         let mut checked = 0usize;
         for p in primes {
+            let f = Fp::new(p);
             let mut seed = p ^ 0xb7d4_218c_517f_3a9d;
             for &a in &[0, 1, 2, p / 2, p - 2, p - 1] {
                 for &b in &[0, 1, 2, p / 2, p - 2, p - 1] {
                     assert_eq!(f.mul(a, b), (a as u128 * b as u128 % p as u128) as u64);
                     checked += 1;
+                }
+            }
             for _ in 0..100_000 {
                 seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
                 let a = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
                 let b = seed % p;
                 assert_eq!(f.mul(a, b), (a as u128 * b as u128 % p as u128) as u64, "p={p} a={a} b={b}");
                 checked += 1;
+            }
+        }
         assert_eq!(checked, 800_288);
+    }
+}
 
+#[cfg(test)]
 mod round116_coefficient_normalization_tests {
     use super::RadicalRootCtx;
 
+    #[test]
     fn padded_noncanonical_coefficients_match_independent_modulo_normalization() {
         let mut seed = 0x7df4_1159_c2e5_ba08u64;
         for p in [5u64, 7, 101, 65_521, 1_000_000_007, (1u64 << 61) - 1] {
@@ -5467,6 +5209,7 @@ mod round116_coefficient_normalization_tests {
                         _ => 3 * p + x,
                     };
                     polynomial.push(value);
+                }
                 // Ensure nonzero degree for the comparison, even if
                 // a random leading coefficient was congruent to zero.
                 polynomial[degree] = if i & 1 == 0 { 1 } else { p + 1 };
@@ -5474,35 +5217,52 @@ mod round116_coefficient_normalization_tests {
                 // necessarily zero as machine words.
                 if i & 3 == 0 {
                     polynomial.extend_from_slice(&[p, 2 * p, 0, p]);
+                }
                 let mut normalized: Vec<u64> =
                     polynomial.iter().map(|x| x % p).collect();
                 while normalized.last() == Some(&0) {
                     normalized.pop();
+                }
                 assert_eq!(
                     ctx.roots(&polynomial),
                     ctx.roots(&normalized),
                     "p={p}, i={i}, polynomial={polynomial:?}"
                 );
+            }
             for zero in [&[][..], &[p][..], &[0, p, 2 * p][..]] {
                 assert_eq!(ctx.roots(zero), ctx.roots(&[]));
+            }
             assert!(ctx.roots(&[1, 0, 0, 0, 0, 1]).is_err());
+        }
+    }
+}
 
+#[cfg(test)]
 mod round117_sqrt_chain_and_discriminant_tests {
+    use super::*;
     fn next(seed: &mut u64) -> u64 {
         *seed ^= *seed << 13;
         *seed ^= *seed >> 7;
         *seed ^= *seed << 17;
         *seed
+    }
+    #[test]
     fn special_square_root_chain_matches_independent_binary_power() {
         let f = Fp::new(4_294_967_291);
         let mut seed = 0xb199_117a_d947_62e1u64;
         for a in [0, 1, 2, 3, f.p - 2, f.p - 1]
+            .into_iter()
             .chain((0..16_384).map(|_| next(&mut seed) % f.p))
+        {
             assert_eq!(f.sqrt_power_4294967291(a), f.powm(a, (f.p + 1) / 4),
                        "a={a}");
+        }
+    }
+    #[test]
     fn discriminant_character_matches_independent_euler_character() {
         let mut seed = 0x117e_2026_1122_80abu64;
         for p in [1_000_000_007u64, 4_294_967_291] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
             let f = &ctx.f;
             for i in 0..8_192 {
                 let mut a = next(&mut seed) % p;
@@ -5512,16 +5272,27 @@ mod round117_sqrt_chain_and_discriminant_tests {
                 assert_eq!(root.is_some(), is_square, "p={p}, a={a}");
                 if let Some(r) = root { assert_eq!(f.sqr(r), a, "p={p}, a={a}"); }
                 assert_eq!(root, ctx.sqrt(a), "p={p}, a={a}");
+            }
             for a in [p, p + 1, p + 2, u64::MAX] {
                 assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a), "p={p}, a={a}");
+            }
+        }
+    }
+}
 
+#[cfg(test)]
 mod round120_five_mod_eight_discriminant_regressions {
+    use super::*;
+    #[test]
     fn jacobi_prefilter_matches_standalone_sqrt_and_euler_criterion() {
         let mut state = 0x120a_2026_1122_5abdu64;
         for p in [13u64, 101, 1_000_000_021, 4_294_967_197,
                   2_305_843_009_213_693_693] {
             let ctx = RadicalRootCtx::new(p).expect("p is prime");
             for i in 0..2_048 {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
                 let x = state % p;
                 let a = if i & 1 == 0 { ctx.f.sqr(x) } else { x };
                 let old = ctx.sqrt(a);
@@ -5532,16 +5303,32 @@ mod round120_five_mod_eight_discriminant_regressions {
                            "Euler criterion p={p} a={a}");
                 if let Some(r) = filtered {
                     assert_eq!(ctx.f.sqr(r), a, "p={p} a={a}");
+                }
+            }
             for a in [p, p + 1, u64::MAX] {
                 assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a));
+            }
+        }
+    }
+}
 
+#[cfg(test)]
 mod round121_narrow_jacobi_and_sparse_extension_tests {
+    use super::*;
 
+    fn next(seed: &mut u64) -> u64 {
+        *seed ^= *seed << 13;
+        *seed ^= *seed >> 7;
+        *seed ^= *seed << 17;
+        *seed
+    }
 
+    #[test]
     fn embedded_prime_field_multiplication_matches_schoolbook() {
         let mut seed = 0x1210_2026_1122_ff20u64;
         let mut count = 0usize;
         for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
+            let f = Fp::new(p);
             let q = Fq2 { f, n: 2 };
             for i in 0..50_000 {
                 let x = (next(&mut seed) % p,
@@ -5552,27 +5339,47 @@ mod round121_narrow_jacobi_and_sparse_extension_tests {
                 let expected = (
                     f.add(f.mul(x.0, y.0), f.mul(2, f.mul(x.1, y.1))),
                     f.add(f.mul(x.0, y.1), f.mul(x.1, y.0)),
+                );
                 assert_eq!(got, expected, "p={p} i={i}");
                 count += 1;
+            }
+        }
         assert_eq!(count, 150_000);
+    }
 
+    #[test]
     fn narrow_jacobi_matches_full_square_root_and_euler_criterion() {
         let mut seed = 0x1210_2026_1122_abb5u64;
         for p in [101u64, 1_000_000_021, 4_294_967_197, 4_294_967_291,
+                  2_305_843_009_213_693_693] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
             for i in 0..4_096 {
                 let x = next(&mut seed) % p;
                 let a = if i % 2 == 0 { ctx.f.sqr(x) } else { x };
                 let got = ctx.sqrt_discriminant(a);
                 assert_eq!(got, ctx.sqrt(a), "p={p} a={a}");
                 assert_eq!(got.is_some(),
+                           a == 0 || ctx.f.powm(a, (p - 1) / 2) == 1,
                            "p={p} a={a}");
                 if let Some(r) = got { assert_eq!(ctx.f.sqr(r), a); }
+            }
+            for a in [p, p + 1, u64::MAX] {
+                assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a));
+            }
+        }
+    }
+}
 
+#[cfg(test)]
 mod round122_cube_cofactor_cache_tests {
+    use super::*;
+    #[test]
     fn cached_3_coprime_cofactor_matches_group_orders_and_cube_roots() {
         let mut seed = 0x1220_2026_f00d_1a72u64;
         for p in [5u64, 7, 31, 97, 109, 487, 65_521,
                   1_000_000_007, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = &ctx.f;
             for (order, cofactor, factor, one) in [
                 (ctx.cube_p.n, ctx.cube_p.cofactor, ctx.cube_p.p3s, ctx.cube_p.cofactor_mod3_eq1),
                 (ctx.cube_q.n, ctx.cube_q.cofactor, ctx.cube_q.p3s, ctx.cube_q.cofactor_mod3_eq1),
@@ -5580,6 +5387,7 @@ mod round122_cube_cofactor_cache_tests {
                 assert_eq!(cofactor * factor, order, "p={p}");
                 assert_ne!(cofactor % 3, 0, "p={p}");
                 assert_eq!(one, cofactor % 3 == 1, "p={p}");
+            }
             for _ in 0..32 {
                 seed ^= seed << 13;
                 seed ^= seed >> 7;
@@ -5588,19 +5396,31 @@ mod round122_cube_cofactor_cache_tests {
                 let y = (seed >> 21) % p;
                 if let Some(root) = ctx.cube_p.root(x) {
                     assert_eq!(f.mul(f.sqr(root), root), x, "Fp p={p}");
+                }
                 if let Some(root) = ctx.cube_q.root((x, y)) {
                     let q = &ctx.cube_q.r;
                     assert_eq!(q.mul(q.sqr(root), root), (x, y), "Fp2 p={p}");
+                }
+            }
+        }
+    }
+}
 
+#[cfg(test)]
 mod round73_mersenne_single_fold {
+    use super::*;
 
     // Test the actual production arithmetic against an independent wide oracle.
+    #[test]
     fn canonical_mersenne_products_match_wide_modulo() {
+        let p = MAX_PRIME;
         let field = Fp::new(p);
         let edges = [0, 1, 2, p / 2, p - 2, p - 1];
         for &a in &edges {
             for &b in &edges {
                 assert_eq!(field.mul(a, b), ((a as u128 * b as u128) % p as u128) as u64);
+            }
+        }
         let mut state = 0x2026_1120_0073_0001u64;
         for _ in 0..16_384 {
             state ^= state >> 12;
@@ -5610,17 +5430,26 @@ mod round73_mersenne_single_fold {
             state = state.wrapping_mul(2_685_821_657_736_338_717);
             let b = state % p;
             assert_eq!(field.mul(a, b), ((a as u128 * b as u128) % p as u128) as u64);
+        }
+    }
 
+    #[test]
     #[ignore = "native Rust A/B microbenchmark; release mode recommended"]
     fn benchmark_canonical_mersenne_fold() {
         use std::hint::black_box;
         use std::time::Instant;
+        let p = MAX_PRIME;
+        let f = Fp::new(p);
         let mut state = 0x73_2026_1120_0001u64;
         let mut xs = Vec::with_capacity(8_192);
         for _ in 0..8_192 {
             state = state.wrapping_mul(6_364_136_223_846_793_005)
                 .wrapping_add(1_442_695_040_888_963_407);
+            let a = state % p;
+            state = state.wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
             xs.push((a, state % p));
+        }
         let original = |a: u64, b: u64| {
             let product = a as u128 * b as u128;
             let folded = ((product as u64) & p) + (product >> 61) as u64;
@@ -5635,18 +5464,25 @@ mod round73_mersenne_single_fold {
                 for &(a,b) in &xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if before { original(a,b) } else { f.mul(a,b) };
+                }
+            }
             black_box(checksum);
             start.elapsed().as_nanos() as f64 / (64 * xs.len()) as f64
+        };
         let (mut before, mut after) = (Vec::new(), Vec::new());
         for i in 0..13 {
             if i % 2 == 0 {
                 before.push(measure(true)); after.push(measure(false));
             } else {
                 after.push(measure(false)); before.push(measure(true));
+            }
+        }
         before.sort_by(f64::total_cmp);
         after.sort_by(f64::total_cmp);
         println!("round73 rust p={p} before_ns={} after_ns={} speedup={}",
                  before[6], after[6], before[6] / after[6]);
+    }
+}
 
 #[cfg(test)]
 mod round125_canonical_trim_tests {
