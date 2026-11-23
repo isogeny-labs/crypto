@@ -345,10 +345,8 @@ impl F2mElement {
     #[inline]
     pub fn add(&self, other: &Self) -> Self {
         debug_assert_eq!(self.m, other.m);
-        if let (
-            Words::Inline { len: la, w: wa },
-            Words::Inline { len: lb, w: wb },
-        ) = (&self.bits, &other.bits)
+        if let (Words::Inline { len: la, w: wa }, Words::Inline { len: lb, w: wb }) =
+            (&self.bits, &other.bits)
         {
             let len = (*la).max(*lb);
             let mut w = [0u64; INLINE_WORDS];
@@ -781,6 +779,70 @@ struct TraceTables {
     half_trace: Vec<u64>,
 }
 
+/// Limit the new constructor to the complete moduli used by the IC study.
+fn packed_half_trace_modulus(irreducible: &IrreduciblePoly) -> bool {
+    let terms: &[u32] = match irreducible.degree {
+        83 => &[0, 1, 2, 45],
+        131 => &[0, 1, 2, 13],
+        _ => return false,
+    };
+    irreducible.low_terms.len() == terms.len()
+        && terms.iter().all(|t| irreducible.low_terms.contains(t))
+}
+
+/// Construct the exact half-trace, not just an arbitrary quadratic root.
+/// For odd n, B(x)=x²+x+Tr(x) is invertible: its kernel is contained in
+/// F_2, and B(1)=1. If e=((n+1)/2) mod 2, then Tr(H(x))=e*Tr(x), hence
+/// H(x)=B^-1(x)+(1+e)*Tr(x). Newton's trace mask is already available.
+/// Only n basis squarings and a packed binary matrix inverse are needed.
+fn half_trace_basis_by_elimination(
+    irreducible: &IrreduciblePoly,
+    trace_mask: &[u64],
+) -> Option<Vec<F2mElement>> {
+    let n = irreducible.degree as usize;
+    if !(3..=192).contains(&n) || n % 2 == 0 || trace_mask.len() != n.div_ceil(64) {
+        return None;
+    }
+    let mut rows = vec![[0u64; 6]; n];
+    for col in 0..n {
+        let unit = F2mElement::from_bit_positions(&[col as u32], irreducible.degree);
+        let mut image = unit.square(irreducible).add(&unit);
+        image.bits[0] ^= (trace_mask[col / 64] >> (col % 64)) & 1;
+        for (row, data) in rows.iter_mut().enumerate() {
+            data[col / 64] |= ((image.bits[row / 64] >> (row % 64)) & 1) << (col % 64);
+        }
+    }
+    for (row, data) in rows.iter_mut().enumerate() {
+        data[3 + row / 64] = 1u64 << (row % 64);
+    }
+    for col in 0..n {
+        let word = col / 64;
+        let mask = 1u64 << (col % 64);
+        let pivot = (col..n).find(|&r| rows[r][word] & mask != 0)?;
+        rows.swap(col, pivot);
+        let pivot = rows[col];
+        for (r, row) in rows.iter_mut().enumerate() {
+            if r != col && row[word] & mask != 0 {
+                for j in 0..6 {
+                    row[j] ^= pivot[j];
+                }
+            }
+        }
+    }
+    let mut basis = Vec::with_capacity(n);
+    for col in 0..n {
+        let mut words = [0u64; 3];
+        for (r, row) in rows.iter().enumerate() {
+            words[r / 64] |= ((row[3 + col / 64] >> (col % 64)) & 1) << (r % 64);
+        }
+        if n.div_ceil(2) % 2 == 0 {
+            words[0] ^= (trace_mask[col / 64] >> (col % 64)) & 1;
+        }
+        basis.push(F2mElement::from_words(&words, irreducible.degree));
+    }
+    Some(basis)
+}
+
 impl TraceTables {
     fn new(irreducible: &IrreduciblePoly) -> Self {
         let m = irreducible.degree;
@@ -817,21 +879,26 @@ impl TraceTables {
             }
         }
 
-        // Half-trace byte tables (odd m): H(z^i) by its squaring chain,
-        // then every byte combination by linearity.
+        // Exact half-trace basis images, then byte combinations by linearity.
+        // Other moduli, or a singular candidate matrix, retain scalar chains.
         let (n_bytes, half_trace) = if m % 2 == 1 {
-            let basis: Vec<F2mElement> = (0..m)
-                .map(|i| {
-                    let a = F2mElement::from_bit_positions(&[i], m);
-                    let mut h = a.clone();
-                    let mut t = a;
-                    for _ in 0..(m - 1) / 2 {
-                        t = t.square_k_times(2, irreducible);
-                        h.add_assign(&t);
-                    }
-                    h
-                })
-                .collect();
+            let basis: Vec<F2mElement> = packed_half_trace_modulus(irreducible)
+                .then(|| half_trace_basis_by_elimination(irreducible, &trace_mask))
+                .flatten()
+                .unwrap_or_else(|| {
+                    (0..m)
+                        .map(|i| {
+                            let a = F2mElement::from_bit_positions(&[i], m);
+                            let mut h = a.clone();
+                            let mut t = a;
+                            for _ in 0..(m - 1) / 2 {
+                                t = t.square_k_times(2, irreducible);
+                                h.add_assign(&t);
+                            }
+                            h
+                        })
+                        .collect()
+                });
             let n_bytes = m.div_ceil(8) as usize;
             let mut tab = vec![0u64; n_bytes * 256 * nw];
             for k in 0..n_bytes {
@@ -2087,6 +2154,113 @@ mod tests {
     /// for trinomial and pentanomial moduli, odd and even `m`; and
     /// `H(a)² + H(a) = a + Tr(a)` for odd `m`.
     #[test]
+    fn packed_half_trace_basis_and_every_byte_entry_match_scalar_chains() {
+        let fields = [
+            IrreduciblePoly {
+                degree: 5,
+                low_terms: vec![0, 2],
+            },
+            IrreduciblePoly {
+                degree: 13,
+                low_terms: vec![0, 1, 3, 4],
+            },
+            IrreduciblePoly {
+                degree: 83,
+                low_terms: vec![0, 1, 2, 45],
+            },
+            IrreduciblePoly {
+                degree: 131,
+                low_terms: vec![0, 1, 2, 13],
+            },
+            IrreduciblePoly::deg_131(),
+        ];
+        for irr in &fields {
+            let n = irr.degree;
+            let tables = TraceTables::new(irr);
+            let packed = half_trace_basis_by_elimination(irr, &tables.trace_mask).unwrap();
+            let reference: Vec<_> = (0..n)
+                .map(|i| {
+                    let a = F2mElement::from_bit_positions(&[i], n);
+                    let mut h = a.clone();
+                    let mut term = a.clone();
+                    for _ in 0..(n - 1) / 2 {
+                        term = term.square_k_times(2, irr);
+                        h.add_assign(&term);
+                    }
+                    assert_eq!(
+                        (tables.trace_mask[i as usize / 64] >> (i % 64)) & 1,
+                        trace_by_squarings(&a, irr) as u64
+                    );
+                    h
+                })
+                .collect();
+            assert_eq!(packed, reference, "all basis images, n={n}");
+            // In particular H(1) is fixed; either Artin--Schreier root alone
+            // would be insufficient to preserve the existing table.
+            assert_eq!(
+                packed[0],
+                if n.div_ceil(2) % 2 == 1 {
+                    F2mElement::one(n)
+                } else {
+                    F2mElement::zero(n)
+                }
+            );
+            for byte in 0..tables.n_bytes {
+                for value in 0..256usize {
+                    let mut want = F2mElement::zero(n);
+                    for bit in 0..8 {
+                        let column = byte * 8 + bit;
+                        if value >> bit & 1 != 0 && column < n as usize {
+                            want.add_assign(&reference[column]);
+                        }
+                    }
+                    let at = (byte * 256 + value) * tables.nw;
+                    assert_eq!(
+                        &tables.half_trace[at..at + tables.nw],
+                        want.raw_bits(),
+                        "n{n}/byte{byte}/value{value}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn packed_half_trace_dispatch_checks_all_terms_and_singular_input_falls_back() {
+        for mut irr in [
+            IrreduciblePoly {
+                degree: 83,
+                low_terms: vec![0, 1, 2, 45],
+            },
+            IrreduciblePoly {
+                degree: 131,
+                low_terms: vec![0, 1, 2, 13],
+            },
+        ] {
+            assert!(packed_half_trace_modulus(&irr));
+            irr.low_terms.reverse();
+            assert!(packed_half_trace_modulus(&irr));
+            irr.low_terms.push(3);
+            assert!(!packed_half_trace_modulus(&irr));
+            irr.low_terms.pop();
+            irr.low_terms[0] += 1;
+            assert!(!packed_half_trace_modulus(&irr));
+        }
+        let even = IrreduciblePoly::deg_8();
+        assert!(!packed_half_trace_modulus(&IrreduciblePoly::deg_131()));
+        assert!(!packed_half_trace_modulus(&even));
+        assert!(half_trace_basis_by_elimination(&even, &[0]).is_none());
+        // X³+1 is reducible: the normalized map is singular. Do not assume
+        // that the type name proves irreducibility or accept a partial inverse.
+        let reducible = IrreduciblePoly {
+            degree: 3,
+            low_terms: vec![0],
+        };
+        let tables = TraceTables::new(&reducible);
+        assert!(half_trace_basis_by_elimination(&reducible, &tables.trace_mask).is_none());
+    }
+
+    #[test]
     fn trace_and_half_trace_tables_match_definitions() {
         let fields = [
             IrreduciblePoly::deg_8(),
@@ -2098,6 +2272,10 @@ mod tests {
             IrreduciblePoly {
                 degree: 13,
                 low_terms: vec![0, 1, 3, 4],
+            },
+            IrreduciblePoly {
+                degree: 83,
+                low_terms: vec![0, 1, 2, 45],
             },
             IrreduciblePoly::deg_113(),
             IrreduciblePoly::deg_131(),
