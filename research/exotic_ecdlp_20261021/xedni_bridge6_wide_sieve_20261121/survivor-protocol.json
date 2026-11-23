@@ -1,0 +1,10 @@
+{
+  "schema": "xedni-bridge6-wide-sieve-survivor-protocol-v1",
+  "source_row": "rows/107.jsonl",
+  "source_row_sha256": "47d725b54a7c1d0352fa9380eeb8783cbb9669c82da0718faa257e8141bc6862",
+  "source_result_rows_sha256": "2b45c956a270f05204070486df0fb798be7e76b13b30cadec0ee759593c2e432",
+  "cell": {"u": -5, "v": -8},
+  "tests": ["scan every integer t in [-10000,10000] against the saved primitive numerator", "for each integer root replay the exact rational curve, discriminant, P and Q, P+6Q, and the local F7/F11 relation gates", "if no integer root in the scan, continue first-rootless-prime search through 2003"],
+  "resource": "checked local Sage launcher, 300-second process cap; retain startup receipt and status",
+  "claim_boundary": "one frozen cell, bounded integer-root scan or modular certificate; no extrapolation from a finite scan without a rootless-prime certificate"
+}

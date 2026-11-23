@@ -3,7 +3,7 @@
 How close does an implementation run to what its machine can do? Definition,
 formulas, tiers and failure modes: [`docs/OPTIMIZATION_LEVEL.md`](../../docs/OPTIMIZATION_LEVEL.md).
 How to use it on a kernel: the `optlevel` skill
-([`.agents/skills/optlevel/SKILL.md`](../../.agents/skills/optlevel/SKILL.md)).
+([`isogeny-labs/workspace:.agents/skills/optlevel/SKILL.md`](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/optlevel/SKILL.md)).
 
 A standalone Rust crate (not a member of the repository's root crate). No
 Python, at run time or build time.

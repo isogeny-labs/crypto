@@ -1,0 +1,61 @@
+R17 production integration review receipt [pcc:unverified]
+
+Date: 2026-11-19
+Host: Linux 6.18.57 x86_64
+Compiler: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+Audited snapshot SHA-256:
+  434594d4e127ab9d63016145d4875e441da43ad2e416b9acb0e8eb4a4475d9b0  research/quartic_ghs_strong_rho_20261114/strong_rho.rs
+  eae23b34b2899781c967ec10ae9b1e57faff72a73a0a89e09682875bff47e6fc  research/quartic_ghs_strong_rho_20261114/main.rs
+  b820dece039c575400cc67ba531ac21c58c67014ef338001d3a41a87972eb280  research/quartic_ghs_strong_rho_20261114/analyze.py
+  f5753cf7d6d21c50af50777c05a044ba47f790028cabecd50c61754d2b081670  research/quartic_ghs_strong_rho_20261114/test_analyze.py
+
+Commands and outcomes:
+
+1. Production build and selftest
+
+   rustc --edition 2021 -O research/quartic_ghs_strong_rho_20261114/main.rs \
+     -o /tmp/ghs-r17-production-review
+   /tmp/ghs-r17-production-review selftest
+
+   Exit status: 0
+   Final stdout: SELFTEST OK
+   Relevant stderr:
+     selftest: production mul5 matches Karatsuba/frozen field on 20000 pairs; per call 5 fq_mul + 4 fq_small_div
+     selftest: full trajectory exact; setup legacy=... batch=... walker_table=... mul5=... combined=...
+
+2. Deterministic q=223 paired-record check
+
+   /tmp/ghs-r17-production-review run 223 1 0 1 ic-repeat \
+     strong-b8,strong-b8-mul5,fast-b8,fast-b8-mul5 | jq -s -e <review predicate>
+
+   Predicate result: true
+   Checked: recovered scalar; steps; DP count; restarts; lookahead; cycles;
+   cycle additions; selected native counts; kernel labels; count authority;
+   one fewer fq_mul per f3_mul in every phase; four fq_small_div per f3_mul;
+   and zero field counters in both fast arms.
+
+   The command also emits development calibration and wall clocks. They were
+   deliberately excluded from the predicate and no timing conclusion is made.
+
+3. Required explicit mul6 CLI arm
+
+   /tmp/ghs-r17-production-review run 223 1 0 1 ic-repeat strong-b8-mul6
+
+   Exit status: 101
+   Panic: invalid batch width in arm strong-b8-mul6
+
+4. Analyzer and CLI source presence checks
+
+   rg -n 'fq_small_div' analyze.py test_analyze.py
+   Exit status: 1 (no match)
+
+   rg -n -- '-mul6' main.rs
+   Exit status: 1 (no match)
+
+Disposition:
+  Arithmetic and q=223 deterministic compatibility pass at the stated scope.
+  Promotion is blocked because the analyzer omits fq_small_div entirely and
+  would silently assign it zero modeled cost; the required -mul6 diagnostic
+  arm is also absent. Production correctness coverage remains narrower than
+  the frozen R1 gate. No performance claim is supported.

@@ -49,13 +49,21 @@ curve of the table row it is written to. `Calibration::pin` stores
 **Host.** The calibration host named in `calibration.json` is
 `Intel(R) Xeon(R) Processor @ 2.10GHz`. The single Apple M4 Pro row is
 marked for re-pinning on that host. Run on that host class through
-[`isolab-eks`](../../.claude/skills/isolab-eks/SKILL.md) (CLAUDE.md default
+[`isolab-eks`](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md) (CLAUDE.md default
 route). Requirements: an isolated node; `.resume/RESUME.md` filled
 (`scripts/checkpoint.sh init`); a `bench.record/v1` record
 (`python3 tools/benchrec.py init|run|add-raw|metric|close`), with raw
 reports in S3 by SHA-256. Record the image and commit in the record.
 
-**Tooling.** [`tools/boundary_pin_calibration.py`](tools/boundary_pin_calibration.py)
+**Tooling.** [`tools/solver_unit_pin_calibration.py`](tools/solver_unit_pin_calibration.py)
+patches one solver/native key per instance into the existing table without
+touching other keys; [`tools/run_interleaved_solver_pin.sh`](tools/run_interleaved_solver_pin.sh)
+runs the frozen 5× interleaved harness. The hashed-tensor contraction timer
+lives in `ic_framework::hashed` (`hashed_tensor_contraction_wall_ns` /
+`hashed_tensor_primitive_steps` on relation counters) and
+`examples/hashed_tensor_contraction_timer.rs`.
+
+[`tools/boundary_pin_calibration.py`](tools/boundary_pin_calibration.py)
 exists, but it cannot pin these keys as written. It reads
 `ledger.instances[].calibration` from `ic boundary` runs, where no solver
 unit is measured, and its `UNITS` list stops at `ns_per_canon`. A pin needs
@@ -68,7 +76,8 @@ three things that do not exist yet:
    `instances` rows, without touching any other key;
 2. a primitive microbenchmark for `ns_per_fp_mul`: the oracle's own `mulm`
    (`u128` product reduced mod `p`) on the row's prime, built in the style of
-   `ecbench::full_price::field_and_lookup_ns`;
+   `ecbench::full_price::field_and_lookup_ns`; see
+   `examples/fp_mul_calibration_microbench.rs`;
 3. a contraction timer for `ns_per_hashed_tensor_step`: wall time of the
    `hashed-tensor` contraction calls divided by `Meter::used` over the same
    calls, excluding the curve additions and square roots the meter also
@@ -98,7 +107,7 @@ card before any run. The executor runs them unchanged.
 | `ns_per_vector_xor_8x32` / `_16x32` | `fes-f2-wide` | as above, `fes-f2-wide` on a host with AVX2 (8 lanes) or AVX-512 (16 lanes); the lane count is read from `op_unit`, never assumed | same rows; a host without the ISA pins nothing for that key |
 | `ns_per_f4_muladd` | `pkm-semaev` F4 block | `prime-kummer:t=2` + `pkm-semaev:m=3` (the configuration of `pkm_semaev_solves_on_a_prime_curve_and_matches_the_grid`) | prime rows `prime/bench-16bit`, `prime/bench-18bit`, `prime/bench-20bit`; confirm with a dry run that the configuration recovers the logarithm on each row before freezing, and drop a row that does not |
 | `ns_per_fp_mul` | `pkm_*_fp_mults_uncharged`; the grid block; the line oracles' bare `F_p multiplications` | microbenchmark (tooling item 2), 400,000 dependent `mulm` per rep, operands drawn from a fixed seed | every `prime/*` row |
-| `ns_per_hashed_tensor_step` | `hashed_tensor_steps` | `hashed-affine` (its default `slots`, `tau` and `s`; seed frozen in the task card) + `hashed-tensor` with matching parameters on the prime row of matching size; contraction timer (tooling item 3) | `prime/generated-24bit-10935329`, `prime/bench-20bit` |
+| `ns_per_hashed_tensor_step` | `hashed_tensor_steps` | `hashed-affine` (its default `slots`, `tau` and `s`; seed frozen in the task card) + `hashed-tensor` with matching parameters on the prime row of matching size; contraction timer (tooling item 3) | `prime/generated-24bit-10935329`, `prime/bench-20bit`, `prime/generated-31bit-2147483647` (scaffold row; boundary re-pin pending — [`PROTOCOL.md`](research/fp_p31_subexp_calibration_20261121/PROTOCOL.md)) |
 | `ns_per_word_op` | `crossbred-f2` | **do not pin**: refused until the count covers the per-point solves | — |
 
 ## Acceptance checks
