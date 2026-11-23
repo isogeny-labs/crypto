@@ -1,0 +1,32 @@
+name: CT238 F103 independent norm-fiber Python pilot
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct238_p103_norm_fiber_pilot.py"
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct237_independent_raw_relation_replay.py"
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py"
+      - ".github/workflows/ct238-norm-fiber-oracle.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-source-norm-census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+      - name: Recompute exact public source and compressed-factor-base pilot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+          python3 ct238_p103_norm_fiber_pilot.py

@@ -1,0 +1,190 @@
+% Four-page reading edition. Full derivations and obligations: REPORT.md, PROOF_MAP.md.
+% Render diagram.svg with Inkscape, then:
+% pdflatex -jobname=report '\def\DiagramPath{/tmp/selector-diagram.pdf}\input{report.tex}'
+% All numerical values are instance parameters or written identities, not timings.
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=0.66in,headheight=13pt,footskip=24pt]{geometry}
+\usepackage{amsmath,amssymb,graphicx,xcolor,array,booktabs,hyperref}
+\definecolor{navy}{HTML}{17324C}
+\definecolor{teal}{HTML}{145248}
+\definecolor{muted}{HTML}{516779}
+\hypersetup{colorlinks=true,urlcolor=teal,linkcolor=navy,pdftitle={A division-free selector resultant for prime-field S3 relations},pdfauthor={Isogeny Labs research continuation},pdfsubject={Analytical component report; frozen-source qualification passed, current-main and whole-library gates unresolved}}
+\providecommand{\DiagramPath}{diagram.pdf}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5.5pt}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.18}
+\newcommand{\F}{\mathbf F_p}
+\newcommand{\R}{\operatorname{Res}}
+\newcommand{\status}{\textcolor{muted}{\footnotesize [pcc:unverified] Written derivation; no Lean or signed PCC verdict.}}
+\newcommand{\heading}[1]{\vspace{4pt}{\large\bfseries\color{navy}#1}\par\vspace{1pt}}
+\newcommand{\mini}[1]{\textbf{\color{teal}#1}}
+\begin{document}
+\fontsize{10.5}{13.0}\selectfont
+{\small\color{muted}ISOGENY LABS\hfill 22 November 2026\quad |\quad PR \#4921}\par
+\vspace{3pt}
+{\LARGE\bfseries\color{navy}A division-free selector resultant}\par
+{\large\color{navy}An algebraic component for prime-field S3 relations}
+
+\mini{Construction.} Eliminate one coordinate from S3 together with a split subgroup selector, then extract the remaining support by a polynomial gcd. The recurrence works in a ring with zero divisors and retains diagonal, linear and constant fibers. This is candidate C of the existing FASS protocol.
+
+\mini{Evidence boundary.} All 15 focused tests passed on frozen FASS sources; current-main and whole-library gates remain open. The test oracle is from this team. No performance or complete-cost measurement is claimed. \status
+
+\heading{1. Equations and extraction path}
+Let $E:y^2=x^3+ax+b$ be nonsingular over an odd prime field, let $T=(t,u)$ be a finite public point, and let $d\ge1$ divide $p-1$. Solve
+\[
+S_3(X,Y,t)=0,\qquad X^d=1,\qquad Y^d=1.
+\]
+Write $q(Y)=AY^2+BY+C$ with coefficients in $\F[X]$:
+\[
+\begin{aligned}
+A&=(X-t)^2,& B&=-2\bigl((X+t)(Xt+a)+2b\bigr),\\
+C&=(Xt-a)^2-4b(X+t).&&
+\end{aligned}
+\]
+In $K=\F[X]/(X^d-1)$ compute $N_d=A^d+C^d-T_d$, where
+\[
+T_0=2,\qquad T_1=-B,\qquad T_{n+2}=-BT_{n+1}-ACT_n.
+\]
+The quotient $K$ is a commutative ring, generally \emph{not} a field. No inverse of $A$ is used. The support polynomial is $G=\gcd(X^d-1,N_d)$.
+
+\vspace{1pt}
+\makebox[\textwidth][c]{\includegraphics[width=0.97\textwidth]{\DiagramPath}}
+
+{\footnotesize\color{muted}Figure 1. Computation and point-validation boundary. Coordinate roots are candidates, not yet signed elliptic-curve relations. Additional phases remain charged.}
+
+\mini{Frozen Prime31 fixture.} Reuse $p=2147483647$, $a=847514846$, $b=2087444724$, declared $r=2147446831$ and $G=(625037715,2100627251)$ from the existing Prime31 native example (source in REPORT.md). Prime/order replay passed; no independent point count was made. Chosen targets do not estimate random-target yield.
+
+\newpage
+{\small\color{muted}FASS SELECTOR RESULTANT\hfill WRITTEN MATHEMATICS}\par
+\heading{2. Universal identity, including degree drops}
+\mini{Proposition.} For every commutative ring $R$, every $A,B,C\in R$ and integer $d\ge1$,
+\[
+\boxed{\R_Y(Y^d-1,AY^2+BY+C)=A^d+C^d-T_d.}
+\]
+The monic selector is the \emph{first} argument: this is the determinant of multiplication by $q$ on $R[Y]/(Y^d-1)$. It continues correctly when the quadratic loses degree. No invertibility or characteristic restriction is needed for the identity; root-existence consequences require a field separately. \status
+
+\mini{Universal proof.} Work first in $\mathbb Z[A,B,C]$, embed into $\mathbb Q(A,B,C)$, and let $\alpha,\beta$ be the generic quadratic's roots in a splitting field. Their sum and product are $-B/A$ and $C/A$. The sequence $A^n(\alpha^n+\beta^n)$ satisfies the initial values and recurrence, so equals $T_n$. Since the selector is monic,
+\[
+\begin{aligned}
+\R(Y^d-1,q)
+ &=\prod_{\zeta^d=1}A(\zeta-\alpha)(\zeta-\beta)\\
+ &=A^d\bigl[(-1)^d(\alpha^d-1)\bigr]
+          \bigl[(-1)^d(\beta^d-1)\bigr]\\
+ &=A^d\bigl((\alpha\beta)^d-\alpha^d-\beta^d+1\bigr)\\
+ &=C^d-T_d+A^d.
+\end{aligned}
+\]
+Both sides are integer coefficient polynomials. Injection into the fraction field proves their equality before specialization; the coefficient homomorphism then gives the statement in any $R$, including rings with zero divisors. Division belongs only to this generic proof, never to the resulting algorithm.
+
+\mini{Odd $d$ and the linear case.} If $A=0$, the expression is $C^d-(-B)^d$: $C^d+B^d$ for odd $d$ and $C^d-B^d$ for even $d$. If $A=B=0$, it is $C^d$. Silently replacing $(-B)^d$ by $B^d$, or reversing resultant arguments after a degree drop, is incorrect.
+
+\mini{S3 diagonal.} At $X=t$, $A=0$ and $B=-4(t^3+at+b)$. A nonzero target ordinate gives a linear tangent fiber. If $t^3+at+b=0$, then $C=(3t^2+a)^2\ne0$ by nonsingularity, so no finite second summand exists there. Infinity targets need a separate inverse-pair path.
+
+\heading{3. Ring-safe binary evaluation}
+Set $s=-B$, $v=AC$ and $T_n=D_n(s,v)$, the first-kind Dickson evaluation. The identities
+\[
+\begin{aligned}
+T_{2n}&=T_n^2-2v^n,\\
+T_{2n+1}&=T_nT_{n+1}-sv^n=T_nT_{n+1}+Bv^n,\\
+T_{2n+2}&=T_{n+1}^2-2v^{n+1}
+\end{aligned}
+\]
+follow by expanding powers of formal roots with sum $s$ and product $v$, then specializing universal polynomials. Maintain $(T_n,T_{n+1},v^n)$ from $(2,s,1)$; each exponent bit selects the even or odd update. This requires $O(\log d)$ ring products. Binary powering computes $A^d,C^d$; reduction after each step follows the quotient homomorphism.
+
+\mini{Valid Prime31 selector.} The written integer equality
+\[
+2147483646=1302\cdot1649373,\qquad1302=2\cdot3\cdot7\cdot31
+\]
+gives a split, squarefree selector. Since $p-1=2\cdot1073741823$, a pure $2^k$ selector has its full base-field domain only for $k\le1$.
+
+\newpage
+{\small\color{muted}FASS SELECTOR RESULTANT\hfill CORRECTNESS AND CHARGED WORK}\par
+\heading{4. Coordinate support and signed relations}
+For prime $p$ and $d\mid p-1$, $Y^d-1$ splits into distinct linear factors. For a selector root $x$,
+\[
+N_d(x)=\prod_{y^d=1}q(x,y).
+\]
+A product in the field is zero exactly when a factor is zero. Therefore
+\[
+G(x)=0\iff x^d=1\ \text{and}\ \exists y\in\F:\ y^d=1,\ q(x,y)=0.
+\]
+Reducing $N_d$ modulo $X^d-1$ preserves this support. Extract every root of $G$, solve its quadratic fiber, and recheck both selectors and S3. A general zero-polynomial fiber returns every selector root; a nonsingular S3 fiber cannot be identically zero by the diagonal argument. \status
+
+\mini{Point stage.} Recover every rational ordinate, enumerate all signs, and replay $P+Q=T$. Optional order checks require $[r]P=[r]Q=[r]T=O$. An annihilator test alone does not identify a particular cyclic subgroup in an arbitrary group: a stronger subgroup claim needs its own order/decomposition certificate.
+
+\mini{Negative lift fixture.} On $E/\mathbf F_7:y^2=x^3+x$, take $T=(0,0)$ and $\mu_3=\{1,2,4\}$. The coordinates $(2,4)$ satisfy the selectors and $S_3(2,4,0)=(8-1)^2=0\pmod7$. Yet $f(2)=3$ and $f(4)=5$ are nonsquares. The qualified fixture retained the coordinate candidates and rejected both ordered nonliftable forms. This finite check does not prove the general lifting theorem.
+
+\heading{5. Actual backend and full phase costs}
+Let $M(d)$ price polynomial multiplication modulo the degree-$d$ selector and $h=\deg G\le d$.
+
+\begin{tabular}{@{}p{0.25\textwidth}p{0.70\textwidth}@{}}
+\toprule
+\textbf{Phase} & \textbf{Bound or remaining charge}\\
+\midrule
+Norm & $O(M(d)\log d)$; actual schoolbook reuse gives $O(d^2\log d)$ field operations and $O(d)$ live coefficients.\\
+Support gcd & Charge actual gcd; classical dense Euclidean cost is $O(d^2)$ field operations, including divisions.\\
+Roots & Separate dependence on $h,p$. Reused Las Vegas splitting has no deterministic retry bound.\\
+Fibers and replay & Quadratic roots, selector exponentiation, rational ordinates, signs, additions, order checks and output.\\
+Complete IC & Setup, all attempts, useful relations/rank, mod-$r$ linear algebra, individual recovery and scalar verification.\\
+\bottomrule
+\end{tabular}
+
+The norm bound does not demonstrate an implemented fast-multiplication method. Its storage bound excludes retained output, recursive splitting, relation matrices and the complete solver. S3 has at most $2d$ ordered coordinate outputs; the general quadratic interface can have larger output in zero fibers.
+
+\mini{Algebraic comparators.} Include same-base F4 systems and \texttt{ResultantOracleM2} from the pinned main source. Charge selector constraints, extraction and rejected lifts in each arm; compare useful-relation cost and later the complete cold pipeline. No novelty or speed advantage is asserted.
+
+\mini{Separate generic reference.} Scan the $O(d)$ signed base points, compute $T-P$, and probe a membership index. This uses $O(d)$ group operations and expected constant-time indexed probes after charged $O(d)$ setup. Field bit cost, inversions and square roots remain real work. No asymptotic advantage over this direct scan is asserted.
+
+The unsigned source audit covers the prior manuscript, not the later integration note. Its reviewer also authored the tests. The separate main audit supplies the source comparison; neither record is a signed PCC verdict.
+
+\newpage
+\fontsize{10}{12.1}\selectfont
+{\small\color{muted}FASS SELECTOR RESULTANT\hfill QUALIFICATION, PROOF MAP AND SOURCES}\par
+\heading{6. Qualification and gates}
+All 15 focused tests passed: 2,808 constant/Sylvester and 50 polynomial cases; 360 small-field coordinate cases (225 empty, 489 pairs); 388 rational targets (450 signed pairs). Guards, odd degrees, degree drops, lifting and order checks are covered. Receipts: REPORT.md.
+
+At $d=6,31,1302$, positives reused one diagonal target, with one coordinate/signed pair each. Added $d=1302$ checks give two ordered pairs for a distinct-coordinate target and zero for fixed $G$. The reference-only oracle checks 1,695,204 pairs and 1,306 rational selector points. Chosen fixtures do not estimate yield.
+
+The focused build uses complete selector/projection/polynomial modules and the unchanged tower prefix through polynomial-root items, before the Method 2 Hilbert anchor. Hashes bind sources and executable; later consumers are excluded.
+
+\mini{Current-main limit.} At \href{https://github.com/isogeny-labs/crypto/commit/856dfeb0be25df78ab3877741544f64940128fac}{\texttt{856dfeb0}}, used projection wrappers and imports changed. This whole-file qualifier has not been rebuilt there; branch tests do not qualify a current-main merge. The selected tower prefix and polynomial/identity/hash sources match. Reconciliation and fresh qualification remain open. The integration audit is unsigned.
+
+\begin{tabular}{@{}p{0.37\textwidth}p{0.58\textwidth}@{}}
+\toprule
+\textbf{Deliverable / gate} & \textbf{Recorded status}\\
+\midrule
+Identity / doubling / Lean & Written; \texttt{lean}/\texttt{lake} unavailable.\\
+Identity controls & Three issued evaluation records; no universal proof.\\
+Whole-library gate & Limits 180\,s then 300\,s; both exit 124; no tests reached.\\
+Performance / complete cold recovery & Future admitted work; no measured value.\\
+\bottomrule
+\end{tabular}
+
+The harness was corrected after attempt 1; attempt 2 passed 13 tests and attempt 3 added two. Build overlap was compilation-only; test execution was serialized. Both root logs stop in dependency compilation without an observed compiler error or out-of-memory failure. Checkpoint credentials were missing per the session log; no performance run followed.
+
+Three identity controls passed 32 deterministic producer and 32 additional checker points each over $\mathbf F_{2^{61}-1}$. IDs and receipts are in REPORT.md. Public samples supply neither a universal proof nor an adversarial soundness bound.
+
+After main reconciliation and requalification, compare same-base F4 and \texttt{ResultantOracleM2} under the frozen complete-cost protocol, before three-summand integration.
+
+\heading{7. Lean instance map}
+Use \texttt{Polynomial.dickson 1 (A*C)} and existing recurrence/mapping laws over \texttt{CommRing}. The support theorem separately assumes a field and split selector. The inspected parameter-1 evaluation theorem does not cover arbitrary $AC$. Missing generic doubling and resultant bridges belong upstream in crypto-lean.
+
+\texttt{PROOF\_MAP.md} records the six instance-gate fields, quantifiers, inheritance and proof chain. No uncompiled Lean file is supplied. Completion requires dependency pins, type-checked abstract/instance probes, focused build, axiom audit and the proof gate.
+
+\heading{8. Sources and overlap avoided}
+\begin{tabular}{@{}p{0.30\textwidth}p{0.65\textwidth}@{}}
+\toprule
+\textbf{Source} & \textbf{Role}\\
+\midrule
+\href{https://eprint.iacr.org/2004/031}{Semaev 2004/031} & Classical S3 context; direct PDF fetch was 403. The report supplies its own norm proof.\\
+\href{https://github.com/leanprover-community/mathlib4/blob/6ebcce37335bcb6bca64596e5d57bb3035648030/Mathlib/RingTheory/Polynomial/Dickson.lean}{Mathlib Dickson, 6ebcce3} & Source-audited existing recurrence; not a compiled study dependency.\\
+Existing Rust modules & Field/polynomial/point/root reuse; same-base subgroup F4. Exact paths in REPORT.md.\\
+\href{https://github.com/isogeny-labs/crypto/pull/4920}{\#4920}, \href{https://github.com/isogeny-labs/crypto/pull/4922}{\#4922} & Chained S3 and shared Macaulay already owned elsewhere.\\
+\href{https://github.com/isogeny-labs/crypto/pull/4692}{\#4692}, \href{https://github.com/isogeny-labs/crypto/pull/4822}{\#4822}, \href{https://github.com/isogeny-labs/crypto/pull/4812}{\#4812} & Selector/RR9, sparse Wiedemann and Horner/F3 work.\\
+\href{https://github.com/isogeny-labs/crypto/pull/4368}{\#4368}, \href{https://github.com/isogeny-labs/crypto/pull/4228}{\#4228} & Oriented lift and earlier quotient/resultant prototypes.\\
+\bottomrule
+\end{tabular}
+
+{\footnotesize\color{muted}Sources, audit limits and full manuscript: REPORT.md. Formal obligations: PROOF\_MAP.md. New claims remain [pcc:unverified].}
+\end{document}
