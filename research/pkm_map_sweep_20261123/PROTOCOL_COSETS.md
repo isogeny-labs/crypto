@@ -1,0 +1,9 @@
+# PKM coset sweep: second frozen rung
+
+Frozen on 2026-11-23 before any coset measurement. The first rung's `PROTOCOL.md` and `results.jsonl` remain unchanged.
+
+Use the same two recorded PKM auxiliary curves, exact-order generators `Q`, Vélu step coefficients, target curve `E:y²=x³+2x+3` over `F_1000003`, and 144 fixed target points as rung one. For each source map, draw 16 distinct non-equivalent cosets `R'+<Q>` from deterministic RNG seed `20261124`, requiring `2R'` outside `<Q>`. Recompute each full `V=x(R'+<Q>)`, terminal `c=Φ_x(x(R'))`, and verify `|V|=S` and `Φ_x(x)=c` for every fiber element. Do not substitute affine translations. The low-degree rational maps remain fixed; the high-degree membership equation changes through `c`.
+
+Every candidate uses all its abscissae lifting to `E`, with both point signs. Pair it with an interval containing exactly the same number of lifting abscissae. Targets 0–47 screen; targets 48–143 confirm. Record every candidate and control, including failures, in append-only fsynced JSONL. Measure auxiliary coset enumeration and map checking separately from point-decomposition queries, with wall and CPU times. The source auxiliary-curve search, order computation and Vélu-chain construction remain uncharged and must not be inferred from this component cost.
+
+Stop after 32 cosets or a confirmed candidate. A candidate must beat its size-matched interval on screen successes; on confirmation it must have more successes, a paired one-sided exact binomial `p < 0.01/32`, and lower query CPU per successful target including all failed queries. Report multiple-testing and non-stopping outcomes exactly. This is an exploratory component screen, not an end-to-end ECDLP claim. Candidate selection on these targets cannot be used to claim a gain on a future target without a new holdout workload.

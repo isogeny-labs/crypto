@@ -14,7 +14,6 @@
 //! [`SolveReport::unpriced`]; a report with any unpriced work is a lower
 //! bound and says so.
 
-use crate::cryptanalysis::ic_framework::plugins::{ResidualSweepOracle, CosetMitmOracle};
 use super::exact_scalar::ExactScalar;
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -868,8 +867,6 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::diem_kgrow::solve",
             applies: Applies::Any,
             params: DIEM_KGROW_PARAMS,
-            family: "ic",
-            applies: Applies::Any,
         },
         MethodDecl {
             id: "ic.growing_arity",
@@ -878,8 +875,6 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::growing_arity::solve",
             applies: Applies::Any,
             params: GROWING_ARITY_PARAMS,
-            family: "ic",
-            applies: Applies::Any,
         },
         MethodDecl {
             id: "ic.aux_tower_solver",
@@ -888,8 +883,6 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::aux_tower_solver::solve",
             applies: Applies::Any,
             params: AUX_TOWER_SOLVER_PARAMS,
-            family: "ic",
-            applies: Applies::Any,
         },
         MethodDecl {
             id: "rho.cubic",
