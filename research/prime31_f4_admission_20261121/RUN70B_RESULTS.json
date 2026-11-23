@@ -1,0 +1,70 @@
+{
+  "schema": "prime31-run70b-k4-cold-full-cost-v1",
+  "date_utc": "2026-11-22",
+  "classification": "GENERIC signed-pair dictionary reference; actual RHS 32/32 logs, NOT index calculus or non-generic solver",
+  "source": "research/prime31_ic_20261115/native/examples/prime31_run70b_k4_cold.rs",
+  "source_blob_sha": "94a83b21ef32593bc76a67ef15bf831b010d5a42",
+  "source_tested_commit": "083dc8caf2b673fdbe4a4c59212990ca41143280",
+  "original_rust": "research/prime31_ic_20261115/native: Arithmetic/Base/PRIME31, Rust 1.100.0",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "h": 1,
+    "G": [
+      625037715,
+      2100627251
+    ]
+  },
+  "public_target_count": 32,
+  "hybrid_base_size": 677,
+  "homogeneous_verified_rows": 88,
+  "generic_pair_dictionary_keys": 916469,
+  "certificate_width": 4,
+  "public_leaf_probes_including_all_failures": 933657,
+  "actual_kG_relation_shifts": 2528933,
+  "actual_RHS_pair_hits": 1088,
+  "independent_pair_rows": 546,
+  "independently_verified_target_logs": 32,
+  "exact_run70_K4_replay": true,
+  "comparative_run69_K1_query_count": 5378231,
+  "query_reduction_fraction": 0.5297834920069443,
+  "runs": [
+    {
+      "workflow_run_id": 45066979236,
+      "job_id": 137345217885,
+      "conclusion": "success",
+      "release_library_tests_pass": 41,
+      "setup_ms": 218.321,
+      "witness_ms": 180.211,
+      "relation_ms": 536.272,
+      "whole_pipeline_ms": 1086.016,
+      "matched_BSGS_setup_ms": 9.984,
+      "matched_BSGS_online_32_ms": 140.785,
+      "whole_to_reference_bsgs": 7.203178372211794
+    },
+    {
+      "workflow_run_id": 45066973351,
+      "job_id": 137345200888,
+      "conclusion": "success",
+      "release_library_tests_pass": 41,
+      "setup_ms": 348.384,
+      "witness_ms": 295.405,
+      "relation_ms": 828.398,
+      "whole_pipeline_ms": 1708.381,
+      "matched_BSGS_setup_ms": 15.779,
+      "matched_BSGS_online_32_ms": 219.769,
+      "whole_to_reference_bsgs": 7.252793485828791
+    }
+  ],
+  "distinctions": [
+    "Unlike joint Run70, Run70B scans only 4 certificates per target and stops kG walk at the K4 first completion.",
+    "Two different GitHub Actions executions but same frozen public-target cohort, not independent statistical trials.",
+    "Generic precomputed signed-pair table is disallowed for the owner's novel/non-generic index calculus requirement.",
+    "The comparator is original-Rust same-process BSGS, not strongest existing index calculus or optimized rho.",
+    "No public-only nonenumerative RR9/F3 root extraction was used.",
+    "No PCC independent signed audit."
+  ],
+  "pcc": "unverified"
+}
