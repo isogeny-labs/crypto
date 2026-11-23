@@ -163,6 +163,26 @@ fn ata_vec_into(
     mat_t_vec_into(m, mv, n_cols, n, out);
 }
 
+
+/// Compute M^T D M v without materializing the Gram matrix. D is a
+/// nonzero diagonal on the original rows, over the *relation* field.
+fn atda_vec_into(
+    m: &[SparseRow],
+    v: &[BigUint],
+    n_cols: usize,
+    n: &BigUint,
+    weights: &[BigUint],
+    mv: &mut Vec<BigUint>,
+    out: &mut Vec<BigUint>,
+) {
+    debug_assert_eq!(m.len(), weights.len());
+    mat_vec_into(m, v, n, mv);
+    for (entry, weight) in mv.iter_mut().zip(weights) {
+        *entry = (&*entry * weight) % n;
+    }
+    mat_t_vec_into(m, mv, n_cols, n, out);
+}
+
 // ── Berlekamp-Massey ────────────────────────────────────────────────
 
 /// **Berlekamp-Massey** over `Z/n` (with `n` prime — or more
@@ -256,6 +276,61 @@ fn reduce_tail(c: &mut [BigUint], n: &BigUint) {
 
 // ── Wiedemann solve ────────────────────────────────────────────────
 
+/// Opt-in row-preconditioned rectangular Wiedemann over a caller-supplied
+/// prime relation modulus. This is a correctness/robustness alternative to
+/// unweighted normal equations, not a new asymptotic algorithm.
+///
+/// Over finite fields, full column rank of M does NOT imply invertibility of
+/// M^T M: the nonzero column (1,2)^T has zero Gram matrix in F_5.
+/// For a tall full-column-rank M, random nonzero row weights form
+/// A = M^T D M, c = M^T D b. By Cauchy-Binet, det(A) is a nonzero
+/// multilinear polynomial of degree n_cols in D's entries. Uniform
+/// independent D entries in F_p^* give a failure probability at most
+/// n_cols/(p-1) for this *Gram non-singularity* event, conditional on
+/// prime p and full column rank. Scalar Wiedemann's Krylov projection has
+/// additional failure modes: this API returns None and lets callers retry.
+/// All reported solutions are verified against the original Mx=b.
+///
+/// For square M, the existing direct Wiedemann path is used without weights.
+/// The original wiedemann_solve function remains bit-for-bit unchanged.
+pub fn wiedemann_solve_row_preconditioned(
+    m: &[SparseRow],
+    b: &[BigUint],
+    n_cols: usize,
+    n: &BigUint,
+    seed: u64,
+) -> Option<Vec<BigUint>> {
+    assert_eq!(m.len(), b.len(), "M and b must have matching row counts");
+    if m.len() == n_cols {
+        return wiedemann_solve(m, b, n_cols, n, seed);
+    }
+    if n <= &BigUint::from(2u32) || n_cols == 0 {
+        return None;
+    }
+
+    // Independent seeded stream for D; do not perturb the existing random
+    // Krylov projection stream. Exact rejection sampling avoids modulo bias.
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x9e37_79b9_7f4a_7c15);
+    let bits = n.bits() as usize;
+    let mut bytes = vec![0u8; bits.div_ceil(8)];
+    let high = bits % 8;
+    let mut weights = Vec::with_capacity(m.len());
+    for _ in m {
+        let w = loop {
+            rng.fill(&mut bytes[..]);
+            if high != 0 {
+                *bytes.last_mut().expect("positive modulus has bytes") &= (1u8 << high) - 1;
+            }
+            let candidate = BigUint::from_bytes_le(&bytes);
+            if !candidate.is_zero() && &candidate < n {
+                break candidate;
+            }
+        };
+        weights.push(w);
+    }
+    wiedemann_solve_impl(m, b, n_cols, n, seed, Some(&weights))
+}
+
 /// **Solve `M x ≡ b (mod n)`** via sequential Wiedemann.
 ///
 /// `m` is a sparse matrix with `n_cols` columns (the RHS `b` has
@@ -282,6 +357,17 @@ pub fn wiedemann_solve(
     n: &BigUint,
     seed: u64,
 ) -> Option<Vec<BigUint>> {
+    wiedemann_solve_impl(m, b, n_cols, n, seed, None)
+}
+
+fn wiedemann_solve_impl(
+    m: &[SparseRow],
+    b: &[BigUint],
+    n_cols: usize,
+    n: &BigUint,
+    seed: u64,
+    row_weights: Option<&[BigUint]>,
+) -> Option<Vec<BigUint>> {
     assert_eq!(m.len(), b.len(), "M and b must have matching row counts");
     let n_rows = m.len();
     let mut rng = StdRng::seed_from_u64(seed);
@@ -304,11 +390,25 @@ pub fn wiedemann_solve(
             Box::new(|v: &[BigUint], out: &mut Vec<BigUint>| mat_vec_into(m, v, n, out));
         (b.to_vec(), apply, n_cols)
     } else {
-        // A = M^T M, v_0 = M^T b.
-        let c = mat_t_vec(m, b, n_cols, n);
-        let apply: Box<dyn FnMut(&[BigUint], &mut Vec<BigUint>)> =
+        // A = M^T D M, v_0 = M^T D b when weights are supplied.
+        // Unweighted callers preserve the historical M^T M behavior.
+        let c = if let Some(weights) = row_weights {
+            let scaled_b: Vec<BigUint> = b
+                .iter()
+                .zip(weights)
+                .map(|(rhs, w)| (rhs * w) % n)
+                .collect();
+            mat_t_vec(m, &scaled_b, n_cols, n)
+        } else {
+            mat_t_vec(m, b, n_cols, n)
+        };
+        let apply: Box<dyn FnMut(&[BigUint], &mut Vec<BigUint>)>> =
             Box::new(|v: &[BigUint], out: &mut Vec<BigUint>| {
-                ata_vec_into(m, v, n_cols, n, &mut mv_scratch, out)
+                if let Some(weights) = row_weights {
+                    atda_vec_into(m, v, n_cols, n, weights, &mut mv_scratch, out);
+                } else {
+                    ata_vec_into(m, v, n_cols, n, &mut mv_scratch, out);
+                }
             });
         (c, apply, n_cols)
     };
@@ -600,6 +700,108 @@ mod tests {
         let wied_x = wied_x.expect("Wiedemann should succeed on at least one seed");
         assert_eq!(wied_x, dense_x);
         assert_eq!(wied_x, true_sol);
+    }
+
+    /// Over F5, the 2x1 full-column-rank M=(1,2)^T has M^T M=0.
+    /// A different projection seed cannot repair that structural failure.
+    /// Nonzero diagonal row preconditioning can repair this Gram matrix.
+    #[test]
+    fn rectangular_isotropic_column_requires_row_preconditioning() {
+        let n = BigUint::from(5u32);
+        let m = vec![
+            SparseRow::from_entries(vec![(0, BigUint::from(1u32))], BigUint::from(3u32)),
+            SparseRow::from_entries(vec![(0, BigUint::from(2u32))], BigUint::from(1u32)),
+        ];
+        let b: Vec<BigUint> = m.iter().map(|r| r.rhs.clone()).collect();
+        let x = vec![BigUint::from(3u32)];
+        assert_eq!(mat_vec(&m, &x, &n), b);
+        let mut gram = Vec::new();
+        let mut scratch = Vec::new();
+        ata_vec_into(&m, &[BigUint::from(1u32)], 1, &n, &mut scratch, &mut gram);
+        assert_eq!(gram, vec![BigUint::zero()]);
+        for seed in 0..32u64 {
+            assert!(wiedemann_solve(&m, &b, 1, &n, seed).is_none());
+        }
+
+        let successes: Vec<u64> = (0..64u64)
+            .filter(|&seed| {
+                let result = wiedemann_solve_row_preconditioned(&m, &b, 1, &n, seed);
+                assert_eq!(
+                    result,
+                    wiedemann_solve_row_preconditioned(&m, &b, 1, &n, seed)
+                );
+                match result {
+                    Some(sol) => {
+                        assert_eq!(sol, x);
+                        assert_eq!(mat_vec(&m, &sol, &n), b);
+                        true
+                    }
+                    None => false,
+                }
+            })
+            .collect();
+        assert!(!successes.is_empty(), "no successful weighted seed");
+    }
+
+    /// Overdetermined, full-column-rank exact solves are checked against
+    /// the *original* system, not merely the weighted normal equations.
+    #[test]
+    fn weighted_rectangular_recovery_and_inconsistent_rhs() {
+        let n = BigUint::from(7u32);
+        let true_sol = vec![BigUint::from(4u32), BigUint::from(2u32)];
+        let m = vec![
+            SparseRow::from_entries(vec![(0, BigUint::from(1u32))], BigUint::zero()),
+            SparseRow::from_entries(vec![(1, BigUint::from(1u32))], BigUint::zero()),
+            SparseRow::from_entries(
+                vec![(0, BigUint::from(2u32)), (1, BigUint::from(3u32))],
+                BigUint::zero(),
+            ),
+            SparseRow::from_entries(
+                vec![(0, BigUint::from(4u32)), (1, BigUint::from(1u32))],
+                BigUint::zero(),
+            ),
+        ];
+        let b = mat_vec(&m, &true_sol, &n);
+        let mut recovered = false;
+        for seed in 0..128u64 {
+            if let Some(sol) = wiedemann_solve_row_preconditioned(&m, &b, 2, &n, seed) {
+                assert_eq!(sol, true_sol);
+                assert_eq!(mat_vec(&m, &sol, &n), b);
+                recovered = true;
+            }
+        }
+        assert!(recovered, "no successful seed on full-rank system");
+
+        let mut inconsistent = b.clone();
+        inconsistent[2] = (&inconsistent[2] + BigUint::one()) % &n;
+        for seed in 0..64u64 {
+            assert!(
+                wiedemann_solve_row_preconditioned(&m, &inconsistent, 2, &n, seed).is_none(),
+                "inconsistent source rows must not pass original verification"
+            );
+        }
+    }
+
+    #[test]
+    fn preconditioned_square_path_is_the_original_direct_solver() {
+        let n = BigUint::from(11u32);
+        let m = vec![
+            SparseRow::from_entries(
+                vec![(0, BigUint::from(2u32)), (1, BigUint::from(3u32))],
+                BigUint::from(8u32),
+            ),
+            SparseRow::from_entries(
+                vec![(0, BigUint::from(1u32)), (1, BigUint::from(1u32))],
+                BigUint::from(4u32),
+            ),
+        ];
+        let b: Vec<BigUint> = m.iter().map(|r| r.rhs.clone()).collect();
+        for seed in 0..16u64 {
+            assert_eq!(
+                wiedemann_solve_row_preconditioned(&m, &b, 2, &n, seed),
+                wiedemann_solve(&m, &b, 2, &n, seed)
+            );
+        }
     }
 
     /// The solver as it was before the delayed reduction: a `% n` after
