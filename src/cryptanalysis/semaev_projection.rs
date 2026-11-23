@@ -2529,6 +2529,7 @@ mod tests {
         assert_eq!(fast.stats.irreducible_root_keys, 0);
         for &(u, yu, _, _) in &fast.fast_finite_list {
             assert_eq!(mulm(yu, yu, e.p), e.rhs(u));
+        }
         for target in 0..e.p {
             let (a, _) = fast.decompose_three_fast_path(target);
             let (b, _) = slow.decompose_three_generic(target);
@@ -2540,6 +2541,9 @@ mod tests {
             assert_eq!(fast.decompose_four_first(target).0.is_some(), b.is_some());
             if let Some(w) = fast.decompose_four_first(target).0 {
                 assert!(witness_reaches(&e, &w.x, target));
+            }
+        }
+    }
 
 /// Op-count comparison on Prime31 (p = 2^31 - 1), B = 64.
     /// Run with `--nocapture` to print the table.
@@ -2554,6 +2558,7 @@ mod tests {
         opcount::reset();
         let old = PairProjection::build_generic(e, &base).unwrap();
         let (os, oi, om) = opcount::snapshot();
+        opcount::reset();
         let new = PairProjection::build_fast(e, &base).unwrap();
         let (ns, ni, nm) = opcount::snapshot();
         println!("BUILD pairs={} old sqrtm={os} invm={oi} mulm={om} | new sqrtm={ns} invm={ni} mulm={nm}", old.stats.unordered_pairs);
@@ -2571,38 +2576,54 @@ mod tests {
             opcount::reset();
             let (a3, _) = old.decompose_three_generic(t);
             let s = opcount::snapshot(); for k in 0..3 { c[0][k] += [s.0, s.1, s.2][k]; }
+            opcount::reset();
             let (b3, _) = new.decompose_three_fast_path(t);
             let s = opcount::snapshot(); for k in 0..3 { c[1][k] += [s.0, s.1, s.2][k]; }
+            opcount::reset();
             let (a4, sa) = old.decompose_four_generic(t);
             let s = opcount::snapshot(); for k in 0..3 { c[2][k] += [s.0, s.1, s.2][k]; }
+            opcount::reset();
             let (b4, sb) = new.decompose_four_first(t);
             let s = opcount::snapshot(); for k in 0..3 { c[3][k] += [s.0, s.1, s.2][k]; }
             if a3.is_some() != b3.is_some() { mism3 += 1; }
             if a3 == b3 { eq3 += 1; }
+            if a3.is_some() != b3.is_some() { mism3 += 1; }
             if a4.is_some() != b4.is_some() { mism4 += 1; }
             if let Some(w) = &b4 { assert!(witness_reaches(&e, &w.x, t)); }
             if let Some(w) = &b3 { assert!(witness_reaches(&e, &w.x, t)); }
             let _ = (sa, sb);
+        }
         println!("Q3 over {} targets: old (sqrtm,invm,mulm)={:?} new={:?}; found/none mismatches={mism3}; exact-equal witnesses={eq3}", targets.len(), c[0], c[1]);
         println!("Q4 over {} targets: old={:?} new(first)={:?}; found/none mismatches={mism4}", targets.len(), c[2], c[3]);
         assert_eq!(mism3, 0);
         assert_eq!(mism4, 0);
+    }
 
+    #[test]
     fn both_constructor_caches_keep_reference_query_answers() {
+        let e = curve();
+        let base = interval_factor_base(&e, 30);
+        let fast = PairProjection::build_fast(e, &base).unwrap();
         let batched = PairProjection::build(e, &base).unwrap();
         let generic = PairProjection::build_generic(e, &base).unwrap();
         assert_eq!(fast.witnesses, batched.witnesses);
         assert_eq!(fast.finite_witnesses, batched.finite_witnesses);
+        for target in 0..e.p {
             let three = generic.decompose_three_generic(target).0;
             for got in [fast.decompose_three_fast_path(target).0, batched.decompose_three(target).0] {
                 assert_eq!(got.is_some(), three.is_some());
                 if let Some(w) = got { assert!(witness_reaches(&e, &w.x, target)); }
+            }
             let (four, expected) = generic.decompose_four_generic(target);
             for (got, stats) in [fast.decompose_four_fast_path(target), batched.decompose_four_exhaustive(target)] {
                 assert_eq!(got.is_some(), four.is_some());
                 assert_eq!(stats.compatible_keys, expected.compatible_keys);
+                if let Some(w) = got { assert!(witness_reaches(&e, &w.x, target)); }
+            }
             let mut ops = FpOpCounts::default();
             assert_eq!(generic.decompose_four_counted(target, &mut ops).0.is_some(), four.is_some());
             assert_eq!(fast.decompose_four_first(target).0.is_some(), four.is_some());
+        }
+    }
 
 }
