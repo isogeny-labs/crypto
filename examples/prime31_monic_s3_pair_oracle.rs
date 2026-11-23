@@ -263,7 +263,7 @@ fn reference(f:Fp,w:&[u64],z:u64)->Vec<(u64,u64)> {
     let _=f;
     result.into_iter().collect()
 }
-fn check(f:Fp,size:usize,z:u64) {
+fn check(f:Fp,size:usize,z:u64)->usize {
     let w=factorbase(f,size);
     let start=Instant::now();
     let (got,ddeg,ndeg,cdeg)=extract(f,&w,z).expect("non-table elimination / roots");
@@ -278,6 +278,7 @@ fn check(f:Fp,size:usize,z:u64) {
     let (h0,h1,_,_,_,_,_)=construct(f,&w,z);
     assert_eq!(tree,(h0,h1),"balanced rank-four subproduct tree differs from Newton trace moments");
     println!("monic-t-oracle p={P} B={size} z={z} Ddeg={ddeg} Ndeg={ndeg} gcd_deg={cdeg} verified_pairs={} online_ms={elapsed:.3} reference_scan_ms={reference_ms:.3} tree_build_ms={tree_ms:.3} tree_newton_coeff_equality=pass exact_reference=pass no_generic_table=true",got.len());
+    got.len()
 }
 /// Fixed public affine abscissae on the same prime-order ordinary curve.
 /// No discrete-log indices are generated or passed to extract(); independent
@@ -330,7 +331,19 @@ fn main(){
         targets.dedup();
         if scale {assert_eq!(targets.len(),8,"all scale controls must be distinct");}
         println!("native original-Rust Prime31 non-table S3 pair elimination scale={} B={} z={:?}; public-only oracle, two planted positives for grading",scale,size,targets);
-        for &z in &targets{check(f,size,z);}
+        let mut total_pairs=0usize;
+        let mut positive_targets=0usize;
+        for &z in &targets {
+            let count=check(f,size,z);
+            total_pairs+=count;
+            if count>0 {positive_targets+=1;}
+        }
+        if scale {
+            // Independent fixed S3 ground truth: GX and both nontrivial planted pairs
+            // have one witness each; X10G and four deterministic curve-x controls do not.
+            assert_eq!(positive_targets,3,"missing planted S3 positives at B={size}");
+            assert_eq!(total_pairs,3,"unexpected S3 pair-set cardinality at B={size}");
+        }
     }
     println!("S3 x-roots only: full signed group checks, authentic RHS rank, cold solver and asymptotic speedup NOT established.");
 }
