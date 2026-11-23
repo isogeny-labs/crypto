@@ -1121,7 +1121,7 @@ fn forest_witness_factors_shared_lca_suffix_once() {
             .expect("original sources reproduce every small row and RHS");
         assert_eq!(replay.len(), 49);
         for (w, row) in witnesses.iter().zip(replay.iter()) {
-            assert_eq!(row.sources.iter().map(|(id, a)| (id - 7000, *a)).collect::<Vec<_>>(),
+            assert_eq!(row.sources.iter().map(|(id, a)| (*id - 7000, *a)).collect::<Vec<_>>(),
                        w.sources.iter().map(|&(i, a)| (i as u64, a)).collect::<Vec<_>>());
         }
     }
