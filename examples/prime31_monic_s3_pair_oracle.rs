@@ -171,6 +171,43 @@ fn construct(f:Fp,w:&[u64],z:u64)->(Pair,Pair,Poly,Poly,Poly,Poly,Poly) {
     let c=gcd(f,d.clone(),n.clone());
     (hs.remove(0),hs.remove(0),q,r,d,n,c)
 }
+// Rank-four algebra Fp[s,t,X]/(F_z(t),X^2-sX+t).
+// This balanced factor-tree construction is source-independent of the
+// Newton recurrence used by construct(), and is an exact coefficient oracle.
+// Product of two degree-L nodes uses a constant number of poly products;
+// fast univariate multiplication would make its asymptotic work O(M(B) log B).
+fn product_pair_mod(f:Fp,a:&Pair,b:&Pair,q:&Poly,r:&Poly)->Pair {
+    let bd=product(f,&a.1,&b.1);
+    (
+        minus(f,&product(f,&a.0,&b.0),&product(f,r,&bd)),
+        minus(f,
+              &plus(f,&product(f,&a.0,&b.1),&product(f,&a.1,&b.0)),
+              &product(f,q,&bd)),
+    )
+}
+fn balanced_h(f:Fp,w:&[u64],q:&Poly,r:&Poly)->(Pair,Pair) {
+    if w.is_empty() {return ((vec![1],vec![0]),(vec![0],vec![0]));}
+    if w.len()==1 {
+        return ((vec![f.neg(w[0])],vec![0]),(vec![1],vec![0]));
+    }
+    let (u0,v0)=balanced_h(f,&w[..w.len()/2],q,r);
+    let (u1,v1)=balanced_h(f,&w[w.len()/2..],q,r);
+    let vv=product_pair_mod(f,&v0,&v1,q,r);
+    let u=pair_minus(f,&product_pair_mod(f,&u0,&u1,q,r),&pair_times_t(f,&vv,q,r));
+    let v=pair_plus(f,
+        &pair_plus(f,&product_pair_mod(f,&u0,&v1,q,r),&product_pair_mod(f,&u1,&v0,q,r)),
+        &pair_times_s(f,&vv));
+    (u,v)
+}
+fn construct_balanced(f:Fp,w:&[u64],z:u64)->(Pair,Pair) {
+    let (q,r)=coeff_s3(f,z);
+    let (u,v)=balanced_h(f,w,&q,&r);
+    let h0=pair_plus(f,&pair_scale(f,&u,2),&pair_times_s(f,&v));
+    let h1=pair_minus(f,
+        &pair_plus(f,&pair_times_s(f,&u),&pair_times_s(f,&pair_times_s(f,&v))),
+        &pair_scale(f,&pair_times_t(f,&v,&q,&r),2));
+    (h0,h1)
+}
 fn poly_eval_pair(f:Fp,x:&Pair,s:u64,t:u64)->u64 {
     f.add(eval(f,&x.0,s),f.mul(eval(f,&x.1,s),t))
 }
@@ -233,7 +270,12 @@ fn check(f:Fp,size:usize,z:u64) {
     let elapsed=start.elapsed().as_secs_f64()*1000.;
     let expected=reference(f,&w,z);
     assert_eq!(got,expected,"mismatched exact root set for B={size} target {z}");
-    println!("monic-t-oracle p={P} B={size} z={z} Ddeg={ddeg} Ndeg={ndeg} gcd_deg={cdeg} verified_pairs={} online_ms={elapsed:.3} exact_reference=pass no_generic_table=true",got.len());
+    let start_tree=Instant::now();
+    let tree=construct_balanced(f,&w,z);
+    let tree_ms=start_tree.elapsed().as_secs_f64()*1000.;
+    let (h0,h1,_,_,_,_,_)=construct(f,&w,z);
+    assert_eq!(tree,(h0,h1),"balanced rank-four subproduct tree differs from Newton trace moments");
+    println!("monic-t-oracle p={P} B={size} z={z} Ddeg={ddeg} Ndeg={ndeg} gcd_deg={cdeg} verified_pairs={} online_ms={elapsed:.3} tree_build_ms={tree_ms:.3} tree_newton_coeff_equality=pass exact_reference=pass no_generic_table=true",got.len());
 }
 fn main(){
     let f=Fp::new(P);
