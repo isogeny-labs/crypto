@@ -1,3 +1,9 @@
+## Resume400: same protocol dependency; second consecutive blocked goal turn
+
+Environmentreadyagain; HEAD e6f36bd722f9f23510ad22c73256c37fac8b49df, trackedstateclean, no experimentprocess. No supportedKEY/fallback binding or explicitprotocolchoice reply. No numerical/timing/sourcework thisturn. Counter=2consecutivegoalturns withsameexternalblocker; metadataupdates do notresetcount. Keepgoalactive now. Ifthirdconsecutivegoalturn stillhasnomeaningfulprogress becauseaccess/explicitdecision isneeded, stop_goalblocked (nevercomplete), then summarize. Don'trepeatquestion, dispatchjobs, inferapprovalfromenvironmentmessages orclaim15×.
+
+Originalacceptance/control/proof/measurement obligations and allpublished scientificscopes below unchanged. UserCPU0/onethread/zerocloud/checkpointS3waiver persists. Latest research/evidence b1c6da50b2 onPR4989; metadata9cab/e6f. No activejob. PROTOCOL_WAIT_400.json recordsboundedresumechecks; no extra credential/key/CIsearch.
+
 ## Resume399: connection restored; first consecutive blocked goal turn
 
 Environmentready, worktree tracked state clean beforethismetadata. Published9cab564832acb21d4625e112153e0e004dce3246 matchesremote. Fetchedmain143a0b91unchanged. No activejob/interruptedcommand torepeat. KEY/fallbackstillabsent inreconnectedenvironment; no credentialvaluesaccessed. No protocolchoice reply; no actualmeasurement ornewnumericalrun. Fullroot/unachieved15× scopesbelow unchanged.
