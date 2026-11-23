@@ -586,3 +586,123 @@ fn evaluator_runs_every_stage_and_replays_every_relation() {
         assert!(json.contains("lp-graph-eval/v1"));
     }
 }
+
+
+#[test]
+fn forest_witness_dual_anchored_bridge_has_exact_source_coefficients() {
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    let p = 7;
+    let mut forest = ForestWitnessExtractor::new(2, p).unwrap();
+    assert!(forest.add_row(&[(0, 1)]).unwrap().is_none());
+    assert!(forest.add_row(&[(1, 2)]).unwrap().is_none());
+    // Both components are pinned. Connecting them is a dependent row,
+    // despite being a *graph* bridge. Source coefficients are (4, 5, 1).
+    let w = forest.add_row(&[(0, 3), (1, 4)]).unwrap().unwrap();
+    assert_eq!(w.sources, vec![(0, 4), (1, 5), (2, 1)]);
+    let stream = vec![
+        PartialRelation { id: 0, small: vec![], large: vec![(10, 1)], rhs: 0 },
+        PartialRelation { id: 1, small: vec![], large: vec![(11, 2)], rhs: 0 },
+        PartialRelation { id: 2, small: vec![], large: vec![(10, 3), (11, 4)], rhs: 0 },
+    ];
+    let idx = LpIndex::build(&stream, p).unwrap();
+    assert!(witness_cancels_lp(&idx, &w));
+    assert_eq!(forest.rank(), 2);
+    assert_eq!(forest.stats().tree_edges, 0);
+    assert_eq!(forest.stats().anchors, 2);
+    assert_eq!(forest.stats().dependent_rows, 1);
+}
+
+#[test]
+fn forest_witness_balanced_unbalanced_and_zero_rows() {
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    let p = 7u64;
+    let rows = vec![
+        vec![(0, 1), (1, 1)],
+        vec![(1, 1), (2, 1)],
+        vec![(0, 1), (2, 6)], // balanced cycle (x2 = x0)
+        vec![(0, 1), (2, 1)], // unbalanced; first anchor
+        vec![(1, 1)],         // anchored; exact handcuff cancellation
+        vec![],               // zero LP row
+    ];
+    let mut f = ForestWitnessExtractor::new(3, p).unwrap();
+    let mut dependent = Vec::new();
+    for row in &rows {
+        if let Some(w) = f.add_row(row).unwrap() {
+            dependent.push(w);
+        }
+    }
+    assert_eq!(f.rank(), 3);
+    assert_eq!(f.stats().tree_edges, 2);
+    assert_eq!(f.stats().anchors, 1);
+    assert_eq!(dependent.len(), 3);
+    assert_eq!(dependent.iter().map(|w| w.row_index).collect::<Vec<_>>(), vec![2, 4, 5]);
+    let mut stream = Vec::new();
+    for (i, row) in rows.iter().enumerate() {
+        stream.push(PartialRelation {
+            id: i as u64, small: vec![],
+            large: row.iter().map(|&(j, c)| (100 + j as u64, c)).collect(),
+            rhs: 0,
+        });
+    }
+    let idx = LpIndex::build(&stream, p).unwrap();
+    for w in &dependent {
+        assert!(witness_cancels_lp(&idx, w), "bad witness at row {}", w.row_index);
+    }
+}
+
+#[test]
+fn forest_witness_matches_dense_rank_and_replays_all_random_certificates() {
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    let mut rng = Rng(0x2c1b_3c6d_7b4a_9a13);
+    for trial in 0..450 {
+        let p = PRIMES[trial % PRIMES.len()];
+        let rows = 1 + rng.below(50) as usize;
+        let cols = 1 + rng.below(12);
+        let source = random_lp_stream(&mut rng, rows, cols, 2, p);
+        let index = LpIndex::build(&source, p).unwrap();
+        let output = collect_witnesses(&index).unwrap();
+        let dense = dense_rank(&index.rows, index.num_columns(), p).unwrap();
+        let gain = gain_dsu_rank(&index).unwrap();
+        assert_eq!(output.rank, dense, "dense mismatch trial {trial} p {p}");
+        assert_eq!(output.rank, gain.rank, "gain mismatch trial {trial}");
+        assert_eq!(output.witnesses.len(), rows - dense);
+        assert_eq!(output.stats.rows, rows);
+        assert_eq!(output.stats.independent_rows, dense);
+        assert_eq!(output.stats.dependent_rows, rows - dense);
+        assert_eq!(output.stats.tree_edges + output.stats.anchors, dense);
+        for w in &output.witnesses {
+            assert!(witness_cancels_lp(&index, w), "trial {trial} row {}", w.row_index);
+        }
+    }
+}
+
+#[test]
+fn forest_witness_rejects_bad_rows_without_spurious_rank() {
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    let mut f = ForestWitnessExtractor::new(3, 7).unwrap();
+    assert!(f.add_row(&[(0, 1), (1, 2)]).unwrap().is_none());
+    let baseline = f.stats();
+    let baseline_rows = f.rows().to_vec();
+    for bad in [
+        vec![(0, 0)],
+        vec![(0, 7)],
+        vec![(1, 2), (1, 3)],
+        vec![(0, 1), (1, 2), (2, 3)],
+        vec![(3, 1)],
+    ] {
+        assert!(f.add_row(&bad).is_err());
+        assert_eq!(f.stats(), baseline);
+        assert_eq!(f.rows(), baseline_rows.as_slice());
+    }
+    // Explicitly composite F9 only tests inverse-failure atomicity,
+    // not correctness of frame rank over a ring.
+    let mut composite = ForestWitnessExtractor::new(2, 9).unwrap();
+    assert!(matches!(
+        composite.add_row(&[(0, 3), (1, 1)]),
+        Err(LpGraphError::NonInvertible { .. })
+    ));
+    assert_eq!(composite.stats().rows, 0);
+    assert_eq!(composite.rank(), 0);
+    assert!(f.add_row(&[(0, 1), (1, 2)]).unwrap().is_some());
+    assert_eq!(f.stats().dependent_rows, 1);
+}
