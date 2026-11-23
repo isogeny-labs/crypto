@@ -36,6 +36,7 @@ use std::cmp::Reverse;
 use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, VecDeque};
 
 pub mod eval;
+pub mod witness;
 
 // ---------------------------------------------------------------------------
 // Field helpers (uncounted; the evaluator times phases instead)
