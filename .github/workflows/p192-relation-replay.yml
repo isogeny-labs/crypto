@@ -2,7 +2,10 @@ name: P192 fixed relation and complete-transfer replay
 on:
   pull_request:
     paths:
-      - 'research/nist_cover_three_tests_20261116/replay_20261123/**'
+      - 'research/nist_cover_three_tests_20261116/replay_20261123/*.cpp'
+      - 'research/nist_cover_three_tests_20261116/replay_20261123/*.sh'
+      - 'research/nist_cover_three_tests_20261116/replay_20261123/PROTOCOL.md'
+      - 'research/nist_cover_three_tests_20261116/replay_20261123/LEGACY_INPUTS.sha256'
       - '.github/workflows/p192-relation-replay.yml'
   workflow_dispatch:
     inputs:
@@ -50,6 +53,23 @@ jobs:
         run: |
           set -euo pipefail
           research/nist_cover_three_tests_20261116/replay_20261123/run.sh evidence/ci-replay
+      - name: Export bounded public fixture records through the job log
+        shell: bash
+        run: |
+          set -euo pipefail
+          out=research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay
+          for name in native/relations/result.json native/relations/checker-result.json \
+            native/transfer/result.json native/transfer/checker-result.json comparison.json \
+            pipeline-clock.json certificate-clock.json clock-build-cost.json exit7-clock.json \
+            certificate-summary.json replay-certificate.json validator-report.json \
+            pre-call-manifest.sha256 build-input-manifest.sha256 adapter-binary-manifest.sha256 \
+            certificate-pre-call-manifest.sha256 post-call-source-manifest.sha256; do
+            test "$(wc -c < "$out/$name")" -le 1048576
+            printf 'P192_PUBLIC_SHA256 %s %s\n' "$name" "$(sha256sum "$out/$name" | cut -d' ' -f1)"
+            printf 'P192_PUBLIC_BEGIN %s\n' "$name"
+            base64 -w 2000 "$out/$name"
+            printf '\nP192_PUBLIC_END %s\n' "$name"
+          done
       - name: Preserve raw qualification records
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
