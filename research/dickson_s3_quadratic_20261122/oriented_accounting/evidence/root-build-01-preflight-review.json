@@ -1,0 +1,31 @@
+{
+  "schema": "oriented-accounting-root-preflight-review/v1",
+  "recorded_at_utc": "2026-11-23T04:22:17.725Z",
+  "reviewer": "same-team workflow_audit agent; read-only metadata review",
+  "request_sha256": "a45b7665ce8d7fd0973d88c82c70f4ac93a53885f84d1302f0e0ceaf7fd56aa8",
+  "source_inventory_sha256": "c239f245a870f9281cb57e707387d8b7e1e6e168ebc69dc2107ff29da50a7b48",
+  "findings": {
+    "root_compile_only": true,
+    "default_features": true,
+    "offline_locked_release_lib_no_run": true,
+    "jobs": 1,
+    "incremental": false,
+    "budget_seconds": 600,
+    "kill_after_seconds": 20,
+    "cache_resuming_attempts": 1,
+    "linked_metadata_hashes_match": true,
+    "unique_input_count": 1780,
+    "declared_literal_reference_count": 352,
+    "manifest_count": 10,
+    "pre_input_check_ok_count": 1780,
+    "hydrated_paths_and_git_oids_match_request_revision": true,
+    "hydrated_count": 179,
+    "hydrated_bytes": 4480792,
+    "hydration_inventory_input_list_sha256_agreement": true,
+    "production_f4_sha256": "367a323b5bec3df0afe4859cb995c0116a62b336fbc04c1917af33b84f75728e"
+  },
+  "scope_note": "The optional five-leads-study manifest is pinned, but its nonstandard native/lib.rs and sibling source bodies are outside this input inventory. Root enables pencil reporting, which enables serde/serde_json; only pencil producer enables five-leads-study. Those optional bodies are not selected by this default-feature compile. This record does not claim all optional dependency source bodies are pinned.",
+  "blocking_issue": false,
+  "tests_executed": false,
+  "evidence_status": "unsigned same-team source/metadata review; not signed verification"
+}

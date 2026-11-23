@@ -204,6 +204,18 @@ fn main() {
         extract(
             &root,
             &out,
+            "src/cryptanalysis/f4_fp.rs",
+            "367a323b5bec3df0afe4859cb995c0116a62b336fbc04c1917af33b84f75728e",
+            &[Range {
+                start: "#[cfg(test)]\nmod visit_timing_tests {\n",
+                end: "#[derive(Clone, Debug, PartialEq, Eq)]\npub enum Verdict {\n",
+                scope: "complete unchanged new production visitor timing test module",
+            }],
+            "visit_timing_tests.rs",
+        ),
+        extract(
+            &root,
+            &out,
             "src/cryptanalysis/challenge_ladder.rs",
             "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
             &[Range {
@@ -449,6 +461,14 @@ fn main() {
             "actual new example, compiled directly as a binary test target",
         ),
         (
+            "examples/dickson_s3_quadratic/accounting.rs",
+            "cold matched extraction, sign reconciliation, dedup and useful rank",
+        ),
+        (
+            "examples/dickson_s3_quadratic/controls.rs",
+            "independent bounded exhaustive signed oracle; never solver input",
+        ),
+        (
             "research/dickson_s3_quadratic_20261122/qualifier/Cargo.toml",
             "qualifier dependencies, targets, and profile",
         ),
@@ -471,6 +491,10 @@ fn main() {
         (
             "research/dickson_s3_quadratic_20261122/qualifier/src/source_manifest.rs",
             "provenance output binary",
+        ),
+        (
+            "research/dickson_s3_quadratic_20261122/qualifier/src/visit_timing_tests.rs",
+            "public API imports for verbatim production timing tests",
         ),
         (
             "research/dickson_s3_quadratic_20261122/qualifier/src/identity_records.rs",
@@ -511,6 +535,7 @@ fn main() {
         "full_root_library_compiled": false,
         "full_root_library_tests_included": false,
         "legacy_module_unit_tests_included": false,
+        "new_production_visit_timing_tests_included_verbatim": true,
         "f4_solver_included": true,
         "integration_example_included": true,
         "integration_example_rewritten": false,
