@@ -141,8 +141,37 @@ def verify_public_panel():
             "all_query_and_witness_replays_ok": True}
 
 
+def verify_censored_nine_point():
+    results = []
+    identity = None
+    for cap in (2, 4, 8):
+        data = json.loads((EVIDENCE / f"wide9-cap{cap}m.json").read_text())
+        assert data["status"] == "ResourceLimit"
+        assert "matrix_entries admission" in data["reason"]
+        assert data["one_lp_replayed_relations"] == 0
+        points = [tuple(point) for point in data["base"] + data["large_prime_pool"]]
+        assert len(points) == 9 and data["base_size"] == 8
+        query = tuple(data["public_query"])
+        assert signed_sum(points, data["control_planted_terms"]) == query
+        this_identity = (tuple(points), query)
+        if identity is None:
+            identity = this_identity
+        assert identity == this_identity
+        witnesses = 0
+        for three in itertools.combinations(range(8), 3):
+            for signs in itertools.product((-1, 1), repeat=4):
+                if signed_sum(points, list(zip((*three, 8), signs))) == query:
+                    witnesses += 1
+        assert witnesses >= 1
+        results.append({"matrix_entry_cap": cap * 1_000_000,
+                        "status": data["status"],
+                        "independent_witnesses": witnesses})
+    return {"control": "nine_point_censored", "same_target_and_selector": True,
+            "attempts": results}
+
+
 if __name__ == "__main__":
     assert mul(N, G) is None
     print(json.dumps([verify("positive"), verify("smoke"),
                       verify("wide"), verify("wide2"), verify_cycle(),
-                      verify_public_panel()], indent=2))
+                      verify_public_panel(), verify_censored_nine_point()], indent=2))

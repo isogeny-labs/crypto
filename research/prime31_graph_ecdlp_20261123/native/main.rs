@@ -1,5 +1,6 @@
+use crypto_lib::cryptanalysis::f4_fp::F4ResourceLimits;
 use prime31_algebraic_ic::{check_curve, Arithmetic, Curve, Point};
-use prime31_four_summand::extractor::{extract, Limits, Status};
+use prime31_four_summand::extractor::{extract, extract_cofactor, Limits, Status};
 use serde_json::json;
 use std::time::Instant;
 
@@ -101,14 +102,18 @@ fn public_panel() {
             "diagnostics": result.diagnostics,
         }));
     }
-    println!("{}", serde_json::to_string_pretty(&json!({
-        "curve": {"p": CURVE.p, "a": CURVE.a, "b": CURVE.b, "n": CURVE.n, "g": CURVE.g},
-        "public_target": q,
-        "base": &points[..7],
-        "large_prime_pool": &points[7..],
-        "seed": "0x7033315f72723501",
-        "queries": rows,
-    })).unwrap());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "curve": {"p": CURVE.p, "a": CURVE.a, "b": CURVE.b, "n": CURVE.n, "g": CURVE.g},
+            "public_target": q,
+            "base": &points[..7],
+            "large_prime_pool": &points[7..],
+            "seed": "0x7033315f72723501",
+            "queries": rows,
+        }))
+        .unwrap()
+    );
 }
 
 fn main() {
@@ -118,11 +123,18 @@ fn main() {
         return;
     }
     let smoke = mode == "smoke";
-    let wide = mode == "wide" || mode == "wide2";
+    let wide9 = mode == "wide9";
+    let wide = mode == "wide" || mode == "wide2" || wide9;
     assert!(mode.is_empty() || smoke || wide, "unknown control mode");
     let mut check_ar = Arithmetic::default();
     check_curve(CURVE, &mut check_ar).expect("registered curve is valid");
-    let base_size = if wide { 7 } else { 4 };
+    let base_size = if wide9 {
+        8
+    } else if wide {
+        7
+    } else {
+        4
+    };
     let points = public_points(base_size + 1);
     let planted = if mode == "wide2" {
         [(3, 1), (4, -1), (5, 1), (base_size, 1)]
@@ -137,25 +149,45 @@ fn main() {
     assert!(query.is_some());
     assert!(!points.iter().any(|point| Some(*point) == query));
     let started = Instant::now();
-    let output = extract(
-        CURVE,
-        &points,
-        query,
-        Limits {
-            max_degree: 10,
-            seconds: 30,
-            max_polynomial_terms: 20_000,
-            max_assignments: 4096,
-        },
-    );
+    let limits = Limits {
+        max_degree: 10,
+        seconds: 30,
+        max_polynomial_terms: 20_000,
+        max_assignments: 4096,
+    };
+    let output = if wide9 {
+        extract_cofactor(
+            CURVE,
+            &points,
+            query,
+            limits,
+            F4ResourceLimits {
+                max_pairs: 100_000,
+                max_symbolic_monomials: 2_000_000,
+                max_matrix_entries: 8_000_000,
+            },
+        )
+    } else {
+        extract(CURVE, &points, query, limits)
+    };
     let elapsed_ms = started.elapsed().as_millis();
     let partials: Vec<_> = output
         .relations
         .iter()
         .filter(|relation| {
             relation.terms.len() == 4
-                && relation.terms.iter().filter(|(i, _)| *i < base_size).count() == 3
-                && relation.terms.iter().filter(|(i, _)| *i >= base_size).count() == 1
+                && relation
+                    .terms
+                    .iter()
+                    .filter(|(i, _)| *i < base_size)
+                    .count()
+                    == 3
+                && relation
+                    .terms
+                    .iter()
+                    .filter(|(i, _)| *i >= base_size)
+                    .count()
+                    == 1
         })
         .collect();
     for relation in &partials {

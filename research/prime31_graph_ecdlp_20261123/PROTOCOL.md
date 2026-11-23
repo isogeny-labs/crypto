@@ -142,14 +142,14 @@ seven base points plus one external point. The positive queries are formed
 test-side from three base points and the external point; the separate smoke
 query is the registered public `Q` on the five-point selector. The native
 run completed all three charts: the five-point positive returned one signed
-one-LP row in 1 ms, the smoke query returned `Empty` in under 1 ms, and the
-eight-point positive returned one signed one-LP row in 140 ms. The native
+one-LP row in 9 ms, the smoke query returned `Empty` in 1 ms, and the
+eight-point positive returned one signed one-LP row in 166 ms. The native
 producer never receives the positive witness indices. The separate
 `verify_rr5_control.py` uses its own integer group law and exhaustive
 64- and 560-tuple one-LP oracles **after** extraction; it found exactly one
 witness for each positive and zero for the smoke query, matching all native
 outputs. A second eight-point positive query shares the same external point;
-the native extractor completed it with one one-LP row in 131 ms. The
+the native extractor completed it with one one-LP row in 204 ms. The
 independent checker subtracts the two extracted point equations, cancels the
 external point, and replays the resulting six-term factor-base-only equation.
 The raw JSON and build stderr are in `evidence/rr5-control-01/`.
@@ -170,7 +170,7 @@ discrete-log solve.
 
 The same native executable also ran 16 fixed SplitMix-labelled public queries
 `R=aG+bQ` on the `B=7,S=1` selector. It reported 16 `Empty` charts, zero
-accepted one-LP rows, 1,895 ms total extractor wall time, and 118.5 ms median
+accepted one-LP rows, 2,013 ms total extractor wall time, and 119 ms median
 per query on this host. The independent checker recomputed every `aG+bQ`
 with its own integer group law and enumerated all 560 signed one-LP tuples
 after extraction; each had zero witnesses. The frozen labels, per-query
@@ -190,6 +190,23 @@ graph filtering, and linear algebra. This is a derived gate on this
 `B=7,S=1` producer size, not a lower bound on every target-recovery path or
 on larger structured selectors. It makes increasing algebraic support while
 controlling extractor cost the next necessary experiment.
+
+### Nine-point cofactor boundary
+
+The next combined selector, `B=8,S=1`, has 896 signed one-LP tuples. The
+fixed positive query has one independently enumerated witness. The existing
+cofactor presentation was run under a 30-second deadline, 20,000 construction
+terms, 4,096 assignment limit, 100,000-pair cap, two-million symbolic-term
+cap, and successively 2, 4, and 8 million matrix-entry caps. All three
+attempts returned `ResourceLimit`, specifically matrix-entry admission just
+above each cap, and zero extracted rows. Their raw outputs are retained as
+`wide9-cap{2,4,8}m.json`; each represents an incomplete extraction, not an
+empty chart. The independent verifier confirms that every attempt used the
+same curve, selector, and target with one actual one-LP witness. The 2m and
+4m arms are development cap probes; the final 8m arm is the source-pinned
+boundary for this native control. This shows a resource bottleneck at nine
+combined points under these limits. It gives no cost or completeness result
+for a different structured selector or a higher admitted resource cap.
 
 ## Prior work and claim boundary
 
