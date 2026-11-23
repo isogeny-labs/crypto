@@ -1235,3 +1235,143 @@ fn forest_witness_lazy_rank_and_sources_match_random_streams() {
     assert!(total_skips > 0, "random workload missed independent-row fast path");
     assert!(saved_anchor_inversions > 0, "random workload missed redundant anchor inversion");
 }
+
+#[test]
+fn projected_rank_distinguishes_lp_nullity_from_useful_small_rank() {
+    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use crypto::cryptanalysis::large_prime_graph::witness::{
+        collect_witnesses_lazy, materialize_complete_relations,
+    };
+    // Four genuinely LP-identical rows yield three independent LP
+    // cancellation witnesses but only ONE independent factor-base row.
+    // This is a synthetic F7 rank/replay control, not a curve-group proof.
+    let p = 7u64;
+    let input: Vec<PartialRelation> = [(1, 2), (1, 2), (2, 4), (3, 6)]
+        .iter()
+        .enumerate()
+        .map(|(i, &(small_a, rhs))| PartialRelation {
+            id: 900 + i as u64,
+            small: vec![(7, small_a)],
+            large: vec![(100, 1)],
+            rhs,
+        })
+        .collect();
+    let index = LpIndex::build(&input, p).unwrap();
+    let batch = collect_witnesses_lazy(&index).unwrap();
+    assert_eq!(batch.rank, 1);
+    assert_eq!(batch.witnesses.len(), 3);
+    let complete = materialize_complete_relations(&index, &batch, &input, 8, 8)
+        .expect("all three source witnesses replay");
+    assert_eq!(complete.len(), 3);
+    let audit = audit_projected_rank(&complete, p).unwrap();
+    assert_eq!(audit.input_rows, 3);
+    assert_eq!(audit.useful_small_rank, 1);
+    assert_eq!(audit.augmented_rank, 1);
+    assert_eq!(audit.independent_row_indices, vec![1]);
+    assert_eq!(audit.redundant_row_indices, vec![0, 2]);
+    assert!(audit.inconsistent_row_indices.is_empty());
+    assert_eq!(audit.pivot_nonzeros, 1);
+    assert_eq!(complete[1].sources.len(), 2);
+}
+
+#[test]
+fn projected_rank_catches_rhs_contradiction_without_promoting_a_small_row() {
+    use crypto::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    // x_5 = 2 and x_5 = 3 cannot both hold; a zero row with rhs zero is
+    // merely redundant. RHS contradiction is a diagnostic, NOT useful rank.
+    let input = vec![
+        CompleteRelation { small: vec![(5, 1)], rhs: 2, sources: vec![(10, 1)] },
+        CompleteRelation { small: vec![(5, 1)], rhs: 3, sources: vec![(11, 1)] },
+        CompleteRelation { small: vec![], rhs: 0, sources: vec![(12, 1)] },
+    ];
+    let audit = audit_projected_rank(&input, 7).unwrap();
+    assert_eq!(audit.useful_small_rank, 1);
+    assert_eq!(audit.augmented_rank, 2);
+    assert_eq!(audit.independent_row_indices, vec![0]);
+    assert_eq!(audit.inconsistent_row_indices, vec![1]);
+    assert_eq!(audit.redundant_row_indices, vec![2]);
+    assert_eq!(input[0].sources, vec![(10, 1)]); // original witness retained
+}
+
+#[test]
+fn projected_rank_matches_independent_dense_small_and_augmented_oracles() {
+    use crypto::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use std::collections::BTreeMap;
+    let mut rng = Rng(0x8c71_275e_19b3_40a1);
+    for trial in 0..128 {
+        let p = PRIMES[trial % PRIMES.len()];
+        let columns = 1 + rng.below(9) as usize;
+        let count = 2 + rng.below(16) as usize;
+        let mut relations = Vec::new();
+        for i in 0..count {
+            let mut small = BTreeMap::<u32, u64>::new();
+            for _ in 0..rng.below(8) {
+                let col = rng.below(columns as u64) as u32;
+                let a = 1 + rng.below(p - 1);
+                let next = (small.get(&col).copied().unwrap_or(0) + a) % p;
+                if next == 0 {
+                    small.remove(&col);
+                } else {
+                    small.insert(col, next);
+                }
+            }
+            relations.push(CompleteRelation {
+                small: small.into_iter().collect(),
+                rhs: rng.below(p),
+                sources: vec![(i as u64, 1)],
+            });
+        }
+        let audit = audit_projected_rank(&relations, p).unwrap();
+        let sparse = |row: &CompleteRelation| {
+            row.small.iter().map(|&(c, a)| (c as usize, a)).collect::<Vec<_>>()
+        };
+        let small: Vec<_> = relations.iter().map(&sparse).collect();
+        let exact = dense_rank(&small, columns, p).unwrap();
+        let augmented: Vec<_> = relations.iter().map(|r| {
+            let mut s = sparse(r);
+            if r.rhs != 0 { s.push((columns, r.rhs)); }
+            s
+        }).collect();
+        let exact_augmented = dense_rank(&augmented, columns + 1, p).unwrap();
+        let selected: Vec<_> = audit.independent_row_indices.iter()
+            .map(|&i| sparse(&relations[i])).collect();
+        assert_eq!(audit.useful_small_rank, exact, "small rank trial {trial}");
+        assert_eq!(audit.augmented_rank, exact_augmented, "aug rank trial {trial}");
+        assert_eq!(dense_rank(&selected, columns, p).unwrap(), exact, "selected rank trial {trial}");
+        assert_eq!(audit.independent_row_indices.len(), exact);
+        assert_eq!(audit.inconsistent_row_indices.is_empty(), exact_augmented == exact);
+        assert_eq!(audit.input_rows,
+            audit.independent_row_indices.len()
+            + audit.redundant_row_indices.len()
+            + audit.inconsistent_row_indices.len());
+    }
+}
+
+#[test]
+fn projected_rank_refuses_noncanonical_or_nonunit_input() {
+    use crypto::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    let row = |small, rhs| CompleteRelation { small, rhs, sources: vec![] };
+    for malformed in [
+        row(vec![(3, 0)], 0),
+        row(vec![(3, 7)], 0),
+        row(vec![(3, 1), (3, 1)], 0),
+        row(vec![(4, 1), (3, 1)], 0),
+        row(vec![(3, 1)], 7),
+    ] {
+        assert!(matches!(
+            audit_projected_rank(&[malformed], 7),
+            Err(LpGraphError::NonCanonicalRow { row: 0 })
+        ));
+    }
+    assert!(matches!(
+        audit_projected_rank(&[row(vec![(3, 3)], 0)], 9),
+        Err(LpGraphError::NonInvertible { value: 3 })
+    ));
+    assert!(matches!(
+        audit_projected_rank(&[row(vec![(3, 1)], 0)], 2),
+        Err(LpGraphError::InvalidModulus)
+    ));
+}
