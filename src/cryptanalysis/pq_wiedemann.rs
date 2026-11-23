@@ -338,11 +338,12 @@ pub fn wiedemann_solve_row_preconditioned(
 /// the random projection landed on a degenerate Krylov sequence (try
 /// a different seed).
 ///
-/// When `M` is non-square or singular, we apply the normal equations:
-/// solve `M^T M x = M^T b` instead, which has a unique solution iff
-/// `M` has full column rank.  The relation matrix from PQ is always
-/// at least square (we over-collect by `target_extra ≥ 1`), so this
-/// is a reasonable fallback.
+/// When `M` is non-square, the historical path uses the unweighted
+/// normal equations `M^T M x = M^T b`. Over finite fields, full column
+/// rank does NOT ensure `M^T M` is nonsingular (the F_5 isotropic-column
+/// test below is a counterexample). See the separate opt-in
+/// `wiedemann_solve_row_preconditioned` for a seeded row-weighted
+/// rectangular path. Neither method proves rank from a failed solve.
 ///
 /// **Failure modes worth knowing**:
 /// - The minimum polynomial recovered by BM has `c_0 = 0` ⇒ `A` is
@@ -422,9 +423,10 @@ fn wiedemann_solve_impl(
     }
 
     // Build the Krylov scalar sequence s_i = u^T A^i v_0.
-    // Sequence length must be ≥ 2·deg(min poly).  Min poly has
-    // degree ≤ n_cols (square A) or ≤ 2·n_cols (M^T M); we use
-    // `2·n_cols + 2` either way for safety.
+    // Sequence length must be ≥ 2·deg(min poly). The working
+    // operator is n_cols by n_cols (direct M, M^T M, or M^T D M),
+    // so its minimal polynomial has degree at most n_cols.
+    // Keep 2*n_cols + 2 terms for the historical scalar BM path.
     let seq_len = 2 * n_cols + 2;
     let mut seq = Vec::with_capacity(seq_len);
     let mut current = v0.clone();
