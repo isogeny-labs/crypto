@@ -38,7 +38,7 @@ cmp CT333_RESULT.json /tmp/ct333_opt.json
 sha256sum ct333_rational_kernel_sieve.py CT333_RESULT.json
 ```
 
-The script must run at the stated **original source blob**. The first two output hashes above specify exact replay identities; the `/tmp` derivative is not a new frozen source. A checked report PDF was rendered and visually inspected in the coordinator runtime; the accessible standalone PDF is not currently published as a Git blob.
+The script must run at the stated **original source blob**. The first two output hashes above specify exact replay identities; the `/tmp` derivative is not a new frozen source. The inspected one-page [PDF report](CT333_FROBENIUS_KERNEL_GATE.pdf) and [SVG explanatory flow diagram](CT333_KERNEL_SIEVE_FLOW.svg) are now in the PR at commit `246889ebd3b022a5f9247ebe857e7275f163cc52` (PDF Git blob `65a6d1f1a94a9b2df929577ba35448a5bcb2fb3f`, SHA-256 `e5a1efb8510fcb67357408314944bd89a888e5c70da025dce0f7b9d92eafe857`); PDF was rasterized and visually inspected after a layout correction. [pcc:unverified]
 
 ## The mathematical distinction that matters
 
