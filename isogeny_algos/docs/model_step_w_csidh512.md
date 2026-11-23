@@ -70,7 +70,7 @@ The sequential numbers above were collected before deferring the final Montgomer
 
 The exact canonical output matched `action_fast` for the three exponent vectors above with three native seeds each. In the isolated-step sweep, each of 33 seeds per sign and degree matched the corresponding Montgomery step. Timing order alternated between arms by seed. This sweep supersedes any apparent fixed-seed degree crossover: Montgomery's median complete-step time was lower at every checked degree in both directions.
 
-Fifteen independent release-process invocations of the **current** code, each taking the median of five complete-action calls, gave these medians:
+Fifteen independent release-process invocations of the **current** code, each taking the median of five complete-action calls, gave these medians. This first sample's process-level CSV was not archived; treat it as a screening result, with the archived replication below as the inspectable measurement:
 
 | Exponent vector | Montgomery `action_fast` | Native sequential | Native batch loop | Native planned tree |
 | --- | ---: | ---: | ---: | ---: |
