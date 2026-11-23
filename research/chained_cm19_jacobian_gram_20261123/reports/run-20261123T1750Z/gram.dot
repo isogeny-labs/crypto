@@ -1,0 +1,12 @@
+digraph CoverGram {
+  graph [rankdir=LR, bgcolor="white", nodesep=0.5, ranksep=0.9];
+  node [shape=box, style="rounded,filled", fillcolor="#e4f2ed", color="#254459", fontname="DejaVu Sans", fontsize=13, margin="0.16,0.12"];
+  edge [color="#38536e", fontname="DejaVu Sans", fontsize=12];
+  input [label="Original E7 input\nP, kP"];
+  jac [label="Actual J = Jac(C7)\ncanonical polarization"];
+  prod [label="E7 cubed\ncover Gram G, det 9"];
+  input -> jac [label="actual f0 pullback"];
+  jac -> prod [label="F: three pushforwards\ndegree 9 (written proof)"];
+  prod -> jac [label="B: three pullbacks\ndegree 9 (written proof)"];
+  input -> prod [label="composite (2P,-P,0)\nDLP preserved; no speedup", constraint=false];
+}
