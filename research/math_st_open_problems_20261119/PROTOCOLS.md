@@ -118,3 +118,51 @@ Recorded after the run, not before; the measurements do not depend on them.
    unmet either way.
 4. $S_4$ has a single box lattice within dimension about 150 (dimension 125;
    the next is 729), so its trend clause is untestable.
+
+## A4. P3.3/Q099: basic KLPT against the exact least ℓ-power norm (2026-11-23)
+
+Written before any KLPT code exists.
+
+**Question.** On upstream's 108 matched near-$p$ ideals (math-st `f631bcc`,
+`measure_power_targets_p2203-245000047x18_t6_s33032028_20260713_raw.csv`), how
+far above the exact least $2^e$ and $3^e$ equivalent norms ($\approx p/12$,
+see `P3.3_counting_check.md`) does a basic KLPT land?
+
+**Setting (upstream's conventions).** $B=(-1,-p)$ with $p\equiv3\pmod 4$,
+$i^2=-1$, $j^2=-p$, $k=ij$. The maximal order is
+$\mathcal O_0=\mathbb Z\langle1,i,(1+j)/2,(i+k)/2\rangle$. The input is
+$I=\mathcal O_0\alpha+\mathcal O_0\ell'$, with $\alpha$ given by the CSV column
+`alpha_order_coordinates` and the prime $\ell'$ by `input_ideal_norm`.
+
+**Hypothesis H4 (prediction, not a kill).** Basic KLPT (Kohel–Lauter–Petit–
+Tignol 2014) returns an equivalent ideal of norm $\ell^{e}$ with
+$\log_p \ell^{e}\in[3.0,3.7]$ (median per bit band). The exact optimum has
+$\log_p\approx1$. So the KLPT/optimum ratio grows like $p^{\approx2.5}$.
+
+**Surprise (lead).** A median $\log_p\ell^e<2.5$ in any band, or a ratio
+growing more slowly than $p^{2}$. Either would mean basic KLPT is much closer
+to the counting optimum on these instances than its analysis says.
+
+**Method.** Native Rust, num-bigint.
+1. Rebuild each $I$. Control: our exact shortest-vector norm $\min
+   \mathrm{nrd}(x)/N(I)$ must equal upstream's `unconstrained_norm` on all 105
+   usable rows.
+2. KLPT: (a) an equivalent ideal $J$ of prime norm $N$ from a short element of
+   $I$; (b) $\gamma\in\mathbb Z\langle i,j\rangle$ with
+   $\mathrm{nrd}(\gamma)=N\ell^{e_0}$, via Cornacchia; (c) $\mu=j(C+Di)$ with
+   $\gamma\mu\in J$ modulo $N$; (d) strong approximation lifting $\mu$ to
+   norm $\ell^{e_1}$; (e) translate back to $I$. Record $e=e_0+e_1$ (plus the
+   step (a) translation) and every retry.
+3. $\ell\in\{2,3\}$, each instance, fixed seeds.
+
+**Correctness controls (every output).** $\beta\in I$ exactly, by coordinates
+in an HNF basis of $I$. $\mathrm{nrd}(\beta)/N(I)=\ell^e$ exactly. The equivalent
+ideal $I\bar\beta/N(I)$ is a left $\mathcal O_0$-ideal of norm $\ell^e$. An
+output that fails any check counts as a failure, never as a result.
+
+**Outputs.** Per instance: $p$, $\ell'$, $\ell$, $e_{\text{KLPT}}$,
+$\log_p\ell^{e}$, the exact optimum from upstream, the ratio, retries and time.
+Summary per bit band with median and IQR. Report, graph and PDF.
+
+**Stop.** All 105 instances × 2 values of $\ell$ done, or a correctness
+control fails (fix, rerun, record).
