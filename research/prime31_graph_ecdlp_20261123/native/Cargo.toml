@@ -1,0 +1,16 @@
+[package]
+name = "prime31-graph-rr5-control"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[[bin]]
+name = "prime31-graph-rr5-control"
+path = "main.rs"
+
+[dependencies]
+prime31-four-summand = { path = "../../prime31_four_summand_20261122/native" }
+prime31-algebraic-ic = { path = "../../prime31_four_summand_20261122/native/original-native" }
+serde_json = "1"

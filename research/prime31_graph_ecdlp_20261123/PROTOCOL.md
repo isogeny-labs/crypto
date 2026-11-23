@@ -134,6 +134,29 @@ the end-to-end boundary. Only after this gate should gain-aware DSU,
 two-core filtering, low-stretch forest, MST, matching/DM, and block
 Wiedemann be evaluated on the actual partial stream.
 
+### First registered-curve control, 2026-11-23
+
+`native/main.rs` calls the inherited RR5 `extract` on a five-point combined
+selector: four publicly enumerated base points and one disjoint external
+point. The positive query is formed test-side from three base points and the
+external point; the separate smoke query is the registered public `Q`. The
+native run completed both charts: the positive returned one signed one-LP
+row in 1 ms, and the smoke query returned `Empty` in under 1 ms. The native
+producer never receives the positive witness indices. The separate
+`verify_rr5_control.py` uses its own integer group law and exhaustive 64-tuple
+oracle **after** extraction; it found exactly one positive witness and zero
+smoke witnesses, matching both native outputs. The raw JSON and build stderr
+are in `evidence/rr5-control-01/`.
+
+The build uses the existing RR5 source closure. Its two whole-source pins
+were refreshed after reviewing current-main changes: `ic_boundary.rs` gained
+test-only map views and binary-group provenance fields; `semaev_prime_poly.rs`
+gained support diagnostics and factored `poly_mulmod` through `poly_mul`.
+The selected source ranges and current hashes are checked at build time.
+The native diagnostics report incomplete phase accounting. This is a
+planted correctness control at `B=4,S=1`, not evidence of random-query
+yield, useful graph rank, cold solve cost, or a speed advantage.
+
 ## Prior work and claim boundary
 
 - Semaev, [*Summation polynomials and the discrete logarithm problem on
