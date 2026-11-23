@@ -5,9 +5,9 @@ on:
     paths:
       - 'research/chained_twohop_descent_20261123/src/**'
       - 'research/chained_twohop_descent_20261123/formal/**'
-      - 'research/chained_twohop_descent_20261123/run_first_C.sh'
-      - 'research/chained_twohop_descent_20261123/custody_metadata_C.py'
-      - 'research/chained_twohop_descent_20261123/SOURCE_LOCK_C.json'
+      - 'research/chained_twohop_descent_20261123/run_CI_only_E.sh'
+      - 'research/chained_twohop_descent_20261123/custody_metadata_E.py'
+      - 'research/chained_twohop_descent_20261123/SOURCE_LOCK_E.json'
       - '.github/workflows/chained-twohop-descent.yml'
 permissions:
   contents: read
@@ -23,6 +23,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if ! command -v strace >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install --yes strace
+          fi
           rustup toolchain install 1.99.1 --profile minimal --component clippy,rustfmt
           curl --fail --location --retry 0 --proto '=https' \
             --output "$RUNNER_TEMP/lean-4.35.0-linux.tar.zst" \
@@ -34,7 +38,7 @@ jobs:
           LEAN4_BIN: ${{ runner.temp }}/lean-4.35.0-linux/bin/lean
         run: |
           set -euo pipefail
-          bash research/chained_twohop_descent_20261123/run_first_C.sh \
+          bash research/chained_twohop_descent_20261123/run_CI_only_E.sh \
             "$GITHUB_SHA" "$RUNNER_TEMP/twohop-custody" "$RUNNER_TEMP/twohop-compiler-temp"
       - name: Preserve complete source, both ELFs and every recorded stream
         if: always()
