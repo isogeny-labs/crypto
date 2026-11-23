@@ -64,7 +64,15 @@ pub fn run(out: &mut impl Write) -> Result<()> {
             .iter()
             .map(number)
             .collect::<Result<Vec<_>>>()?;
-        let block = Block::compile(&s, r.clone(), q, Limits::default())?;
+        let block = match Block::compile(&s, r.clone(), q, Limits::default()) {
+            Ok(b) => b,
+            Err(e) if e.starts_with("UNSUPPORTED") => {
+                excluded += 1;
+                writeln!(out,"{}",json!({"case":name,"kind":"excluded_regular_chart","reason":e,"scope":"declared excluded target chart; not absence or whole-route failure"})).map_err(|e|e.to_string())?;
+                continue;
+            }
+            Err(e) => return Err(format!("{name}: {e}")),
+        };
         let augmented = match block.extend(&values, &cs) {
             Ok(v) => v,
             Err(e) if e.contains("UNSUPPORTED regular-chart boundary") => {
