@@ -32,14 +32,21 @@
 //!
 //! The binary group batches through [`FastCurve::add_many`]; the prime
 //! group uses the default one-inversion-an-addition path, so on a prime
-//! curve the two ids measure the same additions as `mitm` and `subtract`
-//! with the memoryless three-summand arm added.
+//! curve the two ids measure the same additions as `mitm:batch=0` and
+//! `subtract:batch=0` with the memoryless three-summand arm added (the
+//! default `mitm` and `subtract` share an inversion over a block,
+//! [`CountedGroup::add_each_batched`]).
 //!
 //! **`rootfind-mitm-prime-batch`** (prime curves): `rootfind-mitm` with each
 //! block's additions done by one shared inversion
 //! ([`PairedAdd::add_many_batched`], `prime_fast`'s Montgomery-form batch
 //! addition).  The same points, probes, relations and charged additions;
 //! the field tally is the batched one (docs/perf/20261112-rust-deep-audit.md).
+//!
+//! On binary curves, `rootfind-mitm` prepares through
+//! [`PairTable::build_negation_folded_binary_batch`] (PLAN lever 6) and
+//! keeps a word Bloom filter in front of each probe (same layout as
+//! `rootfind-floor` / `rootfind-kmitm`).
 //!
 //! [`FastCurve::add_many`]: crate::cryptanalysis::koblitz_fast::FastCurve::add_many
 
@@ -50,7 +57,48 @@ use crate::cryptanalysis::ic_boundary::{
     BinaryGroup, CountedGroup, FactorBase, GroupOps, OracleCounters, PairTable, PrimeCurve,
     PrimePoint,
 };
-use crate::cryptanalysis::koblitz_fast::BatchScratch;
+use crate::cryptanalysis::koblitz_fast::{BatchScratch, FastPoint};
+
+/// Word-blocked Bloom filter: one 64-bit word a key, five bits in it
+/// (same layout as `rootfind-floor` / `rootfind-kmitm`).
+struct WordBloom {
+    words: Vec<u64>,
+    mask: usize,
+}
+
+impl WordBloom {
+    fn new(keys: usize) -> Self {
+        let words = (keys / 4).next_power_of_two().max(64);
+        Self {
+            words: vec![0; words],
+            mask: words - 1,
+        }
+    }
+
+    #[inline(always)]
+    fn slot(&self, key: u64) -> (usize, u64) {
+        let h = key.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        let h2 = (h ^ (h >> 29)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        let mut bits = 0u64;
+        let mut g = h2;
+        for _ in 0..5 {
+            bits |= 1u64 << (g & 63);
+            g >>= 6;
+        }
+        ((h >> 34) as usize & self.mask, bits)
+    }
+
+    fn insert(&mut self, key: u64) {
+        let (w, bits) = self.slot(key);
+        self.words[w] |= bits;
+    }
+
+    #[inline(always)]
+    fn maybe(&self, key: u64) -> bool {
+        let (w, bits) = self.slot(key);
+        self.words[w] & bits == bits
+    }
+}
 
 /// `R + Q_j` for every `j`, appended to `out`, charged one addition
 /// each.  A group that can share one field inversion over the slice
@@ -83,6 +131,15 @@ pub trait PairedAdd: CountedGroup {
         out: &mut Vec<Self::Elt>,
     ) {
         self.add_many(ops, counters, r, qs, out);
+    }
+
+    /// Negation-folded pair table for `rootfind-mitm` prepare. Binary
+    /// curves override with the abscissa-row batched builder (PLAN lever 6).
+    fn build_negation_folded_table(&self, fb: &FactorBase<Self::Elt>) -> PairTable
+    where
+        Self: Sized,
+    {
+        PairTable::build_negation_folded(self, fb)
     }
 }
 
@@ -215,6 +272,13 @@ impl PairedAdd for BinaryGroup<'_> {
         }
         SCRATCH.with(|s| self.0.add_many(r, qs, out, &mut s.borrow_mut()));
     }
+
+    /// PLAN lever 6: one shared inversion per abscissa row (and the
+    /// paired SIMD path when the layout allows), same first witnesses
+    /// and charged additions as serial `build_negation_folded`.
+    fn build_negation_folded_table(&self, fb: &FactorBase<FastPoint>) -> PairTable {
+        PairTable::build_negation_folded_binary_batch(self, fb)
+    }
 }
 
 /// Abscissae a batch of `rootfind-mitm`: `R ∓ P_k` for a block are
@@ -336,6 +400,8 @@ pub struct RootfindMitmOracle<E> {
     /// [`PairedAdd::add_many_batched`].
     batched: bool,
     table: Option<PairTable>,
+    /// Word Bloom over folded table keys (`g.key >> 1`); miss skips probe.
+    bloom: Option<WordBloom>,
     reps: Option<Reps<E>>,
     bufs: RowBufs<E>,
 }
@@ -346,6 +412,7 @@ impl<E> RootfindMitmOracle<E> {
             m,
             batched: false,
             table: None,
+            bloom: None,
             reps: None,
             bufs: RowBufs::default(),
         }
@@ -414,9 +481,14 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
         let table = if params.flag("full_table") {
             PairTable::build(ctx.group, fb)
         } else {
-            PairTable::build_negation_folded(ctx.group, fb)
+            // Binary: `build_negation_folded_binary_batch`; prime: serial
+            // folded (prime-batch table build lives on floor/subtract).
+            ctx.group.build_negation_folded_table(fb)
         };
         ops.merge(table.build_ops);
+        let mut bloom = WordBloom::new(table.entries.max(1) as usize);
+        table.for_each_folded_key(|k| bloom.insert(k));
+        self.bloom = Some(bloom);
         self.table = Some(table);
         self.reps = Some(Reps::of(ctx.group, fb));
         Ok(())
@@ -426,9 +498,15 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
         let mut counts = BTreeMap::new();
         if let Some(table) = &self.table {
             counts.insert("pair_table_entries".into(), table.entries);
+            if table.kind.contains("binary_batch") {
+                counts.insert("binary_batch_table".into(), 1);
+            }
         }
         if let Some(reps) = &self.reps {
             counts.insert("abscissae".into(), reps.index.len() as u64);
+        }
+        if self.bloom.is_some() {
+            counts.insert("probe_bloom".into(), 1);
         }
         counts
     }
@@ -457,8 +535,13 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
     ) -> Option<Vec<usize>> {
         let g = ctx.group;
         let table = self.table.as_ref()?;
+        let bloom = self.bloom.as_ref();
         let reps = self.reps.as_ref()?;
         if self.m == 2 {
+            let folded = g.key(&point) >> 1;
+            if bloom.is_some_and(|b| !b.maybe(folded)) {
+                return None;
+            }
             return table
                 .probe(g, fb, ops, &mut counters.lookups, point)
                 .map(|(j, l)| vec![j, l]);
@@ -474,6 +557,10 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
             }
             for &(k, s) in &self.bufs.out {
                 if g.is_identity(&s) {
+                    continue;
+                }
+                let folded = g.key(&s) >> 1;
+                if bloom.is_some_and(|b| !b.maybe(folded)) {
                     continue;
                 }
                 if let Some((j, l)) = table.probe(g, fb, ops, &mut counters.lookups, s) {
@@ -689,6 +776,77 @@ mod tests {
             })
             .collect();
         check(&ctx, &fb, &targets);
+
+        // PLAN lever 6: prepare uses the binary batched PairTable + Bloom.
+        let mut rf = RootfindMitmOracle::new(3);
+        let mut prep = GroupOps::default();
+        rf.prepare(&ctx, &fb, &Params::default(), &mut prep)
+            .unwrap();
+        let setup = DecompositionOracle::<BinaryGroup<'_>>::setup_native(&rf);
+        assert_eq!(setup.get("binary_batch_table"), Some(&1));
+        assert_eq!(setup.get("probe_bloom"), Some(&1));
+        assert_eq!(
+            rf.table.as_ref().map(|t| t.kind),
+            Some("negation_folded_binary_batch")
+        );
+    }
+
+    /// PLAN lever 6 falsifier: batched binary prepare wall vs serial.
+    /// Shared host (`[pcc:unverified]`); fail-closed if median batch is
+    /// not strictly faster than serial over cold repeats.
+    #[test]
+    fn binary_batch_prepare_wall_beats_serial_on_koblitz_n23() {
+        use std::time::Instant;
+
+        let inst = koblitz_instance(0, 23).expect("registered n23 Koblitz instance");
+        let g = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &g,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let (_, params) = Params::parse_spec("binary-subspace:dimension=8").unwrap();
+        let mut ops = GroupOps::default();
+        let fb = BinarySubspaceBase { instance: &inst }
+            .build(&ctx, &params, &mut ops)
+            .unwrap();
+
+        let reps = 9usize;
+        let mut serial_ns = Vec::with_capacity(reps);
+        let mut batch_ns = Vec::with_capacity(reps);
+        for _ in 0..reps {
+            let t0 = Instant::now();
+            let serial = PairTable::build_negation_folded(&g, &fb);
+            serial_ns.push(t0.elapsed().as_nanos() as u64);
+            std::hint::black_box(serial.entries);
+
+            let t1 = Instant::now();
+            let batch = PairTable::build_negation_folded_binary_batch(&g, &fb);
+            batch_ns.push(t1.elapsed().as_nanos() as u64);
+            std::hint::black_box(batch.entries);
+        }
+        serial_ns.sort_unstable();
+        batch_ns.sort_unstable();
+        let med = |v: &[u64]| v[v.len() / 2];
+        let (s_med, b_med) = (med(&serial_ns), med(&batch_ns));
+        eprintln!(
+            "lever6 prepare wall n23 d=8: serial_med_ns={s_med} batch_med_ns={b_med} ratio={:.3}",
+            s_med as f64 / b_med.max(1) as f64
+        );
+        assert!(
+            b_med < s_med,
+            "binary batch prepare not faster: serial_med={s_med} batch_med={b_med} \
+             (shared host; fail-closed for lever 6)"
+        );
+        assert_eq!(
+            PairTable::build_negation_folded(&g, &fb).entries,
+            PairTable::build_negation_folded_binary_batch(&g, &fb).entries
+        );
     }
 
     #[test]

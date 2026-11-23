@@ -1175,7 +1175,6 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::g4::*;
     use super::*;
 
     fn fset_all(c: &Curve) -> Fset {

@@ -4,17 +4,18 @@
 //!
 //! ```text
 //! cargo run --release --example jv_cover -- --exp ccov --sizes 53,101,251,503,1009 --seeds 2 --residuals 200 --constructed 40 --max-degree 24 --budget 300 --json experiments/30_jv_cover_ccov.json
-//! cargo run --release --example jv_cover -- --exp dlp --sizes 53,101,251 --seeds 2 --rho-runs 16 --check-every 64 --json experiments/30_jv_cover_dlp.json
+//! cargo run --release --example jv_cover -- --exp dlp --stop full --sizes 53,101,251 --seeds 2 --rho-runs 16 --check-every 64 --json experiments/30_jv_cover_dlp.json
 //! cargo run --release --example jv_cover -- --exp ccov --stop 64 --sizes 53,61,71 --seeds 2 --residuals 300 --constructed 60 --oracle-base 45 --json experiments/31_jv_cover_stop_ccov_oracle.json
-//! cargo run --release --example jv_cover -- --exp dlp --sizes 503 --seeds 1 --rho-runs 0 --rho-ref <pooled S_rho of the smaller sizes> --json experiments/30_jv_cover_dlp_503.json
+//! cargo run --release --example jv_cover -- --exp dlp --stop full --sizes 503 --seeds 1 --rho-runs 0 --rho-ref <pooled S_rho of the smaller sizes> --json experiments/30_jv_cover_dlp_503.json
 //! cargo run --release --example jv_cover -- --exp sieve --stop 64 --sizes 251,503 --seeds 2 --rho-runs 4 --json experiments/32_jv_cover_sieve_dlp.json
 //! ```
 
 use std::env;
 use std::fs;
 
-/// With `--features jemalloc`: F4's per-term allocations go to jemalloc
-/// instead of glibc (see the `jemalloc` feature in Cargo.toml).
+/// jemalloc is the global allocator under the default `jemalloc` feature: F4's
+/// per-term allocations go to jemalloc instead of glibc (1.256x on `--exp dlp`;
+/// see the feature in Cargo.toml). `--no-default-features` restores glibc.
 #[cfg(feature = "jemalloc")]
 #[global_allocator]
 static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
@@ -136,8 +137,12 @@ fn main() {
     let mut oracle_base = 40usize;
     let mut rho_ref = 1.3f64;
     let mut stop = 0usize;
-    // `--stop hilbert` or `--stop hilbert:N`: the Hilbert rule, N pairs per step (default 1)
-    let mut hilbert: Option<usize> = None;
+    // `--stop hilbert` or `--stop hilbert:N`: the Hilbert rule, N pairs per step
+    // (`hilbert` alone: 1).  The default since 2026-11-21 is `hilbert:16`
+    // (benchmarks/20261029-jv-cover-hilbert-stop: S 1.85x lower, identical
+    // relations); `--stop full` (or `--stop 0`) runs F4 to the certified basis
+    // as before, `--stop K` stops at K standard monomials.
+    let mut hilbert: Option<usize> = Some(16);
     let mut margin = 1.25f64;
     let mut m_override = 0usize;
     let mut trace = false;
@@ -180,7 +185,14 @@ fn main() {
                                 .map_or(1, |c| c.parse().expect("--stop hilbert:N")),
                         )
                     }
-                    None => stop = v.parse().expect("--stop"),
+                    None if v == "full" => {
+                        hilbert = None;
+                        stop = 0;
+                    }
+                    None => {
+                        hilbert = None;
+                        stop = v.parse().expect("--stop K | full | hilbert[:N]");
+                    }
                 }
             }
             "--margin" => margin = next(&mut i).parse().expect("--margin"),
