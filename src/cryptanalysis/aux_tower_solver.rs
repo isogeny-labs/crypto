@@ -17,7 +17,7 @@ use crate::cryptanalysis::growing_arity::{
 use crate::cryptanalysis::ic_boundary::{
     prime_instance_for, Calibration, CountedGroup, GroupOps, PrimeInstance,
 };
-use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrebuiltPrimeIsogenyBase};
+use crate::cryptanalysis::ic_framework::prime_tower::{AuxFamily, isogeny_tower, PrebuiltPrimeIsogenyBase};
 use crate::cryptanalysis::ic_framework::rootfind::RootfindMitmOracle;
 use crate::cryptanalysis::ic_framework::stages::{InstanceCtx, Targets};
 use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec, RunReport};
@@ -124,7 +124,7 @@ pub fn run_aux_tower_cell(bits: u32, seed: u64) -> Result<AuxTowerCell, String> 
     let cold_started = Instant::now();
     let tower_started = Instant::now();
     let mut tower_ops = GroupOps::default();
-    let tower = isogeny_tower(inst.curve.p, t, seed, &mut tower_ops)?;
+    let tower = isogeny_tower(inst.curve.p, t, seed, AuxFamily::Any, &mut tower_ops)?;
     let tower_wall_ns = tower_started.elapsed().as_nanos().min(u64::MAX as u128) as u64;
     let mut oracle = RootfindMitmOracle::new(M);
     let base = PrebuiltPrimeIsogenyBase {
