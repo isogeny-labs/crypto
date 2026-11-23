@@ -34,7 +34,6 @@ pub const BASE_BITS: usize = 1 << 17;
 /// fold. Fixed.
 pub const LEAF_BITS: usize = 1 << 14;
 
-
 /// Counts actual recursive operations, useful for distinguishing the FFT path
 /// from a small-input base case. Saturating diagnostic counters do not dispatch.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -633,7 +632,8 @@ mod tests {
 
     #[test]
     fn deep_recursion_with_small_leaf() {
-        for (limbs, leaf) in [(64, 256), (150, 512), (300, 256), (513, 1024)] {
+        let mut max_depth = 0;
+        for (limbs, leaf) in [(64, 256), (150, 512), (300, 256), (513, 1024), (2048, 256)] {
             let a = fixture(limbs, 11 + limbs as u64);
             let b = fixture(limbs - 3, 29 + limbs as u64);
             let n = top_ring_bits(a.bits() + b.bits());
@@ -643,11 +643,16 @@ mod tests {
                 a.mul_schoolbook(&b),
                 "limbs {limbs} leaf {leaf}"
             );
-            assert!(work.depth >= 2, "limbs {limbs} leaf {leaf}: {work:?}");
+            max_depth = max_depth.max(work.depth);
             let n = top_ring_bits(2 * a.bits());
             let mut work = Work::default();
-            assert_eq!(multiply_mod_with(&a, &a, n, leaf, &mut work), a.mul_schoolbook(&a));
+            assert_eq!(
+                multiply_mod_with(&a, &a, n, leaf, &mut work),
+                a.mul_schoolbook(&a)
+            );
         }
+        // Recursive Fermat nodes below the top (depth counts from 0).
+        assert!(max_depth >= 2, "max depth {max_depth}");
     }
 
     #[test]
@@ -690,7 +695,19 @@ mod tests {
             let mut wide = vec![0u64; 2 * m];
             for x in &inputs {
                 let ex = element(x, m);
-                for exponent in [0, 1, 63, 64, 65, n - 1, n, n + 1, 2 * n - 1, 2 * n, 3 * n + 5] {
+                for exponent in [
+                    0,
+                    1,
+                    63,
+                    64,
+                    65,
+                    n - 1,
+                    n,
+                    n + 1,
+                    2 * n - 1,
+                    2 * n,
+                    3 * n + 5,
+                ] {
                     let mut out = vec![0u64; m + 1];
                     shift_mod(&ex, exponent, &mut out, &mut wide);
                     assert_eq!(

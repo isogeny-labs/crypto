@@ -35,8 +35,14 @@ fn time<F: FnMut() -> Big>(mut f: F) -> (f64, Big) {
 }
 
 fn main() {
-    let max_log: u32 = std::env::args().nth(1).map(|s| s.parse().unwrap()).unwrap_or(20);
-    println!("{:>10} {:>14} {:>14} {:>8}", "bits/op", "schoolbook_s", "fastint_s", "ratio");
+    let max_log: u32 = std::env::args()
+        .nth(1)
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(20);
+    println!(
+        "{:>10} {:>14} {:>14} {:>8}",
+        "bits/op", "schoolbook_s", "fastint_s", "ratio"
+    );
     for log in 10..=max_log {
         let bits = 1usize << log;
         let a = fixture(bits / 64, 0x9e3779b97f4a7c15 ^ log as u64);

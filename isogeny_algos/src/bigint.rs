@@ -596,7 +596,11 @@ mod mul_tests {
                 s ^= s << 13;
                 s ^= s >> 7;
                 s ^= s << 17;
-                if dense { u64::MAX - (s & 3) } else { s }
+                if dense {
+                    u64::MAX - (s & 3)
+                } else {
+                    s
+                }
             })
             .collect();
         Big::from_limbs(&v)
