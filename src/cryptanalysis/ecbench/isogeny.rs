@@ -540,18 +540,7 @@ impl Fp<'_> {
             let b30 = extend(self, b15, &b15, 15);
             r = extend(self, b30, &b30, 30);
             if e == (1u64 << 61) - 1 {
-                if b[0] == 0 && b[1] == 1 && b[2..].iter().all(|&x| x == 0) {
-                    // Multiply by x directly, using x^D = sum modulus[i] x^i.
-                    r = self.fixed_mersenne_product::<D, true>(&r, &r, &modulus);
-                    let top = r[D-1];
-                    for i in (1..D).rev() {
-                        r[i] = Self::fold_fixed_mersenne(top as u128 * modulus[i] as u128 + r[i-1] as u128);
-                    }
-                    r[0] = Self::fold_fixed_mersenne(top as u128 * modulus[0] as u128);
-                    self.tally.muls += D as u64;
-                } else {
-                    r = extend(self, r, &b, 1);
-                }
+                r = extend(self, r, &b, 1);
             }
         } else if e >= (1u64 << 30) && e.count_ones() >= 12 {
             let b2 = self.fixed_mersenne_product::<D, true>(&b, &b, &modulus);
