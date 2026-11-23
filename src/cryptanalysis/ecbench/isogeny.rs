@@ -256,7 +256,35 @@ impl Fp<'_> {
                 };
                 out.push(root);
             }
-            _ => loop {
+            _ => {
+                // Once the squarefree root factor has degree two, compute
+                // its roots in F_p directly instead of running another
+                // polynomial modular exponentiation and Euclidean gcd.
+                // For p = 3 (mod 4), sqrt(d) = d^((p+1)/4) when d is a
+                // quadratic residue. Leave other characteristics and
+                // nonresidue inputs on the generic splitting path.
+                if g.len() == 3 && g[2] == 1 && p & 3 == 3 {
+                    let b_squared = self.mul(g[1], g[1]);
+                    let four_c = self.mul(4 % p, g[0]);
+                    let discriminant = self.sub(b_squared, four_c);
+                    let square_root = self.pow(discriminant, (p + 1) / 4);
+                    if self.mul(square_root, square_root) == discriminant {
+                        let minus_b = self.sub(0, g[1]);
+                        let plus = self.add(minus_b, square_root);
+                        let minus = self.sub(minus_b, square_root);
+                        // Division by 2 in an odd prime field needs no
+                        // modular multiplication or inverse. This addition
+                        // fits u64 because supported primes are <= 2^63-1.
+                        let half = |value: u64| {
+                            if value & 1 == 0 { value >> 1 }
+                            else { (value + p) >> 1 }
+                        };
+                        out.push(half(plus));
+                        out.push(half(minus));
+                        return;
+                    }
+                }
+                loop {
                 let shift = self.small(delta);
                 let e = self.powmod(&[shift, 1], (p - 1) / 2, &g);
                 let mut e = e;
@@ -296,6 +324,7 @@ impl Fp<'_> {
                 }
                 if delta > 4 * 64 + p.min(1 << 20) {
                     return;
+                }
                 }
             },
         }
@@ -541,6 +570,29 @@ mod tests {
             f.mulmod(&ab, &c, &[0, 0, 0, 0, 0, 0, 1])
         };
         assert_eq!(f.roots(&poly), vec![3, 50]);
+    }
+
+    #[test]
+    fn round131_quadratic_fast_split_matches_exhaustive_roots() {
+        // Cover p = 3 (mod 4) with two distinct roots, a repeated root,
+        // nonresidue discriminants, and p = 1 (mod 4) fallback cases.
+        for p in [3u64, 5, 7, 11, 13, 19, 23, 31, 101] {
+            let mut tally = FieldTally::default();
+            let mut field = Fp { p, tally: &mut tally };
+            for b in 0..p {
+                for c in 0..p {
+                    let polynomial = [c, b, 1];
+                    let expected: Vec<u64> = (0..p).filter(|&x| {
+                        let x2 = field.mul(x, x);
+                        let bx = field.mul(b, x);
+                        let x2_bx = field.add(x2, bx);
+                        field.add(x2_bx, c) == 0
+                    }).collect();
+                    assert_eq!(field.roots(&polynomial), expected,
+                        "p={p}, b={b}, c={c}");
+                }
+            }
+        }
     }
 
     #[test]
