@@ -855,3 +855,58 @@ fn forest_witness_parent_paths_survive_small_component_reroots() {
         }
     }
 }
+
+
+#[test]
+fn forest_witness_reuses_edge_inverses_on_long_repeated_cycles() {
+    // An unanchored path has a long fundamental cycle, repeated many times.
+    // Count *actual inverse calls*, not merely reduced adjacency traversals.
+    // F101 and generated small payloads are synthetic module-level controls.
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    let p = 101u64;
+    let vertices = 32usize;
+    let repeats = 48usize;
+    let mut equations = Vec::new();
+    for v in 0..(vertices - 1) {
+        equations.push(vec![(v, 1), (v + 1, 1)]);
+    }
+    // Odd path length implies x_last = -x_first, so these are balanced.
+    for _ in 0..repeats {
+        equations.push(vec![(0, 1), (vertices - 1, 1)]);
+    }
+    let mut f = ForestWitnessExtractor::new(vertices, p).unwrap();
+    let mut witnesses = Vec::new();
+    for row in &equations {
+        if let Some(w) = f.add_row(row).unwrap() {
+            witnesses.push(w);
+        }
+    }
+    let stats = f.stats();
+    assert_eq!(f.rank(), vertices - 1);
+    assert_eq!(witnesses.len(), repeats);
+    assert_eq!(stats.anchors, 0);
+    assert_eq!(stats.tree_edges, vertices - 1);
+    assert_eq!(stats.inverse_calls, (2 * equations.len()) as u64);
+    assert!(stats.path_steps > 3 * stats.inverse_calls);
+    let inputs: Vec<PartialRelation> = equations.iter().enumerate().map(|(i, row)| {
+        PartialRelation {
+            id: 4000 + i as u64,
+            small: vec![(i as u32, 1)],
+            large: row.iter().map(|&(j, a)| (500 + j as u64, a)).collect(),
+            rhs: i as u64 % p,
+        }
+    }).collect();
+    let index = LpIndex::build(&inputs, p).unwrap();
+    let batch = collect_witnesses(&index).unwrap();
+    assert_eq!(batch.witnesses, witnesses);
+    assert_eq!(batch.stats.inverse_calls, stats.inverse_calls);
+    for w in &batch.witnesses {
+        assert!(witness_cancels_lp(&index, w));
+    }
+    let replayed = materialize_complete_relations(&index, &batch, &inputs, 128, 128)
+        .expect("exact bounded replay of all repeated cycles");
+    assert_eq!(replayed.len(), repeats);
+    for r in &replayed {
+        assert_eq!(r.sources.len(), vertices);
+    }
+}

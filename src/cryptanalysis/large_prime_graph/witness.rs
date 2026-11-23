@@ -41,7 +41,8 @@ pub struct WitnessStats {
     pub reroot_steps: u64,
     /// Tree edge steps used while reducing original or anchor rows.
     pub path_steps: u64,
-    /// Explicit modular inverse calls, including input validation.
+    /// Actual modular inversions: input admission and anchor normalization.
+    /// Tree-path hops reuse the cached inverses of admitted equation edges.
     pub inverse_calls: u64,
 }
 
@@ -62,7 +63,6 @@ struct Reduced {
     basis: BTreeMap<usize, u64>,
     scans: u64,
     steps: u64,
-    inversions: u64,
 }
 
 fn add_term(map: &mut BTreeMap<usize, u64>, key: usize, value: u64, p: u64) {
@@ -92,6 +92,9 @@ fn coeff_at(row: &[(usize, u64)], vertex: usize) -> u64 {
 /// reroot work is O(V log V). For R rows, maximum forest depth D and L
 /// emitted source terms, the conservative ordered-map work is
 /// O((R D + V log V) log(R+2) + L), excluding modular inverse bit costs.
+/// Inverses for each independent tree edge's two endpoints are computed at
+/// admission, not on each path hop: O(I + R) inversions for I input LP
+/// incidences and at most two anchor normalizations per original row.
 /// D may be V, and witness materialization may dominate; no complete-cost
 /// or asymptotic ECDLP advantage is assumed.
 #[derive(Clone, Debug)]
@@ -108,6 +111,9 @@ pub struct ForestWitnessExtractor {
     anchor: Vec<Option<usize>>,
     /// Every admitted row is retained for source reconstruction.
     rows: Vec<Vec<(usize, u64)>>,
+    /// Exact inverses of both coefficients for each independent tree edge.
+    /// None for anchors and dependent input rows. Indexed by original row.
+    edge_inverses: Vec<Option<[u64; 2]>>,
     stats: WitnessStats,
 }
 
@@ -124,6 +130,7 @@ impl ForestWitnessExtractor {
             tree_parent_edge: vec![None; vertices],
             anchor: vec![None; vertices],
             rows: Vec::new(),
+            edge_inverses: Vec::new(),
             stats: WitnessStats::default(),
         })
     }
@@ -185,7 +192,6 @@ impl ForestWitnessExtractor {
             basis: BTreeMap::new(),
             scans: 0,
             steps: 0,
-            inversions: 0,
         };
         for &(vertex, a) in row {
             let root = self.root(vertex);
@@ -194,16 +200,15 @@ impl ForestWitnessExtractor {
             let mut coefficient = a;
             for (child, par, edge_idx) in path {
                 let edge = &self.rows[edge_idx];
-                let child_a = coeff_at(edge, child);
                 let parent_b = coeff_at(edge, par);
-                let inverse = inv_mod(child_a, p).ok_or(LpGraphError::NonInvertible {
-                    value: child_a,
-                })?;
+                let pair = self.edge_inverses[edge_idx]
+                    .expect("independent tree edge must retain both inverses");
+                let inverse = if edge[0].0 == child { pair[0] } else { pair[1] };
+                debug_assert_eq!(mul_mod(coeff_at(edge, child), inverse, p), 1);
                 let factor = mul_mod(coefficient, inverse, p);
                 add_term(&mut out.basis, edge_idx, neg_mod(factor, p), p);
                 coefficient = neg_mod(mul_mod(factor, parent_b, p), p);
                 out.steps += 1;
-                out.inversions += 1;
             }
             add_term(&mut out.roots, root, coefficient, p);
         }
@@ -225,6 +230,7 @@ impl ForestWitnessExtractor {
                 entries: terms.len(),
             });
         }
+        let mut input_inverses = [0u64; 2];
         for (i, &(v, a)) in terms.iter().enumerate() {
             if v >= self.parent.len() {
                 return Err(LpGraphError::ColumnOutOfRange { column: v });
@@ -232,9 +238,8 @@ impl ForestWitnessExtractor {
             if a == 0 || a >= p || (i == 1 && v == terms[0].0) {
                 return Err(LpGraphError::NonCanonicalRow { row: row_idx });
             }
-            if inv_mod(a, p).is_none() {
-                return Err(LpGraphError::NonInvertible { value: a });
-            }
+            input_inverses[i] = inv_mod(a, p)
+                .ok_or(LpGraphError::NonInvertible { value: a })?;
         }
         let original_roots = if terms.len() == 2 {
             Some((self.root(terms[0].0), self.root(terms[1].0)))
@@ -247,13 +252,12 @@ impl ForestWitnessExtractor {
         let mut outstanding = Vec::new();
         let mut scans = projection.scans;
         let mut steps = projection.steps;
-        let mut inversions = projection.inversions + terms.len() as u64;
+        let mut inversions = terms.len() as u64;
         for (&root, &gamma) in &projection.roots {
             if let Some(anchor_idx) = self.anchor[root] {
                 let anchor_projection = self.project(&self.rows[anchor_idx])?;
                 scans += anchor_projection.scans;
                 steps += anchor_projection.steps;
-                inversions += anchor_projection.inversions;
                 let alpha = anchor_projection.roots.get(&root).copied().unwrap_or(0);
                 let inverse = inv_mod(alpha, p).ok_or(LpGraphError::NonInvertible {
                     value: alpha,
@@ -274,6 +278,11 @@ impl ForestWitnessExtractor {
         self.stats.inverse_calls += inversions;
         self.stats.rows += 1;
         self.rows.push(terms.to_vec());
+        // Only independent bridges can become parent edges. Keep the inverses
+        // already computed for canonical admission; no future path hop divides.
+        let bridge = !outstanding.is_empty()
+            && matches!(original_roots, Some((u, v)) if u != v);
+        self.edge_inverses.push(bridge.then_some(input_inverses));
         if outstanding.is_empty() {
             let witness = CancellationWitness {
                 row_index: row_idx,
