@@ -2,7 +2,7 @@
 
 **Prospective protocol amendment. No experiment has been launched.**
 
-Tracking: [PR #4937](https://github.com/isogeny-labs/crypto/pull/4937), following
+Tracking: [PR #4945](https://github.com/isogeny-labs/crypto/pull/4945), following
 merged [PR #4923](https://github.com/isogeny-labs/crypto/pull/4923). This directory
 adds v2 semantics. The parent 55-cell and isogeny-choice 230-cell panels, their
 receipts, source snapshots and protocol text remain historical evidence.
