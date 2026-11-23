@@ -455,7 +455,127 @@ impl Fp<'_> {
         }
         self.rem_owned(t, m)
     }
+    // Canonical Mersenne residues: at most four products per coefficient,
+    // including the doubled cross terms of a square. Two folds suffice.
+    #[inline(always)]
+    fn fold_fixed_mersenne(value: u128) -> u64 {
+        const P: u64 = (1u64 << 61) - 1;
+        let x = ((value as u64) & P) + (value >> 61) as u64;
+        let x = (x & P) + (x >> 61);
+        if x >= P { x - P } else { x }
+    }
+
+    // D is exclusively 3 or 4. Fixed-width zero padding avoids allocation
+    // and trimming inside powmod; the boundary trims exactly once.
+    #[inline]
+    fn fixed_mersenne_product<const D: usize, const SQUARE: bool>(
+        &mut self, a: &[u64; D], b: &[u64; D], m: &[u64; D],
+    ) -> [u64; D] {
+        const P: u64 = (1u64 << 61) - 1;
+        let mut acc = [0u128; 7];
+        if SQUARE {
+            for i in 0..D {
+                acc[2*i] += a[i] as u128 * a[i] as u128;
+                for j in i+1..D {
+                    acc[i+j] += 2 * (a[i] as u128 * a[j] as u128);
+                }
+            }
+        } else {
+            for i in 0..D {
+                for j in 0..D {
+                    acc[i+j] += a[i] as u128 * b[j] as u128;
+                }
+            }
+        }
+        let mut t = [0u64; 7];
+        for i in 0..2*D-1 {
+            t[i] = Self::fold_fixed_mersenne(acc[i]);
+        }
+        for j in (D..2*D-1).rev() {
+            let c = t[j];
+            for i in 0..D {
+                let v = Self::fold_fixed_mersenne(c as u128 * m[i] as u128);
+                let x = &mut t[j-D+i];
+                *x = if *x >= v { *x - v } else { *x + P - v };
+            }
+        }
+        // Count the actual coefficient products, including padded zeros,
+        // rather than charging the old dynamic convolution or omitting work.
+        self.tally.muls += (if SQUARE { D*(D+1)/2 } else { D*D }) as u64
+            + (D*(D-1)) as u64;
+        let mut result = [0u64; D];
+        result.copy_from_slice(&t[..D]);
+        result
+    }
+
+    fn fixed_mersenne_pow<const D: usize>(
+        &mut self, base: &[u64], mut e: u64, m: &[u64],
+    ) -> Vec<u64> {
+        let reduced = self.rem(base, m);
+        let mut b = [0u64; D];
+        b[..reduced.len()].copy_from_slice(&reduced);
+        let mut modulus = [0u64; D];
+        modulus.copy_from_slice(&m[..D]);
+        let mut r = [0u64; D];
+        r[0] = 1;
+        if e >= (1u64 << 30) && e.count_ones() >= 12 {
+            let b2 = self.fixed_mersenne_product::<D, true>(&b, &b, &modulus);
+            let mut odd = [[0u64; D]; 4];
+            odd[0] = b;
+            for i in 1..4 {
+                odd[i] = self.fixed_mersenne_product::<D, false>(&odd[i-1], &b2, &modulus);
+            }
+            let mut bit = 63i32 - e.leading_zeros() as i32;
+            let mut started = false;
+            while bit >= 0 {
+                if ((e >> bit) & 1) == 0 {
+                    r = self.fixed_mersenne_product::<D, true>(&r, &r, &modulus);
+                    bit -= 1;
+                    continue;
+                }
+                let mut low = (bit - 2).max(0);
+                while ((e >> low) & 1) == 0 { low += 1; }
+                let width = (bit - low + 1) as u32;
+                let value = ((e >> low) & ((1u64 << width) - 1)) as usize;
+                if started {
+                    for _ in low..=bit {
+                        r = self.fixed_mersenne_product::<D, true>(&r, &r, &modulus);
+                    }
+                    r = self.fixed_mersenne_product::<D, false>(&r, &odd[(value-1)/2], &modulus);
+                } else {
+                    r = odd[(value-1)/2];
+                }
+                started = true;
+                bit = low - 1;
+            }
+        } else {
+            while e != 0 {
+                if e & 1 == 1 {
+                    r = self.fixed_mersenne_product::<D, false>(&r, &b, &modulus);
+                }
+                e >>= 1;
+                if e != 0 {
+                    b = self.fixed_mersenne_product::<D, true>(&b, &b, &modulus);
+                }
+            }
+        }
+        let mut out = r.to_vec();
+        Self::trim(&mut out);
+        out
+    }
+
     fn powmod(&mut self, base: &[u64], mut e: u64, m: &[u64]) -> Vec<u64> {
+        if self.p == (1u64 << 61) - 1
+            && (4..=5).contains(&m.len()) && m.last() == Some(&1)
+            && m.iter().all(|&x| x < self.p)
+            && base.iter().all(|&x| x < self.p)
+        {
+            return if m.len() == 4 {
+                self.fixed_mersenne_pow::<3>(base, e, m)
+            } else {
+                self.fixed_mersenne_pow::<4>(base, e, m)
+            };
+        }
         let mut r = vec![1];
         let mut b = self.rem(base, m);
         // A dense, large exponent spends most of its time multiplying
