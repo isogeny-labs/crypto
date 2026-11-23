@@ -8,6 +8,18 @@
 
 ## Problem
 
+Round06(2026-11-23): [double-cover Prym analysis](../research/ecc2k130_jacobian_theory_20261123/round06/REPORT.md)
+reduces the entire-Prym-isogenous-to-A mechanism to ordinary genus260
+over genus130 with one rational invariant1 ramification point, or
+ordinary genus261 over genus131 etale. The etale base cannot be
+hyperelliptic. Two convenient formal base classes fail point-count
+constraints; no target cover is constructed. The mod2 Euler-factor
+and wild genus deductions are independent of the chosen isogeny
+representative. PCC-b29178/fb6a46/366dbf are unverified. This is not
+a classification of A as one factor in a larger Prym or of arbitrary
+genus130–300 carriers. The proposed ramified-base D4 check is next.
+[pcc:unverified]
+
 Round05(2026-11-23): [hyperelliptic fiber/branch report](../research/ecc2k130_jacobian_theory_20261123/round05/REPORT.md)
 gives a written exclusion of the entire genus130 hyperelliptic isogeny
 class:2 F4-points contradict the universal lower bound3. For genus131
