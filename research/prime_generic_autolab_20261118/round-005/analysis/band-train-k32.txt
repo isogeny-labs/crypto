@@ -1,0 +1,22 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-t74357-b7396dac | 31.69 | inc | 12/12 | 1.868 | 2.054 | 3.730 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | rho-neg | 12/12 | 0.970 | 1.066 | 1.933 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | tw2l-x15-j16-n2 | 12/12 | 1.856 | 2.041 | 3.706 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | wsum-b12-n3 | 12/12 | 14.040 | 16.824 | 41.883 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | wsum-b8-n3 | 12/12 | 53.406 | 64.071 | 160.051 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-t74357-b7396dac | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-t74357-b7396dac | inc vs tw2l-x15-j16-n2 | tw2l-x15-j16-n2 < inc |
+| icv1-fp32-t74357-b7396dac | inc vs wsum-b12-n3 | inc < wsum-b12-n3 |
+| icv1-fp32-t74357-b7396dac | inc vs wsum-b8-n3 | inc < wsum-b8-n3 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs tw2l-x15-j16-n2 | rho-neg < tw2l-x15-j16-n2 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs wsum-b12-n3 | rho-neg < wsum-b12-n3 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs wsum-b8-n3 | rho-neg < wsum-b8-n3 |
+| icv1-fp32-t74357-b7396dac | tw2l-x15-j16-n2 vs wsum-b12-n3 | tw2l-x15-j16-n2 < wsum-b12-n3 |
+| icv1-fp32-t74357-b7396dac | tw2l-x15-j16-n2 vs wsum-b8-n3 | tw2l-x15-j16-n2 < wsum-b8-n3 |
+| icv1-fp32-t74357-b7396dac | wsum-b12-n3 vs wsum-b8-n3 | wsum-b12-n3 < wsum-b8-n3 |

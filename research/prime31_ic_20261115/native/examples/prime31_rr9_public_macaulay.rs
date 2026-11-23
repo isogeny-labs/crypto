@@ -648,3 +648,4 @@ pub fn public_b8_barycentric_controls() -> Value { barycentric_core::run() }
 mod d9_blackbox_core;
 pub fn rr9_d9_blackbox_controls(index: usize) -> Value { d9_blackbox_core::run(index) }
 pub fn rr9_d9_blackbox_smoke() -> Value { d9_blackbox_core::smoke() }
+pub fn rr9_d9_positive_krylov() -> Value { d9_blackbox_core::positive() }

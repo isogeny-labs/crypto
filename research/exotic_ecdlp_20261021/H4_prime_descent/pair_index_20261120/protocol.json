@@ -1,0 +1,12 @@
+{
+  "schema": "h4-pair-index-v1",
+  "question": "For the deterministic H4 n=19 instance-0 arms, does a charged group pair index find exactly the group-realizable ordered S4 decompositions?",
+  "source": "research/exotic_ecdlp_20261021/H4_prime_descent/run.py",
+  "source_sha256": "46fb1a8a311f36907427ac35b40066d88cc0948c7f8b522fbc87c8338682e11a",
+  "instances": [{"n": 19, "index": 0, "arm": "planted"}, {"n": 19, "index": 0, "arm": "random"}],
+  "method": "Extract unchanged source functions; extend only the returned instance record with its E and R objects. Enumerate every x in V, lift every curve point at x, index ordered pair sums, query R-C, and verify all triples by group addition and Boolean equations. Compare ordered x-triples with exhaustive S4 enumeration. Charge all point lifting and pair sums to setup, and all target lookups to query.",
+  "statistics": ["factor_base_points", "pair_entries", "distinct_pair_sums", "setup_seconds", "query_seconds", "s4_enumeration_seconds", "s4_solution_count", "group_x_solution_count", "group_triple_count", "symmetric_difference_count", "point_coordinates", "system_sha256"],
+  "host": "local macOS checked Sage; ordinary algorithmic diagnostic tier",
+  "claim_boundary": "Exact fixed-input group decomposition diagnostic and charged pair-index costs; no complete IC candidate or isolated same-target wall-time comparison",
+  "status": "frozen before execution"
+}

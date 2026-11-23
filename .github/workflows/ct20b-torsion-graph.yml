@@ -1,6 +1,7 @@
 name: CT20b two-torsion graph regression
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/ct20_two_torsion_graph.py'
       - 'research/chained_jacobian_transfers_20261110/CT20B_GLOBAL_FACTOR_CERTIFICATE.md'
@@ -12,6 +13,7 @@ permissions:
 
 jobs:
   symbolic:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:

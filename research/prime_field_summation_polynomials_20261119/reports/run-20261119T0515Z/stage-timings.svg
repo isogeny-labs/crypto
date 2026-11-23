@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">Recorded prime-field summation-polynomial stage timings</title>
+  <desc id="desc">Three panels compare all-roots methods, coefficient construction, and one-target methods using aggregate means from the imported campaign.</desc>
+  <rect width="1200" height="820" fill="#fbfaf7"/>
+  <style>
+    text { font-family: Inter, DejaVu Sans, sans-serif; fill: #17202a; }
+    .title { font-size: 27px; font-weight: 700; }
+    .subtitle { font-size: 14px; fill: #566573; }
+    .panel { fill: #ffffff; stroke: #c8d1dc; stroke-width: 1.5; rx: 10; }
+    .ptitle { font-size: 17px; font-weight: 700; }
+    .label { font-size: 12px; }
+    .small { font-size: 10px; fill: #566573; }
+    .tick { stroke: #d5dce5; stroke-width: 1; }
+    .generic { fill: #8da0cb; }
+    .structured { fill: #33a88b; }
+    .target { fill: #e39c3b; }
+    .outline { stroke: #263746; stroke-width: .5; }
+  </style>
+  <text x="55" y="48" class="title">Recorded stage means — exploratory import</text>
+  <text x="55" y="73" class="subtitle">Repository-unverified [pcc:unverified] · g++ 14.2.0, -O3 -march=native · aggregate means; no intervals were recorded</text>
+
+  <rect x="35" y="95" width="1130" height="215" class="panel"/>
+  <text x="55" y="124" class="ptitle">A. Degree-128 all-roots extraction (200 cases × 20 repetitions)</text>
+  <text x="365" y="146" class="small">log scale, microseconds</text>
+  <line x1="365" y1="150" x2="365" y2="288" class="tick"/><line x1="425" y1="150" x2="425" y2="288" class="tick"/>
+  <line x1="486" y1="150" x2="486" y2="288" class="tick"/><line x1="546" y1="150" x2="546" y2="288" class="tick"/>
+  <line x1="607" y1="150" x2="607" y2="288" class="tick"/>
+  <text x="361" y="302" class="small">1</text><text x="417" y="302" class="small">10</text><text x="476" y="302" class="small">100</text><text x="531" y="302" class="small">1,000</text><text x="588" y="302" class="small">10,000</text>
+  <text x="55" y="177" class="label">p=1,009</text><rect x="365" y="158" width="219" height="13" class="generic outline"/><rect x="365" y="176" width="61" height="13" class="structured outline"/><text x="592" y="169" class="small">generic 4,317.40</text><text x="434" y="187" class="small">MITM 10.54</text>
+  <text x="55" y="220" class="label">p=1,000,003</text><rect x="365" y="201" width="248" height="13" class="generic outline"/><rect x="365" y="219" width="60" height="13" class="structured outline"/><text x="621" y="212" class="small">generic 12,847.07</text><text x="433" y="230" class="small">workspace 10.03</text>
+  <text x="55" y="263" class="label">p=2,147,483,647</text><rect x="365" y="244" width="252" height="13" class="generic outline"/><rect x="365" y="262" width="61" height="13" class="structured outline"/><text x="625" y="255" class="small">generic 14,620.25</text><text x="434" y="273" class="small">affine tree 10.50</text>
+  <rect x="900" y="155" width="14" height="14" class="generic outline"/><text x="922" y="167" class="label">generic factorization</text><rect x="900" y="181" width="14" height="14" class="structured outline"/><text x="922" y="193" class="label">selected structure path</text>
+
+  <rect x="35" y="330" width="1130" height="215" class="panel"/>
+  <text x="55" y="359" class="ptitle">B. Degree-4096 coefficient materialization (5 cases × 3 repetitions)</text>
+  <text x="365" y="381" class="small">linear scale, milliseconds</text>
+  <line x1="365" y1="385" x2="365" y2="520" class="tick"/><line x1="452" y1="385" x2="452" y2="520" class="tick"/><line x1="538" y1="385" x2="538" y2="520" class="tick"/><line x1="625" y1="385" x2="625" y2="520" class="tick"/>
+  <text x="362" y="535" class="small">0</text><text x="443" y="535" class="small">20</text><text x="529" y="535" class="small">40</text><text x="616" y="535" class="small">60</text>
+  <text x="55" y="413" class="label">p=1,009</text><rect x="365" y="394" width="227" height="13" class="generic outline"/><rect x="365" y="412" width="70" height="13" class="structured outline"/><text x="600" y="405" class="small">quadratic 52.40</text><text x="443" y="423" class="small">tree 16.13 · 3.248×</text>
+  <text x="55" y="456" class="label">p=1,000,003</text><rect x="365" y="437" width="228" height="13" class="generic outline"/><rect x="365" y="455" width="71" height="13" class="structured outline"/><text x="601" y="448" class="small">quadratic 52.53</text><text x="444" y="466" class="small">tree 16.36 · 3.212×</text>
+  <text x="55" y="499" class="label">p=2,147,483,647</text><rect x="365" y="480" width="166" height="13" class="generic outline"/><rect x="365" y="498" width="12" height="13" class="structured outline"/><text x="539" y="491" class="small">quadratic 38.30</text><text x="385" y="509" class="small">tree 2.85 · 13.417×</text>
+
+  <rect x="35" y="565" width="1130" height="210" class="panel"/>
+  <text x="55" y="594" class="ptitle">C. Degree-4096, one-target workload at p=1,000,003 (20 cases × 5 repetitions)</text>
+  <text x="365" y="616" class="small">log scale, microseconds</text>
+  <line x1="365" y1="620" x2="365" y2="750" class="tick"/><line x1="465" y1="620" x2="465" y2="750" class="tick"/><line x1="565" y1="620" x2="565" y2="750" class="tick"/><line x1="625" y1="620" x2="625" y2="750" class="tick"/>
+  <text x="361" y="765" class="small">1</text><text x="457" y="765" class="small">10</text><text x="554" y="765" class="small">100</text><text x="614" y="765" class="small">400</text>
+  <text x="55" y="657" class="label">target miss</text><rect x="365" y="628" width="14" height="12" class="structured outline"/><rect x="365" y="644" width="244" height="12" class="generic outline"/><rect x="365" y="660" width="147" height="12" class="target outline"/>
+  <text x="55" y="716" class="label">target hit</text><rect x="365" y="687" width="7" height="12" class="structured outline"/><rect x="365" y="703" width="245" height="12" class="generic outline"/><rect x="365" y="719" width="151" height="12" class="target outline"/>
+  <text x="650" y="638" class="small">one signed sum: 1.39 µs miss / 1.18 µs hit</text><text x="650" y="659" class="small">all roots: 274.01 / 281.74 µs</text><text x="650" y="680" class="small">target search: 29.37 / 32.28 µs</text><text x="650" y="713" class="small">all/target: 9.331× miss / 8.727× hit</text><text x="650" y="734" class="small">all/one: 197.007× miss / 237.883× hit</text>
+  <text x="55" y="802" class="small">Source rows and raw nanosecond means: stage-timings.data.csv. Timed boundaries differ across panels; ratios are only within-panel.</text>
+</svg>

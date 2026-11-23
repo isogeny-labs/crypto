@@ -1,0 +1,554 @@
+[
+  {
+    "format": "correspondence-assessment-draft-v1",
+    "assessment_state": "draft",
+    "authority": "companion artifact; not an official ledger record or a standalone mathematical proof",
+    "case": "degree19",
+    "source": {
+      "object_uid": null,
+      "representation_uid": null,
+      "field": {
+        "characteristic": "71",
+        "degree": 1
+      },
+      "dimension": 1,
+      "subgroup_order": "3",
+      "exact_equations": "inputs.gpvec, matching labelled row",
+      "endomorphism_conductor": "1"
+    },
+    "destination": {
+      "object_uid": null,
+      "representation_uid": null,
+      "field": {
+        "characteristic": "71",
+        "degree": 1
+      },
+      "dimension": 1,
+      "exact_equations": "inputs.gpvec, matching labelled row",
+      "endomorphism_conductor": "1"
+    },
+    "transformation": {
+      "kind": "separable elliptic isogeny",
+      "family": "normalized Velu quotient",
+      "degree": "19",
+      "field_of_definition": "71",
+      "formulas": "DERIVATION.md; existing complete_pipeline.cpp",
+      "exceptional_cases": [
+        "infinity",
+        "kernel"
+      ],
+      "normalization": "normalized invariant differential before any explicitly documented CM scaling"
+    },
+    "obligations": {
+      "existence": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "prime kernel and normalized quotient"
+      },
+      "explicit_construction": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "retained actual native map and fresh direct Velu evaluation"
+      },
+      "map_correctness": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "all retained inputs, not exhaustive non-kernel enumeration"
+      },
+      "subgroup_preservation": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "prime q coprime to degree, exact generator order and matched targets"
+      },
+      "computational_advantage": {
+        "state": "unknown",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "no measured cost comparison"
+      },
+      "scaling_support": {
+        "state": "unknown",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "four fixed fixtures do not establish scaling to80bits"
+      }
+    },
+    "preservation_certificate": {
+      "identity": "phi([k]G)=[k]phi(G) checked on frozen panel; homomorphism is the standard Velu construction",
+      "kernel_intersection": "trivial since gcd(q,ell)=1",
+      "recovery_map": "dual isogeny identity supplies abstract inverse on q subgroup; explicit dual not implemented",
+      "scalar_multiplier": "19",
+      "proof_artifact": "DERIVATION.md and exact native checks"
+    },
+    "cost_comparison": {
+      "workload": "fixed known-answer verification, no ECDLP solve",
+      "baseline": "independent direct PARI Velu sums versus retained FLINT evaluator outputs",
+      "units": null,
+      "construction": null,
+      "transfer": null,
+      "destination": null,
+      "recovery": null,
+      "verification": null,
+      "memory_and_data": null,
+      "setup_reuse": null,
+      "uncertainty": null,
+      "evidence_label": "unmeasured"
+    },
+    "controls": [
+      "six negative admissions",
+      "independent direct quotient and all input images",
+      "retained duplicate/kernel/infinity inputs",
+      "matched source/destination scalars; existing coordinate controls remain separate"
+    ],
+    "exploration_boundary": {
+      "families": [
+        "four retained development fixtures"
+      ],
+      "completed_scope": "conductor classification plus direct-map/scalar verification",
+      "completeness_claim": "none beyond labelled input panel"
+    },
+    "open_obligations": [
+      "original minimum80bit explicit crossing",
+      "measured construction/transport/scalar/ECDLP/IC costs",
+      "registration and isolated controls",
+      "independent signed verdict"
+    ],
+    "official_status_change": "none"
+  },
+  {
+    "format": "correspondence-assessment-draft-v1",
+    "assessment_state": "draft",
+    "authority": "companion artifact; not an official ledger record or a standalone mathematical proof",
+    "case": "degree10009",
+    "source": {
+      "object_uid": null,
+      "representation_uid": null,
+      "field": {
+        "characteristic": "6666679",
+        "degree": 1
+      },
+      "dimension": 1,
+      "subgroup_order": "37",
+      "exact_equations": "inputs.gpvec, matching labelled row",
+      "endomorphism_conductor": "3"
+    },
+    "destination": {
+      "object_uid": null,
+      "representation_uid": null,
+      "field": {
+        "characteristic": "6666679",
+        "degree": 1
+      },
+      "dimension": 1,
+      "exact_equations": "inputs.gpvec, matching labelled row",
+      "endomorphism_conductor": "3"
+    },
+    "transformation": {
+      "kind": "separable elliptic isogeny",
+      "family": "normalized Velu quotient",
+      "degree": "10009",
+      "field_of_definition": "6666679",
+      "formulas": "DERIVATION.md; existing complete_pipeline.cpp",
+      "exceptional_cases": [
+        "infinity",
+        "kernel"
+      ],
+      "normalization": "normalized invariant differential before any explicitly documented CM scaling"
+    },
+    "obligations": {
+      "existence": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "prime kernel and normalized quotient"
+      },
+      "explicit_construction": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "retained actual native map and fresh direct Velu evaluation"
+      },
+      "map_correctness": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "all retained inputs, not exhaustive non-kernel enumeration"
+      },
+      "subgroup_preservation": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "prime q coprime to degree, exact generator order and matched targets"
+      },
+      "computational_advantage": {
+        "state": "unknown",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "no measured cost comparison"
+      },
+      "scaling_support": {
+        "state": "unknown",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "four fixed fixtures do not establish scaling to80bits"
+      }
+    },
+    "preservation_certificate": {
+      "identity": "phi([k]G)=[k]phi(G) checked on frozen panel; homomorphism is the standard Velu construction",
+      "kernel_intersection": "trivial since gcd(q,ell)=1",
+      "recovery_map": "dual isogeny identity supplies abstract inverse on q subgroup; explicit dual not implemented",
+      "scalar_multiplier": "10009",
+      "proof_artifact": "DERIVATION.md and exact native checks"
+    },
+    "cost_comparison": {
+      "workload": "fixed known-answer verification, no ECDLP solve",
+      "baseline": "independent direct PARI Velu sums versus retained FLINT evaluator outputs",
+      "units": null,
+      "construction": null,
+      "transfer": null,
+      "destination": null,
+      "recovery": null,
+      "verification": null,
+      "memory_and_data": null,
+      "setup_reuse": null,
+      "uncertainty": null,
+      "evidence_label": "unmeasured"
+    },
+    "controls": [
+      "six negative admissions",
+      "independent direct quotient and all input images",
+      "retained duplicate/kernel/infinity inputs",
+      "matched source/destination scalars; existing coordinate controls remain separate"
+    ],
+    "exploration_boundary": {
+      "families": [
+        "four retained development fixtures"
+      ],
+      "completed_scope": "conductor classification plus direct-map/scalar verification",
+      "completeness_claim": "none beyond labelled input panel"
+    },
+    "open_obligations": [
+      "original minimum80bit explicit crossing",
+      "measured construction/transport/scalar/ECDLP/IC costs",
+      "registration and isolated controls",
+      "independent signed verdict"
+    ],
+    "official_status_change": "none"
+  },
+  {
+    "format": "correspondence-assessment-draft-v1",
+    "assessment_state": "draft",
+    "authority": "companion artifact; not an official ledger record or a standalone mathematical proof",
+    "case": "field202-degree2",
+    "source": {
+      "object_uid": null,
+      "representation_uid": null,
+      "field": {
+        "characteristic": "4794168233664648458988367110514316682522236917173341621535751",
+        "degree": 1
+      },
+      "dimension": 1,
+      "subgroup_order": "1125023250121",
+      "exact_equations": "inputs.gpvec, matching labelled row",
+      "endomorphism_conductor": "1"
+    },
+    "destination": {
+      "object_uid": null,
+      "representation_uid": null,
+      "field": {
+        "characteristic": "4794168233664648458988367110514316682522236917173341621535751",
+        "degree": 1
+      },
+      "dimension": 1,
+      "exact_equations": "inputs.gpvec, matching labelled row",
+      "endomorphism_conductor": "2"
+    },
+    "transformation": {
+      "kind": "separable elliptic isogeny",
+      "family": "normalized Velu quotient",
+      "degree": "2",
+      "field_of_definition": "4794168233664648458988367110514316682522236917173341621535751",
+      "formulas": "DERIVATION.md; existing complete_pipeline.cpp",
+      "exceptional_cases": [
+        "infinity",
+        "kernel"
+      ],
+      "normalization": "normalized invariant differential before any explicitly documented CM scaling"
+    },
+    "obligations": {
+      "existence": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "prime kernel and normalized quotient"
+      },
+      "explicit_construction": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "retained actual native map and fresh direct Velu evaluation"
+      },
+      "map_correctness": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "all retained inputs, not exhaustive non-kernel enumeration"
+      },
+      "subgroup_preservation": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "prime q coprime to degree, exact generator order and matched targets"
+      },
+      "computational_advantage": {
+        "state": "unknown",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "no measured cost comparison"
+      },
+      "scaling_support": {
+        "state": "unknown",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "four fixed fixtures do not establish scaling to80bits"
+      }
+    },
+    "preservation_certificate": {
+      "identity": "phi([k]G)=[k]phi(G) checked on frozen panel; homomorphism is the standard Velu construction",
+      "kernel_intersection": "trivial since gcd(q,ell)=1",
+      "recovery_map": "dual isogeny identity supplies abstract inverse on q subgroup; explicit dual not implemented",
+      "scalar_multiplier": "2",
+      "proof_artifact": "DERIVATION.md and exact native checks"
+    },
+    "cost_comparison": {
+      "workload": "fixed known-answer verification, no ECDLP solve",
+      "baseline": "independent direct PARI Velu sums versus retained FLINT evaluator outputs",
+      "units": null,
+      "construction": null,
+      "transfer": null,
+      "destination": null,
+      "recovery": null,
+      "verification": null,
+      "memory_and_data": null,
+      "setup_reuse": null,
+      "uncertainty": null,
+      "evidence_label": "unmeasured"
+    },
+    "controls": [
+      "six negative admissions",
+      "independent direct quotient and all input images",
+      "retained duplicate/kernel/infinity inputs",
+      "matched source/destination scalars; existing coordinate controls remain separate"
+    ],
+    "exploration_boundary": {
+      "families": [
+        "four retained development fixtures"
+      ],
+      "completed_scope": "conductor classification plus direct-map/scalar verification",
+      "completeness_claim": "none beyond labelled input panel"
+    },
+    "open_obligations": [
+      "original minimum80bit explicit crossing",
+      "measured construction/transport/scalar/ECDLP/IC costs",
+      "registration and isolated controls",
+      "independent signed verdict"
+    ],
+    "official_status_change": "none"
+  },
+  {
+    "format": "correspondence-assessment-draft-v1",
+    "assessment_state": "draft",
+    "authority": "companion artifact; not an official ledger record or a standalone mathematical proof",
+    "case": "field96-degree5",
+    "source": {
+      "object_uid": null,
+      "representation_uid": null,
+      "field": {
+        "characteristic": "78125000378223625457769953627",
+        "degree": 1
+      },
+      "dimension": 1,
+      "subgroup_order": "125000000302579",
+      "exact_equations": "inputs.gpvec, matching labelled row",
+      "endomorphism_conductor": "1"
+    },
+    "destination": {
+      "object_uid": null,
+      "representation_uid": null,
+      "field": {
+        "characteristic": "78125000378223625457769953627",
+        "degree": 1
+      },
+      "dimension": 1,
+      "exact_equations": "inputs.gpvec, matching labelled row",
+      "endomorphism_conductor": "1"
+    },
+    "transformation": {
+      "kind": "separable elliptic isogeny",
+      "family": "normalized Velu quotient",
+      "degree": "5",
+      "field_of_definition": "78125000378223625457769953627",
+      "formulas": "DERIVATION.md; existing complete_pipeline.cpp",
+      "exceptional_cases": [
+        "infinity",
+        "kernel"
+      ],
+      "normalization": "normalized invariant differential before any explicitly documented CM scaling"
+    },
+    "obligations": {
+      "existence": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "prime kernel and normalized quotient"
+      },
+      "explicit_construction": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "retained actual native map and fresh direct Velu evaluation"
+      },
+      "map_correctness": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "all retained inputs, not exhaustive non-kernel enumeration"
+      },
+      "subgroup_preservation": {
+        "state": "supported",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "prime q coprime to degree, exact generator order and matched targets"
+      },
+      "computational_advantage": {
+        "state": "unknown",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "no measured cost comparison"
+      },
+      "scaling_support": {
+        "state": "unknown",
+        "evidence": [
+          "check-v2.gp",
+          "summary.json",
+          "DERIVATION.md"
+        ],
+        "scope": "four fixed fixtures do not establish scaling to80bits"
+      }
+    },
+    "preservation_certificate": {
+      "identity": "phi([k]G)=[k]phi(G) checked on frozen panel; homomorphism is the standard Velu construction",
+      "kernel_intersection": "trivial since gcd(q,ell)=1",
+      "recovery_map": "dual isogeny identity supplies abstract inverse on q subgroup; explicit dual not implemented",
+      "scalar_multiplier": "5",
+      "proof_artifact": "DERIVATION.md and exact native checks"
+    },
+    "cost_comparison": {
+      "workload": "fixed known-answer verification, no ECDLP solve",
+      "baseline": "independent direct PARI Velu sums versus retained FLINT evaluator outputs",
+      "units": null,
+      "construction": null,
+      "transfer": null,
+      "destination": null,
+      "recovery": null,
+      "verification": null,
+      "memory_and_data": null,
+      "setup_reuse": null,
+      "uncertainty": null,
+      "evidence_label": "unmeasured"
+    },
+    "controls": [
+      "six negative admissions",
+      "independent direct quotient and all input images",
+      "retained duplicate/kernel/infinity inputs",
+      "matched source/destination scalars; existing coordinate controls remain separate"
+    ],
+    "exploration_boundary": {
+      "families": [
+        "four retained development fixtures"
+      ],
+      "completed_scope": "conductor classification plus direct-map/scalar verification",
+      "completeness_claim": "none beyond labelled input panel"
+    },
+    "open_obligations": [
+      "original minimum80bit explicit crossing",
+      "measured construction/transport/scalar/ECDLP/IC costs",
+      "registration and isolated controls",
+      "independent signed verdict"
+    ],
+    "official_status_change": "none"
+  }
+]
