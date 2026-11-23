@@ -292,7 +292,7 @@ fn reduce_tail(c: &mut [BigUint], n: &BigUint) {
 /// All reported solutions are verified against the original Mx=b.
 ///
 /// For square M, the existing direct Wiedemann path is used without weights.
-/// The original wiedemann_solve function remains bit-for-bit unchanged.
+/// The original wiedemann_solve API preserves its historical fixed-seed outcomes.
 pub fn wiedemann_solve_row_preconditioned(
     m: &[SparseRow],
     b: &[BigUint],
@@ -402,7 +402,7 @@ fn wiedemann_solve_impl(
         } else {
             mat_t_vec(m, b, n_cols, n)
         };
-        let apply: Box<dyn FnMut(&[BigUint], &mut Vec<BigUint>)>> =
+        let apply: Box<dyn FnMut(&[BigUint], &mut Vec<BigUint>)> =
             Box::new(|v: &[BigUint], out: &mut Vec<BigUint>| {
                 if let Some(weights) = row_weights {
                     atda_vec_into(m, v, n_cols, n, weights, &mut mv_scratch, out);
