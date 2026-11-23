@@ -1,0 +1,18 @@
+[package]
+name = "torus-spectrum-compiler"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+serde_json = "1"
+sha2 = "0.10"
+torus-s4 = { path = "../torus-s4" }
+torus-s4-tree = { path = "../torus-s4-tree" }
+torus-coset-circuit = { path = "../torus-coset-circuit" }
+torus-quotient-query = { path = "../torus-quotient-query" }
+torus-section-radical = { path = "../torus-section-radical" }
