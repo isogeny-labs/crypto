@@ -2070,8 +2070,6 @@ pub fn hasse_interval_big(curve: &HyperellipticCurveP) -> (BigUint, BigUint) {
     (lo.max(one), hi)
 }
 
-    let g = curve.genus.max(1);
-
 pub fn hasse_interval(curve: &HyperellipticCurveP) -> Option<(u128, u128)> {
     // The frozen hyperelliptic rows use the real square root approximation
     // on a word-sized modulus; keep that semantics so instance selection

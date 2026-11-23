@@ -1,0 +1,82 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "pdp-measurement-20261122 m=4/m=5 t>=4 Arm-A finish (panel p=786433)",
+  "description": "Preregistered isolab finish for the natural-panel PKM/Semaev solving-degree cells blocked locally at t>=4 (>13 GiB). Targets the same fp20-class prime as pdp-measurement Arm A (crypto ce396efc). One reference rho arm; four ic.pipeline arms at m=4 and m=5 with Kummer and isogeny presentations at tower t=4. IC S is a counted lower bound; finish obligation is finished F4/msolve degrees, not a sub-rho claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 1
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261122,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "kummer-m4-t4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=4",
+          "oracle": "pkm-semaev:m=4,mode=chain,engine=f4",
+          "max_trials": "8"
+        }
+      }
+    },
+    {
+      "name": "isogeny-m4-t4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=4",
+          "oracle": "pkm-semaev:m=4,mode=chain,engine=f4",
+          "max_trials": "8"
+        }
+      }
+    },
+    {
+      "name": "kummer-m5-t4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=4",
+          "oracle": "pkm-semaev:m=5,mode=chain,engine=f4",
+          "max_trials": "8"
+        }
+      }
+    },
+    {
+      "name": "isogeny-m5-t4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=4",
+          "oracle": "pkm-semaev:m=5,mode=chain,engine=f4",
+          "max_trials": "8"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 202611221045,
+    "isolation_required": "L2",
+    "timeout_seconds": 7200
+  }
+}
