@@ -8,8 +8,8 @@ that earlier qualifier or its frozen evidence.
 
 Broad dependency modules contribute explicit, complete items or contiguous
 implementation spans. The selector checks each whole source against
-`source-pins.json`, then copies exact byte ranges and verifies them against the
-original. Namespace wrappers supply imports only; no arithmetic or solver is
+`source-pins.json`, then copies the selected byte ranges and compares them against the
+original source. [pcc:unverified] Namespace wrappers supply imports only; no arithmetic or solver is
 substituted. Whole production modules and the root example are also hash-pinned.
 The generated source manifest records hashes, byte offsets, and scope.
 
