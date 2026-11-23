@@ -137,14 +137,14 @@ cause is unknown; explicit unknowns are useful, invented explanations are not.
 - `resolved`: linked evidence meets the stated exit criteria for this specific
   obstruction. State any remaining limitations.
 - `superseded`: a linked successor now tracks this obstruction; this is not a
-  claim that it was solved.
+  claim that it was closed.
 
 These statuses describe the problem record, not the scientific status of a
 hypothesis or the completion of a campaign. Stopping work does not resolve
 a problem or authorize abandoning the user's requirement.
 
 Keep observations, calculations, hypotheses, resource/access/assistance gaps,
-and proved limits distinct. Bound a negative result by its exact inputs and
+and established limits distinct. Bound a negative result by its exact inputs and
 search limits. A resource ceiling, missing implementation, or failed search
 does not establish a mathematical obstruction or a security theorem.
 
@@ -253,7 +253,7 @@ existing review, archival, and claim-promotion rules.
 | [Prime-field divisor relation supply](prime-divisor-uniform-solver.md) | investigating | fixed-fixture algebraic IC and witness-pruned encoding implemented; growing-family cost/yield open | proved computable sub-exponential cost/yield contract; auxiliary-pipeline implementation and isolated validation |
 | [Parent-library isogeny-walk validation](root-library-isogeny-walk-runtime.md) | incomplete; processes killed, cause unknown | legacy root-library regression | exact case and full parent scope must complete without weakened acceptance; native primality checks are separate |
 | [IC six-obligation follow-up gates](ic-six-obligation-followup-gates.md) | investigating | fixed-population yield/rank, production arity-three theory, PKM lower bound, Wagner variance, and xedni selector conclusions | clean source custody and native producers; checked proof/lower-bound objects; frozen EKS protocols only after their individual gates |
-| [Hashed-ECDLP boundary-rank family lower bound](hashed-ecdl-boundary-rank-family-lower-bound.md) | open | asymptotic lower bound for the registered exact linear-message contraction | freeze the production cut family and prove a uniform exponential nonzero minor or equivalent rank bound, plus the architecture cost bridge |
+| [Hashed-ECDLP boundary-rank family lower bound](hashed-ecdl-boundary-rank-family-lower-bound.md) | narrowed | all-seed and nonnegligible-probability semantic slot-relation lower bounds refuted at PCC-unverified scope; exceptional seeds and the low-level BTNIR family remain open | freeze the BTNIR cut family and prove a representation-specific rank bound plus the architecture cost bridge [pcc:unverified] |
 
 
 | [Quadratic-twist native and formal parity](quadratic-twist-evidence-native-parity.md) | open | full uniform96/896/210census verified with0joint gains; explicit F13 dual/inverse21named/25audited;pair-weight kernel5/5 and4485base/119912query check;actual F13 row/span/adaptive/scalar bridge20named/24audited,72native source recoveries unchanged | actual-state/iid probability bridge,1921missing-model reconciliation, fresh5140-case suite incomplete at600s, broader geometry/intrinsic regularity/complete cost/Conductor |

@@ -1,0 +1,15 @@
+{
+  "schema": "h4-three-sum-coverage-v1",
+  "question": "What exact fraction of nonidentity points on the fixed H4 n19 curve lies in B+B+B for its 119-point lifted x-subspace base?",
+  "source": "research/exotic_ecdlp_20261021/H4_prime_descent/run.py",
+  "source_sha256": "46fb1a8a311f36907427ac35b40066d88cc0948c7f8b522fbc87c8338682e11a",
+  "control_result": "research/exotic_ecdlp_20261021/H4_prime_descent/pair_index_20261120/result.json",
+  "instance": {"n": 19, "index": 0, "arm": "planted", "subspace_dimension": 7, "summands": 3},
+  "input_law": "Uniform point among all nonidentity elements of this exact E(F_2^19), evaluated by complete finite-group enumeration rather than sampling",
+  "method": "Use the frozen H4 curve and x-subspace. Lift every curve point over V to B; build an ordered pair-sum multiplicity map; add each B point to each distinct pair sum, counting ordered triples per target. Compute the exact image size and group order, verify the total multiplicity equals |B|^3, and replay the two previously recorded target counts.",
+  "cap_seconds": 180,
+  "statistics": ["group_order", "base_points", "ordered_pair_entries", "distinct_pair_sums", "ordered_triples", "distinct_three_sums", "nonidentity_coverage_numerator", "nonidentity_coverage_denominator", "multiplicity_histogram", "setup_seconds", "image_enumeration_seconds", "peak_rss_bytes", "status"],
+  "host": "local macOS checked Sage; ordinary algorithmic diagnostic tier",
+  "claim_boundary": "Exact fixed-curve relation-yield fraction for uniform nonidentity group points with this unfiltered lifted base; no complete IC pipeline or matched reference",
+  "status": "frozen before execution"
+}
