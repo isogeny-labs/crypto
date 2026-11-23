@@ -134,7 +134,12 @@ impl Fp<'_> {
     }
 
     fn rem(&mut self, a: &[u64], m: &[u64]) -> Vec<u64> {
-        let mut r = a.to_vec();
+        self.rem_owned(a.to_vec(), m)
+    }
+
+    // Polynomial multiplication already owns its coefficient buffer. Reduce
+    // it in-place rather than cloning a second Vec for each powmod step.
+    fn rem_owned(&mut self, mut r: Vec<u64>, m: &[u64]) -> Vec<u64> {
         Self::trim(&mut r);
         let dm = m.len() - 1;
         // Monic moduli dominate x^p mod f and Cantor-Zassenhaus splitting.
@@ -173,7 +178,7 @@ impl Fp<'_> {
                 t[i + j] = self.add(t[i + j], v);
             }
         }
-        self.rem(&t, m)
+        self.rem_owned(t, m)
     }
     fn powmod(&mut self, base: &[u64], mut e: u64, m: &[u64]) -> Vec<u64> {
         let mut r = vec![1];
