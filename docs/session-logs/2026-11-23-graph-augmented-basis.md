@@ -39,3 +39,22 @@
 
 ### Errors (what went wrong, how it was handled)
 - Earlier source/test CI runs were superseded/canceled as branch updates triggered concurrency; the final job above, not canceled predecessors, supplies the terminal receipt. No paid jobs or conflicting worktree edits.
+
+
+## 2026-11-23 18:36 UTC — minimum-payload affine basis continuation
+
+### What was done (commands, files, features)
+- Read current AGENTS/ACTIVE, scoped newest graph log, lane handoff, original Rust source/native tests and merged prior graph sources. Queried cryptanalysis and crypto-autoresearcher code search; KB/Conductor/worker runtime unavailable, bounded Cavallar/Diem primary-literature fallback recorded.
+- Preregistered mathematical correctness, fixed input, exhaustive minimality oracle, falsification and CI budget in MINIMUM_PAYLOAD_AUGMENTED_BASIS_20261123.md at b6e3b87.
+- Implemented additive opt-in minimum additive small-NZ+source-witness-entry original augmented-basis selection via sparse echelon ordered by cost. Added exact original-row preservation checks, fixed 10-vs-5 payload control, protected target column and 128 tiny exhaustive matroid-basis checks. Code + tests source frozen for CI; not yet called a passing test.
+
+### Decisions made (and why)
+- Greedy on the represented augmented-row linear matroid gives an exact minimum for the frozen additive ENTRY-COUNT objective only; it does not minimize filled NZ, inversion work, wall time or DLP solving complexity. Leave default evaluator/CLI/production untouched.
+- Reuse one existing source-bound CI gate, no paid compute or parallel builds. Retain contradictory RHS as explicit refusal, never omit unknown target coefficients.
+
+### Open threads
+- Inspect native graph CI on the final source revision and preserve source hashes; fix any test failure within PR #5043 only.
+- Complete costed same-stream actual-curve relation and cold ECDLP comparison once source-verifiable ordinary Prime31 inputs and full-root build authorization are available.
+
+### Errors (what went wrong, how it was handled)
+- No local Rust compiler/worktree or independent agent runner. Existing root parser is out of scope. The synthetic brute-force tests cannot count as measured performance or actual prime-field ECDLP evidence.

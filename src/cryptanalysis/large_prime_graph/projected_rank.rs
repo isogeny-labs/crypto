@@ -83,6 +83,16 @@ pub fn audit_projected_rank(
     relations: &[CompleteRelation],
     ell: u64,
 ) -> Result<ProjectedRankAudit, LpGraphError> {
+    audit_projected_rank_in_order(relations, ell, 0..relations.len())
+}
+
+// Internal exact echelon shared by input-order and payload-weight-order
+// selectors. The latter only permutes original indices, never source rows.
+fn audit_projected_rank_in_order(
+    relations: &[CompleteRelation],
+    ell: u64,
+    order: impl IntoIterator<Item = usize>,
+) -> Result<ProjectedRankAudit, LpGraphError> {
     if !valid_modulus(ell) {
         return Err(LpGraphError::InvalidModulus);
     }
@@ -102,7 +112,8 @@ pub fn audit_projected_rank(
     };
     // Pivot -> (normalized sparse coefficients, correspondingly reduced RHS).
     let mut pivots: BTreeMap<u32, (BTreeMap<u32, u64>, u64)> = BTreeMap::new();
-    for (row_index, relation) in relations.iter().enumerate() {
+    for row_index in order {
+        let relation = &relations[row_index];
         let mut current: BTreeMap<u32, u64> = relation.small.iter().copied().collect();
         let mut rhs = relation.rhs;
         audit.peak_working_nonzeros = audit
@@ -211,4 +222,39 @@ pub fn select_augmented_basis(
         .map(|&i| relations[i].clone())
         .collect();
     Ok((retained, audit))
+}
+
+/// Select a minimum-fixed-payload **original** basis of the augmented rowspace.
+///
+/// For each unchanged row, the additive weight is its number of factor-base
+/// coefficients plus its number of original source-witness coefficients.
+/// Linear independence over F_ell defines a representable matroid on the
+/// original augmented vectors [small | fixed-known-RHS]. The greedy theorem
+/// makes sorted independent-row admission optimal for this FIXED sum of
+/// payload entries; it does not optimize fill, wall time, memory or cold DLP.
+///
+/// The returned third value is the number of row-key comparisons performed
+/// by sorting. Charge that O(R log R) work, the O(R) row-index vector,
+/// the complete sparse echelon and all original-row clones before comparing
+/// against the default input-order selection. No production path is changed.
+/// If a target scalar is unknown, its coefficient MUST be an explicit column.
+pub fn select_min_payload_augmented_basis(
+    relations: &[CompleteRelation],
+    ell: u64,
+) -> Result<(Vec<CompleteRelation>, ProjectedRankAudit, usize), LpGraphError> {
+    let mut order: Vec<usize> = (0..relations.len()).collect();
+    let mut comparisons = 0usize;
+    order.sort_unstable_by(|&i, &j| {
+        comparisons += 1;
+        let weight_i = relations[i].small.len() as u128 + relations[i].sources.len() as u128;
+        let weight_j = relations[j].small.len() as u128 + relations[j].sources.len() as u128;
+        weight_i.cmp(&weight_j).then_with(|| i.cmp(&j))
+    });
+    let audit = audit_projected_rank_in_order(relations, ell, order)?;
+    let retained = audit
+        .augmented_basis_row_indices
+        .iter()
+        .map(|&i| relations[i].clone())
+        .collect();
+    Ok((retained, audit, comparisons))
 }

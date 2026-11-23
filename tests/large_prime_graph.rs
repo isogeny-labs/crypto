@@ -2052,3 +2052,132 @@ fn augmented_basis_randomized_original_rank_and_source_conservation() {
         );
     }
 }
+
+#[test]
+fn augmented_basis_min_payload_fixed_optimum_and_explicit_target_column() {
+    use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::{
+        select_augmented_basis, select_min_payload_augmented_basis,
+    };
+    let mk = |small: Vec<(u32, u64)>, rhs: u64, id: u64, nsrc: usize| CompleteRelation {
+        small,
+        rhs,
+        sources: (0..nsrc).map(|j| (id * 100 + j as u64, 1)).collect(),
+    };
+    // First row is expensive but nonessential. Greedy by original index
+    // retains it; greedy by additive sparse+source payload finds the exact
+    // cheaper independent original rows, including the RHS anomaly.
+    let input = vec![
+        mk(vec![(0, 1), (1, 1)], 0, 10, 5),
+        mk(vec![(0, 1)], 0, 11, 1),
+        mk(vec![(1, 1)], 0, 12, 1),
+        mk(vec![(0, 2), (1, 2)], 0, 13, 1),
+        mk(vec![], 1, 14, 1),
+    ];
+    let (legacy, old) = select_augmented_basis(&input, 101).unwrap();
+    let (selected, new, compares) = select_min_payload_augmented_basis(&input, 101).unwrap();
+    assert_eq!(old.augmented_rank, 3);
+    assert_eq!(new.augmented_rank, old.augmented_rank);
+    assert_eq!(new.useful_small_rank, old.useful_small_rank);
+    assert_eq!(old.augmented_basis_row_indices, vec![0, 1, 4]);
+    assert_eq!(new.augmented_basis_row_indices, vec![1, 2, 4]);
+    assert_eq!(selected, vec![input[1].clone(), input[2].clone(), input[4].clone()]);
+    assert_eq!(new.augmented_basis_nonzeros + new.augmented_basis_source_terms, 5);
+    assert_eq!(old.augmented_basis_nonzeros + old.augmented_basis_source_terms, 10);
+    assert!(!legacy.is_empty());
+    assert!(compares > 0);
+
+    // A protected target scalar is an EXPLICIT column, not an assumed-known
+    // right-hand side. Numeric max-u32 column must remain distinct.
+    let target = vec![
+        mk(vec![(0, 1), (u32::MAX, 1)], 0, 50, 7),
+        mk(vec![(0, 1)], 0, 51, 1),
+        mk(vec![(u32::MAX, 1)], 0, 52, 1),
+    ];
+    let (selected, rank, _) = select_min_payload_augmented_basis(&target, 2_147_446_831).unwrap();
+    assert_eq!(rank.augmented_rank, 2);
+    assert_eq!(rank.augmented_basis_row_indices, vec![1, 2]);
+    assert_eq!(selected, vec![target[1].clone(), target[2].clone()]);
+
+    assert!(select_min_payload_augmented_basis(
+        &[mk(vec![(0, 1), (0, 2)], 0, 20, 1)], 101
+    ).is_err());
+    assert!(select_min_payload_augmented_basis(
+        &[mk(vec![(0, 3)], 0, 21, 1)], 9
+    ).is_err());
+}
+
+#[test]
+fn augmented_basis_min_payload_exact_dense_oracle_and_exhaustive_optimum() {
+    use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::{
+        select_augmented_basis, select_min_payload_augmented_basis,
+    };
+
+    fn augmented(rows: &[CompleteRelation], ncols: usize) -> Vec<Vec<(usize, u64)>> {
+        rows.iter().map(|row| {
+            let mut out: Vec<_> = row.small.iter()
+                .map(|&(column, coefficient)| (column as usize, coefficient)).collect();
+            if row.rhs != 0 {
+                out.push((ncols, row.rhs));
+            }
+            out
+        }).collect()
+    }
+    let mut rng = Rng(0x0ca5_1ca1_2026_1123);
+    // Small enough to exhaust all original-row subsets with no algorithmic
+    // assumption about rank preservation or the matroid-greedy theorem.
+    for trial in 0..128usize {
+        let ell = [3u64, 7, 101, 2_147_446_831][trial % 4];
+        let ncols = 1 + rng.below(5) as usize;
+        let nrows = 1 + rng.below(8) as usize;
+        let mut input = Vec::with_capacity(nrows);
+        for row_index in 0..nrows {
+            let mut small = Vec::new();
+            for col in 0..ncols {
+                if rng.below(3) != 0 {
+                    small.push((col as u32, 1 + rng.below(ell - 1)));
+                }
+            }
+            let source_count = 1 + rng.below(6) as usize;
+            input.push(CompleteRelation {
+                small,
+                rhs: rng.below(ell),
+                sources: (0..source_count)
+                    .map(|j| (100 * row_index as u64 + j as u64, 1))
+                    .collect(),
+            });
+        }
+        let full_rank = dense_rank(&augmented(&input, ncols), ncols + 1, ell).unwrap();
+        let (legacy_rows, legacy) = select_augmented_basis(&input, ell).unwrap();
+        let (kept, audit, comparisons) =
+            select_min_payload_augmented_basis(&input, ell).unwrap();
+        let kept_rank = dense_rank(&augmented(&kept, ncols), ncols + 1, ell).unwrap();
+        assert_eq!(audit.augmented_rank, full_rank, "trial {trial}");
+        assert_eq!(kept_rank, full_rank, "trial {trial}");
+        assert_eq!(kept.len(), full_rank, "trial {trial}");
+        assert_eq!(kept, audit.augmented_basis_row_indices.iter()
+            .map(|&i| input[i].clone()).collect::<Vec<_>>(), "trial {trial}");
+        assert!(audit.augmented_basis_row_indices.windows(2).all(|w| w[0] < w[1]));
+        let weight = audit.augmented_basis_nonzeros + audit.augmented_basis_source_terms;
+        let old_weight = legacy.augmented_basis_nonzeros + legacy.augmented_basis_source_terms;
+        assert!(weight <= old_weight, "trial {trial}: {weight} > {old_weight}");
+        assert_eq!(legacy_rows.len(), kept.len());
+        assert!(comparisons <= (nrows * nrows), "unexpected sort comparisons");
+
+        let mut min_weight = usize::MAX;
+        for mask in 0usize..(1usize << nrows) {
+            if mask.count_ones() as usize != full_rank {
+                continue;
+            }
+            let subset: Vec<_> = (0..nrows).filter(|i| mask & (1usize << i) != 0)
+                .map(|i| input[i].clone()).collect();
+            if dense_rank(&augmented(&subset, ncols), ncols + 1, ell).unwrap() == full_rank {
+                let candidate_weight: usize = subset.iter()
+                    .map(|r| r.small.len() + r.sources.len()).sum();
+                min_weight = min_weight.min(candidate_weight);
+            }
+        }
+        assert_eq!(weight, min_weight, "exhaustive minimum trial {trial}");
+    }
+}
