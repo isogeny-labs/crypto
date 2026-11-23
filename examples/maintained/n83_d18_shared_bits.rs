@@ -349,14 +349,13 @@ mod tests {
 
     #[test]
     fn selected_input_is_pinned_and_changed_bytes_are_rejected() {
-        // CSV is an artifacts-store object (gitignored). Compile must not depend on
-        // include_bytes!; skip when the file has not been materialized.
-        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(
+        // CSV lives in the verified artifacts store, not in the Git tree; skip when absent
+        // so `cargo check --all-targets` / clippy still compile on sparse or CI checkouts.
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join(
             "research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv",
         );
-        let bytes = match fs::read(&path) {
-            Ok(b) => b,
-            Err(_) => return,
+        let Ok(bytes) = std::fs::read(&path) else {
+            return;
         };
         assert_eq!(representatives(&bytes).unwrap().len(), 16_627);
         let mut changed = bytes.clone();
