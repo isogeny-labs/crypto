@@ -97,7 +97,7 @@ class ReplayChecks(unittest.TestCase):
                   {"a":0,"b":0,"point":None,
                    "extraction":{"relations":[{}, {}, {}]},"receipts":[]}],
                 "rank":0,"scalar":None,"final_replay_passed":False,
-                "status":"query_limit"}
+                "status":"query_limit","deadline_exceeded":False}
         with tempfile.TemporaryDirectory() as td:
             manifest_path=Path(td)/"base.json"
             record_path=Path(td)/"record.json"
@@ -211,7 +211,7 @@ class ReplayChecks(unittest.TestCase):
                  {"a":checker.N-4,"b":1,"point":list(self.base[0]),
                   "extraction":{"relations":[{"terms":[[0,1]]}]},
                   "receipts":[second]}],
-             "rank":2,"scalar":5,"status":"solved","final_replay_passed":True}
+             "rank":2,"scalar":5,"status":"solved","deadline_exceeded":False,"final_replay_passed":True}
         with tempfile.TemporaryDirectory() as td:
             manifest_path=Path(td)/"base.json"
             record_path=Path(td)/"record.json"
@@ -267,6 +267,24 @@ class ReplayChecks(unittest.TestCase):
                 checker.canonicalized_extraction(bad,1,0,len(self.base),"poison")
 
 
+    def test_native_terminal_clock_flags_are_fail_closed(self):
+        # The original Rust producer always serializes deadline_exceeded.
+        # Its stop reasons 'deadline' and 'solved_after_deadline' imply true,
+        # and 'solved' implies false after post-replay correction.
+        for status, expired in (("query_limit", False), ("deadline", True),
+                                ("solved", False), ("solved_after_deadline", True),
+                                ("relation_rejected", True)):
+            self.assertTrue(checker.verify_terminal_clock_consistency(
+                {"status":status, "deadline_exceeded":expired}))
+        for status, expired in (("deadline", False), ("solved_after_deadline", False),
+                                ("solved", True), ("deadline", 1),
+                                ("query_limit", "false"), ("query_limit", None)):
+            with self.assertRaisesRegex(ValueError, "deadline_exceeded|terminal clock/status"):
+                checker.verify_terminal_clock_consistency(
+                    {"status":status, "deadline_exceeded":expired})
+        with self.assertRaisesRegex(ValueError, "missing or non-Boolean"):
+            checker.verify_terminal_clock_consistency({"status":"query_limit"})
+
     def test_splitmix_source_exact_query_schedule(self):
         # These four independent known-answer words come from the native u64
         # SplitMix64 constants and modulo-n reduction, not target logs.
@@ -286,7 +304,7 @@ class ReplayChecks(unittest.TestCase):
             attempts.append({"a":a, "b":b, "point":list(qpt) if qpt else None,
                              "extraction":{"relations":[]}, "receipts":[]})
         record = {"target":list(self.q), "attempts":attempts, "rank":0,
-                  "scalar":None, "status":"query_limit",
+                  "scalar":None, "status":"query_limit", "deadline_exceeded":False,
                   "final_replay_passed":False}
         with tempfile.TemporaryDirectory() as td:
             base_path = Path(td)/"base.json"
@@ -332,9 +350,19 @@ class ReplayChecks(unittest.TestCase):
             prefix = copy.deepcopy(record)
             prefix["attempts"] = prefix["attempts"][:1]
             prefix["status"] = "deadline"
+            prefix["deadline_exceeded"] = True
             accepted = run(prefix)
             self.assertEqual(accepted.returncode, 0, accepted.stderr)
             self.assertEqual(json.loads(accepted.stdout)["source_exact_scheduled_queries"], 1)
+
+            # A false clock flag must not legitimize a shortened trace by
+            # claiming the actual query limit expired. This is only metadata
+            # consistency, not independent wall-clock verification.
+            clock_spoof = copy.deepcopy(prefix)
+            clock_spoof["deadline_exceeded"] = False
+            denied = run(clock_spoof)
+            self.assertNotEqual(denied.returncode, 0)
+            self.assertIn("terminal clock/status contradiction", denied.stderr)
 
             denied = run(record, command[:-2]) # --seed without its paired cap
             self.assertNotEqual(denied.returncode, 0)
