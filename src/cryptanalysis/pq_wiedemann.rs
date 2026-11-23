@@ -719,6 +719,19 @@ mod tests {
         let mut scratch = Vec::new();
         ata_vec_into(&m, &[BigUint::from(1u32)], 1, &n, &mut scratch, &mut gram);
         assert_eq!(gram, vec![BigUint::zero()]);
+        // D = diag(1,2): (M^T D M)=[4] and M^T D b=[2].
+        atda_vec_into(
+            &m,
+            &[BigUint::from(1u32)],
+            1,
+            &n,
+            &[BigUint::from(1u32), BigUint::from(2u32)],
+            &mut scratch,
+            &mut gram,
+        );
+        assert_eq!(gram, vec![BigUint::from(4u32)]);
+        let weighted_b = vec![b[0].clone(), (&b[1] * BigUint::from(2u32)) % &n];
+        assert_eq!(mat_t_vec(&m, &weighted_b, 1, &n), vec![BigUint::from(2u32)]);
         for seed in 0..32u64 {
             assert!(wiedemann_solve(&m, &b, 1, &n, seed).is_none());
         }
