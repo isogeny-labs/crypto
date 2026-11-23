@@ -32,7 +32,7 @@ cargo run --locked --release --example prime31_monic_s3_pair_oracle -- --scale
 cargo run --locked --release --example prime31_monic_s3_pair_oracle -- --compare
 ```
 
-**New Run75 execution status:** source committed; native `--compare` logs and CI verdict are still to be inspected. Do **not** use old #450894 timing as a measurement of the newly added tree-extractor arm.
+**New Run75 execution status:** source committed; baseline 32 cells additionally frozen to [RUN74B_MONIC_NATIVE_32_CELLS.json](RUN74B_MONIC_NATIVE_32_CELLS.json); native `--compare` logs and CI verdict are still to be inspected. Do **not** use old #450894 timing as a measurement of the newly added tree-extractor arm.
 
 ## New analytical screening criterion for the *four-summand* candidate
 
@@ -47,7 +47,7 @@ C(B) = Theta((n / B^3) T(B) + B^2)
      = Theta(n B^(gamma-3) + B^2).
 ```
 
-Balancing for `gamma < 3` gives `B = n^(1/(5-gamma))`, exponent `2/(5-gamma)`. **A sub-generic (< n^1/2) exponent requires gamma < 1**, *and* preprocessing / target recovery must not dominate and relation-rank heuristics must hold. A per-probe `~B` oracle only meets the 1/2 exponent under this model; an `~B^2` oracle is worse. If ordinary algorithmic m=4 root extraction cannot achieve **amortized o(B)** work (with setup accounted for), the proposed uniform four-summand framework cannot demonstrate the desired exponent gain on these hypotheses. This is a **conditional cost-model filter**, not an unconditional ECDLP lower bound or a security claim. Prove or falsify its individual assumptions before using it as an accepted complexity estimate.
+**Saturation qualification (important):** the formula `n/B^3` for attempted probes is valid only while `B^4 ≲ n`. For `0 ≤ gamma < 1`, its formal balance `B = n^(1/(5-gamma))` satisfies that restriction, giving exponent `2/(5-gamma) < 1/2`. At `gamma=1`, the balance is exactly `B=n^(1/4)`, on the saturation boundary, giving exponent `1/2`. For `1 < gamma < 3`, the optimal boundary is still `B≈n^(1/4)`, but one must cap hit probability by one: `B*T(B)+B^2` then scales as `n^((gamma+1)/4)` and **not** the extrapolated unsaturated `2/(5-gamma)`. For `gamma ≥ 3`, choosing bounded `B` gives at best the trivial `n` work in this model, so one must not extrapolate beyond saturation. **Thus a sub-generic (< n^1/2) exponent requires gamma < 1**, *and* preprocessing, failed trials, rank, sign-lifting and target recovery must not dominate. A per-probe `~B` oracle only meets the 1/2 exponent under this model; an `~B^2` oracle is worse. The test for a useful four-summand lead is **amortized o(B)** oracle work at fixed charged setup. This is a **conditional cost-model filter**, not an unconditional ECDLP lower bound or a security claim.
 
 Separate *m=2* warning: at B677 and group order 2147446831, a uniform random group target has at most `4*C(678,2)/n = 0.00042749` signed-pair support under a loose cardinality upper bound, so approximately **2339** uniform probes per potential success even optimistically. At the observed 29.34 ms x-only median, that is about 69 seconds of candidate work per putative relation; 677 independent hits would cost about **12.9 hours** in this simplistic, uniform, unchanged-cost extrapolation. This is *not* a measured 12.9-hour run, a bound on biased searches or an accepted full-ECDLP estimate.
 
