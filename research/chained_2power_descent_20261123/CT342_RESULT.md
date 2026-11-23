@@ -4,50 +4,39 @@
 
 ## New group-structure result (public F103 positive control)
 
-For the original CT336–341 bielliptic curve
-[
-C: y^2=prod_{j=1}^6(x-j),quad
-E_+: y^2=(x-	frac14)(x-	frac94)(x-	frac{25}4),quad
-E_-: y^2=(1-	frac{x}4)(1-	frac{9x}4)(1-	frac{25x}4)
-]
-over (mathbb F_{103}), a **new standalone Node.js group-law implementation** (no CT339–341 imports) enumerated every elliptic rational point, its order, and both Sylow structures.
+Consider the CT336–341 bielliptic curve over F103:
 
-| Quantity | `E_+` | `E_-` |
+- C: \`y² = product_(j=1..6) (x-j)\`.
+- E+: \`y² = (x-1/4)(x-9/4)(x-25/4)\`.
+- E-: \`y² = (1-x/4)(1-9x/4)(1-25x/4)\`.
+
+A **standalone Node.js elliptic group-law implementation**, with no CT339–341 code imports, independently enumerated every rational elliptic point and its order.
+
+| Quantity | E+ | E- |
 | --- | ---: | ---: |
-| `#E(F103)` | 92 | 100 |
-| Point-order exponent | 46 | 50 |
+| Number of F103 points | 92 | 100 |
+| Exponent | 46 | 50 |
 | Full invariant factors | **Z/2 × Z/46** | **Z/2 × Z/50** |
-| Nonzero rational 2-torsion | 3 | 3 |
+| Nonzero rational 2-torsion points | 3 | 3 |
 | Odd-primary subgroup | Z/23 | **Z/25** |
-| Order-25 points | 0 | **20** |
-| Order-50 points | 0 | **60** |
+| Order-25 elements | 0 | **20** |
+| Order-50 elements | 0 | **60** |
 
-Thus
-[
-B=(E_+	imes E_-)(mathbb F_{103})
-   cong (mathbb Z/2)^4 	imesmathbb Z/575.
-]
-In particular, `E_-` is **not** (mathbb Z/10	imesmathbb Z/10); the order-25 and order-50 witnesses distinguish its cyclic 25-part. `E_-` has an explicit order-25 witness `(x,y)=(0,1)`, and `E_+` has an order-23 witness `(41,2)`. The 2-torsion abscissae are `[26,28,32]` for `E_+` and `[4,29,92]` for `E_-`.
+It follows that the elliptic product group B is isomorphic to **(Z/2)^4 × Z/575**. Importantly, E- is *not* Z/10 × Z/10: the witnessed order-25 and order-50 elements distinguish its cyclic 25-part. An E- order-25 witness is (x,y)=(0,1); an E+ order-23 witness is (41,2). The nonzero rational two-torsion abscissae are 26,28,32 for E+ and 4,29,92 for E-.
 
-The CT341 independently computed zeta order `#J(C)(F103)=9200=16*575`. All six Weierstrass roots are rational, so (J(C)[2](mathbb F_{103})cong(mathbb Z/2)^4); this consumes the entire 2-primary order 16. The dual composition (PsiPhi=[2]) implies (J(C)_{m odd}cong B_{m odd}). Consequently
-[
-oxed{J(C)(mathbb F_{103})cong (mathbb Z/2)^4	imesmathbb Z/575}
-]
-**conditional on the frozen CT340/CT341 homomorphism and zeta premises**. This is a finite mathematical consequence with a new elliptic group-law crosscheck, not a signed independent Jacobian census.
+CT341 computed the independent curve-zeta cardinality of the Jacobian A=J(C)(F103) as 9200=16×575. All six Weierstrass roots are rational, so its complete 2-torsion has structure (Z/2)^4, accounting for its entire 2-primary subgroup. Combined with the CT340 dual composition and the odd-primary isomorphism below, this fixes the source Jacobian group:
+
+**J(C)(F103) ≅ (Z/2)^4 × Z/575**, conditional on the frozen CT340/CT341 homomorphism and point-count premises. This is a finite mathematical implication with a fresh elliptic group-law crosscheck, not signed independent verification of the entire Jacobian census.
 
 ## Transfer theorem and exact obstruction
 
-Let (A,B) be finite abelian groups and homomorphisms (Phi:A	o B), (Psi:B	o A) satisfy (PsiPhi=[2]_A) and (PhiPsi=[2]_B).
+Let A,B be finite abelian groups, with homomorphisms Φ:A→B and Ψ:B→A satisfying both ΨΦ=[2] on A and ΦΨ=[2] on B.
 
-* For each odd prime (ell), multiplication by 2 is invertible on the (ell)-primary subgroup. Hence (Phi:A_ell	o B_ell) is an isomorphism with explicit inverse ( [2^{-1}]Psi), using an inverse of 2 modulo the relevant subgroup exponent. This holds regardless of nonsurjectivity on all rational points.
-* Since ([2]Bsubseteqoperatorname{im}Phi), the cokernel (operatorname{coker}Phi) is annihilated by 2; likewise for (Psi). CT341's kernel/image counts were 4/2300 for each direction. On F103 both 2-primary groups are 4-dimensional vector spaces over F2; therefore the maps restrict to **rank-two F2-linear maps**, with 2-dimensional kernels and cokernels:
-  [
-  operatorname{coker}Phicongoperatorname{coker}Psicong(mathbb Z/2)^2,
-  qquad |operatorname{im}Phi|=|operatorname{im}Psi|=2300.
-  ]
-* **Single-generator scalar-recovery corollary:** even if (Phi) is not injective on all of (A), its restriction to any cyclic subgroup (langle Gangle) has kernel killed by 2, hence **at most two elements**. If (operatorname{ord}(G)=n) and (operatorname{ord}(Phi G)=m), then (n/min{1,2}). A valid DLP solution in the destination determines (kmod m); at most two candidate lifts (k) or (k+m) need source-group verification. This qualification is stronger and more useful than claiming that the index-four rational cokernel destroys DLP recoverability.
+- **Odd-primary isomorphism.** On each odd-prime primary part, multiplication by 2 is invertible. Hence Φ is an isomorphism with explicit inverse \`[2⁻¹]Ψ\` (where 2⁻¹ is computed modulo the relevant subgroup exponent). Rational-point nonsurjectivity on all of B does not obstruct this odd-part inverse.
+- **Cokernels of exponent two.** Since \`[2]B ⊆ image(Φ)\`, every element of \`coker(Φ)\` has order at most 2; likewise for \`coker(Ψ)\`. CT341 reported the two rational kernels and two image indices each equal four. Here A₂ and B₂ are both four-dimensional F₂-vector spaces, so Φ and Ψ have **rank two** on their 2-primary subgroups, with kernels and cokernels each isomorphic to **(Z/2)^2**. Their images have structure (Z/2)^2 × Z/575 and cardinality 2300.
+- **Single-generator DLP recovery.** For any G in A of known order n, the restriction of Φ to the cyclic group generated by G has kernel killed by 2. A cyclic group has at most one nonidentity element of order 2; therefore \`n / ord(Φ(G))\` is either 1 or 2. If a destination DLP solver returns \`k mod m\` for \`m=ord(Φ(G))\`, then at most **two candidate lifts** \`k\` and \`k+m\` require verification by source scalar multiplication. This shows that an index-four rational cokernel does not, by itself, prevent a correct complete single-target DLP reduction.
 
-The last corollary is a statement about **correctness and bounded ambiguity**, not computational superiority. It requires a computable (Phi), known subgroup order and a complete charged destination DLP solver. The two candidate verifications and all setup/map/linear-algebra/memory belong in cold single-target cost.
+These are statements about correctness and bounded ambiguity, **not** computational superiority. Complete costs must include computing the map, destination DLP, any subgroup/order work, up to two source checks, memory and setup. The explicit valid homomorphisms have been checked only on the intentionally split F103 positive control; no ordinary prime-field elliptic-source transfer or measured cost advantage follows.
 
 ## Executed evidence
 
