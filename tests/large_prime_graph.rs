@@ -1033,3 +1033,93 @@ fn forest_witness_batches_endpoint_inverses_and_keeps_nonunit_refusal_atomic() {
     assert!(ring.add_row(&[(0, 2), (1, 4)]).unwrap().is_none());
     assert_eq!(ring.stats().inverse_calls, 1);
 }
+
+#[test]
+fn forest_witness_factors_shared_lca_suffix_once() {
+    // Two leaves share 29 edges above their LCA. Field arithmetic and
+    // ordered-map work must skip those shared edges for balanced cycles,
+    // while pointer lookups still account for both full parent paths.
+    // Includes the unbalanced (root-pinning) case and exact source replay.
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    for p in [3u64, 7, 101, 1_000_003] {
+        let mut f = ForestWitnessExtractor::new(32, p).unwrap();
+        let mut equations: Vec<Vec<(usize, u64)>> = Vec::new();
+        for v in 0..30 {
+            let row = vec![(v, 1), (v + 1, 1)];
+            assert!(f.add_row(&row).unwrap().is_none());
+            equations.push(row);
+        }
+        let branch = vec![(29, 1), (31, 1)];
+        assert!(f.add_row(&branch).unwrap().is_none());
+        equations.push(branch);
+        assert_eq!(f.rank(), 31);
+        assert_eq!(f.stats().path_steps, 464);
+        assert_eq!(f.stats().parent_path_reads, 464);
+
+        let mut witnesses = Vec::new();
+        for _ in 0..48 {
+            let closer = vec![(30, 1), (31, p - 1)];
+            let witness = f.add_row(&closer).unwrap().expect("balanced cycle");
+            assert_eq!(witness.sources.len(), 3, "only local LCA edges needed");
+            witnesses.push(witness);
+            equations.push(closer);
+        }
+        let before_pin = f.stats();
+        assert_eq!(before_pin.path_steps, 464 + 48 * 2);
+        assert_eq!(before_pin.parent_path_reads, 464 + 48 * 60);
+        assert_eq!(before_pin.inverse_calls, equations.len() as u64);
+        assert_eq!(before_pin.dependent_rows, 48);
+        assert_eq!(f.rank(), 31);
+
+        // A nonzero coefficient at the LCA requires exactly ONE traversal
+        // of the common 29-edge suffix, rather than two full reductions.
+        let unbalanced = vec![(30, 1), (31, 1)];
+        assert!(f.add_row(&unbalanced).unwrap().is_none());
+        equations.push(unbalanced);
+        assert_eq!(f.rank(), 32);
+        assert_eq!(f.stats().path_steps, before_pin.path_steps + 31);
+        assert_eq!(f.stats().parent_path_reads, before_pin.parent_path_reads + 60);
+
+        // A reversed balanced closer must still have the same exact source
+        // size and does not traverse the common suffix during elimination.
+        let reverse = vec![(31, p - 1), (30, 1)];
+        let witness = f.add_row(&reverse).unwrap().expect("reversed balanced cycle");
+        assert_eq!(witness.sources.len(), 3);
+        witnesses.push(witness);
+        equations.push(reverse);
+        assert_eq!(f.stats().path_steps, before_pin.path_steps + 33);
+
+        let before_refusal = f.stats();
+        assert!(matches!(
+            f.add_row(&[(30, 1), (30, p - 1)]),
+            Err(LpGraphError::NonCanonicalRow { .. })
+        ));
+        assert_eq!(f.stats(), before_refusal);
+
+        let inputs: Vec<PartialRelation> = equations.iter().enumerate().map(|(i, row)| {
+            PartialRelation {
+                id: 7000 + i as u64,
+                small: vec![(i as u32, 1)],
+                large: row.iter().map(|&(j, a)| (9000 + j as u64, a)).collect(),
+                rhs: i as u64 % p,
+            }
+        }).collect();
+        let index = LpIndex::build(&inputs, p).unwrap();
+        assert_eq!(index.rows, equations);
+        let batch = collect_witnesses(&index).unwrap();
+        assert_eq!(batch.rank, dense_rank(&index.rows, 32, p).unwrap());
+        assert_eq!(batch.rank, 32);
+        assert_eq!(batch.witnesses, witnesses);
+        assert_eq!(batch.stats, f.stats());
+        for w in &batch.witnesses {
+            assert!(witness_cancels_lp(&index, w), "bad LP witness p={p}");
+        }
+        let replay = materialize_complete_relations(&index, &batch, &inputs, 64, 64)
+            .expect("original sources reproduce every small row and RHS");
+        assert_eq!(replay.len(), 49);
+        for (w, row) in witnesses.iter().zip(replay.iter()) {
+            assert_eq!(row.sources.iter().map(|(id, a)| (id - 7000, *a)).collect::<Vec<_>>(),
+                       w.sources.iter().map(|&(i, a)| (i as u64, a)).collect::<Vec<_>>());
+        }
+    }
+}
