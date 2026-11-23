@@ -2,7 +2,7 @@
 """Round123 source-exact production Rust A/B: quadratic specializations.
 
 The frozen baseline is the *same checked-out production module* with only
-the three Round123 changes reverted, so upstream optimizations are shared.
+the cached-inverse Round123 change reverted, so upstream optimizations are shared.
 """
 import os
 import subprocess
@@ -17,14 +17,7 @@ except (OSError,AttributeError):
     print("ROUND123_CPU=unavailable",flush=True)
 
 s=Path("src/cryptanalysis/prime_radical_root.rs").read_text().split("\n#[cfg(test)]\n",1)[0]
-def remove_block(text, begin, end):
-    a=text.index(begin)
-    b=text.index(end,a)+len(end)
-    return text[:a]+text[b:]
-frozen=remove_block(s,"        // R123_MONIC_BZERO_BEGIN\n",
-                    "        // R123_MONIC_BZERO_END\n")
-frozen=remove_block(frozen,"        // R123_SMALL_LEADING_BZERO_BEGIN\n",
-                    "        // R123_SMALL_LEADING_BZERO_END\n")
+frozen=s
 old="vec![0, f.mul(f.neg(b), self.inv_leading(a))]"
 new="vec![0, f.mul(f.neg(b), f.inv(a))]"
 assert frozen.count(old)==1
@@ -80,12 +73,13 @@ fn make(p:u64,kind:usize,n:usize)->Vec<Q>{
   let t=next(&mut state)%p;
   let a=match kind{
     0|1=>1,
-    2|3|4=>2+(i%3) as u64,
+    2|3|4|7=>2+(i%3) as u64,
     _=>5+next(&mut state)%(p-5),
   };
   let (b,c)=match kind {
     0|2|5=>(0,m.neg(m.mul(a,m.sqr(r)))),
     1|3|6=>(0,next(&mut state)%p),
+    7|8=>(next(&mut state)%p,0),
     4=>{
       let b=m.neg(m.mul(a,m.add(r,t)));
       (b,m.mul(a,m.mul(r,t)))
@@ -104,7 +98,7 @@ fn correctness(){
  let mut count=0u64;
  for p in [5u64,7,11,97,65_521,1_000_000_007,4_294_967_291,(1u64<<61)-1]{
   let old=baseline::ctx(p);let new=candidate::ctx(p);
-  for kind in 0..7 {
+  for kind in 0..9 {
    if p<=5 && kind>=5 {continue;}
    for q in make(p,kind,256){
     let x=baseline::quad(&old,q.a,q.b,q.c);
@@ -125,7 +119,7 @@ fn correctness(){
 fn benchmark(){
  for p in [97u64,65_521,1_000_000_007,4_294_967_291]{
   let old=baseline::ctx(p);let new=candidate::ctx(p);
-  for kind in 0..7{
+  for kind in 0..9{
    if p<=5 && kind>=5 {continue;}
    let inputs=make(p,kind,128);
    let mut before=Vec::new();let mut after=Vec::new();
