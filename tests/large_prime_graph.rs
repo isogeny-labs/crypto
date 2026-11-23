@@ -1403,3 +1403,175 @@ fn projected_rank_target_unknown_must_be_a_sparse_column_not_hidden_rhs() {
     assert!(exact.inconsistent_row_indices.is_empty());
     assert_eq!(exact.independent_row_indices, vec![0]);
 }
+
+
+/// Independent reference oracle for source relations, BEFORE constructing LP
+/// cancellation witnesses. The identity checked below is:
+///   rank(W S) = rank([L | S]) - rank(L)
+///   rank([W S | W b]) = rank([L | S | b]) - rank(L).
+/// Dense elimination is deliberately limited to tiny correctness fixtures.
+/// Compress arbitrary sparse factor-base/target column IDs to avoid allocating
+/// up to u32::MAX when a target log is represented as a protected column.
+fn raw_lp_small_augmented_ranks(
+    source: &[PartialRelation],
+    index: &LpIndex,
+    ell: u64,
+) -> (usize, usize, usize) {
+    assert_eq!(source.len(), index.rows.len());
+    let mut small_ids: Vec<u32> = source
+        .iter()
+        .flat_map(|r| r.small.iter().map(|&(id, _)| id))
+        .collect();
+    small_ids.sort_unstable();
+    small_ids.dedup();
+    let lp_cols = index.num_columns();
+    let mut small_and_lp = Vec::with_capacity(source.len());
+    let mut augmented = Vec::with_capacity(source.len());
+    for (i, source_row) in source.iter().enumerate() {
+        let mut joined = index.rows[i].clone();
+        for &(id, coefficient) in &source_row.small {
+            let compressed = small_ids.binary_search(&id).unwrap();
+            joined.push((lp_cols + compressed, coefficient % ell));
+        }
+        let mut with_rhs = joined.clone();
+        with_rhs.push((lp_cols + small_ids.len(), source_row.rhs % ell));
+        small_and_lp.push(joined);
+        augmented.push(with_rhs);
+    }
+    (
+        dense_rank(&index.rows, lp_cols, ell).unwrap(),
+        dense_rank(&small_and_lp, lp_cols + small_ids.len(), ell).unwrap(),
+        dense_rank(&augmented, lp_cols + small_ids.len() + 1, ell).unwrap(),
+    )
+}
+
+#[test]
+fn raw_block_rank_identity_independently_checks_forest_pivot_mst() {
+    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    use crypto::cryptanalysis::large_prime_graph::witness::{
+        collect_witnesses_lazy, materialize_complete_relations,
+    };
+    use crypto::cryptanalysis::large_prime_filter::{
+        filter_large_primes, filter_large_primes_mst, replay_complete_relation,
+        CompleteRelation, LargePrimeFilterOptions, MstLimits,
+    };
+    let mut rng = Rng(0x8e41_4bbc_729c_1605);
+    let limits = MstLimits {
+        max_rows: 256,
+        max_column_degree: 64,
+        max_edge_evaluations: 1_000_000,
+        max_active_coefficients: 1_000_000,
+    };
+    for trial in 0..128 {
+        let ell = [3u64, 7, 101, 1_000_003, 2_147_446_831][trial % 5];
+        let count = 2 + rng.below(33) as usize;
+        let mut source = random_lp_stream(&mut rng, count, 12, 2, ell);
+        for (i, relation) in source.iter_mut().enumerate() {
+            relation.small = vec![
+                (rng.below(18) as u32, 1 + rng.below(ell - 1)),
+                (rng.below(18) as u32, rng.below(ell)),
+            ];
+            // Includes intentional duplicate support/zero normalization.
+            if i % 7 == 0 {
+                relation.small.push((u32::MAX, 1 + rng.below(ell - 1)));
+            }
+            if i % 11 == 0 {
+                relation.large.clear(); // exact zero-LP row
+            }
+            if i % 13 == 0 {
+                let (id, c) = relation.small[0];
+                relation.small.push((id, ell - c)); // cancellation
+            }
+        }
+        let index = LpIndex::build(&source, ell).unwrap();
+        let (lp_rank, block_rank, full_rank) =
+            raw_lp_small_augmented_ranks(&source, &index, ell);
+        let target_small_rank = block_rank - lp_rank;
+        let target_aug_rank = full_rank - lp_rank;
+        assert!(target_aug_rank >= target_small_rank);
+        assert!(target_aug_rank <= target_small_rank + 1);
+
+        let batch = collect_witnesses_lazy(&index).unwrap();
+        assert_eq!(batch.rank, lp_rank, "LP rank trial {trial}");
+        assert_eq!(batch.witnesses.len(), count - lp_rank);
+        let forest = materialize_complete_relations(&index, &batch, &source, 4096, 4096)
+            .expect("bounded forest source replay");
+        assert_eq!(forest.len(), count - lp_rank);
+
+        let options = LargePrimeFilterOptions {
+            modulus: ell,
+            max_small_weight: 4096,
+            max_sources: 4096,
+        };
+        let (pivot, _) = filter_large_primes(source.clone(), &options).unwrap();
+        let mst = filter_large_primes_mst(source.clone(), &options, &limits).unwrap();
+        // A refusal is NOT a partial result. The production fallback is the
+        // original pivot filter and must be measured/charged separately.
+        let mst_rows = mst.relations.as_ref().unwrap_or(&pivot);
+        for (label, rows) in [
+            ("forest", forest.as_slice()),
+            ("pivot", pivot.as_slice()),
+            ("mst-or-fallback", mst_rows.as_slice()),
+        ] {
+            for row in rows {
+                let replay = replay_complete_relation(row, &source, ell).unwrap();
+                assert_eq!(&replay, row, "{label} replay trial {trial}");
+            }
+            let audit = audit_projected_rank(rows, ell).unwrap();
+            assert!(
+                audit.useful_small_rank <= target_small_rank,
+                "{label} exceeded raw useful rank trial {trial}"
+            );
+            assert!(
+                audit.augmented_rank <= target_aug_rank,
+                "{label} exceeded raw augmented rank trial {trial}"
+            );
+            if label == "forest" {
+                assert_eq!(
+                    audit.useful_small_rank, target_small_rank,
+                    "forest lost rank([L S])-rank(L), trial {trial}"
+                );
+                assert_eq!(
+                    audit.augmented_rank, target_aug_rank,
+                    "forest lost augmented rank, trial {trial}"
+                );
+            }
+        }
+    }
+
+    // A nonzero RHS with no small unknowns has augmented rank one although
+    // all LP-cancelled rows have small-coordinate rank zero. These are
+    // algebraic inconsistent-constant fixtures, not group-valid ECDLP rows.
+    let source = vec![
+        PartialRelation { id: 90, small: vec![], large: vec![(77, 1)], rhs: 0 },
+        PartialRelation { id: 91, small: vec![], large: vec![(77, 1)], rhs: 1 },
+        PartialRelation { id: 92, small: vec![], large: vec![(77, 1)], rhs: 2 },
+    ];
+    let index = LpIndex::build(&source, 7).unwrap();
+    assert_eq!(raw_lp_small_augmented_ranks(&source, &index, 7), (1, 1, 2));
+    let batch = collect_witnesses_lazy(&index).unwrap();
+    let complete = materialize_complete_relations(&index, &batch, &source, 32, 32).unwrap();
+    let audit = audit_projected_rank(&complete, 7).unwrap();
+    assert_eq!(audit.useful_small_rank, 0);
+    assert_eq!(audit.augmented_rank, 1);
+    assert_eq!(audit.inconsistent_row_indices.len(), 2);
+
+    let options = LargePrimeFilterOptions {
+        modulus: 7,
+        max_small_weight: 32,
+        max_sources: 32,
+    };
+    let refused = filter_large_primes_mst(
+        source.clone(), &options,
+        &MstLimits { max_rows: 1, ..MstLimits::default() },
+    ).unwrap();
+    assert!(refused.relations.is_none(), "MST must refuse atomically");
+    assert!(refused.stats.budget_refusals > 0);
+    let (pivot_fallback, _) = filter_large_primes(source.clone(), &options).unwrap();
+    for row in &pivot_fallback {
+        assert_eq!(replay_complete_relation(row, &source, 7).unwrap(), *row);
+    }
+    let fallback = audit_projected_rank(&pivot_fallback, 7).unwrap();
+    assert!(fallback.useful_small_rank <= audit.useful_small_rank);
+    assert!(fallback.augmented_rank <= audit.augmented_rank);
+}
