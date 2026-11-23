@@ -316,6 +316,24 @@ mod tests {
         assert!(verify(&f).is_err());
     }
     #[test]
+    fn real_extracted_grevlex_b8_public_row_has_rank_but_no_target_scalar() {
+        // Replayed from the separate RR5 development09 Grevlex B8 positive
+        // extraction receipt. The target was constructed as a known-positive
+        // correctness fixture: no blind Prime31 scalar claim is possible.
+        let json = include_str!("../../rr5_grevlex_b8_producer_row.json");
+        let receipt: Receipt = serde_json::from_str(json).unwrap();
+        let result = verify(&receipt).unwrap();
+        assert_eq!(result.base_size, 8);
+        assert_eq!(result.authenticated_rows, 1);
+        assert_eq!(result.independent_augmented_rank, 1);
+        assert_eq!(result.first_determined_relation_prefix, None);
+        assert_eq!(result.recovered, None);
+        assert!(!result.scalar_replay_passed);
+        let mut invalid = receipt;
+        invalid.relations[0].terms[1][1] = 1;
+        assert!(verify(&invalid).is_err(), "wrong sign must fail group replay");
+    }
+    #[test]
     fn reject_more_than_four_signed_leaves() {
         let mut f=fixture();
         f.relations[0].terms=vec![[0,4],[1,1]];
