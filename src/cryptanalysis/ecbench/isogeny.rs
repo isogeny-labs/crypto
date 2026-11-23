@@ -584,7 +584,8 @@ mod tests {
                     let polynomial = [c, b, 1];
                     let expected: Vec<u64> = (0..p).filter(|&x| {
                         let x2 = field.mul(x, x);
-                        let x2_bx = field.add(x2, field.mul(b, x));
+                        let bx = field.mul(b, x);
+                        let x2_bx = field.add(x2, bx);
                         field.add(x2_bx, c) == 0
                     }).collect();
                     assert_eq!(field.roots(&polynomial), expected,
