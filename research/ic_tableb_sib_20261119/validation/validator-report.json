@@ -1,0 +1,1269 @@
+{
+ "checks": {
+  "readme_checks": 64,
+  "readme_mismatches_at_printed_precision": 2,
+  "runs_per_arm": {
+   "P20": {
+    "rho-neg": 96,
+    "sib8-p256": 96,
+    "sib8-p512": 96,
+    "tw2l": 96,
+    "tw2l-aa": 96
+   },
+   "P22": {
+    "rho-neg": 96,
+    "sib8-p256": 96,
+    "sib8-p512": 96,
+    "tw2l": 96,
+    "tw2l-aa": 96
+   },
+   "P24": {
+    "rho-neg": 96,
+    "sib8-p256": 96,
+    "sib8-p512": 96,
+    "tw2l": 96,
+    "tw2l-aa": 96
+   }
+  },
+  "scalars": {
+   "P20": {
+    "distinct_target_log_pairs": 48,
+    "failures": 0,
+    "records_checked": 720
+   },
+   "P22": {
+    "distinct_target_log_pairs": 48,
+    "failures": 0,
+    "records_checked": 720
+   },
+   "P24": {
+    "distinct_target_log_pairs": 48,
+    "failures": 0,
+    "records_checked": 720
+   }
+  }
+ },
+ "gaps": [
+  {
+   "gap": "No second host, no EKS/S3 in this container: the replays ran on the same container and CPU class as the producer (L0, 4 shared cores). Counted cost does not depend on the host, so the replays are valid; the wall-time columns (ns/GAE, end-to-end wall) are not independently reproduced.",
+   "id": "G1-no-second-host"
+  },
+  {
+   "gap": "Every replay used target/release/ecbench (sha256 b4fcf0ecdb3d0a0f42842856fe1e258258d52414c3ea54155292ae5431a592a0), the binary that produced the sessions. No cargo build was allowed, so there is no from-source rebuild as in research/ic_tableb_binary_ksum_20261115/validator. The independent checks are (a) a re-execution of all 480 deterministic runs per session by a different session than the producer's, (b) the validator's own Python prime-field arithmetic ([recovered]G == target for every record), and (c) an own recompute of every headline from records.jsonl.",
+   "id": "G2-same-binary"
+  },
+  {
+   "gap": "No pcc claim filed and no keyring signature on the certificate or the report: every statement here is [pcc:unverified]. AGENTS.md 'Sabotage is assumed' asks for signed artifacts; none could be produced in this container.",
+   "id": "G3-no-pcc-or-keyring"
+  },
+  {
+   "gap": "bitop/v1 ratios are recomputed from each record's own work.bitops_per_sqrt_r field; the per-primitive bitop widths behind that field were not re-derived (the unit's definition is the producer's).",
+   "id": "G4-bitop-not-rederived"
+  },
+  {
+   "gap": "L0 runs, no isolation tier and no native L2/replay/A/A admission: valid for counted cost only; no wall-time or L2 claim is validated.",
+   "id": "G5-no-isolation"
+  }
+ ],
+ "headline": [
+  {
+   "claimed": 1.2891370777042772,
+   "name": "P20/S/rho-neg/w0",
+   "recomputed": 1.2891370777042768
+  },
+  {
+   "claimed": 1.4016138601662405,
+   "name": "P20/S/rho-neg/w0.1",
+   "recomputed": 1.4016138601662413
+  },
+  {
+   "claimed": 2.4139049023239196,
+   "name": "P20/S/rho-neg/w1",
+   "recomputed": 2.4139049023239205
+  },
+  {
+   "claimed": 1.4242179410252225,
+   "name": "P20/S/sib8-p256/w0",
+   "recomputed": 1.424217941025223
+  },
+  {
+   "claimed": 1.698827390116805,
+   "name": "P20/S/sib8-p256/w0.1",
+   "recomputed": 1.698827390116804
+  },
+  {
+   "claimed": 4.170312431941032,
+   "name": "P20/S/sib8-p256/w1",
+   "recomputed": 4.170312431941034
+  },
+  {
+   "claimed": 1.6560818149417107,
+   "name": "P20/S/sib8-p512/w0",
+   "recomputed": 1.65608181494171
+  },
+  {
+   "claimed": 1.9156011770862242,
+   "name": "P20/S/sib8-p512/w0.1",
+   "recomputed": 1.9156011770862238
+  },
+  {
+   "claimed": 4.251275436386846,
+   "name": "P20/S/sib8-p512/w1",
+   "recomputed": 4.251275436386846
+  },
+  {
+   "claimed": 2.97196223637529,
+   "name": "P20/S/tw2l/w0",
+   "recomputed": 2.9719622363752904
+  },
+  {
+   "claimed": 3.1488378456728845,
+   "name": "P20/S/tw2l/w0.1",
+   "recomputed": 3.1488378456728845
+  },
+  {
+   "claimed": 4.740718329351234,
+   "name": "P20/S/tw2l/w1",
+   "recomputed": 4.740718329351233
+  },
+  {
+   "claimed": 2.97196223637529,
+   "name": "P20/S/tw2l-aa/w0",
+   "recomputed": 2.9719622363752904
+  },
+  {
+   "claimed": 3.1488378456728845,
+   "name": "P20/S/tw2l-aa/w0.1",
+   "recomputed": 3.1488378456728845
+  },
+  {
+   "claimed": 4.740718329351234,
+   "name": "P20/S/tw2l-aa/w1",
+   "recomputed": 4.740718329351233
+  },
+  {
+   "claimed": 0.4800330953205652,
+   "name": "P20/sib8-p256_over_tw2l/raw_gae",
+   "recomputed": 0.4800330953205652
+  },
+  {
+   "claimed": 0.45858137578188873,
+   "name": "P20/sib8-p256_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.45858137578188884
+  },
+  {
+   "claimed": 0.5024882927488128,
+   "name": "P20/sib8-p256_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.5024882927488122
+  },
+  {
+   "claimed": 0.4792180477912968,
+   "name": "P20/sib8-p256_over_tw2l/band_w0",
+   "recomputed": 0.4792180477912967
+  },
+  {
+   "claimed": 0.5395093280053544,
+   "name": "P20/sib8-p256_over_tw2l/band_w0.1",
+   "recomputed": 0.5395093280053539
+  },
+  {
+   "claimed": 0.8796794372113101,
+   "name": "P20/sib8-p256_over_tw2l/band_w1",
+   "recomputed": 0.87967943721131
+  },
+  {
+   "claimed": 0.5322979756028733,
+   "name": "P20/sib8-p256_over_tw2l/bitop",
+   "recomputed": 0.5322979756028731
+  },
+  {
+   "claimed": 0.5083679462665305,
+   "name": "P20/sib8-p256_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.5083679462665307
+  },
+  {
+   "claimed": 0.5573544455581492,
+   "name": "P20/sib8-p256_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.5573544455581485
+  },
+  {
+   "claimed": 0.5579268050841493,
+   "name": "P20/sib8-p512_over_tw2l/raw_gae",
+   "recomputed": 0.5579268050841492
+  },
+  {
+   "claimed": 0.5340586893098933,
+   "name": "P20/sib8-p512_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.5340586893098938
+  },
+  {
+   "claimed": 0.582861633116845,
+   "name": "P20/sib8-p512_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.5828616331168446
+  },
+  {
+   "claimed": 0.5572351474295736,
+   "name": "P20/sib8-p512_over_tw2l/band_w0",
+   "recomputed": 0.5572351474295736
+  },
+  {
+   "claimed": 0.6083518018302002,
+   "name": "P20/sib8-p512_over_tw2l/band_w0.1",
+   "recomputed": 0.6083518018301998
+  },
+  {
+   "claimed": 0.896757651697192,
+   "name": "P20/sib8-p512_over_tw2l/band_w1",
+   "recomputed": 0.8967576516971919
+  },
+  {
+   "claimed": 0.602167693331502,
+   "name": "P20/sib8-p512_over_tw2l/bitop",
+   "recomputed": 0.6021676933315019
+  },
+  {
+   "claimed": 0.5760670341597754,
+   "name": "P20/sib8-p512_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.5760670341597759
+  },
+  {
+   "claimed": 0.6294509308644292,
+   "name": "P20/sib8-p512_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.6294509308644288
+  },
+  {
+   "claimed": 1.10842019152347,
+   "name": "P20/sib8-p256_over_rho-neg/raw_gae",
+   "recomputed": 1.1084201915234697
+  },
+  {
+   "claimed": 0.993875493977634,
+   "name": "P20/sib8-p256_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 0.9938754939776355
+  },
+  {
+   "claimed": 1.2361662284879458,
+   "name": "P20/sib8-p256_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.2361662284879433
+  },
+  {
+   "claimed": 1.104783940868027,
+   "name": "P20/sib8-p256_over_rho-neg/band_w0",
+   "recomputed": 1.1047839408680271
+  },
+  {
+   "claimed": 1.2120509352806432,
+   "name": "P20/sib8-p256_over_rho-neg/band_w0.1",
+   "recomputed": 1.2120509352806421
+  },
+  {
+   "claimed": 1.7276208470044452,
+   "name": "P20/sib8-p256_over_rho-neg/band_w1",
+   "recomputed": 1.7276208470044452
+  },
+  {
+   "claimed": 1.2338881402400366,
+   "name": "P20/sib8-p256_over_rho-neg/bitop",
+   "recomputed": 1.2338881402400361
+  },
+  {
+   "claimed": 1.1059703527783273,
+   "name": "P20/sib8-p256_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.1059703527783284
+  },
+  {
+   "claimed": 1.376601044323086,
+   "name": "P20/sib8-p256_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.3766010443230825
+  },
+  {
+   "claimed": 1.2882806251816292,
+   "name": "P20/sib8-p512_over_rho-neg/raw_gae",
+   "recomputed": 1.2882806251816288
+  },
+  {
+   "claimed": 1.1645904970632113,
+   "name": "P20/sib8-p512_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 1.1645904970632135
+  },
+  {
+   "claimed": 1.425107772563496,
+   "name": "P20/sib8-p512_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.425107772563494
+  },
+  {
+   "claimed": 1.2846436919577984,
+   "name": "P20/sib8-p512_over_rho-neg/band_w0",
+   "recomputed": 1.284643691957799
+  },
+  {
+   "claimed": 1.366711068952344,
+   "name": "P20/sib8-p512_over_rho-neg/band_w0.1",
+   "recomputed": 1.3667110689523432
+  },
+  {
+   "claimed": 1.7611611096584823,
+   "name": "P20/sib8-p512_over_rho-neg/band_w1",
+   "recomputed": 1.7611611096584823
+  },
+  {
+   "claimed": 1.395848959214845,
+   "name": "P20/sib8-p512_over_rho-neg/bitop",
+   "recomputed": 1.3958489592148446
+  },
+  {
+   "claimed": 1.2615565546497747,
+   "name": "P20/sib8-p512_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.2615565546497762
+  },
+  {
+   "claimed": 1.5444367593033252,
+   "name": "P20/sib8-p512_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.5444367593033221
+  },
+  {
+   "claimed": 2.3090495266441344,
+   "name": "P20/tw2l_over_rho-neg/raw_gae",
+   "recomputed": 2.3090495266441344
+  },
+  {
+   "claimed": 2.102695480307522,
+   "name": "P20/tw2l_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 2.102695480307525
+  },
+  {
+   "claimed": 2.535654718635592,
+   "name": "P20/tw2l_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 2.5356547186355884
+  },
+  {
+   "claimed": 2.305388843262366,
+   "name": "P20/tw2l_over_rho-neg/band_w0",
+   "recomputed": 2.305388843262367
+  },
+  {
+   "claimed": 2.2465801282097835,
+   "name": "P20/tw2l_over_rho-neg/band_w0.1",
+   "recomputed": 2.246580128209784
+  },
+  {
+   "claimed": 1.9639209170117828,
+   "name": "P20/tw2l_over_rho-neg/band_w1",
+   "recomputed": 1.963920917011783
+  },
+  {
+   "claimed": 2.318040264651678,
+   "name": "P20/tw2l_over_rho-neg/bitop",
+   "recomputed": 2.3180402646516773
+  },
+  {
+   "claimed": 2.111906388706807,
+   "name": "P20/tw2l_over_rho-neg/bitop_ci_lo",
+   "recomputed": 2.1119063887068092
+  },
+  {
+   "claimed": 2.5442939598457706,
+   "name": "P20/tw2l_over_rho-neg/bitop_ci_hi",
+   "recomputed": 2.5442939598457652
+  },
+  {
+   "claimed": 1.0,
+   "name": "P20/tw2l-aa_over_tw2l/raw_gae",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P20/tw2l-aa_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P20/tw2l-aa_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P20/tw2l-aa_over_tw2l/band_w0",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P20/tw2l-aa_over_tw2l/band_w0.1",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P20/tw2l-aa_over_tw2l/band_w1",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P20/tw2l-aa_over_tw2l/bitop",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P20/tw2l-aa_over_tw2l/bitop_ci_lo",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P20/tw2l-aa_over_tw2l/bitop_ci_hi",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.165274768802515,
+   "name": "P22/S/rho-neg/w0",
+   "recomputed": 1.165274768802515
+  },
+  {
+   "claimed": 1.2723897463308045,
+   "name": "P22/S/rho-neg/w0.1",
+   "recomputed": 1.2723897463308045
+  },
+  {
+   "claimed": 2.2364245440854105,
+   "name": "P22/S/rho-neg/w1",
+   "recomputed": 2.2364245440854105
+  },
+  {
+   "claimed": 1.1112421767558434,
+   "name": "P22/S/sib8-p256/w0",
+   "recomputed": 1.111242176755843
+  },
+  {
+   "claimed": 1.360626904004726,
+   "name": "P22/S/sib8-p256/w0.1",
+   "recomputed": 1.3606269040047259
+  },
+  {
+   "claimed": 3.6050894492446743,
+   "name": "P22/S/sib8-p256/w1",
+   "recomputed": 3.6050894492446726
+  },
+  {
+   "claimed": 1.299825166700055,
+   "name": "P22/S/sib8-p512/w0",
+   "recomputed": 1.2998251667000555
+  },
+  {
+   "claimed": 1.558985825781673,
+   "name": "P22/S/sib8-p512/w0.1",
+   "recomputed": 1.558985825781673
+  },
+  {
+   "claimed": 3.8914317575162336,
+   "name": "P22/S/sib8-p512/w1",
+   "recomputed": 3.8914317575162336
+  },
+  {
+   "claimed": 2.5224625565989784,
+   "name": "P22/S/tw2l/w0",
+   "recomputed": 2.5224625565989784
+  },
+  {
+   "claimed": 2.7018431835071257,
+   "name": "P22/S/tw2l/w0.1",
+   "recomputed": 2.701843183507126
+  },
+  {
+   "claimed": 4.316268825680454,
+   "name": "P22/S/tw2l/w1",
+   "recomputed": 4.316268825680455
+  },
+  {
+   "claimed": 2.5224625565989784,
+   "name": "P22/S/tw2l-aa/w0",
+   "recomputed": 2.5224625565989784
+  },
+  {
+   "claimed": 2.7018431835071257,
+   "name": "P22/S/tw2l-aa/w0.1",
+   "recomputed": 2.701843183507126
+  },
+  {
+   "claimed": 4.316268825680454,
+   "name": "P22/S/tw2l-aa/w1",
+   "recomputed": 4.316268825680455
+  },
+  {
+   "claimed": 0.4412615435908506,
+   "name": "P22/sib8-p256_over_tw2l/raw_gae",
+   "recomputed": 0.4412615435908507
+  },
+  {
+   "claimed": 0.417159221726641,
+   "name": "P22/sib8-p256_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.41715922172664127
+  },
+  {
+   "claimed": 0.4667564318637366,
+   "name": "P22/sib8-p256_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.4667564318637361
+  },
+  {
+   "claimed": 0.44053862121708703,
+   "name": "P22/sib8-p256_over_tw2l/band_w0",
+   "recomputed": 0.44053862121708726
+  },
+  {
+   "claimed": 0.5035921079026375,
+   "name": "P22/sib8-p256_over_tw2l/band_w0.1",
+   "recomputed": 0.5035921079026373
+  },
+  {
+   "claimed": 0.8352328353126468,
+   "name": "P22/sib8-p256_over_tw2l/band_w1",
+   "recomputed": 0.8352328353126464
+  },
+  {
+   "claimed": 0.5036538527127608,
+   "name": "P22/sib8-p256_over_tw2l/bitop",
+   "recomputed": 0.5036538527127604
+  },
+  {
+   "claimed": 0.4762010116909163,
+   "name": "P22/sib8-p256_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.4762010116909165
+  },
+  {
+   "claimed": 0.5326893415275916,
+   "name": "P22/sib8-p256_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.532689341527591
+  },
+  {
+   "claimed": 0.5159255584262269,
+   "name": "P22/sib8-p512_over_tw2l/raw_gae",
+   "recomputed": 0.515925558426227
+  },
+  {
+   "claimed": 0.4895069673911797,
+   "name": "P22/sib8-p512_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.4895069673911801
+  },
+  {
+   "claimed": 0.5437699554227233,
+   "name": "P22/sib8-p512_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.5437699554227228
+  },
+  {
+   "claimed": 0.5153000837612437,
+   "name": "P22/sib8-p512_over_tw2l/band_w0",
+   "recomputed": 0.5153000837612441
+  },
+  {
+   "claimed": 0.5770082569181653,
+   "name": "P22/sib8-p512_over_tw2l/band_w0.1",
+   "recomputed": 0.5770082569181652
+  },
+  {
+   "claimed": 0.9015730749584986,
+   "name": "P22/sib8-p512_over_tw2l/band_w1",
+   "recomputed": 0.9015730749584983
+  },
+  {
+   "claimed": 0.5779135751884564,
+   "name": "P22/sib8-p512_over_tw2l/bitop",
+   "recomputed": 0.577913575188456
+  },
+  {
+   "claimed": 0.5486200698006789,
+   "name": "P22/sib8-p512_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.5486200698006796
+  },
+  {
+   "claimed": 0.6087712039197618,
+   "name": "P22/sib8-p512_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.6087712039197613
+  },
+  {
+   "claimed": 0.9564426077779263,
+   "name": "P22/sib8-p256_over_rho-neg/raw_gae",
+   "recomputed": 0.9564426077779257
+  },
+  {
+   "claimed": 0.8607001351363196,
+   "name": "P22/sib8-p256_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 0.860700135136321
+  },
+  {
+   "claimed": 1.062835271692102,
+   "name": "P22/sib8-p256_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.0628352716921001
+  },
+  {
+   "claimed": 0.9536310289270249,
+   "name": "P22/sib8-p256_over_rho-neg/band_w0",
+   "recomputed": 0.9536310289270246
+  },
+  {
+   "claimed": 1.0693475862473525,
+   "name": "P22/sib8-p256_over_rho-neg/band_w0.1",
+   "recomputed": 1.0693475862473516
+  },
+  {
+   "claimed": 1.6119879647980613,
+   "name": "P22/sib8-p256_over_rho-neg/band_w1",
+   "recomputed": 1.611987964798061
+  },
+  {
+   "claimed": 1.0874818838118998,
+   "name": "P22/sib8-p256_over_rho-neg/bitop",
+   "recomputed": 1.0874818838118994
+  },
+  {
+   "claimed": 0.9782162436156155,
+   "name": "P22/sib8-p256_over_rho-neg/bitop_ci_lo",
+   "recomputed": 0.978216243615617
+  },
+  {
+   "claimed": 1.2089523715614972,
+   "name": "P22/sib8-p256_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.2089523715614952
+  },
+  {
+   "claimed": 1.118278249459251,
+   "name": "P22/sib8-p512_over_rho-neg/raw_gae",
+   "recomputed": 1.1182782494592503
+  },
+  {
+   "claimed": 1.0080225403490117,
+   "name": "P22/sib8-p512_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 1.0080225403490133
+  },
+  {
+   "claimed": 1.240593531550062,
+   "name": "P22/sib8-p512_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.2405935315500598
+  },
+  {
+   "claimed": 1.1154666706083498,
+   "name": "P22/sib8-p512_over_rho-neg/band_w0",
+   "recomputed": 1.1154666706083496
+  },
+  {
+   "claimed": 1.2252423679751647,
+   "name": "P22/sib8-p512_over_rho-neg/band_w0.1",
+   "recomputed": 1.225242367975164
+  },
+  {
+   "claimed": 1.7400237212597935,
+   "name": "P22/sib8-p512_over_rho-neg/band_w1",
+   "recomputed": 1.7400237212597938
+  },
+  {
+   "claimed": 1.2478223685600118,
+   "name": "P22/sib8-p512_over_rho-neg/bitop",
+   "recomputed": 1.2478223685600116
+  },
+  {
+   "claimed": 1.124307228664419,
+   "name": "P22/sib8-p512_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.1243072286644213
+  },
+  {
+   "claimed": 1.384906744154239,
+   "name": "P22/sib8-p512_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.3849067441542373
+  },
+  {
+   "claimed": 2.167518610379438,
+   "name": "P22/tw2l_over_rho-neg/raw_gae",
+   "recomputed": 2.167518610379436
+  },
+  {
+   "claimed": 1.9512531815521268,
+   "name": "P22/tw2l_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 1.9512531815521303
+  },
+  {
+   "claimed": 2.407753627647675,
+   "name": "P22/tw2l_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 2.4077536276476716
+  },
+  {
+   "claimed": 2.1646933617134514,
+   "name": "P22/tw2l_over_rho-neg/band_w0",
+   "recomputed": 2.164693361713449
+  },
+  {
+   "claimed": 2.1234399218466224,
+   "name": "P22/tw2l_over_rho-neg/band_w0.1",
+   "recomputed": 2.1234399218466216
+  },
+  {
+   "claimed": 1.9299863423049661,
+   "name": "P22/tw2l_over_rho-neg/band_w1",
+   "recomputed": 1.929986342304967
+  },
+  {
+   "claimed": 2.1591850791065075,
+   "name": "P22/tw2l_over_rho-neg/bitop",
+   "recomputed": 2.159185079106509
+  },
+  {
+   "claimed": 1.9458027144703067,
+   "name": "P22/tw2l_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.9458027144703107
+  },
+  {
+   "claimed": 2.3959675722342206,
+   "name": "P22/tw2l_over_rho-neg/bitop_ci_hi",
+   "recomputed": 2.3959675722342175
+  },
+  {
+   "claimed": 1.0,
+   "name": "P22/tw2l-aa_over_tw2l/raw_gae",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P22/tw2l-aa_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P22/tw2l-aa_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P22/tw2l-aa_over_tw2l/band_w0",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P22/tw2l-aa_over_tw2l/band_w0.1",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P22/tw2l-aa_over_tw2l/band_w1",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P22/tw2l-aa_over_tw2l/bitop",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P22/tw2l-aa_over_tw2l/bitop_ci_lo",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P22/tw2l-aa_over_tw2l/bitop_ci_hi",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0853156237899746,
+   "name": "P24/S/rho-neg/w0",
+   "recomputed": 1.0853156237899748
+  },
+  {
+   "claimed": 1.1826682317381991,
+   "name": "P24/S/rho-neg/w0.1",
+   "recomputed": 1.1826682317381991
+  },
+  {
+   "claimed": 2.0588417032722184,
+   "name": "P24/S/rho-neg/w1",
+   "recomputed": 2.058841703272218
+  },
+  {
+   "claimed": 1.0102295676389634,
+   "name": "P24/S/sib8-p256/w0",
+   "recomputed": 1.0102295676389637
+  },
+  {
+   "claimed": 1.2684389690995057,
+   "name": "P24/S/sib8-p256/w0.1",
+   "recomputed": 1.2684389690995055
+  },
+  {
+   "claimed": 3.5923235822443806,
+   "name": "P24/S/sib8-p256/w1",
+   "recomputed": 3.5923235822443806
+  },
+  {
+   "claimed": 1.149048202014901,
+   "name": "P24/S/sib8-p512/w0",
+   "recomputed": 1.1490482020149007
+  },
+  {
+   "claimed": 1.423789451827415,
+   "name": "P24/S/sib8-p512/w0.1",
+   "recomputed": 1.4237894518274155
+  },
+  {
+   "claimed": 3.896460700140047,
+   "name": "P24/S/sib8-p512/w1",
+   "recomputed": 3.896460700140047
+  },
+  {
+   "claimed": 2.1478675873430197,
+   "name": "P24/S/tw2l/w0",
+   "recomputed": 2.1478675873430206
+  },
+  {
+   "claimed": 2.31873018457033,
+   "name": "P24/S/tw2l/w0.1",
+   "recomputed": 2.31873018457033
+  },
+  {
+   "claimed": 3.856493559616118,
+   "name": "P24/S/tw2l/w1",
+   "recomputed": 3.8564935596161174
+  },
+  {
+   "claimed": 2.1478675873430197,
+   "name": "P24/S/tw2l-aa/w0",
+   "recomputed": 2.1478675873430206
+  },
+  {
+   "claimed": 2.31873018457033,
+   "name": "P24/S/tw2l-aa/w0.1",
+   "recomputed": 2.31873018457033
+  },
+  {
+   "claimed": 3.856493559616118,
+   "name": "P24/S/tw2l-aa/w1",
+   "recomputed": 3.8564935596161174
+  },
+  {
+   "claimed": 0.4711514534949805,
+   "name": "P24/sib8-p256_over_tw2l/raw_gae",
+   "recomputed": 0.47115145349498005
+  },
+  {
+   "claimed": 0.44186950071124326,
+   "name": "P24/sib8-p256_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.4418695007112439
+  },
+  {
+   "claimed": 0.5023738723155189,
+   "name": "P24/sib8-p256_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.5023738723155184
+  },
+  {
+   "claimed": 0.47034071075519585,
+   "name": "P24/sib8-p256_over_tw2l/band_w0",
+   "recomputed": 0.4703407107551957
+  },
+  {
+   "claimed": 0.5470403488685995,
+   "name": "P24/sib8-p256_over_tw2l/band_w0.1",
+   "recomputed": 0.5470403488685995
+  },
+  {
+   "claimed": 0.9314999562975977,
+   "name": "P24/sib8-p256_over_tw2l/band_w1",
+   "recomputed": 0.9314999562975977
+  },
+  {
+   "claimed": 0.5502490243430572,
+   "name": "P24/sib8-p256_over_tw2l/bitop",
+   "recomputed": 0.5502490243430573
+  },
+  {
+   "claimed": 0.5160998168134981,
+   "name": "P24/sib8-p256_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.5160998168134987
+  },
+  {
+   "claimed": 0.5866578110022838,
+   "name": "P24/sib8-p256_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.5866578110022831
+  },
+  {
+   "claimed": 0.5356828537361636,
+   "name": "P24/sib8-p512_over_tw2l/raw_gae",
+   "recomputed": 0.5356828537361636
+  },
+  {
+   "claimed": 0.5051366569037942,
+   "name": "P24/sib8-p512_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 0.5051366569037945
+  },
+  {
+   "claimed": 0.568076214357123,
+   "name": "P24/sib8-p512_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 0.5680762143571223
+  },
+  {
+   "claimed": 0.5349716196594361,
+   "name": "P24/sib8-p512_over_tw2l/band_w0",
+   "recomputed": 0.5349716196594358
+  },
+  {
+   "claimed": 0.6140384341834276,
+   "name": "P24/sib8-p512_over_tw2l/band_w0.1",
+   "recomputed": 0.6140384341834275
+  },
+  {
+   "claimed": 1.0103635958173125,
+   "name": "P24/sib8-p512_over_tw2l/band_w1",
+   "recomputed": 1.0103635958173123
+  },
+  {
+   "claimed": 0.6184324391929237,
+   "name": "P24/sib8-p512_over_tw2l/bitop",
+   "recomputed": 0.6184324391929236
+  },
+  {
+   "claimed": 0.5830027286747256,
+   "name": "P24/sib8-p512_over_tw2l/bitop_ci_lo",
+   "recomputed": 0.5830027286747259
+  },
+  {
+   "claimed": 0.6560152517905183,
+   "name": "P24/sib8-p512_over_tw2l/bitop_ci_hi",
+   "recomputed": 0.6560152517905176
+  },
+  {
+   "claimed": 0.9338547056351199,
+   "name": "P24/sib8-p256_over_rho-neg/raw_gae",
+   "recomputed": 0.9338547056351192
+  },
+  {
+   "claimed": 0.8442300536416061,
+   "name": "P24/sib8-p256_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 0.8442300536416074
+  },
+  {
+   "claimed": 1.032994036963145,
+   "name": "P24/sib8-p256_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.0329940369631434
+  },
+  {
+   "claimed": 0.9308163869522058,
+   "name": "P24/sib8-p256_over_rho-neg/band_w0",
+   "recomputed": 0.9308163869522057
+  },
+  {
+   "claimed": 1.072523075415027,
+   "name": "P24/sib8-p256_over_rho-neg/band_w0.1",
+   "recomputed": 1.0725230754150272
+  },
+  {
+   "claimed": 1.7448274806824264,
+   "name": "P24/sib8-p256_over_rho-neg/band_w1",
+   "recomputed": 1.7448274806824269
+  },
+  {
+   "claimed": 1.071502597143497,
+   "name": "P24/sib8-p256_over_rho-neg/bitop",
+   "recomputed": 1.0715025971434973
+  },
+  {
+   "claimed": 0.9687959193132615,
+   "name": "P24/sib8-p256_over_rho-neg/bitop_ci_lo",
+   "recomputed": 0.9687959193132633
+  },
+  {
+   "claimed": 1.185097699935722,
+   "name": "P24/sib8-p256_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.1850976999357201
+  },
+  {
+   "claimed": 1.0617603956832442,
+   "name": "P24/sib8-p512_over_rho-neg/raw_gae",
+   "recomputed": 1.0617603956832444
+  },
+  {
+   "claimed": 0.9515163852621281,
+   "name": "P24/sib8-p512_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 0.9515163852621294
+  },
+  {
+   "claimed": 1.1847774303233645,
+   "name": "P24/sib8-p512_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 1.184777430323362
+  },
+  {
+   "claimed": 1.058722621169286,
+   "name": "P24/sib8-p512_over_rho-neg/band_w0",
+   "recomputed": 1.058722621169286
+  },
+  {
+   "claimed": 1.2038790031037139,
+   "name": "P24/sib8-p512_over_rho-neg/band_w0.1",
+   "recomputed": 1.203879003103714
+  },
+  {
+   "claimed": 1.892549919669497,
+   "name": "P24/sib8-p512_over_rho-neg/band_w1",
+   "recomputed": 1.8925499196694973
+  },
+  {
+   "claimed": 1.204276491983146,
+   "name": "P24/sib8-p512_over_rho-neg/bitop",
+   "recomputed": 1.2042764919831457
+  },
+  {
+   "claimed": 1.078939118220921,
+   "name": "P24/sib8-p512_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.0789391182209227
+  },
+  {
+   "claimed": 1.3441739618585928,
+   "name": "P24/sib8-p512_over_rho-neg/bitop_ci_hi",
+   "recomputed": 1.3441739618585902
+  },
+  {
+   "claimed": 1.9820690325962644,
+   "name": "P24/tw2l_over_rho-neg/raw_gae",
+   "recomputed": 1.982069032596265
+  },
+  {
+   "claimed": 1.765633947472733,
+   "name": "P24/tw2l_over_rho-neg/raw_gae_ci_lo",
+   "recomputed": 1.7656339474727358
+  },
+  {
+   "claimed": 2.2250351810466458,
+   "name": "P24/tw2l_over_rho-neg/raw_gae_ci_hi",
+   "recomputed": 2.225035181046641
+  },
+  {
+   "claimed": 1.9790257693357094,
+   "name": "P24/tw2l_over_rho-neg/band_w0",
+   "recomputed": 1.9790257693357098
+  },
+  {
+   "claimed": 1.9605922627704555,
+   "name": "P24/tw2l_over_rho-neg/band_w0.1",
+   "recomputed": 1.9605922627704562
+  },
+  {
+   "claimed": 1.8731374799173741,
+   "name": "P24/tw2l_over_rho-neg/band_w1",
+   "recomputed": 1.8731374799173746
+  },
+  {
+   "claimed": 1.947304856056337,
+   "name": "P24/tw2l_over_rho-neg/bitop",
+   "recomputed": 1.9473048560563375
+  },
+  {
+   "claimed": 1.7368873608210793,
+   "name": "P24/tw2l_over_rho-neg/bitop_ci_lo",
+   "recomputed": 1.7368873608210829
+  },
+  {
+   "claimed": 2.1832136544697986,
+   "name": "P24/tw2l_over_rho-neg/bitop_ci_hi",
+   "recomputed": 2.1832136544697947
+  },
+  {
+   "claimed": 1.0,
+   "name": "P24/tw2l-aa_over_tw2l/raw_gae",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P24/tw2l-aa_over_tw2l/raw_gae_ci_lo",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P24/tw2l-aa_over_tw2l/raw_gae_ci_hi",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P24/tw2l-aa_over_tw2l/band_w0",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P24/tw2l-aa_over_tw2l/band_w0.1",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P24/tw2l-aa_over_tw2l/band_w1",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P24/tw2l-aa_over_tw2l/bitop",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P24/tw2l-aa_over_tw2l/bitop_ci_lo",
+   "recomputed": 1.0
+  },
+  {
+   "claimed": 1.0,
+   "name": "P24/tw2l-aa_over_tw2l/bitop_ci_hi",
+   "recomputed": 1.0
+  }
+ ],
+ "headline_max_rel_diff": 2.580786709011594e-15,
+ "headline_mismatches": [],
+ "independent": true,
+ "method": "Independent recomputation in Python (stdlib) from the committed records.jsonl of the three sessions by recompute.py: every non-warm-up verified run is priced as priced_gae(w) = G - C + w (U + n_C), S = priced_gae / sqrt(r) (AGENTS.md section 5a), with C and n_C the pinned-calibration native work of the curve's row in docs/ic/calibration.json, U the uncharged counters plus the counted table work; ratios are ratios of per-workload means over 48 workloads with a linearised-t interval on the log scale (df 47). 'claimed' is the full-precision output of ecbench band --json and ecbench compare --json run on the same sessions (ecbench-claimed.json); 'recomputed' is the validator's own number. Band orders were also recomputed from the validator's S. README tables were compared at their printed precision (readme-comparison.json).",
+ "own_band_orders": [
+  {
+   "a": "sib8-p256",
+   "b": "tw2l",
+   "own_band_order": "sib8-p256 < tw2l at every weight",
+   "session": "P20"
+  },
+  {
+   "a": "sib8-p512",
+   "b": "tw2l",
+   "own_band_order": "sib8-p512 < tw2l at every weight",
+   "session": "P20"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "sib8-p512",
+   "own_band_order": "sib8-p256 < sib8-p512 at every weight",
+   "session": "P20"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "rho-neg",
+   "own_band_order": "rho-neg < sib8-p256 at every weight",
+   "session": "P20"
+  },
+  {
+   "a": "rho-neg",
+   "b": "tw2l",
+   "own_band_order": "rho-neg < tw2l at every weight",
+   "session": "P20"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "tw2l",
+   "own_band_order": "sib8-p256 < tw2l at every weight",
+   "session": "P22"
+  },
+  {
+   "a": "sib8-p512",
+   "b": "tw2l",
+   "own_band_order": "sib8-p512 < tw2l at every weight",
+   "session": "P22"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "sib8-p512",
+   "own_band_order": "sib8-p256 < sib8-p512 at every weight",
+   "session": "P22"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "rho-neg",
+   "own_band_order": "unresolved inside the band",
+   "session": "P22"
+  },
+  {
+   "a": "rho-neg",
+   "b": "tw2l",
+   "own_band_order": "rho-neg < tw2l at every weight",
+   "session": "P22"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "tw2l",
+   "own_band_order": "sib8-p256 < tw2l at every weight",
+   "session": "P24"
+  },
+  {
+   "a": "sib8-p512",
+   "b": "tw2l",
+   "own_band_order": "unresolved inside the band",
+   "session": "P24"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "sib8-p512",
+   "own_band_order": "sib8-p256 < sib8-p512 at every weight",
+   "session": "P24"
+  },
+  {
+   "a": "sib8-p256",
+   "b": "rho-neg",
+   "own_band_order": "unresolved inside the band",
+   "session": "P24"
+  },
+  {
+   "a": "rho-neg",
+   "b": "tw2l",
+   "own_band_order": "rho-neg < tw2l at every weight",
+   "session": "P24"
+  }
+ ],
+ "raw_data": [
+  {
+   "path": "../sessions/P20/records.jsonl",
+   "sha256": "a51a54b1688da0fc372c107f23ac15e2062aad2e9bf9e05f9fc56a83659ec94a"
+  },
+  {
+   "path": "../sessions/P20/spec.json",
+   "sha256": "3afd3a6e4ef4b82353b9072eddd068829cc66012f28232d2c6d8c9c197a6049d"
+  },
+  {
+   "path": "../sessions/P20/session.json",
+   "sha256": "826d980487257e00ee0bbbf0816ffab1d2910750360e5f6a676e6017d42cc7c1"
+  },
+  {
+   "path": "../sessions/P22/records.jsonl",
+   "sha256": "8b36880704358278e6b7cf28286819624b4ca82c07b18da1194189ef03099715"
+  },
+  {
+   "path": "../sessions/P22/spec.json",
+   "sha256": "90179d792d7947e20ec7640595e922e7d1363ad9e842a777ca45b9a88e653c50"
+  },
+  {
+   "path": "../sessions/P22/session.json",
+   "sha256": "bf3ed1a59bacf7b2cce3c697710b07789d7c62673b90e8684f224ae7c527e671"
+  },
+  {
+   "path": "../sessions/P24/records.jsonl",
+   "sha256": "1b1ec6fab5b88fda039deb09f1734004d238ed365fb918799bb97986ea80bab2"
+  },
+  {
+   "path": "../sessions/P24/spec.json",
+   "sha256": "d347ef5f759a87408e01f7f239873fae1cee5c1999f35fe209373a2414487476"
+  },
+  {
+   "path": "../sessions/P24/session.json",
+   "sha256": "8c1613d24ca4b00dedc4b333b2c2de2101eee22d7be5f4c3dbf954f5bc5f81a6"
+  },
+  {
+   "path": "../../../docs/ic/calibration.json",
+   "sha256": "f0c0a873dc7b27c8baa86c5ac1debe9643d799e93ce0110175d0622cc8f7fff2"
+  }
+ ],
+ "readme_discrepancies": [
+  {
+   "decimals": 3,
+   "match": false,
+   "readme": 1.088,
+   "recomputed": 1.0874818838118994,
+   "study": "sib",
+   "what": "P22 sib8-p256/rho-neg bitop"
+  },
+  {
+   "decimals": 3,
+   "match": false,
+   "readme": 0.932,
+   "recomputed": 0.9314999562975977,
+   "study": "sib",
+   "what": "P24 sib8-p256/tw2l w=1"
+  }
+ ],
+ "schema": "validation-gate.validator-report/v1",
+ "status": "pass",
+ "study": "research/ic_tableb_sib_20261119",
+ "validated_commit": "afc9a49d36dee4e9ef5074d9a2aa03bc72513ba7",
+ "validator_code_sha256": {
+  "own-numbers.json": "f5de954bcb564669332717a0aeef3a5e05904fd6a267a1cf4db4d203f5124daf",
+  "recompute.py": "4727d5c328114d94a5d8fe8779c010ab14b811621b92a6f2ea98b1ecaeb8375c"
+ }
+}

@@ -90,8 +90,8 @@
 //!   Semaev-polynomial Gröbner basis cost across curve families.
 
 use crate::cryptanalysis::ec_index_calculus::{
-    find_one_relation, gaussian_eliminate_mod_n_particular, semaev_s3, semaev_s3_in_x3, sqrt_mod_p,
-    FactorBaseEntry,
+    factor_base_x_index, find_one_relation_with_index, gaussian_eliminate_mod_n_particular,
+    semaev_s3, semaev_s3_in_x3, sqrt_mod_p, FactorBaseEntry,
 };
 use crate::ecc::curve::CurveParams;
 use crate::ecc::field::FieldElement;
@@ -900,9 +900,11 @@ pub fn eisenstein_smooth_ic_dlp(
     }
     let m = fb.len();
     let target = m + extra_relations;
+    let x_to_idx = factor_base_x_index(&fb);
     let mut relations = Vec::with_capacity(target);
     while relations.len() < target {
-        let rel = find_one_relation(curve, g, q, &fb, max_trials_per_relation)?;
+        let rel =
+            find_one_relation_with_index(curve, g, q, &fb, &x_to_idx, max_trials_per_relation)?;
         relations.push(rel);
     }
     let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(relations.len());

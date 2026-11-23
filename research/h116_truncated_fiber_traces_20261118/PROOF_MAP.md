@@ -44,9 +44,10 @@ This map is written before the first H116 Lean declaration.
    recurrence coefficients, so for prime `p>19` that identity alone implies the
    full finite recurrence. The remaining geometric bridge constructs the actual
    normalized isogeny at-infinity series and proves that it satisfies
-   transformed equation (14). The formal-group congruence for `V-1` is a
-   separate endpoint premise unless an existing verified elliptic formal-group
-   theorem is located. A finite reversed numerator/denominator certificate is
+   transformed equation (14). The generic formal-group filtration congruence
+   is now proved against Mathlib's actual `FormalGroup`; identifying the
+   supplied `V-1` map with that formal sum remains a separate elliptic endpoint
+   premise. A finite reversed numerator/denominator certificate is
    now proved sufficient for transformed equation (14), so the map bridge can
    be discharged by a checked polynomial identity rather than a trusted map
    evaluator. One excluded `p=31`, `r=37` Vélu control constructs this
@@ -145,6 +146,76 @@ for the full identity.  Thus the certificate carries eleven coefficients
 last two are derivative guards, not decoded moments.
 [pcc:unverified]
 
+## Elliptic--Prym low-coefficient factor gate
+
+This section was written after the frozen Prym panel and before adding its
+Lean declarations.
+
+1. **Structure above.**  Work over an arbitrary field.  The elliptic Weil
+   factor begins `(1,-t,p)` and the abelian-surface Prym factor begins
+   `(1,-tau,eta)`.  Only degree-one and degree-two coefficient convolution is
+   formalized.
+2. **Theorems used as stated.**  Ring normalization supplies the generic
+   convolution identities.  No curve, zeta function or isogeny implementation
+   is imported into the arithmetic statement.
+3. **Object as an instance.**  The native experiment supplies the premise
+   that the genus-three Weil polynomial factors as the elliptic polynomial
+   times the Prym polynomial.  The formal theorem then recovers
+   `tau=s1-t` and `eta=e2-p-t*tau` exactly.
+4. **Assembly probe.**  The intended theorem uses the visible coefficient
+   equations `-s1=(-t)+(-tau)` and
+   `e2=p+(-t)*(-tau)+eta`; `ring_nf` and linear combination suffice.  A
+   separate ring identity normalizes the real-Weil discriminant.
+5. **Missing components only.**  Existence of the Prym, the Jacobian isogeny,
+   equality of Weil polynomials and fixed-genus point-counting complexity stay
+   explicit geometric premises.  The theorem does not turn the measured
+   residue association into a decoder.
+6. **Inheritance table.**
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| low product coefficients are `-(t+tau)` and `p+t*tau+eta` | generic ring law | H116 Lean module | field | none |
+| product coefficients recover `tau,eta` | generic coefficient consequence | H116 Lean module | field | two displayed coefficient equations |
+| real-Weil discriminant normalization | generic ring law | H116 Lean module | field | none |
+| `Jac(C) ~ E x Prym` supplies the product | geometric endpoint | future Prym owner | genus-three double cover of an elliptic curve | smooth cover and norm-map construction |
+
+[pcc:unverified]
+
+## Genus-three signed-twist trace-parity obstruction gate
+
+This section was written after the frozen native result exposed exact pair
+balance and before adding the corresponding Lean declarations.
+
+1. **Structure above.**  The geometric calculation supplies integers `t` and
+   `S(Q)` with `S(-Q)=epsilon(Q)*S(Q)`, where `epsilon(Q)` is either `1` or
+   `-1`.  Lean formalizes only this exact arithmetic interface; it does not
+   pretend to construct the genus-three curve or its character sum.
+2. **Theorems used as stated.**  Integer remainder arithmetic is discharged by
+   `omega`.  Pair failure reuses the already-audited local theorem
+   `negInvariant_binaryDecoder_pair_failure`.
+3. **Object as an instance.**  The observable is the integer remainder
+   `(t-S(Q)) % 2`.  The native change of variables `R -> -R` establishes the
+   supplied signed-twist premise for the concrete cover.
+4. **Assembly probe.**  The intended arithmetic statement is that
+   `t-epsilon*S` and `t-S` have equal residues modulo two for
+   `epsilon in {1,-1}`.  The proof splits the two signs and uses only integer
+   arithmetic.  A modulus-three mutation is retained to demonstrate that the
+   modulus-two conclusion cannot be generalized to every modulus.
+5. **Missing components only.**  Smoothness, genus, the character-sum trace
+   formula, and `S(-y0)=chi(-1)S(y0)` remain native checked mathematics and
+   paper derivations.  The theorem proves the exact obstruction conditional on
+   that explicit interface; it makes no point-counting runtime claim.
+6. **Inheritance table.**
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| sign twists preserve an integer trace modulo two | generic arithmetic law | H116 Lean module | integers | sign is `1` or `-1` |
+| signed-twist trace parity is negation-invariant | generic composition law | H116 Lean module | additive commutative group, integer sum observable | supplied signed-twist identity |
+| no exact scalar-parity decoder exists on paired odd orbits | instance obstruction | H116 Lean module | odd-order killed orbit | signed-twist identity and ordinary orbit premises |
+| sign twists need not preserve residue modulo three | mutation control | H116 Lean module | concrete integers | none |
+
+[pcc:unverified]
+
 This gate discharges only fixed-size verification.  Constructing those eleven
 correct coefficients from a generic prime-field isogeny, proving that they
 represent the intended kernel quotient, and bounding that construction below
@@ -176,7 +247,7 @@ local to H116 until the study demonstrates a reusable theorem boundary.
    successful probe uses the default limits.
 5. **Missing components only.** The H116-specific component is the arithmetic
    fact that a prime strictly above 19 is at least 23. The elliptic identities
-   `V+pi=[t]`, `pi(z)=z^p`, the formal-group subtraction law and the regular
+   `V+pi=[t]`, `pi(z)=z^p`, the elliptic negation certificate and the regular
    unit factor in the elliptic x-coordinate remain separate semantic
    obligations; this cutoff lemma must not claim them.
 6. **Inheritance table.** Monomial formation and coefficients come from
@@ -227,8 +298,9 @@ monotonicity lemma, so no limit was raised and no theorem was weakened.
    added.
 5. **Missing components only.** This now proves the double-pole and regular-unit
    substitution algebra. The curve-coordinate instance below identifies the
-   supplied series. Proving `V+pi=[t]`, local Frobenius and formal subtraction
-   still requires an instance.
+   supplied series. Proving `V+pi=[t]`, local Frobenius and the actual elliptic
+   negation certificate still requires an instance; the generic cancellation
+   orientation is discharged by the later formal-group gate.
 6. **Inheritance table.** Truncation, coefficient shifts and unit inverses are
    Mathlib operations; prefix arithmetic is the pre-existing H116 wrapper. The
    only new local laws reconstruct a prefix from coefficients, cancel `X`,
@@ -289,7 +361,7 @@ series. [pcc:unverified]
    `(a⁴A,a⁶B)` and the exact identity
    `qTarget(zNormalized)=qSource(zScalar)` whenever
    `a*zNormalized=zScalar`. The remaining endpoint must derive that parameter
-   equality from `V+pi=[t]`, `pi(z)=z^p` and formal subtraction.
+   equality from `V+pi=[t]`, `pi(z)=z^p` and the actual elliptic negation law.
 6. **Inheritance table.** Curve-unit arithmetic uses PowerSeries ring laws;
    rescaling uses `subst_comp_subst_apply`; prefix transfer reuses the prior
    H116 theorem. No isogeny semantics, decoder, complexity bound, limit
@@ -301,7 +373,7 @@ series. [pcc:unverified]
 | `(A,B,q) -> (a⁴A,a⁶B,q(aX))` | generic scaling law | H116 over Mathlib substitution | field and scale |
 | target/source substitution identity | generic assembly | H116 | zero-constant normalized parameter and `a*zNormalized=zScalar` |
 | normalized x-ratio prefix | curve-coordinate assembly | H116 | source/target coordinate units plus leading-parameter prefix |
-| derive normalized/scalar parameter identity | endpoint obligation | future formal-group owner | `V+pi=[t]`, local Frobenius and formal subtraction |
+| derive normalized/scalar parameter identity | endpoint obligation | future formal-group owner | `V+pi=[t]`, local Frobenius and elliptic negation; generic cancellation is proved below |
 
 `H116-CURVE-COORDINATE-001` is the finite instance control for this table. Its
 fixed-point producer and independent recurrence verifier agree through 24
@@ -309,6 +381,1194 @@ coefficients on five curves; wrong scaling and wrong parameter controls are
 rejected in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` seals
 the polynomial rescaling step and points to the audited Lean source. The
 control supplies no replacement for the open endpoint row. [pcc:unverified]
+
+## Frobenius--Verschiebung characteristic-polynomial instance gate
+
+1. **Structure above.** The quantified object is an arbitrary possibly
+   noncommutative ring containing elements `pi`, `verschiebung`, `trace` and
+   `cardinality`. Only left cancellation by `pi` and centrality of `trace`
+   relative to `pi` are exposed; the theorem does not assume the whole
+   endomorphism ring is commutative.
+2. **Theorems used as stated.** Ring multiplication distributes over addition;
+   `Commute.eq` rewrites `trace*pi` as `pi*trace`; additive `abel` only
+   rearranges the characteristic-polynomial terms. No elliptic theorem is
+   re-proved inside this layer.
+3. **Object as an instance.** The characteristic equation is supplied exactly
+   as `pi^2-trace*pi+cardinality=0`, and the norm relation as
+   `pi*verschiebung=cardinality`. Left cancellation then derives
+   `verschiebung+pi=trace`.
+4. **Assembly probe.** A temporary module first checked the commutative-ring
+   specialization, then the stronger noncommutative statement with only the
+   explicit commute premise. Both pass at default limits. After integration,
+   the tracked module rebuilt at default limits and the exact auditor reported
+   `94 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The actual elliptic endomorphism ring must
+   still supply left cancellation of Frobenius, the norm relation, the
+   Frobenius characteristic polynomial and central scalar interpretation.
+   This gate derives the sum identity but does not construct those certificates.
+6. **Inheritance table.** All manipulation is inherited from Mathlib ring and
+   additive-group laws. H116 contributes only their exact composition into the
+   endomorphism identity needed by the local-parameter endpoint. No curve law,
+   isogeny implementation, runtime claim, trusted decision procedure or limit
+   override is introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `V+pi=trace` from characteristic and norm equations | abstract endomorphism algebra | H116 over Mathlib ring laws | possibly noncommutative ring | left cancellation by `pi`, `pi` commutes with `trace`, `pi*V=cardinality`, characteristic equation |
+| actual elliptic `V+pi=[t]` | endpoint instance | future elliptic formal-group owner | elliptic endomorphism ring | bind the four abstract premises to Frobenius, Verschiebung and scalar maps |
+
+## Additive-endomorphism specialization instance gate
+
+1. **Structure above.** The quantified object is `AddMonoid.End G` for an
+   arbitrary additive commutative group `G`. Mathlib equips this type with a
+   generally noncommutative ring structure whose multiplication is function
+   composition, so `(pi * V)(P)=pi(V(P))`. Integer casts are the scalar
+   endomorphisms `P -> n • P`.
+2. **Theorems used as stated.** `AddMonoid.End.coe_mul` fixes the composition
+   orientation; `AddMonoidHom.map_zsmul` proves that every additive
+   endomorphism commutes with every integer scalar map; extensionality and
+   `Function.Injective pi` prove cancellation of left composition by `pi`.
+   The preceding abstract
+   `frobeniusVerschiebung_sum_of_characteristic` theorem performs the remaining
+   ring calculation.
+3. **Object as an instance.** `pi` and `V` are additive endomorphisms of `G`;
+   `trace` and `cardinality` are integers, coerced to scalar endomorphisms.
+   From pointwise injectivity of `pi`, `pi*V=[cardinality]`, and
+   `pi^2-[trace]*pi+[cardinality]=0`, the specialization derives
+   `V+pi=[trace]` as equality of additive endomorphisms.
+4. **Assembly probe.** A temporary module importing the tracked H116 module
+   and `Mathlib.Algebra.Group.Hom.End` checked scalar centrality, cancellation,
+   and the composed theorem at default limits. Probe source SHA-256 is
+   `662669a9b4d377d30dda3d03cffe5d61f86e4dfe7b65af6454a8a2a36ae77b46`;
+   successful output SHA-256 is
+   `822260e51bb3c89e64865a33a1fde187afdf55670fa38e51b32c4a6d71b95b93`.
+   A second probe added the frozen noninjective mutation control on
+   `AddMonoid.End (ZMod 2)`; source SHA-256 is
+   `43346a0e463c9f238ba179aff9c02b48a95b86efb69722b4f763d506e14e5df2`
+   and successful output SHA-256 is
+   `46055e171c5b3dd5f6753c2d0a0ac3e7ca4c82cd0546d98a958ccd9bd9da98ba`.
+5. **Missing components only.** Scalar centrality and the abstract
+   left-cancellation premise are no longer endpoint certificates. An actual
+   elliptic instance must still bind this theorem to the chosen point group and
+   supply Frobenius, Verschiebung, norm and characteristic-polynomial data.
+   The following affine-point gate discharges Frobenius construction and
+   injectivity. Equality on points must still be connected to the local
+   formal-group series; this specialization does not silently identify the two
+   categories.
+6. **Inheritance table.** Composition, the endomorphism ring, integer scalar
+   maps, preservation of integer multiples, and function extensionality are
+   inherited from Mathlib. H116 only specializes its preceding abstract ring
+   identity. No curve law, point-counting theorem, endomorphism constructor,
+   decoder, complexity claim, trusted decision procedure or limit override is
+   introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| integer scalar maps are central in `AddMonoid.End G` | inherited instance law | H116 over `map_zsmul` | additive commutative group | none |
+| injective `pi` cancels left composition | inherited instance law | H116 over function extensionality | additive commutative group | `Function.Injective pi` |
+| `V+pi=[trace]` on an additive point group | endomorphism specialization | H116 | `AddMonoid.End G` | injective `pi`, norm equation, characteristic equation |
+| noninjective mutation rejects the sum conclusion | negative control | H116 | `AddMonoid.End (ZMod 2)` | `pi=V=0`, `trace=1`, `cardinality=2`; norm and characteristic equations hold but the conclusion fails |
+| affine elliptic-point refinement | following instance gate | H116 over Mathlib | nonsingular points of a base-changed Weierstrass curve | bind `pi` via field Frobenius; leave `V`, norm and characteristic equations explicit |
+
+## Affine elliptic-point Frobenius instance gate
+
+1. **Structure above.** Let `K` be a finite field, `F` a field extension of
+   `K`, and `W` an affine Weierstrass curve over `K`. Mathlib's nonsingular
+   point type on `W.baseChange F` is an additive commutative group. The
+   endomorphism is `WeierstrassCurve.Affine.Point.map` applied to
+   `FiniteField.frobeniusAlgHom K F`, which raises coordinates to `#K`.
+2. **Theorems used as stated.** `Affine.Point.map` is already an additive group
+   homomorphism induced by a base-preserving algebra map;
+   `Affine.Point.map_injective` proves it injective;
+   `FiniteField.coe_frobeniusAlgHom` identifies its field action with the
+   `#K`-power map; and `ZMod.card` specializes `#(ZMod p)` to `p`.
+3. **Object as an instance.** `affineFrobeniusPointEnd W` is an actual
+   `AddMonoid.End` of nonsingular points on the base-changed curve. On an
+   affine point `(x,y)` it maps coordinates to `(x^(#K),y^(#K))`; for
+   `K=ZMod p` these are exactly `(x^p,y^p)`. The composed theorem derives
+   `V+pi=[t]` from only `pi*V=[p]` and
+   `pi^2-[t]*pi+[p]=0`, because construction and injectivity of `pi` are now
+   internal.
+4. **Assembly probe.** A temporary module importing the tracked H116 module,
+   Mathlib's affine point API and finite-field Frobenius API checked the
+   constructor, injectivity, coordinate formula, generic finite-field sum
+   theorem and `ZMod p` specialization at default limits. Probe source SHA-256
+   is `8482c86b0afb73ef9b5ac7fbce0a4155ad0f652b1b2b64c497069daaa4c2e217`;
+   successful output SHA-256 is
+   `7a5401d3108c1e58a5838a9bbfacb8356c0a5b163bcfa484e73282388a660aa4`.
+5. **Missing components only.** The point Frobenius map, its additive law,
+   injectivity and exact prime-field coordinate action are discharged. The
+   following gate constructs the point-group Verschiebung and proves the norm
+   relation over an algebraic extension. The characteristic-polynomial
+   equality and transport from point-endomorphism equality to equality of the
+   chosen local formal-group series remain open. A decidable-equality instance
+   for the extension field is explicit because the pinned affine group-law API
+   requires it; a classical instance is admissible but no computability claim
+   is made.
+6. **Inheritance table.** The curve, nonsingular point group, base change,
+   coordinate map, additive-homomorphism proof, injectivity proof, finite-field
+   Frobenius and `ZMod` cardinality are all inherited from Mathlib. H116 names
+   their composition and applies the previously audited endomorphism theorem.
+   No curve addition formula, isogeny law, point-counting result, decoder,
+   complexity claim, trusted decision procedure or limit override is added.
+   [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| coordinatewise finite-field Frobenius is an injective additive point endomorphism | elliptic instance | H116 over Mathlib | nonsingular points of `W.baseChange F` | finite base field, field extension, decidable equality used by pinned point API |
+| over `ZMod p`, point coordinates map as `(x,y) -> (x^p,y^p)` | prime-field instance | H116 over Mathlib | base-changed affine Weierstrass points | `Fact p.Prime` |
+| `V+pi=[t]` on actual affine points | composed endpoint | H116 | `AddMonoid.End ((W.baseChange F).Point)` | supplied `V`, norm equation, characteristic equation |
+| pointwise Verschiebung and norm refinement | following instance gate | H116 over Mathlib | algebraic extension affine points | construct `[p]*piInverse`; prove norm internally; leave characteristic equation and local-series semantics explicit |
+
+## Algebraic-extension pointwise Verschiebung instance gate
+
+1. **Structure above.** Specialize the extension field `E/ZMod p` to an
+   algebraic field extension. Mathlib's
+   `FiniteField.frobeniusAlgEquivOfAlgebraic` makes the field Frobenius an
+   algebra automorphism. Mapping its inverse through the same affine-point
+   functor gives an inverse Frobenius point endomorphism. Define the pointwise
+   Verschiebung candidate as `[p]` composed with that inverse.
+2. **Theorems used as stated.** `Affine.Point.map_map` identifies composition
+   of point maps with composition of algebra maps; the Frobenius algebra
+   equivalence's `apply_symm_apply` law makes the composite the identity.
+   `AddMonoidHom.map_nsmul` centralizes `[p]` against Frobenius. The preceding
+   prime-field affine-point theorem then consumes the proved norm relation.
+3. **Object as an instance.** `zmodAffineFrobeniusPointInvEnd W` is the point
+   map of inverse Frobenius, and
+   `zmodAffineVerschiebungPointEnd W=[p]*piInverse`. Lean proves
+   `pi*piInverse=1`, hence `pi*V=[p]`. Consequently the characteristic equation
+   alone implies `V+pi=[t]` on the actual nonsingular affine point group.
+4. **Assembly probe.** A temporary module importing the tracked H116 module
+   checked inverse composition, the pointwise Verschiebung definition, the norm
+   equation and the characteristic-only sum theorem at default limits. Probe
+   source SHA-256 is
+   `f1f896488d960bfb19ae6f72277371f0bceb7e60d4927511c209695b74d7db7e`;
+   successful output SHA-256 is
+   `428c1eaefa5fbef1303cb11a5e250595caf4da3a9f6c0524ac38ac0ae8edc730`.
+5. **Missing components only.** This constructs an additive point-group map
+   with the defining norm identity of Verschiebung. It does not prove that the
+   map is represented by the retained rational/scheme morphism, nor that point
+   equality implies equality of local formal power series. The Frobenius
+   characteristic equation remains an explicit premise. Those three items are
+   the semantic endpoint; no asymptotic claim follows from the pointwise
+   construction.
+6. **Inheritance table.** Algebraicity, Frobenius automorphism, inverse laws,
+   affine-point functoriality, scalar multiplication and additive composition
+   are inherited from Mathlib. H116 only defines `[p]*piInverse` and composes
+   the inherited laws. No curve addition formula, isogeny evaluator,
+   point-counting proof, decoder, runtime claim, trusted decision procedure or
+   limit override is introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| inverse field Frobenius induces an inverse point endomorphism | elliptic point instance | H116 over Mathlib | nonsingular affine points after algebraic base change | `Algebra.IsAlgebraic (ZMod p) E` |
+| pointwise `V=[p]*piInverse` satisfies `pi*V=[p]` | constructed norm identity | H116 | additive point endomorphism ring | same algebraic extension |
+| characteristic equation implies `V+pi=[t]` | composed point theorem | H116 | actual affine point group | supplied characteristic equation only |
+| identify pointwise `V` with retained rational/scheme map and local series | endpoint obligation | future elliptic owner | rational morphism and local formal group | morphism semantics, characteristic equation, equality-to-series transport |
+
+The separately frozen `H116-POINTWISE-CHARPOLY-001` panel exhaustively checks
+the supplied characteristic equation and constructed pointwise `V` on 5,066
+points across eight extension-field cells. All positive equations and the
+point-count recurrence pass, and a separate Python implementation matches
+every correctness field. The protocol result remains a failure because one
+missing-inverse mutation is identical to the correct map on the 35-point
+`p=5`, degree-two group. This is finite falsification evidence for the control
+design only; it supplies no generic theorem and leaves the endpoint row above
+unchanged. [pcc:unverified]
+
+## Pointwise `V-1` orientation and observable instance gate
+
+1. **Structure above.** Work first in `AddMonoid.End G` for an arbitrary
+   additive commutative group, then specialize `G` to Mathlib's nonsingular
+   affine point group. The observable is an arbitrary function on points; the
+   chosen elliptic instance sends infinity to zero and an affine point
+   `(x,y)` to `-x/y`.
+2. **Theorems used as stated.** Additive-group rearrangement turns
+   `V+pi=[t]` into `V-1=[t-1]-pi`. `DFunLike.congr_fun` evaluates equality of
+   additive endomorphisms at a point. The preceding pointwise Verschiebung
+   theorem supplies the sum identity under the explicit characteristic
+   premise.
+3. **Object as an instance.** The left side is the actual constructed
+   pointwise `V` applied to `P`, then subtracts `P`. The right side is
+   `(t-1)P-pi(P)`. Applying the selected local-parameter function transports
+   the point equality without asserting equality of rational maps or formal
+   power series.
+4. **Assembly probe.** A temporary module checked the endomorphism
+   rearrangement, its characteristic-polynomial specialization, the total
+   local-parameter definition and the observed point equality at default
+   limits. Probe source SHA-256 is
+   `0f62a2522b7f2c538df1df4d3bdd5b5e236269dad570b2a00e9aeee6df2e0aec`;
+   successful empty output SHA-256 is
+   `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+5. **Missing components only.** Equality after evaluation on algebraic points
+   does not construct the retained rational/scheme morphism or identify its
+   completed local-ring map. A later theorem must show that the retained map
+   represents the constructed pointwise endomorphism and transport it to the
+   selected formal parameter series.
+6. **Inheritance table.** Endomorphism subtraction, integer scalar casts,
+   point-group subtraction, the constructed Frobenius and pointwise `V` are
+   inherited from Mathlib and the preceding H116 declarations. This gate adds
+   only additive rearrangement and congruence through a total observable. It
+   introduces no point-counting theorem, rational-map evaluator, series
+   equality, runtime claim or trusted procedure. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `V-1=[t-1]-pi` from `V+pi=[t]` | generic endomorphism algebra | H116 | `AddMonoid.End G` | supplied sum identity |
+| characteristic equation implies pointwise `V-1` orientation | affine-point specialization | H116 | algebraic prime-field extension points | supplied characteristic equation |
+| equality survives an arbitrary point observable | generic congruence | H116 | function from point group to any type | endomorphism orientation |
+| `z=-x/y` agrees on the two point expressions | elliptic observable instance | H116 | actual affine points | supplied characteristic equation |
+| equality of retained rational/formal maps | endpoint obligation | future morphism owner | rational morphism and completed local ring | representation and local-series transport |
+
+## Generating-set characteristic-certificate gate
+
+1. **Structure above.** Work in `AddMonoid.End G` and a set `S : Set G` whose
+   additive-subgroup closure is top. For the elliptic specialization, `G` is a
+   finite extension-field affine point group and the trace is tied by
+   definition to `p+1-Nat.card E(F_p)`.
+2. **Theorems used as stated.** `AddMonoidHom.eq_of_eqOn_dense` promotes
+   equality of additive homomorphisms on `S` to global equality when
+   `AddSubgroup.closure S=top`. Evaluation of the characteristic-polynomial
+   endomorphism on `S` supplies the equality with the zero homomorphism.
+3. **Object as an instance.** The certificate contains a generating set, a
+   checked closure-to-top proof and one characteristic-equation value per
+   generator. The resulting global equation feeds the already audited
+   pointwise `V-1` orientation and observable theorems.
+4. **Assembly probe.** A temporary module checked the generic
+   zero-on-generators theorem, the characteristic-polynomial wrapper, the
+   point-count trace definition and the affine-point specialization at default
+   limits. Probe source SHA-256 is
+   `f928c423eca1b6b279ea54f79f7fd5675ac4bc6b66a3c15fd98787d5cda3bccc`;
+   successful empty output SHA-256 is
+   `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+5. **Missing components only.** A certificate for one finite extension point
+   group does not prove equality on the algebraic closure or equality of
+   rational maps. Generic Frobenius theory or a separating morphism theorem is
+   still required for the family-level endpoint.
+6. **Inheritance table.** Additive subgroup closure and homomorphism extensionality
+   are inherited from Mathlib. H116 packages the characteristic expression and
+   the already constructed point maps. No enumeration algorithm, curve group
+   law, point-count proof, asymptotic claim or trusted procedure enters Lean.
+   [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| zero on generators implies zero endomorphism | generic group law | Mathlib plus H116 wrapper | additive commutative group | closure of supplied set is top |
+| generator checks imply characteristic equation | proof-carrying certificate | H116 | `AddMonoid.End G` | closure certificate and per-generator evaluations |
+| trace equals `p+1-#E(F_p)` | definition | H116 over `Nat.card` | prime-field affine point type | finite base field |
+| generator certificate implies pointwise `V-1` orientation | elliptic specialization | H116 | finite algebraic extension points | closure and per-generator checks |
+| algebraic coordinate pair has a common Frobenius period | finite-subfield theorem | Mathlib plus H116 composition | algebraic prime-field extension | finite-dimensional adjoin of both coordinates |
+| algebraic affine points exhaust positive Frobenius-fixed loci | elliptic specialization | H116 | algebraic extension points | coordinate iteration and common period |
+| fixed-locus checks imply global characteristic equation | generic endomorphism theorem | H116 | `AddMonoid.End G` | every point periodic and checks on every positive fixed locus |
+| fixed-locus characteristic family implies pointwise `V-1` | elliptic specialization | H116 | algebraic extension points | restricted characteristic identity for every positive period |
+| restricted characteristic identities and rational-map equality | endpoint obligation | future elliptic owner | elliptic morphisms | standard Frobenius theorem on all fixed loci plus morphism identification |
+
+`H116-GENERATOR-CHARPOLY-002` instantiates the finite certificate on the eight
+parent groups. Three cells are cyclic and five use two generators, compressing
+5,066 exhaustive evaluations to 13. Both coefficient mutations and every
+dropped-generator control reject; the independent verifier has zero field
+mismatches. This measures the finite interface only and does not discharge the
+generic endpoint row. [pcc:unverified]
+
+The 119-theorem checkpoint replaces the remaining unstructured quantifier over
+algebraic points by an exact family of finite fixed loci. The pair-coordinate
+adjoin is finite, the `n`th point Frobenius raises coordinates to `p^n`, and
+every algebraic point is consequently periodic. Vanishing on every positive
+fixed locus promotes to a global endomorphism equality and composes to
+pointwise `V-1`. The `ZMod 3` single-locus control retains an identity mutation
+that is invisible at period one but exposed at period two. The frozen
+fixed-loci census passes all eight cells with exact replay: the base locus
+omits 5,002 of 5,066 points, proper-period strata omit 4,924 full-period
+points, and the correct characteristic expression has zero stratum failures.
+This instantiates but does not prove the restricted characteristic family.
+[pcc:unverified]
+
+The 121-theorem checkpoint adds a separating certificate for a supplied pair
+of rational functions. Agreement on a finite regular sample implies equality
+of cross products when the sample cardinality is strictly larger than both
+cross-product degrees. A `ZMod 3` theorem proves strictness is essential:
+`X^3-X` is nonzero of degree three but vanishes on all three field elements.
+The frozen separation-capacity census independently replays all eight cells.
+Their 5,058 affine points give 2,534 distinct x-values and raw strict degree
+capacities from 16 through 1,236. In every cell the nonzero monic sample
+vanishing polynomial has degree exactly the sample size and vanishes on every
+sample, while a constant mutation rejects everywhere. The actual H116
+numerators, denominators, pole set and cross-product degree remain open
+certificate inputs; no morphism or speedup follows from capacity alone.
+[pcc:unverified]
+
+The subsequent split-pole reconstruction deliberately failed: it had
+incorrectly identified `ker(V-1)` with `E(F_p)=ker(pi-1)`. The failure exposed
+the right eigenspace. On a point fixed by `V`, the sum identity forces
+`pi(P)=[t-1]P`; Lean proves this, proves its `n`-fold iteration, and proves that
+Frobenius fixed-locus membership on `ker(V-1)` is exactly the scalar fixed
+condition. The corrected frozen v2 experiment jointly solves for numerator
+and denominator without requiring split roots. Both `2N`-sample windows have
+full rank in all eight cells and recover identical degree-`(N,N-1)` base-field
+maps. The maps are stable across extension degrees and have zero mismatches on
+2,524 regular x-values. The cyclic-kernel prediction
+`gcd(N,(t-1)^d-1)` matches every observed kernel, but cyclicity and the generic
+degree/cardinality statement remain open elliptic obligations.
+[pcc:unverified]
+
+The next audited ring step proves `(V-1)(pi-1)=p+1-t` directly from
+`V*pi=p` and `V+pi=t`, even in a noncommutative ring. This supplies the exact
+algebraic norm factor behind the observed degree `N`; only the elliptic
+morphism theorem translating that factor into degree and kernel cardinality is
+missing. [pcc:unverified]
+
+The 128-theorem checkpoint turns that last translation into an explicit
+certificate. For an abstract multiplicative degree, a factorization
+`left*right=scalar`, scalar degree `N^2`, and equality of the two factor degrees
+imply that each factor has degree `N`. Composing with the norm factor gives
+`deg(V-1)=N` from degree multiplicativity, `deg[N]=N^2`, and
+`deg(V-1)=deg(pi-1)`. The intended elliptic source of the last equality is
+duality, `(V-1)^vee=pi-1`. A checked `4*9=6^2` mutation proves that product
+degree alone cannot discharge it. The pinned Mathlib tree contains no elliptic-
+isogeny, dual-isogeny or morphism-degree object, so these three premises remain
+future instance obligations rather than hidden axioms. [pcc:unverified]
+
+The 134-theorem checkpoint discharges two strictly algebraic sub-obligations.
+`finiteFieldTower_degree_mul` imports the exact finite-rank tower law, and
+`finiteFieldTower_degree_eq_norm_of_paired` shows that an already-constructed
+pullback tower with equal adjacent degrees and total degree `N^2` has adjacent
+degree `N`. Separately, Mathlib's division-polynomial theorems give exact
+coordinate degrees `deg Phi_n=n^2` and `deg Psi_n^2=n^2-1`, with leading
+coefficients `(1,n^2)`, when `n` is nonzero in the coefficient field. If
+`n` instead vanishes in the field and `|n|>1`, Lean proves the denominator
+degree is strictly below `n^2-1`; a `ZMod 3` theorem records a concrete
+instance. The exhaustive frozen experiment checks the
+coordinate quotient against direct scalar multiplication on 5,058 affine
+points with zero failures and independently reproduces the characteristic
+degree collapse. Remaining obligations are the concrete function-field
+pullback tower, identification of `Phi_n/Psi_n^2` with the point/scheme map,
+coordinate degree equals morphism degree, and the duality
+`(V-1)^vee=pi-1`. [pcc:unverified]
+
+The frozen kernel x-orbit experiment tests the denominator consequence that
+point enumeration misses. For cyclic `ker(V-1)`, a rational x-root occurs when
+`(t-1)^d P=+P` or `-P`, because `x(P)=x(-P)`. All eight cells match the locked
+union formula, exact simple/double multiplicities, zero numerator cancellation,
+and an independent replay. The plus-only model fails exactly its two frozen
+negative controls: it misses three roots at `p=5,d=3` and two at `p=7,d=2`.
+This repairs the finite denominator interpretation but does not prove the
+generic cyclic or scheme-theoretic premises. [pcc:unverified]
+
+The next frozen dual-pair experiment reconstructs `pi-1` from two disjoint
+pointwise interpolation windows. Its three base-field maps have the same exact
+degrees as the recovered `V-1` maps, all 2,505 regular evaluations and 29 poles
+match, and the complete point census verifies
+`(V-1)o(pi-1)=[N]` with zero failures on 5,066 points. Omitting the subtraction
+from `pi-1` fails 5,040 times; replacing `[N]` by `[N+1]` fails at all 5,058
+nonidentity points. This instantiates the paired-degree pattern only on the
+finite panel; the abstract dual-isogeny and scheme-degree premises remain open.
+[pcc:unverified]
+
+## Quadratic function-field sandwich instance gate
+
+1. **Structure above.** A dominant curve map induces two compatible finite
+   function-field towers over the pulled-back target x-line `B`. The source
+   tower is `B -> Xs -> E`, where `Xs` is the source x-line and `E` the source
+   curve field. The target tower is `B -> Xt -> E`, where `Xt` is the pulled-
+   back target curve field. The desired curve-map degree is `[E:Xt]`; the
+   rational coordinate degree is `[Xs:B]`.
+2. **Theorems used as stated.** `Module.finrank_mul_finrank` supplies
+   `[E:B]=[Xs:B][E:Xs]` and `[E:B]=[Xt:B][E:Xt]`. If both curve fields are
+   quadratic over their x-lines, then
+   `coordinateDegree * 2 = 2 * curveMapDegree`, and natural-number
+   cancellation gives equality. Mathlib's
+   `RatFunc.finrank_eq_max_natDegree` separately identifies
+   `[K(X):K(f)]` with the maximum degree of the canonical reduced numerator
+   and denominator of `f`.
+3. **Object as an instance.** The Lean statement quantifies over four fields
+   `B`, `Xs`, `Xt`, `E`, the two existing `IsScalarTower` instances, the two
+   quadratic-degree equalities and the coordinate extension degree. It does
+   not define a new curve, rational-map or function-field representation.
+4. **Assembly probe.** Build the generic theorem in the tracked H116 module at
+   default limits, then run the exact theorem/axiom auditor. No finite curve or
+   H116-specific coefficient is needed for elaboration.
+5. **Missing components only.** The theorem does not construct `B`, `Xs`,
+   `Xt`, or `E` from the retained rational formulas. The rational-function
+   wrapper closes `[K(X):K(f)] = max(deg num(f),deg denom(f))`, including
+   canonical cancellation, but does not prove that supplied polynomials such
+   as `Phi_n` and `Psi_n^2` are already coprime or identify their quotient with
+   the curve map. The quadratic field equalities, dominance, separability and
+   duality of `V-1` and `pi-1` are also caller obligations. [pcc:unverified]
+6. **Inheritance table.** Fields, algebras, scalar towers and `Module.finrank`
+   come from Mathlib. The only new endpoint is cancellation between the two
+   existing tower equalities. The mutation control uses unequal line degrees
+   to show that a shared total degree alone does not identify adjacent degrees.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `quadraticFunctionFieldSandwich_degree` | generic law | H116 over Mathlib field towers | four fields and two scalar towers | both line-to-curve degrees are two; supplied coordinate extension degree |
+| `rationalFunctionCoordinateExtension_degree` | inherited rational-function law | H116 wrapper over Mathlib `RatFunc.finrank_eq_max_natDegree` | one rational function over an arbitrary field | none; numerator and denominator are canonical reduced forms |
+| `unequalCoordinateLineDegrees_control` | boundary control | H116 arithmetic | natural numbers | concrete equality `4*3=2*6` with unequal adjacent degrees |
+
+## Reduced quotient and no-cancellation instance gate
+
+1. **Structure above.** For `p,q in F[X]`, the displayed rational function is
+   `f=(p:RatFunc F)/(q:RatFunc F)`. Mathlib's `RatFunc.num` and
+   `RatFunc.denom` divide by `gcd p q` and scale by a nonzero constant so that
+   the denominator is monic.
+2. **Theorems used as stated.** `RatFunc.num_div` and `RatFunc.denom_div`
+   expose the canonical normalization. `IsCoprime.isRelPrime` together with
+   `gcd_isUnit_iff_isRelPrime`, `normalize_eq_one`, and `normalize_gcd` makes
+   the normalized gcd equal to one. `Polynomial.natDegree_C_mul` preserves
+   degree under the remaining nonzero scalar. The existing
+   `rationalFunctionCoordinateExtension_degree` then computes the extension
+   degree.
+3. **Object as an instance.** The planned theorem is generic over a field and
+   two polynomials. It assumes `q != 0` and `IsCoprime p q`; it does not assume
+   that any particular division polynomials are coprime.
+4. **Assembly probe.** First check the generic reduction in a temporary module
+   importing the tracked H116 file, at default limits. Only after the exact
+   numerator and denominator degree equalities elaborate may the theorem move
+   into the tracked module and enter the exact axiom audit.
+5. **Missing components only.** Instantiating the theorem with
+   `Phi_n,Psi_n^2` still requires a proof of `IsCoprime`; identifying that
+   quotient with scalar multiplication and constructing the curve-field tower
+   remain separate. The frozen polynomial-gcd panel below measures this premise
+   on out-of-sample toy cells but cannot prove it generically. [pcc:unverified]
+6. **Inheritance table.** Polynomial gcd, coprimality, rational-function
+   normalization and finite extension degree all come from Mathlib. The local
+   theorem merely connects their exact public APIs. A shared-factor mutation
+   and a singular cubic are retained as negative controls.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| displayed coprime quotient retains numerator and denominator degrees | generic bridge | H116 over Mathlib RatFunc normalization | field and two polynomials | nonzero denominator and `IsCoprime p q` |
+| displayed coprime quotient has extension degree `max(deg p,deg q)` | generic assembly | H116 over the preceding bridge and `RatFunc.finrank_eq_max_natDegree` | rational function field | same hypotheses |
+| shared-factor mutation is not coprime | negative control | native finite polynomial arithmetic | fixed toy polynomials | multiply both sides by the same linear factor |
+
+## Scalar-two short-Weierstrass coprimality instance gate
+
+1. **Structure above.** Put `f=X^3+A*X+B`,
+   `N=X^4-2*A*X^2-8*B*X+A^2`, and
+   `d=4*A^3+27*B^2`.  Direct polynomial expansion gives the explicit
+   Bezout identity
+   `(d*(4*A+3*X^2))*N + (d*(5*A*X+27*B-3*X^3))*f = d^2`.
+   Thus `d != 0` makes `N` and `f` coprime over any field.
+2. **Theorems used as stated.** `IsCoprime` is Mathlib's explicit Bezout
+   predicate.  `WeierstrassCurve.Phi_two` and `PsiSq_two` expose the exact
+   scalar-two division polynomials.  The definitions of `b2,b4,b6,b8`
+   specialize the short curve `(0,0,0,A,B)` to `N` and `4*f`.
+   `isCoprime_mul_unit_left_right` removes the nonzero constant factor four
+   when `2 != 0`.
+3. **Object as an instance.** The first theorem proves coprimality of
+   the displayed `N` and `f` from the explicit discriminant factor `d != 0`.
+   The endpoint theorem instantiates Mathlib's exact `Phi 2` and `PsiSq 2`
+   for `W=<0,0,0,A,B>`, with no copied division-polynomial recurrence.  The
+   final assembly applies the preceding reduced-quotient theorem and Mathlib's
+   exact division-polynomial degrees to prove coordinate extension degree four.
+4. **Assembly probe.** Both the Bezout witness and exact Mathlib specialization
+   first elaborated in a temporary module importing the tracked H116 file at
+   default limits.  The tracked project then completed all 3,162 build jobs;
+   the exact repository auditor reports `142 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This is an actual nonsingular scalar-two
+   instance of the no-cancellation premise; it is not a proof for arbitrary
+   scalar `n`.  The `2 != 0` premise excludes characteristic two, where this
+   short model and the factor-four reduction degenerate.  Identifying the
+   quotient with pointwise scalar multiplication and the curve-field map
+   remains separate. [pcc:unverified]
+6. **Inheritance table.** Field inversion, constant-polynomial embedding,
+   division-polynomial definitions and unit-invariance of coprimality are
+   inherited from Mathlib.  H116 supplies only the explicit Bezout witness
+   and the exact specialization.  The singular case `A=B=0` remains the
+   frozen negative control in the independent finite-field experiment.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| explicit `N,f` Bezout certificate | constructive instance law | H116 over polynomial ring laws | arbitrary field and `A,B` | `4*A^3+27*B^2 != 0` |
+| `IsCoprime (W.Phi 2) (W.PsiSq 2)` for `W=<0,0,0,A,B>` | exact Mathlib endpoint | H116 over Mathlib division polynomials | short Weierstrass curve over arbitrary field | discriminant factor nonzero and `2 != 0` |
+| `[F(X):F(Phi_2/Psi_2^2)]=4` | exact coordinate-degree assembly | H116 over the coprimality endpoint and reduced-quotient theorem | rational function field of the short curve's x-coordinate | same hypotheses |
+| singular cubic loses the premise | negative control | frozen Rust verifier | `y^2=x^3` over `F_13` | `A=B=0` |
+
+## Scalar-three short-Weierstrass coprimality instance gate
+
+1. **Structure above.** Put `f=X^3+A*X+B`,
+   `q=3*X^4+6*A*X^2+12*B*X-A^2`, and
+   `r=X^6+5*A*X^4+20*B*X^3-5*A^2*X^2-4*A*B*X-8*B^2-A^3`.
+   The scalar-three numerator is `p=X*q^2-8*f*r`.  With
+   `d=4*A^3+27*B^2`, exact extended Euclid gives `U*p+V*q=64*d^2`, where
+   `U=27*(15*A*X+27*B+7*X^3)` and `V` is the explicit degree-eight
+   polynomial recorded in the Lean witness.  Thus `d != 0` and `2 != 0`
+   make `p` and `q` coprime, hence `p` and `q^2` coprime.
+2. **Theorems used as stated.** `WeierstrassCurve.Phi_three`, `PsiSq_three`,
+   `Psi3`, `prePsi4`, and `Psi2Sq` specialize Mathlib's exact recurrence to
+   `p` and `q^2`.  `IsCoprime.pow_right` transfers the constructive witness to
+   the squared denominator.  The reduced-quotient theorem and exact degree
+   formulas then give coordinate extension degree nine when `3 != 0`.
+3. **Object as an instance.** The declarations separate the explicit
+   `p,q` Bezout law, the Mathlib division-polynomial endpoint, and the exact
+   rational-function extension degree.  No root enumeration, point counting,
+   or finite-field decision procedure enters the proof.
+4. **Assembly probe.** The full degree-eight witness, every Mathlib
+   specialization and the singular control first elaborated in a temporary
+   importing module at default limits.  The tracked project then completed all
+   3,162 build jobs; the exact repository auditor reports
+   `150 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This extends no-cancellation from scalar two
+   to scalar three, not to arbitrary scalar.  The degree-nine assembly assumes
+   `3 != 0`; characteristic-three inseparability is intentionally outside that
+   statement.  Scheme-map identification and the H116 pullback tower remain
+   separate. [pcc:unverified]
+6. **Inheritance table.** Polynomial rings, Mathlib division polynomials,
+   coprimality under powers, and rational-function degree are inherited.
+   H116 supplies the explicit extended-Euclid witness and specialization.  At
+   `A=B=0`, both displayed scalar-three polynomials vanish at `X=0`; a mapped
+   evaluation contradiction is the negative control.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| explicit scalar-three `p,q` Bezout certificate | constructive instance law | H116 over polynomial ring laws | arbitrary field and `A,B` | `4*A^3+27*B^2 != 0`, `2 != 0` |
+| `IsCoprime (W.Phi 3) (W.PsiSq 3)` | exact Mathlib endpoint | H116 over Mathlib division polynomials | short Weierstrass curve over arbitrary field | same hypotheses |
+| `[F(X):F(Phi_3/Psi_3^2)]=9` | exact coordinate-degree assembly | H116 over reduced quotients | rational function field of the short curve's x-coordinate | same hypotheses and `3 != 0` |
+| singular scalar-three pair is not coprime | negative control | H116 evaluation homomorphism | short singular cubic over `ZMod 5` | `A=B=0` |
+
+## Generic division-polynomial coprimality reduction gate
+
+1. **Structure above.** In any commutative ring,
+   `IsCoprime (x*m-a*b*c) m` is equivalent to
+   `IsCoprime (a*b*c) m`, because the `x*m` term is a multiple of the
+   denominator.  Mathlib defines
+   `Phi_n=X*PsiSq_n-prePsi_(n+1)*prePsi_(n-1)*epsilon_n`, with
+   `epsilon_n=1` for even `n` and `Psi2Sq` for odd `n`.
+2. **Theorems used as stated.** `IsCoprime.mul_sub_right_left_iff` removes the
+   multiple of the denominator.  `IsCoprime.mul_left` combines three factor
+   certificates.  `WeierstrassCurve.Phi` supplies the exact Mathlib
+   definition; no copied recurrence is introduced.
+3. **Object as an instance.** One generic ring theorem assembles three factor
+   certificates.  Its division-polynomial wrapper reduces generic
+   `IsCoprime (Phi n) (PsiSq n)` to coprimality of `prePsi(n+1)`,
+   `prePsi(n-1)`, and the parity factor against the full denominator.
+4. **Assembly probe.** The generic ring theorem, exact
+   `WeierstrassCurve.Phi` wrapper and missing-factor mutation first elaborated
+   in a temporary importing module.  The tracked project then completed all
+   3,162 build jobs; the exact repository auditor reports
+   `153 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This does not prove the three factor premises.
+   It converts the previous opaque generic-`n` no-cancellation gap into exact
+   adjacent-EDS and parity-factor obligations.  Proving those obligations for
+   nonsingular curves under characteristic hypotheses remains the next
+   mathematical task. [pcc:unverified]
+6. **Inheritance table.** All algebraic coprimality transformations and the
+   division-polynomial definition are inherited from Mathlib.  H116 supplies
+   only their exact composition and an integer mutation showing that omitting
+   one factor premise is unsound.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `IsCoprime (x*m-a*b*c) m` from three factor certificates | generic ring law | H116 over Mathlib coprimality | arbitrary commutative ring | each of `a,b,c` coprime to `m` |
+| `IsCoprime (W.Phi n) (W.PsiSq n)` | exact division-polynomial reduction | H116 over Mathlib `Phi` | arbitrary Weierstrass curve over a commutative ring | adjacent and parity factors coprime to `PsiSq n` |
+| omitted first factor premise can fail | negative control | H116 integer arithmetic | fixed `x=0,m=2,a=2,b=c=1` | only the retained factors are coprime |
+
+## Odd-EDS parity-factor coprimality gate
+
+1. **Structure above.** For `preNormEDS' (s^2) c d`, the odd recurrence
+   modulo `s` retains only products of smaller odd-index terms: when the
+   recurrence index is even, the first summand contains `s^2`; when it is
+   odd, the second does. Strong induction therefore proves every odd term
+   coprime to `s` from the single base certificate `IsCoprime c s`.  For a
+   short Weierstrass curve, `s=Psi2Sq` and `c=Psi3`.
+2. **Theorems used as stated.** Mathlib's `preNormEDS'_odd` supplies the exact
+   recurrence. `IsCoprime.mul_left`, `pow_left`,
+   `mul_sub_right_left_iff`, and `sub_mul_right_left_iff` propagate the
+   induction.  A direct H116 Bezout identity proves the short-curve base case:
+   with `d=4*A^3+27*B^2`, `s=4(X^3+AX+B)`, and
+   `q=3X^4+6AX^2+12BX-A^2`,
+   `3(7AX+9B+3X^3)s-4(4A+3X^2)q=4d`.
+3. **Object as an instance.** The generic recurrence theorem is instantiated
+   with Mathlib's exact `prePsi'`.  For every natural scalar on a nonsingular
+   short curve outside characteristic two, it proves the parity factor
+   coprime to `PsiSq n`.  Composing with the earlier generic reduction leaves
+   only the two adjacent `prePsi` certificates.
+4. **Assembly probe.** The recurrence induction, explicit base certificate,
+   Mathlib specialization, parity wrapper, reduced two-premise assembly and
+   singular control first elaborated in a temporary importing module.  The
+   tracked project then completed all 3,162 build jobs; the exact repository
+   auditor reports `170 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The parity-factor premise is closed for
+   natural scalars on short curves.  Coprimality of `prePsi(n-1)` and
+   `prePsi(n+1)` against `PsiSq n` remains open; this is now the only generic
+   no-cancellation obligation in this specialization. [pcc:unverified]
+6. **Inheritance table.** The EDS recurrence and coprimality algebra are
+   inherited from Mathlib. H116 supplies the strong-induction composition and
+   short-curve Bezout certificate.  The singular `A=B=0` curve over `ZMod 5`
+   is a negative control: both base polynomials vanish at zero and are proved
+   not coprime.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| every odd `preNormEDS' (s^2) c d` term is coprime to `s` | generic recurrence law | H116 over Mathlib normalized EDS | arbitrary commutative ring | `IsCoprime c s` |
+| short-curve `Psi3` is coprime to `Psi2Sq` | constructive instance law | H116 polynomial Bezout certificate | short Weierstrass curve over a field | `4*A^3+27*B^2 != 0`, `2 != 0` |
+| every odd `prePsi' n` is coprime to `Psi2Sq` | exact division-polynomial specialization | H116 over Mathlib `prePsi'` | same short curve | odd natural `n` and base hypotheses |
+| parity factor is coprime to `PsiSq n` | exact factor closure | H116 | same short curve | natural `n` and base hypotheses |
+| `Phi n` coprimality reduces to two adjacent factors | semantic assembly | H116 over generic reduction | same short curve | the two adjacent `prePsi` certificates |
+| singular base pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 5` | none |
+
+## Scalar-four recurrence bootstrap gate
+
+1. **Structure above.** The audited scalar-three no-cancellation theorem gives
+   `IsCoprime Phi3 (Psi3^2)`. Since
+   `Phi3=X*Psi3^2-prePsi4*Psi2Sq`, removing the denominator multiple and then
+   a product factor proves `Psi3` coprime to `prePsi4`.  Mathlib's next odd
+   recurrence is `prePsi5=prePsi4*Psi2Sq^2-Psi3^3`; removing the
+   `prePsi4` multiple proves the next adjacent pair.  The parity theorem then
+   supplies the remaining `Psi2Sq` factors in `PsiSq4`.
+2. **Theorems used as stated.** `WeierstrassCurve.Phi_three`,
+   `PsiSq_three`, `prePsi'_odd`, and `PsiSq_four` are used exactly as stated.
+   `IsCoprime.of_mul_right_left`, `of_mul_left_left`, `pow_left`,
+   `pow_right`, `mul_right`, and the subtract-multiple equivalence perform the
+   algebraic extraction. The preceding two-adjacent-factor theorem assembles
+   `Phi4,PsiSq4` coprimality; the reduced rational quotient and exact
+   division-polynomial degree theorems give extension degree sixteen.
+3. **Object as an instance.** On every nonsingular short curve outside
+   characteristic two, the construction proves both adjacent pairs, exact
+   scalar-four numerator/denominator coprimality, and
+   `[F(X):F(Phi4/PsiSq4)]=16`.
+4. **Assembly probe.** Both adjacent-pair derivations, scalar-four assembly,
+   degree endpoint and singular control first elaborated in a temporary
+   importing module. The tracked project then completed all 3,162 build jobs;
+   the exact repository auditor reports
+   `175 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This advances the exact no-cancellation
+   endpoint from scalars two and three to scalar four by recurrence. It does
+   not yet prove adjacent EDS coprimality for arbitrary `n` or an ECDLP
+   runtime bound. [pcc:unverified]
+6. **Inheritance table.** All recurrence identities, division-polynomial
+   formulas, degree results and coprimality transformations are inherited from
+   Mathlib or earlier audited H116 theorems.  H116 supplies their bootstrap
+   composition.  The singular `A=B=0` scalar-four pair over `ZMod 5` is proved
+   non-coprime by evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `Psi3` is coprime to `prePsi4` | recurrence extraction | H116 over scalar-three certificate | short curve over a field | discriminant nonzero, `2 != 0` |
+| `prePsi4` is coprime to `prePsi5` | recurrence bootstrap | H116 over Mathlib odd EDS recurrence | same | same |
+| `Phi4` is coprime to `PsiSq4` | exact division-polynomial assembly | H116 | same | same |
+| scalar-four coordinate extension degree is sixteen | exact degree assembly | H116 | rational function field | same |
+| singular scalar-four pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 5` | none |
+
+## Scalar-five recurrence bootstrap gate
+
+1. **Structure above.** The scalar-five step first reduces
+   `prePsi5=prePsi4*Psi2Sq^2-Psi3^3` modulo `Psi3`; the scalar-four adjacent
+   pair and the odd-parity base certificate prove `Psi3` coprime to
+   `prePsi5`. The even recurrence then gives
+   `prePsi6=Psi3*(prePsi5-prePsi4^2)`. Both surviving factors are coprime to
+   `prePsi5`, so the next adjacent pair follows. Since `PsiSq5=prePsi5^2`,
+   the two adjacent factors assemble scalar-five no-cancellation directly.
+2. **Theorems used as stated.** Mathlib's `prePsi'_odd`, `prePsi'_even`, and
+   `PsiSq_ofNat` supply the exact formulas. The audited scalar-four adjacent
+   pairs and parity theorem provide the base certificates. Coprimality product,
+   power, symmetry and subtract-multiple laws perform the reductions. The
+   generic two-adjacent-factor theorem assembles `Phi5,PsiSq5`; the reduced
+   quotient and exact-degree theorem give degree twenty-five when `5 != 0`.
+3. **Object as an instance.** On every nonsingular short curve outside
+   characteristic two, scalar-five numerator and denominator are coprime.
+   Outside characteristic five as well, the coordinate extension has degree
+   twenty-five. This explicitly separates cancellation from inseparable
+   degree collapse.
+4. **Assembly probe.** Both auxiliary pair derivations, scalar-five assembly,
+   degree endpoint and singular control first elaborated in a temporary
+   importing module. The tracked project then completed all 3,162 build jobs;
+   the exact repository auditor reports
+   `180 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** Exact no-cancellation now holds through scalar
+   five. The proof remains a fixed-depth recurrence bootstrap; an invariant
+   closing arbitrary adjacent indices and any ECDLP runtime conclusion remain
+   open. [pcc:unverified]
+6. **Inheritance table.** EDS identities, coprimality transformations and
+   degree formulas are inherited. H116 supplies their new composition. The
+   singular `A=B=0` scalar-five pair over `ZMod 7` is proved non-coprime by
+   evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `Psi3` is coprime to `prePsi5` | recurrence extraction | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `prePsi5` is coprime to `prePsi6` | recurrence bootstrap | H116 | same | same |
+| `Phi5` is coprime to `PsiSq5` | exact division-polynomial assembly | H116 | same | same |
+| scalar-five coordinate extension degree is twenty-five | exact degree assembly | H116 | rational function field | same plus `5 != 0` |
+| singular scalar-five pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 7` | none |
+
+## Generic two-factor EDS bootstrap gate
+
+1. **Structure above.** In an arbitrary commutative ring, suppose
+   `c=b*s^2-a^3`, with `a` coprime to `b` and `s`, and `b` coprime to `c`.
+   Put `t=c-b^2`. The next recurrence-shaped pair is
+   `d=a*t` and `e=c*a^3-b^3*s^2`. The defining identity rewrites the second
+   element as `e=(a^3-b^2)*t-b^4`. Coprimality with `a` and `t` follows
+   separately, hence `d` and `e` are coprime.
+2. **Theorems used as stated.** Only Mathlib's generic `IsCoprime` product,
+   power, symmetry, and subtract-multiple equivalences plus commutative-ring
+   normalization are used. No elliptic object or polynomial-specific result
+   occurs in the theorem.
+3. **Object as an instance.** The scalar-six construction instantiates
+   `a=Psi3`, `b=prePsi4`, `c=prePsi5`, and `s=Psi2Sq`. Its recurrence formulas
+   identify `d=prePsi6` and `e=prePsi7`, so the curve-specific adjacent proof
+   becomes a direct application of this generic law.
+4. **Assembly probe.** The generic theorem and its integer mutation first
+   elaborated in a temporary importing module. Scalar six was then refactored
+   as a direct instance. The tracked project completed all 3,162 build jobs;
+   the exact repository auditor reports
+   `186 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This packages one binary EDS recurrence
+   stencil. An arbitrary-index proof must show that recursive subproblems
+   always provide its three base coprimality premises or supply companion
+   stencils for the other parity branches. [pcc:unverified]
+6. **Inheritance table.** All ring and coprimality laws are inherited from
+   Mathlib. H116 supplies their composition. The mutation
+   `a=2,b=1,s=2,c=-4` retains `a` coprime to `b` and `b` coprime to `c` but
+   produces `d=-10,e=-36`, which are not coprime; thus the `a`/`s` premise
+   cannot be dropped.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| recurrence-shaped pair `d,e` is coprime | generic algebraic law | H116 over Mathlib `IsCoprime` | arbitrary commutative ring | `c=b*s^2-a^3`, `a` coprime to `b,s`, `b` coprime to `c` |
+| dropping `a` coprime to `s` is unsound | negative mutation | H116 integer arithmetic | fixed integer tuple | retained two pair premises only |
+
+## Generic successor stencil and scalar-seven gate
+
+1. **Structure above.** Under the same generic premises, put
+   `d=a(c-b^2)`, `e=c*a^3-b^3*s^2`, and
+   `f=b(a^2*d-c^2)`. The inner factor satisfies
+   `a^2*d-c^2=e-c(c-b^2)`. Also `c` is automatically coprime to `s`, because
+   `c=(b*s)*s-a^3`. These identities prove `e` coprime to both factors of
+   `f`, so the successor pair is coprime without a new premise.
+2. **Theorems used as stated.** The proof uses the same generic Mathlib
+   coprimality product, power and subtract-multiple laws. Mathlib's
+   `prePsi'_even` at the next index identifies `f=prePsi8`; the prior stencil
+   identifies `e=prePsi7`.
+3. **Object as an instance.** The short-curve instantiation proves
+   `prePsi7` coprime to `prePsi8`, assembles `Phi7,PsiSq7` coprimality, and
+   gives coordinate extension degree forty-nine when `7 != 0`.
+4. **Assembly evidence.** The generic successor, scalar-seven instantiation,
+   no-cancellation assembly, degree endpoint and singular control pass in the
+   tracked module. The pinned full build completed all 3,162 jobs, and the
+   exact repository auditor reports `191 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** Two consecutive outputs of this binary
+   recurrence stencil are now covered generically. Arbitrary-index closure
+   still requires showing that every recursive parity branch decomposes into
+   these stencils or proving additional companion stencils. [pcc:unverified]
+6. **Inheritance table.** Ring laws, EDS formulas, coprimality transformations
+   and degree endpoints are inherited. H116 supplies the successor
+   factorization and composition. The singular scalar-seven pair on
+   `A=B=0` over `ZMod 11` is proved non-coprime by evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| successor pair `e,f` is coprime | generic recurrence stencil | H116 | arbitrary commutative ring | same three premises as the two-factor bootstrap |
+| `prePsi7` is coprime to `prePsi8` | exact EDS instantiation | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi7` is coprime to `PsiSq7` | exact division-polynomial assembly | H116 | same | same |
+| scalar-seven coordinate extension degree is forty-nine | exact degree assembly | H116 | rational function field | same plus `7 != 0` |
+| singular scalar-seven pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
+
+## Second-successor stencil and scalar-eight gate
+
+1. **Structure above.** Retain the generic premises and abbreviations from
+   the two-factor and successor stencils, and put
+   `g=d*b^3*s^2-a*c^3`.  The new reduction identity is
+   `a^2*g=b^3*s^2*(a^2*d-c^2)-c^2*e`.  Thus the inner factor of `f` is
+   coprime to `g` if it is coprime to `c` and `e`; the latter pair is
+   extracted from the proved successor certificate.  The outer factor `b`
+   is handled independently by reducing `g` modulo `b` to `-a*c^3`.
+2. **Theorems used as stated.** The candidate proof uses only the preceding
+   generic successor theorem and Mathlib coprimality product, power,
+   factor-extraction and subtract-multiple laws.  No polynomial resultant or
+   scalar-specific expansion is permitted in the generic theorem.
+3. **Object as an instance.** The planned short-curve instance identifies
+   `f=prePsi8` and `g=prePsi9`, then targets scalar-eight no-cancellation and
+   coordinate extension degree sixty-four.
+4. **Assembly evidence.** Generic elaboration and exact EDS instantiation pass
+   in the tracked module. The pinned full build completed all 3,162 jobs, and
+   the exact repository auditor reports
+   `196 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** Success would cover a third consecutive
+   binary-recurrence output under one invariant, but would not prove that all
+   larger parity branches preserve that invariant. [pcc:unverified]
+6. **Control.** The positive instance requires a nonsingular short curve.
+   At `A=B=0` over `ZMod 11`, the scalar-eight pair is proved non-coprime by
+   evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| second-successor pair `f,g` is coprime | generic recurrence stencil | H116 | arbitrary commutative ring | same three premises as the two-factor bootstrap |
+| `prePsi8` is coprime to `prePsi9` | exact EDS instantiation | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi8` is coprime to `PsiSq8` | exact division-polynomial assembly | H116 | same | same |
+| scalar-eight coordinate extension degree is sixty-four | exact degree assembly | H116 | rational function field | same |
+| singular scalar-eight pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
+
+## Third-successor stencil and scalar-nine gate
+
+1. **Structure above.** Under the same base invariant, retain
+   `t=c-b^2`, `d=a*t`, `e=c*a^3-b^3*s^2`, and
+   `u=a^2*d-c^2`.  Put `w=b^2*u-c*t^2`, so the next odd output is
+   `g=a*w`.  The following even inner factor has the exact alternate form
+   `v=(2*b^2-c)*u-c*t^2=w-t*u`.  The prior second-successor certificate
+   supplies `w` coprime to `u`; the base invariant supplies `w` coprime to
+   `t`.  This is the proposed reduction for `g` coprime to `c*v`.
+2. **Theorems used as stated.** The candidate proof factors the preceding
+   generic certificate and otherwise uses only Mathlib coprimality product,
+   power, factor-extraction and subtract-multiple laws.  The generic theorem
+   may not invoke a scalar-specific resultant.
+3. **Object as an instance.** Mathlib's exact recurrences identify
+   `g=prePsi9` and `c*v=prePsi10`.  The planned endpoint is scalar-nine
+   no-cancellation and coordinate extension degree eighty-one outside
+   characteristic three.
+4. **Exploratory control.** Exhaustive arithmetic over the 13 prime fields
+   from `F_3` through `F_43` found zero simultaneous zeros of the candidate
+   pair among 249,580 tuples satisfying the nonzero field versions of all
+   base premises.  This off-panel sweep is motivation only, not proof and not
+   a frozen benchmark.
+5. **Assembly evidence.** Generic elaboration and exact EDS instantiation pass
+   in the tracked module. The pinned full build completed all 3,162 jobs, and
+   the exact repository auditor reports
+   `201 theorems, 0 failing, 0 trusted`. The singular `A=B=0` specialization
+   over `ZMod 11` is proved non-coprime by evaluation at zero.
+6. **Missing components only.** A successful third successor would extend one
+   invariant through four adjacent outputs, but arbitrary recurrence-tree
+   closure would remain unproved. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| third-successor pair `g,c*v` is coprime | generic recurrence stencil | H116 | arbitrary commutative ring | same three premises as the two-factor bootstrap |
+| `prePsi9` is coprime to `prePsi10` | exact EDS instantiation | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi9` is coprime to `PsiSq9` | exact division-polynomial assembly | H116 | same | same |
+| scalar-nine coordinate extension degree is eighty-one | exact degree assembly | H116 | rational function field | same plus `3 != 0` |
+| singular scalar-nine pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
+
+## Fourth-successor stencil and scalar-ten gate
+
+1. **Structure above.** Retain `t,d,e,u,w,v` from the three preceding
+   stencils.  The next odd recurrence output
+   `i=e*c^3-b*d^3*s^2` has the alternate expression
+   `i=c^2*v-t*u*e`.  Factoring the proved third-successor certificate through
+   `g=a*w` and `v=w-t*u` yields `v` coprime to `t` and `u`; the original
+   bootstrap yields `v` coprime to `e`.  This would prove `v` coprime to `i`.
+   The outer factor `c` is handled independently by reducing `i` modulo `c`.
+2. **Theorems used as stated.** The candidate uses the generic bootstrap and
+   third-successor theorems plus Mathlib factor-extraction, product, power and
+   subtract-multiple laws.  No fixed-scalar resultant is allowed.
+3. **Object as an instance.** The exact EDS recurrence identifies
+   `c*v=prePsi10` and `i=prePsi11`, targeting scalar-ten no-cancellation and
+   coordinate extension degree one hundred outside characteristics two and
+   five.
+4. **Exploratory control.** The same 13-field, 249,580-tuple off-panel sweep
+   found zero simultaneous zeros of the proposed fourth-successor pair.  This
+   is motivation only, not a frozen benchmark or proof.
+5. **Assembly evidence.** Generic elaboration and exact EDS instantiation pass
+   in the tracked module. The pinned full build completed all 3,162 jobs, and
+   the exact repository auditor reports
+   `206 theorems, 0 failing, 0 trusted`. The singular `A=B=0` specialization
+   over `ZMod 11` is proved non-coprime by evaluation at zero.
+6. **Missing components only.** This is still a finite recurrence corridor;
+   an arbitrary recurrence-tree invariant and induction remain open.
+   [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| fourth-successor pair `c*v,i` is coprime | generic recurrence stencil | H116 | arbitrary commutative ring | same three premises as the two-factor bootstrap |
+| `prePsi10` is coprime to `prePsi11` | exact EDS instantiation | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi10` is coprime to `PsiSq10` | exact division-polynomial assembly | H116 | same | same |
+| scalar-ten coordinate extension degree is one hundred | exact degree assembly | H116 | rational function field | same plus `5 != 0` |
+| singular scalar-ten pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 11` | none |
+
+## Universal multiplication-resultant bridge
+
+1. **Structure above.** Schmidt's exact standard-multiplication-polynomial
+   formula is
+   `Res(A_n,B_n)=(-16*(4*A^3+27*B^2))^(n^2*(n^2-1)/6)`. In a field, the
+   right side is nonzero on a nonsingular short curve. Since Mathlib's
+   `Phi_n` is monic, a unit resultant is equivalent to coprimality.
+2. **Theorems used as stated.** H116 uses Mathlib's `leadingCoeff_Phi`,
+   `Polynomial.isUnit_resultant_iff_isCoprime`, exact division-polynomial
+   degree theorems, and the already proved reduced-rational-quotient extension
+   theorem. Schmidt owns the universal resultant identity; H116 does not
+   relabel it as novel.
+3. **Object as an instance.** The Lean interface quantifies over arbitrary
+   natural `n`, assumes the exact resultant identity for pinned Mathlib
+   `Phi_n,PsiSq_n`, and derives both coprimality and exact coordinate extension
+   degree `n^2` when `n` is nonzero in the field.
+4. **Assembly evidence.** The temporary importing module and tracked source
+   pass. The pinned full build completed all 3,164 jobs, and the exact
+   repository auditor reports `208 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The exact convention-alignment proof between
+   Schmidt's standard multiplication polynomials and the pinned Mathlib
+   definitions remains open. This bridge gives no H116 scheme-map identity,
+   digit predicate, decoder, or ECDLP runtime. [pcc:unverified]
+6. **Control.** The existing singular `A=B=0` fixed-scalar theorems demonstrate
+   why the nonzero-discriminant premise cannot be dropped; the exact formula's
+   right side then vanishes for every positive exponent.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| resultant formula implies `Phi_n,PsiSq_n` coprime | source-linked bridge | Schmidt formula + H116 assembly | arbitrary field and natural scalar | nonsingular short curve, exact formula |
+| coordinate extension degree is `n^2` | exact degree assembly | H116 | rational function field | same plus scalar nonzero in field |
+| exact formula in pinned Mathlib conventions | open convention alignment | Schmidt/H116 | universal short curve | characteristic and normalization audit pending |
+
+## Scalar-six two-factor bootstrap gate
+
+1. **Structure above.** Instantiate the preceding generic gate with
+   `a=Psi3`, `b=prePsi4`, `c=prePsi5`, and `s=Psi2Sq`. Set
+   `t=prePsi5-prePsi4^2`. The even recurrence gives
+   `prePsi6=Psi3*t`.  The next odd recurrence initially gives
+   `prePsi7=prePsi5*Psi3^3-prePsi4^3*Psi2Sq^2`; using the scalar-five
+   identity, H116 rewrites this exactly as
+   `(Psi3^3-prePsi4^2)*t-prePsi4^4`.  Thus coprimality with `prePsi6` splits
+   into coprimality with `Psi3` and with `t`, both reducible to earlier pair
+   and parity certificates.
+2. **Theorems used as stated.** Mathlib's `prePsi'_even` and `prePsi'_odd`
+   supply the two recurrences. The scalar-four/five adjacent pairs and
+   `Psi3,Psi2Sq` base certificate discharge the factor goals through
+   `IsCoprime.mul_left_iff`, power laws and subtract-multiple equivalences.
+   The two-adjacent-factor assembly proves scalar-six no-cancellation; the
+   exact quotient-degree theorem gives degree thirty-six when `6 != 0`.
+3. **Object as an instance.** On every nonsingular short curve outside
+   characteristic two, `Phi6` and `PsiSq6` are coprime. Outside characteristic
+   three as well, the coordinate extension degree is thirty-six.
+4. **Assembly probe.** The two-factor adjacent proof, scalar-six assembly,
+   degree endpoint and singular control first elaborated in a temporary
+   importing module. The tracked project then completed all 3,162 build jobs;
+   the exact repository auditor reports
+   `184 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This reaches scalar six and exposes a
+   two-factor recurrence invariant candidate. It does not yet package that
+   invariant for arbitrary indices or imply an ECDLP runtime bound.
+   [pcc:unverified]
+6. **Inheritance table.** EDS identities, coprimality laws and degree formulas
+   are inherited. H116 supplies the exact alternate factorization and
+   composition. The singular `A=B=0` scalar-six pair over `ZMod 7` is proved
+   non-coprime by evaluation at zero.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `prePsi6` is coprime to `prePsi7` | two-factor recurrence bootstrap | H116 | short curve over a field | discriminant nonzero, `2 != 0` |
+| `Phi6` is coprime to `PsiSq6` | exact division-polynomial assembly | H116 | same | same |
+| scalar-six coordinate extension degree is thirty-six | exact degree assembly | H116 | rational function field | same plus `3 != 0` |
+| singular scalar-six pair is not coprime | negative control | H116 evaluation homomorphism | `A=B=0` over `ZMod 7` | none |
+
+## Adjacent-torsion root-semantics gate
+
+1. **Structure above.** Over an algebraically closed field, two polynomials
+   are coprime if they have no common root: a nonunit gcd would
+   have nonzero degree, hence a root, and that root propagates through both gcd
+   divisibilities.  In any additive group, simultaneous equations
+   `[n]P=0` and `[n+1]P=0` force `P=0` by subtraction.
+2. **Theorems used as stated.** `gcd_isUnit_iff`,
+   `Polynomial.isUnit_iff_degree_eq_zero`, `IsAlgClosed.exists_root`,
+   `Polynomial.IsRoot.dvd`, and integer scalar-addition laws supply the two
+   generic arguments.  No elliptic group law is copied.
+3. **Object as an instance.** A semantic wrapper accepts a certificate that
+   every common polynomial root produces a nonzero group element killed by
+   adjacent integers.  The group theorem makes that certificate contradictory,
+   and the root criterion returns polynomial coprimality.
+4. **Assembly probe.** The root criterion, adjacent-scalar group law, semantic
+   wrapper and zero-point control first elaborated in a temporary module.  The
+   tracked project then completed all 3,162 build jobs; the exact repository
+   auditor reports `157 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The wrapper does not yet construct an elliptic
+   point from a root of `prePsi n`, prove that it is nonzero, or prove that the
+   two roots encode `[n]P=[n+1]P=0`.  Those exact division-polynomial root
+   semantics are now the remaining geometric bridge. [pcc:unverified]
+6. **Inheritance table.** Algebraic-closure roots, polynomial gcds and integer
+   scalar laws are inherited from Mathlib.  H116 composes them and explicitly
+   exposes the root-to-torsion premise.  The zero group element satisfies both
+   adjacent equations and is the boundary control.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| no common root implies `IsCoprime p q` | generic algebraic law | H116 over Mathlib gcd/root APIs | algebraically closed field | no shared root |
+| adjacent integer torsion intersects trivially | generic group law | H116 over integer scalar addition | arbitrary additive group | `[n]P=0`, `[n+1]P=0` |
+| root-to-adjacent-torsion semantics implies coprimality | semantic assembly | H116 over the preceding laws | algebraically closed field plus additive group | each common root supplies a nonzero adjacent-torsion point |
+| zero point satisfies both equations | boundary control | H116 group simplification | arbitrary additive group | `P=0` |
+
+## Algebraic-closure descent for root semantics gate
+
+1. **Structure above.** Let `f : F ->+* K` be a homomorphism from an
+   arbitrary base field into an algebraically closed field.  If the mapped
+   polynomials `p.map f` and `q.map f` have no common root in `K`, they are
+   coprime in `K[X]`; field-map invariance then descends coprimality to
+   `F[X]`.  The same descent applies after common mapped roots are converted
+   to nonzero points killed by adjacent integer scalars.
+2. **Theorems used as stated.** The preceding H116 algebraically closed root
+   criterion and adjacent-torsion contradiction are composed with Mathlib's
+   `Polynomial.isCoprime_map`, whose reverse implication is the required
+   descent.  Ring homomorphisms between fields are injective automatically;
+   no chosen algebraic closure or coefficient-level inverse is introduced.
+3. **Object as an instance.** One wrapper accepts no-common-root evidence for
+   `p.map f,q.map f`; a second accepts the mapped-root-to-adjacent-torsion
+   semantic certificate.  Both conclude `IsCoprime p q` over the original
+   coefficient field.
+4. **Assembly probe.** Both wrappers first elaborated in a temporary module.
+   The tracked project then completed all 3,162 build jobs; the exact
+   repository auditor reports `159 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This closes coefficient-field descent but
+   does not construct an algebraic closure, lift a division-polynomial root to
+   an elliptic point, or prove the pointwise scalar-multiplication formula.
+   Those geometric obligations remain explicit. [pcc:unverified]
+6. **Inheritance table.** Polynomial mapping and coprimality invariance are
+   inherited from Mathlib. H116 supplies only the composition with the already
+   audited root and group-semantic theorems.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| mapped no-common-root evidence descends to `IsCoprime p q` | generic field-extension law | H116 over Mathlib `Polynomial.isCoprime_map` | base field, algebraically closed extension field, field homomorphism | no shared mapped root |
+| mapped root-to-adjacent-torsion semantics descends to `IsCoprime p q` | semantic assembly | H116 over the preceding descent and group law | same fields plus additive commutative group | every shared mapped root supplies a nonzero adjacent-torsion point |
+
+## Algebraic-closure affine-point lift gate
+
+1. **Structure above.** For a Weierstrass equation over an algebraically
+   closed field and any chosen `x`, the curve equation is a monic quadratic in
+   `y`.  Its degree-two coefficient is one, so it is nonconstant and has a
+   root.  On an elliptic affine curve the resulting equation witness builds a
+   nonzero `Affine.Point`.  Combining this with the preceding base-change
+   theorem removes point construction from the adjacent-torsion premise.
+2. **Theorems used as stated.** `IsAlgClosed.exists_root` supplies a root of
+   `Y^2+(a1*x+a3)Y-(x^3+a2*x^2+a4*x+a6)`;
+   `Affine.equation_iff`, `Affine.Point.mk`, and `Point.some_ne_zero` turn it
+   into the exact Mathlib point object.  The previous mapped-root semantic
+   bridge supplies the coprimality conclusion.
+3. **Object as an instance.** The first theorem returns an equation witness
+   over any algebraically closed field.  The second returns the associated
+   nonzero elliptic point.  The assembly theorem accepts only the remaining
+   pointwise claim that a common mapped root makes this point satisfy the two
+   adjacent scalar equations.
+4. **Assembly probe.** All three positive statements and the finite-field
+   control first elaborated in a temporary importing module.  The tracked
+   project then completed all 3,162 build jobs; the exact repository auditor
+   reports `163 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The root-to-point construction is closed.
+   The assembly still does not prove that a root of `prePsi_n` is killed by
+   scalar `n`; that pointwise division-polynomial formula is the remaining
+   geometric obligation. [pcc:unverified]
+6. **Inheritance table.** Algebraic-closure root existence, the Weierstrass
+   equation and affine point/group structures are inherited from Mathlib.
+   H116 supplies the quadratic specialization and composition.  The control
+   curve `y^2=x^3+x+1` over `ZMod 5` has no point over `x=1`, verified by
+   exhaustive kernel reduction, showing that algebraic closure cannot be
+   deleted from the lift.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| every `x` lies below a Weierstrass equation point | generic algebraic-closure law | H116 over `IsAlgClosed.exists_root` | arbitrary affine Weierstrass curve over algebraically closed field | none beyond field closure |
+| every `x` lies below a nonzero elliptic affine point | point construction | H116 over Mathlib `Affine.Point.mk` | elliptic affine curve over algebraically closed field | decidable equality for the inherited group instance |
+| pointwise adjacent scalar semantics implies base-field coprimality | semantic assembly | H116 over the point lift and mapped-root descent | base field, closed extension, elliptic affine curve | common-root point is killed by `n` and `n+1` |
+| point lift can fail over the base finite field | negative control | H116 finite reduction | `y^2=x^3+x+1` over `ZMod 5`, `x=1` | none |
+
+## Short-Weierstrass local-parameter instance gate
+
+1. **Structure above.** The local affine parameter is the field expression
+   `z(x,y)=-x/y`. Coordinate negation is `(x,y) -> (x,-y)`, and a coordinate
+   endomorphism is represented by a field ring homomorphism applied to both
+   coordinates. This gate does not construct the elliptic formal group.
+2. **Theorems used as stated.** Field `div_neg` proves
+   `z(x,-y)=-z(x,y)`. Ring-homomorphism preservation of negation and division
+   proves `z(phi(x),phi(y))=phi(z(x,y))`; a supplied power-map identity for
+   `phi` then gives the exact Frobenius parameter formula.
+3. **Object as an instance.** The implementation expression is exactly
+   `shortWeierstrassLocalParameter x y`. The negation and map theorems quantify
+   over arbitrary fields; the Frobenius wrapper quantifies over a ring
+   endomorphism `phi` and the explicit premise `phi(a)=a^p`.
+4. **Assembly probe.** A temporary module importing `H116FiberTrace` checked
+   the definition and all three wrappers at default limits. The tracked module
+   then rebuilt at default limits; the exact repository auditor reported
+   `93 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** This proves the coordinate-level negation and
+   Frobenius formulas. It does not prove that the supplied rational map is
+   Verschiebung, construct its local formal-group law, or identify the
+   endomorphism relation `V+pi=[t]`.
+6. **Inheritance table.** Division, negation, powers and ring-homomorphism laws
+   are inherited from Mathlib field/ring instances. H116 adds only the named
+   local-parameter definition and compositions. No curve equation, copied
+   addition law, complexity claim, trusted decision procedure or resource
+   override is introduced. [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `z(x,-y)=-z(x,y)` | coordinate identity | H116 over field laws | arbitrary field | none |
+| `z(phi(x),phi(y))=phi(z(x,y))` | coordinate naturality | H116 over ring-hom laws | field ring homomorphism | none |
+| coordinate Frobenius sends `z` to `z^p` | instance wrapper | H116 | field endomorphism | supplied identity `phi(a)=a^p` |
+
+## Mathlib formal-group filtration instance gate
+
+1. **Structure above.** The quantified object is Mathlib's
+   `FormalGroup R` from `Mathlib.RingTheory.FormalGroup.Basic`, with underlying
+   bivariate series `F.toPowerSeries`, identity theorem `F.Xzero_eq_X`, and
+   substitution through `MvPowerSeries.HasSubst`. The coordinate endpoint uses
+   the pre-existing H116 `PowerSeriesPrefixEq` and normalized pole bridge.
+2. **Theorems used as stated.** `MvPowerSeries.X_dvd_iff` converts
+   second-variable divisibility into coefficient vanishing;
+   `FormalGroup.Xzero_eq_X` identifies the restriction `F(X,0)`;
+   `MvPowerSeries.subst_sub`, `subst_mul`, and `subst_X` transport the quotient
+   through substitution. `PowerSeriesPrefixEq.add_X_pow_mul` and
+   `leading_X_inv_sq_mul_subst_inv` supply the filtration and pole transfer.
+   For a commutative formal group, `FormalGroup.comm'` turns a certified right
+   inverse into the orientation required by the same correction factorization.
+   In the short-Weierstrass specialization, ordinary ring negation gives the
+   zero constant and order factorization of `-omitted` directly.
+3. **Object as an instance.** A zero-constant scalar parameter `s` and
+   correction `c` are substituted into the actual Mathlib formal group as
+   `F(s,c)`. If `c=X^m tail`, the resulting series is prefix-equal to `s`
+   below degree `m`; after writing both parameters as `X` times units, an
+   order-`n+1` correction yields an order-`n` normalized pole prefix. For the
+   actual endomorphism orientation, the cancellation bridge takes explicit
+   certificates `F(actual,omitted)=scalar` and
+   `F(omitted,inverseCorrection)=0`; associativity and the right identity give
+   `F(scalar,inverseCorrection)=actual`, after which the same filtered pole
+   theorem applies. Commutativity plus `omitted=X^m tail` then proves, rather
+   than assumes, `inverseCorrection=X^m inverseTail`. An alternative endpoint
+   uses the explicit correction `-omitted`; its only inverse premise is the
+   exact certificate `F(omitted,-omitted)=0`.
+4. **Assembly probe.** A temporary module importing `H116FiberTrace` and
+   Mathlib's formal-group module checked all four declarations at default
+   heartbeats. A first direct curve-coordinate wrapper timed out during
+   elaboration; replacing it by the generic pole theorem made every component
+   explicit and passed without a limit override. A second temporary module
+   checked both the associativity-only right-cancellation lemma and its composed
+   pole-prefix endpoint at default limits. A third temporary module checked the
+   inverse-order transfer and the endpoint specialized to omitted-parameter
+   order at default limits. The tracked module then built at default limits and
+   the exact repository auditor reported `88 theorems, 0 failing, 0 trusted`.
+   A fourth temporary module checked the explicit-negation endpoint at default
+   limits; after integration the tracked module rebuilt at default limits and
+   the exact auditor reported `89 theorems, 0 failing, 0 trusted`.
+5. **Missing components only.** The generic laws no longer assume the desired
+   prefix or the desired subtraction equality. The remaining endpoint
+   hypotheses are the actual elliptic identification `V+pi=[t]` in the chosen
+   formal parameter, the elliptic negation certificate
+   `F(piParameter,-piParameter)=0`, the characteristic-`p` formula giving that
+   parameter order `p`, and the sign/target scaling that turns
+   it into the supplied `V-1` rational map. Parity then translates the
+   `z^(p-1)` normalized boundary to `w^((p-1)/2)`; that translation is not
+   asserted by the generic theorem.
+6. **Inheritance table.** The formal group, identity restriction and
+   substitution algebra are inherited from Mathlib; finite prefix arithmetic
+   and the double-pole loss are inherited from earlier H116 theorems. The
+   filtration lemma extracts the second-variable quotient from `F(X,0)=X`.
+   The cancellation bridge uses only `FormalGroup.assoc'`, `add_zero`, and
+   zero-constant substitution witnesses; it does not construct an inverse or
+   import elliptic semantics. The inverse-order transfer additionally inherits
+   `FormalGroup.comm'` and ring factorization; it does not assume the inverse's
+   order. The explicit-negation endpoint uses only ring negation and avoids the
+   commutativity premise, but leaves the actual elliptic negation identity as a
+   visible certificate. No curve equation, endomorphism relation,
+   complexity bound, trusted decision procedure or resource-limit override is
+   introduced.
+   [pcc:unverified]
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| `Y` divides `F(X,Y)-X` | generic law, upstream candidate | H116 over Mathlib `FormalGroup` | commutative ring formal group | Mathlib formal-group laws only |
+| `F(s,c)=s+cq` for some `q` | generic assembly | H116 | commutative ring formal group and univariate power series | zero constant coefficients |
+| order-`m` correction preserves the prefix below `m` | generic assembly | H116 | field formal group | `c=X^m tail` and zero constants |
+| order-`n+1` correction preserves normalized pole prefix below `n` | generic assembly | H116 | field formal group and regular outer unit | leading-`X` factorizations and unit constants |
+| `F(actual,omitted)=scalar` cancels against an explicit right inverse | generic assembly | H116 over Mathlib `FormalGroup` | commutative ring formal group | zero constants and `F(omitted,inverseCorrection)=0` |
+| cancellation plus order-`n+1` inverse preserves normalized pole prefix below `n` | generic endpoint composition | H116 | field formal group and regular outer unit | certified sum, certified inverse, inverse order, leading-`X` factorizations and unit constants |
+| a certified inverse has at least the omitted parameter's order | generic commutative-group assembly | H116 over Mathlib `FormalGroup` | commutative formal group over a commutative ring | zero constants, certified right inverse, omitted-parameter factorization |
+| cancellation plus order-`n+1` omitted parameter preserves normalized pole prefix below `n` | generic endpoint composition | H116 | commutative field formal group and regular outer unit | certified sum and inverse, omitted order, leading-`X` factorizations and unit constants |
+| explicit negation correction preserves normalized pole prefix below `n` | generic endpoint composition | H116 | field formal group and regular outer unit | certified sum, `F(omitted,-omitted)=0`, omitted order, leading-`X` factorizations and unit constants |
+| actual `V-1` normalized x-ratio prefix | endpoint obligation | future elliptic formal-group owner | ordinary elliptic curve over `F_p` | `V+pi=[t]`, local Frobenius, sign and scaling identifications |
 
 ## Inheritance table
 
@@ -318,8 +1578,9 @@ control supplies no replacement for the open endpoint row. [pcc:unverified]
 | finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
 | finite sums and coefficient extraction | Mathlib finite sums plus existing H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
 | field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
-| isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; no Mathlib isogeny object was found, so a finite `N,D` certificate is the checked interface; producing it from the actual kernel and independently validating map semantics remain open |
-| `V+pi=[t]` and `pi(z)=z^p` | H115 algebra plus formal-group instance; lookup pending |
+| isogeny homomorphism, dual and degree laws | finite field-tower multiplication and exact division-polynomial coordinate degrees are now proved; no Mathlib elliptic-isogeny or dual object was found, so constructing the actual pullback tower, identifying the scalar coordinate quotient with the scheme map and its degree, proving `(V-1)^vee=pi-1`, and the differential formula remain open |
+| formal-group filtration of an `X^m` correction | Mathlib `FormalGroup` plus `FormalGroup.filtered_correction_prefix` and `filtered_pole_prefix`; generic layer proved |
+| `V+pi=[t]`, `F(pi,-pi)=0` in parameter coordinates, and the actual local `pi` series of order `p` | elliptic formal-group instance; endpoint identification still pending |
 | radix-six decoder | reuse H115 generic theorem after source import/binding |
 
 The assembly lookup found no ready-made `Derivation K (RatFunc K) (RatFunc K)`
