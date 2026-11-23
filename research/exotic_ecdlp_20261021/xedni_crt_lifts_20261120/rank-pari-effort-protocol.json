@@ -1,0 +1,10 @@
+{
+  "schema": "xedni-crt-rank-pari-effort-protocol-v1",
+  "amends": ["rank-protocol.json", "rank-simon-protocol.json"],
+  "reason": "initial PARI call left [0,3]; Simon with the known point improved the lower bound to 1 but left upper 3",
+  "curve_coefficients": ["1081", "1034", "0", "-6816", "-3997"],
+  "method": "checked Sage rank(use_database=False, proof=True, algorithm='pari', only_use_mwrank=True, pari_effort=3)",
+  "timeout_seconds": 60,
+  "status_rules": "retain complete, error, or timeout; do not promote a rank when the proof-enabled method errors",
+  "interpretation": "selected-curve rank interval diagnostic only"
+}

@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY optimized.c complete_pipeline.cpp projective_walk.hpp prepared_norm.hpp ./
+COPY optimized.c complete_pipeline.cpp projective_walk.hpp ./
 RUN mkdir -p /opt/conductor \
     && cc -O3 -Wall -Wextra -std=c11 \
        -Dprime_log_norm_jet=optimized -Dprime_log_norm_free=optimized_free \
@@ -13,6 +14,7 @@ RUN mkdir -p /opt/conductor \
     && c++ -O2 -Wall -Wextra -std=c++17 complete_pipeline.cpp optimized.o \
        -lpari -lflint -lgmpxx -lgmp -o /opt/conductor/complete_pipeline \
     && sha256sum optimized.c complete_pipeline.cpp projective_walk.hpp prepared_norm.hpp > /opt/conductor/sources.sha256 \
+    && sha256sum optimized.c complete_pipeline.cpp projective_walk.hpp > /opt/conductor/sources.sha256 \
     && sha256sum /opt/conductor/complete_pipeline > /opt/conductor/binary.sha256 \
     && dpkg-query -W g++ gcc libflint-dev libpari-dev libmpfr-dev libgmp-dev \
        > /opt/conductor/build-packages.tsv
@@ -22,7 +24,7 @@ ARG SOURCE_REVISION
 RUN test "${#SOURCE_REVISION}" -eq 40 \
     && case "$SOURCE_REVISION" in *[!0-9a-f]*) exit 1;; esac \
     && apt-get update && apt-get install -y --no-install-recommends \
-       libflint19=3.1.3-2 libpari-gmp-tls9=2.17.2-1 \
+       libflint19=3.1.3-2 libpari-gmp-tls9=2.17.2-1 libgmpxx4ldbl=2:6.3.0+dfsg-3 \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /work && chown 1000:1000 /work
 COPY --from=builder /opt/conductor /opt/conductor

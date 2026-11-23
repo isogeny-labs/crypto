@@ -1,0 +1,20 @@
+Deviations from PRESET.txt (logged before pass-2 analysis)                 [pcc:unverified]
+
+1. 2026-11-18 ~05:30 UTC. count_points in xedni_toy.py is O(p) memory; above 2^20 it now calls PARI ellcard.
+   (first grid attempt crashed at 20-32 bits; no data lost, nothing analysed.)
+2. ~05:38. lh_toy.unimod_to_e1 loop exited at w = [-1,0,0] (trial then skipped by an assert), and a
+   lift could land on Z' = 0 (skipped). Both fixed (sign test; shear Z' += a X'). Skips were
+   unrelated to heights.
+3. ~06:00. HEIGHT ESTIMATOR. A 5-vs-6-doubling check on four r = 9 tangent trials (12 bits) moved
+   rho_G from 3.29-3.33 to 3.87-3.95: the 5-doubling Gram matrix is not converged for that
+   construction (its truncation-error bound eps is 8% of lambda). Pass 1 (5 doublings, V-scaled
+   model; out/pass1_n5_scaled/) is kept but superseded. Pass 2 (out/runs, out/depD) uses the
+   unscaled short model (rational points) and records Gram matrices at 3, 4, 5 doublings; the
+   reported rho is the Richardson value G_inf = G_5 + (G_5 - G_4)/3 (error model C/4^n), and
+   G_4 + (G_4 - G_3)/3 is kept as a consistency check. On one trial the (4,5) and (5,6)
+   extrapolations agree to 5 digits (rho 4.24501 vs 4.24498). The kill rule is unchanged and is
+   applied to the pass-2 (Richardson) values; pass-1 values are reported alongside.
+   Pass-2 sizes: r = 9 tangent 2 x 10 trials per bit size (was 2 x 15) to fit the time budget.
+4. ~06:10. Arm E: lambda_calib.py segfaulted inside PARI ellrank at e = 32, r = 3, trial 2, which
+   ended the run (e = 16 complete; e = 32 has r = 2 and one r = 3 trial). Remaining e = 32 cells
+   run one process per r; the r = 3 cell uses seed 20261121 (the 20261118 seed replays the crash).

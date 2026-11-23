@@ -10,11 +10,12 @@ constructor to `tools/ecdlp-surfaces`.
 
 | Case | Existing entry point | Boundary |
 | --- | --- | --- |
-| Genus-2 cover of `y^2=x^3+a*x+b`, characteristic greater than three | `crypto`: `hyperelliptic-cover construct` / `verify` | The fixed degree-two cover is a smooth sextic with two rational infinity points. Its construction is checked; pullback, norm, and its two-infinity Jacobian arithmetic are not implemented. |
-| Genus-3 cover of an ordinary binary elliptic curve | Same CLI, plus `OrdinaryBinaryCover` in the native libraries | Both repositories support one-infinity Mumford arithmetic, rational elliptic point-class pullbacks, rational source-point pushforward, and typed pull/push witnesses. Current `crypto` source alone supports arbitrary Jacobian-class pushforward for the exact polynomial-basis GF(8) fixture `a=1`, `b=3`, `d=7`; every other crypto field/model is structured unsupported, and the retained `cryptanalysis` source remains pre-norm pending a current mirror/integration receipt. |
+| Genus-2 cover of `y^2=x^3+a*x+b`, characteristic greater than three | `crypto`: `hyperelliptic-cover construct` / `verify` / `arithmetic` | The fixed degree-two cover is a smooth monic sextic with two rational infinity points. Over a deterministically checked odd prime fitting `u64`, the separate balanced backend supports canonical `(u,v,n_plus)` arithmetic; extension fields, larger primes, and the induced pullback/norm remain unsupported. |
+| Genus-3 cover of an ordinary binary elliptic curve | `crypto`: `hyperelliptic-cover`, plus `OrdinaryBinaryCover` in the native library | One-infinity Mumford arithmetic, rational point-class pullback, arbitrary valid reduced degree-at-most-three class pushforward, composition/projector certificates, and conditional subgroup status are implemented. The structured `transfer` command exposes them. The retained `cryptanalysis` mirror is still pre-norm until its separate current-source parity PR lands. |
 | Binary genus-2 cover of `y^2+x*y=x^3+a*x^2+1` | `tools/binary-genus2-cover`: `GenusTwoCover`, `binary_genus2_check` | Same-field separable degree-three cover; checked reduced point-class pullback and inverse on the image. CLI pins the two n=83 fixtures. A generic norm is unsupported. |
-| Genus-3 cover of an ordinary binary elliptic curve | Same CLI, plus `OrdinaryBinaryCover` in both native libraries | One-infinity Mumford arithmetic, rational elliptic point-class pullbacks, rational source-point pushforward, and typed pull/push witnesses are supported. Arbitrary Jacobian-class pushforward is unsupported. |
 | Arithmetic on a supplied odd-prime genus-g hyperelliptic curve | `crypto`: `hyperelliptic-cover arithmetic` with `odd_curve` | Monic squarefree `f` of degree `2g+1`, one rational infinity point, positive genus, and deterministically checked odd prime of at most 64 bits. This alone supplies no elliptic transfer. |
+| Arithmetic on a supplied split genus-2 sextic | `crypto`: `hyperelliptic-cover arithmetic` with `odd_curve.family=odd_prime_split_sextic_balanced_v1` | Monic squarefree degree-six `f`, two labelled rational infinity points, checked odd prime fitting `u64`, and canonical `(u,v,n_plus)` divisors. Enumeration is reference-only and capped at `p<=31`; no cover map or subgroup claim is implied. |
+| Bounded candidate enumeration | `crypto`: `curve-transfer-sweep sweep` / `verify` | Enumerates only the declared finite binary-cubic and odd-quadratic constructor parameters. It is not a search over all covers, isogenies, correspondences, nonhyperelliptic curves, or genera; an empty result is not a nonexistence proof. |
 | Other checked binary hyperelliptic models | `HyperellipticCurve::try_new`, `MumfordDivisor` in both libraries | Use the checked odd-degree, one-infinity API; binary field degree is bounded by 4096. The cover CLI's binary `model` selector reconstructs only its fixed genus-3 family. |
 | CM polarization on `E^2` | `crypto`: `jacobian-certificate` | Bounded exact Hermitian-lattice calculation; geometric existence is conditional. It emits no curve equation or subgroup map. |
 | Binary genus-2 gluing, arbitrary correspondences, nonhyperelliptic curves, other infinity models | Construction workflow below | Inspect existing native support, then implement and verify the missing components within the requested scope. Mark unconstructed maps and unperformed runs explicitly. |
@@ -24,7 +25,8 @@ already available:
 
 ```sh
 cargo build --release --locked --manifest-path Cargo.toml \
-  --bin hyperelliptic-cover --bin jacobian-certificate
+  --bin hyperelliptic-cover --bin curve-transfer-sweep \
+  --bin jacobian-certificate
 ```
 
 A matching packaged executable can also be invoked directly. Select its
@@ -35,17 +37,22 @@ blocker from mathematical nonexistence.
 
 ```sh
 hyperelliptic_cli=./target/release/hyperelliptic-cover
+transfer_sweep_cli=./target/release/curve-transfer-sweep
 jacobian_cli=./target/release/jacobian-certificate
 surface_run_dir="$(mktemp -d "${TMPDIR:-/tmp}/ecdlp-jacobians.XXXXXX")"
 "$hyperelliptic_cli" --help
+"$transfer_sweep_cli" --help
 ```
 
-In `cryptanalysis`, the bounded mirror is in `suite/src/binary_ecc/` and
+In `cryptanalysis`, the retained bounded mirror is in `suite/src/binary_ecc/` and
 `suite/src/prime_hyperelliptic/`. It has no `hyperelliptic-cover` or
 `jacobian-certificate` CLI. Use the sibling `crypto` checkout or a matching
 packaged executable for those commands, and use the mirror's native APIs for
-transfer work. Source parity is an implementation check, not proof that a
-particular subgroup transfer was executed:
+transfer work within the mirror's recorded boundary. Its current pinned source
+precedes the general binary norm. Do not claim parity for that capability until
+the pending mixed-revision mirror PR and explicit `--crypto-root` CI replay
+land. Source parity is an implementation check, not proof that a particular
+subgroup transfer was executed:
 
 ```sh
 cargo run --release --locked --manifest-path suite/Cargo.toml \
@@ -92,9 +99,12 @@ point. Keep sign/lift information and scalar ambiguity explicit in any transfer.
 
 `construct` accepts the bare elliptic model object, not an EC1 record or a
 registry row. `verify` accepts exactly `{model,certificate}`. The documented
-model inputs, arithmetic requests, and output statuses are in the
-[CLI wire contract](https://github.com/aburan28/crypto/blob/a575f1a57d3e0f2c37fc2046a6bfa09cbb1db203/docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md).
-Use a fresh directory; preserve frozen catalogs and evidence.
+baseline model inputs, arithmetic requests, and output statuses are in the
+[CLI wire contract](../../../../docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md).
+For the newer transfer and balanced request fields, also inspect the exact
+checked-out [command source](../../../../src/bin/hyperelliptic_cover.rs) and
+`--help`; do not infer them from an older package. Use a fresh directory and
+preserve frozen catalogs and evidence.
 
 The public odd-prime demonstration from the surface skill is:
 
@@ -134,7 +144,7 @@ fixtures b=d=1. Successful construction verifies genus three and map degree
 three. It accepts no subgroup order and makes no unconditional subgroup claim.
 The prior n=83 surface run did not execute this Jacobian transfer.
 
-## Call divisor arithmetic and binary pullback
+## Call divisor arithmetic and binary transfer maps
 
 For the constructed binary cover, form a complete identity request:
 
@@ -150,15 +160,21 @@ Supported operations are `validate`, `identity`, `equal`, `negate`, `add`, and
 `scalar_multiply` also requires an unsigned decimal or `0x` string `scalar`.
 An identity calculation only initializes arithmetic; it is not a transfer test.
 
-The CLI has no pullback or transfer subcommand. In native Rust, import
-`OrdinaryBinaryCover` and the field/point types from `crypto_lib::binary_ecc`
-or `cryptanalysis_suite::binary_ecc`, then use these checked entry points:
+The `transfer` subcommand accepts a strict
+`hyperelliptic-transfer-operation/v1` request for the binary family. Its
+operations are `pushforward`, `pushforward_certificate`,
+`image_endomorphism_certificate`, `torsion_projector_certificate`, `pullback`,
+`pull_push_composition_certificate`, `pullback_closed_point_certificate`, and
+`subgroup_status`. Each operation accepts only its documented divisor, point,
+or order operands. The result binds the exact target model and reconstructed
+cover certificate. A declared order remains an external premise; the command
+does not independently establish that it is a subgroup's exact order.
 
-For the exact fixed-F8 fixture, the standalone construction receipt's
-`implemented_in_library_only_for_exact_fixed_f8_fixture` value declares the
-capability compiled into the library. The construction command itself only
-replays geometry; it does not run the 486-class norm and is not a transfer
-proof receipt.
+The same operations are available through `OrdinaryBinaryCover` and the
+field/point types in `crypto_lib::binary_ecc`. The retained
+`cryptanalysis_suite::binary_ecc` mirror must not be treated as general-norm
+capable until its current-source parity update lands. Use these checked entry
+points:
 
 1. `OrdinaryBinaryCover::new(m, irreducible, a, b)` and `verify_certificate()`.
 2. `pullback_point_class(&P)` and `pullback_point_class(&Q)` to obtain divisor
@@ -174,18 +190,25 @@ proof receipt.
 
 `pushforward_rational_point_divisor` handles rational source-point classes.
 In current `crypto`, `pushforward_arbitrary_jacobian_class` handles every valid
-reduced class only for the exact polynomial-basis GF(8) model with modulus `z^3+z+1` (`0xb`),
-`a=1`, `b=3`, and `d=7`; its exhaustive native fixture covers 486 classes and
-236,196 ordered additivity pairs. The target has order 6 with six norm fibers
-of size 81, so `gcd(3,6)=3`; treat this as norm mechanics, not an injective
-full-target-group ECDLP transfer. This remains same-implementation evidence:
-the separate point-count certificate checks the ambient order 486 but not the
-divisor presentation, group law, or norm. Every other model returns an explicit
-unsupported result. Do not use the typed pullback witness as a general norm for
-classes produced by a relation collector. A catalog-general or end-to-end
-solver path still needs its own independently verified implementation. The
-retained `cryptanalysis` parity receipt binds a pre-norm source digest, so do
-not claim this exception there until a current mirror/integration replay passes.
+reduced degree-at-most-three class on a checked ordinary binary cubic cover. It
+factors the support, evaluates each closed point in its residue field, and
+takes the Frobenius-orbit norm into the target elliptic group. Reject malformed
+or foreign divisors instead of coercing them.
+
+The exact polynomial-basis GF(8) model with modulus `z^3+z+1` (`0xb`), `a=1`,
+`b=3`, and `d=7` remains the exhaustive control: 486 classes and 236,196
+ordered additivity pairs. Its target has order 6 with six norm fibers of size
+81, so `gcd(3,6)=3`; treat it as norm mechanics, not an injective
+full-target-group ECDLP transfer. The separate point-count certificate checks
+the ambient order 486. A newer test-only oracle independently reimplements
+support factorization, residue fields, Frobenius trace, and the target group
+for all 486 classes and all 236,196 ordered image sums, but it still uses
+production source-Jacobian addition. Catalog replay and that bounded oracle do
+not replace an independent source group law, catalog-wide differential replay,
+proof-grade subgroup orders, or an end-to-end solver.
+The retained `cryptanalysis` parity receipt binds a pre-norm source digest, so
+do not claim the general capability there until the mirror/integration replay
+passes.
 
 For separate genus-2 odd-prime arithmetic, this complete request validates the
 branch-point divisor on `v^2=u^5+u` over F5. It is a demonstration, not an n=83
@@ -198,6 +221,23 @@ model or a transfer from the supplied elliptic curve:
 Save it to a fresh operation file and invoke the same `arithmetic` command.
 For higher genus, use the caller's checked monic squarefree polynomial of exact
 degree `2g+1`; changing only the `genus` field does not change the curve.
+
+For the distinct split-sextic representation, this F5 identity request uses
+the two rational infinity branches of `v^2=u^6+1`:
+
+```json
+{"schema":"hyperelliptic-jacobian-operation/v1","odd_curve":{"family":"odd_prime_split_sextic_balanced_v1","p":"5","genus":2,"f":["1","0","0","0","0","0","1"],"infinity":"two_rational"},"operation":"identity"}
+```
+
+Balanced divisors add an integer `n_plus` to the usual `u` and `v` arrays.
+Require it for this family and reject it for one-infinity and binary Mumford
+pairs. This backend supplies checked arithmetic only; it does not construct the
+degree-two induced maps or support odd extension fields and larger primes.
+
+Use `curve-transfer-sweep` only when the requested task is a finite inventory
+of the implemented constructor shapes. Record the exact selector, families,
+bounds, registry digest, every rejected or incompatible attempt, and replay
+receipt. Never describe its output as all mathematical transfers of a curve.
 
 ## Search other genus-2 and higher targets
 
@@ -274,11 +314,14 @@ standalone surface CLIs; do not reuse their exit-code interpretation.
 
 Run relevant native tests after changing higher-genus implementations. In
 `crypto`, the existing targets include `cargo test --release --locked --bin
-hyperelliptic-cover`, `cargo test --release --locked --bin jacobian-certificate`,
-and the binary `cover_transfer` and hyperelliptic library tests. Replay the
-matching certificates and exact subgroup checks; a surface test pass does not
-validate the Jacobian path. The toy BSGS/rho solvers are exponential; invoking
-them at n=83 is not evidence of a new transfer or a scalable destination solver.
+hyperelliptic-cover`, `cargo test --release --locked --bin
+curve-transfer-sweep`, `cargo test --release --locked --bin
+jacobian-certificate`, and the binary `cover_transfer`, balanced-sextic, and
+hyperelliptic library tests. Replay the matching certificates, malformed-input
+controls, catalog identities, and exact subgroup checks; a surface test pass
+does not validate the Jacobian path. The toy BSGS/rho solvers are exponential;
+invoking them at n=83 is not evidence of a new transfer or a scalable
+destination solver.
 
 Report construction, executable map, kernel/subgroup preservation, arithmetic,
 destination solving, scalar recovery, and measured costs separately. Before

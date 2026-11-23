@@ -142,3 +142,41 @@ Every number is `[pcc:unverified]`.
 - `reap.sh` read the live list afterwards: no `pkm-x-` pod, nothing touched.
 - Not checked: whether `lastStartedAt` changes on a container restart (no restart was provoked), whether the pod sees
   `RUNPOD_POD_ID` or a pod-scoped key (S12), and whether `GET /pods` is complete for large accounts.
+
+## The Amendment 33 port (2026-11-21): what the two smokes above do not cover
+
+Both smokes above ran with REST v1 and the GraphQL price read, the route's earlier names and the runner at
+`runpod/server.py`. The port changes, none of them exercised on a pod yet (offline tests only, `tests/README.md`):
+- every REST call is REST v2 (`api.runpod.io/v2`): the price from the CPU catalog, the create body of main's
+  `runpod/rp.sh` (`cloud`, `cpu {id, vcpuCount}`, `image`, `disk`, `ports`, `env`, `entrypoint`, `cmd`), the GET record,
+  the paginated list and the delete; the field mapping is in `V2_FIELDS.md`;
+- the image is main's pinned digest of `python:3.12-slim`; the runner is `server_pinned.py`, byte-identical to the
+  `runpod/server.py` the smokes ran (`f56fd08e…`);
+- the create must answer 201; the data center is read from a record taken once the runner answers;
+- the git gate replaces the bench-record gate before a completed pod is deleted (owner decision 22).
+
+The development smoke at t = 8 that the main session runs after review should record, with REST v2: the create
+response (HTTP code and its `cloud`, `cpu`, `cost`, `dataCenterId`), the live GET record (`cpu.memory`, `status`,
+`dataCenterId`, `startedAt`, and whether `env` carries `RUNNER_TOKEN`), the runner answering through the proxy with the
+bash entrypoint and the pinned image, the cgroup files before start, the git gate on a committed and pushed tree (a
+development tree is git-ignored, so it is added with `git add -f` for the check), `DELETE` (204), the list afterwards
+and a GET of the deleted pod (404). Every statement here is `[pcc:unverified]`.
+
+## Owner decision 24 (2026-11-21): the smoke moves to the 32-vCPU pod
+
+The route's one flavor is now `cpu5m` at 32 vCPU and 256 GB (US$2.08/h), so the development smoke runs on that size
+(a `t <= 8` stage costs under US$0.50 for under 15 minutes). In addition to the list above it should record the
+cgroup `memory.max` of a 256 GB pod (the pre-start check needs `max` or at least 256,000,000,000 bytes) and the GET
+record's `cpu.memory` (the floor is 256). A development stage may use `--max-dense` 54000000000. Every statement here is
+`[pcc:unverified]`.
+
+## Third development smoke (2026-11-21, REST v2, 32 vCPU / 256 GB)
+
+Pod `pkm-x-dev-smoke3` (`klogu58zoe2owr`), stage `cap:8:0:5:12800000000` (t = 8, not data), receipts in
+`receipts_dev/pkm-x-dev-smoke3/` [pcc:unverified]: create HTTP 201 with `cloud` `SECURE`, `cpu` `{cpu5m, 32, 256}`,
+`cost` 2.08 equal to the catalog price, `dataCenterId` `EUR-IS-1` already at create; GET and ready records `RUNNING`;
+the runner answered through the proxy with the bash entrypoint and the pinned image; `memory.max` 256,000,000,000
+before start; classified ADMITTED P2d; the git gate passed on commit `88b64ac5d5`; `DELETE` 204 and the pod gone from
+the list; pod life 155 s, about US$0.09. Not exercised: token recovery from the record's `env`, and `startedAt` and
+`status` on a container restart. `memory.oom.group` and `vm.max_map_count` were not yet recorded (they are from
+revision 7 on).

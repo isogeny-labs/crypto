@@ -1,0 +1,54 @@
+name: Prime31 F4 field-width smoke
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+  pull_request:
+    paths:
+      - 'examples/prime31_f4_field_gate.rs'
+      - 'examples/prime31_coset_xlift_f4.rs'
+      - 'examples/prime31_coset_cubic_factor.rs'
+      - 'examples/prime31_coset_signed25.rs'
+      - 'src/cryptanalysis/f4_fp.rs'
+      - '.github/workflows/prime31-f4-field-gate.yml'
+  workflow_dispatch:
+
+jobs:
+  field-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CARGO_BUILD_JOBS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cache Cargo dependencies and build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      # Compile is separately timed. Previous run #44984788855 timed out while
+      # compiling dependencies inside its three-minute execution budget.
+      - name: Build only the three Prime31 research examples
+        timeout-minutes: 18
+        run: |
+          cargo build --release \
+            --example prime31_coset_cubic_factor \
+            --example prime31_f4_field_gate \
+            --example prime31_coset_xlift_f4 \
+            --example prime31_coset_signed25
+      - name: Check exact seven-cubic factor-base roots with existing Rust CZ
+        timeout-minutes: 3
+        run: timeout 150s target/release/examples/prime31_coset_cubic_factor
+      - name: Run exact Prime31 field arithmetic smoke
+        timeout-minutes: 2
+        run: timeout 90s target/release/examples/prime31_f4_field_gate
+      - name: Validate signed25 ordinary affine chart in native Rust
+        timeout-minutes: 1
+        run: timeout 50s target/release/examples/prime31_coset_signed25
+      - name: Bounded F4 admission probe (incomplete degree is not UNSAT)
+        timeout-minutes: 2
+        continue-on-error: true
+        run: timeout 100s target/release/examples/prime31_coset_signed25 --bounded-f4
+      - name: Recover 8 split cosets with existing F4 solver
+        timeout-minutes: 3
+        run: timeout 150s target/release/examples/prime31_coset_xlift_f4

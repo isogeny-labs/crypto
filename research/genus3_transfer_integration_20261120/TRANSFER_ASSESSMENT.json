@@ -1,0 +1,62 @@
+{
+  "format": "correspondence-assessment-draft-v1",
+  "assessment_state": "draft",
+  "authority": "cross-repository assessment; not a certificate or benchmark record",
+  "source": {
+    "object": "odd-prime-order elliptic subgroup transported into a genus-3 Jacobian",
+    "field": "F_q",
+    "dimension": 1
+  },
+  "destination": {
+    "object": "nonhyperelliptic genus-3 plane-quartic Jacobian",
+    "field": "F_q when construction and descent succeed",
+    "dimension": 3
+  },
+  "obligations": {
+    "existence": {
+      "state": "supported",
+      "evidence": ["Smith 2008", "research/genus_ladder_20261114"]
+    },
+    "explicit_construction": {
+      "state": "unknown",
+      "evidence": ["no executable target-specific Smith map in the imported package"]
+    },
+    "map_correctness": {
+      "state": "unknown",
+      "evidence": ["theorem identities and lower-dimensional signed controls only"]
+    },
+    "subgroup_preservation": {
+      "state": "supported_conditionally",
+      "evidence": ["odd-order kernel intersection", "phi^dagger o phi=[2]", "f_* o f^*=[d]"]
+    },
+    "computational_advantage": {
+      "state": "unknown",
+      "evidence": ["source-Jacobian toy pipeline measured; Smith destination pipeline unmeasured"]
+    },
+    "scaling_support": {
+      "state": "partial",
+      "evidence": ["seven q=17..101 toy rows", "native genus ladder over seven primes"]
+    }
+  },
+  "preservation_certificate": {
+    "identity": "f_* o phi^dagger o phi o f^*=[2d]",
+    "recovery": "[(2d)^(-1) mod n] o f_* o phi^dagger",
+    "conditions": "odd prime n and gcd(2d,n)=1"
+  },
+  "measured_evidence": {
+    "standing": "producer-only; pcc:unverified",
+    "fields": [17, 19, 47, 53, 67, 83, 101],
+    "targets_per_curve": 20,
+    "relation_candidate_slope_vs_q": 1.1216171563600468,
+    "rho_addition_slope_vs_group_order": 0.5046907263591482,
+    "crossover_target_range": [2, 6]
+  },
+  "open_obligations": [
+    "construct a target-specific Smith isogeny and plane quartic",
+    "execute subgroup transport and dual recovery",
+    "measure the complete cold destination workload against matched controls",
+    "complete P-256 Frobenius descent",
+    "construct a signed NIST divisor-class map and verify dual composition"
+  ],
+  "recommended_next_goal": "P-256 full-bitangent Frobenius descent certificate"
+}

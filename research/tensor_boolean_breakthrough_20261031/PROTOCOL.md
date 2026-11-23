@@ -26,6 +26,23 @@ M_C[a,b] = T_C(a,b).
 
 The primary rank is the minimum exact integer rank among all balanced splits when `|C| <= 16`; the canonical alternating split is also reported and is the only primary split if exhaustive split enumeration would exceed the frozen budget. This “best balanced rank” is an algorithmic opportunity measure, not a universal tensor-rank certificate.
 
+### Semantic relation-matrix distinction
+
+This BTNIR boundary matrix is not the encoding-independent slot relation
+matrix. For the latter, rows and columns are partial factor-base tuples and a
+one marks a complete decomposition. Its rank is at most its decomposition
+count; under the source threshold that count has expectation below two in the
+stated asymptotic regime. Thus an all-seed or nonnegligible-probability
+exponential lower bound is false for a uniformly sampled source seed at
+PCC-unverified scope; an exceptional selected seed sequence is not excluded.
+[pcc:unverified] The derivation is
+in [`SEMANTIC_RANK_BOUND.md`](SEMANTIC_RANK_BOUND.md).
+
+E1 still asks a representation-specific question about Boolean arithmetic
+edges. It does not estimate semantic relation rank, and a high E1 rank would
+not transfer to arbitrary decomposition algorithms without a separate
+rank-equivalence or exact-linear-message theorem.
+
 Exact rank means rank over `Q`, computed by fraction-free elimination. Modular ranks under fixed 61-bit primes are lower bounds only. A cell without exact rank is censored for the primary verdict and remains in diagnostics.
 
 ## Prerequisite E0
@@ -42,7 +59,7 @@ E0 is a validity gate, not evidence for the compression hypothesis.
 
 ### Pre-freeze E0 clarification
 
-The first draft required tags and parameters for production closures and mentioned truth tables only for tiny custom predicates. Source inspection exposed a semantic-identity gap: a tag identifies intended meaning but cannot prove that two closure bodies implement that meaning. E0 first attempted to strengthen every production vertex with a complete table under a 16-port cap. Its representative hash-network control failed as intended: the tiny production graph has a maximum predicate arity of 132 in the Fourier multiplication relation. The corrected hybrid stores exact tables through 16 ports and typed, strictly serialized value-relation programs above the cap. A programmed predicate uses that same typed relation as its live pre-export evaluator and its post-import evaluator, so closure identity is not trusted. This clarification was made before affected data and does not alter the E1 estimand, ladder, controls, or thresholds.
+The first draft required tags and parameters for production closures and mentioned truth tables only for tiny custom predicates. Source inspection exposed a semantic-identity gap: a tag identifies intended meaning but cannot establish that two closure bodies implement that meaning. E0 first attempted to strengthen every production vertex with a complete table under a 16-port cap. Its representative hash-network control failed as intended: the tiny production graph has a maximum predicate arity of 132 in the Fourier multiplication relation. The corrected hybrid stores exact tables through 16 ports and typed, strictly serialized value-relation programs above the cap. A programmed predicate uses that same typed relation as its live pre-export evaluator and its post-import evaluator, so closure identity is not trusted. This clarification was made before affected data and does not alter the E1 estimand, ladder, controls, or thresholds.
 
 ## Population and ladder
 
@@ -139,7 +156,7 @@ E1 advances to E2 only if all correctness and controls pass and, on frozen held-
 
 The registered route is **not advanced** if positive and A/A controls pass, at least 90% of pairs are exact, and the corrected intervals for `D` lie within `[-0.05,+0.05]` on the three largest `b` values for every `m`, with no slope separation. Everything else is `inconclusive`.
 
-These are continuation thresholds, not theorem thresholds. A finite positive result does not prove subexponential contraction; a finite negative result does not disprove all tensor or Boolean structure.
+These are continuation thresholds, not theorem thresholds. A finite positive result does not establish subexponential contraction; a finite negative result does not rule out all tensor or Boolean structure.
 
 ## Holdout rule
 
@@ -159,7 +176,7 @@ E3 has a separate search split: the smallest two frozen E1 sizes form training o
 ## Freeze blockers
 
 The exact boundary contraction and fraction-free rank core named below was
-implemented on 2026-11-01 and is verified only on development controls; see
+implemented on 2026-11-01 and is checked only on development controls; see
 [`E1_IMPLEMENTATION.md`](E1_IMPLEMENTATION.md). This does not freeze the
 protocol or satisfy the production generator, null, A/A, preflight or identity
 fields.

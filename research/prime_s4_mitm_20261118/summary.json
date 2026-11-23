@@ -1,0 +1,99 @@
+{
+ "claim_boundary": "public synthetic known-answer fixtures; no deployed curve, no key recovery, no vs_rho claim, no asymptotic claim; exploratory wall times",
+ "policy_fixed": {
+  "fb_size": 120,
+  "extra_relations": 8,
+  "max_trials_per_relation": 1000000,
+  "max_relation_attempts": 64,
+  "oracle": "pair_sum_mitm"
+ },
+ "paired_fixed_fb_vs_s3": [
+  {
+   "bits": 16,
+   "s3_total_s": 0.0429,
+   "mitm_total_s": 0.0073,
+   "speedup": 5.88,
+   "seeds": 1
+  },
+  {
+   "bits": 20,
+   "s3_total_s": 0.6206,
+   "mitm_total_s": 0.0136,
+   "speedup": 45.63,
+   "seeds": 1
+  },
+  {
+   "bits": 24,
+   "s3_total_s": 14.6374,
+   "mitm_total_s": 0.1935,
+   "speedup": 75.65,
+   "seeds": 3
+  },
+  {
+   "bits": 28,
+   "s3_total_s": 276.2081,
+   "mitm_total_s": 3.0803,
+   "speedup": 89.67,
+   "seeds": 3
+  }
+ ],
+ "tuned": [
+  {
+   "bits": 24,
+   "class": "p256_shape",
+   "fb": 256,
+   "seeds": 2,
+   "median_total_s": 0.0917,
+   "median_table_s": 0.0219,
+   "median_relations_s": 0.0669,
+   "median_la_s": 0.0019,
+   "all_verified": true
+  },
+  {
+   "bits": 28,
+   "class": "cryptopro_b_shape",
+   "fb": 640,
+   "seeds": 1,
+   "median_total_s": 0.6321,
+   "median_table_s": 0.158,
+   "median_relations_s": 0.4525,
+   "median_la_s": 0.0155,
+   "all_verified": true
+  },
+  {
+   "bits": 28,
+   "class": "p256_shape",
+   "fb": 640,
+   "seeds": 2,
+   "median_total_s": 0.6191,
+   "median_table_s": 0.1599,
+   "median_relations_s": 0.4345,
+   "median_la_s": 0.0191,
+   "all_verified": true
+  }
+ ],
+ "equivalence_16bit": [
+  {
+   "seed": 20261005,
+   "s3_ok": true,
+   "mitm_ok": true,
+   "quartic_ok": true,
+   "same_scalar": true
+  },
+  {
+   "seed": 20261006,
+   "s3_ok": true,
+   "mitm_ok": true,
+   "quartic_ok": true,
+   "same_scalar": true
+  },
+  {
+   "seed": 20261007,
+   "s3_ok": true,
+   "mitm_ok": true,
+   "quartic_ok": true,
+   "same_scalar": true
+  }
+ ],
+ "all_rows_verified": true
+}

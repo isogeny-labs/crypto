@@ -1,0 +1,14 @@
+{
+  "action": "recount the phenomenon over all raw rows, including the excluded categories, before accepting the 'only on' statement",
+  "created": "2026-11-21T01:15:59Z",
+  "evidence": [
+    "research/g3_affine_twist_20261121/validation/validator-report.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "when a report says a phenomenon occurs only on one category and the analysis script excludes other categories before counting it",
+  "why": "g3_affine_twist: S_L=0 said to occur only on one-map kernels; analyze.py skipped no-map kernels first; 726 no-map kernels also have S_L=0"
+}

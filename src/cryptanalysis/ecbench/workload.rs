@@ -25,6 +25,7 @@ use crate::cryptanalysis::ecbench::canonical::{bare_id, derive_biguint, derive_u
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
+use crate::cryptanalysis::ecbench::fp3::Fp3Instance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
 use crate::cryptanalysis::ecbench::ghs_cover::GhsInstance;
 use crate::cryptanalysis::ecbench::hec::{thread_scalar, HecInstance};
@@ -56,6 +57,13 @@ use crate::cryptanalysis::prime_orbit_index_calculus::{
 pub enum CurveSpec {
     /// Full Curve25519 model and fixed prime-order generator.
     Curve25519,
+    /// One exact cell from the canonical phased panel.  The cell resolves
+    /// through the embedded reviewed manifest; specs do not copy parameters.
+    Panel { cell: String },
+    /// A pinned direct higher-genus destination in the canonical phased
+    /// panel. Kept distinct from [`Panel`](Self::Panel) so a phase policy
+    /// cannot substitute a source elliptic cell for a Jacobian cell.
+    PanelDestination { cell: String },
     /// `ic_boundary::find_prime_order_curve(bits, seed)`: prime order,
     /// cofactor 1, `8 ≤ bits ≤ 32`.
     PrimeSearch { bits: u32, seed: u64 },
@@ -197,6 +205,12 @@ pub enum CurveSpec {
     /// `p ≡ 1 (mod 4)`, `p < 2^15`.  Unregistered: ICV1 has no
     /// extension-field form.
     Fp4Translation { p: u64, seed: u64 },
+    /// `ecbench::fp3::Fp3Instance::build(p, seed)`: a random prime-order
+    /// curve over `F_{p³} = F_p[t]/(t³ − c)`
+    /// (`gaudry_cubic::generate_instance3`), `p ≡ 1 (mod 3)`,
+    /// `67 ≤ p < 2^20`, cofactor one.  Unregistered: ICV1 has no
+    /// extension-field form.
+    Fp3Random { p: u64, seed: u64 },
     /// Frozen finite-extension fixture for the three-leads study. The source
     /// is a short odd curve or normalized ordinary binary curve, never a
     /// Jacobian masquerading as an elliptic input.
@@ -322,7 +336,10 @@ pub enum CurveSpec {
 impl CurveSpec {
     /// Preserve an external public point when making a measured-child input.
     pub fn for_child(&self, inst: &Instance) -> CurveSpec {
-        if matches!(self, Self::PrimePublicFixture { .. }) {
+        if matches!(
+            self,
+            Self::Panel { .. } | Self::PanelDestination { .. } | Self::PrimePublicFixture { .. }
+        ) {
             self.clone()
         } else {
             Self::explicit(inst).unwrap_or_else(|| self.clone())
@@ -357,6 +374,24 @@ impl CurveSpec {
                     return Err("Curve25519 generator failed its group/order checks".into());
                 }
                 Ok(Instance::Curve25519(Box::new(curve)))
+            }
+            CurveSpec::Panel { ref cell } => {
+                let resolved = super::panel::curve_spec(cell)?;
+                if matches!(resolved, CurveSpec::Panel { .. }) {
+                    return Err(format!(
+                        "panel cell `{cell}` recursively names a panel cell"
+                    ));
+                }
+                resolved.build()
+            }
+            CurveSpec::PanelDestination { ref cell } => {
+                let resolved = super::panel::destination_curve_spec(cell)?;
+                if matches!(resolved, CurveSpec::PanelDestination { .. }) {
+                    return Err(format!(
+                        "destination panel cell `{cell}` recursively names a destination panel cell"
+                    ));
+                }
+                resolved.build()
             }
             CurveSpec::ThreeLeads {
                 p,
@@ -660,6 +695,9 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
             }
+            CurveSpec::Fp3Random { p, seed } => {
+                Fp3Instance::build(p, seed).map(|i| Instance::Fp3(Box::new(i)))
+            }
             CurveSpec::GlsFp2 {
                 p_bits,
                 seed,
@@ -809,6 +847,7 @@ impl CurveSpec {
             | Instance::Wide(_)
             | Instance::Big(_)
             | Instance::Fp4(_)
+            | Instance::Fp3(_)
             | Instance::Fp4Torsion(_)
             | Instance::F2m4(_)
             | Instance::ThreeLeads(_)
@@ -835,6 +874,10 @@ impl CurveSpec {
     pub fn call(&self) -> String {
         match *self {
             CurveSpec::Curve25519 => "Curve25519Wide::new()".into(),
+            CurveSpec::Panel { ref cell } => format!("ecbench::panel::cell({cell})"),
+            CurveSpec::PanelDestination { ref cell } => {
+                format!("ecbench::panel::destination({cell})")
+            }
             CurveSpec::ThreeLeads {p,n,a,b,ref family,parameter,..}=>format!("three_leads_explicit(p={p},n={n},a={a},b={b},family={family},parameter={parameter})"),
             CurveSpec::PrimeSearch { bits, seed } => {
                 format!("find_prime_order_curve({bits}, {seed})")
@@ -902,6 +945,9 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::Fp3Random { p, seed } => {
+                format!("gaudry_cubic::generate_instance3({p}, {seed})")
+            }
             CurveSpec::GlsFp2 {
                 p_bits,
                 seed,
@@ -966,6 +1012,9 @@ pub enum Instance {
     /// A curve over `F_{p⁴}` (`ecbench::fp4`); a point is one 64-bit word
     /// per coordinate, four 16-bit limbs.
     Fp4(Box<Fp4Instance>),
+    /// A curve over `F_{p³}` (`ecbench::fp3`); a point is one 64-bit word
+    /// per coordinate, three 20-bit limbs.
+    Fp3(Box<Fp3Instance>),
     /// A GLS curve over `F_{p²}` or a subfield curve on `E(F_{p³})`
     /// (`ecbench::ext`); a coordinate is one packed word.
     Ext(Box<ExtInstance>),
@@ -1314,6 +1363,7 @@ impl Instance {
             Instance::Binary(i) => u128::from(i.r),
             Instance::Wide(i) => i.kc.r,
             Instance::Fp4(i) => u128::from(i.r),
+            Instance::Fp3(i) => u128::from(i.r),
             Instance::Fp4Torsion(i) => u128::from(i.r),
             Instance::F2m4(i) => i.r,
             Instance::Ext(i) => u128::from(i.r()),
@@ -1536,6 +1586,26 @@ impl Instance {
                 curve_uid: None,
             };
         }
+        if let Instance::Fp3(i) = self {
+            let (icv1, slug) = i.names();
+            let g = Fp3Instance::encode(&i.g).unwrap_or_default();
+            return CurveFacts {
+                slug,
+                icv1,
+                family: "fp3".into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - i.p.leading_zeros()),
+                group_order: ExactScalar::from(i.group_order),
+                r: ExactScalar::from(i.r),
+                cofactor: ExactScalar::from(i.cofactor),
+                generator: g,
+                automorphisms_available: 2,
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
         if let Instance::Fp4(i) = self {
             let (icv1, slug) = i.names();
             let g = Fp4Instance::encode(&i.g).unwrap_or_default();
@@ -1632,6 +1702,7 @@ impl Instance {
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
             Instance::Fp4(_)
+            | Instance::Fp3(_)
             | Instance::ThreeLeads(_)
             | Instance::Ext(_)
             | Instance::Genus2(_)
@@ -1796,6 +1867,9 @@ impl Instance {
         if let Instance::Fp4(i) = self {
             return i.mul_generator_hex(k);
         }
+        if let Instance::Fp3(i) = self {
+            return i.mul_generator_hex(k);
+        }
         if let Instance::ThreeLeads(i) = self {
             let p = i.curve.mul(i.generator, k);
             return (!p.inf).then(|| [format!("0x{:x}", p.x), format!("0x{:x}", p.y)]);
@@ -1854,6 +1928,7 @@ impl Instance {
             | Instance::PrimeMont4(_)
             | Instance::Big(_)
             | Instance::Fp4(_)
+            | Instance::Fp3(_)
             | Instance::ThreeLeads(_)
             | Instance::Ext(_)
             | Instance::Genus2(_)
@@ -1902,6 +1977,7 @@ impl Instance {
         let model = model_hash(curve);
         let scratch = &mut work.group_ops;
         if let Instance::Fp4(_)
+        | Instance::Fp3(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
         | Instance::ThreeLeads(_)
@@ -1998,6 +2074,7 @@ impl Instance {
                 | Instance::PrimeMont4(_)
                 | Instance::Big(_)
                 | Instance::Fp4(_)
+                | Instance::Fp3(_)
                 | Instance::ThreeLeads(_)
                 | Instance::Hec(_)
                 | Instance::Hyper(_) => {
@@ -2628,6 +2705,7 @@ mod tests {
                 max_cofactor: 16,
             },
             CurveSpec::Fp4Translation { p: 13, seed: 1 },
+            CurveSpec::Fp3Random { p: 67, seed: 1 },
         ] {
             let encoded = serde_json::to_string(&spec).unwrap();
             assert_eq!(serde_json::from_str::<CurveSpec>(&encoded).unwrap(), spec);
@@ -2644,7 +2722,7 @@ mod tests {
                 inst.hash_to_subgroup(&facts, 1, 0).is_none(),
                 "quartic translation and torsion variants retain planted-only policy"
             );
-            if !matches!(&inst, Instance::Fp4(_)) {
+            if !matches!(&inst, Instance::Fp4(_) | Instance::Fp3(_)) {
                 // Check subgroup arithmetic on the known fixture 2G, without
                 // enabling the deliberately unavailable public-target route.
                 let target = inst.mul_generator_hex(2).unwrap();
