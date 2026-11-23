@@ -12,10 +12,22 @@ files named, not pcc-certified claims.
 
 | item | outcome | file |
 |---|---|---|
-| A1, P2.3 | Kill. $R(n,d)\le L(n,d)+10$ on all 1,263,300 pairs, $n<2^{16}$; generic cost $\Theta(\sqrt{n/L})$ is already met by Cheon and its base-changed form. | `a1_trinomial_roots/REPORT.pdf` |
+| A1, P2.3 | Kill. $R(n,d)\le L(n,d)+10$ on all 1,263,300 pairs, $n<2^{16}$; generic cost $\Theta(\sqrt{n/L})$ is already met by Cheon and its base-changed form. Envelope $R\ge L$ proved in Lean 4. | `a1_trinomial_roots/REPORT.pdf` |
 | A2, P1.2/Q004 | Kill. Coppersmith lattices reach $\alpha_{\max}=0.14$ for $S_3$ (wall at 0.16, matching the determinant limit $1/6$) and $<0.02$ for $S_4$, against kill lines 0.30 and 0.20. | `a2_semaev_small_roots/REPORT.pdf` |
-| A3, P5.2/Q025 | Kill. (A)–(C) proved on paper; Q025 is closed in the generic model with an endomorphism oracle. No Lean proof (no toolchain). | `A3_P5.2_Q025.pdf` |
-| P3.3 | Upstream's "pure-power penalty" is the counting bound ($N_{\ell^e}\approx p/12$); only Q099 (KLPT vs. optimum) stays open. Medians read from upstream's CSV, not regenerated. | `P3.3_counting_check.md` |
+| A3, P5.2/Q025 | Kill. (A)–(C) proved on paper; Q025 is closed in the generic model with an endomorphism oracle. (A) and (B) also proved in Lean 4 (crypto-lean `MathStClosures`); (C) paper only. | `A3_P5.2_Q025.pdf` |
+| P3.3 | Upstream's "pure-power penalty" is the counting bound ($N_{\ell^e}\approx p/12$); only Q099 (KLPT vs. optimum) stays open. Medians recomputed natively in Rust (`p33_native/`, identical); norms not regenerated. | `P3.3_counting_check.md` |
+
+### Status of the remaining items (2026-11-23)
+
+| item | status | what it would take |
+|---|---|---|
+| Lean, A1 envelope and A3 (A)/(B) | done (crypto-lean `claude/math-st-closures`) | none |
+| Lean, A1 upper bound $R\le L+O(\log n)$ | not attempted: no proof exists on paper | a proof first |
+| Lean, A3 (C) | not attempted | a generic-group-model framework in crypto-lean |
+| P3.3 native medians | done (`p33_native/`) | none |
+| P3.3/Q099: KLPT vs. the counting optimum | not started | a quaternion-order library in Rust (ideal arithmetic, equivalent-ideal enumeration with $\ell$-power norm, KLPT), validated on upstream's matched instances; several days of work |
+| P1.6/Q018: sampler sensitivity of the 317/100,000 count | not started | native Rust canonical heights and a height-pairing regulator over $\mathbb Q$ for the $p=17$ lifts, plus 2–3 samplers; several days of work |
+| research-kb receipt | blocked | the research-kb MCP server was not connected in this session |
 
 None of these is an index-calculus improvement; each closes one non-generic
 route that upstream left open.
