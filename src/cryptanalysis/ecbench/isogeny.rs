@@ -366,13 +366,47 @@ impl Fp<'_> {
         }
         r
     }
+    // Within Euclid's algorithm, remainders are needed only up to a
+    // nonzero field scalar. Pseudo-division eliminates the leading term
+    // without computing an inverse of every intermediate divisor:
+    //   R <- lc(m) * R - lc(R) * x^shift * m.
+    // This is NOT an exact modular remainder and must not be used by
+    // powmod(), where the polynomial residue itself matters.
+    fn pseudo_rem_owned(&mut self, mut r: Vec<u64>, m: &[u64]) -> Vec<u64> {
+        Self::trim(&mut r);
+        let degree = m.len() - 1;
+        if degree == 0 {
+            // A nonzero constant divides every polynomial.
+            return Vec::new();
+        }
+        let leading = m[degree];
+        while r.len() > degree {
+            let len = r.len();
+            let top = r[len - 1];
+            let shift = len - degree - 1;
+            if leading != 1 {
+                for coefficient in &mut r[..len - 1] {
+                    *coefficient = self.mul(*coefficient, leading);
+                }
+            }
+            for (i, &mi) in m[..degree].iter().enumerate() {
+                if mi != 0 {
+                    let term = self.mul(top, mi);
+                    r[shift + i] = self.sub(r[shift + i], term);
+                }
+            }
+            r[len - 1] = 0;
+            Self::trim(&mut r);
+        }
+        r
+    }
     fn gcd(&mut self, a: &[u64], b: &[u64]) -> Vec<u64> {
         let mut a = a.to_vec();
         let mut b = b.to_vec();
         Self::trim(&mut a);
         Self::trim(&mut b);
         while !b.is_empty() {
-            let r = self.rem(&a, &b);
+            let r = self.pseudo_rem_owned(a, &b);
             a = b;
             b = r;
         }
