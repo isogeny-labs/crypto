@@ -76,6 +76,18 @@ fn main() {
         );
     }
     let eval = evaluate_stream(&label, &relations, modulus, &params).expect("evaluate");
+    if params.compare_exact_forest {
+        // These are source-coefficient replay checks, not group replay.
+        assert_eq!(eval.pivot_filter.replay_failures, 0, "pivot source replay");
+        if !eval.mst_filter.refused {
+            assert_eq!(eval.mst_filter.replay_failures, 0, "MST source replay");
+        }
+        if let Some(ref forest) = eval.forest_filter {
+            if !forest.refused {
+                assert_eq!(forest.replay_failures, 0, "forest source replay");
+            }
+        }
+    }
     let json = serde_json::to_string_pretty(&eval).unwrap();
     match get("--out") {
         Some(path) => std::fs::write(path, json + "\n").expect("write --out"),
