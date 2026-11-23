@@ -160,6 +160,29 @@ pub fn backend_controls(exe: &Path, out: &mut impl Write) -> Result<()> {
         let checked = c.check_model(&run.model)?;
         writeln!(out,"{}",json!({"kind":"asserted_original_export_control","case":name,"backend":run.json(),"checked":checked,"scope":"all original values asserted; export extension only, not discovery"})).map_err(|e|e.to_string())?;
     }
+    let p = BigUint::from(101u32);
+    let system = System {
+        p: p.clone(),
+        variables: (0..10).map(|i| format!("x{i}")).collect(),
+        equations: (0..10)
+            .map(|i| &Poly::var(&p, i) - &Poly::small(&p, 3))
+            .collect(),
+    };
+    let query = export(&system)?;
+    let limits = process::Limits {
+        stdout_bytes: 64,
+        ..process::Limits::default()
+    };
+    let run = process::run(exe, &query, &limits)?;
+    if !run.stdout_truncated || run.refusal.is_none() {
+        return Err("native output cap not enforced".into());
+    }
+    writeln!(
+        out,
+        "{}",
+        json!({"kind":"native_output_cap_control","backend":run.json()})
+    )
+    .map_err(|e| e.to_string())?;
     Ok(())
 }
 pub fn public_control(exe: &Path, out: &mut impl Write) -> Result<()> {
