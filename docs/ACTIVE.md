@@ -353,6 +353,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Blocked / questions for the owner
 
+- PR #5015: adjoint projector code and fixed instruction study are ready; original artifact migration fails authenticated S3 HeadObject403. Full-root release compilation timed out before tests. [Exact blocker and preserved evidence](../problems/ecc2k-adjoint-artifact-store-upload.md).
+
 - Dickson oriented-accounting lane (#4950): full-root release compilation capped at 600 seconds without a test executable; scoped 28-test qualifier passed. No authenticated admitted EKS/Actions submission route is available in this environment for the higher-arity scientific cohort. Preserve the warmed build cache and published fixed-control evidence. [pcc:unverified]
 
 - Conductor record (#4723): local execution is authorized and completed; it does not require cloud admission. Raw object-store publication remains blocked by missing AWS credentials (fresh local-20261119/publication/sts.stderr);136624-byte deterministic local archive and hashes are preserved. Original80bit quotient/images remain absent after the60second capped attempt; the next technical construction proposal is local-20261119/LARGER_MAP_NEXT.md. Restored authenticated storage is needed for publication, not for continuing authorized local work. Full target construction feasibility remains separate.
