@@ -753,3 +753,45 @@ fn forest_witness_materialization_randomized_original_replay() {
         }
     }
 }
+
+
+#[test]
+fn forest_witness_projected_small_rank_covers_existing_pivot_on_toys() {
+    // This is a source-exact known-answer consistency check on synthetic
+    // canonical arity<=2 streams, NOT an authentic Prime31 benchmark.
+    use crypto::cryptanalysis::large_prime_graph::witness::*;
+    use crypto::cryptanalysis::large_prime_filter::{
+        filter_large_primes, replay_complete_relation, CompleteRelation, LargePrimeFilterOptions,
+    };
+    let mut rng = Rng(0x99b6_43e7_2d4f_115c);
+    fn small_rank(rows: &[CompleteRelation], p: u64) -> usize {
+        let sparse = rows.iter().map(|r| {
+            r.small.iter().map(|&(i, a)| (i as usize, a)).collect::<Vec<_>>()
+        }).collect::<Vec<_>>();
+        dense_rank(&sparse, 50, p).unwrap()
+    }
+    for trial in 0..96 {
+        let p = [7u64, 101, 1_000_003][trial % 3];
+        let rows = 2 + rng.below(43) as usize;
+        let source = random_lp_stream(&mut rng, rows, 12, 2, p);
+        let index = LpIndex::build(&source, p).unwrap();
+        let batch = collect_witnesses(&index).unwrap();
+        let forest_rows = materialize_complete_relations(&index, &batch, &source, 4096, 4096)
+            .expect("source-exact forest projection");
+        let (pivot_rows, _) = filter_large_primes(
+            source.clone(),
+            &LargePrimeFilterOptions { modulus: p, max_small_weight: 4096, max_sources: 4096 },
+        ).unwrap();
+        for row in &pivot_rows {
+            let replay = replay_complete_relation(row, &source, p).unwrap();
+            assert_eq!(replay.small, row.small);
+            assert_eq!(replay.rhs, row.rhs);
+        }
+        let forest_rank = small_rank(&forest_rows, p);
+        let pivot_rank = small_rank(&pivot_rows, p);
+        assert!(
+            forest_rank >= pivot_rank,
+            "trial {trial}, p {p}: forest small-rank {forest_rank} < pivot {pivot_rank}"
+        );
+    }
+}
