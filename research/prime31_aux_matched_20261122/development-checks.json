@@ -1,0 +1,147 @@
+{
+  "schema": "prime31-aux-matched.development-checks/v1",
+  "date": "2026-11-22",
+  "status": "passed_scoped_native_contracts",
+  "evidence_status": "pcc:unverified",
+  "campaign_execution": false,
+  "command": "CARGO_BUILD_JOBS=2 cargo test --release --offline --locked --manifest-path research/prime31_aux_matched_20261122/native/Cargo.toml --tests -- --test-threads=1",
+  "exit_code": 0,
+  "tests_passed": 30,
+  "tests_failed": 0,
+  "tests_ignored": 0,
+  "suite_counts": {
+    "adversarial_rref": 2,
+    "offline_audit": 5,
+    "base_certificates": 8,
+    "collector": 5,
+    "oracle": 8,
+    "source_provenance": 2
+  },
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+  "logs": [
+    {
+      "path": "evidence/native-tests.stdout.txt",
+      "sha256": "34c339b5f3108a96cb4311c844481d11a66db6da7335189ac2f34e566067e070",
+      "bytes": 2818
+    },
+    {
+      "path": "evidence/native-tests.stderr.txt",
+      "sha256": "a57a9855bfe12c497a52271622ab4d23ebb168233296b724f223165a6a1d1439",
+      "bytes": 5584
+    }
+  ],
+  "tested_study_sources": [
+    {
+      "path": "native/src/audit.rs",
+      "sha256": "2c6fcf2371ba25337a2f72a3fdf3cc3a2abd64ef8b0bcd76537defd7959a9c49",
+      "bytes": 34332
+    },
+    {
+      "path": "native/src/bases.rs",
+      "sha256": "d8d6786ea7eaa30c622318fad052a07cb6c275720257188959e622c92f574864",
+      "bytes": 36604
+    },
+    {
+      "path": "native/src/collector.rs",
+      "sha256": "2b15947a14588d21d81186a1bc284032323be82135e486a807c122394db1699b",
+      "bytes": 15459
+    },
+    {
+      "path": "native/src/cryptanalysis.rs",
+      "sha256": "298cb60653f2956256acca89bceb0384896c30fd005a439b5ed810580d73a58f",
+      "bytes": 1985
+    },
+    {
+      "path": "native/src/lib.rs",
+      "sha256": "c5b4f79725d39bda67eb8b26af88df4098f4a4cde934135b17fdfd72610d574b",
+      "bytes": 1215
+    },
+    {
+      "path": "native/src/main.rs",
+      "sha256": "eba2d31d94d97afb7219f61202ccc4255d1eb8f5321dd3463a062af8c83f4805",
+      "bytes": 15336
+    },
+    {
+      "path": "native/src/oracle.rs",
+      "sha256": "800ae8cfeaba98eeff43652090f68382a01a004894cd024bac9301dc8bb6a21b",
+      "bytes": 32358
+    },
+    {
+      "path": "native/src/provenance.rs",
+      "sha256": "1ca98b17f9e16e3c8ba80fef343c67f4856b0c905476efa8e77d7e7eb5dd14b6",
+      "bytes": 8192
+    },
+    {
+      "path": "native/src/replay.rs",
+      "sha256": "4706ce64575d63304366fb963cac98f23d2ec6699bc0aabd5a9c803797347d0e",
+      "bytes": 3965
+    },
+    {
+      "path": "native/tests/adversarial_contracts.rs",
+      "sha256": "f6ed2cd3ca043b498c61c7de93b09f282e2d57f82adf37d875f4a9ea30d990d5",
+      "bytes": 4380
+    },
+    {
+      "path": "native/tests/audit_contracts.rs",
+      "sha256": "b6814bd695893ecfcdc42832e459e280a20f0dd2eaed3eebf48094ed61d826b4",
+      "bytes": 9203
+    },
+    {
+      "path": "native/tests/base_certificates.rs",
+      "sha256": "bed927f553e8cbecaf2c0f11f224448671bf25a6427554b0daa9ba0f8847afe5",
+      "bytes": 8919
+    },
+    {
+      "path": "native/tests/collector_contracts.rs",
+      "sha256": "3429f1220d2765b87569d9b96cd60936735cc5d05ac0d2f9e3dd470ce802e053",
+      "bytes": 4112
+    },
+    {
+      "path": "native/tests/oracle_contracts.rs",
+      "sha256": "d74caac8e16ba7a1819959f66b8b337e2f6415a3ea3494750d370243338b2247",
+      "bytes": 12827
+    },
+    {
+      "path": "native/tests/provenance_contracts.rs",
+      "sha256": "cbf2e1668fe3c0b936ac37c470f37d3c863348cb3b8494f34345d2e532592a9b",
+      "bytes": 3301
+    },
+    {
+      "path": "native/build.rs",
+      "sha256": "5d2dc9f58fce964672c6bca0d1acc707951a266b9ec55aeb86e5c607bef0608a",
+      "bytes": 23032
+    },
+    {
+      "path": "native/Cargo.toml",
+      "sha256": "901e75f73455f0640f3fa63fac80e546001f38cf0dd6f1b93f3421af7f9e691e",
+      "bytes": 1037
+    },
+    {
+      "path": "native/Cargo.lock",
+      "sha256": "8fd8a4feaf91e864957e144fbd600bff3c9a3f50852d46a6a9da8866622b4b85",
+      "bytes": 9633
+    }
+  ],
+  "root_library_gate": {
+    "status": "compile_failed_missing_fixture_inputs_and_compiler_sigkill",
+    "exit_code": 101,
+    "passed": false,
+    "receipt": "evidence/root-library-gate.json"
+  },
+  "shell_syntax": {
+    "command": "bash -n research/prime31_aux_matched_20261122/run-cell.sh",
+    "exit_code": 0,
+    "full_backend_execution_tested": false
+  },
+  "protocol_validation": "evidence/protocol-structural-validation.json",
+  "source_check_against_published_head": {
+    "status": "passed",
+    "receipt": "evidence/source-check-published.json",
+    "source_revision": "d6666a25e2656ca30112d5fe7a62fb9ba0cfbe46",
+    "checked_file_count": 61,
+    "cargo_profile": "release",
+    "opt_level": "3",
+    "running_binary_sha256": "8701a671d392a0d4c7d56779671f615feaae53fd6cb1f9f4246ed3327f8b99dd"
+  }
+}
