@@ -28,4 +28,4 @@ jobs:
       - name: Native exact-source graph integration tests
         shell: bash
         run: |
-          cargo test --manifest-path research/lp_graph_algorithms_20261123/native_gain_dsu/Cargo.toml --test large_prime_graph --release -- --nocapture
+          bash research/lp_graph_algorithms_20261123/native_gain_dsu/run.sh
