@@ -1,0 +1,951 @@
+     Locking 21 packages to highest compatible versions
+      Adding sha2 v0.10.9 (available: v0.11.1)
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling typenum v1.20.1
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling generic-array v0.14.7
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling serde v1.0.229
+   Compiling syn v3.0.10
+   Compiling cfg-if v1.0.5
+   Compiling cpufeatures v0.2.17
+   Compiling itoa v1.0.19
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling memchr v2.8.3
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling serde_derive v1.0.229
+   Compiling graph-ic-hypothesis-identity v0.1.0 (/workspace/crypto-unit-descent-20261123/research/extension_ic_graph_20261115/hypotheses-20261123/native)
+error[E0433]: cannot find module or crate `hex` in this scope
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:380:24
+    |
+380 |     format!("IDC1h{}", hex::encode(&h[..8]))
+    |                        ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `hex` in this scope
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:434:5
+    |
+434 |     hex::encode(sha256(&buf))
+    |     ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:21:27
+    |
+ 21 |     let sq = |name| Expr::mul(vec![var(name), var(name)]);
+    |                           ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 21 -     let sq = |name| Expr::mul(vec![var(name), var(name)]);
+ 21 +     let sq = |name| Expr::Mul(vec![var(name), var(name)]);
+    |
+
+error[E0599]: no variant, associated function, or constant named `add` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:22:19
+    |
+ 22 |     let a = Expr::add(vec![
+    |                   ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `add` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `add`, perhaps you need to implement it:
+            candidate #1: `Add`
+help: there is a variant with a similar name
+    |
+ 22 -     let a = Expr::add(vec![
+ 22 +     let a = Expr::Add(vec![
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:23:15
+    |
+ 23 |         Expr::mul(vec![var("u"), var("L")]),
+    |               ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 23 -         Expr::mul(vec![var("u"), var("L")]),
+ 23 +         Expr::Mul(vec![var("u"), var("L")]),
+    |
+
+error[E0599]: no variant, associated function, or constant named `neg` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:24:15
+    |
+ 24 |         Expr::neg(Expr::mul(vec![var("C"), var("v")])),
+    |               ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `neg` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `neg`, perhaps you need to implement it:
+            candidate #1: `Neg`
+help: there is a variant with a similar name
+    |
+ 24 -         Expr::neg(Expr::mul(vec![var("C"), var("v")])),
+ 24 +         Expr::Neg(Expr::mul(vec![var("C"), var("v")])),
+    |
+help: there is a method `ne` with a similar name
+    |
+ 24 -         Expr::neg(Expr::mul(vec![var("C"), var("v")])),
+ 24 +         Expr::ne(Expr::mul(vec![var("C"), var("v")])),
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:24:25
+    |
+ 24 |         Expr::neg(Expr::mul(vec![var("C"), var("v")])),
+    |                         ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 24 -         Expr::neg(Expr::mul(vec![var("C"), var("v")])),
+ 24 +         Expr::neg(Expr::Mul(vec![var("C"), var("v")])),
+    |
+
+error[E0599]: no variant, associated function, or constant named `add` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:31:20
+    |
+ 31 |         lhs: Expr::add(vec![
+    |                    ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `add` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `add`, perhaps you need to implement it:
+            candidate #1: `Add`
+help: there is a variant with a similar name
+    |
+ 31 -         lhs: Expr::add(vec![
+ 31 +         lhs: Expr::Add(vec![
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:32:19
+    |
+ 32 |             Expr::mul(vec![
+    |                   ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 32 -             Expr::mul(vec![
+ 32 +             Expr::Mul(vec![
+    |
+
+error[E0599]: no variant, associated function, or constant named `add` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:34:23
+    |
+ 34 |                 Expr::add(vec![sq("v"), Expr::mul(vec![var("u"), var("W")])]),
+    |                       ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `add` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `add`, perhaps you need to implement it:
+            candidate #1: `Add`
+help: there is a variant with a similar name
+    |
+ 34 -                 Expr::add(vec![sq("v"), Expr::mul(vec![var("u"), var("W")])]),
+ 34 +                 Expr::Add(vec![sq("v"), Expr::mul(vec![var("u"), var("W")])]),
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:34:47
+    |
+ 34 |                 Expr::add(vec![sq("v"), Expr::mul(vec![var("u"), var("W")])]),
+    |                                               ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 34 -                 Expr::add(vec![sq("v"), Expr::mul(vec![var("u"), var("W")])]),
+ 34 +                 Expr::add(vec![sq("v"), Expr::Mul(vec![var("u"), var("W")])]),
+    |
+
+error[E0599]: no variant, associated function, or constant named `neg` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:36:19
+    |
+ 36 |             Expr::neg(Expr::mul(vec![a.clone(), a])),
+    |                   ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `neg` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `neg`, perhaps you need to implement it:
+            candidate #1: `Neg`
+help: there is a variant with a similar name
+    |
+ 36 -             Expr::neg(Expr::mul(vec![a.clone(), a])),
+ 36 +             Expr::Neg(Expr::mul(vec![a.clone(), a])),
+    |
+help: there is a method `ne` with a similar name
+    |
+ 36 -             Expr::neg(Expr::mul(vec![a.clone(), a])),
+ 36 +             Expr::ne(Expr::mul(vec![a.clone(), a])),
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:36:29
+    |
+ 36 |             Expr::neg(Expr::mul(vec![a.clone(), a])),
+    |                             ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 36 -             Expr::neg(Expr::mul(vec![a.clone(), a])),
+ 36 +             Expr::neg(Expr::Mul(vec![a.clone(), a])),
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:38:20
+    |
+ 38 |         rhs: Expr::mul(vec![
+    |                    ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 38 -         rhs: Expr::mul(vec![
+ 38 +         rhs: Expr::Mul(vec![
+    |
+
+error[E0599]: no variant, associated function, or constant named `add` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:40:19
+    |
+ 40 |             Expr::add(vec![
+    |                   ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `add` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `add`, perhaps you need to implement it:
+            candidate #1: `Add`
+help: there is a variant with a similar name
+    |
+ 40 -             Expr::add(vec![
+ 40 +             Expr::Add(vec![
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:41:23
+    |
+ 41 |                 Expr::mul(vec![sq("C"), var("W")]),
+    |                       ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 41 -                 Expr::mul(vec![sq("C"), var("W")]),
+ 41 +                 Expr::Mul(vec![sq("C"), var("W")]),
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:42:23
+    |
+ 42 |                 Expr::mul(vec![Expr::constant(2), var("C"), var("v"), var("L")]),
+    |                       ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 42 -                 Expr::mul(vec![Expr::constant(2), var("C"), var("v"), var("L")]),
+ 42 +                 Expr::Mul(vec![Expr::constant(2), var("C"), var("v"), var("L")]),
+    |
+
+error[E0599]: no variant, associated function, or constant named `constant` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:42:38
+    |
+ 42 |                 Expr::mul(vec![Expr::constant(2), var("C"), var("v"), var("L")]),
+    |                                      ^^^^^^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `constant` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no variant, associated function, or constant named `neg` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:43:23
+    |
+ 43 |                 Expr::neg(Expr::mul(vec![var("u"), sq("L")])),
+    |                       ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `neg` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `neg`, perhaps you need to implement it:
+            candidate #1: `Neg`
+help: there is a variant with a similar name
+    |
+ 43 -                 Expr::neg(Expr::mul(vec![var("u"), sq("L")])),
+ 43 +                 Expr::Neg(Expr::mul(vec![var("u"), sq("L")])),
+    |
+help: there is a method `ne` with a similar name
+    |
+ 43 -                 Expr::neg(Expr::mul(vec![var("u"), sq("L")])),
+ 43 +                 Expr::ne(Expr::mul(vec![var("u"), sq("L")])),
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:43:33
+    |
+ 43 |                 Expr::neg(Expr::mul(vec![var("u"), sq("L")])),
+    |                                 ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+ 43 -                 Expr::neg(Expr::mul(vec![var("u"), sq("L")])),
+ 43 +                 Expr::neg(Expr::Mul(vec![var("u"), sq("L")])),
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:170:23
+    |
+170 |         s.rhs = Expr::mul(vec![
+    |                       ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+170 -         s.rhs = Expr::mul(vec![
+170 +         s.rhs = Expr::Mul(vec![
+    |
+
+error[E0599]: no variant, associated function, or constant named `add` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:172:19
+    |
+172 |             Expr::add(vec![
+    |                   ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `add` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `add`, perhaps you need to implement it:
+            candidate #1: `Add`
+help: there is a variant with a similar name
+    |
+172 -             Expr::add(vec![
+172 +             Expr::Add(vec![
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:173:23
+    |
+173 |                 Expr::mul(vec![Expr::var("C"), Expr::var("C"), Expr::var("W")]),
+    |                       ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+173 -                 Expr::mul(vec![Expr::var("C"), Expr::var("C"), Expr::var("W")]),
+173 +                 Expr::Mul(vec![Expr::var("C"), Expr::var("C"), Expr::var("W")]),
+    |
+
+error[E0599]: no variant, associated function, or constant named `neg` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:174:23
+    |
+174 |                 Expr::neg(Expr::mul(vec![
+    |                       ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `neg` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `neg`, perhaps you need to implement it:
+            candidate #1: `Neg`
+help: there is a variant with a similar name
+    |
+174 -                 Expr::neg(Expr::mul(vec![
+174 +                 Expr::Neg(Expr::mul(vec![
+    |
+help: there is a method `ne` with a similar name
+    |
+174 -                 Expr::neg(Expr::mul(vec![
+174 +                 Expr::ne(Expr::mul(vec![
+    |
+
+error[E0599]: no variant, associated function, or constant named `mul` found for enum `identity_certificate::Expr` in the current scope
+   --> src/main.rs:174:33
+    |
+174 |                 Expr::neg(Expr::mul(vec![
+    |                                 ^^^ variant, associated function, or constant not found in `identity_certificate::Expr`
+    |
+   ::: src/../../../../../src/cryptanalysis/identity_certificate.rs:79:1
+    |
+ 79 | pub enum Expr {
+    | ------------- variant, associated function, or constant `mul` not found for this enum
+    |
+note: if you're trying to build a new `identity_certificate::Expr` consider using one of the following associated functions:
+      identity_certificate::Expr::var
+      identity_certificate::Expr::plus
+      identity_certificate::Expr::times
+      identity_certificate::Expr::sum
+      and 2 others
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `mul`, perhaps you need to implement it:
+            candidate #1: `Mul`
+help: there is a variant with a similar name
+    |
+174 -                 Expr::neg(Expr::mul(vec![
+174 +                 Expr::neg(Expr::Mul(vec![
+    |
+
+Some errors have detailed explanations: E0433, E0599.
+For more information about an error, try `rustc --explain E0433`.
+error: could not compile `graph-ic-hypothesis-identity` (bin "graph-ic-hypothesis-identity" test) due to 25 previous errors

@@ -1,0 +1,40 @@
+{
+  "schema": "vieta-official-censored-close/v1",
+  "official_close_exit": 0,
+  "record": "benchmarks/records/20261117T0418Z-vieta-half-gcd-cold-speed.json",
+  "status_before": "open",
+  "status_after": "censored",
+  "closed_utc": "2026-11-23T06:50:07+00:00",
+  "raw_equal": true,
+  "raw_count": 1301,
+  "commands_equal": true,
+  "metrics_equal": true,
+  "changed_fields": [
+    "closed_utc",
+    "reports",
+    "status",
+    "summary",
+    "validation"
+  ],
+  "scoped_record_findings": [],
+  "new_vieta_measured_series": 0,
+  "progress_counts_with_old_open_record": {
+    "open": 63,
+    "measured": 310,
+    "invalid": 8,
+    "censored": 18
+  },
+  "progress_counts_after_close": {
+    "censored": 19,
+    "invalid": 8,
+    "measured": 310,
+    "open": 62
+  },
+  "progress_series_equal_to_main_records_reading": true,
+  "main_historical_exclusion": {
+    "reason": "Historical receipt lacks current comparison-eligibility metadata: command 1 has no successful integer exit code; use invalid/censored or an explicit pinned historical exclusion. Original record and successful/failed/uncertain arms are preserved. This excludes automated comparisons; it does not decide the validity of every underlying measurement.",
+    "sha256": "cceddc4549b0a35a9acb5ad5001d4dd335ab9d82a70c7cdc945927cfa600f501"
+  },
+  "no_unrelated_record_or_exclusion_edit": true,
+  "local_s3_operation": false
+}

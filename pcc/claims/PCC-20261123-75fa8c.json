@@ -1,0 +1,22 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T10:11:28Z",
+ "id": "PCC-20261123-75fa8c",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e33eb5511d84ea8ae596601ca53c99185d5453ae",
+  "model": "Codex",
+  "session": "native-precision-20261123"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "72b48b96db59bc71d059360987abec830ef5c8019625d01758dbd3ba1e7034c1",
+   "kind": "lean",
+   "project": "research/hashed_ecdl_precision_20261123/formal/CryptoLeanCore/TaperedPrecision.lean",
+   "theorem": "CryptoLeanCore.TaperedPrecision.childPrecision_mul_le"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "PR4996; shared CryptoLeanCore.TaperedPrecision scalar component; exact Nat arithmetic only",
+ "statement": "The Std Nat precision model satisfies childPrecision(p,M,u,A+2u,i)*u <=34*M*2^(A+2u-i), conditional on u<=M, i<u, s<=M*q, p<=c*s*2^A, c*q*u<=2^(u+1), and8*u*(A+2u+1)<=2^(A+u+1). This scalar endpoint does not prove the inherited-path premise, Rust refinement, source admission, full counter complexity or an ECDLP improvement."
+}
