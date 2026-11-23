@@ -1,0 +1,3 @@
+# Native diagnostic cross-check before execution
+
+Build a fresh, isolated CLI linked to the existing pencil-target-information crate with default features; no producer feature or collector binary. Pass each of the468 fixed one-row cases and6 fixed multirow cases twice (legacy and converted) through the actual information() implementation:948 rows of output. Compare all three ranks, consistency and target-determination booleans to recorded explicit solution sets. Capture source inventories, command/native status/stdout/stderr and post bindings. This is a same-producer implementation cross-check, not independent review. Build and run each receive120-second limits; no scientific measurements or new inputs.

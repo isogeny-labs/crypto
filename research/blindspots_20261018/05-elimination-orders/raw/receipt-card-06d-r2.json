@@ -1,0 +1,212 @@
+{
+  "card_id": "CARD-BLINDSPOT-05-06d-r2",
+  "card_path": "research/blindspots_20261018/05-elimination-orders/card-06d-r2.yaml",
+  "card_sha256": "29e3e5d9073a12716e47d37c85a145fa94625f6e11517d47e5806bac2895b5d1",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-05/card-06d-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-05/card-06d-r2/b05",
+        "examples/blindspots_05_elimination_orders.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.814,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 4.814,
+      "stderr_sha256": "68c726b2922de2b59f9658ee1bf338ad10c01ad3911f3a25af38414155bbe22c",
+      "stderr_tail": [
+        "    |",
+        "458 | fn poly_degree(p: &Poly) -> u32 {",
+        "    |    ^^^^^^^^^^^",
+        "",
+        "warning: field `nv` is never read",
+        "   --> examples/blindspots_05_elimination_orders.rs:549:5",
+        "    |",
+        "548 | struct Order {",
+        "    |        ----- field in this struct",
+        "549 |     nv: usize,",
+        "    |     ^^",
+        "",
+        "warning: constant `FIXED_ARMS` is never used",
+        "    --> examples/blindspots_05_elimination_orders.rs:1334:7",
+        "     |",
+        "1334 | const FIXED_ARMS: [&str; 6] = [\"grevlex\", \"blkLI\", \"blkIL\", \"wdeg\", \"mindeg\", \"tw\"];",
+        "     |       ^^^^^^^^^^",
+        "",
+        "warning: 4 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-05/card-06d-r2/b05",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/05-elimination-orders/draws.tsv",
+        "--cell",
+        "c15-3-4",
+        "--targets",
+        "5",
+        "--arms",
+        "wdeg,blkIL,mindeg,tw,mindeg-rev,tw-rev,rand0",
+        "--time-limit",
+        "60",
+        "--total-limit",
+        "300"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 171.489,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "main-c15-3-4-t5",
+      "index": 3,
+      "outputs": {},
+      "seconds": 171.489,
+      "stderr_sha256": "ee80b765152c83e736ac6df237c24e19b582f7bba43500d90bc7dfcf1369fe1a",
+      "stderr_tail": [
+        "c15-3-4 t5 wdeg: refuted D=6 steps=33 touches=5239539317 9.8s",
+        "c15-3-4 t5 blkIL: refuted D=12 steps=165 touches=9778553691 22.3s",
+        "c15-3-4 t5 mindeg: refuted D=4 steps=17 touches=15807884053 30.4s",
+        "c15-3-4 t5 tw: refuted D=4 steps=17 touches=15807884053 31.5s",
+        "c15-3-4 t5 mindeg-rev: refuted D=4 steps=17 touches=11167362265 23.1s",
+        "c15-3-4 t5 tw-rev: refuted D=4 steps=17 touches=11167362265 22.7s",
+        "c15-3-4 t5 rand0: refuted D=4 steps=17 touches=14924845357 31.6s"
+      ],
+      "stdout_sha256": "649b5236af6b580f68ede284d403e891b92535d90a98fe464c3ce2cb6040a6ea",
+      "stdout_tail": [
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"wdeg\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":6,\"d_sel\":6,\"steps\":33,\"pairs_sel\":19184,\"pairs_gen\":64307,\"rows_max\":33745,\"cols_max\":28698,\"rc_max\":968414010,\"nnz_max\":8163172,\"cols_sum\":87596,\"rows_sum\":78115,\"touches\":5239539317,\"build\":9395182,\"elim\":5138629044,\"back\":91515091,\"zero_red\":14297,\"new_elems\":4887,\"g_size\":4932,\"ms\":9847.3,\"ms_sym\":135.1,\"ms_elim\":8747.0,\"ms_back\":174.3,\"ms_add\":616.3,\"rss_kb\":76468,\"step_rows\":[14,16,90,78,98,68,148,1388,34,82,556,341,258,171,170,1688,268,197,1352,275,1097,1433,114,612,14528,6018,1792,2922,109,206,4875,3372,33745],\"step_cols\":[63,64,342,92,76,61,167,2349,44,85,890,593,336,298,283,1253,296,272,1213,279,998,976,189,678,14331,10323,4048,4956,695,493,6971,5184,28698],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"blkIL\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":12,\"d_sel\":10,\"steps\":165,\"pairs_sel\":50898,\"pairs_gen\":67709,\"rows_max\":54918,\"cols_max\":57169,\"rc_max\":2913180228,\"nnz_max\":12817818,\"cols_sum\":1219494,\"rows_sum\":907888,\"touches\":9778553691,\"build\":64232155,\"elim\":9175903908,\"back\":538417628,\"zero_red\":43068,\"new_elems\":7830,\"g_size\":7875,\"ms\":22300.7,\"ms_sym\":2761.1,\"ms_elim\":15207.7,\"ms_back\":878.7,\"ms_add\":1929.6,\"rss_kb\":213328,\"step_rows\":[14,25,10,95,36,8,96,3,67,33,35,312,174,101,72,30,39,442,148,94,51,689,36,32,10,89,263,83,2073,823,276,22,1579,1108,782,1595,21382,14801,11897,49555,5334,1006,4339,424,579,341,850,765,393,1033,2093,488,624,562,196,359,852,694,655,391,270,1051,750,699,13577,681,183,2351,652,14091,14795,2467,2105,8925,27072,15348,154,78,282,175,8576,12797,1468,1681,765,78,2212,411,357,264,873,873,631,913,9003,996,81,101,1482,1539,19525,2192,809,2300,1184,10444,13055,15958,15242,41096,108,258,237,184,13928,9480,8294,14564,7774,6005,11639,111,194,332,214,11156,19887,4611,8501,51,73,146,10704,11127,2937,2278,3975,2868,3491,3680,4835,29150,39,293,1138,2557,4143,4523,4176,947,60,8,54,244,3679,265,20289,16537,13849,10138,38987,43710,45072,45900,54918],\"step_cols\":[63,95,80,345,70,35,617,2,763,844,869,1028,880,771,706,646,637,850,448,334,265,597,22,13,8,154,218,131,1047,844,321,82,860,817,791,1686,24528,21632,18760,57169,8734,4016,8320,2574,2763,2233,3332,3253,2711,3684,5974,2540,2661,2610,1632,2360,3191,3000,2562,1780,1674,2463,2746,2940,17796,1700,1324,5226,2888,17847,19018,5744,5410,15170,34423,22001,1160,788,1296,1126,11863,16501,5203,5599,3975,115,6324,2005,1992,1805,2987,3065,2785,3182,13910,3353,508,2682,5385,5666,25343,6318,4235,6458,4756,15777,19427,22326,21545,46804,802,1180,1128,1096,19976,15472,14151,20411,13473,11672,17242,794,844,798,984,16566,24817,9283,13122,310,270,660,15130,15145,6962,6258,7703,6584,7162,7253,7568,25812,15,92,310,483,653,713,1663,180,6,2,16,64,2733,53,15568,13453,12891,10028,38953,43587,44686,45079,53046],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"mindeg\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":31025,\"pairs_gen\":78139,\"rows_max\":53090,\"cols_max\":59064,\"rc_max\":2931045810,\"nnz_max\":25648516,\"cols_sum\":167876,\"rows_sum\":128003,\"touches\":15807884053,\"build\":25638745,\"elim\":14485039189,\"back\":1297206119,\"zero_red\":23724,\"new_elems\":7301,\"g_size\":7346,\"ms\":30432.8,\"ms_sym\":356.4,\"ms_elim\":26769.4,\"ms_back\":1726.6,\"ms_add\":1139.6,\"rss_kb\":246548,\"step_rows\":[14,30,471,572,2059,217,307,9355,69,1912,35201,2319,2588,2380,53090,11245,6174],\"step_cols\":[63,77,1843,653,611,155,1100,17219,212,3934,59064,3913,5866,5671,55209,6566,5720],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"tw\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":31025,\"pairs_gen\":78139,\"rows_max\":53090,\"cols_max\":59064,\"rc_max\":2931045810,\"nnz_max\":25648516,\"cols_sum\":167876,\"rows_sum\":128003,\"touches\":15807884053,\"build\":25638745,\"elim\":14485039189,\"back\":1297206119,\"zero_red\":23724,\"new_elems\":7301,\"g_size\":7346,\"ms\":31496.7,\"ms_sym\":380.5,\"ms_elim\":27694.2,\"ms_back\":1690.6,\"ms_add\":1240.4,\"rss_kb\":246600,\"step_rows\":[14,30,471,572,2059,217,307,9355,69,1912,35201,2319,2588,2380,53090,11245,6174],\"step_cols\":[63,77,1843,653,611,155,1100,17219,212,3934,59064,3913,5866,5671,55209,6566,5720],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"mindeg-rev\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":30393,\"pairs_gen\":110089,\"rows_max\":50496,\"cols_max\":59934,\"rc_max\":2694870528,\"nnz_max\":18448158,\"cols_sum\":170630,\"rows_sum\":133639,\"touches\":11167362265,\"build\":22481032,\"elim\":10582536584,\"back\":562344649,\"zero_red\":22831,\"new_elems\":7562,\"g_size\":7607,\"ms\":23084.1,\"ms_sym\":328.4,\"ms_elim\":20114.9,\"ms_back\":768.1,\"ms_add\":1439.8,\"rss_kb\":246328,\"step_rows\":[14,4,426,402,2040,195,561,15167,30,2401,35768,2821,3002,2512,50496,11713,6087],\"step_cols\":[63,30,1832,423,592,133,1354,22815,32,4723,59934,4415,4365,3869,53368,7049,5633],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"tw-rev\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":30393,\"pairs_gen\":110089,\"rows_max\":50496,\"cols_max\":59934,\"rc_max\":2694870528,\"nnz_max\":18448158,\"cols_sum\":170630,\"rows_sum\":133639,\"touches\":11167362265,\"build\":22481032,\"elim\":10582536584,\"back\":562344649,\"zero_red\":22831,\"new_elems\":7562,\"g_size\":7607,\"ms\":22657.6,\"ms_sym\":340.2,\"ms_elim\":19796.2,\"ms_back\":674.9,\"ms_add\":1471.5,\"rss_kb\":246328,\"step_rows\":[14,4,426,402,2040,195,561,15167,30,2401,35768,2821,3002,2512,50496,11713,6087],\"step_cols\":[63,30,1832,423,592,133,1354,22815,32,4723,59934,4415,4365,3869,53368,7049,5633],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"rand0\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":30391,\"pairs_gen\":94757,\"rows_max\":54095,\"cols_max\":57066,\"rc_max\":3047441825,\"nnz_max\":22293640,\"cols_sum\":169093,\"rows_sum\":132999,\"touches\":14924845357,\"build\":25435568,\"elim\":14424807569,\"back\":474602220,\"zero_red\":23424,\"new_elems\":6967,\"g_size\":7012,\"ms\":31637.6,\"ms_sym\":327.3,\"ms_elim\":29074.2,\"ms_back\":588.9,\"ms_add\":1133.9,\"rss_kb\":246328,\"step_rows\":[14,29,454,465,2044,201,369,14499,74,2306,32935,2551,2794,2637,54095,11509,6023],\"step_cols\":[63,76,1822,486,596,139,1161,22332,87,4221,57066,4145,4157,3994,56335,6844,5569],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-05/card-06d-r2/b05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-05/card-06d-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "72c3303a0ce7e23ef9e7039230132360dd56f068",
+  "dirty_after": [
+    "examples/blindspots_13_rho_negation.rs",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06d-r2-main-c15-3-4-t5.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06d-r2-main-c15-3-4-t5.stdout.log"
+  ],
+  "dirty_before": [
+    "examples/blindspots_13_rho_negation.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

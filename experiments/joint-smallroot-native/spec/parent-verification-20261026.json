@@ -1,0 +1,35 @@
+{
+  "schema": "native-smallroot-parent-software-check-v1",
+  "observed_at": "2026-10-26T19:38:14Z",
+  "review_source_snapshot": "1d47988261c4d13f7a8549d70f53571163246c77",
+  "tested_integrated_commit": "b02f8c1fa192c375f140b86ba967c432e994a226",
+  "native_implementation_bytes_unchanged_by_integration": true,
+  "library_check": {
+    "command": "CARGO_HOME=/workspace/native-rust/cargo RUSTUP_HOME=/workspace/native-rust/rustup CARGO_TARGET_DIR=/workspace/native-smallroot-owner-target /workspace/native-rust/cargo/bin/cargo test --release --lib --locked",
+    "cargo_version": "1.99.1",
+    "rustc_version": "1.99.1",
+    "exit_code": 0,
+    "passed": 4862,
+    "failed": 0,
+    "ignored": 121,
+    "duration_seconds": 1217.09,
+    "raw_log_local_path": "/workspace/smallroot-session/native-owner-cargo-test-attempt6-main-integrated.log",
+    "raw_log_sha256": "32bc990c209878df092ec1803ffb63a56e585df87a0352bb542181645d42bba9",
+    "raw_log_bytes": 425485,
+    "raw_log_publication": "local only, not committed or represented as canonical-store custody"
+  },
+  "preserved_previous_attempt": {
+    "passed": 4844,
+    "failed_missing_sparse_fixtures": 18,
+    "ignored": 121,
+    "all_18_same_binary_rechecks_after_unchanged_tracked_restore": "passed",
+    "old_full_run_relabelled": false
+  },
+  "native_structural_checks": "Eight sealed groups plus exact memory.max codec and missing/unapproved admission rejection checks pass; exact records retained in spec/checks",
+  "raw_diff_advisories": "Exact upstream GMP license and native fixture/trace whitespace preserved, not rewritten",
+  "scientific_calls": 0,
+  "all_24_bound_slots": "not_started",
+  "verified_ic_improvement": false,
+  "guard_qualification": "unperformed; current cgroupfs read-only",
+  "hosted_verification": "migrate/review checks at source snapshot failed before start with account payment/spending-limit annotations; no bypass"
+}

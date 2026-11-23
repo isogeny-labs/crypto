@@ -1,0 +1,70 @@
+{
+  "arm": "wide_25000",
+  "command": [
+    "/opt/homebrew/bin/cryptominisat5",
+    "--threads",
+    "1",
+    "--random",
+    "20261114",
+    "--maxtime",
+    "600",
+    "--maxconfl",
+    "1000000",
+    "--verb",
+    "1",
+    "--verbstat",
+    "1",
+    "--printsol",
+    "1",
+    "--maxnummatrices",
+    "32",
+    "--autodisablegauss",
+    "0",
+    "--gaussusefulcutoff",
+    "0",
+    "--maxmatrixcols",
+    "25000",
+    "--branchstr",
+    "vsids",
+    "/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114/raw/export-positive/result.xcnf"
+  ],
+  "cpu_system_seconds": 0.027572,
+  "cpu_user_seconds": 0.253955,
+  "ended_unix_ms": 1794663524641,
+  "exit_code": 10,
+  "export_receipt_sha256": "6120d5ef8d65739dc4b85e8995bea95cfe5416f90fa0e400b6cec84edfe20007",
+  "formula_sha256": "f46a900495ec1a3594add973ee641de21a318a8fda6c9bfa67bd19057326d44c",
+  "host_preflight": [
+    {
+      "load_1m": 5.650390625,
+      "swapouts": 164320,
+      "unix_ms": 1794663494294
+    },
+    {
+      "load_1m": 4.91455078125,
+      "swapouts": 164320,
+      "unix_ms": 1794663509303
+    },
+    {
+      "load_1m": 5.2529296875,
+      "swapouts": 164320,
+      "unix_ms": 1794663524308
+    }
+  ],
+  "lock_sha256": "82faf113259facec150c883f3f24a67eb1d3255953ddfb3b014f76279a26aaca",
+  "mode": "positive",
+  "runner_binary_sha256": "8068f14749066e0b855fb65946faf7679b6c5b47e814241d5d0af28a5bcad0c6",
+  "schema": "n83.k2048-m5-native-solver-run/v1",
+  "selected_best_total_runtime": null,
+  "solver_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "source_commit": "b4477fd36b70e3fea1a232135fbcabe437329a65",
+  "started_unix_ms": 1794663524329,
+  "status": "SAT_PENDING_REPLAY",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "bf7caafb268d9986b8840481d4917aea5ab4db771dfb165937e9f5e760c203cc",
+  "swapouts_after": 164320,
+  "terminal_conflicts": 839,
+  "timed_out": false,
+  "wait4_peak_rss_bytes": 82378752,
+  "wall_seconds": 0.311283708
+}

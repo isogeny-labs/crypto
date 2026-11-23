@@ -1,0 +1,74 @@
+{
+  "schema": "committed-evidence-checks/v1",
+  "evidence_commit": "d2999db1cda716819787d5fef9897e97ab828321",
+  "native_input_commit": "0e88deaae36ac48eee24baaac21ef02bbc979c4d",
+  "checks": {
+    "artifacts": 0,
+    "size": 0,
+    "diff": 0,
+    "inputs": 0,
+    "outputs": 0
+  },
+  "new_lean_gate": {
+    "named": 9,
+    "audited": 16,
+    "failing": 0,
+    "extra_trusted": 0,
+    "source_sha256": "3d2fe90457262b639a7bcd3a5632654e0efbed01747de2b2bf8db36f860f30ba"
+  },
+  "native": {
+    "arms": 96,
+    "comparisons": 210,
+    "failed_queries": 172,
+    "independent_arithmetic": true,
+    "index_sha256": "9cbead94f568099affc0990f8ba34a090ef5ccadb3bc2987ebf71d17984f4904",
+    "joint_original": 0,
+    "joint_reduced": 0,
+    "missing_failed_query_control": "applicable",
+    "reachable_states": 536,
+    "semantic_witness_audit": true,
+    "status": "passed",
+    "targets": 896
+  },
+  "backend_tests_passed": 22,
+  "workflow_parser_tests_passed": 4,
+  "backlog_draft_validator_exit": 0,
+  "naming": {
+    "exit": 1,
+    "reported_files": 38,
+    "historical_untouched_files": 37,
+    "new_report_references_five_known_lost_historical_ids": true,
+    "output_exactly_reconstructible_with_patch": true
+  },
+  "library": {
+    "schema": "library-attempt/v1",
+    "source_commit": "0e88deaae36ac48eee24baaac21ef02bbc979c4d",
+    "command": "timeout 600 cargo test --release --locked --lib -- --test-threads=2",
+    "exit": 124,
+    "suite_declared_tests": 5140,
+    "completed_summary": null,
+    "observed_ok_lines": 1595,
+    "observed_failed_lines": 0,
+    "observed_ignored_lines": 35,
+    "status": "incomplete; timed out600sec; not a suite pass",
+    "preparation_failures": [
+      "missing sparse tools/factor-base local dependency",
+      "missing tracked archive-comparison v1/v2 include fixtures; exact head/base blobs identical"
+    ],
+    "extension_test_note": "current external main-merge source expects1371; this case passes but does not assert restoration of1921study models",
+    "raw_log_sha256": "24bf98c445c540bad74954dd3d1a7ea41a8c4149bbb823e0b9e105e8f88b07a2"
+  },
+  "raw_archive": {
+    "schema": "raw-archive/v1",
+    "raw_files": 1909,
+    "dehydrated_exact_duplicates": 1638,
+    "archive_bytes": 64508,
+    "archive_sha256": "67ef6f53bf5ea38f2463b260a6f70c043bbaeb0be3075cd44ef2736a78a66e44",
+    "duplicates_source": "canonical native case/receipt files plus exact existing draft/project/report/library-receipt bytes; every altered payload remains complete",
+    "excluded": "build binaries/Cargo targets/Lean .lake caches, signing/session internals and all credential files; source/binary hashes retained",
+    "restore_verified": true,
+    "repack_verified": true
+  },
+  "completion": "finite uniform protocol and conditional theorem deliverables; broader objective, registry/full-library/coordination/review/integration gates remain open",
+  "auto_merge": "externally re-enabled, disabled again; must remain off"
+}

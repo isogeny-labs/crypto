@@ -1,0 +1,31 @@
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/compact/degree-evidence/draft-001.lean.txt:101:80: error: unsolved goals
+case h
+a u i x y : ℕ
+t : ℤ
+hiu : i < u
+hu : u ≤ a
+ht0 : t ≠ 0
+hi : padicValInt 2 t = i
+hc : x.testBit i = y.testBit i
+⊢ ?m.34
+
+a u i x y : ℕ
+t : ℤ
+hiu : i < u
+hu : u ≤ a
+ht0 : t ≠ 0
+hi : padicValInt 2 t = i
+hc : x.testBit i = y.testBit i
+h : ?m.34
+⊢ Graded 0 (1 + C (chartSlope a u x y t) * X)
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/compact/degree-evidence/draft-001.lean.txt:102:8: error: unexpected token 'λ'; expected command
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/compact/degree-evidence/draft-001.lean.txt:112:2: error: Type mismatch: After simplification, term
+  Mixed.mul
+    (mixed_affine (1 + C (chartSlope a u x y t) * X) (C (OrientationMoment.slope u (rowResidue u x) y ↑t)) hA hB)
+    (anchor_rows_mixed u x y m)
+ has type
+  Mixed 0
+    ((C (1 + C (chartSlope a u x y t) * X) + C (C (OrientationMoment.slope u (rowResidue u x) y ↑t)) * X) *
+      anchorRows u x y m)
+but is expected to have type
+  Mixed 0 (denomRows a u x y t m)

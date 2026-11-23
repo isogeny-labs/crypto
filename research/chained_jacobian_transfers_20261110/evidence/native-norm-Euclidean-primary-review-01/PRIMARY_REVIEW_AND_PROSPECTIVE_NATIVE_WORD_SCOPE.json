@@ -1,0 +1,48 @@
+{
+  "time": "2026-11-16T20:33:05.902458+00:00",
+  "sources": [
+    {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/entire-original-common.rs.txt",
+      "bytes": 9286,
+      "sha256": "832fd28810909194875a9438e164ec1b45dcefbaa83257b4e3fad3095ef865d6"
+    },
+    {
+      "path": "research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/src/lib.rs",
+      "bytes": 7143,
+      "sha256": "c29c96650bd301596d38ccd8d2298b69f8ca417275689cff0be9f0952d50b8bd"
+    },
+    {
+      "path": "research/chained_jacobian_transfers_20261110/lean/CubicCofactorWordBridge22307.lean",
+      "bytes": 18785,
+      "sha256": "22bd90207f04182513291a40a25a52a951c975502d4eaf35c3985f8fdb2f0c16"
+    },
+    {
+      "path": "research/chained_jacobian_transfers_20261110/lean/CubicFiniteNorm22308.lean",
+      "bytes": 11633,
+      "sha256": "5f9ad6da74d02cc262e04a4255b31305db48f035d0976f99cfedfa76e31a873d"
+    }
+  ],
+  "official_Rust_reference": {
+    "url": "https://github.com/rust-lang/reference/blob/3b63884a5e445787078c19422fe627105e2a4933/src/expressions/operator-expr.md",
+    "Git_blob": "3b63884a5e445787078c19422fe627105e2a4933",
+    "content_sha256": "8914c64e00b738858e7fcf38fe8e8daebacd0efbc7c9a1eff3a44444f8145ffc",
+    "reviewed": "overflow, integer division rounds toward zero, numeric integer casts; full source/tool response retained"
+  },
+  "Std_division": {
+    "source": "/home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/src/lean/Init/Data/Int/DivMod/Lemmas.lean",
+    "sha256": "3675ff5212781c8b30e8e3b780e95aa31d6842ebd26a96d79f776c147e0cd32f",
+    "theorem": "Int.tdiv_eq_ediv_of_nonneg",
+    "role": "Actual Euclidean r/nr are nonnegative/positive; truncating and Euclidean division coincide, with source lemma"
+  },
+  "critical_review": "Actual Fp.inv is signed extended Euclid, not powmod or the mathematical N^221 certificate. No powmod implementation/model substitution; review caught this before any new source.",
+  "prospective": [
+    "Preserve exact fullWord07 prefix; literal original raw norm expression order, prove no-overflow/canonical/raw value and cofactor-to-Fin norm.",
+    "Model actual t,nt,r,nr signed Euclid updates and final t<0 addition, guarded zero input. Fuel16 returns None on exhaustion, never partial acceptance; kernel certificates over only223 base inputs prove every nonzero input terminates with gcd1 and canonical inverse.",
+    "Preserve actual quotient/truncation and prove every visited intermediate fits signed64; explicit trace/all-state safety then structural consequences, not just a producer boolean.",
+    "Retain zero/fuel-exhaustion/negative-normalization/noncanonical-overflow controls, all full failed/accepted sources/logs and complete bindings/report/CI/normal source checkpoint."
+  ],
+  "resources": "Original Root4.35/Consumer4.34.1 gates/auditors, j1/120s each/default memory/default tactic limits, no native_decide/custom axioms.",
+  "limits": "Source-level normalized word and bounded signed-state arithmetic, no Rust compiler/ABI/counter/runtime proof, no complete composed inverse/field/Jacobian or benchmark/original LP run; paid STOP unchanged.",
+  "KB": "MCP absent, five wrappers127, conductor127, atlas locked unread; no absence/novelty inference",
+  "new_source_created": false
+}

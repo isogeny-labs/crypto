@@ -1,0 +1,18 @@
+[package]
+name = "sgsecant"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "sgsecant"
+path = "sgsecant_main.rs"
+
+[workspace]
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+debug = false
+overflow-checks = true

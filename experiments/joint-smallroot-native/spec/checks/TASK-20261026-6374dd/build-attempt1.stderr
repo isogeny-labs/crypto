@@ -1,0 +1,16 @@
+tests/guard_qualification.cpp: In function ‘void group_record(const std::filesystem::__cxx11::path&, const std::filesystem::__cxx11::path&)’:
+tests/guard_qualification.cpp:63:9: error: call of overloaded ‘copy(std::filesystem::__cxx11::path, std::filesystem::__cxx11::path)’ is ambiguous
+   63 |     copy(cg / key, out / key);
+      |     ~~~~^~~~~~~~~~~~~~~~~~~~~
+tests/guard_qualification.cpp:48:6: note: candidate: ‘void copy(const std::filesystem::__cxx11::path&, const std::filesystem::__cxx11::path&)’
+   48 | void copy(const fs::path &p, const fs::path &out) {
+      |      ^~~~
+In file included from /usr/include/c++/14/filesystem:54,
+                 from src/backend.hpp:6,
+                 from src/supervisor.hpp:3,
+                 from tests/guard_qualification.cpp:4:
+/usr/include/c++/14/bits/fs_ops.h:60:3: note: candidate: ‘void std::filesystem::copy(const __cxx11::path&, const __cxx11::path&)’
+   60 |   copy(const path& __from, const path& __to)
+      |   ^~~~
+make: *** [Makefile:33: /workspace/native-smallroot-guard-build-6374dd/guard-qualification] Error 1
+make: *** Waiting for unfinished jobs....

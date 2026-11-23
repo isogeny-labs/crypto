@@ -18,6 +18,10 @@ type BigRational = num_rational::Ratio<BigInt>;
 #[path = "coupled_controls.rs"]
 mod coupled_controls;
 
+#[cfg(test)]
+#[path = "dimension_controls.rs"]
+mod dimension_controls;
+
 #[derive(Clone, Debug)]
 pub(super) struct Parameters {
     pub radix: usize,

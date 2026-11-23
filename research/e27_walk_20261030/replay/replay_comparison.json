@@ -1,0 +1,420 @@
+{
+ "schema": "e27-replay-comparison/v1",
+ "tool": "research/e27_walk_20261030/validate_e27.rs compare",
+ "rule": "every leaf of every committed record against the replay: integers and floats by their text (equal text, or equal value with the same integer/float form), strings and booleans exactly; wall_ms and solve_ms are wall-clock and listed, not compared",
+ "runs_total": 11,
+ "runs_identical": 11,
+ "fields_compared": 23144,
+ "fields_identical": 23144,
+ "all_identical": true,
+ "runs": [
+  {
+   "run": "stage_w",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/stage_w.json",
+    "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/stage_w.json",
+    "sha256": "e63191edd8561208b55b6be582c6e69244c1e21c6fc5bab274f2cf1847fda3d1"
+   },
+   "fields_compared": 11044,
+   "fields_identical": 11044,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [],
+   "identical": true
+  },
+  {
+   "run": "e2e_p101s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s1.json",
+    "sha256": "39d93707a3dc8430fce2df47886012ea6545b63b02d8cdf58990eb4e6d3adadb"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p101s1.json",
+    "sha256": "05d13f784f92487c13bbb1683b490af697c8f01ce9043e5b4af4ef5be2e6b794"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 136394.842815,
+     "replay": 149643.90390399954
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 51337.761762,
+     "replay": 58660.020572
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 77169.00054799994,
+     "replay": 74728.47942999985
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 29296.512055,
+     "replay": 29764.281094
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "e2e_p101s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p101s2.json",
+    "sha256": "bc4c3a81a1a7de63ddf204a4b8b289ae6bcc200f33a7bcc6251e65430afd31f9"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p101s2.json",
+    "sha256": "6eb52b178570167d4932840e415929043ed3175b17832e5ec20b9d8c5f27368b"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 51998.45986600023,
+     "replay": 53099.79781300028
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 19659.319679,
+     "replay": 21085.686481
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 23965.768885999958,
+     "replay": 24711.512786999967
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 9098.002493999998,
+     "replay": 9898.106602
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "e2e_p149s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s1.json",
+    "sha256": "71618ef39d4b6ca0ec0a38b3667288393d087572cc6d97208e5d331baed0d5f7"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p149s1.json",
+    "sha256": "7dbb0ee9528b4bf006621ceb243a3572e6f8dc211d871872152ff64b609efbbb"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 1456299.635012978,
+     "replay": 1606953.0449599707
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 601773.46677,
+     "replay": 703509.149825
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 576507.9004280122,
+     "replay": 528717.0100890014
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 242627.85031100002,
+     "replay": 220700.77653
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "e2e_p149s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p149s2.json",
+    "sha256": "683e68771a3615fc2cacfa573736b156478899cbe8d99a81e4edaf611a3a8b24"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p149s2.json",
+    "sha256": "3ad704d88b34a04d06ecb62eabe313a15aaf3c4eabc966ae2f90712fddc1aec4"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 218213.73770099925,
+     "replay": 191130.45656500052
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 85361.26107200001,
+     "replay": 69540.745555
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 125267.07518700043,
+     "replay": 105030.29950399991
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 49244.869125,
+     "replay": 37711.890981000004
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "e2e_p197s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s1.json",
+    "sha256": "db97629bc6887c37fd5b3b06bd62b37e14936c660022af252e653a0a796c0d10"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p197s1.json",
+    "sha256": "f2a13b36e9584161fbf9f479b208cc0e6a48845e50a0d61653164d89b1f2bd2e"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 230058.03714700087,
+     "replay": 157865.8113640018
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 97716.237757,
+     "replay": 55987.314769000004
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 197440.30496199973,
+     "replay": 115912.07646400064
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 88606.692173,
+     "replay": 41213.994747000004
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "e2e_p197s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p197s2.json",
+    "sha256": "d86f811e85852e311ee8583823ef5a3619635c0511148038c6cf99f83ed1f38a"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p197s2.json",
+    "sha256": "0e10119643b5a4bc7ebaa54dd0bfffd0d093599fbdbfffd67a086845ba73b48e"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 127827.01458599945,
+     "replay": 84139.78485099992
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 55369.832723,
+     "replay": 30490.308249
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 79254.04378100045,
+     "replay": 45531.7209489998
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 35604.72475,
+     "replay": 15666.713359
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "e2e_p269s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s1.json",
+    "sha256": "ed045d101098b39e58686b48cc663aaedb8b40920f13f8824be7badebe5c817a"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p269s1.json",
+    "sha256": "4045779adf2bef1c1f1c7f4938eabb1e2023def18db2b6c8f9fd489419aa7d6d"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 435933.80424700386,
+     "replay": 237427.4607189993
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 191574.340512,
+     "replay": 81492.98412000001
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 208360.57640999972,
+     "replay": 144340.74513099983
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 83840.579716,
+     "replay": 51524.534156
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "e2e_p269s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p269s2.json",
+    "sha256": "a67423a8acf8fab3fd32276b31374ab60deef3864d2c4129a0b63db14f232e1a"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p269s2.json",
+    "sha256": "0ee91b3a4aa60f498bf218c891f87905ca1442cc53dbbd283e7ab281445e96bb"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 101386.85601900023,
+     "replay": 97374.7695509998
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 37409.229883,
+     "replay": 34817.492168000004
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 48301.24646099979,
+     "replay": 44044.15706000034
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 17503.611195,
+     "replay": 15507.313373
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "e2e_p397s1",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s1.json",
+    "sha256": "cb469c62cbf518eb8610f42e50dff859b28c480c4d9776fe9921bf1e3465eabd"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p397s1.json",
+    "sha256": "7283a655390796dd076d51edcf44a454b9dc5d4041aa1beaf2a922f6cf7edd47"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 194162.2152829994,
+     "replay": 170680.0755099997
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 65586.348771,
+     "replay": 55668.608996
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 108567.69537399936,
+     "replay": 96974.48539400053
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 36818.841596,
+     "replay": 31207.5677
+    }
+   ],
+   "identical": true
+  },
+  {
+   "run": "e2e_p397s2",
+   "committed": {
+    "path": "experiments/32_walk_karatsuba/e2e_chain_karatsuba_p397s2.json",
+    "sha256": "7fbc78e9ffc61aeca3353f14d70badf51624b15e2344cd380b066951f847fd0c"
+   },
+   "replay": {
+    "path": "research/e27_walk_20261030/replay/e2e/e2e_chain_karatsuba_p397s2.json",
+    "sha256": "725d47aa90ca47897e24b971616bbb8a7d476b7d2dd020294e7c74d5c2159722"
+   },
+   "fields_compared": 1210,
+   "fields_identical": 1210,
+   "mismatches": [],
+   "only_in_committed": [],
+   "only_in_replay": [],
+   "timing_not_compared": [
+    {
+     "path": "$[0].solve_ms",
+     "committed": 319760.3586240017,
+     "replay": 306892.3686999982
+    },
+    {
+     "path": "$[0].wall_ms",
+     "committed": 104249.700203,
+     "replay": 98256.025035
+    },
+    {
+     "path": "$[1].solve_ms",
+     "committed": 136824.7227269997,
+     "replay": 133741.26952399986
+    },
+    {
+     "path": "$[1].wall_ms",
+     "committed": 44952.023297,
+     "replay": 43712.512313
+    }
+   ],
+   "identical": true
+  }
+ ]
+}

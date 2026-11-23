@@ -1,0 +1,120 @@
+   Compiling isogeny_algos v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/isogeny_algos)
+   Compiling hashed-ecdl-tensor v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/crates/hashed-ecdl-tensor)
+   Compiling volcano-cli v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/tools/volcano-cli)
+   Compiling factor-base v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/tools/factor-base)
+   Compiling ecdl-tensor-ic v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/crates/ecdl-tensor-ic)
+   Compiling pencil-symbolic-graph v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105/research/pencil_large_prime_20261029)
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105)
+error: couldn't read `/home/ec2-user/crypto-curve25519-workload-20261105/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/binary_field_basis.rs:281:62
+    |
+281 |           let frozen: serde_json::Value = serde_json::from_str(include_str!(concat!(
+    |  ______________________________________________________________^
+282 | |             env!("CARGO_MANIFEST_DIR"),
+283 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json"
+284 | |         )))
+    | |__________^
+
+error: couldn't read `/home/ec2-user/crypto-curve25519-workload-20261105/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)
+   --> src/cryptanalysis/binary_field_basis.rs:349:22
+    |
+349 |           let points = include_str!(concat!(
+    |  ______________________^
+350 | |             env!("CARGO_MANIFEST_DIR"),
+351 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl"
+352 | |         ));
+    | |__________^
+
+error: couldn't read `/home/ec2-user/crypto-curve25519-workload-20261105/research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1635:21
+     |
+1635 |           let bytes = include_bytes!(concat!(
+     |  _____________________^
+1636 | |             env!("CARGO_MANIFEST_DIR"),
+1637 | |             "/research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz"
+1638 | |         ));
+     | |__________^
+
+error: couldn't read `/home/ec2-user/crypto-curve25519-workload-20261105/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1734:62
+     |
+1734 |           let frozen: serde_json::Value = serde_json::from_str(include_str!(concat!(
+     |  ______________________________________________________________^
+1735 | |             env!("CARGO_MANIFEST_DIR"),
+1736 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json"
+1737 | |         )))
+     | |__________^
+
+error: couldn't read `/home/ec2-user/crypto-curve25519-workload-20261105/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1815:22
+     |
+1815 |           let points = include_str!(concat!(
+     |  ______________________^
+1816 | |             env!("CARGO_MANIFEST_DIR"),
+1817 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl"
+1818 | |         ));
+     | |__________^
+
+error: couldn't read `/home/ec2-user/crypto-curve25519-workload-20261105/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1911:71
+     |
+1911 |           let frozen_manifest: serde_json::Value = serde_json::from_str(include_str!(concat!(
+     |  _______________________________________________________________________^
+1912 | |             env!("CARGO_MANIFEST_DIR"),
+1913 | |             "/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json"
+1914 | |         )))
+     | |__________^
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/frontier.rs:1526:13
+     |
+1526 |             r,
+     |             ^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `exact_scalar::ExactScalar`
+     |
+1526 |             r: r.into(),
+     |             ++  +++++++
+
+error[E0277]: the trait bound `exact_scalar::ExactScalar: LowerHex` is not satisfied
+    --> src/cryptanalysis/ecbench/gpu.rs:1161:13
+     |
+1158 | ...   "#!/bin/sh\nif [ \"$1\" = selftest ]; then echo 'selftest OK'; exit 0; fi\nsleep 1\necho 'ECBENCH_CURVE p={} a={} b={} r={} gx={} gy={} cofactor={}'\necho 'ECBENCH_RESULT k=0x{:064x} ba...
+     |                                                                                                                                                                                      ------- required by this formatting parameter
+...
+1161 | ...   workload.planted.unwrap()
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+     |
+help: the trait `LowerHex` is not implemented for `exact_scalar::ExactScalar`
+    --> src/cryptanalysis/ecbench/exact_scalar.rs:9:1
+     |
+   9 | pub struct ExactScalar([u64; 4]);
+     | ^^^^^^^^^^^^^^^^^^^^^^
+     = help: the following other types implement trait `LowerHex`:
+               &T
+               &mut T
+               GenericArray<u8, T>
+               OpenFlags
+               PrepFlags
+               Wrapping<T>
+               bytes::bytes::Bytes
+               bytes::bytes_mut::BytesMut
+             and 77 others
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/hyper_ic.rs:1181:15
+     |
+1181 |         (rep, w.planted.unwrap())
+     |               ^^^^^^^^^^^^^^^^^^ expected `u128`, found `ExactScalar`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/workload.rs:2614:31
+     |
+2614 |             assert!(facts.r > 2);
+     |                     -------   ^ expected `ExactScalar`, found integer
+     |                     |
+     |                     expected because this is `exact_scalar::ExactScalar`
+
+Some errors have detailed explanations: E0277, E0308.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `crypto` (lib test) due to 10 previous errors

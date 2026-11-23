@@ -1,0 +1,79 @@
+status disagreements vs wd_b: []
+
+=== UNSAT cells, metric=conflicts: mean per instance (n finished / n total; TO=timeouts) ===
+wd_b     l=3:       85.6 (8/8) | l=4:      690.2 (8/8) | l=5:     5522.0 (4/4) | l=6:    43883.6 (5/5) | l=7:   351264.3 (3/3)
+   slope log2(mean conflicts) vs l [l5-7] = 2.996  95% CI [2.992, 2.998]
+   slope log2(mean conflicts) vs l [all] = 2.999  95% CI [2.993, 3.006]
+wd_bx    l=3:       43.8 (8/8) | l=4:      363.1 (8/8) | l=5:     3405.8 (4/4) | l=6:    31833.8 (5/5) | l=7:   284485.3 (3/3)
+   slope log2(mean conflicts) vs l [l5-7] = 3.192  95% CI [3.186, 3.198]
+   slope log2(mean conflicts) vs l [all] = 3.179  95% CI [3.173, 3.185]
+cms_std  l=3:      594.0 (8/8) | l=4:     3271.9 (8/8) | l=5:    14658.8 (4/4) | l=6:   104502.8 (5/5) | l=7:  1168246.3 (3/3)
+   slope log2(mean conflicts) vs l [l5-7] = 3.158  95% CI [2.948, 3.444]
+   slope log2(mean conflicts) vs l [all] = 2.688  95% CI [2.550, 2.904]
+cms_gad  l=3:     6715.8 (8/8) | l=4:    13929.4 (8/8) | l=5:    39294.0 (4/4) | l=6:   183582.0 (5/5) | l=7: --
+   slope log2(mean conflicts) vs l [all] = 1.581  95% CI [1.379, 1.796]
+cms_std_gj l=3: -- | l=4: -- | l=5:    14658.8 (4/4) | l=6:    90539.5 (2/2) | l=7:   868085.0 (2/2)
+   slope log2(mean conflicts) vs l [l5-7] = 2.944  95% CI [2.741, 3.231]
+   slope log2(mean conflicts) vs l [all] = 2.944  95% CI [2.741, 3.231]
+cms_gad_gj l=3: -- | l=4: -- | l=5:    55206.0 (4/4) | l=6:   157790.0 (2/2) | l=7: --
+
+=== SAT cells, metric=conflicts: mean per instance (n finished / n total; TO=timeouts) ===
+wd_b     l=3:       21.0 (8/8) | l=4:      163.9 (8/8) | l=5:     1833.5 (12/12) | l=6:    15840.2 (11/11) | l=7:   194862.0 (1/1)
+   slope log2(mean conflicts) vs l [l5-7] = 3.366  95% CI [3.135, 3.733]
+   slope log2(mean conflicts) vs l [all] = 3.295  95% CI [3.089, 3.586]
+wd_bx    l=3:       13.0 (8/8) | l=4:       73.5 (8/8) | l=5:      947.7 (12/12) | l=6:    10445.4 (11/11) | l=7:   144944.0 (1/1)
+   slope log2(mean conflicts) vs l [l5-7] = 3.628  95% CI [3.367, 4.057]
+   slope log2(mean conflicts) vs l [all] = 3.404  95% CI [3.237, 3.578]
+cms_std  l=3:      191.0 (8/8) | l=4:     2131.5 (8/8) | l=5:     8411.8 (12/12) | l=6:    42633.9 (11/11) | l=7: --
+   slope log2(mean conflicts) vs l [all] = 2.539  95% CI [2.074, 4.890]
+cms_gad  l=3:     1509.5 (8/8) | l=4:    15748.6 (8/8) | l=5:    25983.2 (12/12) | l=6:    66015.5 (11/11) | l=7: --
+   slope log2(mean conflicts) vs l [all] = 1.707  95% CI [1.247, 4.981]
+cms_std_gj l=3: -- | l=4: -- | l=5:     3873.8 (4/4) | l=6:    51452.0 (6/6) | l=7: --
+cms_gad_gj l=3: -- | l=4: -- | l=5:    20348.8 (4/4) | l=6:    48540.5 (6/6) | l=7: --
+
+=== UNSAT cells, metric=cpu_s: mean per instance (n finished / n total; TO=timeouts) ===
+wd_b     l=3:        0.0 (8/8) | l=4:        0.0 (8/8) | l=5:        0.0 (4/4) | l=6:        0.4 (5/5) | l=7:        4.9 (3/3)
+   slope log2(mean cpu_s) vs l [l5-7] = 3.602  95% CI [3.551, 3.662]
+   slope log2(mean cpu_s) vs l [all] = 2.636  95% CI [2.586, 2.694]
+wd_bx    l=3:        0.0 (8/8) | l=4:        0.0 (8/8) | l=5:        0.2 (4/4) | l=6:        3.1 (5/5) | l=7:       44.7 (3/3)
+   slope log2(mean cpu_s) vs l [l5-7] = 3.875  95% CI [3.857, 3.896]
+   slope log2(mean cpu_s) vs l [all] = 3.382  95% CI [3.334, 3.435]
+cms_std  l=3:        0.0 (8/8) | l=4:        0.1 (8/8) | l=5:        0.5 (4/4) | l=6:        8.9 (5/5) | l=7:      139.5 (3/3)
+   slope log2(mean cpu_s) vs l [l5-7] = 4.023  95% CI [3.779, 4.367]
+   slope log2(mean cpu_s) vs l [all] = 3.459  95% CI [3.370, 3.582]
+cms_gad  l=3:        0.3 (8/8) | l=4:        1.2 (8/8) | l=5:        5.1 (4/4) | l=6:       38.7 (5/5) | l=7: --
+   slope log2(mean cpu_s) vs l [all] = 2.327  95% CI [2.186, 2.509]
+cms_std_gj l=3: -- | l=4: -- | l=5:        0.5 (4/4) | l=6:        7.8 (2/2) | l=7:       93.6 (2/2)
+   slope log2(mean cpu_s) vs l [l5-7] = 3.775  95% CI [3.516, 4.146]
+   slope log2(mean cpu_s) vs l [all] = 3.775  95% CI [3.516, 4.146]
+cms_gad_gj l=3: -- | l=4: -- | l=5:       10.5 (4/4) | l=6:       52.2 (2/2) | l=7: --
+
+=== SAT cells, metric=cpu_s: mean per instance (n finished / n total; TO=timeouts) ===
+wd_b     l=3:        0.0 (8/8) | l=4:        0.0 (8/8) | l=5:        0.0 (12/12) | l=6:        0.1 (11/11) | l=7:        2.6 (1/1)
+   slope log2(mean cpu_s) vs l [l5-7] = 3.854  95% CI [3.667, 4.102]
+   slope log2(mean cpu_s) vs l [all] = 2.345  95% CI [2.203, 2.438]
+wd_bx    l=3:        0.0 (8/8) | l=4:        0.0 (8/8) | l=5:        0.0 (12/12) | l=6:        1.0 (11/11) | l=7:       20.7 (1/1)
+   slope log2(mean cpu_s) vs l [l5-7] = 4.356  95% CI [4.090, 4.762]
+   slope log2(mean cpu_s) vs l [all] = 3.203  95% CI [3.042, 3.306]
+cms_std  l=3:        0.0 (8/8) | l=4:        0.0 (8/8) | l=5:        0.2 (12/12) | l=6:        2.9 (11/11) | l=7: --
+   slope log2(mean cpu_s) vs l [all] = 2.831  95% CI [2.404, 3.117]
+cms_gad  l=3:        0.1 (8/8) | l=4:        1.4 (8/8) | l=5:        2.5 (12/12) | l=6:       14.9 (11/11) | l=7: --
+   slope log2(mean cpu_s) vs l [all] = 2.369  95% CI [1.922, 3.409]
+cms_std_gj l=3: -- | l=4: -- | l=5:        0.1 (4/4) | l=6:        3.8 (6/6) | l=7: --
+cms_gad_gj l=3: -- | l=4: -- | l=5:        3.5 (4/4) | l=6:       14.7 (6/6) | l=7: --
+
+=== paired ratio cms_gad/cms_std (sum over matched finished instances) ===
+UNSAT l=3 n=8  conflicts ratio   11.31  cpu ratio    27.14
+UNSAT l=4 n=8  conflicts ratio    4.26  cpu ratio    20.71
+UNSAT l=5 n=4  conflicts ratio    2.68  cpu ratio     9.74
+UNSAT l=6 n=5  conflicts ratio    1.76  cpu ratio     4.35
+SAT   l=3 n=8  conflicts ratio    7.90  cpu ratio     8.88
+SAT   l=4 n=8  conflicts ratio    7.39  cpu ratio    48.13
+SAT   l=5 n=12  conflicts ratio    3.09  cpu ratio    10.15
+SAT   l=6 n=11  conflicts ratio    1.55  cpu ratio     5.12
+
+=== paired ratio cms_gad_gj/cms_std_gj (sum over matched finished instances) ===
+UNSAT l=5 n=4  conflicts ratio    3.77  cpu ratio    21.11
+UNSAT l=6 n=2  conflicts ratio    1.74  cpu ratio     6.70
+SAT   l=5 n=4  conflicts ratio    5.25  cpu ratio    32.30
+SAT   l=6 n=6  conflicts ratio    0.94  cpu ratio     3.90

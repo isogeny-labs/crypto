@@ -1,0 +1,25 @@
+Usage: gaudry_cubic_graph_compare [OPTIONS] --source-revision <SOURCE_REVISION> --out <OUT>
+
+Options:
+      --primes <PRIMES>
+          [default: 7,13,19,31]
+      --seeds <SEEDS>
+          [default: 3,7,11,23]
+      --rounds <ROUNDS>
+          [default: 5]
+      --warmup-rounds <WARMUP_ROUNDS>
+          [default: 1]
+      --oracles <ORACLES>
+          [default: mitm,groebner,pair,symmetric-pair,symmetric-mitm] [possible values: mitm, groebner, f4, f4-krylov, f4-krylov-delayed, f4-trace-delayed, f4-trace-pair-graph, pair, symmetric-pair, prepared-pair, pseudo-pair, delayed-pseudo-pair, symmetric-mitm]
+      --sampler <SAMPLER>
+          [default: fresh] [possible values: fresh, r-adding, r-adding-long]
+      --max-residuals <MAX_RESIDUALS>
+          [default: 10000]
+      --execution-starts
+          Flush a start event before every arm, outside its measured interval
+      --source-revision <SOURCE_REVISION>
+          Frozen source commit, externally checked against binary/build receipt
+      --out <OUT>
+          
+  -h, --help
+          Print help

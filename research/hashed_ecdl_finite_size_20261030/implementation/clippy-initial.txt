@@ -1,0 +1,29 @@
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/crypto-finite-size/crates/hashed-ecdl-tensor)
+error: useless use of `vec!`
+   --> tests/width_extensions.rs:124:39
+    |
+124 |     let word = width::witness(&graph, &vec![None; 70], &plan, &mut meter)
+    |                                       ^^^^^^^^^^^^^^^ help: you can use a slice directly: `&[None; 70]`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#useless_vec
+    = note: `-D clippy::useless-vec` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::useless_vec)]`
+
+error: useless use of `vec!`
+   --> tests/width_extensions.rs:129:30
+    |
+129 |         width::count(&graph, &vec![None; 70], &plan, &mut meter),
+    |                              ^^^^^^^^^^^^^^^ help: you can use a slice directly: `&[None; 70]`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#useless_vec
+
+error: useless use of `vec!`
+   --> tests/width_extensions.rs:134:32
+    |
+134 |         width::witness(&graph, &vec![None; 70], &plan, &mut meter),
+    |                                ^^^^^^^^^^^^^^^ help: you can use a slice directly: `&[None; 70]`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#useless_vec
+
+error: could not compile `hashed-ecdl-tensor` (test "width_extensions") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

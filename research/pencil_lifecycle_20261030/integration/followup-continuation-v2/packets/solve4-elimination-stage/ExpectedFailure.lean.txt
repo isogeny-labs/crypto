@@ -1,0 +1,3 @@
+import StageControls
+open Solve4Stage Solve4Controls
+theorem false_rhs_omission : residual (decode 7 (fun j => (#[0,0,1,0,0] : Array UInt64)[j.val]!)) solution=0 := by decide

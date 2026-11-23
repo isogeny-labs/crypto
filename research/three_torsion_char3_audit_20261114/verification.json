@@ -1,0 +1,70 @@
+{
+  "schema": "original-bk-three-char3-verification/v1",
+  "source_commit": "2b509f99b0ce56ccafd638a9c1751e930606c8e5",
+  "claim_id": "PCC-20261114-72d986",
+  "declaration_sha256": "74e11c778d8f1080d20c9897db3a9cd4cf4da901b758c86599e6c2ce56e9a56d",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 60,
+  "gate_declarations": 22,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 55,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-72d986",
+    "claim_sha256": "b5d95e500c90fd10da9638ef092945d6c22f82e768d9e35edd9345a2a4d53ba0",
+    "commit": "2b509f99b0ce56ccafd638a9c1751e930606c8e5",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/three_torsion_char3_audit_20261114/lean (SourceThreeCriterion.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T05:02:48Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-72d986",
+    "claim_sha256": "b5d95e500c90fd10da9638ef092945d6c22f82e768d9e35edd9345a2a4d53ba0",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47261,
+    "sha256": "3f883ce73033fd54c4e9b0d40da0c12121d0a94d384b86dc04d730b450c3400a",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 22,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "original_prime3_without_coprime_proved": true,
+    "general_char3_card_and_module_rank_proved": true,
+    "qualified_source_refuted": false,
+    "full_paper_read": false,
+    "full_book_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

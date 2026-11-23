@@ -1,0 +1,17 @@
+/var/tmp/pencil-czero-output-20261101-v1/Probe.lean:3:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.Monic.sub_of_left`
+/var/tmp/pencil-czero-output-20261101-v1/Probe.lean:4:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.Monic.sub_of_natDegree_lt`
+/var/tmp/pencil-czero-output-20261101-v1/Probe.lean:5:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.Monic.of_mul_monic_left`
+/var/tmp/pencil-czero-output-20261101-v1/Probe.lean:6:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.Monic.of_mul_monic_right`
+/var/tmp/pencil-czero-output-20261101-v1/Probe.lean:7:7: error(lean.unknownIdentifier): Unknown identifier `eq_X_add_C_of_natDegree_eq_one`
+/var/tmp/pencil-czero-output-20261101-v1/Probe.lean:8:7: error(lean.unknownIdentifier): Unknown identifier `eq_X_add_C_of_monic_of_natDegree_eq_one`
+/var/tmp/pencil-czero-output-20261101-v1/Probe.lean:9:7: error(lean.unknownIdentifier): Unknown identifier `eq_sum_range_C_mul_X_pow`
+Polynomial.as_sum_range_C_mul_X_pow.{u} {R : Type u} [Semiring R] (p : R[X]) :
+  p = ∑ i ∈ Finset.range (p.natDegree + 1), C (p.coeff i) * X ^ i
+/var/tmp/pencil-czero-output-20261101-v1/Probe.lean:11:7: error(lean.unknownIdentifier): Unknown identifier `eq_C_add_X_mul`
+Polynomial.natDegree_add_le.{u} {R : Type u} [Semiring R] (p q : R[X]) : (p + q).natDegree ≤ max p.natDegree q.natDegree
+Polynomial.natDegree_mul_le.{u} {R : Type u} [Semiring R] {p q : R[X]} : (p * q).natDegree ≤ p.natDegree + q.natDegree
+Polynomial.natDegree_le_iff_coeff_eq_zero.{u} {R : Type u} {n : ℕ} [Semiring R] {p : R[X]} :
+  p.natDegree ≤ n ↔ ∀ (N : ℕ), n < N → p.coeff N = 0
+Polynomial.coeff_mul.{u} {R : Type u} [Semiring R] (p q : R[X]) (n : ℕ) :
+  (p * q).coeff n = ∑ x ∈ Finset.antidiagonal n, p.coeff x.1 * q.coeff x.2
+/var/tmp/pencil-czero-output-20261101-v1/Probe.lean:16:7: error(lean.unknownIdentifier): Unknown constant `Polynomial.Monic.natDegree_mul`

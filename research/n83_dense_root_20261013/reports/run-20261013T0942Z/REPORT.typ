@@ -2,6 +2,9 @@
 #set text(font: "Helvetica Neue", size: 8pt)
 #set heading(numbering: none)
 
+#block(fill: luma(235), inset: 6pt, width: 100%)[#text(size: 8pt)[Correction 2026-10-20 (validation sweep B, verdict 110.1: contradicted). The N83 18.528 rho/IC ratio below compares against rho with an empty table on one L0 target. It is superseded and is not an improvement; precomputed rho wins every N83 matched pair (benchmarks/20261016-n83-precomputed-rho-control). The within-IC K1798 vs K1500 result stands.]]
+
+
 = N83 dense packed-root primary run
 2026-10-13 09:42 UTC · exact public point · Apple M4 Pro shared host
 

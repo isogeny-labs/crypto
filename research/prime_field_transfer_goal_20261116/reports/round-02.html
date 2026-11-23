@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Prime-field transfer: input-only local torsion lift</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="round-02.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Prime-field transfer: input-only local torsion
+lift</h1>
+<p class="date">16 November 2026 — round two</p>
+</header>
+<p>The native evaluator now lifts public source points to their unique
+local r-torsion branch on the compact model, without the input scalar or
+subgroup lookup. The full planned correctness suite completes. This is
+the classical source-local lifting step; the same-point image at the
+second prime remains the transfer obligation. <strong>Scientific
+standing: unsigned</strong> PCC-20261116-391259. [pcc:unverified]</p>
+<figure>
+<img src="round-02-route.svg"
+alt="Implemented step and the remaining interface" />
+<figcaption aria-hidden="true">Implemented step and the remaining
+interface</figcaption>
+</figure>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 28%" />
+<col style="width: 21%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Source / subgroup</th>
+<th style="text-align: right;">Public inputs per precision</th>
+<th>Digits N</th>
+<th style="text-align: right;">Memoized nodes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>F17, y²=x³+2x+2, r=19</td>
+<td style="text-align: right;">all 18 nonidentity points</td>
+<td>1,2,4,8,16,32,64</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr class="even">
+<td>F257, y²=x³+23x+11, r=83</td>
+<td style="text-align: right;">all 82 nonidentity points</td>
+<td>1,2,4,8,16,32,64</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr class="odd">
+<td>secp256k1</td>
+<td style="text-align: right;">4 hash-derived public points</td>
+<td>1,2,4,8,16,32,64</td>
+<td style="text-align: right;">2019</td>
+</tr>
+</tbody>
+</table>
+<p>The evaluator receives the fixed model, Q coordinates and N. GMP
+modular exponentiation projects its symbolic coefficients, and a
+memoized classical division recurrence propagates values and derivatives
+for Newton lifting. The ordinate is selected by its source residue.
+Dense polynomials and the secp256k1 global coefficients are never
+expanded. These are coverage and node counts, not runtimes or
+attack-cost estimates. [pcc:unverified]</p>
+<figure>
+<img src="round-02-nodes.svg"
+alt="Actual recurrence-node counts; logarithmic vertical axis" />
+<figcaption aria-hidden="true">Actual recurrence-node counts;
+logarithmic vertical axis</figcaption>
+</figure>
+<div style="break-before:page">
+
+</div>
+<h2 id="checks-and-mathematical-scope">Checks and mathematical
+scope</h2>
+<p>A separately implemented Jacobian group law checks r times each lift
+is O, and checks four small multiplication formulas. All small-fixture
+scalar relations pass. At 64 digits the four secp256k1 points pass
+negation and addition of the fixed source generator. OpenSSL separately
+checks source membership, order and addition. Scalar enumeration is
+restricted to the small fixture auditor; the four secp256k1 inputs have
+no supplied generating scalar. This is producer development evidence,
+not independently signed execution. [pcc:unverified]</p>
+<p>The written scalar-preservation argument is classical uniqueness of
+prime-to-p torsion lifts: the good-reduction kernel has no r-torsion for
+r≠p. Thus lifts of Q=[k]P satisfy the same relation in E(Qp).
+Implementing that local lift does not specify the algebraic embedding at
+the second prime.</p>
+<p>Lean applies existing Mathlib laws to the exact integral models and
+checks division-polynomial degrees 180 and 3444. It also checks there is
+no unital ring hom ZMod(17^64)→ZMod2 or ZMod(257^64)→ZMod2. The
+unchanged proof gate passes 20 theorems, zero trusted native exceptions.
+Four explicit axiom audits use standard foundations only. These
+endpoints formalize the degree and residue-ring statements; the native
+Newton implementation and the cross-prime bridge are not formally
+proved. Claims 75ba98,25851b,ec6bcb, fe3335 carry the PCC-20261116
+prefix and remain unsigned. [pcc:unverified]</p>
+<h2 id="failures-and-provenance-retained">Failures and provenance
+retained</h2>
+<p>Launch01 failed before arithmetic because the read-only binary lacked
+execute permission. Aggregate call02 and isolated secp256k1 call03 hit
+the frozen 60-second timeout; call03 completed through 32 digits. The
+unchanged suite completes when partitioned by public point, each still
+limited to 60 seconds. Distinct build/pre-call/post-call manifests and
+immutable qualifier hashes preserve those failures. No independent
+preregistration, cloud run, runtime comparison or leaderboard promotion
+is claimed. [pcc:unverified]</p>
+<p>The earlier small-degree restriction was already in CT95 and is
+reused. CT124’s two-prime chimera warning remains relevant: satisfying
+two local root equations does not certify one global torsion point. The
+next candidate must provide a common-field branch certificate and allow
+evaluation of the oriented component label at the fixed second place
+without discovering k first. No novel efficient transfer or demonstrated
+target advantage is established by this round. [pcc:unverified]</p>
+<h2 id="evidence-and-sources">Evidence and sources</h2>
+<ul>
+<li><a href="../round-02/RESULT.md">Full result and proof map</a>, <a
+href="../round-02/PROTOCOL.md">protocol and source links</a>, <a
+href="../round-02/local_torsion.cpp">native source</a>, <a
+href="../receipts/round-02/">raw receipts</a>.</li>
+<li>Read CT85,95,97,123,124; Silverman, <em>Four Faces of Lifting</em>,
+pp.11–14; Cremona, <em>Computing in Component Groups</em>, §2; Sage
+division-polynomial documentation; pinned Mathlib4 v4.24.0 degree and
+characteristic laws.</li>
+<li>KB and Conductor unavailable; Rust workspace tests not run. Local
+native development only. No novelty/absence claim from the unavailable
+KB.</li>
+<li>PR4378 merged externally at 02:30:36Z (66d1727b4). A read-only audit
+finds both journal histories preserved, but the external resolution does
+not preserve the prior published ledger prefix. That historical issue is
+recorded, not repaired. This new round publishes from fresh main with
+unchanged claim files and a fresh prefix check. The goal remains active.
+[pcc:unverified]</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "schema": "software.independent-source-review/v1",
+  "task": "T-1463",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "independent": true,
+  "decision": "accept_scoped_temporary_capture_correction",
+  "source_sha256": "1079c1a5827588d4a3f64b6e54c9fda8c4439ca848d842331c27a3af801c522c",
+  "producer_test_sha256": "be4ab57ca346be41c979162dc37b10309829a4c43c201356b0241c2b48a501fe",
+  "own_test_sha256": "18770ac1252f3747bc676d03b1b8e8f2e813ef610990faecdae8b8651a471e9e",
+  "replay_sha256": "d93718f3fe949f9f1d3958821a420493c05d0d4ecd5906cdbf31c7b2e69bec3d",
+  "controls_passed": 24,
+  "execution_allowance_approved": false,
+  "findings": [
+    "Only production delta adds inspection_capture(directory) with explicit TemporaryFile dir=directory and changes inspection call site to command directory d.",
+    "Anonymous capture stays under private bounded disk and is closed by existing finally path. Missing or readonly explicit location fails without ambient fallback.",
+    "22 producer controls and2 independent controls passed under120seconds/2GiB; source pins unchanged.",
+    "Default-directory failure is directly reproduced by regression control; real file lifecycle and noO_TMPFILE fallback checked. EROFS is mocked and command ordering is static."
+  ],
+  "successor_requirements": [
+    "New owner-scoped qualifier source and receipt directories, preserving previous failed attempt directories; existing fixed directories collide on retained disk.",
+    "New current disk custody derivation from failed qualification worker, endpoint, stopped/cgroup/loop observations and failure postreview; old assembly disk hash is historical.",
+    "New exact source/input pins, budgeted admission and publication; no runtime retry authorized here."
+  ],
+  "predecessor_scope": "A new assembled-stopped custody derivative can preserve original assembly lineage while carrying current post-failure disk hash. Endpoint issuance follows retained daemon-ID/image-inspect checks. This supports image identity lineage, not new Qcase success. Failed qualification must remain explicit.",
+  "limitations": [
+    "No live service/mount integration replay or gate execution.",
+    "Source author separate; reviewer previously supplied diagnosis, so review is not blind."
+  ],
+  "prior_work": [
+    "runtime-private-qualification-attempt-v3/qualifier-receipt.stdout",
+    "runtime-private-qualifier-v2/supervise.py",
+    "runtime-private-supervisor-v3/supervise.py",
+    "Python installed tempfile explicit dir behavior exercised in native temporary-file controls"
+  ]
+}

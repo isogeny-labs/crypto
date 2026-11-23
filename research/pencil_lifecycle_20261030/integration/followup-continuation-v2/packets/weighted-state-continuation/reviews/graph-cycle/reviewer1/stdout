@@ -1,0 +1,84 @@
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:6:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field ℤ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:6:44: error: Expected type must not contain metavariables
+  1 + -1 = 0
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:6:56: error: Expected type must not contain metavariables
+  2 ≠ 0
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:6:68: error: Expected type must not contain metavariables
+  1 * 6 + -1 * 6 = 1 + 2 * 3
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:8:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field ℤ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:8:36: error: Expected type must not contain metavariables
+  2 ≠ 0
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:8:48: error: Expected type must not contain metavariables
+  -1 ≠ 0
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:8:60: error: Expected type must not contain metavariables
+  -1 * 4 + -1 * 4 = 0 + 2 * 3
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:9:66: error: Tactic `decide` failed for proposition
+  4 ≠ 0 * 2⁻¹ + 2 * 2⁻¹ * 3
+because its `Decidable` instance
+  instDecidableNot
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableNot`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑4).beq ↑(0 * 2⁻¹ + 2 * 2⁻¹ * 3) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:11:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field ℕ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:11:42: error: Expected type must not contain metavariables
+  2 - 1 ≠ 0
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:11:54: error: Expected type must not contain metavariables
+  0 = 1 + 2 * 3
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:11:66: error: Expected type must not contain metavariables
+  0 = 4 + 1 * 3
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:13:1: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Field ℕ
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:13:38: error: Expected type must not contain metavariables
+  4 - 4 = 0
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:13:50: error: Expected type must not contain metavariables
+  1 = 3 + 4 * 3
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:13:62: error: Expected type must not contain metavariables
+  1 = 3 + 4 * 3
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:16:67: error: Tactic `decide` failed for proposition
+  1 * 1 + 1 * 1 = 0 + 0 * 1 ∧ 1 ≠ 0 * (2 * 1)⁻¹ + 0 * (2 * 1)⁻¹ * 1
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableNot`, `Int.decLe`, `Int.decNonneg`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at the `Decidable` instance
+  match h : (↑1).beq ↑(0 * (2 * 1)⁻¹ + 0 * (2 * 1)⁻¹ * 1) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-graph-cycle-review-20261101/ReviewerControls.lean:19:1: error: Type mismatch
+  native_denominator (-1) (Or.inr rfl)
+has type
+  (if
+        -@OfNat.ofNat ?m.41 1
+              (@One.toOfNat1 ?m.41
+                (@AddMonoidWithOne.toOne ?m.41
+                  (@AddGroupWithOne.toAddMonoidWithOne ?m.41
+                    (@Ring.toAddGroupWithOne ?m.41 Field.toDivisionRing.toRing)))) =
+          1 then
+      2
+    else -2) =
+    2 * -1
+but is expected to have type
+  (if
+        -@OfNat.ofNat (ZMod 7) 1
+              (@One.toOfNat1 (ZMod 7)
+                (@AddMonoidWithOne.toOne (ZMod 7)
+                  (@AddGroupWithOne.toAddMonoidWithOne (ZMod 7)
+                    (@Ring.toAddGroupWithOne (ZMod 7) (ZMod.commRing 7).toRing)))) =
+          1 then
+      2
+    else -2) =
+    2 * -1

@@ -1,0 +1,298 @@
+--- a/research/pencil_large_prime_20261029/src/relation_stream.rs
++++ b/research/pencil_large_prime_20261029/src/relation_stream.rs
+@@ -123,6 +123,10 @@
+ #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+ #[serde(tag = "kind", content = "data", deny_unknown_fields)]
+ pub enum Event {
++    /// Native callbacks retain their own convention; never pencil Admission rows.
++    ObservedHeader { identity: Identity, native: serde_json::Value },
++    Observed(serde_json::Value),
++    ObservedTerminal(serde_json::Value),
+     Header(Header),
+     Candidate(Candidate),
+     Relation(Relation),
+@@ -221,8 +225,8 @@
+         result
+     }
+     fn write_event(&mut self, event: Event) -> Result<(), Error> {
+-        let is_header = matches!(event, Event::Header(_));
+-        let is_terminal = matches!(event, Event::Terminal(_));
++        let is_header = matches!(event, Event::Header(_) | Event::ObservedHeader { .. });
++        let is_terminal = matches!(event, Event::Terminal(_) | Event::ObservedTerminal(_));
+         if self.terminal || self.started == is_header {
+             return Err(Error::State);
+         }
+@@ -440,3 +444,244 @@
+         assert_eq!(t.emit(header()), Err(Error::State));
+     }
+ }
++
++/// Diagnostic adapter for existing native callbacks. Reuses Trace limits,
++/// sequence, flushing and poisoned-prefix semantics; performs no field work.
++/// This validates event coverage, not geometry, scalar correctness or ranks.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum NativeProtocol { SignedCollector, KummerLabels }
++
++pub struct NativeEvents<'a, 'w> {
++    trace: &'a mut Trace<'w>,
++    expected_header: serde_json::Value,
++    protocol: NativeProtocol,
++    started: bool,
++    terminal: bool,
++    failed: bool,
++    attempts: u64,
++    pending: Option<u64>,
++    recovered: Option<u64>,
++    nodes: u64,
++    first: std::collections::BTreeMap<String, u64>,
++}
++impl<'a, 'w> NativeEvents<'a, 'w> {
++    pub fn new(trace: &'a mut Trace<'w>, protocol: NativeProtocol,
++        expected_header: serde_json::Value) -> Result<Self, Error> {
++        if trace.records_written() != 0 || !expected_header.is_object()
++            || expected_header["kind"] != "header" { return Err(Error::State); }
++        let schema = match protocol {
++            NativeProtocol::SignedCollector => "signed-collector-events/v1",
++            NativeProtocol::KummerLabels => "kummer-label-events/v1",
++        };
++        if expected_header["schema"] != schema { return Err(Error::State); }
++        Ok(Self { trace, expected_header, protocol, started:false, terminal:false,
++            failed:false, attempts:0, pending:None, recovered:None, nodes:1,
++            first:std::collections::BTreeMap::new() })
++    }
++    pub fn observe(&mut self, value: serde_json::Value) -> Result<(), Error> {
++        if let Some(error) = self.trace.failure() { return Err(error.clone()); }
++        if self.failed || self.terminal { return self.reject(); }
++        match self.accept(value) {
++            Ok(()) => Ok(()),
++            Err(error) => {
++                self.failed=true;
++                let first=self.trace.failure.get_or_insert(error).clone();
++                Err(first)
++            }
++        }
++    }
++    fn reject<T>(&mut self) -> Result<T, Error> {
++        self.failed=true;
++        let first=self.trace.failure.get_or_insert(Error::State).clone();
++        Err(first)
++    }
++    fn number(value:&serde_json::Value, field:&str) -> Result<u64, Error> {
++        value.get(field).and_then(|v|v.as_u64()).ok_or(Error::State)
++    }
++    fn scalar(value:&serde_json::Value, field:&str) -> Result<Option<u64>, Error> {
++        match value.get(field) {
++            Some(v) if v.is_null() => Ok(None),
++            Some(v) => v.as_u64().map(Some).ok_or(Error::State),
++            None => Err(Error::State),
++        }
++    }
++    fn accept(&mut self, value:serde_json::Value) -> Result<(), Error> {
++        let kind=value.get("kind").and_then(|x|x.as_str()).ok_or(Error::State)?;
++        if !self.started {
++            if value != self.expected_header { return Err(Error::State); }
++            self.trace.emit(Event::ObservedHeader { identity:self.trace.identity().clone(), native:value })?;
++            self.started=true; return Ok(());
++        }
++        if kind=="header" { return Err(Error::State); }
++        if kind=="terminal" {
++            if self.pending.is_some() || Self::number(&value,"attempts")? != self.attempts
++                || Self::scalar(&value,"recovered")? != self.recovered { return Err(Error::State); }
++            self.trace.emit(Event::ObservedTerminal(value))?;
++            self.terminal=true; return Ok(());
++        }
++        match (self.protocol,kind) {
++            (NativeProtocol::SignedCollector,"candidate") |
++            (NativeProtocol::KummerLabels,"label_candidate") => {
++                let attempt=Self::number(&value,"attempt")?;
++                if self.pending.is_some() || self.recovered.is_some()
++                    || self.attempts.checked_add(1)!=Some(attempt) { return Err(Error::State); }
++                self.attempts=attempt; self.pending=Some(attempt);
++            }
++            (NativeProtocol::SignedCollector,"node") => {
++                if self.pending!=Some(Self::number(&value,"attempt")?)
++                    || Self::number(&value,"node")? != self.nodes { return Err(Error::State); }
++                self.nodes=self.nodes.checked_add(1).ok_or(Error::State)?;
++            }
++            (NativeProtocol::SignedCollector,"edge") => {
++                let attempt=Self::number(&value,"attempt")?;
++                if self.pending!=Some(attempt) || Self::number(&value,"node_count")?!=self.nodes {
++                    return Err(Error::State);
++                }
++                let nodes=value["nodes"].as_array().ok_or(Error::State)?;
++                let signs=value["signs"].as_array().ok_or(Error::State)?;
++                if nodes.len()!=2 || signs.len()!=2 || nodes.iter().any(|n|n.as_u64().is_none_or(|n|n>=self.nodes))
++                    || signs.iter().any(|s|!matches!(s.as_i64(),Some(-1)|Some(1))) { return Err(Error::State); }
++                if value.get("canonical").is_none() { return Err(Error::State); }
++                let key=serde_json::to_string(&value["canonical"]).map_err(|_|Error::State)?;
++                if self.first.insert(key,attempt).is_some() { return Err(Error::State); }
++                self.recovered=Self::scalar(&value,"recovered")?; self.pending=None;
++            }
++            (NativeProtocol::SignedCollector,"duplicate") => {
++                if self.pending!=Some(Self::number(&value,"attempt")?) { return Err(Error::State); }
++                let key=serde_json::to_string(&value["canonical"]).map_err(|_|Error::State)?;
++                if self.first.get(&key).copied()!=Some(Self::number(&value,"first_attempt")?) {
++                    return Err(Error::State);
++                }
++                self.pending=None;
++            }
++            (NativeProtocol::SignedCollector,"identity") => {
++                if self.pending!=Some(Self::number(&value,"attempt")?) { return Err(Error::State); }
++                self.recovered=Self::scalar(&value,"recovered")?;self.pending=None;
++            }
++            (NativeProtocol::SignedCollector,"nonsplit") => {
++                if self.pending!=Some(Self::number(&value,"attempt")?) { return Err(Error::State); }
++                self.pending=None;
++            }
++            (NativeProtocol::SignedCollector,"choice") => {
++                let selected=Self::number(&value,"selected_attempt")?;
++                if self.pending.is_some() || self.recovered.is_some() || selected==0 || selected>self.attempts {
++                    return Err(Error::State);
++                }
++            }
++            (NativeProtocol::SignedCollector,"restart") => {
++                if self.pending.is_some() || self.recovered.is_some()
++                    || Self::number(&value,"after_attempt")?!=self.attempts { return Err(Error::State); }
++            }
++            (NativeProtocol::KummerLabels,"label_result") => {
++                if self.pending!=Some(Self::number(&value,"attempt")?) { return Err(Error::State); }
++                let result=&value["result"];
++                if !matches!(result["status"].as_str(),Some("first"|"redundant"|"invariant_error"|
++                    "candidate_verified"|"candidate_rejected"|"noncanonical_label")) { return Err(Error::State); }
++                self.recovered=Self::scalar(result,"answer")?;
++                self.pending=None;
++            }
++            _ => return Err(Error::State),
++        }
++        self.trace.emit(Event::Observed(value))
++    }
++}
++
++#[cfg(test)]
++mod native_adapter_controls {
++ use super::*;
++ use serde_json::json;
++ fn identity()->Identity { Identity { source_revision:"a".repeat(40),source_sha256:"b".repeat(64),workload_id:"target".into(),run_id:"attempt".into() } }
++ fn header()->serde_json::Value { json!({"kind":"header","schema":"signed-collector-events/v1","r":7,"target":"bound-target"}) }
++ fn candidate(a:u64)->serde_json::Value { json!({"kind":"candidate","attempt":a}) }
++ #[test]
++ fn identity_before_terminal_is_retained() {
++  let mut out=Vec::new();
++  { let mut t=Trace::new(&mut out,identity(),20,10000).unwrap();
++    { let mut a=NativeEvents::new(&mut t,NativeProtocol::SignedCollector,header()).unwrap();
++      a.observe(header()).unwrap();a.observe(candidate(1)).unwrap();
++      a.observe(json!({"kind":"identity","attempt":1,"recovered":3})).unwrap();
++      a.observe(json!({"kind":"terminal","attempts":1,"recovered":3})).unwrap(); }
++    assert!(t.complete());assert_eq!(t.records_written(),4); }
++  let rows:Vec<Record>=out.split(|b|*b==b'\n').filter(|b|!b.is_empty()).map(|b|serde_json::from_slice(b).unwrap()).collect();
++  assert!(matches!(&rows[2].event,Event::Observed(v) if v["kind"]=="identity"));
++ }
++ #[test]
++ fn duplicate_disposition_and_first_reference_are_retained() {
++  let mut out=Vec::new();let mut t=Trace::new(&mut out,identity(),20,10000).unwrap();
++  { let mut a=NativeEvents::new(&mut t,NativeProtocol::SignedCollector,header()).unwrap();
++    a.observe(header()).unwrap();a.observe(candidate(1)).unwrap();
++    a.observe(json!({"kind":"edge","attempt":1,"node_count":1,"nodes":[0,0],"signs":[1,-1],"canonical":[1,2],"recovered":null})).unwrap();
++    a.observe(candidate(2)).unwrap();
++    a.observe(json!({"kind":"duplicate","attempt":2,"canonical":[1,2],"first_attempt":1})).unwrap();
++    a.observe(json!({"kind":"terminal","attempts":2,"recovered":null})).unwrap(); }
++  assert!(t.complete());assert_eq!(t.records_written(),6);
++ }
++ #[test]
++ fn missing_disposition_poisoned() {
++  let mut out=Vec::new();let mut t=Trace::new(&mut out,identity(),20,10000).unwrap();
++  { let mut a=NativeEvents::new(&mut t,NativeProtocol::SignedCollector,header()).unwrap();
++    a.observe(header()).unwrap();a.observe(candidate(1)).unwrap();
++    assert_eq!(a.observe(json!({"kind":"terminal","attempts":1,"recovered":null})),Err(Error::State)); }
++  assert!(!t.complete());assert_eq!(t.failure(),Some(&Error::State));
++ }
++ #[test]
++ fn post_identity_candidate_rejected() {
++  let mut out=Vec::new();let mut t=Trace::new(&mut out,identity(),20,10000).unwrap();
++  let mut a=NativeEvents::new(&mut t,NativeProtocol::SignedCollector,header()).unwrap();
++  a.observe(header()).unwrap();a.observe(candidate(1)).unwrap();
++  a.observe(json!({"kind":"identity","attempt":1,"recovered":3})).unwrap();
++  assert_eq!(a.observe(candidate(2)),Err(Error::State));
++ }
++ #[test]
++ fn changed_target_header_rejected() {
++  let mut out=Vec::new();let mut t=Trace::new(&mut out,identity(),20,10000).unwrap();
++  let mut a=NativeEvents::new(&mut t,NativeProtocol::SignedCollector,header()).unwrap();
++  let mut wrong=header();wrong["target"]=json!("other");assert_eq!(a.observe(wrong),Err(Error::State));
++ }
++ #[test]
++ fn early_kummer_rejection_has_result_and_terminal() {
++  let h=json!({"kind":"header","schema":"kummer-label-events/v1","provenance":"fixed_control","r":7});
++  let mut out=Vec::new();let mut t=Trace::new(&mut out,identity(),20,10000).unwrap();
++  { let mut a=NativeEvents::new(&mut t,NativeProtocol::KummerLabels,h.clone()).unwrap();
++    a.observe(h).unwrap();a.observe(json!({"kind":"label_candidate","attempt":1,"a":7,"b":0})).unwrap();
++    a.observe(json!({"kind":"label_result","attempt":1,"result":{"status":"noncanonical_label","emit_graph_edge":false,"answer":null}})).unwrap();
++    a.observe(json!({"kind":"terminal","attempts":1,"recovered":null})).unwrap(); }
++  assert!(t.complete());assert_eq!(t.records_written(),4);
++ }
++ struct FailsSecondWrite { calls:usize }
++ impl std::io::Write for FailsSecondWrite {
++  fn write(&mut self, bytes:&[u8])->std::io::Result<usize> {
++   self.calls+=1;
++   if self.calls==2 { Err(std::io::Error::other("injected native callback output failure")) }
++   else { Ok(bytes.len()) }
++  }
++  fn flush(&mut self)->std::io::Result<()> { Ok(()) }
++ }
++ #[test]
++ fn callback_preserves_first_output_error_after_later_event() {
++  let mut sink=FailsSecondWrite {calls:0};
++  let mut t=Trace::new(&mut sink,identity(),20,10000).unwrap();
++  let first;
++  { let mut a=NativeEvents::new(&mut t,NativeProtocol::SignedCollector,header()).unwrap();
++    // Exercise the same fallible closure shape passed to the native producer.
++    a.observe(header()).unwrap();
++    let mut callback=|event| a.observe(event);
++    first=callback(candidate(1)).unwrap_err();
++    assert!(matches!(&first,Error::Output(message) if message.contains("injected native callback")));
++    assert_eq!(callback(json!({"kind":"identity","attempt":1,"recovered":3})),Err(first.clone()));
++  }
++  assert_eq!(t.failure(),Some(&first));assert!(!t.complete());assert_eq!(t.records_written(),1);
++ }
++ #[test]
++ fn callback_preserves_first_record_limit_after_later_event() {
++  let mut sink=Vec::new();let mut t=Trace::new(&mut sink,identity(),2,10000).unwrap();
++  { let mut a=NativeEvents::new(&mut t,NativeProtocol::SignedCollector,header()).unwrap();
++    a.observe(header()).unwrap();a.observe(candidate(1)).unwrap();
++    let error=a.observe(json!({"kind":"identity","attempt":1,"recovered":3})).unwrap_err();
++    assert_eq!(error,Error::RecordLimit);
++    assert_eq!(a.observe(json!({"kind":"terminal","attempts":1,"recovered":3})),Err(error));
++  }
++  assert_eq!(t.failure(),Some(&Error::RecordLimit));assert!(!t.complete());
++ }
++
++}
+--- a/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/target-stream/src/lib.rs
++++ b/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/target-stream/src/lib.rs
+@@ -262,6 +262,8 @@
+             return Err("nonterminal event after cap or scalar candidate".into());
+         }
+         match &record.event {
++            Event::ObservedHeader { .. } | Event::Observed(_) | Event::ObservedTerminal(_) =>
++                return Err("native observed envelope requires native event validation, not pencil rank replay".into()),
+             Event::Header(_) => return Err("repeated header".into()),
+             Event::Candidate(c) => {
+                 if pending.is_some() {
+--- a/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/duplicate.rs
++++ b/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/kummer-duplicate-adapter/src/duplicate.rs
+@@ -20,3 +20,15 @@
+  }else{self.first.insert(key,(aa,bb));("first",true,None)};
+  json!({"status":status,"emit_graph_edge":emit,"answer":answer,"candidate_verified":verified,"canonical_divisor":key,"sign_flipped":flipped,"normalized_labels":[aa,bb],"delta":delta,"stored_pairs":self.first.len(),"scalar_before":before,"scalar_after":self.ring.counts.get(),"field":self.j.f.counts()-field_before})}
+ }
++
++impl<'a> Labels<'a> {
++ /// Emits both sides of the existing ingest call, including early rejection.
++ /// A callback error is an incomplete diagnostic attempt, not an accepted result.
++ pub fn ingest_observed(&mut self, attempt:u64, d:Divisor, a:u64, b:u64,
++     observer:&mut dyn FnMut(Value)->Result<(),String>) -> Result<Value,String> {
++  observer(json!({"kind":"label_candidate","attempt":attempt,"divisor":d,"a":a,"b":b}))?;
++  let result=self.ingest(d,a,b);
++  observer(json!({"kind":"label_result","attempt":attempt,"result":result.clone()}))?;
++  Ok(result)
++ }
++}

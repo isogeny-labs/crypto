@@ -1,0 +1,132 @@
+{
+  "schema": "pkm.merged-native-compilation-failure/v1",
+  "utc": "2026-10-30T18:48:34.757359+00:00",
+  "source_merge": "a030c1630518564bdb3633815391858b424377ce",
+  "source_objects": {
+    "src": "1ed5fbf7d68fcb2612bc794cd5a2f8934a2b55b1",
+    "crates": "598dc041ae257995d5dc666151921ee88f281017",
+    "Cargo.toml": "27bd18ea4dd995f969ddff7ef859c3b88612551c",
+    "Cargo.lock": "efc8d1888cb0f579d2045003195d517ce93d9e3c",
+    "examples/pkm_oracle_program.rs": "0b2d978683664b8c3d1ab6663a3b0cf75dc68d4e",
+    "examples/pkm_oracle_program": "6acb74a9bb88b3aa29a26cbe94d22d1a6a6d557d",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/factor-base": "7ddafa821c968783132462b62f2e051c508e7172",
+    "tools/volcano-cli": "52b1c64049002561f3ff55b149c300cdb4656f34",
+    "scripts/checkpoint.sh": "6a2a37967047b1a46ed62a4123f4c69f08a55d04",
+    "tools/lean": "b53b7f1eac6e4688f782c7e83d87fd9847867020",
+    "tests": "944fa03b7a0db26878e679649c7cbf24f4b53c57",
+    "research/prime_ecdlp_three_leads_20261029/lean": "1c366822536c08b212a7d36045580ee715f327a0",
+    "research/aps_measurement_20261029/spec-controls.json": "c11e5f1515b0080aae37539e8321cc82be573f3c",
+    "research/aps_measurement_20261029/spec-orbit-controls.json": "4f832f6190d8347f42892e304fec986453e59f66",
+    "backlog/XP-20261029-pkm-verified-oracle-program/card.json": "e99f0d598cd89d839060e991b9b157efbd6f286a"
+  },
+  "source_bindings_clean_and_equal": 17,
+  "phase": "example-tests",
+  "command": "cargo test --release --locked --example pkm_oracle_program --example pkm_symmetric_complete --example hecke_target_router -j2 -- --test-threads=1",
+  "started": "2026-10-30T18:37:34Z",
+  "finished": "2026-10-30T18:38:25Z",
+  "cargo_exit": 101,
+  "supervisor_exit": 101,
+  "native_tests_run": 0,
+  "new_native_passes": 0,
+  "full_library_started": false,
+  "not_reached": [
+    "clippy",
+    "rustfmt",
+    "cli-build",
+    "cli-gate",
+    "backlog-build",
+    "backlog-validate",
+    "library-build",
+    "library-test"
+  ],
+  "failure": {
+    "kind": "inherited base compilation error",
+    "file": "src/cryptanalysis/binary_semaev_chain_sat.rs",
+    "diagnostic": "unclosed delimiter at1703; duplicate outer guard at27-28",
+    "revision_comparison": [
+      {
+        "revision": "a030c1630518564bdb3633815391858b424377ce",
+        "git_blob": "cc1d72055ee13acf4941e13162186ffead445904",
+        "bytes": 64414,
+        "sha256": "554203d74681f1c8eed9b9e3ac6c644551bfd48be5dae28a1053494bb5cb3da0"
+      },
+      {
+        "revision": "0cc5e0d23a37a502dd363e41d866ec4991d3afb3",
+        "git_blob": "cc1d72055ee13acf4941e13162186ffead445904",
+        "bytes": 64414,
+        "sha256": "554203d74681f1c8eed9b9e3ac6c644551bfd48be5dae28a1053494bb5cb3da0"
+      },
+      {
+        "revision": "d4b3fe763a1a16dc1df6f674ea09eaf9670e370c",
+        "git_blob": "cc1d72055ee13acf4941e13162186ffead445904",
+        "bytes": 64414,
+        "sha256": "554203d74681f1c8eed9b9e3ac6c644551bfd48be5dae28a1053494bb5cb3da0"
+      }
+    ],
+    "earlier_pr_comment": 6526695631,
+    "patched_or_waived": false
+  },
+  "current_main_preview": {
+    "file_git_blob": "4e2111e29f64c5fece73f2c52dd9aff9c6e7f69f",
+    "observation": "GitHub main file excerpt lacks the obsolete outer guard",
+    "exact_main_commit": null,
+    "complete_main_build_validation": false
+  },
+  "proof_gate": "18declarations/zero trusted and module replay PASS, separate from native failure",
+  "captures": {
+    "example-tests.log": {
+      "raw_bytes": 1167,
+      "raw_sha256": "72f3be4388d505079a506fab644c34cb9df33b36f0bf6c771a3b12563fbbe154",
+      "stored_bytes": 1167,
+      "stored_sha256": "72f3be4388d505079a506fab644c34cb9df33b36f0bf6c771a3b12563fbbe154",
+      "prefix_preserved": true
+    },
+    "example-tests.exit": {
+      "raw_bytes": 4,
+      "raw_sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "stored_bytes": 4,
+      "stored_sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "prefix_preserved": true
+    },
+    "example-tests.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "4429c6eba766a549c3b6cf45227bda1a90016dca6193b7acfa4e056b3daa24ad",
+      "stored_bytes": 21,
+      "stored_sha256": "4429c6eba766a549c3b6cf45227bda1a90016dca6193b7acfa4e056b3daa24ad",
+      "prefix_preserved": true
+    },
+    "example-tests.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "cae199392cd222b24869739a214d38bdd851130506bb2e7e34aa8c52923ab4bb",
+      "stored_bytes": 21,
+      "stored_sha256": "cae199392cd222b24869739a214d38bdd851130506bb2e7e34aa8c52923ab4bb",
+      "prefix_preserved": true
+    },
+    "supervisor.log": {
+      "raw_bytes": 23,
+      "raw_sha256": "8390deed1dedacc8bd061280d7e6748408fcb4f7f82791477dc3865032b0bc23",
+      "stored_bytes": 23,
+      "stored_sha256": "8390deed1dedacc8bd061280d7e6748408fcb4f7f82791477dc3865032b0bc23",
+      "prefix_preserved": true
+    },
+    "supervisor.exit": {
+      "raw_bytes": 4,
+      "raw_sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "stored_bytes": 4,
+      "stored_sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "prefix_preserved": true
+    },
+    "supervisor.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "cae199392cd222b24869739a214d38bdd851130506bb2e7e34aa8c52923ab4bb",
+      "stored_bytes": 21,
+      "stored_sha256": "cae199392cd222b24869739a214d38bdd851130506bb2e7e34aa8c52923ab4bb",
+      "prefix_preserved": true
+    }
+  },
+  "comparison_admissible": false,
+  "scientific_panels": 0,
+  "research_goal_complete": false
+}

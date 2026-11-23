@@ -1,0 +1,173 @@
+{
+  "schema": "mumford-native-source-plan/v1",
+  "status": "Built source; calibration/full protocols not yet frozen, no curve invocation yet.",
+  "upstream": {
+    "repository": "isogeny-labs/cryptanalysis",
+    "revision": "fe751b09b08bc274d60cb22cfba25b13983b2b6e",
+    "original_path": "suite/src/prime_hyperelliptic",
+    "license": "MIT; exact notice retained",
+    "files": [
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/native-census-v1/src/vendor/curve.rs",
+        "git_blob": "048e2265aa4066241b10be3538806ad6c3a22484",
+        "sha256": "7a769bfb7abfe92ce06da7c02340f2a2426827d8066ebef510375149b8c3d5ad"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/native-census-v1/src/vendor/fp_poly.rs",
+        "git_blob": "7b6da8f85e473ad9a04da537b71d5835d1ca97c9",
+        "sha256": "44f7af14d22bed78d85c4bd009ccce7197fa9257e7ff56164c8d891303e49590"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/native-census-v1/src/vendor/fp2.rs",
+        "git_blob": "aa38cd2908c1ab9e82785e3596ff2a5c89c0888e",
+        "sha256": "b833bdff5247f2eea0cde7feb89d0378cfe8305671f9065d2dae7ab538c03e55"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/native-census-v1/src/vendor/LICENSE",
+        "git_blob": "2ca1beac471803167fefcabb79385473fa4fa1a4",
+        "sha256": "f9df02d446c6aeb66d2131a8516f119888960229cb41e272f204d075676c5e51"
+      }
+    ]
+  },
+  "local_sources": [
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/native-census-v1/Cargo.toml",
+      "sha256": "7924545f447c769170e77bc62747b9267280732eb3eac4fc22c3adc229844bd3"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/native-census-v1/Cargo.lock",
+      "sha256": "9f98bdac886f4c26dbad5d4a026a8ce778a1a7daa2b07d054db8cfc7c6f8dcf3"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/native-census-v1/src/main.rs",
+      "sha256": "0352a204e745e26e6d2fb3c100e665c0109880a33505c423578563301793ab65"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/native-census-v1/cpp_counts.cpp",
+      "sha256": "44e6523bd7657b9db8175779dffefbb6e9f7d4849040f57a925bd46ec1c92cd5"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/native-census-v1/src/vendor/mod.rs",
+      "sha256": "9167a6e0f2ff4cc1dab18f1e00d18d74ec41378239611fc381b08d7d63860ef6"
+    }
+  ],
+  "protocol_tool": {
+    "repository": "isogeny-labs/crypto-autoresearcher",
+    "revision": "7ff7bb1f2586040fb751669f43a190909a268fc5",
+    "workspace": "/workspace/crypto-autoresearcher-protocol-7ff7bb1f",
+    "method": "Exact pinned GitHub-blob materialization; not a Git checkout. Old materialization unchanged.",
+    "source": {
+      "repository": "isogeny-labs/crypto-autoresearcher",
+      "revision": "7ff7bb1f2586040fb751669f43a190909a268fc5",
+      "method": "Exact GitHub-blob materialization; not a Git checkout.",
+      "files": [
+        {
+          "path": "tools/experiment_protocol.py",
+          "sha": "9917acf83f0eeb37a249d3c822cbd422117d461a",
+          "bytes": 64811
+        },
+        {
+          "path": "docs/experiment-protocol.md",
+          "sha": "0830f344b30e6d4386eec7be071d3cb7a94f4b3a",
+          "bytes": 15572
+        },
+        {
+          "path": "schemas/experiment-protocol.v1.json",
+          "sha": "9d8543e6b448264c333649e1a4dfd83a2a297bd5",
+          "bytes": 37583
+        },
+        {
+          "path": "schemas/experiment-export.v1.json",
+          "sha": "707ebf6f814d96bb44b36a9ccb3e25128e1aaf5e",
+          "bytes": 11875
+        },
+        {
+          "path": "schemas/experiment-review.v1.json",
+          "sha": "256da7e4bc5dbc8e471ca220103da37320ba1275",
+          "bytes": 5251
+        },
+        {
+          "path": ".claude/skills/experiment-protocol/SKILL.md",
+          "sha": "f0e4eb0b92a7bdb755fc0eb477f447d6acd486e5",
+          "bytes": 9477
+        }
+      ]
+    }
+  },
+  "controls": {
+    "lean_f3": {
+      "polynomial": [
+        0,
+        2,
+        0,
+        0,
+        0,
+        1
+      ],
+      "pairs": 8,
+      "smooth": 7,
+      "binding": "MumfordSmoothnessAudit.mumford_count_audit_certificate"
+    },
+    "lean_f5": {
+      "polynomial": [
+        0,
+        4,
+        0,
+        0,
+        0,
+        1
+      ],
+      "pairs": 16,
+      "smooth": 16,
+      "binding": "MumfordFiveControlAudit.mumford_five_control_certificate"
+    },
+    "source_stoll_f3": {
+      "polynomial": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "source": "Stoll2014Example4.19printedpp25-26read in full",
+      "predictions": {
+        "pairs": 10,
+        "smooth": 8,
+        "generator_u": [
+          0,
+          1
+        ],
+        "generator_v": [
+          1
+        ],
+        "order": 5,
+        "subgroup_smooth": 5
+      },
+      "status": "Pre-data source-based prediction; not a new Lean formalization or observation."
+    },
+    "full_squarefree_model_counts": {
+      "p3": 162,
+      "p5": 2500,
+      "status": "Combinatorial pre-data count controls; not observations."
+    }
+  },
+  "prospective_full_population": "All monic quintics overF3/F5; singular models retained, all reduced pairs/Cantor tables/group axioms/distinct cyclic subgroups checked in Rust and separate C++.",
+  "scope": "Same-host two-language exact finite arithmetic. No independent machine, signed execution verification, general geometric Lean bridge, scaling or typical/asymptotic conclusion.",
+  "new_native_curve_population": false,
+  "paid_spend": 0,
+  "built_binaries": {
+    "rust": {
+      "path": "target/release/mumford-census-audit",
+      "sha256": "851c5594fc67e56c1a414a4a1d1716f158c512902ead1aab4d267f4652328a0a"
+    },
+    "cpp": {
+      "path": "target/mumford_cpp_counts",
+      "sha256": "8030184af28b2621f76bc31263c6626ab219e8a92cf5049e84ef1e0e7dc578d0"
+    }
+  },
+  "compiler": {
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+    "gxx": "g++ (Debian 14.2.0-19) 14.2.0"
+  }
+}

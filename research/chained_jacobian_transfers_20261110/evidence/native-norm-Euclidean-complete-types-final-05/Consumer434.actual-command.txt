@@ -1,0 +1,5 @@
+cwd=/workspace/cryptanalysis
+toolchain=leanprover/lean4:v4.34.1
+workers=1
+memory=original defaults unchanged
+timeout --signal=TERM --kill-after=5s 120 bash tools/lean/proof-gate.sh --out /workspace/scratch/ct555-native-norm-Euclid-complete-types-original-dual-gates/Consumer434 .resume/native-norm-Euclid-complete-types-source-20261116-09/CubicNativeNormEuclid22309.lean

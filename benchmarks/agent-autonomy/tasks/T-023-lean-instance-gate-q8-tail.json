@@ -1,0 +1,36 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-023",
+  "title": "Write the instance statement for the q8 tail arithmetic file",
+  "class": "lean",
+  "difficulty": 2,
+  "source": [
+    ".agents/skills/lean-instance-gate/SKILL.md",
+    "research/ghs_degree3_q8_tail_20261026/Counts.lean",
+    "docs/lean-health/BASELINE-20261115.md",
+    "AGENTS.md 'Continuous learning loop' (Lean work)"
+  ],
+  "prompt": "Apply the lean-instance-gate skill to `research/ghs_degree3_q8_tail_20261026/Counts.lean` (two `subgroup` theorems form a family). Write `$T_OUT/PROOF_MAP.md` with the skill's six instance-statement fields, as headings, and the inheritance table. Say whether the two theorems are a missing checker or two honest instances. Do not edit the study. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout. No fixture. The study directory is read-only for this task.",
+  "acceptance": [
+    "$T_OUT/PROOF_MAP.md has the six headings: Structure above, Theorem used as stated, The object as an instance, Assembly probe, Missing components, Inheritance table",
+    "the note names a concrete Mathlib or crypto-lean declaration for field 2 (for example Nat.Coprime)",
+    "research/ghs_degree3_q8_tail_20261026 is unchanged"
+  ],
+  "check_command": "for h in 'Structure above' 'Theorem used as stated' 'The object as an instance' 'Assembly probe' 'Missing components' 'Inheritance table'; do grep -qi \"$h\" \"$T_OUT/PROOF_MAP.md\" || exit 1; done && grep -q 'Nat\\.' \"$T_OUT/PROOF_MAP.md\" && git diff --quiet \"$T_BASE\" HEAD -- research/ghs_degree3_q8_tail_20261026",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "editing the study's Lean file",
+    "inventing a declaration name that does not exist"
+  ],
+  "max_wall_minutes": 25,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Heading check is a format gate; the validator judges whether field 2 and the inheritance table are correct. No Lean needed."
+}

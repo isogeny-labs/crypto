@@ -1,0 +1,14 @@
+{
+  "action": "Constrain the exact canonical range and test an overflow label that produces the same original parameter, not just a random out-of-range value",
+  "created": "2026-11-16T19:46:56Z",
+  "evidence": [
+    "pcc/claims/PCC-20261116-b3227f.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "curve25519-relations"
+  ],
+  "trigger": "Encoding a finite cyclic index with binary bits inside original point equations",
+  "why": "Coordinate equality cannot distinguish t from t+q; a full-width bit encoding otherwise introduces aliases."
+}

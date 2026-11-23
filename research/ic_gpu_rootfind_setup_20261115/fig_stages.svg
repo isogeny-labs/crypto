@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" width="900" height="240" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">Stages of the device pair-table build on an A100</title>
+<desc id="d">Median stage times: at 4096 the copy of the build-index map to the host is 47 ms of about 64 ms; the key kernel 2 ms.</desc>
+<style>.bg{fill:#fcfcfb}.c1{fill:#2a78d6}.c2{fill:#86b6ee}.c3{fill:#c3c2b7}.c4{fill:#8f8e89}.c5{fill:#d95f3b}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.c1{fill:#3987e5}.c2{fill:#1f5ea8}.c3{fill:#6b6a64}.c4{fill:#8f8e89}.c5{fill:#e0714f}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>
+<rect class="bg" width="900" height="240"/>
+<text class="p" x="20" y="30" font-size="17" font-weight="600">Where the device pair-table build spends its time (round 6)</text>
+<text class="q" x="20" y="52" font-size="12.5">A100, daemon stage timings, median per session creation [pcc:unverified]</text>
+<line class="g" x1="140.0" x2="140.0" y1="84" y2="190"/><text class="q" x="140.0" y="206" font-size="11" text-anchor="middle">0 ms</text>
+<line class="g" x1="236.0" x2="236.0" y1="84" y2="190"/><text class="q" x="236.0" y="206" font-size="11" text-anchor="middle">10 ms</text>
+<line class="g" x1="332.0" x2="332.0" y1="84" y2="190"/><text class="q" x="332.0" y="206" font-size="11" text-anchor="middle">20 ms</text>
+<line class="g" x1="428.0" x2="428.0" y1="84" y2="190"/><text class="q" x="428.0" y="206" font-size="11" text-anchor="middle">30 ms</text>
+<line class="g" x1="524.0" x2="524.0" y1="84" y2="190"/><text class="q" x="524.0" y="206" font-size="11" text-anchor="middle">40 ms</text>
+<line class="g" x1="620.0" x2="620.0" y1="84" y2="190"/><text class="q" x="620.0" y="206" font-size="11" text-anchor="middle">50 ms</text>
+<line class="g" x1="716.0" x2="716.0" y1="84" y2="190"/><text class="q" x="716.0" y="206" font-size="11" text-anchor="middle">60 ms</text>
+<line class="g" x1="812.0" x2="812.0" y1="84" y2="190"/><text class="q" x="812.0" y="206" font-size="11" text-anchor="middle">70 ms</text>
+<text class="p" x="130" y="109.0" font-size="12" text-anchor="end">|F_x| = 2048</text>
+<rect class="c1" x="140.0" y="92" width="12.5" height="26"/>
+<rect class="c2" x="152.5" y="92" width="19.2" height="26"/>
+<rect class="c3" x="171.7" y="92" width="19.2" height="26"/>
+<rect class="c4" x="190.9" y="92" width="15.4" height="26"/>
+<rect class="c5" x="206.2" y="92" width="148.8" height="26"/>
+<text class="q" x="361.0" y="109.0" font-size="11">22.4 ms</text>
+<text class="p" x="130" y="153.0" font-size="12" text-anchor="end">|F_x| = 4096</text>
+<rect class="c1" x="140.0" y="136" width="18.2" height="26"/>
+<rect class="c2" x="158.2" y="136" width="66.7" height="26"/>
+<rect class="c3" x="225.0" y="136" width="49.0" height="26"/>
+<rect class="c4" x="273.9" y="136" width="27.8" height="26"/>
+<rect class="c5" x="301.8" y="136" width="453.6" height="26"/>
+<text class="q" x="761.4" y="153.0" font-size="11">64.1 ms</text>
+<rect class="c1" x="20" y="222" width="11" height="11" rx="2"/><text class="q" x="36" y="231.5" font-size="11">key kernel</text>
+<rect class="c2" x="117.0" y="222" width="11" height="11" rx="2"/><text class="q" x="133.0" y="231.5" font-size="11">dedupe</text>
+<rect class="c3" x="188.8" y="222" width="11" height="11" rx="2"/><text class="q" x="204.8" y="231.5" font-size="11">compact</text>
+<rect class="c4" x="266.9" y="222" width="11" height="11" rx="2"/><text class="q" x="282.9" y="231.5" font-size="11">probe insert</text>
+<rect class="c5" x="376.5" y="222" width="11" height="11" rx="2"/><text class="q" x="392.5" y="231.5" font-size="11">copy of the 67 MB map to the host</text>
+</svg>

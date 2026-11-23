@@ -1,0 +1,34 @@
+{
+  "checks": {
+    "dedicated_call": 0,
+    "fmt198": 0,
+    "fmt199": 0,
+    "pinned_source_build_attempt2": 0,
+    "prepublication_rust198_package": {
+      "cli_passed": 2,
+      "failed": 0,
+      "library_passed": 8,
+      "note": "both original and quartic binaries exercised by each CLI guard; exact same Rust/lock bytes as published source"
+    },
+    "prose": 0,
+    "strict_clippy198": 0,
+    "strict_clippy199": 0
+  },
+  "not_run": [
+    "root full library suite",
+    "Rust1.99 runtime suite",
+    "performance/scaling/EKS",
+    "split4 comparison"
+  ],
+  "retained_prose_failure": "initial negative speed claim lacked standing tag; tag added, no result assertion changed",
+  "retained_setup_failures": [
+    {
+      "attempt": "first pinned build",
+      "cause": "new package omitted by sparse checkout; restored exact published Git blobs before successful build; source/solver unchanged",
+      "exit": 101
+    }
+  ],
+  "schema": "aps.quartic-validation/v1",
+  "source": "f6ca72f9d11d80d4ea9aaf7cfd124a189bb3094b",
+  "standing": "unverified"
+}

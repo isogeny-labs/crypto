@@ -1,0 +1,3135 @@
+{
+  "all_verified": true,
+  "calibration": {
+    "ns_per_add": 141.80243,
+    "ns_per_as_solve": 8.15023646668,
+    "ns_per_canon": 9.861791796779999,
+    "ns_per_double": 143.77731244261,
+    "ns_per_frobenius": 6.768938996049999,
+    "ns_per_inversion": null,
+    "ns_per_legendre": null,
+    "ns_per_lookup": 1.21212717164,
+    "ns_per_row_op": 1.6097411853599997,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": null,
+    "ns_per_word_xor": 0.22404783939999998,
+    "pinned_units": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_as_solve",
+      "ns_per_word_xor",
+      "ns_per_frobenius",
+      "ns_per_canon"
+    ]
+  },
+  "calibration_pins": {
+    "measured": [],
+    "pinned": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_as_solve",
+      "ns_per_word_xor",
+      "ns_per_frobenius",
+      "ns_per_canon"
+    ]
+  },
+  "configurations_run": 12,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 12.875334319,
+  "instance": "icv1-f2m19-tm797-9c54981b",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + mitm[m=2] + — + walk | 1042 | 521 | 2.0 | 0.731 | 134 | 98 | 98 | — | — | 1062.780 | 784.81× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + mitm[m=2] + — + walk | 1042 | 521 | 2.0 | 0.649 | 353 | 229 | 229 | — | — | 1063.517 | 785.35× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + mitm[m=2] + — + walk | 1042 | 521 | 2.0 | 0.678 | 342 | 232 | 232 | — | — | 1063.475 | 785.32× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + descent-algebraic[m=2] + inherited-f4 + walk | 1042 | 521 | 2.0 | 0.731 | 134 | 98 | 98 | — | 5 | 227.520 | 168.01× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + descent-algebraic[m=2] + inherited-f4 + walk | 1042 | 521 | 2.0 | 0.649 | 353 | 229 | 229 | — | 5 | 594.496 | 439.00× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + descent-algebraic[m=2] + inherited-f4 + walk | 1042 | 521 | 2.0 | 0.678 | 342 | 232 | 232 | — | 5 | 574.342 | 424.12× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-inherited + walk | 1042 | 521 | 2.0 | 0.731 | 134 | 98 | 98 | — | 5 | 227.520 | 168.01× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-inherited + walk | 1042 | 521 | 2.0 | 0.649 | 353 | 229 | 229 | — | 5 | 594.496 | 439.00× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-inherited + walk | 1042 | 521 | 2.0 | 0.678 | 342 | 232 | 232 | — | 5 | 574.342 | 424.12× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-batched + walk | 1042 | 521 | 2.0 | 0.731 | 134 | 98 | 98 | — | 5 | 202.263 | 149.36× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-batched + walk | 1042 | 521 | 2.0 | 0.649 | 353 | 229 | 229 | — | 5 | 527.858 | 389.79× | yes |\n| icv1-f2m19-tm797-9c54981b | binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-batched + walk | 1042 | 521 | 2.0 | 0.678 | 342 | 232 | 232 | — | 5 | 510.808 | 377.20× | yes |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "koblitz",
+  "rho_reference": {
+    "all_verified": true,
+    "automorphisms": 2,
+    "max_s": 2.2365797881643177,
+    "mean_s": 1.3541944158049875,
+    "mean_s_walk": 0.9816750728155775,
+    "method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+    "min_s": 0.390328060761661,
+    "per_run": [
+      {
+        "planted": 45377,
+        "s": 0.390328060761661,
+        "s_walk": 0.08587217336756542,
+        "seed": 1400727542,
+        "steps": 40,
+        "steps_over_expected": 0.09689637146117494,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 0.915319302486095,
+        "s_walk": 0.569878968712025,
+        "seed": 1400727543,
+        "steps": 282,
+        "steps_over_expected": 0.6430395560605245,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 1.6920721434018005,
+        "s_walk": 1.2997924423363312,
+        "seed": 1400727540,
+        "steps": 606,
+        "steps_over_expected": 1.4666587134805116,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 0.9992398355498522,
+        "s_walk": 0.6537995017757822,
+        "seed": 1400727541,
+        "steps": 315,
+        "steps_over_expected": 0.7377337372612183,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 1.3388252484124974,
+        "s_walk": 0.966061950385111,
+        "seed": 1400727538,
+        "steps": 465,
+        "steps_over_expected": 1.090084178938218,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 1.0890152895250342,
+        "s_walk": 0.7338167542319227,
+        "seed": 1400727539,
+        "steps": 355,
+        "steps_over_expected": 0.8280235379409495,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 1.2802760392982482,
+        "s_walk": 0.901657820359437,
+        "seed": 1400727536,
+        "steps": 430,
+        "steps_over_expected": 1.0174119003423368,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 2.06093216082157,
+        "s_walk": 1.617909811857085,
+        "seed": 1400727537,
+        "steps": 756,
+        "steps_over_expected": 1.8256157259389552,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 2.183885499961493,
+        "s_walk": 1.7584279137312828,
+        "seed": 1400727550,
+        "steps": 841,
+        "steps_over_expected": 1.984173424693605,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 1.5652155236542606,
+        "s_walk": 1.1924522256268744,
+        "seed": 1400727551,
+        "steps": 574,
+        "steps_over_expected": 1.3455382491540429,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 0.6850257466367151,
+        "s_walk": 0.3630050965083447,
+        "seed": 1400727548,
+        "steps": 176,
+        "steps_over_expected": 0.4096073884495122,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 1.7603795540350913,
+        "s_walk": 1.356390011146772,
+        "seed": 1400727549,
+        "steps": 649,
+        "steps_over_expected": 1.5305222310344677,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 1.4910531921095451,
+        "s_walk": 1.100725131347884,
+        "seed": 1400727546,
+        "steps": 527,
+        "steps_over_expected": 1.2420353069114243,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 2.2365797881643177,
+        "s_walk": 1.8091705616302989,
+        "seed": 1400727547,
+        "steps": 857,
+        "steps_over_expected": 2.0414303714661175,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 0.8021241648652134,
+        "s_walk": 0.4508289101797185,
+        "seed": 1400727544,
+        "steps": 219,
+        "steps_over_expected": 0.5087059501711684,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 1.176839103196408,
+        "s_walk": 0.8470118918528045,
+        "seed": 1400727545,
+        "steps": 402,
+        "steps_over_expected": 0.9557505730488619,
+        "verified": true
+      }
+    ],
+    "runs": 16
+  },
+  "rho_reference_candidates": [
+    {
+      "all_verified": true,
+      "automorphisms": 38,
+      "max_s": 2.279740695546045,
+      "mean_s": 2.0513987800004734,
+      "mean_s_walk": 0.17454982967185526,
+      "method": "signed-Frobenius r-adding walk, distinguished points (koblitz_signed_frobenius_rho_reference)",
+      "min_s": 1.893315915392001,
+      "per_run": [
+        {
+          "planted": 45377,
+          "s": 2.119706190633764,
+          "s_walk": 0.23810011706461323,
+          "seed": 1400727542,
+          "steps": 122,
+          "steps_over_expected": 1.1710932255862476,
+          "verified": true
+        },
+        {
+          "planted": 85880,
+          "s": 2.1606906370137384,
+          "s_walk": 0.27908456344458765,
+          "seed": 1400727543,
+          "steps": 143,
+          "steps_over_expected": 1.3726748463838803,
+          "verified": true
+        },
+        {
+          "planted": 126383,
+          "s": 2.0962865069880645,
+          "s_walk": 0.22053535433033847,
+          "seed": 1400727540,
+          "steps": 113,
+          "steps_over_expected": 1.0847011023872621,
+          "verified": true
+        },
+        {
+          "planted": 45377,
+          "s": 2.0260274560509655,
+          "s_walk": 0.1502763033932395,
+          "seed": 1400727541,
+          "steps": 77,
+          "steps_over_expected": 0.7391326095913202,
+          "verified": true
+        },
+        {
+          "planted": 85880,
+          "s": 1.9869946499747997,
+          "s_walk": 0.11124349731707339,
+          "seed": 1400727538,
+          "steps": 57,
+          "steps_over_expected": 0.5471501135935747,
+          "verified": true
+        },
+        {
+          "planted": 126383,
+          "s": 2.279740695546045,
+          "s_walk": 0.4039895428883192,
+          "seed": 1400727539,
+          "steps": 207,
+          "steps_over_expected": 1.9870188335766659,
+          "verified": true
+        },
+        {
+          "planted": 45377,
+          "s": 2.0533504203042816,
+          "s_walk": 0.17759926764655576,
+          "seed": 1400727536,
+          "steps": 91,
+          "steps_over_expected": 0.873520356789742,
+          "verified": true
+        },
+        {
+          "planted": 85880,
+          "s": 2.0026077724052658,
+          "s_walk": 0.12685661974753984,
+          "seed": 1400727537,
+          "steps": 65,
+          "steps_over_expected": 0.6239431119926728,
+          "verified": true
+        },
+        {
+          "planted": 126383,
+          "s": 2.010414333620499,
+          "s_walk": 0.13466318096277305,
+          "seed": 1400727550,
+          "steps": 69,
+          "steps_over_expected": 0.662339611192222,
+          "verified": true
+        },
+        {
+          "planted": 45377,
+          "s": 2.022124175443349,
+          "s_walk": 0.1463730227856229,
+          "seed": 1400727551,
+          "steps": 75,
+          "steps_over_expected": 0.7199343599915456,
+          "verified": true
+        },
+        {
+          "planted": 85880,
+          "s": 2.0553020606080903,
+          "s_walk": 0.17369598703893915,
+          "seed": 1400727548,
+          "steps": 89,
+          "steps_over_expected": 0.8543221071899675,
+          "verified": true
+        },
+        {
+          "planted": 126383,
+          "s": 1.893315915392001,
+          "s_walk": 0.017564762734274746,
+          "seed": 1400727549,
+          "steps": 9,
+          "steps_over_expected": 0.08639212319898547,
+          "verified": true
+        },
+        {
+          "planted": 45377,
+          "s": 1.9557684051138666,
+          "s_walk": 0.08001725245614051,
+          "seed": 1400727546,
+          "steps": 41,
+          "steps_over_expected": 0.3935641167953783,
+          "verified": true
+        },
+        {
+          "planted": 85880,
+          "s": 2.0982381472918727,
+          "s_walk": 0.22248699463414678,
+          "seed": 1400727547,
+          "steps": 114,
+          "steps_over_expected": 1.0943002271871494,
+          "verified": true
+        },
+        {
+          "planted": 126383,
+          "s": 2.1470291548870803,
+          "s_walk": 0.2712780022293544,
+          "seed": 1400727544,
+          "steps": 139,
+          "steps_over_expected": 1.3342783471843311,
+          "verified": true
+        },
+        {
+          "planted": 45377,
+          "s": 1.9147839587338924,
+          "s_walk": 0.039032806076166104,
+          "seed": 1400727545,
+          "steps": 20,
+          "steps_over_expected": 0.1919824959977455,
+          "verified": true
+        }
+      ],
+      "runs": 16
+    }
+  ],
+  "rho_reference_plain": {
+    "all_verified": true,
+    "automorphisms": 1,
+    "max_s": 6.9400329203423325,
+    "mean_s": 3.8388764775909356,
+    "mean_s_walk": 1.661821718692772,
+    "method": "r-adding walk, distinguished points, 16 jumps",
+    "min_s": 1.9945763904920877,
+    "per_run": [
+      {
+        "planted": 45377,
+        "s": 4.408755446302961,
+        "s_walk": 1.8013640004150655,
+        "seed": 1400727542,
+        "steps": 923,
+        "steps_over_expected": 1.4372805243172675,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 3.5266140289816073,
+        "s_walk": 1.5339892787933278,
+        "seed": 1400727543,
+        "steps": 786,
+        "steps_over_expected": 1.2239463619863187,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 2.896234210851525,
+        "s_walk": 1.3095506438553728,
+        "seed": 1400727540,
+        "steps": 671,
+        "steps_over_expected": 1.0448702403216539,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 4.086734796174591,
+        "s_walk": 1.5105695951476281,
+        "seed": 1400727541,
+        "steps": 774,
+        "steps_over_expected": 1.2052601579865276,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 2.6073914458878957,
+        "s_walk": 0.7962692439537885,
+        "seed": 1400727538,
+        "steps": 408,
+        "steps_over_expected": 0.6353309359928982,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 5.747580694715459,
+        "s_walk": 2.482486466444164,
+        "seed": 1400727539,
+        "steps": 1272,
+        "steps_over_expected": 1.9807376239778594,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 6.9400329203423325,
+        "s_walk": 4.51414402270861,
+        "seed": 1400727536,
+        "steps": 2313,
+        "steps_over_expected": 3.6017658209597396,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 4.53756370635431,
+        "s_walk": 1.7701377555541327,
+        "seed": 1400727537,
+        "steps": 907,
+        "steps_over_expected": 1.4123655856508792,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 3.881812564274719,
+        "s_walk": 1.5496024012237943,
+        "seed": 1400727550,
+        "steps": 794,
+        "steps_over_expected": 1.236403831319513,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 3.485629582601633,
+        "s_walk": 1.7350082300855831,
+        "seed": 1400727551,
+        "steps": 889,
+        "steps_over_expected": 1.3843362796511927,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 4.250672581694489,
+        "s_walk": 1.8891878140864393,
+        "seed": 1400727548,
+        "steps": 968,
+        "steps_over_expected": 1.5073537893164841,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 1.9945763904920877,
+        "s_walk": 0.5093781192939676,
+        "seed": 1400727549,
+        "steps": 261,
+        "steps_over_expected": 0.406424936995457,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 3.9423134136927764,
+        "s_walk": 1.401277738134363,
+        "seed": 1400727546,
+        "steps": 718,
+        "steps_over_expected": 1.118057872654169,
+        "verified": true
+      },
+      {
+        "planted": 85880,
+        "s": 3.126527766700905,
+        "s_walk": 1.4481171054257624,
+        "seed": 1400727547,
+        "steps": 742,
+        "steps_over_expected": 1.1554302806537513,
+        "verified": true
+      },
+      {
+        "planted": 126383,
+        "s": 2.0179960741377876,
+        "s_walk": 0.4117961041035524,
+        "seed": 1400727544,
+        "steps": 211,
+        "steps_over_expected": 0.32856575366299395,
+        "verified": true
+      },
+      {
+        "planted": 45377,
+        "s": 3.971588018249901,
+        "s_walk": 1.926268979858797,
+        "seed": 1400727545,
+        "steps": 987,
+        "steps_over_expected": 1.5369402789828202,
+        "verified": true
+      }
+    ],
+    "runs": 16
+  },
+  "rho_reference_rule": "Koblitz curve: the signed-Frobenius walk (A = 2n) and the negation walk (A = 2) on the same seeds; the lower mean S prices the column, the other is kept in rho_reference_candidates",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 1067.290864,
+          "group_ops": {
+            "adds": 515,
+            "doubles": 550,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 134,
+            "relations": 98,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 134,
+            "trials": 134,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 133
+          },
+          "wall_ns": 209326,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 133,
+            "walk_modr_adds": 266
+          }
+        },
+        "description": "a table of pair sums probed once per target (m = 2) or once per R − P (m = 3), built in full",
+        "gae_before_solver": 1067.290864,
+        "hit_rate": 0.7313432835820896,
+        "name": "mitm",
+        "relations_found": 98,
+        "setup": {
+          "gae": 543403.0,
+          "group_ops": {
+            "adds": 543403,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 76850552,
+          "work_native": {
+            "counted:table_insert_attempts": 1,
+            "table_insert_attempts": 542882
+          }
+        },
+        "solver": null,
+        "summands": 2,
+        "system": null,
+        "targets_tried": 134
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 418062,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + mitm[m=2] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 7.980455999999999,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 98,
+            "repeated_column_rows": 0,
+            "row_ops": 703,
+            "rows": 98,
+            "single_column_rows": 1,
+            "two_column_rows": 97
+          },
+          "wall_ns": 250605,
+          "work_native": {
+            "column_part_inserts": 98,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 135546,
+            "pivot_inversion_steps": 3724,
+            "row_build_modr_adds": 294,
+            "row_build_modr_muls": 196,
+            "row_build_words": 153272,
+            "row_key_mixes": 195
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 98,
+        "rows": 98,
+        "work": 703,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 45377,
+      "rho_s": 1.3541944158049875,
+      "s": 1062.7795241071597,
+      "s_over_rho": 784.8057204366781,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "mitm",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20261110,
+        "solver": null,
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 544557.069268,
+      "verified": true,
+      "verify": {
+        "gae": 20.0,
+        "group_ops": {
+          "adds": 5,
+          "doubles": 15,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 2756
+      },
+      "wall_seconds": 0.07779004
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 1423.0348880000001,
+          "group_ops": {
+            "adds": 875,
+            "doubles": 542,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 353,
+            "relations": 229,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 353,
+            "trials": 353,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 352
+          },
+          "wall_ns": 292170,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 352,
+            "walk_modr_adds": 704
+          }
+        },
+        "description": "a table of pair sums probed once per target (m = 2) or once per R − P (m = 3), built in full",
+        "gae_before_solver": 1423.0348880000001,
+        "hit_rate": 0.6487252124645893,
+        "name": "mitm",
+        "relations_found": 229,
+        "setup": {
+          "gae": 543403.0,
+          "group_ops": {
+            "adds": 543403,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 71649073,
+          "work_native": {
+            "counted:table_insert_attempts": 1,
+            "table_insert_attempts": 542882
+          }
+        },
+        "solver": null,
+        "summands": 2,
+        "system": null,
+        "targets_tried": 353
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 356388,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + mitm[m=2] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 25.303607999999997,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 229,
+            "repeated_column_rows": 0,
+            "row_ops": 2229,
+            "rows": 229,
+            "single_column_rows": 1,
+            "two_column_rows": 228
+          },
+          "wall_ns": 969580,
+          "work_native": {
+            "column_part_inserts": 229,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 394848,
+            "pivot_inversion_steps": 8702,
+            "row_build_modr_adds": 687,
+            "row_build_modr_muls": 458,
+            "row_build_words": 358156,
+            "row_key_mixes": 457
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 229,
+        "rows": 229,
+        "work": 2229,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 85880,
+      "rho_s": 1.3541944158049875,
+      "s": 1063.5173752453884,
+      "s_over_rho": 785.3505839582059,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "mitm",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20301613,
+        "solver": null,
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 544935.1364440001,
+      "verified": true,
+      "verify": {
+        "gae": 25.0,
+        "group_ops": {
+          "adds": 9,
+          "doubles": 16,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 3620
+      },
+      "wall_seconds": 0.073314116
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 1394.8468320000002,
+          "group_ops": {
+            "adds": 852,
+            "doubles": 537,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 342,
+            "relations": 232,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 342,
+            "trials": 342,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 341
+          },
+          "wall_ns": 277582,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 341,
+            "walk_modr_adds": 682
+          }
+        },
+        "description": "a table of pair sums probed once per target (m = 2) or once per R − P (m = 3), built in full",
+        "gae_before_solver": 1394.8468320000002,
+        "hit_rate": 0.6783625730994152,
+        "name": "mitm",
+        "relations_found": 232,
+        "setup": {
+          "gae": 543403.0,
+          "group_ops": {
+            "adds": 543403,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 68454013,
+          "work_native": {
+            "counted:table_insert_attempts": 1,
+            "table_insert_attempts": 542882
+          }
+        },
+        "solver": null,
+        "summands": 2,
+        "system": null,
+        "targets_tried": 342
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 341771,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + mitm[m=2] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 28.924895999999997,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 232,
+            "repeated_column_rows": 0,
+            "row_ops": 2548,
+            "rows": 232,
+            "single_column_rows": 0,
+            "two_column_rows": 232
+          },
+          "wall_ns": 666362,
+          "work_native": {
+            "column_part_inserts": 232,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 407146,
+            "pivot_inversion_steps": 8816,
+            "row_build_modr_adds": 696,
+            "row_build_modr_muls": 464,
+            "row_build_words": 362848,
+            "row_key_mixes": 464
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 232,
+        "rows": 232,
+        "work": 2548,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 126383,
+      "rho_s": 1.3541944158049875,
+      "s": 1063.4752846717365,
+      "s_over_rho": 785.3195023253468,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "mitm",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20342116,
+        "solver": null,
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 544913.5696759999,
+      "verified": true,
+      "verify": {
+        "gae": 28.0,
+        "group_ops": {
+          "adds": 12,
+          "doubles": 16,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 3833
+      },
+      "wall_seconds": 0.069784106
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 116491.830272,
+          "group_ops": {
+            "adds": 911,
+            "doubles": 550,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "relations": 98,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 134,
+            "solver_ops": 72803598,
+            "sqrt_solves": 0,
+            "target_guard_probes": 134,
+            "trials": 134,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 133
+          },
+          "wall_ns": 695791485,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 133,
+            "walk_modr_adds": 266
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with inherited-f4",
+        "gae_before_solver": 1462.145432,
+        "hit_rate": 0.7313432835820896,
+        "name": "descent-algebraic",
+        "relations_found": 98,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 61486,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 134,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 89200,
+            "bitop_field_invs": 0,
+            "bitop_field_muls": 29700,
+            "bitop_field_sqrs": 16335,
+            "bitop_hash_probes": 8364811,
+            "bitop_word_ops": 347250312,
+            "eliminated": 211,
+            "engine_overridden_by_environment": 0,
+            "infeasible_branches": 3758,
+            "max_degree": 402,
+            "oversize": 0,
+            "propagations": 6003,
+            "reduction_cache_on": 0,
+            "reductions": 9232,
+            "slot_hit_rotation_0": 98,
+            "slot_hits": 98,
+            "slot_systems": 134,
+            "splits": 3912,
+            "verification_tests": 328798
+          },
+          "gae": 115029.68484,
+          "name": "inherited-f4",
+          "ns_per_op": 0.22404783939999998,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops": 72803598,
+          "peak_bytes": 0,
+          "priced_by": "pinned",
+          "semi_regular_degree": 5,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 687318928
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 19,
+          "n_vars": 20,
+          "semi_regular_degree": 5
+        },
+        "targets_tried": 134
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 338835,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + descent-algebraic[m=2] + inherited-f4 + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 7.980455999999999,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 98,
+            "repeated_column_rows": 0,
+            "row_ops": 703,
+            "rows": 98,
+            "single_column_rows": 1,
+            "two_column_rows": 97
+          },
+          "wall_ns": 978922,
+          "work_native": {
+            "column_part_inserts": 98,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 135546,
+            "pivot_inversion_steps": 3724,
+            "row_build_modr_adds": 294,
+            "row_build_modr_muls": 196,
+            "row_build_words": 153272,
+            "row_key_mixes": 195
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 98,
+        "rows": 98,
+        "work": 703,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 45377,
+      "rho_s": 1.3541944158049875,
+      "s": 227.51951125397818,
+      "s_over_rho": 168.01096548513786,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20261110,
+        "solver": "inherited-f4",
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 116578.60867600002,
+      "verified": true,
+      "verify": {
+        "gae": 20.0,
+        "group_ops": {
+          "adds": 5,
+          "doubles": 15,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 3528
+      },
+      "wall_seconds": 0.697219198
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 304504.234584,
+          "group_ops": {
+            "adds": 1734,
+            "doubles": 542,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "relations": 229,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 353,
+            "solver_ops": 191281783,
+            "sqrt_solves": 0,
+            "target_guard_probes": 353,
+            "trials": 353,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 352
+          },
+          "wall_ns": 1698432272,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 352,
+            "walk_modr_adds": 704
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with inherited-f4",
+        "gae_before_solver": 2279.017444,
+        "hit_rate": 0.6487252124645893,
+        "name": "descent-algebraic",
+        "relations_found": 229,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 64445,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 353,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 233748,
+            "bitop_field_invs": 0,
+            "bitop_field_muls": 77880,
+            "bitop_field_sqrs": 42834,
+            "bitop_hash_probes": 21636234,
+            "bitop_word_ops": 907527663,
+            "eliminated": 611,
+            "engine_overridden_by_environment": 0,
+            "infeasible_branches": 10018,
+            "max_degree": 1059,
+            "oversize": 0,
+            "propagations": 15651,
+            "reduction_cache_on": 0,
+            "reductions": 24247,
+            "slot_hit_rotation_0": 229,
+            "slot_hits": 229,
+            "slot_systems": 353,
+            "splits": 10436,
+            "verification_tests": 866611
+          },
+          "gae": 302225.21714,
+          "name": "inherited-f4",
+          "ns_per_op": 0.22404783939999998,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops": 191281783,
+          "peak_bytes": 0,
+          "priced_by": "pinned",
+          "semi_regular_degree": 5,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 1677722383
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 19,
+          "n_vars": 20,
+          "semi_regular_degree": 5
+        },
+        "targets_tried": 353
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 366015,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + descent-algebraic[m=2] + inherited-f4 + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 25.303607999999997,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 229,
+            "repeated_column_rows": 0,
+            "row_ops": 2229,
+            "rows": 229,
+            "single_column_rows": 1,
+            "two_column_rows": 228
+          },
+          "wall_ns": 2579745,
+          "work_native": {
+            "column_part_inserts": 229,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 394848,
+            "pivot_inversion_steps": 8702,
+            "row_build_modr_adds": 687,
+            "row_build_modr_muls": 458,
+            "row_build_words": 358156,
+            "row_key_mixes": 457
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 229,
+        "rows": 229,
+        "work": 2229,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 85880,
+      "rho_s": 1.3541944158049875,
+      "s": 594.495663888331,
+      "s_over_rho": 439.00318665465693,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20301613,
+        "solver": "inherited-f4",
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 304613.33614,
+      "verified": true,
+      "verify": {
+        "gae": 25.0,
+        "group_ops": {
+          "adds": 9,
+          "doubles": 16,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 3985
+      },
+      "wall_seconds": 1.701494259
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 294170.91471599997,
+          "group_ops": {
+            "adds": 1822,
+            "doubles": 537,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "relations": 232,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 342,
+            "solver_ops": 184689235,
+            "sqrt_solves": 0,
+            "target_guard_probes": 342,
+            "trials": 342,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 341
+          },
+          "wall_ns": 1724977450,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 341,
+            "walk_modr_adds": 682
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with inherited-f4",
+        "gae_before_solver": 2361.923416,
+        "hit_rate": 0.6783625730994152,
+        "name": "descent-algebraic",
+        "relations_found": 232,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 39055,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 342,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 226584,
+            "bitop_field_invs": 0,
+            "bitop_field_muls": 75460,
+            "bitop_field_sqrs": 41503,
+            "bitop_hash_probes": 21917447,
+            "bitop_word_ops": 880342754,
+            "eliminated": 598,
+            "engine_overridden_by_environment": 0,
+            "infeasible_branches": 9714,
+            "max_degree": 1026,
+            "oversize": 0,
+            "propagations": 15221,
+            "reduction_cache_on": 0,
+            "reductions": 23505,
+            "slot_hit_rotation_0": 232,
+            "slot_hits": 232,
+            "slot_systems": 342,
+            "splits": 10119,
+            "verification_tests": 854459
+          },
+          "gae": 291808.9913,
+          "name": "inherited-f4",
+          "ns_per_op": 0.22404783939999998,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops": 184689235,
+          "peak_bytes": 0,
+          "priced_by": "pinned",
+          "semi_regular_degree": 5,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 1703997695
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 19,
+          "n_vars": 20,
+          "semi_regular_degree": 5
+        },
+        "targets_tried": 342
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 346447,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + descent-algebraic[m=2] + inherited-f4 + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 28.924895999999997,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 232,
+            "repeated_column_rows": 0,
+            "row_ops": 2548,
+            "rows": 232,
+            "single_column_rows": 0,
+            "two_column_rows": 232
+          },
+          "wall_ns": 3163282,
+          "work_native": {
+            "column_part_inserts": 232,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 407146,
+            "pivot_inversion_steps": 8816,
+            "row_build_modr_adds": 696,
+            "row_build_modr_muls": 464,
+            "row_build_words": 362848,
+            "row_key_mixes": 464
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 232,
+        "rows": 232,
+        "work": 2548,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 126383,
+      "rho_s": 1.3541944158049875,
+      "s": 574.341662734323,
+      "s_over_rho": 424.12053692667996,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20342116,
+        "solver": "inherited-f4",
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 294286.63756,
+      "verified": true,
+      "verify": {
+        "gae": 28.0,
+        "group_ops": {
+          "adds": 12,
+          "doubles": 16,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 4341
+      },
+      "wall_seconds": 1.728576471
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 116491.830272,
+          "group_ops": {
+            "adds": 911,
+            "doubles": 550,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "relations": 98,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 134,
+            "solver_ops": 72803598,
+            "sqrt_solves": 0,
+            "target_guard_probes": 134,
+            "trials": 134,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 133
+          },
+          "wall_ns": 689985822,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 133,
+            "walk_modr_adds": 266
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with fes-then-inherited",
+        "gae_before_solver": 1462.145432,
+        "hit_rate": 0.7313432835820896,
+        "name": "descent-algebraic",
+        "relations_found": 98,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 39237,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 134,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 89200,
+            "bitop_field_invs": 0,
+            "bitop_field_muls": 29700,
+            "bitop_field_sqrs": 16335,
+            "bitop_hash_probes": 8306515,
+            "bitop_word_ops": 346727635,
+            "eliminated": 211,
+            "engine_overridden_by_environment": 0,
+            "infeasible_branches": 3758,
+            "max_degree": 402,
+            "oversize": 0,
+            "propagations": 6003,
+            "reduction_cache_on": 0,
+            "reductions": 9232,
+            "size_rule_fes": 0,
+            "slot_hit_rotation_0": 98,
+            "slot_hits": 98,
+            "slot_systems": 134,
+            "splits": 3912,
+            "verification_tests": 328798
+          },
+          "gae": 115029.68484,
+          "name": "fes-then-inherited",
+          "ns_per_op": 0.22404783939999998,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops": 72803598,
+          "peak_bytes": 0,
+          "priced_by": "pinned",
+          "semi_regular_degree": 5,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 680239124
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 19,
+          "n_vars": 20,
+          "semi_regular_degree": 5
+        },
+        "targets_tried": 134
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 366132,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-inherited + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 7.980455999999999,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 98,
+            "repeated_column_rows": 0,
+            "row_ops": 703,
+            "rows": 98,
+            "single_column_rows": 1,
+            "two_column_rows": 97
+          },
+          "wall_ns": 1237536,
+          "work_native": {
+            "column_part_inserts": 98,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 135546,
+            "pivot_inversion_steps": 3724,
+            "row_build_modr_adds": 294,
+            "row_build_modr_muls": 196,
+            "row_build_words": 153272,
+            "row_key_mixes": 195
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 98,
+        "rows": 98,
+        "work": 703,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 45377,
+      "rho_s": 1.3541944158049875,
+      "s": 227.51951125397818,
+      "s_over_rho": 168.01096548513786,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20261110,
+        "solver": "fes-then-inherited",
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 116578.60867600002,
+      "verified": true,
+      "verify": {
+        "gae": 20.0,
+        "group_ops": {
+          "adds": 5,
+          "doubles": 15,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 2981
+      },
+      "wall_seconds": 0.691680832
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 304504.234584,
+          "group_ops": {
+            "adds": 1734,
+            "doubles": 542,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "relations": 229,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 353,
+            "solver_ops": 191281783,
+            "sqrt_solves": 0,
+            "target_guard_probes": 353,
+            "trials": 353,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 352
+          },
+          "wall_ns": 1849923587,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 352,
+            "walk_modr_adds": 704
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with fes-then-inherited",
+        "gae_before_solver": 2279.017444,
+        "hit_rate": 0.6487252124645893,
+        "name": "descent-algebraic",
+        "relations_found": 229,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 55212,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 353,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 233748,
+            "bitop_field_invs": 0,
+            "bitop_field_muls": 77880,
+            "bitop_field_sqrs": 42834,
+            "bitop_hash_probes": 21636234,
+            "bitop_word_ops": 907527940,
+            "eliminated": 611,
+            "engine_overridden_by_environment": 0,
+            "infeasible_branches": 10018,
+            "max_degree": 1059,
+            "oversize": 0,
+            "propagations": 15651,
+            "reduction_cache_on": 0,
+            "reductions": 24247,
+            "size_rule_fes": 0,
+            "slot_hit_rotation_0": 229,
+            "slot_hits": 229,
+            "slot_systems": 353,
+            "splits": 10436,
+            "verification_tests": 866611
+          },
+          "gae": 302225.21714,
+          "name": "fes-then-inherited",
+          "ns_per_op": 0.22404783939999998,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops": 191281783,
+          "peak_bytes": 0,
+          "priced_by": "pinned",
+          "semi_regular_degree": 5,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 1826430615
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 19,
+          "n_vars": 20,
+          "semi_regular_degree": 5
+        },
+        "targets_tried": 353
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 349808,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-inherited + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 25.303607999999997,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 229,
+            "repeated_column_rows": 0,
+            "row_ops": 2229,
+            "rows": 229,
+            "single_column_rows": 1,
+            "two_column_rows": 228
+          },
+          "wall_ns": 3242345,
+          "work_native": {
+            "column_part_inserts": 229,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 394848,
+            "pivot_inversion_steps": 8702,
+            "row_build_modr_adds": 687,
+            "row_build_modr_muls": 458,
+            "row_build_words": 358156,
+            "row_key_mixes": 457
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 229,
+        "rows": 229,
+        "work": 2229,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 85880,
+      "rho_s": 1.3541944158049875,
+      "s": 594.495663888331,
+      "s_over_rho": 439.00318665465693,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20301613,
+        "solver": "fes-then-inherited",
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 304613.33614,
+      "verified": true,
+      "verify": {
+        "gae": 25.0,
+        "group_ops": {
+          "adds": 9,
+          "doubles": 16,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 3754
+      },
+      "wall_seconds": 1.853622732
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 294170.91471599997,
+          "group_ops": {
+            "adds": 1822,
+            "doubles": 537,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "relations": 232,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 342,
+            "solver_ops": 184689235,
+            "sqrt_solves": 0,
+            "target_guard_probes": 342,
+            "trials": 342,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 341
+          },
+          "wall_ns": 1673093536,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 341,
+            "walk_modr_adds": 682
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with fes-then-inherited",
+        "gae_before_solver": 2361.923416,
+        "hit_rate": 0.6783625730994152,
+        "name": "descent-algebraic",
+        "relations_found": 232,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 38838,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 342,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 226584,
+            "bitop_field_invs": 0,
+            "bitop_field_muls": 75460,
+            "bitop_field_sqrs": 41503,
+            "bitop_hash_probes": 21893649,
+            "bitop_word_ops": 880146886,
+            "eliminated": 598,
+            "engine_overridden_by_environment": 0,
+            "infeasible_branches": 9714,
+            "max_degree": 1026,
+            "oversize": 0,
+            "propagations": 15221,
+            "reduction_cache_on": 0,
+            "reductions": 23505,
+            "size_rule_fes": 0,
+            "slot_hit_rotation_0": 232,
+            "slot_hits": 232,
+            "slot_systems": 342,
+            "splits": 10119,
+            "verification_tests": 854459
+          },
+          "gae": 291808.9913,
+          "name": "fes-then-inherited",
+          "ns_per_op": 0.22404783939999998,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops": 184689235,
+          "peak_bytes": 0,
+          "priced_by": "pinned",
+          "semi_regular_degree": 5,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 1651849228
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 19,
+          "n_vars": 20,
+          "semi_regular_degree": 5
+        },
+        "targets_tried": 342
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 352089,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-inherited + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 28.924895999999997,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 232,
+            "repeated_column_rows": 0,
+            "row_ops": 2548,
+            "rows": 232,
+            "single_column_rows": 0,
+            "two_column_rows": 232
+          },
+          "wall_ns": 3110185,
+          "work_native": {
+            "column_part_inserts": 232,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 407146,
+            "pivot_inversion_steps": 8816,
+            "row_build_modr_adds": 696,
+            "row_build_modr_muls": 464,
+            "row_build_words": 362848,
+            "row_key_mixes": 464
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 232,
+        "rows": 232,
+        "work": 2548,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 126383,
+      "rho_s": 1.3541944158049875,
+      "s": 574.341662734323,
+      "s_over_rho": 424.12053692667996,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20342116,
+        "solver": "fes-then-inherited",
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 294286.63756,
+      "verified": true,
+      "verify": {
+        "gae": 28.0,
+        "group_ops": {
+          "adds": 12,
+          "doubles": 16,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 4230
+      },
+      "wall_seconds": 1.676644827
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 103550.67437200001,
+          "group_ops": {
+            "adds": 911,
+            "doubles": 550,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "relations": 98,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 134,
+            "solver_ops": 64612993,
+            "sqrt_solves": 0,
+            "target_guard_probes": 134,
+            "trials": 134,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 133
+          },
+          "wall_ns": 704256235,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 133,
+            "walk_modr_adds": 266
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with fes-then-batched",
+        "gae_before_solver": 1462.145432,
+        "hit_rate": 0.7313432835820896,
+        "name": "descent-algebraic",
+        "relations_found": 98,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 37960,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 134,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 89200,
+            "bitop_field_invs": 0,
+            "bitop_field_muls": 29700,
+            "bitop_field_sqrs": 16335,
+            "bitop_hash_probes": 8306515,
+            "bitop_word_ops": 315075862,
+            "eliminated": 211,
+            "engine_overridden_by_environment": 0,
+            "infeasible_branches": 3758,
+            "max_degree": 402,
+            "oversize": 0,
+            "propagations": 6003,
+            "reduction_cache_on": 0,
+            "reductions": 9232,
+            "size_rule_fes": 0,
+            "slot_hit_rotation_0": 98,
+            "slot_hits": 98,
+            "slot_systems": 134,
+            "splits": 3912,
+            "verification_tests": 328798
+          },
+          "gae": 102088.52894,
+          "name": "fes-then-batched",
+          "ns_per_op": 0.22404783939999998,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops": 64612993,
+          "peak_bytes": 0,
+          "priced_by": "pinned",
+          "semi_regular_degree": 5,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 695392398
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 19,
+          "n_vars": 20,
+          "semi_regular_degree": 5
+        },
+        "targets_tried": 134
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 378223,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-batched + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 7.980455999999999,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 98,
+            "repeated_column_rows": 0,
+            "row_ops": 703,
+            "rows": 98,
+            "single_column_rows": 1,
+            "two_column_rows": 97
+          },
+          "wall_ns": 1373521,
+          "work_native": {
+            "column_part_inserts": 98,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 135546,
+            "pivot_inversion_steps": 3724,
+            "row_build_modr_adds": 294,
+            "row_build_modr_muls": 196,
+            "row_build_words": 153272,
+            "row_key_mixes": 195
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 98,
+        "rows": 98,
+        "work": 703,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 45377,
+      "rho_s": 1.3541944158049875,
+      "s": 202.26302982167155,
+      "s_over_rho": 149.36040753161598,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20261110,
+        "solver": "fes-then-batched",
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 103637.45277600002,
+      "verified": true,
+      "verify": {
+        "gae": 20.0,
+        "group_ops": {
+          "adds": 5,
+          "doubles": 15,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 3281
+      },
+      "wall_seconds": 0.706093113
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 270359.90212399996,
+          "group_ops": {
+            "adds": 1734,
+            "doubles": 542,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "relations": 229,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 353,
+            "solver_ops": 169671446,
+            "sqrt_solves": 0,
+            "target_guard_probes": 353,
+            "trials": 353,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 352
+          },
+          "wall_ns": 1890408518,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 352,
+            "walk_modr_adds": 704
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with fes-then-batched",
+        "gae_before_solver": 2279.017444,
+        "hit_rate": 0.6487252124645893,
+        "name": "descent-algebraic",
+        "relations_found": 229,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 37442,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 353,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 233748,
+            "bitop_field_invs": 0,
+            "bitop_field_muls": 77880,
+            "bitop_field_sqrs": 42834,
+            "bitop_hash_probes": 21636234,
+            "bitop_word_ops": 823449551,
+            "eliminated": 611,
+            "engine_overridden_by_environment": 0,
+            "infeasible_branches": 10018,
+            "max_degree": 1059,
+            "oversize": 0,
+            "propagations": 15651,
+            "reduction_cache_on": 0,
+            "reductions": 24247,
+            "size_rule_fes": 0,
+            "slot_hit_rotation_0": 229,
+            "slot_hits": 229,
+            "slot_systems": 353,
+            "splits": 10436,
+            "verification_tests": 866611
+          },
+          "gae": 268080.88467999996,
+          "name": "fes-then-batched",
+          "ns_per_op": 0.22404783939999998,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops": 169671446,
+          "peak_bytes": 0,
+          "priced_by": "pinned",
+          "semi_regular_degree": 5,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 1868404542
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 19,
+          "n_vars": 20,
+          "semi_regular_degree": 5
+        },
+        "targets_tried": 353
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 340712,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-batched + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 25.303607999999997,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 229,
+            "repeated_column_rows": 0,
+            "row_ops": 2229,
+            "rows": 229,
+            "single_column_rows": 1,
+            "two_column_rows": 228
+          },
+          "wall_ns": 3303963,
+          "work_native": {
+            "column_part_inserts": 229,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 394848,
+            "pivot_inversion_steps": 8702,
+            "row_build_modr_adds": 687,
+            "row_build_modr_muls": 458,
+            "row_build_words": 358156,
+            "row_key_mixes": 457
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 229,
+        "rows": 229,
+        "work": 2229,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 85880,
+      "rho_s": 1.3541944158049875,
+      "s": 527.8582085127647,
+      "s_over_rho": 389.7949971969015,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20301613,
+        "solver": "fes-then-batched",
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 270469.00367999997,
+      "verified": true,
+      "verify": {
+        "gae": 25.0,
+        "group_ops": {
+          "adds": 9,
+          "doubles": 16,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 4170
+      },
+      "wall_seconds": 1.894141026
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 261616.69583600003,
+          "group_ops": {
+            "adds": 1822,
+            "doubles": 537,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "relations": 232,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 342,
+            "solver_ops": 164085299,
+            "sqrt_solves": 0,
+            "target_guard_probes": 342,
+            "trials": 342,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 341
+          },
+          "wall_ns": 1676881127,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 341,
+            "walk_modr_adds": 682
+          }
+        },
+        "description": "Weil-descend S_3 over the base's abscissa subspace and solve with fes-then-batched",
+        "gae_before_solver": 2361.923416,
+        "hit_rate": 0.6783625730994152,
+        "name": "descent-algebraic",
+        "relations_found": 232,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 39006,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 342,
+          "degree_over_bound": null,
+          "extra": {
+            "bitop_complete": 1,
+            "bitop_field_adds": 226584,
+            "bitop_field_invs": 0,
+            "bitop_field_muls": 75460,
+            "bitop_field_sqrs": 41503,
+            "bitop_hash_probes": 21893649,
+            "bitop_word_ops": 800470878,
+            "eliminated": 598,
+            "engine_overridden_by_environment": 0,
+            "infeasible_branches": 9714,
+            "max_degree": 1026,
+            "oversize": 0,
+            "propagations": 15221,
+            "reduction_cache_on": 0,
+            "reductions": 23505,
+            "size_rule_fes": 0,
+            "slot_hit_rotation_0": 232,
+            "slot_hits": 232,
+            "slot_systems": 342,
+            "splits": 10119,
+            "verification_tests": 854459
+          },
+          "gae": 259254.77242000002,
+          "name": "fes-then-batched",
+          "ns_per_op": 0.22404783939999998,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops": 164085299,
+          "peak_bytes": 0,
+          "priced_by": "pinned",
+          "semi_regular_degree": 5,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "wall_ns": 1656503831
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 19,
+          "n_vars": 20,
+          "semi_regular_degree": 5
+        },
+        "targets_tried": 342
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 521,
+        "columns": 521,
+        "cost": {
+          "gae": 58.797948000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 1023,
+            "as_solves": 1023
+          },
+          "wall_ns": 346127,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1563,
+            "index_sort_word_ops": 5731
+          }
+        },
+        "description": "points whose abscissa lies in the 10-dimensional subspace spanned by {1, z, …}",
+        "name": "binary-subspace",
+        "points_per_column": 2.0,
+        "signed_points": 1042
+      },
+      "group_order": 525086,
+      "instance": "icv1-f2m19-tm797-9c54981b",
+      "label": "binary-subspace[dimension=10] + descent-algebraic[m=2] + fes-then-batched + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 28.924895999999997,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 522,
+            "pinned_by_repeated_row": 0,
+            "rank": 232,
+            "repeated_column_rows": 0,
+            "row_ops": 2548,
+            "rows": 232,
+            "single_column_rows": 0,
+            "two_column_rows": 232
+          },
+          "wall_ns": 3275377,
+          "work_native": {
+            "column_part_inserts": 232,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 407146,
+            "pivot_inversion_steps": 8816,
+            "row_build_modr_adds": 696,
+            "row_build_modr_muls": 464,
+            "row_build_words": 362848,
+            "row_key_mixes": 464
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 232,
+        "rows": 232,
+        "work": 2548,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 18.002194205049015,
+      "r": 262543,
+      "recovered": 126383,
+      "rho_s": 1.3541944158049875,
+      "s": 510.8075371091178,
+      "s_over_rho": 377.20399017114045,
+      "spec": {
+        "factor_base": "binary-subspace",
+        "factor_base_params": {
+          "dimension": "10"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "descent-algebraic",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 20342116,
+        "solver": "fes-then-batched",
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 261732.41868000003,
+      "verified": true,
+      "verify": {
+        "gae": 28.0,
+        "group_ops": {
+          "adds": 12,
+          "doubles": 16,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 4243
+      },
+      "wall_seconds": 1.68059834
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "x86_64",
+    "binary_blake3": "c531c4cbdea7c641bd099c46ffa0bc0136530cae9d6112bb6c1f20e6cc0016b5",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "linux",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}

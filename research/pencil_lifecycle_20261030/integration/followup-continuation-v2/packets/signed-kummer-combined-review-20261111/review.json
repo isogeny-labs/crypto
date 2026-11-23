@@ -1,0 +1,80 @@
+{
+  "schema": "source-review/v1",
+  "created_utc": "2026-11-11T00:15:00Z",
+  "reviewer": "/root/ci_audit",
+  "subject": "signed-kummer-combined-runner-20261110",
+  "subject_manifest_sha256": "a5f6c051e925a06adb45edb8610d3dd3ae3343f0eaf36a2c944973bccce4d4ae",
+  "status": "release_blocked_by_source_integration_findings",
+  "execution_performed": false,
+  "verdict_scope": "Static source, staging, acceptance, resource-bound, ownership, and cleanup review only. No Cargo invocation, compile, test, lock generation, solver, experiment, or cloud action.",
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "blocking",
+      "kind": "missing_staged_source",
+      "summary": "driver-controls.rs is required by staged pruned.rs but absent from all 49 staged inputs",
+      "evidence": [
+        "kummer-signed-driver-20261109/pruned.rs.candidate:939-941 declares #[path = \"driver-controls.rs\"] mod driver_controls",
+        "signed-kummer-combined-runner-20261110/driver-inputs.json has 49 entries and no driver-controls.rs destination",
+        "signed-kummer-combined-runner-20261110/stage_driver.py:17-29 copies only listed inputs, the generated lock, and three derived fixture files",
+        "signed-kummer-combined-runner-20261110/durable-worker.py:238-242 invokes tests implemented in driver-controls.rs"
+      ],
+      "required_correction": "Stage the exact reviewed driver-controls.rs at the driver crate src/driver-controls.rs destination and refresh all manifests and hashes without reducing the two tests or 11-call panel."
+    },
+    {
+      "id": "F2",
+      "severity": "blocking",
+      "kind": "source_identity_not_admitted",
+      "summary": "Driver acceptance treats a solve-status boolean as source verification and never checks trace Identity",
+      "evidence": [
+        "signed-kummer-combined-runner-20261110/durable-worker.py:211 supplies the staged pruned.rs hash and published revision at compile time",
+        "signed-kummer-combined-runner-20261110/overlay/research/pencil_large_prime_20261029/src/relation_stream.rs:6-13 defines serialized source_revision/source_sha256 identity",
+        "kummer-signed-driver-20261109/pruned.rs.candidate:680 defines source_verified as status == verified",
+        "signed-kummer-combined-runner-20261110/panel_acceptance.py:12-21 checks that boolean and only nonempty trace files"
+      ],
+      "required_correction": "Parse retained trace headers and require exact published revision and staged pruned.rs SHA-256; retain the outcome boolean under its actual semantic meaning and add changed-revision/hash negatives."
+    },
+    {
+      "id": "F3",
+      "severity": "blocking_until_resolved",
+      "kind": "cargo_package_selection_unproven",
+      "summary": "Adapter compilation selects a nested-workspace path dependency through the driver manifest",
+      "evidence": [
+        "signed-kummer-combined-runner-20261110/durable-worker.py:214 selects -p pencil-symbolic-graph through the driver manifest",
+        "signed-kummer-combined-amendment-20261109/driver-Cargo.toml:5 declares the driver workspace and lines 14-15 list pencil-symbolic-graph only as a dev path dependency",
+        "/var/tmp/pencil-root-materialize-t1953-20261109/source/research/pencil_large_prime_20261029/Cargo.toml:7 declares a separate workspace",
+        "The predecessor lock review records actual offline dependency resolution as unexecuted"
+      ],
+      "required_correction": "Invoke the staged pencil Cargo.toml directly with --features reporting and provide an exact published Cargo.lock at that standalone workspace root, or create one reviewed workspace containing both packages. Retain exact target/executable checks and all four adapter negatives."
+    }
+  ],
+  "passed_static_checks": {
+    "declared_staged_inputs": 49,
+    "declared_input_hashes_and_bytes_match": true,
+    "duplicate_destinations": 0,
+    "packet_manifest_matches": true,
+    "admission_packet_files_match": true,
+    "signed_cases": 28,
+    "labels_cases": 7,
+    "native_driver_calls": 11,
+    "forced_fallback_probe_present": true,
+    "zero_vector_probe_present": true,
+    "adapter_negatives": 4,
+    "build_cap_seconds": 1800,
+    "execution_cap_seconds": 600,
+    "total_attempt_cap_seconds": 2400,
+    "cpu_limit": 2,
+    "memory_limit_gib": 16,
+    "swap_bytes": 0,
+    "tasks_max": 512,
+    "owner_permit_and_terminal_cgroup_controls_present": true
+  },
+  "expected_release_blockers": [
+    "admission released=false",
+    "generated_driver_lock path/hash/bytes null",
+    "published source revision null",
+    "attempt, deadline, authorization and release receipts null",
+    "future authorization must provide the runner's exact 43200-worker-second suballocation rather than reusing a 129600-second campaign value"
+  ],
+  "recommendation": "Correct F1 and F2, make F3 structurally unambiguous, refresh hashes, and repeat independent source review before lock generation or release. Preserve every planned panel and finite resource control."
+}

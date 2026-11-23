@@ -1,0 +1,49 @@
+module
+
+public import Mathlib.Data.Nat.Choose.Lucas
+public import Mathlib.NumberTheory.Padics.PadicVal.Basic
+
+public section
+
+namespace NatParityProbe
+
+theorem choose_pow_two_digit (n i : Nat) :
+    (n.choose (2 ^ i) : ZMod 2) = ((n / 2 ^ i : Nat) : ZMod 2) := by
+  letI : Fact (Nat.Prime 2) := ⟨by decide⟩
+  induction i generalizing n with
+  | zero => simp
+  | succ i ih =>
+    have h : (n.choose (2 ^ (i + 1)) : ZMod 2) =
+        (((n % 2).choose (2 ^ (i + 1) % 2) *
+          (n / 2).choose (2 ^ (i + 1) / 2) : Nat) : ZMod 2) := by
+      exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr
+        (Choose.choose_modEq_choose_mod_mul_choose_div_nat (p := 2))
+    have hr : 2 ^ (i + 1) % 2 = 0 := by simp [pow_succ]
+    have hq : 2 ^ (i + 1) / 2 = 2 ^ i := by simp [pow_succ]
+    rw [hr, hq, Nat.choose_zero_right, one_mul] at h
+    rw [h, ih]
+    congr 1
+    rw [Nat.div_div_eq_div_mul, pow_succ']
+
+theorem valuation_quotient_odd (n : Nat) (hn : n ≠ 0) :
+    Odd (n / 2 ^ padicValNat 2 n) := by
+  letI : Fact (Nat.Prime 2) := ⟨by decide⟩
+  apply Nat.not_even_iff_odd.mp
+  rw [even_iff_two_dvd]
+  intro hd
+  have hv : 2 ^ padicValNat 2 n ∣ n := pow_padicValNat_dvd
+  have hm := mul_dvd_mul_right hd (2 ^ padicValNat 2 n)
+  rw [← pow_succ', Nat.div_mul_cancel hv] at hm
+  exact pow_succ_padicValNat_not_dvd (p := 2) hn hm
+
+theorem choose_valuation_pow_two_odd (n : Nat) (hn : n ≠ 0) :
+    Odd (n.choose (2 ^ padicValNat 2 n)) := by
+  apply ZMod.natCast_eq_one_iff_odd.mp
+  rw [choose_pow_two_digit]
+  exact ZMod.natCast_eq_one_iff_odd.mpr (valuation_quotient_odd n hn)
+
+#print axioms choose_pow_two_digit
+#print axioms valuation_quotient_odd
+#print axioms choose_valuation_pow_two_odd
+
+end NatParityProbe

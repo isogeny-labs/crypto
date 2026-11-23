@@ -1,0 +1,212 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.9,g=1,grow=2",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "inc",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.3,g=1,grow=2"
+        }
+      },
+      "name": "wwalkG-x03-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.4,g=1,grow=2"
+        }
+      },
+      "name": "wwalkG-x04-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.5,g=1,grow=2"
+        }
+      },
+      "name": "wwalkG-x05-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2"
+        }
+      },
+      "name": "wwalkG-x06-j8-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2"
+        }
+      },
+      "name": "wwalkG-x09-j8-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2"
+        }
+      },
+      "name": "wwalkG-x06-j32-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2"
+        }
+      },
+      "name": "wwalkG-x09-j32-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.3,g=1,grow=2",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "wwalkGg-x03-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.4,g=1,grow=2",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "wwalkGg-x04-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.5,g=1,grow=2",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "wwalkGg-x05-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.6,jumps=8,g=1,grow=2",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "wwalkGg-x06-j8-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.9,jumps=8,g=1,grow=2",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "wwalkGg-x09-j8-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.6,jumps=32,g=1,grow=2",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "wwalkGg-x06-j32-n2",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=0.9,jumps=32,g=1,grow=2",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "wwalkGg-x09-j32-n2",
+      "role": "candidate"
+    }
+  ],
+  "description": "research/curve25519_autolab_20261104/round-034/PROTOCOL.md (frozen before data), train screen. Public synthetic Curve25519-family miniature and targets; no security claim. In-sample selection; promotion_eligible=false.",
+  "label": "ic_autolab round 34 train, generic track, k = 24",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate_measured",
+    "rounds": 1,
+    "seed": 2026144431,
+    "timeout_seconds": 1800,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 16743506,
+        "b": 2381926,
+        "group_order": 16778792,
+        "gx": 109,
+        "gy": 3123379,
+        "kind": "prime_explicit",
+        "p": 16777213,
+        "r": 2097349
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026144424,
+    "targets_per_curve": 32
+  }
+}

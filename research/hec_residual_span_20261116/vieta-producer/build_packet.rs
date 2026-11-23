@@ -1,0 +1,6 @@
+use crate::{packet::{Packet,Row,Kind},core::Trace,sparse::Sparse,action};
+use hec_native_ic::{fp::Fp,jac::{Curve,Div}};
+pub fn build(c:&Curve,d:&Div,target:&Div,ell:u64,sm:u64,trace:&Trace)->Packet{let lambda=action::witness(c,trace.z,ell).unwrap().lambda;let fl=Fp::new(ell);let n=trace.points.len()+1;let mut rows=vec![];let mut public=vec![0;n];public[0]=1;rows.push(Row{kind:Kind::Public,coeff:public,rhs:fl.inv(sm)});
+ for p in &trace.primitives{let mut v=vec![0;n];for &(x,y)in &p.points{let mut found=None;for(j,&(rx,ry))in trace.points.iter().enumerate(){let(mut xx,mut w)=(rx,1);for _ in 0..5{if xx==x&&(ry==y||c.fp.neg(ry)==y){assert!(found.is_none());found=Some((j,if ry==y{w}else{fl.neg(w)}));}xx=c.fp.mul(xx,trace.z);w=fl.mul(w,lambda);}}let(j,w)=found.unwrap();v[j]=fl.add(v[j],w);}v[n-1]=1;rows.push(Row{kind:Kind::Pencil{a:p.a,t:p.t,points:p.points.clone()},coeff:v,rhs:fl.neg(p.a%ell)});}
+ let mut solver=Sparse::new(n,ell);for row in &rows{solver.insert(&row.coeff,row.rhs);}let k=solver.k().expect("true-action rows must determine scalar");assert_eq!(Some(k),trace.answer.map(|x|x.1));Packet{curve:c.clone(),d:*d,target:*target,ell,sm,z:trace.z,lambda,reps:trace.points.clone(),rows,witness:solver.witness(),k}
+}

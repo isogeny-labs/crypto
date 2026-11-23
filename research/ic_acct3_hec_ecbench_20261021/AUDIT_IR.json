@@ -1,0 +1,45 @@
+{
+  "schema": "ic-acct.audit-ir/v1",
+  "study": "research/ic_acct3_hec_ecbench_20261021",
+  "status": "pass",
+  "date": "2026-11-07",
+  "code_commit": "8c37d9a6e7 (branch claude/ic-acct-3; the commit that produced sessions/g2-p41)",
+  "branch_head_note": "claude/ic-acct-3 head 67c7e7e060 does not compile (src/cryptanalysis/ecbench/workload.rs: unclosed delimiter after a union merge), so the audit ran on the study commit",
+  "tool": "ecbench audit-ir --spec sessions/g2-p41/spec.json --seq 0..44 (valgrind-3.22.0 --tool=callgrind --cache-sim=no --branch-sim=no), RAYON_NUM_THREADS=1",
+  "session": {
+    "spec_sha256": "a1aef2b3f884b2f0dcf59fbc60fc99d748ddcd5677a55d14c87cec31233a717c",
+    "records_sha256": "9c2a0fdce63ee36550ebc708839dc7cf6adeed824cad6fbbae20e95e1a022b21"
+  },
+  "criterion": "BITOPS.md: each arm re-executed reproduces its recorded bitop/v1 count exactly, and its instructions per counted gate are not far above the reference walk on the same curve (the bitop_unit_20261016 panel admitted arms within 2x of rho)",
+  "arms": [
+    {
+      "method": "hec.ic_fb_walk",
+      "runs": 5,
+      "reproduces_total": true,
+      "reproduces_every_phase_primitive": true,
+      "recovered_matches": true,
+      "complete": true,
+      "sum_bitops": 117422628,
+      "sum_solve_ir": 147787550,
+      "ir_per_kilo_bitop_pooled": 1258.5951491393976,
+      "ir_per_kilo_bitop_min": 1232.594753168441,
+      "ir_per_kilo_bitop_max": 1285.3643948524361
+    },
+    {
+      "method": "hec.rho_full_width",
+      "runs": 40,
+      "reproduces_total": true,
+      "reproduces_every_phase_primitive": true,
+      "recovered_matches": true,
+      "complete": true,
+      "sum_bitops": 4535211568,
+      "sum_solve_ir": 5954975607,
+      "ir_per_kilo_bitop_pooled": 1313.053540658988,
+      "ir_per_kilo_bitop_min": 1308.698018419706,
+      "ir_per_kilo_bitop_max": 1317.4110995451706
+    }
+  ],
+  "rows": "audit/audit-rows.json",
+  "raw": "audit/audit-ir.jsonl",
+  "ic_over_rho_ir_per_gate": 0.9585253838984669
+}

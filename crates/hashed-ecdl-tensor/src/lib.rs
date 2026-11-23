@@ -13,13 +13,40 @@
 #[macro_use]
 mod serialization;
 
+pub mod admission;
 pub mod arithmetic;
+pub mod batch;
+pub mod binary;
+pub mod canonical;
+pub mod census;
+mod collector_metrics;
 pub mod contraction;
 pub mod curve;
 pub mod encoding;
+pub mod factoring;
+pub mod finite;
+pub mod floor_sum;
+pub mod joint;
+pub mod metrics;
 pub mod network;
+pub mod optimized;
+pub mod partial;
+pub mod prepared;
+pub mod primality;
 pub mod reduction;
+mod relation_graph;
+pub mod relations;
 pub mod ring;
+pub mod short_box;
+pub mod structured;
+pub mod structured_runner;
+mod subgroup;
+pub mod target_walk;
+pub mod treewidth;
+pub mod unimodular;
+pub mod weighted;
+pub mod width;
+mod witness_policy;
 
 pub use num_bigint::{BigInt, BigUint};
 
@@ -75,14 +102,27 @@ pub struct Meter {
     pub limits: Limits,
     /// Primitive steps charged so far.
     pub used: u64,
+    /// Affine curve additions charged (`curve addition`).
+    pub curve_additions: u64,
+    /// Square-root extraction requests, counted once per `SquareRootContext::root` call.
+    pub square_roots: u64,
 }
 impl Meter {
     /// Start an operation with explicit bounds.
     pub fn new(limits: Limits) -> Self {
-        Self { limits, used: 0 }
+        Self {
+            limits,
+            used: 0,
+            curve_additions: 0,
+            square_roots: 0,
+        }
     }
     /// Charge before doing work; limits never wrap or become successful results.
     pub fn charge(&mut self, n: u64, phase: &str) -> Result<()> {
+        if phase == "curve addition" {
+            self.curve_additions = self.curve_additions.saturating_add(n);
+        }
+        crate::metrics::work(n)?;
         self.used = self
             .used
             .checked_add(n)

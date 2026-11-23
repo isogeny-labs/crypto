@@ -1,0 +1,183 @@
+# Written by the main session from the red team's returned text, verbatim apart from this line (the red team's harness blocked writing it).
+red_team_report:
+  id: RT-20261103-fd05ef
+  task_id: null  # no task card id was provided
+  claim_under_review: >
+    (A) research/jv_sieve_fbline_20261102: the factor-base line search lowers the JV12 sec. 3.2 sieve
+    route's cost with the search charged (pooled S ratio H 0.623, U 0.600, T 0.560; S+ U 0.525 (x1.90);
+    T improves across the band pooled). (B) research/jv_sieve_negrho_20261102: the plain sieve route is
+    S/rho 0.0065 (U1) / 0.0156 (U2), S+/rho 0.027 / 0.065, at p=1511 against a pooled 142-run negation
+    rho. (C) LEADS.md combined: ~0.0042 (U1) and ~0.034 (S+ U2) as a product of ratios. Snapshot main
+    aa1c89ab2a. Weak class only.
+  objections:
+    - id: O1
+      severity: high
+      joint: A2, C, next lever
+      text: >
+        S+ prices an 11-bit F_p addition as a full multiplication, about 10x its bitop/v1 price
+        (field_add/field_mul = 0.096 at b=11). In the "rho unpriced" form it also leaves rho's 45.1
+        additions per step free. The line search cuts add-heavy phases (enumeration adds B^-7.9) and
+        grows mod-l LA (B^+2.0, priced 16 vs bitop's 31.2), so S+ inflates the gain. In a bitop/v1
+        proxy that reproduces ic_acct1 (0.0091 vs measured 0.0098 [0.0069, 0.0144]): U 0.618
+        [0.561, 0.680] (x1.62, not x1.90); H 0.632; frontier with line search 0.0134 [0.0124,
+        0.0147] of a tuned rho (x75), not 0.034 (x29). L8's like-for-like ceiling is x1.19.
+    - id: O2
+      severity: high
+      joint: A3
+      text: >
+        Table-mode lookups execute chi[(x0*p + x1)] (jv_cover.rs table_count), an uncounted integer
+        multiply and add per walk lookup; T walks p*L = p^2(p+1)/2 points (1.7e9 at p=1511, 3.0e9 at
+        1823). Charged: T's band at w=0.1 is 0.751/1.240/1.696, pooled 1.164 [1.103, 1.231] (worse
+        than plain); S+ 1.016 [0.955, 1.083]; S 1.003 [0.906, 1.113] if the multiply is an F_p mult.
+        "T has the lowest S" and "T improves across the band (pooled)" do not stand; with an add-only
+        index T's S win is a sec. 6 relabelling. U moves by about 1% only (S+ 0.525 -> 0.532).
+    - id: O3
+      severity: medium
+      joint: C
+      text: >
+        The combined product multiplies 0.0065 (seeds 17-24) by 0.644 (seeds 17-32) and gives no
+        interval. Computed directly on matched seeds, H is 0.0045 [0.0042, 0.0049] (seeds 17-24) and
+        0.0042 (16 seeds). The "~0.034 S+ U2" uses the unpriced-rho denominator (mixed pricing);
+        like for like S+/rhoS+ U2 is 0.0233 and the bitop proxy against the tuned rho 0.0134.
+        AGENTS' success criterion forbids combining experiments; the direct ratio (arm records over
+        the matched reference) is the admissible derived form.
+    - id: O4
+      severity: medium
+      joint: A7, A6
+      text: >
+        The descent's geometric test count dominates noise (sd of log descent ratio 0.68-1.23 per
+        run). Sixteen seeds resolve H1, but not per-prime ranking or decay: +-5% per prime on S needs
+        99-577 seeds. U/H is unresolved in S (0.963 [0.883, 1.051]) and in the bitop proxy (0.978
+        [0.914, 1.051]). H's faster decay (slope 0.711 [0.261, 1.170] vs the rule model's 0.248;
+        gamma_eff 7.46 -> 4.05) does not appear in T or U on the same instances.
+    - id: O5
+      severity: low
+      joint: B1
+      text: >
+        The frozen homogeneity rule has power 0.45 at a 20% shift and 0.20 at 10% (simulated; 80%-power
+        detectable shift 36% of the mean). "Homogeneous" means not rejected. Pooling is justified by
+        theory (rho steps/sqrt(l) depends only on l; pooled = theory +3.4%), not by the test. The
+        choice moves S/rho U1 between 0.0065 (pooled), 0.0067 (theory) and 0.0074 (matched).
+    - id: O6
+      severity: low
+      joint: B3, B4
+      text: >
+        U1 prices rho at a schoolbook harness x2.40 dearer than TUNED; the cover is F_p-native, so U2
+        is the like-for-like F_p-mult unit. TUNED itself is not minimal (F_q3 product 24 vs 18
+        achievable: about 103 F_p mults per step, x1.34). Batch-16 inversion is 2.9% of the tuned
+        price. The headline distance should be U2 or bitop with a tuned rho, not U1 (x155/x240).
+    - id: O7
+      severity: low
+      joint: A4 (charging)
+      text: >
+        Mod-l Wiedemann operations are priced at 16 F_p mults; bitop/v1 prices a 62-bit modmul at 31.2.
+        Repriced, H's pooled S ratio is 0.658 (vs 0.623) and U's 0.641 (vs 0.600); LA becomes 29-34%
+        of U's mults. The single-exponent B^-5 model hides that LA grows as B^+2.0.
+    - id: O8
+      severity: low
+      joint: A4 (freeze)
+      text: >
+        The freeze rests on a system-clock timestamp; the first git commit with the protocol
+        (73582ce306, 19:37:29Z) already holds P_1009, H_1009 and 6 rows of T_1009. The timeline is
+        consistent and the rule's n is insensitive to gamma (optimal n=4096 for gamma 5-7.5), so no
+        steering was possible. The chi table's p^2 bytes are not listed as a byte counter (sec. 5a
+        listing).
+  required_controls:
+    - id: C1
+      text: >
+        Emit table-walk index arithmetic (or use an add-only incremental index) and restate T's S, S+
+        and band; predicted: T worse than plain at p >= 1511 in S+ and the band.
+    - id: C2
+      text: >
+        Active random-line null: JV_FB_LINE_PICK=matched (move to the candidate with B nearest
+        B_plain), 48 runs of about 10 s; predicted ratio 1.00 within descent noise. The passive null
+        (natural-B cross-section) already matches every deterministic phase within +-0.1.
+    - id: C3
+      text: >
+        Descent variance reduction before any per-prime or arm ranking: R >= 8 independent descent
+        streams per instance, or the route without descent plus c_cov x fitted expected tests.
+    - id: C4
+      text: >
+        j-invariant check on V2's 16 instances (JV_DUMP_INSTANCE; j^(p^2) != j and j^(p^3) != j) to
+        close the automorphism joint on the matched instances.
+    - id: C5
+      text: >
+        One frozen study of P, U and R3 rho on the same seeds, counted in bitop/v1 via the jv_bitops
+        hooks, replacing the product of ratios and supplying a VALIDATION.json matched reference.
+  counterexample_or_mutation: >
+    Mutation of the charging (no new run): charge the uncounted x0*p + x1 per table-walk lookup.
+    T's pooled band at w=0.1 goes from 0.876 to 1.164 [1.103, 1.231], flipping its sign against
+    plain, while H is unchanged and U moves about 1%. Unit mutation: re-price S+ to bitop/v1 weights.
+    U's gain goes from x1.90 to x1.62, the U-vs-H difference vanishes, and L8's ceiling drops from
+    x2 to x1.19.
+  baseline_comparison: >
+    Rho: matched negation-map r-adding rho (r=256, batch 16, dp 16), pooled 142 runs, 0.918
+    steps/sqrt(l) (theory 0.888). Aut(E)={+-1} by the generator, so no Frobenius speed-up. The
+    strongest-plausible F_p-mult rho is about x1.34 cheaper than TUNED. BSGS has the same sqrt
+    exponent with sqrt memory and is no stronger. Closest specialised baseline: the plain sieve route
+    (V2 sparse; dense is 1.10x dearer, V2 T4) and the ic_acct1 sec. 18 route; the Nagao arm is
+    dominated x83-100. At p=1511 (derived), the sieve/rho ratios for the plain route and the line
+    search (H/U) are:
+      U1 S: 0.0065 / 0.0042-0.0045 / 0.0040
+      U2 S: 0.0156 / 0.0101 / 0.0096
+      bitop proxy, harness rho: 0.0091 / 0.0059 / 0.0057
+      bitop proxy, tuned rho: 0.0214 / 0.0139 / 0.0134
+      band A U2 w=1: 0.122 / 0.068 / 0.065
+    All are below rho at every weight.
+  heuristic_challenges:
+    - >
+      B over random lines is Gaussian with sd sqrt(p)/2 and the best of n sits at k(n) (extreme
+      value): accepted (prior census); measured B gains match k(4096)=3.63 (mean z_best about 3.5).
+    - >
+      The route cost scales as B^-gamma with gamma=5: replaced by measured per-phase elasticities
+      (relation yield +8.05, families -6.86, enumeration -8.08, sieve -5.89, descent -5.9, LA +2.00).
+      The move equals natural variation in every deterministic phase (intercepts 0 within +-0.05).
+      A single exponent cannot capture LA's growth.
+    - >
+      Rho homogeneity across instances: true by theory, not established by the test (power 0.45 at
+      20%).
+  cost_model_challenges:
+    - "S+ 1:1 add pricing vs bitop/v1 0.096 (O1); S+/rho with unpriced rho is mixed pricing (O3)."
+    - "Table-walk index arithmetic uncounted (O2)."
+    - "Mod-l LA at 16 vs bitop 31.2 F_p mults per op (O7)."
+    - "F4, descent and LA additions unemitted: imputed at 1 per mult they move U's S+ 0.525 -> 0.530 (not material)."
+    - "Harness inversion priced 16 F_p mults vs bitop about 2.1 (slightly over-charges the cover)."
+    - "Memory: chi table p^2 bytes (2.3-3.3 MB), unlisted; rho DP table about 8.6k entries; negligible."
+    - "dp 16 vs 15: 0.03% of the rho mean (negligible)."
+  reduction_and_scope_challenges:
+    - >
+      The line move is an F_q-isomorphism of the cover (a = t^2), so l and the ECDLP are unchanged,
+      and the matched rho applies to moved instances.
+    - >
+      Scope: weak class only. The plain route's total work is nearly flat in p (3.46e9 / 3.51e9 /
+      4.02e9 F_p mults at p = 1009 / 1511 / 1823) while rho grows as p^3; nothing transfers to
+      prime-order curves, and the line-search gain tends to 1 as p grows.
+  proof_architecture_challenges: []
+  narrowest_supported_statement: >
+    On the weak class at p in {1009, 1511, 1823} (16 V2 seeds each), choosing the factor-base line
+    with the largest B (Horner n=4096 or chi-table n=32768, search charged) lowers the JV12 sec. 3.2
+    sieve route's cost by about x1.6. Pooled ratios: H 0.623 [0.562, 0.689] and U 0.600 [0.535,
+    0.674] in F_p mults; U 0.618 [0.561, 0.680] in a bitop/v1 proxy. The gain is explained phase by
+    phase by B, and it decays with p as (1 + k/sqrt p)^-gamma_eff (gamma_eff about 6 to 5). The
+    exhaustive table arm T is not an improvement once its index arithmetic is charged. At p=1511 the
+    route with the line search is about 0.010 (U2) / 0.013-0.014 (bitop proxy, tuned rho) of a
+    matched negation rho; this is a derived ratio, not a single measured run, and says nothing about
+    prime-order curves.
+  next_concrete_action: >
+    Freeze one combined study: arms P and U plus the R3 negation rho on the same V2 seeds (p=1511,
+    1823), counted in bitop/v1 via the jv_bitops hooks, with the table walk's index arithmetic
+    emitted and 8 descent streams per instance, headline in U2 and tuned-rho bitop. That produces
+    the admissible frontier row (VALIDATION.json). Then target LA (filtering/SGE before Wiedemann,
+    smaller relation surplus; ceiling x1.31-1.37 and growing), not L8 (x1.19 ceiling like for like).
+  artifact_paths:
+    - research/jv_sieve_fbline_20261102/review/red_team/analysis/Cargo.toml
+    - research/jv_sieve_fbline_20261102/review/red_team/analysis/Cargo.lock
+    - research/jv_sieve_fbline_20261102/review/red_team/analysis/src/main.rs
+    - research/jv_sieve_fbline_20261102/review/red_team/derived_numbers.txt
+    - research/jv_sieve_fbline_20261102/review/red_team/REPORT.md
+  review_attestation:
+    joints_owned: [A1, A2, A3, A4, A5, A6, A7, B1, B2, B3, B4, B5, C, scope]
+    read_sibling_reports: false
+    verdict: >
+      A1, A4, A5 hold; A2 holds as measured but is unit-inflated; A3 breaks; A6, A7 partial;
+      B1-B5 hold with qualifications; C to be replaced by the direct computation; scope holds.

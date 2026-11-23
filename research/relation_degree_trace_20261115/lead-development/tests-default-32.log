@@ -1,0 +1,22 @@
+   Compiling certified-relations v0.1.0 (/workspace/crypto-integrate/crates/certified-relations)
+error[E0515]: cannot return value referencing temporary value
+    --> src/lib.rs:1685:44
+     |
+1685 |         assert!(std::panic::catch_unwind(||lead_legacy(&Poly::new())).is_err());
+     |                                            ^^^^^^^^^^^^^-----------^
+     |                                            |            |
+     |                                            |            temporary value created here
+     |                                            returns a value referencing data owned by the current function
+
+error[E0515]: cannot return value referencing temporary value
+    --> src/lib.rs:1686:44
+     |
+1686 |         assert!(std::panic::catch_unwind(||lead_with_cached_degrees(&Poly::new())).is_err());
+     |                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^-----------^
+     |                                            |                         |
+     |                                            |                         temporary value created here
+     |                                            returns a value referencing data owned by the current function
+
+For more information about this error, try `rustc --explain E0515`.
+error: could not compile `certified-relations` (lib test) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

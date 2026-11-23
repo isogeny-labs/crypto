@@ -1,0 +1,15 @@
+warning: value assigned to `cands` is never read
+   --> isogeny_algos/src/quat/deuring.rs:320:17
+    |
+320 |         let mut cands: Vec<([Int; 4], Int)> = vec![];
+    |                 ^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` on by default
+
+warning: `isogeny_algos` (lib) generated 1 warning
+   Compiling crypto v0.1.0 (/workspace/crypto-twist-runs)
+    Finished `release` profile [optimized] target(s) in 6m 30s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-6a16cd246fedb10f)
+Restoring native checkpoint: degree=2, next_column=1
+error: test failed, to rerun pass `--lib`

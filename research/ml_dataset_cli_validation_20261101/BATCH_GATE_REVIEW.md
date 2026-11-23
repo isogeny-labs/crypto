@@ -1,0 +1,15 @@
+# Independent batched source verifier review
+
+Reviewed exact adapter `809db72d4b353a09123c0b3ac44b8f68162704cd111c73e2f89b33467bc8fde2`. Original adapter remains `55b39efd0f1ffc8d9f29b473f55e061c748a0520dd4982d214e652ac70dc2705`. AST comparison confirms only source_check changed among existing functions; two batch helpers and tempfile import were added. All guards-final001 before/after hashes match current artifacts. Both successful guard logs match receipt hashes and contain 3 batch plus 12 inherited tests.
+
+## Findings
+
+No blocker found in the examined replacement. Current HEAD equality, clean git status, exact Rust/Cargo inventory, regular/non-symlink current files, current SHA256, and committed tree query remain. Each requested commit:path is sent to one git cat-file --batch process; its ordered response must be a blob with exact expected size, exact streamed SHA256, one newline separator, and no extra output. Missing/nonblob/malformed responses and mismatched/truncated data fail. Object IDs are syntactically checked; content identity is independently checked with the original SHA256 snapshot.
+
+The complete request stream is written and rewound in a temporary file before process start. Stderr also goes to a temporary file, avoiding coupled stdin/stdout/stderr pipe backpressure. Stdout is consumed incrementally in at-most-1MiB reads, with response size bounded by the already-inspected local file size. After output EOF, nonzero child exit is rejected. On any parsing/refusal exception, the finally block closes stdout and kills/reaps a still-live child. No additional subprocess is started per file.
+
+Commit identity must be a full hex hash. Requests reject empty, absolute, parent-traversal, newline, carriage-return and NUL paths. Spaces are preserved because raw filesystem-encoded commit:path lines are written without shell interpolation. The real temporary-git guard exercises a file with spaces and binary content and checks one cat-file/no show invocation, tree identity, missing/nonblob/wrong-hash cases, inventory differences and a dirty source. Stream controls cover framing, truncation, size, separator, hash and extra-output rejection.
+
+The source race boundary remains the original sequential check model: initial HEAD/status/inventory plus current file hashes and immutable commit bytes; this is not a new atomic filesystem snapshot or ownership lease. A current-file size is additionally captured for response framing; changes that alter it fail against the immutable blob. Existing outer ownership/source checks remain necessary. No timeout is newly introduced and no live previous adaptation is interrupted or restarted by this change.
+
+No actual validation worktree command, build, crypto CLI, or cloud action was run by this review. The running original adaptation was untouched. This is source and retained-guard review, not a benchmark of the new verifier. Root may use the reviewed replacement for subsequent authorized source checks after reconciling the active adaptation.

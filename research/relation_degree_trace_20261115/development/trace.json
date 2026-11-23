@@ -1,0 +1,6638 @@
+{
+  "reports": [
+    {
+      "all_candidates": {
+        "solving_degree": 4,
+        "status": "complete",
+        "top_forms": {
+          "status": "vanished",
+          "top_form_d_reg": 4,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 2,
+              "monomials": 2,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 2,
+              "monomials": 4,
+              "rank": 2
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 0,
+              "monomials": 5,
+              "rank": 5
+            }
+          ]
+        },
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 1,
+            "columns": 10,
+            "degree": 3,
+            "degree_falls": 0,
+            "max_new_certificate_product_degree": 3,
+            "new_pivot_degree_histogram": {
+              "3": 2
+            },
+            "new_pivots": 2,
+            "new_row_nonzeros": 18,
+            "new_rows_processed": 2,
+            "rank": 2,
+            "reference_gb_contained": false,
+            "row_reductions": 0
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 2,
+            "columns": 15,
+            "degree": 4,
+            "degree_falls": 0,
+            "max_new_certificate_product_degree": 4,
+            "new_pivot_degree_histogram": {
+              "4": 5
+            },
+            "new_pivots": 5,
+            "new_row_nonzeros": 118,
+            "new_rows_processed": 12,
+            "rank": 7,
+            "reference_gb_contained": true,
+            "row_reductions": 20
+          }
+        ]
+      },
+      "baseline": {
+        "solving_degree": 5,
+        "status": "complete",
+        "top_forms": {
+          "status": "not_vanished_within_cap",
+          "top_form_d_reg": null,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 2,
+              "monomials": 2,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 4,
+              "monomials": 4,
+              "rank": 0
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 4,
+              "monomials": 5,
+              "rank": 1
+            },
+            {
+              "degree": 5,
+              "hilbert_function": 4,
+              "monomials": 6,
+              "rank": 2
+            },
+            {
+              "degree": 6,
+              "hilbert_function": 4,
+              "monomials": 7,
+              "rank": 3
+            },
+            {
+              "degree": 7,
+              "hilbert_function": 4,
+              "monomials": 8,
+              "rank": 4
+            },
+            {
+              "degree": 8,
+              "hilbert_function": 4,
+              "monomials": 9,
+              "rank": 5
+            }
+          ]
+        },
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 15,
+            "degree": 4,
+            "degree_falls": 1,
+            "max_new_certificate_product_degree": 5,
+            "new_pivot_degree_histogram": {
+              "3": 1,
+              "4": 3
+            },
+            "new_pivots": 4,
+            "new_row_nonzeros": 60,
+            "new_rows_processed": 7,
+            "rank": 4,
+            "reference_gb_contained": false,
+            "row_reductions": 5
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 21,
+            "degree": 5,
+            "degree_falls": 2,
+            "max_new_certificate_product_degree": 8,
+            "new_pivot_degree_histogram": {
+              "3": 1,
+              "4": 2,
+              "5": 6
+            },
+            "new_pivots": 9,
+            "new_row_nonzeros": 290,
+            "new_rows_processed": 29,
+            "rank": 13,
+            "reference_gb_contained": true,
+            "row_reductions": 87
+          }
+        ]
+      },
+      "candidate_discovery": {
+        "free_online_preprocessing": false,
+        "max_degree_paid": 5,
+        "method": "baseline closure",
+        "rows_paid": 36
+      },
+      "candidates": [
+        {
+          "certificate_max_product_degree": 4,
+          "degree": 3,
+          "discovered_at_degree": 4,
+          "id": "c0",
+          "membership_certificate": [
+            {
+              "coefficient": 1111961964,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 1035521683,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 6,
+              "exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 812072490,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 523338667,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 812072490,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                2,
+                1
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 2,
+                  "monomials": 5,
+                  "rank": 3
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 2,
+                  "monomials": 6,
+                  "rank": 4
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 2,
+                  "monomials": 7,
+                  "rank": 5
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 2,
+                  "monomials": 8,
+                  "rank": 6
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 2,
+                  "monomials": 9,
+                  "rank": 7
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 8,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 3
+                },
+                "new_pivots": 3,
+                "new_row_nonzeros": 52,
+                "new_rows_processed": 6,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 7,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 8
+        },
+        {
+          "certificate_max_product_degree": 6,
+          "degree": 3,
+          "discovered_at_degree": 5,
+          "id": "c1",
+          "membership_certificate": [
+            {
+              "coefficient": 782172576,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 1738198950,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 1738198950,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 981239198,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 1957081697,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 1957081697,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 1166244449,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 1820210152,
+              "exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 922321232,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 311582410,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 922321232,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 1297074898,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 1948384091,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 311582410,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 1948384091,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                3,
+                0
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 6,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 2,
+                  "monomials": 5,
+                  "rank": 3
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 1,
+                  "monomials": 6,
+                  "rank": 5
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 0,
+                  "monomials": 7,
+                  "rank": 7
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 10,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 5
+                },
+                "new_pivots": 6,
+                "new_row_nonzeros": 105,
+                "new_rows_processed": 11,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 10
+              }
+            ]
+          },
+          "terms": 10
+        },
+        {
+          "certificate_max_product_degree": 5,
+          "degree": 4,
+          "discovered_at_degree": 4,
+          "id": "c2",
+          "membership_certificate": [
+            {
+              "coefficient": 1111961964,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 1035521683,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 6,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 812072490,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 523338667,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 812072490,
+              "exponents": [
+                3,
+                0
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                3,
+                1
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 3,
+                  "monomials": 5,
+                  "rank": 2
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 3,
+                  "monomials": 6,
+                  "rank": 3
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 3,
+                  "monomials": 7,
+                  "rank": 4
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 3,
+                  "monomials": 8,
+                  "rank": 5
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 3,
+                  "monomials": 9,
+                  "rank": 6
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 3
+                },
+                "new_pivots": 4,
+                "new_row_nonzeros": 60,
+                "new_rows_processed": 7,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 7,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 8
+        },
+        {
+          "certificate_max_product_degree": 5,
+          "degree": 4,
+          "discovered_at_degree": 4,
+          "id": "c3",
+          "membership_certificate": [
+            {
+              "coefficient": 2147483646,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 1111961964,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 1035521683,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 1985096670,
+              "exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 2093354674,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 509645525,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 812072490,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 2093354668,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 1128192607,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 1570015995,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                1,
+                3
+              ]
+            },
+            {
+              "coefficient": 509645523,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 1858749818,
+              "exponents": [
+                2,
+                1
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 3,
+                  "monomials": 5,
+                  "rank": 2
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 3,
+                  "monomials": 6,
+                  "rank": 3
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 3,
+                  "monomials": 7,
+                  "rank": 4
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 3,
+                  "monomials": 8,
+                  "rank": 5
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 3,
+                  "monomials": 9,
+                  "rank": 6
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 3
+                },
+                "new_pivots": 4,
+                "new_row_nonzeros": 60,
+                "new_rows_processed": 7,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 7,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 10
+        },
+        {
+          "certificate_max_product_degree": 8,
+          "degree": 4,
+          "discovered_at_degree": 5,
+          "id": "c4",
+          "membership_certificate": [
+            {
+              "coefficient": 358243621,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 3957899,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 785429729,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 1999094829,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 158021756,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 184762914,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 1194714426,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 1351007363,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 1564401812,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 1615744422,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 1362053918,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 985918563,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 190401950,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 2147241310,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 1552455868,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 980996861,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 583081835,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                2
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 1449590742,
+              "exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 16301782,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 1621953047,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 926859695,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                0,
+                4
+              ]
+            },
+            {
+              "coefficient": 1296461582,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 1387386540,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 2015970960,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 301432701,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 1555137081,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 440391082,
+              "exponents": [
+                3,
+                0
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 3,
+                  "monomials": 5,
+                  "rank": 2
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 2,
+                  "monomials": 6,
+                  "rank": 4
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 2,
+                  "monomials": 7,
+                  "rank": 5
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 2,
+                  "monomials": 8,
+                  "rank": 6
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 2,
+                  "monomials": 9,
+                  "rank": 7
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 4
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 71,
+                "new_rows_processed": 8,
+                "rank": 5,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 8,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 1,
+                  "5": 6
+                },
+                "new_pivots": 8,
+                "new_row_nonzeros": 278,
+                "new_rows_processed": 28,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 90
+              }
+            ]
+          },
+          "terms": 11
+        },
+        {
+          "certificate_max_product_degree": 8,
+          "degree": 4,
+          "discovered_at_degree": 5,
+          "id": "c5",
+          "membership_certificate": [
+            {
+              "coefficient": 1619702321,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 785429729,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 1619702321,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 1896220706,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 184762914,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 785429729,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 184762914,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 1564401812,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 1362053918,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 2147241310,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 1362053918,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 2147241310,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 583081835,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                2
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 2027645003,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 40852582,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 579884955,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                0,
+                4
+              ]
+            },
+            {
+              "coefficient": 2027645003,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 204002329,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 1414989172,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 454792284,
+              "exponents": [
+                1,
+                3
+              ]
+            },
+            {
+              "coefficient": 40852582,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 1414989172,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 551340946,
+              "exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 579884955,
+              "exponents": [
+                3,
+                0
+              ]
+            },
+            {
+              "coefficient": 454792284,
+              "exponents": [
+                3,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                4,
+                0
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 7,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 3,
+                  "monomials": 5,
+                  "rank": 2
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 2,
+                  "monomials": 6,
+                  "rank": 4
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 1,
+                  "monomials": 7,
+                  "rank": 6
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 0,
+                  "monomials": 8,
+                  "rank": 8
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 4
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 74,
+                "new_rows_processed": 8,
+                "rank": 5,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 8,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 1,
+                  "5": 6
+                },
+                "new_pivots": 8,
+                "new_row_nonzeros": 294,
+                "new_rows_processed": 28,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 95
+              }
+            ]
+          },
+          "terms": 14
+        },
+        {
+          "certificate_max_product_degree": 6,
+          "degree": 5,
+          "discovered_at_degree": 5,
+          "id": "c6",
+          "membership_certificate": [
+            {
+              "coefficient": 1111961964,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 1035521683,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 6,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 812072490,
+              "exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                3,
+                0
+              ]
+            },
+            {
+              "coefficient": 523338667,
+              "exponents": [
+                3,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                3,
+                2
+              ]
+            },
+            {
+              "coefficient": 812072490,
+              "exponents": [
+                4,
+                0
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                4,
+                1
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 4,
+                  "monomials": 5,
+                  "rank": 1
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 3,
+                  "monomials": 6,
+                  "rank": 3
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 3,
+                  "monomials": 7,
+                  "rank": 4
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 3,
+                  "monomials": 8,
+                  "rank": 5
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 3,
+                  "monomials": 9,
+                  "rank": 6
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 3
+                },
+                "new_pivots": 4,
+                "new_row_nonzeros": 60,
+                "new_rows_processed": 7,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 8,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 8
+        },
+        {
+          "certificate_max_product_degree": 5,
+          "degree": 5,
+          "discovered_at_degree": 5,
+          "id": "c7",
+          "membership_certificate": [
+            {
+              "coefficient": 1,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 162386977,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 54128979,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 1637838124,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 54128979,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 1019291042,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 1100806319,
+              "exponents": [
+                1,
+                3
+              ]
+            },
+            {
+              "coefficient": 1637838124,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 1100806319,
+              "exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                2,
+                3
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 4,
+                  "monomials": 5,
+                  "rank": 1
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 4,
+                  "monomials": 6,
+                  "rank": 2
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 4,
+                  "monomials": 7,
+                  "rank": 3
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 4,
+                  "monomials": 8,
+                  "rank": 4
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 4,
+                  "monomials": 9,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 3
+                },
+                "new_pivots": 4,
+                "new_row_nonzeros": 60,
+                "new_rows_processed": 7,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 8,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 9
+        }
+      ],
+      "claim_status": "producer output; no signed independent PCC verdict",
+      "definition": "Bounded affine Macaulay closure threshold to a certified reduced grevlex GB; not a solver-independent runtime claim.",
+      "end_to_end_complete": true,
+      "end_to_end_peak_matrix_degree": 5,
+      "greedy_final": {
+        "solving_degree": 4,
+        "status": "complete",
+        "top_forms": {
+          "status": "vanished",
+          "top_form_d_reg": 4,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 2,
+              "monomials": 2,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 2,
+              "monomials": 4,
+              "rank": 2
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 0,
+              "monomials": 5,
+              "rank": 5
+            }
+          ]
+        },
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 1,
+            "columns": 10,
+            "degree": 3,
+            "degree_falls": 0,
+            "max_new_certificate_product_degree": 3,
+            "new_pivot_degree_histogram": {
+              "3": 2
+            },
+            "new_pivots": 2,
+            "new_row_nonzeros": 18,
+            "new_rows_processed": 2,
+            "rank": 2,
+            "reference_gb_contained": false,
+            "row_reductions": 0
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 2,
+            "columns": 15,
+            "degree": 4,
+            "degree_falls": 0,
+            "max_new_certificate_product_degree": 4,
+            "new_pivot_degree_histogram": {
+              "4": 5
+            },
+            "new_pivots": 5,
+            "new_row_nonzeros": 97,
+            "new_rows_processed": 10,
+            "rank": 7,
+            "reference_gb_contained": true,
+            "row_reductions": 10
+          }
+        ]
+      },
+      "greedy_selected": [
+        "c1",
+        "c0"
+      ],
+      "greedy_trace": [
+        {
+          "added": "c1",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 6,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 2,
+                  "monomials": 5,
+                  "rank": 3
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 1,
+                  "monomials": 6,
+                  "rank": 5
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 0,
+                  "monomials": 7,
+                  "rank": 7
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 10,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 5
+                },
+                "new_pivots": 6,
+                "new_row_nonzeros": 105,
+                "new_rows_processed": 11,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 10
+              }
+            ]
+          }
+        },
+        {
+          "added": "c0",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 97,
+                "new_rows_processed": 10,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 10
+              }
+            ]
+          }
+        }
+      ],
+      "input": [
+        [
+          {
+            "coefficient": 1,
+            "exponents": [
+              2,
+              2
+            ]
+          },
+          {
+            "coefficient": 1100806319,
+            "exponents": [
+              2,
+              1
+            ]
+          },
+          {
+            "coefficient": 1100806319,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 1637838124,
+            "exponents": [
+              2,
+              0
+            ]
+          },
+          {
+            "coefficient": 1019291042,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 1637838124,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 54128979,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 54128979,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 162386977,
+            "exponents": [
+              0,
+              0
+            ]
+          }
+        ],
+        [
+          {
+            "coefficient": 1,
+            "exponents": [
+              2,
+              2
+            ]
+          },
+          {
+            "coefficient": 2147483641,
+            "exponents": [
+              2,
+              1
+            ]
+          },
+          {
+            "coefficient": 2147483641,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 9,
+            "exponents": [
+              2,
+              0
+            ]
+          },
+          {
+            "coefficient": 2147483625,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 9,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 2147483623,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 2147483623,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 2147483615,
+            "exponents": [
+              0,
+              0
+            ]
+          }
+        ]
+      ],
+      "leave_one_out": [
+        {
+          "removed": "c0",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 10,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 5
+                },
+                "new_pivots": 6,
+                "new_row_nonzeros": 148,
+                "new_rows_processed": 15,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 25
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c1",
+          "solve": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 8,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 77,
+                "new_rows_processed": 8,
+                "rank": 6,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "5": 6
+                },
+                "new_pivots": 7,
+                "new_row_nonzeros": 267,
+                "new_rows_processed": 27,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 85
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c2",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 118,
+                "new_rows_processed": 12,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 20
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c3",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 118,
+                "new_rows_processed": 12,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 20
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c4",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 107,
+                "new_rows_processed": 11,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 17
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c5",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 104,
+                "new_rows_processed": 11,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 13
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c6",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 118,
+                "new_rows_processed": 12,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 20
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c7",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 118,
+                "new_rows_processed": 12,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 20
+              }
+            ]
+          }
+        }
+      ],
+      "prime": 2147483647,
+      "reference_gb_max_degree": 4,
+      "reference_groebner_basis": [
+        [
+          {
+            "coefficient": 1570015997,
+            "exponents": [
+              0,
+              0
+            ]
+          },
+          {
+            "coefficient": 523338685,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 1986161200,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 812072490,
+            "exponents": [
+              0,
+              3
+            ]
+          },
+          {
+            "coefficient": 523338679,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 322644904,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 1858749824,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              1,
+              3
+            ]
+          },
+          {
+            "coefficient": 1986161198,
+            "exponents": [
+              2,
+              0
+            ]
+          }
+        ],
+        [
+          {
+            "coefficient": 878733072,
+            "exponents": [
+              0,
+              0
+            ]
+          },
+          {
+            "coefficient": 1529550990,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 582794764,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 486468613,
+            "exponents": [
+              0,
+              3
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              0,
+              4
+            ]
+          },
+          {
+            "coefficient": 662227143,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 1394621673,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 460833879,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 1409758065,
+            "exponents": [
+              2,
+              0
+            ]
+          }
+        ],
+        [
+          {
+            "coefficient": 867323841,
+            "exponents": [
+              0,
+              0
+            ]
+          },
+          {
+            "coefficient": 1320520344,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 1821879770,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              0,
+              3
+            ]
+          },
+          {
+            "coefficient": 1320520344,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 423963825,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 1821879770,
+            "exponents": [
+              2,
+              0
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              3,
+              0
+            ]
+          }
+        ],
+        [
+          {
+            "coefficient": 6,
+            "exponents": [
+              0,
+              0
+            ]
+          },
+          {
+            "coefficient": 2,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 812072490,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 2,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 523338667,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 812072490,
+            "exponents": [
+              2,
+              0
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              2,
+              1
+            ]
+          }
+        ]
+      ],
+      "reference_oracle_seconds_diagnostic": 0.000710867,
+      "schema": "relation-degree-trace/v1",
+      "variables": [
+        "x1",
+        "x2"
+      ]
+    },
+    {
+      "all_candidates": {
+        "solving_degree": 4,
+        "status": "complete",
+        "top_forms": {
+          "status": "vanished",
+          "top_form_d_reg": 4,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 2,
+              "monomials": 2,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 2,
+              "monomials": 4,
+              "rank": 2
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 0,
+              "monomials": 5,
+              "rank": 5
+            }
+          ]
+        },
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 1,
+            "columns": 10,
+            "degree": 3,
+            "degree_falls": 0,
+            "max_new_certificate_product_degree": 3,
+            "new_pivot_degree_histogram": {
+              "3": 2
+            },
+            "new_pivots": 2,
+            "new_row_nonzeros": 18,
+            "new_rows_processed": 2,
+            "rank": 2,
+            "reference_gb_contained": false,
+            "row_reductions": 0
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 2,
+            "columns": 15,
+            "degree": 4,
+            "degree_falls": 0,
+            "max_new_certificate_product_degree": 4,
+            "new_pivot_degree_histogram": {
+              "4": 5
+            },
+            "new_pivots": 5,
+            "new_row_nonzeros": 118,
+            "new_rows_processed": 12,
+            "rank": 7,
+            "reference_gb_contained": true,
+            "row_reductions": 20
+          }
+        ]
+      },
+      "baseline": {
+        "solving_degree": 5,
+        "status": "complete",
+        "top_forms": {
+          "status": "not_vanished_within_cap",
+          "top_form_d_reg": null,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 2,
+              "monomials": 2,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 4,
+              "monomials": 4,
+              "rank": 0
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 4,
+              "monomials": 5,
+              "rank": 1
+            },
+            {
+              "degree": 5,
+              "hilbert_function": 4,
+              "monomials": 6,
+              "rank": 2
+            },
+            {
+              "degree": 6,
+              "hilbert_function": 4,
+              "monomials": 7,
+              "rank": 3
+            },
+            {
+              "degree": 7,
+              "hilbert_function": 4,
+              "monomials": 8,
+              "rank": 4
+            },
+            {
+              "degree": 8,
+              "hilbert_function": 4,
+              "monomials": 9,
+              "rank": 5
+            }
+          ]
+        },
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 15,
+            "degree": 4,
+            "degree_falls": 1,
+            "max_new_certificate_product_degree": 5,
+            "new_pivot_degree_histogram": {
+              "3": 1,
+              "4": 3
+            },
+            "new_pivots": 4,
+            "new_row_nonzeros": 60,
+            "new_rows_processed": 7,
+            "rank": 4,
+            "reference_gb_contained": false,
+            "row_reductions": 5
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 21,
+            "degree": 5,
+            "degree_falls": 2,
+            "max_new_certificate_product_degree": 8,
+            "new_pivot_degree_histogram": {
+              "3": 1,
+              "4": 2,
+              "5": 6
+            },
+            "new_pivots": 9,
+            "new_row_nonzeros": 290,
+            "new_rows_processed": 29,
+            "rank": 13,
+            "reference_gb_contained": true,
+            "row_reductions": 87
+          }
+        ]
+      },
+      "candidate_discovery": {
+        "free_online_preprocessing": false,
+        "max_degree_paid": 5,
+        "method": "baseline closure",
+        "rows_paid": 36
+      },
+      "candidates": [
+        {
+          "certificate_max_product_degree": 4,
+          "degree": 3,
+          "discovered_at_degree": 4,
+          "id": "c0",
+          "membership_certificate": [
+            {
+              "coefficient": 95263289865768,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 8911935964875113,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 6,
+              "exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 7293034980190437,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 3428328549100888,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 7293034980190437,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                2,
+                1
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 2,
+                  "monomials": 5,
+                  "rank": 3
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 2,
+                  "monomials": 6,
+                  "rank": 4
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 2,
+                  "monomials": 7,
+                  "rank": 5
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 2,
+                  "monomials": 8,
+                  "rank": 6
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 2,
+                  "monomials": 9,
+                  "rank": 7
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 8,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 3
+                },
+                "new_pivots": 3,
+                "new_row_nonzeros": 52,
+                "new_rows_processed": 6,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 7,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 8
+        },
+        {
+          "certificate_max_product_degree": 6,
+          "degree": 3,
+          "discovered_at_degree": 5,
+          "id": "c1",
+          "membership_certificate": [
+            {
+              "coefficient": 6282806170587777,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 2527233421576122,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 2527233421576122,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 6154853693396000,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 375151292812437,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 375151292812437,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 2852345561344881,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 7772704268705467,
+              "exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 569075500281815,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 4641008189569502,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 569075500281815,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 3457954879392411,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 8215402618073828,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 4641008189569502,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 8215402618073828,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                3,
+                0
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 6,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 2,
+                  "monomials": 5,
+                  "rank": 3
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 1,
+                  "monomials": 6,
+                  "rank": 5
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 0,
+                  "monomials": 7,
+                  "rank": 7
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 10,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 5
+                },
+                "new_pivots": 6,
+                "new_row_nonzeros": 105,
+                "new_rows_processed": 11,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 10
+              }
+            ]
+          },
+          "terms": 10
+        },
+        {
+          "certificate_max_product_degree": 5,
+          "degree": 4,
+          "discovered_at_degree": 4,
+          "id": "c2",
+          "membership_certificate": [
+            {
+              "coefficient": 95263289865768,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 8911935964875113,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 6,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 7293034980190437,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 3428328549100888,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 7293034980190437,
+              "exponents": [
+                3,
+                0
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                3,
+                1
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 3,
+                  "monomials": 5,
+                  "rank": 2
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 3,
+                  "monomials": 6,
+                  "rank": 3
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 3,
+                  "monomials": 7,
+                  "rank": 4
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 3,
+                  "monomials": 8,
+                  "rank": 5
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 3,
+                  "monomials": 9,
+                  "rank": 6
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 3
+                },
+                "new_pivots": 4,
+                "new_row_nonzeros": 60,
+                "new_rows_processed": 7,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 7,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 8
+        },
+        {
+          "certificate_max_product_degree": 5,
+          "degree": 4,
+          "discovered_at_degree": 4,
+          "id": "c3",
+          "membership_certificate": [
+            {
+              "coefficient": 9007199254740880,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 95263289865768,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 8911935964875113,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 5111145570247092,
+              "exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 4706114941662677,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 3314150041301540,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 7293034980190437,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 4706114941662671,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 2378899172137811,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 1277786392561777,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                1,
+                3
+              ]
+            },
+            {
+              "coefficient": 3314150041301538,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 5142492823651326,
+              "exponents": [
+                2,
+                1
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 3,
+                  "monomials": 5,
+                  "rank": 2
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 3,
+                  "monomials": 6,
+                  "rank": 3
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 3,
+                  "monomials": 7,
+                  "rank": 4
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 3,
+                  "monomials": 8,
+                  "rank": 5
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 3,
+                  "monomials": 9,
+                  "rank": 6
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 3
+                },
+                "new_pivots": 4,
+                "new_row_nonzeros": 60,
+                "new_rows_processed": 7,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 7,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 10
+        },
+        {
+          "certificate_max_product_degree": 8,
+          "degree": 4,
+          "discovered_at_degree": 5,
+          "id": "c4",
+          "membership_certificate": [
+            {
+              "coefficient": 4489864338269124,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 3628623062566986,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 653085602738723,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 5535033843306349,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 75106181237233,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 4401885821040639,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 7133051435903482,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 7254231382385520,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 7798160691009961,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 8046886334597592,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 8354113652002158,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 8864868638011333,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 8632047961928444,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 7704393953091758,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 7978962359189721,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 4852048391746877,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 1209038563730920,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                2
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 3537522490649604,
+              "exponents": [
+                0,
+                0
+              ]
+            },
+            {
+              "coefficient": 8030156391874945,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 6817912454180624,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 8177089848161972,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                0,
+                4
+              ]
+            },
+            {
+              "coefficient": 4513871557908035,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 3851025628471368,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 241088265506703,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 4665243680564701,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 8913938843796888,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 7044282072382026,
+              "exponents": [
+                3,
+                0
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 3,
+                  "monomials": 5,
+                  "rank": 2
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 2,
+                  "monomials": 6,
+                  "rank": 4
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 2,
+                  "monomials": 7,
+                  "rank": 5
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 2,
+                  "monomials": 8,
+                  "rank": 6
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 2,
+                  "monomials": 9,
+                  "rank": 7
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 4
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 71,
+                "new_rows_processed": 8,
+                "rank": 5,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 8,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 1,
+                  "5": 6
+                },
+                "new_pivots": 8,
+                "new_row_nonzeros": 278,
+                "new_rows_processed": 28,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 90
+              }
+            ]
+          },
+          "terms": 11
+        },
+        {
+          "certificate_max_product_degree": 8,
+          "degree": 4,
+          "discovered_at_degree": 5,
+          "id": "c5",
+          "membership_certificate": [
+            {
+              "coefficient": 2668310142423697,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 653085602738723,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 2668310142423697,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 2602339602813355,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 4401885821040639,
+              "input": 0,
+              "multiplier_exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 653085602738723,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 4401885821040639,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 7798160691009961,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 8354113652002158,
+              "input": 1,
+              "multiplier_exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 7704393953091758,
+              "input": 1,
+              "multiplier_exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 8354113652002158,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 7704393953091758,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 1209038563730920,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                2
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 6664493124270655,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 6945312241666532,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 8953397062658821,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                0,
+                4
+              ]
+            },
+            {
+              "coefficient": 6664493124270655,
+              "exponents": [
+                1,
+                0
+              ]
+            },
+            {
+              "coefficient": 3687884614940855,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 3001244637194282,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 2001041181714052,
+              "exponents": [
+                1,
+                3
+              ]
+            },
+            {
+              "coefficient": 6945312241666532,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 3001244637194282,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 8519417279899860,
+              "exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 8953397062658821,
+              "exponents": [
+                3,
+                0
+              ]
+            },
+            {
+              "coefficient": 2001041181714052,
+              "exponents": [
+                3,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                4,
+                0
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 7,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 3,
+                  "monomials": 5,
+                  "rank": 2
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 2,
+                  "monomials": 6,
+                  "rank": 4
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 1,
+                  "monomials": 7,
+                  "rank": 6
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 0,
+                  "monomials": 8,
+                  "rank": 8
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 4
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 74,
+                "new_rows_processed": 8,
+                "rank": 5,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 8,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 1,
+                  "5": 6
+                },
+                "new_pivots": 8,
+                "new_row_nonzeros": 294,
+                "new_rows_processed": 28,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 95
+              }
+            ]
+          },
+          "terms": 14
+        },
+        {
+          "certificate_max_product_degree": 6,
+          "degree": 5,
+          "discovered_at_degree": 5,
+          "id": "c6",
+          "membership_certificate": [
+            {
+              "coefficient": 95263289865768,
+              "input": 0,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 8911935964875113,
+              "input": 1,
+              "multiplier_exponents": [
+                2,
+                0
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 6,
+              "exponents": [
+                2,
+                0
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 7293034980190437,
+              "exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 2,
+              "exponents": [
+                3,
+                0
+              ]
+            },
+            {
+              "coefficient": 3428328549100888,
+              "exponents": [
+                3,
+                1
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                3,
+                2
+              ]
+            },
+            {
+              "coefficient": 7293034980190437,
+              "exponents": [
+                4,
+                0
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                4,
+                1
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 4,
+                  "monomials": 5,
+                  "rank": 1
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 3,
+                  "monomials": 6,
+                  "rank": 3
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 3,
+                  "monomials": 7,
+                  "rank": 4
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 3,
+                  "monomials": 8,
+                  "rank": 5
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 3,
+                  "monomials": 9,
+                  "rank": 6
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 3
+                },
+                "new_pivots": 4,
+                "new_row_nonzeros": 60,
+                "new_rows_processed": 7,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 8,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 8
+        },
+        {
+          "certificate_max_product_degree": 5,
+          "degree": 5,
+          "discovered_at_degree": 5,
+          "id": "c7",
+          "membership_certificate": [
+            {
+              "coefficient": 1,
+              "input": 0,
+              "multiplier_exponents": [
+                0,
+                1
+              ]
+            }
+          ],
+          "polynomial": [
+            {
+              "coefficient": 3896053684493789,
+              "exponents": [
+                0,
+                1
+              ]
+            },
+            {
+              "coefficient": 4301084313078210,
+              "exponents": [
+                0,
+                2
+              ]
+            },
+            {
+              "coefficient": 5693049213439343,
+              "exponents": [
+                0,
+                3
+              ]
+            },
+            {
+              "coefficient": 4301084313078210,
+              "exponents": [
+                1,
+                1
+              ]
+            },
+            {
+              "coefficient": 6628300082603072,
+              "exponents": [
+                1,
+                2
+              ]
+            },
+            {
+              "coefficient": 2150542156539111,
+              "exponents": [
+                1,
+                3
+              ]
+            },
+            {
+              "coefficient": 5693049213439343,
+              "exponents": [
+                2,
+                1
+              ]
+            },
+            {
+              "coefficient": 2150542156539111,
+              "exponents": [
+                2,
+                2
+              ]
+            },
+            {
+              "coefficient": 1,
+              "exponents": [
+                2,
+                3
+              ]
+            }
+          ],
+          "single_addition": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "not_vanished_within_cap",
+              "top_form_d_reg": null,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 4,
+                  "monomials": 4,
+                  "rank": 0
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 4,
+                  "monomials": 5,
+                  "rank": 1
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 4,
+                  "monomials": 6,
+                  "rank": 2
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 4,
+                  "monomials": 7,
+                  "rank": 3
+                },
+                {
+                  "degree": 7,
+                  "hilbert_function": 4,
+                  "monomials": 8,
+                  "rank": 4
+                },
+                {
+                  "degree": 8,
+                  "hilbert_function": 4,
+                  "monomials": 9,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 3
+                },
+                "new_pivots": 4,
+                "new_row_nonzeros": 60,
+                "new_rows_processed": 7,
+                "rank": 4,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 2,
+                "max_new_certificate_product_degree": 8,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 2,
+                  "5": 6
+                },
+                "new_pivots": 9,
+                "new_row_nonzeros": 290,
+                "new_rows_processed": 29,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 87
+              }
+            ]
+          },
+          "terms": 9
+        }
+      ],
+      "claim_status": "producer output; no signed independent PCC verdict",
+      "definition": "Bounded affine Macaulay closure threshold to a certified reduced grevlex GB; not a solver-independent runtime claim.",
+      "end_to_end_complete": true,
+      "end_to_end_peak_matrix_degree": 5,
+      "greedy_final": {
+        "solving_degree": 4,
+        "status": "complete",
+        "top_forms": {
+          "status": "vanished",
+          "top_form_d_reg": 4,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 2,
+              "monomials": 2,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 2,
+              "monomials": 4,
+              "rank": 2
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 0,
+              "monomials": 5,
+              "rank": 5
+            }
+          ]
+        },
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 1,
+            "columns": 10,
+            "degree": 3,
+            "degree_falls": 0,
+            "max_new_certificate_product_degree": 3,
+            "new_pivot_degree_histogram": {
+              "3": 2
+            },
+            "new_pivots": 2,
+            "new_row_nonzeros": 18,
+            "new_rows_processed": 2,
+            "rank": 2,
+            "reference_gb_contained": false,
+            "row_reductions": 0
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 2,
+            "columns": 15,
+            "degree": 4,
+            "degree_falls": 0,
+            "max_new_certificate_product_degree": 4,
+            "new_pivot_degree_histogram": {
+              "4": 5
+            },
+            "new_pivots": 5,
+            "new_row_nonzeros": 97,
+            "new_rows_processed": 10,
+            "rank": 7,
+            "reference_gb_contained": true,
+            "row_reductions": 10
+          }
+        ]
+      },
+      "greedy_selected": [
+        "c1",
+        "c0"
+      ],
+      "greedy_trace": [
+        {
+          "added": "c1",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 6,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 2,
+                  "monomials": 5,
+                  "rank": 3
+                },
+                {
+                  "degree": 5,
+                  "hilbert_function": 1,
+                  "monomials": 6,
+                  "rank": 5
+                },
+                {
+                  "degree": 6,
+                  "hilbert_function": 0,
+                  "monomials": 7,
+                  "rank": 7
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 10,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 3,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 5
+                },
+                "new_pivots": 6,
+                "new_row_nonzeros": 105,
+                "new_rows_processed": 11,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 10
+              }
+            ]
+          }
+        },
+        {
+          "added": "c0",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 97,
+                "new_rows_processed": 10,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 10
+              }
+            ]
+          }
+        }
+      ],
+      "input": [
+        [
+          {
+            "coefficient": 1,
+            "exponents": [
+              2,
+              2
+            ]
+          },
+          {
+            "coefficient": 2150542156539111,
+            "exponents": [
+              2,
+              1
+            ]
+          },
+          {
+            "coefficient": 2150542156539111,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 5693049213439343,
+            "exponents": [
+              2,
+              0
+            ]
+          },
+          {
+            "coefficient": 6628300082603072,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 5693049213439343,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 4301084313078210,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 4301084313078210,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 3896053684493789,
+            "exponents": [
+              0,
+              0
+            ]
+          }
+        ],
+        [
+          {
+            "coefficient": 1,
+            "exponents": [
+              2,
+              2
+            ]
+          },
+          {
+            "coefficient": 9007199254740875,
+            "exponents": [
+              2,
+              1
+            ]
+          },
+          {
+            "coefficient": 9007199254740875,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 9,
+            "exponents": [
+              2,
+              0
+            ]
+          },
+          {
+            "coefficient": 9007199254740859,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 9,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 9007199254740857,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 9007199254740857,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 9007199254740849,
+            "exponents": [
+              0,
+              0
+            ]
+          }
+        ]
+      ],
+      "leave_one_out": [
+        {
+          "removed": "c0",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 10,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "4": 5
+                },
+                "new_pivots": 6,
+                "new_row_nonzeros": 148,
+                "new_rows_processed": 15,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 25
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c1",
+          "solve": {
+            "solving_degree": 5,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 3,
+                  "monomials": 4,
+                  "rank": 1
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 1
+                },
+                "new_pivots": 1,
+                "new_row_nonzeros": 8,
+                "new_rows_processed": 1,
+                "rank": 1,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 77,
+                "new_rows_processed": 8,
+                "rank": 6,
+                "reference_gb_contained": false,
+                "row_reductions": 5
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 21,
+                "degree": 5,
+                "degree_falls": 1,
+                "max_new_certificate_product_degree": 5,
+                "new_pivot_degree_histogram": {
+                  "3": 1,
+                  "5": 6
+                },
+                "new_pivots": 7,
+                "new_row_nonzeros": 267,
+                "new_rows_processed": 27,
+                "rank": 13,
+                "reference_gb_contained": true,
+                "row_reductions": 85
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c2",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 118,
+                "new_rows_processed": 12,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 20
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c3",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 118,
+                "new_rows_processed": 12,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 20
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c4",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 107,
+                "new_rows_processed": 11,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 17
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c5",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 104,
+                "new_rows_processed": 11,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 13
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c6",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 118,
+                "new_rows_processed": 12,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 20
+              }
+            ]
+          }
+        },
+        {
+          "removed": "c7",
+          "solve": {
+            "solving_degree": 4,
+            "status": "complete",
+            "top_forms": {
+              "status": "vanished",
+              "top_form_d_reg": 4,
+              "trace": [
+                {
+                  "degree": 0,
+                  "hilbert_function": 1,
+                  "monomials": 1,
+                  "rank": 0
+                },
+                {
+                  "degree": 1,
+                  "hilbert_function": 2,
+                  "monomials": 2,
+                  "rank": 0
+                },
+                {
+                  "degree": 2,
+                  "hilbert_function": 3,
+                  "monomials": 3,
+                  "rank": 0
+                },
+                {
+                  "degree": 3,
+                  "hilbert_function": 2,
+                  "monomials": 4,
+                  "rank": 2
+                },
+                {
+                  "degree": 4,
+                  "hilbert_function": 0,
+                  "monomials": 5,
+                  "rank": 5
+                }
+              ]
+            },
+            "trace": [
+              {
+                "closure_completed": true,
+                "closure_rounds": 1,
+                "columns": 10,
+                "degree": 3,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 3,
+                "new_pivot_degree_histogram": {
+                  "3": 2
+                },
+                "new_pivots": 2,
+                "new_row_nonzeros": 18,
+                "new_rows_processed": 2,
+                "rank": 2,
+                "reference_gb_contained": false,
+                "row_reductions": 0
+              },
+              {
+                "closure_completed": true,
+                "closure_rounds": 2,
+                "columns": 15,
+                "degree": 4,
+                "degree_falls": 0,
+                "max_new_certificate_product_degree": 4,
+                "new_pivot_degree_histogram": {
+                  "4": 5
+                },
+                "new_pivots": 5,
+                "new_row_nonzeros": 118,
+                "new_rows_processed": 12,
+                "rank": 7,
+                "reference_gb_contained": true,
+                "row_reductions": 20
+              }
+            ]
+          }
+        }
+      ],
+      "prime": 9007199254740881,
+      "reference_gb_max_degree": 4,
+      "reference_groebner_basis": [
+        [
+          {
+            "coefficient": 1277786392561779,
+            "exponents": [
+              0,
+              0
+            ]
+          },
+          {
+            "coefficient": 3428328549100906,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 8222830147661932,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 7293034980190437,
+            "exponents": [
+              0,
+              3
+            ]
+          },
+          {
+            "coefficient": 3428328549100900,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 1568738214157908,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 5142492823651332,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              1,
+              3
+            ]
+          },
+          {
+            "coefficient": 8222830147661930,
+            "exponents": [
+              2,
+              0
+            ]
+          }
+        ],
+        [
+          {
+            "coefficient": 5655564983576785,
+            "exponents": [
+              0,
+              0
+            ]
+          },
+          {
+            "coefficient": 2209296463136952,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 5757770636513578,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 1132807775779946,
+            "exponents": [
+              0,
+              3
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              0,
+              4
+            ]
+          },
+          {
+            "coefficient": 7700210883910923,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 7789044982028999,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 334348676450696,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 3605101862897655,
+            "exponents": [
+              2,
+              0
+            ]
+          }
+        ],
+        [
+          {
+            "coefficient": 3516284833966904,
+            "exponents": [
+              0,
+              0
+            ]
+          },
+          {
+            "coefficient": 2152668773615921,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 2846972050330390,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              0,
+              3
+            ]
+          },
+          {
+            "coefficient": 2152668773615921,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 7046027157870635,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 2846972050330390,
+            "exponents": [
+              2,
+              0
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              3,
+              0
+            ]
+          }
+        ],
+        [
+          {
+            "coefficient": 6,
+            "exponents": [
+              0,
+              0
+            ]
+          },
+          {
+            "coefficient": 2,
+            "exponents": [
+              0,
+              1
+            ]
+          },
+          {
+            "coefficient": 7293034980190437,
+            "exponents": [
+              0,
+              2
+            ]
+          },
+          {
+            "coefficient": 2,
+            "exponents": [
+              1,
+              0
+            ]
+          },
+          {
+            "coefficient": 3428328549100888,
+            "exponents": [
+              1,
+              1
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              1,
+              2
+            ]
+          },
+          {
+            "coefficient": 7293034980190437,
+            "exponents": [
+              2,
+              0
+            ]
+          },
+          {
+            "coefficient": 1,
+            "exponents": [
+              2,
+              1
+            ]
+          }
+        ]
+      ],
+      "reference_oracle_seconds_diagnostic": 0.000571728,
+      "schema": "relation-degree-trace/v1",
+      "variables": [
+        "x1",
+        "x2"
+      ]
+    }
+  ]
+}

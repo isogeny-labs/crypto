@@ -1,0 +1,2401 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "solver-multiplicity-20261109-v1",
+  "created": "2026-11-09T04:09:31.606Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "cff556238d4049de994e63b2f25896ffaf0e8574c1a9b6b6f358b43053cd35b5",
+    "protocol_id": "solver-multiplicity-20261109",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "f0bea543060faeeceb9894a009ad11d88de1239d",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "provenance.json",
+    "sha256": "d741580690ca661dcc4d639c8657e7a28b69ff8b0f7994936f052a7c7c6de6a1",
+    "class_id": "local-shared-solver-audit",
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": "6.18.57",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "gb",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "param",
+      "role": "candidate",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "double-0-gb",
+      "arm": "gb",
+      "instance_id": "double",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197310,1794197310]",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "multiplicity": 2,
+          "support": 1,
+          "selected_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/double-0-gb.argv",
+          "sha256": "d8096481baec168760c145015c9f03c14a0084f482cbc96d980817074afeaa8a",
+          "bytes": 109,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-gb.end-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-gb.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-gb.out",
+          "sha256": "4a305f005b2572e95a71adc98adadf96315ce9abd8d8b88c7987f03e8dd041a0",
+          "bytes": 241,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-gb.start-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-gb.stderr",
+          "sha256": "0563676cc077636ba6a79b5c80af47e627547f67a29254780221b3d9fd74ecb1",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-gb.stdout",
+          "sha256": "13466aeaf30de699ec8c1e342d3f52e14f46e74f98948e3edd60746eb096dd1b",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:30.000Z",
+      "finished_at": "2026-11-09T04:08:30.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/double-0-gb"
+    },
+    {
+      "run_id": "double-0-param",
+      "arm": "param",
+      "instance_id": "double",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197310,1794197310]",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "multiplicity": 2,
+          "support": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/double-0-param.argv",
+          "sha256": "8de712e99dc5448438d0025cd7fae5a9c2e8e94cc25b52810edcff398ae3b04c",
+          "bytes": 107,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-param.end-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-param.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-param.out",
+          "sha256": "dfde66ec6d510aebc1cb6e34654a039ee7fb23da8cb0a88ae8fff671c0392785",
+          "bytes": 107,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-param.start-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-param.stderr",
+          "sha256": "6f5e3d9f3388df7169d7b2437e94dc0e7e6b32a96da9d6127c151fbe98bbcaf3",
+          "bytes": 3121,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-0-param.stdout",
+          "sha256": "6a1b542e14ef4f703db8ef55ed6892427c4f1886fedc0cdd469f8f9021b9cea0",
+          "bytes": 6573,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:30.000Z",
+      "finished_at": "2026-11-09T04:08:30.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/double-0-param"
+    },
+    {
+      "run_id": "double-1-gb",
+      "arm": "gb",
+      "instance_id": "double",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197310,1794197310]",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "multiplicity": 2,
+          "support": 1,
+          "selected_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/double-1-gb.argv",
+          "sha256": "c23163b674529d6312d30c69417a8ff74750def5a91c647ba2c214628b48cad2",
+          "bytes": 109,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-gb.end-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-gb.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-gb.out",
+          "sha256": "4a305f005b2572e95a71adc98adadf96315ce9abd8d8b88c7987f03e8dd041a0",
+          "bytes": 241,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-gb.start-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-gb.stderr",
+          "sha256": "0563676cc077636ba6a79b5c80af47e627547f67a29254780221b3d9fd74ecb1",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-gb.stdout",
+          "sha256": "49b4a14f328e6c22418cb55b28d750dd1afe4fd9a89b239d0294488fc66b76a6",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:30.000Z",
+      "finished_at": "2026-11-09T04:08:30.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/double-1-gb"
+    },
+    {
+      "run_id": "double-1-param",
+      "arm": "param",
+      "instance_id": "double",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197310,1794197310]",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "multiplicity": 2,
+          "support": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/double-1-param.argv",
+          "sha256": "6f5c4e970055e29b9bf249726a3945ce9fde5b78ff1ea9591283792a5413c7a7",
+          "bytes": 107,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-param.end-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-param.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-param.out",
+          "sha256": "dfde66ec6d510aebc1cb6e34654a039ee7fb23da8cb0a88ae8fff671c0392785",
+          "bytes": 107,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-param.start-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-param.stderr",
+          "sha256": "890ec1a5af650d57d253694137edbcc818f2dfb7dbfc9c5ad38d5357e9a50d0d",
+          "bytes": 3122,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/double-1-param.stdout",
+          "sha256": "336e8e8e94e230b34a969cf7d76afb12f6eb2ecebc4b3ac4ccc1741cd6e7f96c",
+          "bytes": 6573,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:30.000Z",
+      "finished_at": "2026-11-09T04:08:30.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/double-1-param"
+    },
+    {
+      "run_id": "split-0-gb",
+      "arm": "gb",
+      "instance_id": "split",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197310,1794197310]",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "multiplicity": 2,
+          "support": 2,
+          "selected_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/split-0-gb.argv",
+          "sha256": "0080df962b6aabf8a8997ae0f752572bcaf3e41dc1060b61f634e272a2f86511",
+          "bytes": 107,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-gb.end-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-gb.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-gb.out",
+          "sha256": "8435555cc61a6d449fe151d3ffc897bff3d485383eecf9e80d68e7b77800b3de",
+          "bytes": 249,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-gb.start-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-gb.stderr",
+          "sha256": "378bfc213731bf7d13a1d2e5ff25ab849124c1a29e9063cdaa31e03d7c9a94c0",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-gb.stdout",
+          "sha256": "70820b4d470bc16b4e3b353aa82f9c0aac63b20216e4de76db2c034b141e6938",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:30.000Z",
+      "finished_at": "2026-11-09T04:08:30.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/split-0-gb"
+    },
+    {
+      "run_id": "split-0-param",
+      "arm": "param",
+      "instance_id": "split",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197310,1794197310]",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "multiplicity": 2,
+          "support": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/split-0-param.argv",
+          "sha256": "60b6aad407e85389329f10c3666ffafd6973e678257995cebf9e6a422433c21f",
+          "bytes": 105,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-param.end-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-param.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-param.out",
+          "sha256": "9c4acd0b569a261debdd215aacc68ae598542cb9bb1318818df5d9a5d04318c1",
+          "bytes": 91,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-param.start-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-param.stderr",
+          "sha256": "4874c03aa3abf875a7f7dcafd3ab3cc9191b1340002f24f687b3926e1127d61a",
+          "bytes": 1197,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-0-param.stdout",
+          "sha256": "d38d93a588f36802e7d281f1d0e91c797950aa0238a400e0c300af466591f789",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:30.000Z",
+      "finished_at": "2026-11-09T04:08:30.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/split-0-param"
+    },
+    {
+      "run_id": "split-1-gb",
+      "arm": "gb",
+      "instance_id": "split",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197310,1794197310]",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "multiplicity": 2,
+          "support": 2,
+          "selected_degree": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/split-1-gb.argv",
+          "sha256": "10467eac32c3c36d827e59f15f68d949cbdef3f239c8d46efa3706c22024a696",
+          "bytes": 107,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-gb.end-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-gb.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-gb.out",
+          "sha256": "8435555cc61a6d449fe151d3ffc897bff3d485383eecf9e80d68e7b77800b3de",
+          "bytes": 249,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-gb.start-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-gb.stderr",
+          "sha256": "378bfc213731bf7d13a1d2e5ff25ab849124c1a29e9063cdaa31e03d7c9a94c0",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-gb.stdout",
+          "sha256": "d43ae5e74a7234b8aaafb4db3fa10901a8a32b048a32ccac5ee8300834eaf723",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:30.000Z",
+      "finished_at": "2026-11-09T04:08:30.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/split-1-gb"
+    },
+    {
+      "run_id": "split-1-param",
+      "arm": "param",
+      "instance_id": "split",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197310,1794197310]",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "multiplicity": 2,
+          "support": 2
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/split-1-param.argv",
+          "sha256": "a8343e8817afe3eee7e4dd4053a00489616239a06c9ba53bd413c276b7198478",
+          "bytes": 105,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-param.end-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-param.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-param.out",
+          "sha256": "9c4acd0b569a261debdd215aacc68ae598542cb9bb1318818df5d9a5d04318c1",
+          "bytes": 91,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-param.start-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-param.stderr",
+          "sha256": "1432d492dfd0dd1a3d23fc075c24b5758b6dd052b06009ec23e71f84c6ede976",
+          "bytes": 1196,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/split-1-param.stdout",
+          "sha256": "5074af44d07dd1ae86f79ba8f52cf2840da1029ba6683ebc49e62d9cf578ecd5",
+          "bytes": 2029,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:30.000Z",
+      "finished_at": "2026-11-09T04:08:30.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/split-1-param"
+    },
+    {
+      "run_id": "simple-0-gb",
+      "arm": "gb",
+      "instance_id": "simple",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197310,1794197311]",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "multiplicity": 1,
+          "support": 1,
+          "selected_degree": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/simple-0-gb.argv",
+          "sha256": "cb54990019add491393cd9016d9516c54d0962093cac4caf6f77cb00474f7599",
+          "bytes": 109,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-gb.end-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-gb.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-gb.out",
+          "sha256": "477fe834d0da770b444926b509d19c7cedece794d1359428db91d3725424519b",
+          "bytes": 235,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-gb.start-epoch",
+          "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-gb.stderr",
+          "sha256": "3a23288b11f0507596f416f70de18d69af93c2435f8d97a5321c7edec09ca6cb",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-gb.stdout",
+          "sha256": "62b1595fd85d90ec05ba94aac591acbe3fd845b52eb6ed27e363a543dee577bb",
+          "bytes": 1926,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:30.000Z",
+      "finished_at": "2026-11-09T04:08:31.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/simple-0-gb"
+    },
+    {
+      "run_id": "simple-0-param",
+      "arm": "param",
+      "instance_id": "simple",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197311,1794197311]",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "multiplicity": 1,
+          "support": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/simple-0-param.argv",
+          "sha256": "5be8334a3e6d4d807bffdc1e88429c8d386be6993b2156f81c741971837a5574",
+          "bytes": 107,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-param.end-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-param.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-param.out",
+          "sha256": "ee33428c2bf6f13ea3346f546a9731c0d778fbeae851e3b58b0e2bf8fbda146f",
+          "bytes": 86,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-param.start-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-param.stderr",
+          "sha256": "e6dcaca1c0def66345923e07e2a326a60bd4f9bbe630f2c8e03fc1a4d3c4c9c5",
+          "bytes": 1196,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-0-param.stdout",
+          "sha256": "9d9f42db45dea9528037b39f7d52dd52a9e554a70e1eb7cd5d65f652cd790e1e",
+          "bytes": 1926,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:31.000Z",
+      "finished_at": "2026-11-09T04:08:31.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/simple-0-param"
+    },
+    {
+      "run_id": "simple-1-gb",
+      "arm": "gb",
+      "instance_id": "simple",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197311,1794197311]",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "multiplicity": 1,
+          "support": 1,
+          "selected_degree": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/simple-1-gb.argv",
+          "sha256": "23d3d90a4ee4350bc0d85f7cd5b4f2a4cfd521d58b42c6c6e1f4d9a6b6d0eba3",
+          "bytes": 109,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-gb.end-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-gb.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-gb.out",
+          "sha256": "477fe834d0da770b444926b509d19c7cedece794d1359428db91d3725424519b",
+          "bytes": 235,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-gb.start-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-gb.stderr",
+          "sha256": "3a23288b11f0507596f416f70de18d69af93c2435f8d97a5321c7edec09ca6cb",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-gb.stdout",
+          "sha256": "42638b34cdd5135af5987c4883e73d80a9b1cf9a6e24e79c0728f17c7fcfb3fe",
+          "bytes": 1926,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:31.000Z",
+      "finished_at": "2026-11-09T04:08:31.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/simple-1-gb"
+    },
+    {
+      "run_id": "simple-1-param",
+      "arm": "param",
+      "instance_id": "simple",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197311,1794197311]",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "multiplicity": 1,
+          "support": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/simple-1-param.argv",
+          "sha256": "9b431fefb2bb6a3b23102a64c6df001e199f050f907a0183f35d0425b7b214ed",
+          "bytes": 107,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-param.end-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-param.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-param.out",
+          "sha256": "ee33428c2bf6f13ea3346f546a9731c0d778fbeae851e3b58b0e2bf8fbda146f",
+          "bytes": 86,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-param.start-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-param.stderr",
+          "sha256": "e6dcaca1c0def66345923e07e2a326a60bd4f9bbe630f2c8e03fc1a4d3c4c9c5",
+          "bytes": 1196,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/simple-1-param.stdout",
+          "sha256": "4a420c06b39cee96b0db4adf58766b4e6732df57ede5ca0494f1806b15d422eb",
+          "bytes": 1926,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:31.000Z",
+      "finished_at": "2026-11-09T04:08:31.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/simple-1-param"
+    },
+    {
+      "run_id": "degree3-0-gb",
+      "arm": "gb",
+      "instance_id": "degree3",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197311,1794197311]",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "multiplicity": 1,
+          "support": 1,
+          "selected_degree": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/degree3-0-gb.argv",
+          "sha256": "5308313a52a8a6cb2694ab1964a4d84c581618405687c3107d05203935422989",
+          "bytes": 111,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-gb.end-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-gb.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-gb.out",
+          "sha256": "2b51bcff8f10346aae2fb75a2ec035bff04cce91b98071baecda7655ac554d96",
+          "bytes": 235,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-gb.start-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-gb.stderr",
+          "sha256": "ce31c325f50de9c9df56672e3d07b8d41a59ff04e31de379dbd217688ed00cee",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-gb.stdout",
+          "sha256": "87cb41e8b79a8a128d2124a1b56f81945168352b0a2f5fa41cdf03048073416a",
+          "bytes": 2132,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:31.000Z",
+      "finished_at": "2026-11-09T04:08:31.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/degree3-0-gb"
+    },
+    {
+      "run_id": "degree3-0-param",
+      "arm": "param",
+      "instance_id": "degree3",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197311,1794197311]",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "multiplicity": 1,
+          "support": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/degree3-0-param.argv",
+          "sha256": "1c64ca4337fb6f0849f8965c777b30d26a1b91d6d1be6d9f5108d6cb515d53a3",
+          "bytes": 109,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-param.end-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-param.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-param.out",
+          "sha256": "cd1237c1da03066152b8559362dca9a0db8f54fab0ff0bf8db5e1a5097b5de3c",
+          "bytes": 86,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-param.start-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-param.stderr",
+          "sha256": "3e40fd75eb561f0bb7bc7f6db59ce07f0fdeac71ef436556857b155abcd73a35",
+          "bytes": 1196,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-0-param.stdout",
+          "sha256": "d2e5a5a8764cff6a2bf52221c2f96dcaf9bf30842a43f1418f80e382f26b7266",
+          "bytes": 2132,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:31.000Z",
+      "finished_at": "2026-11-09T04:08:31.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/degree3-0-param"
+    },
+    {
+      "run_id": "degree3-1-gb",
+      "arm": "gb",
+      "instance_id": "degree3",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197311,1794197311]",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "multiplicity": 1,
+          "support": 1,
+          "selected_degree": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/degree3-1-gb.argv",
+          "sha256": "63544b9af1f7b50d8ed65dbeaa758bda7892e2d5c730b5343bf50267be614047",
+          "bytes": 111,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-gb.end-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-gb.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-gb.out",
+          "sha256": "2b51bcff8f10346aae2fb75a2ec035bff04cce91b98071baecda7655ac554d96",
+          "bytes": 235,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-gb.start-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-gb.stderr",
+          "sha256": "ce31c325f50de9c9df56672e3d07b8d41a59ff04e31de379dbd217688ed00cee",
+          "bytes": 881,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-gb.stdout",
+          "sha256": "6f332c5c755f28674c3d0af5270a821da2696433d2b301083cf378d42496777a",
+          "bytes": 2132,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:31.000Z",
+      "finished_at": "2026-11-09T04:08:31.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/degree3-1-gb"
+    },
+    {
+      "run_id": "degree3-1-param",
+      "arm": "param",
+      "instance_id": "degree3",
+      "seed": "upstream time(0) if random form needed; containing epoch interval [1794197311,1794197311]",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "multiplicity": 1,
+          "support": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen native/analyze.cpp; independent polynomial reductions/Buchberger, registered Lean-backed known answers; one host."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/degree3-1-param.argv",
+          "sha256": "d0b91a553e554016998a43d5507cdc962dda1949ea21e7110a15d3b13888929a",
+          "bytes": 109,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-param.end-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-param.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-param.out",
+          "sha256": "cd1237c1da03066152b8559362dca9a0db8f54fab0ff0bf8db5e1a5097b5de3c",
+          "bytes": 86,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-param.start-epoch",
+          "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-param.stderr",
+          "sha256": "3e40fd75eb561f0bb7bc7f6db59ce07f0fdeac71ef436556857b155abcd73a35",
+          "bytes": 1196,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/degree3-1-param.stdout",
+          "sha256": "66b6729a944e927d604f49d6ad679df654a3a504a71b0a20d0511725df8c8aca",
+          "bytes": 2132,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T04:08:31.000Z",
+      "finished_at": "2026-11-09T04:08:31.000Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/degree3-1-param"
+    }
+  ],
+  "flow": {
+    "planned": 16,
+    "attempted": 16,
+    "completed": 16,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "912bd9259f456f8002aad518cdecd7b4893677861e0d12e7e78671defd0787f2",
+      "bytes": 15067,
+      "kind": "protocol"
+    },
+    {
+      "path": "PROTOCOL.md",
+      "sha256": "cbb2d7ee6293ef01c6599dec97aee796cc659a6c0237422d649ab2c3dfd4a34d",
+      "bytes": 4407,
+      "kind": "raw"
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "d741580690ca661dcc4d639c8657e7a28b69ff8b0f7994936f052a7c7c6de6a1",
+      "bytes": 4951,
+      "kind": "raw"
+    },
+    {
+      "path": "frozen-files.sha256",
+      "sha256": "983d212478f4e5ea900aa54d14f072e3aec5521338a335366d1cea4ec1acba0b",
+      "bytes": 732,
+      "kind": "raw"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "28888ce80442ba7dc029d759cfc47c5fe9f9233cd331f5552b2140657197da03",
+      "bytes": 1899,
+      "kind": "raw"
+    },
+    {
+      "path": "build-msolve.sh",
+      "sha256": "89ebcb92530002d63d6aebc1fc54c9309c218807f733eb31135dc6d05f8fb13e",
+      "bytes": 683,
+      "kind": "raw"
+    },
+    {
+      "path": "native/analyze.cpp",
+      "sha256": "5c809337803de22ec66939d6838df18a722db4181c67a8fc8fe96d9a6af7e6d2",
+      "bytes": 11265,
+      "kind": "analysis"
+    },
+    {
+      "path": "evidence/analysis.jsonl",
+      "sha256": "792e423d3cb679dc510aea0e55d50886c7684f332ce1bb5351b629ca9168c0e0",
+      "bytes": 2104,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/run.log",
+      "sha256": "f50c9fac367f86ef00850b3882e8324b4c25d983f8545ba4cd1f2824e8c5549d",
+      "bytes": 174,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/double.ms",
+      "sha256": "99c4f09001904186c67c3fb95b6e0bd6b9e952c52c6cf5117f5c7009a7f710fb",
+      "bytes": 15,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/split.ms",
+      "sha256": "c5c2eb75881bf59efdce81a8200e0c08cb36b91a8fa9f31c3bd5524ab60711b5",
+      "bytes": 17,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/simple.ms",
+      "sha256": "0dd25fa1fc30d1e16b23d4097487fb5a66dbcae3d71028c7dcdc77e5d8cd612d",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/degree3.ms",
+      "sha256": "5424702dd58f1319f9586a4a6735cc82673a6be2a49b60b072c9f9b6d991eef3",
+      "bytes": 28,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/preflight-c2.ms",
+      "sha256": "243c578ec64d0e3c67d20f0b4b93f48bc8842af1851655fae71161b34c91eab3",
+      "bytes": 17,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-gb.argv",
+      "sha256": "5308313a52a8a6cb2694ab1964a4d84c581618405687c3107d05203935422989",
+      "bytes": 111,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-gb.end-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-gb.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-gb.out",
+      "sha256": "2b51bcff8f10346aae2fb75a2ec035bff04cce91b98071baecda7655ac554d96",
+      "bytes": 235,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-gb.start-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-gb.stderr",
+      "sha256": "ce31c325f50de9c9df56672e3d07b8d41a59ff04e31de379dbd217688ed00cee",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-gb.stdout",
+      "sha256": "87cb41e8b79a8a128d2124a1b56f81945168352b0a2f5fa41cdf03048073416a",
+      "bytes": 2132,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-param.argv",
+      "sha256": "1c64ca4337fb6f0849f8965c777b30d26a1b91d6d1be6d9f5108d6cb515d53a3",
+      "bytes": 109,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-param.end-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-param.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-param.out",
+      "sha256": "cd1237c1da03066152b8559362dca9a0db8f54fab0ff0bf8db5e1a5097b5de3c",
+      "bytes": 86,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-param.start-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-param.stderr",
+      "sha256": "3e40fd75eb561f0bb7bc7f6db59ce07f0fdeac71ef436556857b155abcd73a35",
+      "bytes": 1196,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-0-param.stdout",
+      "sha256": "d2e5a5a8764cff6a2bf52221c2f96dcaf9bf30842a43f1418f80e382f26b7266",
+      "bytes": 2132,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-gb.argv",
+      "sha256": "63544b9af1f7b50d8ed65dbeaa758bda7892e2d5c730b5343bf50267be614047",
+      "bytes": 111,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-gb.end-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-gb.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-gb.out",
+      "sha256": "2b51bcff8f10346aae2fb75a2ec035bff04cce91b98071baecda7655ac554d96",
+      "bytes": 235,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-gb.start-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-gb.stderr",
+      "sha256": "ce31c325f50de9c9df56672e3d07b8d41a59ff04e31de379dbd217688ed00cee",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-gb.stdout",
+      "sha256": "6f332c5c755f28674c3d0af5270a821da2696433d2b301083cf378d42496777a",
+      "bytes": 2132,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-param.argv",
+      "sha256": "d0b91a553e554016998a43d5507cdc962dda1949ea21e7110a15d3b13888929a",
+      "bytes": 109,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-param.end-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-param.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-param.out",
+      "sha256": "cd1237c1da03066152b8559362dca9a0db8f54fab0ff0bf8db5e1a5097b5de3c",
+      "bytes": 86,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-param.start-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-param.stderr",
+      "sha256": "3e40fd75eb561f0bb7bc7f6db59ce07f0fdeac71ef436556857b155abcd73a35",
+      "bytes": 1196,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/degree3-1-param.stdout",
+      "sha256": "66b6729a944e927d604f49d6ad679df654a3a504a71b0a20d0511725df8c8aca",
+      "bytes": 2132,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-gb.argv",
+      "sha256": "d8096481baec168760c145015c9f03c14a0084f482cbc96d980817074afeaa8a",
+      "bytes": 109,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-gb.end-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-gb.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-gb.out",
+      "sha256": "4a305f005b2572e95a71adc98adadf96315ce9abd8d8b88c7987f03e8dd041a0",
+      "bytes": 241,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-gb.start-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-gb.stderr",
+      "sha256": "0563676cc077636ba6a79b5c80af47e627547f67a29254780221b3d9fd74ecb1",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-gb.stdout",
+      "sha256": "13466aeaf30de699ec8c1e342d3f52e14f46e74f98948e3edd60746eb096dd1b",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-param.argv",
+      "sha256": "8de712e99dc5448438d0025cd7fae5a9c2e8e94cc25b52810edcff398ae3b04c",
+      "bytes": 107,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-param.end-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-param.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-param.out",
+      "sha256": "dfde66ec6d510aebc1cb6e34654a039ee7fb23da8cb0a88ae8fff671c0392785",
+      "bytes": 107,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-param.start-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-param.stderr",
+      "sha256": "6f5e3d9f3388df7169d7b2437e94dc0e7e6b32a96da9d6127c151fbe98bbcaf3",
+      "bytes": 3121,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-0-param.stdout",
+      "sha256": "6a1b542e14ef4f703db8ef55ed6892427c4f1886fedc0cdd469f8f9021b9cea0",
+      "bytes": 6573,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-gb.argv",
+      "sha256": "c23163b674529d6312d30c69417a8ff74750def5a91c647ba2c214628b48cad2",
+      "bytes": 109,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-gb.end-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-gb.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-gb.out",
+      "sha256": "4a305f005b2572e95a71adc98adadf96315ce9abd8d8b88c7987f03e8dd041a0",
+      "bytes": 241,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-gb.start-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-gb.stderr",
+      "sha256": "0563676cc077636ba6a79b5c80af47e627547f67a29254780221b3d9fd74ecb1",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-gb.stdout",
+      "sha256": "49b4a14f328e6c22418cb55b28d750dd1afe4fd9a89b239d0294488fc66b76a6",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-param.argv",
+      "sha256": "6f5c4e970055e29b9bf249726a3945ce9fde5b78ff1ea9591283792a5413c7a7",
+      "bytes": 107,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-param.end-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-param.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-param.out",
+      "sha256": "dfde66ec6d510aebc1cb6e34654a039ee7fb23da8cb0a88ae8fff671c0392785",
+      "bytes": 107,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-param.start-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-param.stderr",
+      "sha256": "890ec1a5af650d57d253694137edbcc818f2dfb7dbfc9c5ad38d5357e9a50d0d",
+      "bytes": 3122,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/double-1-param.stdout",
+      "sha256": "336e8e8e94e230b34a969cf7d76afb12f6eb2ecebc4b3ac4ccc1741cd6e7f96c",
+      "bytes": 6573,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-gb.argv",
+      "sha256": "cb54990019add491393cd9016d9516c54d0962093cac4caf6f77cb00474f7599",
+      "bytes": 109,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-gb.end-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-gb.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-gb.out",
+      "sha256": "477fe834d0da770b444926b509d19c7cedece794d1359428db91d3725424519b",
+      "bytes": 235,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-gb.start-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-gb.stderr",
+      "sha256": "3a23288b11f0507596f416f70de18d69af93c2435f8d97a5321c7edec09ca6cb",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-gb.stdout",
+      "sha256": "62b1595fd85d90ec05ba94aac591acbe3fd845b52eb6ed27e363a543dee577bb",
+      "bytes": 1926,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-param.argv",
+      "sha256": "5be8334a3e6d4d807bffdc1e88429c8d386be6993b2156f81c741971837a5574",
+      "bytes": 107,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-param.end-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-param.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-param.out",
+      "sha256": "ee33428c2bf6f13ea3346f546a9731c0d778fbeae851e3b58b0e2bf8fbda146f",
+      "bytes": 86,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-param.start-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-param.stderr",
+      "sha256": "e6dcaca1c0def66345923e07e2a326a60bd4f9bbe630f2c8e03fc1a4d3c4c9c5",
+      "bytes": 1196,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-0-param.stdout",
+      "sha256": "9d9f42db45dea9528037b39f7d52dd52a9e554a70e1eb7cd5d65f652cd790e1e",
+      "bytes": 1926,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-gb.argv",
+      "sha256": "23d3d90a4ee4350bc0d85f7cd5b4f2a4cfd521d58b42c6c6e1f4d9a6b6d0eba3",
+      "bytes": 109,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-gb.end-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-gb.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-gb.out",
+      "sha256": "477fe834d0da770b444926b509d19c7cedece794d1359428db91d3725424519b",
+      "bytes": 235,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-gb.start-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-gb.stderr",
+      "sha256": "3a23288b11f0507596f416f70de18d69af93c2435f8d97a5321c7edec09ca6cb",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-gb.stdout",
+      "sha256": "42638b34cdd5135af5987c4883e73d80a9b1cf9a6e24e79c0728f17c7fcfb3fe",
+      "bytes": 1926,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-param.argv",
+      "sha256": "9b431fefb2bb6a3b23102a64c6df001e199f050f907a0183f35d0425b7b214ed",
+      "bytes": 107,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-param.end-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-param.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-param.out",
+      "sha256": "ee33428c2bf6f13ea3346f546a9731c0d778fbeae851e3b58b0e2bf8fbda146f",
+      "bytes": 86,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-param.start-epoch",
+      "sha256": "09a100833bbe8b6330f7586482cb42fc583311618be2d27f9be2aef299f12c52",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-param.stderr",
+      "sha256": "e6dcaca1c0def66345923e07e2a326a60bd4f9bbe630f2c8e03fc1a4d3c4c9c5",
+      "bytes": 1196,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/simple-1-param.stdout",
+      "sha256": "4a420c06b39cee96b0db4adf58766b4e6732df57ede5ca0494f1806b15d422eb",
+      "bytes": 1926,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-gb.argv",
+      "sha256": "0080df962b6aabf8a8997ae0f752572bcaf3e41dc1060b61f634e272a2f86511",
+      "bytes": 107,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-gb.end-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-gb.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-gb.out",
+      "sha256": "8435555cc61a6d449fe151d3ffc897bff3d485383eecf9e80d68e7b77800b3de",
+      "bytes": 249,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-gb.start-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-gb.stderr",
+      "sha256": "378bfc213731bf7d13a1d2e5ff25ab849124c1a29e9063cdaa31e03d7c9a94c0",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-gb.stdout",
+      "sha256": "70820b4d470bc16b4e3b353aa82f9c0aac63b20216e4de76db2c034b141e6938",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-param.argv",
+      "sha256": "60b6aad407e85389329f10c3666ffafd6973e678257995cebf9e6a422433c21f",
+      "bytes": 105,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-param.end-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-param.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-param.out",
+      "sha256": "9c4acd0b569a261debdd215aacc68ae598542cb9bb1318818df5d9a5d04318c1",
+      "bytes": 91,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-param.start-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-param.stderr",
+      "sha256": "4874c03aa3abf875a7f7dcafd3ab3cc9191b1340002f24f687b3926e1127d61a",
+      "bytes": 1197,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-0-param.stdout",
+      "sha256": "d38d93a588f36802e7d281f1d0e91c797950aa0238a400e0c300af466591f789",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-gb.argv",
+      "sha256": "10467eac32c3c36d827e59f15f68d949cbdef3f239c8d46efa3706c22024a696",
+      "bytes": 107,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-gb.end-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-gb.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-gb.out",
+      "sha256": "8435555cc61a6d449fe151d3ffc897bff3d485383eecf9e80d68e7b77800b3de",
+      "bytes": 249,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-gb.start-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-gb.stderr",
+      "sha256": "378bfc213731bf7d13a1d2e5ff25ab849124c1a29e9063cdaa31e03d7c9a94c0",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-gb.stdout",
+      "sha256": "d43ae5e74a7234b8aaafb4db3fa10901a8a32b048a32ccac5ee8300834eaf723",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-param.argv",
+      "sha256": "a8343e8817afe3eee7e4dd4053a00489616239a06c9ba53bd413c276b7198478",
+      "bytes": 105,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-param.end-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-param.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-param.out",
+      "sha256": "9c4acd0b569a261debdd215aacc68ae598542cb9bb1318818df5d9a5d04318c1",
+      "bytes": 91,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-param.start-epoch",
+      "sha256": "91af25fbe3f1584256e1ed98c41ecee1791a25692d138952fc2c387d3bd354f1",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-param.stderr",
+      "sha256": "1432d492dfd0dd1a3d23fc075c24b5758b6dd052b06009ec23e71f84c6ede976",
+      "bytes": 1196,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/split-1-param.stdout",
+      "sha256": "5074af44d07dd1ae86f79ba8f52cf2840da1029ba6683ebc49e62d9cf578ecd5",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/analysis.json",
+      "sha256": "eb33253dd3fe6f24f8a24a8b113b0a1b2604e52b1a60b5cffc05128ac95e793d",
+      "bytes": 117,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/gb.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/gb.out",
+      "sha256": "0769c0e394268f528df4d6d44e72e6e875caed23c23c5fa0239331df52866b15",
+      "bytes": 249,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/gb.stderr",
+      "sha256": "378bfc213731bf7d13a1d2e5ff25ab849124c1a29e9063cdaa31e03d7c9a94c0",
+      "bytes": 881,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/gb.stdout",
+      "sha256": "474d6146e27dc1e94b7ae13a484cb690a52011733dda52deea8f3143585f86b6",
+      "bytes": 2029,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/gb.time",
+      "sha256": "82a9866c907339f689a7ebfdcdd4d23fb24d41d0657511bdd748df39cec52dfb",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/param.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/param.out",
+      "sha256": "c147a35a9fda5f053e0215cb3998f40cafbdaa11506c131c46b34d2df78f9999",
+      "bytes": 122,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/param.stderr",
+      "sha256": "6dcbf5425a23cf705eef521b4ec980ba5a09c631eca5e867ae3126ec9bcc0ee1",
+      "bytes": 365264,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/param.stdout",
+      "sha256": "d3cad72b84d916a14cd83fa987d349e7192919da19652ec5aab5a2b6070d948f",
+      "bytes": 793375,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/param.time",
+      "sha256": "207839e7d1e2eddba1f4bad08366187825892efc52db645eecd4903f7c0d495e",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-loader-failure/gb.exit",
+      "sha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-loader-failure/gb.stderr",
+      "sha256": "323d7ba73bede709503f679a66cf0ef2c4f87454de82081b373f4e5bb77a20d1",
+      "bytes": 147,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-loader-failure/gb.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-loader-failure/gb.time",
+      "sha256": "c0d0ae13dcd08f28bb1553dad033cfd03bf6c9e6f61f24dbba141f9d2c8323ab",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-loader-failure/param.exit",
+      "sha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-loader-failure/param.stderr",
+      "sha256": "323d7ba73bede709503f679a66cf0ef2c4f87454de82081b373f4e5bb77a20d1",
+      "bytes": 147,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-loader-failure/param.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight-loader-failure/param.time",
+      "sha256": "743c151339f6a9fcee0aaae5ee38fe4d7fc8d1af4ca74873d7f71c832d7069ff",
+      "bytes": 32,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "native/analyze.cpp",
+      "sha256": "5c809337803de22ec66939d6838df18a722db4181c67a8fc8fe96d9a6af7e6d2",
+      "bytes": 11265,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "evidence/analysis.jsonl",
+        "sha256": "792e423d3cb679dc510aea0e55d50886c7684f332ce1bb5351b629ca9168c0e0",
+        "bytes": 2104,
+        "kind": "summary"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "All16calls exited0. Eight paired fixture/repetition analysis records pass every registered check. Double point: qdim2, eliminant degree1. Split: qdim2, degree2. Simple and F2 known-degree control: qdim1, degree1. Selected-pair degree3 for the known control in both repetitions. Preflight c=2 excluded from these16rows.",
+      "by": "executor"
+    },
+    {
+      "kind": "observation",
+      "text": "Protocol and native analysis committed in f0bea543060faeeceb9894a009ad11d88de1239d before the first affected call. Protocol hash cff556238d4049de994e63b2f25896ffaf0e8574c1a9b6b6f358b43053cd35b5. No after-data change to protocol or native analysis.",
+      "by": "executor"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

@@ -1,0 +1,19 @@
+# diff of Rust text outputs against the archived Python outputs (shell trace lines '+...' removed from the Python files)
+$ diff <(grep -v '^+' run1.txt [python archive]) run1.txt [rust]
+  -> identical (63 lines)
+  python archive sha256 18146165983930bf112b875a94e0a2db5521bae8017e51d7883d65e0e4ea683f
+$ diff <(grep -v '^+' run2.txt [python archive]) run2.txt [rust]
+  -> identical (28 lines)
+  python archive sha256 a4f7f59b97f9055f67daae7fa3fb3d7a6451769757a6eeab82d7c9ef6f204985
+$ diff <(grep -v '^+' run3.txt [python archive]) run3.txt [rust]
+  -> identical (82 lines)
+  python archive sha256 cc2b42d6488f6561e3d8b0b31e3eb85f5771cf59ca03af4065befa2a872188c4
+$ diff <(grep -v '^+' hsupp2_t9_c4.txt [python archive]) hsupp2_t9_c4.txt [rust]
+  -> identical (35 lines)
+  python archive sha256 7eec8ca82015409b93165ab2200f085cb4ef6a8fabb22462134a9f78bfb95fb1
+$ diff <(grep -v '^+' s0pat_t9_c4.txt [python archive]) s0pat_t9_c4.txt [rust]
+  -> identical (26 lines)
+  python archive sha256 54be49b84291362d624fef37fc16a8d456f0fc26aa966e968ef4c3352f81021c
+$ diff <(grep -v '^+' mult2_d2_s6.txt [python archive]) mult2_d2_s6.txt [rust]
+  -> identical (15 lines)
+  python archive sha256 2eb589e03802150f6dbcc4550ffeb068253d56512b9bf7843f32f4ed7ef51123

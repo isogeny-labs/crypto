@@ -1,0 +1,10 @@
+import Multiplicity
+set_option autoImplicit false
+namespace NormalizationMultiplicity
+open Polynomial MumfordNormalization
+variable {K : Type*} [Field K]
+theorem residual_power_iff (n k : ℕ) (a b : K) (ha : a≠0) (u f v : K[X]) :
+ (T n a b u)^k∣T 6 a b f-(T 3 a b v)^2 ↔ u^k∣f-v^2 := by
+ rw [← residual_compatible]
+ exact power_dvd_iff n 6 k a b ha u (f-v^2)
+end NormalizationMultiplicity

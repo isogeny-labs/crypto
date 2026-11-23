@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T19:27:09Z",
+ "id": "PCC-20261116-f14049",
+ "kind": "statement",
+ "producer": {
+  "commit": "8b922e07cabd3cdb4155c6ce68380b7330a92815",
+  "model": "",
+  "session": "codex-20261116-nist-differential-test"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/KERNEL_SYMMETRY_PROTOCOL.md",
+    "sha256": "87ac2fe37a84b525cd57c72408e1619b42767395ca9b386822595da9a5b8104c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/kernel_symmetry.cpp",
+    "sha256": "390dbd9a10b80915351336206315a800f2cfdd8de8d60f1fe73e032b166050a5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-kernel-symmetry.sh",
+    "sha256": "3bbaad8f856f5463d114a48e8526eca4efb817f3a8baac5f69f3f6095ddfa8bd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/kernel-symmetry-v1/result.json",
+    "sha256": "4a70e400cf20164baa1345c290d55ef3af63c251ef8285dd9b6095ebe0449ba6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/kernel-symmetry-v1/pre-call-manifest.sha256",
+    "sha256": "e73b7a3952d29bf0c2bafc523c634ca76692bc19d46bc313c8dac3f9d3c6cf49"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/kernel-symmetry-v1/post-call-source-manifest.sha256",
+    "sha256": "56da5df4e30fe6efe92756ac2a85de11b494e681936f6a0bc6a9b151b5c17e7e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "On the actual P-192 d7 odd model the native cleared-denominator cover-involution identity passes, and diag(1,1,-1,-1,-1,-1) permutes all eight archived kernels as four pairs (1,2),(3,7),(4,8),(5,6), checking all 216 kernel vectors and rejecting an altered involution. The polarized quotient-isomorphism interpretation uses the stated cover/pullback argument and is producer-unverified."
+}

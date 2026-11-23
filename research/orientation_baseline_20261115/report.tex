@@ -1,0 +1,76 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,hyperref}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+\begin{center}\LARGE Binary relation finding: a stronger baseline\end{center}
+\textbf{2026-11-15. Native development controls; timing pending.}\\
+\texttt{PCC-20261115-c73d58}: \textbf{unverified}. Results below are producer observations, with no signed independent verdict. [pcc:unverified]
+
+The baseline now finds every ordered two-point relation by target subtraction and full-point lookup, with one shared field inversion. Nine native tests pass, including the six previous orientation/hybrid controls. This is a fixture implementation of existing repo mechanisms; it is not a wall-time record. [pcc:unverified]
+
+\textbf{Contract.} Return all index pairs $(i,j)$ satisfying $F[i]+F[j]=T$, with the same signed base, target and output order. Repeated labels remain distinct. Rebuild the membership index per target; no pair table or cross-target cache.
+
+\begin{center}
+\fbox{\begin{minipage}[c][1in][c]{0.27\textwidth}\centering\textbf{Pair scan}\\[5pt]Test $P_i+P_j=T$\\[5pt]$B^2$ addition calls\end{minipage}}
+$\to$
+\fbox{\begin{minipage}[c][1in][c]{0.27\textwidth}\centering\textbf{Subtract}\\[5pt]Look up $T-P_i$\\[5pt]$B$ additions + index\end{minipage}}
+$\to$
+\fbox{\begin{minipage}[c][1in][c]{0.27\textwidth}\centering\textbf{Batch subtract}\\[5pt]Same full-point lookup\\[5pt]At most one inversion\end{minipage}}
+\end{center}
+Diagram source: \texttt{model.svg}. Proof idea: $P+Q=T$ iff $Q=T-P$. Batch nonzero denominators with prefix/suffix products; dispatch zero denominators through identity, inverse, doubling and two-torsion branches. Expected work is $O(B+R)$ with R output rows; R can be quadratic for duplicate labels. [pcc:unverified]
+
+\textbf{Cold counters, B=64, eight GF(256) targets.} Input point validation and inversion-internal arithmetic are included. All arms emit the same 165 ordered rows. [pcc:unverified]
+\begin{center}\begin{tabular}{lrrr}
+& Pair scan & Scalar subtract & Batch subtract\\\hline
+Group-add calls&32,768&512&512\\
+Field multiplications&282,765&5,475&3,772\\
+Field squarings&251,006&4,526&1,509\\
+Inversion calls&31,248&438&7\\
+Index inserts&0&512&512\\
+Lookups&0&512&512\\
+Output rows&165&165&165
+\end{tabular}\end{center}
+The inversion column is descriptive: its internal arithmetic is already in the multiplication/squaring columns. Do not add it again. XORs, hashing instructions, allocation bytes and machine cycles are not counted. A 64-fold group-call reduction against pair scan is not a 64-fold wall-time result. [pcc:unverified]
+
+\textbf{Checks.} Exact complete outputs agree in 528 cases on 18 curves over GF(4), GF(8), GF(16), plus 32 GF(256) cases. Inputs cover full, non-negation-closed, empty and repeated-label bases; all small-curve targets include O and x=0. Every inverse is checked in the five supported fixture fields. The old pinned controls remain unchanged. [pcc:unverified]
+
+\textbf{Reproduce:}
+\begin{verbatim}
+cargo test --release --manifest-path \
+  research/orientation_baseline_20261115/Cargo.toml -- --nocapture
+\end{verbatim}
+\newpage
+\begin{center}\Large Scope, timing gate and source receipt\end{center}
+\textbf{Baseline selection.} Use batched subtraction as the component comparison for orientation/y-x relation finders on identical inputs. For the earlier $P_1+P_2+P_3=O$ convention, supply $T=-P_3$. The baseline uses full coordinates, so it retains point orientation and handles chart boundaries directly. Higher-arity decomposition and whole-pipeline improvements are not established.
+
+\textbf{Additional cold accounting, eight targets per base size:} [pcc:unverified]
+\begin{center}\begin{tabular}{rlrrr}
+B&Arm&Group calls&Inversions&Output rows\\\hline
+8&Pair scan&512&336&16\\
+8&Scalar&64&47&16\\
+8&Batch&64&7&16\\
+16&Pair scan&2048&1680&28\\
+16&Scalar&128&103&28\\
+16&Batch&128&7&28\\
+32&Pair scan&8192&7440&55\\
+32&Scalar&256&215&55\\
+32&Batch&256&7&55
+\end{tabular}\end{center}
+GF(256) fixtures: modulus $z^8+z^4+z^3+z+1$, a=0,b=1. Bases are prefixes of lexicographic full-point enumeration; eight deterministic targets include O and the finite x=0 point. Small curves use degrees 2,3,4 with a in $\{0,1,z\}$ and b in $\{1,z\}$. Exact fixtures, every arithmetic counter and outputs are controlled in \texttt{baseline.rs}; raw stdout/stderr is in \texttt{unit-tests.log}. [pcc:unverified]
+
+\textbf{Timing gate.} No benchmark or cloud job was submitted. This runtime has no EKS MCP or AWS identity. GitHub dispatch alone cannot read the remaining shared daily/monthly budgets and live pool capacity. The repository's \texttt{COST\_CONTROLS.md} requires: ``If the remainder is unknown or exhausted, do not start a new build/job.'' The user was asked for the existing connection.
+
+The native timing driver is ready; its no-timer preflight checks all four arms and sizes. Timing remains unrun. See \texttt{TIMING\_DRIVER.md} for the exact 16-repetition stream and build-time source pin. Actual STS access check failed: ``Unable to locate credentials.'' [pcc:unverified]
+
+The frozen follow-up requires EKS L2, one warmup, five alternating rounds, matching A/A and exact complete outputs. Charge cold point validation, index/buffers and output materialization. Proposed ceiling: USD 5 including build/failures, 4 CPU/4 GiB, 900 seconds, zero retries. Compare the fastest applicable external backend before any fastest claim. No local-timing substitute or provider/pool change.
+
+\textbf{Implementation scope.} This crate uses explicit tiny-field arithmetic. Production comparison should reuse binary \texttt{FastCurve::add\_many}; this is not an optimized ECC2K field backend. No library, leaderboard or calibrated-cost graph is changed. The explanatory diagram is appropriate because no admitted timing dataset exists.
+
+\textbf{Sources checked.} Base \texttt{9acb741c2}, prior orientation validation and its pinned controls;
+\path{docs/ic/ECDLP_RESEARCH_TECHNIQUES.md}, root-finding section;
+\path{ic_framework/plugins.rs}, generic SubtractOracle and prime-only RootfindSubtractOracle;
+\path{ic_framework/rootfind.rs}, existing binary PairedAdd/FastCurve batching. These establish prior art: no novelty claim.
+
+Kosters--Yeo, \href{https://arxiv.org/html/1503.08001v2}{Notes on summation polynomials}, sections 2,4,5, read for the preceding validation: distinguish algebraic roots, rational orientation and solving cost. KB unavailable: no MCP or fallback executable. Execution sources: \texttt{isolab-eks/SKILL.md}, submission/access references and \texttt{HARNESS.md}, \texttt{COST\_CONTROLS.md}. Full paths and limitations are in \texttt{README.md}; frozen acceptance criteria are in \texttt{PROTOCOL.md}.
+\end{document}

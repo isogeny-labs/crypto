@@ -1,0 +1,53 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "DEV SMOKE (not data) B2 PC: bsgs.textbook / bsgs.negation positive control, six 33-41-bit curves, fresh targets",
+  "description": "research/ic_lead_queue_20261114/B_sweep_followups/B2/PROTOCOL.md. Same arms and curves as research/prime_medium_rho_cpc_20261109/specs/PC.json; fresh target block and measurement seed.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 5557729739,
+        "a": 2036002406,
+        "b": 2773982840,
+        "group_order": 5557664551,
+        "r": 5557664551,
+        "gx": 3,
+        "gy": 898702012
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 21344195110516,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "bsgs-neg",
+      "role": "reference",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    },
+    {
+      "name": "bsgs-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    },
+    {
+      "name": "bsgs-tb",
+      "role": "baseline",
+      "method": {
+        "id": "bsgs.textbook"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 35920352509606,
+    "isolation_required": "L0",
+    "timeout_seconds": 300
+  }
+}

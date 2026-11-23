@@ -1,0 +1,15 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\setlength{\parskip}{7pt}
+\begin{document}
+\section*{Targeted metadata and PID observation design}
+Primary Docker API/source inspection supports replacing the broad /opt archive with targeted HEAD archive-path metadata for eight precise ancestors. The HEAD handler returns base64 JSON PathStat without requesting an archive stream. PathStat has mode, size, name, time and link target; it does not have UID/GID, ACLs or hashes. Preserve narrow artifact tar reads for ownership and byte checks. Interpret mode as Go FileMode, not POSIX stat mode.
+
+The proposed client uses the same local Unix socket, a pinned API version and curl identity, no redirects/proxy, bounded headers and exact stopped-container identity. Reject duplicate stat headers, symlink indicators, non-directories and missing traversal bits. Query ancestors individually. The included pure decoder has been syntax parsed only; no endpoint was contacted. Installed engine/API behavior remains unverified. The existing300-second budget remains unchanged.
+
+For PID limits, the current pre-container-start kernel observation cannot be replaced by Docker configuration or an after-start sample. The proposed explicit amendment moves the boundary to before the tested program's exec. A small reviewed static single-process gate would verify its actual cgroup-v2 pids.max=1 and pids.current=1, emit a bound receipt, then execve the unchanged ecbench/owner in the same PID. It must not fork or create threads. This is a future design; no gate was implemented or compiled.
+
+The gate changes the entrypoint and adds one read-only executable mount, so both require prospective review. It observes the kernel state before payload exec, not before container creation and not continuous enforcement against administrative mutation. If the original literal boundary is mandatory, a runtime-level hook/lifecycle design remains necessary and this proposal is insufficient.
+
+References and exact scope: DESIGN.md and sources.json. Original supervisor revisions remain unchanged. No Docker commands, helper execution, cloud operations or scientific work occurred.
+\end{document}

@@ -1,0 +1,132 @@
+{
+  "schema": "jv-scheme-source-review/v1",
+  "credited_dependency_modules": [
+    "research/coordinate_length_audit_20261114/lean/Bivariate.lean",
+    "research/coordinate_length_audit_20261114/lean/Solutions.lean",
+    "research/coordinate_length_audit_20261114/lean/Thickening.lean",
+    "research/jv_graded_hilbert_audit_20261114/lean/CanonicalPieces.lean",
+    "research/jv_graded_hilbert_audit_20261114/lean/GradedBasis.lean",
+    "research/jv_graded_hilbert_audit_20261114/lean/GradedCertificate.lean",
+    "research/jv_hilbert_audit_20261113/lean/CubicDual.lean",
+    "research/jv_hilbert_audit_20261113/lean/DualBasis.lean",
+    "research/jv_hilbert_audit_20261113/lean/QuotientBasis.lean",
+    "research/jv_hilbert_audit_20261113/lean/SharpCutoff.lean",
+    "research/jv_local_multiplicity_audit_20261115/lean/JVCharts.lean",
+    "research/jv_local_multiplicity_audit_20261115/lean/JVConePoints.lean",
+    "research/jv_local_multiplicity_audit_20261115/lean/JVLocalCertificate.lean",
+    "research/jv_local_multiplicity_audit_20261115/lean/JVLocalization.lean",
+    "research/jv_local_multiplicity_audit_20261115/lean/JVOrigin.lean",
+    "research/jv_local_multiplicity_audit_20261115/lean/JVTailFlags.lean",
+    "research/jv_macaulay_certificate_20261113/lean/ActualIdeal.lean",
+    "research/jv_macaulay_certificate_20261113/lean/CubicNormalForms.lean",
+    "research/jv_macaulay_certificate_20261113/lean/LiteralQuadratics.lean",
+    "research/jv_macaulay_certificate_20261113/lean/MacaulayCertificate.lean",
+    "research/local_algebra_length_audit_20261114/lean/LocalLengthCertificate.lean",
+    "research/local_algebra_length_audit_20261114/lean/PowerBasisLength.lean",
+    "research/local_algebra_length_audit_20261114/lean/ResidueDegreeControl.lean",
+    "research/local_algebra_length_audit_20261114/lean/TruncatedLocal.lean"
+  ],
+  "new_modules": [
+    "JVSchemeCertificate",
+    "JVSchemeCharts",
+    "JVSchemeImports",
+    "JVSchemeStalk"
+  ],
+  "new_concrete_modules": 3,
+  "import_only_adapter": "JVSchemeImports",
+  "prior_claims": [
+    {
+      "claim": "PCC-20261115-2e7ce0",
+      "credit": "Actual literal F101 quotient, own ring/localization length8, unit/locality/prime/residue facts, nilpotent nonreduced ring, actual first zero chart/open and actual second source-root-induced maps; known point population. Fresh prior gate73 credited separately."
+    },
+    {
+      "claim": "PCC-20261114-aec576",
+      "credit": "Actual basis/multiplication/scalar dimension/Hilbert function/all-field zero characterization; transitive credited dependency."
+    },
+    {
+      "claim": "PCC-20261114-81195a",
+      "credit": "Classical ideal flag/scalar length upper bound/residue-degree control; transitive credited dependency."
+    }
+  ],
+  "primary_sources_credit": {
+    "JV": "Current-session fulltext+visual author manuscript PDF7/21; literal toy systems/known first empty chart/second root. Credit preceding packet, no new whole-paper read claim.",
+    "Diem": "Current-session fulltext+visual PDF6–8/printed79–81 of31; Proposition2.5 explicitly with multiplicities/zero-dimensional cycle degree/product(P1)^n; textual relevant excerpt reread before scheme code. General intersection sketch not formalized.",
+    "primary_copyright_files": "Local only; not archived or committed."
+  },
+  "official_api_reads": [
+    {
+      "path": "Mathlib/AlgebraicGeometry/StructureSheaf.lean",
+      "scope": "stalk algebra, actual IsLocalization.AtPrime instance and canonical stalkIso around810–930."
+    },
+    {
+      "path": "Mathlib/AlgebraicGeometry/AffineScheme.lean",
+      "scope": "Spec.stalkIso, algebraMap_stalkIso_inv and germ identity around1270–1325."
+    },
+    {
+      "path": "Mathlib/AlgebraicGeometry/Scheme.lean",
+      "scope": "Actual Spec scheme and its locally ringed space around454–475."
+    },
+    {
+      "path": "Mathlib/AlgebraicGeometry/Properties.lean",
+      "scope": "Actual scheme reducedness and affine_isReduced_iff around88–128."
+    },
+    {
+      "path": "Mathlib/RingTheory/Spectrum/Prime/Basic.lean",
+      "scope": "Actual zero/nonzero ring spectrum empty/nonempty around50–85."
+    },
+    {
+      "path": "Mathlib/RingTheory/Spectrum/Prime/Topology.lean",
+      "scope": "Actual principal basic open and membership around498–515."
+    },
+    {
+      "path": "Mathlib/Data/Set/Basic.lean",
+      "scope": "Correct empty-set lemma eq_empty_of_forall_notMem after failed guessed name, without target relaxation."
+    }
+  ],
+  "methods": "Official affine-scheme stalk/localization isomorphism and coefficient/germ identity, ordinary scalar restriction/linear equivalence length transport, official affine reducedness equivalence and actual evaluation-induced comap points. Established methods credited; no novel comparison theorem.",
+  "prior_tools": {
+    "correct_KB_calls": 4,
+    "exit": 127,
+    "before_query_processing": true,
+    "MCP_relevant_tools": 0,
+    "Conductor_calls": 1,
+    "Conductor_exit": 127,
+    "before_code": true,
+    "fallback": "Bounded current frozen proof/source review, current-session primary source coverage and official API source; no absence or novelty claim."
+  },
+  "dependencies": {
+    "custom_modules": 24,
+    "formal_configuration_files": 42,
+    "formal_artifact_pins": 59,
+    "copied_modules": 0,
+    "hydrated_files": 0,
+    "existing_local_Lake_pattern": true,
+    "old_pins_checked_before_after_every_numbered_state": true
+  },
+  "new_scope": {
+    "actual_Spec_origin_stalk": true,
+    "official_categorical_stalk_localization_comparison": true,
+    "actual_coefficient_equals_global_section_germ": true,
+    "actual_stalk_self_module_length8": true,
+    "actual_stalk_canonical_residue_F101": true,
+    "actual_Spec_nonreduced": true,
+    "actual_first_quotient_and_localization_schemes_empty": true,
+    "actual_second_source_root_induced_points": true,
+    "actual_first_basic_open_empty_and_second_nonempty": true,
+    "known_prime_and_geometric_population_credited": true
+  },
+  "limits": {
+    "general_cycle_or_intersection_theorem": false,
+    "qualified_Diem_bound_refuted": false,
+    "ordinary_cone_is_Diem_product_projective_instance": false,
+    "positive_dimensional_isolated_components": false,
+    "Rojas_C_refinement": false,
+    "scheme_isomorphism_of_localized_Spec_with_basic_open_constructed": false,
+    "source_second_unique_root_proved": false,
+    "whole_curve_order_scalar_decomposition": false,
+    "new_native_solver_or_cryptographic_experiment": false,
+    "novelty_claim": false,
+    "new_physical_host_or_implementation_independence": false,
+    "original14_complete": false
+  }
+}

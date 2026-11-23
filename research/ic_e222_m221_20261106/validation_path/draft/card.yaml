@@ -1,0 +1,40 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-e222m221-h1-isolab-draft-001
+experiment_id: e222m221-h1-isolab-draft
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+bus_address: executor-e222m221
+background: false
+write_scope:
+  - research/ic_e222_m221_20261106/validation_path/run/
+receipt: research/ic_e222_m221_20261106/validation_path/run/receipt.json
+must_not_exist:
+  - research/ic_e222_m221_20261106/validation_path/run/launch
+binds:
+  - path: research/ic_e222_m221_20261106/validation_path/draft/request.json
+    sha256: bef1b41a1019c18e65ae7e3577a6b018567dcedd5241936e526e12017a0a9f40
+  - path: taskq/deploy/eks-karpenter/remote/launch-remote-command
+    sha256: 7e1daae8dc70f8fcb813d9315daa73df3e18e7e5f72e2d47f34f9a3c85637416
+commands:
+  - id: submit-command-job
+    argv:
+      - taskq/deploy/eks-karpenter/remote/launch-remote-command
+      - research/ic_e222_m221_20261106/validation_path/draft/request.json
+    env:
+      AWS_REGION: us-east-2
+      ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+      ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+      ISOLAB_CLIENT_OUTPUT: research/ic_e222_m221_20261106/validation_path/run/launch
+    timeout_seconds: 2400
+    success_exit_codes: [0]
+    stdout: research/ic_e222_m221_20261106/validation_path/run/launch.stdout
+    stderr: research/ic_e222_m221_20261106/validation_path/run/launch.stderr
+    outputs:
+      - research/ic_e222_m221_20261106/validation_path/run/launch/result.json
+stop_when:
+  - the request sha256 differs from the bound sha256
+  - aws sts get-caller-identity does not report account 104186811093
+  - the image digest in the request is all zeros
+  - the launcher exits with a code that is not 0
+notes: "DRAFT, NOT FOR EXECUTION. The image digest and provenance.source_revision in draft/request.json are zero placeholders; no digest-pinned image containing the ic binary and this repository exists in isolab/tasks (taskq/deploy/eks-karpenter/publish-image bundles only ecbench and isolab-fresh-owner). The card also has no commit pin."

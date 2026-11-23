@@ -1,0 +1,24 @@
+{
+  "schema": "software.private-runtime.prospective-review/v1",
+  "reviewer": "/root/assembler_independent_review_v2",
+  "independent": true,
+  "independence_scope": "Did not author private supervisor; supplied advisory findings and independently reviewed implementation and software tests.",
+  "scope": "one-private-runtime-assembly",
+  "inputs_sha256": "ba15f0b8639110811082258591d7ca6de39d01277c24c562fe525cb8086ddb5d",
+  "binding_sha256": "8a9c10a1480afaf54e80ced33540a9a65c3d880f780abc2bde8e46d115dde586",
+  "preflight_sha256": "45e8ae5682f5dfb60bf1d9571eed93b9d95d3bba54d7935670297249d52c1020",
+  "supervisor_sha256": "f2c638ed4ec07509a3254632fb7831e009559667b6a82eacb9fb5ea31ac9cb66",
+  "decision": "conditional_approve",
+  "execution_allowance_approved": false,
+  "technical_scope_acceptable": true,
+  "attempt_limit": 1,
+  "total_seconds": 600,
+  "conditions_remaining": [
+    "Bind completed campaign accounting establishing sufficient remaining cumulative allowance for the entire attempt.",
+    "Bind current ownership reconciliation showing no unresolved matching owner, service or attempt.",
+    "Record reservation of 2 CPU, 2 GiB RAM and 4 GiB retained storage against concurrent work."
+  ],
+  "failure_disposition": "Preserve unresolved execution and cleanup evidence; no automatic retry or qualification.",
+  "qualification_admitted": false,
+  "runtime_launched_by_reviewer": false
+}

@@ -1,0 +1,8 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | ksum5 | 96/96 | 6.660 | 7.402 | 14.085 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | ksum5-aa | 96/96 | 6.660 | 7.402 | 14.085 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | ksum5-sib | 96/96 | 5.549 | 6.402 | 14.085 | — |
+| icv1-fp22-tm1267-a5acaf6d | 21.65 | rho-neg | 96/96 | 1.170 | 1.278 | 2.247 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.

@@ -1,0 +1,94 @@
+validation_report:
+  id: VAL-20261029-4aed57
+  task_id: none issued (main-session dispatch, 2026-10-29; XP-20261029-stride-renew-prime, P20 and P28 improvement claims)
+  snapshot:
+    branch: claude/ic-stride-renew-prime-20261029
+    head_commit: 0e7243aa6cbeae8f0f5a85e618929928d2aa1fd3
+    protocol_freeze_commit: 4d4593aabda667a681fab4a67e351dc5bcb7c1f4   # PROTOCOL.md + spec-P{20,24,28,32}.json; unchanged at HEAD and in the work tree
+    evidence_dir_state: >-
+      research/ic_stride_renew_prime_20261029 is in no commit. It was untracked when validation began
+      and was staged by another session during validation. The worker receipts are bound by sha256 to
+      the S3 originals the worker wrote (every file byte-identical), so this is not a working-tree-only
+      producer receipt. A commit of the study directory must carry the hashes in validation/provenance.txt.
+  run_ids:
+    - ECBS1hf29b6429c225   # P20, job ic-srenew-p20-20261029, pod 8d5ba87a-31b6-46fb-9d07-14bee7f6c08b
+    - ECBS1h6db57a5af362   # P28, job ic-srenew-p28-20261029, pod e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4
+  artifact_checks:
+    - "S3 originals: every file in each job's SHA256SUMS, and SHA256SUMS itself, streamed from S3 through sha256sum; 19/19 + 1 identical to the local eks-results for P20 and P28; local sha256sum -c 19/19 OK on both: pass"
+    - "One pod output per job prefix (one pod uid and one launcher receipt dir each); no rerun or alternative run to choose from: pass"
+    - "Frozen spec: input-spec.json, session/spec.json, request.job.spec and validated-request.job.spec are JSON-equal to backlog/.../spec-P20.json and spec-P28.json at 4d4593aa (bytes differ: compact vs indented); request.json sha256 equals the card pins 934c0429.../3d7602bf...; validated-request sha256 equals result.request_sha256: pass"
+    - "Protocol section 2/3 values in the frozen specs: P20 prime-abscissa:size=45, max_trials 1410236, curve seeds 202610292011/2012; P28 size=407, max_trials 26479085, seeds 20261029281/282; 24 targets per curve; 1 warm-up + 6 rounds, alternate, L2, 1800 s; curve slugs equal to section 3: pass"
+    - "Worker audit (ecbench verify on the worker, binary 583e62f0): ok, 1680 records, 1680 verified, 1440 replays reproduced, 0 problems, all 12 checks true, on both sizes: pass"
+    - "L2 gate: required L2, 1680 executions, 1680 graded L2, 0 below L2, 0 invalid, accepted true, on both sizes; every record's isolation.level is L2 (recounted from records.jsonl); job exit 0: pass"
+    - "Binary: measured by ecbench 583e62f0 (image; build-info source_revision cb2ec6873f30, built 2026-10-19); session.git_commit and git_dirty are null (image build). Not rebuilt by the validator: recorded, not verified"
+    - "The local ecbench bf5eec6d re-ran compare (5 pairs x 3 weights x 2 sizes = 30 files) and band --ranks (2 files): 32/32 byte-identical with P<b>/analysis/: pass"
+  metric_recomputations:
+    - "validation/recompute.py (stdlib, own code) read records.jsonl directly: S(w) = (G + w*U)/sqrt(r) with C = n_C = 0 (0 records name a pinned calibration unit) and U per the band definition (band.rs). 60 pooled and per-curve paired ratios agree with ecbench compare to <= 1.5e-15 relative; 24 per-curve band means per size agree to <= 1e-12"
+    - "P20 sum S_srenew / sum S_walk (288 pairs, 48 targets, 2 curves): w=0 0.841678 [ecbench 0.8071, 0.8778]; w=0.1 0.858319 [0.8214, 0.8971]; w=1 0.925542 [0.8788, 0.9753]. Validator two-stage cluster bootstrap (seed 29102026): [0.8076, 0.8773], [0.8219, 0.8967], [0.8792, 0.9747]; upper bound below 1 at all three weights"
+    - "P28 sum S_srenew / sum S_walk: w=0 0.976555 [ecbench 0.9609, 0.9924]; w=0.1 0.975191 [0.9577, 0.9929]; w=1 0.968163 [0.9413, 0.9955]. Validator two-stage: [0.9610, 0.9921], [0.9578, 0.9925], [0.9413, 0.9950]; over 11 seeds the w=1 upper bound ranges 0.9945-0.9965, always below 1"
+    - "Per curve srenew/walk at w=0/0.1/1: P20 tm327 0.8402/0.8570/0.9261, tm1549 0.8432/0.8596/0.9250; P28 t20713 0.9798/0.9788/0.9740, tm21435 0.9734/0.9716/0.9623"
+    - "Distance to matched rho (rho.negation, same session and seeds), walk/rho-neg and srenew/rho-neg at w=0/0.1/1: P20 7.922/8.194/9.510 and 6.668/7.033/8.802; P28 22.784/22.326/20.232 and 22.249/21.772/19.588"
+    - "Main-session numbers: P20 all nine agree at 3 decimals; P28 w=0 and w=0.1 agree; P28 w=1 upper bound quoted 0.996 should be 0.995 (0.99549). Not decision-relevant; the true bound is lower"
+    - "One-stage cluster bootstraps (targets only, and stratified by curve) are narrower (P20 w=0 [0.817, 0.865]; P28 w=1 [0.948, 0.988]). ecbench's scheme is two-stage (stats.rs cluster_bootstrap_ci: workloads, then pairs within each drawn workload), which the validator reproduced"
+  control_checks:
+    - "Validator verify --replay-all with ecbench bf5eec6d on byte-identical copies of both sessions (taskset -c 2, RAYON_NUM_THREADS=1): P20 1440/1440 and P28 1440/1440 measured replays identical, 1680/1680 verified, 0 problems, all checks true, rc 0. This replay used a different binary from the measurement (bf5eec6d vs 583e62f0) on a different host class (ECBENV3h13e37662a118 vs ECBENV2h3a51beea0bc2). Session copies unchanged by the replay (sha256 before = after)"
+    - "[d]G = Q with the validator's own affine arithmetic for all 1440 measured records of every arm at each size: 2880/2880. Curve a, b derived from plan.json points. p and r prime; every point on the curve; [r]G = O; r is the only multiple of r in the Hasse interval, so #E = r (prime order); j-invariants 304448, 761303, 122401184, 131563971 equal the ICV1 strings and are not 0 or 1728, so Aut(E) = {+-1}. Negation is the strongest fold over a prime field; rho records show automorphisms_used 2"
+    - "A/A null arms: walk-aa/walk and rho-neg-aa/rho-neg exactly 1.0 [1, 1] at every weight and size. 288/288 pairs identical in total GAE, U, every phase's adds, doubles, scalar_mults, gae and native counts, and recovered scalar"
+    - "Completeness: walk, srenew, walk-aa, rho-neg, rho-neg-aa each 288 measured + 48 warm-up per size; 288/288 verified, matches_target true; 0 censored; 0 unpaired; 288 pairs share keys (workload, round) and algorithm seeds across all five arms"
+    - "Only `targets` differs: in every one of the 288 paired records per size, the method params of srenew and walk differ in exactly one key (targets: walk vs stride-renew). linalg incremental-gauss, solver empty and budget 0 on both. walk-aa params equal walk's. The frozen specs differ in the same single key"
+    - "Band --ranks: srenew < walk on every curve at both sizes (re-run, byte-identical to band.md); recomputed means give rho-neg < srenew < walk at every weight on all four curves"
+    - "Section 6 reading recomputed: P20 conditions 1-4 hold (improvement); P28 conditions 1-4 hold (improvement)"
+  heuristic_validation_checks:
+    - "Not applicable: no heuristic distribution is claimed. The section 7 predictions were frozen before confirmatory data (commit 4d4593aa precedes both jobs). Checked:"
+    - "Prediction 1 (P20 below 1 at every weight; about 0.85-0.90 from scalar multiplications alone): holds; 0.842 at w=0, slightly beyond the predicted range on the favourable side"
+    - "Prediction 2 (the gain shrinks with size): P20 15.8% -> P28 2.3% (P24 null and P32 run 1 are producer numbers, not validated here). The direction holds, but the P28 gain is mostly not the scalar-multiplication share the prediction names (see cost_model_checks)"
+    - "Prediction 3 (ratio at w=1 close to the ratio at w=0): fails at P20 (0.842 vs 0.926). Unpriced counts per pair barely change, so pricing them dilutes the gain. Roughly holds at P28 (0.977 vs 0.968)"
+    - "Null-object rule (inventor-protocol section 3): the A/A arms are null objects of the same shape and measure exactly 1. The protocol states the gain should decay with size, and the measured ratios move toward 1 from P20 to P28"
+    - "Inventor-protocol section 6 ladder: no extrapolation is claimed. The improvement is a measured ratio against the baseline at each claimed size, with matched controls"
+  cost_model_checks:
+    - "Unit declared: ecbench GAE / sqrt(r), cold whole pipeline, one target. The section 5a band w = 0, 0.1, 1 is applied to every arm including rho. IC arms carry lower_bound true (unpriced natives: sqrt_solves, lookups, row_ops, legendre_symbols, target_guard_probes); rho leaves canonicalisations unpriced. C = 0 on every record"
+    - "Stride-renew set-up and per-relation cost are charged. Code that ran (ic_boundary.rs at cb2ec6873f30): stride and renew_by are drawn by draw_jumps (two counted scalar multiplications + one add each) into rel.group_ops. Each restart R0 = [a]G + [b]Q costs two counted muls + one add; each step R <- R + S and each renewal S <- S + T is a counted add. CountedGroup::mul is the default double-and-add (no override in the crate) and charges every doubling and addition; GroupOps::gae = adds + doubles. origin/main differs only by instrumentation (rng_draws, walk_modr_adds) and a scale_coeff hook, and the cross-binary replay is identical"
+    - "Records confirm it, 288/288 srenew records per size: relations scalar_mults = 4 + 2*stride_restarts; relations adds >= stride_steps + stride_renewals + stride_restarts + 2; 1 <= stride_renewals <= relations; every phase gae = adds + doubles; total_gae = sum of phase gae (walk too). Doublings per scalar multiplication are equal across arms (P20 17.61 vs 17.62; P28 25.23 vs 25.23). factor_base natives and oracle_setup GAE are identical per pair"
+    - "Where the saving comes from (validation/mechanism.py, per-pair means): P20 dG = 1440.5 GAE (15.8%), of which 950.3 doublings and 490.2 adds; scalar muls 59.94 -> 6.00; trials ratio 0.995 [0.937, 1.057], relations 0.975 [0.927, 1.023]. The P20 gain is the deterministic scalar-multiplication saving"
+    - "P28: dG = 6226 GAE (2.34%), of which 1482 doublings and 4744 adds; scalar muls 64.75 -> 6.00. Trials ratio 0.957 [0.915, 0.999] and relations 0.956 [0.916, 0.996] (203.3 vs 212.7). No dependent rows in either arm (matrix_dependent 0, rank = rows). About 2,200 GAE (about 0.8% of S) is the scalar-multiplication saving (1,482 measured doublings plus an estimated 730 additions). About 4,000 GAE comes from needing fewer relations and trials, an effect protocol section 7 did not predict and for which no mechanism is stated"
+    - "Not a relabelling: the total falls at every weight on both sizes, the unpriced natives are priced in the band, and the gain is in charged group operations"
+    - "Memory: mean max RSS walk 33969 vs srenew 33959 KiB (P20) and 38489 vs 38448 KiB (P28); no time-memory trade-off"
+    - "Success probability: every measured run solved and verified, so the cost per solved target needs no inverse-success factor"
+  proof_architecture_checks: []
+  verdict: passed
+  verdict_by_size:
+    P20: "pass: section 6 conditions 1-4 hold. The gain is the predicted, deterministic scalar-multiplication saving"
+    P28: >-
+      pass with caveats: section 6 conditions 1-4 hold, but about 2/3 of the 2.3% gain comes from srenew
+      needing 4.4% fewer relations. That effect is about two standard errors from zero, was not predicted,
+      and has no mechanism. The w=1 upper bound is 0.9955, within 0.5% of 1. The scalar-multiplication
+      component alone (about 0.8%) would probably not resolve at this sample size.
+  limitations:
+    - "Admissible evidence only: this report does not authorize promotion; VALIDATION.json (rho_reference descriptor), the leaderboard and the benchmarks row remain the Coordinator's"
+    - "Evidence directory not committed at validation time. The verdict binds to the sha256 values in validation/provenance.txt and validator-report.json raw_data"
+    - "Measurement and replay share one IC implementation (ecbench). The replay is cross-binary and cross-host, not an independent implementation. The measuring binary 583e62f0 was not rebuilt from cb2ec6873f30"
+    - "Two fresh curves per size, 24 targets x 6 rounds each. Intervals cover target-to-target variation on these curves only. No exponent, pooled-size or larger-size claim"
+    - "Four sizes are each decided at 95% with no multiplicity correction (as frozen). P24 and P32 are outside this validation"
+    - "Counted unit only; no wall-clock claim"
+    - "Not checked: figures/, README/PDF (none yet), the producer's session-log narrative, P24, P32-run1"
+    - "P28/analysis/err is an empty producer file (0 bytes)"
+  artifact_paths:
+    - research/ic_stride_renew_prime_20261029/validation/validation_report.yaml
+    - research/ic_stride_renew_prime_20261029/validation/replay-certificate.json   # gate replay certificate (2880 runs)
+    - research/ic_stride_renew_prime_20261029/validation/validator-report.json     # gate validator report (162 headline numbers)
+    - research/ic_stride_renew_prime_20261029/validation/provenance.txt
+    - research/ic_stride_renew_prime_20261029/validation/recompute.py
+    - research/ic_stride_renew_prime_20261029/validation/recompute-P20.json
+    - research/ic_stride_renew_prime_20261029/validation/recompute-P28.json
+    - research/ic_stride_renew_prime_20261029/validation/mechanism.py
+    - research/ic_stride_renew_prime_20261029/validation/mechanism-P20.json
+    - research/ic_stride_renew_prime_20261029/validation/mechanism-P28.json
+    - research/ic_stride_renew_prime_20261029/validation/build_gate_files.py
+    - research/ic_stride_renew_prime_20261029/validation/band-P{20,28}.ecbench.json
+    - research/ic_stride_renew_prime_20261029/validation/replay-P{20,28}.{audit.json,verify.log,verify.stderr,session-files.before.sha256,session-files.after.sha256}
+    - research/ic_stride_renew_prime_20261029/validation/SHA256SUMS
+  review_attestation:
+    joints_owned: [whole receipt for P20 and P28; no review_plan]
+    read_sibling_reports: false
+    sources_read: listed in validator-report.json review_attestation
+    verdict: passed

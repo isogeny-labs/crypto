@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+"""Verify explicit 3-torsion certificates and the observed cover separator."""
+import concurrent.futures
+import json
+import math
+from pathlib import Path
+import sympy as S
+from flint import fmpz_mod_poly_ctx
+from nist_prym_three_local import one
+
+ROOT=Path(__file__).parent
+
+
+def elliptic_order(r):
+    p=int(r['p']);b=int(r['b']);P=fmpz_mod_poly_ctx(p)
+    f=P([b,-3,0,1]);psi=P([-3,4*b,-6,0,1])
+    leading,factors=psi.factor();assert int(leading)==1
+    orbit=[]
+    for g,e in factors:
+        assert e==1 and g.is_irreducible()
+        chi=pow(int(g.resultant(f)),(p-1)//2,p);assert chi in (1,p-1)
+        orbit.extend([g.degree(),g.degree()] if chi==1 else [2*g.degree()])
+    assert sum(orbit)==8
+    return math.lcm(*orbit)
+
+
+def verify(z,r):
+    p=int(r['p']);b=int(r['b']);d=z['cover_parameter_d'];P=fmpz_mod_poly_ctx(p)
+    cp=P(z['Kummer_characteristic_polynomial_coefficients'])
+    lam=P(z['lambda_polynomial_coefficients']);w=P(z['w_polynomial_coefficients']);u=P(z['u_polynomial_coefficients']);k=P([0,1]);onep=P([1])
+    assert cp.degree()==40 and cp.gcd(cp.derivative()).degree()==0 and cp.gcd(lam).degree()==0
+    assert (2*w-3*u-lam)%cp==0
+    x=S.Symbol('x');ff=S.Poly(x*(x-1)*((x+d)**3-3*(x+d)*(x-1)**2+b*(x-1)**3),x,modulus=p)
+    lc=int(ff.LC());f=[int(ff.nth(i))*pow(lc,4-i,p)%p for i in range(6)]
+    zz=((f[4]*lam-w*w+3*u*u+3*k*k)*pow(2,-1,p))%cp
+    U=[k*k%cp,u,onep];C=[k**3%cp,zz,w,onep]
+    def mul(a,b):
+        out=[P([]) for _ in range(len(a)+len(b)-1)]
+        for i,c in enumerate(a):
+            for j,e in enumerate(b):out[i+j]=(out[i+j]+c*e)%cp
+        return out
+    C2=mul(C,C);U3=mul(mul(U,U),U)
+    for i in range(7):assert (C2[i]-U3[i]-(f[i]*lam if i<6 else P([])))%cp==0
+    prod=onep;profile=[]
+    for part in z['Kummer_irreducible_factors']:
+        g=P(part['coefficients']);assert g.degree()==part['degree'] and g.is_irreducible()
+        prod*=g;norm=int(g.resultant(lam));assert norm==part['lambda_norm']
+        chi=pow(norm,(p-1)//2,p);assert chi==part['lambda_quadratic_character']%p
+        profile.extend([g.degree(),g.degree()] if chi==1 else [2*g.degree()])
+    assert prod==cp and sorted(profile)==z['Prym_nonzero_three_torsion_orbit_lengths'] and sum(profile)==80
+    return {'reduced_Kummer_scheme_degree':40,'original_torsion_identity_verified':True,
+            'irreducible_factors_verified':True,'all_eighty_nonzero_three_torsion_points_accounted_for':True}
+
+
+def job(rd):
+    r,d=rd;z=one(r,d);checks=verify(z,r);eo=elliptic_order(r);m=math.lcm(eo,z['Prym_full_three_torsion_field_degree'])
+    return {'family':r['family'],'candidate':r['candidate'],'label':r['label'],'status':r['status'],'d':d,
+            'E_full_three_torsion_field_degree':eo,'Prym_full_three_torsion_field_degree':z['Prym_full_three_torsion_field_degree'],
+            'JH_full_three_torsion_field_degree':m,'certificate_file':str(ROOT/'nist_cover_prym_three_local'/f'{r["family"]}_{r["candidate"]}_d{d}.json'),**checks}
+
+
+def main():
+    original=[r for r in json.loads((ROOT/'nist_selection_audit.json').read_text())['rows'] if r['baseline_eligible']]
+    variants=[{**r,'candidate':-r['candidate'],'label':r['label']+' (opposite b)', 'b':str(-int(r['b'])%int(r['p']))} for r in original if r['family']=='224']
+    jobs=[(r,d) for r in original+variants for d in range(8)]
+    out=[]
+    with concurrent.futures.ProcessPoolExecutor(max_workers=4) as pool:
+        for z in pool.map(job,jobs):
+            out.append(z);print('CERTIFIED',len(out),len(jobs),z['family'],z['candidate'],z['d'],z['JH_full_three_torsion_field_degree'],flush=True)
+    scores=[]
+    for r in original+variants:
+        covers=sorted([z for z in out if z['family']==r['family'] and z['candidate']==r['candidate']],key=lambda z:z['d'])
+        assert len(covers)==8
+        scores.append({k:r[k] for k in ['family','candidate','label','status']}|{'torsion_field_degrees':[z['JH_full_three_torsion_field_degree'] for z in covers],
+            'score':sum(z['JH_full_three_torsion_field_degree'] for z in covers),'opposite_b_sensitivity_variant':r['candidate']<0})
+    groups=[]
+    for fam in ['192','224','256','239','384','521']:
+        selected=[r['score'] for r in scores if r['family']==fam and r['candidate']>0 and r['status']=='published']
+        skipped=[r['score'] for r in scores if r['family']==fam and r['candidate']>0 and r['status']=='eligible_skip']
+        groups.append({'family':fam,'published_scores':sorted(selected),'eligible_skipped_scores':sorted(skipped),
+                       'strict_separation':max(selected)<min(skipped) if skipped else None})
+    assert all(g['strict_separation'] for g in groups if g['eligible_skipped_scores'])
+    search=json.loads((ROOT/'nist_cover_three_separator_search_d0_to15.json').read_text())
+    result={'status':'An exact common within-family separator in all four reconstructed streams with eligible skipped controls.',
+        'criterion':'For the fixed covers H_(b,d), d=0..7, S(E)=sum_d min{m>=1: J(H_(b,d))[3] is pointwise rational over F_(p^m)}. Every published candidate has smaller S than every eligible skipped candidate in the same stream.',
+        'proof_method':'Explicit forty-point reduced Kummer schemes. Independently verify C(X)^2-U(X)^3=lambda*f5(X), squarefreeness, irreducibility of every factor, and Frobenius signs from exact lambda norms. Recover all 80 nonzero Prym 3-torsion points. Independently compute E[3] field degree from its quartic division polynomial. The degree-eight isogeny gives m_H=lcm(m_E,m_Prym).',
+        'limits':['This is a post hoc separator of the observed finite candidate pool, not a theorem about unexamined candidates or a demonstrated historical selection criterion.',
+                  'The common rule is a within-stream ordering; it is not a single numerical cutoff shared by different fields.',
+                  'The covers use the specified a=-3,b models and the d=0..7 branch choices. Coordinate/cover-choice sensitivity must be reported.',
+                  'No eligible skipped controls exist for P384 or P521 in these reconstructed prefixes.',
+                  'The search-only conditional label fraction is 439/4480, about 9.8%; it excludes earlier research choices and is not a historical-intent probability.'],
+        'search_calibration':{k:search[k] for k in ['feature_count','tested_rules','attainable_labelings','all_within_family_labelings','conditional_label_fraction']},
+        'groups':groups,'scores':scores,'cover_certificates':out}
+    (ROOT/'nist_cover_common_three_torsion_separator.json').write_text(json.dumps(result,indent=2)+'\n')
+    print('GROUPS',json.dumps(groups),flush=True)
+    print('VARIANTS',json.dumps([s for s in scores if s['opposite_b_sensitivity_variant']]),flush=True)
+
+
+if __name__=='__main__':main()

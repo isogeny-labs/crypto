@@ -1,0 +1,212 @@
+{
+  "schema": "pencil.continuation_binding_ledger/v1",
+  "planning_only": true,
+  "execution_admitted": false,
+  "fields": [
+    {
+      "field": "resource.authorization",
+      "status": "bound_planning_only",
+      "value": {
+        "schema": "pencil.continuation_planning_authorization/v1",
+        "recorded_utc": "2026-10-30T23:12:46.615469+00:00",
+        "cumulative_active_worker_seconds": 25200,
+        "absolute_deadline_utc": "2026-10-31T06:00:00Z",
+        "absolute_deadline_unix_seconds": 1793426400,
+        "authorization_scope": "planning_limits_only",
+        "scientific_execution_admitted": false,
+        "prior_campaign_modified": false,
+        "prior_campaign_deadline_utc": "2026-10-30T22:08:40Z",
+        "prior_campaign_ceiling_seconds": 25200,
+        "conditions": [
+          "completed artifact bindings",
+          "runtime qualification",
+          "prospective review"
+        ],
+        "prior_costs_and_failures_retained": true,
+        "starts_new_execution_automatically": false
+      },
+      "evidence": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/continuation-planning-20261030/authorization.json",
+      "next_action": "Keep25200 and06:00 unchanged; bind canonical reviewed protocol separately."
+    },
+    {
+      "field": "cohort.enrollment",
+      "status": "hash_reconciled",
+      "value": {
+        "targets": 1260,
+        "slots": 22680,
+        "warmups": 3780,
+        "measured_pairs": 6300,
+        "plans": 8
+      },
+      "evidence": "input-reconciliation.json",
+      "next_action": "Reuse exact plans and seeds; do not regenerate or count separate gate in enrollment."
+    },
+    {
+      "field": "known_data.C1",
+      "status": "retained",
+      "value": {
+        "recorded_executions": 7,
+        "measured": 4,
+        "warmups": 3,
+        "pencil_timeouts": 2,
+        "pencil_verified": 0,
+        "missing": 11,
+        "active_worker_seconds": null
+      },
+      "evidence": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-c1/terminal-g18-observations/observation.json",
+      "next_action": "Preserve seven rows/eleven missing/two timeouts; ratios remain null."
+    },
+    {
+      "field": "resource.spent_remaining_outstanding",
+      "status": "unresolved",
+      "value": null,
+      "evidence": "budget-and-known-data.json",
+      "next_action": "Read authenticated complete campaign/owner ledger including open reservations and all charged work; do not initialize zero or subtract calendar time."
+    },
+    {
+      "field": "owner.remote_reconciliation",
+      "status": "partially_observed",
+      "value": {
+        "isolab_pencil_jobs": 0,
+        "recovery_owner_live_status": null
+      },
+      "evidence": "external-observation.json;status-projection.json",
+      "next_action": "Compatible read-only durable state retrieval and exact owner/controller terminal closure required; helper rejects memory schema; no role expansion."
+    },
+    {
+      "field": "resource.worker_unit_and_enforcement",
+      "status": "prospective_unbound",
+      "value": null,
+      "evidence": "/var/tmp/pencil-continuation-minimal-amendment-20261031-v1/amendment-fields.json",
+      "next_action": "Bind reviewed conservative reservation policy, campaign UID/CAS revision, worker unit and observed allocation closure; nested owner intervals are not additive worker charges."
+    },
+    {
+      "field": "resource.cutoff_and_reserve",
+      "status": "proposed_not_admitted",
+      "value": {
+        "latest_payload_stop": "2026-10-31T05:30:00Z",
+        "reserve_seconds": 1800,
+        "absolute_end": "2026-10-31T06:00:00Z"
+      },
+      "evidence": "/var/tmp/pencil-continuation-retry-clarification-20261031-v1/clarification.json",
+      "next_action": "Review actual enforcement/grace bound; tighten cutoff if needed; no completion guarantee."
+    },
+    {
+      "field": "retry.policy",
+      "status": "prospective_clarification",
+      "value": {
+        "total_attempts": 2,
+        "retries": 1,
+        "only_authenticated_never_started": true,
+        "automatic_scientific_retry": false
+      },
+      "evidence": "/var/tmp/pencil-continuation-retry-clarification-20261031-v1/clarification.json",
+      "next_action": "Bind exact launch/start producer boundary and all-attempt identities; uncertainty/postspawn/preemption/timeouts stop."
+    },
+    {
+      "field": "gate.decision",
+      "status": "unapproved",
+      "value": {
+        "separate_target": "p186379-target0",
+        "slots": 18,
+        "measured_replays": 15,
+        "max_new_scientific_attempts": 1
+      },
+      "evidence": "/var/tmp/pencil-continuation-minimal-amendment-20261031-v1/amendment-fields.json",
+      "next_action": "Prospective scientific decision must address known C1 stop and unchanged algorithm; diagnostics do not reopen it."
+    },
+    {
+      "field": "instrument.controller_owner_sources",
+      "status": "reconciled",
+      "value": {
+        "manifests_match": [
+          true,
+          true
+        ]
+      },
+      "evidence": "source-reconciliation.json",
+      "next_action": "Reuse retained bytes subject to final exact package/source review."
+    },
+    {
+      "field": "instrument.final_ecbench",
+      "status": "await_root_receipt",
+      "value": null,
+      "evidence": null,
+      "next_action": "Join corrected-source final binary, toolchain/flags, source tree and donor algorithm/counter equivalence review; historical b985 not substituted."
+    },
+    {
+      "field": "instrument.image_runtime_qualification",
+      "status": "pending",
+      "value": null,
+      "evidence": null,
+      "next_action": "Root exact local assembly and Q0-Q4 qualify software only; bind actual runtime/custody qualification required by scientific protocol."
+    },
+    {
+      "field": "publication.new_package_versions",
+      "status": "pending_approval_and_receipts",
+      "value": null,
+      "evidence": null,
+      "next_action": "Review exact new package keys/hashes; prior approval of other bytes is not publication of these artifacts; retain versioned download/readback."
+    },
+    {
+      "field": "request.launch_identity",
+      "status": "unallocated",
+      "value": null,
+      "evidence": null,
+      "next_action": "Allocate real prospective request only after reviewed protocol and valid balance; real Job/Pod/owner IDs come from actual receipts, never placeholders."
+    },
+    {
+      "field": "session.preparation_context",
+      "status": "unobserved",
+      "value": null,
+      "evidence": null,
+      "next_action": "Bind actual native session/preparation/clock/host/enrollment certificate/ordered context subset and owner receipts before accepting rows."
+    },
+    {
+      "field": "p739.reuse",
+      "status": "pending_exact_original_rows_review",
+      "value": null,
+      "evidence": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/known-c1-amendment-v2-independent-review.md",
+      "next_action": "Original fresh rows need replay or reviewed exact non-wall equivalence; 900 computation reproductions alone insufficient; old timing invalid."
+    },
+    {
+      "field": "timing.L2_AA_fresh",
+      "status": "unqualified",
+      "value": null,
+      "evidence": "/var/tmp/pencil-continuation-minimal-amendment-20261031-v1/amendment-fields.json",
+      "next_action": "Retain individual-target L2/fresh/A-A obligations; changed observer endpoint is not method timing."
+    },
+    {
+      "field": "analysis.finite_price_mapping",
+      "status": "preserved_mapping_pending_binary",
+      "value": {
+        "square": [
+          0,
+          0.5,
+          1
+        ],
+        "inverse": [
+          1,
+          10,
+          100,
+          1000
+        ],
+        "native": [
+          0,
+          0.1,
+          1
+        ],
+        "cells": 36
+      },
+      "evidence": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/known-c1-amendment-draft/amendment-draft-v2.json",
+      "next_action": "Bind source/export executable and exact operation coverage; incomplete/capped pairs retain null ratios."
+    },
+    {
+      "field": "protocol.canonical_validation_review_freeze",
+      "status": "not_performed",
+      "value": null,
+      "evidence": "/var/tmp/pencil-continuation-minimal-amendment-20261031-v1/amendment-fields.json",
+      "next_action": "Join claims/variable ledger/controls/seeds/metrics/custody/retry/source review; canonical validate and independent review before freeze and affected data."
+    }
+  ]
+}

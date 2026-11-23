@@ -1,0 +1,122 @@
+{
+  "source": "counts.json",
+  "scope": "single-instrument development fixture; counted helpers and allocator events only",
+  "records": 1140,
+  "labels": {
+    "compile": {
+      "compile": {
+        "products": 24076995,
+        "alloc_calls": 6601,
+        "zero_alloc_calls": 4717,
+        "realloc_calls": 33,
+        "free_calls": 10843,
+        "requested_bytes": 12366586,
+        "freed_bytes": 12212402
+      }
+    },
+    "calibration": {
+      "calibration": {
+        "products": 5974,
+        "inversions": 9,
+        "euclid_steps": 48,
+        "scalar_inversions": 1,
+        "characters": 1,
+        "alloc_calls": 560,
+        "zero_alloc_calls": 87,
+        "realloc_calls": 78,
+        "free_calls": 638,
+        "requested_bytes": 75760,
+        "freed_bytes": 57224
+      }
+    },
+    "prepare": {
+      "prepare": {
+        "products": 818,
+        "inversions": 1,
+        "euclid_steps": 3,
+        "alloc_calls": 7,
+        "realloc_calls": 12,
+        "free_calls": 4,
+        "requested_bytes": 6600,
+        "freed_bytes": 1432
+      }
+    },
+    "k25": {
+      "query": {
+        "alloc_calls": 1,
+        "free_calls": 40,
+        "requested_bytes": 32,
+        "freed_bytes": 9566
+      },
+      "initial_geometry": {
+        "products": 6818,
+        "inversions": 1,
+        "euclid_steps": 6,
+        "alloc_calls": 27,
+        "realloc_calls": 34,
+        "free_calls": 8,
+        "requested_bytes": 150472,
+        "freed_bytes": 63104
+      },
+      "initial_transport": {
+        "products": 3100,
+        "inversions": 6,
+        "scalar_inversions": 2,
+        "euclid_steps": 42,
+        "alloc_calls": 73,
+        "zero_alloc_calls": 3,
+        "free_calls": 58,
+        "requested_bytes": 18576,
+        "freed_bytes": 45464
+      },
+      "initial_character": {
+        "products": 12138,
+        "characters": 14,
+        "alloc_calls": 6680,
+        "zero_alloc_calls": 1176,
+        "realloc_calls": 210,
+        "free_calls": 7854,
+        "requested_bytes": 218526,
+        "freed_bytes": 211792
+      },
+      "decode": {
+        "popcounts": 128,
+        "rule_comparisons": 5
+      },
+      "extension": {
+        "free_calls": 8,
+        "freed_bytes": 1120
+      },
+      "extra_geometry": {
+        "products": 916,
+        "inversions": 2,
+        "euclid_steps": 12,
+        "alloc_calls": 12,
+        "realloc_calls": 8,
+        "free_calls": 10,
+        "requested_bytes": 7296,
+        "freed_bytes": 5632
+      },
+      "extra_transport": {
+        "alloc_calls": 4,
+        "zero_alloc_calls": 2,
+        "requested_bytes": 384,
+        "products": 48
+      },
+      "extra_character": {
+        "products": 867,
+        "characters": 1,
+        "alloc_calls": 477,
+        "zero_alloc_calls": 84,
+        "realloc_calls": 15,
+        "free_calls": 561,
+        "requested_bytes": 15592,
+        "freed_bytes": 15128
+      },
+      "verify": {
+        "products": 122,
+        "inversions": 6
+      }
+    }
+  }
+}

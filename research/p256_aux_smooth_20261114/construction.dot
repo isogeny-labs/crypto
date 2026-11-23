@@ -1,0 +1,14 @@
+digraph Construction {
+  graph [rankdir=LR, bgcolor="white", fontname="DejaVu Sans", label="P-256 auxiliary fixture — unsigned development evidence", labelloc=t];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fc", color="#33537a", fontname="DejaVu Sans", fontsize=11];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#33537a"];
+  target [label="Registered P-256\ny² = x³ − 3x + B"];
+  aux [label="Auxiliary E′ / Fp\nw² = x³ − 3x\npoint of order 2⁹⁶"];
+  fibre [label="R + H, |H| = 16\n4 rational 2-isogenies\nnonzero terminal ordinate"];
+  base [label="FB1h2704fe49495e\n9 columns / 18 signed points\nshared-x target lifts"];
+  input [label="tower / paired / oriented\nmaximum input degree 3\nregularity: unmeasured", fillcolor="#eaf5ee"];
+  aux -> fibre;
+  fibre -> base [label="x fibre"];
+  target -> base [label="Fp point lift"];
+  base -> input;
+}

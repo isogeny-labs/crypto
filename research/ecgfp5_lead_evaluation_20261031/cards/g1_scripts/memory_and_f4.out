@@ -1,0 +1,72 @@
+== memory at the unconstrained optimum (bytes) ==
+log2c=40 nolp: B=2^59.2  LA mem 2^67.3 B (1.81e+20 B); relation storage = matrix = 2^64.5 B; total time 2^128.8
+          lp1: B=2^58.4  1-LP relations stored M1=2^61.3 x 40 B = 2^66.6 B ; LA(w=8) mem 2^66.7 B; time 2^127.7
+log2c=44 nolp: B=2^59.8  LA mem 2^68.0 B (2.88e+20 B); relation storage = matrix = 2^65.2 B; total time 2^130.2
+          lp1: B=2^59.2  1-LP relations stored M1=2^61.7 x 40 B = 2^67.0 B ; LA(w=8) mem 2^67.4 B; time 2^129.2
+log2c=50 nolp: B=2^60.8  LA mem 2^69.0 B (5.75e+20 B); relation storage = matrix = 2^66.2 B; total time 2^132.2
+          lp1: B=2^60.3  1-LP relations stored M1=2^62.3 x 40 B = 2^67.6 B ; LA(w=8) mem 2^68.5 B; time 2^131.4
+log2c=60 nolp: B=2^62.5  LA mem 2^70.6 B (1.83e+21 B); relation storage = matrix = 2^67.8 B; total time 2^135.5
+          lp1: B=2^62.0  1-LP relations stored M1=2^63.3 x 40 B = 2^68.6 B ; LA(w=8) mem 2^70.2 B; time 2^135.6
+rho DP memory: 2^40 stored points x 40 B = 2^45.3 B ; walkers share nothing
+
+== memory-capped optimum (no LP; B <= cap/280) vs rho_words 2^169.0 ==
+ log2 c = 40
+   mem cap 2^40 B (1.1e+12 B): B=2^31.9 time 2^236.4  > rho
+   mem cap 2^45 B (3.52e+13 B): B=2^36.9 time 2^216.4  > rho
+   mem cap 2^50 B (1.13e+15 B): B=2^41.9 time 2^196.4  > rho
+   mem cap 2^55 B (3.6e+16 B): B=2^46.9 time 2^176.4  > rho
+   mem cap 2^57 B (1.44e+17 B): B=2^48.9 time 2^168.4  < rho
+   mem cap 2^60 B (1.15e+18 B): B=2^51.9 time 2^156.4  < rho
+   mem cap 2^62 B (4.61e+18 B): B=2^53.9 time 2^148.4  < rho
+   mem cap 2^65 B (3.69e+19 B): B=2^56.9 time 2^136.4  < rho
+   mem cap 2^68 B (2.95e+20 B): B=2^59.2 time 2^128.8  < rho
+   -> break-even with rho at memory 2^56.8 B (1.3e+17 B); 2^128 needs unconstrained 2^67.3 B
+ log2 c = 50
+   mem cap 2^40 B (1.1e+12 B): B=2^31.9 time 2^246.4  > rho
+   mem cap 2^45 B (3.52e+13 B): B=2^36.9 time 2^226.4  > rho
+   mem cap 2^50 B (1.13e+15 B): B=2^41.9 time 2^206.4  > rho
+   mem cap 2^55 B (3.6e+16 B): B=2^46.9 time 2^186.4  > rho
+   mem cap 2^57 B (1.44e+17 B): B=2^48.9 time 2^178.4  > rho
+   mem cap 2^60 B (1.15e+18 B): B=2^51.9 time 2^166.4  < rho
+   mem cap 2^62 B (4.61e+18 B): B=2^53.9 time 2^158.4  < rho
+   mem cap 2^65 B (3.69e+19 B): B=2^56.9 time 2^146.4  < rho
+   mem cap 2^68 B (2.95e+20 B): B=2^59.9 time 2^134.4  < rho
+   -> break-even with rho at memory 2^59.3 B (7.34e+17 B); 2^128 needs unconstrained 2^69.0 B
+ log2 c = 60
+   mem cap 2^40 B (1.1e+12 B): B=2^31.9 time 2^256.4  > rho
+   mem cap 2^45 B (3.52e+13 B): B=2^36.9 time 2^236.4  > rho
+   mem cap 2^50 B (1.13e+15 B): B=2^41.9 time 2^216.4  > rho
+   mem cap 2^55 B (3.6e+16 B): B=2^46.9 time 2^196.4  > rho
+   mem cap 2^57 B (1.44e+17 B): B=2^48.9 time 2^188.4  > rho
+   mem cap 2^60 B (1.15e+18 B): B=2^51.9 time 2^176.4  > rho
+   mem cap 2^62 B (4.61e+18 B): B=2^53.9 time 2^168.4  < rho
+   mem cap 2^65 B (3.69e+19 B): B=2^56.9 time 2^156.4  < rho
+   mem cap 2^68 B (2.95e+20 B): B=2^59.9 time 2^144.4  < rho
+   -> break-even with rho at memory 2^61.8 B (4.15e+18 B); 2^128 needs unconstrained 2^70.6 B
+
+== F4 RAM extrapolation: dense echelon bound  rank_d x N_d x 4 B at degree d ==
+S5/raw-shape D=16^5=2^20 (5 eqs deg 16)  D=1048576=2^20.00  Macaulay bound d_reg=76
+   Hilbert function peak h(37)=39280
+   d=20  N_d=    10626  rank=      350  dense echelon 1.49e+07 B = 0.0 GiB
+   d=28  N_d=    35960  rank=     9100  dense echelon 1.31e+09 B = 1.2 GiB
+   d=32  N_d=    58905  rank=    24215  dense echelon 5.71e+09 B = 5.3 GiB
+   d=33  N_d=    66045  rank=    29875  dense echelon 7.89e+09 B = 7.4 GiB
+   d=34  N_d=    73815  rank=    36425  dense echelon 1.08e+10 B = 10.0 GiB
+   d=38  N_d=   111930  rank=    72650  dense echelon 3.25e+10 B = 30.3 GiB
+   d=45  N_d=   211876  rank=   180800  dense echelon 1.53e+11 B = 142.7 GiB
+   d=55  N_d=   455126  rank=   444850  dense echelon 8.1e+11 B = 754.2 GiB
+   d=65  N_d=   864501  rank=   863500  dense echelon 2.99e+12 B = 2780.9 GiB
+   d=76  N_d=  1581580  rank=  1581580  dense echelon 1e+13 B = 9318.4 GiB
+   sum over d<=top of N_d*rank (dense flops proxy): 2^64.5
+rational quotient 5 eqs deg 8 (+ w^2 relation) D=8^5*2=2^16  D=32768=2^15.00  Macaulay bound d_reg=36
+   Hilbert function peak h(17)=2460
+   d=20  N_d=    10626  rank=     8400  dense echelon 3.57e+08 B = 0.3 GiB
+   d=28  N_d=    35960  rank=    35630  dense echelon 5.13e+09 B = 4.8 GiB
+   d=32  N_d=    58905  rank=    58870  dense echelon 1.39e+10 B = 12.9 GiB
+   d=33  N_d=    66045  rank=    66030  dense echelon 1.74e+10 B = 16.2 GiB
+   d=34  N_d=    73815  rank=    73810  dense echelon 2.18e+10 B = 20.3 GiB
+   d=38  N_d=   111930  rank=   111930  dense echelon 5.01e+10 B = 46.7 GiB
+   d=36  N_d=    91390  rank=    91390  dense echelon 3.34e+10 B = 31.1 GiB
+   sum over d<=top of N_d*rank (dense flops proxy): 2^51.2
+EXP-GFPN-05ff43 m=5 S5 arm: 836 s x 1 thread(s) x 2.8 GHz = 2^41.1 cycles before OOM at degree 33 (p'=4111)
+EXP-GFPN-05ff43 m=5 S5 arm: 836 s x 4 thread(s) x 2.8 GHz = 2^43.1 cycles before OOM at degree 33 (p'=4111)

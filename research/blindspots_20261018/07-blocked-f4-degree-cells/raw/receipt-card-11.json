@@ -1,0 +1,216 @@
+{
+  "card_id": "CARD-BLINDSPOT-07-11",
+  "card_path": "research/blindspots_20261018/07-blocked-f4-degree-cells/card-11.yaml",
+  "card_sha256": "438aa952a097518419fd0be6f5ba68ff95ecb62d715577cecb7b5494e868b0b3",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-07/card-11"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-07/card-11/b07",
+        "examples/blindspots_07_blocked_closure.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.12,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 4.12,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=7516192768",
+        "target/blindspots-07/card-11/b07",
+        "closure",
+        "--m",
+        "4",
+        "--n",
+        "17",
+        "--ell",
+        "5",
+        "--basis",
+        "6348,85483,45829,14426,51090",
+        "--xr",
+        "48054",
+        "--from",
+        "3",
+        "--to",
+        "4",
+        "--label",
+        "l-17-5-4-g0",
+        "--time-limit",
+        "450",
+        "--expect-solutions",
+        "0"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 463.383,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "l-17-5-4-g0",
+      "index": 3,
+      "outputs": {},
+      "seconds": 463.383,
+      "stderr_sha256": "c1ff1ff1b19fab8a9e968357ad438f5682824e4a2241f305731cdc21c865efad",
+      "stderr_tail": [
+        "  [21s] rank 66375 products 97013 pending 1632 basis 1064 MiB vm 1181 MiB rss-peak 1178 MiB",
+        "  [41s] rank 104499 products 162521 pending 1713 basis 1670 MiB vm 1832 MiB rss-peak 1830 MiB",
+        "  [63s] rank 130321 products 219867 pending 1624 basis 2093 MiB vm 2232 MiB rss-peak 2232 MiB",
+        "  [85s] rank 146763 products 260817 pending 1975 basis 2384 MiB vm 2509 MiB rss-peak 2505 MiB",
+        "  [111s] rank 157823 products 285379 pending 2845 basis 2588 MiB vm 2735 MiB rss-peak 2732 MiB",
+        "  [136s] rank 171138 products 314067 pending 2728 basis 2885 MiB vm 3052 MiB rss-peak 3046 MiB",
+        "  [161s] rank 179496 products 334541 pending 2685 basis 3064 MiB vm 3166 MiB rss-peak 3164 MiB",
+        "  [185s] rank 186041 products 346842 pending 2619 basis 3287 MiB vm 3417 MiB rss-peak 3415 MiB",
+        "  [208s] rank 190012 products 355035 pending 2642 basis 3419 MiB vm 3582 MiB rss-peak 3580 MiB",
+        "  [228s] rank 193806 products 367317 pending 2466 basis 3536 MiB vm 3711 MiB rss-peak 3720 MiB",
+        "  [262s] rank 199529 products 387790 pending 2293 basis 3675 MiB vm 3772 MiB rss-peak 3785 MiB",
+        "  [301s] rank 201886 products 391894 pending 2217 basis 3753 MiB vm 3881 MiB rss-peak 3880 MiB",
+        "  [330s] rank 203675 products 395994 pending 2158 basis 3808 MiB vm 3961 MiB rss-peak 3959 MiB",
+        "  [355s] rank 207696 products 408258 pending 2124 basis 3901 MiB vm 4028 MiB rss-peak 4069 MiB",
+        "  [417s] rank 211640 products 412362 pending 2048 basis 4010 MiB vm 4134 MiB rss-peak 4134 MiB"
+      ],
+      "stdout_sha256": "aff4f7c6b854523147e3c4cf7bf105db301f0c65e6d58fb2af2ae76eb19f2a1d",
+      "stdout_tail": [
+        "{\"tool\":\"b07\",\"mode\":\"count\",\"cell\":\"l-17-5-4-g0\",\"solutions\":0}",
+        "{\"tool\":\"b07\",\"cell\":\"l-17-5-4-g0\",\"m\":4,\"n\":17,\"ell\":5,\"n_vars\":54,\"degree\":3,\"columns\":26290,\"status\":\"saturated\",\"refuted\":false,\"rank\":3017,\"products\":4438,\"seed_rows\":51,\"chunks\":4,\"falls\":83,\"new_pivots\":3017,\"word_ops\":13013727,\"word_ops_forward\":696126,\"word_ops_block\":8719117,\"word_ops_pass\":3598484,\"hits_forward\":5281,\"bytes_pass\":7498504,\"bytes_read_forward\":5569008,\"basis_bytes_peak\":5777072,\"rss_peak_kb\":16652,\"secs\":0.042,\"secs_forward\":0.006,\"secs_block\":0.015,\"secs_pass\":0.008,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"cell\":\"l-17-5-4-g0\",\"m\":4,\"n\":17,\"ell\":5,\"n_vars\":54,\"degree\":4,\"columns\":342541,\"status\":\"timelimit\",\"refuted\":false,\"rank\":217485,\"products\":428775,\"seed_rows\":51,\"chunks\":106,\"falls\":10358,\"new_pivots\":217485,\"word_ops\":446856519412,\"word_ops_forward\":93182672764,\"word_ops_block\":43188799323,\"word_ops_pass\":310485047325,\"hits_forward\":47445819,\"bytes_pass\":212205474992,\"bytes_read_forward\":745461382112,\"basis_bytes_peak\":4329931184,\"rss_peak_kb\":4399576,\"secs\":462.988,\"secs_forward\":114.014,\"secs_block\":35.319,\"secs_pass\":299.323,\"chunk_rows\":4096,\"tile_words\":256,\"order\":2}",
+        "{\"tool\":\"b07\",\"mode\":\"closure-summary\",\"cell\":\"l-17-5-4-g0\",\"closure_degree\":null,\"last_status\":\"timelimit\",\"rss_peak_kb\":4399576}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-07/card-11/b07"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-07/card-11"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "63bf2070d4e578f89e1b7a260373b4b3e06fb744",
+  "dirty_after": [
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-11-l-17-5-4-g0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-11-l-17-5-4-g0.stdout.log"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-11.json",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/summary.json",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-first.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-first.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-planted.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-b-cell3-planted.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-10-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-10.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-10-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-10-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-10-l-15-5-4-g14.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-10-l-15-5-4-g14.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-10.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

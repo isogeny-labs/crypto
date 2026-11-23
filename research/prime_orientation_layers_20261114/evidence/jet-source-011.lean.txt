@@ -1,0 +1,175 @@
+module
+public import OrientationDiagonal
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationHierarchy
+import all OrientationResidue
+import all OrientationDiagonal
+import all OrientationBaseBridge
+public section
+noncomputable section
+namespace OrientationJet
+open Polynomial Finset OrientationAnchor OrientationResidue OrientationDiagonal OrientationBaseBridge
+
+theorem poleQ_ne_zero (i : ℕ) : poleQ i ≠ 0 := by
+  exact neg_ne_zero.mpr (by positivity)
+
+/-- Actual coefficient one under the literal affine chart. -/
+theorem chart_first (a : ℕ) (t : ℤ) (P : ℚ[X]) :
+    (chart a t P).coeff 1 = (2:ℚ)^(a+1)*P.derivative.eval (t:ℚ) := by
+  calc
+    _ = (chart a t P).derivative.eval 0 := by
+      rw [← coeff_zero_eq_eval_zero,coeff_derivative]
+      simp
+    _ = _ := by simp [chart,derivative_comp]
+
+theorem nodal_derivative (S : Finset ℚ) (t : ℚ) (ht : t ∈ S) :
+    (nodal S).derivative.eval t = (puncture S t).eval t := by
+  have h := congrArg (fun P : ℚ[X] => P.derivative.eval t) (nodal_puncture S t ht)
+  simpa [derivative_mul] using h.symm
+
+theorem nodal_derivative_ne_zero (S : Finset ℚ) (t : ℚ) (ht : t ∈ S) :
+    (nodal S).derivative.eval t ≠ 0 := by
+  rw [nodal_derivative S t ht]
+  simp only [puncture,eval_prod]
+  apply prod_ne_zero_iff.mpr
+  intro s hs
+  simpa only [eval_sub,eval_X,eval_C] using sub_ne_zero.mpr (Ne.symm (mem_erase.mp hs).1)
+
+theorem base_at_other_node (S : Finset ℚ) (d t : ℚ) (ht : t ∈ S) (hdt : d ≠ t) :
+    (base S d).eval t = 0 := by
+  have hp : (puncture S d).eval t = 0 := by
+    simp only [puncture,eval_prod]
+    exact prod_eq_zero (mem_erase.mpr ⟨Ne.symm hdt,ht⟩) (by simp)
+  simp only [base,eval_mul,eval_C,hp,mul_zero]
+
+theorem base_times_linear (S : Finset ℚ) (d : ℚ) (hd : d ∈ S) :
+    base S d*(X-C d) = C ((normalizer S)⁻¹)*nodal S := by
+  dsimp [base]
+  rw [mul_assoc,nodal_puncture S d hd]
+
+theorem base_derivative (S : Finset ℚ) (d t : ℚ)
+    (hd : d ∈ S) (ht : t ∈ S) (hdt : d ≠ t) :
+    (base S d).derivative.eval t =
+      ((normalizer S)⁻¹*(nodal S).derivative.eval t)/(t-d) := by
+  have h := congrArg (fun P : ℚ[X] => P.derivative.eval t) (base_times_linear S d hd)
+  have hz := base_at_other_node S d t ht hdt
+  simp only [derivative_mul,derivative_sub,derivative_X,derivative_C,eval_add,eval_mul,
+    eval_sub,eval_X,eval_C,zero_mul,zero_add,add_zero,sub_zero,mul_one,hz] at h
+  exact (eq_div_iff (sub_ne_zero.mpr (Ne.symm hdt))).mpr h
+
+/-- The actual completed matrix first coefficient, before any diagonal normalization. -/
+theorem completed_first (S : Finset ℚ) (a u x y : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (hd : delta x y ∈ S) (ht : (t:ℚ) ∈ S) (hdt : delta x y ≠ (t:ℚ)) :
+    (chart a t (completed S u x y m)).coeff 1 =
+      ((2:ℚ)^(a+1)*(normalizer S)⁻¹*(nodal S).derivative.eval (t:ℚ)) /
+        ((t:ℚ)-delta x y) * (correction u x y m).eval (t:ℚ) := by
+  rw [chart_first,completed,derivative_mul]
+  simp only [eval_add,eval_mul,base_at_other_node S (delta x y) (t:ℚ) ht hdt,zero_mul,add_zero]
+  rw [base_derivative S (delta x y) (t:ℚ) hd ht hdt]
+  ring
+
+theorem pole_member (a i : ℕ) (hi : i ≤ a) : poleQ i ∈ grid a := by
+  rw [← pole_cast]
+  exact mem_image.mpr ⟨pole i,pole_in_grid a i hi,rfl⟩
+
+/-- A crossing cannot be a surviving source translation at the negative active node. -/
+theorem crossing_displacement_ne_pole (x y i : ℕ) (hc : x.testBit i = y.testBit i) :
+    delta x y ≠ poleQ i := by
+  intro hd
+  have hr : delta y x = (2:ℚ)^i := by dsimp [delta,poleQ] at hd ⊢; linarith
+  exact anchor_flips y x i hr hc.symm
+
+/-- Exact common scalar in all first crossing coefficients. -/
+def jetScalar (a i : ℕ) : ℚ :=
+  (2:ℚ)^(a+1)*(normalizer (grid a))⁻¹*(nodal (grid a)).derivative.eval (poleQ i)
+
+theorem jetScalar_ne_zero (a i : ℕ) (hi : i ≤ a) : jetScalar a i ≠ 0 := by
+  apply mul_ne_zero
+  · exact mul_ne_zero (by positivity) (inv_ne_zero (normalizer_ne_zero _ (zero_in_grid a)))
+  · exact nodal_derivative_ne_zero _ _ (pole_member a i hi)
+
+def firstJet (a u i x y : ℕ) (m : ℕ → ℕ) : ℚ :=
+  (chart a (pole i) (completed (grid a) u x y m)).coeff 1
+
+def diagonalJet (a u i : ℕ) (m : ℕ → ℕ) : ℚ := firstJet a u i 0 0 m
+
+/-- Exact matrix entries derived from the actual polynomial chart. -/
+theorem firstJet_formula (a u i x y : ℕ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hy : y < 2^a) (hi : i ≤ a)
+    (hc : x.testBit i = y.testBit i) :
+    firstJet a u i x y m = jetScalar a i/(poleQ i-delta x y)*
+      (correction u x y m).eval (poleQ i) := by
+  have h := completed_first (grid a) a u x y (pole i) m (delta_in_grid a x y hx hy)
+    (by rw [pole_cast]; exact pole_member a i hi)
+    (by rw [pole_cast]; exact crossing_displacement_ne_pole x y i hc)
+  simpa only [firstJet,jetScalar,pole_cast] using h
+
+theorem diagonalJet_formula (a u i : ℕ) (m : ℕ → ℕ) (hi : i ≤ a) :
+    diagonalJet a u i m = jetScalar a i/poleQ i * diagonalValue u i m := by
+  simpa [diagonalJet,delta,diagonalValue] using
+    firstJet_formula a u i 0 0 m (by positivity) (by positivity) hi rfl
+
+theorem diagonalJet_ne_zero (a u i : ℕ) (m : ℕ → ℕ) (hi : i ≤ a) :
+    diagonalJet a u i m ≠ 0 := by
+  rw [diagonalJet_formula a u i m hi]
+  exact mul_ne_zero (div_ne_zero (jetScalar_ne_zero a i hi) (poleQ_ne_zero i))
+    (ne_of_gt (diagonal_positive u i m))
+
+/-- The actual normalized jet ratio: all derivative/normalizer factors cancel explicitly. -/
+theorem normalized_firstJet (a u i x y : ℕ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hy : y < 2^a) (hi : i ≤ a)
+    (hc : x.testBit i = y.testBit i) :
+    firstJet a u i x y m/diagonalJet a u i m =
+      (poleQ i/(poleQ i-delta x y))*
+      ((correction u x y m).eval (poleQ i)/diagonalValue u i m) := by
+  rw [firstJet_formula a u i x y m hx hy hi hc,diagonalJet_formula a u i m hi]
+  field_simp [jetScalar_ne_zero a i hi,ne_of_gt (diagonal_positive u i m),
+    poleQ_ne_zero i,
+    sub_ne_zero.mpr (Ne.symm (crossing_displacement_ne_pole x y i hc))]
+
+/-- Concrete polynomial derivative ratio equals the previously proved actual rho. -/
+theorem derivative_ratio_rho (a : ℕ) (m : Nodes a) :
+    (nodal (grid a)).derivative.eval (node a m)/normalizer (grid a) =
+      CauchyNormalizer.cauchyRho a m.val := by
+  have hn : node a m ∈ grid a := by rw [grid_eq_image]; exact mem_image.mpr ⟨m,mem_univ _,rfl⟩
+  have h := base_eval_old a m (node a m)
+  have hold := CauchyNormalizer.baseKernel_node a m.val m.val m.isLt
+  simp only [ite_true] at hold
+  change (base (grid a) (node a m)).eval (node a m) =
+    CauchyNormalizer.baseKernel a m.val (node a m) at h
+  have hv : CauchyNormalizer.baseKernel a m.val (node a m) = CauchyNormalizer.cauchyRho a m.val := hold
+  rw [hv] at h
+  rw [nodal_derivative _ _ hn]
+  simpa only [base,eval_mul,eval_C,div_eq_mul_inv,mul_comm] using h
+
+/-- Absolute scalar valuation derived from the actual nodal derivative unit, not assumed. -/
+theorem jetScalar_valuation (a i : ℕ) (hi : i ≤ a) : padicValRat 2 (jetScalar a i) = (a+1:ℕ) := by
+  have ht := pole_member a i hi
+  rw [grid_eq_image] at ht
+  obtain ⟨m,_,hm⟩ := mem_image.mp ht
+  have hr := derivative_ratio_rho a m
+  rw [hm] at hr
+  have he : jetScalar a i = (2:ℚ)^(a+1)*CauchyNormalizer.cauchyRho a m.val := by
+    rw [← hr]
+    dsimp [jetScalar]
+    ring
+  rw [he,padicValRat.mul (by positivity) (CauchyNormalizer.cauchyRho_ne_zero a m.val m.isLt),
+    two_power_valuation,CauchyNormalizer.cauchyRho_unit a m.val m.isLt]
+  simp
+
+/-- Exact first-jet diagonal weight, including the old base factor. -/
+theorem diagonalJet_valuation (a u i : ℕ) (m : ℕ → ℕ) (hi : i < u) (hu : u ≤ a) :
+    padicValRat 2 (diagonalJet a u i m) = (a:ℤ)+1-i+schedule u i m := by
+  have hia : i ≤ a := by omega
+  rw [diagonalJet_formula a u i m hia,
+    padicValRat.mul (div_ne_zero (jetScalar_ne_zero a i hia) (poleQ_ne_zero i))
+      (ne_of_gt (diagonal_positive u i m)),
+    padicValRat.div (jetScalar_ne_zero a i hia) (poleQ_ne_zero i),
+    jetScalar_valuation a i hia,poleQ,padicValRat.neg,two_power_valuation,diagonal_valuation u i m hi]
+  push_cast
+  ring
+
+end OrientationJet

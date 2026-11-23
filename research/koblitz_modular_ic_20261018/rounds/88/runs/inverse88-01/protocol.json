@@ -1,0 +1,43 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R88-INVERSE-DIAMOND-UPPER",
+  "version": 1,
+  "goal": "verify the explicit inverse rational diamond coordinates through full two-way products",
+  "claims": [{"id": "inverse_diamond88", "class": "exact_computation", "statement": "target-to-source-to-target and source-to-target-to-source coordinates compose to identity on the quadratic overlap, with complete ideal lifts and corrupted controls"}],
+  "arms": {
+    "reference": "R85 base transition, R86 affine lambda update, R87 relative equation preservation",
+    "candidate": "explicit inverse z,V,T rational formulas",
+    "positive": ["target q product and full lift", "target t cancellation", "source base products", "source coefficient and offset products with full lifts", "source T composition"],
+    "negative": ["corrupted target T numerator", "corrupted source T return"],
+    "baseline": {"not_applicable_reason": "exact symbolic identity"},
+    "A_A": {"not_applicable_reason": "deterministic polynomial reduction"}
+  },
+  "variables": {
+    "fixed": ["F2 quadratic source equation", "one Singular/FLINT thread", "1200 seconds", "4 GiB virtual memory"],
+    "measured": ["zero products", "ideal lifts", "nonzero corruptions", "exit and errors"],
+    "statistical": "not applicable"
+  },
+  "randomization": {"method": "fixed", "reason": "exact algebra", "seeds": [88]},
+  "blinding": {"method": "none", "reason": "exact algebra"},
+  "sample_size": {"instances": 2, "replicates": 1, "warmups": 0, "power": "not applicable"},
+  "metrics": ["two composition directions", "four full ideal lifts", "two corruption rejections"],
+  "execution": {
+    "launchers": ["REPLAY_CAS.sh inverse88-01 INVERSE88.sing INVERSE88_ALL_CHECKS_PASS"],
+    "backend": "authorized local Singular",
+    "timeout_seconds_per_program": 1200,
+    "virtual_KiB_native": 4194304,
+    "threads": 1,
+    "seed": 88,
+    "queue": "one serial math job",
+    "source_gate": "committed Git bytes and verified donor manifest",
+    "checkpoint": "existing checkpoint gate and immutable raw copy"
+  },
+  "stopping": {
+    "accept": "exit 0, exact marker, zero native ? errors, all products and full lifts, two nonzero corrupted controls",
+    "failure": "retain raw failure and freeze a repair under a fresh attempt ID"
+  },
+  "analysis": {
+    "method": "two-variable quadratic ideal reduction plus exact cleared affine cancellation",
+    "scope": "rational inverse on registered field open; no normalized RR generator regularity"
+  }
+}

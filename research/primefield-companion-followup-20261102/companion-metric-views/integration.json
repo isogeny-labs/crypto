@@ -1,0 +1,98 @@
+[
+  {
+    "source": "companion-metric-pivot/selection.py",
+    "target": "selection_view.py",
+    "extract": null,
+    "substitutions": [
+      [
+        "from metric import validate_metric",
+        "from metric_views import require_view"
+      ],
+      [
+        "def select(source, d, di):",
+        "def select(source, d, di, view):"
+      ],
+      [
+        "    validate_metric(d, di, m)",
+        "    require_view(view, d, di, m)"
+      ]
+    ]
+  },
+  {
+    "source": "companion-metric-pivot/metric.py",
+    "target": "rows_view.py",
+    "extract": "def transpose_from_columns(",
+    "substitutions": [
+      [
+        "def transpose_from_columns(columns, d, di, meter):",
+        "from metric_views import require_view\n\ndef transpose_from_columns(columns, d, di, meter, view):"
+      ],
+      [
+        "    validate_metric(d, di, meter)",
+        "    require_view(view, d, di, meter)"
+      ]
+    ]
+  },
+  {
+    "source": "companion-metric-solver/block_cache.py",
+    "target": "block_cache_view.py",
+    "extract": null,
+    "substitutions": [
+      [
+        "from metric import transpose_from_columns",
+        "from rows_view import transpose_from_columns"
+      ],
+      [
+        "def __init__(self, source, cut, inverse, columns, d, di):",
+        "def __init__(self, source, cut, inverse, columns, d, di, view):"
+      ],
+      [
+        "transpose_from_columns(self.columns, d, di, self.m)",
+        "transpose_from_columns(self.columns, d, di, self.m, view)"
+      ],
+      [
+        "row_setup_products=self.n+2*self.n*cut",
+        "row_setup_products=2*self.n*cut"
+      ]
+    ]
+  },
+  {
+    "source": "companion-paired-transport/driver_paired.py",
+    "target": "driver_views.py",
+    "extract": null,
+    "substitutions": [
+      [
+        "from metric import validate_metric",
+        "from metric_views import MetricRoot"
+      ],
+      [
+        "from selection import select",
+        "from selection_view import select"
+      ],
+      [
+        "from block_cache import BlockCache",
+        "from block_cache_view import BlockCache"
+      ],
+      [
+        "    validate_metric(metric,inverse_metric,meter)\n    root_metric,root_inverse_metric=tuple(metric),tuple(inverse_metric)",
+        "    metric_root=MetricRoot(metric,inverse_metric,meter)\n    root_metric,root_inverse_metric=metric_root.d,metric_root.di\n    view=metric_root.view()"
+      ],
+      [
+        "selection=select(source,d,di)",
+        "selection=select(source,d,di,view)"
+      ],
+      [
+        "        labels=tuple(labels[i] for i in order)",
+        "        labels=tuple(labels[i] for i in order)\n        view=view.permuted(order)"
+      ],
+      [
+        "moved['metric'],moved['inverse_metric'])",
+        "moved['metric'],moved['inverse_metric'],view)"
+      ],
+      [
+        "        labels=labels[k:]",
+        "        labels=labels[k:]\n        view=view.tail(k)"
+      ]
+    ]
+  }
+]

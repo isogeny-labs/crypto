@@ -1,0 +1,9 @@
+# C119 primary-source novelty boundary
+
+[Neiger,Rosenkilde,Schost2017](https://arxiv.org/abs/1705.10658), DOI10.1145/3087604.3087642: the primary abstract describes unconditional all-series-root computation including multiple roots, using degree-reduced factors to control recursion. This is given-polynomial prior art; it does not solve our unknown affine coefficient family.
+
+[Lecerf2006,Sharp precision in Hensel lifting for bivariate polynomial factorization](https://researchportal.ip-paris.fr/en/publications/sharp-precision-in-hensel-lifting-for-bivariate-polynomial-factor/), DOI10.1090/S0025-5718-06-01810-2: the primary abstract and indexed author preprint introduction were reviewed. Lifting/recombination and linear algebra for recombination are established. The author2007PDF direct fetch returned403; no full-text review of that paper is claimed. No asymptotic improvement over these methods is asserted.
+
+[FLINT official factorization documentation](https://flintlib.org/doc/nmod_mpoly_factor/index.html), sections Bivariate factorisation and Hensel lifting: documents bivariate lifting and logarithmic-derivative recombination, monic factor checks and partial-fraction correction systems. The page warns that parts were LLM-generated; it is a baseline-interface lead, not sufficient novelty evidence or a replacement for version-pinned source review. No FLINTbenchmark was run.
+
+The fixed five-by-five inverse and triangular recurrence instantiate known coprime Hensel lifting. What is measured here is an exact conditional predicate representation on a pinned unknown coefficient family. Any proposed novelty must reside in an independently reviewed family-search reduction, whole-cell pruning or complete formulation/algorithm; neither factor degrees nor this partial graph certify it. Next compare full support-on-factors plus factorization to equally scoped quintic support, and review pinned FLINT/Lecerf sources before claiming a new method.

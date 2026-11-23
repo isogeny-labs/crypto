@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m41-tm2308219-7f48b14a | 39.00 | rho-neg | 144/144 | 0.978 | 1.076 | 1.955 | — |
+| icv1-f2m41-tm2308219-7f48b14a | 39.00 | rho-strong | 144/144 | 0.147 | 0.176 | 0.443 | — |
+| icv1-f2m41-tm2308219-7f48b14a | 39.00 | rho-strong-aa | 144/144 | 0.147 | 0.176 | 0.443 | — |
+| icv1-f2m41-tm2308219-7f48b14a | 39.00 | rho-strong-v2 | 144/144 | 0.159 | 0.191 | 0.475 | — |
+| icv1-f2m41-tm2308219-7f48b14a | 39.00 | rho-v5 | 144/144 | 0.138 | 0.151 | 0.276 | — |
+| icv1-f2m41-tm2308219-7f48b14a | 39.00 | rho-v5-aa | 144/144 | 0.138 | 0.151 | 0.276 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m41-tm2308219-7f48b14a | rho-neg vs rho-strong | rho-strong < rho-neg |
+| icv1-f2m41-tm2308219-7f48b14a | rho-neg vs rho-strong-aa | rho-strong-aa < rho-neg |
+| icv1-f2m41-tm2308219-7f48b14a | rho-neg vs rho-strong-v2 | rho-strong-v2 < rho-neg |
+| icv1-f2m41-tm2308219-7f48b14a | rho-neg vs rho-v5 | rho-v5 < rho-neg |
+| icv1-f2m41-tm2308219-7f48b14a | rho-neg vs rho-v5-aa | rho-v5-aa < rho-neg |
+| icv1-f2m41-tm2308219-7f48b14a | rho-strong vs rho-strong-aa | unresolved inside the band |
+| icv1-f2m41-tm2308219-7f48b14a | rho-strong vs rho-strong-v2 | rho-strong < rho-strong-v2 |
+| icv1-f2m41-tm2308219-7f48b14a | rho-strong vs rho-v5 | rho-v5 < rho-strong |
+| icv1-f2m41-tm2308219-7f48b14a | rho-strong vs rho-v5-aa | rho-v5-aa < rho-strong |
+| icv1-f2m41-tm2308219-7f48b14a | rho-strong-aa vs rho-strong-v2 | rho-strong-aa < rho-strong-v2 |
+| icv1-f2m41-tm2308219-7f48b14a | rho-strong-aa vs rho-v5 | rho-v5 < rho-strong-aa |
+| icv1-f2m41-tm2308219-7f48b14a | rho-strong-aa vs rho-v5-aa | rho-v5-aa < rho-strong-aa |
+| icv1-f2m41-tm2308219-7f48b14a | rho-strong-v2 vs rho-v5 | rho-v5 < rho-strong-v2 |
+| icv1-f2m41-tm2308219-7f48b14a | rho-strong-v2 vs rho-v5-aa | rho-v5-aa < rho-strong-v2 |
+| icv1-f2m41-tm2308219-7f48b14a | rho-v5 vs rho-v5-aa | unresolved inside the band |

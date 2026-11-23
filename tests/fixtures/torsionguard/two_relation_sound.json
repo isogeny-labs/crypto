@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "name": "two-independent-order-3-relations",
+  "description": "Neither projection is injective alone, but their common kernel is trivial.",
+  "torsion_components": [
+    {"label": "H3-first", "prime": "3", "exponent": 1},
+    {"label": "H3-second", "prime": "3", "exponent": 1}
+  ],
+  "obligations": {
+    "group_structure": {"status": "verified", "evidence": "synthetic (Z/3)^2 fixture"},
+    "point_on_curve": {"status": "not_applicable", "evidence": "abstract module fixture"},
+    "input_domain": {"status": "not_applicable", "evidence": "abstract module fixture"},
+    "scalar_binding": {"status": "verified", "evidence": "fixed synthetic relations"},
+    "coefficient_bounds": {"status": "not_applicable", "evidence": "fixed coefficients"},
+    "map_actions": {"status": "verified", "evidence": "matrices directly define the module actions"}
+  },
+  "relations": [
+    {
+      "name": "bind_first_coordinate",
+      "evidence": "synthetic first-coordinate projection",
+      "matrix": [["1", "0"], ["0", "0"]]
+    },
+    {
+      "name": "bind_second_coordinate",
+      "evidence": "synthetic second-coordinate projection",
+      "matrix": [["0", "0"], ["0", "1"]]
+    }
+  ]
+}

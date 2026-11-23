@@ -2091,6 +2091,11 @@ fn snapshot_build(source: &Path, destination: &Path, prebuilt: Option<&Path>) ->
     }
     if prebuilt.is_none() {
         copytree(&source.join("src"), &snap.join("src"))?;
+        // The root Cargo manifest names local crates. A registered worker
+        // must build from their sealed source too, with no checkout fallback.
+        for rel in ["tools/factor-base", "tools/volcano-cli", "isogeny_algos"] {
+            copytree(&source.join(rel), &snap.join(rel))?;
+        }
         let st = Store::Dir(source.join("src"));
         for rel in st.files_under("") {
             if !rel.ends_with(".rs") {
@@ -2099,12 +2104,13 @@ fn snapshot_build(source: &Path, destination: &Path, prebuilt: Option<&Path>) ->
             let rust = source.join("src").join(&rel);
             let text = std::fs::read_to_string(&rust).map_err(|e| e.to_string())?;
             for inc in includes(&text) {
-                let dep = rust
-                    .parent()
-                    .expect("parent")
-                    .join(&inc)
-                    .canonicalize()
-                    .map_err(|e| format!("{inc}: {e}"))?;
+                // This lexical scan also sees include-like text in tests and
+                // strings. Missing incidental paths are harmless; the offline
+                // rebuild below rejects any real compile-time input omitted
+                // from the frozen tree.
+                let Ok(dep) = rust.parent().expect("parent").join(&inc).canonicalize() else {
+                    continue;
+                };
                 let root = source.canonicalize().map_err(|e| e.to_string())?;
                 let rel_dep = dep
                     .strip_prefix(&root)

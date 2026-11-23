@@ -1,0 +1,47 @@
+m cap filt s | n  ub_ok  sound_bad | B* min/med/max | offset (m-1)s-B*: min/med/max | per-curve mean offset | SAT-med UNSAT-med
+3 2 1 4 | 96 96 0 | 5 6.0 7 | 1 2.0 3 | [np.float64(3.0), np.float64(2.0), np.float64(1.0)] | 6.0 6.0
+3 2 1 5 | 96 96 0 | 7 8.0 9 | 1 2.0 3 | [np.float64(1.0), np.float64(3.0), np.float64(2.0)] | 8.0 8.0
+3 2 1 6 | 96 96 0 | 11 11.0 11 | 1 1.0 1 | [np.float64(1.0), np.float64(1.0), np.float64(1.0)] | 11.0 11.0
+3 2 1 7 | 96 96 0 | 13 13.0 13 | 1 1.0 1 | [np.float64(1.0), np.float64(1.0), np.float64(1.0)] | 13.0 13.0
+3 4 0 4 | 96 96 0 | 4 4.0 5 | 3 4.0 4 | [np.float64(4.0), np.float64(4.0), np.float64(3.0)] | 4.0 4.0
+3 4 0 5 | 96 96 0 | 7 7.0 7 | 3 3.0 3 | [np.float64(3.0), np.float64(3.0), np.float64(3.0)] | 7.0 7.0
+3 4 0 6 | 96 96 0 | 9 9.0 9 | 3 3.0 3 | [np.float64(3.0), np.float64(3.0), np.float64(3.0)] | 9.0 9.0
+3 4 0 7 | 96 96 0 | 11 11.0 11 | 3 3.0 3 | [np.float64(3.0), np.float64(3.0), np.float64(3.0)] | 11.0 11.0
+3 4 1 4 | 96 96 0 | 3 3.0 5 | 3 5.0 5 | [np.float64(5.0), np.float64(5.0), np.float64(3.0)] | 3.0 3.0
+3 4 1 5 | 96 96 0 | 5 5.0 7 | 3 5.0 5 | [np.float64(3.0), np.float64(5.0), np.float64(5.0)] | 5.0 5.0
+3 4 1 6 | 96 96 0 | 8 9.0 9 | 3 3.0 4 | [np.float64(3.0), np.float64(4.0), np.float64(3.0)] | 9.0 9.0
+3 4 1 7 | 96 96 0 | 11 11.0 11 | 3 3.0 3 | [np.float64(3.0), np.float64(3.0), np.float64(3.0)] | 11.0 11.0
+3 8 1 4 | 96 96 0 | 1 1.0 3 | 5 7.0 7 | [np.float64(7.0), np.float64(7.0), np.float64(5.0)] | 1.0 1.0
+3 8 1 5 | 96 96 0 | 3 3.0 5 | 5 7.0 7 | [np.float64(5.0), np.float64(7.0), np.float64(7.0)] | 3.0 3.0
+3 8 1 6 | 96 96 0 | 5 7.0 7 | 5 5.0 7 | [np.float64(5.0), np.float64(7.0), np.float64(5.0)] | 7.0 7.0
+3 8 1 7 | 96 96 0 | 8 8.0 9 | 5 6.0 6 | [np.float64(5.0), np.float64(6.0), np.float64(6.0)] | 8.0 8.0
+4 2 1 4 | 96 0 0 | 9 9.0 12 | 0 3.0 3 | [np.float64(3.0), np.float64(3.0), np.float64(0.0)] | 9.0 9.0
+4 2 1 5 | 96 0 0 | 15 15.0 15 | 0 0.0 0 | [np.float64(0.0), np.float64(0.0), np.float64(0.0)] | 15.0 15.0
+4 2 1 6 | 12 0 0 | 18 18.0 18 | 0 0.0 0 | [np.float64(0.0), np.float64(0.0), np.float64(0.0)] | 18.0 18.0
+4 4 0 4 | 96 96 0 | 8 9.0 9 | 3 3.0 4 | [np.float64(3.0), np.float64(3.0), np.float64(4.0)] | 9.0 9.0
+4 4 0 5 | 96 96 0 | 13 13.0 13 | 2 2.0 2 | [np.float64(2.0), np.float64(2.0), np.float64(2.0)] | 13.0 13.0
+4 4 1 4 | 96 96 0 | 7 7.0 8 | 4 5.0 5 | [np.float64(5.0), np.float64(5.0), np.float64(4.0)] | 7.0 7.0
+4 4 1 5 | 96 96 0 | 11 13.0 13 | 2 2.0 4 | [np.float64(2.0), np.float64(2.0), np.float64(4.0)] | 13.0 13.0
+4 4 1 6 | 96 96 0 | 15 16.0 16 | 2 2.0 3 | [np.float64(2.0), np.float64(3.0), np.float64(2.0)] | 16.0 16.0
+4 8 1 4 | 96 96 0 | 5 5.0 5 | 7 7.0 7 | [np.float64(7.0), np.float64(7.0), np.float64(7.0)] | 5.0 5.0
+4 8 1 5 | 96 96 0 | 8 10.0 11 | 4 5.0 7 | [np.float64(4.0), np.float64(5.0), np.float64(7.0)] | 10.0 10.0
+4 8 1 6 | 12 12 0 | 12 14.0 14 | 4 4.0 6 | [np.float64(4.0), np.float64(4.0), np.float64(6.0)] | 14.0 14.0
+
+slope of per-curve mean B* vs s (OLS, 95% t-CI, n=3 curves x cells)
+m=3 cap=2 filt=1: slope=2.400 +- 0.390 (CI [2.010,2.790]), intercept=-3.70, n=12; m-1=2
+m=3 cap=4 filt=0: slope=2.200 +- 0.188 (CI [2.012,2.388]), intercept=-4.27, n=12; m-1=2
+m=3 cap=4 filt=1: slope=2.500 +- 0.464 (CI [2.036,2.964]), intercept=-6.50, n=12; m-1=2
+m=3 cap=8 filt=1: slope=2.267 +- 0.544 (CI [1.723,2.810]), intercept=-7.47, n=12; m-1=2
+m=4 cap=2 filt=1: slope=4.000 +- 1.032 (CI [2.968,5.032]), intercept=-5.67, n=9; m-1=3
+m=4 cap=4 filt=0: slope=4.333 +- 0.925 (CI [3.408,5.259]), intercept=-8.67, n=6; m-1=3
+m=4 cap=4 filt=1: slope=4.167 +- 0.847 (CI [3.320,5.014]), intercept=-9.06, n=9; m-1=3
+m=4 cap=8 filt=1: slope=4.167 +- 1.021 (CI [3.145,5.188]), intercept=-11.50, n=9; m-1=3
+
+common profiles at B* (cap=4,filt=1): first/top profile string per cell, representative instance
+(3, 4, 1, 4) 1,0,2x9
+(3, 4, 1, 5) 3,0,4x50
+(3, 4, 1, 6) 4,0,5x90
+(3, 4, 1, 7) 5,0,6x147
+(4, 4, 1, 4) 3,2,0,2x16;1,0,3,3x4
+(4, 4, 1, 5) 5,4,0,4x25;3,0,5,5x10
+(4, 4, 1, 6) 6,5,0,5x36;4,0,6,6x15

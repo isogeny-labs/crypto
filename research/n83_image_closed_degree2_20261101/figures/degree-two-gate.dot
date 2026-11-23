@@ -1,0 +1,32 @@
+digraph degree_two_gate {
+  graph [rankdir=LR, bgcolor="white", margin="0.18", nodesep="0.55", ranksep="0.75",
+         fontname="Helvetica", label="n=83 image-closed degree-two fiber gate",
+         labelloc="t", fontsize=18];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11,
+        color="#24324a", penwidth=1.2, fillcolor="#eef4ff"];
+  edge [fontname="Helvetica", fontsize=10, color="#40516f", penwidth=1.2];
+
+  P [label="P in E(Fq)\ngeneric rational target", fillcolor="#dceaff"];
+  F [label="phi^{-1}(P)\nclosed degrees 1 + 2"];
+  D1 [label="degree-one component"];
+  D2 [label="degree-two component"];
+  L1 [label="projected label P", fillcolor="#dff6e7"];
+  L2 [label="projected label [2]P", fillcolor="#dff6e7"];
+  I [label="P + [2]P = [3]P\nscalar identity only", fillcolor="#fff0dc"];
+  R [label="Information gate: FAIL\nrank per identity = 0", shape=octagon,
+     fillcolor="#ffe1e1", color="#9f2f35"];
+  C [label="No finite rho crossover\ncollector / EKS run stopped", shape=octagon,
+     fillcolor="#ffe1e1", color="#9f2f35"];
+  O [label="Still open:\ngrowing-degree / adaptive\ntarget-local router", fillcolor="#f2edff"];
+
+  P -> F [label="pullback"];
+  F -> D1;
+  F -> D2;
+  D1 -> L1 [label="norm"];
+  D2 -> L2 [label="norm"];
+  L1 -> I;
+  L2 -> I;
+  I -> R;
+  R -> C [label="strict gate"];
+  C -> O [style=dashed, label="not ruled out"];
+}

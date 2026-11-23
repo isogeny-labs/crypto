@@ -1,0 +1,147 @@
+{
+  "schema": "validator-report/v1",
+  "lead": "L15 engine confirmation of greedy digit-set factor-base frames (f4cost, Curve25519 k=20 miniature, p=1048573, r=131203)",
+  "validator": "validator (independent; Claude Sonnet 5.5), dispatch 2026-11-04",
+  "validated_at_utc": "2026-11-04T15:50:00Z",
+  "status": "pass_with_errata",
+  "disposition": "validated",
+  "binding": {
+    "frozen_artifact_set": {
+      "engine_commit": "b847203692bdd7c2f67e088fcf091a45c3339d27 (2026-11-04T08:13:43Z)",
+      "protocol_commit": "808527da5c76f62cf0bc8c3e0afcfa7ef75db618 (2026-11-04T08:15:23Z; contains only PROTOCOL.md and scripts/run.sh of this lead)",
+      "result_commit": "4f0b011445a14af5615a89174e625f072991cc2b (2026-11-04T08:16:59Z; README.md, data/*, atlas REPORT.md edit)"
+    },
+    "head_at_validation": "035dad5b0a6a214c320df08d48fc07d323588375 (branch claude/curve25519-index-calculus-i674j4; HEAD moved during the session, other sessions commit to it)",
+    "moving_tree_handling": "validated only the named commits. All 20 files under l15_digits_engine are blob-identical (git rev-parse <commit>:path == git hash-object path) between commit 4f0b011445 and disk; `git diff 4f0b011445 HEAD -- l15_digits_engine` is empty; `git diff b847203692 HEAD -- src/cryptanalysis/ic_framework/pkm_semaev.rs src/bin/curve25519_family.rs` is empty, so the source read for the code review is the b847203692 source.",
+    "binary": "/home/user/ctarget-l15/release/curve25519_family sha256 c1924bb3289e6db791a0f3829eb15d6a8e7608d35876f2a262a517abb3c4241d (matches data/binary.sha256; hash file written 08:15:26.87Z, after the protocol commit); never modified by the validator (only executed read-only, outputs to scratch)",
+    "toolchain_on_validation_host": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0; not recorded by the producer",
+    "scratch": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/l15val (census.py, hits.py, cert.py, recompute.py, replay/*.json); nothing written to data/, README.md, PROTOCOL.md"
+  },
+  "requirements": [
+    {
+      "id": "R1 freeze order",
+      "status": "pass",
+      "evidence": "PROTOCOL.md mtime 08:15:05.66Z, run.sh mtime 08:15:11.47Z, protocol commit 808527da5c at 08:15:23Z. First data object born 08:15:26.867Z (data/binary.sha256), first JSON 08:15:26.879Z (created at start of ctl cell, completed 08:15:29.68Z), last data (SHA256SUMS) 08:16:07.52Z, README mtime 08:16:38.8Z, README+data commit 4f0b011445 at 08:16:59Z. run.log stamps 08:15:29Z .. 08:16:07Z, DONE. 808527da5c is an ancestor of 4f0b011445 and b847203692 an ancestor of 808527da5c; the frozen commit tree contains no data/ or README. PROTOCOL.md and scripts/run.sh blobs are identical in 808527da5c, 4f0b011445 and on disk (e2d09bfa3f05..., 5fe6d3ffded3...). Caveat: freeze margin is 3.5 s and rests on local commit and file timestamps (the commit is also on origin/claude/curve25519-index-calculus-i674j4, push time not established)."
+    },
+    {
+      "id": "R2 hashes",
+      "status": "pass",
+      "evidence": "`sha256sum -c data/SHA256SUMS` 8/8 OK (7 JSON + binary.sha256); `sha256sum -c data/binary.sha256` OK for the binary at the recorded path. The 7 .stderr files are 0 bytes; run.log has 7 x rc=0 and DONE; sum of wall_s = 40.5 s matches README '40 s'."
+    },
+    {
+      "id": "R3 binary built from b847203692",
+      "status": "partial (established by indirect evidence, not by rebuild)",
+      "evidence": "CANNOT establish: byte identity of the binary with a build of b847203692. Binary mtime 07:36:52Z precedes both the commit (08:13:43Z) and the last write of src/cryptanalysis/ic_framework/pkm_semaev.rs (07:42:49.83Z; a cargo clippy artifact is stamped 07:42:34Z, so the 07:42:49 write is probably rustfmt, unverified). The binary was therefore built from an uncommitted working tree that was committed later; 'built from b847203692' is not literally true. A rebuild was not attempted: the host has 1.7 GB free and the evidence target dir (libcrypto_lib rlib alone 391 MB, deps 1.8 GB) does not fit; I would not risk filling the disk or touching the evidence target dir. ESTABLISHED: (a) every live-code string literal added by b847203692 is present in the binary (13 of 14; the 14th is the describe() format string, and the sibling bits/2-descent/T0 describe() strings are also absent, i.e. dead-code elimination, not drift); (b) the binary's panic locations src/bin/curve25519_family.rs:1662:13 (digits t-mismatch assert) and :1745:10 (prepare expect) equal the lines of the b847203692 bin source; (c) error paths behave as the committed code: repeated subset sum -> 'pkm-semaev: the digits [1, 2, 3, 8, 16] have a repeated subset sum mod 1048573', t mismatch -> 'digits: t must equal the digit count'; (d) behavioural equivalence: the binary re-run (scratch) reproduced all 7 evidence cells field-for-field except wall_s, and two-power digits (`digits@0:1;2;4;8;16`, `digits@815271:1;2;4;8;16`, `digits@976503:1;2;4;8;16`) reproduce the bits cells ctl (3,036,911.76; 11/42), trans_t5_g3 (3,014,275.30; 24/248) and the frame-search published bits@976503 (3,036,916.11; 24/198) exactly, so digits with c_j = 2^j are bits. The source-vs-binary gap is a provenance erratum (E1); it does not affect the numbers because columns/covered are independently recomputed (R5) and hits/soundness are independently recomputed (R8)."
+    },
+    {
+      "id": "R4 code review of Membership::Digits",
+      "status": "pass",
+      "evidence": "pkm_semaev.rs @ b847203692. digit_sums(p, lo, digits): 2^t entries, entry k = lo%p + sum over set bits j of k of (c_j % p), each step addm mod p (u64, p<2^20, no overflow); for c_j=2^j entry k = lo+k (unit test digits_two_powers_reproduce_bits plus my binary replays). digits_factor_base -> abscissa_factor_base: sort+dedup abscissae, keep those with rhs(x) a QR (curve.sqrt), both signs; the base is ALL curve points over those abscissae (cofactor cosets included, NOT intersected with the order-r subgroup: base_points = 2*columns, covered_points_all_cosets > covered_points). prepare() for Digits: checks digits.len()==t, rejects a repeated subset sum, and rejects any base abscissa outside the sum set; the t=5 and t=6 sets have 32 and 64 distinct sums (my check). System build: coef(j)=digits[j]%p replaces 2^j for the linear form x_i = base + sum_j coef(j) b_(i,j); rules b^2=b are pushed for Bits and Digits alike (same SquareRule{c:1,d:0}); guessing fixes the top g digits c_(t-g..t-1) of summand 0 with bit k of the branch index <-> b_(t-g+k), offset summed with addm - identical to `a << (t-g)` when c_j=2^j; free bits j in 0..t-g. grid/v set = digit_sums. Decode: solutions are abscissae looked up in fb.x_index then lifted with signs (lift_abscissae), no 2^j assumption remains (grep of 1u64<<, lo+k sites: all in Bits/T0/Kummer/Square arms). No off-by-one or modular defect found. Note: charged F4 unit is 'elimination only'; system build (pkm_system_fp_mults_uncharged) and the grid (pkm_grid_fp_mults_uncharged) are uncharged (see E5). Unit-test claim '29 pkm_semaev tests pass' not re-run (no disk for a test build)."
+    },
+    {
+      "id": "R5 independent recomputation of columns and covered_points (D1)",
+      "status": "pass",
+      "evidence": "census.py written from scratch: own Weierstrass affine group law (y^2=x^3+a x+b, a=(3-A^2)/3, b=(2A^3-9A)/27, x_W=x_M+A/3) and a second, independent Montgomery affine group law; #E(F_p) counted by Legendre sum = 1,049,624 = 8*131,203, r prime. covered = |{R != O : [r]R = O, R = P_i + P_j, P_i,P_j in B}|, B = all curve points with x_W in the abscissa set, both signs, i=j allowed (this is exactly decomposable_points(m=2) filtered by [r]R=O in f4cost_m; it counts R and -R separately, coverage_exact = covered/r; it is NOT 'points of the subgroup whose x lies in the set'). Results (identical in both group-law models): ctl bits@0 t=5: 11 cols / 42; bits@815271 t=5: 24 / 248; bits@889850 t=6: 48 / 570; digits t=5 (lo 113971): 22 / 522; digits t=6 (lo 51134): 43 / 1268; also bits@976503 t=5: 24 / 198 (frame-search published cell). Engine covered_points_all_cosets = my distinct sums + 1 (the identity) in all five: 243=242+1, 1153=1152+1, 4603=4602+1, 969=968+1, 3695=3694+1. D1 'held' confirmed, 4/4 exact (and ctl 11/42 for D5)."
+    },
+    {
+      "id": "R6 D2-D5 and table arithmetic from the JSON",
+      "status": "pass (one rounding slip, E2)",
+      "evidence": "recompute.py. Per cell: mul-adds/target = f4_muladds/targets_done; terms = native.pkm_system_terms/pkm_system_specialisations; coverage_exact = covered/131203; per-relation = mpt/coverage_exact; calls_per_target = f4_calls/100; base_points = 2*columns; hits == hits_verified == hits_exact; 100 targets, capped=false, undecided=0 in all 7: all consistent. D2: degree 5/5, terms 64/64, 32/32, 44/44; mpt ratios 1.007507, 1.008194, 0.973437 (within 0.95-1.05) -> held at all three pairs. The ratios equal the F4 call-count ratios (794/800, 1587/1600, 3115/3200), i.e. per-call cost is identical to 0.006% and the mpt spread is only the early exit on hit targets. D3: per-relation digits/trans = 0.4787 (5,3), 0.4790 (5,4), 0.4376 (6,5); README 0.479 and 0.438 correct; point predictions 0.4751 and 0.4495. D4: E = columns*mpt/covered: digits (5,4) = 22*1,375,663.15/522 = 57,978.14 (README prints 57,977); winner = 22*52,816/210 = 5,533.10 (T10 cell data/cells/t5_g4_s1307.json: 22 cols, 210 covered, mpt 52,816.0, degree 4, isogeny@1307; r cancels, T10 E_0 = 725,959,944 reproduced); ratio 10.478 (README 10.5 correct), threshold 2 -> held. D5: control mpt 3,036,911.76 exactly equal to published, 11 cols, 42 covered -> held. README table: every mul-adds/target and per-relation entry recomputes to the printed digits; hit line (trans t=5 cells 1/1, digits t=6 3/3, others 0) correct."
+    },
+    {
+      "id": "R7 README Reading bullets (overclaims)",
+      "status": "pass_with_errata",
+      "evidence": "'membership is free / per-target cost moves less than hit noise': true (+0.75%, +0.82%, -2.7%, entirely the early-exit call-count effect). '2.1-2.3x less F4 work per relation': true as a derived quantity (2.089, 2.088, 2.285 = trans/digits). 'about 12x below its 2026-11-02 state per relation at t=5': arithmetic correct and at matched (t,G)=(5,3): 9.487e9/7.633e8 = 12.43 = 522/42 * 0.999998; BUT it is per relation, not per solve: the control has 11 columns, the digit set 22, so E = columns*mpt/covered falls only 795,381.7 -> 127,992.1 = 6.21x (E4); and the control was run only at G=3, so no G=4 statement is supported. The premise 'trans frames already 6x (t=4) to 4.7x (t=5) below lo=0' is not this run's trans cell (L=815271, 248 covered: 5.95x) but the frame-search frames (bits@976503 with 198 covered: 4.71x; atlas REPORT.md says 6.5x at t=4, README says 6x) so the two factors cannot be chained (4.71*2.09 = 9.8, not 12.4). 'does not overtake the isogeny tower ... 10.5x behind ... at matched (t,G)': correct as a modelled ratio (per-solve E), whereas the per-target ratio is 26.0x (1,375,663/52,816) and per (5,3) 17.1x (3,036,904/177,112); both statements in the README are individually right but not distinguished."
+    },
+    {
+      "id": "R8 certificate discipline (relations)",
+      "status": "pass (certified by validator re-derivation; not stored by producer)",
+      "evidence": "The artifacts hold relation counts only (hits, hits_verified, hits_exact = harness self-check by the engine's own group law); no target scalar or index pair is stored. Independent re-derivation (hits.py, cert.py): regenerated the 100 targets per t from the seed LCG (seed 2026111500+t; st=st*6364136223846793005+1442695040888963407 mod 2^64; a=1+(st>>11)%(r-1)) with generator u=4 (Q_W=(349837,122), the smallest u>=2 of order r) and tested membership of a*G in the independently built covered set. Independent hit counts equal the engine's in every cell: ctl 0, trans t5 1 (a=69608), digits t5 0, trans t6 0, digits t6 3 (a=108445, 71310, 81978); G=4 cells share frames and targets with G=3 (1 and 0, match). Each of the 4 distinct relations was re-verified in both group-law models: a=69608: bits@815271, P=(815275,69621)+(815276,359028); a=108445: (44105,792111)+(425659,726161); a=71310: (73956,212834)+(965278,950464); a=81978: (425659,726161)+(583724,811645) (Weierstrass x_W, y). So no false hit among 100 targets x 7 cells and all 4 true hits found. Completeness of the digit path with guessing on cells that have zero natural hits: planted-target replay in scratch (F4COST_PLANTED): digits t5 G=3 36/36 planted hits, exact 36/36; G=4 36/36; digits t6 G=5 20/20, undecided 0. No failed certificate."
+    },
+    {
+      "id": "R9 controls and reporting contract",
+      "status": "pass_with_errata",
+      "evidence": "Controls present: lo=0 bits control (reproduces published cell exactly), best-of-2000 translation frame arm at the same (t,G) and the same targets (target seed depends on t only), isogeny winner as a priced comparator. Rho reference not run: the protocol scopes this to engine-only counted F4 mul-adds, no timing, no S, no end-to-end claim, and the README says 'Rho remains ahead'; not a leaderboard row, no VALIDATION.json required. One table, one unit (F4 mul-adds), phases separated, ratio columns present. Gaps: the unpriced native counters are not listed (E5); per-relation is derived (README table does say '(derived)') (E4); the amortised search cost promised in PROTOCOL 'Costs' is stated as counts only (62,000 Legendre + 31,034 [r]P at t=5; 126,000 + 62,902 at t=6, verified against l14 data/k20_t{5,6}.json cost fields, 791,434 and 1,604,137 group ops there) and not compared to the translation-frame search. m=83 / ECC2K-130 disclosure rules do not apply (prime field k=20)."
+    },
+    {
+      "id": "R10 process items (disclosed by the producer)",
+      "status": "noted, not blocking",
+      "evidence": "README 'Deviations' discloses: no Conductor, no AWS CLI (no S3 resume checkpoint), no graph or PDF (research-visuals not met). No data record of rustc/host/dirty-tree; JSON has no seed field (seeds only in scripts/run.sh). None changes a count: run is deterministic and my replays on this host are identical except wall_s."
+    }
+  ],
+  "recomputed_numbers": {
+    "D1": {"digits_t5": [22, 522], "digits_t6": [43, 1268], "trans_t5": [24, 248], "trans_t6": [48, 570], "ctl_bits_lo0_t5": [11, 42], "all_match_engine": true},
+    "D2_mpt_ratio_digits_over_trans": {"(5,3)": 1.007507, "(5,4)": 1.008194, "(6,5)": 0.973437},
+    "D3_per_relation_digits_over_trans": {"(5,3)": 0.4787, "(5,4)": 0.4790, "(6,5)": 0.4376},
+    "D4": {"E_digits_5_4": 57978.14, "E_winner": 5533.105, "ratio": 10.478, "ratio_across_5a_band_one_for_one_w_0_0.1_1": [10.478, 10.475, 10.441], "ratio_if_1_GAE_equals_63_muladds_w_0_0.1_1": [10.478, 10.248, 8.608]},
+    "D5": {"mpt": 3036911.76, "published": 3036911.76, "relative_diff": 0.0},
+    "per_relation_ctl_over_digits_5_3": 12.429,
+    "per_solve_E_ctl_over_digits_5_3": 6.214,
+    "per_solve_E_trans_over_digits": {"(5,3)": 2.279, "(5,4)": 2.278, "(6,5)": 2.551},
+    "per_relation_trans_over_ctl_5_3": 5.949,
+    "per_target_digits_over_winner_5_4": 26.05
+  },
+  "unpriced_native_counters_per_target (not listed in README)": {
+    "ctl_bits_lo0_t5_g3": 659.0,
+    "trans_t5_g3": 684.4,
+    "trans_t5_g4": 897.2,
+    "digits_t5_g3": 679.0,
+    "digits_t5_g4": 895.0,
+    "trans_t6_g5": 2395.0,
+    "digits_t6_g5": 2471.6,
+    "T10_winner_t5_g4_s1307": 224.0,
+    "counters": "pkm_system_fp_mults_uncharged, pkm_grid_fp_mults_uncharged (F_p multiplications); not in the charged F4 mul-add unit. D3 and D4 conclusions hold at every weight 0, 0.1, 1."
+  },
+  "errata": [
+    {
+      "id": "E1",
+      "severity": "moderate (provenance)",
+      "location": "PROTOCOL.md 'Binary' line and README.md header ('built from b847203692'); data/binary.sha256",
+      "issue": "The binary (mtime 2026-11-04 07:36:52Z) was built before commit b847203692 (08:13:43Z) and before the last write of pkm_semaev.rs (07:42:49Z), so it was built from an uncommitted working tree; byte-identity with a build of b847203692 is not established and was not checkable (no rebuild possible on a 1.7 GB-free disk). Indirect evidence (literals, panic line numbers, error paths, full replay, two-power equivalence) agrees with the committed source.",
+      "fix": "Say 'built from the working tree later committed as b847203692 (post-build edit at 07:42:49Z, probably rustfmt)'; or rebuild b847203692 in a clean tree, record its sha256 and the rustc version, and cite that the replay of the 7 cells is identical (this validation's replay is the evidence for behaviour, not for bytes)."
+    },
+    {
+      "id": "E2",
+      "severity": "minor (arithmetic)",
+      "location": "README.md 'Predictions' table, D4 row: '22 x 1,375,663 / 522 = 57,977'",
+      "issue": "The quotient is 57,978.1 (57,978.14 with the unrounded 1,375,663.15). The ratio 10.478 and its rounding 10.5 are unaffected.",
+      "fix": "Replace 57,977 by 57,978."
+    },
+    {
+      "id": "E3",
+      "severity": "minor (scope qualifier)",
+      "location": "README.md 'Reading' bullet 2 ('about 12x below its 2026-11-02 state per relation at t = 5'; 'trans frames already 6x (t = 4) to 4.7x (t = 5) below lo = 0'); atlas REPORT.md section 11.6 line '~12x below its 2026-11-02 per-relation cost at t = 5' (and the 11.4 L15 bullet, same figure family)",
+      "issue": "12.43x is per relation at matched (t,G) = (5,3) only (control not run at G=4) and equals the coverage ratio 522/42; per solve (columns*mpt/covered; 11 vs 22 columns) the fall is 6.21x. The 6x/4.7x premise refers to the frame-search frames (bits@976503, 198 covered, 4.71x; t=4 is 6.5x in the atlas), not to this run's trans cell bits@815271 (5.95x below lo=0), so the factors do not chain.",
+      "fix": "Write '12.4x per relation at (5,3), 6.2x per solve; this run's translation frame is 5.95x below lo=0 (the frame-search frame was 4.71x)'; correct '6x' to 6.5x or drop it."
+    },
+    {
+      "id": "E4",
+      "severity": "minor (derived vs measured)",
+      "location": "README.md 'Reading' bullets 1-2 and table column 'F4 mul-adds / relation'",
+      "issue": "Per-relation figures are mul-adds per target divided by the exact coverage (modelled hit rate); measured relations are 0, 0, 0, 1, 1, 0, 3 of 100 targets (expected 0.03-0.97 per cell), so 2.1-2.3x is a derived coverage effect, not a measured relation-rate ratio. The table note says '(derived)' but the bullets do not.",
+      "fix": "Add 'derived at exact coverage; measured relations 0-3 per 100 targets' to the Reading bullets."
+    },
+    {
+      "id": "E5",
+      "severity": "minor (AGENTS 5a listing)",
+      "location": "README.md 'Costs and scope'",
+      "issue": "The ranking of D4 (digits vs isogeny winner) does not list the unpriced native counters of the arms. Per target: digits (5,4) 895.0 F_p mults (pkm_system_fp_mults_uncharged), winner 224.0, trans (5,4) 897.2 (incl. grid 12.5), digits t=6 2471.6 (incl. grid 136.3). Pricing them at 0, 0.1, 1 per native op leaves D3 unchanged and D4 at 10.44-10.48 (or 8.6-10.5 if one GAE is 63 mul-adds), so no ranking changes.",
+      "fix": "List the two counters per arm in a table and add the band line."
+    },
+    {
+      "id": "E6",
+      "severity": "minor (reproducibility record)",
+      "location": "data/ (no env record), JSON (no seed, no relation records)",
+      "issue": "No rustc/host/dirty-tree record, no seed field, and the 4 relations behind 'hits 1/1, 3/3 verified' are stored only as counts. The validator re-derived all four (target scalars 69608, 108445, 71310, 81978 with pairs of base points, see R8).",
+      "fix": "Add the validator's relation list (or the engine's indices) and an env note, or cite validator-report.json R8."
+    }
+  ],
+  "numbers_that_disagree": [
+    {"where": "README D4 row", "reported": "57,977", "recomputed": "57,978.14", "effect": "none on the 10.5 ratio"}
+  ],
+  "non_blocking_advisories": [
+    "Distance to matched rho is not restated in the L15 README ('Rho remains ahead'); l14 cites the T12 winner as 6.06e4x behind rho-neg at w=0.1 on k=20 (T12, end-to-end S). Do not multiply it with the modelled 10.5x (different units); cite it as context.",
+    "Digit set is greedy rep 0 of 5 replicates chosen a priori (rep 0 is mid-range: covered 522/524/582/392/474 at t=5 and 1268/1364/1326/1142/1148 at t=6 in l14 data/k20_t{5,6}.json); l14 P9 failed (greedy not stable across replicates), so 522/1268 are for that specific set on this k=20 curve; the README says rep 0 but not that replicates vary. This favours neither direction (rep 0 is not the best replicate).",
+    "research-visuals (report, graph, PDF), S3 resume checkpoint and Conductor were not done; disclosed in the README."
+  ]
+}

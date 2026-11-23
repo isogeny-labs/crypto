@@ -1,0 +1,16 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.65in]{geometry}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\begin{document}
+\section*{Private runtime source integration}
+The separate private assembly and qualification sources now have matching interfaces and an independent non-author source review. All 20 supervisor and 14 qualifier software controls passed. The reviewer participated in advisory design but authored neither implementation.
+\begin{center}\includegraphics[width=\linewidth]{diagram.pdf}\end{center}
+\textbf{Corrections checked.} Exact context and token modes despite umask 0077; narrowly permitted predecessor-disk access; complete four-file callback snapshot; actual phase expiry; daemon readiness; managed child discovery; retained terminal unit state and explicit stop reconciliation. The original qualifier packet remains preserved alongside its corrected version.
+
+\textbf{Gate check.} GCC 11.5.0 accepted the exact C source with -Wall -Wextra -Werror -fsyntax-only. No executable was produced by this check. Source requires a complete exact nonce and host-side container cgroup checks before payload release.
+
+\textbf{Evidence boundary.} These are mock/static and temporary-file tests, not actual systemd, mount, Docker or native PID1-gate observations. Both phase drafts remain unadmitted. Native gate controls, concrete runtime admission and actual resource/cleanup readback remain required. Unknown surviving processes or mounts prohibit automatic retry.
+
+\textbf{Review artifacts.} independent-review.json binds eight exact sources and records all 34 checks and limitations. PLAN.md, syntax-check-plan.json and raw syntax exit/output records preserve this integration check. Full matched-cohort and mathematical obligations remain unchanged.
+\end{document}

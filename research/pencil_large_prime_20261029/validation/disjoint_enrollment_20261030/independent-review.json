@@ -1,0 +1,67 @@
+{
+  "schema": "pencil-disjoint-preparation-independent-review/v1",
+  "reviewer": "/root/four_lead_state",
+  "status": "clean_within_preparation_scope",
+  "source": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_preparation/src/disjoint_enrollment.rs",
+    "sha256": "583377eed49f1f6d409376d8f57040379be95671e9274613f579319225ff19ae"
+  },
+  "request": {
+    "path": "/tmp/pencil-disjoint-request.json",
+    "sha256": "6b99db317edac83a401126ec1d427739b2e786591e4fbaffd0003ce882c846f2",
+    "bound_files_hash_checked": 22
+  },
+  "software_validation": {
+    "reviewer_reran_tests": false,
+    "tests": {
+      "path": "/tmp/native-preparation-disjoint-tests-final.log",
+      "sha256": "4a1f269aa67ea203698480383d44fb53aecc0a11af497627dda15535920ef8b0",
+      "passed": 11,
+      "failed": 0
+    },
+    "fmt": {
+      "path": "/tmp/native-preparation-disjoint-fmt-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy": {
+      "path": "/tmp/native-preparation-disjoint-clippy-final.log",
+      "sha256": "aaefbb45b0c5903a07c22891d1c41c428648fa9bdf894db341b5b5975ba07fb2"
+    }
+  },
+  "checks": {
+    "compiled_original_and_gate_hash_pins": true,
+    "exact_curve_removal_and_label_only": true,
+    "full_workload_and_resolved_arm_equality": true,
+    "exact_u64_seeds": true,
+    "within_round_arm_order": true,
+    "unique_workload_and_slot_bijection": true,
+    "retains_original_and_enrolled_seq_and_indices": true,
+    "mapping_recomputed": true,
+    "typed_spec_identity_matches_seven_original_and_gate_vectors": true,
+    "prepare_and_verify_bind_derived_spec_identity": true,
+    "entire_certificate_and_receipt_recomputed": true,
+    "old_default_routes_retained": true,
+    "verification_does_not_invoke_instrument": true
+  },
+  "expected_counts": {
+    "original_plans": 7,
+    "enrolled_plans": 8,
+    "workloads": 1260,
+    "slots": 22680,
+    "measured": 18900,
+    "warmups": 3780,
+    "measured_candidate_reference_pairs": 6300
+  },
+  "readiness": "single root-controlled plan-only generation and verification",
+  "plan_only_invocation_performed": false,
+  "solver_execution_performed": false,
+  "cloud_action_performed": false,
+  "repository_edits_performed": false,
+  "limits": [
+    "Source and saved software-log review; no actual generated remainder output inspected in this review.",
+    "Root subsequently reported one prepare and one check exit zero; those actions are outside reviewer actions and are not independently certified here.",
+    "Scientific reuse admission, continuation budget, clock qualification, and separately charged upper gate remain distinct requirements.",
+    "Analyzer and canonical exporter enrollment support remains separate from this preparation contract.",
+    "No empirical ratios or mathematical outcome claims are made."
+  ]
+}

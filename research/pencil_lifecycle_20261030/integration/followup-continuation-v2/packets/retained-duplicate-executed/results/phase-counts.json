@@ -1,0 +1,115 @@
+{
+  "schema": "instrumented-audit-phase-counts/v1",
+  "counts": {
+    "setup_checks_field": {
+      "bit_ops": 0,
+      "ec_adds": 0,
+      "field_adds": 760038,
+      "i": 14252,
+      "jac_adds": 3904,
+      "m": 438198,
+      "s": 8436,
+      "sqrt_calls": 0
+    },
+    "constructor_field": {
+      "bit_ops": 0,
+      "ec_adds": 0,
+      "field_adds": 519770,
+      "i": 9823,
+      "jac_adds": 2640,
+      "m": 299213,
+      "s": 5631,
+      "sqrt_calls": 0
+    },
+    "label_reference_field": {
+      "bit_ops": 0,
+      "ec_adds": 0,
+      "field_adds": 1261330,
+      "i": 23216,
+      "jac_adds": 6940,
+      "m": 726153,
+      "s": 14163,
+      "sqrt_calls": 0
+    },
+    "eligibility_field": {
+      "bit_ops": 0,
+      "ec_adds": 0,
+      "field_adds": 720,
+      "i": 0,
+      "jac_adds": 0,
+      "m": 6175,
+      "s": 9462,
+      "sqrt_calls": 360
+    },
+    "key_reference_field": {
+      "bit_ops": 0,
+      "ec_adds": 0,
+      "field_adds": 404,
+      "i": 0,
+      "jac_adds": 0,
+      "m": 0,
+      "s": 0,
+      "sqrt_calls": 0
+    },
+    "terminal_reference_field": {
+      "bit_ops": 0,
+      "ec_adds": 0,
+      "field_adds": 0,
+      "i": 0,
+      "jac_adds": 0,
+      "m": 0,
+      "s": 0,
+      "sqrt_calls": 0
+    },
+    "adapter_field": {
+      "bit_ops": 0,
+      "ec_adds": 0,
+      "field_adds": 404,
+      "i": 0,
+      "jac_adds": 0,
+      "m": 0,
+      "s": 0,
+      "sqrt_calls": 0
+    },
+    "adapter_scalar": {
+      "add": 248,
+      "inv": 0,
+      "mul": 0
+    },
+    "graph_processing_field": {
+      "bit_ops": 0,
+      "ec_adds": 0,
+      "field_adds": 1914,
+      "i": 0,
+      "jac_adds": 0,
+      "m": 5220,
+      "s": 6960,
+      "sqrt_calls": 174
+    },
+    "graph_factor_verification_field": {
+      "bit_ops": 0,
+      "ec_adds": 0,
+      "field_adds": 26616,
+      "i": 696,
+      "jac_adds": 174,
+      "m": 12873,
+      "s": 0,
+      "sqrt_calls": 0
+    },
+    "graph_scalar": {
+      "add": 1812,
+      "inv": 0,
+      "mul": 0
+    }
+  },
+  "setup_aggregation": "unique60target ledger; repeated copies not summed",
+  "unpriced": [
+    "hashing",
+    "memory",
+    "comparisons",
+    "primality arithmetic",
+    "underlying scalar exponentiation expansion",
+    "full fixture/input/runtime work"
+  ],
+  "timing_ratio": null
+}

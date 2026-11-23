@@ -1,0 +1,96 @@
+{
+  "schema": "crypto.pr-metadata-repair/v1",
+  "status": "pass_for_scoped_local_repair",
+  "head_before": "55da3adf5dc96be86687583c5ae967a686bc1a09",
+  "base": "b7cafe04485eb97d873dffef698e7337cfb38cfe",
+  "repair_scope": [
+    "exact historical protocol label binding via existing artifact/hash/model policy",
+    "official leaderboard and downstream browser source-digest regeneration"
+  ],
+  "frozen_protocol_rewritten": false,
+  "native_or_scientific_source_changed": false,
+  "scientific_values_changed": false,
+  "scientific_promotions": false,
+  "new_research_runs": false,
+  "new_cloud_actions": false,
+  "name_checks": {
+    "identity_vectors_exit": 0,
+    "whole_tree_exit": 0,
+    "pr_diff_exit": 0,
+    "archived_label_tests_passed": 6,
+    "archived_label_tests_failed": 0,
+    "protocol_binding": "../../oracle_integration/historical-label-binding.json",
+    "controls": [
+      "raw archive/source/certificate identity",
+      "canonical field/model/order match",
+      "changed protocol hash rejected",
+      "wrong replacement rejected",
+      "different path rejected",
+      "unknown diff label rejected"
+    ]
+  },
+  "generated_data": {
+    "receipt": "generated-data/validation.json",
+    "leaderboard_json_changed_leaves": 1,
+    "browser_json_changed_leaves": 1,
+    "numeric_changes": 0,
+    "path_selftests_passed": 9,
+    "path_filters_cover_inputs": 217,
+    "builder_check_exit": 0,
+    "browser_check_exit": 0,
+    "full_committed_dynamic_input_globs_preserved": true,
+    "source_leaf_changes": [
+      {
+        "path": "/sources/curves_yaml/sha256",
+        "kind": "changed",
+        "before": "ab4891397fe07fca9478d96e1533c167a885b7557be9e6801025d14fec0976c5",
+        "after": "658a422ce97ef3ea505ed6337fe4680e146f1b951b208688a13f9199bbdd5712"
+      }
+    ],
+    "browser_leaf_changes": [
+      {
+        "path": "/sources/docs~1ic~1leaderboard.json",
+        "kind": "changed",
+        "before": "49c52128766a7641ce353bae63b4422ee1b8b5caf0dcf19e8011cc77795debc1",
+        "after": "96387b63f1d93e3cf7cc01b10a73937e0951b643b6d59b52f4b4a0dde238844e"
+      }
+    ]
+  },
+  "preservation": {
+    "frozen_inputs": "frozen-inputs.sha256",
+    "compiled_inputs_log": "logs/compiled-input-preservation.log",
+    "traits_log": "logs/traits-preservation.log",
+    "native_binaries_log": "logs/native-binary-preservation.log",
+    "prior_full_validation": "../merge-main-f85012683-20261018/validation.json",
+    "prior_library_passed": 4382,
+    "prior_library_failed": 0,
+    "prior_library_ignored": 117,
+    "prior_example_tests_passed": 7,
+    "new_full_library_run": false,
+    "sparse_patterns_changed": false,
+    "missing_tracked_metadata_restored_from_HEAD_only": 5282
+  },
+  "unfixed_baseline_failures": {
+    "source_attribution": "baseline-attribution.json",
+    "pr_comment": "https://github.com/aburan28/crypto/pull/2148#issuecomment-6247527278",
+    "checks": [
+      "Cover transfer assessment hardcoded catalog counts",
+      "blocked quintic backlog output-verifier placeholder"
+    ],
+    "observed_base_workflow_rerun_claimed": false,
+    "checks_waived": false
+  },
+  "ci_snapshot": {
+    "head": "55da3adf5dc96be86687583c5ae967a686bc1a09",
+    "total": 89,
+    "success": 10,
+    "failure": 4,
+    "skipped": 2,
+    "neutral": 1,
+    "pending": 72,
+    "required_protection_API": "403; no policy absence inferred",
+    "new_repair_commit_ci_yet_verified": false
+  },
+  "conductor_exit": 127,
+  "publication": "Root independently reviews and pushes; all applicable checks on new head remain required"
+}

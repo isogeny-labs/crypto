@@ -1,0 +1,10 @@
+[package]
+name="hec-power-relations"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../hec_residual_span_20261116/holdout/native"}
+[[bin]]
+name="power-relations"
+path="../main.rs"

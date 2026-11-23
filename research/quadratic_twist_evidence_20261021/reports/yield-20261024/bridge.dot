@@ -1,0 +1,19 @@
+digraph yield {
+  graph [rankdir=TB, bgcolor="white", pad=.2, nodesep=.35, ranksep=.45];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#304958", fillcolor="#eef4f6", margin=.15];
+  edge [fontname="Helvetica", fontsize=10, color="#304958"];
+  base [label="Same factor base B, same coefficient candidates C"];
+  map [label="Actual twist injection psi: E_d(k) -> E(K)\nMatched base psi(B); target is the minus image"];
+  equal [label="Identical accepted coefficient sets\nSame raw/useful yield and coefficient-row rank\nKernel-checked",fillcolor="#dcefed"];
+  different [label="Different rational groups or factor-base constraints\nWhole-group raw rate = 1 / group order\nArbitrary small-base useful rate needs evidence",fillcolor="#fff1d8"];
+  degree [label="Solver degree D and work model\nM(n,D)=binomial(n+D,n)^omega\nNo claim D is lower merely because of twisting",fillcolor="#fff1d8"];
+  cost [label="Conditional total budget\nO + required_rows * attempt_work / useful_rate\nSetup + transfer + LA + descent + verification in O"];
+  test [label="Faster iff overhead increase is below collection savings\nKernel-checked inequality; not a measured speedup",fillcolor="#dcefed"];
+  transfer [label="To solve the original main DLP:\nverified scalar-preserving injective subgroup reduction\nand charge its entire cost",fillcolor="#fff1d8"];
+  base -> map -> equal;
+  base -> different [label="change the actual problem"];
+  different -> cost [label="useful-rate input"];
+  degree -> cost [label="per-attempt work input"];
+  cost -> test;
+  test -> transfer;
+}

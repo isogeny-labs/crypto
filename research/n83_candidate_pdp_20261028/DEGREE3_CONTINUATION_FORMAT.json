@@ -1,0 +1,41 @@
+{
+  "schema": "n83.m3-continuation-format/v1",
+  "purpose": "New V3 suffixes bound to immutable full prefixes; preserves exact row/operation order without rewriting parent data",
+  "parent_archive": {
+    "sha256": "37d67c62bc7a551c54485693a613a22384144ace1fdeb713802b19438b5e32d4",
+    "bytes": 1047336364,
+    "object": "s3://setec-astronomy-artifacts/store/sha256/37/37d67c62bc7a551c54485693a613a22384144ace1fdeb713802b19438b5e32d4",
+    "format": "DEGREE3_M3_FORMAT.json; extract into a separate parent directory and verify manifest.sha256",
+    "case_path": "cases/KEY/"
+  },
+  "suffix.rows.u64le": {
+    "header_bytes": 44,
+    "fields": [
+      {"offset": 0, "bytes": 8, "encoding": "ASCII", "value": "N83V3S1\n"},
+      {"offset": 8, "bytes": 4, "encoding": "u32 little endian", "meaning": "variables, 164 for production"},
+      {"offset": 12, "bytes": 8, "encoding": "u64 little endian", "meaning": "columns, 735295"},
+      {"offset": 20, "bytes": 8, "encoding": "u64 little endian", "meaning": "words per row, 11489"},
+      {"offset": 28, "bytes": 8, "encoding": "u64 little endian", "meaning": "first global row ID, equal to prefix rank"},
+      {"offset": 36, "bytes": 8, "encoding": "u64 little endian", "meaning": "first global operation step, equal to prefix operation count"}
+    ],
+    "record_bytes": 91912,
+    "record_encoding": "11489 little-endian u64 words; bit c represents squarefree monomial column c; no extra/trailing bytes",
+    "column_order": "Graded colex, identical to the parent: 0 constant; 1+i variable i; 1+n+C(j,2)+i for i<j; 1+n+C(n,2)+C(k,3)+C(j,2)+i for i<j<k; variable indices zero-based",
+    "global_row_lookup": "id<prefix_rows reads parent header28+id*record_bytes; otherwise suffix header44+(id-prefix_rows)*record_bytes"
+  },
+  "suffix.operations.jsonl": "One JSON object per new processed source. step and inserted_row are global; source is equation ID or parent row ID plus zero-based variable; xor_basis_rows is the exact ordered list of global reducer IDs; inserted_row=null means zero remainder. Fresh replay recomputes the canonical operation.",
+  "continuation.json": "SHA256 and byte length of each parent basis/operations/state/result file; prefix row/operation counts, pending count and next source; cumulative caps and exact system hash",
+  "closure_state.json": "Cumulative rank and processed count, exact pending count/next source, complete flag and first stop reason: queue_exhausted, row_cap or operation_cap",
+  "result.json": "Full native verdict and source identity; V2 binding; continuation binding; added_rows/added_operations; witness_origin distinguishes parent_prefix from new_suffix; unknown exact LFD and upper bounds remain null",
+  "progress.jsonl": "Diagnostic cumulative and added counts, pending count and completion flag, flushed every128 new operations and at terminal state",
+  "summary.json": "Native per-case results; only producer+fresh-replay success exposes certified numerical fields; includes failures and missing cases",
+  "status/": "Per-case process exits and immutable cumulative summary snapshots",
+  "logs/": "Producer stdout/stderr, including any timeouts or partial failures",
+  "replay/": "Fresh-process replay stdout/stderr",
+  "controls/": "Positive/negative fixtures, parent/suffix/uninterrupted byte-equivalence records; rejected tampering traces retained separately in development evidence",
+  "inputs/": "Exact input.json and system.sing snapshots, unchanged from parent run",
+  "v2/": "Original complete V2 rows, operations and verdict, replayed before every continuation",
+  "manifest.sha256": "SHA256 map of every file in the sealed suffix run except the manifest itself; parent files have their own immutable manifest",
+  "claim_boundary": "Complete V3 is not a global LFD upper certificate; capped traces prove admitted memberships only. No rank is labelled degree of regularity or solving degree. Parent witnesses remain parent witnesses.",
+  "restoration": "Download/verify parent and suffix archives into separate fresh directories. Replay with instrument replay INPUTS ID V2_DIR PARENT/cases/KEY SUFFIX/cases/KEY. Verify both manifests after replay. This version accepts one full parent plus one suffix."
+}

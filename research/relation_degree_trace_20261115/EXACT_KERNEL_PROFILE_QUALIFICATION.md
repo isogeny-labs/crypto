@@ -1,0 +1,5 @@
+# Selected exact-kernel instruction-capture qualification
+
+Existing immutable callgrind driver/report6bd05b0e5 and runtime from callgrind-development/archives-17.json are reused unchanged. New profile-config-22.json points to selected root-kernel-both-608ac0fd4-18 and its own n3/n16 uninstrumented outputs. On the old n3 fixture, complete checked basis and both mode match, runtime/program pins remain unchanged and Rust raw self/summary/totals/profiler Collected reconciliation passes. This is correctness-only calibration; no native speed or optimization selected from these counters. PCCb2881e. [pcc:unverified]
+
+Complete qualifying raw/profile/functions/report bytes are retained by kernel-development/archives-profile-22.json. EXACT_KERNEL_PROFILE_PROTOCOL.md freezes one known firstn16 whole-process Ir diagnosis, existing caps/default CPU0 reservation/no heavy concurrent work, no native ratio, retry, new seed or admission. The prior1029 A/A rejection is retained separately. KB unavailable; official Callgrind6.1/format3.1-3.2 sources and prior profile methodology are reused, with no new arithmetic claim.

@@ -13,7 +13,20 @@
     "rho_additions": "rho.native.scalar_adds_uncharged",
     "rho_inversions": "rho.native.scalar_inversions_uncharged",
     "rho_multiplications": "rho.native.scalar_muls_uncharged",
-    "weights": null,
+    "weights": {
+      "unit": "native GAE per logical event",
+      "sensitivity": [
+        0,
+        0.1,
+        1
+      ],
+      "applies_to": [
+        "atomic scalar addition/negation",
+        "scalar multiplication outside inverse expansion",
+        "atomic scalar inverse"
+      ],
+      "base_field_inverse_price_applies": false
+    },
     "raw_counts_preserved": true,
     "negative_corrected_count": "reject",
     "overflow": "helper rejects product/addition/subtraction overflow; analyzer must checked-add disjoint raw ledgers"
@@ -35,11 +48,35 @@
   "open_requirements": [
     "Freeze complete experiment.protocol/v1 and analysis before new data",
     "Select fixed partition without post hoc best-arm selection",
-    "Declare scalar-operation and other event weights symmetrically",
     "Resolve incomplete native logical and primality/setup coverage",
-    "Define allocation valuation or retain bytes as independent observations",
     "Bind immutable workload, protocol, source and binary identities",
     "Reconcile retained EKS jobs using existing authorized job-submitter connection",
-    "Retain failures and caps; only independently verified completed pairs receive ratios"
-  ]
+    "Retain failures and caps; only independently verified completed pairs receive ratios",
+    "Review and freeze explicit disjoint logical category mapping, preserving inherited hash/RNG work and actual reference coverage"
+  ],
+  "model_amendment": "atomic-scalar-disjoint-logical/v1-draft",
+  "inherited_price_grid": {
+    "S_over_M": [
+      0,
+      0.5,
+      1
+    ],
+    "I_over_M": [
+      1,
+      10,
+      100,
+      1000
+    ],
+    "native_GAE_per_logical": [
+      0,
+      0.1,
+      1
+    ],
+    "cells": 36,
+    "contract": "validation/accounting/historical-price-contract.json"
+  },
+  "amendment_scope": "New data only; preserve all historical raw records and old ratios. Atomic scalar normalization and disjoint primitive mapping are explicitly changed conventions.",
+  "allocation_valuation": "No inherited GAE weight. Preserve bytes/calls when observed and RSS separately; absence is null, not zero. Not an instruction-level cost census.",
+  "hash_policy": "Synthetic rho collision table uses rust-default-hasher-v1; bind Rust1.99.1/source/binary. Table layout and runtime differ from historical RandomState. validation/accounting/hash-policy-amendment.json",
+  "coverage_status": "Incomplete until engine geometry, adapter scope and importer/independent review bind all actual required categories. No full ratio admitted by these software tests."
 }

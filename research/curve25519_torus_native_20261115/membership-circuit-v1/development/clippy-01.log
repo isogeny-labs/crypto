@@ -1,0 +1,56 @@
+    Checking typenum v1.20.1
+    Checking cfg-if v1.0.5
+    Checking serde_core v1.0.229
+    Checking num-traits v0.2.19
+    Checking zmij v1.0.23
+    Checking itoa v1.0.19
+    Checking generic-array v0.14.7
+    Checking memchr v2.8.3
+    Checking num-integer v0.1.47
+    Checking block-buffer v0.10.4
+    Checking crypto-common v0.1.7
+    Checking cpufeatures v0.2.17
+    Checking digest v0.10.7
+    Checking num-bigint v0.4.8
+    Checking adler2 v2.0.1
+    Checking sha2 v0.10.9
+    Checking simd-adler32 v0.3.10
+    Checking crc32fast v1.5.5
+    Checking miniz_oxide v0.9.1
+    Checking hex v0.4.3
+    Checking flate2 v1.1.11
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking torus-s4 v0.1.0 (/workspace/isogeny-labs/crypto-energy/tools/torus-s4)
+    Checking torus-s4-tree v0.1.0 (/workspace/isogeny-labs/crypto-energy/tools/torus-s4-tree)
+    Checking torus-coset-circuit v0.1.0 (/workspace/isogeny-labs/crypto-energy/tools/torus-coset-circuit)
+error: equal expressions as operands to `||`
+   --> src/controls.rs:207:8
+    |
+207 |     if (31u64 + 3) % 17 != 17 % 17 || 31u64 <= 17 {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#eq_op
+    = note: `#[deny(clippy::eq_op)]` on by default
+
+error: equal expressions as operands to `!=`
+   --> src/controls.rs:207:8
+    |
+207 |     if (31u64 + 3) % 17 != 17 % 17 || 31u64 <= 17 {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#eq_op
+
+error: manual implementation of `.is_multiple_of()`
+   --> src/controls.rs:207:8
+    |
+207 |     if (31u64 + 3) % 17 != 17 % 17 || 31u64 <= 17 {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `!(31u64 + 3).is_multiple_of(17)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#manual_is_multiple_of
+    = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: could not compile `torus-coset-circuit` (lib test) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `torus-coset-circuit` (lib) due to 3 previous errors

@@ -1,0 +1,77 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "validator": "Validator V (Claude Opus 5.5, validator role, independent of the producers); 2026-11-14",
+ "standing": "[pcc:unverified]: no pcc claim id; no keyring signature",
+ "source": {
+  "commit": "224624a91a97639781ff336f2e8dc9a0738035b3",
+  "dirty": false,
+  "pr_commits": {
+   "data_and_code": "c88c7b4e0c6409e8b2fa3a6d94294cb5d04ac289",
+   "rustfmt_bin": "f1997205729b506658fadbaebfab7de84ba91aca",
+   "merge": "cc075763d700e225dd269876d0589a307422da12"
+  },
+  "commit_note": "built from a git-archive export of origin/main 224624a91a into the validator's scratch (not the shared working tree, which another agent was editing); every target file is byte-equal between f199720572 and 224624a91a",
+  "recorded_run_binding": "record commit 28da34a03b924a473e495ab38a203d0031cdfda9 with commit_dirty=True: the measured binary was built from uncommitted code; the clippy fixes at full_jacobian_ic.rs:627 and :791 and the rustfmt of the bin came after the run (producer scratch logs 17:39 and commit f199720572); this replay shows the committed code reproduces every non-timing value",
+  "source_files": [
+   {
+    "path": "src/cryptanalysis/chained_transfer/full_jacobian_ic.rs",
+    "sha256_at_head": "057aea74586ca7ffd4bcc7c166d2d869d0d4f9e313d808da1f0654ebdb0c9eb7",
+    "sha256_at_rustfmt_commit": "057aea74586ca7ffd4bcc7c166d2d869d0d4f9e313d808da1f0654ebdb0c9eb7"
+   },
+   {
+    "path": "src/bin/full_jacobian_ic.rs",
+    "sha256_at_head": "f76a541f11a6995fc55ba3b21914c3b6b234d20d394ca11c410fc8f7a2bf3bd7",
+    "sha256_at_rustfmt_commit": "f76a541f11a6995fc55ba3b21914c3b6b234d20d394ca11c410fc8f7a2bf3bd7"
+   },
+   {
+    "path": "src/cryptanalysis/chained_transfer/ic_control.rs",
+    "sha256_at_head": "71f558a3020dbca8054a9400b0c9cad8cbb4acc91e82b2c735450a8b5b447f36",
+    "sha256_at_rustfmt_commit": "71f558a3020dbca8054a9400b0c9cad8cbb4acc91e82b2c735450a8b5b447f36"
+   },
+   {
+    "path": "src/cryptanalysis/chained_transfer/negation_remeasure.rs",
+    "sha256_at_head": "aacb9dac55d3895849c378d9e929ccdc558bf7d9be43b800781356c6aa00dca4",
+    "sha256_at_rustfmt_commit": "aacb9dac55d3895849c378d9e929ccdc558bf7d9be43b800781356c6aa00dca4"
+   },
+   {
+    "path": "src/cryptanalysis/chained_transfer/instrument.rs",
+    "sha256_at_head": "d4292c1aeed4b2189cf50b271553a1399bbbf0178dcc8bd0f8c1892f644d4b39",
+    "sha256_at_rustfmt_commit": "d4292c1aeed4b2189cf50b271553a1399bbbf0178dcc8bd0f8c1892f644d4b39"
+   },
+   {
+    "path": "src/cryptanalysis/chained_transfer/mod.rs",
+    "sha256_at_head": "f47e74369f198e49fe7dd5bd0998767c10ce080144524a3ad565c1d72a9bab72",
+    "sha256_at_rustfmt_commit": "f47e74369f198e49fe7dd5bd0998767c10ce080144524a3ad565c1d72a9bab72"
+   }
+  ]
+ },
+ "build": {
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+  "profile": "release",
+  "binaries_sha256": [
+   "cde53af399a21e3bc081425eb518ab74f98f1b7980c91e5b1ad4e9c2978b8ce8  /tmp/claude-0/-home-user/b3fd4014-06f7-5e0c-8338-36d52644c351/scratchpad/valV/bin_head/full_jacobian_ic",
+   "f68012641ad3b261f2a2b820241f5702ca02727433f6cfb3b2be152a447e5653  /tmp/claude-0/-home-user/b3fd4014-06f7-5e0c-8338-36d52644c351/scratchpad/valV/bin_head/ecbench",
+   "c636b4703b4e46e2e978ecd6fbc5be55a07dd9db19dcddbe0cdc361bd0479b3c  /tmp/claude-0/-home-user/b3fd4014-06f7-5e0c-8338-36d52644c351/scratchpad/valV/bin_head/val_fj_dump"
+  ]
+ },
+ "runs": [
+  {
+   "command": "full_jacobian_ic --threads 2 --stage2 25601,51203 --budget-s 2400 --out-dir <scratch>",
+   "recorded_command": [
+    "bash",
+    "-c",
+    "set -o pipefail; ./target/release/full_jacobian_ic --threads 2 --stage2 25601,51203 --budget-s 2400 2>&1 | tee research/full_jacobian_ic_20261113/run.log"
+   ],
+   "exit": 0,
+   "result": "every non-timing value of full_jacobian.json identical: 3017 values, 0 differences (all 9 primes, stage 1 and 2); calibrated order classes: 135 values, 0 differ"
+  },
+  {
+   "command": "val_fj_dump (validator program, research/validation_20261114/scripts/val_fj_dump.rs) + check_fj_certs.py",
+   "exit": 0,
+   "result": "certificates re-verified with independent Python arithmetic (E1 group law, Cantor on the quintic model of J_C): 360 of 360 IC logs on E1, 360 on J_C, 736 of 736 rho logs on E1; per-run counters re-averaged equal the committed means (468 means, 0 differ)"
+  }
+ ]
+}

@@ -1,0 +1,89 @@
+import Mathlib.Tactic
+
+namespace TwistTorus
+variable {K : Type*} [Field K]
+
+def denominator (d u : K) : K := 1 - d * u^2
+def realCoord (d u : K) : K := (1 + d * u^2) / denominator d u
+def imagCoord (d u : K) : K := (2 * u) / denominator d u
+def compress (a b : K) : K := b / (a + 1)
+
+theorem product_real (d u v : K) :
+    (1+d*u^2)*(1+d*v^2)+d*(2*u)*(2*v) =
+      (1+d*u*v)^2+d*(u+v)^2 := by ring
+
+theorem product_imag (d u v : K) :
+    (2*u)*(1+d*v^2)+(1+d*u^2)*(2*v) =
+      2*(u+v)*(1+d*u*v) := by ring
+
+theorem product_denominator (d u v : K) :
+    denominator d u * denominator d v =
+      (1+d*u*v)^2-d*(u+v)^2 := by
+  unfold denominator
+  ring
+
+theorem decompressed_norm (d u : K) (hc : denominator d u ≠ 0) :
+    (realCoord d u)^2 - d*(imagCoord d u)^2 = 1 := by
+  unfold realCoord imagCoord
+  field_simp [hc]
+  unfold denominator
+  ring
+
+theorem denominator_of_compressed (d a b : K)
+    (hnorm : a^2-d*b^2=1) (ha : a+1 ≠ 0) :
+    denominator d (compress a b) = 2/(a+1) := by
+  unfold denominator compress
+  field_simp [ha]
+  linear_combination hnorm
+
+theorem decompress_compress (d a b : K) (h2 : (2:K) ≠ 0)
+    (hnorm : a^2-d*b^2=1) (ha : a+1 ≠ 0) :
+    realCoord d (compress a b) = a ∧ imagCoord d (compress a b) = b := by
+  have hc := denominator_of_compressed d a b hnorm ha
+  have hn : denominator d (compress a b) ≠ 0 := by
+    rw [hc]
+    exact div_ne_zero h2 ha
+  constructor
+  · unfold realCoord
+    apply (div_eq_iff hn).2
+    unfold denominator compress
+    field_simp [ha]
+    linear_combination -(a+1)*hnorm
+  · unfold imagCoord
+    rw [hc]
+    unfold compress
+    field_simp [ha, h2] <;> ring
+
+theorem compress_decompress (d u : K) (h2 : (2:K) ≠ 0)
+    (hc : denominator d u ≠ 0) :
+    compress (realCoord d u) (imagCoord d u) = u := by
+  have ha : realCoord d u + 1 = 2 / denominator d u := by
+    unfold realCoord
+    field_simp [hc]
+    unfold denominator
+    ring
+  unfold compress
+  rw [ha]
+  unfold imagCoord
+  field_simp [hc, h2] <;> ring
+
+theorem membership_linearization (d x y t : K) (hp : 1-d*t*x ≠ 0) :
+    x+y=t*(1+d*x*y) ↔ y=(t-x)/(1-d*t*x) := by
+  constructor
+  · intro h
+    apply (eq_div_iff hp).2
+    linear_combination h
+  · intro h
+    have h' := (eq_div_iff hp).1 h
+    linear_combination h'
+
+end TwistTorus
+
+#print axioms TwistTorus.product_real
+#print axioms TwistTorus.product_imag
+#print axioms TwistTorus.product_denominator
+#print axioms TwistTorus.decompressed_norm
+#print axioms TwistTorus.denominator_of_compressed
+#print axioms TwistTorus.decompress_compress
+#print axioms TwistTorus.compress_decompress
+#print axioms TwistTorus.membership_linearization

@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T20:48:55Z",
+ "id": "PCC-20261115-497daa",
+ "kind": "statement",
+ "producer": {
+  "commit": "b42bc6d1ae547d9cbc84d8a512c894db396c89af",
+  "model": "",
+  "session": "courtois-native-20261115"
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/courtois_native_20261115/evidence/native-unit-tests-final.txt",
+   "sha256": "e3c72b2292ea10e1469d332f0266a291c7927c768a350af400bb108f2f177570"
+  },
+  {
+   "kind": "recompute",
+   "path": "research/courtois_native_20261115/evidence/cryptanalysis-field-replay.txt",
+   "sha256": "fac8625b0aa2f8b91e51004a6d31bfe3e004b8730fb3f1ccbf0fa8571353153a"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/courtois_native_20261115",
+ "statement": "Producer development checks report eight native Courtois tests passing and 256 field vectors agreeing with the cryptanalysis Rust Field implementation; independent signed standing is pending."
+}

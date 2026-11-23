@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp24-t1355-39d9b7fa",
+      "log2_r": 23.11107309082852,
+      "arm": "rho-neg",
+      "runs": 2,
+      "verified": 2,
+      "mean_s": [
+        1.196520938516613,
+        1.3041131378609432,
+        2.2724429319599144
+      ],
+      "charged_sum": 7203.0,
+      "native_sum": 6477,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-t1355-39d9b7fa",
+      "log2_r": 23.11107309082852,
+      "arm": "sem-chain-t2",
+      "runs": 2,
+      "verified": 2,
+      "mean_s": [
+        214.2729298021352,
+        8049499.5178481415,
+        80493066.72211319
+      ],
+      "charged_sum": 1289913.0,
+      "native_sum": 484563201134,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp24-t1355-39d9b7fa",
+      "a": "rho-neg",
+      "b": "sem-chain-t2",
+      "verdict": "rho-neg < sem-chain-t2"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "theriault-collision-source-review/v1",
+  "citation": "Nicolas Theriault, Index Calculus Attack for Hyperelliptic Curves of Small Genus, ASIACRYPT2003,LNCS2894,75\u201392",
+  "doi": "10.1007/978-3-540-40061-5_5",
+  "primary": {
+    "url": "https://link.springer.com/content/pdf/10.1007/978-3-540-40061-5_5.pdf",
+    "bytes": 216881,
+    "sha256": "3048be18dd347b51421ab723165f87de2af1ac108445e11ea8647105c0eb6a33",
+    "pages": 18
+  },
+  "read_scope": "Definitions/algorithm in sections2\u20134 including Definition7/Proposition2; selected smoothness/intersection/search/linear-algebra/optimization sections5.3\u20135.12. Exact printed pages85\u201386 visually inspected. Not a full-paper or full-dependency review.",
+  "visual_inspection": [
+    {
+      "printed_page": 85,
+      "pdf_page": 11,
+      "bytes": 262968,
+      "sha256": "0a6f883cb59c7756a0bbcb09bf8ad51af3fa7f8d24909626ed5f47bbe8f2fd85",
+      "full_visual_inspection": true
+    },
+    {
+      "printed_page": 86,
+      "pdf_page": 12,
+      "bytes": 249530,
+      "sha256": "241203e7cca1ce7201800ed424a1741c96436b7dc6877708d03709a9dfecc5c9",
+      "full_visual_inspection": true
+    }
+  ],
+  "theorem1": {
+    "printed_page": 85,
+    "domain": "3<=s<n/2; uniform draws with replacement, large primes paired by negation, self-negative points excluded",
+    "lower_bound": "2s^2/(3n)",
+    "upper_bound": "s^2/n",
+    "intersections": "s minus number of distinct negation orbits; a label occurring k times contributes k-1, not choose(k,2)",
+    "counterexample": "n8,s3, actual Pool=Fin4\u00d7Bool; negation flips Bool. All512 equally likely ordered triples, total352, expectation11/16<3/4.",
+    "bad_proof_step": "Printedp86 lower-bound chain replaces s(s-1)/n\u22122s(s-1)(s-2)/(3n\u00b2) by larger s\u00b2/n\u22122s\u00b3/(3n\u00b2) under a > sign."
+  },
+  "repair": "Conditional on source recurrence e0=0, e(s+1)=(1\u22122/n)e(s)+2s/n, for n>=2,s<=n/2 prove 2s(s\u22121)/(3n)<=e(s)<=s(s\u22121)/n. For s>=3 infer4s\u00b2/(9n)<=e(s)<=s\u00b2/n. This preserves quadratic constant-factor scaling of that recurrence. Generic actual iid recurrence identification is not claimed.",
+  "scope": "Literal finite Theorem1 lower bound refuted; finite sample source model faithful. No complete source algorithm/runtime/Theorem3 counterexample or proof. Actual Jacobian smoothness, random-walk iid model, subgroup proportions, linear-algebra invertibility/rank and general occupancy bridge remain distinct.",
+  "kb": "MCP absent; wrapper status, positive/negative mechanism searches and theorem query unavailable127; frozen corpus/backlog, public primary and pinned Mathlib fallback. No novelty or absence-of-errata claim.",
+  "conductor": "Scoped check unavailable127 before edits.",
+  "identity_certificate_reference": "Authoritative docs/identity-certificates/README.md recovered through git show after sparse exclusion. Official native checker issues denominator-cleared cubic identity supplement with32points plus32extra; Lean closed_form_cleared_identity proves scalar identity; actual finite counterexample remains in Lean.",
+  "access": "IACR403; publisher route succeeds, so no remaining primary access blocker for this result.",
+  "full_paper_read": false,
+  "canonical_corpus_promoted": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0,
+  "identity_supplement": {
+    "id": "IDC1h939108711fe75407",
+    "official_checker": "src/cryptanalysis/identity_certificate.rs",
+    "official_checker_sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+    "issued_points": 32,
+    "extra_points": 32,
+    "same_host": true,
+    "lean_symbolic_proof": "TheriaultCollisionAudit.closed_form_cleared_identity",
+    "actual_finite_expectation_proved_by_this_supplement": false
+  }
+}

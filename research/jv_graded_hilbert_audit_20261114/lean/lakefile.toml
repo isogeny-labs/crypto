@@ -1,0 +1,11 @@
+name = "jv_graded_hilbert_audit"
+version = "0.1.0"
+defaultTargets = ["JVGradedHilbertAudit"]
+
+[[require]]
+name = "jv_hilbert_audit"
+path = "../../jv_hilbert_audit_20261113/lean"
+
+[[lean_lib]]
+name = "JVGradedHilbertAudit"
+roots = ["GradedBasis", "CanonicalPieces", "GradedCertificate"]

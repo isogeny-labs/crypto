@@ -1923,6 +1923,10 @@ mod tests {
                 .iter()
                 .filter(|p| !p.terms.is_empty())
                 .map(|p| {
+                    #[allow(
+                        clippy::useless_conversion,
+                        reason = "Compare canonical 128-bit monomials in either feature build."
+                    )]
                     let mut t: Vec<Mono> = p.terms.iter().map(|m| u128::from(m.mask)).collect();
                     t.sort_unstable();
                     t

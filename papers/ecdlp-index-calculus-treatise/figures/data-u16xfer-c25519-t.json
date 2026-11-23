@@ -1,0 +1,16 @@
+{
+  "description": "Curve25519 k=20 miniature, isogeny-tower base, F4 engine, blind arm, 20,000 targets per arm: hits per 1e9 counted F4 mul-adds and mul-adds per target, by tower depth t and guess count G. All values [pcc:unverified], copied from the summaries; no rho arm.",
+  "rows": [
+    {"t": 3, "G": 2, "seeds": "8 screened (top 4 + bottom 4 of 40 by on-curve count)", "hits": 74, "rate": 12.340, "lo": 9.690, "hi": 15.492, "muladds_per_target": 3748, "source": "lower_t"},
+    {"t": 4, "G": 2, "seeds": "8 screened (top 4 + bottom 4 of 40 by on-curve count)", "hits": 129, "rate": 3.103, "lo": 2.591, "hi": 3.687, "muladds_per_target": 51960, "source": "lower_t"},
+    {"t": 4, "G": 3, "seeds": "8 screened (top 4 + bottom 4 of 40 by on-curve count)", "hits": 129, "rate": 9.167, "lo": 7.653, "hi": 10.892, "muladds_per_target": 17590, "source": "lower_t"},
+    {"t": 5, "G": 3, "seeds": "1-20 unscreened", "hits": 206, "rate": 2.909, "lo": 2.525, "hi": 3.334, "muladds_per_target": 177050, "source": "seeds_20261114"},
+    {"t": 6, "G": 3, "seeds": "101-108 unscreened", "hits": 315, "rate": 0.643, "lo": 0.574, "hi": 0.718, "muladds_per_target": 3061200, "source": "scaling"}
+  ],
+  "notes": "mul-adds per target: t=3 3748, t=4 G=3 1.759e4, t=4 G=2 5.196e4 (lower_t summary, rounded there); t=5 1.7705e5 (scaling summary); t=6 3.0612e6 (lower end of the 3.0612e6..3.0635e6 range in the scaling summary).",
+  "sources": [
+    {"path": "research/curve25519_isogeny_lower_t_20261115/summary.txt", "commit": "bb70178877d9ad51c1433309b5ebb3e33b0f33df", "blob": "ef6254045166f844932c58b56bc86aeb2ae3e5ec"},
+    {"path": "research/curve25519_isogeny_scaling_20261115/summary.txt", "commit": "bb70178877d9ad51c1433309b5ebb3e33b0f33df", "blob": "64a4de7ca4cfccdc5d5eb1f10b329086c69ef8ff"},
+    {"path": "research/curve25519_isogeny_seeds_20261114/summary.txt", "commit": "bb70178877d9ad51c1433309b5ebb3e33b0f33df", "blob": "89982b1402d5f5db107b00110be2ee59df0c558b"}
+  ]
+}

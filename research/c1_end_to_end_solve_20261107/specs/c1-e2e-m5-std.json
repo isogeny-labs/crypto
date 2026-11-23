@@ -1,0 +1,71 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "C1 end-to-end [std dispatch]: standard vs twisted line vs strong rho, m = 5 (N = 20)",
+  "description": "C1 end-to-end IC solve (relations, linear algebra, discrete log) with the standard base x in F_q and the twisted all-lift line x in u.F_q on a = 0 curves over F_(2^m)^4, against the strong negation rho in the same counted unit (F_q multiplications / fq_muls_per_add). Frozen by research/c1_end_to_end_solve_20261107/PROTOCOL.md.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "f2m4_a0",
+        "m": 5,
+        "seed": 1,
+        "max_cofactor": 8
+      }
+    ],
+    "targets_per_curve": 6,
+    "target_seed": 20261107
+  },
+  "arms": [
+    {
+      "name": "rho-strong-l1",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_strong",
+        "params": {
+          "lanes": "1",
+          "dp_bits": "auto"
+        }
+      }
+    },
+    {
+      "name": "rho-strong-l16",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_strong",
+        "params": {
+          "lanes": "16",
+          "dp_bits": "auto"
+        }
+      }
+    },
+    {
+      "name": "ic-std",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "bin-x-line:line=standard",
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+        }
+      }
+    },
+    {
+      "name": "rho-strong-l1-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_strong",
+        "params": {
+          "lanes": "1",
+          "dp_bits": "auto"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 1,
+    "isolation_required": "L2",
+    "timeout_seconds": 900
+  }
+}

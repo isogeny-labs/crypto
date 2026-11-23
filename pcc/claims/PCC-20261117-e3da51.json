@@ -1,0 +1,33 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T08:07:38Z",
+ "id": "PCC-20261117-e3da51",
+ "kind": "measurement",
+ "producer": {
+  "commit": "6a1540d0d80227cfea558aab0f3a5dcbaffff394",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/selection-replay.json",
+   "sha256": "e77e329d6e90d378a3d35ecc8c2fecd741d352f02d785e8d3b49f6a5ef559a29"
+  },
+  {
+   "kind": "recompute",
+   "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/selection-summary.json",
+   "sha256": "609e7a3d447847093d7145d3c95b7d76665884bac3ade0590eea7e005131f6ec"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/speedup-20261117/SELECTION_ERRATA.md",
+    "sha256": "3484dc342aecd76f133d4371a43737a3a3d0d31b2a03bb18238911c559387e21"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "vieta-speedup-selection-correction",
+ "statement": "Correction to producer PCC-20261117-e675f2: immutable native summary word62 cold Newton/fast ratios1.1495533435469294 conditioned and1.2541011420512354 random. Other ratios unchanged.54/54 calls and six inputs replayed. Calibration only; belowL2; unverified pending independent signed standing."
+}

@@ -1,0 +1,4 @@
+import NodeControls
+example : NativeNode.get (NativeNode.append NativeNodeControls.one).fixed (Fin.last 1)=some (0,0) := by
+ rw [NativeNodeControls.new_unanchored]
+ rfl

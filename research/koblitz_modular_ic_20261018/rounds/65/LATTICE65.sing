@@ -1,0 +1,70 @@
+LIB "linalg.lib";
+proc require65(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump65(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../first-frobenius65-01/quotient-basis65.sing"));
+execute(read("../first-frobenius65-01/square-kernel65.sing"));
+require65(rank65==80 && kernelDimension65==80 && nrows(binaryMap65)==242 && ncols(binaryMap65)==160,"LATTICE65_COMPLETE_FIRST_KERNEL_SHAPE");
+require65(binaryMap65*kernelBasis65==matrix(0,242,80) && mat_rk(binaryMap65)==80 && mat_rk(kernelBasis65)==80,"LATTICE65_RECHECK_FULL_BINARY_KERNEL");
+map quotientToBinary65=quotientPolynomial65,u;
+matrix Gpoly65=quotientToBinary65(sourceGram65);
+matrix Qpoly65=quotientToBinary65(sourceQ65);
+require65(nrows(Qpoly65)==32 && ncols(Qpoly65)==160 && vdim(std(module(Gpoly65)))==160,"LATTICE65_COMPLETE_QUOTIENT_REBOUND");
+matrix survivorsPoly65=Qpoly65*kernelBasis65;
+matrix combined65[32][112];int i65;int j65;
+for(i65=1;i65<=32;i65++){
+ for(j65=1;j65<=32;j65++){combined65[i65,j65]=Gpoly65[i65,j65];}
+ for(j65=1;j65<=80;j65++){combined65[i65,32+j65]=survivorsPoly65[i65,j65];}
+}
+module moduleV165=std(module(combined65));int quotientLength165=vdim(moduleV165);
+require65(quotientLength165==80,"LATTICE65_EXACT_80_LENGTH_DROP");
+matrix basisV165=matrix(moduleV165);
+require65(nrows(basisV165)==32 && ncols(basisV165)==32,"LATTICE65_FULL_PID_BASIS");
+matrix remainderForward65=matrix(reduce(module(combined65),moduleV165));
+matrix remainderReverse65=matrix(reduce(module(basisV165),std(module(combined65))));
+require65(mat_rk(remainderForward65)==0 && mat_rk(remainderReverse65)==0,"LATTICE65_BOTH_FULL_MODULE_INCLUSIONS");
+link polynomialOut65="ASCII:w first-lattice-polynomial65.sing";open(polynomialOut65);
+write(polynomialOut65,"ring firstLatticePolynomial65=2,(u),dp;short=0;");
+dump65(polynomialOut65,"Gpoly65",Gpoly65);dump65(polynomialOut65,"Qpoly65",Qpoly65);
+dump65(polynomialOut65,"kernelBasis65",kernelBasis65);dump65(polynomialOut65,"basisV165",basisV165);close(polynomialOut65);
+execute(read("../../../61/runs/trace61-01/trace-dual61.sing"));
+map binaryToField65=binaryCertificate65,u;
+matrix V1dual65=binaryToField65(basisV165);
+matrix V1coordinates65=inverse61*V1dual65;
+require65(T61*V1coordinates65==V1dual65,"LATTICE65_FULL_TRACE_DUAL_COORDINATE_BRIDGE");
+matrix V1inverse65=lift(module(V1coordinates65),module(unitmat(32)));
+require65(V1coordinates65*V1inverse65==unitmat(32) && V1inverse65*V1coordinates65==unitmat(32),"LATTICE65_BOTH_PID_BASIS_INVERSES");
+number coefficient65;
+for(i65=1;i65<=32;i65++){for(j65=1;j65<=32;j65++){
+ if(V1inverse65[i65,j65]!=0){coefficient65=leadcoef(V1inverse65[i65,j65]);require65(denominator(coefficient65)==1,"LATTICE65_ORDER_INSIDE_V1_INTEGRALLY");}
+}}
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat squareSlots65[32][1];int p65;int k65;
+for(p65=1;p65<=528;p65++){
+ if(parents50[p65,1]==parents50[p65,2]){j65=parents50[p65,1];require65(j65>=1 && j65<=32 && squareSlots65[j65,1]==0,"LATTICE65_UNIQUE_SOURCE_SQUARE_SLOTS");squareSlots65[j65,1]=p65;}
+}
+matrix squareSource65[32][32];
+for(j65=1;j65<=32;j65++){
+ require65(squareSlots65[j65,1]>0,"LATTICE65_ALL_SOURCE_SQUARE_SLOTS");
+ for(i65=1;i65<=32;i65++){squareSource65[i65,j65]=table50[i65,squareSlots65[j65,1]];}
+}
+setring traceDual61;
+map tableToField65=tablePidCertificate50,u;
+matrix square65=tableToField65(squareSource65);
+matrix squaredBasis65[32][32];
+for(i65=1;i65<=32;i65++){for(j65=1;j65<=32;j65++){squaredBasis65[i65,j65]=V1coordinates65[i65,j65]^2;}}
+matrix squareDual65=T61*square65*squaredBasis65;
+for(i65=1;i65<=32;i65++){for(j65=1;j65<=32;j65++){
+ if(squareDual65[i65,j65]!=0){coefficient65=leadcoef(squareDual65[i65,j65]);require65(denominator(coefficient65)==1,"LATTICE65_EVERY_BASIS_SQUARE_IN_TRACE_DUAL");}
+}}
+matrix changedInverse65=V1inverse65;changedInverse65[1,1]=changedInverse65[1,1]+1;
+require65(V1coordinates65*changedInverse65!=unitmat(32),"LATTICE65_CHANGED_INVERSE_REJECTED");
+link fieldOut65="ASCII:w first-lattice-field65.sing";open(fieldOut65);
+write(fieldOut65,"ring firstLatticeField65=(2,u),(q),dp;short=0;");
+dump65(fieldOut65,"V1coordinates65",V1coordinates65);
+dump65(fieldOut65,"V1inverse65",V1inverse65);
+dump65(fieldOut65,"squareDual65",squareDual65);close(fieldOut65);
+print("LATTICE65_RESULT order_rank=32 old_trace_dual_length=160 survivor_dimension=80 new_trace_dual_length=80 basis_columns=32 module_inclusions=2 inverse_products=2 basis_square_checks=32 changed_inverse_rejected=1");
+print("LATTICE65_ALL_CHECKS_PASS");quit;

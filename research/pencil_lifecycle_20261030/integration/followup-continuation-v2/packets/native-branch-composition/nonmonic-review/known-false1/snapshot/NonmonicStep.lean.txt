@@ -1,0 +1,56 @@
+import NonmonicCoefficient
+set_option autoImplicit false
+namespace NonmonicDivision
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest RemainderPolynomial CoefficientTraversal
+def raw (p a:UInt64) (b r:List UInt64) (hr:r≠[]) (hl:b.length≤r.length) : List UInt64 :=
+ (RemainderWord.run p (coefficient p a (r.getLast hr)) (events (r.length-b.length) b (by omega)) (state r)).val.toList
+def selected (p a:UInt64) (b r:List UInt64) (hr:r≠[]) (hl:b.length≤r.length) :=
+ trimFuel (raw p a b r hr hl).length (raw p a b r hr hl)
+theorem raw_length (p a:UInt64) (b r:List UInt64) (hr:r≠[]) (hl:b.length≤r.length) :
+ (raw p a b r hr hl).length=r.length := by
+ simp only [raw,Array.length_toList]
+ exact (RemainderWord.run p _ _ (state r)).property
+theorem raw_correct (p a:UInt64) [Fact p.toNat.Prime] (b r:List UInt64)
+ (hr:r≠[]) (hl:b.length≤r.length) (hp:1<p.toNat) (hb:p.toNat<2^31)
+ (ha:a.toNat<p.toNat) (hn:a≠0) (hbs:Canon p b) (hrs:Canon p r) :
+ Canon p (raw p a b r hr hl) ∧ wordsPoly p (raw p a b r hr hl)=wordsPoly p r-
+ C ((coefficient p a (r.getLast hr)).toNat:ZMod p.toNat)*X^(r.length-b.length)*wordsPoly p b := by
+ have hc:=(coefficient_correct p a (r.getLast hr) hp hb ha hn (hrs _ (List.getLast_mem hr))).1
+ constructor
+ · exact list_good p _ (RemainderWord.run_correct p _ _ _ (by omega) hb hc (state_good p r hrs) (events_good p _ b _ hbs)).1
+ · simpa only [raw,wordsPoly_array,state_polynomial] using generated_polynomial_step p (coefficient p a (r.getLast hr)) (r.length-b.length) b (by omega) (state r) (by omega) hb hc (state_good p r hrs) hbs
+theorem selected_correct (p a:UInt64) [Fact p.toNat.Prime] (b r:List UInt64)
+ (hr:r≠[]) (hl:b.length≤r.length) (hp:1<p.toNat) (hb:p.toNat<2^31)
+ (ha:a.toNat<p.toNat) (hn:a≠0) (hbs:Canon p b) (hrs:Canon p r) :
+ Canon p (selected p a b r hr hl) ∧ wordsPoly p (selected p a b r hr hl)=wordsPoly p r-
+ C ((coefficient p a (r.getLast hr)).toNat:ZMod p.toNat)*X^(r.length-b.length)*wordsPoly p b := by
+ have h:=raw_correct p a b r hr hl hp hb ha hn hbs hrs
+ exact ⟨trim_good p _ _ h.1,by simpa only [selected,trim_preserves] using h.2⟩
+theorem selected_shorter (p a:UInt64) [Fact p.toNat.Prime] (b r:List UInt64)
+ (hr:r≠[]) (hl:b.length≤r.length) (hp:1<p.toNat) (hb:p.toNat<2^31)
+ (ha:a.toNat<p.toNat) (hn:a≠0) (hbs:Canon p b) (hrs:Canon p r) (hm:b.getLast?=some a) :
+ (selected p a b r hr hl).length<r.length := by
+ have hbn:b≠[] := by intro he; subst b; simp at hm
+ have hbl:0<b.length:=List.length_pos_iff.mpr hbn
+ have hshift:r.length-b.length≤r.length-1:=by omega
+ have hindex:r.length-1-(r.length-b.length)=b.length-1:=by omega
+ have hc:=raw_correct p a b r hr hl hp hb ha hn hbs hrs
+ have hz:(wordsPoly p (raw p a b r hr hl)).coeff (r.length-1)=0 := by
+  rw [hc.2,coeff_sub,last_coefficient p r hr,mul_assoc,coeff_C_mul,coeff_X_pow_mul',if_pos hshift,hindex,top_coefficient,hm]
+  simpa using sub_eq_zero.mpr (coefficient_cancel p a (r.getLast hr) hp hb ha hn (hrs _ (List.getLast_mem hr))).symm
+ let out:=raw p a b r hr hl
+ have hlen:out.length=r.length:=raw_length p a b r hr hl
+ have ho:out≠[]:=by intro h; simp [h] at hlen; exact hr (List.length_eq_zero_iff.mp hlen.symm)
+ rw [←hlen,last_coefficient p out ho] at hz
+ have hv:=congrArg ZMod.val hz
+ rw [ZMod.val_natCast_of_lt (hc.1 _ (List.getLast_mem ho))] at hv
+ have hw:out.getLast ho=0:=UInt64.toNat_inj.mp (by simpa using hv)
+ have hlast:out.getLast?=some 0:=by simp [List.getLast?_eq_some_getLast ho,hw]
+ have hpos:0<r.length:=List.length_pos_iff.mpr hr
+ change (trimFuel out.length out).length<r.length
+ have hk:out.length=(out.length-1)+1:=by omega
+ rw [hk,trimFuel,if_pos hlast]
+ have ht:=trim_length (out.length-1) out.dropLast
+ simp only [List.length_dropLast] at ht
+ omega
+end NonmonicDivision

@@ -51,12 +51,16 @@
   },
   "reconciliation": {
     "namespace": "isolab",
-    "active_jobs_observed": 0,
+    "active_jobs_observed": 1,
     "jobs_submitted": 0,
     "diem_state": "deadline-expired",
     "diem_records": 50,
     "diem_expected": 52,
-    "diem_restarted": false
+    "diem_restarted": false,
+    "observed_utc": "2026-10-29T16:51:48.978389+00:00",
+    "active_jobs": [
+      "semaev-panel-n43-poly01-v3-20261029-1642"
+    ]
   },
   "cohort_completion": {
     "requested_targets": 1260,
@@ -64,5 +68,28 @@
     "remaining_historical_candidates": 717,
     "new_symbolic_cohort_executed": false,
     "candidate_over_rho": null
+  },
+  "implementation_update": {
+    "observed_utc": "2026-10-29T16:12:00Z",
+    "state": "implemented_tests_completed_prepublication",
+    "common_clock": "time.method_call_wall_ns: exact enclosing methods::solve call including dispatch, setup, in-child verification and report construction; excludes workload preparation and serialization",
+    "audit_clock": "time.parent_audit_verification_ns: independent parent check, absent for censored or unrecovered records; not child L2",
+    "legacy_timers": "unchanged",
+    "test_process": "full suite terminal:5154 passed,1 failed,123 ignored; lock failure same-binary serial recheck passed. Later online diagnostics field regression pending.",
+    "experiment_executed": false,
+    "focused_test": "1 passed,0 failed; cold-boundary-test.log",
+    "seed_policy": "measurement.algorithm_seed_round=measured_index implemented; default absolute omitted from serialization preserves legacy identity; regressions in combined suite",
+    "native_build": "completed exit0; native-ecbench-build.log",
+    "paired_export": "12 tests passed; exact plan completeness and per-clock operational A/A calibration; independent qualification pending",
+    "native_parity": "passed1260/1260 workload IDs,coordinates,target seeds/indices and archived first algorithm seeds; native_parity/result.json",
+    "final_ecbench_tests": "287 passed,0 failed,1 ignored; final-ecbench-tests.log"
+  },
+  "prepared_execution_plan": {
+    "targets": 1260,
+    "planned_executions": 22680,
+    "measured_executions": 18900,
+    "warmup_executions": 3780,
+    "solver_executions_performed": 0,
+    "evidence": "prepared_native_plans/result.json"
   }
 }

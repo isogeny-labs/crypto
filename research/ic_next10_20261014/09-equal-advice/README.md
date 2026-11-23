@@ -1,5 +1,7 @@
 # Item 9: the online IC wins at equal advice, and the free-relation census
 
+> **2026-10-20 note (validation sweep, PR #2328):** the 13.9x (n=61) and 54.1x (N83) online "wins" quoted below compare IC with a table against rho with no table; they are superseded by Bernstein-Lange/precomputed-rho controls. This item itself is the retirement recommendation, not a claim that they stand. The 120/168 replay figure is superseded by 72/168 on current main (open regression, PR #2290).
+
 **Verdict: POSITIVE for the audit (Lead A).** At the same advice size or less,
 Bernstein–Lange preprocessing rho solves a fresh Koblitz target 50–500 times
 faster online than compact-orbit index calculus. This holds on every rung that

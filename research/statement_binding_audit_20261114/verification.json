@@ -1,0 +1,83 @@
+{
+  "schema": "statement-binding-verification/v1",
+  "source_commit": "22d1ab578b1ce85e3739022013d01e8cfbf92ef2",
+  "claim_id": "PCC-20261114-286b6f",
+  "declaration_sha256": "b3e3af513d61f8acbcfbca85f672699b2b8132900fdbe18a09c0208ea39c1988",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 33,
+  "gate_declarations": 8,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 419,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-286b6f",
+    "claim_sha256": "383842ba88ce83633e0a76e5bb3fabc576ee10240885ce5b8f2c95952d99ad99",
+    "commit": "22d1ab578b1ce85e3739022013d01e8cfbf92ef2",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/statement_binding_audit_20261114/lean (HeaderCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T14:37:43Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-286b6f",
+    "claim_sha256": "383842ba88ce83633e0a76e5bb3fabc576ee10240885ce5b8f2c95952d99ad99",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46251,
+    "sha256": "b683308ace66605b5b882359e06041131baf43cd7f9540ffbbdfb64dc06a04a9",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 8,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "unsafe_initializer_call": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "model_is_not_parser_refinement": true,
+    "native_observations_are_not_kernel_theorems": true,
+    "written_surface_header_only": true,
+    "issued_BK_prefix_observed": true,
+    "old_math_theorem_refuted": false,
+    "BK_complete_binding_repair_closed": false,
+    "canonical_shared_verifier_modified": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  },
+  "model_proof_scope": "Kernel-checked genuine integer absolute-value/named-argument semantic controls and explicit transparent List-Char delimiter-prefix model. For each of the three fixed delimiter constants, concrete unequal source strings have the same model prefix, and the model prefix function is not injective. Genuine default-proof/inline-by/comment/string Lean declarations also compile under standard foundations/default settings. This is a delimiter-only model, not a formal refinement of Python regex, native parser/auditor, SHA256, every Lean syntax form, theorem semantics or execution authenticity. Native bounded written-header observations are separately archived procedural evidence and are not established by this theorem. No holes/custom axioms/native proof evaluation/unsafe initializer calls/raised limits/global flags/waivers/new cryptographic experiment/paid compute/upload.",
+  "native_observation_summary": {
+    "audit_complete": true,
+    "cases": 62,
+    "complete": 61,
+    "summary": true,
+    "truncated_prefixes": 1,
+    "unresolved": 0
+  },
+  "native_observation_not_covered_by_model_theorem": true
+}

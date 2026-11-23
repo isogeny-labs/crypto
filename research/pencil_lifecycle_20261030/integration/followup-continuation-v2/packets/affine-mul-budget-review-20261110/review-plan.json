@@ -1,0 +1,23 @@
+{
+  "task": "T-2092",
+  "created_at": "2026-11-10T23:40:55.644627+00:00",
+  "scope": "source-only comparison; no execution",
+  "prior": "unverified candidate claim that worker/compiler caps alone change from10800/9000 to10200/8400",
+  "checks": [
+    "inventory and byte differences",
+    "137-call schedule and26-name audit inventory preservation",
+    "source bindings and resource bounds preservation",
+    "release deadline and admission boundaries"
+  ],
+  "attacks": [
+    "find additional executable deltas",
+    "check source bytes independently of manifests",
+    "check cap consistency across launch/replay/release files"
+  ],
+  "limits": [
+    "untracked candidate not yet published",
+    "no compiler or trials",
+    "no launch authorization",
+    "renewed allowance does not supply missing deadline"
+  ]
+}

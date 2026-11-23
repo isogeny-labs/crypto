@@ -1,0 +1,85 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-15T12:11:58+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Users/adamburan/pq-work/hec-followup-target/zero-core-pr-a500c14f9a/collector",
+        "/Users/adamburan/pq-work/hec-followup-target/zero-core-pr-a500c14f9a/worker",
+        "/Users/adamburan/pq-work/hec-followups/research/hec_zero_core_20261115/run",
+        "/Users/adamburan/pq-work/hec-followups/research/hec_point_sieve_20261115/fixtures"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T12:08:57+00:00",
+      "wall_s": 2.549
+    }
+  ],
+  "commit": "a500c14f9a2052317499038b0b3d515e0e3d8aa8",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T12:08:36+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-hec-zero-core-cold"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261115T1208Z-hec-zero-core-cold",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g2_p1009_best_over_zero",
+      "note": "Same-target min14 controls/zero, local ARM L0, unvalidated producer median",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.24525297305952823
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g2_p16381_best_over_zero",
+      "note": "Same-target min14 controls/zero, local ARM L0, unvalidated producer median",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.3621937709591867
+    }
+  ],
+  "problem": "kernel:hec-zero-core-genus2",
+  "raw": [
+    {
+      "bytes": 44695,
+      "path": "research/hec_zero_core_20261115/raw-cold.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f5/f5a035fe4285bb787b976f6fa566bc5df3a734d658b9ee93aeffc1e344f7cf56",
+      "sha256": "f5a035fe4285bb787b976f6fa566bc5df3a734d658b9ee93aeffc1e344f7cf56",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/hec_zero_core_20261115/REPORT.pdf",
+    "png": [
+      "benchmarks/20261115-hec-zero-core-cold/zero-cold.png"
+    ],
+    "svg": [
+      "research/hec_zero_core_20261115/ZERO-COLD.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-zero-core-cold",
+  "status": "measured",
+  "summary": "Z1 exactness passes, Z2 cost fails: six new genus-2 targets, 6 gates/102 cold cells, min14controls/zero fixture medians 0.245253 and 0.362194; local ARM L0, producer unvalidated",
+  "validation": null
+}

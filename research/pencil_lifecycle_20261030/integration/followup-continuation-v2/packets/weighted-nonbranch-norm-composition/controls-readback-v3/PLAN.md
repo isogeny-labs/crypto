@@ -1,0 +1,1 @@
+Samezero-scalar statement, nowexplicit localNontrivial witness0,1 verified against pinnedMathlib/Basic/Nontrivial/Defs.lean constructor. Previousphase6 instancefailure and sorryAx retained. No actualtheorem or retainedoleanchange; all14names and expectedfailure unchanged. Oneprospective1200sequence,2callsmax, fullphase4continuity; rootreview required before run.

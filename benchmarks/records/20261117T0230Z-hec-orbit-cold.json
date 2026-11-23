@@ -1,0 +1,309 @@
+{
+  "schema": "bench.record/v1",
+  "id": "20261117T0230Z-hec-orbit-cold",
+  "slug": "hec-orbit-cold",
+  "problem": "ic:hec-orbit-cold-g4f19",
+  "curve_uid": null,
+  "repo": "crypto",
+  "created_utc": "2026-11-17T02:34:11Z",
+  "closed_utc": "2026-11-17T02:37:54Z",
+  "status": "measured",
+  "commit": "36305a2acc3b0733cebd8297c4374d2e8e6cc68c",
+  "commit_dirty": true,
+  "branch": "research/hec-git-custody-20261116",
+  "host": {
+    "cpu": "Apple M4 Pro",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "platform": "macOS 27.2 arm64",
+    "isolation": "L0 shared, no exclusive core or frequency guarantee"
+  },
+  "entries": [
+
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/perl",
+        "-e",
+        "alarm 180; exec @ARGV",
+        "/Volumes/SSD990-2/hec-orbit-cold-target/release/orbit-cold-cost"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T02:34:18Z",
+      "wall_s": 3.0
+    }
+  ],
+  "raw": [
+    {
+      "path": "research/hec_residual_span_20261116/cost/CONTROL.tsv",
+      "sha256": "2025fb4bbcc03279ccf5e6fb29deb1ece8216f7cbda4cdce4e9becf7ab9aa0ed",
+      "bytes": 29276,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/cost/CONTROL.stderr",
+      "sha256": "b0b1166a285bfcd36b001ac05c40969844287f8ece61a931f2e5e276fe0cddaa",
+      "bytes": 184,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/cost/SUMMARY.tsv",
+      "sha256": "ba73fa773d2287320a28c342744e52c9f8943d2254d7d679f767964bd7bf75b1",
+      "bytes": 685,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/cost/SUMMARY.stderr",
+      "sha256": "ec8dd7bbe9f168a7e12a488fdae2ecd88e9b85fb64a8c41c9b44072f67e70c76",
+      "bytes": 356,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/cost/RUN.txt",
+      "sha256": "13d612d223a4cbca7b53ac09f5ca9242d1c014e8987b0d6f1099924e54f27cf0",
+      "bytes": 182,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/cost/OUTPUT.sha256",
+      "sha256": "e09cd1cf369e83328214112b1a3430726732788d8c082275f9a2082fc186ac2b",
+      "bytes": 472,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "target0_cached_cold_wall",
+      "value": 0.009627262875,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.009576953125,
+        0.009739502625
+      ],
+      "baseline": 0.0007328411879999999,
+      "reference": 0.0007328411879999999,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target0_orbit_cold_wall",
+      "value": 0.000423458312,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.00041354693800000003,
+        0.00042669275
+      ],
+      "baseline": 0.0007328411879999999,
+      "reference": 0.0007328411879999999,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target0_native_cold_wall",
+      "value": 0.0007328411879999999,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.00072591925,
+        0.000736554625
+      ],
+      "baseline": 0.0007328411879999999,
+      "reference": 0.0007328411879999999,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target0_native_aa_cold_wall",
+      "value": 0.000722971188,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.0007186458120000001,
+        0.00072854175
+      ],
+      "baseline": 0.0007328411879999999,
+      "reference": 0.0007328411879999999,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target1_cached_cold_wall",
+      "value": 0.009591494875,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.009588500062,
+        0.009655137938
+      ],
+      "baseline": 0.000592968875,
+      "reference": 0.000592968875,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target1_orbit_cold_wall",
+      "value": 0.000429330688,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.00042410956199999996,
+        0.00043790106199999995
+      ],
+      "baseline": 0.000592968875,
+      "reference": 0.000592968875,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target1_native_cold_wall",
+      "value": 0.000592968875,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000587406375,
+        0.000598198
+      ],
+      "baseline": 0.000592968875,
+      "reference": 0.000592968875,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target1_native_aa_cold_wall",
+      "value": 0.0005857031879999999,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000579630062,
+        0.000603440125
+      ],
+      "baseline": 0.000592968875,
+      "reference": 0.000592968875,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target2_cached_cold_wall",
+      "value": 0.009567994875,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.009531273437999999,
+        0.009593351625
+      ],
+      "baseline": 0.00081266925,
+      "reference": 0.00081266925,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target2_orbit_cold_wall",
+      "value": 0.00041427606199999996,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.0004100105,
+        0.000420198
+      ],
+      "baseline": 0.00081266925,
+      "reference": 0.00081266925,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target2_native_cold_wall",
+      "value": 0.00081266925,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.0008004895,
+        0.000819169375
+      ],
+      "baseline": 0.00081266925,
+      "reference": 0.00081266925,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "target2_native_aa_cold_wall",
+      "value": 0.000806914125,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000796544312,
+        0.000809609375
+      ],
+      "baseline": 0.00081266925,
+      "reference": 0.00081266925,
+      "reference_kind": "baseline",
+      "note": "Median of 5 batch means, 16 fresh complete setups each. L0 local wall diagnostic; noise checks pass, native/orbit tenfold fails. No external or independent admission."
+    },
+    {
+      "name": "verified_complete_calls",
+      "value": 960,
+      "unit": "count",
+      "better": "neutral",
+      "n": null,
+      "spread": null,
+      "baseline": null,
+      "reference": null,
+      "reference_kind": null,
+      "note": "All calls verified; correctness and local noise gates do not establish tenfold."
+    }
+  ],
+  "reports": {
+    "pdf": "research/hec_residual_span_20261116/reports/git-custody/REPORT.pdf",
+    "svg": [
+
+    ],
+    "png": [
+
+    ]
+  },
+  "validation": null,
+  "summary": "960/960 correct. Frozen local spread/A-A checks pass. Local orbit improvement22.34–23.10x over cached exhaustive reference, but only1.38–1.96x over completing native IC. Numerical tenfold gate fails. Known special-curve method, L0/no external comparison or independent admission. Git custody authorized while S3 unavailable.",
+  "session": null,
+  "custody": {
+    "kind": "git",
+    "authorization": "research/hec_degree2_lp_20261116/GIT-CUSTODY-AMENDMENT.md",
+    "s3_available": false
+  },
+  "protocol": "research/hec_residual_span_20261116/cost/PROTOCOL.md",
+  "scientific_paths_clean_at_execution": true,
+  "qualification": {
+    "local_spread_pass": true,
+    "native_aa_pass": true,
+    "numerical_tenfold": false,
+    "admitted": false,
+    "external_comparison": "not run",
+    "primary_counted_operation_result": false
+  }
+}

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T20:04:03Z",
+ "id": "PCC-20261116-ffe108",
+ "kind": "statement",
+ "producer": {
+  "commit": "d174823774609e0d5249bfa01824a91db59ebfa5",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/indexed-circuit-v1/publication-ci-20e821/FACTS.json",
+    "sha256": "d6013f7fa975cc315ee626af93e7aeba6a9f73c2e8176ac53d055d1ee81d67b6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/indexed-circuit-v1/publication-ci-20e821/RETENTION.json",
+    "sha256": "e4c5dbbdb1c9027d68fda488696624fb80d000abe9d3b6bd8cabd3f27df00b44"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/indexed-circuit-v1/publication-ci-20e821/decoded-logs.tar.xz",
+    "sha256": "f8881a0e6230b3a3343d6b8ef8a4213ac250862eb3701f929523e447cc780bfc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/indexed-circuit-v1/publication-ci-20e821/STATUS.md",
+    "sha256": "45ecb250f2fd6e76cf8e089b9507bcb3e65361399dd26a292711b9305a694a4b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/curve25519_torus_native_20261115/indexed-circuit-v1/publication-ci-20e821",
+ "statement": "On source-publication head20e82118494e438afedb83e1dfdfb3b2b27a3dcd, backend current133570169265 and recompute133570169492 fail during S3 HeadObject403 artifact hydration before backend validation. Complete decoded logs are retained losslessly with hashes; relevant workflow/helper/policy/backend manifests are identical across feature-parent21f5, prior lane50a5 and20e. The hosted checkout merge has the same source tree. These are limited CI diagnostic facts, not raw server-byte or signed execution/scientific receipts, a claim about later-head/main CI, an algorithm failure or a repaired gate. Other pending outcomes are not inferred."
+}

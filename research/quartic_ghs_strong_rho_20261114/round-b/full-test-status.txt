@@ -1,0 +1,18 @@
+command: cargo test --release --lib
+attempt_1_exit: 101
+attempt_1_error: no matching package named `certified-relations` found; the reused sparse worktree omitted a tracked root path dependency.
+
+repair: materialized the tracked root path dependencies from the same HEAD with `git sparse-checkout add`; no source file changed.
+
+command: cargo test --release --lib
+attempt_2_exit: 101
+attempt_2_summary: `crypto` (lib test) generated 3 warnings and could not compile due to 39 errors.
+representative_unrelated_errors:
+- duplicate `binary_affine_subspace_factor_base` in `src/cryptanalysis/ic_boundary.rs`
+- duplicate `trace_kernel_basis`, `trace_coset_basis`, and a duplicate test in `src/cryptanalysis/ic_framework/plugins.rs`
+- missing `linalg_mixed` module references in `src/cryptanalysis/ic_framework/linalg.rs`
+- duplicate replay fields in `src/cryptanalysis/aps_single_relation/replay.rs`
+- F4 Hilbert-diagnostic fields/methods referenced by callers but absent from `F4Options`, `F4Report`, and `VisitReport`
+- sparse-worktree `include_str!` fixtures absent from several unrelated modules
+
+Scope check: `git diff origin/main -- src Cargo.toml Cargo.lock` was empty. The edited standalone GHS source compiled and its source-bound self-test passed; see `selftest.txt`.

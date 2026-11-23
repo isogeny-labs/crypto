@@ -26,10 +26,10 @@ const MAX_REFERENCES: usize = 100_000;
 const COMMAND_OUTPUT_LIMIT: usize = 8 * 1024 * 1024;
 
 #[derive(Debug)]
-struct CommandOutput {
-    status: ExitStatus,
-    stdout: Vec<u8>,
-    stderr: Vec<u8>,
+pub(crate) struct CommandOutput {
+    pub(crate) status: ExitStatus,
+    pub(crate) stdout: Vec<u8>,
+    pub(crate) stderr: Vec<u8>,
 }
 
 fn terminate(child: &mut Child) {
@@ -63,7 +63,7 @@ fn read_pipe(mut pipe: impl Read, limit: usize, total: &AtomicUsize) -> Result<V
 /// Bound wall time and combined captured output. A GET additionally monitors
 /// its output file; the final artifact check enforces its exact declared size.
 /// The monitor is a polling guard, not a filesystem quota against hostile code.
-fn run_bounded(
+pub(crate) fn run_bounded(
     command: &mut Command,
     timeout: Duration,
     output_limit: usize,
@@ -137,7 +137,7 @@ fn run_bounded(
     result
 }
 
-fn require_success(output: &CommandOutput, operation: &str) -> Result<()> {
+pub(crate) fn require_success(output: &CommandOutput, operation: &str) -> Result<()> {
     ensure!(
         output.status.success(),
         "{operation} failed ({}): {}",
@@ -161,7 +161,7 @@ fn relative(value: &str) -> Result<()> {
     Ok(())
 }
 
-fn remote_prefix(remote: &str) -> Result<String> {
+pub(crate) fn remote_prefix(remote: &str) -> Result<String> {
     let base = format!("s3://{BUCKET}");
     let suffix = remote
         .strip_prefix(&base)
@@ -660,6 +660,60 @@ mod tests {
         ] {
             assert!(remote_prefix(uri).is_err(), "{uri}");
         }
+    }
+
+    #[test]
+    #[ignore = "requires immutable pre-extraction and candidate CLIs; local mock only"]
+    fn partial_extraction_preserves_legacy_fetch_cli_bytes() -> Result<()> {
+        let f = Fixture::new();
+        let before = PathBuf::from(std::env::var("ML_PARTIAL_BASELINE")?);
+        let after = PathBuf::from(std::env::var("ML_PARTIAL_BINARY")?);
+        ensure!(
+            hash_file(&before)?
+                == "2512b52b8d4061febd068746b0e15fffb72cc5c1bfb8e4f54f45469236d8523c",
+            "baseline binding"
+        );
+        ensure!(
+            hash_file(&after)? == std::env::var("ML_PARTIAL_BINARY_SHA256")?,
+            "candidate binding"
+        );
+        let out = PathBuf::from(std::env::var("ML_PARTIAL_FETCH_OUT")?);
+        fs::create_dir(&out)?;
+        let commands = f._temp.path().join("commands");
+        fs::create_dir(&commands)?;
+        fs::copy(&f.aws, commands.join("aws"))?;
+        let path = format!("{}:{}", commands.display(), std::env::var("PATH")?);
+        let mut reports = Vec::new();
+        for (label, binary) in [("before", before), ("after", after)] {
+            let dest = out.join(label);
+            let mut command = Command::new(binary);
+            command
+                .args(["fetch", "--receipt"])
+                .arg(&f.receipt)
+                .args(["--expected-sha256", &f.expected, "--out"])
+                .arg(&dest)
+                .env("PATH", &path);
+            let result = run_bounded(&mut command, Duration::from_secs(30), 1024 * 1024, None)?;
+            fs::write(out.join(format!("{label}.stdout")), &result.stdout)?;
+            fs::write(out.join(format!("{label}.stderr")), &result.stderr)?;
+            require_success(&result, "legacy fetch byte comparison")?;
+            reports.push(result.stdout);
+        }
+        ensure!(
+            reports[0] == reports[1],
+            "legacy fetch report byte regression"
+        );
+        fs::copy(&f.receipt, out.join("mock-receipt.json"))?;
+        fs::copy(&f.aws, out.join("mock-aws-script.txt"))?;
+        fs::write(
+            out.join("summary.json"),
+            serde_json::to_vec_pretty(&json!({
+            "schema":"partial-extraction-legacy-fetch-comparison/v1",
+            "report_sha256":digest(&reports[0]),"byte_identical":true,
+            "actual_remote_invoked":false,"producer_invoked":false,
+            "boundary":"mocked legacy fetch compatibility; legacy remote_rechecked field is not actual S3 evidence"}))?,
+        )?;
+        Ok(())
     }
 
     #[test]

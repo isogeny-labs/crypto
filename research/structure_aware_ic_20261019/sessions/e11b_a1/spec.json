@@ -1,0 +1,24 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "structure-aware IC Test A: E11b on three new a=1 curves, half base at d-1 against default at d",
+ "description": "research/structure_aware_ic_20261019/PROTOCOL.md Test A (Amendment 2 to round 7 E11b): three fresh random binary curves with a=1 and cofactor 2; rho.plain is the positive control, rho.negation the reference, mitm-default9b repeats mitm-default9 (determinism check).",
+ "arms": [
+  {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+  {"name": "rho-plain", "role": "control", "method": {"id": "rho.plain"}},
+  {"name": "mitm-default9", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-subspace:dimension=9", "oracle": "mitm:negation_folded=1"}}},
+  {"name": "mitm-default9b", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-subspace:dimension=9", "oracle": "mitm:negation_folded=1"}}},
+  {"name": "mitm-half9", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-subspace:dimension=8,trace_kernel=1", "oracle": "mitm:negation_folded=1"}}},
+  {"name": "f4-default9", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-subspace:dimension=9", "oracle": "descent-algebraic:m=2", "solver": "f4-f2"}}},
+  {"name": "f4-half9", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-subspace:dimension=8,trace_kernel=1", "oracle": "descent-algebraic:m=2", "solver": "f4-f2"}}}
+ ],
+ "measurement": {"isolation_required": "L0", "order": "alternate", "rounds": 1, "seed": 1, "timeout_seconds": 3600, "warmup": 0},
+ "workloads": {
+  "curves": [
+   {"kind": "binary_random", "n": 19, "seed": 7001, "max_cofactor": 2},
+   {"kind": "binary_random", "n": 21, "seed": 7001, "max_cofactor": 2},
+   {"kind": "binary_random", "n": 23, "seed": 7001, "max_cofactor": 2}
+  ],
+  "target_seed": 20261019,
+  "targets_per_curve": 8
+ }
+}

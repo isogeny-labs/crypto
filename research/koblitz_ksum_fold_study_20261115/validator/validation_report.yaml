@@ -1,0 +1,117 @@
+validation_report:
+  id: VAL-20261115-f7df34
+  task_id: TASK-unassigned (validation-gate request from the producing session, 2026-11-15)
+  study: research/koblitz_ksum_fold_study_20261115
+  validated_snapshot: 28aae8813acbc95914a226db582d6187995e90ad   # == origin/claude/f4-f5-algorithm-speed-bvp7qd at start; study files identical to results commit 84f7ffea3e
+  freeze_commit: 9fa38942e40f8583fe24acf15f830dbf1b77ea6f
+  results_commit: 84f7ffea3ecdadb4fa453870bf1eb73cdf9fac10
+  code_commit: 71d56d2af02bdcfcd2bcaa736cfdf1a326e33785   # src, Cargo.toml, Cargo.lock unchanged to HEAD
+  claim_status: "[pcc:unverified] (no pcc claim exists for these numbers)"
+  run_ids:
+    study: [ECBS1h0d377811bfbd, ECBS1heb10a74e6cd4, ECBS1h3978b6fbe105, ECBS1h34b585733d3a, ECBS1hd12cf9daa79c, ECBS1ha4e72333a25b]
+    validator_fresh: [ECBS1h2ca69419c8fd, ECBS1h4748a7923dde, ECBS1h50db40b58020, ECBS1h9638c22ddb17, ECBS1hd1bf83a9cc06, ECBS1h464dec72c90f, ECBS1h57a51b892d5b]   # F1-F6 K1 n23, G1 K1 n29
+  artifact_checks:
+    - "REGISTRATION.sha256: 9/9 OK; registered-at.txt binary sha256 6c60b4c9...4d77 committed in the freeze commit before the first session (22:24:30Z vs 22:25:31Z)"
+    - "sessions.sha256: 6/6 records.jsonl OK (gunzipped to scratch); session spec.json == frozen specs/*.json (canonical JSON) 6/6"
+    - "binary: target/release/ecbench sha256 == registered == session.json binary_sha256 (6/6); not rebuilt by the validator (disk)"
+    - "replay: ecbench verify --replay-all 6/6 ok, 9504/9504 replays reproduced, 0 problems (validator/replay/*.verify.json.gz)"
+    - "scalars: 10944/10944 verified study records' logs correct under the validator's own GF(2^n) arithmetic (scalarcheck.py)"
+    - "dirty tree: sessions record git_dirty=true (n23-r1..r3, n29-r3) and a moving head (concurrent commits); binary constant, counts unaffected"
+  metric_recomputations:
+    - "150 claimed point estimates (results.json) recomputed independently (recompute.py, analyse.py, mkreports.py), 0 mismatches at 1e-9 (max relative difference 7e-15)"
+    - "n23 H1 kf3-c1g-sr / lazy-c4 pooled: 0.784 [0.754, 0.815], 0.799 [0.770, 0.830], 0.832 [0.803, 0.863] at w = 0 / 0.1 / 1 (validator linearised t); producer's bootstrap intervals reproduced exactly by ecbench compare"
+    - "n23 gap kf3 / rho-strong: 0.883, 1.105, 2.262 (claimed numbers reproduced)"
+    - "n29 kf3 / lazy-c1: 5.303 [5.240, 5.368], 5.622 [5.556, 5.689], 6.312 [6.240, 6.385]"
+  control_checks:
+    - "A/A rho-strong-aa / rho-strong = 1.000 exactly (deterministic counts, same seeds): a determinism check, not a noise control; H1(c) vacuous"
+    - "fresh sessions on nonce seeds (F1-F6): registered statistic reproduced, 0.777/0.792/0.826 and 0.790/0.806/0.839, every per-session upper end < 1"
+    - "missing control (supplied by the validator): incumbent given the candidate's generator-orbit base. kf3 / gen-lazy-c4-sr = 0.977 [0.945, 1.010], 0.986 [0.955, 1.019], 1.006 [0.975, 1.038] (F4-F6): the effect disappears"
+    - "strongest existing IC arm (research/ecbench_generator_orbit_20261022, gen-layout): pre-declared confirmation kf3 / gen-layout-c4 = 1.051 [0.980, 1.126], 1.089 [1.021, 1.161], 1.175 [1.113, 1.239]: null at w = 0, regression at w = 0.1 and 1"
+    - "rho reference: rho.signed_frobenius_v5 / rho-strong = 0.248, 0.256, 0.295 (F4-F6); kf3 / rho.signed_frobenius_v5 = 3.473 [3.319, 3.634], 4.213 [4.025, 4.409], 7.410 [7.067, 7.769]"
+  per_task_check:
+    1_code_audit: pass        # charging, fold soundness, column map, no hidden precomputation; priced as the pair table
+    2_incumbent_fairness: fail  # lazy-c4 is not the strongest existing IC arm; generator-orbit confound; tuning asymmetry
+    3_replays: pass
+    4_independent_recompute: pass
+    5_fresh_sessions: pass      # the registered statistic reproduces; the same sessions carry the check-2 failure
+    6_n29_regression: characterised  # genuine: fixed-size table (46 % coverage) at log2 r 15.4; no pricing defect in either arm; lazy-c1 vs rho-strong is a rho set-up artefact
+    7_protocol_adherence: pass_with_findings
+  heuristic_validation_checks:
+    - "not a heuristic-validation experiment; protocol section 2 hit model (entries x 2n / r) agrees with measured trials: 398 predicted vs 405-418 (n23), 2.2 vs 1.9-2.2 (n29)"
+  cost_model_checks:
+    - "unit declared: ecbench.gae, S = GAE / sqrt r, AGENTS.md 5a band w = 0, 0.1, 1, table inserts priced; unpriced counters listed with counts per arm (unpriced-n23.json)"
+    - "memory not reported beside cost (minor): 229 k-sum entries vs 356 pair entries at n23"
+    - "expected cost is the empirical mean to a verified log (no success-certain shortcut)"
+    - "inventor-protocol section 6 ladder not applicable: no extrapolation claimed"
+  proof_architecture_checks: []
+  defects:
+    - "D1 major: the incumbent is not the strongest existing IC arm on K1 n23 and the comparison is confounded by generator_orbit=1 (candidate only); the improvement claim fails"
+    - "D2 major (distance to rho): rho.signed_frobenius_strong costs about 4x rho.signed_frobenius_v5 in the same binary on K1 n23; the gap to rho is 3.5-7.4x, not 0.88-2.26x"
+    - "D3 minor: H0 lower_bound=false unattainable for plain methods; A/A deterministic"
+    - "D4 minor: raw .gz committed to Git above the artifact threshold; dirty tree and moving head during the run"
+    - "D5 minor: no memory column"
+  verdict: failed
+  verdict_scope: >-
+    The receipt is admissible for the narrow registered statement "on K1 n23, kf3-c1g-sr
+    (ksum-frobenius:m=3 on compact-orbit-scan:columns=1,generator_orbit=1, stride-renew) costs
+    0.78-0.83x lazy-c4 (mitm-frobenius-lazy-counted:m=2 on compact-orbit-scan:columns=4,
+    stride-renew) under the 5a band". It does not support "a measured improvement over the
+    strongest existing IC arm" (fails, D1) nor the stated distance to rho (D2). No n23 row may
+    enter benchmarks/README.md or the leaderboard on this evidence; no evidence directory or
+    VALIDATION.json was written. A passed or failed validation is not an ECDLP claim.
+  limitations:
+    - "replays used the producer's sha-matched binary, not a validator rebuild (2.1-2.4 GB free vs 3.8 GB release target)"
+    - "unit tests of 71d56d2af0 not re-run (same disk reason)"
+    - "same host/container class (L0); counts deterministic"
+    - "validator is a subagent of the producing session (same Claude-Session id)"
+    - "generator-orbit incumbents tuned by the validator only over columns 2-5; wider tuning could only strengthen D1"
+    - "rho.signed_frobenius_v5 accounting checked at record level, not source level"
+    - "n29 characterisation: one validator session (G1) plus the study's three"
+  artifact_paths:
+    - research/koblitz_ksum_fold_study_20261115/validator/validation_report.yaml
+    - research/koblitz_ksum_fold_study_20261115/validator/validator-report.json
+    - research/koblitz_ksum_fold_study_20261115/validator/replay-certificate.json
+    - research/koblitz_ksum_fold_study_20261115/validator/checks.json
+    - research/koblitz_ksum_fold_study_20261115/validator/own-study.json
+    - research/koblitz_ksum_fold_study_20261115/validator/own-fresh.json
+    - research/koblitz_ksum_fold_study_20261115/validator/own-confirm.json
+    - research/koblitz_ksum_fold_study_20261115/validator/own-n29char.json
+    - research/koblitz_ksum_fold_study_20261115/validator/own-scalarcheck.json
+    - research/koblitz_ksum_fold_study_20261115/validator/unpriced-n23.json
+    - research/koblitz_ksum_fold_study_20261115/validator/confirm-predeclared.txt
+    - research/koblitz_ksum_fold_study_20261115/validator/nonce.txt
+    - research/koblitz_ksum_fold_study_20261115/validator/replay/
+    - research/koblitz_ksum_fold_study_20261115/validator/fresh/
+review_attestation:
+  task_id: TASK-unassigned (validation-gate request from the producing session, 2026-11-15)
+  review_kind: independent_validation_gate
+  joints_owned: [code_audit, incumbent_fairness, replay, recompute, fresh_sessions, n29_characterisation, protocol_adherence, rho_reference]
+  verdicts:
+    code_audit: holds
+    incumbent_fairness: breaks
+    replay: holds
+    recompute: holds
+    fresh_sessions: holds
+    n29_characterisation: holds   # regression genuine, no pricing defect
+    protocol_adherence: holds_with_findings
+    rho_reference: breaks         # for the stated distance to rho
+  read_sibling_reports: false   # research/ic_ksum_prune_20261115/validator/ (another validator, same worktree) was not opened
+  sources_read:
+    - /home/user/crypto-autoresearcher/docs/agent-runtime-core.md
+    - /home/user/crypto-autoresearcher/agents/validator.md
+    - AGENTS.md (Standing workflow rules; 5a; 13)
+    - docs/VALIDATION_GATE.md
+    - research/koblitz_ksum_fold_study_20261115/{PROTOCOL.md, README.md, registered-at.txt, REGISTRATION.sha256, sessions.sha256, run.sh, specs/, sessions/ (records, session.json, spec.json), logs/run-n23-r1.log (head)}
+    - research/koblitz_ksum_fold_study_20261115/results.json and summary.json (claimed numbers only, after own-study.json was written)
+    - research/ic_tableb_binary_ksum_20261115/validator/ (template: validator-report.json, replay-certificate.json structure, nonce.txt, fresh/F24 listing)
+    - benchmarks/20261115-tableb-binary-ksum/VALIDATION.json (template)
+    - research/ecbench_generator_orbit_20261022/{README.md, PROTOCOL.md, make_specs.sh, tables/band-a0-n23.md, tables/band-a1-n29.md, analysis/core-band-a1-n29.json (head), REPORT.typ 60-100}
+    - research/ecbench_e2e_frontier_20261031/REPORT.md 809-870
+    - src/cryptanalysis/ic_framework/plugins.rs (990-1200, 2140-2170, 3520-3760, 6860-7350)
+    - src/cryptanalysis/ic_boundary.rs (305-356, 12240-12640)
+    - src/cryptanalysis/ecbench/band.rs (1-470), compare.rs (1-60, 240-300, 860-930), stats.rs (linearised_ratio, ci95_log), methods.rs (dispatch diff, PRICED_NATIVE)
+    - src/cryptanalysis/ic_framework/stages.rs (Targets), solver_units.rs (PINNABLE_NATIVE)
+    - docs/ic/calibration.json (K_1 / GF(2^23), K_1 / GF(2^29) rows)
+  not_read: [research/koblitz_ksum_fold_study_20261115/analyze.py]
+  partly_read: ["research/koblitz_ksum_fold_study_20261115/make_report.py: one grep for field names (per_rep, replicate, rho-strong), after own-study.json was written"]
+  verdict: failed

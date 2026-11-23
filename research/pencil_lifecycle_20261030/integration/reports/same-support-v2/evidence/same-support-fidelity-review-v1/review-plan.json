@@ -1,0 +1,31 @@
+{
+  "created_utc": "2026-10-30T21:19:13.047185+00:00",
+  "claim": "Valid Mumford inputs on the same curve with common monic quadratic support and equal linear slopes force equal squares and the two coefficient equations excluding same-support error.",
+  "inputs": {
+    "SameSupport.lean": "c0cd495c938a7370d0e8b3b199fe41b67301ae0377d462237bf533435e26977a",
+    "ProjectiveLawBoundary.lean": "0cbdbb636e11f34ad94493353f2fc748a353c89f248f868accbdaaf02fc88e2b",
+    "RuntimeSemantics.lean": "9e015c3c79f465b2b16f6e0dae5c744f9de3400f51646f746c61c54c4722c318"
+  },
+  "prior": "Plausible: divisibility of a degree-at-most-one square difference by a degree-two monic polynomial forces zero.",
+  "joints_owned": [
+    "degree cancellation",
+    "coefficient extraction",
+    "error branch bridge"
+  ],
+  "attacks": [
+    "Drop common curve; divisibility subtraction is lost.",
+    "Drop equal slope; degree-two square difference can be a nonzero multiple of support.",
+    "Check validity and monic degree-two assumptions are explicit, not derived from runtime encoding."
+  ],
+  "blind_derivation": "Before reading source, derive: if u divides f-v1^2 and f-v2^2 then u divides v1^2-v2^2; equal slopes cancels X^2; degree < 2 and monic degree 2 imply zero, giving 2*b*(a1-a2)=0 and a1^2-a2^2=0.",
+  "scope": "Read-only source fidelity review; no build, no external services, no source mutation, no formal promotion. Machine status not_verified.",
+  "permitted_sources": [
+    "three named Lean source files",
+    "applicable guidance"
+  ],
+  "forbidden_sources": [
+    "producer compiler logs",
+    "sibling reviewer reports"
+  ],
+  "controls": "Symbolic hand-derived counterexamples only; no execution."
+}

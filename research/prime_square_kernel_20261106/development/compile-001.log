@@ -1,0 +1,8 @@
+research/prime_square_kernel_20261106/check.cpp: In function ‘std::string histogram(const std::vector<int>&, int)’:
+research/prime_square_kernel_20261106/check.cpp:108:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  108 |         if(!r.empty())r+=';';r+=std::to_string(i)+":"+std::to_string(count[i]);
+      |         ^~
+research/prime_square_kernel_20261106/check.cpp:108:30: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  108 |         if(!r.empty())r+=';';r+=std::to_string(i)+":"+std::to_string(count[i]);
+      |                              ^
+cc1plus: all warnings being treated as errors

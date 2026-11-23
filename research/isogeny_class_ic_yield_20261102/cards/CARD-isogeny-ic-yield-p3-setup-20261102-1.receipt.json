@@ -1,0 +1,275 @@
+{
+  "card_id": "CARD-isogeny-ic-yield-p3-setup-20261102-1",
+  "card_path": "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.yaml",
+  "card_sha256": "3d9678f99dcb411fdc6c2f07bc6187edff9f9e442e5a1b95850de20690e83933",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "mkdir-full",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "target/release/p3h",
+        "class",
+        "--n",
+        "43",
+        "--ell",
+        "257",
+        "--a2",
+        "0",
+        "--out",
+        "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/n43_l257_curves.tsv"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.788,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "class",
+      "index": 2,
+      "outputs": {
+        "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/n43_l257_curves.tsv": "48bd3171e661b4563baded700f179058970359d28de94d613395c786c0d65c64",
+        "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/n43_l257_curves.tsv.meta.json": "1517e6a3adfcfd6948b9471214fbd2f14f41ebc8a782d3b60beb8b360f67bd77"
+      },
+      "seconds": 1.788,
+      "stderr_sha256": "2e397b9406633815f7ffaf8df58e7bfa0ff5a237273802b894709b5d502de4a6",
+      "stderr_tail": [
+        "# n=43 ell=257 a2=0 t=998717 f=2209943 (-7/ell)=-1 h(O_ell)=258",
+        "[level1] ell=257 primes=16 modulus_bits=977 elapsed=0.1s",
+        "[level1] ell=257 primes=32 modulus_bits=1953 elapsed=0.2s",
+        "[level1] ell=257 primes=48 modulus_bits=2929 elapsed=0.2s",
+        "[level1] ell=257 primes=64 modulus_bits=3905 elapsed=0.3s",
+        "[level1] ell=257 primes=80 modulus_bits=4881 elapsed=0.3s",
+        "[level1] ell=257 primes=96 modulus_bits=5857 elapsed=0.4s",
+        "[level1] ell=257 primes=112 modulus_bits=6833 elapsed=0.4s",
+        "[level1] ell=257 primes=128 modulus_bits=7809 elapsed=0.5s",
+        "[level1] ell=257 primes=144 modulus_bits=8785 elapsed=0.6s",
+        "[level1] ell=257 primes=160 modulus_bits=9761 elapsed=0.6s",
+        "[level1] ell=257 primes=176 modulus_bits=10737 elapsed=0.7s",
+        "[level1] ell=257 primes=192 modulus_bits=11713 elapsed=0.8s",
+        "[level1] ell=257 primes=208 modulus_bits=12689 elapsed=0.9s",
+        "[level1] ell=257 primes=224 modulus_bits=13665 elapsed=0.9s",
+        "[level1] ell=257 primes=240 modulus_bits=14641 elapsed=1.0s",
+        "[level1] ell=257 primes=256 modulus_bits=15617 elapsed=1.1s",
+        "[level1] ell=257 primes=272 modulus_bits=16593 elapsed=1.1s",
+        "[level1] ell=257 primes=288 modulus_bits=17569 elapsed=1.2s",
+        "Phi_ell(X, j0): 288 primes, 1.3s"
+      ],
+      "stdout_sha256": "1517e6a3adfcfd6948b9471214fbd2f14f41ebc8a782d3b60beb8b360f67bd77",
+      "stdout_tail": [
+        "{\"n\":43,\"ell\":257,\"a2_koblitz\":0,\"modulus\":\"z^43+z^6+z^4+z^3+1\",\"trace\":\"998717\",\"conductor\":\"2209943\",\"kronecker\":-1,\"h_Oell\":\"258\",\"level1_curves\":258,\"distinct_j\":258,\"crater_multiplicity\":0,\"expected_horizontal\":0,\"orbits\":6,\"verified_one_twist_order_N\":258,\"random_j_false_positives\":0,\"all_checks_pass\":true,\"curves_tsv_sha256\":\"48bd3171e661b4563baded700f179058970359d28de94d613395c786c0d65c64\",\"seconds\":1.8}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cmp",
+        "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/data/n43_l257_curves.tsv",
+        "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/n43_l257_curves.tsv"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "class-reproduces-data",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "target/release/p3h",
+        "selftest"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.08,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 4,
+      "outputs": {
+        "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/selftest.txt": "84a684c5dc41f4449f4b88afbfd18c84fd1b3b6e73cfb379ac1f2402d86fd0d6"
+      },
+      "seconds": 0.08,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "84a684c5dc41f4449f4b88afbfd18c84fd1b3b6e73cfb379ac1f2402d86fd0d6",
+      "stdout_tail": [
+        "   frobenius-conjugate count 6 == 6: true",
+        "selftest n=17 k=4 trial=2 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok",
+        "   frobenius-conjugate count 6 == 6: true",
+        "selftest n=17 k=4 trial=3 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok",
+        "   frobenius-conjugate count 6 == 6: true",
+        "selftest n=21 k=4 trial=0 planted_satisfies=true brute=3 numeric=3 chained_fast=3 -> ok",
+        "   frobenius-conjugate count 3 == 3: true",
+        "selftest n=21 k=4 trial=1 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok",
+        "   frobenius-conjugate count 6 == 6: true",
+        "selftest n=21 k=4 trial=2 planted_satisfies=true brute=6 numeric=6 chained_fast=6 -> ok",
+        "   frobenius-conjugate count 6 == 6: true",
+        "selftest n=21 k=4 trial=3 planted_satisfies=true brute=3 numeric=3 chained_fast=3 -> ok",
+        "   frobenius-conjugate count 3 == 3: true",
+        "selftest m=2 n=13 k=5 brute=2 numeric=2 -> ok",
+        "selftest m=2 n=13 k=5 brute=0 numeric=0 -> ok",
+        "selftest m=2 n=13 k=5 brute=0 numeric=0 -> ok",
+        "selftest m=2 n=13 k=5 brute=0 numeric=0 -> ok",
+        "selftest iso z^43+z^6+z^4+z^3+1 -> z^43+z^6+z^5+z+1 : ok",
+        "selftest iso z^43+z^6+z^4+z^3+1 -> z^43+z^6+z^5+z^4+1 : ok",
+        "selftest ALL OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "target/release/p3h",
+        "isocheck"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 171.744,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "isocheck",
+      "index": 5,
+      "outputs": {
+        "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/isocheck.txt": "6d7c936a802d7ffb3cf8be8e8163cf803426c8f8fc5d81a6e2bcd85ec0bc408b"
+      },
+      "seconds": 171.744,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "6d7c936a802d7ffb3cf8be8e8163cf803426c8f8fc5d81a6e2bcd85ec0bc408b",
+      "stdout_tail": [
+        "isocheck n=131 k=6 b#1 g=b+1      Mg_irred=true ring_hom=true g->z=true b_img(w=2,deg=1) count[random xR] base=0 gpres=0 | count[planted xR] base=6 gpres=6 planted_satisfies=1 -> ok",
+        "isocheck n=131 k=4 b#1 g=1/b      Mg_irred=true ring_hom=true g->z=true b_img(w=60,deg=130) count[random xR] base=0 gpres=0 | count[planted xR] base=6 gpres=6 planted_satisfies=1 -> ok",
+        "isocheck n=131 k=5 b#1 g=1/b      Mg_irred=true ring_hom=true g->z=true b_img(w=60,deg=130) count[random xR] base=0 gpres=0 | count[planted xR] base=6 gpres=6 planted_satisfies=1 -> ok",
+        "isocheck n=131 k=6 b#1 g=1/b      Mg_irred=true ring_hom=true g->z=true b_img(w=60,deg=130) count[random xR] base=0 gpres=0 | count[planted xR] base=6 gpres=6 planted_satisfies=1 -> ok",
+        "isocheck n=131 k=4 b#1 g=b^3      Mg_irred=true ring_hom=true g->z=true b_img(w=59,deg=130) count[random xR] base=0 gpres=0 | count[planted xR] base=3 gpres=3 planted_satisfies=1 -> ok",
+        "isocheck n=131 k=5 b#1 g=b^3      Mg_irred=true ring_hom=true g->z=true b_img(w=59,deg=130) count[random xR] base=0 gpres=0 | count[planted xR] base=3 gpres=3 planted_satisfies=1 -> ok",
+        "isocheck n=131 k=6 b#1 g=b^3      Mg_irred=true ring_hom=true g->z=true b_img(w=59,deg=130) count[random xR] base=0 gpres=0 | count[planted xR] base=6 gpres=6 planted_satisfies=1 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=0 gpres=0 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=2 gpres=2 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=2 gpres=2 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=0 gpres=0 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=8 gpres=8 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=2 gpres=2 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=2 gpres=2 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=0 gpres=0 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=2 gpres=2 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=0 gpres=0 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=2 gpres=2 -> ok",
+        "isocheck m=2 n=13 k=7 g=b count base=6 gpres=6 -> ok",
+        "isocheck ALL OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "d97f5953b24e05096208a54df6e699827d021541",
+  "dirty_after": [
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-ctrl-k3-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-ctrl-k4-s0-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-ctrl-k4-s1-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-m2-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-main-k3-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-main-k4-s0-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-main-k4-s1-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-main-k5-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-badapt-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-bsparse-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-ctrl-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-main-k34-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-main-k5-s0-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-main-k5-s1-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s1-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.class-reproduces-data.stderr",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.class-reproduces-data.stdout",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.class.stderr",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.isocheck.stderr",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.mkdir-full.stderr",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.mkdir-full.stdout",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.selftest.stderr",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/class.stdout.json",
+    "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/isocheck.txt",
+    "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/n43_l257_curves.tsv",
+    "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/n43_l257_curves.tsv.meta.json",
+    "research/isogeny_class_ic_yield_20261102/p3_ecc2k130/full/selftest.txt",
+    "resume/RESUME.md"
+  ],
+  "dirty_before": [
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-ctrl-k3-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-ctrl-k4-s0-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-ctrl-k4-s1-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-m2-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-main-k3-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-main-k4-s0-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-main-k4-s1-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-a-main-k5-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-badapt-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-bsparse-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-ctrl-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-main-k34-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-main-k5-s0-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-main-k5-s1-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s0-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-b-stdv-s1-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p3-setup-20261102-1.yaml",
+    "resume/RESUME.md"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,110 @@
+{
+  "schema": "finite-fourier-upper-bound-source-review/v1",
+  "created": "2026-11-14T12:24:22.893916+00:00",
+  "scope": "Finite-abelian Upper Bound Lemma with actual finite normalized PMFs and genuine uniform law. Finite complex Plancherel derived from character orthogonality, no supplied energy premise. Actual fullL1 and halfL1 are defined from actual point probabilities; halfL1 is in[0,1], bounds every event and is attained by the actual positive-difference event. Actual probability-difference Parseval gives fullL1^2<=difference character energy and halfL1^2<=energy/4. Actual uniform coefficients and probability normalization remove the trivial character. Applying the actual iid character-moment law gives halfL1(walk,uniform)^2 and every-event squared error <=nontrivial normSq(eigenvalue)^t sum/4, for all finite abelian groups/all times/starts. Actual ZMod2 pointmass/uniform has fullL1=1, halfL1=1/2 and nontrivial energy1: direct mixed-normalization bound negation, correct quarter equality and quarter constant necessity. This is a normalization control, not a qualified-source refutation. Original1981 uses fullL1, author1987 report/Hildebrand use halfL1; exact selected primary scopes/versions credited. Standard foundations/default limits; no holes/custom axioms/native evaluation/raised limits/global flags/waivers/native experiment/paid compute/upload. General nonabelian matrix version, canonical measure-tvDist conversion and stronger expected random-support spectral averaging remain open. No novelty claim.",
+  "primaries": [
+    {
+      "url": "https://link.springer.com/content/pdf/10.1007/BF01199265.pdf",
+      "bytes": 576938,
+      "sha256": "4629e178e68096fa5b37193de34e3e55dfb3f12021721dea06080737b5901458",
+      "read_scope": "Full original13-page read/inspection credited; rechecked Upper Bound Lemma1p195 and actual iid Fourier power convention."
+    },
+    {
+      "url": "https://arxiv.org/pdf/math/0401189",
+      "bytes": 322419,
+      "sha256": "a43ec4cad3318fc072d601053ed8f60e6ec4d2bf145b99f9879e7d8434c7d570",
+      "read_scope": "Selected section4.1/4.2 pp12–16 and reference14p36 read; visual15–16 credited. Explicit unitary representations, unnormalized probability transform, nontrivial exclusion and quarter factor. Not full37-page read."
+    },
+    {
+      "url": "https://purl.stanford.edu/ps020md6873",
+      "bytes": 8209020,
+      "sha256": "9241668202c8092dd67a798614a09eb0e8e2a907f700dfa1cdaf37e1ff3d9784",
+      "read_scope": "Author Stanford report269, April1987,271 scanned pages; title/contents and chapter3B printed29–33/PDF35–39 OCR read; printed29/32/33 and contents visually inspected. Maxevent=halfL1 and Upper Bound Lemma/complete proof checked. Not full report or published1988 pagination."
+    },
+    {
+      "url": "https://www.imo.universite-paris-saclay.fr/~pierre-loic.meliot/symmetric/texts/Diaconis%2C%20Shahshahani%20-%20Generating%20a%20random%20permutation%20with%20random%20transpositions.pdf",
+      "bytes": 925947,
+      "sha256": "3b8bbd8293e3de24889ae65defde46e4c7cecbff9e472387984068ff3401a3a4",
+      "read_scope": "Published Diaconis–Shahshahani1981,21pages159–179. Selected normalization/definitions/convolution/Plancherel and full Lemma14 proof on168 read; images159/161/162/168 inspected. FullL1 normalization means no quarter factor in its bound. Not full paper read."
+    }
+  ],
+  "prior": [
+    {
+      "path": "research/walk_character_audit_20261114/README.md",
+      "commit": "553e11cae69f3a73c11776803f96579d68b6ed3a",
+      "sha256": "c8957aeda6c2c71a260cb927bcba066c20e2fbb06b994f0b9a9b1c027e99a283"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/sources.json",
+      "commit": "553e11cae69f3a73c11776803f96579d68b6ed3a",
+      "sha256": "3ac10f0f63e74da023b21b75e2bf1ba2ce1213fdd22788fe1c144df2035459ba"
+    },
+    {
+      "path": "research/walk_character_audit_20261114/verification.json",
+      "commit": "553e11cae69f3a73c11776803f96579d68b6ed3a",
+      "sha256": "83936394e84b6b6699d4f5ee7266673ea4671b7e3352298f97e7d81ea649b674"
+    },
+    {
+      "path": "research/hildebrand_box_asymptotic_audit_20261114/README.md",
+      "commit": "553e11cae69f3a73c11776803f96579d68b6ed3a",
+      "sha256": "e55137493fe05ba7350f5995d1dcae20395dd17b03e5b666b73d0d73e7ba90c9"
+    },
+    {
+      "path": "research/hildebrand_cell_audit_20261114/lean/UniformChoices.lean",
+      "commit": "553e11cae69f3a73c11776803f96579d68b6ed3a",
+      "sha256": "ada870ea6fd8545943f33542161c09ce2cfab73922b8022988a1340da22557f0"
+    }
+  ],
+  "official_mathlib": {
+    "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "sources": [
+      {
+        "path": "Mathlib/Analysis/Fourier/FiniteAbelian/PontryaginDuality.lean",
+        "sha256": "08f9b82db591e733d8ad6e979f751ee96143015e3c48510f92a4328fc5834b80"
+      },
+      {
+        "path": "Mathlib/Analysis/Fourier/FiniteAbelian/Orthogonality.lean",
+        "sha256": "51f7b69756a69976a9f3f63ae8ff3d93c31e7de7e1154a36c18825fa18a8a9df"
+      },
+      {
+        "path": "Mathlib/Algebra/Order/BigOperators/Ring/Finset.lean",
+        "sha256": "aa14f233b0b83a55314925b119fd1cd2824a055cf1ebab8ec7f23fab96305f45"
+      },
+      {
+        "path": "Mathlib/Algebra/Order/BigOperators/Group/Finset.lean",
+        "sha256": "6c31074e3991a03e6f99c99229fbde4aba6dea19202dab72c880427d9ae351c4"
+      },
+      {
+        "path": "Mathlib/Algebra/BigOperators/Group/Finset/Basic.lean",
+        "sha256": "45b548e8d8491da4820c71eb29b0a2c92786f98e300d947e677f6fbe16e6f78a"
+      },
+      {
+        "path": "Mathlib/MeasureTheory/Measure/TotalVariation/Defs.lean",
+        "sha256": "40311c6132a8e029f0e84334fc1159e21c30b4150ca511767b43c9045faaa498"
+      },
+      {
+        "path": "Mathlib/Probability/Distributions/Uniform.lean",
+        "sha256": "19b53a1140fb5a29373ddecd3550a07020da16b6f1f9118827ea85a67c752f20"
+      }
+    ]
+  },
+  "kb": "MCP absent; fresh status, two finite-Fourier/negative-normalization queries and AddChar Parseval theorem query all127. Primary/prior/official fallback before approach/code. No absence/novelty claim.",
+  "source_connection": "Actual finite-abelian specialization of Hildebrand1994Lemma1/preprint section4.1 Upper Bound Lemma, with actual iid application. Derives Plancherel from finite-character orthogonality and PMF-to-halfL1/maxevent from point probabilities. Original1981 published fullL1 and author1987 report halfL1 conventions explicitly separated; normalization-deletion counter is not a source refutation.",
+  "primary_access": "Published1988 book DOI returns bot-check iframe, not read. Public Stanford metadata/stacks downloads succeed and match metadata SHA1/byte counts. Author1987 report selected3B read with its own pagination. Author1980 transpositions report downloaded/hash-checked but unread. Published1981 university mirror selected proof actually read. No raw PDFs/scans/OCR text committed; hash/read-scope metadata retained.",
+  "attempts": "All failed/success build source/config/log/exit states retained. Finite double-sum order and factor collection corrected; indicator theorem receives only local Classical scope; deprecated alias replaced by current ite_eq_right. Dry PCC extraction initially stopped at an ASCII abs bar after357 characters; equivalent explicit abs syntax and second whole gate preserve complete statement binding. First whole gate retained in attempts; no truncated claim issued. Final default limits/standard axioms, no waivers.",
+  "finite_abelian_plancherel_derived": true,
+  "actual_uniform_pmf_and_character_coefficients": true,
+  "actual_half_l1_equals_max_event_by_attainment": true,
+  "actual_nontrivial_fourier_quarter_bound": true,
+  "actual_independent_walk_spectral_upper_bound": true,
+  "actual_two_point_normalization_negation_and_sharpness": true,
+  "full_nonabelian_matrix_bound_closed": false,
+  "canonical_measure_tvDist_bridge_closed": false,
+  "stronger_expected_random_support_mixing_closed": false,
+  "qualified_theorem_one_or_two_refuted": false,
+  "full_diaconis_book_or_paper_read": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

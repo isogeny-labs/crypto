@@ -1,0 +1,31 @@
+   Compiling quotient-target-calibration v0.1.0 (/workspace/crypto-quotient-target/research/quotient_calibration_20261025/target-native)
+    Finished `release` profile [optimized] target(s) in 2.71s
+     Running unittests src/main.rs (research/quotient_calibration_20261025/target-native/target/release/deps/quotient_target_calibration-b7161ba81b9f66d7)
+
+running 8 tests
+test tests::evaluator_envelope_rejects_reference_scalar_labels - should panic ... ok
+test tests::deficient_target_frame_is_rejected - should panic ... ok
+test tests::prediction_parser_requires_the_complete_frozen_case_list ... ok
+test tests::projective_comparison_rejects_prefixes_and_extra_coordinates ... ok
+test tests::scalar_fast_path_preserves_extension_products ... ok
+test tests::prediction_parser_rejects_malformed_vectors_in_every_output_column ... ok
+test tests::planted_projective_map_recovers_the_same_matrix ... ok
+test tests::historical_target_vectors_are_reproduced_by_two_paths ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/bin/trace-certificate.rs (research/quotient_calibration_20261025/target-native/target/release/deps/trace_certificate-4e5418e3d9949ec0)
+
+running 9 tests
+test identity_certificate::tests::degree_bound_is_checked_syntactically_not_trusted ... ok
+test identity_certificate::tests::field_arithmetic_agrees_with_u128_reference ... ok
+test identity_certificate::tests::committed_schoenhage_certificate_still_checks ... ok
+test identity_certificate::tests::points_depend_on_the_id_so_the_author_cannot_pre_pick_them ... ok
+test identity_certificate::tests::canonical_bytes_are_sorted_and_round_trip ... ok
+test identity_certificate::tests::schoenhage_identity_certifies_and_checks ... ok
+test identity_certificate::tests::swapping_the_statement_under_a_sealed_id_is_malformed ... ok
+test identity_certificate::tests::the_identity_without_its_error_term_is_false_and_cannot_be_issued ... ok
+test identity_certificate::tests::tampering_with_the_digest_is_detected ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

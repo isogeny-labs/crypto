@@ -1,0 +1,31 @@
+S4Degree.lean:385:10: error: Application type mismatch: The argument
+  positionPolynomial_curve_eval W x y z
+has type
+  ∀ (t : K) (i : Fin 4),
+    eval t
+        (positionPolynomial (WeierstrassCurve.b₂ W) (WeierstrassCurve.b₄ W) (WeierstrassCurve.b₆ W)
+          (WeierstrassCurve.b₈ W) x y z i) =
+      match i with
+      | 0 => generalS4 W t x y z
+      | 1 => generalS4 W x t y z
+      | 2 => generalS4 W x y t z
+      | 3 => generalS4 W x y z t
+but is expected to have type
+  ∀ (i : Fin 4) (t : K),
+    eval t
+        (positionPolynomial (WeierstrassCurve.b₂ W) (WeierstrassCurve.b₄ W) (WeierstrassCurve.b₆ W)
+          (WeierstrassCurve.b₈ W) x y z i) =
+      match i with
+      | 0 => generalS4 W t x y z
+      | 1 => generalS4 W x t y z
+      | 2 => generalS4 W x y t z
+      | 3 => generalS4 W x y z t
+in the application
+  And.intro (positionPolynomial_curve_eval W x y z)
+'S4DegreeAudit.quartic_coeff_four' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.quartic_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.curveLast_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.fullySymbolicLast_natDegree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.all_four_symbolic_degrees' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.actual_specialization_degree_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.s4_degree_audit_certificate' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

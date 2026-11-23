@@ -1,0 +1,27 @@
+{
+  "schema": "lab-browser-software-protocol/v1",
+  "purpose": "local software catalog-generation control; no cryptanalysis price or attack claim",
+  "baseline_commit": "6458fa6a05fa1666c92ba7e5b44b2d36ad8e7d5c",
+  "trial_order": [
+    "baseline-a1",
+    "candidate-b1",
+    "candidate-b2",
+    "baseline-a2"
+  ],
+  "source_sha256": {
+    "baseline": "93f50c69d0a6f05c7282f50cdb8b3d62ef57db0e67eeb3f89bd8da98b1b2b105",
+    "candidate": "81760f2d9f067447895a0c32a47b64f086d6089d5688fd0155601eb8facb055c"
+  },
+  "input_sha256": {
+    "docs/browser/data.json": "a3b17b4440c4761655220a313dae7f54418ec1ced2eaaba5944c3a54567a6d43",
+    "docs/curves/registry.json": "c0e1027ac8023409e7ce072428b4a978cd4d81cbcf7101dc7e728b7abb8f0134",
+    "docs/curves/covers.json": "55547076f290ea08a3c2c7c979ab4f64a81d72f83780244309eeed227d55cd88",
+    "docs/curves/cover-links.yaml": "73026051d5f156f0ddd731e5c0713985c8941b9c83e040903ea9a971c3622021",
+    "docs/ic/leaderboard.json": "c5b64f609806a07ca5b8958a12091a727ab9c62f87c3d111588b9b1214d0da3e"
+  },
+  "semantic_sha256": "0c1f719ceddd9134bd8d1ec293896406036274d02c2fc384e44a3d5d4dd87692",
+  "timing_scope": "generator main, including build/render/document check; excludes module import and independent digest",
+  "isolation": "unisolated local software control",
+  "failure_rule": "retain failed, invalid or interrupted arms with their actual status; do not pool failures as successful elapsed times",
+  "publication": "each registered run has a bench.record/v1 entry, raw JSON and the standard progress report; existing CI uploads Git-tracked raw files and verifies S3 custody"
+}

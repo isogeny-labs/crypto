@@ -1,0 +1,29 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "pfd-a-20261108",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0d6b2ecd6df3f5f092fe4b6179986b041eb7d6be3b94e52d92809bdab2ff3ae8",
+    "command": [
+      "/usr/local/bin/entry.sh",
+      "g1",
+      "hky-A",
+      "g3",
+      "d-A",
+      "cap-A"
+    ],
+    "cpu": 12,
+    "memory": "56Gi",
+    "seconds": 172800,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 300,
+    "instance_type": "r6i.4xlarge"
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "source_revision": "f13a690df016d0a457bd40579fbb9d054f486adf",
+    "study": "prime_fall_degree",
+    "protocol_sha256": "7bfc1dec059f730ac38d4c35b4abb0c3b71b9e6cd286250cff3a7f30c0c9011d",
+    "note": "stage A + F4 chain: g1 hky-A g3 d-A cap-A. seconds is a proposal (worst-case sum of per-system budgets ~3.8e5 s; the proposed 172800 s is below it). Amendment 9 (R2-C, AMENDMENT_R2_C_cpu12.md, frozen 2026-11-08): cpu 14->12 because a 14-vCPU pod cannot be scheduled on cpu-spot (14180m > 14000m allocatable); RAYON_NUM_THREADS=12 from the pod env; instance_type r6i.4xlarge where seconds > 90000 (US$40 per job); every wall budget and seconds unchanged."
+  }
+}

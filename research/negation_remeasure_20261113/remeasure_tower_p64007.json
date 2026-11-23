@@ -1,0 +1,607 @@
+{
+  "args": "Args { sections: [\"tower\"], out_dir: \"research/negation_remeasure_20261113\", tag: \"_p64007\", tower_primes: \"64007\", tower_instances: 3, tower_old_seeds: 4, tower_seeds: 2, tower_rho_seeds: 64, v3_seeds: 8, v3_rho_seeds: 32, cover_primes: \"211,419,821,1619,3203,6421,12841\", cover_seeds: 3, cover_ic_seeds: 8, cover_rho_seeds: 32, threads: 4, max_trials: 40000000, no_calibration: false }",
+  "calibration": {
+    "batch_len": 20000,
+    "batches": 25,
+    "calibrated_reading": "every native class at 0, 1 and 10 times its own w_cal",
+    "definition": "w_cal(class) = time(one native operation of the class) / time(one group addition of the arm's own group), same host and process",
+    "host": {
+      "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+      "cpus": 4,
+      "isolation": "none: shared VM, other processes may run"
+    },
+    "method": "best-of-N timing (not perf-ipc; no isolated host): minimum over batches of ns per operation"
+  },
+  "calibration_skipped": false,
+  "ok": true,
+  "rows": [
+    {
+      "arms": {
+        "g2_A": {
+          "attempts": 2.0,
+          "certified": 6,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 31956.333333333332,
+          "core_cols": 2383.3333333333335,
+          "exhausted": 0,
+          "group_ops": 83882.83333333333,
+          "la_add": 2273564471.6666665,
+          "la_mul": 1150809630.0,
+          "lower_bound": false,
+          "name": "g2_A",
+          "native": {
+            "mul_p": 20361045.666666668,
+            "mul_r": 1150809630.0
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            268.2283658650323,
+            229791.4700656924,
+            512414.6952525265
+          ],
+          "ratio_neg_band": [
+            268.2283658650323,
+            229791.4700656924,
+            512414.6952525265
+          ],
+          "ratio_neg_cal": [
+            268.2283658650323,
+            26113.29894468542,
+            187302.11584587346
+          ],
+          "ratio_plain_band": [
+            228.45334619421828,
+            190820.81248791612,
+            412799.6681755603
+          ],
+          "rel_add": 16440437.833333334,
+          "rel_mul": 20361045.666666668,
+          "relations": 33554.666666666664,
+          "runs": 6,
+          "setup_ops": 501.5,
+          "t_add_ns": 860.88975,
+          "total_band": [
+            83882.83333333333,
+            117200950.4,
+            1171254558.5
+          ],
+          "total_cal": [
+            83882.83333333333,
+            8528212.841590218,
+            84527182.91590215
+          ],
+          "total_w1_with_additions": 3461259468.0,
+          "trials": 67376.66666666667,
+          "verify_ops": 20.0,
+          "walk_ops": 83361.33333333333
+        },
+        "g2_B": {
+          "attempts": 1.0,
+          "certified": 6,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 3201.0,
+          "core_cols": 17.333333333333332,
+          "exhausted": 0,
+          "group_ops": 50575.0,
+          "la_add": 359893.3333333333,
+          "la_mul": 446118.6666666667,
+          "lower_bound": false,
+          "name": "g2_B",
+          "native": {
+            "mul_p": 11292732.666666666,
+            "mul_r": 446118.6666666667
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            161.72140430351075,
+            2400.7526655304355,
+            5157.78167773689
+          ],
+          "ratio_neg_band": [
+            161.72140430351075,
+            2400.7526655304355,
+            5157.78167773689
+          ],
+          "ratio_neg_cal": [
+            161.72140430351075,
+            414.0337720730896,
+            1987.6387628694474
+          ],
+          "ratio_plain_band": [
+            137.74007773270165,
+            1993.6056551101888,
+            4155.092710685243
+          ],
+          "rel_add": 9676719.5,
+          "rel_mul": 11292732.666666666,
+          "relations": 3531.5,
+          "runs": 6,
+          "setup_ops": 501.5,
+          "t_add_ns": 860.88975,
+          "total_band": [
+            50575.0,
+            1224460.1333333333,
+            11789426.333333332
+          ],
+          "total_cal": [
+            50575.0,
+            135217.23698431381,
+            896997.369843138
+          ],
+          "total_w1_with_additions": 21826039.166666664,
+          "trials": 40400.833333333336,
+          "verify_ops": 20.0,
+          "walk_ops": 50053.5
+        },
+        "g2_C": {
+          "attempts": 1.0,
+          "certified": 6,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 506.0,
+          "core_cols": 1.3333333333333333,
+          "exhausted": 0,
+          "group_ops": 52898.0,
+          "la_add": 92884.66666666667,
+          "la_mul": 9178.5,
+          "lower_bound": false,
+          "name": "g2_C",
+          "native": {
+            "mul_p": 11694102.333333334,
+            "mul_r": 9178.5
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            169.14955699153953,
+            2398.33311037609,
+            5143.236156904743
+          ],
+          "ratio_neg_band": [
+            169.14955699153953,
+            2398.33311037609,
+            5143.236156904743
+          ],
+          "ratio_neg_cal": [
+            169.14955699153953,
+            420.3618257489884,
+            1987.10579220809
+          ],
+          "ratio_plain_band": [
+            144.06672529717156,
+            1991.5964357067028,
+            4143.374884813775
+          ],
+          "rel_add": 10082676.166666666,
+          "rel_mul": 11694102.333333334,
+          "relations": 21229.166666666668,
+          "runs": 6,
+          "setup_ops": 501.5,
+          "t_add_ns": 860.88975,
+          "total_band": [
+            52898.0,
+            1223226.0833333335,
+            11756178.833333334
+          ],
+          "total_cal": [
+            52898.0,
+            137283.884662012,
+            896756.8466201199
+          ],
+          "total_w1_with_additions": 21931739.666666668,
+          "trials": 41956.5,
+          "verify_ops": 20.0,
+          "walk_ops": 52376.5
+        },
+        "g2_recorded": {
+          "certified": 12,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "counters_listed": [
+            "linalg_mulmods",
+            "linalg_inversions",
+            "oracle_fp_muls",
+            "factor_base_fp_muls",
+            "factor_base_lookups",
+            "canonicalisations",
+            "step_draws",
+            "large_prime_*"
+          ],
+          "group_ops": 63987.0,
+          "la_mulmods": 15322621.833333334,
+          "lower_bound": false,
+          "name": "g2_recorded",
+          "native": {
+            "canon": 63930.666666666664,
+            "draw": 127922.58333333333,
+            "inv_r": 26803.75,
+            "lookup": 63930.666666666664,
+            "mul_p": 7418232.083333333,
+            "mul_r": 15322621.833333334
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            204.60835387382585,
+            4639.575990466281,
+            10100.569168195234
+          ],
+          "ratio_neg_band": [
+            204.60835387382585,
+            4639.575990466281,
+            10100.569168195234
+          ],
+          "ratio_neg_cal": [
+            204.60835387382585,
+            712.4084209771828,
+            3879.4220992377545
+          ],
+          "ratio_plain_band": [
+            174.26741184147068,
+            3852.7437935233534,
+            8136.98677974191
+          ],
+          "recorded_class": "above",
+          "recorded_ratio_to_old_plain_rho_la_priced": [
+            47.08190036751884,
+            1174.5267790556416,
+            11321.530687248744
+          ],
+          "runs": 12,
+          "t_add_ns": 860.88975,
+          "total_band": [
+            63987.0,
+            2366331.1583333337,
+            23087428.583333336
+          ],
+          "total_cal": [
+            63987.0,
+            232661.93433101723,
+            1750736.3433101722
+          ]
+        },
+        "g3_A": {
+          "attempts": 2.0,
+          "certified": 6,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 31906.0,
+          "core_cols": 2357.6666666666665,
+          "exhausted": 0,
+          "group_ops": 81878.83333333333,
+          "la_add": 2252844103.8333335,
+          "la_mul": 1140205095.3333333,
+          "lower_bound": false,
+          "name": "g3_A",
+          "native": {
+            "mul_p": 44324140.5,
+            "mul_r": 1140205095.3333333
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            261.8202651388981,
+            232406.70325888603,
+            518258.08395748126
+          ],
+          "ratio_neg_band": [
+            261.8202651388981,
+            232406.70325888603,
+            518258.08395748126
+          ],
+          "ratio_neg_cal": [
+            261.8202651388981,
+            16245.307257135695,
+            115930.05566354084
+          ],
+          "ratio_plain_band": [
+            222.99548923373712,
+            192992.5246172998,
+            417507.0837527763
+          ],
+          "rel_add": 38047501.333333336,
+          "rel_mul": 44324140.5,
+          "relations": 33502.0,
+          "runs": 6,
+          "setup_ops": 501.5,
+          "t_add_ns": 1407.5672,
+          "total_band": [
+            81878.83333333333,
+            118534802.41666666,
+            1184611114.6666665
+          ],
+          "total_cal": [
+            81878.83333333333,
+            5305474.35846208,
+            52317834.08462081
+          ],
+          "total_w1_with_additions": 3475502719.8333335,
+          "trials": 65716.33333333333,
+          "verify_ops": 20.0,
+          "walk_ops": 81357.33333333333
+        },
+        "g3_B": {
+          "attempts": 1.0,
+          "certified": 6,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 8049.0,
+          "core_cols": 119.33333333333333,
+          "exhausted": 0,
+          "group_ops": 47541.666666666664,
+          "la_add": 6309955.166666667,
+          "la_mul": 7328780.666666667,
+          "lower_bound": false,
+          "name": "g3_B",
+          "native": {
+            "mul_p": 25003012.5,
+            "mul_r": 7328780.666666667
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            152.0218506428619,
+            6432.385531538579,
+            14165.70537181138
+          ],
+          "ratio_neg_band": [
+            152.0218506428619,
+            6432.385531538579,
+            14165.70537181138
+          ],
+          "ratio_neg_cal": [
+            152.0218506428619,
+            582.1584158786568,
+            3264.805532080224
+          ],
+          "ratio_plain_band": [
+            129.47885046384295,
+            5341.5082509930035,
+            11411.847730234778
+          ],
+          "rel_add": 21852244.333333332,
+          "rel_mul": 25003012.5,
+          "relations": 8751.166666666666,
+          "runs": 6,
+          "setup_ops": 501.5,
+          "t_add_ns": 1407.5672,
+          "total_band": [
+            47541.666666666664,
+            3280720.9833333334,
+            32379334.833333336
+          ],
+          "total_cal": [
+            47541.666666666664,
+            190124.23090061586,
+            1473367.3090061585
+          ],
+          "total_w1_with_additions": 60541534.33333333,
+          "trials": 38045.333333333336,
+          "verify_ops": 20.0,
+          "walk_ops": 47020.166666666664
+        },
+        "g3_C": {
+          "attempts": 1.0,
+          "certified": 6,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "columns": 3201.0,
+          "core_cols": 16.666666666666668,
+          "exhausted": 0,
+          "group_ops": 44494.0,
+          "la_add": 409672.1666666667,
+          "la_mul": 429916.6666666667,
+          "lower_bound": false,
+          "name": "g3_C",
+          "native": {
+            "mul_p": 23093987.166666668,
+            "mul_r": 429916.6666666667
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            142.2764639264539,
+            4699.480542980881,
+            10310.989447780072
+          ],
+          "ratio_neg_band": [
+            142.2764639264539,
+            4699.480542980881,
+            10310.989447780072
+          ],
+          "ratio_neg_cal": [
+            142.2764639264539,
+            453.8934706299132,
+            2397.365688422276
+          ],
+          "ratio_plain_band": [
+            121.17858662657098,
+            3902.4890489903783,
+            8306.500695706445
+          ],
+          "rel_add": 20325569.5,
+          "rel_mul": 23093987.166666668,
+          "relations": 18074.5,
+          "runs": 6,
+          "setup_ops": 501.5,
+          "t_add_ns": 1407.5672,
+          "total_band": [
+            44494.0,
+            2396884.383333334,
+            23568397.833333336
+          ],
+          "total_cal": [
+            44494.0,
+            148234.818325311,
+            1081902.18325311
+          ],
+          "total_w1_with_additions": 44303639.5,
+          "trials": 35508.5,
+          "verify_ops": 20.0,
+          "walk_ops": 43972.5
+        },
+        "g3_recorded": {
+          "certified": 12,
+          "class_best_band": "above",
+          "class_best_cal": "above",
+          "class_neg_band": "above",
+          "class_neg_cal": "above",
+          "class_plain_band": "above",
+          "counters_listed": [
+            "linalg_mulmods",
+            "linalg_inversions",
+            "oracle_fp_muls",
+            "factor_base_fp_muls",
+            "factor_base_lookups",
+            "canonicalisations",
+            "step_draws",
+            "large_prime_*"
+          ],
+          "group_ops": 192688.33333333334,
+          "la_mulmods": 2168308628.0833335,
+          "lower_bound": false,
+          "name": "g3_recorded",
+          "native": {
+            "canon": 95745.41666666667,
+            "draw": 321086.9166666667,
+            "inv_r": 29955.416666666668,
+            "lookup": 95745.41666666667,
+            "mul_p": 105584154.83333333,
+            "mul_r": 2168308628.0833335
+          },
+          "ranked_at_calibrated_price": true,
+          "ratio_best_band": [
+            616.150822729998,
+            446317.72559920186,
+            995131.9354425621
+          ],
+          "ratio_neg_band": [
+            616.150822729998,
+            446317.72559920186,
+            995131.9354425621
+          ],
+          "ratio_neg_cal": [
+            616.150822729998,
+            31305.19458378152,
+            222704.58119356108
+          ],
+          "ratio_plain_band": [
+            524.7831144145933,
+            370626.07677409076,
+            801675.1598803164
+          ],
+          "recorded_class": "above",
+          "recorded_ratio_to_old_plain_rho_la_priced": [
+            141.78087599017394,
+            159686.83032892746,
+            1595592.2754053632
+          ],
+          "runs": 12,
+          "t_add_ns": 1407.5672,
+          "total_band": [
+            192688.33333333334,
+            227636219.94166666,
+            2274628004.4166665
+          ],
+          "total_cal": [
+            192688.33333333334,
+            10223808.298729768,
+            100503887.98729768
+          ]
+        }
+      },
+      "calibration_skipped": false,
+      "class_times_ns": {
+        "canon": 2.2878,
+        "draw": 2.06995,
+        "hash": 2.07035,
+        "insert": 7.2603,
+        "inv_r": 125.868,
+        "lookup": 4.19185,
+        "mul_p": 6.2074,
+        "mul_r": 6.20715,
+        "word": 1.03565
+      },
+      "gate_reproduces_record": true,
+      "instances": 3,
+      "old_plain_rho_ops_mean": 1359.0572916666667,
+      "p": 64007,
+      "r_mean": 26649.666666666668,
+      "rho": {
+        "automorphism_fold": {
+          "automorphism_beyond_negation": null,
+          "fold_run": false,
+          "j_invariant": 17143,
+          "note": "a curve with j = 0 or 1728 would be an implementation gap: the fold is not implemented for this curve type"
+        },
+        "negation": {
+          "canonicalisations": 236.59895833333334,
+          "certified": 192,
+          "dp_inserts": 20.541666666666668,
+          "dp_lookups": 21.614583333333332,
+          "key_evaluations": 731.4114583333334,
+          "kind": "negation",
+          "native": 1973.0260416666667,
+          "native_per_step": 10.788318049780715,
+          "other_ops": 97.8125,
+          "partition_hashes": 236.59895833333334,
+          "runs": 192,
+          "steps": 182.88541666666666,
+          "total_ops": 312.7291666666667,
+          "walk_ops": 214.91666666666666,
+          "walk_share": 0.6872293651322363,
+          "walks": 21.682291666666668,
+          "word_ops": 1457.671875
+        },
+        "plain": {
+          "canonicalisations": 0.0,
+          "certified": 192,
+          "dp_inserts": 31.223958333333332,
+          "dp_lookups": 32.223958333333336,
+          "key_evaluations": 323.2708333333333,
+          "kind": "plain",
+          "native": 2470.1666666666665,
+          "native_per_step": 9.546730006642644,
+          "other_ops": 108.36979166666667,
+          "partition_hashes": 291.046875,
+          "runs": 192,
+          "steps": 258.7447916666667,
+          "total_ops": 367.1770833333333,
+          "walk_ops": 258.8072916666667,
+          "walk_share": 0.7048568753723511,
+          "walks": 32.239583333333336,
+          "word_ops": 2115.671875
+        }
+      },
+      "skipped": [],
+      "t_add_ns": {
+        "E": 200.6741,
+        "J_g2": 860.88975,
+        "J_g3": 1407.5672
+      },
+      "target": "tower_large",
+      "transfer_wall_s_mean_one_time": 309.623562622,
+      "wall_s_max_instance": 625.595916456
+    }
+  ],
+  "section": "tower",
+  "wall_s": 626.940957046
+}

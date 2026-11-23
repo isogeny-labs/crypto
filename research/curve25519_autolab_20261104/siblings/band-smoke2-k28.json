@@ -1,0 +1,91 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp28-tm29890-9a501a3e",
+      "log2_r": 25.00015593684098,
+      "arm": "rho-neg",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.9480806685017128,
+        1.0364167678108571,
+        1.8314416615931561
+      ],
+      "charged_sum": 131812.0,
+      "native_sum": 122814,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm29890-9a501a3e",
+      "log2_r": 25.00015593684098,
+      "arm": "tw2cj-lazy",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.8393895657194455,
+        2.017051476199976,
+        3.6160086705247516
+      ],
+      "charged_sum": 255731.0,
+      "native_sum": 247004,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 10249.083333333334
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm29890-9a501a3e",
+      "log2_r": 25.00015593684098,
+      "arm": "tw2cj-lazy-sib8-p64",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.0495980611156872,
+        1.3515867701516282,
+        4.069485151475102
+      ],
+      "charged_sum": 145926.0,
+      "native_sum": 419856,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "sibling_lift_products": 706.375,
+        "sibling_second_points": 5550.125,
+        "table_insert_attempts": 11194.166666666666
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp28-tm29890-9a501a3e",
+      "a": "rho-neg",
+      "b": "tw2cj-lazy",
+      "verdict": "rho-neg < tw2cj-lazy"
+    },
+    {
+      "curve": "icv1-fp28-tm29890-9a501a3e",
+      "a": "rho-neg",
+      "b": "tw2cj-lazy-sib8-p64",
+      "verdict": "rho-neg < tw2cj-lazy-sib8-p64"
+    },
+    {
+      "curve": "icv1-fp28-tm29890-9a501a3e",
+      "a": "tw2cj-lazy",
+      "b": "tw2cj-lazy-sib8-p64",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}

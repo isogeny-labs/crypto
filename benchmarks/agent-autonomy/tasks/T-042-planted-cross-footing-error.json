@@ -1,0 +1,36 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-042",
+  "title": "Find the inconsistent number in a copied results table",
+  "class": "research",
+  "difficulty": 2,
+  "source": [
+    "research/smith_near_prime_20261114/tables.md (T1 pooled row, T2 admitted column)",
+    "AGENTS.md 'Persistent scientific research loop' (inspect outputs, check correctness)"
+  ],
+  "prompt": "The research-kb server may be unreachable in this environment; if so, record that under 'Sources checked' and use the repository's own files. Every number you report is an unverified assertion unless a pcc claim says otherwise; tag it. `benchmarks/agent-autonomy/fixtures/T-042/tables.md` is a copy of a committed results table in which a number has been altered. Find the inconsistency by cross-footing (row sums against the pooled row, and the two tables against each other), say which cell is wrong and what it should be, and how you know. Write `$T_OUT/error-report.json` with keys `line`, `found`, `expected`, `method`. Do not edit the copy. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Harness copies research/smith_near_prime_20261114/tables.md to benchmarks/agent-autonomy/fixtures/T-042/tables.md and changes the pooled admitted pass cell `82/761 = 0.108 [0.088, 0.132]` to `92/761 = 0.121 [0.100, 0.145]`. Commits it.",
+  "acceptance": [
+    "error-report.json names the line of the altered pooled cell",
+    "found is `92/761`, expected is `82/761`",
+    "method cites the per-prime admitted pass counts 26, 20, 13, 10, 13 (sum 82)",
+    "the copy is unchanged"
+  ],
+  "check_command": "python3 -c \"import json,os,subprocess;r=json.load(open(os.environ['T_OUT']+'/error-report.json'));L=[i for i,l in enumerate(open('benchmarks/agent-autonomy/fixtures/T-042/tables.md'),1) if '92/761' in l];assert int(r['line']) in L;assert '92/761' in r['found'] and '82/761' in r['expected'];assert all(s in r['method'] for s in ['26','20','13','10'])\" && git diff --quiet \"$T_BASE\" HEAD -- benchmarks/agent-autonomy/fixtures/T-042",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "citing a result as verified without a pcc claim id (use [pcc:unverified])",
+    "editing the study or evidence you are checking",
+    "inventing a source id, claim id or number"
+  ],
+  "max_wall_minutes": 25,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Planted defect on top of a real table; the true value 82 is the sum of per-prime counts and matches T2 (0+33+35+14)."
+}

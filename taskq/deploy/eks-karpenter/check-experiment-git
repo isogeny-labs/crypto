@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+"""Check exact launch inputs are clean, committed and available from GitHub."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+
+def command(*args):
+    return subprocess.check_output(args)
+
+
+def verify(repository, paths):
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
+        raise ValueError("Expected GitHub owner/repository")
+    root = Path(command("git", "rev-parse", "--show-toplevel").decode().strip())
+    revision = command("git", "rev-parse", "HEAD").decode().strip()
+    records = []
+    for name in paths:
+        path = Path(name)
+        if path.is_absolute() or ".." in path.parts or str(path) != name:
+            raise ValueError("Use exact repository-relative file paths")
+        if (root / path).is_symlink() or not (root / path).is_file():
+            raise ValueError(f"Not a regular input file: {name}")
+        frozen = command("git", "-C", str(root), "show", f"{revision}:{name}")
+        staged = command("git", "-C", str(root), "show", f":{name}")
+        local = (root / path).read_bytes()
+        if frozen != local or frozen != staged:
+            raise ValueError(f"Uncommitted experiment input: {name}")
+        records.append({"path": name, "sha256": hashlib.sha256(frozen).hexdigest(), "bytes": len(frozen)})
+    published = command("gh", "api", f"repos/{repository}/commits/{revision}", "--jq", ".sha").decode().strip()
+    if published != revision:
+        raise ValueError("Exact commit is not verified on GitHub; push before spending")
+    return {"schema": "isolab.git-publication/v1", "repository": repository, "source_revision": revision,
+            "commit_url": f"https://github.com/{repository}/commit/{revision}", "inputs": records,
+            "scope": "listed inputs only; operator must enumerate every source, protocol and launch input"}
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--repository", required=True)
+    parser.add_argument("--path", required=True, action="append", dest="paths")
+    args = parser.parse_args()
+    print(json.dumps(verify(args.repository, args.paths), indent=2))

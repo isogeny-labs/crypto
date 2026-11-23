@@ -1,0 +1,229 @@
+{
+ "schema": "replay-certificate/producer-v1",
+ "id": "NH-20261112-replay",
+ "study": "research/jv_nagao_hilbert_20261112",
+ "status": "verified",
+ "independent": true,
+ "independence": "HOST-independent only: a second host (RunPod pod, see host) re-ran the frozen command; the replay was run by a sibling agent of the producing programme, not by an independent validator. A validator should re-sign or redo it.",
+ "scalars_verified": true,
+ "scope": "all 10 records: the A/A drift control aa_line_p1301_s1 and the 9 hilbert instances, frozen command of ../run.sh, unchanged flags",
+ "host": "host AMD EPYC 4564P 16-Core Processor nproc 32 mem 124 GB; Linux 4cbeb3be5757 6.8.0-138-generic #138~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug  7 13:43:15 UTC  x86_64 x86_64 x86_64 GNU/Linux",
+ "producer_host": "Intel Xeon, 4 vCPU cloud container (../results/walls.txt context; README \"local L0\")",
+ "binary": {
+  "replay_sha256": "9ccf9217c717fa58f859fe7d75c2880f240d3a71696c17765dff9254eecab2fc",
+  "study_sha256": "f35af5d3722fe19fc55e844e88d2637302aed85568245a5cd755627449f74745",
+  "source_commit": "dd00d429d6bc060085948ded46c3cbabcc60a882",
+  "note": "rebuilt from the study commit (git archive of the crate sources, rustc 1.97.0, cargo --release --example jv_cover); the hash did not reproduce byte-for-byte (different build directory and target state), every counted field did"
+ },
+ "comparison": "flattened JSON, every field compared for exact equality except timing fields (*_ms); the two fields [0].f4_muls_per_test_sum, [0].hilbert_check_muls are per-test differences of a process-wide counter (f4_fp.rs FIELD_OPS) and scale with the number of concurrent rayon threads, so they are not counted quantities; neither enters total_muls, s, or the rescore",
+ "concurrency_control": {
+  "run": "hilbert_p1301_s1 single-threaded (RAYON_NUM_THREADS=1) on the pod",
+  "replay": "replay_1thread/hilbert_p1301_s1.json",
+  "replay_sha256": "639ec13072d73c3950f9966af9e2ec85ee1452d343a63bb3f8e5e95b6b158ba1",
+  "differing_fields": [
+   "[0].f4_muls_per_test_sum",
+   "[0].hilbert_check_muls"
+  ],
+  "finding": "with one thread f4_muls_per_test_sum falls to within 0.02% of f4_muls (as its doc comment says) and hilbert_check_muls to 8.875e9 (11.1% of f4_muls), against 6.44e10 in the committed 4-thread record: the committed hilbert_check_muls is concurrency-inflated and must not be quoted"
+ },
+ "rho_reference_replay": {
+  "runs": 126,
+  "identical_except_wall_ms": 126,
+  "all_correct": true,
+  "none_capped": true,
+  "dir": "rho_fresh_run0-13/",
+  "compare": "rho_fresh_run0-13/compare.json",
+  "note": "the 126-run pooled reference of research/jv_cover_negrho_rescore_20261101 (binary 8f62bee...) re-run with the study binary on the pod: every record identical except wall_ms"
+ },
+ "runs": [
+  {
+   "run": "aa_line_p1301_s1",
+   "record": "../results/aa_line_p1301_s1.json",
+   "record_sha256": "04219838cf75c754a2711c27154267694b4cbb32db37827ee0427822db2fa4bb",
+   "replay": "replay/aa_line_p1301_s1.json",
+   "replay_sha256": "032950aa9df38a822cf1f4b514a57fa2f92aeb152b7c67da389728546af762f1",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 265597174434,
+   "s": 0.7287751622892765,
+   "relation_digest": 4198168094706900228,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  },
+  {
+   "run": "hilbert_p1301_s1",
+   "record": "../results/hilbert_p1301_s1.json",
+   "record_sha256": "65103e32587a0578e5ab3a757d9ae8822843059b725593dfc74ff5d7ce9ca64d",
+   "replay": "replay/hilbert_p1301_s1.json",
+   "replay_sha256": "3ccba91bc3cd030279b454c1e0506f28fad629c49277268a6919ac6a4daccd6a",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum",
+    "[0].hilbert_check_muls"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 140174712426,
+   "s": 0.38462701651404885,
+   "relation_digest": 4198168094706900228,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  },
+  {
+   "run": "hilbert_p1301_s2",
+   "record": "../results/hilbert_p1301_s2.json",
+   "record_sha256": "fbdd5a710227bd001860e329da4c235596eac2e485a1cbba433ff3e2ebdba44a",
+   "replay": "replay/hilbert_p1301_s2.json",
+   "replay_sha256": "15011fad1b3d0c3d5b8635e789535ba323af7f53a4a3dff34404fcab141ebdbd",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum",
+    "[0].hilbert_check_muls"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 150234219750,
+   "s": 0.41222941502945415,
+   "relation_digest": 1709996992905166501,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  },
+  {
+   "run": "hilbert_p1301_s3",
+   "record": "../results/hilbert_p1301_s3.json",
+   "record_sha256": "dea7a8f234791a246c00b0a9a58b0b6914eb445ba33c2d2944f5297cd838e357",
+   "replay": "replay/hilbert_p1301_s3.json",
+   "replay_sha256": "fd7c1b70d57242619b513c4e27b801d2991b5557045e721c660dce031e29d36c",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum",
+    "[0].hilbert_check_muls"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 135319708867,
+   "s": 0.37130531591288424,
+   "relation_digest": 7945254227474834773,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  },
+  {
+   "run": "hilbert_p1451_s1",
+   "record": "../results/hilbert_p1451_s1.json",
+   "record_sha256": "51647b65b0e52c88146b47252f5361b38530e29bc46292eceb2db080b247c47d",
+   "replay": "replay/hilbert_p1451_s1.json",
+   "replay_sha256": "7cdd1269675ae3e0c3972f2aa0720ea9d1dfa749ed499942c9d268a95f1a29c0",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum",
+    "[0].hilbert_check_muls"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 160577077018,
+   "s": 0.3176020615333068,
+   "relation_digest": 6420516432887268099,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  },
+  {
+   "run": "hilbert_p1451_s2",
+   "record": "../results/hilbert_p1451_s2.json",
+   "record_sha256": "4fe921e36cd7113796533a70058067a8926825fd312e41d52c314c3a7458d393",
+   "replay": "replay/hilbert_p1451_s2.json",
+   "replay_sha256": "721d5e9230c0a81d114f42969186834ce9d3d540f562007129dc19a9c4a7b6e4",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum",
+    "[0].hilbert_check_muls"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 168914503445,
+   "s": 0.33409248399584784,
+   "relation_digest": 18411537890479433485,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  },
+  {
+   "run": "hilbert_p1451_s3",
+   "record": "../results/hilbert_p1451_s3.json",
+   "record_sha256": "f85c041fe434e2dbee156f75e639c468222c4ded1f9feb5fef2de2d43ecbeb27",
+   "replay": "replay/hilbert_p1451_s3.json",
+   "replay_sha256": "6f32f909bef58039cf5e5a7bd4c5f558594632d4b509a65a3199190f586ed20c",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum",
+    "[0].hilbert_check_muls"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 162898818503,
+   "s": 0.3221941858346924,
+   "relation_digest": 13684779922048911267,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  },
+  {
+   "run": "hilbert_p1601_s1",
+   "record": "../results/hilbert_p1601_s1.json",
+   "record_sha256": "67285be2b3171de02ebf65fa0b2ec10ab297f1d7ada6a32a4156d92c53088557",
+   "replay": "replay/hilbert_p1601_s1.json",
+   "replay_sha256": "2e393405717214e4a2d318f6733722bead442d587d352816c699b7881a8612f6",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum",
+    "[0].hilbert_check_muls"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 187545267253,
+   "s": 0.27614304862381717,
+   "relation_digest": 8540138019265480148,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  },
+  {
+   "run": "hilbert_p1601_s2",
+   "record": "../results/hilbert_p1601_s2.json",
+   "record_sha256": "b55a1369bbfb43d9796876ea620b33e30a5824e1469ccfcf6801617a48ba5bf7",
+   "replay": "replay/hilbert_p1601_s2.json",
+   "replay_sha256": "55232ab50fe1b1a77a64bcdea67178092bf624df12bcf91c1aa4c25163d61306",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum",
+    "[0].hilbert_check_muls"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 180656654191,
+   "s": 0.26600020352753456,
+   "relation_digest": 13133600631316149944,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  },
+  {
+   "run": "hilbert_p1601_s3",
+   "record": "../results/hilbert_p1601_s3.json",
+   "record_sha256": "41b85d159f497f12bee7272a4db1f00f74181a0801cbbbae726ab5d71b3d2740",
+   "replay": "replay/hilbert_p1601_s3.json",
+   "replay_sha256": "f0a20c4743b63e8700761b3e169b901c0ac26ae9611fe975e5af41076fd050ad",
+   "fields_compared": 73,
+   "identical_counted_fields": true,
+   "differing_fields": [
+    "[0].f4_muls_per_test_sum",
+    "[0].hilbert_check_muls"
+   ],
+   "solved": true,
+   "correct": true,
+   "total_muls": 181461894403,
+   "s": 0.26718584518476646,
+   "relation_digest": 5485990484725658252,
+   "scalar": "correct: true -- the recovered logarithm equals the planted one"
+  }
+ ]
+}

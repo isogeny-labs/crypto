@@ -5,15 +5,15 @@
 //! A certificate is replayed using curve arithmetic and a matrix dependency,
 //! independently of the contraction implementation and its execution counters.
 
-use crate::arithmetic::{floor_root, hash_prime, inverse, is_prime, random_below, RandomSource};
+use crate::arithmetic::{floor_root, hash_prime_by, inverse, random_below, RandomSource};
 use crate::contraction::Counter;
 use crate::curve::{Curve, Point};
-use crate::encoding::Encoder;
+use crate::encoding::{Encoder, Multiplier, PointWords};
 use crate::network::Network;
 use crate::{integrity, invalid, overflow, BigUint, Error, Meter, Result};
 use num_integer::Integer;
 use num_traits::{One, ToPrimitive, Zero};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// One independent affine-hash seed over the common public prime.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -48,7 +48,7 @@ impl FactorBase {
             || seed.alpha.is_zero()
             || seed.alpha >= prime
             || seed.beta >= prime
-            || !is_prime(&prime, meter)?
+            || !curve.certifies_prime(&prime, meter)?
         {
             return Err(invalid("factor-base parameters"));
         }
@@ -96,11 +96,12 @@ impl FactorBase {
         meter.vector(count, "factor-base enumeration")?;
         let inv = inverse(&self.seed.alpha, &self.prime)?;
         let mut points = Vec::new();
+        let mut decoder = curve.decoder()?;
         for t in 0..count {
             meter.charge(1, "inverse-hash enumeration")?;
             let z = &inv * ((BigUint::from(t) + &self.prime - &self.seed.beta) % &self.prime)
                 % &self.prime;
-            if let Some(point) = curve.decode(&z, rng, meter)? {
+            if let Some(point) = decoder.decode(&z, rng, meter)? {
                 if curve.in_subgroup(&point, meter)? {
                     points.push(point);
                 }
@@ -124,18 +125,165 @@ pub fn decomposition_network(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<Network> {
+    Ok(decomposition_network_impl(curve, bases, target, false, Multiplier::Auto, true, meter)?.0)
+}
+
+/// The same language with the integer multiplication gadget chosen explicitly
+/// (`Fourier` is Theorem 3's gadget throughout). Only the Boolean graph
+/// changes: the accepted assignments, counts and witnesses do not. Free points
+/// keep the plain `(x, y)` input layout here; `decomposition_network` (Auto
+/// multiplier) enumerates prime-order free points as `(x, parity of y)`.
+pub fn decomposition_network_with_multiplier(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    multiplier: Multiplier,
+    meter: &mut Meter,
+) -> Result<Network> {
+    Ok(decomposition_network_impl(curve, bases, target, false, multiplier, false, meter)?.0)
+}
+
+/// Build the same decomposition language with semantic slot regions and return
+/// the canonical vertex side immediately after slot `ceil(m/2)`.
+///
+/// Region labels are bound into every production predicate tag. Equality,
+/// fanout and endpoint vertices inherit the region in which their signal was
+/// produced, placing the wiring needed to legalize a crossing on the producer
+/// side of the cut.
+pub fn decomposition_network_with_semantic_cut(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    meter: &mut Meter,
+) -> Result<(Network, Vec<usize>)> {
+    decomposition_network_impl(
+        curve,
+        bases,
+        target,
+        true,
+        Multiplier::Fourier,
+        false,
+        meter,
+    )
+}
+
+/// The same language as the general construction, with the last slot computed
+/// instead of searched: slots `0..m-1` are free input points, and
+/// `A_m = target - (A_1 + ... + A_{m-1})` is built from them, then held to its
+/// own hash predicate and marked as interface like every other slot. Each
+/// assignment of the general network maps to exactly one here (its last point is
+/// determined by the others), so counts and the canonical witness are unchanged,
+/// while the free input bits drop from `2*w*m` to `2*w*(m-1)`. `hash_member`
+/// still rejects an identity last slot, as the general network does.
+fn derived_last_slot_network(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    multiplier: Multiplier,
+    compressed: bool,
+    meter: &mut Meter,
+) -> Result<Network> {
+    let (last, free) = bases
+        .split_last()
+        .ok_or_else(|| invalid("decomposition target or arity"))?;
+    let mut encoder = Encoder::new();
+    encoder.set_multiplier(multiplier);
+    let mut sum: Option<PointWords> = None;
+    for base in free {
+        let point = if compressed {
+            encoder.input_point_compressed_unchecked(curve, meter)?
+        } else {
+            encoder.input_point(curve, false, meter)?
+        };
+        // The hash reads only x and the low ordinate bit, both free when
+        // compressed, so it runs before the costlier curve equation; the
+        // constraints are a conjunction, so the order changes no language.
+        encoder.hash_member(
+            curve,
+            &point,
+            &base.prime,
+            &base.seed.alpha,
+            &base.seed.beta,
+            &base.threshold,
+            meter,
+        )?;
+        encoder.assert_valid_point(curve, &point, meter)?;
+        encoder.mark_point_interface(&point, meter)?;
+        // O + A_1 = A_1: the first free point starts the sum directly instead
+        // of passing through a whole addition network with a constant identity.
+        sum = Some(match sum {
+            None => point,
+            Some(sum) => encoder.point_add(curve, &sum, &point, meter)?,
+        });
+    }
+    let sum = sum.ok_or_else(|| invalid("decomposition target or arity"))?;
+    let negated = encoder.negate_point(curve, &sum, meter)?;
+    let point = encoder.point_add(
+        curve,
+        &Encoder::constant_point(curve, target)?,
+        &negated,
+        meter,
+    )?;
+    encoder.hash_member(
+        curve,
+        &point,
+        &last.prime,
+        &last.seed.alpha,
+        &last.seed.beta,
+        &last.threshold,
+        meter,
+    )?;
+    encoder.mark_point_interface(&point, meter)?;
+    encoder.finish(meter)
+}
+
+fn decomposition_network_impl(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    semantic_cut: bool,
+    multiplier: Multiplier,
+    compressed: bool,
+    meter: &mut Meter,
+) -> Result<(Network, Vec<usize>)> {
     if bases.len() < 2 || !curve.in_subgroup(target, meter)? {
         return Err(invalid("decomposition target or arity"));
     }
+    if !semantic_cut && curve.cofactor().is_one() {
+        return Ok((
+            derived_last_slot_network(curve, bases, target, multiplier, compressed, meter)?,
+            Vec::new(),
+        ));
+    }
     let mut encoder = Encoder::new();
+    encoder.set_multiplier(multiplier);
+    if semantic_cut {
+        encoder.set_semantic_region("setup")?;
+    }
     let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
-    for base in bases {
+    let cut_after_slots = bases.len().div_ceil(2);
+    let mut left_regions = BTreeSet::new();
+    for (slot, base) in bases.iter().enumerate() {
+        let input_region = format!("slot.{slot}.input");
+        let membership_region = format!("slot.{slot}.membership");
+        let addition_region = format!("slot.{slot}.addition");
+        if slot < cut_after_slots {
+            left_regions.insert(input_region.clone());
+            left_regions.insert(membership_region.clone());
+            left_regions.insert(addition_region.clone());
+        }
+        if semantic_cut {
+            encoder.set_semantic_region(&input_region)?;
+        }
         let point = if curve.cofactor().is_one() {
             encoder.input_point(curve, false, meter)?
         } else {
             let source = encoder.input_point(curve, true, meter)?;
             encoder.clear_cofactor(curve, &source, meter)?
         };
+        if semantic_cut {
+            encoder.set_semantic_region(&membership_region)?;
+        }
         encoder.hash_member(
             curve,
             &point,
@@ -146,10 +294,38 @@ pub fn decomposition_network(
             meter,
         )?;
         encoder.mark_point_interface(&point, meter)?;
+        if semantic_cut {
+            encoder.set_semantic_region(&addition_region)?;
+        }
         sum = encoder.point_add(curve, &sum, &point, meter)?;
     }
+    if semantic_cut {
+        encoder.set_semantic_region("target.assertion")?;
+    }
     encoder.assert_point_equal(&sum, &Encoder::constant_point(curve, target)?, meter)?;
-    encoder.finish(meter)
+    let network = encoder.finish(meter)?;
+    if !semantic_cut {
+        return Ok((network, Vec::new()));
+    }
+    let mut left_vertices = Vec::new();
+    for (vertex_id, vertex) in network.vertices.iter().enumerate() {
+        let tag = vertex
+            .predicate
+            .canonical_tag()
+            .ok_or_else(|| integrity("semantic-cut vertex lacks canonical tag"))?;
+        let region = tag
+            .parameters
+            .iter()
+            .find_map(|(key, value)| (key == "semantic_region").then_some(value))
+            .ok_or_else(|| integrity("semantic-cut vertex lacks region"))?;
+        if left_regions.contains(region) {
+            left_vertices.push(vertex_id);
+        }
+    }
+    if left_vertices.is_empty() || left_vertices.len() == network.vertex_count() {
+        return Err(integrity("semantic mid-slot cut is not proper"));
+    }
+    Ok((network, left_vertices))
 }
 
 /// Deterministic prefix-count decomposition. `None` certifies zero assignments;
@@ -161,10 +337,31 @@ pub fn decompose(
     counter: &mut Counter,
     meter: &mut Meter,
 ) -> Result<Option<Vec<Point>>> {
+    decompose_with(
+        curve,
+        bases,
+        target,
+        |network, work| counter.witness(network, &vec![None; network.edge_count()], work),
+        meter,
+    )
+}
+
+/// Opt-in exact witness backend for the existing point-coordinate language.
+/// Returned interface words receive the same independent point/hash/sum replay.
+pub fn decompose_with(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    mut witness: impl FnMut(&Network, &mut Meter) -> Result<Option<Vec<bool>>>,
+    meter: &mut Meter,
+) -> Result<Option<Vec<Point>>> {
+    crate::metrics::phase("network_build")?;
     let network = decomposition_network(curve, bases, target, meter)?;
-    let Some(word) = counter.witness(&network, &vec![None; network.edge_count()], meter)? else {
+    crate::metrics::phase("contraction")?;
+    let Some(word) = witness(&network, meter)? else {
         return Ok(None);
     };
+    crate::metrics::phase("witness_check")?;
     let width = curve.modulus().bits() as usize;
     let stride = 1usize
         .checked_add(
@@ -220,6 +417,10 @@ pub struct Config {
     /// Override tau; `None` uses a conservative integer version of Lemma 13,
     /// clamped to s in the finite range where its large-size hypotheses fail.
     pub threshold: Option<BigUint>,
+    /// Optional fixed prime s in [2p,4p], as permitted by the source. Supplied
+    /// proofs are checked by the curve constructor; an uncovered s retains the
+    /// exact primality fallback. None preserves the original random selection.
+    pub hash_prime: Option<BigUint>,
     /// Maximum fresh-seed trials; reaching it returns a resource error.
     pub trials: usize,
     /// Maximum total number of slot/point columns admitted in one trial.
@@ -230,6 +431,7 @@ impl Default for Config {
         Self {
             slots: 2,
             threshold: None,
+            hash_prime: None,
             trials: 16,
             columns: 4096,
         }
@@ -237,6 +439,24 @@ impl Default for Config {
 }
 
 impl Config {
+    /// Certify an explicitly selected hash modulus without enumerating a base
+    /// or building a tensor graph. Does no work when no modulus is specified.
+    pub fn validate_hash_prime(&self, curve: &Curve, meter: &mut Meter) -> Result<()> {
+        if let Some(prime) = &self.hash_prime {
+            FactorBase::new(
+                curve,
+                prime.clone(),
+                BigUint::one(),
+                HashSeed {
+                    alpha: BigUint::one(),
+                    beta: BigUint::zero(),
+                },
+                meter,
+            )?;
+        }
+        Ok(())
+    }
+
     /// Use Theorem 4's integer slot choice `ceil((log2(b))^(1/4))`, with
     /// a minimum of two in the finite range. Other fields keep explicit defaults.
     /// This is a parameter choice, not a proved runtime guarantee for this code.
@@ -299,7 +519,7 @@ json_record!(
     optional {}
 );
 
-fn threshold(
+pub(crate) fn threshold(
     curve: &Curve,
     prime: &BigUint,
     config: &Config,
@@ -324,7 +544,7 @@ fn threshold(
 
 // Streaming elimination stores at most N pivot rows and their expression in
 // the input rows. It selects the first dependency deterministically from M only.
-fn row_dependency(
+pub(crate) fn row_dependency(
     matrix: &[Vec<BigUint>],
     modulus: &BigUint,
     meter: &mut Meter,
@@ -371,7 +591,7 @@ fn row_dependency(
     Err(integrity("N+1 rows lacked a dependency"))
 }
 
-fn indexed_bases(
+pub(crate) fn indexed_bases(
     curve: &Curve,
     bases: &[FactorBase],
     rng: &mut impl RandomSource,
@@ -392,7 +612,7 @@ fn indexed_bases(
     Ok(indexes)
 }
 
-fn matrix_row(
+pub(crate) fn matrix_row(
     relation: &Relation,
     indexes: &[BTreeMap<Point, usize>],
     columns: usize,
@@ -410,7 +630,7 @@ fn matrix_row(
     Ok(row)
 }
 
-fn combined_scalars(
+pub(crate) fn combined_scalars(
     relations: &[Relation],
     dependency: &[BigUint],
     modulus: &BigUint,
@@ -434,12 +654,129 @@ pub fn solve(
     counter: &mut Counter,
     meter: &mut Meter,
 ) -> Result<Certificate> {
-    if config.slots < 2 || config.trials == 0 || !curve.in_subgroup(target, meter)? {
+    solve_using(
+        curve,
+        target,
+        config,
+        rng,
+        &mut |curve, bases, point, work| decompose(curve, bases, point, counter, work),
+        meter,
+    )
+}
+
+/// Opt-in relation oracle. It receives only curve, bases and query point, never
+/// the hidden random relation labels or their RNG. Every supplied witness is
+/// independently checked before it enters the original certificate reduction.
+pub fn solve_with_oracle(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    mut oracle: impl FnMut(&Curve, &[FactorBase], &Point, &mut Meter) -> Result<Option<Vec<Point>>>,
+    meter: &mut Meter,
+) -> Result<Certificate> {
+    solve_using(
+        curve,
+        target,
+        config,
+        rng,
+        &mut |curve, bases, point, work| {
+            let answer = oracle(curve, bases, point, work)?;
+            if let Some(points) = &answer {
+                crate::metrics::phase("witness_check")?;
+                if points.len() != bases.len() {
+                    return Err(integrity("oracle slot count"));
+                }
+                let mut sum = Point::Infinity;
+                for (base, point) in bases.iter().zip(points) {
+                    if !base.contains(curve, point, work)? {
+                        return Err(integrity("oracle membership replay"));
+                    }
+                    sum = curve.add(&sum, point, work)?;
+                }
+                if &sum != point {
+                    return Err(integrity("oracle sum replay"));
+                }
+            }
+            Ok(answer)
+        },
+        meter,
+    )
+}
+
+fn solve_using(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    oracle: &mut impl FnMut(&Curve, &[FactorBase], &Point, &mut Meter) -> Result<Option<Vec<Point>>>,
+    meter: &mut Meter,
+) -> Result<Certificate> {
+    solve_with_preparation(
+        curve,
+        target,
+        config,
+        rng,
+        |_, _, _, _| Ok(()),
+        |c, bases, _, query, work| oracle(c, bases, query, work),
+        meter,
+    )
+}
+
+// The indexes are complete enumerations owned by this reduction, never a
+// caller-supplied partial table. Prepare only once per nonempty fresh trial.
+pub(crate) fn solve_with_preparation<State>(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    prepare: impl FnMut(&Curve, &[FactorBase], &[BTreeMap<Point, usize>], &mut Meter) -> Result<State>,
+    oracle: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &mut State,
+        &Point,
+        &mut Meter,
+    ) -> Result<Option<Vec<Point>>>,
+    meter: &mut Meter,
+) -> Result<Certificate> {
+    solve_with_target_preparation(curve, target, config, rng, prepare, oracle, false, meter)
+}
+
+// Joint targets are an explicit alternative; the original collector stays the
+// control. Coefficients never enter the decomposition oracle.
+pub(crate) fn solve_with_target_preparation<State>(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    mut prepare: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &[BTreeMap<Point, usize>],
+        &mut Meter,
+    ) -> Result<State>,
+    mut oracle: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &mut State,
+        &Point,
+        &mut Meter,
+    ) -> Result<Option<Vec<Point>>>,
+    joint_targets: bool,
+    meter: &mut Meter,
+) -> Result<Certificate> {
+    if config.slots < 2 || config.trials == 0 {
         return Err(invalid("reduction input"));
     }
     meter.vector(config.slots, "factor-base slots")?;
+    config.validate_hash_prime(curve, meter)?;
     // Identity has an immediate, independently checkable certificate.
     if target == &Point::Infinity {
+        crate::metrics::phase("target_validation")?;
+        if !curve.in_subgroup(target, meter)? {
+            return Err(invalid("reduction input"));
+        }
         return Ok(Certificate {
             version: 1,
             prime: BigUint::zero(),
@@ -450,9 +787,18 @@ pub fn solve(
             scalar: BigUint::zero(),
         });
     }
+    let mut joint_table = None;
+    let mut target_validated = false;
     for _ in 0..config.trials {
+        crate::metrics::phase("factor_base")?;
         meter.charge(1, "fresh-seed trial")?;
-        let prime = hash_prime(curve.modulus(), rng, meter)?;
+        let prime = if let Some(prime) = &config.hash_prime {
+            prime.clone()
+        } else {
+            hash_prime_by(curve.modulus(), rng, meter, |value, work| {
+                curve.certifies_prime(value, work)
+            })?
+        };
         let tau = threshold(curve, &prime, config, meter)?;
         let mut bases = Vec::with_capacity(config.slots);
         for _ in 0..config.slots {
@@ -490,13 +836,42 @@ pub fn solve(
             .ok_or_else(|| overflow("relation attempts"))?;
         let mut relations = Vec::with_capacity(required);
         let mut matrix = Vec::with_capacity(required);
+        let mut oracle_state = prepare(curve, &bases, &indexes, meter)?;
+        // Original per-target contract: initial bases and oracle setup are
+        // reusable, but subgroup validation, target tables and later retries
+        // belong to the same online interval.
+        if !target_validated {
+            crate::metrics::phase("target_validation")?;
+            if !curve.in_subgroup(target, meter)? {
+                return Err(invalid("reduction input"));
+            }
+            target_validated = true;
+        }
         for _ in 0..attempts {
+            crate::metrics::phase("relation_target")?;
             let u = random_below(curve.order(), rng, meter)?;
             let v = random_below(curve.order(), rng, meter)?;
-            let left = curve.mul(curve.generator(), &u, meter)?;
-            let right = curve.mul(target, &v, meter)?;
-            let point = curve.add(&left, &right, meter)?;
-            if let Some(points) = decompose(curve, &bases, &point, counter, meter)? {
+            let point = if joint_targets {
+                if joint_table.is_none() {
+                    joint_table = Some(crate::joint::JointTable::from_subgroup_points(
+                        curve,
+                        curve.generator(),
+                        target,
+                        meter,
+                    )?);
+                }
+                joint_table
+                    .as_ref()
+                    .expect("initialized joint table")
+                    .evaluate(&u, &v, meter)?
+            } else {
+                let left = curve.mul(curve.generator(), &u, meter)?;
+                let right = curve.mul(target, &v, meter)?;
+                curve.add(&left, &right, meter)?
+            };
+            crate::metrics::phase("relation_search")?;
+            if let Some(points) = oracle(curve, &bases, &mut oracle_state, &point, meter)? {
+                crate::metrics::phase("matrix_build")?;
                 let relation = Relation { u, v, points };
                 matrix.push(matrix_row(&relation, &indexes, columns)?);
                 relations.push(relation);
@@ -508,11 +883,13 @@ pub fn solve(
         if relations.len() != required {
             continue;
         }
+        crate::metrics::phase("linear_algebra")?;
         let dependency = row_dependency(&matrix, curve.order(), meter)?;
         let (u, v) = combined_scalars(&relations, &dependency, curve.order());
         if v.is_zero() {
             continue;
         }
+        crate::metrics::phase("recovery_check")?;
         let scalar = (curve.order() - u) * inverse(&v, curve.order())? % curve.order();
         if curve.mul(curve.generator(), &scalar, meter)? != *target {
             return Err(integrity("recovered scalar replay"));
@@ -656,8 +1033,205 @@ pub fn verify_with_rng(
 mod tests {
     use super::*;
     use crate::arithmetic::Seeded;
+    use crate::canonical::{CanonicalNetwork, ExportPolicy, IrProvenance};
+    use crate::census::{
+        boundary_shape, contract_functional_boundary, rewire_functional_definitions,
+    };
     use crate::contraction::Backend;
     use crate::Limits;
+
+    #[test]
+    fn semantic_mid_slot_cut_is_bound_into_the_canonical_ir() {
+        let mut meter = Meter::new(Limits {
+            steps: 1_000_000_000,
+            vector: 20_000_000,
+            bits: 1_000_000,
+        });
+        let curve = crate::curve::tiny(&mut meter);
+        let bases = [(7u8, 3u8), (2, 1), (3, 4)]
+            .into_iter()
+            .map(|(alpha, beta)| {
+                FactorBase::new(
+                    &curve,
+                    11u8.into(),
+                    5u8.into(),
+                    HashSeed {
+                        alpha: alpha.into(),
+                        beta: beta.into(),
+                    },
+                    &mut meter,
+                )
+                .unwrap()
+            })
+            .collect::<Vec<_>>();
+        let (network, left_vertices) =
+            decomposition_network_with_semantic_cut(&curve, &bases, curve.generator(), &mut meter)
+                .unwrap();
+        assert!(!left_vertices.is_empty());
+        assert!(left_vertices.len() < network.vertex_count());
+        assert!(left_vertices.windows(2).all(|pair| pair[0] < pair[1]));
+        let canonical = CanonicalNetwork::capture(
+            &network,
+            &vec![None; network.edge_count()],
+            IrProvenance {
+                source: "semantic-cut-control".into(),
+                generator: "unit-test".into(),
+                revision: "test-v1".into(),
+            },
+            ExportPolicy::RequireTagged,
+            &mut meter,
+        )
+        .unwrap();
+        assert!(canonical.vertices.iter().all(|vertex| vertex
+            .predicate
+            .tag
+            .parameters
+            .iter()
+            .any(|(key, value)| key == "semantic_region" && !value.is_empty())));
+        let shape = boundary_shape(&canonical, &left_vertices, &mut meter).unwrap();
+        assert!(!shape.cut_edges.is_empty());
+        assert_eq!(
+            shape.enumerated_free_width,
+            shape.cut_edges.len() + shape.free_internal_edges.len()
+        );
+        let mut corrupted = canonical.clone();
+        let region = corrupted.vertices[0]
+            .predicate
+            .tag
+            .parameters
+            .iter_mut()
+            .find(|(key, _)| key == "semantic_region")
+            .unwrap();
+        region.1.push_str(".mutation");
+        assert!(corrupted.validate(&mut meter).is_err());
+
+        let (rewired, receipt) =
+            rewire_functional_definitions(&network, &left_vertices, 17, &mut meter).unwrap();
+        assert!(receipt.candidate_definitions >= receipt.definition_pairs * 2);
+        assert!(receipt.definition_pairs > 0);
+        assert!(receipt.edge_endpoint_swaps > 0);
+        let rewired_canonical = CanonicalNetwork::capture(
+            &rewired,
+            &vec![None; rewired.edge_count()],
+            IrProvenance {
+                source: "semantic-cut-control-rewired".into(),
+                generator: "unit-test".into(),
+                revision: "test-v1".into(),
+            },
+            ExportPolicy::RequireTagged,
+            &mut meter,
+        )
+        .unwrap();
+        assert!(rewired_canonical
+            .vertices
+            .iter()
+            .zip(&canonical.vertices)
+            .all(|(left, right)| left.predicate == right.predicate));
+        let rewired_shape = boundary_shape(&rewired_canonical, &left_vertices, &mut meter).unwrap();
+        assert_eq!(rewired_shape.cut_edges.len(), shape.cut_edges.len());
+        assert_eq!(
+            rewired_shape.internal_edges.len(),
+            shape.internal_edges.len()
+        );
+        let rewired_tensor =
+            contract_functional_boundary(&rewired, &left_vertices, 16, 20, &mut meter).unwrap();
+        let (repeated, repeated_receipt) =
+            rewire_functional_definitions(&network, &left_vertices, 17, &mut meter).unwrap();
+        let repeated_tensor =
+            contract_functional_boundary(&repeated, &left_vertices, 16, 20, &mut meter).unwrap();
+        assert_eq!(receipt, repeated_receipt);
+        assert_eq!(rewired_tensor, repeated_tensor);
+    }
+
+    #[test]
+    fn derived_last_slot_matches_general_network_and_brute_force() {
+        let mut meter = Meter::new(Limits {
+            steps: 20_000_000_000,
+            vector: 20_000_000,
+            bits: 1_000_000,
+        });
+        let curve = crate::curve::tiny(&mut meter);
+        // Every subgroup point: the generator's multiples, identity included.
+        let mut points = vec![Point::Infinity];
+        let mut next = curve.generator().clone();
+        while next != Point::Infinity {
+            points.push(next.clone());
+            next = curve.add(&next, curve.generator(), &mut meter).unwrap();
+        }
+        let seeds = [(7u8, 3u8), (2, 1), (3, 4)];
+        let mut checked = 0;
+        // Three slots only at the smallest threshold and a few targets: the
+        // general network's three free points make larger cases slow.
+        for (slots, thresholds, targets) in [
+            (2usize, &[11u8, 5, 2][..], points.len()),
+            (3, &[2u8][..], 3),
+        ] {
+            for &threshold in thresholds {
+                let bases: Vec<_> = seeds[..slots]
+                    .iter()
+                    .map(|&(alpha, beta)| {
+                        FactorBase::new(
+                            &curve,
+                            11u8.into(),
+                            threshold.into(),
+                            HashSeed {
+                                alpha: alpha.into(),
+                                beta: beta.into(),
+                            },
+                            &mut meter,
+                        )
+                        .unwrap()
+                    })
+                    .collect();
+                for target in points.iter().take(targets) {
+                    // Independent count: ordered tuples of base points summing to target.
+                    let members: Vec<Vec<Point>> = bases
+                        .iter()
+                        .map(|base| {
+                            points
+                                .iter()
+                                .filter(|p| base.contains(&curve, p, &mut meter).unwrap())
+                                .cloned()
+                                .collect()
+                        })
+                        .collect();
+                    let mut brute = 0u64;
+                    let mut stack = vec![(0usize, Point::Infinity)];
+                    while let Some((slot, partial)) = stack.pop() {
+                        if slot == slots {
+                            brute += u64::from(&partial == target);
+                            continue;
+                        }
+                        for point in &members[slot] {
+                            stack.push((slot + 1, curve.add(&partial, point, &mut meter).unwrap()));
+                        }
+                    }
+                    let derived =
+                        decomposition_network(&curve, &bases, target, &mut meter).unwrap();
+                    let (general, _) =
+                        decomposition_network_with_semantic_cut(&curve, &bases, target, &mut meter)
+                            .unwrap();
+                    assert!(derived.input_bit_count() < general.input_bit_count());
+                    let count = |network: &Network, meter: &mut Meter| {
+                        Counter::default()
+                            .count(network, &vec![None; network.edge_count()], meter)
+                            .unwrap()
+                    };
+                    let derived_count = count(&derived, &mut meter);
+                    assert_eq!(derived_count, count(&general, &mut meter));
+                    assert_eq!(derived_count, BigUint::from(brute));
+                    let witness = |network: &Network, meter: &mut Meter| {
+                        Counter::default()
+                            .witness(network, &vec![None; network.edge_count()], meter)
+                            .unwrap()
+                    };
+                    assert_eq!(witness(&derived, &mut meter), witness(&general, &mut meter));
+                    checked += 1;
+                }
+            }
+        }
+        assert_eq!(checked, 3 * points.len() + 3);
+    }
 
     #[test]
     fn inverse_hash_enumeration_matches_independent_subgroup_scan() {
@@ -716,7 +1290,26 @@ mod tests {
         assert_eq!(certificate.scalar, 4u8.into());
         assert_eq!(certificate.relations.len(), 13);
         assert_eq!(counter.statistics.last_backend, Some(Backend::Functional));
-        assert!(counter.statistics.contractions > 13);
+        assert_eq!(counter.statistics.contractions, 0);
+        assert!(counter.statistics.witness_searches >= 13);
+        // The original count-based implementation remains selectable. Require
+        // the entire seeded certificate, not only the scalar, to stay identical.
+        let mut reference = Counter {
+            functional_witnesses: false,
+            functional_pruning: false,
+            ..Counter::default()
+        };
+        let reference_certificate = solve(
+            &curve,
+            &target,
+            &Config::default(),
+            &mut Seeded(1),
+            &mut reference,
+            &mut meter,
+        )
+        .unwrap();
+        assert_eq!(reference_certificate, certificate);
+        assert!(reference.statistics.contractions > 13);
         verify(&curve, &target, &certificate, &mut meter).unwrap();
         struct CountedRandom {
             source: Seeded,
@@ -835,5 +1428,70 @@ mod tests {
             ),
             Err(Error::Limit(_))
         ));
+    }
+
+    #[test]
+    fn factor_base_enumeration_reuses_square_root_setup() {
+        struct Nonresidue {
+            calls: usize,
+        }
+        impl RandomSource for Nonresidue {
+            fn fill(&mut self, bytes: &mut [u8]) -> Result<()> {
+                self.calls += 1;
+                bytes.fill(3); // 3 is a quadratic nonresidue modulo 17.
+                Ok(())
+            }
+        }
+        let mut meter = Meter::new(Limits::default());
+        let curve = Curve::new(
+            17u8.into(),
+            2u8.into(),
+            2u8.into(),
+            19u8.into(),
+            Point::Affine {
+                x: 5u8.into(),
+                y: 1u8.into(),
+            },
+            &mut meter,
+        )
+        .unwrap();
+        let base = FactorBase::new(
+            &curve,
+            37u8.into(),
+            37u8.into(),
+            HashSeed {
+                alpha: 1u8.into(),
+                beta: 0u8.into(),
+            },
+            &mut meter,
+        )
+        .unwrap();
+        let mut expected: Vec<_> = (1u8..19)
+            .map(|scalar| {
+                curve
+                    .mul(curve.generator(), &scalar.into(), &mut meter)
+                    .unwrap()
+            })
+            .collect();
+        expected.sort();
+        let mut one_shot = Nonresidue { calls: 0 };
+        let mut decoded = Vec::new();
+        for encoding in 0u8..34 {
+            if let Some(point) = curve
+                .decode(&encoding.into(), &mut one_shot, &mut meter)
+                .unwrap()
+            {
+                decoded.push(point);
+            }
+        }
+        decoded.sort();
+        assert_eq!(decoded, expected);
+        assert_eq!(one_shot.calls, 18);
+        let mut batched = Nonresidue { calls: 0 };
+        assert_eq!(
+            base.enumerate(&curve, &mut batched, &mut meter).unwrap(),
+            expected
+        );
+        assert_eq!(batched.calls, 1, "one setup must serve the entire base");
     }
 }

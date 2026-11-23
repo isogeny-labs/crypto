@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-bridge6-k3-polynomial-protocol-v1",
+  "source_bridge_result_sha256": "a7029ae3e18fc040c554f95ebc9e6763ad62a06f1533cb904ace2cee0cc7e805",
+  "source_bridge_protocol_sha256": "f3d6f79980ac07c8f2ae0d145bf39990ee564e08a6ad736fb6a5ebbeb711974d",
+  "fixed_pair": [[2, 2], [-16, 17]],
+  "shift_law": "hold k1=-3 and k2=-11, vary k3=1+77t for every integer t; reconstruct a4,a6 from both point equations",
+  "necessary_polynomial": "primitive integer numerator of x(6Q(t))-x(P) over QQ(t), after rational-function cancellation; any nonsingular rational specialization with P+6Q=O gives an integer root",
+  "certificate": "search primes 13 through 257 in order for the first modulus on which the numerator has no root; otherwise retain unresolved",
+  "resource": "one exact symbolic function-field curve and bounded finite-prime certificate search; no timing comparison",
+  "claim_boundary": "all integer k3 shifts only with fixed pair, k1, k2 and auxiliary policy; k1/k2 shifts or changed point lifts are separate"
+}

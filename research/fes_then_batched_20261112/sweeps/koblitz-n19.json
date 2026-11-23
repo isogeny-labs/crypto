@@ -1,0 +1,33 @@
+{
+  "_what": "End to end on a degree-19 Koblitz curve (instances of research/m4gb_e2e_ic_ladder_20261110): the pair-table reference row and the symbolic descent solved by inherited-f4, fes-then-inherited (fes-f2 up to 14 unknowns, inherited-f4 above) and fes-then-batched (fes-f2 up to 14 unknowns, inherited-f4-batched above).",
+  "instance": {
+    "regime": "koblitz",
+    "degree": 19,
+    "max_cofactor": 8
+  },
+  "repeats": 3,
+  "seed": 20261110,
+  "configurations": [
+    {
+      "factor_base": "binary-subspace:dimension=10",
+      "oracle": "mitm:m=2",
+      "targets": "walk"
+    }
+  ],
+  "matrix": {
+    "factor_base": [
+      "binary-subspace:dimension=10"
+    ],
+    "oracle": [
+      "descent-algebraic:m=2"
+    ],
+    "solver": [
+      "inherited-f4",
+      "fes-then-inherited",
+      "fes-then-batched"
+    ],
+    "targets": [
+      "walk"
+    ]
+  }
+}

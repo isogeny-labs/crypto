@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -u
+out=/workspace/scratch/ct523-finite-cubic-norm-primary-review
+cd /workspace/crypto || exit 1
+phase() {
+ local label=$1 code
+ shift
+ "$@" > "$out/$label.stdout.txt" 2> "$out/$label.stderr.txt"
+ code=$?
+ printf '%s\n' "$code" > "$out/$label.exit"
+ printf '%s %s\n' "$label" "$code"
+}
+phase KB-status scripts/research-kb status
+phase KB-exact scripts/research-kb search 'q223 cubic norm cofactor irreducible polynomial nonzero' --top-k 8
+phase KB-negative scripts/research-kb search 'zero norm reducible cubic ring cofactor inverse denominator' --top-k 8
+phase KB-adjacent scripts/research-kb search 'finite field resultant determinant adjugate cube nonresidue' --top-k 8
+phase KB-theorems scripts/research-kb theorems CubicConstructorFrobenius22301.no_base_cubic_root_three
+phase conductor conductor check --summary 'Prove universal finite q223 nonzero cubic norm using the existing no-cube-root certificate and finite base units, no coefficient population or native run' --scope path:research/chained_jacobian_transfers_20261110
+sha256sum research/chained_jacobian_transfers_20261110/lean/CubicConstructorFrobenius22301.lean research/chained_jacobian_transfers_20261110/lean/CubicRelativeNorm22304.lean research/chained_jacobian_transfers_20261110/lean/CubicCofactorWordBridge22307.lean research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-primary-review-01/arkworks-v0.5.0/cubic_extension.rs > "$out/exact-prior-primary-source.sha256"

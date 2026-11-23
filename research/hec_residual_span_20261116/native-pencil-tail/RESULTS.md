@@ -1,0 +1,9 @@
+# Cheap quadratic-tail extraction exactly reproduces all22complete pencil reports
+
+[pcc:unverified]. Freezeebeb00ff265; input hashes pass; sole600CPU-bounded equivalence invocation exit0. All9syntheticcomponentcases qualify atfirstt1withboth highfcoefficientsnonzero, exactfasttail==constructedQ==fullnormdivision. Coversg2/3/4andquadratic/linear/constanttails.
+
+On same11initialmixed-term models/22publicfixtures, every14089queriedtail exactlymatchesfullnorm H dividedbyknownfactors. AllfullHbrutesplit/multiplicitychecks and6742nativeprincipalchecks pass, including63repeatedroot/32overlapoccurrences. All2053denseLPprefixchecks pass. EverycompleteReport is byte-identical to the retainedfullnormReport, includinganswer/anchors/queries/nonsplits/acceptedrows/repeats/overlaps/LPpivots/finalrows; all22scalars nativeverified. This is not independent oldfullrawrelationtape replay where nonewasretained; directper-queryequivalence andfinalstates established.
+
+Productionbranch no longerconstructsfullnorm H orper-known-root polynomialdivision; exacttail fromleadingcoefficients andelementaryknownrootsums, knownpointordinatesreused. Diagnosticbranch stillconstructs/brutefactorsfullHforchecks. No speed orcountermeasurementinthisgate. ClassicalVieta/shortenedsieve, no novelty/10xclaim; independentreviewpending.
+
+Nextcompletecostgate disablesdiagnostics and compares fullnormandcheap-tailcompletecalls ontheseSAME22fixtures, bothmatchedvalidation, againstfrozenoriginal2LPwalk/Fast/Dense/Hybridcontrols. No parameter/base/cataloguechange. Reuseexistingcontrolcountswithsourcehashes ratherthanunnecessaryscientificreruns. Preserveallregressions andnoidentityshortcut; fieldmoduliseparate.

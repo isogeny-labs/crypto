@@ -1,0 +1,15 @@
+{
+  "schema": "native-polynomial-check/v1",
+  "source_commit": "d75ea6611b97b729fb562c5d01b31a71463163ba",
+  "build_attempts": 1,
+  "test_attempts": 1,
+  "build_exit": 0,
+  "test_exit": 0,
+  "tests_passed": 4,
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "binary_sha256": "0c75bbda9da2e1131dac256b615e38d412baff90ec6c0a18af94bf0b498d185b",
+  "build_command": "timeout 120 rustc --edition=2021 --test lib.rs -o unit-tests",
+  "test_command": "timeout 30 ./unit-tests --test-threads=1",
+  "full_cohort_executed": false,
+  "cloud_jobs_launched": 0
+}

@@ -1,0 +1,9 @@
+# C123 corrected verifier/control contract
+
+Let g(H)be the five prefixwords produced by the C122deterministic generator on the fixed leadingk3family. Every output word is in the declared domain,with two low and three high words. For every fully supported raw H,the proved/tested generator returns the complete multiset. Hence H=product(T+g_i(H))iff Hhas fullprefixsupport. This is exact raw coefficient equality,not hashing/modM or an existential guessed-root check. Multiplicities and all qliftbits remain.
+
+The fresh generalized dvariant tests all32768leadingk3d2coefficient assignments against the complete independent five-root product catalog,plus every supported d3multiset and128random cases. The alias test changes rawconstantcoefficient by the degree3fieldmodulus: fieldremainders agree but rawsupportdoesnot,so the verifier must reject the wrong lift. Root values match the old fullpredicate generator even on rejected inputs; accepted lists match complete catalogs.
+
+CONTROLISOLATIONFIX: separately prune the old predicate/control BEFOREappending product gates to the working circuit. Candidate/control are distinct Circuitobjects; assert the control's nodearray stays byte-for-byte unchanged. Both retain only the SAMEfive-root recovery outputs,so no cost advantage comes from dropping A/Bonly onone side. Prune temporary recovery rows fromconstraints after liveness accounting. The prepared C123prototype remains unchanged.
+
+Source500000gatecap,90s4GiB1core78/84sfinalization. Profilebothcompleteformulations under the same raw63parameter contract,allconstruction/rootvalidation/RSS included; no comparative runtimeclaimfromsizes. Originalsource/U/otherstrata/outerfamilies and field/curve releasegate remain. Known verifieddecoding/Hensel/prefix tools do not establish novelty of this family-search application.

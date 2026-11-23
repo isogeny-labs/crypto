@@ -1,0 +1,24 @@
+{
+ "old_commit": "a992ed6c807eee6fa713176412e6475e19db7946",
+ "new_commit": "43fc3b0e61907dbc12b95ddd471678535311b011",
+ "alias_block_found": true,
+ "alias_block": "// The hash tables of every arm. Default build: std HashMap (SipHash, RandomState). With the cargo feature\n// `mt-fasthash`: the same tables with a fast multiplicative hasher (MtFastH). Counted operations are identical in\n// both builds (a hash-table operation is counted per call, whatever the hasher); only wall time differs.\n#[cfg(not(feature = \"mt-fasthash\"))]\ntype HState = std::collections::hash_map::RandomState;\n#[cfg(feature = \"mt-fasthash\")]\ntype HState = std::hash::BuildHasherDefault<MtFastH>;\ntype HashMap<K, V> = std::collections::HashMap<K, V, HState>;\n#[derive(Default)]\n#[allow(dead_code)]\nstruct MtFastH(u64);\nimpl std::hash::Hasher for MtFastH {\n    fn finish(&self) -> u64 {\n        self.0\n    }\n    fn write(&mut self, b: &[u8]) {\n        for &c in b {\n            self.0 = (self.0 ^ c as u64).wrapping_mul(0x100_0000_01b3);\n        }\n    }\n    fn write_u64(&mut self, v: u64) {\n        self.0 = (self.0 ^ v ^ (v >> 29)).wrapping_mul(0xbf58_476d_1ce4_e5b9);\n    }\n}\n",
+ "normalised_equal": true,
+ "alias_default_is_RandomState": true,
+ "alias_feature_is_MtFastH": true,
+ "remaining_std_hashmap_uses_in_new": [
+  "let mut m: std::collections::HashMap<u64, (u64, u64)> =",
+  "std::collections::HashMap::with_capacity(size * 2);",
+  "let mut m2: std::collections::HashMap<u64, (u64, u64), Fast> =",
+  "std::collections::HashMap::with_capacity_and_hasher(size * 2, Fast::default());"
+ ],
+ "hashmap_new_or_with_capacity_left_in_new": [
+  "std::collections::HashMap::with_capacity(size * 2);"
+ ],
+ "cargo_toml_diff": [
+  "+# examples/mt_fieldops.rs: fast multiplicative hasher for every arm's hash tables (timing sensitivity only;",
+  "+# counted operations are identical with and without it).",
+  "+mt-fasthash = []"
+ ],
+ "cargo_toml_only_feature": true
+}

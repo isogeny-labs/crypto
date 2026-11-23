@@ -1,0 +1,1 @@
+Initial test invocation preceded compiler completion and returned No such file or directory. No test ran and no fixture changed. The compiler handle was then polled to exit0. Final compilation and tests below bind frozen dependencies.

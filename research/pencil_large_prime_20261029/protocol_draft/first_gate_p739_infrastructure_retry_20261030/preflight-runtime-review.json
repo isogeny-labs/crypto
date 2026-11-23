@@ -1,0 +1,66 @@
+{
+  "actions_performed": [
+    "read-only source and protocol-rule inspection"
+  ],
+  "conclusion": {
+    "cap_derived_treatment_permissible_for_freeze": true,
+    "not_established": [
+      "observed call cost",
+      "expected completion time",
+      "host-specific runtime",
+      "full 1080-execution completion within the cap"
+    ],
+    "reason": "The project checklist explicitly permits actual evidence OR an explicit justified protocol treatment. The schema and both validators require only non-null estimated_total_seconds for frozen status; fixed_seconds and per_sample_seconds may remain null. The skill still prefers measured one-call-per-arm costs, so the treatment must be labeled as an upper-bound scheduling/admission envelope and cannot be cited as measurement."
+  },
+  "concrete_next_step": "Create the gate-only protocol with 60 instances, 5 measured replicates, 1 warmup, all 3 arms and 1,080 planned executions; insert the proposed preflight block and adjacent qualification; run deterministic native validation/freeze only. Do not run a solver during this step.",
+  "created_utc": "2026-10-29T23:45:04.254818+00:00",
+  "fallback_if_empirical_costs_are_required": {
+    "budget": "Consumes the same existing 14,400 cumulative worker-second allowance and deadline; it is not a fresh budget.",
+    "feasibility_warning": "This can exhaust the four-hour envelope before measured gate rounds and is therefore inferior to the explicit treatment when the immediate gate is intended to run within the same authorization.",
+    "recursive_freeze_resolution": "The calibration protocol itself still needs a non-null estimate. Use this same explicitly labeled cap-derived envelope to freeze it; afterward actual timings can support a later, separately versioned gate protocol.",
+    "smallest_full_scope_design": "A separate, frozen, non-decisive calibration stratum of one execution for each of the 60 prescribed targets in each of candidate, rho, and rho A/A: 180 executions total, same interleaving/seeds/instrument/isolation/replay, no cohort outcomes reused."
+  },
+  "proposed_preflight_runtime": {
+    "estimated_total_seconds": 14400,
+    "fixed_seconds": null,
+    "measured_on": "Not measured; conservative cap-derived upper bound on additive worker-execution seconds for this first gate, equal to the explicitly authorized 14,400-second cumulative admission/stop cap. The fixed UTC deadline 2026-10-30T03:32:22Z may stop the gate earlier. This is a scheduling/admission envelope, not an observed call cost or runtime prediction.",
+    "per_sample_seconds": null,
+    "threads": 1
+  },
+  "record_type": "first_gate_preflight_runtime_interpretation/v1",
+  "required_adjacent_protocol_treatment": [
+    "State that estimated_total_seconds uses additive worker-execution seconds, matching the authorization accounting, rather than wall-clock completion time.",
+    "Preserve all 1,080 planned rows and explicit missing/capped/interrupted outcomes.",
+    "State that first-gate observations will supply empirical runtime evidence for later protocol versions, but do not retroactively relabel this field measured.",
+    "Do not populate fixed_seconds or per_sample_seconds from the 3,600-second timeout; those are unmeasured.",
+    "Do not cite validator acceptance as evidence that the upper bound is an empirical estimate."
+  ],
+  "rule_evidence": [
+    {
+      "lines": "64-71,134-144",
+      "path": "/var/lib/spot-codex/home/skills/experiment-protocol/SKILL.md",
+      "text": "Time one call per arm first and record fixed/per-sample cost; checklist says pre-flight runtime recorded."
+    },
+    {
+      "lines": "37-42",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/first_gate_freeze_requirements.md",
+      "text": "Allowed maximum is not a measured estimate; provide actual evidence or an explicit justified protocol treatment; do not invent measurement."
+    },
+    {
+      "lines": "950-991",
+      "path": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/schemas/experiment-protocol.v1.json",
+      "text": "All fields required, but fixed/per-sample/estimate/measured_on allow null."
+    },
+    {
+      "lines": "289-314",
+      "path": "/home/ec2-user/crypto-autoresearcher-fall-degree-submission-20261029/tools/experiment_protocol.py",
+      "text": "Frozen validation rejects only null estimated_total_seconds; timeout sanity divides estimate by instances*replicates."
+    },
+    {
+      "lines": "189-203",
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/src/protocol_lint.rs",
+      "text": "Native lint matches non-null estimate rule and timeout check."
+    }
+  ],
+  "solver_or_experiment_execution": false
+}

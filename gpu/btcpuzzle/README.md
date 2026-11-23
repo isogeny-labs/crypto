@@ -89,8 +89,35 @@ make bench ARCH=sm_100
 ./bench solve --bits 65 --pubkey 02...
 ./bench solve --puzzle 65       # target from puzzles.txt
 ./bench solve --puzzle 65 --gpu 0,1,2,3   # the same search across four devices
+./bench solve --puzzle 66 --key-out /secure/p66.key   # where an unknown key goes
 ./bench bench --gpu all         # per-device throughput, and the sum
 ```
+
+### Recovered keys and GPU memory
+
+A key whose answer is already known (`--self`, or a registry entry with a
+known private key) is printed as before. A key that is **not** already
+known is never printed by default, because stdout from a cloud or batch run
+usually ends up in a log store you do not control. It is written to
+`--key-out PATH` (default `puzzle-N.key`, or `kangaroo-found.key` for
+`--pubkey`), which is created with mode 0600. An existing file is never overwritten;
+a clash gets `.1`, `.2`, ... appended.
+`--print-key` also puts it on stdout. If the file cannot be written, the
+key is printed anyway, since losing it would be worse.
+
+Device memory is not cleared by the driver when it is freed, and on a
+shared or rented GPU the next tenant can be handed the same pages. The tame
+distances and distinguished points are enough to rebuild the key
+(`k = centre + d_tame - d_wild`), so `DeviceRun::free_all` zeroes every
+buffer before release, and so is the per-device host staging buffer for
+DPs. The host-side DP table and the recovered key itself are not. That does
+not cover a run killed with SIGKILL or a driver reset. For a target that
+is worth something, use a dedicated GPU or a MIG slice, not time-sliced or
+MPS sharing.
+
+The kernels are deliberately not constant-time. The target is a public
+key and the walk handles no one else's secret, so a side channel in it
+leaks nothing that the walk itself isn't already computing.
 
 ## Multi-GPU
 
@@ -242,7 +269,7 @@ used by `make test` as regression targets. They are not puzzle keys.
 
 This is an interval discrete-log solver. It does not scan address lists,
 derive addresses, or touch a wallet or the Bitcoin network in any way — a
-solved key is printed as a hex integer. The puzzle series is a deliberately
+solved key is written out as a hex integer (see *Recovered keys* above). The puzzle series is a deliberately
 constructed public challenge, which is what makes it a reasonable
 cryptanalytic target; the same solver applies to any interval ECDLP, such as
 the biased-nonce and small-range key problems the rest of this repository

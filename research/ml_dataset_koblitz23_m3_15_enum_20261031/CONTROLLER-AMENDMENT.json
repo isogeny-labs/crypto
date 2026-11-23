@@ -1,0 +1,11 @@
+{
+  "schema": "ml-dataset.koblitz23-operational-controller-amendment/v1",
+  "applies_from_next_unattempted_index": 19,
+  "original_controller_sha256": "db3f66e706a8f8789d39b07f80fde36acf73e08f22fd55cf266703d87847c047",
+  "amended_controller_sha256": "43afff5f2da504279ef6dcc69c0f223f51eb1ff8ca967746f41afda6f5405c99",
+  "reason": "Repeated read-only git show of the committed plan stalled under host I/O contention. The original controller had verified the committed protocol and plan before the first attempt and through index 18.",
+  "change": "Replace repeated git show object reads with an immutable recorded pre-data commit/file-hash receipt; retain local pinned SHA-256 and native preflight gates.",
+  "unchanged": ["protocol", "plan", "native binary", "source commit", "axes", "limits", "native verifier", "one-attempt markers", "S3 content-addressed custody"],
+  "index_18": "One native attempt was sealed by the original controller. The controller was interrupted during the pointer-store client; both archive and pointer already existed in S3 and were independently fresh-GET byte-checked, with no new PUT or native attempt. See S3-INTERRUPTED-CUSTODY-18.json.",
+  "host_contention": "An unrelated release cargo test and rustc process were observed during later cells; native timeout outcomes remain resource-conditioned and whole-worker instruction labels remain ineligible."
+}

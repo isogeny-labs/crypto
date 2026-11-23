@@ -1,0 +1,107 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ic-cofactor-clear-ab-20261103-2
+experiment_id: ic_cofactor_clear_ab_20261103
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 11173ecd0230a9ceedc4d833736402934fdcb95e
+receipt: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.receipt.json
+binds:
+- path: research/ic_cofactor_clear_ab_20261103/specs/v2-treatment.json
+  sha256: 6c34ea6f879433301f041e3a9ad91a632da510720198f211d8cd076fd671ace3
+- path: research/ic_cofactor_clear_ab_20261103/specs/h1-negative-control.json
+  sha256: 46f18137ec0dccc118d540c5521d50ce867bfbf2fd4c5e972484d12c70ece59b
+- path: research/ic_cofactor_clear_ab_20261103/protocol-v2.json
+  sha256: 189dd0dced5465f35f01873e97b7e13e2c7f8a6c07830f1f30d9010a933957b1
+- path: research/ic_cofactor_clear_ab_20261103/protocol-h1-control.json
+  sha256: ae180881db0f1dc987d7d3f59f466e5c2bfc1c663464a0bdaacd3476a088c0c2
+- path: research/ic_cofactor_clear_ab_20261103/analysis.sh
+  sha256: b8646be78ac90a925586cecb1b22f7c2a9c6f67f823e89e6de4cf27c670cbe5c
+- path: research/ic_cofactor_clear_ab_20261103/PREREG.md
+  sha256: 62756ca9797a016d46092870383ca060ee85ab7fc05505c07d5981896852ddfa
+- path: ./target/release/ecbench
+  sha256: b38cffb4f64c4ec7289ee4ef19bf60560d2d99684d4f996114eb403560081ec4
+must_not_exist:
+- research/ic_cofactor_clear_ab_20261103/sessions/v2
+- research/ic_cofactor_clear_ab_20261103/sessions/h1
+commands:
+- id: git-head
+  argv: [git, rev-parse, HEAD]
+  timeout_seconds: 60
+  success_exit_codes: [0]
+  stdout: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.git-head.stdout
+  stderr: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.git-head.stderr
+- id: tracked-tree-clean
+  argv: [git, diff, --quiet, HEAD]
+  timeout_seconds: 60
+  success_exit_codes: [0]
+  stdout: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.tracked-tree-clean.stdout
+  stderr: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.tracked-tree-clean.stderr
+- id: git-status
+  argv: [git, status, --porcelain, --untracked-files=no]
+  timeout_seconds: 60
+  success_exit_codes: [0]
+  stdout: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.git-status.stdout
+  stderr: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.git-status.stderr
+- id: binary-sha256
+  argv: [sha256sum, ./target/release/ecbench]
+  timeout_seconds: 60
+  success_exit_codes: [0]
+  stdout: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.binary-sha256.stdout
+  stderr: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.binary-sha256.stderr
+- id: run-v2
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_cofactor_clear_ab_20261103/specs/v2-treatment.json
+  - --out
+  - research/ic_cofactor_clear_ab_20261103/sessions/v2
+  timeout_seconds: 1680000
+  success_exit_codes: [0]
+  stdout: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.run-v2.stdout
+  stderr: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.run-v2.stderr
+- id: verify-v2
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_cofactor_clear_ab_20261103/sessions/v2
+  - --replay-all
+  timeout_seconds: 1680000
+  success_exit_codes: [0]
+  stdout: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.verify-v2.stdout
+  stderr: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.verify-v2.stderr
+- id: run-h1
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --spec
+  - research/ic_cofactor_clear_ab_20261103/specs/h1-negative-control.json
+  - --out
+  - research/ic_cofactor_clear_ab_20261103/sessions/h1
+  timeout_seconds: 1680000
+  success_exit_codes: [0]
+  stdout: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.run-h1.stdout
+  stderr: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.run-h1.stderr
+- id: verify-h1
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ic_cofactor_clear_ab_20261103/sessions/h1
+  - --replay-all
+  timeout_seconds: 1680000
+  success_exit_codes: [0]
+  stdout: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.verify-h1.stdout
+  stderr: research/ic_cofactor_clear_ab_20261103/cards/CARD-ic-cofactor-clear-ab-20261103-2.verify-h1.stderr
+bus_address: executor-mechanical-ic-cofactor-clear-ab
+background: true
+write_scope:
+- research/ic_cofactor_clear_ab_20261103/
+stop_when:
+- Any command in the card exits with a status other than 0, or the tool prints FAILED for a command.
+- The tool exits with status 2 and prints an IMPEDIMENT line.
+- The tool exits with status 3.
+- The file research/ic_cofactor_clear_ab_20261103/sessions/v2 or research/ic_cofactor_clear_ab_20261103/sessions/h1 exists before the run starts.
+notes: Local route on this machine, which ecbench grades L1, so only counted metrics are valid. Run no analysis, compare, table or band command. Retry nothing. Card 2 is a retry of card 1 after a host-busy refusal with no data produced.

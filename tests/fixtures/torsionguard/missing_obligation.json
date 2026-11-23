@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "name": "injective-with-open-point-validity",
+  "description": "A full-rank algebraic relation must not bypass an unverified external obligation.",
+  "torsion_components": [
+    {"label": "H2", "prime": "2", "exponent": 1}
+  ],
+  "obligations": {
+    "group_structure": {"status": "verified", "evidence": "synthetic Z/2 fixture"},
+    "point_on_curve": {"status": "unverified", "evidence": "intentionally open negative-control gate"},
+    "input_domain": {"status": "verified", "evidence": "synthetic declared input"},
+    "scalar_binding": {"status": "verified", "evidence": "fixed synthetic relation"},
+    "coefficient_bounds": {"status": "not_applicable", "evidence": "fixed coefficient"},
+    "map_actions": {"status": "not_applicable", "evidence": "identity action"}
+  },
+  "relations": [
+    {
+      "name": "identity_on_torsion",
+      "evidence": "synthetic identity relation",
+      "matrix": [["1"]]
+    }
+  ]
+}

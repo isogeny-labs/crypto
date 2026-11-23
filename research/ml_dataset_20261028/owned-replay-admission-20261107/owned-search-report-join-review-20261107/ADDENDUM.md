@@ -1,0 +1,7 @@
+# Terminal-head correction verified
+
+The reviewed report_join.py now requires the final snapshot acknowledgement event_count to equal the fully verified committed capture event_count before joining report metadata or replaying rows. Because check_capture verifies the complete hash chain and derives acknowledgement positions from that chain, this closes the previously demonstrated trailing-event gap without bypassing capture verification.
+
+Independently reran three changed controls: a valid trailing committed event is rejected; a two-snapshot capture rejects the stale first report and accepts the final report with row labels attributed to snapshot 1; CLI success exits 0 while a zero-row allowance returns inconclusive and exits 2. All three pass. The saved full-suite log also reports 54 tests passing (13 new and 41 donor); that full suite was inspected rather than redundantly rerun by this reviewer.
+
+Final reviewed source/test/log hashes are in FIX_REVIEWED_HASHES.json. Frozen donor integrity was rechecked for all 17 manifest files and remains unchanged. The original finding receipt and review are preserved as historical evidence, not overwritten. No remaining concrete blocker found within this report-to-capture join scope. Caller-supplied identities, immutable directory, lack of original-descent authentication and absence of native cell admission remain explicit dependencies/limits.

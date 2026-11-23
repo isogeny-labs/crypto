@@ -1,0 +1,30 @@
+import WordAdd11Validity
+open PencilWordRefinement Polynomial
+instance : Fact (7:UInt64).toNat.Prime := ⟨by decide⟩
+def a : WordD1 := ⟨0,0,2,3⟩
+def b : WordD1 := ⟨2,3,3,2⟩
+example : let c := add11WordPayload 7 a b
+ wordGuard 7 a b = .distinct ∧ c.canonical 7 ∧ c.z ≠ 0 ∧ c.w ≠ 0 ∧
+ c.normalizedValid 7 ((X:Polynomial (ZMod (7:UInt64).toNat))^2) := by
+ apply distinct_word_branch_preserves
+ · decide
+ · decide
+ · dsimp [WordD1.canonical,a]; decide
+ · dsimp [WordD1.canonical,b]; decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · change (X-C (WeightedAdd11.nx (a.decode 7))) ∣ X^2-(C (WeightedAdd11.ny (a.decode 7)))^2
+   have hx : WeightedAdd11.nx (a.decode 7)=0 := by norm_num [WeightedAdd11.nx,WordD1.decode,a,b]
+   have hy : WeightedAdd11.ny (a.decode 7)=0 := by norm_num [WeightedAdd11.ny,WordD1.decode,a,b]
+   rw [hx,hy]; simp
+ · change (X-C (WeightedAdd11.nx (b.decode 7))) ∣ X^2-(C (WeightedAdd11.ny (b.decode 7)))^2
+   have hx : WeightedAdd11.nx (b.decode 7)=1 := by norm_num [WeightedAdd11.nx,WordD1.decode,a,b]
+   have hy : WeightedAdd11.ny (b.decode 7)=1 := by norm_num [WeightedAdd11.ny,WordD1.decode,a,b]
+   rw [hx,hy]
+   refine ⟨X+1,?_⟩
+   simp only [C_1]; ring
+ · norm_num [WeightedAdd11.nx,WordD1.decode,a,b]
+example : wordGuard 7 ⟨4,1,2,1⟩ ⟨2,2,3,1⟩ ≠ .distinct := by decide
+example : (add11WordPayload 7 ⟨0,0,0,1⟩ b).z=0 := by decide

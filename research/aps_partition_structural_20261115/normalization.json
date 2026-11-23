@@ -1,0 +1,19 @@
+{
+  "schema": "aps.partition-post-call-normalization/v1",
+  "literal_native_output": {
+    "path": "structural-report.json",
+    "sha256": "01f12b3cf9fc7540f4ca471be9aeb7a8a3b5a28e5a1e70110c7c60d241b4ab4e",
+    "bytes": 82067,
+    "storage": "local; artifact-store upload not performed"
+  },
+  "canonical_view": {
+    "path": "structural-report.canonical.json",
+    "sha256": "0b70c1e4f049a4e526197dcbff96393986f75db05562d90a396520d8a7347c0f",
+    "bytes": 15816
+  },
+  "command": "jq -cS . structural-report.json",
+  "normalizer": "jq-1.7",
+  "all_json_values_retained": true,
+  "normalization_after_call": true,
+  "execution_attested": false
+}

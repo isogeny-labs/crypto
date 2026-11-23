@@ -1,0 +1,498 @@
+{
+  "schema": "actual-geometric-principal-divisor-source-plan/v1",
+  "created": "2026-11-15T08:44:32.214392+00:00",
+  "formal": {
+    "project": "research/geometric_principal_divisor_audit_20261115/lean",
+    "theorem": "GeometricPrincipalDivisorAudit.geometric_principal_divisor_certificate",
+    "statement": "theorem geometric_principal_divisor_certificate : (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f : W.FunctionField) (hf : f ≠ 0), divisorDegree W (functionDivisor W f hf) = 0) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f : W.FunctionField) (_ : f ≠ 0), NoPoles W f ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f : W.FunctionField) (hf : f ≠ 0), functionDivisor W f hf = 0 ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0), functionDivisor W f hf = functionDivisor W g hg ↔ ∃ c : K, c ≠ 0 ∧ f = constantHom W c * g) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0), functionDivisor W f hf = functionDivisor W g hg → InfinityMonic W f → InfinityMonic W g → f = g) ∧ (∀ (K : Type) [Field K] [IsAlgClosed K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (_ : W.Δ ≠ 0) (P : W.Point) (i j : ℕ), millerFunction W P (i + j) = millerFunction W P i * millerFunction W P j * stepFunction W (i • P) (j • P)) ∧ divisorDegree rationalCurve (functionDivisor rationalCurve numeratorFunction numerator_function_nonzero) = -4 ∧ geometricControlCurve.Δ ≠ 0 ∧ divisorDegree geometricControlCurve (functionDivisor geometricControlCurve (verticalFunction geometricControlCurve 0) (vertical_nonzero geometricControlCurve 0)) = 0 ∧ rationalFunction ≠ (1 : rationalCurve.FunctionField) ∧ functionDivisor rationalCurve rationalFunction rational_function_nonzero = functionDivisor rationalCurve 1 one_ne_zero ∧ InfinityMonic rationalCurve rationalFunction ∧ InfinityMonic rationalCurve (1 : rationalCurve.FunctionField)",
+    "decl_sha256": "87af23f53b8644b39d35a8d39e7b83e65d5a5c4e15b785494cadc5bab49e10dd",
+    "scope": "Actual geometric elliptic principal-divisor degreezero, constant kernel and normalized uniqueness for every FieldK/IsAlgClosedK and actual general Weierstrass model with actual discriminantnonzero, every characteristic including2/3, every actual nonzero FunctionField element. Actual integer coefficient-sum divisorDegree additive homomorphism and point-permutation invariance. Actual constants have zero point divisor. Algebraic closure gives actual nonsingular point over every x; actual vertical divisors plus actual split-polynomial factorization give polynomial-function degreezero. Actual full-field normfraction and negation divisor identity imply 2timesactualdegree=0 inintegers, hence actualdegreezero; no degree premise or inverseof2inK. Actual infinity chart residue/localization/maximalideal maps derive coefficient constant approximation for every actual infinityregular function. Actual no-poles subtraction and nonnegative degreezero coefficients imply no-poles iff nonzero constant, zeroactualdivisor iff nonzero constant and equalactualdivisors iff nonzero scalar multiple, without globalregularityclassification premise. Actual leading-residue-one normalization gives uniqueness, anyvalidMillerfunctionequalschosen and exact chosenall-n i+jaddition identity includingzero/vertical branches. Actual prior nonsingularF3curve y²=x³+x+1: nonzero polynomialX²+1 has rational-onlydivisor−4(O)/degree−4, refuting deletedgeometricpointscope. Actual priornormalizednonconstantzero-rational-divisor ratio versus1 reconstructs rational-onlynormalizeduniqueness counter. Actualcoefficient-mappedellipticmodeloveractualAlgebraicClosureF3 has discriminantnonzero/verticaldegreezero, realizesgeometricguards. Elliptic geometric specialization of Galbraith7.7.11/Cor7.7.13/7.7.14 survives, notallcurves theorem.58modules47exactcredited+11new/defaults/standardfoundations. Generalfunctionfield/pointdivisor basechange-descent, separateScheme.localRing/Divisor APIinterop, translation/reciprocity/isogeny/Lang/Cartier/Jacobian/canonicalWeilTate/MOVFR/binaryruntime/full14 remainopen. Samehost/prover/Mathlib/nativeheaderprocedural/notcompiler-parser-physicalhostrefinement. No novelty/canonicalpromotion/signedstandingclaim.",
+    "sources": [
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/AllMiller.lean",
+        "bytes": 3541,
+        "sha256": "957b06f548600a2befac32f94513ff5bc5782fbcea21d73079d65ef385c446ae"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/ChartAdicValuation.lean",
+        "bytes": 3767,
+        "sha256": "b8f6b793ef7d2a3805885417979e737e93265d56a02a03bf402979ac17d32078"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/ChartAlgebra.lean",
+        "bytes": 5144,
+        "sha256": "211969ef3498e5d786030a97b8783bd07a9b9d5434f2238114cf1b448c3f737a"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/ChartCertificate.lean",
+        "bytes": 2296,
+        "sha256": "b191e8c77a5364b9bf9d06c7216ba954c38493ff60470390451b5cc9289f85bd"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/ChartFractionField.lean",
+        "bytes": 5097,
+        "sha256": "3c0f5414072a7da74490335bff5f7224d833fdcc36c2c4c6be7f137d7c71dea7"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/ChartLocalization.lean",
+        "bytes": 4824,
+        "sha256": "6fd5bf89c3d69e4ca7d8c9bb3fbdc9a617c8a9151283890be0cbff26506d5112"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/ConstantDivisors.lean",
+        "bytes": 1879,
+        "sha256": "6824027e72964a8c468d1a6e32f0a099d3fe41501cbdecf4510ad8824966896d"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/ConstantKernel.lean",
+        "bytes": 3505,
+        "sha256": "a66048dd185a17e3f9b49a0e0870260fe06ce8bf79c1fc491ec684c26d980c26"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/DVRIdentification.lean",
+        "bytes": 3372,
+        "sha256": "964e3c213cdd1296bb3fffc2229ca2d4ed96f5dfce9c8b79f9cf2e55693ad0fc"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/DivisorDegree.lean",
+        "bytes": 2090,
+        "sha256": "90f0b79b8973002613252cab0ca8b39125044daeb90135a7a06165d8929460ab"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/FiniteControls.lean",
+        "bytes": 4550,
+        "sha256": "6d89f39552273975fcb78c48e379a5d545a92809fd9f3adadaae75f141e57056"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/FiniteDVR.lean",
+        "bytes": 6827,
+        "sha256": "4b1ca398165e92d3562300d43f03f946c56d5d681b5a245c86c8733f7465caa1"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/FiniteFractionField.lean",
+        "bytes": 3133,
+        "sha256": "b5c768debd68ab967466a30e623d4d8ab720b1d9e4482100c2598ed2b746ff20"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/FinitePointCertificate.lean",
+        "bytes": 3225,
+        "sha256": "e1982dcd3f71270e748979792f672bd3748bfec428af31c553423bd298fbed2b"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/FiniteValuation.lean",
+        "bytes": 4354,
+        "sha256": "7afdecddd0bde0b2aecaa9ae632a09fb4602dc2d8d07c5af5062e0c06a50b0eb"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/FiniteZeros.lean",
+        "bytes": 3615,
+        "sha256": "87c1352f6a533b766cce10ca68f9e092547980451931e34946531dd6fe44f494"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/FunctionDivisor.lean",
+        "bytes": 5039,
+        "sha256": "70866614e80ecc49200bc15a09f5b8d8ca30bf76c708d07246c07d5f970751d3"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/FunctionDivisorCertificate.lean",
+        "bytes": 2288,
+        "sha256": "713fa781862832962c898c6db56238c349efe184422ab03c77c45b6ac4914285"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/GeometricCertificate.lean",
+        "bytes": 3257,
+        "sha256": "06619bf9d34c7ad63c4cbaa24ae0364a74138ee0f214fd112a476a887a27eae0"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/GeometricControls.lean",
+        "bytes": 3994,
+        "sha256": "3a486893f0333ccc42aa363070992cd430948e8c804b144de097eb79616cda0e"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/GeometricDegree.lean",
+        "bytes": 1765,
+        "sha256": "d6cf4517944b22254bb4549919de849da9f212daf85651c1144cf522f678507f"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/GeometricFibers.lean",
+        "bytes": 1309,
+        "sha256": "39a7e06a20c0529ba59de470aae19dd32c8e08e9f7cf84f48af542daeb27d219"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2953,
+        "sha256": "d993b8a271d0b45b877f0f0c03ae970934500a70981549df266473b43d83d366"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/InfinityEvaluation.lean",
+        "bytes": 2135,
+        "sha256": "32790f41b39dd1bffe5c2af23dcdcaf198f44d58f37ec2a1ffbda4e372e0b764"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/InfinityMonic.lean",
+        "bytes": 6901,
+        "sha256": "522fc47b03d83b14d6ee0e649b6a61db0de3391ad5ea5ce01c2b3510060f3075"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/LineEvaluation.lean",
+        "bytes": 2628,
+        "sha256": "59405f70efc92e408edb087790965f3dc7d8559dd3b55fe0deb122e859de49ef"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/LineIdeals.lean",
+        "bytes": 5086,
+        "sha256": "f14f02c6998c132789cb332a5879cb57bb0ed6f17c1664bfd5fbabf98678d097"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/LineMultiplicity.lean",
+        "bytes": 5708,
+        "sha256": "f63e57417708ec7f8d809b169567a332365b4e8f00db30483d1ff8662442aca2"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/LocalComparison.lean",
+        "bytes": 3873,
+        "sha256": "cb0cedd56066bd863244da6aca7c0b921b0ff8bebd286b257db98aadd7aa5075"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/LocalNegation.lean",
+        "bytes": 3344,
+        "sha256": "389e1937500b192442e9f8dd858fd0f16c250a4112dc9beb1cbe6d0e7799a7e3"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/LocalOrderAlgebra.lean",
+        "bytes": 4627,
+        "sha256": "208e6317562c3428e3c4ecf87ee2c818e49ca601e58529ed0bc92b37bad601da"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/LocalOriginEvaluation.lean",
+        "bytes": 2050,
+        "sha256": "3692803fda5ecbb3185199a0b9e045ffb42ea6ce62e2ffc04122b3bc71d939c7"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/MillerStep.lean",
+        "bytes": 3712,
+        "sha256": "af03145385dd37fe065e7f532e26f256b010b49f2a8b5c839045987f87e897b3"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NegationCertificate.lean",
+        "bytes": 2363,
+        "sha256": "634c422e8e6c752872b7a960545711bd2cc0c204e063dcd64a92f0546935b555"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NegationControls.lean",
+        "bytes": 2673,
+        "sha256": "d879a00357297322c628f90d29489694be39f15104c978c48cc0ff8f23eaf604"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NegationCoordinate.lean",
+        "bytes": 4229,
+        "sha256": "7757296d2542df2aadcb26c84754163f9c9cb184214305d49a5fa969813790f1"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NegationDivisor.lean",
+        "bytes": 2042,
+        "sha256": "eae68fd2af513043179747ff6c8db825ebb71bb2bdaf57fbade4c4b47c17dc84"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NegationField.lean",
+        "bytes": 2834,
+        "sha256": "b4e670cf28477dc9ca7e9152019ac047935dfada79bb56b151ff1f663464ad4c"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NegationNorm.lean",
+        "bytes": 1963,
+        "sha256": "d58625b3365f957f323a5b0893f593cfcb3b555e9523b3ef7aa018a5f79232b9"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NegationValuation.lean",
+        "bytes": 3340,
+        "sha256": "8ab265d21e0bbef2e6d32a3651310c4055585b369f5a97ddf2cd7d2ab8ff167e"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NormEvaluation.lean",
+        "bytes": 3070,
+        "sha256": "97a31eb12e47c3ca706def9b3d77947e792d18efb54a53f5272ee7805b9c2eed"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/NormalizedUniqueness.lean",
+        "bytes": 2812,
+        "sha256": "91f8ada30670005c05bced0979b820104a287fe584eac94828dcea53e8f2eaea"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/OrderBounds.lean",
+        "bytes": 2249,
+        "sha256": "ec6e5cfd59ae338ff4333043c9180a77083e0fbe829ce120b8c22e359b9be667"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/OriginEvaluation.lean",
+        "bytes": 5686,
+        "sha256": "5f183c7d2306ea8a6f4874e4e226ae6c47f8919399a8f7bd8a439f630941adb0"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/PointDivisor.lean",
+        "bytes": 6952,
+        "sha256": "1c501f52d0a66d4c8118c3555f279b2599a121806af2c44518db608bd0086986"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/PointLocalization.lean",
+        "bytes": 4265,
+        "sha256": "9bf6c929fb31a34187a82ed3d3ddb7d9d3fba5f7f1b6b332fa43d578ccfb6594"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/PolynomialValues.lean",
+        "bytes": 1292,
+        "sha256": "36b18679067f57503a2f3c37eca56d39397c467423fc7d30563c40167943fdf4"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/RationalControls.lean",
+        "bytes": 7157,
+        "sha256": "68b65085186d1011aff59d16671e9725b447c0aafa84a1214f464002804f653d"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/RecursionCertificate.lean",
+        "bytes": 2595,
+        "sha256": "88f37e0bfa19bd6cf009bf8340eae0e82ef79b55478c79e9c7e1f22a4c1cd49f"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/RecursionControls.lean",
+        "bytes": 2016,
+        "sha256": "089da7719c94e96d224c501a97a78dd0f677f1a60b5e75e4ebf3dd77256208dd"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/SplitPolynomialDivisors.lean",
+        "bytes": 3773,
+        "sha256": "b7123a14082b947c5ca9835226de09d149b9848ceb7f3149e10864dd33833495"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/lakefile.toml",
+        "bytes": 1457,
+        "sha256": "56bdef951e78b421e4e7588c5d3ad996209faf96627a497d926d51ee496a484e"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/geometric_principal_divisor_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "AllMiller",
+    "ChartAdicValuation",
+    "ChartAlgebra",
+    "ChartCertificate",
+    "ChartFractionField",
+    "ChartLocalization",
+    "ConstantDivisors",
+    "ConstantKernel",
+    "DVRIdentification",
+    "DiscreteValuation",
+    "DivisorDegree",
+    "FieldValuation",
+    "FiniteControls",
+    "FiniteDVR",
+    "FiniteFractionField",
+    "FinitePointCertificate",
+    "FiniteValuation",
+    "FiniteZeros",
+    "FunctionDivisor",
+    "FunctionDivisorCertificate",
+    "GeometricCertificate",
+    "GeometricControls",
+    "GeometricDegree",
+    "GeometricFibers",
+    "GuardControls",
+    "InfinityEvaluation",
+    "InfinityMonic",
+    "LineEvaluation",
+    "LineIdeals",
+    "LineMultiplicity",
+    "LocalComparison",
+    "LocalNegation",
+    "LocalOrderAlgebra",
+    "LocalOriginEvaluation",
+    "MillerFunctions",
+    "MillerStep",
+    "NegationCertificate",
+    "NegationControls",
+    "NegationCoordinate",
+    "NegationDivisor",
+    "NegationField",
+    "NegationNorm",
+    "NegationValuation",
+    "NormDegree",
+    "NormEvaluation",
+    "Normalization",
+    "NormalizedUniqueness",
+    "OrderBounds",
+    "OriginEvaluation",
+    "PointDivisor",
+    "PointLocalization",
+    "PolynomialValues",
+    "RationalControls",
+    "RecursionCertificate",
+    "RecursionControls",
+    "ResidueNormalization",
+    "SplitPolynomialDivisors",
+    "ValuationCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 20220,
+      "sha256": "fe2c370e571c494b5d4bf1f1a2a98a4385dfff9842f6521b55a222806b6ec189"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "8233b504e1f2243b16832c0f96b7802f468798b5dafb117d7b86934d8f381d97"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/evidence/attempts.json",
+      "bytes": 237,
+      "sha256": "b4dd0bcb2c4c6854ece10fdcb53cc7e84a67135307b0269e94cd974d2fd5c55f"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 6463,
+      "sha256": "7e7b895bd3ea1a5476567ca652e1bd7502e29236a0f9b1ebaa38e81e12f61a91"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/evidence/gate.json",
+      "bytes": 1482,
+      "sha256": "9b312242f8fe4682b629e115dda617e9c506dbcf9f28b8e6bcfd0edd2f1e4e7e"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/evidence/source-review.json",
+      "bytes": 13090,
+      "sha256": "e037f7bbf9ff125814428651aecb674741cf35f8d9a8f544ee4e21a4dd64f3f7"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/evidence/binding-check.json",
+      "bytes": 7629,
+      "sha256": "f61de87a2b80bc46da4c2f99e0fe058e083736bce506ba2fbbf30bc657653899"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/proof-map.json",
+      "bytes": 11698,
+      "sha256": "010697439f155e003aaa5dcedde372541b02f54861563d470996e05762e10e06"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/render_report.py",
+      "bytes": 7823,
+      "sha256": "c22b9079a636ff8effc277628ee37ab38ba0490f8e97de95560f4f78d8862bf9"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/export_binding_input.py",
+      "bytes": 1782,
+      "sha256": "7854326271c25772608e7a71310a3a99f417627b81304b3d5ac27c0ff60d2379"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/PROTOCOL.md",
+      "bytes": 4546,
+      "sha256": "63c139611ab411d66d2ed104acc630f2c21eaecfd0544645011ae5f7f01a5725"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/reports/geometric-divisor.svg",
+      "bytes": 1439,
+      "sha256": "8667ad752af4067be9f1bca705d377df1c87fa518ec5debe94066a83ea30eeaa"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/reports/layout.json",
+      "bytes": 259,
+      "sha256": "2c92d34e4584bc4330ce8c510b410b0e996e506c88f92d4f58757a6f4b18f2cb"
+    },
+    {
+      "path": "research/geometric_principal_divisor_audit_20261115/reports/report.pdf",
+      "bytes": 47263,
+      "sha256": "b0912f19c31b46118d976b00c514edb472665c240657bf61934cc84aa0de93db"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 428,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 47,
+    "new_modules": 11,
+    "actual_geometric_degree_zero": true,
+    "actual_no_poles_constant_kernel": true,
+    "actual_equal_divisor_scalar_criterion": true,
+    "actual_normalized_uniqueness_and_chosen_miller_addition": true,
+    "actual_F3_rational_only_degree_minus4_counter": true,
+    "prior_F3_normalized_uniqueness_counter_reconstructed": true,
+    "actual_algebraic_closure_F3_elliptic_positive_control": true,
+    "source_elliptic_geometric_specialization_survives": true,
+    "actual_hypotheses": "EveryFieldK/IsAlgClosedK/actualW.discriminantnonzero/everyactualnonzerofunction; everycharacteristicincluding2/3.",
+    "all_curves_source_theorem": false,
+    "general_functionfield_divisor_basechange_descent": false,
+    "binary_runtime_complexity": false,
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

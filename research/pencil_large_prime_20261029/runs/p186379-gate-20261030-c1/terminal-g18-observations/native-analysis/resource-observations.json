@@ -1,0 +1,73 @@
+{
+  "schema": "pencil-terminal-resource-observations/v1",
+  "observation_utc": "2026-10-30T14:46:00Z",
+  "scope": "Terminal controller and last committed checkpoint; scientific accounting incomplete. Allocation is not active execution time.",
+  "controller_status": "FAILED",
+  "controller_phase": "COMPLETED",
+  "controller_end_utc": "2026-10-30T07:54:08.858Z",
+  "controller_build": "isolab-recovery-controller:2fe8ec79-1f54-4abe-8ec4-151b50b1178b",
+  "controller_invocations_observed": 3,
+  "controller_history": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-c1/terminal-g18-observations/terminal-build.json",
+    "sha256": "52baba6d7bca8730f3d4c56d0559e2dd7b645068378ce38c6ce4de226760d31a"
+  },
+  "controller_amendment": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/protocol/controller-continuation-v5.json",
+    "sha256": "d00be8a9e4b12fd4e6bb60d3d6c423b9213850de1859e22e248b52cddf70c956"
+  },
+  "controller_continuation_admission": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/controller-takeover/continuation-admission.json",
+    "sha256": "187f21544280fdef4835b52e1ea860a1ed8472e0f3b50b2a6b6fdfd5da215ca2"
+  },
+  "worker_termination_verified": false,
+  "worker_instance_terminated_verified": false,
+  "worker_instance_id": "i-04d58c2b309fb6549",
+  "worker_pod_uid": "3a7ab215-49d1-4982-8c78-5a0c71646842",
+  "worker_elapsed_seconds": null,
+  "worker_active_seconds": null,
+  "worker_restores_observed": 0,
+  "worker_attempt_observed": 0,
+  "scientific_submission_count": 1,
+  "maximum_active_scientific_payloads": 1,
+  "request_G_unix": 1793347824,
+  "outer_D_unix": 1793359074,
+  "original_authorization_start_unix": 1793337474,
+  "cumulative_active_worker_seconds_limit": 21600,
+  "resource_authorization": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/replacement_upper_gate_20261030/resource_authorization.json",
+    "sha256": "5ea8e080af4b28572f3ff1d074e9e261ef8ad3c24a53a6e7d06d1b37b0316d25"
+  },
+  "prior_b1_resources": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/native-analysis/resource-observations-worker-terminal.json",
+    "sha256": "4880cc449b6d4b0065cd71d1be119cb748bb5f658d8574b87051454738b6f928"
+  },
+  "cost_conversion": null,
+  "allocated_dollars": null,
+  "scientific_total_cost": null,
+  "charged_categories": [
+    "candidate",
+    "rho",
+    "rho_AA",
+    "warmups",
+    "computation",
+    "fresh_epoch_if_any",
+    "independent_replay_if_any",
+    "recovery",
+    "failed_attempts"
+  ],
+  "allocation_and_algorithm_costs_distinct": true,
+  "failed_costs_retained": true,
+  "missing_costs_not_zero": true,
+  "accounting_notes": [
+    "Controller terminal; generation19 failed to commit, generation18 retained.",
+    "Two pencil timeouts are retained, including one measured row; no candidate solve.",
+    "Active worker time, exact termination time and total spend remain unknown. EC2 lookup returned no instance, not an exact termination receipt.",
+    "No independent replay or new experiment was launched; expired budget is not renewed.",
+    "Prior b1 failed attempt costs remain linked separately, without refund or pooling."
+  ],
+  "terminal_state": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-c1/terminal-g18-observations/terminal-observed-state.json",
+    "sha256": "0c082596e8aa9b5f4b7179c2be6e38eab51123d4de534ab02cf81ab92bfc3307"
+  },
+  "terminal_failure": "CRIU dump failed; retained log, no generation committed"
+}

@@ -1,0 +1,23 @@
+E32 (handover ladder, note §9.34) pinned binaries, built 2026-10-31 before any E32 run.
+Build-input commit: e75771052b28668c834d227588389abff164fc7 (branch claude/glv-endomorphism-index-calculus-pe7ige, PR #2152).
+  HEAD had advanced to 45378560dd (E33/E34 pre-registrations, CI) by the end of the build; git diff e75771052..45378560dd
+  touches no file under src/, examples/, Cargo.toml or Cargo.lock, so the build inputs are identical at both commits.
+  Working tree under src/ clean at build time.
+Build: cargo build --release -j3 --example quartic_pipeline_gls --example e27_walk  (then --example e32_ladder)
+New example: examples/e32_ladder.rs (E32's own; untracked at build time, source sha256 a093a902e9e0958eea405678eb3f1e52e8bceb1fbce125b56b6ce4562a5ff756;
+  committed in E32's pre-registration commit, see git log for its SHA).  It calls only unchanged library
+  functions: run_k4_gls_pipeline_with (Chain solver, set_karatsuba_default(true)) and rho4_folded_batched (Karatsuba).
+Runs use only the copies in /tmp/claude-0/-home-user/1f75bcdd-3a63-5794-929b-19635cbd5274/scratchpad/e32bin/ (E33 edits src/ in this checkout after READY).
+sha256:
+44b45a7d85bdee6aa1a5e29dcba60c2460d1dd1c09c4e66b99ec455c8f61121b  quartic_pipeline_gls
+93edcc4059ed305e73e6989cda28fa4903c988b710504457eee12b129e599ed0  e27_walk
+1713471e6f446f296271476bb845400e8ad36d22fc47e1786af49105329234d4  e32_ladder
+
+Runner: run_ladder.py (pre-registration commit) ran the three p = 101 curves and was then replaced by
+run_ladder.sh with the same logic (AGENTS.md "Implementation language: no Python"); the p = 149 seed 1 run it
+had started was killed and rerun by run_ladder.sh, its wall time added to spent_s.
+
+Analysis: examples/e32_tables.rs (std + serde_json 1.0.151 only, no library code), built outside the shared
+target dir as a standalone crate in the scratchpad (e32tables/Cargo.toml: [[bin]] path = this file;
+cargo build --release --offline). Source sha256 at build: 6616e08cab8e2e8a254b425d26cf573f4ec522128f08ee18965d16939003fa15; binary sha256: 5f854b73bdc164d685e9d474204323fa5a8d59bbab95683d39e53d88764b4c05.
+If the source changes later, its commit and hashes are recorded below.

@@ -1,0 +1,21 @@
+{
+  "schema": "compact-release-cli-build/v1",
+  "source_commit": "96f0c814d928f07e96e15361cc43a35fe7306377",
+  "class": "optimized actual-root CLI development qualification",
+  "executables": {
+    "worker": {
+      "path": "/workspace/relation-native-qualifiers/compact-release-worker-96f0c814d-01",
+      "sha256": "1e6523063d68820c9d1972f764a187b7b2900042758d19933b4867cc7014657d",
+      "bytes": 6897184
+    },
+    "cli": {
+      "path": "/workspace/relation-native-qualifiers/compact-release-cli-96f0c814d-01",
+      "sha256": "0ce25088e6749e4ca8e73f2a55729bc1568c87afc9e1c755c3fb8321be84cd6c",
+      "bytes": 1361376
+    }
+  },
+  "build_command": "CARGO_BUILD_JOBS=2 cargo test --release --locked --no-run --test root_worker --manifest-path research/relation_degree_trace_20261115/rust-integration/Cargo.toml --target-dir target --message-format=json",
+  "profile": "release, opt-level 3, default profile; counters feature disabled",
+  "transform": "separate copies, strip debug, read-only before hash",
+  "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)"
+}

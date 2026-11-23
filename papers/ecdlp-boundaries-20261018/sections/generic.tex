@@ -1,0 +1,60 @@
+\section{Compact-orbit tables: a conditional generic closure}
+
+The programme's step-back note classifies compact-orbit decomposition
+through enumeration, pair tables and group-law root extraction as generic
+\cite{compactSource}. The useful mathematical content is a simulation
+statement with explicit admissible operations.
+
+\begin{proposition}[Simulation schema, conditional on the interface]
+Suppose a prime-order-group computation constructs its advice through
+generic group operations and public known scalar actions. Its online
+phase uses only those operations, equality, and lookup against advice
+sets; representation-dependent indexing is required to be bookkeeping
+with no additional mathematical predicate. Then the table-decomposition
+computation can be simulated in the same generic interface, charging its
+advice and all simulated operations.
+\end{proposition}
+
+The simulation tracks each available point as $[a]G+[b]Q$. Addition,
+negation and multiplication by a public scalar update $(a,b)$; a table
+entry is another stored point, and membership against the table is an
+equality query or a generic lookup whose implementation cost is charged.
+For a fixed known factor-base point $F$, extraction through
+$S_3(x_Q,x_F,X)$ can instead compute the group elements $Q+F,Q-F$.
+This identity does not supply a generic method for deciding arbitrary
+low-degree coordinate restrictions on unknown summands. The latter
+operation is precisely what an algebraic decomposition method must
+exploit, and is outside the proposition's interface.
+
+The generic discrete-log lower bound \cite{shoup1997} then applies to a
+computation that meets these hypotheses. With target-independent advice,
+Corrigan-Gibbs and Kogan give an appropriate preprocessing tradeoff
+\cite{cgk2018}; its frequently quoted schematic form is
+$S T^2=\widetilde\Omega(\varepsilon r)$, with success probability
+$\varepsilon$ and the original paper's units and parameter regime.
+An automorphism quotient needs its own model and orbit accounting before
+replacing $r$ by an effective orbit count. Neither schematic inequality
+proves that one concrete implementation beats every other implementation
+in wall time or at equal bytes. Such a constant comparison needs paired
+measurements and an equal accounting interval.
+
+\paragraph{The concrete bridge is an obligation.}
+A factor base selected by coordinates is not automatically generated
+by a generic interface. A lookup key can be mere indexing, whereas a
+field trace, a subspace test or a coordinate-dependent branch can supply
+additional information. One must inspect the frozen construction and
+all online predicates, state whether and how their outputs are simulated,
+and account for any target-independent coordinate-selected advice. This
+draft does not certify every current compact-pipeline path against a
+new simulator. In particular, the source's historical statement that
+all table methods are dominated by preprocessing rho at every constant
+must not be substituted for a same-input comparison.
+
+The existing Lean file \art{GenericInvariance.lean} proves transcript
+invariance for a more restrictive interface: \art{Alg.next} sees an
+operation count, prior equality answers and a random tape, but no point
+representation. Its source comment explicitly warns that it does not
+cover the representation-hashing rho and kangaroo implementations that
+ecbench measures. It proves neither the current compact pipeline's
+simulation bridge nor the probabilistic preprocessing lower bound.
+The two model boundaries must remain visible when using that file.

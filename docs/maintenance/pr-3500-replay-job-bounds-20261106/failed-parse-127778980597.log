@@ -1,0 +1,585 @@
+﻿2026-11-06T07:52:20.8862783Z Current runner version: '2.338.2'
+2026-11-06T07:52:20.8889143Z ##[group]Runner Image Provisioner
+2026-11-06T07:52:20.8890424Z Hosted Compute Agent
+2026-11-06T07:52:20.8891081Z Version: 20261028.624
+2026-11-06T07:52:20.8891806Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-06T07:52:20.8892565Z Build Date: 2026-10-28T21:51:42Z
+2026-11-06T07:52:20.8893296Z Worker ID: {5fe1d58e-2485-4973-ba07-3dd23dbbb1a6}
+2026-11-06T07:52:20.8894099Z Region: westus
+2026-11-06T07:52:20.8894640Z Cloud: Azure
+2026-11-06T07:52:20.8895210Z ##[endgroup]
+2026-11-06T07:52:20.8896726Z ##[group]Operating System
+2026-11-06T07:52:20.8897426Z Ubuntu
+2026-11-06T07:52:20.8898042Z 24.04.5
+2026-11-06T07:52:20.8898560Z LTS
+2026-11-06T07:52:20.8899054Z ##[endgroup]
+2026-11-06T07:52:20.8899678Z ##[group]Runner Image
+2026-11-06T07:52:20.8900587Z Image: ubuntu-24.04
+2026-11-06T07:52:20.8901273Z Version: 20261101.360.1
+2026-11-06T07:52:20.8902515Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-06T07:52:20.8904144Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-06T07:52:20.8905168Z ##[endgroup]
+2026-11-06T07:52:20.8906345Z ##[group]GITHUB_TOKEN Permissions
+2026-11-06T07:52:20.8908487Z Contents: read
+2026-11-06T07:52:20.8909215Z Metadata: read
+2026-11-06T07:52:20.8910037Z ##[endgroup]
+2026-11-06T07:52:20.8912161Z Secret source: Actions
+2026-11-06T07:52:20.8913216Z Cache mode: write
+2026-11-06T07:52:20.8914326Z Prepare workflow directory
+2026-11-06T07:52:20.9294514Z Prepare all required actions
+2026-11-06T07:52:20.9358198Z Getting action download info
+2026-11-06T07:52:21.2825265Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-06T07:52:21.3913296Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-06T07:52:21.5703313Z Complete job name: parse
+2026-11-06T07:52:21.6603632Z ##[group]Run actions/checkout@v4
+2026-11-06T07:52:21.6604640Z with:
+2026-11-06T07:52:21.6605067Z   filter: blob:none
+2026-11-06T07:52:21.6605540Z   sparse-checkout-cone-mode: false
+2026-11-06T07:52:21.6607106Z   sparse-checkout: /.github/workflows/
+/.github/scripts/
+/scripts/test_workflows_parse.py
+/research/weak_curve_properties_lean_20261011/EVIDENCE_SHA256.tsv
+/research/weak_curve_conjectures_20261012/EVIDENCE_SHA256SUMS
+
+2026-11-06T07:52:21.6608686Z   repository: isogeny-labs/crypto
+2026-11-06T07:52:21.6612743Z   token: ***
+2026-11-06T07:52:21.6613174Z   ssh-strict: true
+2026-11-06T07:52:21.6613600Z   ssh-user: git
+2026-11-06T07:52:21.6614039Z   persist-credentials: true
+2026-11-06T07:52:21.6614516Z   clean: true
+2026-11-06T07:52:21.6614924Z   fetch-depth: 1
+2026-11-06T07:52:21.6615343Z   fetch-tags: false
+2026-11-06T07:52:21.6615774Z   show-progress: true
+2026-11-06T07:52:21.6616215Z   lfs: false
+2026-11-06T07:52:21.6616757Z   submodules: false
+2026-11-06T07:52:21.6617229Z   set-safe-directory: true
+2026-11-06T07:52:21.6617738Z   allow-unsafe-pr-checkout: false
+2026-11-06T07:52:21.6618537Z ##[endgroup]
+2026-11-06T07:52:22.0124272Z Syncing repository: isogeny-labs/crypto
+2026-11-06T07:52:22.0127325Z ##[group]Getting Git version info
+2026-11-06T07:52:22.0128884Z Working directory is '/home/runner/work/crypto/crypto'
+2026-11-06T07:52:22.0131215Z [command]/usr/bin/git version
+2026-11-06T07:52:22.0276848Z git version 2.56.0
+2026-11-06T07:52:22.0302078Z ##[endgroup]
+2026-11-06T07:52:22.0318929Z Temporarily overriding HOME='/home/runner/work/_temp/bbfe7178-009c-4a23-b9fe-39f1d357d224' before making global git config changes
+2026-11-06T07:52:22.0320987Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-06T07:52:22.0326366Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-06T07:52:22.0405626Z Deleting the contents of '/home/runner/work/crypto/crypto'
+2026-11-06T07:52:22.0412452Z ##[group]Initializing the repository
+2026-11-06T07:52:22.0417746Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+2026-11-06T07:52:22.0554073Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-06T07:52:22.0556175Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-06T07:52:22.0557712Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-06T07:52:22.0558636Z hint: call:
+2026-11-06T07:52:22.0559098Z hint:
+2026-11-06T07:52:22.0559676Z hint: 	git config --global init.defaultBranch <name>
+2026-11-06T07:52:22.0560953Z hint:
+2026-11-06T07:52:22.0561645Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-06T07:52:22.0562685Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-06T07:52:22.0563548Z hint:
+2026-11-06T07:52:22.0564044Z hint: 	git branch -m <name>
+2026-11-06T07:52:22.0564873Z hint:
+2026-11-06T07:52:22.0565628Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-06T07:52:22.0571381Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+2026-11-06T07:52:22.0584629Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/crypto
+2026-11-06T07:52:22.0637716Z ##[endgroup]
+2026-11-06T07:52:22.0638606Z ##[group]Disabling automatic garbage collection
+2026-11-06T07:52:22.0643310Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-06T07:52:22.0679434Z ##[endgroup]
+2026-11-06T07:52:22.0680736Z ##[group]Setting up auth
+2026-11-06T07:52:22.0689040Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-06T07:52:22.0734931Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-06T07:52:22.1183436Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-06T07:52:22.1228592Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-06T07:52:22.1473493Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-06T07:52:22.1519450Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-06T07:52:22.1765276Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-06T07:52:22.1813446Z ##[endgroup]
+2026-11-06T07:52:22.1814483Z ##[group]Fetching the repository
+2026-11-06T07:52:22.1827187Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +00a0a1c98651ff257eacbe59e974f24fb79c041e:refs/remotes/pull/3500/merge
+2026-11-06T07:52:23.1943146Z From https://github.com/isogeny-labs/crypto
+2026-11-06T07:52:23.1945236Z  * [new ref]           00a0a1c98651ff257eacbe59e974f24fb79c041e -> pull/3500/merge
+2026-11-06T07:52:23.1958707Z ##[endgroup]
+2026-11-06T07:52:23.1959328Z ##[group]Determining the checkout info
+2026-11-06T07:52:23.1961789Z ##[endgroup]
+2026-11-06T07:52:23.1962383Z ##[group]Setting up sparse checkout
+2026-11-06T07:52:23.1966721Z [command]/usr/bin/git config core.sparseCheckout true
+2026-11-06T07:52:23.2012005Z [command]/usr/bin/git rev-parse --git-path info/sparse-checkout
+2026-11-06T07:52:23.2043094Z .git/info/sparse-checkout
+2026-11-06T07:52:23.2050998Z ##[endgroup]
+2026-11-06T07:52:23.2052109Z ##[group]Checking out the ref
+2026-11-06T07:52:23.2056525Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/3500/merge
+2026-11-06T07:52:25.0031718Z Updating files:  99% (579/581)
+2026-11-06T07:52:25.0032287Z Updating files: 100% (581/581)
+2026-11-06T07:52:25.0032740Z Updating files: 100% (581/581), done.
+2026-11-06T07:52:25.2661280Z Note: switching to 'refs/remotes/pull/3500/merge'.
+2026-11-06T07:52:25.2661930Z 
+2026-11-06T07:52:25.2662731Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-06T07:52:25.2663582Z changes and commit them, and you can discard any commits you make in this
+2026-11-06T07:52:25.2664367Z state without impacting any branches by switching back to a branch.
+2026-11-06T07:52:25.2664728Z 
+2026-11-06T07:52:25.2665075Z If you want to create a new branch to retain commits you create, you may
+2026-11-06T07:52:25.2665924Z do so (now or later) by using -c with the switch command. Example:
+2026-11-06T07:52:25.2666433Z 
+2026-11-06T07:52:25.2666628Z   git switch -c <new-branch-name>
+2026-11-06T07:52:25.2666955Z 
+2026-11-06T07:52:25.2667159Z Or undo this operation with:
+2026-11-06T07:52:25.2667459Z 
+2026-11-06T07:52:25.2667611Z   git switch -
+2026-11-06T07:52:25.2667883Z 
+2026-11-06T07:52:25.2668246Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-06T07:52:25.2668786Z 
+2026-11-06T07:52:25.2669434Z HEAD is now at 00a0a1c9 Merge 8eeb260af550e84da48372fce238f249174d57ae into a2e8fbc1d08f3369ddcd647311a4a6faf408b986
+2026-11-06T07:52:25.2731699Z ##[endgroup]
+2026-11-06T07:52:25.2785882Z [command]/usr/bin/git log -1 --format=%H
+2026-11-06T07:52:25.2819175Z 00a0a1c98651ff257eacbe59e974f24fb79c041e
+2026-11-06T07:52:25.3171723Z ##[group]Run actions/setup-python@v5
+2026-11-06T07:52:25.3172087Z with:
+2026-11-06T07:52:25.3172297Z   python-version: 3.12
+2026-11-06T07:52:25.3172521Z   check-latest: false
+2026-11-06T07:52:25.3175109Z   token: ***
+2026-11-06T07:52:25.3175326Z   update-environment: true
+2026-11-06T07:52:25.3175569Z   allow-prereleases: false
+2026-11-06T07:52:25.3175805Z   freethreaded: false
+2026-11-06T07:52:25.3176018Z ##[endgroup]
+2026-11-06T07:52:25.4537773Z ##[group]Installed versions
+2026-11-06T07:52:25.4641859Z (node:2367) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-06T07:52:25.4642900Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-06T07:52:25.4643623Z Successfully set up CPython (3.12.16)
+2026-11-06T07:52:25.4644237Z ##[endgroup]
+2026-11-06T07:52:25.4855128Z ##[group]Run pip install --quiet pyyaml
+2026-11-06T07:52:25.4855739Z [36;1mpip install --quiet pyyaml[0m
+2026-11-06T07:52:25.4900824Z shell: /usr/bin/bash -e {0}
+2026-11-06T07:52:25.4901263Z env:
+2026-11-06T07:52:25.4901747Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:25.4902448Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-06T07:52:25.4903222Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:25.4903904Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:25.4904570Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:25.4905236Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-06T07:52:25.4905788Z ##[endgroup]
+2026-11-06T07:52:26.8279665Z 
+2026-11-06T07:52:26.8280307Z [notice] A new release of pip is available: 26.2.2 -> 26.3
+2026-11-06T07:52:26.8280794Z [notice] To update, run: pip install --upgrade pip
+2026-11-06T07:52:26.8775313Z ##[group]Run python3 -B scripts/test_workflows_parse.py -v
+2026-11-06T07:52:26.8775775Z [36;1mpython3 -B scripts/test_workflows_parse.py -v[0m
+2026-11-06T07:52:26.8797619Z shell: /usr/bin/bash -e {0}
+2026-11-06T07:52:26.8797863Z env:
+2026-11-06T07:52:26.8798128Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:26.8798562Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-06T07:52:26.8799005Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:26.8799400Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:26.8799789Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:26.8800410Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-06T07:52:26.8800734Z ##[endgroup]
+2026-11-06T07:52:26.9862845Z test_a_trailing_colon_in_a_run_step_is_caught (__main__.WorkflowsParse.test_a_trailing_colon_in_a_run_step_is_caught)
+2026-11-06T07:52:26.9872356Z The check discriminates: this is the exact text that broke main. ... ok
+2026-11-06T07:52:29.6450753Z test_every_workflow_declares_a_trigger_and_a_job (__main__.WorkflowsParse.test_every_workflow_declares_a_trigger_and_a_job) ... ok
+2026-11-06T07:52:32.2546922Z test_every_workflow_parses_as_yaml (__main__.WorkflowsParse.test_every_workflow_parses_as_yaml) ... ok
+2026-11-06T07:52:32.6269209Z test_historical_koblitz_stages_are_manual_only (__main__.WorkflowsParse.test_historical_koblitz_stages_are_manual_only) ... ok
+2026-11-06T07:52:32.6270298Z 
+2026-11-06T07:52:32.6270546Z ----------------------------------------------------------------------
+2026-11-06T07:52:32.6271108Z Ran 4 tests in 5.641s
+2026-11-06T07:52:32.6271330Z 
+2026-11-06T07:52:32.6271446Z OK
+2026-11-06T07:52:32.6398581Z ##[group]Run node --test .github/scripts/test-ci-scope.mjs
+2026-11-06T07:52:32.6399036Z [36;1mnode --test .github/scripts/test-ci-scope.mjs[0m
+2026-11-06T07:52:32.6419524Z shell: /usr/bin/bash -e {0}
+2026-11-06T07:52:32.6419768Z env:
+2026-11-06T07:52:32.6420361Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:32.6420804Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-06T07:52:32.6421234Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:32.6421622Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:32.6422008Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:32.6422389Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-06T07:52:32.6422703Z ##[endgroup]
+2026-11-06T07:52:32.9015084Z TAP version 13
+2026-11-06T07:52:33.6048518Z # materialized 1 compile-time inputs
+2026-11-06T07:52:33.9372653Z # ::warning::CI scope comparison unavailable; running all checks (Command failed: git fetch --no-tags --depth=1 origin ffffffffffffffffffffffffffffffffffffffff)
+2026-11-06T07:52:33.9423194Z # ::warning::CI scope comparison unavailable; running all checks (Command failed: git diff --name-only -z --no-renames a0d9858954e9b0ff5ceba793649178721610e56e missing-ref --)
+2026-11-06T07:52:33.9909699Z # materialized 2 compile-time inputs
+2026-11-06T07:52:34.0636478Z # materialized 1 compile-time inputs
+2026-11-06T07:52:34.1411188Z # materialized 1 compile-time inputs
+2026-11-06T07:52:34.1640326Z # ::warning::CI scope comparison unavailable; running all checks (missing Rust source dependency in examples/check.rs: research/study/reference.rs)
+2026-11-06T07:52:34.1961526Z # ::warning::CI scope comparison unavailable; running all checks (missing Rust source dependency in research/study/reference.rs: research/study/render.inc)
+2026-11-06T07:52:34.2275983Z # ::warning::CI scope comparison unavailable; running all checks (missing Rust source dependency in research/study/reference.rs: research/study/arithmetic.rs)
+2026-11-06T07:52:34.3152096Z # materialized 2 compile-time inputs
+2026-11-06T07:52:34.8845475Z # Subtest: a cold root checkout resolves path crates and their embedded inputs
+2026-11-06T07:52:34.8854352Z ok 1 - a cold root checkout resolves path crates and their embedded inputs
+2026-11-06T07:52:34.8855368Z   ---
+2026-11-06T07:52:34.8856102Z   duration_ms: 870.922668
+2026-11-06T07:52:34.8857018Z   type: 'test'
+2026-11-06T07:52:34.8857793Z   ...
+2026-11-06T07:52:34.8858592Z # Subtest: prose does not run compilers, profiling or CodeQL
+2026-11-06T07:52:34.8861480Z ok 2 - prose does not run compilers, profiling or CodeQL
+2026-11-06T07:52:34.8862419Z   ---
+2026-11-06T07:52:34.8863046Z   duration_ms: 2.145345
+2026-11-06T07:52:34.8863823Z   type: 'test'
+2026-11-06T07:52:34.8864448Z   ...
+2026-11-06T07:52:34.8865200Z # Subtest: crates and languages select their own checks
+2026-11-06T07:52:34.8866537Z ok 3 - crates and languages select their own checks
+2026-11-06T07:52:34.8867744Z   ---
+2026-11-06T07:52:34.8868119Z   duration_ms: 0.533714
+2026-11-06T07:52:34.8868548Z   type: 'test'
+2026-11-06T07:52:34.8868919Z   ...
+2026-11-06T07:52:34.8870872Z # Subtest: dependencies, workflow edits and frozen evidence remain applicable
+2026-11-06T07:52:34.8872953Z ok 4 - dependencies, workflow edits and frozen evidence remain applicable
+2026-11-06T07:52:34.8874239Z   ---
+2026-11-06T07:52:34.8874612Z   duration_ms: 0.435421
+2026-11-06T07:52:34.8875018Z   type: 'test'
+2026-11-06T07:52:34.8875368Z   ...
+2026-11-06T07:52:34.8887837Z # Subtest: staged Rust release inputs select the Rust package lane
+2026-11-06T07:52:34.8889496Z ok 5 - staged Rust release inputs select the Rust package lane
+2026-11-06T07:52:34.8901022Z   ---
+2026-11-06T07:52:34.8901614Z   duration_ms: 0.44535
+2026-11-06T07:52:34.8902363Z   type: 'test'
+2026-11-06T07:52:34.8903031Z   ...
+2026-11-06T07:52:34.8903931Z # Subtest: volcano-cli, a path dependency of the root crate, selects the root lanes
+2026-11-06T07:52:34.8905642Z ok 6 - volcano-cli, a path dependency of the root crate, selects the root lanes
+2026-11-06T07:52:34.8910228Z   ---
+2026-11-06T07:52:34.8910890Z   duration_ms: 0.216934
+2026-11-06T07:52:34.8920999Z   type: 'test'
+2026-11-06T07:52:34.8921642Z   ...
+2026-11-06T07:52:34.8922506Z # Subtest: real git diffs include renames, deletes, unusual names and over 300 files
+2026-11-06T07:52:34.8923829Z ok 7 - real git diffs include renames, deletes, unusual names and over 300 files
+2026-11-06T07:52:34.8924836Z   ---
+2026-11-06T07:52:34.8925477Z   duration_ms: 131.569631
+2026-11-06T07:52:34.8926167Z   type: 'test'
+2026-11-06T07:52:34.8926792Z   ...
+2026-11-06T07:52:34.8927760Z # Subtest: sparse compilation restores only embedded inputs, preserving archived files off disk
+2026-11-06T07:52:34.8929239Z ok 8 - sparse compilation restores only embedded inputs, preserving archived files off disk
+2026-11-06T07:52:34.8930624Z   ---
+2026-11-06T07:52:34.8931233Z   duration_ms: 39.319096
+2026-11-06T07:52:34.8931980Z   type: 'test'
+2026-11-06T07:52:34.8932620Z   ...
+2026-11-06T07:52:34.8933602Z # Subtest: new Cargo targets and source modules survive sparse checkouts without loading archives
+2026-11-06T07:52:34.8935137Z ok 9 - new Cargo targets and source modules survive sparse checkouts without loading archives
+2026-11-06T07:52:34.8936149Z   ---
+2026-11-06T07:52:34.8936691Z   duration_ms: 74.384231
+2026-11-06T07:52:34.8937321Z   type: 'test'
+2026-11-06T07:52:34.8937821Z   ...
+2026-11-06T07:52:34.8938508Z # Subtest: external Rust path modules and includes are followed recursively
+2026-11-06T07:52:34.8939463Z ok 10 - external Rust path modules and includes are followed recursively
+2026-11-06T07:52:34.8940548Z   ---
+2026-11-06T07:52:34.8941057Z   duration_ms: 173.395133
+2026-11-06T07:52:34.8941553Z   type: 'test'
+2026-11-06T07:52:34.8941998Z   ...
+2026-11-06T07:52:34.8942824Z # Subtest: shared factor-base crate selects root compilation and release checks
+2026-11-06T07:52:34.8944061Z ok 11 - shared factor-base crate selects root compilation and release checks
+2026-11-06T07:52:34.8944954Z   ---
+2026-11-06T07:52:34.8945498Z   duration_ms: 0.276425
+2026-11-06T07:52:34.8946137Z   type: 'test'
+2026-11-06T07:52:34.8946756Z   ...
+2026-11-06T07:52:34.8947636Z # Subtest: path dependencies of the root crate are materialized, transitively
+2026-11-06T07:52:34.8948765Z ok 12 - path dependencies of the root crate are materialized, transitively
+2026-11-06T07:52:34.8949685Z   ---
+2026-11-06T07:52:34.8950465Z   duration_ms: 78.650897
+2026-11-06T07:52:34.8951167Z   type: 'test'
+2026-11-06T07:52:34.8951734Z   ...
+2026-11-06T07:52:34.8952531Z # Subtest: large tracked path lists preserve source discovery beyond 16 MiB
+2026-11-06T07:52:34.8953715Z ok 13 - large tracked path lists preserve source discovery beyond 16 MiB
+2026-11-06T07:52:34.8954591Z   ---
+2026-11-06T07:52:34.8955178Z   duration_ms: 517.870587
+2026-11-06T07:52:34.8955803Z   type: 'test'
+2026-11-06T07:52:34.8956385Z   ...
+2026-11-06T07:52:34.8957152Z # Subtest: failed Git commands propagate and remove their temporary output
+2026-11-06T07:52:34.8958278Z ok 14 - failed Git commands propagate and remove their temporary output
+2026-11-06T07:52:34.8959183Z   ---
+2026-11-06T07:52:34.8960322Z   duration_ms: 41.797452
+2026-11-06T07:52:34.8960992Z   type: 'test'
+2026-11-06T07:52:34.8961569Z   ...
+2026-11-06T07:52:34.9120452Z 1..14
+2026-11-06T07:52:34.9121243Z # tests 14
+2026-11-06T07:52:34.9130705Z # suites 0
+2026-11-06T07:52:34.9131061Z # pass 14
+2026-11-06T07:52:34.9131392Z # fail 0
+2026-11-06T07:52:34.9131705Z # cancelled 0
+2026-11-06T07:52:34.9131981Z # skipped 0
+2026-11-06T07:52:34.9132202Z # todo 0
+2026-11-06T07:52:34.9132440Z # duration_ms 2030.997593
+2026-11-06T07:52:34.9212326Z ##[group]Run node --test .github/scripts/test-frozen-workflow-check.mjs
+2026-11-06T07:52:34.9212861Z [36;1mnode --test .github/scripts/test-frozen-workflow-check.mjs[0m
+2026-11-06T07:52:34.9233752Z shell: /usr/bin/bash -e {0}
+2026-11-06T07:52:34.9234006Z env:
+2026-11-06T07:52:34.9234273Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:34.9234707Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-06T07:52:34.9235158Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:34.9235561Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:34.9235943Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:34.9236328Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-06T07:52:34.9236648Z ##[endgroup]
+2026-11-06T07:52:34.9669087Z TAP version 13
+2026-11-06T07:52:35.0579460Z # FROZEN_WORKFLOW_METADATA_VIEW {"workflow":".github/workflows/study.yml","revision":"a3ead617b7964c0fadc3d55fdef8fcc68254bd91","live_workflow_sha256":"d5c76ee3c79e755e2131e9380a9cd87320b0e9935ca20a000ef806c5c5571c13","view_workflow_sha256":"7ae1f1786552665b1da73ae15c0eb2fd48bae57021a2f93c9f3931579bdf0efa","extra_workflows":[],"pinned_input_views":[],"scope":"workflow metadata and explicitly pinned historical inputs are substituted in an isolated view; current checkout and evidence remain unchanged"}
+2026-11-06T07:52:35.4038003Z # FROZEN_WORKFLOW_METADATA_VIEW {"workflow":".github/workflows/study.yml","revision":"a3ead617b7964c0fadc3d55fdef8fcc68254bd91","live_workflow_sha256":"d5c76ee3c79e755e2131e9380a9cd87320b0e9935ca20a000ef806c5c5571c13","view_workflow_sha256":"7ae1f1786552665b1da73ae15c0eb2fd48bae57021a2f93c9f3931579bdf0efa","extra_workflows":[],"pinned_input_views":[],"scope":"workflow metadata and explicitly pinned historical inputs are substituted in an isolated view; current checkout and evidence remain unchanged"}
+2026-11-06T07:52:35.6436256Z # FROZEN_WORKFLOW_METADATA_VIEW {"workflow":".github/workflows/study.yml","revision":"a3ead617b7964c0fadc3d55fdef8fcc68254bd91","live_workflow_sha256":"d5c76ee3c79e755e2131e9380a9cd87320b0e9935ca20a000ef806c5c5571c13","view_workflow_sha256":"7ae1f1786552665b1da73ae15c0eb2fd48bae57021a2f93c9f3931579bdf0efa","extra_workflows":[],"pinned_input_views":[],"scope":"workflow metadata and explicitly pinned historical inputs are substituted in an isolated view; current checkout and evidence remain unchanged"}
+2026-11-06T07:52:35.9951994Z # FROZEN_WORKFLOW_METADATA_VIEW {"workflow":".github/workflows/study.yml","revision":"0f32f8a681dee5385ec7a73e1ee35715aea1a8c5","live_workflow_sha256":"d5c76ee3c79e755e2131e9380a9cd87320b0e9935ca20a000ef806c5c5571c13","view_workflow_sha256":"7ae1f1786552665b1da73ae15c0eb2fd48bae57021a2f93c9f3931579bdf0efa","extra_workflows":[],"pinned_input_views":[{"target":"research/archive/Cargo.lock","revision":"0f32f8a681dee5385ec7a73e1ee35715aea1a8c5","source_path":"research/archive/Cargo.lock","sha256":"a997fbf69c20e594ba6e60e22a803d4a5323f280e3a1114cd7e527f808e65cf8","original_manifest":"research/rotation/FROZEN.json","original_manifest_sha256":"397635d9c4f2ce4944817f2e0e7f7f9728e9f2c19ca94424ba297e10e763eae0","original_source_key":"cargo_lock","live_target_sha256":"2816d634069f997bc4a85e6e199459fdc79fe5444722fea579441653b8f3be91","current_sources":{"research/archive/Cargo.lock":"2816d634069f997bc4a85e6e199459fdc79fe5444722fea579441653b8f3be91","Cargo.lock":"2816d634069f997bc4a85e6e199459fdc79fe5444722fea579441653b8f3be91"},"view_sha256":"a997fbf69c20e594ba6e60e22a803d4a5323f280e3a1114cd7e527f808e65cf8"}],"scope":"workflow metadata and explicitly pinned historical inputs are substituted in an isolated view; current checkout and evidence remain unchanged"}
+2026-11-06T07:52:36.3261804Z # FROZEN_WORKFLOW_METADATA_VIEW {"workflow":".github/workflows/study.yml","revision":"af2b4f9cc4140e54198b753da38648f1342bb8fa","live_workflow_sha256":"d5c76ee3c79e755e2131e9380a9cd87320b0e9935ca20a000ef806c5c5571c13","view_workflow_sha256":"7ae1f1786552665b1da73ae15c0eb2fd48bae57021a2f93c9f3931579bdf0efa","extra_workflows":[],"pinned_input_views":[],"scope":"workflow metadata and explicitly pinned historical inputs are substituted in an isolated view; current checkout and evidence remain unchanged"}
+2026-11-06T07:52:36.6566967Z # FROZEN_WORKFLOW_METADATA_VIEW {"workflow":".github/workflows/study.yml","revision":"d183563e4f8ff5ae644434983b9ebc10a951d824","live_workflow_sha256":"d5c76ee3c79e755e2131e9380a9cd87320b0e9935ca20a000ef806c5c5571c13","view_workflow_sha256":"7ae1f1786552665b1da73ae15c0eb2fd48bae57021a2f93c9f3931579bdf0efa","extra_workflows":[{"workflow":".github/workflows/other-check.yml","manifest":"research/other/FROZEN.json","view_workflow_sha256":"0c279c12022a09ba956dbc7f1800fe87148727cbea8080f7dbd6dd761fefd70f"}],"pinned_input_views":[],"scope":"workflow metadata and explicitly pinned historical inputs are substituted in an isolated view; current checkout and evidence remain unchanged"}
+2026-11-06T07:52:37.0347290Z # FROZEN_WORKFLOW_METADATA_VIEW {"workflow":".github/workflows/study.yml","revision":"d183563e4f8ff5ae644434983b9ebc10a951d824","live_workflow_sha256":"d5c76ee3c79e755e2131e9380a9cd87320b0e9935ca20a000ef806c5c5571c13","view_workflow_sha256":"7ae1f1786552665b1da73ae15c0eb2fd48bae57021a2f93c9f3931579bdf0efa","extra_workflows":[{"workflow":".github/workflows/other-check.yml","manifest":"research/other/FROZEN.json","view_workflow_sha256":"0c279c12022a09ba956dbc7f1800fe87148727cbea8080f7dbd6dd761fefd70f"}],"pinned_input_views":[],"scope":"workflow metadata and explicitly pinned historical inputs are substituted in an isolated view; current checkout and evidence remain unchanged"}
+2026-11-06T07:52:37.1037681Z # Subtest: historical metadata is isolated while current source and live checkout are retained
+2026-11-06T07:52:37.1043851Z ok 1 - historical metadata is isolated while current source and live checkout are retained
+2026-11-06T07:52:37.1073808Z   ---
+2026-11-06T07:52:37.1091428Z   duration_ms: 90.835809
+2026-11-06T07:52:37.1103336Z   type: 'test'
+2026-11-06T07:52:37.1104077Z   ...
+2026-11-06T07:52:37.1105082Z # Subtest: root-relative sha256 manifest passes through the CLI without changing live inputs
+2026-11-06T07:52:37.1106507Z ok 2 - root-relative sha256 manifest passes through the CLI without changing live inputs
+2026-11-06T07:52:37.1107546Z   ---
+2026-11-06T07:52:37.1108118Z   duration_ms: 124.924788
+2026-11-06T07:52:37.1108734Z   type: 'test'
+2026-11-06T07:52:37.1109271Z   ...
+2026-11-06T07:52:37.1110360Z # Subtest: root-relative frozen input drift is rejected before the validator executes
+2026-11-06T07:52:37.1111717Z ok 3 - root-relative frozen input drift is rejected before the validator executes
+2026-11-06T07:52:37.1112700Z   ---
+2026-11-06T07:52:37.1113273Z   duration_ms: 49.257964
+2026-11-06T07:52:37.1140458Z   type: 'test'
+2026-11-06T07:52:37.1140823Z   ...
+2026-11-06T07:52:37.1141383Z # Subtest: root-relative manifest cannot be repinned together with its input
+2026-11-06T07:52:37.1142303Z ok 4 - root-relative manifest cannot be repinned together with its input
+2026-11-06T07:52:37.1142916Z   ---
+2026-11-06T07:52:37.1143235Z   duration_ms: 42.883775
+2026-11-06T07:52:37.1143602Z   type: 'test'
+2026-11-06T07:52:37.1143924Z   ...
+2026-11-06T07:52:37.1144423Z # Subtest: manifest layouts require an explicit supported format
+2026-11-06T07:52:37.1145207Z ok 5 - manifest layouts require an explicit supported format
+2026-11-06T07:52:37.1145813Z   ---
+2026-11-06T07:52:37.1146158Z   duration_ms: 46.909345
+2026-11-06T07:52:37.1146572Z   type: 'test'
+2026-11-06T07:52:37.1147402Z   ...
+2026-11-06T07:52:37.1148005Z # Subtest: a validator failure remains a failed status and cleans its source view
+2026-11-06T07:52:37.1149000Z ok 6 - a validator failure remains a failed status and cleans its source view
+2026-11-06T07:52:37.1149709Z   ---
+2026-11-06T07:52:37.1150361Z   duration_ms: 72.49097
+2026-11-06T07:52:37.1150768Z   type: 'test'
+2026-11-06T07:52:37.1151110Z   ...
+2026-11-06T07:52:37.1151863Z # Subtest: workflow CLI arguments reach the isolated validator
+2026-11-06T07:52:37.1152645Z ok 7 - workflow CLI arguments reach the isolated validator
+2026-11-06T07:52:37.1153225Z   ---
+2026-11-06T07:52:37.1153590Z   duration_ms: 119.729195
+2026-11-06T07:52:37.1153994Z   type: 'test'
+2026-11-06T07:52:37.1154326Z   ...
+2026-11-06T07:52:37.1154929Z # Subtest: a shallow checkout fetches its exact missing pin and keeps current source
+2026-11-06T07:52:37.1155949Z ok 8 - a shallow checkout fetches its exact missing pin and keeps current source
+2026-11-06T07:52:37.1156682Z   ---
+2026-11-06T07:52:37.1157045Z   duration_ms: 131.813349
+2026-11-06T07:52:37.1157450Z   type: 'test'
+2026-11-06T07:52:37.1157782Z   ...
+2026-11-06T07:52:37.1158462Z # Subtest: coordinated manifest and frozen-source replacement fails pinned manifest custody
+2026-11-06T07:52:37.1159627Z ok 9 - coordinated manifest and frozen-source replacement fails pinned manifest custody
+2026-11-06T07:52:37.1160952Z   ---
+2026-11-06T07:52:37.1161230Z   duration_ms: 43.401425
+2026-11-06T07:52:37.1161473Z   type: 'test'
+2026-11-06T07:52:37.1161741Z   ...
+2026-11-06T07:52:37.1162084Z # Subtest: changed frozen evidence is rejected without changing the live workflow
+2026-11-06T07:52:37.1162666Z ok 10 - changed frozen evidence is rejected without changing the live workflow
+2026-11-06T07:52:37.1163104Z   ---
+2026-11-06T07:52:37.1163305Z   duration_ms: 47.561621
+2026-11-06T07:52:37.1163543Z   type: 'test'
+2026-11-06T07:52:37.1163738Z   ...
+2026-11-06T07:52:37.1163970Z # Subtest: deleted frozen evidence fails closed
+2026-11-06T07:52:37.1164343Z ok 11 - deleted frozen evidence fails closed
+2026-11-06T07:52:37.1164688Z   ---
+2026-11-06T07:52:37.1164883Z   duration_ms: 48.331065
+2026-11-06T07:52:37.1165160Z   type: 'test'
+2026-11-06T07:52:37.1165357Z   ...
+2026-11-06T07:52:37.1165572Z # Subtest: deleted manifest fails closed
+2026-11-06T07:52:37.1165908Z ok 12 - deleted manifest fails closed
+2026-11-06T07:52:37.1166168Z   ---
+2026-11-06T07:52:37.1166356Z   duration_ms: 39.253122
+2026-11-06T07:52:37.1166622Z   type: 'test'
+2026-11-06T07:52:37.1166819Z   ...
+2026-11-06T07:52:37.1167144Z # Subtest: a revision with mismatched workflow bytes cannot satisfy the freeze
+2026-11-06T07:52:37.1167692Z ok 13 - a revision with mismatched workflow bytes cannot satisfy the freeze
+2026-11-06T07:52:37.1168107Z   ---
+2026-11-06T07:52:37.1168307Z   duration_ms: 44.719587
+2026-11-06T07:52:37.1168596Z   type: 'test'
+2026-11-06T07:52:37.1168792Z   ...
+2026-11-06T07:52:37.1169037Z # Subtest: paths outside the source view are rejected
+2026-11-06T07:52:37.1169444Z ok 14 - paths outside the source view are rejected
+2026-11-06T07:52:37.1169783Z   ---
+2026-11-06T07:52:37.1180634Z   duration_ms: 35.527556
+2026-11-06T07:52:37.1180894Z   type: 'test'
+2026-11-06T07:52:37.1181097Z   ...
+2026-11-06T07:52:37.1181435Z # Subtest: released input overlay is isolated and records current lock provenance
+2026-11-06T07:52:37.1181991Z ok 15 - released input overlay is isolated and records current lock provenance
+2026-11-06T07:52:37.1182379Z   ---
+2026-11-06T07:52:37.1182579Z   duration_ms: 86.304322
+2026-11-06T07:52:37.1182802Z   type: 'test'
+2026-11-06T07:52:37.1182992Z   ...
+2026-11-06T07:52:37.1183276Z # Subtest: historical Git input must match the original freeze digest
+2026-11-06T07:52:37.1183726Z ok 16 - historical Git input must match the original freeze digest
+2026-11-06T07:52:37.1184055Z   ---
+2026-11-06T07:52:37.1184240Z   duration_ms: 53.696733
+2026-11-06T07:52:37.1184452Z   type: 'test'
+2026-11-06T07:52:37.1184631Z   ...
+2026-11-06T07:52:37.1184941Z # Subtest: current nested/root lock drift fails before the historical overlay
+2026-11-06T07:52:37.1185645Z ok 17 - current nested/root lock drift fails before the historical overlay
+2026-11-06T07:52:37.1185999Z   ---
+2026-11-06T07:52:37.1186180Z   duration_ms: 47.169832
+2026-11-06T07:52:37.1186392Z   type: 'test'
+2026-11-06T07:52:37.1186576Z   ...
+2026-11-06T07:52:37.1186866Z # Subtest: current lock comparison cannot be reduced to a self-comparison
+2026-11-06T07:52:37.1187442Z ok 18 - current lock comparison cannot be reduced to a self-comparison
+2026-11-06T07:52:37.1187788Z   ---
+2026-11-06T07:52:37.1187977Z   duration_ms: 52.658771
+2026-11-06T07:52:37.1188210Z   type: 'test'
+2026-11-06T07:52:37.1188396Z   ...
+2026-11-06T07:52:37.1188711Z # Subtest: pinned input digest cannot diverge from the original frozen manifest
+2026-11-06T07:52:37.1189227Z ok 19 - pinned input digest cannot diverge from the original frozen manifest
+2026-11-06T07:52:37.1189598Z   ---
+2026-11-06T07:52:37.1189784Z   duration_ms: 47.598268
+2026-11-06T07:52:37.1190260Z   type: 'test'
+2026-11-06T07:52:37.1190453Z   ...
+2026-11-06T07:52:37.1190752Z # Subtest: a changed original source manifest rejects the pinned input view
+2026-11-06T07:52:37.1191238Z ok 20 - a changed original source manifest rejects the pinned input view
+2026-11-06T07:52:37.1191592Z   ---
+2026-11-06T07:52:37.1191773Z   duration_ms: 51.873682
+2026-11-06T07:52:37.1191980Z   type: 'test'
+2026-11-06T07:52:37.1192163Z   ...
+2026-11-06T07:52:37.1192516Z # Subtest: a key-pinned workflow is overlaid from history while the live checkout is retained
+2026-11-06T07:52:37.1193111Z ok 21 - a key-pinned workflow is overlaid from history while the live checkout is retained
+2026-11-06T07:52:37.1193518Z   ---
+2026-11-06T07:52:37.1193697Z   duration_ms: 77.553627
+2026-11-06T07:52:37.1193904Z   type: 'test'
+2026-11-06T07:52:37.1194080Z   ...
+2026-11-06T07:52:37.1194360Z # Subtest: a nested key path reaches the workflow digest through the CLI
+2026-11-06T07:52:37.1194852Z ok 22 - a nested key path reaches the workflow digest through the CLI
+2026-11-06T07:52:37.1195502Z   ---
+2026-11-06T07:52:37.1195887Z   duration_ms: 121.736891
+2026-11-06T07:52:37.1196314Z   type: 'test'
+2026-11-06T07:52:37.1196665Z   ...
+2026-11-06T07:52:37.1197287Z # Subtest: a key that does not hold the workflow digest fails before the validator runs
+2026-11-06T07:52:37.1198346Z ok 23 - a key that does not hold the workflow digest fails before the validator runs
+2026-11-06T07:52:37.1198979Z   ---
+2026-11-06T07:52:37.1199181Z   duration_ms: 80.342262
+2026-11-06T07:52:37.1199399Z   type: 'test'
+2026-11-06T07:52:37.1199587Z   ...
+2026-11-06T07:52:37.1200161Z # Subtest: a key pin cannot be moved to the live workflow by rewriting the manifest
+2026-11-06T07:52:37.1200705Z ok 24 - a key pin cannot be moved to the live workflow by rewriting the manifest
+2026-11-06T07:52:37.1201075Z   ---
+2026-11-06T07:52:37.1201259Z   duration_ms: 42.745354
+2026-11-06T07:52:37.1201474Z   type: 'test'
+2026-11-06T07:52:37.1201653Z   ...
+2026-11-06T07:52:37.1201970Z # Subtest: an extra workflow is overlaid from history through a JSON Pointer pin
+2026-11-06T07:52:37.1202482Z ok 25 - an extra workflow is overlaid from history through a JSON Pointer pin
+2026-11-06T07:52:37.1202843Z   ---
+2026-11-06T07:52:37.1203020Z   duration_ms: 86.970896
+2026-11-06T07:52:37.1203231Z   type: 'test'
+2026-11-06T07:52:37.1203409Z   ...
+2026-11-06T07:52:37.1203726Z # Subtest: extra workflows pass through the CLI and are required by the validator
+2026-11-06T07:52:37.1204243Z ok 26 - extra workflows pass through the CLI and are required by the validator
+2026-11-06T07:52:37.1204613Z   ---
+2026-11-06T07:52:37.1204793Z   duration_ms: 215.282263
+2026-11-06T07:52:37.1205010Z   type: 'test'
+2026-11-06T07:52:37.1205189Z   ...
+2026-11-06T07:52:37.1205477Z # Subtest: an extra workflow pin is held to the same custody as the main one
+2026-11-06T07:52:37.1205942Z ok 27 - an extra workflow pin is held to the same custody as the main one
+2026-11-06T07:52:37.1206284Z   ---
+2026-11-06T07:52:37.1206460Z   duration_ms: 72.931153
+2026-11-06T07:52:37.1206866Z   type: 'test'
+2026-11-06T07:52:37.1207197Z   ...
+2026-11-06T07:52:37.1207779Z # Subtest: a JSON Pointer reads names with dots and escapes, and only own fields
+2026-11-06T07:52:37.1208718Z ok 28 - a JSON Pointer reads names with dots and escapes, and only own fields
+2026-11-06T07:52:37.1209158Z   ---
+2026-11-06T07:52:37.1209347Z   duration_ms: 114.085488
+2026-11-06T07:52:37.1209564Z   type: 'test'
+2026-11-06T07:52:37.1209745Z   ...
+2026-11-06T07:52:37.1292601Z 1..28
+2026-11-06T07:52:37.1293042Z # tests 28
+2026-11-06T07:52:37.1293395Z # suites 0
+2026-11-06T07:52:37.1293863Z # pass 28
+2026-11-06T07:52:37.1294336Z # fail 0
+2026-11-06T07:52:37.1294831Z # cancelled 0
+2026-11-06T07:52:37.1295277Z # skipped 0
+2026-11-06T07:52:37.1295757Z # todo 0
+2026-11-06T07:52:37.1296238Z # duration_ms 2174.298117
+2026-11-06T07:52:37.1382804Z ##[group]Run python3 -B .github/scripts/test-pr-budgets.py -v
+2026-11-06T07:52:37.1383268Z [36;1mpython3 -B .github/scripts/test-pr-budgets.py -v[0m
+2026-11-06T07:52:37.1403299Z shell: /usr/bin/bash -e {0}
+2026-11-06T07:52:37.1403548Z env:
+2026-11-06T07:52:37.1403810Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.1404253Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-06T07:52:37.1404693Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.1405083Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.1405465Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.1405851Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-06T07:52:37.1406180Z ##[endgroup]
+2026-11-06T07:52:37.2398161Z test_dependencies_inherit_manual_only_admission (__main__.BudgetPolicyTests.test_dependencies_inherit_manual_only_admission) ... ok
+2026-11-06T07:52:37.2400734Z test_explicit_labeled_experiments_are_not_automatic_merge_checks (__main__.BudgetPolicyTests.test_explicit_labeled_experiments_are_not_automatic_merge_checks) ... ok
+2026-11-06T07:52:37.2402928Z test_github_string_comparisons_ignore_case (__main__.BudgetPolicyTests.test_github_string_comparisons_ignore_case) ... ok
+2026-11-06T07:52:37.2404840Z test_job_labels_do_not_exempt_automatic_or_branches (__main__.BudgetPolicyTests.test_job_labels_do_not_exempt_automatic_or_branches) ... ok
+2026-11-06T07:52:37.2406765Z test_long_and_missing_automatic_budgets_fail (__main__.BudgetPolicyTests.test_long_and_missing_automatic_budgets_fail) ... ok
+2026-11-06T07:52:37.2409524Z test_manual_and_disabled_jobs_keep_long_budgets (__main__.BudgetPolicyTests.test_manual_and_disabled_jobs_keep_long_budgets) ... ok
+2026-11-06T07:52:37.2411903Z test_merge_group_requires_its_own_bounded_branch (__main__.BudgetPolicyTests.test_merge_group_requires_its_own_bounded_branch) ... ok
+2026-11-06T07:52:37.2412900Z test_metadata_is_not_executed (__main__.BudgetPolicyTests.test_metadata_is_not_executed) ... ok
+2026-11-06T07:52:37.2414453Z test_multiline_conditions_preserve_manual_only_routing (__main__.BudgetPolicyTests.test_multiline_conditions_preserve_manual_only_routing) ... ok
+2026-11-06T07:52:37.2430903Z test_named_exceptions_are_exact (__main__.BudgetPolicyTests.test_named_exceptions_are_exact) ... ok
+2026-11-06T07:52:37.2433047Z test_pr_full_event_expression_preserves_long_manual_lane (__main__.BudgetPolicyTests.test_pr_full_event_expression_preserves_long_manual_lane) ... ok
+2026-11-06T07:52:37.2434697Z test_retired_lean_workflows_have_no_pr_budget_exemption (__main__.BudgetPolicyTests.test_retired_lean_workflows_have_no_pr_budget_exemption) ... ok
+2026-11-06T07:52:37.2436080Z test_short_budgets_pass (__main__.BudgetPolicyTests.test_short_budgets_pass) ... ok
+2026-11-06T07:52:37.2437172Z test_unknown_budgets_fail_closed (__main__.BudgetPolicyTests.test_unknown_budgets_fail_closed) ... ok
+2026-11-06T07:52:37.2442476Z test_unknown_or_conditions_cannot_hide_applicable_jobs (__main__.BudgetPolicyTests.test_unknown_or_conditions_cannot_hide_applicable_jobs) ... ok
+2026-11-06T07:52:37.2443506Z 
+2026-11-06T07:52:37.2444112Z ----------------------------------------------------------------------
+2026-11-06T07:52:37.2444692Z Ran 15 tests in 0.005s
+2026-11-06T07:52:37.2444920Z 
+2026-11-06T07:52:37.2445049Z OK
+2026-11-06T07:52:37.2550068Z ##[group]Run python3 -B .github/scripts/test-ecbench-session-freeze.py -v
+2026-11-06T07:52:37.2550648Z [36;1mpython3 -B .github/scripts/test-ecbench-session-freeze.py -v[0m
+2026-11-06T07:52:37.2570446Z shell: /usr/bin/bash -e {0}
+2026-11-06T07:52:37.2570694Z env:
+2026-11-06T07:52:37.2570965Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.2571420Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-06T07:52:37.2571857Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.2572235Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.2572613Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.2572993Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-06T07:52:37.2573318Z ##[endgroup]
+2026-11-06T07:52:37.6285414Z test_existing_capsules_records_and_pointer_changes_stay_blocked (__main__.SessionFreeze.test_existing_capsules_records_and_pointer_changes_stay_blocked) ... ok
+2026-11-06T07:52:37.6726683Z test_existing_record_deletion_stays_blocked (__main__.SessionFreeze.test_existing_record_deletion_stays_blocked) ... ok
+2026-11-06T07:52:37.7187160Z test_generated_ignore_metadata_can_change (__main__.SessionFreeze.test_generated_ignore_metadata_can_change) ... ok
+2026-11-06T07:52:37.7625932Z test_new_session_is_allowed (__main__.SessionFreeze.test_new_session_is_allowed) ... ok
+2026-11-06T07:52:37.7626584Z 
+2026-11-06T07:52:37.7626782Z ----------------------------------------------------------------------
+2026-11-06T07:52:37.7627177Z Ran 4 tests in 0.357s
+2026-11-06T07:52:37.7627353Z 
+2026-11-06T07:52:37.7627446Z OK
+2026-11-06T07:52:37.7768685Z ##[group]Run python3 -B .github/scripts/check-pr-budgets.py
+2026-11-06T07:52:37.7769160Z [36;1mpython3 -B .github/scripts/check-pr-budgets.py[0m
+2026-11-06T07:52:37.7789155Z shell: /usr/bin/bash -e {0}
+2026-11-06T07:52:37.7789405Z env:
+2026-11-06T07:52:37.7789671Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.7790385Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-06T07:52:37.7790822Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.7791214Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.7791600Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-06T07:52:37.7791981Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-06T07:52:37.7792304Z ##[endgroup]
+2026-11-06T07:52:40.5017835Z .github/workflows/ecbench.yml: exhaustive_replay can run on pull_request/opened without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5019220Z Checked routine PR/merge-group budgets in 543 workflows: 10 violations
+2026-11-06T07:52:40.5021424Z .github/workflows/ecbench.yml: replay_sentinels_pr can run on pull_request/opened without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5023629Z .github/workflows/ecbench.yml: exhaustive_replay can run on pull_request/ready_for_review without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5025454Z .github/workflows/ecbench.yml: replay_sentinels_pr can run on pull_request/ready_for_review without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5027169Z .github/workflows/ecbench.yml: exhaustive_replay can run on pull_request/reopened without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5028879Z .github/workflows/ecbench.yml: replay_sentinels_pr can run on pull_request/reopened without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5030512Z .github/workflows/ecbench.yml: exhaustive_replay can run on pull_request/synchronize without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5031592Z .github/workflows/ecbench.yml: replay_sentinels_pr can run on pull_request/synchronize without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5032833Z .github/workflows/ecbench.yml: exhaustive_replay can run on merge_group/checks_requested without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5033755Z .github/workflows/ecbench.yml: replay_sentinels_pr can run on merge_group/checks_requested without a proven 1–25 minute timeout
+2026-11-06T07:52:40.5106173Z ##[error]Process completed with exit code 1.
+2026-11-06T07:52:40.5254386Z Post job cleanup.
+2026-11-06T07:52:40.6141629Z [command]/usr/bin/git version
+2026-11-06T07:52:40.6190658Z git version 2.56.0
+2026-11-06T07:52:40.6234584Z Temporarily overriding HOME='/home/runner/work/_temp/03a0c6c1-8484-458c-adf7-01f1d3c6e867' before making global git config changes
+2026-11-06T07:52:40.6235959Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-06T07:52:40.6241584Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-06T07:52:40.6287208Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-06T07:52:40.6351563Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-06T07:52:41.0490183Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-06T07:52:41.0537741Z http.https://github.com/.extraheader
+2026-11-06T07:52:41.0552503Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-06T07:52:41.0601630Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-06T07:52:41.1348396Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-06T07:52:41.1406782Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-06T07:52:41.2260545Z Cleaning up orphan processes
+2026-11-06T07:52:41.2638671Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

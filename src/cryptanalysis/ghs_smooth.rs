@@ -543,6 +543,10 @@ impl SmoothCover {
     /// `Con(O)` as a reduced divisor class on `C` over `K`: `Σ_{P(δ)=0} (δ, 0)`
     /// (minus the appropriate multiple of infinity).
     fn weierstrass_class(&self) -> Result<MumfordDivisor, SmoothCoverError> {
+        self.weierstrass_class_impl(true)
+    }
+
+    fn weierstrass_class_impl(&self, checked: bool) -> Result<MumfordDivisor, SmoothCoverError> {
         let irr = self.kirr();
         let u = match self.model {
             CoverModel::V => self.p_poly().scalar_mul(&self.inv(&self.p[self.r]), irr),
@@ -558,11 +562,16 @@ impl SmoothCover {
                 )
             }
         };
-        Ok(MumfordDivisor::try_from_unreduced(
-            &self.curve_big,
-            u,
-            F2mPoly::zero(self.tower.big_n),
-        )?)
+        let v = F2mPoly::zero(self.tower.big_n);
+        if checked {
+            Ok(MumfordDivisor::try_from_unreduced(&self.curve_big, u, v)?)
+        } else {
+            Ok(MumfordDivisor::from_unreduced_unchecked(
+                &self.curve_big,
+                u,
+                v,
+            )?)
+        }
     }
 
     /// The class of `σ'^i Con(P) − (degree)·∞` on `C` over `K`, from the
@@ -573,17 +582,50 @@ impl SmoothCover {
         z0: &F2mElement,
         s0: &F2mElement,
     ) -> Result<MumfordDivisor, SmoothCoverError> {
+        self.conorm_class_impl(i, z0, s0, true)
+    }
+
+    /// `σ^i(x)`.  The checked path uses the library's untallied
+    /// `square_k_times`; the cost-counted path squares one step at a time so
+    /// that every squaring reaches the operation ledger.
+    fn frob_i(&self, x: &F2mElement, i: u32, checked: bool) -> F2mElement {
+        if checked {
+            self.tower.frobenius_iter(x, i)
+        } else {
+            let mut acc = x.clone();
+            for _ in 0..i * self.tower.l {
+                acc = self.sq(&acc);
+            }
+            acc
+        }
+    }
+
+    fn conorm_class_impl(
+        &self,
+        i: u32,
+        z0: &F2mElement,
+        s0: &F2mElement,
+        checked: bool,
+    ) -> Result<MumfordDivisor, SmoothCoverError> {
         let irr = self.kirr();
         let nn = self.tower.big_n;
-        let zi = self.tower.frobenius_iter(z0, i);
-        let si = self.tower.frobenius_iter(s0, i);
+        let mk = |u: F2mPoly, v: F2mPoly| -> Result<MumfordDivisor, SmoothCoverError> {
+            if checked {
+                Ok(MumfordDivisor::try_from_unreduced(&self.curve_big, u, v)?)
+            } else {
+                Ok(MumfordDivisor::from_unreduced_unchecked(
+                    &self.curve_big,
+                    u,
+                    v,
+                )?)
+            }
+        };
+        let zi = self.frob_i(z0, i, checked);
+        let si = self.frob_i(s0, i, checked);
         // Y(v) = z_i (s_i + Θ^{σ^i}(v)) at exponents 0 and 2^j
         let mut y_terms: Vec<(usize, F2mElement)> = vec![(0, self.mul(&zi, &si))];
         for (j, th) in self.theta.iter().enumerate() {
-            y_terms.push((
-                1usize << j,
-                self.mul(&zi, &self.tower.frobenius_iter(th, i)),
-            ));
+            y_terms.push((1usize << j, self.mul(&zi, &self.frob_i(th, i, checked))));
         }
         match self.model {
             CoverModel::V => {
@@ -595,7 +637,7 @@ impl SmoothCover {
                 }
                 let u = self.mono_poly(&u_terms).scalar_mul(&pr_inv, irr);
                 let y = self.mono_poly(&y_terms).scalar_mul(&mu_inv, irr);
-                Ok(MumfordDivisor::try_from_unreduced(&self.curve_big, u, y)?)
+                mk(u, y)
             }
             CoverModel::T => {
                 let top = 1usize << self.r;
@@ -608,7 +650,7 @@ impl SmoothCover {
                 let y_t: Vec<(usize, F2mElement)> =
                     y_terms.iter().map(|(e, c)| (top - *e, c.clone())).collect();
                 let y = self.mono_poly(&y_t);
-                Ok(MumfordDivisor::try_from_unreduced(&self.curve_big, u, y)?)
+                mk(u, y)
             }
         }
     }
@@ -636,6 +678,49 @@ impl SmoothCover {
         let nw = w.try_scalar_mul(&BigUint::from(self.tower.n), &self.curve_big)?;
         let total = acc.try_add(&nw.try_neg(&self.curve_big)?, &self.curve_big)?;
         self.to_base(&total)
+    }
+
+    /// [`Self::image`] computed with the validation-free group law
+    /// ([`MumfordDivisor::add_unchecked`], [`MumfordDivisor::from_unreduced_unchecked`])
+    /// and with every Frobenius squaring visible to the field-operation
+    /// ledger.  Returns the same divisor (tested) and the number of Cantor
+    /// additions over `K` that were performed.  This is the entry point for
+    /// cost-counted attacks: the operand re-checks of the validated path are
+    /// defensive, not algorithm work.
+    pub fn image_alg(&self, pt: &Pt) -> Result<(MumfordDivisor, u64), SmoothCoverError> {
+        let (x0, y0) = match pt {
+            Pt::Inf => return Ok((MumfordDivisor::identity(self.tower.l), 0)),
+            Pt::Aff { x, y } => (x, y),
+        };
+        if x0.is_zero() {
+            return Err(SmoothCoverError::UnsupportedPoint("x = 0"));
+        }
+        let cb = &self.curve_big;
+        let z0 = self.inv(x0);
+        let s0 = self.mul(&y0.add(&self.beta0), &z0);
+        let mut adds = 0u64;
+        let mut acc = MumfordDivisor::identity(self.tower.big_n);
+        for i in 0..self.tower.n {
+            let xi = self.conorm_class_impl(i, &z0, &s0, false)?;
+            acc = acc.add_unchecked(&xi, cb);
+            adds += 1;
+        }
+        // n·W by double-and-add, then total − nW
+        let w = self.weierstrass_class_impl(false)?;
+        let mut nw = MumfordDivisor::identity(self.tower.big_n);
+        let nbig = BigUint::from(self.tower.n);
+        for bit in (0..nbig.bits()).rev() {
+            nw = nw.add_unchecked(&nw, cb);
+            adds += 1;
+            if nbig.bit(bit) {
+                nw = nw.add_unchecked(&w, cb);
+                adds += 1;
+            }
+        }
+        let neg = nw.try_neg(cb)?;
+        let total = acc.add_unchecked(&neg, cb);
+        adds += 1;
+        Ok((self.to_base(&total)?, adds))
     }
 
     /// Move a divisor class with `k`-rational Mumford coefficients from

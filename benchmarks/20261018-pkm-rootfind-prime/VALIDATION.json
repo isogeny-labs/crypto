@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "note": "Root-finder round (research/pkm_tower_rootfind_20261018). gae_band shows the 15-bit cell (P8): rootfind-subtract (m = 2) against same-target rho-negation, medians of S_w. The order (IC above rho) holds at every weight in all four cells: P5 29.0/5.50, 31.0/5.68, 48.9/7.47; P6 36.0/2.79, 39.1/2.90, 67.0/3.98; P7 35.7/2.01, 39.1/2.14, 69.8/3.23. The row's main comparison (root finders against tower F4 and signature F5) is unresolved under the band, as RESULT.md states.",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "bd38e945d54155731669438c9c066ffa1dcd5fc3c257954980793853cc878b2c"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "8c6b266f981b0c1b8b4c05c36a430f48792faec5aaa1b8c4ffa3bd74d4386b31"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "rho.negation on the same public targets, named by research/pkm_tower_rootfind_20261018/PROTOCOL.md (prime-order curves with no automorphism beyond negation in use)",
+  "unit": "GAE / sqrt(r) (ecbench S)",
+  "binary_or_process": "ecbench, commit ebed0cc51, one binary for every arm of every session",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 49.972738006943246,
+    "rho": 1.9836619693195279
+   },
+   "0.1": {
+    "ic": 55.328255237917666,
+    "rho": 2.1265152380055983
+   },
+   "1": {
+    "ic": 103.52791031668744,
+    "rho": 3.4121946561802323
+   }
+  },
+  "order_holds_across_band": true
+ }
+}

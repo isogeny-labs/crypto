@@ -1,0 +1,71 @@
+{
+  "schema": "formal.construction/v1",
+  "task": "T-1327",
+  "main_declarations": 9,
+  "controls": 7,
+  "axiom_readbacks": 16,
+  "scientific_execution": false,
+  "independent_review": "pending",
+  "native_source_sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+  "general_machine_bound": "n < USize.size",
+  "fixed_controls_hypothesis": "System.Platform.numBits = 64",
+  "component_cardinality_correspondence": "explicit premise, graph correspondence not yet proved",
+  "dynamic_array_growth": "not covered",
+  "both_anchors_returned_constraint": "separate obligation",
+  "receipts": {
+    "ExpectedFailure-attempt-HmT6FJ4F": {
+      "module": "ExpectedFailure",
+      "native_exit": 1,
+      "bindings_unchanged": true,
+      "gate_exit": 1
+    },
+    "Probe-attempt-5xZoloZp": {
+      "module": "Probe",
+      "native_exit": 0,
+      "bindings_unchanged": true,
+      "gate_exit": 0
+    },
+    "SizeComposition-attempt-kklV0OOS": {
+      "module": "SizeComposition",
+      "native_exit": 0,
+      "bindings_unchanged": true,
+      "gate_exit": 0
+    },
+    "SizeControls-attempt-T1BnKjVk": {
+      "module": "SizeControls",
+      "native_exit": 1,
+      "bindings_unchanged": true,
+      "gate_exit": 1
+    },
+    "SizeControls-attempt-r8KP9aZp": {
+      "module": "SizeControls",
+      "native_exit": 0,
+      "bindings_unchanged": true,
+      "gate_exit": 0
+    },
+    "SizeReadback-attempt-7ODz4Eyi": {
+      "module": "SizeReadback",
+      "native_exit": 0,
+      "bindings_unchanged": true,
+      "gate_exit": 0
+    },
+    "UnionSize-attempt-Jy1o8Jyk": {
+      "module": "UnionSize",
+      "native_exit": 1,
+      "bindings_unchanged": true,
+      "gate_exit": 1
+    },
+    "UnionSize-attempt-uK4QXLaN": {
+      "module": "UnionSize",
+      "native_exit": 1,
+      "bindings_unchanged": true,
+      "gate_exit": 1
+    },
+    "UnionSize-attempt-wcVgUynI": {
+      "module": "UnionSize",
+      "native_exit": 0,
+      "bindings_unchanged": true,
+      "gate_exit": 0
+    }
+  }
+}

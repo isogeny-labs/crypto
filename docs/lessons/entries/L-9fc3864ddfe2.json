@@ -1,0 +1,15 @@
+{
+  "action": "check algebraically whether the factor cancels; if it does, the control does not test it: find the separate gate that can flip it (e.g. a model change) and report only its informative rows",
+  "created": "2026-11-21T01:15:59Z",
+  "evidence": [
+    "research/g3_affine_twist_20261121/validation/validator-report.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "when a positive control's ground truth and the tested statistic both contain the same factor (e.g. a twist character chi(c) in both a fibre-norm symbol and a chi_18 sign)",
+  "why": "g3_affine_twist: chi(c) cancels in the Smith control (chi(c)-only null 817/1569); the c^27 factor is tested only by the model-t gate, informative on 34 of the 80 reported rows"
+}

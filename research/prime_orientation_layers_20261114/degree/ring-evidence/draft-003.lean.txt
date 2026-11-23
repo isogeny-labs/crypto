@@ -1,0 +1,83 @@
+module
+public import OrientationDegree
+public import Mathlib.NumberTheory.Padics.RingHoms
+public import OrientationContent
+import all OrientationContent
+
+public section
+noncomputable section
+namespace OrientationCoefficientReduction
+open OrientationAnchor Polynomial
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+
+def integralRationals : Subring ℚ where
+  carrier := {q | VBound 0 q}
+  zero_mem' := VBound.zero 0
+  one_mem' := Or.inr (by simp)
+  add_mem' ha hb := ha.add hb
+  neg_mem' ha := ha.neg
+  mul_mem' ha hb := by simpa using ha.mul hb
+
+theorem norm_bound {q : ℚ} (n : ℕ) (h : VBound (n:ℤ) q) :
+    padicNorm 2 q ≤ (2:ℚ)^(-(n:ℤ)) := by
+  rcases h with rfl | h
+  · simp only [padicNorm.zero]
+    positivity
+  by_cases hq : q=0
+  · subst q
+    simp only [padicNorm.zero]
+    positivity
+  rw [padicNorm.eq_zpow_of_nonzero hq]
+  exact zpow_le_zpow_right₀ (by norm_num) (neg_le_neg h)
+
+theorem integral_norm {q : ℚ} (h : VBound 0 q) : padicNorm 2 q ≤ 1 := by
+  simpa using norm_bound 0 h
+
+def toPadic : integralRationals →+* ℤ_[2] where
+  toFun q := ⟨(q.val : ℚ_[2]), by
+    rw [Padic.eq_padicNorm]
+    exact_mod_cast integral_norm q.property⟩
+  map_one' := by apply Subtype.ext; simp
+  map_zero' := by apply Subtype.ext; simp
+  map_add' a b := by apply Subtype.ext; simp
+  map_mul' a b := by apply Subtype.ext; simp
+
+def reduce (p : ℕ) : integralRationals →+* ZMod (2^p) :=
+  (PadicInt.toZModPow p).comp toPadic
+
+theorem reduce_zero_of_bound (p : ℕ) (q : integralRationals)
+    (h : VBound (p:ℤ) q.val) : reduce p q=0 := by
+  change PadicInt.toZModPow p (toPadic q)=0
+  rw [← RingHom.mem_ker,PadicInt.ker_toZModPow,
+    ← PadicInt.norm_le_pow_iff_mem_span_pow]
+  change ‖(q.val:ℚ_[2])‖ ≤ (2:ℝ)^(-(p:ℤ))
+  rw [Padic.eq_padicNorm]
+  exact_mod_cast norm_bound p h
+
+theorem integral_den_valuation {q : ℚ} (h : VBound 0 q) : padicValNat 2 q.den=0 := by
+  by_cases hq : q=0
+  · subst q; simp
+  have hv := h.resolve_left hq
+  rcases Rat.num_or_den_zero_padicVal q (by decide : Nat.Prime 2) with hn | hd
+  · rw [padicValRat_def,hn] at hv
+    omega
+  · exact hd
+
+theorem integral_den_not_dvd {q : ℚ} (h : VBound 0 q) : ¬ 2 ∣ q.den := by
+  have hd := (padicValNat.eq_zero_iff).mp (integral_den_valuation h)
+  rcases hd with hd | hd | hd
+  · norm_num at hd
+  · exact (q.den_ne_zero hd).elim
+  · exact hd
+
+theorem integral_den_odd {q : ℚ} (h : VBound 0 q) : Odd q.den := by
+  exact Nat.not_even_iff_odd.mp (fun he => integral_den_not_dvd h he.two_dvd)
+
+theorem reduce_compatible (m n : ℕ) (hmn : m ≤ n) (q : integralRationals) :
+    ZMod.castHom (pow_dvd_pow 2 hmn) (ZMod (2^m)) (reduce n q)=reduce m q := by
+  exact DFunLike.congr_fun (PadicInt.zmod_cast_comp_toZModPow m n hmn) (toPadic q)
+
+end OrientationCoefficientReduction
+#print axioms OrientationCoefficientReduction.reduce_zero_of_bound
+#print axioms OrientationCoefficientReduction.integral_den_odd
+#print axioms OrientationCoefficientReduction.reduce_compatible

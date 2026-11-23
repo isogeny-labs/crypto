@@ -47,3 +47,19 @@ proposals, not results.
   reading logs or JSONL by key.
 - Keep the proposal grounded in the numbers on disk: quote them, never
   re-derive them from memory.
+
+## Continuous loop: learn, adapt, act on your own
+
+AGENTS.md "Continuous learning loop"; ledger `tools/lessons.py`. Your role's
+limits above still hold: the loop adds records, never authority.
+
+1. **Before acting**: `python3 tools/lessons.py brief --scope idea-generator`; apply
+   adopted lessons, treat candidates as hypotheses to test.
+2. **While acting**: resolve blockers within your role first (diagnose, the
+   documented remedy, a materially different approach); escalate only what
+   needs authority you do not have.
+3. **After acting**: `lessons.py outcome --scope idea-generator ...` with evidence;
+   `lessons.py test` for each lesson applied; `lessons.py add --scope idea-generator`
+   for a repeatable surprise, with the evidence that showed it.
+4. **Adapt**: an adopted lesson for `idea-generator` is folded into this file by a PR
+   that cites its id.

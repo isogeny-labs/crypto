@@ -130,7 +130,10 @@ fn main() {
                     Value::Null
                 });
             }
-            let r0 = rs.first().map(|r| r.workload.curve.r).unwrap_or(0);
+            let r0 = rs
+                .first()
+                .map(|r| r.workload.curve.r.checked_u128().expect("a u128 order"))
+                .unwrap_or(0);
             report["arms"].as_array_mut().unwrap().push(json!({
                 "curve": curve, "r": r0, "arm": arm, "runs": rs.len(),
                 "verified": ok.len(), "mean_priced_s": means,

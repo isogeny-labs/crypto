@@ -1,0 +1,28 @@
+import Multiplicity
+namespace NormalizationMultiplicityControls
+open Polynomial MumfordNormalization NormalizationMultiplicity
+ theorem double_root : exactMultiplicity (5:ℚ) 2 ((X-C 5)^2) := by
+  constructor
+  · exact dvd_rfl
+  · intro h
+    have hd := natDegree_le_of_dvd h (pow_ne_zero 2 (X_sub_C_ne_zero (5:ℚ)))
+    norm_num [natDegree_pow,natDegree_X_sub_C] at hd
+ theorem transported_double : exactMultiplicity (1:ℚ) 2 (T 2 2 3 ((X-C 5)^2)) := by
+  have h := (exact_multiplicity_iff 2 2 (2:ℚ) 3 5 (by norm_num) ((X-C 5)^2)).2 double_root
+  norm_num at h ⊢
+  exact h
+ theorem not_simple : ¬exactMultiplicity (5:ℚ) 1 ((X-C 5)^2) := by
+  intro h
+  exact h.2 dvd_rfl
+ theorem wrong_root : ¬((X-C (4:ℚ))∣(X-C 5)^2) := by
+  intro h
+  obtain ⟨q,hq⟩ := h
+  have he := congrArg (Polynomial.eval (4:ℚ)) hq
+  norm_num at he
+ theorem zero_all_powers (k : ℕ) : (X-C (5:ℚ))^k∣(0:ℚ[X]) := dvd_zero _
+ theorem zero_no_exact (k : ℕ) : ¬exactMultiplicity (5:ℚ) k 0 := by
+  intro h
+  exact h.2 (dvd_zero _)
+ theorem exponent_zero : (X-C (5:ℚ))^0∣(1:ℚ[X]) := by simp
+ theorem zero_scale_collapses : T 2 (0:ℚ) 3 ((X-C 5)^2)=0 := by simp [T]
+end NormalizationMultiplicityControls

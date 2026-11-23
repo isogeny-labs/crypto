@@ -1,0 +1,152 @@
+\documentclass[10pt]{article}
+\usepackage[margin=20mm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,tikz,graphicx,hyperref}
+\usepackage{xurl}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\definecolor{win}{HTML}{2C7B58}\definecolor{tie}{HTML}{9BABB7}\definecolor{loss}{HTML}{C64A4A}
+\title{Common scalar repair: exact census and rational successor}
+\author{Producer research report; unsigned evidence}
+\date{8 November 2026}
+\begin{document}\maketitle
+The common scalar eliminates the finite mode proliferation caused by the
+entry-dependent normalizer. At equal precision it has fewer admissible tuples
+in every one of the 2,616 registered cells for each representation. This is
+component evidence, not measured execution speed. All findings here have
+\texttt{[pcc:unverified]} standing; no independent signature is supplied.
+
+Let $L=2^a$, $S=\{-L,\ldots,L-1\}$, $C(T)=\prod_{s\in S}(T-s)$,
+$B_d(T)=C(T)/((T-d)C'(0))$, interpreted as its punctured polynomial, and
+$\rho_d=B_d(d)$. Compare $B_d$, $B_d^2/\rho_d$, and
+\[R(T)B_d(T)^2,\qquad R(T)=\sum_{s\in S} B_s(T)/\rho_s^2.\]
+At each source node, $R(s)=1/\rho_s$, so all original node values survive.
+\texttt{CommonScalar.node\_preserved} proves this for the actual kernel.
+
+\paragraph{Frozen experiment.}
+$L=16,32,64$; every nonzero $t\in[-L+1,L-1]$; $\zeta=-1,1,3$;
+$T=t+2L\zeta$; $q=16,24,32,48$; Newton and Smith factorizations.
+All tiles and crossing rows are included. Two physical executions each emit
+20,928 records. The separate grouped-generating-function analyzer checks all
+registered keys and recounts 41,856 integer tuple totals. Outputs are byte
+identical. All rational Newton and modular Smith reconstructions and the
+embedded controls pass (producer assertions).
+
+\begin{center}\small
+\begin{tabular}{lllrrr}\toprule
+Representation & Kernel & Budget & Fewer & Equal & More\\\midrule
+Newton & entry & same &1944&0&672\\
+Newton & scalar & same &2616&0&0\\
+Smith & entry & same &1176&0&1440\\
+Smith & scalar & same &2616&0&0\\
+Newton & entry & proxy &540&0&768\\
+Newton & scalar & proxy &72&36&1200\\
+Smith & entry & proxy &300&0&1008\\
+Smith & scalar & proxy &0&36&1272\\\bottomrule
+\end{tabular}\end{center}
+Same-precision rows have $n=2616$ per group. Proxy rows have $n=1308$;
+entry precision is $\lceil4q/3\rceil$, scalar precision $2q$, for base
+$q=16,24$. These are conservative proxies, not a necessary actual recovery cost.
+No population inference, interval, p-value or timed metric is used.
+
+\paragraph{Execution.}
+One logical CPU, 2 GiB address-space cap, 900 s timeout per process;
+no retries or restores. Requested 2, attempted 2, completed 2, excluded 0.
+Both receipts record exit 0. A Lean replay also used the host, so no idle-host
+or valid-clock claim is made. Exact values do not depend on CPU contention.
+
+\newpage
+\section*{Every outcome retained}
+\begin{center}\resizebox{\linewidth}{!}{\input{plot.tex}}\end{center}
+Green: fewer candidate tuples; gray: equal; red: more. Counts are exact,
+recorded values from \path{reports/summary.json}; each bar is normalized by
+its printed $n$. The original rows are embedded A/A controls. The complete
+level-by-level census is \path{reports/per-level.csv}; no successful level
+was selected. Study \texttt{prime-common-scalar-20261108}; unsigned producer
+evidence, claim \texttt{PCC-20261108-4f9871}.
+
+\section*{What the origin constraint permits}
+Zero is itself a source node. Preserving all node values therefore retains
+the identity at zero. The actual matrix theorem is
+\texttt{CommonScalar.matrix\_origin}. A value-preserving jet correction
+$W_{\rm new}=W+CH$ satisfies $W_{\rm new}(0)=W(0)$ when $C(0)=0$.
+Jet completion may change derivatives, but cannot replace this origin value.
+
+\section*{Why the proxy loss is not a rejection}
+The old sufficient odd-node recovery estimate is conservative. The existing
+all-node recovery review supports doubled degree in its stated $u\ge3$ regime.
+The first three levels already give
+\[hL\left(u+\frac{u-1}{2}+\frac{u-2}{4}\right)>4ML
+ \quad(h>0,\ u\ge3,\ hu\ge3M).\]
+\texttt{RationalScalar.three\_level\_margin} proves this numeric inequality.
+The finite-precision recovery hypotheses still have to be connected to the
+new evaluator. This lemma alone is not that recovery theorem.
+
+\section*{Selected successor}
+Replace the polynomial normalizer by one common rational denominator:
+\[D(T)=\sum_s B_s(T)=\frac{C'(T)}{C'(0)},\qquad
+ U_d(T)=\frac{B_d(T)^2}{D(T)}.\]
+At a node, $D(s)=\rho_s$ is a nonzero two-adic unit and $U_d(s)=B_d(s)$.
+The node statements have actual-kernel Lean proofs. For a finite homogeneous
+contraction with exactly $M$ factors per term and $D\ne0$,
+\[D^M\sum_j w_j\prod_k U_{j,k}
+   =\sum_j w_j\prod_k B_{j,k}^2.\]
+\texttt{RationalScalar.clear\_homogeneous\_sum} proves the general identity.
+The cleared numerator has degree at most $M(4L-2)$, rather than $M(6L-3)$
+for the polynomial scalar. The formal degree lemma is generic; its actual
+puncture-polynomial bridge remains open. This rational candidate has not
+been run as an experimental arm.
+
+\section*{Next proof and construction costs}
+At chart $t+\alpha z$, $\alpha=2L$, every $\alpha/(t-u)$, $u\ne t$,
+is even and two-adically integral. The explicit formulas are
+\begin{align*}
+B_t(t+\alpha z)&=\rho_t\prod_{u\ne t}
+ (1+\alpha z/(t-u)),\\
+B_s(t+\alpha z)&=\rho_t\frac{\alpha z}{t-s}
+ \prod_{u\ne t,s}(1+\alpha z/(t-u))\quad(s\ne t).
+\end{align*}
+Thus $D$ has unit constant coefficient and even higher coefficients;
+its reciprocal formal series is integral. This is the written coefficientwise
+argument; it is not yet a completed Lean series theorem. The pointwise
+\texttt{kernel\_valuation} theorem explicitly assumes a unit denominator.
+
+The proof programme is: formalize this actual local-ring bridge; connect
+homogeneous clearing and the source all-level finite-precision recovery;
+prove uniform all-level mode bounds; then charge the full recursive evaluator.
+A point evaluation of $D$ by product/derivative accumulation costs $O(L)$ ring
+operations, not a free scalar oracle. Truncated series, inverses, basis
+construction, child entry queries, bit arithmetic and recovery all need charges.
+A constant valuation shift alone does not establish a changed asymptotic exponent.
+See \path{PLAN.md} for milestones and rejection tests.
+
+\section*{Provenance and retained errors}
+Native source \texttt{555cd9430} and frozen protocol \texttt{12e310bda}
+were published before both execution starts. Protocol hash:
+\begin{quote}\ttfamily\small
+ dedbb0086d84e5ecffba17a424a1fcfe6\\
+ b89bb3d5db0ea40a5421afc36e8d548
+\end{quote}
+The final export has two physical rows, no valid clocks and verification
+\texttt{no\_claim}. Canonical schemas plus explicit study-scoped native
+bindings pass; this checker is not claimed equivalent to the general canonical
+checker. Initial errors survive: unfrozen one-arm schema draft; an analyzer
+call made before replay completion; export missing file byte lengths.
+Only metadata and completed-data analysis were repaired after data; no
+algorithm, input, hypothesis or experimental panel was changed or rerun.
+Saved outputs are losslessly archived as XZ. The original adapter is in Git.
+
+\section*{Source-linked artifacts}
+\begin{itemize}
+\item \path{protocol.json}, \path{publication-receipt.json},
+ \path{source-manifest.sha256}, \path{export.json}, \path{host.txt}.
+\item \path{runs/0/panel.csv.xz}, \path{runs/1/panel.csv.xz}; receipts beside them.
+\item \path{reports/summary.json}, \path{reports/per-level.csv},
+ \path{analysis.log}, \path{contract-validation.log}.
+\item \path{lean/PROOF_MAP.md}, \path{lean/VERIFICATION.md}; all failed attempts retained.
+\item Prior \path{prime_square_kernel_20261106/RESULTS_local_20261107.md};
+ \path{prime_common_kernel_20261030/sources.md} primary-source pins;
+ \path{prime_tensor_variants_20261030/reviews/matched-recovery-independent.md}.
+\end{itemize}
+KB unavailable (wrapper status 127); repository/atlas fallback. No priority or
+literature-exhaustion claim. No speedup or leaderboard promotion; independent
+review and trusted PCC signatures remain external obligations.
+\end{document}

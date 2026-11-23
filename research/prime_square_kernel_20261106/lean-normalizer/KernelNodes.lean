@@ -1,0 +1,95 @@
+module
+public import CauchyNormalizer
+public section
+namespace CauchyNormalizer
+
+/-- Actual original puncture kernel on the shifted source grid. -/
+@[expose] def baseKernel (a k : ℕ) (t : ℚ) : ℚ :=
+  (∏ j ∈ Finset.range (2^(a+1)), if j=k then 1 else t-((j : ℚ)-(2^a : ℕ))) /
+    shiftedPuncture (2^(a+1)-1) (2^a) (2^a)
+
+/-- Public product API; the definition is unchanged. Used by the subsequent
+coefficientwise local-series proof, rather than assuming a polynomial model. -/
+theorem baseKernel_formula (a k : ℕ) (t : ℚ) :
+    baseKernel a k t =
+      (∏ j ∈ Finset.range (2^(a+1)), if j=k then 1 else t-((j : ℚ)-(2^a : ℕ))) /
+        shiftedPuncture (2^(a+1)-1) (2^a) (2^a) := rfl
+
+theorem baseKernel_node (a k m : ℕ) (hm : m < 2^(a+1)) :
+    baseKernel a k ((m : ℚ)-(2^a : ℕ)) =
+      if m=k then cauchyRho a k else 0 := by
+  have hp : 0 < 2^(a+1) := by positivity
+  have hcount : 2^(a+1)-1+1 = 2^(a+1) := by omega
+  by_cases h : m=k
+  · subst m
+    simp only [ite_true]
+    unfold baseKernel cauchyRho shiftedPuncture
+    rw [hcount]
+    push_cast
+    rfl
+  · simp only [h, ite_false]
+    unfold baseKernel
+    have hz : (∏ j ∈ Finset.range (2^(a+1)),
+        if j=k then (1 : ℚ) else ((m : ℚ)-(2^a : ℕ))-((j : ℚ)-(2^a : ℕ))) = 0 := by
+      apply Finset.prod_eq_zero (Finset.mem_range.mpr hm)
+      simp [h]
+    rw [hz, zero_div]
+
+def squareKernel (a k : ℕ) (t : ℚ) : ℚ :=
+  baseKernel a k t * baseKernel a k t / cauchyRho a k
+
+theorem squareKernel_node_preserved (a k m : ℕ)
+    (hk : k < 2^(a+1)) (hm : m < 2^(a+1)) :
+    squareKernel a k ((m : ℚ)-(2^a : ℕ)) =
+      baseKernel a k ((m : ℚ)-(2^a : ℕ)) := by
+  unfold squareKernel
+  rw [baseKernel_node a k m hm]
+  split_ifs
+  · field_simp [cauchyRho_ne_zero a k hk]
+  · simp
+
+theorem squareKernel_valuation (a k : ℕ) (hk : k < 2^(a+1))
+    (t : ℚ) (hb : baseKernel a k t ≠ 0) :
+    padicValRat 2 (squareKernel a k t) = 2*padicValRat 2 (baseKernel a k t) := by
+  exact normalized_square_valuation a k hk (baseKernel a k t) hb
+
+theorem cauchyRho_center (a : ℕ) : cauchyRho a (2^a) = 1 := by
+  have hn : shiftedPuncture (2^(a+1)-1) (2^a) (2^a) ≠ 0 := by
+    rw [shiftedPuncture_eq, puncture_eq_signedWeight (a+1) (2^a) (center_lt a)]
+    exact signedWeight_ne_zero _ _
+  simp [cauchyRho, hn]
+
+theorem baseKernel_origin (a k : ℕ) :
+    baseKernel a k 0 = if k=2^a then 1 else 0 := by
+  have h := baseKernel_node a k (2^a) (center_lt a)
+  simp only [sub_self] at h
+  rw [h]
+  by_cases hk : k=2^a
+  · subst k
+    simp [cauchyRho_center]
+  · simp [hk, Ne.symm hk]
+
+theorem squareKernel_origin (a k : ℕ) (hk : k < 2^(a+1)) :
+    squareKernel a k 0 = if k=2^a then 1 else 0 := by
+  have h := squareKernel_node_preserved a k (2^a) hk (center_lt a)
+  simp only [sub_self] at h
+  rw [h, baseKernel_origin]
+
+def matrixEntry (a x y : ℕ) (t : ℚ) : ℚ :=
+  squareKernel a (y+2^a-x) t
+
+/-- Entrywise identity at the origin for all real row/column slots. -/
+theorem matrixEntry_origin (a x y : ℕ) (hx : x < 2^a) (hy : y < 2^a) :
+    matrixEntry a x y 0 = if x=y then 1 else 0 := by
+  have hk : y+2^a-x < 2^(a+1) := by rw [pow_succ]; omega
+  have he : y+2^a-x = 2^a ↔ x=y := by omega
+  unfold matrixEntry
+  rw [squareKernel_origin a _ hk]
+  simp only [he]
+
+end CauchyNormalizer
+#print axioms CauchyNormalizer.baseKernel_node
+#print axioms CauchyNormalizer.squareKernel_node_preserved
+#print axioms CauchyNormalizer.squareKernel_valuation
+#print axioms CauchyNormalizer.squareKernel_origin
+#print axioms CauchyNormalizer.matrixEntry_origin

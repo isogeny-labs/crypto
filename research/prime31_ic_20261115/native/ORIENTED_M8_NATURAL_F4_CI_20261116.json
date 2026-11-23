@@ -1,0 +1,1097 @@
+{
+  "date": "2026-11-16",
+  "standing": "[pcc:unverified]",
+  "source_commit": "ea455b4578913c42427753e7e8fd2d8d1ebbc9c0",
+  "source_run_id": 43782128635,
+  "source_job_id": 133021473364,
+  "source_url": "https://github.com/isogeny-labs/crypto/actions/runs/43782128635",
+  "status": "success",
+  "scope": "source-specific Rust 1.100.0 development execution of 16 natural public target 8-summand F4 fixed 15k cap; target-conditioned original and oriented systems, no root extraction or complete ECDLP",
+  "summary": {
+    "original": {
+      "verdicts": {
+        "undetermined": 16
+      },
+      "first": {
+        "f4": {
+          "basis_elements": 24,
+          "caps": {
+            "degree": 12,
+            "dense": 15000,
+            "nnz": 15000,
+            "seconds": 5
+          },
+          "degree_reached": 6,
+          "f4_internal_ms": 2.17989,
+          "max_cols": 429,
+          "max_dense_entries": 26618,
+          "max_nnz": 11446,
+          "muladds": 30943,
+          "oversize": true,
+          "root_extraction": "not_implemented",
+          "solving_degree_max": 5,
+          "steps": 5,
+          "timed_out": false,
+          "verdict": "undetermined",
+          "whole_f4_wall_ns": 2183575
+        },
+        "poly_count": 4,
+        "target_construct_ns": 21612,
+        "target_normal_form_terms": 125
+      },
+      "uniform_input_terms": [
+        125
+      ],
+      "f4_time_median_ms": 1.758252,
+      "construction_median_ms": 0.024227
+    },
+    "oriented": {
+      "verdicts": {
+        "undetermined": 16
+      },
+      "first": {
+        "f4": {
+          "basis_elements": 18,
+          "caps": {
+            "degree": 12,
+            "dense": 15000,
+            "nnz": 15000,
+            "seconds": 5
+          },
+          "degree_reached": 6,
+          "f4_internal_ms": 1.143731,
+          "max_cols": 291,
+          "max_dense_entries": 17216,
+          "max_nnz": 1950,
+          "muladds": 12141,
+          "oversize": true,
+          "root_extraction": "not_implemented",
+          "solving_degree_max": 5,
+          "steps": 5,
+          "timed_out": false,
+          "verdict": "undetermined",
+          "whole_f4_wall_ns": 1146766
+        },
+        "poly_count": 5,
+        "target_construct_ns": 258000,
+        "target_normal_form_terms": 875
+      },
+      "uniform_input_terms": [
+        875
+      ],
+      "f4_time_median_ms": 1.084552,
+      "construction_median_ms": 0.172311
+    }
+  },
+  "raw": {
+    "B": 31,
+    "all_public_targets_from_frozen_panel": true,
+    "base": "inherited depth-six Dickson64 x preimages (31 liftable canonical points)",
+    "curve_order": 2147446831,
+    "curve_p": 2147483647,
+    "fixed_symbolic_preprocessing_ns": 3753462,
+    "generic_pair_tables_used_by_algebraic_solver": false,
+    "oriented_fixed_nf_terms": [
+      526,
+      526,
+      4,
+      7
+    ],
+    "original_fixed_nf_terms": [
+      526,
+      526,
+      16
+    ],
+    "outcomes": [
+      {
+        "index": 0,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.143731,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1146766
+          },
+          "poly_count": 5,
+          "target_construct_ns": 258000,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 2.17989,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 2183575
+          },
+          "poly_count": 4,
+          "target_construct_ns": 21612,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          1968789159,
+          1892466856
+        ]
+      },
+      {
+        "index": 1,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.0814570000000001,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1084552
+          },
+          "poly_count": 5,
+          "target_construct_ns": 203678,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.7549869999999999,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1758252
+          },
+          "poly_count": 4,
+          "target_construct_ns": 24848,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          717194643,
+          229440838
+        ]
+      },
+      {
+        "index": 2,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.052574,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1055257
+          },
+          "poly_count": 5,
+          "target_construct_ns": 176988,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.690028,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1693784
+          },
+          "poly_count": 4,
+          "target_construct_ns": 24046,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          1139688853,
+          1663496011
+        ]
+      },
+      {
+        "index": 3,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.0261230000000001,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1028978
+          },
+          "poly_count": 5,
+          "target_construct_ns": 184610,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.659202,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1662707
+          },
+          "poly_count": 4,
+          "target_construct_ns": 24126,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          903384438,
+          1336077056
+        ]
+      },
+      {
+        "index": 4,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.035788,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1038692
+          },
+          "poly_count": 5,
+          "target_construct_ns": 172441,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.73054,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1733645
+          },
+          "poly_count": 4,
+          "target_construct_ns": 23846,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          416168746,
+          769355412
+        ]
+      },
+      {
+        "index": 5,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.050661,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1053574
+          },
+          "poly_count": 5,
+          "target_construct_ns": 185581,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.713434,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1716909
+          },
+          "poly_count": 4,
+          "target_construct_ns": 25409,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          1809836224,
+          2040899650
+        ]
+      },
+      {
+        "index": 6,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.0327730000000002,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1035237
+          },
+          "poly_count": 5,
+          "target_construct_ns": 170328,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.6880549999999999,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1691020
+          },
+          "poly_count": 4,
+          "target_construct_ns": 23285,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          507326007,
+          1484169864
+        ]
+      },
+      {
+        "index": 7,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.031731,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1034576
+          },
+          "poly_count": 5,
+          "target_construct_ns": 169506,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.7388329999999999,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1742177
+          },
+          "poly_count": 4,
+          "target_construct_ns": 23716,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          2021378929,
+          681564049
+        ]
+      },
+      {
+        "index": 8,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.001035,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1003880
+          },
+          "poly_count": 5,
+          "target_construct_ns": 169276,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.687144,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1690418
+          },
+          "poly_count": 4,
+          "target_construct_ns": 24407,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          355071516,
+          1885301435
+        ]
+      },
+      {
+        "index": 9,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.006424,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1008967
+          },
+          "poly_count": 5,
+          "target_construct_ns": 168996,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.683038,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1686113
+          },
+          "poly_count": 4,
+          "target_construct_ns": 22424,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          313899796,
+          1258699631
+        ]
+      },
+      {
+        "index": 10,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.1207369999999999,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1123440
+          },
+          "poly_count": 5,
+          "target_construct_ns": 169697,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.79729,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1801507
+          },
+          "poly_count": 4,
+          "target_construct_ns": 23596,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          838650931,
+          143875807
+        ]
+      },
+      {
+        "index": 11,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.15605,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1158483
+          },
+          "poly_count": 5,
+          "target_construct_ns": 172311,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.799334,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1802679
+          },
+          "poly_count": 4,
+          "target_construct_ns": 24497,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          168674640,
+          27179311
+        ]
+      },
+      {
+        "index": 12,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.140306,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1142730
+          },
+          "poly_count": 5,
+          "target_construct_ns": 170247,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.798703,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1801767
+          },
+          "poly_count": 4,
+          "target_construct_ns": 24608,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          960365344,
+          5913570
+        ]
+      },
+      {
+        "index": 13,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.1220480000000002,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1124872
+          },
+          "poly_count": 5,
+          "target_construct_ns": 170858,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.83005,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1833275
+          },
+          "poly_count": 4,
+          "target_construct_ns": 24227,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          1030456516,
+          1905316550
+        ]
+      },
+      {
+        "index": 14,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.1588239999999999,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1176521
+          },
+          "poly_count": 5,
+          "target_construct_ns": 185030,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.769749,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1772684
+          },
+          "poly_count": 4,
+          "target_construct_ns": 24677,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          326383954,
+          663099615
+        ]
+      },
+      {
+        "index": 15,
+        "oriented": {
+          "f4": {
+            "basis_elements": 18,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.147457,
+            "max_cols": 291,
+            "max_dense_entries": 17216,
+            "max_nnz": 1950,
+            "muladds": 12141,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1150231
+          },
+          "poly_count": 5,
+          "target_construct_ns": 169967,
+          "target_normal_form_terms": 875
+        },
+        "original": {
+          "f4": {
+            "basis_elements": 24,
+            "caps": {
+              "degree": 12,
+              "dense": 15000,
+              "nnz": 15000,
+              "seconds": 5
+            },
+            "degree_reached": 6,
+            "f4_internal_ms": 1.821507,
+            "max_cols": 429,
+            "max_dense_entries": 26618,
+            "max_nnz": 11446,
+            "muladds": 30943,
+            "oversize": true,
+            "root_extraction": "not_implemented",
+            "solving_degree_max": 5,
+            "steps": 5,
+            "timed_out": false,
+            "verdict": "undetermined",
+            "whole_f4_wall_ns": 1824431
+          },
+          "poly_count": 4,
+          "target_construct_ns": 24677,
+          "target_normal_form_terms": 125
+        },
+        "public_R": [
+          239766802,
+          2091337017
+        ]
+      }
+    ],
+    "planted_positive_validator": {
+      "fixed_positive_witness_only": true,
+      "note": "generic EC arithmetic constructs validator only; no certificate enters public panel discovery",
+      "oriented_polynomials_vanish": 5,
+      "public_target": [
+        903384438,
+        1336077056
+      ],
+      "standard_polynomials_vanish": 4
+    },
+    "scope": "target-conditioned m8 Rust F4 diagnostic only; no roots/logarithms",
+    "standing": "[pcc:unverified]",
+    "target_known_scalars_used_by_algebraic_solver": false
+  }
+}

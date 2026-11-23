@@ -1,0 +1,48 @@
+   Compiling secant-descriptive-report v0.1.0 (/workspace/crypto/research/prime_factor_base_degree_20261031/parallel_20261031/reporting)
+    Finished `release` profile [optimized] target(s) in 1.37s
+     Running unittests src/main.rs (target/release/deps/secant_descriptive_report-6c3261a780445c15)
+
+running 4 tests
+test tests::manifest_path_escape_is_rejected ... ok
+test tests::incomplete_branch_has_no_target_degree_credit ... ok
+test tests::all_branch_counters_are_summed_not_maximized ... ok
+test tests::supplied_group_replays_match_known_values ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests v1.rs (target/release/deps/secant_descriptive_report_v1-8246609076bd2c2b)
+
+running 4 tests
+test tests::all_branch_counters_are_summed_not_maximized ... ok
+test tests::supplied_group_replays_match_known_values ... ok
+test tests::incomplete_branch_has_no_target_degree_credit ... ok
+test tests::manifest_path_escape_is_rejected ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling version_check v0.9.5
+    Checking typenum v1.20.1
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling generic-array v0.14.7
+    Checking memchr v2.8.3
+    Checking cpufeatures v0.2.17
+    Checking itoa v1.0.18
+    Checking cfg-if v1.0.5
+    Checking crypto-common v0.1.7
+    Checking block-buffer v0.10.4
+    Checking digest v0.10.7
+    Checking sha2 v0.10.9
+    Checking secant-descriptive-report v0.1.0 (/workspace/crypto/research/prime_factor_base_degree_20261031/parallel_20261031/reporting)
+error: manual implementation of `.is_multiple_of()`
+  --> src/main.rs:78:24
+   |
+78 |     if u[0] == v[0] && (u[1] + v[1]) % p == 0 {
+   |                        ^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `(u[1] + v[1]).is_multiple_of(p)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.94.0/index.html#manual_is_multiple_of
+   = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: could not compile `secant-descriptive-report` (bin "secant-descriptive-report") due to 1 previous error

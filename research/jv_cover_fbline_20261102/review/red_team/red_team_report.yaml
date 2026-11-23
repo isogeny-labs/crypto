@@ -1,0 +1,107 @@
+# Written by the main session from the red team's returned text, verbatim apart from this line (the red team's harness blocked writing it).
+red_team_report:
+  id: RT-20261102-172964
+  task_id: null  # no task card id was provided
+  claim_under_review: >
+    research/jv_cover_fbline_20261102 (PR #3286, main 5f3b5c209a): choosing the best of 65536
+    square-direction factor-base lines cuts JV-cover (Nagao/F4 arm) cost 1.71x (residuals ~ B^-5),
+    putting the cover below the negation rho in U1 (0.791/0.659/0.548) and above in U2 (1.900/1.585/1.318).
+  objections:
+    - id: O1
+      severity: high
+      text: >
+        The Pareto (dominated_by) check is absent. The in-tree JV12 section 3.2 sieving variant
+        (jv_sieve.rs) has the same class, factor base, unit and descent test, and has S = 0.00615
+        [0.0055, 0.0069] at p=1511 (jv_sieve_strong_rho_v2_20261020 T1, n=16; S+ 0.0248). The
+        line-search arm has S = 0.615 (p=1451) and 0.511 (p=1601): x83-100 more (x21-25 more than
+        S+), with comparable memory. "The JV cover passes the negation rho" holds only for a
+        dominated arm. The cover route already passed rho (ic_acct1: 0.0098 [0.0069, 0.0144] in
+        bitop/v1).
+    - id: O2
+      severity: medium
+      text: >
+        U1 prices a rho step at the harness schoolbook 331 F_p mults, 2.40x the tuned 137.7. The
+        cover's F_p-native F4/linear work gets no matching discount. U1's "below" describes the
+        harness walk, not a competent rho. U2 is the like-for-like unit and says above at all three
+        primes.
+    - id: O3
+      severity: medium
+      text: >
+        Section 5a admissibility. The cover names counters it does not emit (F_p additions, pair
+        selection), so by section 5a it "cannot be ranked", yet the README declares "the order
+        holds" for U1. With additions modelled at r_c=1 and priced as native ops, U1 flips to above
+        at w=0.1 (3.94/3.28/2.73). At a physical add price (0.1-0.3 of a mult), U1 is 0.86-0.99 at
+        p=1301.
+    - id: O4
+      severity: low
+      text: >
+        The p* extrapolation uses the plain-arm slope -2.10. The line-search gain decays as
+        (1+4.29/sqrt p)^5 (census: dlnG/dlnp = -0.26), so the line-arm slope is about -1.84 and
+        U2 p* is about 1845-1865, not 1799.
+    - id: O5
+      severity: low
+      text: >
+        "Controls (all pass)" while the committed analysis/rescore_fit.json has controls_pass=false
+        (#3278's plain-arm consistency controls, expected to fail on line inputs) is not disclosed.
+        The byte-for-byte reproduction and the re-score command/input layout are not recorded.
+    - id: O6
+      severity: low
+      text: >
+        "A tuned F4 or structured solver is the remaining lever for U2" is an under-supported
+        closure. Untested: the sieve route, the large-prime variation (ic_cover_leads L6), an
+        exhaustive table-driven line search (+x1.075 measured ceiling), other F_p-sublines.
+  required_controls:
+    - "bitop/v1 tally (jv_bitops hooks) on one line-search instance per prime, to settle U1 vs U2 with additions counted on both arms"
+    - "emit cover F_p additions and pair-selection counts before any U1 ranking"
+    - "commit the rescore invocation and the plain-input reproduction diff (table.md byte equality)"
+    - "random-line null arm (pick candidate 1, not the max): expected ratio about 1 (model)"
+  counterexample_or_mutation: >
+    Mutation: the study's own search_fb_line placed in front of the frontier sieve route
+    (exploratory pilot, p=1511, seeds 17-24, all correct). Route cost x1.75 lower, but with the
+    n=65536 search charged the result is x0.92 (search 47% of cost). With n=4096: x1.42 [1.18, 1.73].
+    The "0.5% search" is cheap only because the Nagao arm is about 90x off the frontier.
+  baseline_comparison: >
+    Matched negation rho (126 runs, same l and c_add_e, r=256, batch 16) is the full-automorphism
+    rho: j(E) in neither F_p2 nor F_p3, and not 0 or 1728, on all 9 instances; Aut(E) = {+-1}, no
+    Frobenius/GLS map, no sqrt3. U1 0.791/0.659/0.548 (t(2): upper ends 0.924/0.732/0.604); U2
+    1.900/1.585/1.318. Closest specialized baseline: the in-tree jv_sieve route, x83-100 cheaper
+    (O1). BSGS is dominated in this unit.
+  heuristic_challenges:
+    - "B random-line model: verified exactly by a census of all p(p+1)/2 lines (sd = sqrt(p)/2 within 0.2%, skew and excess kurtosis about 0)"
+    - "EVT: z(B_best) 4.22 +- 0.18 vs 4.29 predicted; exact census E[max] 727.3/726.6/727.0 vs 728/725/730 at p=1301"
+    - "regression to the mean: rejected; plain-line percentiles uniform (mean 0.507); fair speed-up x1.710 vs realised x1.705"
+    - "rate law on the moved model: rate/ff 0.987 line vs 0.981 plain; paired difference t=0.45"
+  cost_model_challenges:
+    - "search mults charged (0.51-0.57%); native lookups 0.05-0.23 GAE/sqrt(l) leave all band verdicts unchanged"
+    - "per-residual F4 x1.0001 and linear stage x1.0011 unchanged"
+    - "the search is overpriced: a chi(h) table over F_q (about 38q mults, x20 cheaper) allows exhaustive search (+x1.075), with p^3/2 natives to be priced"
+    - "tuned-cover model: tau_c in [0.65, 1.0] gives tuned/tuned 1.24-1.90 / 1.03-1.58 / 0.86-1.32"
+  reduction_and_scope_challenges:
+    - "scope correctly limited to the weak class (never prime order); the gain decays with p (x1.57 at p=2039, x1.23 at p=1e4; model)"
+  proof_architecture_challenges: []
+  narrowest_supported_statement: >
+    On the 9 jv_cover weak-class instances, the best-of-65536 square-direction factor-base line
+    cuts the Nagao-only arm's cost x1.71 [1.50, 1.94], search charged. The cut matches the B^-5
+    model; the fair random-instance gain is x1.71 and decays as (1+4.29/sqrt p)^5. Against the
+    full-automorphism negation rho the arm is above in like-for-like F_p mults (U2 1.90/1.58/1.32)
+    and below only in harness schoolbook-priced group additions (U1 0.79/0.66/0.55, a lower bound).
+    It remains x83-100 costlier than the in-tree sieve variant of the same cover route.
+  next_concrete_action: >
+    Freeze a protocol applying the line search to jv_sieve::run_cover_sieve_dlp_on. Use V2's
+    instances and options (p in {1009, 1511, 1823}, seeds 17-32, --stop 64, sparse; the plain arm
+    must reproduce V2 exactly). Charge the search fully (chi(h) table or a pre-registered n). Price
+    both arms in bitop/v1 against the matched strong rho with the section 5a band.
+  artifact_paths:
+    - research/jv_cover_fbline_20261102/review/red_team/records_check/src/main.rs
+    - research/jv_cover_fbline_20261102/review/red_team/records_check.txt
+    - research/jv_cover_fbline_20261102/review/red_team/line_census/src/main.rs
+    - research/jv_cover_fbline_20261102/review/red_team/line_census/build.sh
+    - research/jv_cover_fbline_20261102/review/red_team/line_census_p1301.txt
+    - research/jv_cover_fbline_20261102/review/red_team/line_census_p1451_p1601.txt
+    - research/jv_cover_fbline_20261102/review/red_team/sieve_transfer_pilot/src/main.rs
+    - research/jv_cover_fbline_20261102/review/red_team/sieve_transfer_pilot/build.sh
+    - research/jv_cover_fbline_20261102/review/red_team/sieve_transfer_pilot_p1511.jsonl
+  review_attestation:
+    joints_owned: [interpretation, cost_model, units, rho_reference, statistics, frontier/Pareto]
+    read_sibling_reports: false  # saw only the validator's commit subject in git log
+    verdict: "component gain holds; frontier framing refuted; U1 downgraded; next step is to apply the lever to the sieve route"

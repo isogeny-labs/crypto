@@ -1,0 +1,36 @@
+//! Exact GF(32)[z]/z^154 products. No timings or attack claims.
+use std::{env,fs,io::{BufWriter,Write}};
+const N:usize=154; const W:usize=13;
+type Series=[u8;N]; type Bits=[u64;W];
+fn field(mut a:u8,mut b:u8)->u8{let mut c=0;for _ in 0..5{if b&1!=0{c^=a;}b>>=1;a<<=1;if a&32!=0{a^=0x25;}}c}
+fn field_independent(a:u8,b:u8)->u8{let mut c=0u16;for i in 0..5{for j in 0..5{if (a>>i)&1!=0 && (b>>j)&1!=0{c^=1<<(i+j);}}}for k in (5..=8).rev(){if c&(1<<k)!=0{c^=0x25<<(k-5);}}c as u8}
+fn mul(a:&Series,b:&Series,table:&[[u8;32];32])->Series{let mut c=[0;N];for i in 0..N{if a[i]!=0{for j in 0..N-i{c[i+j]^=table[a[i] as usize][b[j] as usize];}}}c}
+fn plane(a:&Series)->[[u64;3];5]{let mut p=[[0;3];5];for i in 0..N{for k in 0..5{if (a[i]>>k)&1!=0{p[k][i/64]^=1<<(i%64);}}}p}
+fn binary_conv(a:&[u64;3],b:&[u64;3])->[u64;3]{let mut c=[0;3];for i in 0..3{let mut v=a[i];while v!=0{let s=v.trailing_zeros() as usize;v&=v-1;for j in 0..3-i{c[i+j]^=b[j]<<s;if s!=0 && i+j+1<3{c[i+j+1]^=b[j]>>(64-s);}}}}c[2]&=(1<<26)-1;c}
+fn mul_independent(a:&Series,b:&Series)->Series{let a=plane(a);let b=plane(b);let mut p=[[0u64;3];9];for i in 0..5{for j in 0..5{let c=binary_conv(&a[i],&b[j]);for k in 0..3{p[i+j][k]^=c[k];}}}for i in (5..=8).rev(){for k in 0..3{p[i-5][k]^=p[i][k];p[i-3][k]^=p[i][k];}}let mut c=[0;N];for i in 0..N{for k in 0..5{c[i]^=(((p[k][i/64]>>(i%64))&1) as u8)<<k;}}c}
+fn pack(a:&Series)->Bits{let mut b=[0;W];for i in 0..N{for k in 0..5{if (a[i]>>k)&1!=0{let p=5*i+k;b[p/64]^=1<<(p%64);}}}b}
+fn unpack(b:&Bits)->Series{let mut a=[0;N];for i in 0..N{for k in 0..5{let p=5*i+k;a[i]^=(((b[p/64]>>(p%64))&1) as u8)<<k;}}a}
+fn xor(a:&mut Bits,b:&Bits){for i in 0..W{a[i]^=b[i];}}
+fn top(a:&Bits)->Option<usize>{for i in (0..W).rev(){if a[i]!=0{return Some(i*64+63-a[i].leading_zeros() as usize);}}None}
+fn bit(i:usize)->Bits{let mut a=[0;W];a[i/64]=1<<(i%64);a}
+fn combine(co:&Bits,basis:&[Bits])->Bits{let mut a=[0;W];for i in 0..W{let mut v=co[i];while v!=0{let j=i*64+v.trailing_zeros() as usize;v&=v-1;assert!(j<basis.len());xor(&mut a,&basis[j]);}}a}
+struct Space{piv:Vec<Option<(Bits,Bits)>>,basis:Vec<Bits>}
+impl Space{
+ fn new()->Self{Self{piv:vec![None;770],basis:vec![]}}
+ fn insert(&mut self,a:Bits)->(Bits,bool){let mut v=a;let mut co=[0;W];while let Some(p)=top(&v){if let Some((b,c))=&self.piv[p]{xor(&mut v,b);xor(&mut co,c);}else{let label=bit(self.basis.len());xor(&mut co,&label);self.piv[p]=Some((v,co));self.basis.push(a);return(label,true);}}(co,false)}
+ fn check(&self){for (p,bc) in self.piv.iter().enumerate(){if let Some((b,c))=bc{assert_eq!(top(b),Some(p));assert_eq!(combine(c,&self.basis),*b);}}}
+}
+fn read(path:&str)->Vec<Vec<Series>>{let text=fs::read_to_string(path).unwrap();let mut spaces=vec![vec![],vec![],vec![]];for line in text.lines(){let mut parts=line.split_whitespace();let s:usize=parts.next().unwrap().parse().unwrap();let i:usize=parts.next().unwrap().parse().unwrap();assert!((1..=3).contains(&s));assert_eq!(i,spaces[s-1].len()+1);let values:Vec<u8>=parts.next().unwrap().split(',').map(|x|x.parse().unwrap()).collect();assert_eq!(values.len(),N);assert!(values.iter().all(|&x|x<32));assert!(parts.next().is_none());let a:Series=values.try_into().unwrap();assert_eq!(unpack(&pack(&a)),a);spaces[s-1].push(a);}assert_eq!(spaces.iter().map(Vec::len).collect::<Vec<_>>(),vec![68,196,324]);spaces}
+fn write_bits(out:&mut impl Write,a:&Bits){for v in a{write!(out," {v:016x}").unwrap();}writeln!(out).unwrap();}
+fn poly_bits35(s:&str,width:usize)->Bits{let mut a=[0;W];for term in s.trim_end_matches(';').split('+'){let p=if term=="1"{0}else if term=="w"{1}else{term.strip_prefix("w^").or_else(||term.strip_prefix('w')).unwrap().parse().unwrap()};assert!(p<width);xor(&mut a,&bit(p));}a}
+fn parse_coupled35(path:&str)->(Vec<Bits>,Vec<Bits>){let s=fs::read_to_string(path).unwrap();let mut cols=vec![];let mut kernels=vec![];for line in s.lines(){let (name,width,rows)=if line.starts_with("coupledColumns34["){("coupledColumns34[",128,&mut cols)}else if line.starts_with("coupledKernel34["){("coupledKernel34[",196,&mut kernels)}else{assert_eq!(line,"ideal coupledColumns34;ideal coupledKernel34;");continue;};let (left,right)=line.split_once("]=").unwrap();let idx:usize=left.strip_prefix(name).unwrap().parse().unwrap();assert_eq!(idx,rows.len()+1);rows.push(poly_bits35(right,width));}assert_eq!(cols.len(),196);assert_eq!(kernels.len(),68);(cols,kernels)}
+fn main(){let args:Vec<String>=env::args().collect();assert_eq!(args.len(),4);let spaces=read(&args[1]);fs::create_dir(&args[3]).unwrap();let mut table=[[0u8;32];32];for a in 0..32{for b in 0..32{table[a][b]=field(a as u8,b as u8);assert_eq!(table[a][b],field_independent(a as u8,b as u8));}}
+ let v=&spaces[0];let quadratics:Vec<Bits>=spaces[1].iter().map(pack).collect();let mut cubic=Space::new();for c in &spaces[2]{let (_,new)=cubic.insert(pack(c));assert!(new);}assert_eq!(cubic.basis.len(),324);cubic.check();
+ let mut labels:Vec<_>=fs::read_dir(&args[2]).unwrap().map(|e|e.unwrap().path()).collect();labels.sort();assert_eq!(labels.len(),10);
+ for path in labels{let label=path.file_stem().unwrap().to_str().unwrap();let (constraints,kernels)=parse_coupled35(path.to_str().unwrap());let mut constraint_rank=Space::new();for c in &constraints{constraint_rank.insert(*c);}assert_eq!(constraint_rank.basis.len(),128);constraint_rank.check();let mut kernel_rank=Space::new();let mut kernel_jets=vec![];
+ for k in &kernels{assert_eq!(combine(k,&constraints),[0;W]);assert!(kernel_rank.insert(*k).1);let val=unpack(&combine(k,&quadratics));assert!(val[..9].iter().all(|&x|x==0));kernel_jets.push(val);}assert_eq!(kernel_rank.basis.len(),68);kernel_rank.check();
+ let mut bad=kernels[0];let nonzero=constraints.iter().position(|c|top(c).is_some()).unwrap();xor(&mut bad,&bit(nonzero));assert_ne!(combine(&bad,&constraints),[0;W]);
+ let mut inflated=Space::new();let mut selected=BufWriter::new(fs::File::create(format!("{}/{}-basis.txt",args[3],label)).unwrap());let mut out=BufWriter::new(fs::File::create(format!("{}/{}-product-coordinates.txt",args[3],label)).unwrap());let mut count=0;
+ for (i,s) in v.iter().enumerate(){for (j,k) in kernel_jets.iter().enumerate(){let val=mul(s,k,&table);assert_eq!(val,mul_independent(s,k));assert!(val[..9].iter().all(|&x|x==0));let bits=pack(&val);let (co,new)=cubic.insert(bits);assert!(!new,"product outside V324");assert_eq!(combine(&co,&cubic.basis),bits);let (small,new)=inflated.insert(bits);assert_eq!(combine(&small,&inflated.basis),bits);if new{write!(selected,"{} {} {}",inflated.basis.len(),i+1,j+1).unwrap();for x in val{write!(selected," {x}").unwrap();}writeln!(selected).unwrap();write!(selected,"cubic").unwrap();write_bits(&mut selected,&co);}write!(out,"{} {}",i+1,j+1).unwrap();write_bits(&mut out,&small);count+=1;}}
+ assert_eq!(count,4624);assert_eq!(inflated.basis.len(),196);inflated.check();selected.flush().unwrap();out.flush().unwrap();println!("INFLATE35_DIVISOR label={} input_constraints_rank=128 kernel_rank=68 products=4624 independent_products=4624 ambient_membership=all inflated_rank=196 all_recombinations=pass",label);
+ }println!("INFLATE35_RESULT divisors=10 source_kernel_rank=68 large_model_rank=196 ambient_rank=324 products=46240 independent_products=46240 corrupt_controls=10");println!("INFLATE35_ALL_CHECKS_PASS");}

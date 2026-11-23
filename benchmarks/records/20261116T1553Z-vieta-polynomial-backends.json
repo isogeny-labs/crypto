@@ -1,0 +1,65 @@
+{
+  "branch": "lane/vieta-coset-closeout",
+  "closed_utc": "2026-11-16T16:33:54+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--cpus",
+        "4",
+        "--out",
+        "research/vieta_coset_rust_20261115/continuation-20261116/run/main/isolation.jsonl",
+        "--",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "3600",
+        "bash",
+        "research/vieta_coset_rust_20261115/continuation-20261116/run/bin/run-panel.sh",
+        "all",
+        "research/vieta_coset_rust_20261115/continuation-20261116/run/main",
+        "research/vieta_coset_rust_20261115/continuation-20261116/run/bin/qualifier"
+      ],
+      "cwd": ".",
+      "exit": 1,
+      "started_utc": "2026-11-16T16:01:09+00:00",
+      "wall_s": 932.887
+    }
+  ],
+  "commit": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T15:53:33+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261116-vieta-polynomial-backends"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "2b48a61969ab",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T1553Z-vieta-polynomial-backends",
+  "metrics": [],
+  "problem": "kernel:vieta_coset_polynomial_backends",
+  "raw": [],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261116-vieta-polynomial-backends/report.pdf",
+    "png": [
+      "benchmarks/20261116-vieta-polynomial-backends/counts.png"
+    ],
+    "svg": [
+      "benchmarks/20261116-vieta-polynomial-backends/counts.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "vieta-polynomial-backends",
+  "status": "censored",
+  "summary": "All192 primary calls completed and replayed; supplemental8 polynomial30s deadlines retained,4 lookup successes. Matched generic-reference counts through m16384, clocks belowL2, no independent signed standing or canonical promotion. Explicit local/Git-only authorization; prospective S3 addresses are not upload/availability claims [pcc:unverified].",
+  "validation": null
+}

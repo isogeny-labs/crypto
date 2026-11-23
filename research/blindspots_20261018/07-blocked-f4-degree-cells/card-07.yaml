@@ -1,0 +1,47 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-07-07
+experiment_id: BLINDSPOT-07
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-07.json
+binds:
+  - {path: examples/blindspots_07_blocked_closure.rs, sha256: 2d019d295a6e8e74ee814b7ca69ebfa17ddcdd3b7db17b00f0ee427b64c0cf2b}
+  - {path: research/blindspots_20261018/07-blocked-f4-degree-cells/controls.tsv, sha256: 9bde3abe294c509b14825436f94f282eab6759012a99c1036333fd905d4c8d54}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-07/card-07]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=7516192768, rustc, --edition, "2021", -C, opt-level=3, -C, target-cpu=native, -o, target/blindspots-07/card-07/b07, examples/blindspots_07_blocked_closure.rs]
+    timeout_seconds: 240
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-07-build.stdout.log
+    stderr: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-07-build.stderr.log
+  - id: l-15-5-4-g0
+    argv: [prlimit, --as=7516192768, target/blindspots-07/card-07/b07, "closure", "--m", "4", "--n", "15", "--ell", "5", "--basis", "27128,26333,11557,22366,27133", "--xr", "21860", "--from", "3", "--to", "4", "--label", "l-15-5-4-g0", "--time-limit", "460", "--expect-solutions", "0"]
+    timeout_seconds: 550
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-07-l-15-5-4-g0.stdout.log
+    stderr: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-07-l-15-5-4-g0.stderr.log
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-07/card-07/b07]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-07/card-07]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-07
+background: false
+write_scope:
+  - research/blindspots_20261018/07-blocked-f4-degree-cells/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

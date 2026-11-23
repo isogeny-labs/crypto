@@ -1,0 +1,73 @@
+{
+  "schema": "research.source-fidelity-review/v1",
+  "status": "prospective_source_supported_uncompiled",
+  "source_sha256": "6fcd937560610a02401e301b7e67df98d73ef43d7114b8c1fef2450b802c9b71",
+  "new_execution": false,
+  "findings": [],
+  "checks": [
+    "Acc uses literal UInt64 lowbit; Run performs accumulator add then shift then conditional square, matching native1062\u20131073. Scalar0 done and scalar1 skip-last-square are explicit.",
+    "Reach closure derives both-register WellFormed from initial invariant and imported every_execution_preserves; accepted_return uses test_accepts_wellformed, not output acceptance as premise.",
+    "Shift strict decrease uses UInt64.toNat_shiftRight and natural division by2; actual pinned toolchain source contains these APIs. Proof elaboration remains pending.",
+    "Steps counts loop iterations separately from addition events. bounded_execution/accepted_within_sixty_four assert existence of a witness with n<=64, not elapsed-time/cost bounds or a universal count theorem for arbitrary relations.",
+    "Controls0/1/2/3 reflect exact event order; valid prime17 input and degree5 curve premises are constructed. Existing validator-only noncanonical-padding counterexample is retained.",
+    "17main declarations and9controls give26 prospective named readbacks; negative WellFormed assertion targets actual canonicality gap.",
+    "All listed source bindings matched inspected bytes, including completed prerequisite review8bec7. No scalar/divisor-class equation, full Rust/compiler fidelity, extension-field behavior or cost claim added."
+  ],
+  "scope_limits": [
+    "Canonical initial stored slots remain premise; point/transfer provenance is still separate.",
+    "Source-compatible mathematical relation and storage acceptance only; prospective elaboration/kernel/readback and bounded dependency protocol remain required."
+  ],
+  "sources_checked": [
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/affine-caller-next-join-20261109/proposal.json",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/affine-dispatch/producer/three_leads.rs",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/dispatch-acceptance-review-20261109/review.json",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/dispatch-acceptance/DispatchAcceptance.lean.txt",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/affine-dispatch/producer/AffineTotal.lean.txt",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/affine-dispatch/producer/AffineUnique.lean.txt",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/affine-dispatch/producer/AffineRelation.lean.txt",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/affine-dispatch/producer/AffineControls.lean.txt",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/stored-input-extraction/producer/StoredInput.lean.txt",
+    "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/dispatch-acceptance/AcceptanceControls.lean.txt",
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/src/lean/Init/Data/UInt/Bitwise.lean",
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/src/lean/Init/Data/UInt/Lemmas.lean",
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/src/lean/Init/Data/Nat/Bitwise/Basic.lean",
+    "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/src/lean/Init/Data/Nat/Div/Basic.lean"
+  ],
+  "reviewed_files": [
+    {
+      "path": "MulAcceptance.lean.txt",
+      "sha256": "6fcd937560610a02401e301b7e67df98d73ef43d7114b8c1fef2450b802c9b71",
+      "bytes": 10739
+    },
+    {
+      "path": "Controls.lean.txt",
+      "sha256": "dc45f0211c9edfd131955991280bd3dbe2aeb2e1a3ef592d154f6a86bbde1aca",
+      "bytes": 2795
+    },
+    {
+      "path": "ExpectedFailure.lean.txt",
+      "sha256": "dafe026644b85cf605461093c59a660a049cf7ea9680d4430c98475c2fb86a6d",
+      "bytes": 221
+    },
+    {
+      "path": "Readback.lean.txt",
+      "sha256": "b6f905fb7d36a08e2abdf86a4ac560350956d57d79953fccc7bdc5fa4cf2e7c7",
+      "bytes": 1401
+    },
+    {
+      "path": "names.json",
+      "sha256": "2e53a58bef72a1b158f50d825b8d32073d90df66947a4eb934b264079b337ddc",
+      "bytes": 1154
+    },
+    {
+      "path": "source-bindings.json",
+      "sha256": "2d8c7a01dda8a4a94c9f7df8724da3f9e815cd8631ad2c6701a28fda707be463",
+      "bytes": 3247
+    },
+    {
+      "path": "REPORT.md",
+      "sha256": "243be2a40fdb8b77da62b9cce7e58d9410d1adc6a601e084b980b12ed703de26",
+      "bytes": 1952
+    }
+  ]
+}

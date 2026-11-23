@@ -1,0 +1,345 @@
+--- a/src/bin/ic_autolab.rs
++++ b/src/bin/ic_autolab.rs
+@@ -268,7 +268,8 @@
+     arm: ArmConfig,
+     /// Mean S at w = 0, 0.1, 1 GAE per unpriced native operation.
+     s: [f64; 3],
+-    rho_s: [f64; 3],
++    #[serde(default)]
++    rho_s: Option<[f64; 3]>,
+     evidence: Value,
+     since_round: u64,
+ }
+@@ -700,8 +701,27 @@
+     format!("{:.3} / {:.3} / {:.3}", s[0], s[1], s[2])
+ }
+ 
+-fn distance(s: &[f64; 3], rho: &[f64; 3]) -> [f64; 3] {
+-    [s[0] / rho[0], s[1] / rho[1], s[2] / rho[2]]
++/// Return a cost mean only for a nonempty, completely verified cohort.
++fn complete_means(rows: &BTreeMap<String, ([f64; 3], u64, u64)>, arm: &str) -> Option<[f64; 3]> {
++    let (s, runs, verified) = rows.get(arm)?;
++    (*runs > 0 && runs == verified && s.iter().all(|v| v.is_finite() && *v >= 0.0)).then_some(*s)
++}
++
++/// Missing/zero/corrupt reference costs cannot define a finite ratio.
++fn checked_distance(s: &[f64; 3], rho: &[f64; 3]) -> Option<[f64; 3]> {
++    if s.iter().any(|v| !v.is_finite() || *v < 0.0)
++        || rho.iter().any(|v| !v.is_finite() || *v <= 0.0)
++    {
++        return None;
++    }
++    let ratio = [s[0] / rho[0], s[1] / rho[1], s[2] / rho[2]];
++    ratio.iter().all(|v| v.is_finite()).then_some(ratio)
++}
++
++fn fmt_distance(s: &[f64; 3], rho: Option<&[f64; 3]>) -> String {
++    rho.and_then(|r| checked_distance(s, r))
++        .map(|d| format!("{:.1}x / {:.1}x / {:.1}x", d[0], d[1], d[2]))
++        .unwrap_or_else(|| "unavailable".into())
+ }
+ 
+ // ---------------------------------------------------------------------------
+@@ -1749,7 +1769,7 @@
+     Option<[f64; 3]>,
+ ) {
+     let rows = band_rows(band);
+-    let inc_s = rows.get("inc").map(|r| r.0);
++    let inc_s = complete_means(&rows, "inc");
+     let mut table = Vec::new();
+     let mut best0: Option<(f64, ArmConfig)> = None;
+     let mut best2: Option<(f64, ArmConfig)> = None;
+@@ -1825,7 +1845,7 @@
+         }
+         let band = read_json(Path::new(row["band"].as_str().ok_or("band")?))?;
+         let (sel, alt_w1, table, inc_s) = select_from_band(&band, &cands);
+-        let rho_s = band_rows(&band).get("rho-neg").map(|r| r.0);
++        let rho_s = complete_means(&band_rows(&band), "rho-neg");
+         match &sel {
+             Some(arm) => {
+                 let inc = ledger.incumbent(&track, k)?;
+@@ -2099,9 +2119,9 @@
+         let band = read_json(Path::new(run["band"].as_str().ok_or("band")?))?;
+         let (class, why) = classify(&c0, &band, Some(&aa));
+         let rows = band_rows(&band);
+-        let s_sel = rows.get("sel").map(|r| r.0);
+-        let s_inc = rows.get("inc").map(|r| r.0);
+-        let s_rho = rows.get("rho-neg").map(|r| r.0);
++        let s_sel = complete_means(&rows, "sel");
++        let s_inc = complete_means(&rows, "inc");
++        let s_rho = complete_means(&rows, "rho-neg");
+         let session = read_json(&sdir.join("session.json"))?;
+         sizes.insert(
+             k_s.clone(),
+@@ -2118,10 +2138,11 @@
+                 },
+                 "band_verdict": band_verdict(&band, "inc", "sel"),
+                 "band_rho": band_verdict(&band, "rho-neg", "sel"),
++                "rho_reference": band["rows"].as_array().and_then(|rows| rows.iter().find(|row| row["arm"] == "rho-neg")).cloned(),
+                 "s": {"sel": s_sel, "inc": s_inc, "rho_neg": s_rho},
+                 "distance_to_rho": {
+-                    "sel": s_sel.zip(s_rho).map(|(a, b)| distance(&a, &b)),
+-                    "inc": s_inc.zip(s_rho).map(|(a, b)| distance(&a, &b)),
++                    "sel": s_sel.zip(s_rho).and_then(|(a, b)| checked_distance(&a, &b)),
++                    "inc": s_inc.zip(s_rho).and_then(|(a, b)| checked_distance(&a, &b)),
+                 },
+                 "evidence": {
+                     "session_id": session["session_id"],
+@@ -2251,7 +2272,7 @@
+             let sel: ArmConfig =
+                 serde_json::from_value(r["sel"].clone()).map_err(|e| e.to_string())?;
+             let s_to = s3(&r["s"]["sel"]).ok_or("sel S")?;
+-            let rho = s3(&r["s"]["rho_neg"]).ok_or("rho S")?;
++            let rho = s3(&r["s"]["rho_neg"]);
+             let ratio = r["ratio"]["w0"]["ratio"].as_f64().ok_or("ratio")?;
+             let ci = r["ratio"]["w0"]["ci95"]
+                 .as_array()
+@@ -2286,6 +2307,8 @@
+                 "band_verdict": r["band_verdict"],
+                 "route": manifest["route"],
+                 "validation_gate": "none (development loop)",
++                "rho_reference_complete": rho.is_some(),
++                "rho_reference": r["rho_reference"],
+             });
+             ledger.tracks.get_mut(&track).unwrap().insert(
+                 k_s.clone(),
+@@ -2559,7 +2582,7 @@
+                     best.as_ref().map(|b| fmt_s(&b.0)).unwrap_or("-".into()),
+                     inc_s.map(|s| fmt_s(&s)).unwrap_or("-".into()),
+                     rho_s.map(|s| fmt_s(&s)).unwrap_or("-".into()),
+-                    inc_s.zip(rho_s).map(|(a, b)| { let d = distance(&a, &b); format!("{:.1}x / {:.1}x / {:.1}x", d[0], d[1], d[2]) }).unwrap_or("-".into()),
++                    inc_s.zip(rho_s).map(|(a, b)| fmt_distance(&a, Some(&b))).unwrap_or("unavailable".into()),
+                 );
+                 continue;
+             }
+@@ -2732,17 +2755,15 @@
+     md += "## Ledger after this round\n\n| k | incumbent | since round | S (w = 0 / 0.1 / 1) | distance to rho |\n|--:|:--|--:|:--|:--|\n";
+     if let Some(t) = ledger.tracks.get(&track) {
+         for (k, inc) in t {
+-            let d = distance(&inc.s, &inc.rho_s);
++            let d = fmt_distance(&inc.s, inc.rho_s.as_ref());
+             md += &format!(
+-                "| {k} | `{}` (`{}` + `{}`) | {} | {} | {:.1}x / {:.1}x / {:.1}x |\n",
++                "| {k} | `{}` (`{}` + `{}`) | {} | {} | {} |\n",
+                 inc.arm.name,
+                 inc.arm.factor_base,
+                 inc.arm.oracle,
+                 inc.since_round,
+                 fmt_s(&inc.s),
+-                d[0],
+-                d[1],
+-                d[2]
++                d
+             );
+         }
+     }
+@@ -2781,15 +2802,13 @@
+             "k", "incumbent", "round", "S (w=0 / 0.1 / 1)", "to rho"
+         );
+         for (k, inc) in sizes {
+-            let d = distance(&inc.s, &inc.rho_s);
++            let d = fmt_distance(&inc.s, inc.rho_s.as_ref());
+             println!(
+-                "  {k:>3} | {:<14} | {:<5} | {:<28} | {:.1}x / {:.1}x / {:.1}x",
++                "  {k:>3} | {:<14} | {:<5} | {:<28} | {}",
+                 inc.arm.name,
+                 inc.since_round,
+                 fmt_s(&inc.s),
+-                d[0],
+-                d[1],
+-                d[2]
++                d
+             );
+         }
+     }
+@@ -3068,7 +3087,7 @@
+             Incumbent {
+                 arm: inc,
+                 s: [8.987, 9.71, 16.217],
+-                rho_s: [1.578, 1.693, 2.724],
++                rho_s: Some([1.578, 1.693, 2.724]),
+                 evidence: json!({}),
+                 since_round: 0,
+             },
+@@ -3263,7 +3282,7 @@
+             Incumbent {
+                 arm: win,
+                 s: [7.0, 7.5, 12.3],
+-                rho_s: [1.2, 1.3, 2.2],
++                rho_s: Some([1.2, 1.3, 2.2]),
+                 evidence: json!({}),
+                 since_round: 2,
+             },
+@@ -3319,7 +3338,7 @@
+                 Incumbent {
+                     arm: tf.arm(tf.family("ksum4").unwrap(), n),
+                     s: [1.0; 3],
+-                    rho_s: [1.0; 3],
++                    rho_s: Some([1.0; 3]),
+                     evidence: json!({}),
+                     since_round: 2,
+                 },
+@@ -3341,7 +3360,7 @@
+             Incumbent {
+                 arm: tf.arm(tf.family("mitm2").unwrap(), 512),
+                 s: [24.0; 3],
+-                rho_s: [1.0; 3],
++                rho_s: Some([1.0; 3]),
+                 evidence: json!({}),
+                 since_round: 0,
+             },
+@@ -3489,6 +3508,78 @@
+             "rows": rows.iter().map(|(a, s, r, v)| json!({"curve": "c", "arm": a, "mean_s": s, "runs": r, "verified": v})).collect::<Vec<_>>(),
+             "ranks": [{"curve": "c", "a": "inc", "b": "sel", "verdict": verdict}]
+         })
++    }
++
++    #[test]
++    fn ratchet_keeps_verified_improvement_when_reference_is_unavailable() {
++        let unique = std::time::SystemTime::now()
++            .duration_since(std::time::UNIX_EPOCH)
++            .unwrap()
++            .as_nanos();
++        let home = std::env::temp_dir().join(format!(
++            "ic-autolab-reference-{}-{unique}",
++            std::process::id()
++        ));
++        struct Cleanup(std::path::PathBuf);
++        impl Drop for Cleanup {
++            fn drop(&mut self) {
++                let _ = std::fs::remove_dir_all(&self.0);
++            }
++        }
++        let _cleanup = Cleanup(home.clone());
++        let mut l = ledger();
++        l.rounds.push(RoundEntry {
++            round: 1,
++            dir: "round-001".into(),
++            track: "generic".into(),
++            sizes: vec![20],
++            status: "assessed".into(),
++        });
++        save_ledger(&home, &mut l).unwrap();
++        let tf = families();
++        let challenger = tf.arm(tf.family("mitm2").unwrap(), 8);
++        let dir = round_dir(&home, 1);
++        write_json(
++            &dir.join("MANIFEST.json"),
++            &json!({"track":"generic", "route":"test-fixture",
++            "seeds":{"20":{"holdout":123}}, "holdout":{"targets":4}}),
++        )
++        .unwrap();
++        write_json(
++            &dir.join("selection.json"),
++            &json!({"sizes":{"20":{"status":"challenger"}}}),
++        )
++        .unwrap();
++        write_json(&dir.join("panel.json"), &json!({"sizes":{}})).unwrap();
++        write_json(
++            &dir.join("analysis/run-train.json"),
++            &json!({"sessions":[]}),
++        )
++        .unwrap();
++        let reference = json!({"arm":"rho-neg", "runs":4, "verified":1});
++        write_json(
++            &dir.join("RESULT.json"),
++            &json!({"sizes":{"20":{
++            "class":"improvement", "sel":challenger, "s":{"sel":[7.0,8.0,12.0],"rho_neg":null},
++            "ratio":{"w0":{"ratio":0.78,"ci95":[0.72,0.84]}},
++            "rho_reference":reference, "band_verdict":"sel < inc",
++            "evidence":{"session_id":"fixture"}}}}),
++        )
++        .unwrap();
++        cmd_ratchet(&home, 1).unwrap();
++        let updated = load_ledger(&home).unwrap();
++        let inc = updated.incumbent("generic", 20).unwrap();
++        assert_eq!(inc.arm.name, challenger.name);
++        assert_eq!(inc.s, [7.0, 8.0, 12.0]);
++        assert_eq!(inc.rho_s, None);
++        assert_eq!(inc.evidence["rho_reference_complete"], false);
++        assert_eq!(inc.evidence["rho_reference"], reference);
++        assert_eq!(updated.history.len(), 1);
++        assert_eq!(updated.rounds[0].status, "ratcheted");
++        assert!(cmd_ratchet(&home, 1)
++            .unwrap_err()
++            .contains("already ratcheted"));
++        assert_eq!(load_ledger(&home).unwrap().history.len(), 1);
+     }
+ 
+     #[test]
+@@ -3685,3 +3776,75 @@
+         assert_eq!(civil_from_days(20761), (2026, 11, 4));
+     }
+ }
++
++#[cfg(test)]
++mod complete_reference_tests {
++    use super::*;
++    #[test]
++    fn partial_reference_does_not_supply_a_distance() {
++        let rows = BTreeMap::from([
++            ("sel".into(), ([1.0, 2.0, 3.0], 4, 4)),
++            ("rho-neg".into(), ([2.0, 3.0, 4.0], 4, 1)),
++        ]);
++        assert!(complete_means(&rows, "sel").is_some());
++        let ratio = complete_means(&rows, "sel")
++            .zip(complete_means(&rows, "rho-neg"))
++            .and_then(|(s, rho)| checked_distance(&s, &rho));
++        assert_eq!(ratio, None);
++    }
++
++    #[test]
++    fn complete_cohorts_keep_the_original_ratios() {
++        let rows = BTreeMap::from([
++            ("sel".into(), ([1.0, 2.0, 3.0], 4, 4)),
++            ("rho-neg".into(), ([2.0, 4.0, 6.0], 4, 4)),
++        ]);
++        assert_eq!(
++            complete_means(&rows, "sel")
++                .zip(complete_means(&rows, "rho-neg"))
++                .and_then(|(s, rho)| checked_distance(&s, &rho)),
++            Some([0.5; 3])
++        );
++    }
++
++    #[test]
++    fn empty_incomplete_and_nonfinite_cohorts_are_not_eligible() {
++        for (means, runs, verified) in [
++            ([1.0; 3], 0, 0),
++            ([1.0; 3], 4, 0),
++            ([1.0; 3], 4, 3),
++            ([f64::NAN; 3], 4, 4),
++            ([-1.0; 3], 4, 4),
++            ([f64::INFINITY; 3], 4, 4),
++        ] {
++            let rows = BTreeMap::from([("inc".into(), (means, runs, verified))]);
++            assert!(complete_means(&rows, "inc").is_none());
++        }
++    }
++
++    #[test]
++    fn invalid_denominators_and_ratio_overflow_are_not_distances() {
++        assert_eq!(checked_distance(&[1.0; 3], &[0.0; 3]), None);
++        assert_eq!(checked_distance(&[1.0; 3], &[-1.0; 3]), None);
++        assert_eq!(checked_distance(&[1.0; 3], &[f64::NAN; 3]), None);
++        assert_eq!(
++            checked_distance(&[f64::MAX; 3], &[f64::MIN_POSITIVE; 3]),
++            None
++        );
++        assert_eq!(checked_distance(&[0.0; 3], &[1.0; 3]), Some([0.0; 3]));
++    }
++
++    #[test]
++    fn optional_reference_keeps_legacy_array_encoding() {
++        let mut value = serde_json::json!({"arm":{"name":"fixture","family":"fixture","n":1,
++        "factor_base":"fixture","oracle":"fixture"},"s":[1.0,2.0,3.0],
++        "rho_s":[2.0,3.0,4.0],"evidence":{},"since_round":0});
++        let mut inc: Incumbent = serde_json::from_value(value.clone()).unwrap();
++        assert_eq!(inc.rho_s, Some([2.0, 3.0, 4.0]));
++        assert_eq!(serde_json::to_value(&inc).unwrap(), value);
++        inc.rho_s = None;
++        value["rho_s"] = Value::Null;
++        assert_eq!(serde_json::to_value(&inc).unwrap(), value);
++        assert_eq!(fmt_distance(&inc.s, inc.rho_s.as_ref()), "unavailable");
++    }
++}

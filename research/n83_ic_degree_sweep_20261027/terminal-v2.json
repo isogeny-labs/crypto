@@ -1,0 +1,176 @@
+{
+  "job": {
+    "created_at": "2026-10-27T15:39:16Z",
+    "job_name": "n83-degree-m2-m9-20261027-v2",
+    "state": "succeeded",
+    "status": {
+      "completionTime": "2026-10-27T15:53:13Z",
+      "conditions": [
+        {
+          "lastProbeTime": "2026-10-27T15:53:13Z",
+          "lastTransitionTime": "2026-10-27T15:53:13Z",
+          "message": "Reached expected number of succeeded pods",
+          "reason": "CompletionsReached",
+          "status": "True",
+          "type": "SuccessCriteriaMet"
+        },
+        {
+          "lastProbeTime": "2026-10-27T15:53:13Z",
+          "lastTransitionTime": "2026-10-27T15:53:13Z",
+          "message": "Reached expected number of succeeded pods",
+          "reason": "CompletionsReached",
+          "status": "True",
+          "type": "Complete"
+        }
+      ],
+      "ready": 0,
+      "startTime": "2026-10-27T15:39:16Z",
+      "succeeded": 1,
+      "terminating": 0,
+      "uncountedTerminatedPods": {}
+    },
+    "uid": "979c76f0-263e-4faa-bdc7-357a79a2f9fc"
+  },
+  "pods": [
+    {
+      "name": "n83-degree-m2-m9-20261027-v2-vhksd",
+      "node": "ip-10-84-168-0.us-east-2.compute.internal",
+      "status": {
+        "allocatedResources": {
+          "cpu": "4",
+          "ephemeral-storage": "10Gi",
+          "memory": "16Gi"
+        },
+        "conditions": [
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-27T15:53:12Z",
+            "observedGeneration": 1,
+            "status": "False",
+            "type": "PodReadyToStartContainers"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-27T15:40:03Z",
+            "observedGeneration": 1,
+            "reason": "PodCompleted",
+            "status": "True",
+            "type": "Initialized"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-27T15:53:11Z",
+            "observedGeneration": 1,
+            "reason": "PodCompleted",
+            "status": "False",
+            "type": "Ready"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-27T15:53:11Z",
+            "observedGeneration": 1,
+            "reason": "PodCompleted",
+            "status": "False",
+            "type": "ContainersReady"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-27T15:40:04Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "PodScheduled"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "allocatedResources": {
+              "cpu": "4",
+              "ephemeral-storage": "10Gi",
+              "memory": "16Gi"
+            },
+            "containerID": "containerd://fa4be0ab5ef9c20fddc40f9c68da8e5bf6da1f46d0e70bb596fc00bf4c302ac4",
+            "image": "sha256:8be30c95e1bee33be8965e7815a92be4793f71f447063b7f58292575c9f005c0",
+            "imageID": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:194ec662a87c1aca1be0a0420b230a45766da3b5217c79e8d05fdd03086d7de3",
+            "lastState": {},
+            "name": "task",
+            "ready": false,
+            "resources": {
+              "limits": {
+                "cpu": "4",
+                "ephemeral-storage": "10Gi",
+                "memory": "16Gi"
+              },
+              "requests": {
+                "cpu": "4",
+                "ephemeral-storage": "10Gi",
+                "memory": "16Gi"
+              }
+            },
+            "restartCount": 0,
+            "started": false,
+            "state": {
+              "terminated": {
+                "containerID": "containerd://fa4be0ab5ef9c20fddc40f9c68da8e5bf6da1f46d0e70bb596fc00bf4c302ac4",
+                "exitCode": 0,
+                "finishedAt": "2026-10-27T15:53:11Z",
+                "reason": "Completed",
+                "startedAt": "2026-10-27T15:40:07Z"
+              }
+            },
+            "user": {
+              "linux": {
+                "gid": 1000,
+                "supplementalGroups": [
+                  1000
+                ],
+                "uid": 1000
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/work",
+                "name": "work"
+              },
+              {
+                "mountPath": "/tmp",
+                "name": "tmp"
+              },
+              {
+                "mountPath": "/var/run/secrets/eks.amazonaws.com/serviceaccount",
+                "name": "aws-iam-token",
+                "readOnly": true,
+                "recursiveReadOnly": "Disabled"
+              }
+            ]
+          }
+        ],
+        "hostIP": "10.84.168.0",
+        "hostIPs": [
+          {
+            "ip": "10.84.168.0"
+          }
+        ],
+        "observedGeneration": 1,
+        "phase": "Succeeded",
+        "podIP": "10.84.169.226",
+        "podIPs": [
+          {
+            "ip": "10.84.169.226"
+          }
+        ],
+        "qosClass": "Guaranteed",
+        "resources": {
+          "limits": {
+            "memory": "16Gi"
+          },
+          "requests": {
+            "cpu": "3996m",
+            "memory": "16Gi"
+          }
+        },
+        "startTime": "2026-10-27T15:40:03Z"
+      },
+      "uid": "25e3489a-612a-4d40-aaa4-93a1b963ff30"
+    }
+  ]
+}

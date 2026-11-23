@@ -1,0 +1,52 @@
+--- qualification/durable_io.py
++++ production-build/durable_io.py
+@@ -37,7 +37,7 @@
+ 
+ def load_admission(packet):
+     p=Path(packet);a=json.loads((p/'admission.json').read_text())
+-    assert a['schema']=='exporter-v4-qualification-admission/v1' and a['released'] is True
++    assert a['schema']=='pencil.production-two-bin-build-admission/v1' and a['released'] is True
+     assert a['total_seconds']==2400 and a['build_phase_seconds']==1800 and a['execution_phase_seconds']==600
+     assert a['cpu']==2 and a['memory_bytes']==16*1024**3 and a['swap_bytes']==0
+     assert a['attempts']==1 and a['automatic_retry'] is False and a['prior_v4_terminal_confirmed'] is True
+@@ -53,7 +53,8 @@
+     assert set(a['lease'])=={'task_id','attempt_id','lease_id','fencing_epoch'}
+     assert type(a['lease']['fencing_epoch']) is int and a['lease']['fencing_epoch']>0
+     assert len(a['exact_tests'])==11 and len(set(a['exact_tests']))==11
+-    commands=json.loads((p/'commands.json').read_text());assert a['exact_tests']==commands['exact_tests']
++    commands=json.loads((p/'commands.json').read_text());assert a['exact_tests']==commands['prerequisite_exact_tests']
++    assert a['production_binaries']=={'ecbench':'src/bin/ecbench.rs','ecbench_retained_attempt_export_v4':'src/bin/ecbench_retained_attempt_export_v4.rs'}
+     assert a['uid']==a['gid']==1000
+     assert a['toolchain']=='/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu'
+     for name,digest in a['packet_files'].items():
+@@ -61,18 +62,26 @@
+         assert hashlib.sha256(q.read_bytes()).hexdigest()==digest,name
+     required={'durable_io.py','durable-launcher.py','durable-worker.py','materialize.py','commands.json','overlays.json','expected-source-manifest.json','overlay-archive.json','source-overlay.tar.gz','cache-mode-inventory.json'}
+     assert required<=set(a['packet_files'])
+-    assert set(a['release_receipts'])=={'prior_v4_terminal','fresh_cache_snapshot','ledger','lease_readback','independent_review','publication','campaign_authorization'}
++    assert set(a['release_receipts'])=={'prior_v4_terminal','fresh_cache_snapshot','ledger','lease_readback','independent_review','publication','campaign_authorization','exporter_qualification','exporter_materialization','combined_qualification'}
+     for name,row in a['release_receipts'].items():
+         q=Path(row['path']);assert q.is_absolute() and hashlib.sha256(q.read_bytes()).hexdigest()==row['sha256'],name
++    qualification=json.loads(Path(a['release_receipts']['exporter_qualification']['path']).read_text())
++    assert qualification['status']=='passed' and qualification['pre_inputs_verified'] is True and qualification['post_inputs_verified'] is True
++    assert [row['name'] for row in qualification['exact_test_results']]==a['exact_tests'] and all(row['passed'] is True for row in qualification['exact_test_results'])
++    synthetic=qualification['synthetic_file_summary'];assert synthetic['attempt_rows']==22680 and synthetic['triplets']==6300 and synthetic['eligible_pairs']==0 and synthetic['scientific_evidence'] is False
++    materialization=json.loads(Path(a['release_receipts']['exporter_materialization']['path']).read_text())
++    assert qualification['materialization_receipt_sha256']==a['release_receipts']['exporter_materialization']['sha256']
++    assert materialization['status']=='passed' and materialization['source_manifest_sha256']==a['source_manifest_sha256'] and materialization['source_files']==4500
++    combined=json.loads(Path(a['release_receipts']['combined_qualification']['path']).read_text());assert combined['status']=='passed'
+     pub=json.loads(Path(a['release_receipts']['publication']['path']).read_text());assert pub['verified_github_commit']==a['published_source_revision']
+     authorization=json.loads(Path(a['release_receipts']['campaign_authorization']['path']).read_text())
+     assert authorization['absolute_deadline']==a['absolute_deadline'] and authorization['worker_seconds']==129600
+     assert a['fresh_cache_manifest']['sha256'] and a['fresh_cache_manifest']['path']
+     assert a['source_manifest_sha256']==hashlib.sha256((p/'expected-source-manifest.json').read_bytes()).hexdigest()
+     assert a['immutable_manifest']['sha256']=='c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2'
+-    assert a['workspace']=='/var/tmp/pencil-exporter-v4-qualification-v3-20261111'
+-    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/exporter-v4-qualification-v3-20261111'
+-    assert a['unit']=='pencil-exporter-v4-qualification-v3-20261111.service'
++    assert a['workspace']=='/var/tmp/pencil-pencil-production-two-bin-build-v1-20261111'
++    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/pencil-production-two-bin-build-v1-20261111'
++    assert a['unit']=='pencil-pencil-production-two-bin-build-v1-20261111.service'
+     assert a['limits']=={'target_stop_threshold_bytes':6*1024**3,'workspace_stop_threshold_bytes':8*1024**3,'logs_stop_threshold_bytes':256*1024**2,'minimum_free_bytes':6*1024**3,'durable_metadata_stop_bytes':64*1024**2,'durable_total_stop_bytes':384*1024**2,'supervisor_permit_seconds':10}
+     return a
+ 

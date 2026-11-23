@@ -1,0 +1,7 @@
+# Frozen adjugate implementation of the same global acceptance checks
+
+2026-11-16,before successor arithmetic data. Continue GLOBAL_CORRESPONDENCE_PROTOCOL unchanged on formal-series-v1. The first implementation's final Euclidean simplification is costly. Preserve its source and eventual exit status. Execute this successor only after that attempt ends and is logged. No coordinate,seed,degree,precision or acceptance change.
+
+Replace cubic-algebra extended Euclid by the adjugate of its3x3 multiplication matrix. Its first adjugate column divided by the determinant gives the inverse;require multiplication to equal1. Require the same direct identity for every source-function-field inverse. Qualify T and1+T+T^2 modulo T^3-2 and reject zero before installing the actual generic cubic. Stop the y-gcd at a linear remainder;after normalization require both original polynomials vanish at its root,as well as all original global characteristic,quartic,differential and reference-limit checks. Linear gcd plus incidence settles pairing without an extra polynomial remainder by a known linear divisor.
+
+One new fixed-input native functional call,ten-minute wall/1GiB process limits. This is an arithmetic implementation successor,not a parameter search or performance campaign. Retain full source snapshots,hashes,controls,failures and exact outcome. No isogeny/kernel/dual promotion from local fits or an unfinished calculation.

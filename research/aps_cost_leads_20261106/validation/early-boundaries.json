@@ -1,0 +1,82 @@
+{
+  "schema": "aps.development-boundaries/v1",
+  "base_commit": "d3d90398964285ca2f1d5ef2f36df4de495b8f03",
+  "standing": "unverified producer assertions",
+  "observations": [
+    {
+      "id": "nov6-core-leads-4",
+      "command": "cargo test --release --locked --lib aps_single_relation::leads -- --test-threads=1",
+      "boundary": "Early new-lead source: three passed; retained-label sign bug failed. Superseded, not final source.",
+      "source_tree_fully_pinned": false,
+      "performance_evidence": false,
+      "private_log_sha256": "099bb5025a8fcfa88d4a01bd260b62d6cab186033656309753f877abb727347a",
+      "exit": 101
+    },
+    {
+      "id": "nov6-trace-pool-boundary-1",
+      "command": "pre-existing release test binary: f4_fp::reuse tests",
+      "boundary": "Early pool test source: one passed and two invalid new-test controls failed. Controls were replaced with actual mismatch and exact storage-cap cases; no production fallback or old assertion was weakened.",
+      "source_tree_fully_pinned": false,
+      "performance_evidence": false,
+      "private_log_sha256": "128e9378d4653c2bda0098cd55f1af815bd8372724d549a0575465bbdaa3de77",
+      "exit": 101
+    },
+    {
+      "id": "nov6-aps-final-1",
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --lib aps_single_relation -- --test-threads=1",
+      "boundary": "39 passed on the label-bug-fixed source before the later opt-in Ir frame additions; not a full library or final source pass.",
+      "source_tree_fully_pinned": false,
+      "performance_evidence": false,
+      "private_log_sha256": "13b3ab504932399ed812f46df47a6a10bf80fc77724b020ad6bbceae9f28a8dc",
+      "exit": 0
+    },
+    {
+      "id": "nov6-frontier-lean-1",
+      "command": "direct pinned Lean 4.34.1 Frontier.lean",
+      "boundary": "Initial incomplete proof failed. Preserved privately and superseded.",
+      "source_tree_fully_pinned": false,
+      "performance_evidence": false,
+      "private_log_sha256": "f3f6d3dc2bd2b1eddb8b450a8270fed044e8ee13d875e41de22419ba38eef712",
+      "exit": 1
+    },
+    {
+      "id": "nov6-frontier-lean-2",
+      "command": "direct pinned Lean 4.34.1 Frontier.lean",
+      "boundary": "Three declarations built; no sorryAx in the final output. Standard foundations are listed in the final output; not a curve or solver correctness proof.",
+      "source_tree_fully_pinned": false,
+      "performance_evidence": false,
+      "private_log_sha256": "76a4d202616440f590206822d5b29c1f3e25b5c70f1ae85a99fb211bf34fe1a4",
+      "exit": 0
+    },
+    {
+      "id": "nov6-export-2",
+      "command": "cargo test --release --locked --manifest-path tools/aps-export/Cargo.toml",
+      "boundary": "Compile failed: embedded native parser needed its serde dependency.",
+      "source_tree_fully_pinned": false,
+      "performance_evidence": false,
+      "private_log_sha256": "7b244839bc81d00912a63031358912f94f58c4717252b8a2cf2e5623ac496aff",
+      "exit": 101
+    },
+    {
+      "id": "nov6-export-3",
+      "command": "cargo test --release --manifest-path tools/aps-export/Cargo.toml",
+      "boundary": "53 library and five CLI tests passed. Before same-read profile pins and cumulative input-byte cap; not final source or a benchmark.",
+      "source_tree_fully_pinned": false,
+      "performance_evidence": false,
+      "private_log_sha256": "f7ed88ed34b307db90607c03a1bbdbe1c0427fa6cfe387c6714f850fc3c1c459",
+      "exit": 0
+    },
+    {
+      "id": "nov6-export-clippy-1",
+      "command": "cargo clippy --locked --manifest-path tools/aps-export/Cargo.toml --all-targets -- -D warnings",
+      "boundary": "Strict stable lint passed before the same-read profile pin change; not a Rust 1.98 or final source pass.",
+      "source_tree_fully_pinned": false,
+      "performance_evidence": false,
+      "private_log_sha256": "676a63e987b62a87cd6b4fb9cec824c2584e3ac801c14149d59011a964c21d28",
+      "exit": 0
+    }
+  ],
+  "raw_logs_published": false,
+  "benchmark_launched": false,
+  "checkpoint_upload_completed": false
+}

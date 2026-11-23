@@ -1,0 +1,228 @@
+{
+  "scope": "R51 actual chart maps and larger marked23 QR construction",
+  "status_counts": {
+    "rejected": 4,
+    "accepted": 16
+  },
+  "runs": [
+    {
+      "attempt": "base23-51-01",
+      "status": "rejected",
+      "source_revision": "422a3ce35a791f39cc6bea1a4641b51ebc0a7b7f",
+      "kind": "Singular",
+      "native_exit": 124,
+      "required_marker": "BASE23_51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "base23-struct51-01",
+      "status": "rejected",
+      "source_revision": "0a4d1b8992d763b26f41e79d7adb2a873cb9b630",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "BASE23_STRUCT51_ALL_CHECKS_PASS",
+      "error_lines": [
+        "   ? BASE23_STRUCT51_ACTUAL_BASE_UNITS",
+        "   ? BASE23_STRUCT51_COMPLETE_NU_NORMALIZATION"
+      ]
+    },
+    {
+      "attempt": "base23-struct51-02",
+      "status": "rejected",
+      "source_revision": "d210ca3b6b1cc576ea7928d79c6f81b44cabbc37",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "BASE23_STRUCT51_ALL_CHECKS_PASS",
+      "error_lines": [
+        "   ? BASE23_STRUCT51_ACTUAL_BASE_UNITS"
+      ]
+    },
+    {
+      "attempt": "base23-struct51-03",
+      "status": "accepted",
+      "source_revision": "6c62f56271834c79cf93d3f667810a531a3c73e4",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "BASE23_STRUCT51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "collision51-01",
+      "status": "accepted",
+      "source_revision": "640cb678604ed9ce04b8c598d4b0bf81b752591a",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "COLLISION51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "diamond-nu51-01",
+      "status": "accepted",
+      "source_revision": "cc74d0a8eec63f3340a61be6d760916347d3ab46",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "DIAMONDNU51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "diamond51-01",
+      "status": "accepted",
+      "source_revision": "8bbedebd71ac0fcd2159618754c2f3e7fca35f69",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "DIAMOND51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "fiber51-01",
+      "status": "accepted",
+      "source_revision": "445c52955a4a31aea5de693f47b65d0fc4d9365c",
+      "kind": "Rust",
+      "native_exit": 0,
+      "required_marker": "FIBER51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "glue-forward51-01",
+      "status": "accepted",
+      "source_revision": "ec5a3f0aae6fb342ecae0a18cf9f666af8bec8d2",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "GLUE51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "glue-prep51-01",
+      "status": "accepted",
+      "source_revision": "e672deb41324e6680351ac97fa5cfbf07e43c8d6",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "GLUE_PREP51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "glue-reload51-01",
+      "status": "accepted",
+      "source_revision": "78a3863cf919112f9e8625d8b47d39ea934f08e6",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "GLUE_RELOAD51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "glue-reverse51-01",
+      "status": "accepted",
+      "source_revision": "ec5a3f0aae6fb342ecae0a18cf9f666af8bec8d2",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "GLUE51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "hecke3-51-01",
+      "status": "accepted",
+      "source_revision": "6079d58213f568b399f9bcfe02a134d06fc80ede",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "HECKE3_51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "line51-01",
+      "status": "accepted",
+      "source_revision": "5b85ae1a2ec7a36b8902b2147d40463599d0e988",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "LINE51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "nu51-01",
+      "status": "accepted",
+      "source_revision": "2ce312f4e2380be7dbfb3ca5105301cbb327914c",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "NU51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "overlap-lean51-01",
+      "status": "accepted",
+      "source_revision": "ea247d929bb40ee543d0172f279f36dec74d417a",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_theorems": 5,
+      "root": "Overlap51",
+      "audit_total_declarations": 5
+    },
+    {
+      "attempt": "specialize-lean51-01",
+      "status": "accepted",
+      "source_revision": "53b37e519de5ed78155d081856ab2819df464d48",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_theorems": 6,
+      "root": "Specialize51",
+      "audit_total_declarations": 6
+    },
+    {
+      "attempt": "twist51-01",
+      "status": "rejected",
+      "source_revision": "be11236ad148a03242b0101a9a8335537e53dbe4",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "TWIST51_ALL_CHECKS_PASS",
+      "error_lines": [
+        "   ? TWIST51_FULL_F4_PRODUCTS",
+        "   ? TWIST51_GAMMA_SYZYGIES"
+      ]
+    },
+    {
+      "attempt": "twist51-02",
+      "status": "accepted",
+      "source_revision": "8e71bda0f8000507d1d858eeddc81288466d3fad",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "TWIST51_ALL_CHECKS_PASS",
+      "error_lines": []
+    },
+    {
+      "attempt": "universal51-01",
+      "status": "accepted",
+      "source_revision": "0ac9aeca3a5fea98b915589f5ed01caae7bebffc",
+      "kind": "Singular",
+      "native_exit": 0,
+      "required_marker": "UNIVERSAL51_ALL_CHECKS_PASS",
+      "error_lines": []
+    }
+  ],
+  "retained_source_field_degree": 32,
+  "normalization_generators_per_direction": 32,
+  "directional_regularity_certificates": 64,
+  "clearing_power": 62,
+  "lean_theorems": 11,
+  "scope_limits": [
+    "native arrays and RR/open-cover premises are not encoded in Lean",
+    "marked23 quotient dimension is not primality",
+    "selected modular-factor action and polarized embedding remain separate"
+  ],
+  "construction_counts": {
+    "localized_generator_compatibilities": 64,
+    "localized_normal_chart_maps": 2,
+    "universal_certificate_denominator_degree": 26,
+    "structured_marked23_algebra_dimension": 112,
+    "structured_marked23_source_equations": 6,
+    "integral_nu_normal_chart_coordinates": 1,
+    "QR_square_determinant_actions": 1008,
+    "QR_largest_cycle": 14,
+    "Hecke3_kernel_parameter_degree": 4,
+    "Hecke3_isogeny_degree": 3,
+    "ordinary_QR_point_algebra_dimension": 48,
+    "coprime_kernel_Bezout_Delta_exponent": 16,
+    "nu_diamond_PID_entries": 32,
+    "nu_diamond_clearing_power": 121,
+    "audited_unique_theorems": 11
+  }
+}

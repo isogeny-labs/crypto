@@ -1,0 +1,70 @@
+WordIteration.step_canonical (p dd f : UInt64) (s : UInt64 × UInt64 × UInt64) (hp : 0 < p.toNat) :
+  WordIteration.canonical p (WordIteration.step p dd f s)
+'WordIteration.step_canonical' depends on axioms: [propext]
+WordIteration.iterate_canonical (p a b c e f : UInt64) (hp : 0 < p.toNat) (ha : a.toNat < p.toNat)
+  (he : e.toNat < p.toNat) (n : ℕ) : WordIteration.canonical p (WordIteration.iterate p a b c e f n)
+'WordIteration.iterate_canonical' depends on axioms: [propext]
+WordIteration.decoded_iteration (p a b c e f : UInt64) (hp : 0 < p.toNat) (bound : p.toNat ≤ 2 ^ 63)
+  (ha : a.toNat < p.toNat) (hb : b.toNat < p.toNat) (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat)
+  (hf : f.toNat < p.toNat) (n : ℕ) :
+  WordIteration.decode p (WordIteration.iterate p a b c e f n) =
+    SieveDifference.state (↑a.toNat) (↑b.toNat) (↑c.toNat) (↑e.toNat) (↑f.toNat) n
+'WordIteration.decoded_iteration' depends on axioms: [propext, Quot.sound]
+WordIteration.decoded_closed (p a b c e f : UInt64) (hp : 0 < p.toNat) (bound : p.toNat ≤ 2 ^ 63)
+  (ha : a.toNat < p.toNat) (hb : b.toNat < p.toNat) (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat)
+  (hf : f.toNat < p.toNat) (n : ℕ) :
+  WordIteration.decode p (WordIteration.iterate p a b c e f n) =
+    (SieveDifference.U (↑a.toNat) (↑b.toNat) (↑c.toNat) n, SieveDifference.D (↑b.toNat) (↑c.toNat) n,
+      SieveDifference.V (↑e.toNat) (↑f.toNat) n)
+'WordIteration.decoded_closed' depends on axioms: [propext, Quot.sound]
+WordIteration.ordered_observations (p a b c e f : UInt64) (hp : 0 < p.toNat) (bound : p.toNat ≤ 2 ^ 63)
+  (ha : a.toNat < p.toNat) (hb : b.toNat < p.toNat) (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat)
+  (hf : f.toNat < p.toNat) (count : ℕ) :
+  WordIteration.observations p a b c e f count =
+    SieveDifference.reference (↑a.toNat) (↑b.toNat) (↑c.toNat) (↑e.toNat) (↑f.toNat) count
+'WordIteration.ordered_observations' depends on axioms: [propext, Quot.sound]
+WordIteration.same_fold.{u_1} {S : Type u_1} (p a b c e f : UInt64) (hp : 0 < p.toNat) (bound : p.toNat ≤ 2 ^ 63)
+  (ha : a.toNat < p.toNat) (hb : b.toNat < p.toNat) (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat)
+  (hf : f.toNat < p.toNat) (count : ℕ) (branch : S → ℕ × ZMod p.toNat × ZMod p.toNat → S) (initial : S) :
+  List.foldl branch initial (WordIteration.observations p a b c e f count) =
+    List.foldl branch initial (SieveDifference.reference (↑a.toNat) (↑b.toNat) (↑c.toNat) (↑e.toNat) (↑f.toNat) count)
+'WordIteration.same_fold' depends on axioms: [propext, Quot.sound]
+WordIteration.canonical_decode_eq (p x y : UInt64) (hp : 0 < p.toNat) (hx : x.toNat < p.toNat)
+  (hy : y.toNat < p.toNat) : ↑x.toNat = ↑y.toNat ↔ x = y
+'WordIteration.canonical_decode_eq' depends on axioms: [propext, Quot.sound]
+WordIteration.canonical_decode_zero (p x : UInt64) (hp : 0 < p.toNat) (hx : x.toNat < p.toNat) : ↑x.toNat = 0 ↔ x = 0
+'WordIteration.canonical_decode_zero' depends on axioms: [propext, Quot.sound]
+WordIteration.final_wrap (p a b c e f : UInt64) (hp : 0 < p.toNat) (bound : p.toNat ≤ 2 ^ 63) (ha : a.toNat < p.toNat)
+  (hb : b.toNat < p.toNat) (hc : c.toNat < p.toNat) (he : e.toNat < p.toNat) (hf : f.toNat < p.toNat) :
+  WordIteration.decode p (WordIteration.iterate p a b c e f p.toNat) =
+    WordIteration.decode p (WordIteration.iterate p a b c e f 0)
+'WordIteration.final_wrap' depends on axioms: [propext, Quot.sound]
+WordIterationControls.constant_padding : WordIteration.iterate 5 3 0 0 0 0 4 = (3, 0, 0)
+'WordIterationControls.constant_padding' depends on axioms: [propext]
+WordIterationControls.binary : WordIteration.iterate 2 1 1 1 0 1 2 = (1, 0, 0)
+'WordIterationControls.binary' depends on axioms: [propext]
+WordIterationControls.zero_intermediate : WordIteration.iterate 7 0 0 1 1 2 0 = (0, 1, 1)
+'WordIterationControls.zero_intermediate' depends on axioms: [propext]
+WordIterationControls.late_step : WordIteration.iterate 7 0 0 1 1 2 6 = (1, 6, 6)
+'WordIterationControls.late_step' depends on axioms: [propext]
+WordIterationControls.full_wrap : WordIteration.iterate 7 0 0 1 1 2 7 = (0, 1, 1)
+'WordIterationControls.full_wrap' depends on axioms: [propext]
+WordIterationControls.final_update_retained : WordIteration.iterate 7 0 0 1 1 2 6 ≠ WordIteration.iterate 7 0 0 1 1 2 7
+'WordIterationControls.final_update_retained' depends on axioms: [propext]
+WordIterationControls.upper_bound :
+  SieveDifference.wordAdd 9223372036854775808 9223372036854775807 9223372036854775807 = 9223372036854775806
+'WordIterationControls.upper_bound' depends on axioms: [propext]
+WordIterationControls.outside_bound :
+  SieveDifference.wordAdd 9223372036854775809 9223372036854775808 9223372036854775808 = 0
+'WordIterationControls.outside_bound' depends on axioms: [propext]
+WordIterationReview.simultaneous_step : WordIteration.iterate 7 1 1 2 3 4 1 = (4, 0, 0)
+'WordIterationReview.simultaneous_step' depends on axioms: [propext]
+WordIterationReview.modulus_one : WordIteration.iterate 1 0 0 0 0 0 4 = (0, 0, 0)
+'WordIterationReview.modulus_one' depends on axioms: [propext]
+WordIterationReview.empty_observations : WordIteration.observations 7 1 1 2 3 4 0 = []
+'WordIterationReview.empty_observations' depends on axioms: [propext, Quot.sound]
+WordIterationReview.upper_boundary_iteration :
+  WordIteration.iterate 9223372036854775808 9223372036854775807 9223372036854775807 9223372036854775807
+      9223372036854775807 9223372036854775807 1 =
+    (9223372036854775805, 9223372036854775804, 9223372036854775806)
+'WordIterationReview.upper_boundary_iteration' depends on axioms: [propext]

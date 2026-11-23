@@ -1,0 +1,33 @@
+   Compiling hec-native-ic v0.1.0 (/Users/adamburan/pq-work/hec-followups/crates/hec-native-ic)
+warning: field `d` is never read
+  --> ../../research/hec_anchor_relations_20261114/rational.rs:53:9
+   |
+51 | pub struct SignedFamily {
+   |            ------------ field in this struct
+52 |     pub m: usize,
+53 |     pub d: usize,
+   |         ^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hec-native-ic` (example "heldout" test) generated 1 warning
+    Finished `release` profile [optimized + debuginfo] target(s) in 1.93s
+     Running unittests ../../research/hec_anchor_relations_20261114/heldout.rs (/Users/adamburan/pq-work/hec-followup-target/release/examples/heldout-eb5c700a5805dbf2)
+
+running 1 test
+linear_solve g=2 p=101 seed=0 requested=8 effective=8 constructed=96 consumed=94 exact_counts=true k=113
+linear_solve g=2 p=101 seed=1 requested=8 effective=8 constructed=128 consumed=106 exact_counts=true k=136
+linear_solve g=2 p=101 seed=0 requested=20 effective=20 constructed=128 consumed=106 exact_counts=true k=113
+linear_solve g=2 p=101 seed=1 requested=20 effective=20 constructed=96 consumed=85 exact_counts=true k=136
+linear_solve g=3 p=61 seed=0 requested=9 effective=10 constructed=384 consumed=329 exact_counts=true k=113
+linear_solve g=3 p=61 seed=1 requested=9 effective=9 constructed=384 consumed=366 exact_counts=true k=136
+linear_solve g=3 p=61 seed=0 requested=24 effective=24 constructed=320 consumed=285 exact_counts=true k=113
+linear_solve g=3 p=61 seed=1 requested=24 effective=24 constructed=192 consumed=174 exact_counts=true k=136
+linear_solve g=4 p=31 seed=0 requested=10 effective=14 constructed=768 consumed=656 exact_counts=true k=113
+linear_solve g=4 p=31 seed=1 requested=10 effective=13 constructed=768 consumed=760 exact_counts=true k=136
+linear_solve g=4 p=31 seed=0 requested=28 effective=16 constructed=512 consumed=481 exact_counts=true k=113
+linear_solve g=4 p=31 seed=1 requested=28 effective=16 constructed=640 consumed=593 exact_counts=true k=136
+test rational_solve::tests::linear_and_generic_complete_solvers_are_exact ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.53s
+

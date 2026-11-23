@@ -1,0 +1,43 @@
+# GS agreement radius t_GS(m) = floor(sqrt(B m)) + 1 for C_L(D, mO) on genus 1 (cited bound, not re-derived here)
+# Structured fact: for received word f' with poles Q + O-part, any f' - f has <= m+1 zeros (Cheng Lemma 3 with m = k-1), so agreement <= m+1 = k.
+# Random-word model: expected number of codewords with agreement >= t is C(B,t) p^(m-t); log2 shown.
+
+B=64 log2(p)=16
+  max over m of log2 E[list at GS radius] = -10.0 at m=62 t=63
+  no m<B with E>=1 at the GS radius in the random model
+  Cheng word (agreement <= m+1): GS radius <= m+1 first possible at m=62 (k=63), i.e. k >= ~B-1
+  k=2: t_GS=9 > k=2  (GS list on Cheng word provably empty: true)
+  k=3: t_GS=12 > k=3  (GS list on Cheng word provably empty: true)
+  k=4: t_GS=14 > k=4  (GS list on Cheng word provably empty: true)
+  k=5: t_GS=17 > k=5  (GS list on Cheng word provably empty: true)
+  k=6: t_GS=18 > k=6  (GS list on Cheng word provably empty: true)
+
+B=128 log2(p)=16
+  max over m of log2 E[list at GS radius] = -9.0 at m=126 t=127
+  no m<B with E>=1 at the GS radius in the random model
+  Cheng word (agreement <= m+1): GS radius <= m+1 first possible at m=126 (k=127), i.e. k >= ~B-1
+  k=2: t_GS=12 > k=2  (GS list on Cheng word provably empty: true)
+  k=3: t_GS=17 > k=3  (GS list on Cheng word provably empty: true)
+  k=4: t_GS=20 > k=4  (GS list on Cheng word provably empty: true)
+  k=5: t_GS=23 > k=5  (GS list on Cheng word provably empty: true)
+  k=6: t_GS=26 > k=6  (GS list on Cheng word provably empty: true)
+
+B=256 log2(p)=16
+  max over m of log2 E[list at GS radius] = -8.0 at m=254 t=255
+  no m<B with E>=1 at the GS radius in the random model
+  Cheng word (agreement <= m+1): GS radius <= m+1 first possible at m=254 (k=255), i.e. k >= ~B-1
+  k=2: t_GS=17 > k=2  (GS list on Cheng word provably empty: true)
+  k=3: t_GS=23 > k=3  (GS list on Cheng word provably empty: true)
+  k=4: t_GS=28 > k=4  (GS list on Cheng word provably empty: true)
+  k=5: t_GS=33 > k=5  (GS list on Cheng word provably empty: true)
+  k=6: t_GS=36 > k=6  (GS list on Cheng word provably empty: true)
+
+B=256 log2(p)=20
+  max over m of log2 E[list at GS radius] = -12.0 at m=254 t=255
+  no m<B with E>=1 at the GS radius in the random model
+  Cheng word (agreement <= m+1): GS radius <= m+1 first possible at m=254 (k=255), i.e. k >= ~B-1
+  k=2: t_GS=17 > k=2  (GS list on Cheng word provably empty: true)
+  k=3: t_GS=23 > k=3  (GS list on Cheng word provably empty: true)
+  k=4: t_GS=28 > k=4  (GS list on Cheng word provably empty: true)
+  k=5: t_GS=33 > k=5  (GS list on Cheng word provably empty: true)
+  k=6: t_GS=36 > k=6  (GS list on Cheng word provably empty: true)

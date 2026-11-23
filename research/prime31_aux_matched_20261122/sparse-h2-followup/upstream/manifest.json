@@ -1,0 +1,421 @@
+{
+  "algorithm_rewriting": false,
+  "byte_equal_checkout_files": 37,
+  "notes": [
+    "Four complete files are exact upstream git blobs; the monomial-order source differs only outside the selected range by formatting.",
+    "This is source provenance, not execution, benchmark admission, correctness qualification, or a strongest-method claim.",
+    "Study source and build environment are inventoried by native/build.rs separately.",
+    "Follow-up snapshots two further dependencies from the same pinned revision so a moving main does not change the comparison backend. The four earlier snapshots and historical manifest remain byte-equal."
+  ],
+  "production_and_path_dependency_files_checked": 43,
+  "repository": "https://github.com/isogeny-labs/crypto",
+  "schema": "prime31-isogeny-upstream-source/v2",
+  "selection_limitations": {
+    "complete_upstream_counted_group_trait_compiled": false,
+    "complete_upstream_ic_boundary_compiled": false,
+    "complete_upstream_prime_curve_counted_group_impl_compiled": false,
+    "malformed_unused_member_omissions": [
+      {
+        "byte_end_exclusive": 75151,
+        "byte_start_inclusive": 73674,
+        "end_anchor_exclusive": "    /// `[k]P` by double-and-add, counted exactly.\n",
+        "git_blob": "9d3bb77a9ae3b4c57efa054517a20650f4389d79",
+        "inserted_bytes": 0,
+        "line_end_inclusive": 1819,
+        "line_start_inclusive": 1796,
+        "members": [
+          "CountedGroup::x_sibling_pair",
+          "CountedGroup::x_sibling_pair_counted"
+        ],
+        "omission_basis": "No reference to either omitted member exists in the retained source ranges, other selected upstream modules, unchanged production/path dependencies, or study source/tests.",
+        "omitted_sha256": "967ae3c02fe6c3638fb92ba287f5d14f103ea5f9d1843a2a72d192221a371853",
+        "snapshot_path": "research/prime31_aux_matched_20261122/isogeny-choice/upstream/ic_boundary.rs",
+        "snapshot_rewritten": false,
+        "snapshot_sha256": "1f94ec22dbf7f865fd309e4fb770478dd555afd3282808143526fa775b81726d",
+        "source_path": "src/cryptanalysis/ic_boundary.rs",
+        "start_anchor": "    /// A binary curve's sibling pair from ONE inversion `1/(x_P + x_J)`:\n",
+        "substitute_bodies": false,
+        "upstream_revision": "33b3bc3c7485df0fe80aae41e2093cf940d87ff3",
+        "upstream_syntax_defect": "The default x_sibling_pair method has no body or closing brace; the following x_sibling_pair_counted default also lacks its closing brace."
+      },
+      {
+        "byte_end_exclusive": 265697,
+        "byte_start_inclusive": 265163,
+        "end_anchor_exclusive": "    fn neg(&self, p: PrimePoint) -> PrimePoint {\n",
+        "git_blob": "9d3bb77a9ae3b4c57efa054517a20650f4389d79",
+        "inserted_bytes": 0,
+        "line_end_inclusive": 7065,
+        "line_start_inclusive": 7054,
+        "members": [
+          "PrimeCurve as CountedGroup::x_sibling_pair_counted"
+        ],
+        "omission_basis": "No reference to either omitted member exists in the retained source ranges, other selected upstream modules, unchanged production/path dependencies, or study source/tests.",
+        "omitted_sha256": "927f8981e897c9c7821bc6b5643d32fc48096c3aa293bcf502e1679b0d4d2a7c",
+        "snapshot_path": "research/prime31_aux_matched_20261122/isogeny-choice/upstream/ic_boundary.rs",
+        "snapshot_rewritten": false,
+        "snapshot_sha256": "1f94ec22dbf7f865fd309e4fb770478dd555afd3282808143526fa775b81726d",
+        "source_path": "src/cryptanalysis/ic_boundary.rs",
+        "start_anchor": "    /// `P + J` in full and the abscissa of `P − J` from ONE inversion: the\n",
+        "substitute_bodies": false,
+        "upstream_revision": "33b3bc3c7485df0fe80aae41e2093cf940d87ff3",
+        "upstream_syntax_defect": "The override lacks its closing brace before fn neg."
+      }
+    ],
+    "selected_backend_dependency_check": "After exact-range omission there are zero x_sibling_pair or x_sibling_pair_counted identifiers in the selected ic_boundary closure; no callers occur in other compiled production/path dependencies or study modules. Existing sibling_pair and sibling_lift methods are retained.",
+    "syntax_qualification_scope": "The complete raw ic_boundary snapshot is not valid Rust at this revision. Only its declared independent exact-byte closure is selected. This is not a patch or successful compilation claim for the upstream crate."
+  },
+  "snapshots": [
+    {
+      "binding": "full_file_verbatim_snapshot",
+      "git_blob": "1268132ff7c7e5d8547ecfd326f3aa0dbd18d7f9",
+      "path": "research/prime31_aux_matched_20261122/isogeny-choice/upstream/f4_fp.rs",
+      "sha256": "92687f382246f602a836049c3aa120af9e2fcb6077e7eab8f4153bc0bc148d79",
+      "source_path": "src/cryptanalysis/f4_fp.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/f4_fp.rs"
+    },
+    {
+      "binding": "full_file_verbatim_snapshot",
+      "git_blob": "9d3bb77a9ae3b4c57efa054517a20650f4389d79",
+      "path": "research/prime31_aux_matched_20261122/isogeny-choice/upstream/ic_boundary.rs",
+      "sha256": "1f94ec22dbf7f865fd309e4fb770478dd555afd3282808143526fa775b81726d",
+      "source_path": "src/cryptanalysis/ic_boundary.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/ic_boundary.rs"
+    },
+    {
+      "binding": "full_file_verbatim_snapshot",
+      "git_blob": "2f337a0df99b74fe6d20a9ff090c675d1ed6b310",
+      "path": "research/prime31_aux_matched_20261122/isogeny-choice/upstream/prime_fast.rs",
+      "sha256": "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+      "source_path": "src/cryptanalysis/prime_fast.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/prime_fast.rs"
+    },
+    {
+      "binding": "full_file_verbatim_snapshot",
+      "git_blob": "8d60fbecd73d8ceab786eb9eeed9ea7b931e5946",
+      "path": "research/prime31_aux_matched_20261122/isogeny-choice/upstream/groebner_f4.rs",
+      "sha256": "36b0bc3232df109b08feb246b0ff97d132397470a6897c84ac63500d5005974f",
+      "source_path": "src/cryptanalysis/groebner_f4.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/groebner_f4.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "09fb5cece2f6dec8a73037ac97ecac1338883836",
+      "path": "research/prime31_aux_matched_20261122/sparse-h2-followup/upstream/fp_backend.rs",
+      "sha256": "2722bbf0c1e58a079772af71680aabc514f7354e8b51bb3ed10ca5729a0da0e1",
+      "source_path": "src/cryptanalysis/fp_backend.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/fp_backend.rs",
+      "reason": "Exact historical dependency retained after main drift; algorithm bytes unchanged."
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "25cb1a07a63cd10bd18ac7db598db5149b7392b9",
+      "path": "research/prime31_aux_matched_20261122/sparse-h2-followup/upstream/prime_tower.rs",
+      "sha256": "d05e73e5420f1c60a554c725a746d2cd6b47ea9509ac81873b7f72578297d0b2",
+      "source_path": "src/cryptanalysis/ic_framework/prime_tower.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/ic_framework/prime_tower.rs",
+      "reason": "Exact historical dependency retained after main drift; algorithm bytes unchanged."
+    }
+  ],
+  "snapshotted_files": 4,
+  "unchanged_dependencies": [
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "89d8ddeedf65c71ff236db47a90fabb55281d55a",
+      "path": "crates/certified-relations/Cargo.toml",
+      "sha256": "79ec28ecedbe3dc424db898a692a90442100562095a86bcc35ac71645d0d91b3",
+      "source_path": "crates/certified-relations/Cargo.toml",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/Cargo.toml"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "d763b80ee289ee7ac551f715b7b4509ac29dd21e",
+      "path": "crates/certified-relations/src/cheap.rs",
+      "sha256": "d5bf10ad2025de513efecb842932af58cd5be142721bdf7321ee4c568374ce24",
+      "source_path": "crates/certified-relations/src/cheap.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/cheap.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "5f672bb847ba19fbc8d76059fe40258ee12f4a93",
+      "path": "crates/certified-relations/src/dag.rs",
+      "sha256": "fac42760e1a3063b74d9c44fb54858052b027760a9d8daf45af7bf64ac6ad3ab",
+      "source_path": "crates/certified-relations/src/dag.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/dag.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "e5f72c45613a6aaab69320c4160a1fc2fa48028f",
+      "path": "crates/certified-relations/src/kernels/arithmetic.rs",
+      "sha256": "4a05cc7600886d4387c9e5d4d2fa988b1b1551efb58be37a200d33ff78fa6ed4",
+      "source_path": "crates/certified-relations/src/kernels/arithmetic.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/kernels/arithmetic.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "4d06d2826d84c71173b54ecbb2977174c2d88571",
+      "path": "crates/certified-relations/src/kernels/cheap.rs",
+      "sha256": "e88b4bcf37bb1e3100390ed33cb68a9a21a9fc52f6df5f1fbf600607720692a5",
+      "source_path": "crates/certified-relations/src/kernels/cheap.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/kernels/cheap.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "7e71ab257fdf6f8a65146d937797f168e93420e1",
+      "path": "crates/certified-relations/src/kernels/check.rs",
+      "sha256": "e7246f2be7bfbecbed73d7bd989aeae582ede6d53ac81b323d92e31dfcaf1af1",
+      "source_path": "crates/certified-relations/src/kernels/check.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/kernels/check.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "edad193b34004be036d6d98241c44058d0b5489a",
+      "path": "crates/certified-relations/src/kernels/compact.rs",
+      "sha256": "064f132822ea5cdd9a1da9cd7095ca77cd06cf9ac393f6938bb8f6d838d6117f",
+      "source_path": "crates/certified-relations/src/kernels/compact.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/kernels/compact.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "fd7b764f5f4d5f48e7c0f196354f1ff5d11bd3d7",
+      "path": "crates/certified-relations/src/kernels/projection.rs",
+      "sha256": "529ba3320d0605ac810d8b8df58c46b0ab3d96bacd7c9bc31e70fd94477147ee",
+      "source_path": "crates/certified-relations/src/kernels/projection.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/kernels/projection.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "d124666e56e7cd77e64143abb9893df1a15046bb",
+      "path": "crates/certified-relations/src/kernels/quotient.rs",
+      "sha256": "50643d14d3dc072eded174b4bb443cdbd5da37b1f2ed419147f284ad025c84af",
+      "source_path": "crates/certified-relations/src/kernels/quotient.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/kernels/quotient.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "b6aa476400088fe70a70d3f168d07354d27f7ee1",
+      "path": "crates/certified-relations/src/lib.rs",
+      "sha256": "c64b0ffb3388a8e5c5a5271f3bffee8ffe1911adf2925863c5ed5e5207e6ec48",
+      "source_path": "crates/certified-relations/src/lib.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/lib.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "93184f2b8b415cdb781ffded5954eae7e1eba10e",
+      "path": "crates/certified-relations/src/monomial.rs",
+      "sha256": "8870db4d1d233532248e57281e794598418ccedb0cf4bdc7de732a0b93af6dbf",
+      "source_path": "crates/certified-relations/src/monomial.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/monomial.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "18a8b8d119e0c895a9883682fb6b923be60f6afd",
+      "path": "crates/certified-relations/src/packed_constructor.rs",
+      "sha256": "f5ff6b7670d3a3207a9b39f53a0403d96397bb486abd16098d7b6dd63bb07fe6",
+      "source_path": "crates/certified-relations/src/packed_constructor.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/packed_constructor.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "7e860c0b9c15467f64a7b961cfc557e5e43d4155",
+      "path": "crates/certified-relations/src/projection.rs",
+      "sha256": "8169bc97dde2a61a9d422809369a2f2a718a817630f04c8f7c7f492ce5519aa3",
+      "source_path": "crates/certified-relations/src/projection.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/projection.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "4c5a232a2173d3a000dca6358288fdf921e09554",
+      "path": "crates/certified-relations/src/quotient.rs",
+      "sha256": "d27ebfd58069597e297e3c84c9f2bc5139d94a90ae4d0150958b9599042935a8",
+      "source_path": "crates/certified-relations/src/quotient.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/quotient.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "b91c3e33cb3d7f064526762c3a4df1fe72ffbbf6",
+      "path": "crates/certified-relations/src/quotient/compact.rs",
+      "sha256": "62b144ba4aff72b09781d6377b406719db67f3546a84612353f3f949eedea095",
+      "source_path": "crates/certified-relations/src/quotient/compact.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/quotient/compact.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "c10a68815e7dbfd13650e3612eb3a3d1f93f8372",
+      "path": "crates/certified-relations/src/replay.rs",
+      "sha256": "47e43919232c08c9f55ccbf225db4bdddbb9b9ea1335ab3e2fb7992e774ae623",
+      "source_path": "crates/certified-relations/src/replay.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/replay.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "6ad64d1c4735c228609d4e84fc261b097de35b51",
+      "path": "crates/certified-relations/src/workload.rs",
+      "sha256": "caad0aad06b00b8287d16a5de9157b2f7d4dbf45024a3e69614e3679e3016df6",
+      "source_path": "crates/certified-relations/src/workload.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/certified-relations/src/workload.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "7d4793a8684ee75e173f4564bd0724ec6b00f853",
+      "path": "crates/relation-replay-checker/Cargo.toml",
+      "sha256": "d5ccb207b3d8271306bd63bc3e716ad0a19f51e2dd609a3f2a4560bd4cd10498",
+      "source_path": "crates/relation-replay-checker/Cargo.toml",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/relation-replay-checker/Cargo.toml"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "4543137c471c5fe55a89f9db9047f2cba2c1597c",
+      "path": "crates/relation-replay-checker/src/identities.rs",
+      "sha256": "d8b1c4fba21a87b310f1657ba9c94b7efe9d8e48de6139f5eeea614a25b09dd9",
+      "source_path": "crates/relation-replay-checker/src/identities.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/relation-replay-checker/src/identities.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "2bb6ba1b23672d4f78df3cc5cc1cae43d064ea62",
+      "path": "crates/relation-replay-checker/src/lib.rs",
+      "sha256": "9dea7862502ec34b49d82ff577df9164a176058f6258fa5e6b0697a9925ef130",
+      "source_path": "crates/relation-replay-checker/src/lib.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/relation-replay-checker/src/lib.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "0e00fe1a572e8d8b912abe2933fcc57dc05d3d32",
+      "path": "crates/relation-replay-checker/src/main.rs",
+      "sha256": "1d1e63285d623bb27daa94f598c460feec32d95381422adb0a270e926487df11",
+      "source_path": "crates/relation-replay-checker/src/main.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/relation-replay-checker/src/main.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "4fd98c4593508220e275ce09a298ee5de3e16ccd",
+      "path": "crates/relation-replay-checker/src/packed.rs",
+      "sha256": "844eaac082af3deec1b61dadb000eb0acc8d5f43ee450b3625f648e4f9585f25",
+      "source_path": "crates/relation-replay-checker/src/packed.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/crates/relation-replay-checker/src/packed.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "04ace0d6961a05c863e1dbb21e5e2a49ab126ff7",
+      "path": "src/cryptanalysis/bitops.rs",
+      "sha256": "f4c15d1d79fe4752c32c9b46bb4fdecaebad7d41ffcaed1832dec3dc06fb28f0",
+      "source_path": "src/cryptanalysis/bitops.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/bitops.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "643f8a3205b9f926d3493b12b3c6a69933e75ece",
+      "path": "src/cryptanalysis/challenge_ladder.rs",
+      "sha256": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
+      "source_path": "src/cryptanalysis/challenge_ladder.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/challenge_ladder.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "94254cbe0590dc8b4805a552202bdc3f04fbd52b",
+      "path": "src/cryptanalysis/f4_fp/certified.rs",
+      "sha256": "a57cd200191f0df6bfd6c2473ad6a234dce3e673379af5a33c4cf6c05b65317e",
+      "source_path": "src/cryptanalysis/f4_fp/certified.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/f4_fp/certified.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "ce0c4e35e6f0c77cef51e5b917a3df76b50fc066",
+      "path": "src/cryptanalysis/f4_fp/pair_certificate.rs",
+      "sha256": "28ce87c569eb345fa8aae3db7e64989b556be01ec902b3b5b64d5b9ff63b4628",
+      "source_path": "src/cryptanalysis/f4_fp/pair_certificate.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/f4_fp/pair_certificate.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "22b58319e2ccd04f219f136d47d741409f3b3dbe",
+      "path": "src/cryptanalysis/f4_fp/reuse.rs",
+      "sha256": "95a1f501ff8437d9b534b3445b5a883317c35d14a2cf04bb7e26452bf099deaf",
+      "source_path": "src/cryptanalysis/f4_fp/reuse.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/f4_fp/reuse.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "b2797a24a572899b302d392d51159eafa0dbceb0",
+      "path": "src/cryptanalysis/fx_hash.rs",
+      "sha256": "4b0c901ec9251b0e71ff7778f4f637c4925461d2b997b9ea82950ee09a0854fa",
+      "source_path": "src/cryptanalysis/fx_hash.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/fx_hash.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "a7a2ef36cec8394cde655fda9915e071ace14478",
+      "path": "src/cryptanalysis/glv_invariant_base.rs",
+      "sha256": "32c38ce6d7207030b50696b36e109fc7acebda7ba3ee518c7083e3fb08722336",
+      "source_path": "src/cryptanalysis/glv_invariant_base.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/glv_invariant_base.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "7e61dd1bc2415912ef85cf8bef10dc97acf73f2e",
+      "path": "src/cryptanalysis/ic_framework/pkm_semaev.rs",
+      "sha256": "089be301e76b94a93de29461b6ee50d475ea59e4fa2cc3482cc10940a3432d1c",
+      "source_path": "src/cryptanalysis/ic_framework/pkm_semaev.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/ic_framework/pkm_semaev.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "3f2b571153704ca4ed9b2967ab74cc8f87917e94",
+      "path": "src/cryptanalysis/ic_measurement.rs",
+      "sha256": "b2bc883f7a7cfc194ebcba78991b9aca901285acebf01187f56bd3e6fe57f980",
+      "source_path": "src/cryptanalysis/ic_measurement.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/ic_measurement.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "c1139b0aa621b279424d9a81170421ac1a58e642",
+      "path": "src/cryptanalysis/jv_bitops.rs",
+      "sha256": "03b8215cd9f6bfed125a7d32e5b2ab765a2315c49097546b65d1da9f133a41f7",
+      "source_path": "src/cryptanalysis/jv_bitops.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/jv_bitops.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "100648f70519a5c900ab797fcb40bc22453c664f",
+      "path": "src/cryptanalysis/jv_bitops_uniform.rs",
+      "sha256": "3f15f1145e24378dd90f19d5aef5cd08db3a0ddfb4ee526dccba02d4c6eb22bc",
+      "source_path": "src/cryptanalysis/jv_bitops_uniform.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/jv_bitops_uniform.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "77bd880f8d26a7d7a4106b95f8b92d083ff9c579",
+      "path": "src/cryptanalysis/pq_groebner_f2.rs",
+      "sha256": "2d014644853e7815a58fb34c29177dd4894b08588d59ad64dffa904bffd35056",
+      "source_path": "src/cryptanalysis/pq_groebner_f2.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/pq_groebner_f2.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "de886556d805ddc2c6fc6c8696c59a15fcb9583e",
+      "path": "src/cryptanalysis/residual_walk.rs",
+      "sha256": "4e54e030cebfc873f9288e25c83153841724d1cc0d8c79417288aa9e74f507c9",
+      "source_path": "src/cryptanalysis/residual_walk.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/residual_walk.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "baaeb88178bfa163b7b3ab2251682c9c8a9d354d",
+      "path": "src/cryptanalysis/symmetrized_semaev.rs",
+      "sha256": "18fd7eb54be7d5def01cb165234ac235d02db94b0b3c39921c8101767cc3d632",
+      "source_path": "src/cryptanalysis/symmetrized_semaev.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/cryptanalysis/symmetrized_semaev.rs"
+    },
+    {
+      "binding": "checkout_byte_equal_to_upstream",
+      "git_blob": "5b942271ee26733ad5525085dc37f17c98ca0b8c",
+      "path": "src/prime_hyperelliptic/ops.rs",
+      "sha256": "668c2ea7804578fe09b8b3dc2dd905b1564be5ebbf0f5e6571d785fa7ad842f4",
+      "source_path": "src/prime_hyperelliptic/ops.rs",
+      "source_url": "https://github.com/isogeny-labs/crypto/blob/33b3bc3c7485df0fe80aae41e2093cf940d87ff3/src/prime_hyperelliptic/ops.rs"
+    }
+  ],
+  "upstream_revision": "33b3bc3c7485df0fe80aae41e2093cf940d87ff3",
+  "parent_manifest": "research/prime31_aux_matched_20261122/isogeny-choice/upstream/manifest.json",
+  "parent_manifest_sha256": "1496e51b27dc390ec9dde6714dd7edd2292fb15e6370a1c9cb878b1ecb4eb789"
+}

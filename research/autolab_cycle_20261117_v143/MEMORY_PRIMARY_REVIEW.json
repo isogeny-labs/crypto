@@ -1,0 +1,28 @@
+{
+  "observations": {
+    "parent_ru_maxrss_kib": 872032,
+    "parent_post_exec_VmHWM_kib": 26104,
+    "fresh_ru_maxrss_kib": 25984,
+    "fresh_post_exec_VmHWM_kib": 26112,
+    "allocation_bytes": 16777216,
+    "same_frozen_probe": "research/joint_translation_20261117_v142b/memory_probe.py",
+    "limitations": "one pair;launcher context changes;not algorithm speed/memory gain;keep mandated full-childwait4metric"
+  },
+  "primary_sources": [
+    {
+      "url": "https://github.com/torvalds/linux/blob/55fbedcec622a943cb09a969aef1ddcba87ee40a/fs/exec.c",
+      "commit": "55fbedcec622a943cb09a969aef1ddcba87ee40a",
+      "excerpt": "static void exec_mm_put_old(struct mm_struct *old_mm)\n{\n\tsetmax_mm_hiwater_rss(&current->signal->maxrss, old_mm);\n\tmm_update_next_owner(old_mm);\n\tmmput(old_mm);\n}\n\nstatic int de_thread(struct task_struct *tsk)\n{\n\tstruct signal_struct *sig = tsk->signal;\n\tstruc"
+    },
+    {
+      "url": "https://github.com/torvalds/linux/blob/6b30c39a5e333cfb1475acf0f73de6ef954eea8a/kernel/sys.c",
+      "commit": "6b30c39a5e333cfb1475acf0f73de6ef954eea8a",
+      "excerpts": [
+        "if (maxrss < sig->maxrss)\n\t\t\tmaxrss = sig->maxrss;\n\n\t\trcu_read_lock();\n\t\t__for_each_thread(sig, t)\n\t\t\tacc",
+        "out_thread:\n\tmm = get_task_mm(p);\n\tif (mm) {\n\t\tsetmax_mm_hiwater_rss(&maxrss, mm);\n\t\tmmput(mm);\n\t}\n\nout_children:\n\tr->ru_maxrss = maxrss * (PAGE_SIZE / 1024); /* convert pages to KBs */\n\tr->ru_utime = ns_to_kernel_old_timeval(utime);\n\tr->ru_stime = ns_to_kernel_old_timeval(stime);\n}\n\nSYSCALL_DEFINE2(getrusage, int, who, struct r"
+      ]
+    }
+  ],
+  "interpretation": "Upstream exec saves the old mm high-water RSS into signal->maxrss;getrusage takes that saved maximum as well as the current mm high-water. This is consistent with inherited launcher/address-space history surviving exec in ru_maxrss while post-exec VmHWM reflects the current mm. The running kernel binary/source build was not reconstructed;the paired empirical observations are retained separately.",
+  "decision": "Do not rewrite prior raw memory. Future frozen wrappers should report both full-child lifetime RSS and post-exec process-stage VmHWM/VmRSS. Keep matched launch context and original qualified memory/timing requirements."
+}

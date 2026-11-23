@@ -1,0 +1,41 @@
+{
+  "schema": "theorem-audit-source-plan/v1",
+  "status": "Source/plan freeze; no supplement issued yet.",
+  "formal": {
+    "lean": "leanprover/lean4:v4.35.0",
+    "mathlib_revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "theorem": "MumfordFiveControlAudit.mumford_five_control_certificate",
+    "source": "research/jacobian_smoothness_audit_20261109/lean/MumfordFiveControl.lean",
+    "source_sha256": "019bb744e6d294593dc4d4b4932376dfb5566c22ae2fbb255c45a4db5f519aa7",
+    "decl_sha256": "64ddf402132efcff08422f96eb344c7b569d47f4b50db8c6fc5c41eb17984196",
+    "statement": "theorem mumford_five_control_certificate : curvePolynomial.Monic ∧ curvePolynomial.natDegree=5 ∧ curvePolynomial.Separable ∧ Fintype.card ReducedPair=16 ∧ Fintype.card {P : ReducedPair // P.u.Splits}=16 ∧ (∀ P : ReducedPair, P.v=0)",
+    "gate": {
+      "path": "evidence/five-control-gate.log",
+      "declarations": 240,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Complete F5reduced-polynomial-pair model only; geometric Picard/Jacobian identification remains open."
+  },
+  "identity_plan": {
+    "status": "Planned; source/plan commit must precede issue.",
+    "source": "research/jacobian_smoothness_audit_20261109/identity/src/bin/mumford_five_control.rs",
+    "source_sha256": "f7720235788a650ad437fa1cdc5908ca6dddbbb260be5625f1deb14330555978",
+    "cargo_lock_sha256": "8f6ee1f1edd91391f7468c6b46f0b7536c05752132fe0cd3f18de92f341c3b61",
+    "variables": 3,
+    "total_degree": 2,
+    "seed_hex": "0x202611092120",
+    "points": 32,
+    "extra_seed_hex": "0x5e4ae097",
+    "extra_points": 11,
+    "scope": "Only scalar supplied-root factorization; not F5cardinality/splitting completeness, separability or geometry."
+  },
+  "reused_proof_source": {
+    "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean",
+    "sha256": "1ebb9df7ecd8c67df17b2a58e44afd95576ccf8f1c218e284260f8773d817bd7",
+    "scope": "Adapted complete coefficient-shape method; characteristic5conditions rechecked, no field-transfer premise assumed."
+  },
+  "primary_sources": "sources.json and cantor-sources.json",
+  "new_native_curve_population": false,
+  "paid_spend": 0
+}

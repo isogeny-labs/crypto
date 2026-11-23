@@ -1,0 +1,18 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.65in]{geometry}
+\setlength{\parskip}{6pt}
+\begin{document}
+\section*{Mixed UInt64 dispatcher review}
+The aggregate preserves the retained add12 decision order and establishes canonical normalized validity from the original inputs for all four successful branches. No blocking discrepancy was found in the new composition.
+
+Source correspondence is against retained projective\_law\_gate.rs SHA5976e7f3 (full hash in source-checks.json), add12\_weighted\_complete lines828-878, and the recorded no-table degree-one Field route. The dispatcher tests outer K first, then cancellation, mismatch, repeated support, and finally positive distinct-other. The generic fallback receives the other point first and the doubled original point second. Option.map Sum.inr preserves None and degree-two payloads. Sum.inl represents the cancellation degree-one payload. Internal tags map respectively to common, cancellation, coincident\_y\_mismatch, tripling and coincident\_double\_plus\_other.
+
+The theorem assumes prime 5\textless{}=p\textless{}2 to power 31; canonical original point/divisor and a0-a3 coefficients; four nonzero representation weights; and original normalized point/divisor validity on the monic quintic. It assumes neither positive ordinate coincidence nor output validity. Existing mismatch exclusion supplies the former. The outer-to-generic guard identity supplies nonzero generic K. Previously reviewed branch theorems then supply canonical output, nonzero weights and normalized validity. The explicit mismatch and both nested generic None paths are excluded under the original premises. returned\_payload\_valid concerns any returned payload and is derived by uniqueness of Some.
+
+Fresh isolated main, producer controls and axiom readback pass. Producer controls include full-premise applications for all four branches, plus zero-ordinate cancellation and invalid-input mismatch. Reviewer controls check p=5 cancellation precedence, invalid mismatch, exact tripling payload and nonunit p=7 positive-distinct argument order. All three exported theorems read back only propext, Classical.choice and Quot.sound. All 43 producer-manifest entries and 8 source/dependency bindings match. Producer files were untouched.
+
+This is a value and branch correspondence: pure helpers can calculate otherwise unused coordinates and therefore do not establish counter-state or evaluation-cost equivalence. It does not claim a compiler refinement, Jacobian class-sum theorem or arbitrary walker closure. No scientific execution or cost measurement occurred.
+
+Independence disclosure: this reviewer authored the imported cancellation, positive-distinct and tripling word components. The new aggregate was produced by another agent; this review independently checked its decision-tree assembly, premises, source mapping and fresh kernel replay. It does not recast the imported component proofs as independent of their author. Prior component reviews remain separately bound.
+
+\end{document}

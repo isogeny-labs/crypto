@@ -1,0 +1,9 @@
+# Frozen full-catalogue observability replay
+
+Original source273d1c564833/checkpoint20261116T163306Zran once:48candidate policies,16verified,32retained noncompletions,12Compact controls verify. All16successes reach full core rank. Preserve original source/output. This is a new instrumented REPLAY of the identical48deterministic streams, not new independent samples or an extension of caps/anchor policies.
+
+Retain every admitted raw coefficient row BEFORE LP elimination, with catalogue columns plus source/target columns, source-unit RHS1. For each stream independently compute dense modular rank(A), rank(A without target column), rank([A|rhs]) over actual ell. Assert consistency rankAug=rankA. Under consistency, target determined iff rankA-rankDrop=1; assert this matches candidate returned-scalar status. This checks original admitted row space rather than just emitted pure core equations. It does not include rejected>2endpoint rows or unavailable primitive functions.
+
+New CERT-CONTROL.tsv adds3rank fields. Its first24fields must byte-match original CONTROL.tsv across48policies; CERT-BASELINE.tsv must byte-match BASELINE.tsv. Input identities also match. No native source/target, RNG, row selection, bounds or solver order change. Source/lock/import/binary/protocol freeze, commit/checkpoint gate before once-only180second replay. Preserve any mismatch/error without overwriting original. Original Cargo bytes preserved separately because adding binary changes Cargo.toml.
+
+Rank proof: consistent A_other*x+a*k=b has k fixed exactly when a is outside columnspan(A_other), equivalentlyrank(A)-rank(A_other)=1. When difference0, nullspace contains a vector changing k, so the admitted equations do not determine it. This is an exact finite-stream certificate, not a universal algorithm lower bound or elapsed-time result. Full mathematical10xobjective remains active.

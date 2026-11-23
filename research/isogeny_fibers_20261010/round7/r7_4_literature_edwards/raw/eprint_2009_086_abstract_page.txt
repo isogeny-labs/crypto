@@ -1,0 +1,324 @@
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Point Compression for Koblitz Elliptic Curves 
+ 
+ 
+ 
+ 
+ 
+ 
+ a.toggle-open:after {
+ content:' -';
+ font-weight: 800;
+ }
+ a.toggle-closed:after {
+ content: " ›";
+ font-weight: 800;
+ }
+ .paper-abstract {
+ white-space: pre-wrap;
+ }
+ #metadata dt {
+ margin-top: 1rem;
+ }
+ #metadata dt + dd { /* gap between dt and first dd */
+ margin-top: .75rem;
+ }
+ #metadata dd {
+ margin-left: 2rem;
+ }
+ #metadata dd.keywords {
+ padding-bottom: .5rem;
+ }
+ span.authorName {
+ margin-top: .5rem;
+ font-style: italic;
+ }
+ 
+ 
+MathJax = {
+ tex: {
+ inlineMath: [['$', '$'], ['\\(', '\\)']],
+ displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+ processEnvironments: false
+ },
+ loader: {
+ load: [
+ "ui/safe",
+ "ui/lazy",
+ ],
+ },
+ options: {
+ safeOptions: {
+ allow: {
+ URLs: "none",
+ classes: "safe",
+ cssIDs: "safe",
+ styles: "safe",
+ },
+ },
+ }
+ };
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ <meta property="og:description" content="Elliptic curves over finite fields have applications in public key cryptography. A Koblitz curve is an elliptic curve $E$ over $\F_2$; the group $E( \Ftn )$ has convenient features for efficient implementation of elliptic curve cryptography.
+Wiener and Zuccherato and Gallant, Lambert and Vanstone showed that one can accelerate the Pollard rho algorithm for the discrete logarithm problem on Koblitz curves. This implies that when using Koblitz curves, one has a lower security per bit than when using general elliptic curves defined over the same field. Hence for a fixed security level, systems using Koblitz curves require slightly more bandwidth.
+We present a method to reduce this bandwidth when a normal basis representation for $\Ftn$ is used. Our method is appropriate for applications such as Diffie-Hellman key exchange or Elgamal encryption. We show that, with a low probability of failure, our method gives the expected bandwidth for a given security level." />
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ What a lovely hat 
+ Is it made out of tin foil ? 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Cryptology ePrint Archive 
+ 
+ 
+ 
+ 
+ 
+ Papers
+ 
+ 
+ Updates from the last: 
+ 7 days 
+ 31 days 
+ 6 months 
+ 365 days 
+ 
+ Listing by year 
+ All papers 
+ Compact view 
+ Subscribe 
+ 
+ How to cite 
+ 
+ Harvesting metadata 
+ 
+ 
+ 
+ 
+ Submissions
+ 
+ 
+ Submit a paper 
+ Revise or withdraw a paper 
+ Acceptance and publishing conditions 
+ 
+ 
+ 
+ 
+ About
+ 
+ 
+ Goals and history 
+ News 
+ Statistics 
+ Contact 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Search
+ 
+ 
+ 
+ Advanced search 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Paper 2009/086 
+ Point Compression for Koblitz Elliptic Curves 
+ 
+ 
+ P. N. J. Eagle, Steven D. Galbraith, and John Ong
+ 
+ 
+ Abstract 
+ Elliptic curves over finite fields have applications in public key cryptography. A Koblitz curve is an elliptic curve $E$ over $\F_2$; the group $E( \Ftn )$ has convenient features for efficient implementation of elliptic curve cryptography.
+Wiener and Zuccherato and Gallant, Lambert and Vanstone showed that one can accelerate the Pollard rho algorithm for the discrete logarithm problem on Koblitz curves. This implies that when using Koblitz curves, one has a lower security per bit than when using general elliptic curves defined over the same field. Hence for a fixed security level, systems using Koblitz curves require slightly more bandwidth.
+We present a method to reduce this bandwidth when a normal basis representation for $\Ftn$ is used. Our method is appropriate for applications such as Diffie-Hellman key exchange or Elgamal encryption. We show that, with a low probability of failure, our method gives the expected bandwidth for a given security level. 
+ 
+ Note: Revised version of the paper with additional author. 
+ 
+ 
+ 
+ Metadata 
+ 
+ 
+ Available format(s)
+ 
+ 
+ 
+ 
+ <a class="btn btn-sm btn-outline-dark"
+ href="/2009/086.pdf">
+ PDF 
+ 
+ 
+ 
+ 
+ 
+ Publication info 
+ Published elsewhere. Unknown where it was published 
+ 
+ 
+ Keywords 
+ elliptic curve cryptography 
+ 
+ Contact author(s) 
+ 
+ S Galbraith &#64; math auckland ac nz
+ 
+ 
+ History 
+ 
+ 
+ 2010-09-27: last of 2 revisions 
+ 
+ 
+ 
+ 2009-02-24: received 
+ 
+ 
+ 
+ See all versions 
+ 
+ Short URL 
+ https://ia.cr/2009/086 
+ License 
+ 
+ 
+ CC BY 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ BibTeX <button id="bibcopy" class="ms-2 btn btn-sm btn-outline-dark"
+ aria-label="Copy to clipboard"
+ onclick="copyBibtex()">
+ Copy to clipboard 
+ 
+@misc{cryptoeprint:2009/086,
+ author = {P. N. J. Eagle and Steven D. Galbraith and John Ong},
+ title = {Point Compression for Koblitz Elliptic Curves},
+ howpublished = {Cryptology {ePrint} Archive, Paper 2009/086},
+ year = {2009},
+ url = {https://eprint.iacr.org/2009/086}
+}
+ 
+ 
+ 
+ var bibcopy;
+ function triggerTooltip() {
+ console.log('setting tooltip');
+ }
+ window.onload = triggerTooltip;
+ function copyBibtex() {
+ let range = document.createRange();
+ range.selectNode(document.getElementById('bibtex'));
+ window.getSelection().removeAllRanges();
+ window.getSelection().addRange(range);
+ document.execCommand('copy');
+ window.getSelection().removeAllRanges();
+ let bibcopy = document.getElementById('bibcopy');
+ let copyTooltip = new bootstrap.Tooltip(bibcopy, {trigger: 'manual',
+ title: 'Copied!'});
+ copyTooltip.show();
+ setTimeout(function() {
+ copyTooltip.dispose();
+ }, 2000);
+ }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Note: In order to protect the privacy of readers, eprint.iacr.org
+ does not use cookies or embedded third party content.
+ 
+ 
+ 
+ 
+ var topNavbar = document.getElementById('topNavbar');
+ if (topNavbar) {
+ document.addEventListener('scroll', function(e) {
+ if (window.scrollY > 100) {
+ topNavbar.classList.add('scrolled');
+ } else {
+ topNavbar.classList.remove('scrolled');
+ }
+ })
+ }
+ 
+ 
+ 

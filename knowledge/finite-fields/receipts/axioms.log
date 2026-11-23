@@ -1,0 +1,190 @@
+FiniteFieldHandbook.ring_laws : ∀ (R : Type u_1) [inst : NonUnitalRing R] (a b c : R),
+  a + b = b + a ∧ a * (b * c) = a * b * c ∧ a * (b + c) = a * b + a * c ∧ (a + b) * c = a * c + b * c
+'FiniteFieldHandbook.ring_laws' does not depend on any axioms
+FiniteFieldHandbook.domain_no_zero_divisors : ∀ (R : Type u_1) [inst : CommRing R] [IsDomain R] (a b : R),
+  a * b = 0 ↔ a = 0 ∨ b = 0
+'FiniteFieldHandbook.domain_no_zero_divisors' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.finite_division_ring_is_field : ∀ (D : Type u_1) [inst : DivisionRing D] [inst_1 : Finite D],
+  IsField D
+'FiniteFieldHandbook.finite_division_ring_is_field' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.domain_characteristic_prime : ∀ (R : Type u_1) [inst : Ring R] [NoZeroDivisors R] [Nontrivial R]
+  (p : ℕ) [CharP R p], p ≠ 0 → Nat.Prime p
+'FiniteFieldHandbook.domain_characteristic_prime' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.finite_field_characteristic_prime : ∀ (K : Type u_1) [inst : Field K] [Finite K],
+  Nat.Prime (ringChar K)
+'FiniteFieldHandbook.finite_field_characteristic_prime' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.frobenius_add : ∀ (R : Type u_1) [inst : CommRing R] (p n : ℕ) [Fact (Nat.Prime p)] [CharP R p]
+  (a b : R), (a + b) ^ p ^ n = a ^ p ^ n + b ^ p ^ n
+'FiniteFieldHandbook.frobenius_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.frobenius_sum : ∀ (R : Type u_1) [inst : CommRing R] (p n : ℕ) [Fact (Nat.Prime p)] [CharP R p]
+  {ι : Type u_2} (s : Finset ι) (a : ι → R), (∑ i ∈ s, a i) ^ p ^ n = ∑ i ∈ s, a i ^ p ^ n
+'FiniteFieldHandbook.frobenius_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.extension_cardinality : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K] (L : Type u_2)
+  [inst_2 : Field L] [inst_3 : Fintype L] [inst_4 : Algebra K L], Fintype.card L = Fintype.card K ^ Module.finrank K L
+'FiniteFieldHandbook.extension_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.field_cardinality_prime_power : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K] (p : ℕ)
+  [CharP K p], ∃ n, Nat.Prime p ∧ Fintype.card K = p ^ ↑n
+'FiniteFieldHandbook.field_cardinality_prime_power' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.fermat : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K] (a : K),
+  a ≠ 0 → a ^ (Fintype.card K - 1) = 1
+'FiniteFieldHandbook.fermat' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.power_card : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K] (a : K), a ^ Fintype.card K = a
+'FiniteFieldHandbook.power_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.power_card_iterate : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K] (a : K) (n : ℕ),
+  a ^ Fintype.card K ^ n = a
+'FiniteFieldHandbook.power_card_iterate' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.inverse_power : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K] (a : K),
+  a ≠ 0 → a ^ (Fintype.card K - 2) = a⁻¹
+'FiniteFieldHandbook.inverse_power' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.sum_elements : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K],
+  2 < Fintype.card K → ∑ a, a = 0
+'FiniteFieldHandbook.sum_elements' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.polynomial_frobenius : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K] (f : Polynomial K),
+  (Polynomial.expand K (Fintype.card K)) f = f ^ Fintype.card K
+'FiniteFieldHandbook.polynomial_frobenius' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.field_polynomial_roots : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K],
+  (Polynomial.X ^ Fintype.card K - Polynomial.X).roots = Finset.univ.val
+'FiniteFieldHandbook.field_polynomial_roots' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.field_polynomial_splits : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K],
+  (Polynomial.X ^ Fintype.card K - Polynomial.X).Splits
+'FiniteFieldHandbook.field_polynomial_splits' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.multiplicative_group_cyclic : ∀ (K : Type u_1) [inst : Field K] [Fintype K], IsCyclic Kˣ
+'FiniteFieldHandbook.multiplicative_group_cyclic' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.multiplicative_group_cardinality : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K]
+  [inst_2 : Fintype Kˣ], Fintype.card Kˣ = Fintype.card K - 1
+'FiniteFieldHandbook.multiplicative_group_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.polynomial_function_exists : ∀ (K : Type u_1) [inst : Field K] [Fintype K] (f : K → K),
+  ∃ g, ∀ (a : K), Polynomial.eval a g = f a
+'FiniteFieldHandbook.polynomial_function_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.polynomial_function_bounded : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K] (f : K → K),
+  ∃ g, g.degree < ↑(Fintype.card K) ∧ ∀ (a : K), Polynomial.eval a g = f a
+'FiniteFieldHandbook.polynomial_function_bounded' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.polynomial_function_unique : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K]
+  (f g : Polynomial K),
+  f.degree < ↑(Fintype.card K) →
+    g.degree < ↑(Fintype.card K) → (∀ (a : K), Polynomial.eval a f = Polynomial.eval a g) → f = g
+'FiniteFieldHandbook.polynomial_function_unique' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.irreducible_divides_field_polynomial : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K]
+  (f : Polynomial K), Irreducible f → ∀ (m : ℕ), f.natDegree ∣ m ↔ f ∣ Polynomial.X ^ Fintype.card K ^ m - Polynomial.X
+'FiniteFieldHandbook.irreducible_divides_field_polynomial' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.permutation_iff_injective : ∀ (K : Type u_1) [Field K] [Fintype K] (f : K → K),
+  Function.Bijective f ↔ Function.Injective f
+'FiniteFieldHandbook.permutation_iff_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.minimal_polynomial_irreducible : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] (a : L), IsIntegral K a → Irreducible (minpoly K a)
+'FiniteFieldHandbook.minimal_polynomial_irreducible' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.degree_tower : ∀ (K : Type u_1) (L : Type u_2) (E : Type u_3) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Field E] [inst_3 : Algebra K L] [inst_4 : Algebra L E] [inst_5 : Algebra K E] [IsScalarTower K L E]
+  [FiniteDimensional K L] [FiniteDimensional L E], Module.finrank K E = Module.finrank K L * Module.finrank L E
+'FiniteFieldHandbook.degree_tower' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.finite_extension_algebraic : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [FiniteDimensional K L] (a : L), IsIntegral K a
+'FiniteFieldHandbook.finite_extension_algebraic' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.trace_formula : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [Finite L] (a : L),
+  (algebraMap K L) ((Algebra.trace K L) a) = ∑ i ∈ Finset.range (Module.finrank K L), a ^ Nat.card K ^ i
+'FiniteFieldHandbook.trace_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.trace_add : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] (a b : L), (Algebra.trace K L) (a + b) = (Algebra.trace K L) a + (Algebra.trace K L) b
+'FiniteFieldHandbook.trace_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.trace_smul : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] (c : K) (a : L), (Algebra.trace K L) (c • a) = c * (Algebra.trace K L) a
+'FiniteFieldHandbook.trace_smul' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.trace_surjective : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [Finite L], Function.Surjective ⇑(Algebra.trace K L)
+'FiniteFieldHandbook.trace_surjective' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.trace_base : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [FiniteDimensional K L] (a : K),
+  (Algebra.trace K L) ((algebraMap K L) a) = ↑(Module.finrank K L) * a
+'FiniteFieldHandbook.trace_base' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.trace_tower : ∀ (K : Type u_1) (L : Type u_2) (E : Type u_3) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Field E] [inst_3 : Algebra K L] [inst_4 : Algebra L E] [inst_5 : Algebra K E] [IsScalarTower K L E]
+  [FiniteDimensional K L] [FiniteDimensional L E] (a : E),
+  (Algebra.trace K L) ((Algebra.trace L E) a) = (Algebra.trace K E) a
+'FiniteFieldHandbook.trace_tower' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.trace_pairing_nondegenerate : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [Finite L] {a : L}, a ≠ 0 → ∃ b, (Algebra.trace K L) (a * b) ≠ 0
+'FiniteFieldHandbook.trace_pairing_nondegenerate' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.norm_formula : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [Finite L] (a : L),
+  (algebraMap K L) ((Algebra.norm K) a) = ∏ i ∈ Finset.range (Module.finrank K L), a ^ Nat.card K ^ i
+'FiniteFieldHandbook.norm_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.norm_power : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [Finite L] (a : L),
+  (algebraMap K L) ((Algebra.norm K) a) = a ^ ((Nat.card L - 1) / (Nat.card K - 1))
+'FiniteFieldHandbook.norm_power' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.norm_mul : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] (a b : L), (Algebra.norm K) (a * b) = (Algebra.norm K) a * (Algebra.norm K) b
+'FiniteFieldHandbook.norm_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.norm_surjective : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [Finite L], Function.Surjective ⇑(Algebra.norm K)
+'FiniteFieldHandbook.norm_surjective' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.norm_units_surjective : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [Finite L], Function.Surjective ⇑(Units.map (Algebra.norm K))
+'FiniteFieldHandbook.norm_units_surjective' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.norm_base : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [FiniteDimensional K L] (a : K), (Algebra.norm K) ((algebraMap K L) a) = a ^ Module.finrank K L
+'FiniteFieldHandbook.norm_base' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.norm_tower : ∀ (K : Type u_1) (L : Type u_2) (E : Type u_3) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Field E] [inst_3 : Algebra K L] [inst_4 : Algebra L E] [inst_5 : Algebra K E] [IsScalarTower K L E]
+  [FiniteDimensional K L] [FiniteDimensional L E] (a : E), (Algebra.norm K) ((Algebra.norm L) a) = (Algebra.norm K) a
+'FiniteFieldHandbook.norm_tower' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.normal_basis_exists : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [Finite L], ∃ a, LinearIndependent K fun σ => σ a
+'FiniteFieldHandbook.normal_basis_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.normal_basis_orbit : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Algebra K L] [Finite L], ∃ b, ∀ (σ : Gal(L/K)), b σ = σ (b 1)
+'FiniteFieldHandbook.normal_basis_orbit' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.frobenius_order : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Fintype K] [inst_3 : Finite L] [inst_4 : Algebra K L],
+  orderOf (FiniteField.frobeniusAlgEquivOfAlgebraic K L) = Module.finrank K L
+'FiniteFieldHandbook.frobenius_order' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.galois_group_cyclic : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [Fintype K] [Finite L] [inst_4 : Algebra K L], IsCyclic Gal(L/K)
+'FiniteFieldHandbook.galois_group_cyclic' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.frobenius_enumerates : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Fintype K] [inst_3 : Finite L] [inst_4 : Algebra K L],
+  Function.Bijective fun i => FiniteField.frobeniusAlgEquivOfAlgebraic K L ^ ↑i
+'FiniteFieldHandbook.frobenius_enumerates' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.trace_frobenius : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Fintype K] [Finite L] [inst_4 : Algebra K L] (a : L),
+  (Algebra.trace K L) (a ^ Fintype.card K) = (Algebra.trace K L) a
+'FiniteFieldHandbook.trace_frobenius' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.norm_frobenius : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Fintype K] [Finite L] [inst_4 : Algebra K L] (a : L),
+  (Algebra.norm K) (a ^ Fintype.card K) = (Algebra.norm K) a
+'FiniteFieldHandbook.norm_frobenius' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.linearized_add : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Fintype K] [Finite L] [Algebra K L] (s : Finset ℕ) (c : ℕ → L) (a b : L),
+  ∑ i ∈ s, c i * (a + b) ^ Fintype.card K ^ i =
+    ∑ i ∈ s, c i * a ^ Fintype.card K ^ i + ∑ i ∈ s, c i * b ^ Fintype.card K ^ i
+'FiniteFieldHandbook.linearized_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.linearized_smul : ∀ (K : Type u_1) (L : Type u_2) [inst : Field K] [inst_1 : Field L]
+  [inst_2 : Fintype K] [Finite L] [inst_4 : Algebra K L] (s : Finset ℕ) (c : ℕ → L) (k : K) (a : L),
+  ∑ i ∈ s, c i * (k • a) ^ Fintype.card K ^ i = k • ∑ i ∈ s, c i * a ^ Fintype.card K ^ i
+'FiniteFieldHandbook.linearized_smul' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.finite_field_exists : ∀ (p n : ℕ) [inst : Fact (Nat.Prime p)],
+  n ≠ 0 → Nat.card (GaloisField p n) = p ^ n
+'FiniteFieldHandbook.finite_field_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.cardinality_prime_field_dimension : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K] (p : ℕ)
+  [inst_2 : Fact (Nat.Prime p)] [CharP K p] [inst_4 : Algebra (ZMod p) K],
+  p ^ Module.finrank (ZMod p) K = Fintype.card K
+'FiniteFieldHandbook.cardinality_prime_field_dimension' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.totient_multiplicative : ∀ (m n : ℕ), m.Coprime n → (m * n).totient = m.totient * n.totient
+'FiniteFieldHandbook.totient_multiplicative' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.power_order : ∀ (G : Type u_1) [inst : Group G] [Finite G] (g : G) (t : ℕ),
+  orderOf (g ^ t) = orderOf g / (orderOf g).gcd t
+'FiniteFieldHandbook.power_order' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.irreducible_splits_degree_extension : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Finite K]
+  (p n : ℕ) [inst_2 : Fact (Nat.Prime p)] [inst_3 : CharP K p] [inst_4 : NeZero n] (f : Polynomial K),
+  Irreducible f → f.natDegree = n → (Polynomial.map (algebraMap K (FiniteField.Extension K p n)) f).Splits
+'FiniteFieldHandbook.irreducible_splits_degree_extension' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.extension_embedding_iff : ∀ (F : Type u_1) (K : Type u_2) (L : Type u_3) [inst : Field F]
+  [inst_1 : Field K] [inst_2 : Field L] [Fintype F] [Fintype K] [Fintype L] [inst_6 : Algebra F K]
+  [inst_7 : Algebra F L], Nonempty (K →ₐ[F] L) ↔ Module.finrank F K ∣ Module.finrank F L
+'FiniteFieldHandbook.extension_embedding_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+FiniteFieldHandbook.composite_characteristic_frobenius_fails : (1 + 1) ^ 4 ≠ 1 ^ 4 + 1 ^ 4
+'FiniteFieldHandbook.composite_characteristic_frobenius_fails' depends on axioms: [propext, Quot.sound]
+FiniteFieldHandbook.field_polynomial_factorization : ∀ (K : Type u_1) [inst : Field K] [inst_1 : Fintype K],
+  Polynomial.X ^ Fintype.card K - Polynomial.X = ∏ a, (Polynomial.X - Polynomial.C a)
+'FiniteFieldHandbook.field_polynomial_factorization' depends on axioms: [propext, Classical.choice, Quot.sound]

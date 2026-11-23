@@ -1,0 +1,127 @@
+{
+  "schema": "pencil.formal-components-and-reviews/v1",
+  "calls": {
+    "kind": "native-polynomial-call-source-proof-component",
+    "main_declarations": 5,
+    "fixed_controls": 5,
+    "axiom_readbacks": 10,
+    "main_exit": 0,
+    "controls_exit": 0,
+    "readback_exit": 0,
+    "false_theorem_exit": 1,
+    "bindings_unchanged": true,
+    "independent_review": "pending",
+    "scientific_execution": false,
+    "costs": null,
+    "repository_modified": false
+  },
+  "batch_review": {
+    "schema": "formal.technical-review/v1",
+    "joint": "C",
+    "reviewer": "/root/strict_storage_reviewer",
+    "producer_commit": "5937d99b29e5027d99b7fda1be35569e44f01836",
+    "plan_commit": "6d7317d5eab6f3a24847353d1ec5b7089cdf2ea2",
+    "machine_status": "passed",
+    "fidelity": "faithful_scoped",
+    "review_outcome": "validated_scoped",
+    "declarations": [
+      "FastBatch.guarded_product",
+      "FastBatch.field_batch",
+      "FastBatch.batch_decode"
+    ],
+    "fresh_modules": 5,
+    "producer_modules": 3,
+    "fresh_bridge_modules": [
+      "Wide",
+      "Inversion"
+    ],
+    "producer_controls": 7,
+    "producer_readbacks": 10,
+    "reviewer_controls": 3,
+    "reviewer_bridge_readbacks": 4,
+    "false_exit": 1,
+    "checker_reject_controls": 3,
+    "unexpected_lean_failures": [],
+    "harness_failures": [
+      {
+        "exit": 127,
+        "receipt": "checker-premature-invocation.json",
+        "resolved": "same compiler completed then checker passed"
+      }
+    ],
+    "bindings_unchanged": true,
+    "assumptions": [
+      "prime p",
+      "2<p<2^31",
+      "canonical nonzero norm and s1",
+      "native correspondence: tables absent and extension degree1"
+    ],
+    "dependency_boundary": "deeper helper and library binary caches reused; copied helpers, shared union caches content-bound; no independent kernel recheck",
+    "review_attestation": {
+      "joints_owned": [
+        "C"
+      ],
+      "sibling_reports_read": [],
+      "blind_rederivation": false,
+      "inherited_context": true,
+      "author_of_reviewed_component": false,
+      "verdict": "holds",
+      "sources_read": "REVIEW.md; mechanical source inventories separate"
+    },
+    "remaining_bridges": [
+      "coefficient prelude",
+      "S0/slope/inverse_lead",
+      "quotient/remainder payload",
+      "compiled native equivalence",
+      "runtime metrics"
+    ],
+    "scientific_execution": false,
+    "official_transition": false
+  },
+  "payload_review": {
+    "schema": "pencil.technical-review/v1",
+    "reviewer": "/root/quintic_fidelity_review",
+    "joints_owned": [
+      "D"
+    ],
+    "source_commit": "6d7317d5eab6f3a24847353d1ec5b7089cdf2ea2",
+    "machine_status": "passed",
+    "fidelity": "faithful_scoped",
+    "outcome": "validated_scoped",
+    "scope": "Coefficient value operation tree and field-polynomial payload endpoint under explicit guards and input hypotheses",
+    "producer_modules_replayed": 8,
+    "main_declarations": 14,
+    "producer_controls_replayed": 13,
+    "producer_named_readbacks": 27,
+    "additional_reviewer_fixture_declarations": 3,
+    "combined_named_readbacks": 30,
+    "false_exit": 1,
+    "combined_checker_rejections": 9,
+    "reused_dependency_caches": true,
+    "fresh_dependency_build": false,
+    "bindings_unchanged": true,
+    "retained_failures": [
+      {
+        "path": "logs/ReviewerFixture-attempt1",
+        "kind": "infrastructure_error",
+        "reason": "Lean module-root cwd mismatch",
+        "recovered": true
+      }
+    ],
+    "domain_observation": "p3 arithmetic covered; native Field.validate study admission excludes odd p below5",
+    "sibling_report_access": false,
+    "inherited_context": true,
+    "mutually_blind_rederivation": false,
+    "scientific_execution": false,
+    "official_promotion": false,
+    "sources_read": "REVIEW.md#sources-read--attestation",
+    "remaining_obligations": [
+      "stored-input extraction",
+      "native polynomial routine outputs",
+      "final storage",
+      "divisor-class interpretation"
+    ]
+  },
+  "scientific_execution": false,
+  "cost_ratio": null
+}

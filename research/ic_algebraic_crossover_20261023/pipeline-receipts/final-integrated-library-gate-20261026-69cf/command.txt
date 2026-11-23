@@ -1,0 +1,2 @@
+python3 tools/isolated_bench.py busy -- timeout -k 30 2700 cargo test --release --lib
+CARGO_BUILD_JOBS=1 RUST_TEST_THREADS=2 RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1

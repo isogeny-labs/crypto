@@ -1,0 +1,189 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "lane width diagnosis, 32-bit",
+ "description": "lead ICP-prime-ic-constant-engineering, extension",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 59297
+   }
+  ],
+  "targets_per_curve": 4,
+  "target_seed": 20261002
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "walk",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "fast",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-fast"
+    }
+   }
+  },
+  {
+   "name": "b4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-4"
+    }
+   }
+  },
+  {
+   "name": "b8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-8"
+    }
+   }
+  },
+  {
+   "name": "b16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-16"
+    }
+   }
+  },
+  {
+   "name": "b24",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-24"
+    }
+   }
+  },
+  {
+   "name": "b32",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-32"
+    }
+   }
+  },
+  {
+   "name": "b48",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-48"
+    }
+   }
+  },
+  {
+   "name": "b64",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-64"
+    }
+   }
+  },
+  {
+   "name": "b128",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-128"
+    }
+   }
+  },
+  {
+   "name": "b256",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-256"
+    }
+   }
+  },
+  {
+   "name": "b512",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-512"
+    }
+   }
+  },
+  {
+   "name": "b1024",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 1,
+  "isolation_required": "L2",
+  "timeout_seconds": 3600
+ }
+}

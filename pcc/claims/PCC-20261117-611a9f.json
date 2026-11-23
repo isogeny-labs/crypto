@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T09:51:26Z",
+ "id": "PCC-20261117-611a9f",
+ "kind": "execution",
+ "producer": {
+  "commit": "bd69a76db876fa1da120de0edf1033489327d937",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-discriminant-pair-20261117-49/replay-tests.log",
+    "sha256": "e0f1251156a87a33d2307b0c518f7277dd5b359992f42ab7ba24d8fb63ffa21a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-discriminant-pair-20261117-49/postexecution-source-binary.sha256",
+    "sha256": "7c59e98e5e9940f4205f17b3d0007f9407007628e961455966ea780f1d5426fc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "examples/jv_sieve_discriminant_pair_replay.rs",
+    "sha256": "d8cb6999469f225227cf6d9d33d3d4781a60e0ce286b5472ad7756de78e98a6c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Separate Runpod49 postexecution Rust replay controls:150pass including timer-only comparison and malformed/altered non-timer evidence rejection; replay/study optimized builds and scoped strict Clippy pass; all frozen152source hashes remain unchanged. Full mathematical replay pending. Unverified producer assertions."
+}

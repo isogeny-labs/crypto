@@ -307,6 +307,7 @@ dependencies = [
  "flate2",
  "getrandom 0.2.17",
  "hex",
+ "isogeny_algos",
  "libc",
  "num-bigint 0.4.8",
  "num-integer",
@@ -318,6 +319,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "streebog",
  "subtle",
  "volcano-cli",
  "zeroize",
@@ -629,6 +631,17 @@ name = "libc"
 version = "0.2.190"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ce5d3ddc6d3fa000eb1536d85e147bfe31aacaba692ed6a876f95cb7c855be78"
+
+[[package]]
+name = "libsqlite3-sys"
+version = "0.30.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2e99fb7a497b1e3339bc746195567ed8d3e24945ecd636e3619d20b9de9e9149"
+dependencies = [
+ "cc",
+ "pkg-config",
+ "vcpkg",
+]
 
 [[package]]
 name = "libsqlite3-sys"
@@ -1068,6 +1081,15 @@ name = "stable_deref_trait"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
+
+[[package]]
+name = "streebog"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e7fe6ed8a42cec360e070309427bb7959e102849b0dbaa7de19d5b9860bd536"
+dependencies = [
+ "digest",
+]
 
 [[package]]
 name = "strsim"

@@ -1,0 +1,144 @@
+{
+  "schema": "crypto.prime-route-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T05:42:21.867848+00:00",
+  "source_commit": "abcc961e6df3f96f64c5f4342260e79b474ecc76",
+  "crypto_binary_sha256": "8cfb04fa2aa4c1ff8b56fe40fb46e3631e2af285328c61f20d240be8c858f8e4",
+  "ic_binary_sha256": "5f9b27188bc60441aad55d50e116a4e9a61fed51ecd9ac6c1f2538633018d0f3",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/prime-route-current-head-20261024T054221Z-f8873d9d",
+  "checks": {
+    "input_push": {
+      "bytes": 95,
+      "cached": true,
+      "name": "prime-route/input.json",
+      "replaced": false,
+      "sha256": "53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+      "uploaded": true
+    },
+    "route_push": {
+      "bytes": 4103,
+      "cached": true,
+      "name": "prime-route/isogeny_routes.json",
+      "replaced": false,
+      "sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+      "uploaded": true
+    },
+    "input_verify": {
+      "checked": 1,
+      "download_checked": true,
+      "entries": [
+        {
+          "bytes": 95,
+          "cache": {
+            "status": "ok"
+          },
+          "name": "prime-route/input.json",
+          "remote": {
+            "status": "bytes_ok"
+          },
+          "sha256": "53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6"
+        }
+      ],
+      "problems": 0,
+      "remote_checked": true,
+      "status": "ok"
+    },
+    "route_verify": {
+      "checked": 1,
+      "download_checked": true,
+      "entries": [
+        {
+          "bytes": 4103,
+          "cache": {
+            "status": "ok"
+          },
+          "name": "prime-route/isogeny_routes.json",
+          "remote": {
+            "status": "bytes_ok"
+          },
+          "sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7"
+        }
+      ],
+      "problems": 0,
+      "remote_checked": true,
+      "status": "ok"
+    },
+    "input_fresh_pull": {
+      "bytes": 95,
+      "cache_path": "/Volumes/SSD990/llm/tmp/prime-route-s3-rt5nuo61/cache-b/sha256/53/53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+      "copied": false,
+      "fetched": true,
+      "name": "prime-route/input.json",
+      "path": "/Volumes/SSD990/llm/tmp/prime-route-s3-rt5nuo61/cache-b/sha256/53/53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+      "sha256": "53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+      "status": "ok"
+    },
+    "route_fresh_pull": {
+      "bytes": 4103,
+      "cache_path": "/Volumes/SSD990/llm/tmp/prime-route-s3-rt5nuo61/cache-b/sha256/06/0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+      "copied": false,
+      "fetched": true,
+      "name": "prime-route/isogeny_routes.json",
+      "path": "/Volumes/SSD990/llm/tmp/prime-route-s3-rt5nuo61/cache-b/sha256/06/0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+      "sha256": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+      "status": "ok"
+    },
+    "solve": {
+      "status": "complete",
+      "verified": true,
+      "scalar": "190",
+      "route_id": "IW1E11h1h1a619f4ab250",
+      "route_edges_verified": 2,
+      "input_sha256": "53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+      "report_sha256": "db8090420fdb9824148fcfe3c2bf4c21474c194404c68db6bddeea912161d469"
+    },
+    "report_verify": {
+      "checked": 1,
+      "download_checked": true,
+      "entries": [
+        {
+          "bytes": 1847,
+          "cache": {
+            "status": "ok"
+          },
+          "name": "prime-route/ic_report.json",
+          "remote": {
+            "status": "bytes_ok"
+          },
+          "sha256": "db8090420fdb9824148fcfe3c2bf4c21474c194404c68db6bddeea912161d469"
+        }
+      ],
+      "problems": 0,
+      "remote_checked": true,
+      "status": "ok"
+    },
+    "report_fresh_pull": {
+      "bytes": 1847,
+      "cache_path": "/Volumes/SSD990/llm/tmp/prime-route-s3-rt5nuo61/cache-c/sha256/db/db8090420fdb9824148fcfe3c2bf4c21474c194404c68db6bddeea912161d469",
+      "copied": false,
+      "fetched": true,
+      "name": "prime-route/ic_report.json",
+      "path": "/Volumes/SSD990/llm/tmp/prime-route-s3-rt5nuo61/cache-c/sha256/db/db8090420fdb9824148fcfe3c2bf4c21474c194404c68db6bddeea912161d469",
+      "sha256": "db8090420fdb9824148fcfe3c2bf4c21474c194404c68db6bddeea912161d469",
+      "status": "ok"
+    },
+    "report_fetched_sha256": "db8090420fdb9824148fcfe3c2bf4c21474c194404c68db6bddeea912161d469"
+  },
+  "cleanup": {
+    "objects_before": 3,
+    "keys": [
+      "ic/v1/acceptance/prime-route-current-head-20261024T054221Z-f8873d9d/sha256/06/0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7",
+      "ic/v1/acceptance/prime-route-current-head-20261024T054221Z-f8873d9d/sha256/53/53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+      "ic/v1/acceptance/prime-route-current-head-20261024T054221Z-f8873d9d/sha256/db/db8090420fdb9824148fcfe3c2bf4c21474c194404c68db6bddeea912161d469"
+    ],
+    "objects_after": 0
+  },
+  "names": {
+    "input": "prime-route/input.json",
+    "route": "prime-route/isogeny_routes.json",
+    "report": "prime-route/ic_report.json"
+  },
+  "source_sha256": {
+    "input": "53b0107b06a528e8630d6f700c31578b4861c4e5181ff6bb791389bbcdae96a6",
+    "route": "0670adb35b443841c5974ada7b37fb6f4d8cd9ab60746b7622264abe05a53af7"
+  }
+}

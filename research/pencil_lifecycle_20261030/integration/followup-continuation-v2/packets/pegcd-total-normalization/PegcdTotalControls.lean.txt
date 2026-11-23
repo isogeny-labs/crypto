@@ -1,0 +1,11 @@
+import PegcdEndpoint
+set_option autoImplicit false
+namespace Pegcd
+open Polynomial ScaleTrim MonicZeroTest MonicRemainder
+instance : Fact (Nat.Prime (7 : UInt64).toNat) := ⟨by decide⟩
+theorem control_trailing_zero_rejected : ¬ Normal ([1,0] : List UInt64) := by simp [Normal]
+theorem control_zero_first_excluded : wordsPoly (7 : UInt64) [] = 0 := by simp [wordsPoly,listPoly]
+theorem control_zero_second_trace :
+ StoredTrace 7 [1] [] (initial (wordsPoly 7 [1]) (wordsPoly 7 []))
+ (initial (wordsPoly 7 [1]) (wordsPoly 7 [])) [1] := StoredTrace.stop _ _
+end Pegcd

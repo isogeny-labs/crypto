@@ -1,0 +1,130 @@
+{
+  "oracle": {
+    "out": {
+      "raw_coefficient_cases": 18724,
+      "literal_raw_roots_tested": 559240,
+      "boolean_assignments": 2340,
+      "field_coefficient_cases": 2600,
+      "fast_field_routes": 600,
+      "fallback_routes": 2000,
+      "wrap_counterexample_checked": true,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "profile": {
+    "out": {
+      "actual_controls": 48,
+      "prefix_valid_controls": 0,
+      "original_complete": false,
+      "formulations": {
+        "candidate": {
+          "inputs": 63,
+          "variables": 57063,
+          "clauses": 206195,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 46,
+            "xor": 34542,
+            "and": 22412
+          },
+          "graph_sha256": "d657261dab0744c512966538c2117ffac5568848e676883d580206dbecb34937"
+        },
+        "control": {
+          "inputs": 63,
+          "variables": 62886,
+          "clauses": 227582,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 59,
+            "xor": 38369,
+            "and": 24395
+          },
+          "graph_sha256": "b5a5ecf01a4bf07797508357c2572839001a773d939947c33213c4b5d5422bd3"
+        }
+      },
+      "total_seconds": 1.1019286090158857,
+      "same_strong_parameter_contract": true,
+      "scope": "k3only;exactquadraticprefix+boundedfactorization+cubiclocals;fullcubic/source/U/othercasesremain"
+    },
+    "error": null
+  },
+  "search": {
+    "out": {
+      "models": [],
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "scope": "conditional k3only,fixednecessarynormfamily;otherstrata/outerfamilies/source/Uunresolved",
+      "inputs": 63,
+      "variables": 57063,
+      "cold_compile_seconds": 0.14532699700794183,
+      "soft_total_target_seconds": 40,
+      "backend_configuration_readback": {
+        "threads": "1",
+        "cut": "true",
+        "cut.xor": "true",
+        "cut.aig": "true",
+        "cut.delay": "0",
+        "anf": "false"
+      },
+      "formulation_seconds": 3.5413221629860345,
+      "version": "4.15.4",
+      "cpu_affinity": [
+        0
+      ],
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "194260",
+        "sat mk clause 3ary": "53230",
+        "sat mk clause nary": "370334",
+        "sat mk var": "114019",
+        "sat gc clause": "80937",
+        "sat del clause": "258796",
+        "sat conflicts": "126251",
+        "sat decisions": "326119",
+        "sat propagations 2ary": "5208111",
+        "sat propagations nary": "210340290",
+        "sat restarts": "27181",
+        "sat minimized lits": "1542500",
+        "sat subs resolution dyn": "8221",
+        "sat units": "30204",
+        "sat elim bool vars res": "19931",
+        "sat backjumps": "126251",
+        "sat elim clauses": "39811",
+        "sat elim literals": "12864",
+        "sat subsumed": "6425",
+        "sat subs resolution": "4601",
+        "sat scc elim vars": "45474",
+        "sat tr": "6",
+        "sat probing assigned": "5",
+        "sat-cut.eqs": "38",
+        "sat-cut.cuts": "44343",
+        "sat-cut.ands": "22412",
+        "sat-cut.xors": "34542",
+        "sat-cut.xands": "1566",
+        "sat-cut.xites": "4674",
+        "sat-cut.xxors": "18065",
+        "sat-cut.dc-reduce": "220",
+        "rlimit count": "213791450",
+        "max memory": "242.58",
+        "memory": "85.67",
+        "num allocs": "8744158946.0",
+        "time": "36.523"
+      },
+      "engine_seconds": 40.06994553800905,
+      "soft_target_overshoot_seconds": 0.06994553800905123,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "qualified_speedup": null,
+  "original_complete": false
+}

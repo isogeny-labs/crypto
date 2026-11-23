@@ -1,0 +1,50 @@
+{
+ "schema": "e39-validator-build/v1",
+ "recorded": {
+  "source": "experiments/46_pivot_rules_confirm3/binary_sha256.txt and binary_commit.txt",
+  "commit": "e1cd726577 (E39 harness; control hook 31f2a2999e; registration 16d17d2462)",
+  "binary_sha256": {
+   "e37_checks": "7aa2f0f347954fa3d0e760b110680b0224e901a0ee2c9349dc4c35115cfd5e72",
+   "e37_walk_e24": "39e81e81ebb2237ad288af7804a6848889d0568aa62f05f235d9858a999a83ce",
+   "e38_checks": "40ba1f54e2342ff605e5442ce175a11370ed671cb228dc001834f7fd5a312427",
+   "e39_checks": "0acc8f2fd071e93bfa2146374996ccb1b22826e87d498081a0ce942d8d4c7304",
+   "e39_stage_a": "68c555472c4764eda89e63bedc8453cc36f4fed4144cea319056e02d42c59886",
+   "e39_tables": "cfe1ccc51134aee12983019ccff95425560808ec2fc6e3f002fc87f262a86735",
+   "quartic_pipeline_gls": "20b73242eec0fb3df6ac981918c169addae256b0ec600d369e9dbfee63d95585",
+   "quartic_pipeline_v4": "5eb643ab305fed5ed3b0282ffae7a17dc9c3323877326b524b5bcda0b33ef529"
+  }
+ },
+ "repository_state_at_start": "local branch claude/glv-endomorphism-index-calculus-pe7ige at 484766c0cb = the remote head named by the task (fetched; equal). Untracked files of E39 (stage_a.json), E41 and E42 present in the shared checkout; not read except E39's stage_a.json (hash-checked). Records read from a git archive of 484766c0cb, not from the working tree.",
+ "export": {
+  "commit": "e1cd7265777490f431f0253eac6dc55be1342042",
+  "path": "/dev/shm/e39_src (the producer's recorded source path; it did not exist before the export)",
+  "method": "replay/export_v39.sh (validator's own): one `git archive e1cd726577 -- <paths> | tar -x`, paths = Cargo.toml, Cargo.lock, src/, examples/, benches/, the path-dependency directories (crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, research/pencil_large_prime_20261029, research/five_leads_e2e_20261019/native, tools/factor-base, tools/volcano-cli, isogeny_algos), every `path = \"...\"` of the root Cargo.toml, then every literal include_str!/include_bytes! target present at the commit, iterated to a fixed point (185 targets resolved). No producer script was used.",
+  "files": 4424,
+  "blob_check": "git hash-object --no-filters over every exported file against git ls-tree e1cd726577: 4,424/4,424 equal, 0 mismatches"
+ },
+ "build": {
+  "command": "cd /dev/shm/e39_src && flock <scratchpad>/build.lock env CARGO_TARGET_DIR=/dev/shm/v39 CARGO_PROFILE_RELEASE_DEBUG=0 CARGO_INCREMENTAL=0 nice -n 5 cargo build --release --offline -j 2 --example e37_checks --example e37_walk_e24 --example e38_checks --example e39_checks --example e39_stage_a --example e39_tables --example quartic_pipeline_gls --example quartic_pipeline_v4",
+  "target_dir": "/dev/shm/v39, fresh and empty (the producer's was /dev/shm/e39); nothing reused from any other target directory; no release unit tests built",
+  "window": "queued 2026-11-02T23:29:30Z, lock acquired 23:39:32Z (shared with the E42 agent), `Finished release profile [optimized] target(s) in 18m 52s`, exit 0 at 23:58:26Z, no warnings",
+  "binary_sha256": {
+   "e37_checks": "7aa2f0f347954fa3d0e760b110680b0224e901a0ee2c9349dc4c35115cfd5e72",
+   "e37_walk_e24": "39e81e81ebb2237ad288af7804a6848889d0568aa62f05f235d9858a999a83ce",
+   "e38_checks": "40ba1f54e2342ff605e5442ce175a11370ed671cb228dc001834f7fd5a312427",
+   "e39_checks": "0acc8f2fd071e93bfa2146374996ccb1b22826e87d498081a0ce942d8d4c7304",
+   "e39_stage_a": "68c555472c4764eda89e63bedc8453cc36f4fed4144cea319056e02d42c59886",
+   "e39_tables": "cfe1ccc51134aee12983019ccff95425560808ec2fc6e3f002fc87f262a86735",
+   "quartic_pipeline_gls": "20b73242eec0fb3df6ac981918c169addae256b0ec600d369e9dbfee63d95585",
+   "quartic_pipeline_v4": "5eb643ab305fed5ed3b0282ffae7a17dc9c3323877326b524b5bcda0b33ef529"
+  },
+  "matches_recorded": true
+ },
+ "build_walk": {
+  "command": "same tree, target directory and lock, `cargo build --release --offline -j 2 --example e27_walk` (2.58 s; links the crypto_lib of the main build), 2026-11-03T00:00:22Z-00:00:24Z",
+  "purpose": "replay the GLS rows' matched rho (E27's stage_w.json) from the same crypto_lib build as the IC arms; no recorded hash at this commit, so the check is on its output",
+  "binary_sha256": {"e27_walk": "d1fb9cdec50d0aa3bbe990417b0fb804497cc1b4766777ba416eac8a578705a9"}
+ },
+ "byte_identity": "All eight recorded binaries are reproduced byte for byte from a clean export of their recorded commit (same source path, same toolchain, a different, fresh target directory). The records were therefore produced by code committed after the pre-registration 16d17d2462 (e1cd726577 descends from it), and the shared, dirty checkout did not reach the builds.",
+ "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); no .cargo/config, no RUSTFLAGS",
+ "host": "Intel(R) Xeon(R) Processor @ 2.10GHz, 4 vCPU, 15 GiB RAM, Linux 6.18.44-fc-v185: the local container, shared with the E42 agent (load 2-9). Not isolab-eks. Operation counts only; no wall time is compared or claimed.",
+ "cleanup": "/dev/shm/v39 (target), /dev/shm/v39bin (pinned copies), /dev/shm/v39run (walk inputs) and /dev/shm/e39_src (export) deleted after the replay"
+}

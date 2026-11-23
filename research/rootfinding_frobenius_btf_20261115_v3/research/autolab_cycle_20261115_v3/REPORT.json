@@ -1,0 +1,304 @@
+{
+  "schema": "rootfinding_research_cycle_v1",
+  "hypothesis": "Two-term Frobenius coefficient construction reduces paid norm formulation; true matched SCC decomposition may expose blocks inside prior connected matrix.",
+  "results": {
+    "exact-btf-20261115-v3": {
+      "status": "passed",
+      "process": {
+        "wall_seconds": 0.14538251299973126,
+        "peak_process_rss_kib": 104368,
+        "user_seconds": 0.131611,
+        "system_seconds": 0.007821
+      },
+      "evidence": {
+        "controls": 45,
+        "global_original_complete": false,
+        "memory_scope": "self peak RSS, not aggregate process tree",
+        "original_root_count_exact": null,
+        "predicates": 16909,
+        "qualified_speedup": null,
+        "raw_sha256": "0ae737ec83db80591e6de1e8216e5bdd471643bfa61169ab37bb239d5aaaa740",
+        "self_peak_rss_kib": 104368,
+        "wall_seconds": 0.10941218699963429
+      },
+      "actual": [
+        {
+          "matching_size": 79,
+          "unmatched_variables": [
+            79,
+            80,
+            81,
+            82
+          ],
+          "unmatched_rows": 87,
+          "block_sizes": [
+            79
+          ],
+          "active_density": 0.48558792130547507
+        },
+        {
+          "matching_size": 79,
+          "unmatched_variables": [
+            79,
+            80,
+            81,
+            82
+          ],
+          "unmatched_rows": 87,
+          "block_sizes": [
+            79
+          ],
+          "active_density": 0.48558792130547507
+        },
+        {
+          "matching_size": 79,
+          "unmatched_variables": [
+            79,
+            80,
+            81,
+            82
+          ],
+          "unmatched_rows": 87,
+          "block_sizes": [
+            79
+          ],
+          "active_density": 0.48558792130547507
+        }
+      ]
+    },
+    "regular-ore-controls-20261115-v3": {
+      "status": "passed",
+      "process": {
+        "wall_seconds": 1.1116305209998245,
+        "peak_process_rss_kib": 126292,
+        "user_seconds": 1.096842,
+        "system_seconds": 0.012135
+      },
+      "evidence": {
+        "complete_conditional_component": true,
+        "complete_global_root_search": false,
+        "error": null,
+        "novelty_claim": false,
+        "original_root_count_exact": null,
+        "peak_process_rss_kib": 126292,
+        "predicates": 51433,
+        "qualified_speedup": null,
+        "raw_bytes": 3207,
+        "raw_sha256": "070b0e78191d5a2b72cd6ec00acb5307608c85b8dc88a7ca6a1ef3d20e230560",
+        "release_gate_claim": false
+      },
+      "details": {
+        "Delta_zero_cells": 88,
+        "Delta_zero_coverage": "observed",
+        "GF16_positive_coverage": "observed",
+        "exhausted_k_states": 7232,
+        "global_original_root_complete": false,
+        "per_field": [
+          {
+            "cells": 16,
+            "n": 2,
+            "positive_regular_norm_parameters": 6,
+            "source_lifts": 2,
+            "targets": 4
+          },
+          {
+            "cells": 128,
+            "n": 3,
+            "positive_regular_norm_parameters": 66,
+            "source_lifts": 4,
+            "targets": 8
+          },
+          {
+            "cells": 384,
+            "n": 4,
+            "positive_regular_norm_parameters": 298,
+            "source_lifts": 6,
+            "targets": 8
+          }
+        ],
+        "positive_regular_norm_parameters": 370,
+        "r1_zero_cells": 44,
+        "r1_zero_coverage": "observed"
+      }
+    },
+    "regular-ore-profile-20261115-v3": {
+      "status": "passed",
+      "process": {
+        "wall_seconds": 2.4534544039997854,
+        "peak_process_rss_kib": 160024,
+        "user_seconds": 2.196491,
+        "system_seconds": 0.25245999999999996
+      },
+      "evidence": {
+        "complete_conditional_component": true,
+        "complete_global_root_search": false,
+        "error": null,
+        "novelty_claim": false,
+        "original_root_count_exact": null,
+        "peak_process_rss_kib": 160024,
+        "predicates": 1956,
+        "qualified_speedup": null,
+        "raw_bytes": 10143,
+        "raw_sha256": "3835a46768a73dea0733ce093ab9a263d9f236d34a983a90b48a5385cf671375",
+        "release_gate_claim": false
+      },
+      "details": {
+        "comparisons": [
+          {
+            "complete_family_equal": true,
+            "every_candidate_equal": true,
+            "order": [
+              "literal",
+              "fast"
+            ],
+            "rep": 0
+          },
+          {
+            "complete_family_equal": true,
+            "every_candidate_equal": true,
+            "order": [
+              "fast",
+              "literal"
+            ],
+            "rep": 1
+          },
+          {
+            "complete_family_equal": true,
+            "every_candidate_equal": true,
+            "order": [
+              "literal",
+              "fast"
+            ],
+            "rep": 2
+          }
+        ],
+        "global_original_root_complete": false,
+        "internal_component_total_ratio": 1.0685341689748993,
+        "internal_formulation_ratio": 8.696822518827219,
+        "main_fixture": {
+          "a": 1,
+          "h": 4989239479274253888111616,
+          "ya": 0
+        },
+        "median_construction_seconds": {
+          "fast": 0.004319460000260733,
+          "literal": 0.037565576999440964
+        },
+        "median_total_seconds": {
+          "fast": 0.38350985199940624,
+          "literal": 0.40979338099987217
+        },
+        "original_root_count_exact": null,
+        "timing_contract": "three alternating SAME-PROCESS reps; cached irreducibility, no cold/A-A/isolation qualifications; no genuine GB comparison"
+      },
+      "stages": [
+        {
+          "method": "literal",
+          "rep": 0,
+          "setup_seconds": 0.30826473200067994,
+          "construction_seconds": 0.03754881999975623,
+          "solve_seconds": 0.0015529540005445597,
+          "extract_verify_seconds": 0.09499404500002129,
+          "serialization_seconds": 0.0001754849999997532,
+          "total_seconds": 0.44254714399994555,
+          "regular_parameters": 16,
+          "supported_parameters": 0,
+          "complete_regular_norm_fiber": true
+        },
+        {
+          "method": "fast",
+          "rep": 0,
+          "setup_seconds": 0.2789095400003134,
+          "construction_seconds": 0.0042790289999175,
+          "solve_seconds": 0.001537870999527513,
+          "extract_verify_seconds": 0.09489222199954384,
+          "serialization_seconds": 0.0001805219999369001,
+          "total_seconds": 0.3798067469997477,
+          "regular_parameters": 16,
+          "supported_parameters": 0,
+          "complete_regular_norm_fiber": true
+        },
+        {
+          "method": "fast",
+          "rep": 1,
+          "setup_seconds": 0.28290291800021805,
+          "construction_seconds": 0.004319460000260733,
+          "solve_seconds": 0.0016082980000646785,
+          "extract_verify_seconds": 0.0953536980005083,
+          "serialization_seconds": 0.00016271500044240383,
+          "total_seconds": 0.3843536899994433,
+          "regular_parameters": 16,
+          "supported_parameters": 0,
+          "complete_regular_norm_fiber": true
+        },
+        {
+          "method": "literal",
+          "rep": 1,
+          "setup_seconds": 0.2775298890001068,
+          "construction_seconds": 0.037565576999440964,
+          "solve_seconds": 0.0015884780004853383,
+          "extract_verify_seconds": 0.08929705399987142,
+          "serialization_seconds": 0.00014375699993252056,
+          "total_seconds": 0.4061311139994359,
+          "regular_parameters": 16,
+          "supported_parameters": 0,
+          "complete_regular_norm_fiber": true
+        },
+        {
+          "method": "literal",
+          "rep": 2,
+          "setup_seconds": 0.2801571840000179,
+          "construction_seconds": 0.037616382999658526,
+          "solve_seconds": 0.0015817770008652587,
+          "extract_verify_seconds": 0.0902871079997567,
+          "serialization_seconds": 0.00014486899999610614,
+          "total_seconds": 0.40979338099987217,
+          "regular_parameters": 16,
+          "supported_parameters": 0,
+          "complete_regular_norm_fiber": true
+        },
+        {
+          "method": "fast",
+          "rep": 2,
+          "setup_seconds": 0.2863613379995513,
+          "construction_seconds": 0.004578079000566504,
+          "solve_seconds": 0.0016062639997471706,
+          "extract_verify_seconds": 0.09072425800059136,
+          "serialization_seconds": 0.00023322199922404252,
+          "total_seconds": 0.38350985199940624,
+          "regular_parameters": 16,
+          "supported_parameters": 0,
+          "complete_regular_norm_fiber": true
+        }
+      ]
+    }
+  },
+  "independent_support_replay": {
+    "schema": "recorded-candidate-verification/v1",
+    "verified": true,
+    "execution_exit_code": 0,
+    "method": "independent bit-convolution arithmetic, direct literal norm and final sparse annihilator evaluation; recorded candidates only; no new candidate/root search",
+    "records": 6,
+    "row_provenance_certificates": 474,
+    "candidate_receipts_verified": 96,
+    "unique_candidate_receipts": 16,
+    "independent_support_rejections": 96,
+    "unique_support_rejections": 16,
+    "supported_candidates": 0,
+    "profile_sha256": "6d8a9ab77b731b972e9fd751b7e424171b933fc1dd924a48d113c2f0742a6f3e",
+    "fixture_sha256": "5c9be468c207cc2b013123b4265ee0963e96490c16aad1b1650a3528c0ce0c25",
+    "global_original_root_complete": false,
+    "qualified_speedup": null
+  },
+  "decisions": [
+    "8.6968x formulation improvement becomes1.0685x same-process conditional total: setup/support dominate. No global or genuine baseline gain.",
+    "Actual chosenmatching leavesone79SCC/fouroutervariables, notsmallblocks. Othermatchings/bases untested.",
+    "Retainedall16uniqueQ/LV/R4 receipts independentlyreplayed, closesprevioussupportauditgap foronefixedregularnormfiber.",
+    "Oddcharacteristicregulardouble-source theorem independentlyreviewed, unexecuted; fixedsum assumption doesnottransfer.",
+    "Nextcacheinvariantannihilatorconstantsandexplicitcubicsquare, paid64celltrainingladderwithbothordinates."
+  ],
+  "scientific_goal_complete": false,
+  "requested_speed_target": 8,
+  "release_floor_unchanged": 2,
+  "qualified_speedup": null
+}

@@ -1,0 +1,51 @@
+--- v3/launch.py
++++ inert-proposal/launch.py
+@@ -1,9 +1,10 @@
++raise SystemExit('INERT PROPOSAL: additional attempt unapproved; publish and review a separately admitted successor')
+ #!/usr/bin/python3
+ """Single prospective continuation. Invoke only after publication and independent review."""
+ from pathlib import Path
+ import argparse,hashlib,json,os,subprocess,time,signal
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-nonbranch-t1651-v3-20261105')
++W=Path('/home/ec2-user/pencil-native-nonbranch-additional-t1708-20261105')
+ O=Path(str(W)+'.outer')
+ DEADLINE=1793937600
+ BOOT='7643b0496f9d444aa34577d07d463277'
+@@ -14,14 +15,13 @@
+ F=json.loads((P/'freeze.json').read_text())
+ for name,digest in F['files'].items():assert hashlib.sha256((P/name).read_bytes()).hexdigest()==digest,('frozen input',name)
+ assert Path('/proc/sys/kernel/random/boot_id').read_text().strip().replace('-','')==BOOT,'boot changed'
+-prior=json.loads((P/'prior-attempts.json').read_text())
+-assert prior['conservative_debit_seconds']==1200 and prior['attempt_number']==3 and prior['total_attempt_ceiling']==3
+-assert prior['remaining_before_attempt_seconds']==45600
+-for file,digest in prior['bindings'].items():assert hashlib.sha256(Path(file).read_bytes()).hexdigest()==digest,('prior attempt drift',file)
+-previous=Path('/home/ec2-user/pencil-native-nonbranch-t1637-v2-20261105')
+-assert not (previous/'compiler.started').exists() and not (previous/'post.started').exists(),'previous phases need reconciliation'
+-assert not Path('/sys/fs/cgroup/system.slice/pencil-nonbranch-t1637-v2-pre.service').exists(),'previous group remains'
+-assert not Path('/proc/882274').exists(),'previous PID remains'
++admission=json.loads((P/'admission-proposal.json').read_text())
++assert admission['launch_disabled'] is False and admission['approval_required'] is False
++assert admission['additional_attempt_approved'] is True
++assert admission['runtime_lease'] is not None and admission['published_github_commit'] is not None
++assert admission['current_remaining_worker_seconds']>=2400
++# Fresh lease validation, approval/publication receipts and current ledger are required
++# in a separately reviewed successor; this inert draft cannot admit execution.
+ assert time.time()+2400<DEADLINE,'insufficient absolute deadline allowance'
+ assert not W.exists(),'existing native workspace; no retries'
+ O.mkdir(mode=0o700)  # exclusive admission: existing outer directory also rejects repeats
+@@ -122,12 +122,12 @@
+  return {'phase':phase,'argv':cmd,'returncode':rc,'elapsed_seconds':elapsed,'invocation_id':invocation,'terminal_owner_confirmed':terminal,'wait_timeout':timed_out,'errors':errors,'native_receipt_present':native is not None,'receipt_error':receipt_error,'passed':passed,'systemd_stdout':str(log_out),'systemd_stderr':str(log_err)}
+ results=[]
+ try:
+- durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':46800,'prior_debit_seconds':1200,'remaining_before_attempt_seconds':45600,'attempt_number':3,'total_attempt_ceiling':3,'boot_id':BOOT,'continuation_ceiling_seconds':2400,'deadline':DEADLINE,'retries':0})
++ durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':46800,'prior_debit_seconds':4500,'remaining_before_attempt_seconds':42300,'historical_norm_attempts_consumed':3,'historical_norm_attempt_ceiling':3,'requested_additional_attempts':1,'boot_id':BOOT,'continuation_ceiling_seconds':2400,'deadline':DEADLINE,'retries':0})
+  for phase,limit in [('pre',900),('compiler',600),('post',900)]:
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+   assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=2400,'insufficient remaining phase allowance'
+-  unit='pencil-nonbranch-t1651-v3-'+phase
++  unit='pencil-nonbranch-additional-t1708-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+    '--property=CPUQuota=100%','--property=MemoryMax=8G','--property=MemorySwapMax=0',

@@ -1,0 +1,5 @@
+{"arms": {"sweep3": {"c": 1.0, "table": false}, "table2": {"c": 2.0, "table": true}, "bsgs": {"B": "ceil(sqrt(T n / 4))"}},
+ "T": 1000, "extra": 6, "eval_bits": [25, 27, 29, 32], "instances": {"25": 2, "27": 2, "29": 2, "32": 1},
+ "basis": "table2 c = 2.0 chosen from exploratory runs on the 26- and 30-bit curves (explore_table_*.jsonl): best of c in {1, 2, 3} in 4 of 4 groups; sweep3 c = 1.0 from the earlier 24/28-bit probes. Evaluation curves are disjoint from 24, 26, 28, 30 bits.",
+ "primary_metric": "total_ms per arm on identical planted targets; ratio table2/sweep3 and table2/bsgs",
+ "abandon_if": "table2/sweep3 median >= 1.0 on the evaluation"}

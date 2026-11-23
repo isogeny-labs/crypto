@@ -1,0 +1,283 @@
+{
+  "actual_export_manifest": {
+    "algebraic_feature_occurrences": 0,
+    "algebraic_outcomes": {
+      "bounded_unknown_suffix_records": 0,
+      "count_scope": "non-deduplicated target occurrences and one terminal unknown record per capped consequence channel; not exact degree invariants or solved instances",
+      "verified_nonzero_target_rows": 0,
+      "verified_zero_target_rows": 0,
+      "witnessed_degree_reduction_rows": 0
+    },
+    "artifacts": [
+      {
+        "bytes": 2657,
+        "encoding": "jsonl",
+        "path": "features.jsonl",
+        "role": "allowlisted-model-inputs",
+        "sha256": "4fa7675837abc746278c0afeb1a438851476210768589766f597d757a452d5ba"
+      },
+      {
+        "bytes": 5017,
+        "encoding": "jsonl",
+        "path": "restricted/targets.jsonl",
+        "role": "restricted-supervised-labels",
+        "sha256": "2614110ce7f9f774a916a3672f69d5066bdc5812756f983f91d08b6b3eadda9c"
+      },
+      {
+        "bytes": 11006,
+        "encoding": "jsonl",
+        "path": "restricted/index.jsonl",
+        "role": "restricted-source-provenance",
+        "sha256": "c183e5772185bb26b2ca26f686a32fb6bc23cb68f011ef0e8680baeb9b19c84f"
+      },
+      {
+        "bytes": 0,
+        "encoding": "jsonl",
+        "path": "prefix-features.jsonl",
+        "role": "allowlisted-causal-model-inputs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 0,
+        "encoding": "jsonl",
+        "path": "restricted/prefix-records.jsonl",
+        "role": "restricted-prefix-labels-certificates-and-provenance",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 0,
+        "encoding": "jsonl",
+        "path": "algebraic-features.jsonl",
+        "role": "allowlisted-polynomial-consequence-inputs",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 0,
+        "encoding": "jsonl",
+        "path": "restricted/algebraic-records.jsonl",
+        "role": "restricted-checked-polynomial-consequences-certificates-and-provenance",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "binary_sha256": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+    "cells_excluded_by_prime_chain_graph_size_limit": 0,
+    "cells_without_verified_alternative_factor_base": 0,
+    "cells_without_verified_features": 0,
+    "cells_without_verified_large_prime_domain": 0,
+    "cells_without_verified_prime_chain_graph": 0,
+    "feature_identity": "SHA256 of canonical strictly projected public inputs, optional exact equation graph and mathematical encoding, actual small/residual factor bases, column actions and PDP/relation-query domain; solver and source provenance excluded",
+    "feature_occurrences": 2,
+    "feature_occurrences_by_pdp_domain": {
+      "cyclic-subgroup-factor-base": 2
+    },
+    "feature_policy": {
+      "algebraic_claim_limits": [
+        "recursive prime m3..15 and p<2^32 only",
+        "admission requires a previously certified equality node",
+        "separate cumulative consequence-channel caps preserve existing branch budget",
+        "witness-dependent cancellation is not exact first/last fall degree",
+        "no native-operation or native-instruction witness"
+      ],
+      "algebraic_task": "prime-polynomial-consequence/v1; pre-native equations only; independently checked identities for retained native basis rows, with separately searched witnesses",
+      "cross_domain_routing_labels_matched": false,
+      "excluded": [
+        "private witness",
+        "sampling seeds",
+        "curve/generator/key indices",
+        "configuration",
+        "order certificates",
+        "construction candidates",
+        "construction trace",
+        "solver outcomes",
+        "solver event streams",
+        "labels",
+        "source paths"
+      ],
+      "koblitz_prefix_task": "crypto.ml-dataset.koblitz-causal-input/v1: independently replayed signed additions only; no native equation or matrix prefixes",
+      "large_prime_domain": "exact saved small/residual domains bound to independently replayed transcript; signed Frobenius and identity/sign routes have distinct identities; missing domain or transcript excluded with provenance retained",
+      "model_input_files": [
+        "features.jsonl",
+        "prefix-features.jsonl",
+        "algebraic-features.jsonl"
+      ],
+      "only_features_jsonl_is_model_input": false,
+      "ordinary_binary_prefix_task": "crypto.ml-dataset.binary-causal-input/v1: original-bound independently replayed committed signed additions; unknown suffix retained; matrix/equation/construction projections not implemented",
+      "pkm_domain": "verified exact alternative Kummer base; missing base excluded from matched routing features",
+      "prefix_claim_limits": [
+        "bounded ideal-certificate search can exclude a suffix",
+        "no complete native execution or instruction proof",
+        "no exact first/last fall degree",
+        "no complete Groebner basis claim"
+      ],
+      "prefix_task": "prime-chain-next-branch-attempt/v1; replayed recursive state and independently derived iterator; observed imitation labels only, no optimality or counterfactual cost",
+      "prime_chain_graph": "prime-chain-graph/v1 static equations/domains and signed-point incidence, reconstructed before publication; no solver-prefix/action features; missing or oversized graphs excluded with restricted provenance",
+      "prime_chain_graph_capabilities": {
+        "claim_limits": [
+          "affine infinity branches are not covered",
+          "no native trace replay or action labels",
+          "no exact first/last fall degree certificate"
+        ],
+        "encoding": "odd-prime-affine-s3-chain/v1",
+        "exact_decimal_field_values": true,
+        "families": [
+          "prime"
+        ],
+        "m": [
+          3,
+          15
+        ],
+        "max_graph_bytes": 8388608,
+        "max_monomials": 4096,
+        "max_signed_points": 128,
+        "max_terms": 4096,
+        "native_prime_modulus_limit_exclusive": "4294967296",
+        "native_solving_required": false,
+        "oversize_policy": "exclude complete graph with restricted reason; never drop terms",
+        "prefix_examples": false,
+        "roundtrip_reconstruction_required": true,
+        "schema": "prime-chain-graph/v1",
+        "static_inputs_only": true,
+        "wide_prime_static_inputs_supported": true
+      },
+      "version": "strict-structural-allowlist-v7"
+    },
+    "plan_sha256": "066b473b4d8412407f14f031a366fec549854db54261ea2a95088d1a6f80f469",
+    "prefix_feature_occurrences": 0,
+    "prime_chain_graph_occurrences": 0,
+    "remote_download_performed": false,
+    "restricted_algebraic_record_rows": 0,
+    "restricted_prefix_record_rows": 0,
+    "restricted_target_rows": 2,
+    "schema": "ml-dataset.training-export/v1",
+    "sealed_source_cells": 2,
+    "sort": {
+      "chunk_bytes": 16777216,
+      "implementation": "bounded Rust external merge",
+      "max_row_bytes": 67108864,
+      "merge_fan_in": 8,
+      "source_cell_values_materialized": true,
+      "total_process_rss_bound_claimed": false
+    },
+    "source_artifacts_modified": false,
+    "source_commit": "93a5ab621ce5ec5aadc830dcd41f3ba186eaa64b",
+    "source_run_sha256": "5739563fe0f05efb8bf093817b9e63989df47e7a5f108c22934a45d2bb944b1f",
+    "split_policy": {
+      "all_same_size_families_twists_generators_keys_stay_together": true,
+      "assignment": "first 64 hash bits modulo 100: train 0..79, validation 80..89, test 90..99",
+      "component": "field-size-nN",
+      "cross_size_algebraic_links_merged": false,
+      "domain": "ml-dataset-whole-field-size-split-v1",
+      "occurrences_by_partition": {
+        "train": 2
+      },
+      "row_random_split_permitted": false
+    },
+    "unique_algebraic_feature_rows": 0,
+    "unique_feature_rows": 2,
+    "unique_prefix_feature_rows": 0,
+    "unsealed_attempts_excluded": 0
+  },
+  "cells": [
+    {
+      "actual_outcome": {
+        "adapter_id": "sat-initial-v1",
+        "checkpoint_sequence": 4,
+        "checkpoint_sha256": "c5b873ff553ccf6f1c2468185b8956a8bc3b04d6387a868546ceb8b9de4fe1ab",
+        "factor_base_verified": true,
+        "first_stop": null,
+        "initial_checked": true,
+        "known_answer_verified": true,
+        "pattern": 0,
+        "patterns_checked": 1,
+        "patterns_total": 2,
+        "requested_channels": {
+          "boolean_consequence": null,
+          "sat_initial": {
+            "execution_verified": false,
+            "reason": "requires_actual_sat_initial_replay",
+            "request": {
+              "mode": "capture_and_check_initial"
+            },
+            "status": "requested",
+            "training_export_admitted": false
+          },
+          "schema": "crypto.ml-dataset.requested-channels/v1"
+        },
+        "scalar_recovered_without_witness": false,
+        "solver_completed": false,
+        "status": "partial",
+        "strategy": "sat-initial-v1",
+        "supervisor": {
+          "checkpoint_mid_call": false,
+          "clock_valid_for_comparison": false,
+          "elapsed_ms_diagnostic": 203.069508,
+          "exit_code": 0,
+          "instruction_counter_status": "whole_worker_not_counted; see phase telemetry for available hardware counts",
+          "interrupted_trace_loss_possible": true,
+          "memory_limit_bytes": 268435456,
+          "output_budget_bytes": 134217728,
+          "output_budget_scope": "all_cell_files_before_manifest_seal",
+          "retired_instructions": null,
+          "worker_output_bytes_before_seal": 203656
+        }
+      },
+      "cell_index": 0,
+      "manifest_sha256": "fcd61e5bbf44ee6e86b3bef0e8b32b4a6cf66ed5d8e6a0297ec8a958628fee38",
+      "twist": false
+    },
+    {
+      "actual_outcome": {
+        "adapter_id": "sat-initial-v1",
+        "checkpoint_sequence": 4,
+        "checkpoint_sha256": "714f78b0db8d6098554dbef5be68d8401720f72b201b03737bf54c239d7b5d4c",
+        "factor_base_verified": true,
+        "first_stop": null,
+        "initial_checked": true,
+        "known_answer_verified": true,
+        "pattern": 0,
+        "patterns_checked": 1,
+        "patterns_total": 2,
+        "requested_channels": {
+          "boolean_consequence": null,
+          "sat_initial": {
+            "execution_verified": false,
+            "reason": "requires_actual_sat_initial_replay",
+            "request": {
+              "mode": "capture_and_check_initial"
+            },
+            "status": "requested",
+            "training_export_admitted": false
+          },
+          "schema": "crypto.ml-dataset.requested-channels/v1"
+        },
+        "scalar_recovered_without_witness": false,
+        "solver_completed": false,
+        "status": "partial",
+        "strategy": "sat-initial-v1",
+        "supervisor": {
+          "checkpoint_mid_call": false,
+          "clock_valid_for_comparison": false,
+          "elapsed_ms_diagnostic": 102.878048,
+          "exit_code": 0,
+          "instruction_counter_status": "whole_worker_not_counted; see phase telemetry for available hardware counts",
+          "interrupted_trace_loss_possible": true,
+          "memory_limit_bytes": 268435456,
+          "output_budget_bytes": 134217728,
+          "output_budget_scope": "all_cell_files_before_manifest_seal",
+          "retired_instructions": null,
+          "worker_output_bytes_before_seal": 203623
+        }
+      },
+      "cell_index": 1,
+      "manifest_sha256": "37cbf38b227b08a16a4ea0e53b21a062e122861d5dd46e533189197e268b3381",
+      "twist": true
+    }
+  ],
+  "export_scope": "Existing exporter command/custody checked; no SAT causal training projection asserted",
+  "initial_prefix_checked_cells": 2,
+  "remote_requests": 0,
+  "sat_training_admitted": false,
+  "schema": "local-sat-cli-custody-analysis/v1",
+  "solver_completed_cells": 0,
+  "status": "PASS"
+}

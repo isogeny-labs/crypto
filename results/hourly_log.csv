@@ -1,0 +1,27 @@
+timestamp_utc,source_sha,curve_n,curve_a,factor_base_hash,natural_trials,natural_relations,planted_count,planted_verified,unsat_count,unsat_hits,wall_seconds,relations_per_sec,success_rate,status,anomaly,host_cpu,run_url,details
+2026-11-17T19:32:10.820403+00:00,71eac8ba97adf10cea364808bd2593a11ff99e4a,23,0,,,,,,,,,,,failed,"run failed: RuntimeError: Cargo build rc=101: m|[0m     pub degree_of_regularity_observed: Option<u32>,
+     [1m[94m|[0m     [1m[94m----------------------------------------------[0m [1m[94mfirst use of `degree_of_regularity_observed`[0m
+[1m[94m...[0m
+[1m[94m6469[0m [1m[94m|[0m     pub degree_of_regularity_observed: Option<u32>,
+     [1m[94m|[0m     [1m[91m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1m[91mused more than once[0m
+
+[1m[33mwarning[0m[1m: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency[0m
+   [1m[94m--> [0msrc/ml_dataset/koblitz_m3.rs:125:14
+    [1m[94m|[0m
+[1m[94m125[0m [1m[94m|[0m             .fetch_update(
+    [1m[94m|[0m              [1m[33m^^^^^^^^^^^^[0m
+    [1m[94m|[0m
+    [1m[94m= [0m[1mnote[0m: `#[warn(deprecated)]` on by default
+[1m[96mhelp[0m: replace the use of the deprecated method
+    [1m[94m|[0m
+[1m[94m125[0m [91m- [0m ",AMD EPYC 7763 64-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44158400387,"Cargo build rc=101: m|[0m     pub degree_of_regularity_observed: Option<u32>,      [1m[94m|[0m     [1m[94m----------------------------------------------[0m [1m[94mfirst use of `degree_of_regularity_observed`[0m [1m[94m...[0m [1m[94m6469[0m [1m[94m|[0m     pub degree_of_regularity_observed: Option<u32>,      [1m[94m|[0m     [1m[91m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1m[91mused more than once[0m  [1m[33mwarning[0m[1m: use of deprecated method `std::sy"
+2026-11-17T19:52:12.167839+00:00,7a2c281db227c196753d1b4b378f005f01b3c0ce,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,18.326767,8.894094706,0.63671875,success,,AMD EPYC 7763 64-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44161771040,first successful run; baseline established; no comparison
+2026-11-17T20:27:21.887880+00:00,4413fd1086420669031fd20a14f18ad3cb2a9121,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,18.355708,8.880071358,0.63671875,success,,AMD EPYC 7763 64-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44168196012,
+2026-11-17T21:20:16.575966+00:00,b037cfa4c71381c76c765ebf68a43665de51673f,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,18.111882,8.999616707,0.63671875,success,,AMD EPYC 7763 64-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44177458876,
+2026-11-17T22:20:26.648117+00:00,1bac57b97dffbb76f28a95d46e57029f086a5843,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,19.461065,8.375697882,0.63671875,success,,AMD EPYC 9V74 80-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44187859531,
+2026-11-17T23:22:05.373273+00:00,747fc37e074f4fe1ecac8242346075df204ed2c2,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,13.705065,11.893412699,0.63671875,regression,relations_per_sec: 8.89409471 -> 11.8934127 (+33.7% vs baseline),AMD EPYC 9V45 96-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44197939477,
+2026-11-18T00:27:42.990006+00:00,28152c3117f4f8c914f71914176f52e40ed85f36,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,19.397108,8.403314366,0.63671875,success,,AMD EPYC 9V74 80-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44206818131,
+2026-11-18T00:49:51.685655+00:00,77e72b196b8b270da44326c79984886ea06ca329,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,18.489076,8.81601638,0.63671875,success,,AMD EPYC 7763 64-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44210054712,
+2026-11-18T01:26:02.381319+00:00,b05b8de72a53806b6b0f77381cdd3e602073ca70,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,13.472952,12.098313656,0.63671875,regression,relations_per_sec: 8.89409471 -> 12.0983137 (+36.0% vs baseline),AMD EPYC 9V45 96-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44215000731,
+2026-11-18T02:28:48.224769+00:00,bec149dd1e47f39bd6fe2a8b9e669595548ace4e,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,18.123186,8.994003733,0.63671875,success,,INTEL(R) XEON(R) PLATINUM 8573C,https://github.com/isogeny-labs/crypto/actions/runs/44222692789,
+2026-11-18T03:27:46.657041+00:00,6c3b83c9aea26df578f43a20c19db1c3614b8db6,23,0,9b5bb635f1c505cb871a9e8723d2b79109688606cc42323ab92e05b8beaf4b58,256,163,64,64,64,0,19.730465,8.261335954,0.63671875,success,,AMD EPYC 7763 64-Core Processor,https://github.com/isogeny-labs/crypto/actions/runs/44229711406,

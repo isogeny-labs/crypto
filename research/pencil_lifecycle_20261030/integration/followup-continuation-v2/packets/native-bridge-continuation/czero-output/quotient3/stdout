@@ -1,0 +1,141 @@
+/var/tmp/pencil-czero-output-20261101-v1/Quotient.lean:40:8: error: Application type mismatch: The argument
+  Eq.symm he5
+has type
+  r1 * r2 * (t.coeff 1 * X.coeff 5) + (r1 * q2 + q1 * r2) * (t.coeff 1 * X.coeff 4) +
+            (r1 * (1 + q2 * X.coeff 2) + q1 * q2 + (1 + q1 * X.coeff 2) * r2) * (t.coeff 1 * X.coeff 3) +
+          (r1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) + q1 * (1 + q2 * X.coeff 2) + (1 + q1 * X.coeff 2) * q2 +
+              (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * r2) *
+            (t.coeff 1 * X.coeff 2) +
+        (r1 * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q2 * X.coeff 4) +
+                  q1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) +
+                (1 + q1 * X.coeff 2) * (1 + q2 * X.coeff 2) +
+              (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * q2 +
+            (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4) * r2) *
+          t.coeff 1 +
+      (r1 * (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q2 * X.coeff 5) +
+                  q1 * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q2 * X.coeff 4) +
+                (1 + q1 * X.coeff 2) * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) +
+              (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * (1 + q2 * X.coeff 2) +
+            (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4) * q2 +
+          (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q1 * X.coeff 5) * r2) *
+        t.coeff 0 =
+    1 -
+      ((t1 - a * r1) *
+                  (s1 * X.coeff 5 -
+                    a * (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q1 * X.coeff 5)) +
+                (s1 - a * q1) *
+                  (s1 * X.coeff 4 - a * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4)) +
+              (s1 * X.coeff 2 - a * (1 + q1 * X.coeff 2)) *
+                (s1 * X.coeff 3 - a * (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3)) +
+            (s1 * X.coeff 3 - a * (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3)) *
+              (s1 * X.coeff 2 - a * (1 + q1 * X.coeff 2)) +
+          (s1 * X.coeff 4 - a * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4)) * (s1 - a * q1) +
+        (s1 * X.coeff 5 -
+            a * (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q1 * X.coeff 5)) *
+          (t1 - a * r1))
+but is expected to have type
+  t.coeff 1 = 1
+in the application
+  And.intro (Eq.symm he5)
+/var/tmp/pencil-czero-output-20261101-v1/Quotient.lean:40:24: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  r1 * r2 * (t.coeff 1 * X.coeff 5) + (r1 * q2 + q1 * r2) * (t.coeff 1 * X.coeff 4) +
+          (r1 * (1 + q2 * X.coeff 2) + q1 * q2 + (1 + q1 * X.coeff 2) * r2) * (t.coeff 1 * X.coeff 3) +
+        (r1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) + q1 * (1 + q2 * X.coeff 2) + (1 + q1 * X.coeff 2) * q2 +
+            (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * r2) *
+          (t.coeff 1 * X.coeff 2) +
+      (r1 * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q2 * X.coeff 4) +
+                q1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) +
+              (1 + q1 * X.coeff 2) * (1 + q2 * X.coeff 2) +
+            (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * q2 +
+          (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4) * r2) *
+        t.coeff 1 +
+    (r1 * (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q2 * X.coeff 5) +
+                q1 * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q2 * X.coeff 4) +
+              (1 + q1 * X.coeff 2) * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) +
+            (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * (1 + q2 * X.coeff 2) +
+          (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4) * q2 +
+        (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q1 * X.coeff 5) * r2) *
+      t.coeff 0
+in the target expression
+  -((s1 * X.coeff 4 - a * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4)) * (t1 - a * r1)) +
+      (-((s1 * X.coeff 3 - a * (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3)) * (s1 - a * q1)) +
+        (-((s1 * X.coeff 2 - a * (1 + q1 * X.coeff 2)) * (s1 * X.coeff 2 - a * (1 + q1 * X.coeff 2))) +
+          (-((s1 - a * q1) * (s1 * X.coeff 3 - a * (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3))) +
+            -((t1 - a * r1) *
+                (s1 * X.coeff 4 - a * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4)))))) =
+    r1 * r2 * (t.coeff 1 * X.coeff 4) + (r1 * q2 + q1 * r2) * (t.coeff 1 * X.coeff 3) +
+          (r1 * (1 + q2 * X.coeff 2) + q1 * q2 + (1 + q1 * X.coeff 2) * r2) * (t.coeff 1 * X.coeff 2) +
+        (r1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) + q1 * (1 + q2 * X.coeff 2) + (1 + q1 * X.coeff 2) * q2 +
+            (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * r2) *
+          t.coeff 1 +
+      (r1 * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q2 * X.coeff 4) +
+                q1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) +
+              (1 + q1 * X.coeff 2) * (1 + q2 * X.coeff 2) +
+            (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * q2 +
+          (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4) * r2) *
+        t.coeff 0
+
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+q1 r1 s1 t1 q2 r2 a : K
+t : K[X]
+hf : f.natDegree = 5
+h5 : f.coeff 5 = 1
+h4 : f.coeff 4 = 0
+he :
+  f - (ordinate s1 t1 - C a * CZeroInterpolation.support q1 r1) ^ 2 =
+    CZeroInterpolation.support q1 r1 * CZeroInterpolation.support q2 r2 * t
+ht : t = C (t.coeff 0) + C (t.coeff 1) * X
+he5 :
+  1 -
+      ((t1 - a * r1) *
+                  (s1 * X.coeff 5 -
+                    a * (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q1 * X.coeff 5)) +
+                (s1 - a * q1) *
+                  (s1 * X.coeff 4 - a * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4)) +
+              (s1 * X.coeff 2 - a * (1 + q1 * X.coeff 2)) *
+                (s1 * X.coeff 3 - a * (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3)) +
+            (s1 * X.coeff 3 - a * (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3)) *
+              (s1 * X.coeff 2 - a * (1 + q1 * X.coeff 2)) +
+          (s1 * X.coeff 4 - a * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4)) * (s1 - a * q1) +
+        (s1 * X.coeff 5 -
+            a * (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q1 * X.coeff 5)) *
+          (t1 - a * r1)) =
+    r1 * r2 * (t.coeff 1 * X.coeff 5) + (r1 * q2 + q1 * r2) * (t.coeff 1 * X.coeff 4) +
+            (r1 * (1 + q2 * X.coeff 2) + q1 * q2 + (1 + q1 * X.coeff 2) * r2) * (t.coeff 1 * X.coeff 3) +
+          (r1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) + q1 * (1 + q2 * X.coeff 2) + (1 + q1 * X.coeff 2) * q2 +
+              (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * r2) *
+            (t.coeff 1 * X.coeff 2) +
+        (r1 * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q2 * X.coeff 4) +
+                  q1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) +
+                (1 + q1 * X.coeff 2) * (1 + q2 * X.coeff 2) +
+              (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * q2 +
+            (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4) * r2) *
+          t.coeff 1 +
+      (r1 * (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q2 * X.coeff 5) +
+                  q1 * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q2 * X.coeff 4) +
+                (1 + q1 * X.coeff 2) * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) +
+              (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * (1 + q2 * X.coeff 2) +
+            (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4) * q2 +
+          (X.coeff 4 + X.coeff 2 * X.coeff 3 + X.coeff 3 * X.coeff 2 + X.coeff 4 + q1 * X.coeff 5) * r2) *
+        t.coeff 0
+he4 :
+  -((s1 * X.coeff 4 - a * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4)) * (t1 - a * r1)) +
+      (-((s1 * X.coeff 3 - a * (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3)) * (s1 - a * q1)) +
+        (-((s1 * X.coeff 2 - a * (1 + q1 * X.coeff 2)) * (s1 * X.coeff 2 - a * (1 + q1 * X.coeff 2))) +
+          (-((s1 - a * q1) * (s1 * X.coeff 3 - a * (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3))) +
+            -((t1 - a * r1) *
+                (s1 * X.coeff 4 - a * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4)))))) =
+    r1 * r2 * (t.coeff 1 * X.coeff 4) + (r1 * q2 + q1 * r2) * (t.coeff 1 * X.coeff 3) +
+          (r1 * (1 + q2 * X.coeff 2) + q1 * q2 + (1 + q1 * X.coeff 2) * r2) * (t.coeff 1 * X.coeff 2) +
+        (r1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) + q1 * (1 + q2 * X.coeff 2) + (1 + q1 * X.coeff 2) * q2 +
+            (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * r2) *
+          t.coeff 1 +
+      (r1 * (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q2 * X.coeff 4) +
+                q1 * (X.coeff 2 + X.coeff 2 + q2 * X.coeff 3) +
+              (1 + q1 * X.coeff 2) * (1 + q2 * X.coeff 2) +
+            (X.coeff 2 + X.coeff 2 + q1 * X.coeff 3) * q2 +
+          (X.coeff 3 + X.coeff 2 * X.coeff 2 + X.coeff 3 + q1 * X.coeff 4) * r2) *
+        t.coeff 0
+⊢ t.coeff 0 = -(q1 + q2 + a ^ 2)

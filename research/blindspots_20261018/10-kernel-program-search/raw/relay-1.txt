@@ -1,0 +1,39 @@
+card CARD-BLINDSPOT-10-02-r2 ran to status completed. Every command succeeded, with no FAILED or MISSING lines.
+
+```
+card: CARD-BLINDSPOT-10-02-r2 (sha256 0ab8f30fb8d3f4d0d257b40ffb539a9a81e83bd66d3f6ef2761c877be5a871fb)
+commit: a89ba3d95691512dcfd86a832b32cc724106fc79
+receipt: research/blindspots_20261018/10-kernel-program-search/raw-r2/receipt-card-02-r2.json sha256 231861b750dd3425098bd72a921545d18e3a1d79abeab3b763e6db3a5738c129
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-10/card-02-r2"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-10/card-02-r2/b10", "examples/blindspots_10_kernel_search.rs"] exit 0 (6.442 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (search-n31-p-a): ["prlimit", "--as=4294967296", "target/blindspots-10/card-02-r2/b10", "search", "--n", "31", "--ell", "9", "--arm", "p", "--state", "research/blindspots_20261018/10-kernel-program-search/raw-r2/state-1", "--budget", "256", "--max-new", "128"] exit 0 (199.637 s) succeeded
+  stdout sha256 a81e9b7cc87cffe05c24d9420f19a4fb5eb0a6f026d1922820481e15e182cb5f; last 20 lines:
+    eval 109 affine-aligned-s2|lift1|stop0|root0|q0|sqt0|pm0|ab2|bt1|gc0 q01=  3.2061e2 phi=0.938 dom=false 786ms
+    eval 110 affine-aligned-s2|lift1|stop0|root2|q0|sqt0|pm0|ab2|bt0|gc0 q01=  2.4713e3 phi=0.938 dom=false 5578ms
+    eval 111 affine-aligned-s2|lift1|stop0|root0|q1|sqt0|pm1|ab2|bt0|gc0 q01=  4.1497e2 phi=0.938 dom=false 1015ms
+    eval 112 affine-aligned-s2|lift1|stop0|root1|q1|sqt1|pm0|ab2|bt2|gc0 q01=  5.6914e2 phi=0.938 dom=false 1523ms
+    eval 113 affine-aligned-s2|lift0|stop0|root0|q2|sqt0|pm0|ab2|bt1|gc0 q01=  1.3733e3 phi=0.938 dom=false 3661ms
+    eval 114 sub-rand2|lift0|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  2.8854e3 phi=0.875 dom=false 3076ms
+    eval 115 sub-rand3|lift1|stop1|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  6.5377e2 phi=1.000 dom=false 627ms
+    eval 116 sub-rand4|lift1|stop0|root1|q1|sqt1|pm0|ab2|bt1|gc0        q01=  1.1733e3 phi=0.875 dom=false 1008ms
+    eval 117 affine-aligned-s2|lift1|stop1|root0|q1|sqt0|pm0|ab2|bt1|gc0 q01=  3.1629e2 phi=0.938 dom=false 811ms
+    eval 118 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab1|bt1|gc0 q01=  3.6316e2 phi=1.000 dom=false 887ms
+    eval 119 affine-aligned-s2|lift0|stop0|root0|q1|sqt1|pm1|ab2|bt1|gc0 q01=  1.6427e3 phi=0.938 dom=false 3934ms
+    eval 120 affine-aligned-s2|lift1|stop1|root2|q1|sqt1|pm0|ab2|bt0|gc0 q01=  2.4650e3 phi=0.938 dom=false 5625ms
+    eval 121 sub-rand3|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  6.5377e2 phi=1.000 dom=false 741ms
+    eval 122 sub-low|lift1|stop0|root0|q1|sqt1|pm0|ab3|bt1|gc0          q01=  7.1630e2 phi=0.531 dom=false 497ms
+    eval 123 affine-aligned-s2|lift1|stop0|root1|q1|sqt1|pm0|ab3|bt1|gc0 q01=  5.4224e2 phi=0.531 dom=false 817ms
+    eval 124 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt0|gc1 q01=  3.4806e2 phi=0.938 dom=false 761ms
+    eval 125 coset2-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0        q01=  8.2803e2 phi=0.812 dom=false 700ms
+    eval 126 affine-aligned-s2|lift1|stop0|root2|q2|sqt0|pm0|ab2|bt0|gc0 q01=  2.4953e3 phi=0.938 dom=false 5845ms
+    eval 127 affine-aligned-s2|lift1|stop1|root0|q0|sqt1|pm0|ab2|bt1|gc0 q01=  3.1867e2 phi=0.938 dom=false 941ms
+    best so far idx 64 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0 q01=3.1435e2 (128 of 256 evaluations done)
+  output research/blindspots_20261018/10-kernel-program-search/raw-r2/state-1/n31-p.jsonl: 83fac4f45f85fcbd60bb03ce0587f9e2a81fdaa2fceeaf77f7844ffd15f2212f
+command 4 (remove-bin): ["rm", "-f", "target/blindspots-10/card-02-r2/b10"] exit 0 (0.007 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 5 (remove-bin-dir): ["rmdir", "target/blindspots-10/card-02-r2"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+```

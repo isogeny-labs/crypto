@@ -41,6 +41,15 @@ group checks, budgets and stop rules. The historical settings file retains
 its original paths; they resolve in the pinned source repository. The active
 native adaptation is stated at the beginning of the protocol.
 
+The [native target continuation](target-native/README.md) now implements
+section-space divisor arithmetic, target Kummer evaluation and separate
+calibration/evaluator/reference interfaces. Its fixed historical checks
+pass; its certified-anchor frame and challenge runs remain unexecuted
+pending configured checkpoint access and a qualified EKS target image/route.
+Same-branch checkpoint uploads were approved on 2026-10-30. See the
+[current review report](reports/review-20261030T1540Z/REPORT.md) and historical
+[preparation report](reports/preparation-20261026T1824Z/REPORT.md).
+
 The [run report](reports/run-20261025T1845Z/REPORT.md),
 [one-page PDF](reports/run-20261025T1845Z/REPORT.pdf) and
 [validation record](reports/run-20261025T1845Z/VALIDATION.md) distinguish

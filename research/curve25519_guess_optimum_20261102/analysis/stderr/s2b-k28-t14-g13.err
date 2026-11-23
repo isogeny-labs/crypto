@@ -1,0 +1,10 @@
+
+thread 'main' (10878) panicked at src/bin/curve25519_family.rs:1552:10:
+prepare: "pkm-semaev: guess = 13 must be below the tower height 14 and at most 12"
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::result::unwrap_failed
+   3: curve25519_family::f4cost_m
+   4: curve25519_family::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

@@ -1,0 +1,30 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T10:15:46Z",
+ "id": "PCC-20261111-2d5c08",
+ "kind": "statement",
+ "producer": {
+  "commit": "75a737b8366ec6c78ed8672886423fcbe69853a2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-independent-01.txt",
+    "sha256": "fc8d76ddebc4eae3d468ecc5a4ca5951088dde74c7262ed81c330c8b0f893fd7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-witness-01.tsv",
+    "sha256": "08d1526850ba2c9fb1dd999b34040971d62c430e577e63ab6132cbe4d69c840d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Independent-arithmetic replay accepts130 fixed cubic-norm witnesses: pre-existing crypto BigUint genus4/13 arithmetic reconstructs each source and pulled class, affine elliptic arithmetic reconstructs each projected norm, and a separate Frobenius-gcd criterion confirms irreducible degree3/4 support. The new trace-norm implementation is not imported by the replay. Both Jacobian engines use Cantor and the harness/receipt remain producer-authored; no signed verdict or timing result."
+}

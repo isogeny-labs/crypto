@@ -1,0 +1,226 @@
+{
+  "schema": "ordinary-binary-s3-source-plan/v1",
+  "created": "2026-11-13T20:57:05.661943+00:00",
+  "formal": {
+    "project": "research/binary_semaev_irreducibility_audit_20261113/lean",
+    "theorem": "BinarySemaevIrreducibilityAudit.actual_binary_S3_certificate",
+    "statement": "theorem actual_binary_S3_certificate : (∀ (K : Type) [Field K] [CharP K 2] (b : K), Irreducible (ordinaryMv b) ∧ (ordinaryMv b).IsSymmetric ∧ (∀ x y z : K, MvPolynomial.eval ![x,y,z] (ordinaryMv b)=BinaryS3Audit.binaryS3 b x y z) ∧ ∀ (L : Type) [Field L] (f : K →+* L), Irreducible (MvPolynomial.map f (ordinaryMv b))) ∧ (∀ (K : Type) [Field K] [CharP K 2] [IsAlgClosed K] [DecidableEq K] (W : WeierstrassCurve.Affine K), W.Δ≠0 → W.a₁=1 → W.a₃=0 → W.a₄=0 → ∀ x y z : K, MvPolynomial.eval ![x,y,z] (ordinaryMv W.a₆)=0 ↔ ∃ P Q R : W.Point, SemaevS3.pointX P=some x ∧ SemaevS3.pointX Q=some y ∧ SemaevS3.pointX R=some z ∧ P+Q+R=0) ∧ sourceMv (0:ZMod 2) 0=binaryFactor^2 ∧ ¬ IsUnit binaryFactor ∧ ¬ Irreducible (sourceMv (0:ZMod 2) 0) ∧ ordinaryMv (0:ZMod 2)≠sourceMv (0:ZMod 2) 0",
+    "decl_sha256": "79d3d696a33624dfc64c9584dc199c88467791f72304ccdb252c318667770424",
+    "scope": "Actual ordinary characteristic2 S3=(xy+xz+yz)^2+xyz+b is symmetric and absolutelyirreducible after every field scalar map, allb. Evaluation matches existing BinaryS3 and actual Mathlib point zero-sums on every nonsingular a1=1,a3=a4=0 ordinary model over algclosedfield, all repeatedcoordinates/two-torsion included. Actual Artin-Schreier change and rationalfunction degree1pole obstruction; primitive/injective algebraicclosure coefficient embedding/Gauss and MV equiv proved, not premises. Explicit shortF2a=b0nonunit square/directnotirreducible and polynomialinequality distinguish models. No square-root, finite-enumeration, nonsingularity or irreducibility premise for algebraic theorem; actual group bridge retainsnonsingularity. No qualifiedsource refutation/novelty/nativeexperiment. Generalhigherarity absoluteirred and splitsk>=3open.",
+    "sources": [
+      {
+        "path": "research/binary_semaev_irreducibility_audit_20261113/lean/ASDegree.lean",
+        "bytes": 3029,
+        "sha256": "09fb28980bc4dfeacc0af904ca063fbd88cbeb210fa1bc1eb99286f75a96b119"
+      },
+      {
+        "path": "research/binary_semaev_irreducibility_audit_20261113/lean/BinaryActualPolynomial.lean",
+        "bytes": 3255,
+        "sha256": "55bc9fc1275f407a0302dc267175d08665a9dab8706782ce568c0850f07b8813"
+      },
+      {
+        "path": "research/binary_semaev_irreducibility_audit_20261113/lean/BinaryCertificate.lean",
+        "bytes": 1882,
+        "sha256": "0bbd6dfc7e4bb872446609d64089af8ac7ff35c80624efa87ee429d366d0c387"
+      },
+      {
+        "path": "research/binary_semaev_irreducibility_audit_20261113/lean/BinaryFunctionField.lean",
+        "bytes": 3064,
+        "sha256": "33186039fa2c3b43b755c66b315d312e471701a3f58b27bcd61984d0ce96d263"
+      },
+      {
+        "path": "research/binary_semaev_irreducibility_audit_20261113/lean/BinaryPrimitive.lean",
+        "bytes": 4344,
+        "sha256": "0f478f4c2b8f69383716a41d8868a14daff6ad780807c878b5ef1286670fdd7b"
+      },
+      {
+        "path": "research/binary_semaev_irreducibility_audit_20261113/lean/lake-manifest.json",
+        "bytes": 4388,
+        "sha256": "ba109051e9f63940c721c93d2f1299179da672a22de19d466277017d364f1fc6"
+      },
+      {
+        "path": "research/binary_semaev_irreducibility_audit_20261113/lean/lakefile.toml",
+        "bytes": 473,
+        "sha256": "bbd0cbbd2c36ba834f555e188cbe77abe07fcbeece1fc594308d0029cc8377f7"
+      },
+      {
+        "path": "research/binary_semaev_irreducibility_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/ActualPolynomial.lean",
+        "bytes": 6747,
+        "sha256": "14cc8645cc0857bf78d346bb68eaf583f3306da2bdac5afe15d28c5e43b93208"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/OddDegree.lean",
+        "bytes": 2217,
+        "sha256": "10cf21a4e615cae792a2ed8f792a8431ba3ec46badd77caabfd8f2c8a44e08b2"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/PrimitiveBridge.lean",
+        "bytes": 4563,
+        "sha256": "25ea8613c399b65c09160821d12198c683ae83ac63932637d291b61f962bb0e9"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/S3FunctionField.lean",
+        "bytes": 3455,
+        "sha256": "9bd3ed26c720410dbf73689cb5fe4445da3e0027f7ef26f232f5996c79456a75"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3822,
+        "sha256": "9e76086c603b2685c4c626c0af3d09422205a338fa69116ce786171b6e540517"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/lakefile.toml",
+        "bytes": 310,
+        "sha256": "76d65ce8e02856c749f6500e9addd21a0a69656168a6981515290846d07d5a7e"
+      },
+      {
+        "path": "research/semaev_irreducibility_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/BinaryS3.lean",
+        "bytes": 11572,
+        "sha256": "d8e15f0092c6721d3078461babf2f07376ac84598429c23b3f7c0b2878e0f188"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ASDegree",
+    "ActualPolynomial",
+    "BinaryActualPolynomial",
+    "BinaryCertificate",
+    "BinaryFunctionField",
+    "BinaryPrimitive",
+    "BinaryS3",
+    "OddDegree",
+    "PrimitiveBridge",
+    "S3Completion",
+    "S3FunctionField",
+    "S3Roots"
+  ],
+  "artifacts": [
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 12418,
+      "sha256": "e2e289c64e5e1e25d55e0f89356f30697192b8ac7adce862d75f2f85f7b880fe"
+    },
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/evidence/attempts.json",
+      "bytes": 5800,
+      "sha256": "7c78dc4e2affb551d75215c6935b91c50432e1aae0deec40abd06b37141fa24f"
+    },
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 2412,
+      "sha256": "5844b136ed68ceca122a7162f6835d3a4ffbb3962127ff1b69aa98514212ab13"
+    },
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/evidence/gate.json",
+      "bytes": 1236,
+      "sha256": "e55c73b109f50505bb36cb80f87b77b9524967b2ccad47f61b8cedce88571ad1"
+    },
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/evidence/source-review.json",
+      "bytes": 2518,
+      "sha256": "a4a190890e3083bc21f9927ce252b2d7d1b5338f2d4f6ea6bdc20841fc0e71d9"
+    },
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/proof-map.json",
+      "bytes": 1700,
+      "sha256": "4eb98dd88e8ecc2b10c5065f84d2b334dfb2cb217f1d7c60c539263c8f0f1564"
+    },
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/render_report.py",
+      "bytes": 6480,
+      "sha256": "532d964d138f100678e0f184c83c042d2d0e27b65eb738a0511d2d09652480ec"
+    },
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/reports/layout.json",
+      "bytes": 289,
+      "sha256": "dce596076e8f74102fcc4435f31fa5230989c8faef9b7ebcb1321f54966b40df"
+    },
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/reports/proof-flow.svg",
+      "bytes": 1533,
+      "sha256": "a9c1e826f21dce57c1dcafb5f3d4c86a1ff5f9ecaaf38607a3cb514c4baf3e1f"
+    },
+    {
+      "path": "research/binary_semaev_irreducibility_audit_20261113/reports/report.pdf",
+      "bytes": 46946,
+      "sha256": "66332d5d1ef6dd9f9976601a8f6b567d5382e509acbca7cf3dd0cd76ae98b2cc"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 43,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "global_elaboration_flags": false,
+    "waivers": false,
+    "actual_ordinary_MV_polynomial": true,
+    "all_field_scalar_extensions": true,
+    "actual_IsSymmetric": true,
+    "actual_ordinary_Mathlib_group_zero_sums": true,
+    "direct_short_model_nonirreducibility": true,
+    "actual_model_polynomial_inequality": true,
+    "qualified_source_refuted": false,
+    "general_higher_arity_irreducibility": false,
+    "general_splits_k_ge_3": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

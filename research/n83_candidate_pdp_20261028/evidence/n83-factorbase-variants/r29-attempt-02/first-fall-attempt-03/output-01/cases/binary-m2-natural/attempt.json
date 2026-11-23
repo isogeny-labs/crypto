@@ -1,0 +1,49 @@
+{
+  "candidate_id": "spike29",
+  "certificate_sha256": "78722ffd08e4f9e1d1b900fbf648e2748c0f399b3fa10041876c48628b2309f6",
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/binary-m2-natural/input",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/binary-m2-natural/output"
+  ],
+  "elapsed_seconds": 0.802,
+  "family": "binary",
+  "first_fall_degree": 2,
+  "first_fall_lower_bound": 2,
+  "id": "binary-m2-natural",
+  "input_row_sha256": "6cab3a3b5cabb0489a868b76b72f85eb1b178d05252664b662992d53b1bd3592",
+  "m": 2,
+  "replay": {
+    "command": [
+      "timeout",
+      "--kill-after=5s",
+      "60s",
+      "prlimit",
+      "--as=8589934592",
+      "--",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+      "replay",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/binary-m2-natural/input",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/binary-m2-natural/output/binary-m2-natural.json"
+    ],
+    "elapsed_seconds": 0.016,
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"binary-m2-natural\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "s3_readback_sha256": "78722ffd08e4f9e1d1b900fbf648e2748c0f399b3fa10041876c48628b2309f6",
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":2,\"first_fall_lower_bound\":2,\"id\":\"binary-m2-natural\",\"status\":\"certified\"}\n",
+  "system_sha256": "1b25c2f4945fbe22f8127b05036eb10bdec907b778ffb24ad8e6d70bcbac36bb",
+  "target_kind": "natural"
+}

@@ -1,0 +1,61 @@
+{
+  "namespace": "CoordinateLengthAudit",
+  "proofs": [
+    {
+      "file": "Solutions.lean",
+      "claim": "Actual solutions/quotient-hom equivalence, finite support/dimension/scalar-length bound",
+      "declarations": [
+        "solutionEquivHom",
+        "solutions_finite",
+        "support_le_dimension",
+        "support_le_scalar_length"
+      ]
+    },
+    {
+      "file": "Thickening.lean",
+      "claim": "Actual K[t]/t^m basis/dimension/length/exact nilpotent powers, field hom uniqueness, reducedm1",
+      "declarations": [
+        "thick_dimension",
+        "thick_scalar_length",
+        "thick_previous_power_ne_zero",
+        "thick_hom_card",
+        "thickOneEquiv",
+        "thick_not_reduced"
+      ]
+    },
+    {
+      "file": "Bivariate.lean",
+      "claim": "Actual two-variable ideal/quotient equivalence, full ideal solutions, unbounded gap and controls",
+      "declarations": [
+        "biEquiv",
+        "bi_dimension",
+        "bi_scalar_length",
+        "bi_one_reduced",
+        "bi_not_reduced",
+        "bi_solution_iff",
+        "bi_support_card",
+        "bi_zero_control",
+        "bi_arbitrary_gap"
+      ]
+    },
+    {
+      "file": "DomainControl.lean",
+      "claim": "Actual finite F3dual-number hom-count counter after target-domain deletion",
+      "declarations": [
+        "dualScale_injective",
+        "target_domain_counterexample"
+      ]
+    },
+    {
+      "file": "LengthCertificate.lean",
+      "claim": "Closed complete certificate and direct universal support=dimension negation",
+      "declarations": [
+        "not_support_equals_dimension",
+        "actual_coordinate_length_certificate"
+      ]
+    }
+  ],
+  "local_gate": "44/0failures/0trusted",
+  "signed_standing": "not established",
+  "open": "Scheme-cycle/local intersection multiplicities and general projective isolated-point Bezout/Rojas/C refinement."
+}

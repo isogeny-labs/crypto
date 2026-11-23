@@ -1,0 +1,80 @@
+{
+  "schema": "twist.chord-project-replay/v1",
+  "category": "ordinary_reproducibility_build_of_already_checked_exact_source",
+  "target": "research/quadratic_twist_chord_proof_20261105",
+  "source_sha256": "3f661b823cfc9c89c23602ad78e689668c2cc233135c58cc578ee009bb51672d",
+  "lean_release": "4.34.1",
+  "lean_binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "mathlib_commit": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+  "dependency_commits": [
+    {
+      "name": "plausible",
+      "url": "https://github.com/leanprover-community/plausible",
+      "commit": "118aa17ee84656b8bd727fef7c458ee8c833385c"
+    },
+    {
+      "name": "LeanSearchClient",
+      "url": "https://github.com/leanprover-community/LeanSearchClient",
+      "commit": "ddf04cf3949fa556442341e87d47f9f6e6074707"
+    },
+    {
+      "name": "importGraph",
+      "url": "https://github.com/leanprover-community/import-graph",
+      "commit": "e928b72544873815af278d38681b31c0293588e3"
+    },
+    {
+      "name": "proofwidgets",
+      "url": "https://github.com/leanprover-community/ProofWidgets4",
+      "commit": "106ff4fafc74ef4ac99d81dbf3ab399118f497a5"
+    },
+    {
+      "name": "aesop",
+      "url": "https://github.com/leanprover-community/aesop",
+      "commit": "355695d523e41d0554926416cba2a2b3544fbbc9"
+    },
+    {
+      "name": "Qq",
+      "url": "https://github.com/leanprover-community/quote4",
+      "commit": "6a489d9af5d0c47e5b259e2e8bcdfc1811b5a259"
+    },
+    {
+      "name": "batteries",
+      "url": "https://github.com/leanprover-community/batteries",
+      "commit": "f2effa3d803fda822b1f97b806c47cf2adfbcbc2"
+    },
+    {
+      "name": "Cli",
+      "url": "https://github.com/leanprover/lean4-cli",
+      "commit": "e92c9f15fdfacc8536f31cfb3b7ad26c3c8cd204"
+    }
+  ],
+  "context_files": {
+    "research/quadratic_twist_chord_proof_20261105/Chord.lean": "3f661b823cfc9c89c23602ad78e689668c2cc233135c58cc578ee009bb51672d",
+    "research/quadratic_twist_chord_proof_20261105/lakefile.toml": "d59ade03eb98d6a5769715f9e0ac76453a2e149a239a742305874e4e16feeb87",
+    "research/quadratic_twist_chord_proof_20261105/lake-manifest.json": "dc8ab6aad98492b60be14f48d95ad43808d90ca5f13536d17155a98bc2982594",
+    "research/quadratic_twist_chord_proof_20261105/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "research/quadratic_twist_chord_proof_20261105/.gitignore": "75f6dfc350bf33c028c870c3e206eb4284a21b95ec14aa0ef8fb304dd14a8585"
+  },
+  "official_gate_git_blob": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+  "official_audit_git_blob": "5d346e4df70b264c339c49c334f56167184d63a1",
+  "trusted_manifest_git_blob": "b6faf2a691d24e9875f11faf0fa3a62e55bb18a8",
+  "expected_public_names": [
+    "TwistChord.curve_line",
+    "TwistChord.cubic_remainder",
+    "TwistChord.vanishing_remainder_sound",
+    "TwistChord.distinct_roots_complete",
+    "TwistChord.diagonal_quadratic"
+  ],
+  "expected_gate_exit": 0,
+  "failing_axioms": 0,
+  "trusted_native": 0,
+  "threads": 2,
+  "stage_cap_seconds": 600,
+  "backend": "existing local only",
+  "checkpoint": "Actual published clean same-branch GitHub source/contract before affected build",
+  "environment": "unset LEAN_PATH; Lake must supply all module paths from the pinned consumer manifest",
+  "outputs": "Fresh outside-checkout raw gate receipts; ordinary generated Lake artifacts ignored in .lake, no source/data overwrite",
+  "prior_scope": "Same5 theorem sources already passed the complete8-stage gate/control plan at97d61b44; this is packaging/reproducibility, not another theorem/degree/scalar claim",
+  "paid_resources": false,
+  "signed_PCC_verdict": false
+}

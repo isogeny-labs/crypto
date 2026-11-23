@@ -1,0 +1,221 @@
+{
+  "schema": "hec.smith-original-cost-screen/v1",
+  "status": "qualified-negative-for-current-implementation-in-declared-proxy",
+  "cost_order": [
+    "base_scalar_product_proxy",
+    "base_inverse_calls",
+    "ell_scalar_product_proxy",
+    "ell_inverse_calls"
+  ],
+  "walltime_bound": false,
+  "isogeny_impossibility_claim": false,
+  "tenfold_goal_achieved": false,
+  "baseline_replays": [
+    {
+      "case": 0,
+      "source_multiple": 1,
+      "rep": 0,
+      "returned_scalar": 83209,
+      "cost": [
+        26310,
+        500,
+        559,
+        32
+      ],
+      "original_h_verified": true
+    },
+    {
+      "case": 0,
+      "source_multiple": 1,
+      "rep": 1,
+      "returned_scalar": 83209,
+      "cost": [
+        26310,
+        500,
+        559,
+        32
+      ],
+      "original_h_verified": true
+    },
+    {
+      "case": 1,
+      "source_multiple": 17,
+      "rep": 0,
+      "returned_scalar": 44792,
+      "cost": [
+        34857,
+        669,
+        489,
+        32
+      ],
+      "original_h_verified": true
+    },
+    {
+      "case": 1,
+      "source_multiple": 17,
+      "rep": 1,
+      "returned_scalar": 44792,
+      "cost": [
+        34857,
+        669,
+        489,
+        32
+      ],
+      "original_h_verified": true
+    }
+  ],
+  "screens": [
+    {
+      "map": 0,
+      "case": 0,
+      "component": "secant_setup",
+      "candidate_lower_bound": [
+        558405,
+        1440,
+        12915,
+        66
+      ],
+      "normalized_total": [
+        26310,
+        500,
+        559,
+        32
+      ],
+      "ratio_lower_bound": "33/16",
+      "tenfold_excluded_in_declared_proxy": true
+    },
+    {
+      "map": 0,
+      "case": 1,
+      "component": "secant_setup",
+      "candidate_lower_bound": [
+        558405,
+        1440,
+        12915,
+        66
+      ],
+      "normalized_total": [
+        34857,
+        669,
+        489,
+        32
+      ],
+      "ratio_lower_bound": "33/16",
+      "tenfold_excluded_in_declared_proxy": true
+    },
+    {
+      "map": 0,
+      "case": 0,
+      "component": "quartic_ic0",
+      "candidate_lower_bound": [
+        381833,
+        3869,
+        994,
+        135
+      ],
+      "normalized_total": [
+        26310,
+        500,
+        559,
+        32
+      ],
+      "ratio_lower_bound": "994/559",
+      "tenfold_excluded_in_declared_proxy": true
+    },
+    {
+      "map": 0,
+      "case": 1,
+      "component": "quartic_ic1",
+      "candidate_lower_bound": [
+        483992,
+        5157,
+        864,
+        135
+      ],
+      "normalized_total": [
+        34857,
+        669,
+        489,
+        32
+      ],
+      "ratio_lower_bound": "288/163",
+      "tenfold_excluded_in_declared_proxy": true
+    },
+    {
+      "map": 1,
+      "case": 0,
+      "component": "secant_setup",
+      "candidate_lower_bound": [
+        526763,
+        1552,
+        13983,
+        66
+      ],
+      "normalized_total": [
+        26310,
+        500,
+        559,
+        32
+      ],
+      "ratio_lower_bound": "33/16",
+      "tenfold_excluded_in_declared_proxy": true
+    },
+    {
+      "map": 1,
+      "case": 1,
+      "component": "secant_setup",
+      "candidate_lower_bound": [
+        526763,
+        1552,
+        13983,
+        66
+      ],
+      "normalized_total": [
+        34857,
+        669,
+        489,
+        32
+      ],
+      "ratio_lower_bound": "33/16",
+      "tenfold_excluded_in_declared_proxy": true
+    },
+    {
+      "map": 1,
+      "case": 0,
+      "component": "quartic_ic0",
+      "candidate_lower_bound": [
+        373510,
+        4033,
+        1171,
+        135
+      ],
+      "normalized_total": [
+        26310,
+        500,
+        559,
+        32
+      ],
+      "ratio_lower_bound": "1171/559",
+      "tenfold_excluded_in_declared_proxy": true
+    },
+    {
+      "map": 1,
+      "case": 1,
+      "component": "quartic_ic1",
+      "candidate_lower_bound": [
+        379636,
+        4159,
+        1176,
+        135
+      ],
+      "normalized_total": [
+        34857,
+        669,
+        489,
+        32
+      ],
+      "ratio_lower_bound": "392/163",
+      "tenfold_excluded_in_declared_proxy": true
+    }
+  ]
+}

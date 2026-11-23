@@ -1,0 +1,27 @@
+proc require99(int ok,string tag){if(!ok){print("NORM99_FATAL "+tag);exit;}}
+execute(read("marked23-triangular51.sing"));
+intvec lambdaWeight99=0,1,0;intvec baseWeight99=0,0,1;
+require99(deg(f51,baseWeight99)==7 && leadcoef(f51)==1,"BASE_DEGREE7_MONIC");
+require99(deg(G51,lambdaWeight99)==16 && leadcoef(G51)==1,"LAMBDA_DEGREE16_MONIC");
+poly lambdaDerivative99=diff(G51,l);
+require99(lambdaDerivative99!=0,"NONZERO_LAMBDA_DERIVATIVE");
+print("NORM99_STAGE derivative_nonzero=1");
+poly lambdaResultant99=resultant(G51,lambdaDerivative99,l);
+require99(lambdaResultant99!=0,"NONZERO_LAMBDA_RESULTANT");
+require99(subst(lambdaResultant99,l,0)==lambdaResultant99 && subst(lambdaResultant99,n,0)==lambdaResultant99,"LAMBDA_RESULTANT_BASE_ONLY");
+print("NORM99_STAGE lambda_resultant_nonzero=1");
+poly towerNorm99=resultant(f51,lambdaResultant99,y);
+require99(towerNorm99!=0,"NONZERO_TOWER_NORM");
+require99(subst(towerNorm99,l,0)==towerNorm99 && subst(towerNorm99,n,0)==towerNorm99 && subst(towerNorm99,y,0)==towerNorm99,"TOWER_NORM_BASE_FIELD_ONLY");
+number normCoefficient99=leadcoef(towerNorm99);
+number normNumerator99=numerator(normCoefficient99);
+number normDenominator99=denominator(normCoefficient99);
+require99(normNumerator99!=0 && normDenominator99!=0,"NONZERO_RATIONAL_NORM");
+link output99="ASCII:w norm99.sing";open(output99);
+write(output99,"// Exact resultant norm in F2(x), from actual R51 G51 and f51.");
+write(output99,"number normNumerator99="+string(normNumerator99)+";");
+write(output99,"number normDenominator99="+string(normDenominator99)+";");
+close(output99);
+print("NORM99_STAGE norm_nonzero=1 numerator_chars="+string(size(string(normNumerator99)))+" denominator_chars="+string(size(string(normDenominator99))));
+print("NORM99_ALL_CHECKS_PASS");
+quit;

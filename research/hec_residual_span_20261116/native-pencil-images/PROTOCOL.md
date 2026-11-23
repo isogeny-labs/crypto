@@ -1,0 +1,13 @@
+# Shared quadratic residue images: algebra, qualification, complete costs
+
+[pcc:unverified]. Classical polynomial quotient-ring arithmetic, no novelty claim. Parent77ddcb4b4b2 phasegate identifies signedrowconstruction as material. Keep exactoriginalquadratic schedule/solver/validation/preparation. Newimplementation only recovers signed ordinates and anchoroverlaps using sharedremainder images.
+
+For Q=X²+A X+B, represent p modQ by cX+d. Horner append coefficient ai sends (c,d) to (d-Ac,ai-Bc). Start (0,leadingcoefficient); when c=0 the update is (d,ai), exactly, no division. Therefore reducing u/v once and forming wbar=vbar+t*ubar yields w(x)=wbar(x), u(x)=ubar(x) for EVERYroot ofQ, including repeated roots. The known bucket points already have y and u(x)!=0 from scan, so they need no redundant overlap evaluation. Unknown roots are keyed once, multiplicity retained in original sparse row. Qdegree1 uses retained native evaluation with u reused; Qconstant implies no unknown roots. A root present in both known and residual sets remains known with accumulated multiplicity. This changes no mathematical relation or factorbase membership.
+
+## Fixed gate
+
+All11 initialmixedterm models/all22same publicfixtures, source1/17, same seeded targets, same512anchors. First one audit=true solve per fixture with counters disabled: EVERYqueriedtail/fullnorm/rootproduct checked, exhaustive splittruth and EVERYacceptedprincipal nativeidentity; every new unknown ordinate/u compared directly with retained nativeevaluation. WholeReport must equal original native-pencil-2lp/CONTROL.txt. Then two audit=false freshcountcalls, fullReports replay with dense_audits=0, scalars nativeverified. SubgroupFULL16vector mustequal prior prepared quadratic control. Base/subgroupFULL16vectors andlookups repeat exactly. Expect66completecalls (22diagnostic,44count); sameknownanswersdriveronly. Countinterval includes commonpublicvalidation,freshpreparation,collection/LP/finalsolve/nativeverification. No performanceclaim from auditcall duration.
+
+Recordeverycounter/lookup/rootbytes, compare six retained sharedprepared controls including strongestquadratic, notuncachedcontrols. Basefieldcostmayimprove orregress bygenus/input; retainallcases. Integer/maps/allocations/lookups execute butarenotfieldpriced; rootbytesnotRSS. Do not inferelapsedtime or10xfromconstantfactorcircuitcount. Sourceimagesresidueargumentdoesnotaddresssubgroupalgebra/validationbudgetidentifiedinphasegate.
+
+One600CPUprocess aftersources/imports/native/protocol/priorraw/binaryhashed andGitcommit/push. Preserveanyfailure, no unchangedrerun or postoutcome tuning. GitcustodywhileS3down; no cloud/merge/auto-merge. Independent arithmeticreview remainsopen; full10xgoalunachieved.

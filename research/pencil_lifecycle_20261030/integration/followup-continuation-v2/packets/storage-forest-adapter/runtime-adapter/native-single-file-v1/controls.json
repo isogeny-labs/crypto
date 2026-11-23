@@ -1,0 +1,349 @@
+{
+  "all_expected": true,
+  "cases": [
+    {
+      "accepted": true,
+      "case": "valid-Q1",
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "valid-Q2",
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "valid-Q3",
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "order-[0, 1, 2]",
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "order-[0, 2, 1]",
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "order-[1, 0, 2]",
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "order-[1, 2, 0]",
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "order-[2, 0, 1]",
+      "expected": true
+    },
+    {
+      "accepted": true,
+      "case": "order-[2, 1, 0]",
+      "expected": true
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Id",
+      "error": "container identity",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Image",
+      "error": "container identity",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Name",
+      "error": "container identity",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Config/Labels/isolab.runtime-qualification.owner",
+      "error": "owner label",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Config/User",
+      "error": "user/entrypoint",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Config/Entrypoint",
+      "error": "user/entrypoint",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/State/Running",
+      "error": "terminal state",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/State/ExitCode",
+      "error": "terminal state",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/ReadonlyRootfs",
+      "error": "readonly root/network",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/NetworkMode",
+      "error": "readonly root/network",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/PidsLimit",
+      "error": "resource limits",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/Memory",
+      "error": "resource limits",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/MemorySwap",
+      "error": "resource limits",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/NanoCpus",
+      "error": "resource limits",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/CapDrop",
+      "error": "privilege restrictions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/SecurityOpt",
+      "error": "privilege restrictions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/Privileged",
+      "error": "namespace restrictions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/PidMode",
+      "error": "namespace restrictions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/UTSMode",
+      "error": "namespace restrictions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/IpcMode",
+      "error": "namespace restrictions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/CgroupnsMode",
+      "error": "namespace restrictions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/Devices",
+      "error": "device/capability additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/DeviceRequests",
+      "error": "device/capability additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/CapAdd",
+      "error": "device/capability additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/HostConfig/Tmpfs",
+      "error": "tmpfs destinations",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Mounts/0/Source",
+      "error": "readonly bind identity",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Mounts/0/RW",
+      "error": "readonly bind identity",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Mounts/1/RW",
+      "error": "readonly bind identity",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Mounts/1/Destination",
+      "error": "duplicate mount destination",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Mounts/0/Type",
+      "error": "mount type",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "valid-diff-invalid-/Mounts",
+      "error": "required bind mounts",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "empty",
+      "error": "diff final newline",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "missing-newline",
+      "error": "diff final newline",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "extra-newline",
+      "error": "diff final newline",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "oversize",
+      "error": "diff byte cap",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "nonascii",
+      "error": "diff ASCII",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "duplicate",
+      "error": "exact three additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "extra",
+      "error": "exact three additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "changed",
+      "error": "exact three additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "deleted",
+      "error": "exact three additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "suffix",
+      "error": "exact three additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "dot",
+      "error": "exact three additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "tab",
+      "error": "exact three additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "crlf",
+      "error": "exact three additions",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "case-Q0-rc-0",
+      "error": "active case Q1-Q3",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "case-Q4-rc-0",
+      "error": "active case Q1-Q3",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "case-Q1-rc-1",
+      "error": "diff transport exit",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "case-Q1-rc--1",
+      "error": "diff transport exit",
+      "expected": false
+    },
+    {
+      "accepted": false,
+      "case": "unexpected-expected-field",
+      "expected": false
+    }
+  ],
+  "count": 58,
+  "docker_invoked": false,
+  "full_supervisor_integrated": false,
+  "schema": "native.qualification-diff-adapter-controls/v1",
+  "scientific_execution": false,
+  "supervisor_invoked": false
+}

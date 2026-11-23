@@ -1,0 +1,62 @@
+import Stored
+import WordAdd11
+set_option autoImplicit false
+namespace RemainderWord
+open PencilWordRefinement CoefficientStorage CoefficientTraversal
+abbrev Event (n : Nat) := Fin n × UInt64
+
+def cancelWord (p r c x : UInt64) := wordSub p r ((c*x)%p)
+theorem cancel_word (p r c x : UInt64) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hr : r.toNat<p.toNat) (hc : c.toNat<p.toNat) (hx : x.toNat<p.toNat) :
+ (cancelWord p r c x).toNat<p.toNat ∧
+ ((cancelWord p r c x).toNat : ZMod p.toNat)=
+ (r.toNat : ZMod p.toNat)-(c.toNat : ZMod p.toNat)*(x.toNat : ZMod p.toNat) := by
+ have hm:=uint64_mul_canonical p c x hp
+ have hs:=wordSub_composition p r ((c*x)%p) hp hb hr hm
+ exact ⟨hs.1,by rw [cancelWord,hs.2,uint64_mul_decode p c x hb hc hx]⟩
+
+def step {n : Nat} (p c : UInt64) (xs : State n) (e : Event n) : State n :=
+ ⟨xs.val.set e.1.val (cancelWord p (read xs e.1) c e.2)
+ (by rw [xs.property]; exact e.1.isLt),by simp [xs.property]⟩
+noncomputable def contribution {n : Nat} (p c : UInt64) (e : Event n) (i : Fin n) : ZMod p.toNat :=
+ if i=e.1 then (c.toNat : ZMod p.toNat)*(e.2.toNat : ZMod p.toNat) else 0
+
+theorem step_correct {n : Nat} (p c : UInt64) (xs : State n) (e : Event n)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hc : c.toNat<p.toNat)
+ (hx : Good p xs) (he : e.2.toNat<p.toNat) :
+ Good p (step p c xs e) ∧ ∀i,decode p (step p c xs e) i=decode p xs i-contribution p c e i := by
+ have h:=cancel_word p (read xs e.1) c e.2 hp hb (hx e.1) hc he
+ constructor
+ · intro i
+   by_cases hi : i=e.1
+   · subst i; simpa [step,read] using h.1
+   · have hne : i.val≠e.1.val := fun h=>hi (Fin.ext h)
+     simpa [step,read,Array.getElem_set,hne,Ne.symm hne] using hx i
+ · intro i
+   by_cases hi : i=e.1
+   · subst i; simpa [step,read,decode,contribution] using h.2
+   · have hne : i.val≠e.1.val := fun h=>hi (Fin.ext h)
+     simp [step,read,decode,contribution,hi,Array.getElem_set,hne,Ne.symm hne]
+
+def run {n : Nat} (p c : UInt64) : List (Event n)→State n→State n
+ | [],xs=>xs
+ | e::es,xs=>run p c es (step p c xs e)
+
+theorem run_correct {n : Nat} (p c : UInt64) (es : List (Event n)) (xs : State n)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hc : c.toNat<p.toNat)
+ (hx : Good p xs) (he : ∀e∈es,e.2.toNat<p.toNat) :
+ Good p (run p c es xs) ∧ ∀i,decode p (run p c es xs) i=
+ decode p xs i-(es.map fun e=>contribution p c e i).sum := by
+ induction es generalizing xs with
+ | nil => simpa [run] using And.intro hx (fun i=>rfl)
+ | cons e es ih =>
+   have hs:=step_correct p c xs e hp hb hc hx (he e (by simp))
+   have hr:=ih (step p c xs e) hs.1 (by intro t ht; exact he t (by simp [ht]))
+   refine ⟨hr.1,?_⟩
+   intro i
+   simp only [run,List.map_cons,List.sum_cons]
+   rw [hr.2 i,hs.2 i]
+   ring
+
+theorem shifted_index (n j m k : Nat) (hj : j+m≤n) (hk : k<m) : j+k<n := by omega
+end RemainderWord

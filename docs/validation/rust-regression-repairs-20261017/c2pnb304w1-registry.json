@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "spec": "docs/curves/ICV1.md",
+  "generated_by": "scripts/build_curve_registry.py",
+  "what_this_is": "Every elliptic curve this repository names, by its ICV1 identity, with every legacy spelling that denotes it.",
+  "curves": [
+    {
+      "slug": "icv1-f2m304-tm1949050066876782037155448244017940336576672053-02fbe089",
+      "icv1": "ICV1:f2m-304-1b812216:-1949050066876782037155448244017940336576672053:32592575621351777380295131014550050576823494300604030077055029226825549040231327635511030070:0xe94cd000c1f1012c27c47de234f525556965fca8774276731fb00f70a04fef673514b3e30da6:unk:unk:r:02fbe0891c08",
+      "family": "binary",
+      "params": {
+        "a": "0xfd0d693149a118f651e6dce6802085377e5f882d1b510b44160074c1288078365a0396c8e681",
+        "b": "0xbddb97e555a50a908e43b01c798ea5daa6788f1ea2794efcf57166b8c14039601e55827340be",
+        "m": 304,
+        "modulus": "0x10000000000000000000000000000000000000000000000000000000000000000000000000807"
+      },
+      "model_json": "{\"a\":\"0xfd0d693149a118f651e6dce6802085377e5f882d1b510b44160074c1288078365a0396c8e681\",\"b\":\"0xbddb97e555a50a908e43b01c798ea5daa6788f1ea2794efcf57166b8c14039601e55827340be\",\"field\":\"f2m-304-1b812216\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"0x10000000000000000000000000000000000000000000000000000000000000000000000000807\",\"v\":\"1\"}",
+      "trace": -1949050066876782037155448244017940336576672053,
+      "order": "32592575621351777380295131014550050576823494300604030077055029226825549040231327635511030070",
+      "j": "0xe94cd000c1f1012c27c47de234f525556965fca8774276731fb00f70a04fef673514b3e30da6",
+      "end": "unk",
+      "aliases": [
+        "c2pnb304w1",
+        "x962/c2pnb304w1"
+      ],
+      "standard_names": [
+        "c2pnb304w1"
+      ],
+      "sources": [
+        "docs/curves/standards/registry.json"
+      ],
+      "standards_provenance": [
+        {
+          "adoption_status": "listed_by_cited_standard_or_standard_example",
+          "category": "x962",
+          "display_name": "c2pnb304w1",
+          "oid": "1.2.840.10045.3.0.17",
+          "parameter_validation": "field and nonsingularity checked; supplied full generator checked on curve; group order remains source-declared",
+          "source_id": "x962/c2pnb304w1",
+          "sources": [
+            {
+              "name": "ANSI X9.62",
+              "url": "https://webstore.ansi.org/standards/ascx9/ansix9621998"
+            }
+          ]
+        }
+      ],
+      "representations": [
+        {
+          "ec1": "EC1N304Cc2pnb304w1h212eb9cecbb8",
+          "curve_uid": "urn:ec-record:1:sha256:212eb9cecbb826b7982a40202131bbbf10a458e0d3e0533088695aff60994305",
+          "field_sha256": "e378d9fdffc5607bc59a323a94fa293bb175215aedb8024d36dcc3c8a14a215d",
+          "field": {
+            "characteristic": 2,
+            "degree": 304,
+            "element_encoding": "hex polynomial coefficient bitset, least significant bit is constant",
+            "modulus_exponents": [
+              304,
+              11,
+              2,
+              1,
+              0
+            ],
+            "representation": "polynomial"
+          },
+          "curve": {
+            "coefficients": [
+              1,
+              32217300932117616200353401348142480094543640138900888501415281554269336123644510452423648897,
+              0,
+              0,
+              24171696342544365087628953806113953157063000330846830142844828379479933394120827973349359806
+            ],
+            "cofactor": 65070,
+            "generator": [
+              "0x197b07845e9be2d96adb0f5f3c7f2cffbd7a3eb8b6fec35c7fd67f26ddf6285a644f740a2614",
+              "0xe19fbeb76e0da171517ecf401b50289bf014103288527a9b416a105e80260b549fdc1b92c03b"
+            ],
+            "model": "binary Weierstrass",
+            "subgroup_order": "500884825900595933307132795674658837818095809137913478977332553047879960661308247049501",
+            "target_group": "prime-order subgroup"
+          },
+          "sources": [
+            "docs/curves/standards/registry.json"
+          ]
+        }
+      ]
+    }
+  ],
+  "standards_source": "docs/curves/standards/registry.json"
+}

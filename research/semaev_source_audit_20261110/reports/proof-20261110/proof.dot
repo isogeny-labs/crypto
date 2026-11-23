@@ -1,0 +1,14 @@
+digraph BinaryFourth {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", nodesep=0.3, ranksep=0.3];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, fillcolor="#eef3fa", color="#2d4262", margin="0.15,0.10"];
+  edge [color="#53657e", arrowsize=0.7];
+  source [label="Original 2004 manuscript, p5, Remark 1\nMissing operator at a line break\nLiteral product and additive repair kept distinct", fillcolor="#fff2d9"];
+  correct [label="Lean: actual quadratic resultant\n= s1⁴+s3⁴+s4(s3+s1)²+s4²s1²+s3²\nEvery characteristic-two field, a and tuple", fillcolor="#e6f3e9"];
+  prime [label="F2 control\nAll 16 tuples: literal = repair\nPrime-field checks miss the omission"];
+  extension [label="Actual F4, alpha²+alpha+1=0\nE: y²+xy=x³+1, nonsingular\nTuple (1,1,alpha,alpha²): s1=s3=s4=1"];
+  points [label="Actual Mathlib points\nP=(1,0), T=(0,1), R=(alpha,0), S=(alpha²,alpha²)\n2P=T, R+S=T, 2T=O; hence P+P+R+S=O"];
+  contradiction [label="Actual resultant = 0; literal product = 1\nLean directly negates formula equality and vanishing\nLocal checks; signed standing unverified", fillcolor="#fce7e7"];
+  source -> correct; source -> prime;
+  correct -> extension; prime -> extension;
+  extension -> points; correct -> contradiction; points -> contradiction;
+}

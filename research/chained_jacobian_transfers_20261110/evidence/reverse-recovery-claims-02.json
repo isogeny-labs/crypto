@@ -1,0 +1,22 @@
+[
+  {
+    "name": "ReverseRecovery.recovery49_order12317",
+    "claim_path": "pcc/claims/PCC-20261112-082015.json",
+    "statement": "theorem recovery49_order12317 {A : Type} [IntModule A] (a : A) (ha : (12317 : Int) \u2022 a = 0) : (4776 : Int) \u2022 ((49 : Int) \u2022 a) = a",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/ReverseRecovery.lean",
+      "theorem": "ReverseRecovery.recovery49_order12317",
+      "decl_sha256": "89887298d87db6aaaea7aa45e1d3f3664600dc08d59521da12d7a19e8ea9b30a"
+    }
+  },
+  {
+    "name": "ReverseRecovery.two_sided_inverse_from_norm49",
+    "claim_path": "pcc/claims/PCC-20261112-71f035.json",
+    "statement": "theorem two_sided_inverse_from_norm49 {A B : Type} [IntModule A] [IntModule B] (f : A \u2192 B) (fh : B \u2192 A) (hf : \u2200 a, fh (f a) = (49 : Int) \u2022 a) (hg : \u2200 b, f (fh b) = (49 : Int) \u2022 b) (fl : \u2200 (n : Int) a, f (n \u2022 a) = n \u2022 f a) (ha : \u2200 a : A, (12317 : Int) \u2022 a = 0) (hb : \u2200 b : B, (12317 : Int) \u2022 b = 0) : (\u2200 a, (4776 : Int) \u2022 fh (f a) = a) \u2227 (\u2200 b, f ((4776 : Int) \u2022 fh b) = b)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/ReverseRecovery.lean",
+      "theorem": "ReverseRecovery.two_sided_inverse_from_norm49",
+      "decl_sha256": "ae67e23c16e471edcb8f01f94499590a0aae940ce8dd0aec903b67bbb908cdbf"
+    }
+  }
+]

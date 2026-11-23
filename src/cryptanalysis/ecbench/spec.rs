@@ -1,4 +1,4 @@
-//! The experiment spec (`ecbench.spec/v1`) and the plan it expands to.
+//! The experiment spec and the plan it expands to.
 //!
 //! A spec names *what* is measured: curves, how many independent
 //! single-target workloads per curve, the arms (methods), and how many
@@ -18,8 +18,63 @@ use crate::cryptanalysis::ecbench::methods::{
     applicable, decl, resolve, Applies, MethodSpec, ResolvedMethod,
 };
 use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance, TargetKind, Workload};
+use crate::cryptanalysis::semaev_field_profile::{
+    canonical_semaev_groebner_profile, CANONICAL_SEMAEV_GROEBNER_PROFILE_ID,
+};
 
-pub const SPEC_SCHEMA: &str = "ecbench.spec/v1";
+/// Policy-bearing specs written by current tooling.
+pub const SPEC_SCHEMA: &str = "ecbench.spec/v2";
+/// Frozen historical specs.  They remain parseable for replay and audit.
+pub const LEGACY_SPEC_SCHEMA: &str = "ecbench.spec/v1";
+
+fn default_phase_lane() -> String {
+    super::panel::DEFAULT_PHASE_LANE.to_string()
+}
+
+fn is_default_phase_lane(lane: &str) -> bool {
+    lane == super::panel::DEFAULT_PHASE_LANE
+}
+
+/// Why a spec is allowed to select its curves.
+///
+/// Phase measurements must select canonical panel cells.  Tiny and off-panel
+/// fixtures remain useful, but are explicitly non-claim smoke or diagnostic
+/// work instead of silently entering the scaling ladder.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "mode", rename_all = "snake_case", deny_unknown_fields)]
+pub enum CurvePolicy {
+    /// Present only on frozen v1 specs.
+    #[default]
+    Legacy,
+    /// Correctness, plumbing, and unit-test fixtures.  Not claim eligible.
+    Smoke,
+    /// Off-panel research that records why the canonical ladder is inapplicable.
+    Diagnostic { off_panel_reason: String },
+    /// A scaling measurement on one or more cells in one independently
+    /// promoted benchmark lane of the named phase. Omission preserves the
+    /// pre-lane v2 identity and means `elliptic_algebraic`. A typed transfer
+    /// lane also names its reviewed route.
+    Phase {
+        phase: u8,
+        #[serde(
+            default = "default_phase_lane",
+            skip_serializing_if = "is_default_phase_lane"
+        )]
+        lane: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        route: Option<String>,
+    },
+}
+
+impl CurvePolicy {
+    pub fn is_legacy(&self) -> bool {
+        matches!(self, Self::Legacy)
+    }
+
+    pub fn is_phase(&self) -> bool {
+        matches!(self, Self::Phase { .. })
+    }
+}
 
 /// What an arm is in the comparison.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -53,14 +108,16 @@ pub struct WorkloadPlan {
     /// `planted` (the default: `Q = [k]G`, checked against `k`),
     /// `planted_shared` (the same `k` on every curve of one order, for
     /// paired quotient statistics) or `public` (`Q` hashed to the
-    /// subgroup, checked by `[d]G = Q`): what a `vs_rho` claim needs.
+    /// subgroup, checked by `[d]G = Q`): what a `vs_rho` claim needs;
+    /// `planted_hec_thread` reproduces the hyperelliptic thread's fixed
+    /// target on a `hec_thread` curve.
     /// Not serialised when planted, so a spec written before the field
     /// keeps its id.
     #[serde(default, skip_serializing_if = "TargetKind::is_plain_planted")]
     pub target_kind: TargetKind,
 }
 
-/// Order of the arms inside a round.
+/// Execution-order law. The versioned paired mode also specifies its seed law.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Order {
@@ -78,36 +135,16 @@ pub enum Order {
     /// even number of measured rounds each arm leads and trails equally
     /// often.
     AlternateMeasured,
+    /// Same-order prime curves, grouped by target index. Reverse each curve
+    /// group and its arms on odd measured rounds (warm-ups alternate separately).
+    /// Algorithm seeds hash the shared public (r, target_seed, target_index),
+    /// instead of the model-specific workload id, in a distinct v1 domain.
+    /// Requires planted_shared, word-size prime subgroup orders, at least two
+    /// curves per order and an even measured-round count. Does not certify a map.
+    PairedCurvesV1,
 }
 
-/// The isolation level a wall-clock figure needs (`docs/ecbench/README.md`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub enum Level {
-    L0,
-    L1,
-    L2,
-    L3,
-}
-
-impl Level {
-    pub fn name(self) -> &'static str {
-        match self {
-            Level::L0 => "L0",
-            Level::L1 => "L1",
-            Level::L2 => "L2",
-            Level::L3 => "L3",
-        }
-    }
-    pub fn parse(s: &str) -> Option<Self> {
-        match s {
-            "L0" => Some(Level::L0),
-            "L1" => Some(Level::L1),
-            "L2" => Some(Level::L2),
-            "L3" => Some(Level::L3),
-            _ => None,
-        }
-    }
-}
+pub use super::isolation::Level;
 
 fn default_warmup() -> u32 {
     1
@@ -120,6 +157,24 @@ fn default_level() -> Level {
 }
 fn default_timeout() -> u64 {
     600
+}
+
+/// Index used in the measured algorithm-seed hash. Scheduling rounds remain
+/// absolute; warm-ups always retain their separate domain and absolute index.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AlgorithmSeedRound {
+    /// Historical law: warm-ups advance the measured seed index.
+    #[default]
+    Absolute,
+    /// Measured streams start at zero independently of the warm-up count.
+    MeasuredIndex,
+}
+
+impl AlgorithmSeedRound {
+    fn is_absolute(&self) -> bool {
+        *self == Self::Absolute
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -135,6 +190,9 @@ pub struct Measurement {
     /// Master seed of the algorithm seeds.  Each (workload, round) gets
     /// one seed shared by every arm, so arms are paired.
     pub seed: u64,
+    /// Opt-in measured-index seed law. Omission preserves historical identities.
+    #[serde(default, skip_serializing_if = "AlgorithmSeedRound::is_absolute")]
+    pub algorithm_seed_round: AlgorithmSeedRound,
     /// Below this level a wall-clock figure is descriptive, never a result.
     #[serde(default = "default_level")]
     pub isolation_required: Level,
@@ -149,6 +207,12 @@ pub struct Spec {
     pub label: String,
     #[serde(default)]
     pub description: String,
+    #[serde(default, skip_serializing_if = "CurvePolicy::is_legacy")]
+    pub curve_policy: CurvePolicy,
+    /// Exact field/curve identity required by a benchmark policy. Omission is
+    /// retained only so sealed historical sessions can still be replayed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub field_profile: Option<String>,
     pub workloads: WorkloadPlan,
     pub arms: Vec<ArmSpec>,
     pub measurement: Measurement,
@@ -202,23 +266,314 @@ impl Plan {
 impl Spec {
     pub fn from_json(text: &str) -> Result<Self, String> {
         let spec: Spec = serde_json::from_str(text).map_err(|e| format!("spec: {e}"))?;
-        if spec.schema != SPEC_SCHEMA {
-            return Err(format!(
-                "spec schema is `{}`, expected `{SPEC_SCHEMA}`",
-                spec.schema
-            ));
+        match spec.schema.as_str() {
+            LEGACY_SPEC_SCHEMA if spec.curve_policy.is_legacy() => {}
+            LEGACY_SPEC_SCHEMA => {
+                return Err("ecbench.spec/v1 cannot carry curve_policy; use ecbench.spec/v2".into())
+            }
+            SPEC_SCHEMA if spec.curve_policy.is_legacy() => {
+                return Err(
+                    "ecbench.spec/v2 requires curve_policy: smoke, diagnostic, or phase".into(),
+                )
+            }
+            SPEC_SCHEMA => {}
+            other => {
+                return Err(format!(
+                    "spec schema is `{other}`, expected `{LEGACY_SPEC_SCHEMA}` or `{SPEC_SCHEMA}`"
+                ))
+            }
         }
         Ok(spec)
     }
 
-    fn identity_view(&self) -> Value {
-        json!({
+    pub(crate) fn identity_view(&self) -> Value {
+        let mut view = json!({
             "schema": self.schema,
             "workloads": serde_json::to_value(&self.workloads).unwrap_or(Value::Null),
             "arms": serde_json::to_value(&self.arms).unwrap_or(Value::Null),
             "measurement": serde_json::to_value(&self.measurement).unwrap_or(Value::Null),
-        })
+        });
+        if !self.curve_policy.is_legacy() {
+            view["curve_policy"] = serde_json::to_value(&self.curve_policy).unwrap_or(Value::Null);
+        }
+        if let Some(profile) = &self.field_profile {
+            view["field_profile"] = json!(profile);
+        }
+        view
     }
+
+    /// Current CLI runs require an explicit curve classification.  Audit and
+    /// replay still parse v1 specs byte-for-byte.
+    pub fn require_current_curve_policy(&self) -> Result<(), String> {
+        if self.curve_policy.is_legacy() {
+            Err("ecbench.spec/v1 is historical: convert the spec to v2 with an explicit curve_policy, or pass --allow-legacy-spec only for reproduction".into())
+        } else {
+            Ok(())
+        }
+    }
+}
+
+fn validate_curve_policy(spec: &Spec) -> Result<(), String> {
+    match &spec.curve_policy {
+        CurvePolicy::Legacy | CurvePolicy::Smoke => Ok(()),
+        CurvePolicy::Diagnostic { off_panel_reason } => {
+            if off_panel_reason.trim().len() < 12 {
+                Err("diagnostic curve_policy needs a substantive off_panel_reason".into())
+            } else {
+                Ok(())
+            }
+        }
+        CurvePolicy::Phase { phase, lane, route } => {
+            let catalog = super::panel::catalog()?;
+            let phase_record = catalog
+                .phase(*phase)
+                .ok_or_else(|| format!("canonical panel has no phase {phase}"))?;
+            let lane_definition = catalog
+                .lane(lane)
+                .ok_or_else(|| format!("canonical panel has no benchmark lane `{lane}`"))?;
+            let lane_record = phase_record
+                .lanes
+                .iter()
+                .find(|record| record.lane_id == *lane)
+                .ok_or_else(|| format!("canonical phase {phase} has no benchmark lane `{lane}`"))?;
+            if lane_record.admission_state != "ready_to_preregister" {
+                return Err(format!(
+                    "canonical phase {phase} lane `{lane}` is {} and cannot start until its admission blockers are cleared in the panel manifest: {}",
+                    lane_record.admission_state,
+                    lane_record.blockers.join("; ")
+                ));
+            }
+            if spec.workloads.target_kind != TargetKind::Public {
+                return Err(format!(
+                    "phase {phase} lane `{lane}` requires public targets, not {:?}",
+                    spec.workloads.target_kind
+                ));
+            }
+            if spec.workloads.targets_per_curve < phase_record.minimum_public_targets_per_curve {
+                return Err(format!(
+                    "phase {phase} lane `{lane}` requires at least {} public targets per curve, not {}",
+                    phase_record.minimum_public_targets_per_curve, spec.workloads.targets_per_curve
+                ));
+            }
+            let mut selected = std::collections::BTreeSet::new();
+            match lane_definition.curve_selector.as_str() {
+                "source_panel_cells" => {
+                    if route.is_some() {
+                        return Err(format!(
+                            "phase {phase} lane `{lane}` does not accept a transfer route"
+                        ));
+                    }
+                    for curve in &spec.workloads.curves {
+                        let CurveSpec::Panel { cell } = curve else {
+                            return Err(format!(
+                                "phase {phase} lane `{lane}` curves must use {{\"kind\":\"panel\",\"cell\":...}}; copied or generated curve parameters are off-panel diagnostics"
+                            ));
+                        };
+                        if !selected.insert(cell.as_str()) {
+                            return Err(format!(
+                                "phase {phase} panel cell `{cell}` is listed twice"
+                            ));
+                        }
+                        let (actual_phase, record) = catalog
+                            .cell(cell)
+                            .ok_or_else(|| format!("`{cell}` is not a canonical panel cell"))?;
+                        if actual_phase.phase != *phase {
+                            return Err(format!(
+                                "panel cell `{cell}` belongs to phase {}, not phase {phase}",
+                                actual_phase.phase
+                            ));
+                        }
+                        if !record.runnable() {
+                            return Err(format!(
+                                "panel cell `{cell}` is {} and cannot enter a run",
+                                record.ecbench.status
+                            ));
+                        }
+                    }
+                }
+                "registered_destination_cells" => {
+                    if route.is_some() {
+                        return Err(format!(
+                            "phase {phase} lane `{lane}` does not accept a transfer route"
+                        ));
+                    }
+                    for curve in &spec.workloads.curves {
+                        let CurveSpec::PanelDestination { cell } = curve else {
+                            return Err(format!(
+                                "phase {phase} lane `{lane}` curves must use {{\"kind\":\"panel_destination\",\"cell\":...}}"
+                            ));
+                        };
+                        if !selected.insert(cell.as_str()) {
+                            return Err(format!(
+                                "phase {phase} destination cell `{cell}` is listed twice"
+                            ));
+                        }
+                        let (actual_phase, record) =
+                            catalog.destination(cell).ok_or_else(|| {
+                                format!("`{cell}` is not a canonical destination cell")
+                            })?;
+                        if actual_phase.phase != *phase {
+                            return Err(format!(
+                                "destination cell `{cell}` belongs to phase {}, not phase {phase}",
+                                actual_phase.phase
+                            ));
+                        }
+                        if !record.runnable() {
+                            return Err(format!(
+                                "destination cell `{cell}` is {} and cannot enter a run",
+                                record.ecbench.status
+                            ));
+                        }
+                        let has_arm = |method: &str, role: Role| {
+                            spec.arms
+                                .iter()
+                                .any(|arm| arm.method.id == method && arm.role == role)
+                        };
+                        if !has_arm(&record.ecbench.required_reference, Role::Reference)
+                            || !has_arm(&record.ecbench.required_reference, Role::Control)
+                        {
+                            return Err(format!(
+                                "destination cell `{cell}` requires reference and A/A control arms using `{}`",
+                                record.ecbench.required_reference
+                            ));
+                        }
+                        for method in &record.ecbench.required_candidates {
+                            if !has_arm(method, Role::Candidate) {
+                                return Err(format!(
+                                    "destination cell `{cell}` requires candidate arm `{method}`"
+                                ));
+                            }
+                        }
+                    }
+                }
+                "registered_transfer_routes" => {
+                    let route_id = route.as_deref().ok_or_else(|| {
+                        format!("phase {phase} lane `{lane}` requires a typed transfer route")
+                    })?;
+                    let transfer = catalog
+                        .transfer_route(route_id)
+                        .ok_or_else(|| format!("`{route_id}` is not a canonical transfer route"))?;
+                    if transfer.phase != *phase {
+                        return Err(format!(
+                            "transfer route `{route_id}` belongs to phase {}, not phase {phase}",
+                            transfer.phase
+                        ));
+                    }
+                    if spec.workloads.curves.len() != 1
+                        || !matches!(
+                            &spec.workloads.curves[0],
+                            CurveSpec::Panel { cell } if cell == &transfer.source_cell
+                        )
+                    {
+                        return Err(format!(
+                            "transfer route `{route_id}` requires the exact source panel cell `{}`",
+                            transfer.source_cell
+                        ));
+                    }
+                    let has_arm = |method: &str, role: Role| {
+                        spec.arms
+                            .iter()
+                            .any(|arm| arm.method.id == method && arm.role == role)
+                    };
+                    if !has_arm(&transfer.source_reference, Role::Reference)
+                        || !has_arm(&transfer.source_reference, Role::Control)
+                    {
+                        return Err(format!(
+                            "transfer route `{route_id}` requires source reference and A/A control arms using `{}`",
+                            transfer.source_reference
+                        ));
+                    }
+                    for (index, method) in transfer.destination_methods.iter().enumerate() {
+                        let role = if index == 0 {
+                            Role::Baseline
+                        } else {
+                            Role::Candidate
+                        };
+                        if !has_arm(method, role) {
+                            return Err(format!(
+                                "transfer route `{route_id}` requires destination {role:?} arm `{method}`"
+                            ));
+                        }
+                    }
+                    for method in &transfer.destination_controls {
+                        if !has_arm(method, Role::Control) {
+                            return Err(format!(
+                                "transfer route `{route_id}` requires destination control arm `{method}`"
+                            ));
+                        }
+                    }
+                }
+                other => {
+                    return Err(format!(
+                        "canonical phase {phase} lane `{lane}` has unsupported selector `{other}`"
+                    ))
+                }
+            }
+            Ok(())
+        }
+    }
+}
+
+fn is_binary_semaev_groebner_method(method: &ResolvedMethod) -> bool {
+    if method.id != "ic.pipeline" {
+        return false;
+    }
+    let oracle = method
+        .params
+        .get("oracle")
+        .map(String::as_str)
+        .unwrap_or("");
+    let solver = method
+        .params
+        .get("solver")
+        .map(String::as_str)
+        .unwrap_or("");
+    let semaev = oracle.contains("descent-algebraic")
+        || oracle.contains("pdp3-koblitz")
+        || oracle.contains("pdp3-binary")
+        || oracle.contains("semaev");
+    let groebner = [
+        "f4", "f5", "m4gb", "msolve", "singular", "magma", "fgb", "openf4",
+    ]
+    .iter()
+    .any(|tag| solver.contains(tag));
+    semaev || groebner
+}
+
+fn validate_field_profile(plan: &Plan, require_for_new_run: bool) -> Result<(), String> {
+    let has_binary_workload = plan
+        .instances
+        .iter()
+        .any(|instance| matches!(instance, Instance::Binary(_)));
+    let governed = has_binary_workload
+        && plan
+            .arms
+            .iter()
+            .any(|arm| is_binary_semaev_groebner_method(&arm.method));
+    let Some(profile_id) = plan.spec.field_profile.as_deref() else {
+        if governed && require_for_new_run {
+            return Err(format!(
+                "new binary Gröbner/Semaev runs must set `field_profile` to `{CANONICAL_SEMAEV_GROEBNER_PROFILE_ID}`"
+            ));
+        }
+        return Ok(());
+    };
+    if profile_id != CANONICAL_SEMAEV_GROEBNER_PROFILE_ID {
+        return Err(format!(
+            "unknown field profile `{profile_id}`; canonical binary Gröbner/Semaev runs use `{CANONICAL_SEMAEV_GROEBNER_PROFILE_ID}`"
+        ));
+    }
+    let profile = canonical_semaev_groebner_profile();
+    for instance in &plan.instances {
+        let Instance::Binary(binary) = instance else {
+            return Err(format!(
+                "field profile `{profile_id}` applies only to the canonical binary curve {}",
+                profile.curve.icv1_slug
+            ));
+        };
+        profile.validate_instance(binary)?;
+    }
+    Ok(())
 }
 
 /// Why a spec's arm order cannot be balanced over its measured rounds, if
@@ -243,7 +598,7 @@ fn order_warnings(m: &Measurement) -> Vec<String> {
                 "order `alternate_measured` with {} measured round(s) cannot be balanced: spec order is used once more than the reverse; use an even number of rounds",
                 m.rounds
             )),
-            Order::Shuffle => {}
+            Order::Shuffle | Order::PairedCurvesV1 => {}
         }
     }
     out
@@ -251,6 +606,7 @@ fn order_warnings(m: &Measurement) -> Vec<String> {
 
 /// Validate and expand.  Every refusal happens here, before anything runs.
 pub fn plan(spec: Spec) -> Result<Plan, String> {
+    validate_curve_policy(&spec)?;
     if spec.arms.is_empty() {
         return Err("a spec needs at least one arm".into());
     }
@@ -259,6 +615,23 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
     }
     if spec.workloads.curves.is_empty() || spec.workloads.targets_per_curve == 0 {
         return Err("a spec needs at least one curve and one target per curve".into());
+    }
+    if spec.measurement.order == Order::PairedCurvesV1
+        && (spec.workloads.target_kind != TargetKind::PlantedShared
+            || !spec.measurement.rounds.is_multiple_of(2))
+    {
+        return Err(
+            "paired_curves_v1 requires planted_shared and an even measured-round count".into(),
+        );
+    }
+    if spec.measurement.order == Order::PairedCurvesV1
+        && spec
+            .measurement
+            .warmup
+            .checked_add(spec.measurement.rounds)
+            .is_none()
+    {
+        return Err("paired_curves_v1 round count exceeds u32".into());
     }
     let mut names = std::collections::BTreeSet::new();
     let mut arms = Vec::new();
@@ -334,21 +707,79 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
         instances.push(inst);
     }
     let m = &spec.measurement;
+    let paired = if m.order == Order::PairedCurvesV1 {
+        let mut groups = std::collections::BTreeMap::<(u64, u64), Vec<usize>>::new();
+        let mut orders = Vec::with_capacity(workloads.len());
+        for (wi, w) in workloads.iter().enumerate() {
+            let r = w.curve.r.checked_u64()
+                .filter(|_| w.curve.family == "prime")
+                .ok_or("paired_curves_v1 currently requires prime-field curves with u64 subgroup orders")?;
+            orders.push(r);
+            groups.entry((w.target_index, r)).or_default().push(wi);
+        }
+        if groups.values().any(|g| g.len() < 2) {
+            return Err(
+                "paired_curves_v1 needs at least two distinct curve workloads per subgroup order"
+                    .into(),
+            );
+        }
+        Some((groups.into_values().collect::<Vec<_>>(), orders))
+    } else {
+        None
+    };
     let mut executions = Vec::new();
     let mut seq = 0u64;
     for round in 0..(m.warmup + m.rounds) {
         let warmup = round < m.warmup;
-        for (wi, w) in workloads.iter().enumerate() {
+        let phase_round = if warmup { round } else { round - m.warmup };
+        let workload_order = if let Some((groups, _)) = &paired {
+            let mut order = Vec::with_capacity(workloads.len());
+            for group in groups {
+                if phase_round % 2 == 1 {
+                    order.extend(group.iter().rev().copied());
+                } else {
+                    order.extend(group.iter().copied());
+                }
+            }
+            order
+        } else {
+            (0..workloads.len()).collect()
+        };
+        for wi in workload_order {
+            let w = &workloads[wi];
             // One seed per (workload, round), shared by every arm.
             let wid = u64::from_str_radix(&w.workload_id[1..], 16).unwrap_or(0);
-            let algorithm_seed = derive_u64(
-                if warmup {
-                    "ecbench.warmup_seed"
+            let seed_round =
+                if !warmup && m.algorithm_seed_round == AlgorithmSeedRound::MeasuredIndex {
+                    round - m.warmup
                 } else {
-                    "ecbench.algorithm_seed"
-                },
-                &[m.seed, wid, round as u64],
-            );
+                    round
+                };
+            let algorithm_seed = if let Some((_, orders)) = &paired {
+                derive_u64(
+                    if warmup {
+                        "ecbench.paired_curves_v1.warmup_seed"
+                    } else {
+                        "ecbench.paired_curves_v1.algorithm_seed"
+                    },
+                    &[
+                        m.seed,
+                        orders[wi],
+                        w.target_seed,
+                        w.target_index,
+                        seed_round as u64,
+                    ],
+                )
+            } else {
+                derive_u64(
+                    if warmup {
+                        "ecbench.warmup_seed"
+                    } else {
+                        "ecbench.algorithm_seed"
+                    },
+                    &[m.seed, wid, seed_round as u64],
+                )
+            };
             let mut order: Vec<usize> = (0..arms.len()).collect();
             match m.order {
                 Order::Alternate => {
@@ -356,7 +787,7 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
                         order.reverse();
                     }
                 }
-                Order::AlternateMeasured => {
+                Order::AlternateMeasured | Order::PairedCurvesV1 => {
                     let k = if warmup { round } else { round - m.warmup };
                     if k % 2 == 1 {
                         order.reverse();
@@ -385,7 +816,7 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
     }
     let (spec_id, spec_sha256) = short_id("ECS1", &spec.identity_view())?;
     let warnings = order_warnings(&spec.measurement);
-    Ok(Plan {
+    let plan = Plan {
         spec,
         spec_id,
         spec_sha256,
@@ -395,7 +826,23 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
         instances,
         curve_of,
         executions,
-    })
+    };
+    // A pinned profile is always binding, including during historical
+    // replay. Missing profiles remain replayable and are refused only by
+    // `plan_for_new_run`.
+    validate_field_profile(&plan, false)?;
+    Ok(plan)
+}
+
+/// Validate and expand a spec that is about to create new evidence.
+///
+/// Sealed historical sessions call [`plan`] so an old unpinned spec remains
+/// replayable. Every new plan, run and Iso Lab request goes through this
+/// stricter boundary.
+pub fn plan_for_new_run(spec: Spec) -> Result<Plan, String> {
+    let plan = plan(spec)?;
+    validate_field_profile(&plan, true)?;
+    Ok(plan)
 }
 
 #[cfg(test)]
@@ -407,6 +854,7 @@ mod tests {
             &json!({
                 "schema": SPEC_SCHEMA,
                 "label": "t",
+                "curve_policy": {"mode": "diagnostic", "off_panel_reason": "unit test uses a generated prime fixture"},
                 "workloads": {"curves": [{"kind": "prime_search", "bits": 14, "seed": 59297}],
                               "targets_per_curve": 2, "target_seed": 1},
                 "arms": arms.iter().map(|(n, m)| json!({"name": n, "role": "candidate", "method": {"id": m}})).collect::<Vec<_>>(),
@@ -441,6 +889,99 @@ mod tests {
         assert_eq!(r1[0].algorithm_seed, r1[1].algorithm_seed);
         assert_eq!((r1[0].arm, r1[1].arm), (1, 0));
         assert!(p.spec_id.starts_with("ECS1h"));
+    }
+
+    #[test]
+    fn default_seed_round_preserves_legacy_serialization_and_expansion() {
+        let s = spec(&[("a", "rho.negation"), ("b", "bsgs.textbook")]);
+        let legacy_measurement = json!({
+            "rounds": 3, "warmup": 1, "order": "alternate", "seed": 9,
+            "isolation_required": "L2", "timeout_seconds": 600
+        });
+        assert_eq!(
+            serde_json::to_value(&s.measurement).unwrap(),
+            legacy_measurement
+        );
+        let mut explicit = serde_json::to_value(&s).unwrap();
+        explicit["measurement"]["algorithm_seed_round"] = json!("absolute");
+        let p = plan(s).unwrap();
+        let explicit = plan(Spec::from_json(&explicit.to_string()).unwrap()).unwrap();
+        assert_eq!(p.spec_id, explicit.spec_id);
+        assert_eq!(p.spec_sha256, explicit.spec_sha256);
+        assert_eq!(
+            serde_json::to_value(&p.executions).unwrap(),
+            serde_json::to_value(&explicit.executions).unwrap()
+        );
+        for e in &p.executions {
+            let wid = u64::from_str_radix(&p.workloads[e.workload].workload_id[1..], 16).unwrap();
+            let domain = if e.warmup {
+                "ecbench.warmup_seed"
+            } else {
+                "ecbench.algorithm_seed"
+            };
+            assert_eq!(
+                e.algorithm_seed,
+                derive_u64(domain, &[9, wid, u64::from(e.round)])
+            );
+        }
+    }
+
+    #[test]
+    fn measured_seed_round_preserves_streams_across_warmup_counts() {
+        let mut s = spec(&[("a", "rho.negation"), ("b", "bsgs.textbook")]);
+        s.measurement.rounds = 5;
+        s.measurement.warmup = 0;
+        let legacy = plan(s.clone()).unwrap();
+        s.measurement.algorithm_seed_round = AlgorithmSeedRound::MeasuredIndex;
+        assert_eq!(
+            serde_json::to_value(&s.measurement).unwrap()["algorithm_seed_round"],
+            "measured_index"
+        );
+        assert_eq!(
+            Spec::from_json(&serde_json::to_string(&s).unwrap()).unwrap(),
+            s
+        );
+        for warmup in [0, 1, 3] {
+            s.measurement.warmup = warmup;
+            let p = plan(s.clone()).unwrap();
+            assert_ne!(p.spec_id, legacy.spec_id);
+            assert_eq!(
+                serde_json::to_value(&p.workloads).unwrap(),
+                serde_json::to_value(&legacy.workloads).unwrap()
+            );
+            for wi in 0..p.workloads.len() {
+                let wid = u64::from_str_radix(&p.workloads[wi].workload_id[1..], 16).unwrap();
+                for index in 0..5 {
+                    let paired: Vec<_> = p
+                        .executions
+                        .iter()
+                        .filter(|e| e.workload == wi && !e.warmup && e.round == warmup + index)
+                        .collect();
+                    assert_eq!(paired.len(), 2);
+                    assert_ne!(paired[0].arm, paired[1].arm);
+                    let expected =
+                        derive_u64("ecbench.algorithm_seed", &[9, wid, u64::from(index)]);
+                    for e in paired {
+                        assert_eq!(e.algorithm_seed, expected);
+                        let old = legacy
+                            .executions
+                            .iter()
+                            .find(|old| {
+                                old.workload == wi && old.round == index && old.arm == e.arm
+                            })
+                            .unwrap();
+                        assert_eq!(e.algorithm_seed, old.algorithm_seed);
+                    }
+                }
+                for e in p.executions.iter().filter(|e| e.workload == wi && e.warmup) {
+                    assert!(e.round < warmup);
+                    assert_eq!(
+                        e.algorithm_seed,
+                        derive_u64("ecbench.warmup_seed", &[9, wid, u64::from(e.round)])
+                    );
+                }
+            }
+        }
     }
 
     fn first_arm_per_round(p: &Plan, workload: usize) -> Vec<(u32, bool, usize)> {
@@ -587,6 +1128,7 @@ mod tests {
                 &json!({
                     "schema": SPEC_SCHEMA,
                     "label": "t",
+                    "curve_policy": {"mode": "diagnostic", "off_panel_reason": "unit test exercises method applicability"},
                     "workloads": {"curves": [curve], "targets_per_curve": 1, "target_seed": 1},
                     "arms": [{"name": "pooled", "role": "candidate",
                               "method": {"id": "rho.multitarget_pooled",
@@ -617,5 +1159,249 @@ mod tests {
     fn koblitz_only_arm_on_a_prime_curve_is_refused() {
         assert!(plan(spec(&[("f", "rho.signed_frobenius")])).is_err());
         assert!(plan(spec(&[("a", "rho.plain"), ("a", "rho.plain")])).is_err());
+    }
+
+    #[test]
+    fn v2_requires_an_explicit_curve_policy_while_v1_remains_replayable() {
+        let current = json!({
+            "schema": SPEC_SCHEMA,
+            "label": "missing policy",
+            "workloads": {"curves": [], "targets_per_curve": 0, "target_seed": 0},
+            "arms": [],
+            "measurement": {"rounds": 0, "seed": 0}
+        });
+        assert!(Spec::from_json(&current.to_string())
+            .unwrap_err()
+            .contains("requires curve_policy"));
+        let mut legacy = current;
+        legacy["schema"] = json!(LEGACY_SPEC_SCHEMA);
+        assert!(Spec::from_json(&legacy.to_string())
+            .unwrap()
+            .curve_policy
+            .is_legacy());
+    }
+
+    #[test]
+    fn phase_policy_uses_panel_cells_and_enforces_public_target_count() {
+        let phase = |curve: Value, targets: u64, target_kind: &str| {
+            Spec::from_json(
+                &json!({
+                    "schema": SPEC_SCHEMA,
+                    "label": "phase policy fixture",
+                    "curve_policy": {"mode": "phase", "phase": 1},
+                    "workloads": {"curves": [curve], "targets_per_curve": targets,
+                                  "target_seed": 1, "target_kind": target_kind},
+                    "arms": [{"name": "rho", "role": "reference", "method": {"id": "rho.plain"}}],
+                    "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+                })
+                .to_string(),
+            )
+            .unwrap()
+        };
+        plan(phase(
+            json!({"kind": "panel", "cell": "P1-K0-23"}),
+            32,
+            "public",
+        ))
+        .unwrap();
+        let copied = json!({"kind": "prime_explicit", "p": 5, "a": 2, "b": 1,
+                            "group_order": 7, "r": 7, "gx": 0, "gy": 1});
+        assert!(plan(phase(copied, 32, "public"))
+            .err()
+            .unwrap()
+            .contains("must use"));
+        assert!(plan(phase(
+            json!({"kind": "panel", "cell": "P1-K0-23"}),
+            31,
+            "public",
+        ))
+        .err()
+        .unwrap()
+        .contains("at least 32"));
+        assert!(plan(phase(
+            json!({"kind": "panel", "cell": "P1-K0-23"}),
+            32,
+            "planted",
+        ))
+        .err()
+        .unwrap()
+        .contains("requires public targets"));
+
+        let blocked = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
+                "label": "blocked phase fixture",
+                "curve_policy": {"mode": "phase", "phase": 4},
+                "workloads": {"curves": [{"kind": "panel", "cell": "P4-KOBLITZ-83"}],
+                    "targets_per_curve": 8, "target_seed": 1, "target_kind": "public"},
+                "arms": [{"name": "rho", "role": "reference",
+                    "method": {"id": "rho.signed_frobenius_strong"}}],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
+        assert!(plan(blocked)
+            .err()
+            .unwrap()
+            .contains("phase 4 lane `elliptic_algebraic` is blocked"));
+
+        let phase_hec = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
+                "label": "phase-matched hyperelliptic lane fixture",
+                "curve_policy": {"mode": "phase", "phase": 1,
+                                 "lane": "hyperelliptic_jacobian"},
+                "workloads": {"curves": [{"kind": "panel_destination", "cell": "P1-JG2-18"}],
+                    "targets_per_curve": 32, "target_seed": 1, "target_kind": "public"},
+                "arms": [
+                    {"name": "rho", "role": "reference", "method": {"id": "rho.negation"}},
+                    {"name": "ic", "role": "candidate", "method": {"id": "ic.hyperelliptic_v2"}},
+                    {"name": "rho-aa", "role": "control", "method": {"id": "rho.negation"}}
+                ],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
+        plan(phase_hec).unwrap();
+
+        let wrong_hec_source = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
+                "label": "wrong hyperelliptic source fixture",
+                "curve_policy": {"mode": "phase", "phase": 1,
+                                 "lane": "hyperelliptic_jacobian"},
+                "workloads": {"curves": [{"kind": "panel", "cell": "P1-K0-23"}],
+                    "targets_per_curve": 32, "target_seed": 1, "target_kind": "public"},
+                "arms": [{"name": "rho", "role": "reference", "method": {"id": "rho.negation"}}],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
+        assert!(plan(wrong_hec_source)
+            .err()
+            .unwrap()
+            .contains("panel_destination"));
+
+        let phase_transfer = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
+                "label": "phase-matched cover-transfer fixture",
+                "curve_policy": {"mode": "phase", "phase": 1,
+                                 "lane": "cover_transfer", "route": "P1-K0-23-G3-COVER"},
+                "workloads": {"curves": [{"kind": "panel", "cell": "P1-K0-23"}],
+                    "targets_per_curve": 32, "target_seed": 1, "target_kind": "public"},
+                "arms": [
+                    {"name": "source-rho", "role": "reference",
+                     "method": {"id": "rho.signed_frobenius_strong"}},
+                    {"name": "destination-rho", "role": "baseline",
+                     "method": {"id": "jacobian_image.rho3_v2"}},
+                    {"name": "destination-bsgs", "role": "control",
+                     "method": {"id": "jacobian_image.bsgs_v2"}},
+                    {"name": "destination-genus3-ic", "role": "candidate",
+                     "method": {"id": "jacobian_image.genus3_projected_ic_v1"}},
+                    {"name": "source-rho-aa", "role": "control",
+                     "method": {"id": "rho.signed_frobenius_strong"}}
+                ],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
+        plan(phase_transfer).unwrap();
+
+        let missing_route = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
+                "label": "missing cover-transfer route fixture",
+                "curve_policy": {"mode": "phase", "phase": 1, "lane": "cover_transfer"},
+                "workloads": {"curves": [{"kind": "panel", "cell": "P1-K0-23"}],
+                    "targets_per_curve": 32, "target_seed": 1, "target_kind": "public"},
+                "arms": [{"name": "source-rho", "role": "reference",
+                    "method": {"id": "rho.signed_frobenius_strong"}}],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
+        assert!(plan(missing_route)
+            .err()
+            .unwrap()
+            .contains("requires a typed transfer route"));
+    }
+
+    #[test]
+    fn field_five_fixture_is_smoke_only_not_a_phase_measurement() {
+        let smoke = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
+                "label": "field five smoke fixture",
+                "curve_policy": {"mode": "smoke"},
+                "workloads": {"curves": [{"kind": "prime_explicit", "p": 5, "a": 2, "b": 1,
+                    "group_order": 7, "r": 7, "gx": 0, "gy": 1}],
+                    "targets_per_curve": 1, "target_seed": 1},
+                "arms": [{"name": "bsgs", "role": "candidate", "method": {"id": "bsgs.textbook"}}],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
+        plan(smoke).unwrap();
+    }
+
+    fn binary_groebner_spec(field_profile: Option<&str>, n: u32) -> Spec {
+        let mut value = json!({
+            "schema": LEGACY_SPEC_SCHEMA,
+            "label": "canonical binary Groebner fixture",
+            "workloads": {
+                "curves": [{"kind": "koblitz", "a": 1, "n": n}],
+                "targets_per_curve": 1,
+                "target_seed": 17
+            },
+            "arms": [{
+                "name": "f4",
+                "role": "candidate",
+                "method": {
+                    "id": "ic.pipeline",
+                    "params": {
+                        "factor_base": "koblitz-orbit:divisor=0;1",
+                        "oracle": "descent-algebraic:m=2",
+                        "solver": "f4-f2",
+                        "max_trials": "1"
+                    }
+                }
+            }],
+            "measurement": {"rounds": 1, "warmup": 0, "seed": 19}
+        });
+        if let Some(profile) = field_profile {
+            value["field_profile"] = json!(profile);
+        }
+        Spec::from_json(&value.to_string()).unwrap()
+    }
+
+    #[test]
+    fn new_binary_groebner_runs_require_the_canonical_field_profile() {
+        let legacy = binary_groebner_spec(None, 17);
+        // Sealed evidence remains replayable under the historical planner.
+        assert!(plan(legacy.clone()).is_ok());
+        let err = plan_for_new_run(legacy).err().expect("new run refused");
+        assert!(err.contains(CANONICAL_SEMAEV_GROEBNER_PROFILE_ID), "{err}");
+
+        let wrong_field = binary_groebner_spec(Some(CANONICAL_SEMAEV_GROEBNER_PROFILE_ID), 19);
+        let err = plan_for_new_run(wrong_field)
+            .err()
+            .expect("different field refused");
+        assert!(
+            err.contains("requires curve") || err.contains("GF(2^17)"),
+            "{err}"
+        );
+
+        plan_for_new_run(binary_groebner_spec(
+            Some(CANONICAL_SEMAEV_GROEBNER_PROFILE_ID),
+            17,
+        ))
+        .expect("canonical profile plans");
     }
 }

@@ -1,0 +1,211 @@
+{
+  "moment-search-preparation-20261115-v16": {
+    "evidence": {
+      "complete_global_root_search": false,
+      "error": null,
+      "external_reviewer": false,
+      "original_root_count_exact": null,
+      "out": {
+        "actual": {
+          "parameter_bits": 69,
+          "setup_seconds": 0.10274633299923153,
+          "stages": [
+            {
+              "cap_seconds": 2,
+              "circuit": {
+                "and_cache_hits": 63,
+                "and_gates": 485,
+                "cnf_clauses": 1455,
+                "constant_and_simplifications": 0,
+                "generated_gates": 1293,
+                "largest_xor_row": 292,
+                "literal_cache_hits": 288,
+                "primary_variables": 69,
+                "variables": 1362,
+                "xor_gates": 808,
+                "xor_literals": 34749,
+                "xor_rows": 833
+              },
+              "compile_seconds": 1.5100158634595573e-07,
+              "elapsed_seconds": 2.0594248050001625,
+              "full": false,
+              "models": [],
+              "result": "native_unknown"
+            },
+            {
+              "cap_seconds": 18,
+              "circuit": {
+                "and_cache_hits": 879,
+                "and_gates": 4212,
+                "cnf_clauses": 12636,
+                "constant_and_simplifications": 0,
+                "generated_gates": 10792,
+                "largest_xor_row": 1831,
+                "literal_cache_hits": 3602,
+                "primary_variables": 69,
+                "variables": 10861,
+                "xor_gates": 6580,
+                "xor_literals": 760512,
+                "xor_rows": 6668
+              },
+              "compile_seconds": 2.9232516810006928,
+              "elapsed_seconds": 25.405416751000303,
+              "full": true,
+              "models": [],
+              "result": "native_unknown"
+            }
+          ]
+        },
+        "controls": [
+          {
+            "assignments": 16,
+            "complete": true,
+            "models": 8,
+            "n": 2
+          },
+          {
+            "assignments": 16,
+            "complete": true,
+            "models": 4,
+            "n": 3
+          },
+          {
+            "assignments": 16,
+            "complete": true,
+            "models": 2,
+            "n": 4
+          }
+        ]
+      },
+      "peak_process_rss_kib": 455820,
+      "qualified_speedup": null,
+      "raw_sha256": "d4f77d09c49a7aba27319d1f81525e7e581bdb36dcd14fcd65910b32fc6044d3",
+      "release_gate_claim": false,
+      "worker_seconds": 27.720584573999076
+    },
+    "experiment_id": "moment-search-preparation-20261115-v16",
+    "next_actions": [
+      "If native search stalls, change to explicit rank factor or a quadratic-only solver with certified degree-specific constraints; do not repeat the identical capped search."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "inconclusive",
+    "summary": "Bounded native necessary-moment search; tiny SAT enumeration independently checked by numeric Newton. No original-root completion."
+  },
+  "moment-factor-search-preparation-20261115-v16": {
+    "evidence": {
+      "complete_global_root_search": false,
+      "error": "NameError: cannot access free variable 'model' where it is not associated with a value in enclosing scope",
+      "external_reviewer": false,
+      "original_root_count_exact": null,
+      "out": {},
+      "peak_process_rss_kib": 33672,
+      "qualified_speedup": null,
+      "raw_sha256": "3466cf62beb7fc1bf624ac6d82bad981c74c7207ae0d119c304282a91231176e",
+      "release_gate_claim": false,
+      "worker_seconds": 0.0024641679992782883
+    },
+    "experiment_id": "moment-factor-search-preparation-20261115-v16",
+    "next_actions": [
+      "If native search stalls, change to explicit rank factor or a quadratic-only solver with certified degree-specific constraints; do not repeat the identical capped search."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "inconclusive",
+    "summary": "Changed rank-factor native moment diagnostic; no original-root completion."
+  },
+  "moment-factor-search-repair-preparation-20261115-v16": {
+    "evidence": {
+      "complete_global_root_search": false,
+      "error": null,
+      "external_reviewer": false,
+      "original_root_count_exact": null,
+      "out": {
+        "actual": {
+          "factor_witness_bits": 72,
+          "parameter_bits": 69,
+          "setup_seconds": 0.10031630400044378,
+          "stages": [
+            {
+              "cap_seconds": 1,
+              "circuit": {
+                "and_cache_hits": 63,
+                "and_gates": 485,
+                "cnf_clauses": 1455,
+                "constant_and_simplifications": 0,
+                "generated_gates": 1293,
+                "largest_xor_row": 292,
+                "literal_cache_hits": 288,
+                "primary_variables": 141,
+                "variables": 1434,
+                "xor_gates": 808,
+                "xor_literals": 34749,
+                "xor_rows": 833
+              },
+              "compile_seconds": 2.6999987312592566e-07,
+              "elapsed_seconds": 1.0331838840029377,
+              "full": false,
+              "models": [],
+              "result": "native_unknown"
+            },
+            {
+              "cap_seconds": 10,
+              "circuit": {
+                "and_cache_hits": 879,
+                "and_gates": 4824,
+                "cnf_clauses": 14472,
+                "constant_and_simplifications": 0,
+                "generated_gates": 11404,
+                "largest_xor_row": 1836,
+                "literal_cache_hits": 3602,
+                "primary_variables": 141,
+                "variables": 11545,
+                "xor_gates": 6580,
+                "xor_literals": 1020202,
+                "xor_rows": 6821
+              },
+              "compile_seconds": 3.4894975850002083,
+              "elapsed_seconds": 15.06973270099843,
+              "full": true,
+              "models": [],
+              "result": "native_unknown"
+            }
+          ]
+        },
+        "controls": [
+          {
+            "assignments": 16,
+            "complete": true,
+            "models": 8,
+            "n": 2
+          },
+          {
+            "assignments": 16,
+            "complete": true,
+            "models": 4,
+            "n": 3
+          },
+          {
+            "assignments": 16,
+            "complete": true,
+            "models": 2,
+            "n": 4
+          }
+        ],
+        "rank_controls": {
+          "all_four_row_factors": 65536
+        }
+      },
+      "peak_process_rss_kib": 572796,
+      "qualified_speedup": null,
+      "raw_sha256": "ccb889d5c6ca540dd5b0351a64b05046516d2f0025429c6503145c69979cf120",
+      "release_gate_claim": false,
+      "worker_seconds": 16.77347527800157
+    },
+    "experiment_id": "moment-factor-search-repair-preparation-20261115-v16",
+    "next_actions": [
+      "If native search stalls, change to explicit rank factor or a quadratic-only solver with certified degree-specific constraints; do not repeat the identical capped search."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "inconclusive",
+    "summary": "Changed rank-factor native moment diagnostic; no original-root completion."
+  }
+}

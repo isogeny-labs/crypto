@@ -1,0 +1,69 @@
+'SameULocal.zero_ordinate_square_factor' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SameULocal.square_factor_value_derivative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SameULocal.extracted_ordinate_nonzero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SameULocal.source_extraction_then_doubling' depends on axioms: [propext, Classical.choice, Quot.sound]
+theorem SameULocal.source_extraction_then_doubling.{u_1} : ∀ {K : Type u_1} [inst : Field K] (a0 a1 a2 a3 : K)
+  (a b : MixedCancellation.D2 K),
+  a.z ≠ 0 →
+    a.w ≠ 0 →
+      b.z ≠ 0 →
+        b.w ≠ 0 →
+          MixedCancellation.validTwo (MixedGeneric.curve a0 a1 a2 a3) a →
+            MixedCancellation.validTwo (MixedGeneric.curve a0 a1 a2 a3) b →
+              MixedCancellation.nq a = MixedCancellation.nq b →
+                MixedCancellation.nr a = MixedCancellation.nr b →
+                  MixedCancellation.ns a - MixedCancellation.ns b ≠ 0 →
+                    ¬(MixedCancellation.ns a = -MixedCancellation.ns b ∧
+                          MixedCancellation.nt a = -MixedCancellation.nt b) →
+                      2 ≠ 0 →
+                        SameULocal.LocalNonsingular a0 a1 a2 a3
+                            ((MixedCancellation.nt b - MixedCancellation.nt a) /
+                              (MixedCancellation.ns a - MixedCancellation.ns b)) →
+                          have point := SameUMixed.sourcePoint a b;
+                          have out := MixedPositiveDistinct.doubled a0 a1 a2 a3 point;
+                          point.y ≠ 0 ∧
+                            out.z ≠ 0 ∧ out.w ≠ 0 ∧ MixedCancellation.validTwo (MixedGeneric.curve a0 a1 a2 a3) out :=
+fun {K} [Field K] a0 a1 a2 a3 a b haz haw hbz hbw ha hb hq hr hk hn hchar hloc =>
+  have hb' :=
+    Eq.mpr
+      (id
+        (congrArg
+          (fun _a =>
+            MixedCancellation.support _a (MixedCancellation.nr a) ∣
+              WeightedDoubling.curve a0 a1 a2 a3 -
+                MixedCancellation.ordinate (MixedCancellation.ns b) (MixedCancellation.nt b) ^ 2)
+          hq))
+      (Eq.mpr
+        (id
+          (congrArg
+            (fun _a =>
+              MixedCancellation.support (MixedCancellation.nq b) _a ∣
+                WeightedDoubling.curve a0 a1 a2 a3 -
+                  MixedCancellation.ordinate (MixedCancellation.ns b) (MixedCancellation.nt b) ^ 2)
+            hr))
+        hb);
+  have hy :=
+    SameULocal.extracted_ordinate_nonzero a0 a1 a2 a3 (MixedCancellation.nq a) (MixedCancellation.nr a)
+      (MixedCancellation.ns a) (MixedCancellation.nt a) (MixedCancellation.ns b) (MixedCancellation.nt b) ha hb' hk hn
+      hloc;
+  And.casesOn (SameUMixed.source_point_decode a b haz haw hbz hbw hk) fun pz right =>
+    And.casesOn right fun pw right =>
+      And.casesOn right fun px py =>
+        have hyr := fun hz =>
+          hy
+            (Eq.mpr (id (congrArg (fun _a => _a = 0) (Eq.symm py)))
+              (id
+                (Eq.mpr
+                  (id
+                    (congrArg (fun _a => _a / ((SameUMixed.sourcePoint a b).z ^ 5 * (SameUMixed.sourcePoint a b).w) = 0)
+                      hz))
+                  (of_eq_true
+                    (Eq.trans
+                      (congrFun'
+                        (congrArg Eq (zero_div ((SameUMixed.sourcePoint a b).z ^ 5 * (SameUMixed.sourcePoint a b).w)))
+                        0)
+                      (eq_self 0))))));
+        have pv :=
+          (SameUMixed.source_point_valid (MixedGeneric.curve a0 a1 a2 a3) a b haz haw hbz hbw ha hb hq hr hk
+                hn).right.right;
+        ⟨hyr, MixedPositiveDistinct.doubled_valid a0 a1 a2 a3 (SameUMixed.sourcePoint a b) pz pw hchar hyr pv⟩

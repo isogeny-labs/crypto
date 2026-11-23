@@ -1,0 +1,7 @@
+# Complete target-order coverage for all ten decoded calibration pairs
+
+The six-fiber cohort recorded ten decodedpairs acrossfive supportedcases. Source-sidecofactor/order checks were executedforeachdecodedzero, but the outer target-ordercheck covered only eachcase'sfirstreturnedpair. This supplementary verifier closes the per-zero target clause of PROTOCOL.md before reportingcompletecoverage; it doesnotrerunorretunefibers.
+
+Readall six committedstdoutfiles,parseEVERYCALIBRATIONpair (tenrecords),verifyactualquarticmembership/distinctpoints,4clearednonzero targetclass,ellannihilationandell−1negativecontrol. Alltenrequired; nofilteringtoonlyselected/firstcandidate. No sourceimageorcalibrationDLPsupplied. Fixeddata-counttenisaverificationcoveragerequirement,notanewsamplingrule.
+
+Source/binaryhash+allrawinputscommitandfreshS3checkpoint/gate BEFOREonce-onlyPAIR-CONTROL.txt/stderr/exit. Unexpectedfailurestopandretain;noscientificrerunoralternateanchorcase. Alignmentalreadyvalidatedonlythepreregisteredfirstsupportedcase; itdoesnotimplicitlyvalidatealltenasglobalmaps. No timing/10xclaim.

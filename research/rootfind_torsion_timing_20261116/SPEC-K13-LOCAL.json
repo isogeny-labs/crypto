@@ -1,0 +1,69 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Local complete-call torsion harvest diagnostic on four public K13 targets",
+  "description": "L0 engineering screen of source-pinned torsion harvest, collision harvest, F6-IC and torsion A/A on exact matched Koblitz E0 n13 workloads. Not the frozen EKS L2 F4/F5/F6 panel.",
+  "workloads": {
+    "curves": [{"kind": "koblitz", "a": 0, "n": 13}],
+    "targets_per_curve": 4,
+    "target_seed": 202611151301,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "f6-ic",
+      "role": "reference",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=f6-ic,degree=3,node_budget=8192",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "harvest-m3",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=rootfind-negfold-batch-harvest",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "torsion-m3",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=rootfind-negfold-batch-harvest-torsion",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "torsion-m3-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=rootfind-negfold-batch-harvest-torsion",
+          "max_trials": "200000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 8,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611160916,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}

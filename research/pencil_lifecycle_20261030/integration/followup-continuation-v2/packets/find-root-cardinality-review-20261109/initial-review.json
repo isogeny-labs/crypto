@@ -1,0 +1,50 @@
+{
+  "schema": "research.source-fidelity-review/v1",
+  "status": "main_source_supported_one_control_gap",
+  "main_source_sha256": "1aea703be91a2dc4e0dd8de44fa575555e460a3d951bbc1665a727ae7d619554",
+  "new_execution": false,
+  "findings": [
+    {
+      "id": "F1",
+      "scope": "joint-premise worked control",
+      "finding": "Current controls show actual Run, root maps and numeric component sizes separately, but do not establish Forest, Represents and initial RootSizes together or instantiate run_preserves_root_sizes.",
+      "requested_correction": "Add one conditional-on-64-bit three-node control with rank(i)=i, value=0, k=0, explicit initial RootSizes and application of main preservation theorem. Main declarations need no change."
+    }
+  ],
+  "checked": [
+    "Run recursion matches existing constructor: recursive call updates t before final compress.",
+    "Edge-constant map preservation uses induction and parent edge equality. Root preservation excludes self redirect via strict rank decrease.",
+    "Returned root equality follows fixed-label-at-root and preserved labels; run_exists supplies actual endpoint existence, avoiding arbitrary-label interpretation.",
+    "RootSizes restricted to actual roots; same map fibers and unchanged size array transfer equality. No all-node size claim.",
+    "Native new/node/find source records initial singleton sizes and parent/potential-only find writes; operations counter changes are outside model.",
+    "Word decoding/run_refines, insertion/union component disjointness and overflow remain explicit future composition.",
+    "Main source1aea703... and all seven provided prior source bindings match inspected bytes."
+  ],
+  "initial_sources": [
+    {
+      "path": "FindRootCardinality.lean.txt",
+      "sha256": "1aea703be91a2dc4e0dd8de44fa575555e460a3d951bbc1665a727ae7d619554",
+      "bytes": 4343
+    },
+    {
+      "path": "Controls.lean.txt",
+      "sha256": "6c44d1010a8917c25fd10361b9cb78c3c40737a0700de2bb9f6b0a60b0bd29a5",
+      "bytes": 1652
+    },
+    {
+      "path": "Readback.lean.txt",
+      "sha256": "77d12e527fcd3eb9d7329d937fb11d95e861a9dad045134c560b5fbeedf36572",
+      "bytes": 781
+    },
+    {
+      "path": "PLAN.md",
+      "sha256": "ef049850c1f93e2f19c9751bd3af6820148592ab4cb34aae8b7e8777ad43cd02",
+      "bytes": 3883
+    },
+    {
+      "path": "source-bindings.json",
+      "sha256": "b72b020b014f50d9954eda4c7499c1c03794c7500ce32d1b30de8425cc75ba74",
+      "bytes": 2452
+    }
+  ]
+}

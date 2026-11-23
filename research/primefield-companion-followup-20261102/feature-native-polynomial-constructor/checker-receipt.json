@@ -1,0 +1,44 @@
+{
+  "recorded_at": "2026-11-05T16:26:37.413285+00:00",
+  "steps": [
+    {
+      "step": "checker-build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "research/primefield-companion-followup-20261102/feature-native-polynomial-constructor/check.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-polynomial-constructor-20261105/checker"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "checker-positive",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-polynomial-constructor-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-polynomial-constructor/program.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "checker-negative",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-polynomial-constructor-20261105/checker",
+        "research/primefield-companion-followup-20261102/feature-native-polynomial-constructor/negative-program.tsv"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 101
+    }
+  ],
+  "binary_sha256": "a0a1b84c510c1a563fb5f1e11322bd01cc04cc0648b33146b78b0dd9e298f5ae",
+  "locked_inputs": {
+    "check.rs": "c65b1588cd433b742d10c10fe343a04494caac88585348be0428618f14be1b84",
+    "program.tsv": "677d16dbbda870ea341f36f576c61c14d48326b74d29635832ca5d1f0365a42f",
+    "negative-program.tsv": "904c23b49a03cc4dc10354e22867445fdad685dda43ee6260c5ed8030a6bab55"
+  }
+}

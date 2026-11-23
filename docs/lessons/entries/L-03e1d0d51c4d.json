@@ -1,0 +1,14 @@
+{
+  "action": "Materialize the tracked pcc ledger and keyring from the pinned base before invoking claim new; verify the base prefix before publication.",
+  "created": "2026-11-15T21:21:27Z",
+  "evidence": [
+    "research/courtois_native_20261115/evidence/unpublished-initial-ledger.txt"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "*"
+  ],
+  "trigger": "Creating a PCC claim in a fresh sparse checkout",
+  "why": "A sparse checkout can omit an existing tracked ledger and the claim command can initialize an unpublished shorter ledger. Preserve any failed local attempt and do not rewrite published history."
+}

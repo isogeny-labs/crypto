@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.followup/v1",
+  "standing": "unverified",
+  "scientific_panel": {
+    "status": "not_launched",
+    "cells": 12,
+    "planned_solver_rows": 4992,
+    "blockers": [
+      "checkpoint upload and AWS access",
+      "live capacity and aggregate budget admission",
+      "measured preflight and frozen deployment/input identities",
+      "independent signed verdict"
+    ]
+  },
+  "final_build": {
+    "source_revision": "5a7e0fa433aa01dfefee8ec7fcb7ad2e6765a957",
+    "local_image_id": "sha256:652edda21d8ff651ebd8d10795c0d1a1d64215190309a97fbc303401fb1058d5",
+    "registry_digest": null,
+    "source_manifest": "validation/SOURCE.sha256",
+    "binary_manifest": "final-image-smoke/ATLAS-BINARIES.sha256"
+  },
+  "fixtures": {
+    "bv_products": 196,
+    "bv_relations": 30,
+    "bv_relation_sat_replayed": 20,
+    "bv_relation_unsat": 10,
+    "rust_unit_tests": 3,
+    "pcc_tests": 12,
+    "pcc_canary_classes": 59,
+    "export_tamper_canaries": 7,
+    "forged_openssl_certificates_rejected": 2
+  },
+  "development_runs": {
+    "historical": {
+      "attempted": 13,
+      "completed": 13,
+      "invalid_or_incomplete": 0,
+      "planned": 13
+    },
+    "local": {
+      "attempted": 13,
+      "completed": 10,
+      "invalid_or_incomplete": 3,
+      "planned": 13
+    },
+    "first_image": {
+      "attempted": 13,
+      "completed": 13,
+      "invalid_or_incomplete": 0,
+      "planned": 13
+    },
+    "final_image": {
+      "attempted": 13,
+      "completed": 13,
+      "invalid_or_incomplete": 0,
+      "planned": 13
+    }
+  },
+  "library": {
+    "schema": "atlas.library-validation/v1",
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "--lib"
+    ],
+    "compiled_source": "c4189e70782fdf71360551dca07007cd6c02ec9f",
+    "final_native_source": "5a7e0fa433aa01dfefee8ec7fcb7ad2e6765a957",
+    "library_source_changed": false,
+    "exit": 101,
+    "finished": true,
+    "declared": 6148,
+    "passed": 6006,
+    "failed": 12,
+    "ignored": 130,
+    "test_execution_seconds": 2776.57,
+    "clock_scope": "unisolated development-test duration, never a performance comparison",
+    "raw_log_sha256": "62af7a6668fae6132fdcec47c9cf307dc37db41965e3180af3ba3f98f8290017",
+    "fixture_failures_repaired_on_targeted_rerun": 6,
+    "remaining": {
+      "host_clock_namespace_failures": 2,
+      "untouched_assertion_failures": 4
+    },
+    "full_gate_passed": false,
+    "independent_standing": "unverified"
+  },
+  "performance_claim": null,
+  "independent_signed_verdict": null,
+  "artifacts": [
+    "README.md",
+    "REPORT.pdf",
+    "fixtures/",
+    "validation/",
+    "unit-example/",
+    "unit-example2/",
+    "image-smoke/",
+    "final-image-smoke/",
+    "metadata-recheck/",
+    "export-canaries-v2/",
+    "prospective/"
+  ]
+}

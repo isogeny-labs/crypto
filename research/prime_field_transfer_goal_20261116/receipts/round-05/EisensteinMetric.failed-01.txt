@@ -1,0 +1,32 @@
+import Mathlib.LinearAlgebra.Matrix.PosDef
+import Mathlib.Tactic
+
+namespace EisensteinMetric
+def gram : Matrix (Fin 2) (Fin 2) ℚ := !![2, -1; -1, 2]
+def minusRow : Matrix (Fin 1) (Fin 2) ℚ := !![1, -1]
+def plusRow : Matrix (Fin 1) (Fin 2) ℚ := !![1, 1]
+
+theorem lower_certificate : gram - 1 = minusRowᴴ * minusRow := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [gram, minusRow, Matrix.mul_apply, Matrix.conjTranspose_apply, Fin.sum_univ_succ]
+
+theorem upper_certificate : 3 - gram = plusRowᴴ * plusRow := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    norm_num [gram, plusRow, Matrix.mul_apply, Matrix.conjTranspose_apply, Fin.sum_univ_succ]
+
+theorem lower_psd : (gram - 1).PosSemidef := by
+  rw [lower_certificate]
+  exact Matrix.posSemidef_conjTranspose_mul_self minusRow
+
+theorem upper_psd : (3 - gram).PosSemidef := by
+  rw [upper_certificate]
+  exact Matrix.posSemidef_conjTranspose_mul_self plusRow
+
+theorem positive : gram.PosDef := by
+  have h : gram = 1 + (gram - 1) := by abel
+  rw [h]
+  exact Matrix.PosDef.one.add_posSemidef lower_psd
+
+end EisensteinMetric

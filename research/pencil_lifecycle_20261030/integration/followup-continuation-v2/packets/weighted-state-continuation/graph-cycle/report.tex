@@ -1,0 +1,19 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\begin{document}\section*{Signed graph cycles, anchors and constraints}
+2026-11-01. Ten main declarations, eight controls and eighteen named axiom readbacks passed.
+
+\textbf{Derived constraint semantics.} From $a+bk=0$ and $b\ne0$, the native expression $(-a)b^{-1}$ equals k. When $b=0$, the relation forces $a=0$, matching the native consistency assertion rather than inventing a solve.
+
+\textbf{Same-root branches.} A reduced edge is $c_uR+c_vR=A+Bk$. Opposite signs derive the source equation $-A+(-B)k=0$ and its returned quotient equals k. Equal signs derive $R=A/(2c)+B/(2c)k$ under $2\ne0,c\ne0$. Explicit sign-domain classification and the conditional native denominator $2$ versus $-2$ are checked.
+
+\begin{center}\fbox{Reduced cycle}\quad$\longrightarrow$\quad\fbox{Constraint or anchor}\quad$\longrightarrow$\quad\fbox{Solve or consistency}\end{center}
+
+\textbf{Existing fixed anchor.} Two valid descriptions $R=x+yk=a+bk$ yield $(x-a)+(y-b)k=0$. Nonzero target coefficient gives k; zero target coefficient forces equal constants. A first anchor only records a root description. Metadata mutation is a separate obligation.
+
+\textbf{Controls.} Direct solve, positive-cycle signs, both negative-cycle signs, existing-anchor solve, equal-anchor consistency, inconsistent zero coefficient rejection and characteristic-two boundary passed. For prime modulus $r>2$, the field has nonzero2; the native representative $r-2$ and inversion routine still need their word-level bridge.
+
+\textbf{Failures retained.} Initial negation orientation and redundant tactic failed; a later extension lacked DecidableEq for the conditional denominator. Corrected proof and controls pass. Failed sources/logs remain; nonfatal warnings retained.
+
+\textbf{Boundaries.} Input relations and root equations must come from graph invariants. This packet does not prove forest mutation, canonical words, i8 sign preservation, modular inverse implementation, index/counter safety or compiled equivalence. Prior add/sub/mul correspondence is not an inverse theorem. Independent semantic review pending. Fresh checks retain cached dependency trust boundaries. No scientific execution or performance claim.
+
+Source: three\_leads.rs SignedGraph edge/anchor/constraint. Artifacts: REPORT.md, status.json, receipts, exact input bindings, source snapshot and editable flow.svg.
+\end{document}

@@ -1,0 +1,681 @@
+{
+  "branch": "fes-ipc-latency-20261115",
+  "closed_utc": "2026-11-16T01:58:33+00:00",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "-u",
+        "IC_BEFORE",
+        "-u",
+        "IC_MAIN",
+        "modal",
+        "run",
+        "research/ic_gpu_ipc_split_20261116/modal_ipc.py",
+        "--fetch-token",
+        "f2c62bad15e848ed8b23b354ddd47e17",
+        "--out",
+        "/tmp/claude-0/-home-user/e375a883-d595-5f04-8ef9-a57bb8288ce5/scratchpad/modal_ipc_fetch3"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T01:58:17+00:00",
+      "wall_s": 10.868
+    }
+  ],
+  "commit": "1939c2ffb8dace070b3aaa95b890ae3fa5ab405d",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T00:58:06+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261116T0058Z-ic-gpu-ipc-split-a100",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "solver_call_a_pre4062_koblitz_n23",
+      "note": "whole fes-f2-gpu solver call per call, ic before the direct pack with the text protocol, 24 unknowns, A100 80GB PCIe",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0004991113333333333,
+        0.0005036781075612353
+      ],
+      "unit": "wall_s",
+      "value": 0.0005009086119985801
+    },
+    {
+      "baseline": 0.0005009086119985801,
+      "better": "lower",
+      "n": 3,
+      "name": "solver_call_b_main_koblitz_n23",
+      "note": "whole fes-f2-gpu solver call per call, ic main with direct pack and binary protocol, 24 unknowns; baseline is arm A; other main changes between the arms are not isolated",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0001969117097976571,
+        0.0002070295969116081
+      ],
+      "unit": "wall_s",
+      "value": 0.00020281910046148388
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "round_trip_a_koblitz_n23",
+      "note": "Rust-side worker round trip per call, text protocol ic before, 24 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0002442,
+        0.00024890000000000003
+      ],
+      "unit": "wall_s",
+      "value": 0.00024606666666666667
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "round_trip_b_koblitz_n23",
+      "note": "Rust-side worker round trip per call, binary protocol ic main, 24 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.00018559999999999998,
+        0.0001967
+      ],
+      "unit": "wall_s",
+      "value": 0.00019193333333333333
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "worker_busy_b_koblitz_n23",
+      "note": "CUDA worker busy time per call from end of request read to flushed reply, 24 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        9.203e-05,
+        9.415000000000001e-05
+      ],
+      "unit": "wall_s",
+      "value": 9.333999999999998e-05
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "kernel_gpu_b_koblitz_n23",
+      "note": "FES kernel GPU time per call from CUDA events, 24 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        6.882e-05,
+        6.921e-05
+      ],
+      "unit": "wall_s",
+      "value": 6.899333333333333e-05
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "pipe_floor_c_koblitz_n23",
+      "note": "round trip of ic main against a null worker that parses the request and answers no solutions; the pipe floor in this container; 24 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.34e-05,
+        1.3599999999999999e-05
+      ],
+      "unit": "wall_s",
+      "value": 1.35e-05
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "unlocated_b_koblitz_n23",
+      "note": "derived: round trip minus worker busy minus null-worker floor, per call (means of 3 runs each); no phase timer covers it; 24 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        8.509333333333331e-05,
+        8.509333333333331e-05
+      ],
+      "unit": "wall_s",
+      "value": 8.509333333333331e-05
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 5,
+      "name": "counted_answers_differ_koblitz_n23",
+      "note": "counted fields of arm A vs arm B runs against the first A run; arm C excluded (answers wrong on purpose)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "solver_call_a_pre4062_char2_n25",
+      "note": "whole fes-f2-gpu solver call per call, ic before the direct pack with the text protocol, 26 unknowns, A100 80GB PCIe",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0006299394067579127,
+        0.0006324092001710864
+      ],
+      "unit": "wall_s",
+      "value": 0.0006309516642429426
+    },
+    {
+      "baseline": 0.0006309516642429426,
+      "better": "lower",
+      "n": 3,
+      "name": "solver_call_b_main_char2_n25",
+      "note": "whole fes-f2-gpu solver call per call, ic main with direct pack and binary protocol, 26 unknowns; baseline is arm A; other main changes between the arms are not isolated",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.00026077928143712577,
+        0.00030012342514970056
+      ],
+      "unit": "wall_s",
+      "value": 0.0002753493986313088
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "round_trip_a_char2_n25",
+      "note": "Rust-side worker round trip per call, text protocol ic before, 26 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0003153,
+        0.0003187
+      ],
+      "unit": "wall_s",
+      "value": 0.0003166333333333333
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "round_trip_b_char2_n25",
+      "note": "Rust-side worker round trip per call, binary protocol ic main, 26 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0002467,
+        0.00028670000000000003
+      ],
+      "unit": "wall_s",
+      "value": 0.00026153333333333337
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "worker_busy_b_char2_n25",
+      "note": "CUDA worker busy time per call from end of request read to flushed reply, 26 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.00016790999999999998,
+        0.00016899000000000002
+      ],
+      "unit": "wall_s",
+      "value": 0.00016852000000000002
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "kernel_gpu_b_char2_n25",
+      "note": "FES kernel GPU time per call from CUDA events, 26 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.00014147999999999998,
+        0.00014165
+      ],
+      "unit": "wall_s",
+      "value": 0.00014156
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "pipe_floor_c_char2_n25",
+      "note": "round trip of ic main against a null worker that parses the request and answers no solutions; the pipe floor in this container; 26 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.34e-05,
+        1.3700000000000001e-05
+      ],
+      "unit": "wall_s",
+      "value": 1.36e-05
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 3,
+      "name": "unlocated_b_char2_n25",
+      "note": "derived: round trip minus worker busy minus null-worker floor, per call (means of 3 runs each); no phase timer covers it; 26 unknowns",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        7.941333333333335e-05,
+        7.941333333333335e-05
+      ],
+      "unit": "wall_s",
+      "value": 7.941333333333335e-05
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 5,
+      "name": "counted_answers_differ_char2_n25",
+      "note": "counted fields of arm A vs arm B runs against the first A run; arm C excluded (answers wrong on purpose)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "kernel:fes_f2_gpu_call_split_a100",
+  "raw": [
+    {
+      "bytes": 4284,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab.out",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/58/58917d5e2878398cde51af8fa23d7d6852ac73d39623f6fbaaa77fb561b00528",
+      "sha256": "58917d5e2878398cde51af8fa23d7d6852ac73d39623f6fbaaa77fb561b00528",
+      "uploaded": false
+    },
+    {
+      "bytes": 15708,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_1_A.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/06/068d11cd871541ed2d44184e08c3b9c05f8bdaee0c800f740f638f182ed1755e",
+      "sha256": "068d11cd871541ed2d44184e08c3b9c05f8bdaee0c800f740f638f182ed1755e",
+      "uploaded": false
+    },
+    {
+      "bytes": 17887,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_1_A.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6a/6a7f455e3cf7a71aa3283d87c8934c93706dc2e6c0017c6440d3d283543c06f9",
+      "sha256": "6a7f455e3cf7a71aa3283d87c8934c93706dc2e6c0017c6440d3d283543c06f9",
+      "uploaded": false
+    },
+    {
+      "bytes": 15709,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_1_B.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6e/6ec957370a1691b7d19497c74d23535e54d62b745e80108ba1bad8721237f42e",
+      "sha256": "6ec957370a1691b7d19497c74d23535e54d62b745e80108ba1bad8721237f42e",
+      "uploaded": false
+    },
+    {
+      "bytes": 16511,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_1_B.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d7/d7239fa5b8e62a5f099c49e11544bee6238ad8003bec786ce66584ed3b071497",
+      "sha256": "d7239fa5b8e62a5f099c49e11544bee6238ad8003bec786ce66584ed3b071497",
+      "uploaded": false
+    },
+    {
+      "bytes": 15387,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_1_C.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a8/a81f0fa7ad7eea9719650d8276658a630293835a37f2c4b764fd938481e45d35",
+      "sha256": "a81f0fa7ad7eea9719650d8276658a630293835a37f2c4b764fd938481e45d35",
+      "uploaded": false
+    },
+    {
+      "bytes": 1607237,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_1_C.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/77/777ed14716da70567bbfb11abe218ee84c4f8a66fdc445383239465797610a21",
+      "sha256": "777ed14716da70567bbfb11abe218ee84c4f8a66fdc445383239465797610a21",
+      "uploaded": false
+    },
+    {
+      "bytes": 15717,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_2_A.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/85/85952ab7675debec64eadb04ec03f81491df90fa805c8863a38f58edc77915b0",
+      "sha256": "85952ab7675debec64eadb04ec03f81491df90fa805c8863a38f58edc77915b0",
+      "uploaded": false
+    },
+    {
+      "bytes": 17896,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_2_A.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a3/a30cd65af2593995443b4e989faf1a5e96b8da84ed8fccdbfc4b2351ab8ce63a",
+      "sha256": "a30cd65af2593995443b4e989faf1a5e96b8da84ed8fccdbfc4b2351ab8ce63a",
+      "uploaded": false
+    },
+    {
+      "bytes": 15705,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_2_B.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/72/72f5566220a9323a40302021a6f7c3da376c123c78a0755c4e7f3eadda2e2203",
+      "sha256": "72f5566220a9323a40302021a6f7c3da376c123c78a0755c4e7f3eadda2e2203",
+      "uploaded": false
+    },
+    {
+      "bytes": 16507,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_2_B.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d8/d838bce64c632982fdd29180fda360e3cf7e77a4da837edd7a604b452646ca72",
+      "sha256": "d838bce64c632982fdd29180fda360e3cf7e77a4da837edd7a604b452646ca72",
+      "uploaded": false
+    },
+    {
+      "bytes": 15386,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_2_C.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9e4e89b0e7f1329e39a4dfc7088effb37115b23546920792d2f33e3f7128428c",
+      "sha256": "9e4e89b0e7f1329e39a4dfc7088effb37115b23546920792d2f33e3f7128428c",
+      "uploaded": false
+    },
+    {
+      "bytes": 1607236,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_2_C.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/13/13686727c804c044425cf5745398bd667f8d6e90c0bcfa26a75dd8a776d99fab",
+      "sha256": "13686727c804c044425cf5745398bd667f8d6e90c0bcfa26a75dd8a776d99fab",
+      "uploaded": false
+    },
+    {
+      "bytes": 15707,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_3_A.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/715dbf9cba588425934bf2bbf71ed2cd7158e150f4bca6d80439ed8e0db96299",
+      "sha256": "715dbf9cba588425934bf2bbf71ed2cd7158e150f4bca6d80439ed8e0db96299",
+      "uploaded": false
+    },
+    {
+      "bytes": 17886,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_3_A.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a5/a5d075280b60d43a2bec5934708353345743098a94b883c4dcf66c8e7370e586",
+      "sha256": "a5d075280b60d43a2bec5934708353345743098a94b883c4dcf66c8e7370e586",
+      "uploaded": false
+    },
+    {
+      "bytes": 15710,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_3_B.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/02/02764efd64e1b37edd4d1f4c85e86287336581d4303ea81aacd415d5edb3d056",
+      "sha256": "02764efd64e1b37edd4d1f4c85e86287336581d4303ea81aacd415d5edb3d056",
+      "uploaded": false
+    },
+    {
+      "bytes": 16512,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_3_B.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/49/49bc54b7a0cdb8639ba2e598f07b06dd69188087c2ebd61917a3f545fe12b7be",
+      "sha256": "49bc54b7a0cdb8639ba2e598f07b06dd69188087c2ebd61917a3f545fe12b7be",
+      "uploaded": false
+    },
+    {
+      "bytes": 15383,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_3_C.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f1/f1048d3ceb43f21e40f95dd958d993ba40fb874fed84faf0fb131648b3372b25",
+      "sha256": "f1048d3ceb43f21e40f95dd958d993ba40fb874fed84faf0fb131648b3372b25",
+      "uploaded": false
+    },
+    {
+      "bytes": 1607233,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/char2-n25_3_C.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/73c8e3902b0bd823c2421ffe72978a8292f6dc84fe1e819eac02dd267823848a",
+      "sha256": "73c8e3902b0bd823c2421ffe72978a8292f6dc84fe1e819eac02dd267823848a",
+      "uploaded": false
+    },
+    {
+      "bytes": 28616,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_1_A.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e0/e03200cb5788b0feb3cc0fbb3880f7e347b8ccfdb9d9ae072735ca6ee0f9a751",
+      "sha256": "e03200cb5788b0feb3cc0fbb3880f7e347b8ccfdb9d9ae072735ca6ee0f9a751",
+      "uploaded": false
+    },
+    {
+      "bytes": 30387,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_1_A.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ab/ab9edea75722b28e4a974d0d6f43c3494492c5f9859057a67e251c076cca3087",
+      "sha256": "ab9edea75722b28e4a974d0d6f43c3494492c5f9859057a67e251c076cca3087",
+      "uploaded": false
+    },
+    {
+      "bytes": 28633,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_1_B.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c2/c28b5efd36e19568b6d7565de2afd08113d196a22ff59c6e0b36978759430511",
+      "sha256": "c28b5efd36e19568b6d7565de2afd08113d196a22ff59c6e0b36978759430511",
+      "uploaded": false
+    },
+    {
+      "bytes": 29289,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_1_B.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/20/201aa1c18674c62a9341ff1e87c8932ee88bf03634cc8f9b6881ded0523f4770",
+      "sha256": "201aa1c18674c62a9341ff1e87c8932ee88bf03634cc8f9b6881ded0523f4770",
+      "uploaded": false
+    },
+    {
+      "bytes": 28056,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_1_C.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/27/27553b66cbf50c92b001de4a57f6e7d9b89503d735f6cf958d0b4d24c838905b",
+      "sha256": "27553b66cbf50c92b001de4a57f6e7d9b89503d735f6cf958d0b4d24c838905b",
+      "uploaded": false
+    },
+    {
+      "bytes": 2467949,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_1_C.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ef/efb4beecd2f2f7ebcc1305d50a203f99fe0c35425dbb0be829d614adf160dae1",
+      "sha256": "efb4beecd2f2f7ebcc1305d50a203f99fe0c35425dbb0be829d614adf160dae1",
+      "uploaded": false
+    },
+    {
+      "bytes": 28665,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_2_A.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/84/84f6553d296fc06a86f81741781f5446f6ca5040321d4d3c0ee89377ccdfb179",
+      "sha256": "84f6553d296fc06a86f81741781f5446f6ca5040321d4d3c0ee89377ccdfb179",
+      "uploaded": false
+    },
+    {
+      "bytes": 30436,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_2_A.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d8/d8cee64023c2ebdca9579899e9d1cf517139314791f3e878a41da11d2b6fb227",
+      "sha256": "d8cee64023c2ebdca9579899e9d1cf517139314791f3e878a41da11d2b6fb227",
+      "uploaded": false
+    },
+    {
+      "bytes": 28644,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_2_B.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ce/ce7a7aef8b9cf1e0a6e9252f59375872779bb8623354ec30147e8d5797de1e2d",
+      "sha256": "ce7a7aef8b9cf1e0a6e9252f59375872779bb8623354ec30147e8d5797de1e2d",
+      "uploaded": false
+    },
+    {
+      "bytes": 29300,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_2_B.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/51/514b2665c5a8c017081bb544f2a4df804c5df9d2092a6b6be6524341cdd02c1f",
+      "sha256": "514b2665c5a8c017081bb544f2a4df804c5df9d2092a6b6be6524341cdd02c1f",
+      "uploaded": false
+    },
+    {
+      "bytes": 28043,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_2_C.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9e733bb6a5b4c03794e850085d0cfacdb1b93f8bf4c00a435301ad695e42dd6e",
+      "sha256": "9e733bb6a5b4c03794e850085d0cfacdb1b93f8bf4c00a435301ad695e42dd6e",
+      "uploaded": false
+    },
+    {
+      "bytes": 2467936,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_2_C.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f3/f34df8c9a026735d72a729a7b25317b8e72f76d691448bb1fb6ccf01ee0287f7",
+      "sha256": "f34df8c9a026735d72a729a7b25317b8e72f76d691448bb1fb6ccf01ee0287f7",
+      "uploaded": false
+    },
+    {
+      "bytes": 28652,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_3_A.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c1/c1802e1c1207b44e8894f766b08bd75fe833bc43c51fca13966cd58ed2cfca57",
+      "sha256": "c1802e1c1207b44e8894f766b08bd75fe833bc43c51fca13966cd58ed2cfca57",
+      "uploaded": false
+    },
+    {
+      "bytes": 30423,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_3_A.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/12/126829dedd5e8d97850388edfc8e0bdaea1b8537b472a41150b3911c0790cfe6",
+      "sha256": "126829dedd5e8d97850388edfc8e0bdaea1b8537b472a41150b3911c0790cfe6",
+      "uploaded": false
+    },
+    {
+      "bytes": 28648,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_3_B.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3f43f8627db93621697b475eb5d190de550bd922fe113f91438d275cf78d8294",
+      "sha256": "3f43f8627db93621697b475eb5d190de550bd922fe113f91438d275cf78d8294",
+      "uploaded": false
+    },
+    {
+      "bytes": 29304,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_3_B.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6e/6e1dc5e66d1ff14567779d605394b2a48f3a9ba23199e774abf69f01de8772fe",
+      "sha256": "6e1dc5e66d1ff14567779d605394b2a48f3a9ba23199e774abf69f01de8772fe",
+      "uploaded": false
+    },
+    {
+      "bytes": 28049,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_3_C.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/93/93d52d441d0360c0d4388781a44d71f4ab9998c9cc1a99bf1f71399797c6a9fa",
+      "sha256": "93d52d441d0360c0d4388781a44d71f4ab9998c9cc1a99bf1f71399797c6a9fa",
+      "uploaded": false
+    },
+    {
+      "bytes": 2467942,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/ab/koblitz-n23_3_C.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0e/0efa42f7deecb30a9a080cd63a139f84de3dfa892893f0c281877e3e8879780b",
+      "sha256": "0efa42f7deecb30a9a080cd63a139f84de3dfa892893f0c281877e3e8879780b",
+      "uploaded": false
+    },
+    {
+      "bytes": 316,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/binaries.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/97/978fdb9a6b7e6475c6a51d9879e75be8ae777831eef2419ff51aa563166ff944",
+      "sha256": "978fdb9a6b7e6475c6a51d9879e75be8ae777831eef2419ff51aa563166ff944",
+      "uploaded": false
+    },
+    {
+      "bytes": 41,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/fes-selftest.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/74/74cef93929666ab5a40ac88f6b87cf321df2892e38057c1b2441e4dcb2da24f2",
+      "sha256": "74cef93929666ab5a40ac88f6b87cf321df2892e38057c1b2441e4dcb2da24f2",
+      "uploaded": false
+    },
+    {
+      "bytes": 64,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/gpu.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/93/9356c0a8a247bed2e90ebabd99091b8f32ff3d259f365b8a069c55040507c9b8",
+      "sha256": "9356c0a8a247bed2e90ebabd99091b8f32ff3d259f365b8a069c55040507c9b8",
+      "uploaded": false
+    },
+    {
+      "bytes": 4591,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/job.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/57/57b382ec61ffd3e21aa44f8b7e4d2be282b8ff6fb1b4072e1a5e9ed7296cc4bc",
+      "sha256": "57b382ec61ffd3e21aa44f8b7e4d2be282b8ff6fb1b4072e1a5e9ed7296cc4bc",
+      "uploaded": false
+    },
+    {
+      "bytes": 465,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/launch.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/76/76e804c7687b4c0c1037ea913652bfc62145cef3b829fef0c89a4d30839b75c9",
+      "sha256": "76e804c7687b4c0c1037ea913652bfc62145cef3b829fef0c89a4d30839b75c9",
+      "uploaded": false
+    },
+    {
+      "bytes": 1217,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/lscpu.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7d/7d496102606091d4cf50e5396652234a72fa19c524e8986e0e1eeee3f356e896",
+      "sha256": "7d496102606091d4cf50e5396652234a72fa19c524e8986e0e1eeee3f356e896",
+      "uploaded": false
+    },
+    {
+      "bytes": 2,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/nproc.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/aa/aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+      "sha256": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+      "uploaded": false
+    },
+    {
+      "bytes": 208,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/nvcc.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/68/68f8b0a1301428031e307cf5260142a517bff25cc232a09eae2734be475d721f",
+      "sha256": "68f8b0a1301428031e307cf5260142a517bff25cc232a09eae2734be475d721f",
+      "uploaded": false
+    },
+    {
+      "bytes": 14930,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/nvidia-smi-q.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/97/9764f7963815bff355ec0e8a71eac5e66f82f268b6c06b06afacfb951183cb38",
+      "sha256": "9764f7963815bff355ec0e8a71eac5e66f82f268b6c06b06afacfb951183cb38",
+      "uploaded": false
+    },
+    {
+      "bytes": 215,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/progress.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/62/627d5ba57262eb1d1bc43d3773f6ca816bd5bd36ba0666ba02ec41d049c85d32",
+      "sha256": "627d5ba57262eb1d1bc43d3773f6ca816bd5bd36ba0666ba02ec41d049c85d32",
+      "uploaded": false
+    },
+    {
+      "bytes": 36,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/serve-smoke-cuda.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/647d42d8e9936a340c011a6a7a9bc3c299c13a2b1354a9529ce0fe70875a9350",
+      "sha256": "647d42d8e9936a340c011a6a7a9bc3c299c13a2b1354a9529ce0fe70875a9350",
+      "uploaded": false
+    },
+    {
+      "bytes": 36,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/serve-smoke-host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/647d42d8e9936a340c011a6a7a9bc3c299c13a2b1354a9529ce0fe70875a9350",
+      "sha256": "647d42d8e9936a340c011a6a7a9bc3c299c13a2b1354a9529ce0fe70875a9350",
+      "uploaded": false
+    },
+    {
+      "bytes": 40,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/serve-smoke.in",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2a/2a209bbe21c7c8243b930b59a971e2a7ae3504ac319605d298211400eba6fc87",
+      "sha256": "2a209bbe21c7c8243b930b59a971e2a7ae3504ac319605d298211400eba6fc87",
+      "uploaded": false
+    },
+    {
+      "bytes": 93,
+      "path": "research/ic_gpu_ipc_split_20261116/raw/uname.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1f/1f2b682809ea1507f5788cf27b6471c7a9a8c5383f3ca82ad7be558824acd5b4",
+      "sha256": "1f2b682809ea1507f5788cf27b6471c7a9a8c5383f3ca82ad7be558824acd5b4",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_ipc_split_20261116/REPORT.pdf",
+    "png": [
+      "research/ic_gpu_ipc_split_20261116/fig_split.png"
+    ],
+    "svg": [
+      "research/ic_gpu_ipc_split_20261116/fig_split.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-ipc-split-a100",
+  "status": "measured",
+  "summary": "fes-f2-gpu on a Modal A100 80GB PCIe, three interleaved runs per arm: whole solver call 0.5009 to 0.2028 ms at 24 unknowns and 0.6310 to 0.2753 ms at 26, from ic before the direct pack (text protocol) to current main (binary protocol); the arms differ by more than one change. Counted answers: 0 of 5 runs differ between the two arms. On main at 24 unknowns the kernel is 0.069 ms, the worker's copies and reply 0.024 ms, the pipe floor (null worker) 0.0135 ms, and about 0.085 ms of the round trip is in none of those phases; the pipe-latency explanation is not supported. The recorded command is the fetch of the finished job by token: the launching client was stopped at its time limit before it could write its own entry (the job itself ran to completion). [pcc:unverified]",
+  "validation": null
+}

@@ -1,0 +1,2798 @@
+{
+ "schema": "replay-certificate/v1",
+ "row": "E31 (GLV note §9.23): solve_weighted_chain A (chain) and B (chain-sparsest) on E25's ten GLS curves, both arms; evidence directory benchmarks/20261024-e31-chain-solve",
+ "date": "2026-10-24",
+ "validator": "validator subagent (review-adversarial policy), independent of the session that produced E31: fresh build in a separate target directory, fresh runs, own comparison scripts (replay_compare.py, agreement_compare.py) and own recompute (validate.py)",
+ "repository": {
+  "commit_at_build_start": "04a33428b935b58918d5c07a380022ac089105de",
+  "commit_at_certificate": "14fcda162124a85a28dc55d09d37b947f0295bc0",
+  "branch": "claude/glv-endomorphism-index-calculus-pe7ige",
+  "working_tree": "clean (git status --short empty) at build start 2026-10-24T06:03:28Z; 14fcda1621 (06:10:53Z, another session: research/e31_chain_solve_20261024/ report and figures, benchmarks/20261024-e31-chain-solve/*.{pdf,png,svg}) landed during the build and touches no build input"
+ },
+ "recorded_binary": "a8f52422d5 (experiments/31_solve_cost/binary_commit.txt)",
+ "code_drift": "git diff a8f52422d5..14fcda1621 outside experiments/, research/ and benchmarks/: examples/e31_tables.rs only (+238, compiled by neither replayed binary); src/, Cargo.toml, Cargo.lock, examples/quartic_pipeline_gls.rs, examples/e31_stage_a.rs and the path dependencies identical to the recorded binary commit",
+ "build": {
+  "command": "CARGO_TARGET_DIR=<validator scratch> CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build --release --example quartic_pipeline_gls --example e31_stage_a (fresh target directory, 127 crates compiled from source, 8 m 09 s); cargo test --release --lib for the unit test in the same target directory",
+  "toolchain": "rustc 1.94.1 (e408947bf 2026-03-25), cargo 1.94.1 (29ea6fb6a 2026-03-24)",
+  "binaries": [
+   {
+    "name": "quartic_pipeline_gls",
+    "sha256": "aea519f0b97dbc2b6c353192bc20b69522f8000b0748a146e2cfd0eb16084742"
+   },
+   {
+    "name": "e31_stage_a",
+    "sha256": "a7e101df6377a269f7383d44a8eac06a059d2b2083b6d4dce13a5550794d24a0"
+   }
+  ]
+ },
+ "environment": {
+  "host": "Intel(R) Xeon(R) Processor @ 2.80GHz, 4 vCPU, Linux 6.18.44, 15 GiB",
+  "RAYON_NUM_THREADS": {
+   "end_to_end": 4,
+   "stage_a": 1,
+   "agreement_stage_a": 1,
+   "agreement_end_to_end": 4
+  },
+  "determinism_note": "collect_and_solve draws each round's 2 x rayon-threads targets from the run's seeded RNG, so RAYON_NUM_THREADS=4 (the recording host's count, run_e2e.sh) is part of the end-to-end trajectory; Stage A draws its stream with a fixed --threads 4 batch size independent of rayon and is one-threaded as recorded. Field counters are per-call (Cell/u64 in each solve), not shared across threads.",
+  "concurrency": "the end-to-end replays, the Stage A replay, the agreement sample and the unit-test build ran concurrently on the same 4 vCPUs (load average up to ~11), beside another agent's session in the same worktree; only wall-clock fields are affected, and they are reported, not compared"
+ },
+ "command": "BIN=<fresh quartic_pipeline_gls> replay/replay_e2e.sh (run_e2e.sh's arguments: --sizes P --first-seed S --seeds 1 --rho-runs 16 --max-residuals 5000000 --solver {chain|chain-sparsest|macaulay} --json OUT, RAYON_NUM_THREADS=4); BIN=<fresh e31_stage_a> replay/replay_stage_a.sh (--sizes 101,149,197,269,397 --seeds 1,2 --targets 1000, RAYON_NUM_THREADS=1); replay/agreement.sh; cargo test --release --lib (the E31 agreement test)",
+ "comparison": "replay/replay_compare.py: every leaf of every committed record compared with the replay, integers and floats exactly; end-to-end wall_ms and solve_ms and Stage A wall_us / wall summaries are wall-clock, reported and not compared",
+ "scalar_verification": "For every replayed end-to-end arm the fresh binary recovered the logarithm by Wiedemann, checked [x]G = Q on the curve and set folded.correct = (x == d) for the instance's planted d (quartic_folds.rs Arm::attempt); every replay reports folded.correct = true, and all 16 x 3 walks per record report correct = true. The committed records carry correct = true but not x; x is tied to them through the instance: the replay regenerates it from (p, seed) and n, #E, h, the base and every deterministic counter (targets, decompositions, relations, Wiedemann operations, walks) are identical. The E25 replay certificate (benchmarks/20261018-k4-gls-v4/replay-certificate.json) checked these ten instances independently (G, Q on curve, n prime, nG = O, dG = Q, #E = h n, j in F_p2 \\ F_p); the E31 records carry identical n, group_order, cofactor and base_points.",
+ "agreement": {
+  "unit_test": {
+   "name": "cryptanalysis::klein_v4::tests::e31_chain_solve_agrees_with_the_existing_solver",
+   "passed": true,
+   "log": "replay/unit_test.log",
+   "covers": "E25 p = 101 s1, 149 s2; E24 p = 101 s2, 53 s1; 24 targets each; both pivot rules; M_P2 and charpoly; negative control"
+  },
+  "validator_sample": {
+   "stage_a": [
+    {
+     "file": "replay/agreement/stage_a_p113s4.json",
+     "sha256": "95826b6fc5f78eeb790048d4663a7ac7ce2a0c70b7a19b25b76f19ad439ef5e5",
+     "p": 113,
+     "seed": 4,
+     "calls": 1000,
+     "agree_A": 1000,
+     "agree_B": 1000,
+     "quotient_agree": [
+      1000,
+      1000
+     ],
+     "quotient_checked": [
+      1000,
+      1000
+     ],
+     "fallbacks": [
+      4,
+      4
+     ],
+     "fallbacks_derived": 4,
+     "C_median": [
+      1622876,
+      604239,
+      306964
+     ],
+     "existing_over_A": 2.6858180289587397,
+     "existing_over_B": 5.28686099998697,
+     "clean_echelon_A_eq_existing": true,
+     "charpoly_eig_A_eq_B": true,
+     "agrees": true
+    },
+    {
+     "file": "replay/agreement/stage_a_p229s3.json",
+     "sha256": "1becf2a678b72d3ea7fcd29ea752b74fb0543fd054ace3742b870f3402b603bb",
+     "p": 229,
+     "seed": 3,
+     "calls": 1000,
+     "agree_A": 1000,
+     "agree_B": 1000,
+     "quotient_agree": [
+      1000,
+      1000
+     ],
+     "quotient_checked": [
+      1000,
+      1000
+     ],
+     "fallbacks": [
+      3,
+      3
+     ],
+     "fallbacks_derived": 3,
+     "C_median": [
+      1652225,
+      625172,
+      325224
+     ],
+     "existing_over_A": 2.6428326924430396,
+     "existing_over_B": 5.0802677539173,
+     "clean_echelon_A_eq_existing": true,
+     "charpoly_eig_A_eq_B": true,
+     "agrees": true
+    },
+    {
+     "file": "replay/agreement/stage_a_p353s3.json",
+     "sha256": "d97644ee5dc1d117505f375859fbb01b6ca0921009cbd7f7b28e74bb818db5cd",
+     "p": 353,
+     "seed": 3,
+     "calls": 1000,
+     "agree_A": 1000,
+     "agree_B": 1000,
+     "quotient_agree": [
+      1000,
+      1000
+     ],
+     "quotient_checked": [
+      1000,
+      1000
+     ],
+     "fallbacks": [
+      2,
+      2
+     ],
+     "fallbacks_derived": 2,
+     "C_median": [
+      1664736,
+      636171,
+      335462
+     ],
+     "existing_over_A": 2.6168058588021146,
+     "existing_over_B": 4.9625173641127756,
+     "clean_echelon_A_eq_existing": true,
+     "charpoly_eig_A_eq_B": true,
+     "agrees": true
+    }
+   ],
+   "e2e": {
+    "curve": "GLS p = 113 seed 4",
+    "records": {
+     "macaulay": {
+      "path": "replay/agreement/e2e_macaulay_p113s4.json",
+      "sha256": "e262a4e7c79b82de75aa0c079575bfacc2b9dc571ad563ac1f8069fedb3ed9f8"
+     },
+     "chain": {
+      "path": "replay/agreement/e2e_chain_p113s4.json",
+      "sha256": "9820164a7acd21da195b0bd3d5e17448d188ae976fa8dea9215ceda2aa79138d"
+     },
+     "chain-sparsest": {
+      "path": "replay/agreement/e2e_chain-sparsest_p113s4.json",
+      "sha256": "98b16fb0a22681c4a30d3ffcb65205feb356199e362b70c31abc4e2c1c77d09c"
+     }
+    },
+    "arms": [
+     {
+      "solver": "chain",
+      "arm": "A",
+      "leaves": 412,
+      "differing": 12,
+      "unexpected": [],
+      "added": [
+       "solver",
+       "solver_fallbacks"
+      ],
+      "missing": [],
+      "fallbacks": 416,
+      "reruns_plus_unsolved": 416,
+      "residuals": 34159,
+      "correct": true,
+      "walks_correct": true,
+      "S_macaulay": 56758625911,
+      "S": 22744193552,
+      "S_macaulay_over_S": 2.4955215836179407,
+      "C_median_macaulay": 1624001.0,
+      "C_median": 604309.0,
+      "agrees": true
+     },
+     {
+      "solver": "chain",
+      "arm": "B",
+      "leaves": 412,
+      "differing": 12,
+      "unexpected": [],
+      "added": [
+       "solver",
+       "solver_fallbacks"
+      ],
+      "missing": [],
+      "fallbacks": 201,
+      "reruns_plus_unsolved": 201,
+      "residuals": 15566,
+      "correct": true,
+      "walks_correct": true,
+      "S_macaulay": 25900525990,
+      "S": 10411877330,
+      "S_macaulay_over_S": 2.4875942319616247,
+      "C_median_macaulay": 1624026.0,
+      "C_median": 604329.0,
+      "agrees": true
+     },
+     {
+      "solver": "chain-sparsest",
+      "arm": "A",
+      "leaves": 412,
+      "differing": 12,
+      "unexpected": [],
+      "added": [
+       "solver",
+       "solver_fallbacks"
+      ],
+      "missing": [],
+      "fallbacks": 416,
+      "reruns_plus_unsolved": 416,
+      "residuals": 34159,
+      "correct": true,
+      "walks_correct": true,
+      "S_macaulay": 56758625911,
+      "S": 12595510954,
+      "S_macaulay_over_S": 4.506258310463775,
+      "C_median_macaulay": 1624001.0,
+      "C_median": 306905.0,
+      "agrees": true
+     },
+     {
+      "solver": "chain-sparsest",
+      "arm": "B",
+      "leaves": 412,
+      "differing": 12,
+      "unexpected": [],
+      "added": [
+       "solver",
+       "solver_fallbacks"
+      ],
+      "missing": [],
+      "fallbacks": 201,
+      "reruns_plus_unsolved": 201,
+      "residuals": 15566,
+      "correct": true,
+      "walks_correct": true,
+      "S_macaulay": 25900525990,
+      "S": 5787260522,
+      "S_macaulay_over_S": 4.475438057702839,
+      "C_median_macaulay": 1624026.0,
+      "C_median": 306919.0,
+      "agrees": true
+     }
+    ]
+   },
+   "all_agree": true
+  }
+ },
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "runs_total": 52,
+ "runs_matched": 52,
+ "coverage": {
+  "e31_end_to_end_records_replayed": 40,
+  "e31_end_to_end_records_committed": 40,
+  "aa_control_records": 2,
+  "stage_a_curves_replayed": 10,
+  "stage_a_curves_committed": 10
+ },
+ "runs": [
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 101,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p101s1.json",
+    "sha256": "de2bb0e38fc0d9cb0b74af2e11678aad41431f3604381eccf6df9c458049a4b9"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p101s1.json",
+    "sha256": "ba592a8e4b0bd09d40d854c0f5c3e54f030d2fbd1f616a72df5e1e1288955795"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 139117.69185900013,
+     "replay": 270520.8197360003
+    },
+    "wall_ms": {
+     "committed": 51939.920209,
+     "replay": 109559.38397600001
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 14926783086,
+    "ratio": 29024.347811123163,
+    "residuals": 41043,
+    "unsolved": 21,
+    "reruns": 467,
+    "decompositions": 336,
+    "macaulay_entries": 7446468736,
+    "rho_matched_muls": 514284.875,
+    "solver_fallbacks": 488
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 101,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p101s1.json",
+    "sha256": "de2bb0e38fc0d9cb0b74af2e11678aad41431f3604381eccf6df9c458049a4b9"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p101s1.json",
+    "sha256": "ba592a8e4b0bd09d40d854c0f5c3e54f030d2fbd1f616a72df5e1e1288955795"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 70139.68736700018,
+     "replay": 108760.93565000048
+    },
+    "wall_ms": {
+     "committed": 25661.374423,
+     "replay": 43416.660966999996
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 7625002792,
+    "ratio": 14826.418513669103,
+    "residuals": 21166,
+    "unsolved": 11,
+    "reruns": 224,
+    "decompositions": 172,
+    "macaulay_entries": 3832401664,
+    "rho_matched_muls": 514284.875,
+    "solver_fallbacks": 235
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 101,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p101s2.json",
+    "sha256": "51784a128fb1c8adc8a2de43582879c6ffe56b850e2b4cd7f879ebfb54d8e874"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p101s2.json",
+    "sha256": "7ef895029d5fea0ceec4f1def8b13dc6b3d59aeb8e279afa7cbd8fa878a31df3"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 50922.27000200001,
+     "replay": 83650.18887899983
+    },
+    "wall_ms": {
+     "committed": 18844.976008,
+     "replay": 34985.701843999996
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 5416154893,
+    "ratio": 13572.607329869172,
+    "residuals": 15010,
+    "unsolved": 13,
+    "reruns": 160,
+    "decompositions": 624,
+    "macaulay_entries": 2719210368,
+    "rho_matched_muls": 399050.4375,
+    "solver_fallbacks": 173
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 101,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p101s2.json",
+    "sha256": "51784a128fb1c8adc8a2de43582879c6ffe56b850e2b4cd7f879ebfb54d8e874"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p101s2.json",
+    "sha256": "7ef895029d5fea0ceec4f1def8b13dc6b3d59aeb8e279afa7cbd8fa878a31df3"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 24658.290239,
+     "replay": 38848.99613000008
+    },
+    "wall_ms": {
+     "committed": 9096.928241000001,
+     "replay": 15758.142797
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 2576029693,
+    "ratio": 6455.398743924445,
+    "residuals": 7106,
+    "unsolved": 7,
+    "reruns": 78,
+    "decompositions": 312,
+    "macaulay_entries": 1288514304,
+    "rho_matched_muls": 399050.4375,
+    "solver_fallbacks": 85
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 149,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p149s1.json",
+    "sha256": "c7974e807e342049449de10a2782674cbbcb9c05cadaaf8aac474e3d7c329fe7"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p149s1.json",
+    "sha256": "84ce5c0262cc1b4c66dbf821c039efa9053838d6c333cf6be8c25799467faf5f"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 1133801.7195940136,
+     "replay": 1191281.7990129895
+    },
+    "wall_ms": {
+     "committed": 405943.75981799996,
+     "replay": 432763.95051
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 125041339246,
+    "ratio": 151751.730378996,
+    "residuals": 352146,
+    "unsolved": 58,
+    "reruns": 2553,
+    "decompositions": 408,
+    "macaulay_entries": 63194288640,
+    "rho_matched_muls": 823986.25,
+    "solver_fallbacks": 2611
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 149,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p149s1.json",
+    "sha256": "c7974e807e342049449de10a2782674cbbcb9c05cadaaf8aac474e3d7c329fe7"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p149s1.json",
+    "sha256": "84ce5c0262cc1b4c66dbf821c039efa9053838d6c333cf6be8c25799467faf5f"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 465055.98658900085,
+     "replay": 455562.5426059985
+    },
+    "wall_ms": {
+     "committed": 167242.697796,
+     "replay": 165559.124043
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 47030393667,
+    "ratio": 57076.672902005346,
+    "residuals": 132036,
+    "unsolved": 27,
+    "reruns": 987,
+    "decompositions": 224,
+    "macaulay_entries": 23709225792,
+    "rho_matched_muls": 823986.25,
+    "solver_fallbacks": 1014
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 149,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p149s2.json",
+    "sha256": "3615f0a21fadb700da28cfcb6825ebfa3b4e2264d515efa65383cdee779fcc10"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p149s2.json",
+    "sha256": "8122bda9ad12780c12d659d4d7b2ff4a92120bf94ff6a59470de543d5175072e"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 197740.26293500152,
+     "replay": 225559.63105499977
+    },
+    "wall_ms": {
+     "committed": 71589.28069,
+     "replay": 81801.77656700001
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 21679440050,
+    "ratio": 26805.524083632798,
+    "residuals": 60585,
+    "unsolved": 13,
+    "reruns": 473,
+    "decompositions": 668,
+    "macaulay_entries": 10888461696,
+    "rho_matched_muls": 808767.625,
+    "solver_fallbacks": 486
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 149,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p149s2.json",
+    "sha256": "3615f0a21fadb700da28cfcb6825ebfa3b4e2264d515efa65383cdee779fcc10"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p149s2.json",
+    "sha256": "8122bda9ad12780c12d659d4d7b2ff4a92120bf94ff6a59470de543d5175072e"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 109886.75859700001,
+     "replay": 135015.10238899902
+    },
+    "wall_ms": {
+     "committed": 39810.738803,
+     "replay": 48540.788773
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 12266512184,
+    "ratio": 15166.917919099445,
+    "residuals": 34176,
+    "unsolved": 11,
+    "reruns": 275,
+    "decompositions": 380,
+    "macaulay_entries": 6146620032,
+    "rho_matched_muls": 808767.625,
+    "solver_fallbacks": 286
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 197,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p197s1.json",
+    "sha256": "a6f8ef21cc1656e4cc42c73435a2c9dc3753b7577e712464ec8f651ada457692"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p197s1.json",
+    "sha256": "adbfef5ba400e922c4cd01bd3e1349027c5ff6acb37546bd95178861257e4e6b"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 161517.17639800048,
+     "replay": 186024.806546001
+    },
+    "wall_ms": {
+     "committed": 56119.014568,
+     "replay": 66615.411737
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 18260214701,
+    "ratio": 17643.432286968597,
+    "residuals": 51024,
+    "unsolved": 5,
+    "reruns": 310,
+    "decompositions": 1152,
+    "macaulay_entries": 9128112000,
+    "rho_matched_muls": 1034958.1875,
+    "solver_fallbacks": 315
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 197,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p197s1.json",
+    "sha256": "a6f8ef21cc1656e4cc42c73435a2c9dc3753b7577e712464ec8f651ada457692"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p197s1.json",
+    "sha256": "adbfef5ba400e922c4cd01bd3e1349027c5ff6acb37546bd95178861257e4e6b"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 111489.56758099892,
+     "replay": 139765.67901700022
+    },
+    "wall_ms": {
+     "committed": 38500.239909,
+     "replay": 51156.481228
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 13562826890,
+    "ratio": 13104.709981339221,
+    "residuals": 37794,
+    "unsolved": 2,
+    "reruns": 238,
+    "decompositions": 648,
+    "macaulay_entries": 6764870784,
+    "rho_matched_muls": 1034958.1875,
+    "solver_fallbacks": 240
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 197,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p197s2.json",
+    "sha256": "115f52f8e771f4b444e51a535edaebb71b5f90e149dffa238343a41192c3bcdb"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p197s2.json",
+    "sha256": "e03ee52aa8854d3e6f59e9f8b82d04c52e4ad8aa0da7cb76216ebf612f35a28d"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 81367.56380000022,
+     "replay": 88760.36541400087
+    },
+    "wall_ms": {
+     "committed": 28853.293064999998,
+     "replay": 31982.589513
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 9371238762,
+    "ratio": 9484.704879264698,
+    "residuals": 26236,
+    "unsolved": 3,
+    "reruns": 154,
+    "decompositions": 1904,
+    "macaulay_entries": 4691155392,
+    "rho_matched_muls": 988036.9375,
+    "solver_fallbacks": 157
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 197,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p197s2.json",
+    "sha256": "115f52f8e771f4b444e51a535edaebb71b5f90e149dffa238343a41192c3bcdb"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p197s2.json",
+    "sha256": "e03ee52aa8854d3e6f59e9f8b82d04c52e4ad8aa0da7cb76216ebf612f35a28d"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 48841.96372900023,
+     "replay": 53592.58553900024
+    },
+    "wall_ms": {
+     "committed": 17394.857605999998,
+     "replay": 19386.193955
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 5534073492,
+    "ratio": 5601.079556805537,
+    "residuals": 15500,
+    "unsolved": 2,
+    "reruns": 90,
+    "decompositions": 984,
+    "macaulay_entries": 2771075328,
+    "rho_matched_muls": 988036.9375,
+    "solver_fallbacks": 92
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 269,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p269s1.json",
+    "sha256": "255ba82997d4ba9677f942592b172e4b400240eb5a838168e0a53671cfaffbb0"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p269s1.json",
+    "sha256": "081da05ea480b20494e97c425b1b474846c18da03d1cbc1333a9dd15eb68446f"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 245450.50013499951,
+     "replay": 255630.34993500117
+    },
+    "wall_ms": {
+     "committed": 84648.281406,
+     "replay": 89521.87709499999
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 28956396052,
+    "ratio": 17786.20615195394,
+    "residuals": 81994,
+    "unsolved": 6,
+    "reruns": 345,
+    "decompositions": 1664,
+    "macaulay_entries": 14597220288,
+    "rho_matched_muls": 1628025.4375,
+    "solver_fallbacks": 351
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 269,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p269s1.json",
+    "sha256": "255ba82997d4ba9677f942592b172e4b400240eb5a838168e0a53671cfaffbb0"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p269s1.json",
+    "sha256": "081da05ea480b20494e97c425b1b474846c18da03d1cbc1333a9dd15eb68446f"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 140612.56060600033,
+     "replay": 149935.67074200092
+    },
+    "wall_ms": {
+     "committed": 48019.711824,
+     "replay": 53170.576822
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 16684387970,
+    "ratio": 10248.23543028946,
+    "residuals": 47207,
+    "unsolved": 4,
+    "reruns": 201,
+    "decompositions": 944,
+    "macaulay_entries": 8405358528,
+    "rho_matched_muls": 1628025.4375,
+    "solver_fallbacks": 205
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 269,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p269s2.json",
+    "sha256": "2ebf943756f145032ca7f1c210e73a9c79a38808ddece98a321e6be9b32c4203"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p269s2.json",
+    "sha256": "4e74f01f3762f49496c13473edfdca50e422a6529c621e455e0e2a04ba50ea73"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 98105.22168099928,
+     "replay": 93534.2880770001
+    },
+    "wall_ms": {
+     "committed": 34926.750568,
+     "replay": 32600.278346000003
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 10722088340,
+    "ratio": 6645.501688787683,
+    "residuals": 30514,
+    "unsolved": 1,
+    "reruns": 115,
+    "decompositions": 2224,
+    "macaulay_entries": 5425916160,
+    "rho_matched_muls": 1613435.5,
+    "solver_fallbacks": 116
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 269,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p269s2.json",
+    "sha256": "2ebf943756f145032ca7f1c210e73a9c79a38808ddece98a321e6be9b32c4203"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p269s2.json",
+    "sha256": "4e74f01f3762f49496c13473edfdca50e422a6529c621e455e0e2a04ba50ea73"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 48699.72392100013,
+     "replay": 46577.72106000012
+    },
+    "wall_ms": {
+     "committed": 17410.59518,
+     "replay": 16345.233965999998
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 5300613665,
+    "ratio": 3285.2962916707856,
+    "residuals": 15079,
+    "unsolved": 1,
+    "reruns": 57,
+    "decompositions": 1224,
+    "macaulay_entries": 2681474880,
+    "rho_matched_muls": 1613435.5,
+    "solver_fallbacks": 58
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 397,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p397s1.json",
+    "sha256": "0cfe08c57e10a67ecc3c8dded74a82804caa484da930963e9021fe00abf8fdac"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p397s1.json",
+    "sha256": "1b1e51228aee16c5b5321eb21d02761e25624fcb7c02305f70514c744ea16bc9"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 155810.11818099875,
+     "replay": 241279.60584500286
+    },
+    "wall_ms": {
+     "committed": 52235.722713,
+     "replay": 94466.59332
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 15236404952,
+    "ratio": 4132.017291785981,
+    "residuals": 42695,
+    "unsolved": 3,
+    "reruns": 119,
+    "decompositions": 3608,
+    "macaulay_entries": 7572761280,
+    "rho_matched_muls": 3687401.0625,
+    "solver_fallbacks": 122
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 397,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p397s1.json",
+    "sha256": "0cfe08c57e10a67ecc3c8dded74a82804caa484da930963e9021fe00abf8fdac"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p397s1.json",
+    "sha256": "1b1e51228aee16c5b5321eb21d02761e25624fcb7c02305f70514c744ea16bc9"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 86885.18431500021,
+     "replay": 192124.76084499905
+    },
+    "wall_ms": {
+     "committed": 28703.517929,
+     "replay": 76752.28334800001
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 8819969973,
+    "ratio": 2391.9204403060508,
+    "residuals": 24789,
+    "unsolved": 3,
+    "reruns": 63,
+    "decompositions": 1848,
+    "macaulay_entries": 4394191872,
+    "rho_matched_muls": 3687401.0625,
+    "solver_fallbacks": 66
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 397,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p397s2.json",
+    "sha256": "b84a48c6db3c660bd02136d45553f86f65818169a6cf75143f5ee0e6298d6b2d"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p397s2.json",
+    "sha256": "23b7f1104fc7d370b3dd22778ca34ee9625544de12aa83653995f8fe04c933be"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 272176.24795200065,
+     "replay": 319566.12440099963
+    },
+    "wall_ms": {
+     "committed": 88639.703341,
+     "replay": 108347.20124899999
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 27921106648,
+    "ratio": 8454.690381910435,
+    "residuals": 78391,
+    "unsolved": 5,
+    "reruns": 219,
+    "decompositions": 2936,
+    "macaulay_entries": 13904260608,
+    "rho_matched_muls": 3302439.875,
+    "solver_fallbacks": 224
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain-sparsest",
+   "p": 397,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain-sparsest_p397s2.json",
+    "sha256": "b84a48c6db3c660bd02136d45553f86f65818169a6cf75143f5ee0e6298d6b2d"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain-sparsest_p397s2.json",
+    "sha256": "23b7f1104fc7d370b3dd22778ca34ee9625544de12aa83653995f8fe04c933be"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 114821.72760399968,
+     "replay": 149913.40576699987
+    },
+    "wall_ms": {
+     "committed": 37170.302257,
+     "replay": 51653.667228000006
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 12018420390,
+    "ratio": 3639.254867584834,
+    "residuals": 33726,
+    "unsolved": 2,
+    "reruns": 95,
+    "decompositions": 1560,
+    "macaulay_entries": 5982337536,
+    "rho_matched_muls": 3302439.875,
+    "solver_fallbacks": 97
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 101,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p101s1.json",
+    "sha256": "b36f3a9fdb704233d1af8d93d59ec1a683a8a964ceaa3d71743e9ad25d3c3b39"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p101s1.json",
+    "sha256": "5b491ea88111710cf56b0787ed0c467cbf318c38bc35092a9409aaf8a02ed7fc"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 119182.1750149999,
+     "replay": 166117.78795300136
+    },
+    "wall_ms": {
+     "committed": 43292.803597000006,
+     "replay": 69167.588268
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 27092897978,
+    "ratio": 52680.72092923207,
+    "residuals": 41043,
+    "unsolved": 21,
+    "reruns": 467,
+    "decompositions": 336,
+    "macaulay_entries": 7446468736,
+    "rho_matched_muls": 514284.875,
+    "solver_fallbacks": 488
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 101,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p101s1.json",
+    "sha256": "b36f3a9fdb704233d1af8d93d59ec1a683a8a964ceaa3d71743e9ad25d3c3b39"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p101s1.json",
+    "sha256": "5b491ea88111710cf56b0787ed0c467cbf318c38bc35092a9409aaf8a02ed7fc"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 61372.50606800003,
+     "replay": 84570.36927700041
+    },
+    "wall_ms": {
+     "committed": 22456.553416,
+     "replay": 35482.371448000005
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 13899571384,
+    "ratio": 27026.988464321454,
+    "residuals": 21166,
+    "unsolved": 11,
+    "reruns": 224,
+    "decompositions": 172,
+    "macaulay_entries": 3832401664,
+    "rho_matched_muls": 514284.875,
+    "solver_fallbacks": 235
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 101,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p101s2.json",
+    "sha256": "a090dc3efe4585a4532f86eb8966b7995b007b8f94b421ee4f38094b379e6653"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p101s2.json",
+    "sha256": "f29ffea7381422c464218cf9997afbfb425b82dc937d3794641dd2c5047622ec"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 43098.565663,
+     "replay": 74929.41666400025
+    },
+    "wall_ms": {
+     "committed": 15379.363406,
+     "replay": 30265.971906000002
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 9865699461,
+    "ratio": 24722.938590939397,
+    "residuals": 15010,
+    "unsolved": 13,
+    "reruns": 160,
+    "decompositions": 624,
+    "macaulay_entries": 2719210368,
+    "rho_matched_muls": 399050.4375,
+    "solver_fallbacks": 173
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 101,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p101s2.json",
+    "sha256": "a090dc3efe4585a4532f86eb8966b7995b007b8f94b421ee4f38094b379e6653"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p101s2.json",
+    "sha256": "f29ffea7381422c464218cf9997afbfb425b82dc937d3794641dd2c5047622ec"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 21064.084039999972,
+     "replay": 36032.30102699996
+    },
+    "wall_ms": {
+     "committed": 7778.409074,
+     "replay": 15337.82379
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 4682498928,
+    "ratio": 11734.102980403322,
+    "residuals": 7106,
+    "unsolved": 7,
+    "reruns": 78,
+    "decompositions": 312,
+    "macaulay_entries": 1288514304,
+    "rho_matched_muls": 399050.4375,
+    "solver_fallbacks": 85
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 149,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p149s1.json",
+    "sha256": "94f077092d14eb94072cd373a1cd3d8183ece90f320619f91d04bb9b69c643ce"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p149s1.json",
+    "sha256": "c4e16086f477f051e93fb5efad0055b91cdfde351b861e58179c4a22cac09e28"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 977436.2115950139,
+     "replay": 1432007.0295119907
+    },
+    "wall_ms": {
+     "committed": 343581.740141,
+     "replay": 599134.310178
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 230120609513,
+    "ratio": 279277.2446299923,
+    "residuals": 352146,
+    "unsolved": 58,
+    "reruns": 2553,
+    "decompositions": 408,
+    "macaulay_entries": 63194288640,
+    "rho_matched_muls": 823986.25,
+    "solver_fallbacks": 2611
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 149,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p149s1.json",
+    "sha256": "94f077092d14eb94072cd373a1cd3d8183ece90f320619f91d04bb9b69c643ce"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p149s1.json",
+    "sha256": "c4e16086f477f051e93fb5efad0055b91cdfde351b861e58179c4a22cac09e28"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 359186.8926949988,
+     "replay": 403864.6177419972
+    },
+    "wall_ms": {
+     "committed": 125611.430075,
+     "replay": 146642.387585
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 86429946254,
+    "ratio": 104892.46180260896,
+    "residuals": 132036,
+    "unsolved": 27,
+    "reruns": 987,
+    "decompositions": 224,
+    "macaulay_entries": 23709225792,
+    "rho_matched_muls": 823986.25,
+    "solver_fallbacks": 1014
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 149,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p149s2.json",
+    "sha256": "210c65f16dab920edf43031868b88197336439c2e93599575c4bfee8e176cb06"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p149s2.json",
+    "sha256": "db376fe37204569f02ea4b731a2e0102461845ec08a549a57b8b08c420834849"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 168225.94550099992,
+     "replay": 207670.19557999895
+    },
+    "wall_ms": {
+     "committed": 58954.433600000004,
+     "replay": 77282.689859
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 39758972369,
+    "ratio": 49159.94550226958,
+    "residuals": 60585,
+    "unsolved": 13,
+    "reruns": 473,
+    "decompositions": 668,
+    "macaulay_entries": 10888461696,
+    "rho_matched_muls": 808767.625,
+    "solver_fallbacks": 486
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 149,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p149s2.json",
+    "sha256": "210c65f16dab920edf43031868b88197336439c2e93599575c4bfee8e176cb06"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p149s2.json",
+    "sha256": "db376fe37204569f02ea4b731a2e0102461845ec08a549a57b8b08c420834849"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 91876.77520999993,
+     "replay": 112837.7947680005
+    },
+    "wall_ms": {
+     "committed": 31967.82358,
+     "replay": 41689.60824
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 22465283217,
+    "ratio": 27777.179158228544,
+    "residuals": 34176,
+    "unsolved": 11,
+    "reruns": 275,
+    "decompositions": 380,
+    "macaulay_entries": 6146620032,
+    "rho_matched_muls": 808767.625,
+    "solver_fallbacks": 286
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 197,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p197s1.json",
+    "sha256": "33fc49156cbbd88df15fe9fd8d4c759f0a730718a2da329c3de46cf4b2572b8d"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p197s1.json",
+    "sha256": "0ad2a62d60edca2805a9829f9e898264c86ed535fb20bb9b17832e56499db98e"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 152149.16599200058,
+     "replay": 177913.9600400018
+    },
+    "wall_ms": {
+     "committed": 54509.772875,
+     "replay": 65116.631633
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 33536914676,
+    "ratio": 32404.125191772542,
+    "residuals": 51024,
+    "unsolved": 5,
+    "reruns": 310,
+    "decompositions": 1152,
+    "macaulay_entries": 9128112000,
+    "rho_matched_muls": 1034958.1875,
+    "solver_fallbacks": 315
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 197,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p197s1.json",
+    "sha256": "33fc49156cbbd88df15fe9fd8d4c759f0a730718a2da329c3de46cf4b2572b8d"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p197s1.json",
+    "sha256": "0ad2a62d60edca2805a9829f9e898264c86ed535fb20bb9b17832e56499db98e"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 115803.06388800085,
+     "replay": 119499.10425900028
+    },
+    "wall_ms": {
+     "committed": 41761.382163999995,
+     "replay": 43743.309589
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 24878373248,
+    "ratio": 24038.046704181466,
+    "residuals": 37794,
+    "unsolved": 2,
+    "reruns": 238,
+    "decompositions": 648,
+    "macaulay_entries": 6764870784,
+    "rho_matched_muls": 1034958.1875,
+    "solver_fallbacks": 240
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 197,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p197s2.json",
+    "sha256": "2ac24660a68e713a5a0b4c17f04fa7268b84efd0c7afae56e69972bf69647d7e"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p197s2.json",
+    "sha256": "053091f958f238be7a6fbe5cec59c96ea7620373aaf48a393acedbfaf0a3c0bd"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 77866.55820700008,
+     "replay": 83716.31058600057
+    },
+    "wall_ms": {
+     "committed": 27846.298730000002,
+     "replay": 30242.464600000003
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 17226260595,
+    "ratio": 17434.834611130114,
+    "residuals": 26236,
+    "unsolved": 3,
+    "reruns": 154,
+    "decompositions": 1904,
+    "macaulay_entries": 4691155392,
+    "rho_matched_muls": 988036.9375,
+    "solver_fallbacks": 157
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 197,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p197s2.json",
+    "sha256": "2ac24660a68e713a5a0b4c17f04fa7268b84efd0c7afae56e69972bf69647d7e"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p197s2.json",
+    "sha256": "053091f958f238be7a6fbe5cec59c96ea7620373aaf48a393acedbfaf0a3c0bd"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 44877.292311000296,
+     "replay": 46114.69283599999
+    },
+    "wall_ms": {
+     "committed": 16001.762369000002,
+     "replay": 16434.856609000002
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 10174739227,
+    "ratio": 10297.93405572957,
+    "residuals": 15500,
+    "unsolved": 2,
+    "reruns": 90,
+    "decompositions": 984,
+    "macaulay_entries": 2771075328,
+    "rho_matched_muls": 988036.9375,
+    "solver_fallbacks": 92
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 269,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p269s1.json",
+    "sha256": "1549c869ea9192de424fd15dec1e074ea51fbfe018023df75d49d3b6a3717277"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p269s1.json",
+    "sha256": "89d29cb71968760b2a58d95b2a64ad0a2d4e1f7aa99af269d9407adfe5566c78"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 234853.01954399835,
+     "replay": 239571.88521199697
+    },
+    "wall_ms": {
+     "committed": 82465.314763,
+     "replay": 84890.352483
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 53572585848,
+    "ratio": 32906.47960038401,
+    "residuals": 81994,
+    "unsolved": 6,
+    "reruns": 345,
+    "decompositions": 1664,
+    "macaulay_entries": 14597220288,
+    "rho_matched_muls": 1628025.4375,
+    "solver_fallbacks": 351
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 269,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p269s1.json",
+    "sha256": "1549c869ea9192de424fd15dec1e074ea51fbfe018023df75d49d3b6a3717277"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p269s1.json",
+    "sha256": "89d29cb71968760b2a58d95b2a64ad0a2d4e1f7aa99af269d9407adfe5566c78"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 139484.80854200004,
+     "replay": 130160.04873200043
+    },
+    "wall_ms": {
+     "committed": 49714.391608,
+     "replay": 44942.413745000005
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 30856902622,
+    "ratio": 18953.575239821766,
+    "residuals": 47207,
+    "unsolved": 4,
+    "reruns": 201,
+    "decompositions": 944,
+    "macaulay_entries": 8405358528,
+    "rho_matched_muls": 1628025.4375,
+    "solver_fallbacks": 205
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 269,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p269s2.json",
+    "sha256": "2bf95cc827b0ca91d7941b7268efacc523e7c289bd12e792083bd5e825a4b388"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p269s2.json",
+    "sha256": "2ce0dafc5481682675e57224be1c697ce7a279dcb8fdbbed287e9a83f28b1cf5"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 87927.62449199946,
+     "replay": 89867.26423199968
+    },
+    "wall_ms": {
+     "committed": 31434.827063,
+     "replay": 31835.339295
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 19882875493,
+    "ratio": 12323.31598815075,
+    "residuals": 30514,
+    "unsolved": 1,
+    "reruns": 115,
+    "decompositions": 2224,
+    "macaulay_entries": 5425916160,
+    "rho_matched_muls": 1613435.5,
+    "solver_fallbacks": 116
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 269,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p269s2.json",
+    "sha256": "2bf95cc827b0ca91d7941b7268efacc523e7c289bd12e792083bd5e825a4b388"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p269s2.json",
+    "sha256": "2ce0dafc5481682675e57224be1c697ce7a279dcb8fdbbed287e9a83f28b1cf5"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 45267.23760499993,
+     "replay": 40361.41823599991
+    },
+    "wall_ms": {
+     "committed": 16320.369431,
+     "replay": 13696.629343999999
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 9827483637,
+    "ratio": 6091.029754210813,
+    "residuals": 15079,
+    "unsolved": 1,
+    "reruns": 57,
+    "decompositions": 1224,
+    "macaulay_entries": 2681474880,
+    "rho_matched_muls": 1613435.5,
+    "solver_fallbacks": 58
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 397,
+   "seed": 1,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p397s1.json",
+    "sha256": "2fb42a34c4c84a22a6fa88a7b54ddf5a41c98b89783b06db43c2b64324915bde"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p397s1.json",
+    "sha256": "c57ae7e75b397c574ecc282de1fc22877742aac65ddf2b4fcc8bc2a8bcee62d3"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 171240.3059410001,
+     "replay": 175507.38594400004
+    },
+    "wall_ms": {
+     "committed": 55643.490822,
+     "replay": 57475.737070999996
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 28085056071,
+    "ratio": 7616.4907464551125,
+    "residuals": 42695,
+    "unsolved": 3,
+    "reruns": 119,
+    "decompositions": 3608,
+    "macaulay_entries": 7572761280,
+    "rho_matched_muls": 3687401.0625,
+    "solver_fallbacks": 122
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 397,
+   "seed": 1,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p397s1.json",
+    "sha256": "2fb42a34c4c84a22a6fa88a7b54ddf5a41c98b89783b06db43c2b64324915bde"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p397s1.json",
+    "sha256": "c57ae7e75b397c574ecc282de1fc22877742aac65ddf2b4fcc8bc2a8bcee62d3"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 97683.47458100032,
+     "replay": 100499.81016599914
+    },
+    "wall_ms": {
+     "committed": 31904.222708999998,
+     "replay": 33049.434266
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 16280247309,
+    "ratio": 4415.100780483653,
+    "residuals": 24789,
+    "unsolved": 3,
+    "reruns": 63,
+    "decompositions": 1848,
+    "macaulay_entries": 4394191872,
+    "rho_matched_muls": 3687401.0625,
+    "solver_fallbacks": 66
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 397,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p397s2.json",
+    "sha256": "4398fc1c6ed6c699493ad2b916a604bad086a64c70ac4c568a378b8482e3ded6"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p397s2.json",
+    "sha256": "7302a2f47c212f522dacce2a3f95855356fd1da82ab7f8d506362a090d5cd8b3"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 310242.6300309955,
+     "replay": 320087.9505950004
+    },
+    "wall_ms": {
+     "committed": 100662.686462,
+     "replay": 104009.064409
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 51511467220,
+    "ratio": 15598.003043128832,
+    "residuals": 78391,
+    "unsolved": 5,
+    "reruns": 219,
+    "decompositions": 2936,
+    "macaulay_entries": 13904260608,
+    "rho_matched_muls": 3302439.875,
+    "solver_fallbacks": 224
+   }
+  },
+  {
+   "experiment": "e31",
+   "solver": "chain",
+   "p": 397,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/31_solve_cost/e2e_chain_p397s2.json",
+    "sha256": "4398fc1c6ed6c699493ad2b916a604bad086a64c70ac4c568a378b8482e3ded6"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_chain_p397s2.json",
+    "sha256": "7302a2f47c212f522dacce2a3f95855356fd1da82ab7f8d506362a090d5cd8b3"
+   },
+   "replayed": true,
+   "fields_compared": 410,
+   "fields_identical": 410,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 132910.47502200067,
+     "replay": 144266.83468700087
+    },
+    "wall_ms": {
+     "committed": 43140.67711,
+     "replay": 48077.23346
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 22167942593,
+    "ratio": 6712.595363450788,
+    "residuals": 33726,
+    "unsolved": 2,
+    "reruns": 95,
+    "decompositions": 1560,
+    "macaulay_entries": 5982337536,
+    "rho_matched_muls": 3302439.875,
+    "solver_fallbacks": 97
+   }
+  },
+  {
+   "experiment": "e25 A/A control through the E31 dispatch",
+   "solver": "macaulay",
+   "p": 101,
+   "seed": 2,
+   "arm": "A",
+   "committed": {
+    "path": "experiments/30_gls_v4/p101s2.json",
+    "sha256": "4aae4ec5866654358f72e1df8b9d021b751eb6cba2e3d7ae1f54293d6c9bbd91"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_macaulay_p101s2.json",
+    "sha256": "1cc04bd00d2ac0c77da7ae716145dc45f9a08f16a9859e786b3c7076c1d4b927"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 62014.3823659999,
+     "replay": 119206.77879000046
+    },
+    "wall_ms": {
+     "committed": 23970.923898999998,
+     "replay": 46829.523975000004
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 24712296642,
+    "ratio": 61927.75228319353,
+    "residuals": 15010,
+    "unsolved": 13,
+    "reruns": 160,
+    "decompositions": 624,
+    "macaulay_entries": 2665742016,
+    "rho_matched_muls": 399050.4375
+   }
+  },
+  {
+   "experiment": "e25 A/A control through the E31 dispatch",
+   "solver": "macaulay",
+   "p": 101,
+   "seed": 2,
+   "arm": "B",
+   "committed": {
+    "path": "experiments/30_gls_v4/p101s2.json",
+    "sha256": "4aae4ec5866654358f72e1df8b9d021b751eb6cba2e3d7ae1f54293d6c9bbd91"
+   },
+   "replay_output": {
+    "path": "replay/e2e/e2e_macaulay_p101s2.json",
+    "sha256": "1cc04bd00d2ac0c77da7ae716145dc45f9a08f16a9859e786b3c7076c1d4b927"
+   },
+   "replayed": true,
+   "fields_compared": 408,
+   "fields_identical": 408,
+   "mismatches": [],
+   "fields_added_in_replay": [],
+   "timing_not_compared": {
+    "solve_ms": {
+     "committed": 23734.497258000036,
+     "replay": 51798.1515110001
+    },
+    "wall_ms": {
+     "committed": 8485.111491,
+     "replay": 21134.53722
+    }
+   },
+   "matched": true,
+   "logarithm": {
+    "replay_solved": true,
+    "replay_correct": true,
+    "walks_correct": true
+   },
+   "key_scalars": {
+    "total_muls": 11695092130,
+    "ratio": 29307.303115035425,
+    "residuals": 7106,
+    "unsolved": 7,
+    "reruns": 78,
+    "decompositions": 312,
+    "macaulay_entries": 1262331840,
+    "rho_matched_muls": 399050.4375
+   }
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 101,
+   "seed": 1,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 15380.685,
+     "replay_median": 6941.236
+    },
+    "chain": {
+     "committed_median": 9804.494999999999,
+     "replay_median": 4927.79
+    },
+    "chain-sparsest": {
+     "committed_median": 10007.617,
+     "replay_median": 5279.096
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    999,
+    999
+   ],
+   "quotient_checked": [
+    999,
+    999
+   ],
+   "fallbacks": [
+    0,
+    12,
+    12
+   ],
+   "C_median": [
+    1617013,
+    600981,
+    304257
+   ]
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 101,
+   "seed": 2,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 17332.686,
+     "replay_median": 6784.901000000001
+    },
+    "chain": {
+     "committed_median": 10884.19,
+     "replay_median": 4919.5380000000005
+    },
+    "chain-sparsest": {
+     "committed_median": 11332.418,
+     "replay_median": 4952.138
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    998,
+    998
+   ],
+   "quotient_checked": [
+    998,
+    998
+   ],
+   "fallbacks": [
+    0,
+    11,
+    11
+   ],
+   "C_median": [
+    1616974,
+    600890,
+    304103
+   ]
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 149,
+   "seed": 1,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 16666.436999999998,
+     "replay_median": 6772.093
+    },
+    "chain": {
+     "committed_median": 10568.872,
+     "replay_median": 4894.87
+    },
+    "chain-sparsest": {
+     "committed_median": 10795.229,
+     "replay_median": 4965.829
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    999,
+    999
+   ],
+   "quotient_checked": [
+    999,
+    999
+   ],
+   "fallbacks": [
+    0,
+    7,
+    7
+   ],
+   "C_median": [
+    1632660,
+    612064,
+    313237
+   ]
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 149,
+   "seed": 2,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 15493.965,
+     "replay_median": 6467.320000000001
+    },
+    "chain": {
+     "committed_median": 9837.557,
+     "replay_median": 4717.332
+    },
+    "chain-sparsest": {
+     "committed_median": 9983.865,
+     "replay_median": 4850.712
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    0,
+    10,
+    10
+   ],
+   "C_median": [
+    1633472,
+    612068,
+    313320
+   ]
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 197,
+   "seed": 1,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 15756.959,
+     "replay_median": 6170.178
+    },
+    "chain": {
+     "committed_median": 9755.162,
+     "replay_median": 4547.650000000001
+    },
+    "chain-sparsest": {
+     "committed_median": 9943.216,
+     "replay_median": 4618.057
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    0,
+    5,
+    5
+   ],
+   "C_median": [
+    1645617,
+    620058,
+    320425
+   ]
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 197,
+   "seed": 2,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 17059.827999999998,
+     "replay_median": 6280.735
+    },
+    "chain": {
+     "committed_median": 10422.199,
+     "replay_median": 4558.952
+    },
+    "chain-sparsest": {
+     "committed_median": 10477.202,
+     "replay_median": 4648.8099999999995
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    0,
+    8,
+    8
+   ],
+   "C_median": [
+    1646416,
+    620152,
+    320741
+   ]
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 269,
+   "seed": 1,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 15214.76,
+     "replay_median": 5869.102
+    },
+    "chain": {
+     "committed_median": 9747.043,
+     "replay_median": 4468.077
+    },
+    "chain-sparsest": {
+     "committed_median": 9926.159,
+     "replay_median": 4590.477
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    0,
+    5,
+    5
+   ],
+   "C_median": [
+    1650218,
+    623969,
+    323602
+   ]
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 269,
+   "seed": 2,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 16602.367,
+     "replay_median": 6112.688
+    },
+    "chain": {
+     "committed_median": 10307.725,
+     "replay_median": 4542.32
+    },
+    "chain-sparsest": {
+     "committed_median": 10539.807999999999,
+     "replay_median": 4654.323
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    0,
+    4,
+    4
+   ],
+   "C_median": [
+    1651643,
+    624544,
+    324142
+   ]
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 397,
+   "seed": 1,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 19818.628,
+     "replay_median": 8646.618999999999
+    },
+    "chain": {
+     "committed_median": 11849.287,
+     "replay_median": 5352.793
+    },
+    "chain-sparsest": {
+     "committed_median": 11388.252,
+     "replay_median": 4980.2429999999995
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    0,
+    3,
+    3
+   ],
+   "C_median": [
+    1663086,
+    633960,
+    333134
+   ]
+  },
+  {
+   "experiment": "e31 stage A",
+   "p": 397,
+   "seed": 2,
+   "calls": 1000,
+   "committed": {
+    "path": "experiments/31_solve_cost/stage_a.json",
+    "sha256": "05d82b0c53b3bf8ca921c2c542cf9c93050a34c3b45193dc49030d9e8109e7c8"
+   },
+   "replay_output": {
+    "path": "replay/stage_a/stage_a_replay.json",
+    "sha256": "acd6acd7859d38cdfcbbbd07cf2b3388371d566dfd122bf47d0f136755de0d2d"
+   },
+   "replayed": true,
+   "fields_compared": 24052,
+   "fields_identical": 24052,
+   "mismatches": [],
+   "timing_not_compared": {
+    "macaulay": {
+     "committed_median": 18677.669,
+     "replay_median": 8627.176
+    },
+    "chain": {
+     "committed_median": 11613.899000000001,
+     "replay_median": 5392.311000000001
+    },
+    "chain-sparsest": {
+     "committed_median": 11201.502,
+     "replay_median": 5015.192
+    }
+   },
+   "matched": true,
+   "agree": [
+    1000,
+    1000
+   ],
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    0,
+    1,
+    1
+   ],
+   "C_median": [
+    1661986,
+    633419,
+    332624
+   ]
+  }
+ ]
+}

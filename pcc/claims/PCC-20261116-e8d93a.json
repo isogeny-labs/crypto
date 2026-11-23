@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T18:28:32Z",
+ "id": "PCC-20261116-e8d93a",
+ "kind": "statement",
+ "producer": {
+  "commit": "506deadb017935da7b6f01f215c5e7d9485e20b8",
+  "model": "",
+  "session": "p256-aux-resume-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_aux_smooth_20261114/continuation_20261116/evidence/pcc-merge-receipt.json",
+    "sha256": "5a8503f2eb8dc4a29d0d403318254d86795beaf7209d31dc36770a180ef1bb22"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_aux_smooth_20261114/continuation_20261116/evidence/calculator-info.json",
+    "sha256": "6ec66a5516ca8d7caa2f024db7c6ddaf7e0b9af83119ac938d781cbd279d6f7e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_aux_smooth_20261114/continuation_20261116",
+ "statement": "Resumed PR4147 at506deadb. Main synchronization retains the canonical main PCC ledger bytes and uses the maintained append_entry API for four unchanged unsigned branch claim bodies; no signed verdict or claim proof changed. Metadata merge receipt records both hashes. Magma public calculator metadata advertises a REST endpoint and1GiB/300-second service limits; no CAS computation has been submitted yet. The original benchmark and2x result remain unmeasured."
+}

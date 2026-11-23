@@ -1,0 +1,128 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 39,
+  "runs": [
+    {
+      "attempt": "encode39-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "1ae6510b23145997cd7044afb432ca1721307e70",
+      "observations": [
+        "ENC39_RESULT source_polynomials=5 unit_polynomials=8 linear_nu_polynomials=2 derivatives=10 all_reconstructions=pass corrupt_control=rejected"
+      ]
+    },
+    {
+      "attempt": "diamond39-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "1ae6510b23145997cd7044afb432ca1721307e70",
+      "observations": [
+        "DIAMOND39_RESULT full_deck_shift=true image_nonzero=true image_eleven_zero=true scalar_character=7 expected_six_matches=false scalar_tests=11 all_generator_memberships=checked independent_products=all intended_sign_factor_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "collect39-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "09b3f08304ae7b1a2c461166f82ff1715c8f99fe",
+      "observations": [
+        "COLLECT39_RESULT field=128 base_points=140 chart_base_points=140 excluded_base_points=0 lambda_candidates=17920 failed_nu_descent=0 source_passes=420 rational_source_points=420 degree7_closed_points=60 deck_orbits=6 jacobian_rank2_points=420 complete_source_equations=5 units=8 conjugates=7 torsion_order11=checked proper_local_presentations=false Picard_classes_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "joint39-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "1953a2b5efbed7cf1d590b13afafdcd0046f497e",
+      "observations": [
+        "JOINT39_GLOBAL all_four_annihilators=pass full_twist_characteristics=pass crossed_operators=separate_in_both_conventions complementary_order=3721",
+        "JOINT39_FIXED branch=E0_twist direct_D=8 inverse_D=7",
+        "JOINT39_FIXED branch=E1_twist direct_D=7 inverse_D=8",
+        "JOINT39_RESULT old_shared_joint_systems=2 twisted_shared_joint_systems=2 twisted_shared_rational_systems=0 direct_fixed_E1_D=7 direct_fixed_E0_D=8 operator7_on_D7=9 operator7_on_D8=0 operator8_on_D7=0 operator8_on_D8=9 recovery_scalar=5 observed_character7_consistent=true actual_Koblitz_target_map_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "local39-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "0db8ef3c2f6718a1240a80709eac28681ae011cd",
+      "observations": [
+        "LOCAL39_RESULT closed_point_representatives=60 all_frobenius_conjugates_via_F2_certificates=true proper_model_binding=retained_written_bridge"
+      ]
+    },
+    {
+      "attempt": "lean39-01",
+      "kind": "Lean",
+      "status": "rejected",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "errors": "TwistOperators39.lean:1:0: error: object file '/home/ec2-user/crypto-modular-ic/research/koblitz_modular_ic_20261018/lean/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Algebra/GroupPower/Lemmas.olean' of module Mathlib.Algebra.GroupPower.Lemmas does not exist\n"
+    },
+    {
+      "attempt": "lean39-02",
+      "kind": "Lean",
+      "status": "rejected",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "errors": "TwistOperators39.lean:25:24: error: unsolved goals\nA : Type u_1\ninst\u271d : CommRing A\nd f : A\nh : d ^ 5 = -1\n\u22a2 -f = 1 \u2194 f = -1\n"
+    },
+    {
+      "attempt": "lean39-03",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 8
+    }
+  ],
+  "measured_diamond_character": 7,
+  "prospective_character_six_matched": false,
+  "twisted_shared_rational_joint_systems": 0,
+  "twisted_shared_total_joint_systems": 2,
+  "crossed_integral_operator_actions_mod11": {
+    "character7": [
+      9,
+      0
+    ],
+    "character8": [
+      0,
+      9
+    ]
+  },
+  "rational_recovery_scalar": 5,
+  "operator_pair_separates_under_both_diamond_conventions": true,
+  "collector": {
+    "field": 128,
+    "rational_chart_points": 420,
+    "degree7_closed_points": 60,
+    "diamond_orbits": 6,
+    "local_presentations_certified": 60,
+    "source_equations": 5,
+    "registered_units": 8
+  },
+  "geometry": {
+    "local_standard_etale_certificates": true,
+    "proper_model_binding": "retained written function-field bridge",
+    "degree7_jets_constructed": false,
+    "complete_degree460_divisor_evaluated": false,
+    "new_collector_classes_evaluated": false,
+    "chosen_Koblitz_model_map_evaluated": false,
+    "full_quotient_saturation": false,
+    "proper_polarized_embedding": false
+  },
+  "formal": {
+    "audited_declarations": 8,
+    "native_arrays_formalized": false,
+    "proper_geometry_formalized": false
+  },
+  "performance_measured": false,
+  "IC_relation_rank": null,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false,
+  "global_metrics_integration": "pending exclusive T-865; scoped R37 patch retained"
+}

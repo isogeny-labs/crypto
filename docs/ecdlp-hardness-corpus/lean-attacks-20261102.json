@@ -1,0 +1,305 @@
+{
+  "sources": [
+    {
+      "id": "S-LEAN-ATTACKS-20261102",
+      "title": "Fake-degree assumptions attacked with exact witnesses and Lean",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/lean_attacks_20261102/PROTOCOL.md (frozen before computing), fall_gap_census.rs, brute_inside_witness.py, results/, and papers/ic-negative-results/lean/IcNegative/FakeDegreeGap.lean.",
+      "repository_path": "research/lean_attacks_20261102/PROTOCOL.md"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "CLAIM-FAKE-DEGREE-BOUNDS-TRUE",
+      "label": "d_F bounded by a function of d'_F (outside)",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "algebraic_coordinate",
+      "statement": "There is a function f with d_F <= f(d'_F) for every system over F_2 with the field equations outside the generating set; in particular a repair of Nagao's Lemma 4 of the form d_F <= d'_F + c.",
+      "scope": "The weakest form an estimate 'the fake degree is small, so the true first fall degree is small' needs once Lemma 4 itself is refuted. Refuted by the family W_k (d'_F = 2, d_F = k + 1).",
+      "assumptions": [
+        "Equality reading",
+        "Field equations outside"
+      ],
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ],
+      "tags": [
+        "first-fall-degree",
+        "fake-degree",
+        "refuted",
+        "candidate-repair"
+      ],
+      "formula": "d_F <= f(d'_F)",
+      "evidence_class": "counterexample",
+      "non_implications": [
+        "Says nothing about the inside placement, where W_k has d_F = 3 for every k computed",
+        "Per-instance certificates whose products already have unreduced degree <= d'_F still certify a true fall"
+      ]
+    },
+    {
+      "id": "CEX-FAKE-GAP-FAMILY-WK",
+      "label": "Family W_k = {X^k Y, XY + X}: d'_F = 2, d_F = k + 1",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "Over F_2, W_k = {X^k Y, XY + X} (k >= 2) has fake first fall degree 2 for every k (X^k Y reduces to XY) and, with the field equations outside, true first fall degree k + 1 (X^{k-1}(XY + X) + X^k Y = X^k; below k + 1 only multiples of XY + X are admissible and a single generator never falls).",
+      "scope": "Hand proof for all k; native computation k = 2..7; core-Lean decide +kernel for k = 3 (gap 2), kernel-checked by the repository proof gate. Inside placement: d_F = 3 for k = 2..7.",
+      "assumptions": [
+        "Equality reading"
+      ],
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ],
+      "tags": [
+        "counterexample",
+        "first-fall-degree",
+        "family",
+        "lean"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/FakeDegreeGap.lean",
+            "decl": "IcNegative.FakeDegreeGap.gap_two_witnessW3"
+          },
+          {
+            "path": "research/lean_attacks_20261102/fall_gap_census.rs",
+            "decl": "family"
+          }
+        ],
+        "notes": "Lean covers k = 3; the all-k statement is a hand proof plus the native table k = 2..7. lean-proof-gate run 41399938870 (commit 6427e000c): papers/ic-negative-results/lean PASS, 40 theorems (8 from FakeDegreeGap), 0 trusted."
+      },
+      "cited_by": [
+        {
+          "path": "research/lean_attacks_20261102/results/family.txt",
+          "use": "measures"
+        },
+        {
+          "path": "research/lean_attacks_20261102/REPORT.md",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE",
+      "label": "d_F <= d'_F + 1 (inside)",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "algebraic_coordinate",
+      "statement": "With the field equations inside the generating set, d_F <= d'_F + 1 for every system over F_2.",
+      "scope": "Candidate repair suggested by W_k, whose inside degree stays 3. Refuted: 10,752 of 521,731 pairs (degree <= 2, n = 3) have gap 2.",
+      "assumptions": [
+        "Equality reading",
+        "Field equations inside"
+      ],
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ],
+      "tags": [
+        "first-fall-degree",
+        "fake-degree",
+        "refuted",
+        "candidate-repair"
+      ],
+      "formula": "d_F(inside) <= d'_F + 1",
+      "evidence_class": "counterexample"
+    },
+    {
+      "id": "CEX-FAKE-GAP-INSIDE-YZ",
+      "label": "{YZ + 1, XZ + X + 1}: d_F(inside) = 3, d'_F = 1",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "Over F_2, F = {YZ + 1, XZ + X + 1}: (1 + Z)(YZ + 1) + Z(XZ + X + 1) reduces to 1, a fake fall at degree 1; with the field equations inside, Z(XZ + X + 1) + X(Z^2 + Z) = Z is a fall at degree 3 and none exists below, so d_F(inside) = 3 = d'_F + 2.",
+      "scope": "Exact, two independent implementations (linear-algebra census in Rust; brute force over every admissible multiplier tuple in Python). Three variables: outside the two-variable Lean mask encoding, so not kernel-checked.",
+      "assumptions": [
+        "Equality reading"
+      ],
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ],
+      "tags": [
+        "counterexample",
+        "first-fall-degree",
+        "exact"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "native_exact",
+        "artifacts": [
+          {
+            "path": "research/lean_attacks_20261102/fall_gap_census.rs",
+            "decl": "gap_census"
+          },
+          {
+            "path": "research/lean_attacks_20261102/brute_inside_witness.py",
+            "decl": "true_fall_at"
+          }
+        ]
+      },
+      "cited_by": [
+        {
+          "path": "research/lean_attacks_20261102/results/p3gap.txt",
+          "use": "measures"
+        },
+        {
+          "path": "research/lean_attacks_20261102/results/brute_inside_witness.txt",
+          "use": "measures"
+        }
+      ]
+    },
+    {
+      "id": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "label": "Inside gap: at most 3 for n >= 2 (tight), unbounded for n = 1",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "With the field equations inside the generating set, for n >= 2 variables and every system F over F_2, d_F(F ∪ S_fe) <= 4, because Y^2 (X^2 + X) + X^2 (Y^2 + Y) = X Y^2 + X^2 Y is a fall at degree 4 made of field equations alone; since d'_F >= 1, d_F(inside) - d'_F <= 3. The bound 3 is attained at n = 4. For n = 1, {X^k, X^k + 1} has d_F(inside) = k and d'_F = 1, so the gap is unbounded.",
+      "scope": "Settles the question posed 2026-11-02 (inside fake-to-true gap). The n >= 2 bound is a one-line hand proof whose key identity is kernel-checked in two variables (proof gate run 41484047855); d_F(S_fe) = 4 checked for n = 2..8 (Rust) and n = 2..5 (independent Python). It also shows that inside-placement d_F under the equality reading never exceeds 4: the 'trivial' field-equation falls that Ding-Hodges and Petit-Quisquater exclude.",
+      "assumptions": [],
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102",
+        "S-INSIDE-GAP-20261102"
+      ],
+      "tags": [
+        "first-fall-degree",
+        "fake-degree",
+        "bound",
+        "attack-graph"
+      ],
+      "formula": "n >= 2: d_F(inside) <= 4, gap <= 3",
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/InsideGap.lean",
+            "decl": "IcNegative.InsideGap.fe_first_fall_four"
+          },
+          {
+            "path": "research/inside_gap_n4_20261102/family_n8.rs",
+            "decl": "main"
+          },
+          {
+            "path": "research/inside_gap_n4_20261102/independent_falls.py",
+            "decl": "true_first_fall_inside"
+          }
+        ],
+        "notes": "Lean: the field-equation fall at 4 in two variables, alone and padded with witness A; that zero multipliers on further generators keep the fall is argued. lean-proof-gate run 41484047855 (commit 1dec4ed48): papers/ic-negative-results/lean PASS, 44 theorems (4 from InsideGap), 0 trusted."
+      }
+    },
+    {
+      "id": "MEAS-REVERSE-TRIPLES",
+      "label": "Reverse repair, triples: 0 counterexamples with independent reduced generators",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Exact census of unordered triples (cap 6): T1 all degree <= 2, n = 2: 37,820 triples (25,536 with independent reduced generators), 266 reverse counterexamples outside, all dependent; T2 multilinear degree <= 2, n = 3: 325,500 triples (322,896 independent), 0 counterexamples.",
+      "scope": "Supports the surviving form of GAP-LEMMA4-REVERSE beyond pairs; degree <= 2, n <= 3 only.",
+      "assumptions": [],
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ],
+      "tags": [
+        "census",
+        "first-fall-degree",
+        "exact"
+      ],
+      "evidence_class": "measurement",
+      "cited_by": [
+        {
+          "path": "research/lean_attacks_20261102/results/t1.txt",
+          "use": "measures"
+        },
+        {
+          "path": "research/lean_attacks_20261102/results/t2.txt",
+          "use": "measures"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "LA-001",
+      "from": "CEX-FAKE-GAP-FAMILY-WK",
+      "to": "CLAIM-FAKE-DEGREE-BOUNDS-TRUE",
+      "relation": "refutes",
+      "statement": "d'_F = 2 for every k while d_F (outside) = k + 1.",
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ]
+    },
+    {
+      "id": "LA-002",
+      "from": "CEX-FAKE-GAP-INSIDE-YZ",
+      "to": "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE",
+      "relation": "refutes",
+      "statement": "d_F(inside) = 3 = d'_F + 2.",
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ]
+    },
+    {
+      "id": "LA-003",
+      "from": "CLAIM-FAKE-DEGREE-BOUNDS-TRUE",
+      "to": "GAP-NAGAO-PROP5-ROUTE",
+      "relation": "qualifies",
+      "statement": "No bound on d_F through d'_F alone survives with the field equations outside; only per-instance certificates (products already of unreduced degree <= d'_F) can carry Proposition 5.",
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ]
+    },
+    {
+      "id": "LA-004",
+      "from": "CLAIM-FAKE-GAP-INSIDE-PLUS-ONE",
+      "to": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "relation": "qualifies",
+      "statement": "The +1 form is refuted; whether any bound holds inside is open.",
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ]
+    },
+    {
+      "id": "LA-005",
+      "from": "MEAS-REVERSE-TRIPLES",
+      "to": "GAP-LEMMA4-REVERSE",
+      "relation": "measures",
+      "statement": "No counterexample with independent reduced generators among 348,432 independent triples.",
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ]
+    },
+    {
+      "id": "LA-006",
+      "from": "CLAIM-NAGAO-LEMMA4",
+      "to": "GAP-FAKE-GAP-INSIDE-BOUNDED",
+      "relation": "leaves_open",
+      "statement": "With Lemma 4 refuted, a bounded-gap repair in the inside placement is the remaining fake-to-true route.",
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ]
+    }
+  ],
+  "research_targets": [
+    {
+      "id": "RT-FAKE-GAP-INSIDE",
+      "label": "Bound or break the inside fake-to-true gap",
+      "status": "working",
+      "priority": 3,
+      "objective": "Settled 2026-11-02: gap <= 3 for n >= 2 (tight at n = 4), unbounded for n = 1 (research/inside_gap_n4_20261102). InsideGap.lean passed the proof gate (run 41484047855). Remaining: a 4-variable Lean encoding if the n = 4 gap-3 witness is to be kernel-checked.",
+      "depends_on": [
+        "GAP-FAKE-GAP-INSIDE-BOUNDED",
+        "CEX-FAKE-GAP-INSIDE-YZ"
+      ],
+      "acceptance": "A proof reviewed independently, or a witness family checked by two implementations (Lean where it fits the encoding).",
+      "next_step": "Optional: a 4-variable Lean encoding to kernel-check the gap-3 witness {XYW+XY+W, XZW+XW+1}.",
+      "source_refs": [
+        "S-LEAN-ATTACKS-20261102"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+[package]
+name="hec-kernel631"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+num-bigint="0.4"
+[[bin]]
+name="kernel631"
+path="main.rs"

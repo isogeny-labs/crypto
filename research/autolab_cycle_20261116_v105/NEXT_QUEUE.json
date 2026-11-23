@@ -1,0 +1,21 @@
+{
+  "id": "C106-inversion-free-discriminant-factor-dispatch",
+  "hypothesis": "An inversion-free exact squarefree test confines inversions to smaller repeated-factor branches and can avoid unnecessary nilpotency work without losing any roots.",
+  "proof": "DISCRIMINANT_DISPATCH_NEXT.md",
+  "experiments": [
+    {
+      "test": "Exhaust small binary-field quintics with literal factor-division and multiplicity oracles; verify Delta squarefree equivalence, quadratic and cubic branch reconstruction.",
+      "seconds": 90,
+      "memory_mb": 4096,
+      "cpu": 0
+    },
+    {
+      "test": "Freeze full-width binary field cases, including GF2^83, squarefree/repeated/zero controls; calibrate cold total costs against original nilpotency and factor recovery.",
+      "seconds": 90,
+      "memory_mb": 4096,
+      "cpu": 0
+    }
+  ],
+  "falsifier": "Any lost repeated/zero branch or no total arithmetic benefit after inverse/dispatch/setup costs. Keep old predicate when faster.",
+  "qualified_speedup": null
+}

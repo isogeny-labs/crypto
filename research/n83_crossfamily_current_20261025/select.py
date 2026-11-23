@@ -10,6 +10,8 @@ from pathlib import Path
 
 SOURCE_SHA256 = '58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8'
 TARGETS_SHA256 = 'fd56a59079fc6cded14539320e0cc7ab88deda0f76fa4fbaf6b663c0cd7ac1b6'
+CURVE_ID = 'EC1N83Ckb1a1haacb69ee9f37'
+SUBGROUP_ORDER = 8569786107849059
 T_975_DF15 = 2.131449545559323
 T_975_DF7 = 2.3646242510103
 IDS = (
@@ -62,6 +64,8 @@ def summary(differences):
 
 def admitted_matrix(data):
     if (data.get('schema') != 'n83.crossfamily-current-validated/v1' or
+            data.get('curve_id') != CURVE_ID or
+            data.get('subgroup_order') != SUBGROUP_ORDER or
             data.get('source_sha256') != SOURCE_SHA256 or
             data.get('targets_sha256') != TARGETS_SHA256 or
             data.get('evidence_status') != 'PASS_INDEPENDENT_REPLAY' or

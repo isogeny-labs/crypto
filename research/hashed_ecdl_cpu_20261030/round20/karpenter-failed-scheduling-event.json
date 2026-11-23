@@ -1,0 +1,37 @@
+[
+  {
+    "cloudwatch_event_id": "39996498764031118232426148839023530865859044649054830622",
+    "cloudwatch_timestamp": 1793505033485,
+    "log_stream": "kube-apiserver-audit-dfd204cce5cd1056f57495af97a166cf",
+    "audit_id": "2842d359-d68a-4411-8572-428cb20d933b",
+    "audit_timestamp": "2026-11-01T03:50:33.262441Z",
+    "event": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "hashed-ecdl-cpu-round20-20261030-c4jld.18e3cf5349e082ba",
+        "namespace": "isolab"
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "isolab",
+        "name": "hashed-ecdl-cpu-round20-20261030-c4jld",
+        "uid": "991e9449-9982-46f8-a9ce-2db9bdfa58bc",
+        "apiVersion": "v1",
+        "resourceVersion": "8350584"
+      },
+      "reason": "FailedScheduling",
+      "message": "Failed to schedule pod, node limits have been exhausted for nodepool (NodePool=gha-on-demand-extra); node limits have been exhausted for nodepool (NodePool=gha-on-demand); node limits have been exhausted for nodepool (NodePool=gha-gates); node limits have been exhausted for nodepool (NodePool=cpu-spot); did not tolerate taint (taint=isolab.dev/measurement=l2:NoSchedule)",
+      "source": {
+        "component": "karpenter"
+      },
+      "firstTimestamp": "2026-11-01T03:50:33Z",
+      "lastTimestamp": "2026-11-01T03:50:33Z",
+      "count": 1,
+      "type": "Warning",
+      "eventTime": null,
+      "reportingComponent": "karpenter",
+      "reportingInstance": ""
+    }
+  }
+]

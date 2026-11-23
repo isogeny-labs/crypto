@@ -1,0 +1,120 @@
+{
+  "schema": "edwards-descent-source-plan/v1",
+  "created": "2026-11-13T01:26:00.967151+00:00",
+  "formal": {
+    "project": "research/edwards_descent_audit_20261113/lean",
+    "theorem": "EdwardsDescentAudit.actual_edwards_descent_counterexample",
+    "statement": "theorem actual_edwards_descent_counterexample : Fintype.card K=25 ∧ a≠0 ∧ d≠0 ∧ a≠d ∧ (∀ r : F, algebraMap F K r≠a) ∧ equation a d targetX targetY ∧ (∀ r : F, algebraMap F K r≠targetY) ∧ curve.Δ≠0 ∧ R≠0 ∧ P+Q=R ∧ (∀ x y : K, sourceF3 a d x y targetY=MvPolynomial.eval ![x+y,x*y] symmetric) ∧ descendRe symmetric=f0 ∧ descendIm symmetric=f1 ∧ f0≠0 ∧ f1≠0 ∧ f0.totalDegree=2 ∧ f1.totalDegree=2 ∧ Module.Finite F A ∧ Module.finrank F A=2 ∧ IsArtinianRing A ∧ ¬ RingTheory.Sequence.IsRegular Poly [homogeneousComponent (descendRe symmetric).totalDegree (descendRe symmetric), homogeneousComponent (descendIm symmetric).totalDegree (descendIm symmetric)]",
+    "decl_sha256": "ce76b77d337dcdced1883e0c16de67e4f85bc8672cca81392596b26b25464154",
+    "scope": "Literal universal n2 FGHR2014 Hypothesis3 in the twisted-Edwards representation: actual F25curve/target/factorbase point sum, exact printed sourceF3 symmetrization and basis-coordinate descent, both nonzero degree2 equations, actual quotient equivalence to F5[T]/T², dimension2/finite/Artinian and direct nonregularity of highest homogeneous parts. No generic-input/n>=3, conditional-complexity/Joux-Vitse or prime-order sampling/refinement assertion.",
+    "sources": [
+      {
+        "path": "research/edwards_descent_audit_20261113/lean/ActualDescent.lean",
+        "bytes": 5159,
+        "sha256": "a7f50828505b805ccf400a9e2ac922f1eba70a190bfdf6ddfc020968f6891540"
+      },
+      {
+        "path": "research/edwards_descent_audit_20261113/lean/DescentAlgebra.lean",
+        "bytes": 5655,
+        "sha256": "24755dccd2d033d225f01b0e38ab328dd8e46c021a5a54f4467468d7edf98eae"
+      },
+      {
+        "path": "research/edwards_descent_audit_20261113/lean/DescentCertificate.lean",
+        "bytes": 1774,
+        "sha256": "1a08a2246cc8ec2f5ffe3a2215534361088a7ec664f871a12232db7e06b4fe7e"
+      },
+      {
+        "path": "research/edwards_descent_audit_20261113/lean/EdwardsInput.lean",
+        "bytes": 3798,
+        "sha256": "6fca5263934541e782b24b133cc023c5e61629ec5c475fd9ed3aa64d14b879a1"
+      },
+      {
+        "path": "research/edwards_descent_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3555,
+        "sha256": "a30e274ca574e937a3b1297e22583b2d5ef24716d61d1cc0f574c406bdbec02c"
+      },
+      {
+        "path": "research/edwards_descent_audit_20261113/lean/lakefile.toml",
+        "bytes": 355,
+        "sha256": "2113f8c4b5f5599b851e247138b43bbcf8201a01481c63262ebccde1b8c78417"
+      },
+      {
+        "path": "research/edwards_descent_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/edwards_descent_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 8796,
+      "sha256": "11059f07245007c3c6bad3cb22643d15b5e7918ca52b18ed7e98477b4fc57268"
+    },
+    {
+      "path": "research/edwards_descent_audit_20261113/evidence/attempts.json",
+      "bytes": 4023,
+      "sha256": "d9f9c9839a9f48fa7564dcdb2ac710e258706bdeb58d3f18b267106d360313ea"
+    },
+    {
+      "path": "research/edwards_descent_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 1462,
+      "sha256": "f10cb21f3069a0dbd3ea87b88ca8ff0de069a5eab2818ce3eae9749e712272c5"
+    },
+    {
+      "path": "research/edwards_descent_audit_20261113/evidence/gate.json",
+      "bytes": 1161,
+      "sha256": "e82d6698a716fd8307b40e74857a77012146380aa1f6936f2485b3da8ad38b32"
+    },
+    {
+      "path": "research/edwards_descent_audit_20261113/evidence/source-review.json",
+      "bytes": 1915,
+      "sha256": "96d2c0ab36cc7855414663c8e21149db06d5bb217a0dfc5b2af9544e3366a605"
+    },
+    {
+      "path": "research/edwards_descent_audit_20261113/evidence/kb-status.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research/edwards_descent_audit_20261113/evidence/kb-status.stderr",
+      "bytes": 81,
+      "sha256": "c6469ac928dfdb446054c9d34486cd5d7a3243e7c20444e8da1bf1b0dbd77238"
+    },
+    {
+      "path": "research/edwards_descent_audit_20261113/evidence/kb-status.exit",
+      "bytes": 4,
+      "sha256": "743c7850cccfba5e53a9002663ec1ddd1079315a98bdbfdde10e6044f56abefe"
+    }
+  ],
+  "gate": {
+    "archive": "research/edwards_descent_audit_20261113/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 55,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/edwards_descent_audit_20261113/evidence/attempts.tar.gz",
+    "files": 23,
+    "roundtrip_equal": true
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "custom_axioms": false,
+    "waivers": false,
+    "added_elaboration_options": false,
+    "assumed_regularity": false,
+    "native_solver_runs": 0,
+    "paid_compute_and_agent_storage_upload": 0
+  }
+}

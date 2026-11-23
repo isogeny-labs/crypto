@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "timeout",
+    "-k",
+    "2s",
+    "30s",
+    "aws",
+    "ec2",
+    "describe-snapshots",
+    "--owner-ids",
+    "self",
+    "--query",
+    "Snapshots[].{Id:SnapshotId,Size:VolumeSize,State:State,Tier:StorageTier}",
+    "--region",
+    "us-east-2",
+    "--cli-connect-timeout",
+    "5",
+    "--cli-read-timeout",
+    "15",
+    "--output",
+    "json"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T22:29:38.407517+00:00",
+  "observed_utc": "2026-11-03T22:29:39.340560+00:00",
+  "elapsed_seconds": 0.933047536003869,
+  "stdout_sha256": "ddb7595f548f5d34fe730e8f3d1477d76b38b0b8eb1fcd6e0231ddde1955b145",
+  "stdout_bytes": 7796,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_bytes": 0
+}

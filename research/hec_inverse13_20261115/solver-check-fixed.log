@@ -1,0 +1,111 @@
+Making check in src/usolve
+make[1]: Nothing to be done for `check'.
+Making check in src/fglm
+make[1]: Nothing to be done for `check'.
+Making check in src/neogb
+make[1]: Nothing to be done for `check'.
+Making check in src/msolve
+make[1]: Nothing to be done for `check'.
+/Library/Developer/CommandLineTools/usr/bin/make  neogb_io fglm_build_matrixn_radical-shape-31 fglm_build_matrixn_nonradical-shape-31 fglm_build_matrixn_nonradical-radicalshape-31 line_endings_support
+make[2]: `neogb_io' is up to date.
+make[2]: `fglm_build_matrixn_radical-shape-31' is up to date.
+make[2]: `fglm_build_matrixn_nonradical-shape-31' is up to date.
+make[2]: `fglm_build_matrixn_nonradical-radicalshape-31' is up to date.
+make[2]: `line_endings_support' is up to date.
+/Library/Developer/CommandLineTools/usr/bin/make  check-TESTS
+./test-driver: line 119: 28463 Abort trap: 6           "$@" >> "$log_file" 2>&1
+FAIL: fglm_build_matrixn_radical-shape-31
+./test-driver: line 119: 28464 Abort trap: 6           "$@" >> "$log_file" 2>&1
+FAIL: neogb_io
+./test-driver: line 119: 28505 Abort trap: 6           "$@" >> "$log_file" 2>&1
+FAIL: fglm_build_matrixn_nonradical-radicalshape-31
+./test-driver: line 119: 28504 Abort trap: 6           "$@" >> "$log_file" 2>&1
+FAIL: fglm_build_matrixn_nonradical-shape-31
+./test-driver: line 119: 28552 Abort trap: 6           "$@" >> "$log_file" 2>&1
+FAIL: line_endings_support
+FAIL: test/diff/diff_bug-2nd-prime-bad.sh
+FAIL: test/diff/diff_bug-68.sh
+FAIL: test/diff/diff_bug-empty-tracer.sh
+FAIL: test/diff/diff_cp-d3-n4-p2.sh
+FAIL: test/diff/diff_bug-prob-sparse-dense-la.sh
+FAIL: test/diff/diff_cyclic5-16.sh
+FAIL: test/diff/diff_cyclic5-31.sh
+FAIL: test/diff/diff_cyclic5-qq.sh
+FAIL: test/diff/diff_eco10-31.sh
+FAIL: test/diff/diff_eco6-16.sh
+FAIL: test/diff/diff_eco6-31.sh
+FAIL: test/diff/diff_eco6-qq.sh
+FAIL: test/diff/diff_elim-31.sh
+FAIL: test/diff/diff_elim-qq.sh
+FAIL: test/diff/diff_empty-elim-qq.sh
+FAIL: test/diff/diff_f4sat-31.sh
+FAIL: test/diff/diff_f4sat-byone-31.sh
+FAIL: test/diff/diff_f4sat-field-char.sh
+FAIL: test/diff/diff_f4sat-is-saturated-check.sh
+FAIL: test/diff/diff_f4sat-zero-input.sh
+FAIL: test/diff/diff_groebner-g2.sh
+FAIL: test/diff/diff_hankel-degenerate-16.sh
+FAIL: test/diff/diff_sum-squares-system.sh
+FAIL: test/diff/diff_henrion5-qq.sh
+FAIL: test/diff/diff_input-overflow-a-16.sh
+FAIL: test/diff/diff_input-overflow-b-16.sh
+FAIL: test/diff/diff_issue-230.sh
+FAIL: test/diff/diff_issue-230-squared.sh
+FAIL: test/diff/diff_issue-310-bivariate.sh
+FAIL: test/diff/diff_kat6-31.sh
+FAIL: test/diff/diff_kat7-qq.sh
+FAIL: test/diff/diff_kat8-qq-truncate.sh
+FAIL: test/diff/diff_line-endings.sh
+FAIL: test/diff/diff_linear0-qq.sh
+FAIL: test/diff/diff_linear1-qq.sh
+FAIL: test/diff/diff_linear2-qq.sh
+FAIL: test/diff/diff_maxbitsize-bug.sh
+FAIL: test/diff/diff_mq-2-1.sh
+FAIL: test/diff/diff_multy-16.sh
+FAIL: test/diff/diff_multy-31.sh
+FAIL: test/diff/diff_multy-qq.sh
+FAIL: test/diff/diff_nf-16.sh
+FAIL: test/diff/diff_nf-31.sh
+FAIL: test/diff/diff_nf-8.sh
+FAIL: test/diff/diff_nf-lm-bug.sh
+FAIL: test/diff/diff_nonradical-radicalshape-no-square-31.sh
+FAIL: test/diff/diff_nonradical-radicalshape-no-square-qq.sh
+FAIL: test/diff/diff_nonradical-radicalshape-qq.sh
+FAIL: test/diff/diff_nonradical-shape-31.sh
+FAIL: test/diff/diff_nonradical-shape-qq.sh
+FAIL: test/diff/diff_one-16.sh
+FAIL: test/diff/diff_one-31.sh
+FAIL: test/diff/diff_one-qq.sh
+FAIL: test/diff/diff_quadratic-nonradical-qq.sh
+FAIL: test/diff/diff_radical-shape-31.sh
+FAIL: test/diff/diff_radical-shape-qq.sh
+FAIL: test/diff/diff_realroot1.sh
+FAIL: test/diff/diff_realroot-extraction-exact-root.sh
+FAIL: test/diff/diff_reals-dim0-chgvar.sh
+FAIL: test/diff/diff_reals-dim0-extract.sh
+FAIL: test/diff/diff_reals-dim0.sh
+FAIL: test/diff/diff_reals-dim0-swapvar.sh
+FAIL: test/diff/diff_test-lifting2.sh
+FAIL: test/diff/diff_univariate-assign-left.sh
+FAIL: test/diff/diff_univariate-cubic-close-roots.sh
+FAIL: test/diff/diff_univariate-sgn.sh
+============================================================================
+Testsuite summary for msolve 0.11.0
+============================================================================
+# TOTAL: 71
+# PASS:  0
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  71
+# XPASS: 0
+# ERROR: 0
+============================================================================
+See ./test-suite.log for debugging.
+Some test(s) failed.  Please report this to ederc@rptu.de,mohab.safey@lip6.fr,
+together with the test-suite.log file (gzipped) and your system
+information.  Thanks.
+============================================================================
+make[3]: *** [test-suite.log] Error 1
+make[2]: *** [check-TESTS] Error 2
+make[1]: *** [check-am] Error 2
+make: *** [check-recursive] Error 1

@@ -1,0 +1,33 @@
+{
+  "schema": "validator-claimed-side/v1",
+  "what": "The producer's claimed figures for session ECBS1h695ef8e76c34, transcribed verbatim by the validator from the main session's dispatch (2026-11-15), with the printed number of decimals. Full-precision claimed values are read by build_reports.py from claimed/band.json and claimed/comparisons/*.json (producer's ecbench band / compare output), which this file does not restate.",
+  "source": "dispatch text: 'paired S ratio fes-f2/inherited-f4 = 0.7081, 95 % interval [0.6683, 0.7503] (linearised_t over 8 workloads); mean S rho-sfstrong-v2 2.584, rho-negation 2.788, ic-pairtable-mitm2 197.489, ic-descent-inherited-f4 121.544, ic-descent-fes-f2 86.067. Band S(w=0/0.1/1): fes-f2 15.177/3081.763/30681.037; inherited-f4 15.174/4621.699/46080.422; rho-sfstrong-v2 2.584/2.677/3.513. The producer reads this as \"H1 unresolved inside the band, because the order flips at w=0\".'",
+  "printed": [
+    {"name": "paired_ratio_fes_over_inherited", "printed": "0.7081"},
+    {"name": "paired_ratio_ci95_low", "printed": "0.6683"},
+    {"name": "paired_ratio_ci95_high", "printed": "0.7503"},
+    {"name": "mean_S/rho-sfstrong-v2", "printed": "2.584"},
+    {"name": "mean_S/rho-negation", "printed": "2.788"},
+    {"name": "mean_S/ic-pairtable-mitm2", "printed": "197.489"},
+    {"name": "mean_S/ic-descent-inherited-f4", "printed": "121.544"},
+    {"name": "mean_S/ic-descent-fes-f2", "printed": "86.067"},
+    {"name": "band_S/ic-descent-fes-f2/w=0", "printed": "15.177"},
+    {"name": "band_S/ic-descent-fes-f2/w=0.1", "printed": "3081.763"},
+    {"name": "band_S/ic-descent-fes-f2/w=1", "printed": "30681.037"},
+    {"name": "band_S/ic-descent-inherited-f4/w=0", "printed": "15.174"},
+    {"name": "band_S/ic-descent-inherited-f4/w=0.1", "printed": "4621.699"},
+    {"name": "band_S/ic-descent-inherited-f4/w=1", "printed": "46080.422"},
+    {"name": "band_S/rho-sfstrong-v2/w=0", "printed": "2.584"},
+    {"name": "band_S/rho-sfstrong-v2/w=0.1", "printed": "2.677"},
+    {"name": "band_S/rho-sfstrong-v2/w=1", "printed": "3.513"}
+  ],
+  "bench_record_spreads": {
+    "source": "benchmarks/records/20261115T0009Z-fes-k13-runpod.json (metrics[].spread, unlabelled there)",
+    "printed": [
+      {"name": "spread/ic-descent-fes-f2", "printed": ["78.914", "93.868"]},
+      {"name": "spread/ic-descent-inherited-f4", "printed": ["106.689", "138.468"]},
+      {"name": "spread/rho-sfstrong-v2", "printed": ["2.512", "2.659"]}
+    ]
+  },
+  "interpretation": "H1 unresolved inside the band, because the order flips at w=0"
+}

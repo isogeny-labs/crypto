@@ -1,0 +1,32 @@
+Diff in /workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/entire-original-common.rs.txt:40:
+ }
+ pub fn snap() -> Cnt {
+     unsafe {
+-        Cnt { mul: MUL, inv: INV, add: ADD, lmul: LMUL, ladd: LADD, hash: HASH, cmp: CMP }
++        Cnt {
++            mul: MUL,
++            inv: INV,
++            add: ADD,
++            lmul: LMUL,
++            ladd: LADD,
++            hash: HASH,
++            cmp: CMP,
++        }
+     }
+ }
+ #[inline(always)]
+Diff in /workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/entire-original-common.rs.txt:270:
+             c += 1;
+         }
+         let w = powmod(c, (q - 1) / 3, q);
+-        Kf { fp, c, w, w2: w * w % q, size: (q as u128).pow(3) }
++        Kf {
++            fp,
++            c,
++            w,
++            w2: w * w % q,
++            size: (q as u128).pow(3),
++        }
+     }
+     pub fn q(&self) -> u64 {
+         self.fp.q

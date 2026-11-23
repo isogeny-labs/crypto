@@ -1,0 +1,31 @@
+{
+ "created_at": "2026-11-04T16:30:33Z",
+ "id": "PCC-20261104-ab1619",
+ "kind": "statement",
+ "producer": {
+  "commit": "2d746d0577ddf797b8706de1f45489fb31ad3d31",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_skip_criterion_20261025/journal_qualification_20261104/BUILD.json",
+    "sha256": "2013f8f4d868b70d1a936bdd2cd042bbfc17388dc23f482c22ed1431afb25eb5"
+   },
+   "subject_kind": "artifact"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_skip_criterion_20261025/journal_qualification_20261104/MANIFEST.sha256",
+    "sha256": "38c82caafbc102c72d3e1ad298cc75e7719ccd0ea742bd9fbacb324c0169e37b"
+   },
+   "subject_kind": "artifact"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Producer development observations only; unsigned attestations, shared PARI/GMP/OpenSSL dependencies, no execution proof, no cloud restore qualification or scientific baseline result.",
+ "statement": "Development assertion: the native NIST journal reader and fresh-directory recovery wrapper passed 46 bounded native controls and seven CLI controls; recovered toy journals match the frozen producer, with zero baseline samples collected."
+}

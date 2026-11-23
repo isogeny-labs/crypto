@@ -1,0 +1,39 @@
+import PositiveDistinct
+open Polynomial MixedCancellation MixedPositiveDistinct
+example : let a : WeightedAdd11.Input ℚ := ⟨0,64,2,2⟩
+ let b : D2 ℚ := ⟨-9,0,0,486,3,2⟩
+ let d := doubled 1 (-1) 0 0 a
+ let c := MixedGeneric.output (other a b) d 0
+ classify a b = .positiveCoincidence ∧ (2:ℚ) ≠ 0 ∧ a.y ≠ 0 ∧
+ MixedGeneric.dispatch (other a b) d 0 = some c ∧ c.z ≠ 0 ∧ c.w ≠ 0 ∧
+ validTwo (MixedGeneric.curve 1 (-1) 0 0) c := by
+ apply source_branch_preserves
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4-1,?_⟩
+   simp [MixedGeneric.curve]; ring
+ · norm_num [validTwo,nq,nr,ns,nt,MixedCancellation.support,ordinate]
+   refine ⟨X^3+X^2+X+1,?_⟩
+   simp [MixedGeneric.curve]; ring
+ · norm_num [rawK]
+ · norm_num [rawW3,rawY3]
+ · norm_num [other]
+example : let a : WeightedAdd11.Input ℚ := ⟨0,64,2,2⟩
+ let b : D2 ℚ := ⟨-9,0,0,486,3,2⟩
+ let c := MixedGeneric.output (other a b) (doubled 1 (-1) 0 0 a) 0
+ nq c=3/4 ∧ nr c=5/4 ∧ ns c=7/8 ∧ nt c= -3/8 := by
+ norm_num [MixedGeneric.output,MixedGeneric.outputWith,MixedGeneric.genericK,MixedGeneric.genericA,rawW3,rawY3,other,doubled,WeightedDoubling.output,nq,nr,ns,nt]
+example : classify (⟨0,0,1,1⟩:WeightedAdd11.Input ℚ) (⟨-1,0,0,0,1,1⟩:D2 ℚ) = .cancellation := by
+ norm_num [classify,rawK,rawW3,rawY3]
+example : let a : WeightedAdd11.Input ℚ := ⟨0,1,1,1⟩
+ let b : D2 ℚ := ⟨0,0,0,1,1,1⟩
+ classify a b = .positiveCoincidence ∧ a.x*(b.z*b.z)=(other a b).x := by
+ norm_num [classify,rawK,rawW3,rawY3,other]
+example : ¬ (X:ℚ[X]) ∣ MixedGeneric.curve 2 (-1) 0 0-1 := by
+ intro h
+ obtain ⟨q,hq⟩ := h
+ have hc := congrArg (fun p : ℚ[X] => p.coeff 0) hq
+ norm_num [MixedGeneric.curve] at hc

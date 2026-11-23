@@ -1,0 +1,381 @@
+{
+ "schema": "validator-report/v1 (validation-gate/v1 companion)",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_scope": "The T3 component claims at k = 20, bits translation frames, t in {4, 5}, G = 3, full mode: the frozen step-S selection (L3*(4) = 598026, L3*(5) = 546312; L2* 797820, 233902), the 12 f4cost cells, the derived rho_t, g3_t, g2_t, q_t (PROTOCOL 2.5) and the verdicts P0 held, P1 held, P2 held at t = 4 and FAILED at t = 5 (poly_terms_per_specialisation unequal), P3 held, P4 held, P5 held. Validated as an F4-elimination component measurement only; it is not a leaderboard row, makes no cross-method ranking and no improvement over the IC baseline. The errata are wording and arithmetic errors in README prose; none changes a table value or a verdict.",
+ "independent": true,
+ "validator": "validator (Claude Opus 5.5, claude-opus-5-5); did not produce T3",
+ "date": "2026-11-03",
+ "validated_commit": "2b330f250a1bca382b81023d95d556fccd7078d3",
+ "tree_state": "Repository HEAD ea2570e5385832819d535eb2fc11bd183f05abe2. PROTOCOL.md, scripts/run.sh and scripts/select_frames.py are byte-identical to commit 2b330f25 (git diff against it is empty; read-only git used only for this check). README.md and data/ are untracked and excluded by .git/info/exclude lines 8-9 (local, not .gitignore); the results set is therefore pinned by the hashes below, not by a commit. Commit 2b330f25 is dated 16:54:44Z; data/env.txt records the run start 16:55:10Z, so the protocol and scripts predate the data.",
+ "artifact_hashes_at_validation": {
+  "PROTOCOL.md": "85c8c2b77b2995d7d495214b1bf5cbd3ceab5bd2d23532e481595d9a7eccd54e",
+  "scripts/run.sh": "7e5b63b3a444ff1d78210635ac3631e351725532db30e0ee31bb853ecab4c191",
+  "scripts/select_frames.py": "4e30374163c67d213e8ebf6c8f8d2eb68b359016d74fade4bfe7c2813e84f671",
+  "README.md": "e523cf2b44be89e2f920cfffc428cdbe8ff214ed0897f09a9f4878b1328ef7e2",
+  "data/SHA256SUMS": "2e0cb8159967b43eb05b4849cc612a032e45c6b1a9df1c4b1e760caa0f8122c0",
+  "data/SHA256SUMS.supplement": "925808abee8c24c9550c7b3e54ceabcbde94d2d37f6f4023cb99d900d61c45b4",
+  "data/census/k20.json": "dc08cc8ea25f6ff8598603e5751394d7a4448c4353819cc49952937d71d1099f"
+ },
+ "instrument": {
+  "binary": "/home/user/ctarget/release/curve25519_family",
+  "sha256": "7a438b1d8ce9d7a0b8049a4331599727e9574ea4201f9c7957befa3184ba98be",
+  "checks": "Equal to data/binary.sha256 and PROTOCOL 2.1 at validation time, and re-hashed immediately before every rerun cell (rerun.log). Another session was running cargo check/clippy on this bin into /home/user/ctarget during validation; the hash never changed."
+ },
+ "requirements": [
+  {
+   "id": "R1 data files match data/SHA256SUMS",
+   "result": "pass",
+   "evidence": "sha256sum -c inside data/: SHA256SUMS 17/17 OK (binary.sha256, env.txt, selection.json, frames.txt, census/k20.json, 12 cells/*.json); SHA256SUMS.supplement 17/17 OK (run.log, census/k20.log, census/SHA256SUMS, selection.log, 12 .stderr, and SHA256SUMS itself); census/SHA256SUMS OK. census/k20.json sha256 dc08cc8e...1099f equals the k20.json entry of research/curve25519_torsion_leads_20261103/data/.artifacts.json as committed at 2b330f25. All 12 .stderr files are empty (e3b0c442...). The supplement list was added after the run, as the README discloses.",
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/SHA256SUMS"
+  },
+  {
+   "id": "R2 rerun of run.sh cells with the frozen command",
+   "result": "pass",
+   "evidence": "Validator reran 12 of 12 cells, one process at a time, with the frozen command line `f4cost 20 <form> <t> 3 <targets> <seed> 3600 <m> full 0 30000000` under timeout 4200 and ulimit -v 6000000, binary hash checked before each cell. Every field except wall_s is identical in 12/12 reran cells (m2_t4_L2, m2_t4_L3, m2_t4_lo0, m2_t5_L2, m2_t5_L3, m2_t5_lo0, m3_t4_L3, m3_t4_lo0, m3_t5_L3, m3_t5_lo0, m3cov_t4_L2, m3cov_t5_L2): 49 fields per engine cell, 51 for cell 9 (which adds pkm_consistent_systems and pkm_grid_fp_mults_uncharged), 39 per coverage-only cell. Cell 9 reproduces hits = hits_verified = hits_exact = 1, 234 F4 calls, 233 refutations, f4_muladds 8479559465325 and terms 3843.991452991453. All 12 cells were rerun. Same host as the producer (not an independent host class).",
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/rerun/"
+  },
+  {
+   "id": "R3 recompute every README number from data/",
+   "result": "pass",
+   "evidence": "Exact-rational recomputation (recompute.py) of muladds_per_target, coverage_exact = cov/r, C = mpt/coverage_exact, rho_t, g3_t, g2_t, q_t, the per-call ratios, the exploratory ratios (cells 3/6 vs L2*: 1.6957, 1.0337; J3 vs J m3 coverage: 1.145, 1.2035; q on L3*: 1354.72, 6426.25; coverage ratios 7.6333, 11.5089), total f4_muladds 17417097182355, summed wall_s 2867.43 s and the column counts. Every README table value and figure agrees, except the prose errata listed. JSON fields muladds_per_target, coverage_exact, muladds_per_relation_at_exact_coverage and poly_terms_per_specialisation (= pkm_system_terms/pkm_system_specialisations) agree with recomputation in every cell.",
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/"
+  },
+  {
+   "id": "R4 step S selection recomputed from the census",
+   "result": "pass",
+   "evidence": "Validator code (max with explicit tie-break, not select_frames.py) over data/census/k20.json: first 300 rows carry m3_cov (contiguous), L3*(4) = 598026 (m3_cov 458, J3 484, cols 14, m2 cov 46), L3*(5) = 546312 (2578, 2748, 25, 178), L2*(4) = 797820 (78), L2*(5) = 233902 (184); no ties at the maximum; mean m3_cov 103.97333 and 757.22. Equal to data/selection.json, data/frames.txt and research/curve25519_torsion_leads_20261103/analysis/summary.json (m3_sel_cov, m3_mean, cov_frame_only).",
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/selection.json"
+  },
+  {
+   "id": "R5 certificate: coverage and the cell 9 relation, re-verified independently of the solver",
+   "result": "pass",
+   "evidence": "indep_cert.py (pure Python, no Rust code) rebuilds the curve from (p, A) = (1048573, 926) (Weierstrass aW 63700, bW 872826, the same as the parent ecbench workload record), the generator G = (349837, 122) by the frozen rule, every bits/bits@L base, and the f4cost target LCG. It reproduces columns, base_points and covered_points in all 12 cells (12, 78, 46, 42, 184, 178, 60, 458, 2578, 224, 400, 2142). Of the 860 engine targets, exactly one is a sum of m base points: cell 9, target index 2, a = 56809, R = (345926, 631973) = (546316, 69880) + (546321, 554249) + (546325, 585562), all three on the curve, x in [546312, 546344). Every other cell has 0 decomposable targets, matching hits = 0. So the one relation is genuine and the engine's 233 refutations in cell 9 and all refutations elsewhere are consistent with ground truth on these targets. The artifacts themselves carry no relation certificate (only solver-side hits_verified); the validator reconstructed it.",
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/indep_cert.json"
+  },
+  {
+   "id": "R6 controls and reference arms",
+   "result": "pass",
+   "evidence": "P0 control values verified in the cited sources: curve25519_edwards_semaev_20261102/cells/bits_t4_g3.json (8884000, 12), curve25519_torsion_leads_20261103/engine_confirm/bits_797820_t4.json (8884000, 78), curve25519_frame_search_20261103/engine/bits_t5_g3.json (303691176, 42), engine_confirm/bits_233902_t5.json (303690989, 184), curve25519_algebraic_m3_20261102/analysis/f4cost_m3.jsonl line 16 (119824176893, 800 calls, undecided 0) and coverage.jsonl (60, 224). The unmodified lo = 0 arm is present and priced in the same unit (F4 mul-adds) at every (m, t); the m = 2 selected comparator is present. No cross-method claim is made, so no rho arm or external fastest implementation is required for this component scope.",
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/PROTOCOL.md"
+  },
+  {
+   "id": "R7 reporting contract",
+   "result": "pass",
+   "evidence": "One results table in one unit (F4 elimination mul-adds), the reference arms as rows, derived ratios in a second table, correctness columns (undecided, capped, hits/hits_verified). Native uncharged work is listed and stated as unpriced; no section 5a band is needed because no two methods are ranked. Distance to rho is quoted from parent studies (curve25519_algebraic_ecbench_20261102 README: 18x / 9.6e5x behind rho-neg, baseline 7.8-7.9x on the earlier 48 runs; 547-936 group ops from curve25519_frame_search_20261103 README), not measured here. The m = 83 / ECC2K-130 rules do not apply (k = 20 prime-field miniature, no transfer claim).",
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/README.md"
+  },
+  {
+   "id": "R8 scope and failed predictions",
+   "result": "pass_with_errata",
+   "evidence": "P2 at t = 5 is reported as failed with its numbers and is not retuned; F1-F3 did not trigger; claims stay at k = 20, bits frames, t in {4, 5}, G = 3, full; no 255-bit extrapolation; 'no improvement over the index-calculus baseline' is stated. Two Summary sentences overstate (errata E2, E5).",
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/README.md"
+  }
+ ],
+ "predictions": {
+  "P0": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "cells 1, 2, 4, 5 (f4_muladds, covered_points) = (8884000, 12), (8884000, 78), (303691176, 42), (303690989, 184); cell 7 119824176893 over 800 calls, undecided 0. Exact."
+  },
+  "P1": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "covered_points cells 8, 9, 7, 10 = 458, 2578, 60, 224; also reproduced by independent code."
+  },
+  "P2_t4": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "sd 10 = 10, terms 512.0 = 512.0, undecided 0/0, rho_4 = 1.0000484 in [0.90, 1.10]."
+  },
+  "P2_t5": {
+   "outcome": "failed",
+   "readme": "failed",
+   "agree": true,
+   "evidence": "sd 11 = 11, undecided 0/0, rho_5 = 0.9750043 in band, but poly_terms_per_specialisation 3843.991452991453 (899494/234) != 3843.991666666667 (922558/240)."
+  },
+  "P3": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "g3_4 = 7.6330, g3_5 = 11.8040, both >= 5.0."
+  },
+  "P4": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "g3 > g2 at t = 4 (7.6330 > 6.5000) and t = 5 (11.8040 > 4.3810)."
+  },
+  "P5": {
+   "outcome": "held",
+   "readme": "held",
+   "agree": true,
+   "evidence": "q_4 = 2297.13, q_5 = 6642.86, both >= 100; no q < 1."
+  }
+ },
+ "errata": [
+  "E1 (README Summary, P2 bullet; Exploratory 'Why P2 failed'): 'that target stopped after 6 of its 8 guess branches' / 'ended its target after 6 guess branches' is wrong. The hit target solved 2 of its 8 branches and skipped 6: cell 9 has 233 refutations + 1 consistent system = 234 = 29 x 8 + 2, and the F4 loop breaks at the first consistent branch (src/cryptanalysis/ic_framework/pkm_semaev.rs, `let stop = !rep.inconsistent; ... break`). The 234-vs-240 count and rho_5 = 0.975 = 234/240 are correct.",
+  "E2 (README Summary, second bullet): 'keeps the m = 3 F4 system: same solving degree, same terms per specialisation at t = 4, and the same mul-adds per F4 call (ratio 1.0000484 ... 1.0000044)' states as a finding what the frozen rule decided only at t = 4. At t = 5 P2 failed and the 'same system' reading is the README's own exploratory interpretation. Per-call mul-adds are not equal (ratios 1.0000484 and 1.0000044, and per-call cost is not a preregistered quantity). Should read: 'held under P2 at t = 4; at t = 5 P2 failed (terms unequal), and the per-call agreement to 4.4e-6 is exploratory'.",
+  "E3 (README Summary, P2 bullet): the two poly_terms_per_specialisation values 3843.991452991453 and 3843.991666666667 first differ in the 8th significant digit, not the 7th (relative difference 5.6e-8).",
+  "E4 (README Costs): 'Peak RSS seen for cell 9 was about 2.4 GB' is not supported by any artifact (no RSS is recorded in data/). The validator saw 2.38 GB RSS during its own rerun of cell 9, which agrees with it, but the number is an unrecorded observation. It is for sizing only and is not a claim.",
+  "E5 (README Exploratory, cells 3/6): 'per-target cost is unchanged (88840.0; 3036908.81)' is exact at t = 4 only. At t = 5 the m = 2 per-target cost is 3036908.81 (L3*), 3036909.89 (L2*), 3036911.76 (lo = 0); it differs by less than 1e-6 relative but is not equal."
+ ],
+ "notes": [
+  "N1 Results are not committed: README.md and data/ are excluded by .git/info/exclude. If they are landed, data/census/k20.json (1,555,899 bytes, over the 1 MiB artifact-store threshold, AGENTS.md section 13) must go through tools/artifacts. The same bytes are already listed in the torsion study's .artifacts.json.",
+  "N2 g3_5 = 11.8040 is the frozen definition's value. As the README discloses, it includes about 2.5% from the one early-stopped target (coverage ratio 11.5089). P3 and P4 hold at t = 5 with or without that 2.5%.",
+  "N3 Diagnostic consistent with the README's exploratory reading of the P2 t = 5 failure: arm A's total terms minus arm B's (922558 - 899494 = 23064) are exactly 6 x 3844.0, i.e. the 6 unsolved branches of the hit target at the population per-branch size. This does not change the frozen verdict.",
+  "N4 The single relation (cell 9) is now certified independently (R5), but the artifact set does not record it. Recording the relation (target scalar, base indices) in the cell JSON or an evidence file would make it checkable without re-deriving the targets.",
+  "N5 wall_s is measured after oracle.prepare, so coverage-only cells show sub-second wall_s while their run.log intervals are 29 s and about 4.6 min. No timing claim is made, so this has no effect."
+ ],
+ "recompute_agrees": true,
+ "recompute_agrees_detail": "All table values, derived quantities and verdicts recompute exactly from data/ (exact rationals). Disagreements are limited to errata E1-E5 in prose.",
+ "headline": [
+  {
+   "name": "rho_4",
+   "claimed": 1.0000484,
+   "recomputed": 1.0000484294251,
+   "rel_tol": 1e-07
+  },
+  {
+   "name": "rho_5",
+   "claimed": 0.9750043,
+   "recomputed": 0.9750042861049449,
+   "rel_tol": 1e-07
+  },
+  {
+   "name": "g3_4",
+   "claimed": 7.633,
+   "recomputed": 7.632963673290827,
+   "rel_tol": 0.0001
+  },
+  {
+   "name": "g3_5",
+   "claimed": 11.804,
+   "recomputed": 11.803977413684727,
+   "rel_tol": 0.0001
+  },
+  {
+   "name": "g2_4",
+   "claimed": 6.5,
+   "recomputed": 6.5,
+   "rel_tol": 0.0001
+  },
+  {
+   "name": "g2_5",
+   "claimed": 4.381,
+   "recomputed": 4.380955078556607,
+   "rel_tol": 0.0001
+  },
+  {
+   "name": "q_4",
+   "claimed": 2297.13,
+   "recomputed": 2297.1325794721483,
+   "rel_tol": 1e-05
+  },
+  {
+   "name": "q_5",
+   "claimed": 6642.86,
+   "recomputed": 6642.859079959235,
+   "rel_tol": 1e-05
+  },
+  {
+   "name": "C_m3_t4_L3",
+   "claimed": 343276263187.7844,
+   "recomputed": 343276263187.7844,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "C_m2_t4_L2",
+   "claimed": 149436852.82051283,
+   "recomputed": 149436852.82051283,
+   "rel_tol": 1e-12
+  },
+  {
+   "name": "total_f4_muladds",
+   "claimed": 17417097182355,
+   "recomputed": 17417097182355,
+   "rel_tol": 0
+  }
+ ],
+ "raw_data": [
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/SHA256SUMS",
+   "sha256": "2e0cb8159967b43eb05b4849cc612a032e45c6b1a9df1c4b1e760caa0f8122c0"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/SHA256SUMS.supplement",
+   "sha256": "925808abee8c24c9550c7b3e54ceabcbde94d2d37f6f4023cb99d900d61c45b4"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/census/k20.json",
+   "sha256": "dc08cc8ea25f6ff8598603e5751394d7a4448c4353819cc49952937d71d1099f"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/selection.json",
+   "sha256": "59854b45c6b981865b02ee8dbf8762d1b2615301fe8211afabaf974b6b2ac6bb"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/frames.txt",
+   "sha256": "8f367f2e5bd545f8a5f45fad6231a18594cb5cdf311c709a21d8a7d8f12bc707"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/binary.sha256",
+   "sha256": "9b7dee65df7d8145a69bc4d26371bd61b81ce31454790015fd6c6c8bff49bdd6"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/env.txt",
+   "sha256": "dd870420ca92863acedcf555e43e0d1794f24c476ce68c1a79b38be51fbb176c"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/run.log",
+   "sha256": "9e80f97a21dc6633bf19b2c44bc0b20ca00863e9e10aaf414a35defce9e1a2ae"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m2_t4_lo0.json",
+   "sha256": "58cb2ae05ea186d2b6265257b19abf3cf89462caaa88e448b5e5bc76243ca22d"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m2_t4_L2.json",
+   "sha256": "6c2bf3b2114598e6e614bbb4ace4a09eb0e5064a3f3a5471ebcecad527af1b97"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m2_t4_L3.json",
+   "sha256": "3d15cccae75bd6af82d2e3e430d96a2303e6242402c8c4c91e06df4f0fd04bcb"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m2_t5_lo0.json",
+   "sha256": "69aaebe81b9e08e0cd6c69e3fec748ae19aeaa7c85b350eec58aa6572eb0a372"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m2_t5_L2.json",
+   "sha256": "747c9a3d2a01543068e10b1178e5bc37ae6215c0a75bdeca1c0178d20962f91b"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m2_t5_L3.json",
+   "sha256": "3c3ba80eb0ade9bfdd77b43863f19a3533ca8754ee0f80dfc397b19af6f35fe0"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m3_t4_lo0.json",
+   "sha256": "bd4e65d34545fc59d5de7db844c23c22a3cd8de36d106e5f4b92a16981deb1ec"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m3_t4_L3.json",
+   "sha256": "a4c5cec61ffdc1b6fbf98118605201af6278e98e119783ce00cba9f8ca1d0b63"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m3_t5_L3.json",
+   "sha256": "8b4bd8a802fcba2b95e26bc90f893efc7202798464cbf7aa459b3820e4dd7522"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m3_t5_lo0.json",
+   "sha256": "054e72c1fbdcf1b9341b5ecd358fb2701531fb6367a13eccabb139e496a18933"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m3cov_t4_L2.json",
+   "sha256": "716bfa11be3fa3a95888477b47b6bc4ea168f3517a67af0cf7aef92b096fc638"
+  },
+  {
+   "path": "research/curve25519_leads_wave2_20261103/t3_m3_engine/data/cells/m3cov_t5_L2.json",
+   "sha256": "ca78e2e2c2237af73ac2724be44e9fff76a569884306f423c5a778b098d697a0"
+  }
+ ],
+ "validator_scripts": {
+  "note": "Validator-owned, outside the repository (session scratchpad); not producer code. Paths are ephemeral; hashes pin the content used.",
+  "recompute": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/recompute.py",
+   "sha256": "6f30e94265ac5a555268504dcd9c9f0953e84d5571325250ce2e46fd4fd50ac9"
+  },
+  "recompute_output": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/recompute.out.txt",
+   "sha256": "48d2b9a1ab5e5563d13bae7ed8147dc90d70860430b252d7ec370c125e7124c6"
+  },
+  "independent_certificate": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/indep_cert.py",
+   "sha256": "540f44c113a164e9e8be1791810dce875b30b1dee0c4d9ddf182fb099b1ed8c1"
+  },
+  "independent_certificate_output": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/indep_cert.json",
+   "sha256": "82c4f4144b1d53e78c8a4868cd1935ecd8f3531e869a85b867024d097f1d8dfc"
+  },
+  "compare": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/compare.py",
+   "sha256": "73ba20bb81ebc001d2ea53eab2461b24c7a48f1ffabb7b0e1ca4e45b1bebdf07"
+  },
+  "rerun_script": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/rerun.sh",
+   "sha256": "013bad6f84eb9aee92b9c5885a69d8a2e7a3c85669036f7a614a05b40cf4181d"
+  },
+  "rerun_log": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/rerun/rerun.log",
+   "sha256": "8c62173fa73124b549632319c7b37e19fcf4585559d2e746a4a35033db2c8745"
+  },
+  "rerun_dir": {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/rerun/",
+   "cells": {
+    "m2_t4_L2": {
+     "sha256": "459fc752774c496232cd3f1bd3d52604daa2e0f04f85b3b98bc996d7c8ae744d",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 0.73262276
+    },
+    "m2_t4_L3": {
+     "sha256": "1d76b8cb4169c5f9ec1cd6cb49cad192809f9d10571b0d22be5a50b58853d7a8",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 0.891839693
+    },
+    "m2_t4_lo0": {
+     "sha256": "851c156844f8af402c7dc2eacb5df3639720470d596a4e2ea2e21eadfd889e3d",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 0.448435836
+    },
+    "m2_t5_L2": {
+     "sha256": "e9e074534669531137bb5bfbe3ba2354b2f391272274931a3f19e1dbf45ea049",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 2.574100773
+    },
+    "m2_t5_L3": {
+     "sha256": "4596c522b58210974c2db0442f6cc5ed5bb9b54ad18ecceb80df372b6da11fb6",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 2.6838476460000003
+    },
+    "m2_t5_lo0": {
+     "sha256": "05661078939a475507e25891317ac31e3acb7647ce6903db13275d3a70a9a6d2",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 2.358321606
+    },
+    "m3_t4_L3": {
+     "sha256": "8788204e262104d4b2b006eeb3e4702b88ae4d4e3b67e2f5f214db6b72081a43",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 55.213066908
+    },
+    "m3_t4_lo0": {
+     "sha256": "1f9fb24db7f7814f945bc855fe6b74aee6110277e05ea463beeb94fb46b30845",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 55.38911297
+    },
+    "m3_t5_L3": {
+     "sha256": "92fea8b85fc2a371d932fe0d4b4efefe01652754363f3c1598d12b26c19a203b",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 874.173673056
+    },
+    "m3_t5_lo0": {
+     "sha256": "c25aafd75bf2300e1082c908c09911f2517c499c3f24813d2873ee96870f7229",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 901.35435315
+    },
+    "m3cov_t4_L2": {
+     "sha256": "8cf277abfd9f1cbfc4c9d53b52c1581f5d3c8ced11ee5e23cb045ac6dd5ac333",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 0.005576087
+    },
+    "m3cov_t5_L2": {
+     "sha256": "85c8148d7b00dd4bac99d68620e0b84587f102615ffac65b9f3492076a6845ba",
+     "mismatches_excluding_wall_s": 0,
+     "wall_s": 0.066290237
+    }
+   }
+  }
+ }
+}

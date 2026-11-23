@@ -1,0 +1,64 @@
+digraph foundational_attack_queue {
+  graph [rankdir=LR, bgcolor="white", pad=0.2, nodesep=0.24, ranksep=0.65,
+         fontname="DejaVu Sans", fontsize=16,
+         labelloc=t, label="Foundational ECDLP obligation queue · 2026-11-17"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=9,
+        color="#526575", fillcolor="#fff1b8"];
+  edge [fontname="DejaVu Sans", fontsize=8, color="#66788a", arrowsize=0.7];
+
+  tensor_exact [label="checked: exact D.4\nnumeric boundary", fillcolor="#dff4e5", color="#257942"];
+  tensor_pred [label="open: typed predicate\ncost certificate"];
+  tensor_space [label="open: aggregate\ntime/space proof"];
+  tensor_route [label="conditional hashed-tensor\nbound", fillcolor="#fde2e2"];
+
+  population [label="blocked: fixed-budget\nwrite-once population", fillcolor="#f8d7da", color="#a33a3a"];
+  yield [label="heuristic: target-wise\nyield distribution", fillcolor="#f4e8fb"];
+  rank [label="heuristic: reused\nrelation rank", fillcolor="#f4e8fb"];
+
+  fp_kernel [label="checked: Fp unit\nexplanation kernel", fillcolor="#dff4e5", color="#257942"];
+  bool_bind [label="open: Boolean literal\nbinding"];
+  proof_log [label="open: combined\nproof-log replay"];
+  solver [label="open: arity-three\nsolver scaling"];
+
+  dual [label="defined: A_c ell=0,\nell_const=1", fillcolor="#e6f1ff"];
+  dual_family [label="open: growing dual\ncertificate family"];
+  width [label="open: degree to\nwidth/work bridge"];
+
+  wdef [label="defined: bucket\nvariance W", fillcolor="#e6f1ff"];
+  wscale [label="open: native\nW scaling"];
+  wgain [label="open: concentration to\nenumerable filter gain"];
+
+  selector [label="open: terminating\nlift selector"];
+  height [label="open: selected height /\nglobal minimal discriminant"];
+  reduction [label="open: reduction and\nsubgroup correspondence"];
+
+  ic [label="complete prime-field IC\nexponent/cost claim", fillcolor="#fde2e2", penwidth=2];
+  xedni [label="conditional xedni\nheight obstruction", fillcolor="#fde2e2", penwidth=2];
+
+  tensor_exact -> tensor_route [label="qualifies"];
+  tensor_pred -> tensor_route [label="conditions"];
+  tensor_space -> tensor_route [label="conditions"];
+  tensor_route -> ic;
+
+  population -> yield [label="measures"];
+  population -> rank [label="measures"];
+  yield -> ic;
+  rank -> ic;
+
+  fp_kernel -> bool_bind [label="enables"];
+  bool_bind -> proof_log [label="conditions"];
+  proof_log -> solver [label="conditions"];
+  solver -> ic;
+
+  dual -> dual_family [label="defines"];
+  dual_family -> width [label="separate bridge"];
+  width -> ic;
+
+  wdef -> wscale [label="defines"];
+  wscale -> wgain [label="then"];
+  wgain -> ic;
+
+  selector -> xedni [label="conditions"];
+  height -> xedni [label="conditions"];
+  reduction -> xedni [label="conditions"];
+}

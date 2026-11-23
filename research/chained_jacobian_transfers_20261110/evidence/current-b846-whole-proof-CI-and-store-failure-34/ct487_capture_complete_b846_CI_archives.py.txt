@@ -1,0 +1,44 @@
+"""Whole original CI archive custody/metadata only; no scientific execution."""
+from pathlib import Path,PurePosixPath
+from datetime import datetime,timezone
+import hashlib,json,lzma,os,shutil,stat,urllib.request,zipfile
+h=Path('/workspace/scratch/ct483-Root-b846-own-current-CI');head='b8462a65d882de1069dd863a3b8de4a3b6ba8cbb'
+cases=[('odd',9,'ClearedChainOddSubgroup01.lean','chained-transfer-odd-subgroup-proof-01.yml'),('constructor',13,'CubicConstructorFrobenius22301.lean','chained-transfer-cubic-constructor-proof-01.yml'),('basis',37,'CubicBasisInjectivity22303.lean','chained-transfer-cubic-basis-injectivity-proof-03.yml'),('full',24,'CubicFullFrobenius22302.lean','chained-transfer-cubic-full-frobenius-proof-02.yml'),('pcc',None,None,None)]
+r=Path('/workspace/crypto');p=r/'research/chained_jacobian_transfers_20261110';allrows=[]
+for label,count,source,workflow in cases:
+ response=json.loads((h/'private'/(label+'_download.json')).read_text())['structuredContent'];url=response['file_uri']['download_url'];assert url.startswith('https://')
+ meta=json.loads(json.loads((h/(label+'_artifacts.json')).read_text())['structuredContent']['content'])['artifacts'];assert len(meta)==1;meta=meta[0]
+ archive=h/(label+'-entire-original-artifact.zip');assert not archive.exists()
+ with urllib.request.urlopen(url,timeout=90)as inp,archive.open('xb')as out:
+  shutil.copyfileobj(inp,out,1024*1024)
+ sha=hashlib.sha256(archive.read_bytes()).hexdigest();assert archive.stat().st_size==meta['size_in_bytes']and 'sha256:'+sha==meta['digest']
+ memberroot=h/(label+'-all-entire-members');memberroot.mkdir();rows=[]
+ with zipfile.ZipFile(archive)as z:
+  for info in z.infolist():
+   n=PurePosixPath(info.filename);assert not n.is_absolute()and '..'not in n.parts
+   kind=stat.S_IFMT(info.external_attr>>16);assert kind in [0,stat.S_IFREG,stat.S_IFDIR]
+   dst=memberroot/info.filename
+   if info.is_dir():dst.mkdir(parents=True,exist_ok=True);rows.append(dict(member=info.filename,directory=True));continue
+   raw=z.read(info);assert len(raw)==info.file_size
+   dst.parent.mkdir(parents=True,exist_ok=True);dst.write_bytes(raw)
+   mode=stat.S_IMODE(info.external_attr>>16)
+   if mode:os.chmod(dst,mode)
+   rows.append(dict(member=info.filename,bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest(),zip_CRC32=info.CRC,archive_mode=mode,scope='whole literal regular member, no selection or replacement'))
+ (h/(label+'-all-entire-member-inventory.json')).write_text(json.dumps(rows,indent=2)+'\n')
+ if count is not None:
+  assert (memberroot/'actual-source-head.txt').read_text().strip()==head
+  assert (memberroot/'entire-actual-source.lean').read_bytes()==(p/'lean'/source).read_bytes()
+  assert (memberroot/'entire-actual-workflow.yml').read_bytes()==(r/'.github/workflows'/workflow).read_bytes()
+  for side in ['Root435','Consumer434']:
+   assert (memberroot/(side+'.exit')).read_text().strip()=='0'
+   logs=list((memberroot/side).rglob('audit.log'));assert len(logs)==1 and f'audited {count} theorems'in logs[0].read_text()and'0 failing, 0 trusted'in logs[0].read_text()and'sorryAx'not in logs[0].read_text()
+  for side,sha_gate,sha_audit in [('Root','2fe88bb302db587bbb6ede217fc646cf8fa35f9b9a2980e4a15dae273b8df6eb','b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929'),('Consumer','a64f4010f3713653786e56ef7762b3e879720e2706ca78f979a0fefe2d53a7e2','f97280b48f1846d13e7ed96d9691753811551864162086fb25e9fe05438aa7dc')]:
+   d=memberroot/('entire-original-'+side+'-tools');assert hashlib.sha256((d/'proof-gate.sh').read_bytes()).hexdigest()==sha_gate;assert hashlib.sha256((d/'AuditAxioms.lean').read_bytes()).hexdigest()==sha_audit
+  if label!='odd':assert hashlib.sha256((memberroot/'entire-original-common.rs').read_bytes()).hexdigest()=='832fd28810909194875a9438e164ec1b45dcefbaa83257b4e3fad3095ef865d6'
+ regular=sum(not x.get('directory',False)for x in rows)
+ allrows.append(dict(case=label,artifact_id=meta['id'],bytes=archive.stat().st_size,sha256=sha,regular_members=regular,all_regular_CRC_SHA_checked_and_retained=True,original_dual_count=count,scope='PCC failed before gate, one partial artifact only'if count is None else'exact source/head/workflow/tools, both original audits'))
+ print(label,archive.stat().st_size,'members',regular,'dual',count,flush=True)
+for f in sorted(h.glob('*_log.json')):
+ s=json.loads(f.read_text())['structuredContent']['content'];(h/(f.stem+'-entire-decoded.txt.xz')).write_bytes(lzma.compress(s.encode()))
+(h/'ACTUAL_ENTIRE_CURRENT_CI_CUSTODY.json').write_text(json.dumps(dict(time=datetime.now(timezone.utc).isoformat(),source_head=head,archives=allrows,all_five_ZIPs_and_every_regular_member='retained complete, exact provider size/SHA and every literal CRC/SHA checked',PCC_and_validation='failed at original store pull403, no original byte/prose/ledger verdict reached',migration='startup_failure/zero jobs; no new eleven-object upload or remote replay observed',reviews='no reviews/review comments/conversation comments at first scheduled observation',scope='independent CI custody only; all claims unsigned, native/population/cost/admission unchanged'),indent=2)+'\n')
+print('all_regular_members',sum(x['regular_members']for x in allrows),flush=True)

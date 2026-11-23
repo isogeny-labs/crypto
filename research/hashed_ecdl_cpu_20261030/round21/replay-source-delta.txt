@@ -1,0 +1,134 @@
+diff --git a/src/cryptanalysis/hashed_ecdl.rs b/src/cryptanalysis/hashed_ecdl.rs
+index 684f96b68f83..c470f0cfc914 100644
+--- a/src/cryptanalysis/hashed_ecdl.rs
++++ b/src/cryptanalysis/hashed_ecdl.rs
+@@ -1271,6 +1271,17 @@ impl Jacobian {
+     fn from_affine(point: Point) -> Self {
+         point.map_or(Self { x: 0, y: 1, z: 0 }, |(x, y)| Self { x, y, z: 1 })
+     }
++    // Compare validated group elements without normalizing either operand.
++    fn same_point(self, other: Self, modulus: Modulus) -> bool {
++        if self.z == 0 || other.z == 0 {
++            return self.z == 0 && other.z == 0;
++        }
++        let z2 = modulus.mul(self.z, self.z);
++        let other_z2 = modulus.mul(other.z, other.z);
++        modulus.mul(self.x, other_z2) == modulus.mul(other.x, z2)
++            && modulus.mul(self.y, modulus.mul(other_z2, other.z))
++                == modulus.mul(other.y, modulus.mul(z2, self.z))
++    }
+     fn affine(self, modulus: Modulus, inverses: &[u64]) -> Point {
+         if self.z == 0 {
+             return None;
+@@ -1426,6 +1437,11 @@ impl FixedPair {
+             }
+             return out;
+         }
++        self.evaluate_projective(curve, u, v)
++            .affine(self.modulus, &curve.inverses)
++    }
++    fn evaluate_projective(&self, curve: &Curve, mut u: u64, mut v: u64) -> Jacobian {
++        debug_assert!(u < curve.r && v < curve.r);
+         let mut out = Jacobian::from_affine(None);
+         for (p, q) in self.p.iter().zip(&self.q) {
+             out = out.add_affine(p[(u & 15) as usize], curve.a, self.modulus);
+@@ -1433,7 +1449,7 @@ impl FixedPair {
+             u >>= 4;
+             v >>= 4;
+         }
+-        out.affine(self.modulus, &curve.inverses)
++        out
+     }
+ }
+ 
+@@ -1496,7 +1512,18 @@ fn check_relation(
+             return Err(Error::Verification);
+         }
+     }
+-    if !relation_sum_matches(curve, &rel.points, fixed.evaluate(curve, rel.u, rel.v)) {
++    let matches = if curve.inverses.is_empty() {
++        let sum = rel
++            .points
++            .iter()
++            .fold(Jacobian::from_affine(None), |sum, &p| {
++                sum.add_affine(p, curve.a, curve.field)
++            });
++        sum.same_point(fixed.evaluate_projective(curve, rel.u, rel.v), curve.field)
++    } else {
++        relation_sum_matches(curve, &rel.points, fixed.evaluate(curve, rel.u, rel.v))
++    };
++    if !matches {
+         return Err(Error::Verification);
+     }
+     Ok(())
+@@ -1565,6 +1592,70 @@ pub fn verify(curve: &Curve, p: Point, q: Point, cert: &Certificate) -> Result<(
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++    #[test]
++    fn projective_equality_and_replay_match_independent_affine_targets() {
++        let (mut small, generator) = fixture();
++        small.inverses.clear();
++        let wide_p = 1_099_511_627_563;
++        let wide_generator = Some((1, 15_267_301_451));
++        let wide =
++            Curve::with_order_witness(wide_p, wide_p - 3, 56, 1_099_512_551_701, wide_generator)
++                .unwrap();
++        for (curve, p) in [(small, generator), (wide, wide_generator)] {
++            let q = curve.mul(p, 42).unwrap();
++            let fixed = FixedPair::new(&curve, p, q);
++            let scale = |point, z| {
++                let mut result = Jacobian::from_affine(point);
++                if point.is_some() {
++                    let z2 = curve.field.mul(z, z);
++                    result.x = curve.field.mul(result.x, z2);
++                    result.y = curve.field.mul(result.y, curve.field.mul(z2, z));
++                    result.z = z;
++                }
++                result
++            };
++            for u in [0, 1, 15, 16, 42, curve.r / 2, curve.r - 1] {
++                for v in [0, 1, 15, 16, 42, curve.r / 2, curve.r - 1] {
++                    let up = curve.mul(p, u).unwrap();
++                    let vq = curve.mul(q, v).unwrap();
++                    let expected = curve.add(up, vq).unwrap();
++                    let target = fixed.evaluate_projective(&curve, u, v);
++                    assert_eq!(target.affine(curve.field, &[]), expected);
++                    let wrong = curve.add(expected, p).unwrap();
++                    for z in [1, 2, curve.p - 1] {
++                        for other_z in [1, 3, curve.p - 1] {
++                            let lhs = scale(expected, z);
++                            assert!(lhs.same_point(scale(expected, other_z), curve.field));
++                            assert!(!lhs.same_point(scale(wrong, other_z), curve.field));
++                            assert!(target.same_point(lhs, curve.field));
++                            if let Some((x, y)) = expected {
++                                if y != 0 {
++                                    assert!(!lhs.same_point(
++                                        scale(Some((x, curve.p - y)), other_z),
++                                        curve.field
++                                    ));
++                                }
++                            }
++                        }
++                    }
++                    // Replay must still reject an incorrect u even when all
++                    // tuple points are valid members of their respective bases.
++                    if up.is_some() && vq.is_some() {
++                        let bases = vec![vec![up], vec![vq]];
++                        let mut relation = Relation {
++                            u,
++                            v,
++                            points: vec![up, vq],
++                        };
++                        assert!(check_relation(&curve, &fixed, &bases, &relation).is_ok());
++                        relation.u = (u + 1) % curve.r;
++                        assert!(check_relation(&curve, &fixed, &bases, &relation).is_err());
++                    }
++                }
++            }
++        }
++    }
++
+     #[test]
+     fn projective_relation_sums_match_affine_with_cancellation_and_doubling() {
+         let (cached, generator) = fixture();

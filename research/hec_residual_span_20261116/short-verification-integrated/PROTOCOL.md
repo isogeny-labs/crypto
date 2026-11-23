@@ -1,0 +1,7 @@
+# Complete solver integration replay
+
+Prospective [pcc:unverified]. Same source-phases12original genus-two workloads/seed/public sources/targets, two fresh calls each. Copy retained solver; change ONLY final scalar verification to short-verification kernel, using P/z already computed by prepare and exact coefficient reducer. No producer/rows/anchors/budget change. Conditional certified-Frobenius operator contract inherited and explicitly unchanged; this is not independent per-call character qualification.
+
+Require every returned scalar equals fixed driver answer and native originalsource multiplication. Require complete base-field16vector matches prior derived old-total minus old-verify plus new-verify exactly; complete subgroup16vector matches old phase-sum exactly. Require repeated fullcounts/outcomes exact. Derived source totals are operation-count predictions, not runtime; independent group arithmetic review pending. No other phase removed, no free cofactor/log oracle, no target substitution. Record every call and failure, no10x threshold relaxation or wall timing.
+
+One120CPU Rust process after source/native/import/protocol/prior-raw/binary hashes committed/pushed; no retry/S3/cloud/merge. References: short-verification/{PROTOCOL.md,RESULTS.md,DERIVED-VECTORS.tsv} and source-phases/{baseline.rs,main.rs,CONTROL.tsv}. Standalone kernel stage passed before this integration. No novelty claim, no separate new mathematical premise. All base/subgroup fields kept separate; integer/memory work not represented in these counts.

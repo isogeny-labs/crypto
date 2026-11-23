@@ -1,0 +1,23 @@
+{
+  "schema": "n83.factor-base-producer-evidence/v1",
+  "files": {
+    "index.json": "native complete shared-factor-bases/v2 index downloaded from the immutable producer snapshot",
+    "*-manifest.json": "native n83.factor-base/v2 per-family manifests with 128 shard records each",
+    "shard-object-verification.json": "384 exact manifest-to-content-addressed-S3-key joins, including expected compressed sizes and raw shard checksums",
+    "results-pages/page-NN.json": "complete paginated isolab results listing used to verify all shard keys",
+    "DATA_INDEX.json": "hash/size inventory of all evidence except the inventory and its checksum file",
+    "manifest.sha256": "checksum list for all evidence files except this file"
+  },
+  "data_location": "isolab-results S3 attempt-07 snapshots; see DATA_INDEX.json and shard-object-verification.json",
+  "claims": [
+    "producer complete index",
+    "384 manifest entries map to S3 keys with matching listed compressed size",
+    "all candidates reported checked by native manifests"
+  ],
+  "excluded_claims": [
+    "affine solving degree",
+    "first or last fall degree",
+    "degree of regularity",
+    "runtime or cryptographic advantage"
+  ]
+}

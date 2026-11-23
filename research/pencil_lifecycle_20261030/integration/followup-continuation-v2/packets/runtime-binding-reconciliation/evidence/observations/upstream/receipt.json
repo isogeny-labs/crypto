@@ -1,0 +1,23 @@
+{
+  "label": "upstream",
+  "argv": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin:/bin",
+    "HOME=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+    "DOCKER_CONFIG=/var/tmp/runtime-mountpoint-binding-20261101/empty-docker-config",
+    "/usr/bin/docker",
+    "--host",
+    "unix:///var/run/docker.sock",
+    "image",
+    "inspect",
+    "--format",
+    "{\"Id\":{{json .Id}},\"RepoTags\":{{json .RepoTags}},\"RepoDigests\":{{json .RepoDigests}},\"Os\":{{json .Os}},\"Architecture\":{{json .Architecture}},\"OnBuild\":{{json .Config.OnBuild}},\"User\":{{json .Config.User}},\"Entrypoint\":{{json .Config.Entrypoint}},\"Volumes\":{{json .Config.Volumes}},\"Labels\":{{json .Config.Labels}},\"Layers\":{{json .RootFS.Layers}}}",
+    "public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39"
+  ],
+  "exit": 0,
+  "timeout_seconds": 15,
+  "observed_at": "2026-11-01T20:12:55.594562+00:00"
+}

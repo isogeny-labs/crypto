@@ -1,0 +1,455 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-PRIME-LEADING-FIRST-FALL-20261027-R4",
+  "version": 1,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/n83_ic_degree_sweep_20261027/fall/prime",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "ARGUMENT.md",
+    "proof_map": "PROOF_MAP.md"
+  },
+  "question": "Validate proof-assisted standard leading-syzygy first-fall degrees and explicit factored witnesses on all16 retained prime inputs; distinguish earliest new affine fall.",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Standard leading-syzygy first-fall degree is floor(ell/2)+4 by the written filtered Koszul argument and endpoint annihilator. Lower bound is proof-assisted, not full n83 matrix measurement; full Lean formalization remains open.",
+      "class": "theorem",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Native code checks hypotheses, original input presentation, pair identities, nonzero affine products and fresh-process certificate consistency for every retained prime input.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "Earliest NEW affine fall, last fall, regularity, performance and ECDLP remain unestablished by this stage.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "prime_planted",
+      "role": "reference",
+      "description": "Retained prime planted targets; absolute certificate computation, no causal comparison",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c9543a2b5a95266792dadf15a921ac24a779bf0",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_ic_degree_sweep_20261027/Cargo.toml",
+            "--bin",
+            "prime_fall"
+          ]
+        ],
+        "binary_sha256": "638ef803dc993aad93ae3f9d83eaa183649e8dd9e798c7cdc8a1658d0ded2fc1",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "floor(83/m)",
+        "target_kinds": [
+          "planted"
+        ],
+        "certificate_mode": "proof_assisted_leading_syzygy_first_fall"
+      }
+    },
+    {
+      "id": "prime_natural",
+      "role": "candidate",
+      "description": "Retained prime natural targets; absolute certificate computation, no causal comparison",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "0c9543a2b5a95266792dadf15a921ac24a779bf0",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_ic_degree_sweep_20261027/Cargo.toml",
+            "--bin",
+            "prime_fall"
+          ]
+        ],
+        "binary_sha256": "638ef803dc993aad93ae3f9d83eaa183649e8dd9e798c7cdc8a1658d0ded2fc1",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "ell_rule": "floor(83/m)",
+        "target_kinds": [
+          "natural"
+        ],
+        "certificate_mode": "proof_assisted_leading_syzygy_first_fall"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact finite-field computations, two pivot orders and fresh-process witness replay; no timing or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Five exact small-matrix controls over65537 at (ell,m)=(2,4),(3,3),(4,3),(5,2),(6,2) must detect the first kernel at5,5,6,6,7. All degrees are below8, so no quartic Koszul boundaries can create false positives."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "All preceding degree matrices in the same controls must have zero kernel. Pair identity uses minus then plus; minus squared must remain nonzero. Wide modular multiplication is separately tested."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "family",
+        "levels": [
+          "prime"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "name": "target_kind",
+        "levels": [
+          "planted",
+          "natural"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "c1cd5e1cfbba80e5f2f34491cfc106faafbbc02c0686a6159d25679339695979",
+        "how": "Native proof-hypothesis/witness checker; pinned R3 verifier rechecks every original presentation"
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "95bc8431d46e11cffa11051b2ae9ff82c2b5c8cfc0dfef1b373629c50c4c94a2",
+        "how": "Pinned R3 results and per-input original system hashes; fixed selection of all16 prime rows"
+      },
+      {
+        "name": "factor_base",
+        "treatment": "crossed",
+        "how": "Binary basis subspace or prime integer interval, ell=floor(83/m)"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Sequential producer and replay; two requested CPUs do not imply two algorithm threads"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "EKS Spot host manifest; clocks invalid for performance"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Retained input list order; all cells processed"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen exact acceptance and no discretionary exclusions"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "600s job,300s producer+10s grace,4Gi memory,no retries; outputs uploaded after producer and at exit"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "prime_planted",
+          "prime_natural"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All proof hypotheses and original-presentation checks hold; factored nontrivial syzygy and nonzero affine product checked; report formalization gap"
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact computations on saved inputs, no timing comparison or target resampling.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "Original generator seed only; no new randomness."
+    },
+    "instance_sampling": {
+      "rule": "All16 prime records from retained original48 inputs, fixed before new stage data",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Fixed certificate rules; exact witness reconstruction, no statistical analysis",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 8,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Two target-kind arms,8 exact original inputs per arm;16 total. No statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.01,
+      "per_sample_seconds": 18.75,
+      "threads": 1,
+      "estimated_total_seconds": 600,
+      "measured_on": "Five small matrix controls complete in under0.1s;300/16 is target budget allowance, not measured n83 performance."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "first_fall_degree",
+        "name": "Standard leading-syzygy first-fall degree",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "Least nontrivial homogeneous syzygy degree modulo Koszul; exact value from stated lower-bound derivation plus explicit nontrivial annihilator. Not earliest NEW affine fall.",
+        "source": "certificate first_fall_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "affine_product_degree_upper_bound",
+        "name": "Degree bound for nonzero affine product",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "At most first_fall_degree minus1 after selector reduction; novelty in lower V(F,d) is not established",
+        "source": "certificate affine_product_degree_upper_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "first_fall_degree",
+      "affine_product_degree_upper_bound"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "cpus": 2,
+      "memory": "4Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All16 prime inputs, original presentation replay plus new certificate and fresh-process replay, then stop",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "600s job;300s producer+10s grace;4Gi memory;no automatic retries",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Pinned R3 data or input hash mismatch, failed matrix controls, original-presentation replay or witness check prevents certificate admission",
+    "Full-n83 ranks are theorem-derived, never called direct matrix measurements",
+    "Earliest new affine fall, last fall and regularity remain null; do not equate them with standard leading-syzygy first fall",
+    "The full Lean theorem remains open; limited lemma must not be represented as full formalization",
+    "No performance claim;wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report standard first-fall certificate values with explicit derivation/formalization status and separate unresolved affine and last-fall invariants.",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact witness or exclusion certificate per input",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "certificate_validated",
+      "incomplete",
+      "invalid"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../../src/bin/prime_fall.rs",
+      "sha256": "c1cd5e1cfbba80e5f2f34491cfc106faafbbc02c0686a6159d25679339695979"
+    },
+    "inputs": [
+      "pinned R3 results.json",
+      "original prime inputs/*/system.sing"
+    ],
+    "outputs": [
+      "certificates/results.json",
+      "controls.json",
+      "replay.jsonl"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "First-fall exact values and explicitly censored lower bounds by m and family"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Proof-derived ranks called direct full-n83 matrix measurements",
+    "Leading-syzygy first fall conflated with earliest NEW affine fall, last fall or regularity",
+    "Partial Lean lemma called full formal proof",
+    "Missing or failed certificate represented as completed",
+    "Performance or subgroup claims"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Trace identity giving binary degree-two-to-linear falls",
+      "verified_by": "Primary definitions reviewed and scope documented in DESIGN.md"
+    },
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "V(F,d), nontrivial syzygies, first and last fall are distinct",
+      "verified_by": "Primary definitions reviewed and scope documented in DESIGN.md"
+    },
+    {
+      "ref": "https://arxiv.org/html/1906.05594",
+      "provenance": "retrieved",
+      "claim": "Boolean filtered-algebra first-fall conventions",
+      "verified_by": "Primary definitions reviewed and scope documented in DESIGN.md"
+    },
+    {
+      "ref": "https://arxiv.org/html/2211.13548",
+      "provenance": "retrieved",
+      "claim": "Theorem2.7: square-zero complete-intersection strong Lefschetz property in characteristic greater than variable count",
+      "verified_by": "Read theorem, field assumptions and linear-algebra rank formulation; variable scaling is invertible here"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "6e12ffdda6e1610783f0e3d0caea595387737eb798900659f3466d50edcf79b7",
+    "commit": "0c9543a2b5a95266792dadf15a921ac24a779bf0",
+    "frozen_at": "2026-10-27T17:11:20Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "detailed_design": "ARGUMENT.md",
+    "proof_map": "PROOF_MAP.md",
+    "argument_sha256": "50b219daa9cd83676966531ee17758800db76d0c21f36baeac018939a9e504da",
+    "ordinary_job_nonresumable": true,
+    "r3_results_sha256": "95bc8431d46e11cffa11051b2ae9ff82c2b5c8cfc0dfef1b373629c50c4c94a2",
+    "r3_verifier_binary_sha256": "eee9ed3594597d68048aaaf719cb8e40acd8093e6f77398935e92f5e286c7f4c",
+    "full_lean_formalization_complete": false,
+    "definition_change_from_earliest_new_affine_fall_explicit": true
+  }
+}

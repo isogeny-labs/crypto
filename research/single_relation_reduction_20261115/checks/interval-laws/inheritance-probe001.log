@@ -1,0 +1,12 @@
+Complex.mul_conj (z : ℂ) : z * (starRingEnd ℂ) z = ↑(Complex.normSq z)
+Complex.mul_conj' (z : ℂ) : z * (starRingEnd ℂ) z = ↑‖z‖ ^ 2
+Complex.normSq_eq_norm_sq (z : ℂ) : Complex.normSq z = ‖z‖ ^ 2
+AddChar.inv_apply_eq_conj.{u_1, u_3} {K : Type u_1} [RCLike K] {G : Type u_3} [Finite G] [AddLeftCancelMonoid G]
+  (ψ : AddChar G K) (x : G) : (ψ x)⁻¹ = (starRingEnd K) (ψ x)
+AddChar.map_neg_eq_inv.{u_1, u_2} {A : Type u_1} {M : Type u_2} [AddGroup A] [DivisionMonoid M] (ψ : AddChar A M)
+  (a : A) : ψ (-a) = (ψ a)⁻¹
+Finset.sum_ite_eq'.{u_1, u_2} {ι : Type u_1} {M : Type u_2} [AddCommMonoid M] [DecidableEq ι] (s : Finset ι) (a : ι)
+  (b : ι → M) : (∑ x ∈ s, if x = a then b x else 0) = if a ∈ s then b a else 0
+Finset.sum_boole.{u_1, u_4} {ι : Type u_1} {R : Type u_4} [AddCommMonoidWithOne R] (p : ι → Prop) [DecidablePred p]
+  (s : Finset ι) : (∑ x ∈ s, if p x then 1 else 0) = ↑{x ∈ s | p x}.card
+Finset.addConvolution.{u_1} {G : Type u_1} [AddGroup G] [DecidableEq G] (A B : Finset G) : G → ℕ

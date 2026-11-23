@@ -1,0 +1,114 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hbc3887c49b3c9ce8",
+  "statement": {
+    "name": "Finite-product difference telescope ring substep",
+    "source": "OrientationRank.prod_difference ring substep only. Does not certify determinants, valuations, rank bounds or cost.",
+    "variables": [
+      "a",
+      "b",
+      "c",
+      "d"
+    ],
+    "degree_bound": 2,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "var",
+              "args": "b"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "c"
+              },
+              {
+                "op": "var",
+                "args": "d"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "c"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "b"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "c"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "b"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "d"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261114,
+  "value_digest": "3ff92d04cf695e34c1d4bf2a097f7d8277297ad6d5aa059f716bfe48bf0fee45",
+  "independence": "Unsigned producer literal product-difference identity only. Does not execute Lean or certify the parameterized family, determinant, rank, or cost.",
+  "proof": {
+    "kind": "lean4",
+    "path": "../lean/OrientationRank.lean",
+    "sha256": "b8b92939de6ae571634c4f89ba80de82d98aa2e34f89fbdb06f28cdaedd3b336"
+  }
+}

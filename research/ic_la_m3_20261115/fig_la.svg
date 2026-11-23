@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 438" width="820" height="438" font-family="system-ui, -apple-system, Segoe UI, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">Linear-algebra row operations of three solvers in m = 3 rootfind-subtract solves</title>
+<desc id="d">Median linear-algebra row_ops per run for incremental-gauss, structured-gauss and incremental-gauss-echelon, per curve and base size, log scale; all three give the same trials, relations, logarithm and S.</desc>
+<style>.bg{fill:#fcfcfb}.c1{fill:#8f8e89}.c2{fill:#86b6ee}.c3{fill:#2a78d6}.p{fill:#0b0b0b}.q{fill:#52514e}.g{stroke:#e4e3df}@media (prefers-color-scheme: dark){.bg{fill:#1a1a19}.c1{fill:#8f8e89}.c2{fill:#1f5ea8}.c3{fill:#3987e5}.p{fill:#f0efec}.q{fill:#c3c2b7}.g{stroke:#383835}}</style>
+<rect class="bg" width="820" height="438"/>
+<text class="p" x="16" y="24" font-size="15" font-weight="600">Linear algebra in m = 3 rootfind-subtract solves: row operations per solver</text>
+<text class="q" x="16" y="42" font-size="12">median row_ops per run (deterministic counts), log scale; the three solvers give identical trials, relation counts, logarithm and S</text>
+<rect class="c1" x="16" y="54" width="12" height="12" rx="2"/><text class="p" x="34" y="64" font-size="12">incremental-gauss (the default)</text>
+<rect class="c2" x="246" y="54" width="12" height="12" rx="2"/><text class="p" x="264" y="64" font-size="12">structured-gauss</text>
+<rect class="c3" x="476" y="54" width="12" height="12" rx="2"/><text class="p" x="494" y="64" font-size="12">incremental-gauss-echelon</text>
+<line class="g" x1="200.0" x2="200.0" y1="86" y2="408" stroke-width="1"/>
+<text class="q" x="200.0" y="424" font-size="11" text-anchor="middle">1e+06</text>
+<line class="g" x1="356.7" x2="356.7" y1="86" y2="408" stroke-width="1"/>
+<text class="q" x="356.7" y="424" font-size="11" text-anchor="middle">1e+07</text>
+<line class="g" x1="513.3" x2="513.3" y1="86" y2="408" stroke-width="1"/>
+<text class="q" x="513.3" y="424" font-size="11" text-anchor="middle">1e+08</text>
+<line class="g" x1="670.0" x2="670.0" y1="86" y2="408" stroke-width="1"/>
+<text class="q" x="670.0" y="424" font-size="11" text-anchor="middle">1e+09</text>
+<text class="p" x="190" y="112.5" font-size="12" text-anchor="end">log2 r = 33.4, |F_x| = 2048</text>
+<g><title>gauss: 46,595,764 row_ops</title><rect class="c1" x="200" y="92" width="261.4" height="11" rx="2"/></g>
+<text class="q" x="467.4" y="101.3" font-size="11">46.6M</text>
+<g><title>structured: 12,373,965 row_ops</title><rect class="c2" x="200" y="105" width="171.2" height="11" rx="2"/></g>
+<text class="p" x="377.2" y="114.3" font-size="11">12.4M (0.27×)</text>
+<g><title>echelon: 6,900,110 row_ops</title><rect class="c3" x="200" y="118" width="131.4" height="11" rx="2"/></g>
+<text class="p" x="337.4" y="127.3" font-size="11">6.9M (0.15×)</text>
+<text class="p" x="190" y="163.5" font-size="12" text-anchor="end">log2 r = 33.4, |F_x| = 4096</text>
+<g><title>gauss: 108,899,824 row_ops</title><rect class="c1" x="200" y="143" width="319.1" height="11" rx="2"/></g>
+<text class="q" x="525.1" y="152.3" font-size="11">108.9M</text>
+<g><title>structured: 27,848,620 row_ops</title><rect class="c2" x="200" y="156" width="226.4" height="11" rx="2"/></g>
+<text class="p" x="432.4" y="165.3" font-size="11">27.8M (0.26×)</text>
+<g><title>echelon: 11,069,696 row_ops</title><rect class="c3" x="200" y="169" width="163.6" height="11" rx="2"/></g>
+<text class="p" x="369.6" y="178.3" font-size="11">11.1M (0.10×)</text>
+<text class="p" x="190" y="214.5" font-size="12" text-anchor="end">log2 r = 35.2, |F_x| = 2048</text>
+<g><title>gauss: 43,602,814 row_ops</title><rect class="c1" x="200" y="194" width="256.9" height="11" rx="2"/></g>
+<text class="q" x="462.9" y="203.3" font-size="11">43.6M</text>
+<g><title>structured: 12,938,796 row_ops</title><rect class="c2" x="200" y="207" width="174.2" height="11" rx="2"/></g>
+<text class="p" x="380.2" y="216.3" font-size="11">12.9M (0.30×)</text>
+<g><title>echelon: 5,790,094 row_ops</title><rect class="c3" x="200" y="220" width="119.5" height="11" rx="2"/></g>
+<text class="p" x="325.5" y="229.3" font-size="11">5.8M (0.13×)</text>
+<text class="p" x="190" y="265.5" font-size="12" text-anchor="end">log2 r = 35.2, |F_x| = 4096</text>
+<g><title>gauss: 293,352,270 row_ops</title><rect class="c1" x="200" y="245" width="386.6" height="11" rx="2"/></g>
+<text class="q" x="592.6" y="254.3" font-size="11">293.4M</text>
+<g><title>structured: 72,659,014 row_ops</title><rect class="c2" x="200" y="258" width="291.6" height="11" rx="2"/></g>
+<text class="p" x="497.6" y="267.4" font-size="11">72.7M (0.25×)</text>
+<g><title>echelon: 41,575,257 row_ops</title><rect class="c3" x="200" y="271" width="253.6" height="11" rx="2"/></g>
+<text class="p" x="459.6" y="280.4" font-size="11">41.6M (0.14×)</text>
+<text class="p" x="190" y="316.5" font-size="12" text-anchor="end">log2 r = 37.4, |F_x| = 2048</text>
+<g><title>gauss: 42,327,114 row_ops</title><rect class="c1" x="200" y="296" width="254.8" height="11" rx="2"/></g>
+<text class="q" x="460.8" y="305.4" font-size="11">42.3M</text>
+<g><title>structured: 12,533,656 row_ops</title><rect class="c2" x="200" y="309" width="172.0" height="11" rx="2"/></g>
+<text class="p" x="378.0" y="318.4" font-size="11">12.5M (0.30×)</text>
+<g><title>echelon: 5,906,238 row_ops</title><rect class="c3" x="200" y="322" width="120.8" height="11" rx="2"/></g>
+<text class="p" x="326.8" y="331.4" font-size="11">5.9M (0.14×)</text>
+<text class="p" x="190" y="367.5" font-size="12" text-anchor="end">log2 r = 37.4, |F_x| = 4096</text>
+<g><title>gauss: 340,654,663 row_ops</title><rect class="c1" x="200" y="347" width="396.7" height="11" rx="2"/></g>
+<text class="q" x="602.7" y="356.4" font-size="11">340.7M</text>
+<g><title>structured: 99,389,693 row_ops</title><rect class="c2" x="200" y="360" width="312.9" height="11" rx="2"/></g>
+<text class="p" x="518.9" y="369.4" font-size="11">99.4M (0.29×)</text>
+<g><title>echelon: 46,505,346 row_ops</title><rect class="c3" x="200" y="373" width="261.2" height="11" rx="2"/></g>
+<text class="p" x="467.2" y="382.4" font-size="11">46.5M (0.14×)</text>
+</svg>

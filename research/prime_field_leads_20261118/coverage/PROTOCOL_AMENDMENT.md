@@ -1,0 +1,5 @@
+# Source-slice replay amendment
+
+The shared sparse checkout omits the root crate's path dependencies. No main arm had been run when this amendment was written. Keep the frozen fixture matrix, stream, caps, validation and recovery requirements. Run exact helper bodies from the pinned APS, FastCurve, and modular arithmetic sources in an isolated native crate. The build checks the source hashes, extracts only the relevant bodies, and supplies no-op operation tally hooks used outside the correctness scope. Source anchor is 9ec88b7637aac4ce816739155f12f518b393da37. Source bodies also match the tracking head in the original protocol.
+
+Replace the stock F4 call with complete evaluation of the exact pair of S3 expressions used by Split4 over each disjoint slot product and all auxiliary field elements. Slot membership already enforces the original vanishing equations. This distinguishes correct expression construction and exact root agreement from any claim about F4 or algebraic solver performance. Keep the original production sampler and signed recovery bodies as the exact comparison paths. No full-crate or F4 result is claimed.

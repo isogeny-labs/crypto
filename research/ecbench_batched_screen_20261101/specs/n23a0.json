@@ -1,0 +1,137 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "batch_trials development screen: Koblitz a=0 n=23",
+  "description": "Frozen in research/ecbench_batched_screen_20261101/PROTOCOL.md before its data. Only batch_trials differs between arms. Counted unit, L0, diagnostic; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 23
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 202611011004,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "ic-b1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "1"
+        }
+      }
+    },
+    {
+      "name": "ic-b2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "2"
+        }
+      }
+    },
+    {
+      "name": "ic-b4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "4"
+        }
+      }
+    },
+    {
+      "name": "ic-b8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "8"
+        }
+      }
+    },
+    {
+      "name": "ic-b16",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "16"
+        }
+      }
+    },
+    {
+      "name": "ic-b32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "32"
+        }
+      }
+    },
+    {
+      "name": "ic-b64",
+      "role": "baseline",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "64"
+        }
+      }
+    },
+    {
+      "name": "ic-b128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "128"
+        }
+      }
+    },
+    {
+      "name": "ic-b256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "256"
+        }
+      }
+    },
+    {
+      "name": "ic-b64-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.koblitz_batched",
+        "params": {
+          "factor_base_points": "138",
+          "batch_trials": "64"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 202611012001,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

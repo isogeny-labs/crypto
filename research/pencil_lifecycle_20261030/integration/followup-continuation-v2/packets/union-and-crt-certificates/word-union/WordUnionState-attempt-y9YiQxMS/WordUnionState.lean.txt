@@ -1,0 +1,56 @@
+import WordUnionTransport
+set_option autoImplicit false
+namespace SignedWord
+structure UnionState (n : Nat) where
+ graph : State n
+ fixed : Fin n → Option (UInt64×UInt64)
+def FixedGood {n : Nat} (r : UInt64) (s : UnionState n) : Prop :=
+ ∀ i ab, s.fixed i=some ab → GoodPair r ab
+def unionDecode {n : Nat} (r : UInt64) (s : UnionState n) : GraphUnion.State (F r) n :=
+ ⟨decode r s.graph,fun i => (s.fixed i).map (pairDecode r)⟩
+def joinWord {n : Nat} (r : UInt64) (s : UnionState n) (child parent : Fin n) (p : Pot) : UnionState n :=
+ ⟨compress s.graph child parent p,fun i =>
+ if i=parent then match s.fixed child,s.fixed parent with
+ | some ab,none => some (transportPair r p ab)
+ | _,_ => s.fixed i
+ else s.fixed i⟩
+
+theorem joinWord_decode {n : Nat} (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (child parent : Fin n) (p : Pot)
+ (hp : 0<r.toNat) (hb : r.toNat≤2^63) (hgp : GoodPot r p) (hgf : FixedGood r s) :
+ unionDecode r (joinWord r s child parent p)=GraphUnion.joined (unionDecode r s) child parent (decPot r p) := by
+ apply GraphUnion.State.ext
+ · exact compress_decode r s.graph child parent p
+ · funext i
+   by_cases hi : i=parent
+   · subst i
+     cases hc : s.fixed child with
+     | none => simp [unionDecode,joinWord,GraphUnion.joined,hc]
+     | some ab =>
+       cases ht : s.fixed parent with
+       | none =>
+         have hh := (transportPair_correct r p ab hp hb hgp (hgf child ab hc)).2
+         simpa [unionDecode,joinWord,GraphUnion.joined,hc,ht] using congrArg some hh
+       | some xy => simp [unionDecode,joinWord,GraphUnion.joined,hc,ht]
+   · simp [unionDecode,joinWord,GraphUnion.joined,hi]
+
+theorem joinWord_good {n : Nat} (r : UInt64) [Fact r.toNat.Prime]
+ (s : UnionState n) (child parent : Fin n) (p : Pot)
+ (hp : 0<r.toNat) (hb : r.toNat≤2^63) (hgp : GoodPot r p)
+ (hgg : Good r s.graph) (hgf : FixedGood r s) :
+ Good r (joinWord r s child parent p).graph ∧ FixedGood r (joinWord r s child parent p) := by
+ refine ⟨compress_good r s.graph child parent p hgg hgp,?_⟩
+ intro i ab hab
+ by_cases hi : i=parent
+ · subst i
+   cases hc : s.fixed child with
+   | none => exact hgf parent ab (by simpa [joinWord,hc] using hab)
+   | some xy =>
+     cases ht : s.fixed parent with
+     | none =>
+       have he : transportPair r p xy=ab := by simpa [joinWord,hc,ht] using hab
+       rw [←he]
+       exact (transportPair_correct r p xy hp hb hgp (hgf child xy hc)).1
+     | some zw => exact hgf parent ab (by simpa [joinWord,hc,ht] using hab)
+ · exact hgf i ab (by simpa [joinWord,hi] using hab)
+end SignedWord

@@ -1,0 +1,16 @@
+{
+ "schema":"pencil.formal-review/v1",
+ "scope":"nonmonic prime-field n1 no-table division on admitted canonical nonzero-leading inputs",
+ "publication":"b4684a67ca626d338099525aefae817a3d276e78",
+ "machine_status":"passed",
+ "main":19,"producer_controls":22,"reviewer_controls":8,"readbacks":49,"modules":11,
+ "native_runner":"Rust","native_verifier":"Rust","python_executed":false,
+ "acceptance":"acceptance3.json","successful_replay":"replay1",
+ "actual_false_equality":"known-false2","false_native_exit":1,"false_runner_exit":1,
+ "mutated_sorryAx_exit":101,
+ "source_fidelity":"conditional value correspondence checked; invalid-input panic/admission semantics not modeled",
+ "material_premises":["prime p with1<p<2^31","native odd-prime n1 no tables","canonical divisor/input","supplied leading word equals actual last word and is nonzero","fuel sufficient for totality"],
+ "review_failures":["native/verifier-attempt1 missing no-axioms readback form","known-false1 missing source, not counted as false-equality check"],
+ "remaining":["physical allocation/layout","compiled usize/array/word execution","other Field dispatches","general pegcd","instrumentation"],
+ "scientific_execution":false,"full_history_blind":false,"independent_review":true
+}

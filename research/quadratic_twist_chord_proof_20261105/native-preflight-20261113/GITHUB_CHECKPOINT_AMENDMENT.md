@@ -1,0 +1,11 @@
+# Explicit GitHub checkpoint selection — 2026-11-15
+
+The user selected GitHub after the local launch refused the absent S3 credential, and requested continuing the bounded experiments and auxiliary-twist ideas. For this fixed-point engineering run, store the exact sources, protocol, pins and handoff on the existing PR3560 branch before execution, then publish actual successes/failures and raw bindings on the same branch. This selection changes the durable checkpoint transport; it is not an S3 gate success, a signed external anchor, or a general storage/paid-compute authorization.
+
+The historical `run-fixed.sh`, `ENGINEERING_PROTOCOL.md`, native algorithms, numerical inputs, binary pins, case order, success criteria and ten corruption modes remain unchanged. `run-fixed-github.sh` is a separately named transport variant; its source and this amendment are pinned in `GITHUB_RUN_PINS.json` before the first scientific data. It requires an exact live remote-head match and a clean committed worktree. No `CHECKPOINT_SKIP` flag, forged last-push, alternate AWS profile, credential probe or modified official S3 gate is used.
+
+The run remains the one-point engineering preflight over actual Q=P=(1,8), not the full nineteen-query census. Two fresh producer/audit runs, exact A/A output equality, then all ten changed/rehashed corruption rejections remain mandatory. All per-stage600second limits, outer3600second limit, at most two existing local workers and no paid provisioning remain. No field/group arithmetic runs in shell or Python. [pcc:unverified]
+
+A failed stage ends this version and is retained before any correction. A complete engineering replay is an unsigned producer observation; no signed PCC standing, Lean theorem, new identity certificate, measured relation yield/degree gain or original-source scalar recovery follows from geometry alone. Existing frozen evidence and ledger history are preserved. [pcc:unverified]
+
+Pre-data sources: the existing auxiliary derivation and native engineering protocol; current main instructions and Nov15 shared journal; PCC contract. KB MCP tools are unavailable and the repository wrapper returns127. No prior corpus answers are fed into either native instrument.

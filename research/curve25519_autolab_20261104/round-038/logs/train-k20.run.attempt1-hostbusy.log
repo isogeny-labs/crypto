@@ -1,0 +1,8 @@
+$ target/release/ecbench run --wait --spec research/curve25519_autolab_20261104/round-038/specs/train-k20.json --out research/curve25519_autolab_20261104/round-038/sessions/train-k20 --cpus auto
+--- stdout ---
+
+--- stderr ---
+warning: order `alternate_measured` with 1 measured round(s) cannot be balanced: spec order is used once more than the reverse; use an even number of rounds
+ecbench: host is not quiet (PSI cpu some avg10 5.01 > 5.00); wait, or pass --allow-busy to record runs below L2
+
+--- exit Some(2) ---

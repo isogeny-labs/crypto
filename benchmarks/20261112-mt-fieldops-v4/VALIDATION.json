@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "592f94c0b5496a5903f1378d0d3ef54fb078f6e6085fc4dd48339700c18cc380"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "d05f67eab8b0b5e49a9211b1037663c6971f7d8df8f35d0bb0d75e0c00aac3c8"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "research/mt_fieldops_v4_20261112/PROTOCOL.md: per configuration and price, the cheapest of 15 runs of this harness's multi-target rho (Kuhn-Struik retention rho rho2xks x 3 kappa, distinguished-point rho rhodp with retention x 12)",
+  "unit": "GAE per target from counted F_p I, M, S (I = 10M, S = M, 1 GAE = I + 2M + S) plus h GAE per hash/solver op",
+  "binary_or_process": "target/release/examples/mt_fieldops built from the commit in every row of rows.jsonl (25a2540781)",
+  "matches_protocol": true,
+  "strongest_available": false,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 448.104,
+    "rho": 405.742
+   },
+   "0.1": {
+    "ic": 521.745,
+    "rho": 499.467
+   },
+   "1": {
+    "ic": 1176.461,
+    "rho": 730.818
+   }
+  },
+  "order_holds_across_band": false,
+  "note": "band for 32 b, T = 16384, frozen rule. Not the strongest rho: rhodp has duplicate steps and rho2xks's best kappa is the grid floor; rho's per-step canonicalisations are not priced (section 5a pricing makes every decision unranked). The validator's status is insufficient_evidence for a ranking, so this gate does not pass."
+ }
+}

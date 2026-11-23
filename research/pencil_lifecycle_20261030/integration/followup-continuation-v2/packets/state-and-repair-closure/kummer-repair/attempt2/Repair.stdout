@@ -1,0 +1,20 @@
+Repair.lean:60:44: warning: Variable name `hc` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hc
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+Repair.lean:60:53: warning: Variable name `h` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _h
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+Repair.lean:91:38: error: Application type mismatch: The argument
+  [1, -a1, a0, q3 + σ * a0]
+has type
+  List K
+of sort `Type u_1` but is expected to have type
+  Bool
+of sort `Type` in the application
+  ![1, -a1, a0, q3 + σ * a0]

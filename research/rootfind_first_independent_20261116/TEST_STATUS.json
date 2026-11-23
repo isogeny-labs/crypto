@@ -1,0 +1,36 @@
+{
+  "schema": "rootfind-first-independent-dev-tests/v1",
+  "status": "full_library_suite_failed",
+  "source_commit": "58c7557e20bbc3977083e5239c693df5d2854bbd",
+  "command": "RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc /Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/cargo test --release --lib --locked --target-dir /Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target -- --test-threads=4",
+  "suite": {
+    "exit_code": 101,
+    "passed": 6416,
+    "failed": 16,
+    "ignored": 135,
+    "measured": 0,
+    "filtered_out": 0,
+    "test_seconds_reported": 844.31,
+    "raw_stdout_sha256": "01755196df73df42e0c90f11997e77c677d0625b81bca19d3907a1583e07c90a",
+    "raw_stderr_sha256": "5d6e15b3ecde136953d75fee313a158dd4cc07af9f8cb66f0792ab3f1233307b",
+    "exit_file_sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+  },
+  "exact_reruns": [
+    {
+      "test": "cryptanalysis::ecbench::aps::tests::streaming_and_exhaustive_recover_with_closed_phase_accounts",
+      "exit_code": 0,
+      "result": "one_pass_after_suite_failure",
+      "stdout_sha256": "03b50a77fb6ed6efe4e2be4254ba94cd6ede2fb3b806210e88da1c87843c4cec",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "test": "cryptanalysis::koblitz_index_calculus::tests::chained_s3_strategy_feeds_verified_relation_rank_and_target_solve",
+      "exit_code": 101,
+      "result": "same_assertion_failure_on_exact_rerun",
+      "stdout_sha256": "28ebf36b8ecd3ba0401293a113f55597347c9df0d16207779cb58a35e611e71c",
+      "stderr_sha256": "3aea09dc79dc0033d9e34f84dd0c6669a9a09c249b923288c6e988bd7805dbad"
+    }
+  ],
+  "new_library_source_paths_since_parent": 0,
+  "scientific_trial_executions": 0
+}

@@ -1,0 +1,49 @@
+// Generic marked quotient normalization; exceptional specializations recorded.
+proc require53(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../51/runs/hecke3-51-01/hecke3-function-certificate51.sing"));
+ring tateBase53=(2,b,c),(t),dp;short=0;
+map sourceMap53=hecke3FunctionCertificate51,0,0,0,t;
+ideal mappedSource53=sourceMap53(source51);poly psi53=mappedSource53[3];ideal gb53=std(ideal(psi53));
+poly A53=1+c;poly a453=sourceMap53(a4_51);poly a653=sourceMap53(a6_51);
+poly X053=sourceMap53(X51);poly Y053=sourceMap53(Y51);
+link out53="ASCII:w tate-base-certificate53.sing";
+write(out53,"ring tateBaseCertificate53=(2,b,c),(t),dp;short=0;poly psi53="+string(psi53)+";");
+proc inv53(poly p,string name){
+ matrix W=lift(ideal(psi53,p),ideal(1));
+ require53(matrix(ideal(psi53,p))*W==matrix(ideal(1)),"TATE53_UNIT_"+name);
+ write(out53,"poly "+name+"53="+string(p)+";poly "+name+"Inverse53="+string(W[2,1])+";poly "+name+"Lift53="+string(W[1,1])+";");
+ return(reduce(W[2,1],gb53));
+}
+poly it53=inv53(t,"t");poly r53=reduce(X053*it53^2,gb53);
+poly q53=reduce(Y053*it53^3,gb53);
+poly pointResidual53=q53^2+A53*r53*q53+b*q53+r53^3+b*r53^2+a453*r53+a653;
+require53(reduce(pointResidual53,gb53)==0,"TATE53_MARKED_POINT");
+poly h53=reduce(A53*r53+b,gb53);poly ih53=inv53(h53,"h");
+poly s53=reduce((r53^2+a453+A53*q53)*ih53,gb53);
+poly D253=reduce(b+r53+s53^2+A53*s53,gb53);poly iD253=inv53(D253,"D2");
+poly u53=reduce(h53*iD253,gb53);poly iu53=inv53(u53,"u");
+poly bnew53=reduce(D253*iu53^2,gb53);poly Anew53=reduce(A53*iu53,gb53);
+poly cnew53=1+Anew53;
+require53(reduce(bnew53+h53*iu53^3,gb53)==0,"TATE53_EQUAL_A2_A3");
+write(out53,"poly A53="+string(A53)+";poly a453="+string(a453)+";poly a653="+string(a653)+";poly r53="+string(r53)+";poly q53="+string(q53)+";poly s53="+string(s53)+";poly bnew53="+string(bnew53)+";poly Anew53="+string(Anew53)+";poly cnew53="+string(cnew53)+";");
+matrix pointWitness53=lift(ideal(psi53),ideal(pointResidual53));
+require53(psi53*pointWitness53[1,1]==pointResidual53,"TATE53_MARKED_POINT_FULL_PRODUCT");
+write(out53,"poly pointResidual53="+string(pointResidual53)+";poly pointLift53="+string(pointWitness53[1,1])+";");
+print("TATE53_BASE_UNITS_SAVED");
+ring tateCurve53=(2,b,c),(y,x,t),lp;short=0;
+map baseMap53=tateBase53,t;
+poly psi53=baseMap53(psi53);poly A53=1+c;
+poly a453=baseMap53(a453);poly a653=baseMap53(a653);
+poly r53=baseMap53(r53);poly q53=baseMap53(q53);poly s53=baseMap53(s53);
+poly u53=baseMap53(u53);poly bnew53=baseMap53(bnew53);poly Anew53=baseMap53(Anew53);
+poly oldX53=u53^2*x+r53;poly oldY53=u53^3*y+s53*u53^2*x+q53;
+poly oldCurve53=oldY53^2+A53*oldX53*oldY53+b*oldY53+oldX53^3+b*oldX53^2+a453*oldX53+a653;
+poly newCurve53=y^2+Anew53*x*y+bnew53*y+x^3+bnew53*x^2;
+poly residual53=oldCurve53+u53^6*newCurve53;
+require53(reduce(residual53,std(ideal(psi53)))==0,"TATE53_FULL_CURVE_IDENTITY");
+matrix curveWitness53=lift(ideal(psi53),ideal(residual53));poly lift53=curveWitness53[1,1];
+require53(lift53*psi53==residual53,"TATE53_FULL_CURVE_PRODUCT");
+require53(reduce(residual53+u53^6*x,std(ideal(psi53)))!=0,"TATE53_CORRUPTION_DETECTED");
+link curveOut53="ASCII:w tate-curve-certificate53.sing";
+write(curveOut53,"ring tateCurveCertificate53=(2,b,c),(y,x,t),lp;short=0;poly psi53="+string(psi53)+";poly oldX53="+string(oldX53)+";poly oldY53="+string(oldY53)+";poly oldCurve53="+string(oldCurve53)+";poly newCurve53="+string(newCurve53)+";poly residual53="+string(residual53)+";poly lift53="+string(lift53)+";");close(curveOut53);close(out53);
+print("TATE53_ALL_CHECKS_PASS");quit;

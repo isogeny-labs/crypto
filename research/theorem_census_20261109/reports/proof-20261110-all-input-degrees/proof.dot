@@ -1,0 +1,12 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.15,ranksep=0.3];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=11];
+ a [label="Actual S3 cycles: degree 2\nAll four actual S4 base positions: degree 4"];
+ b [label="First two inputs\nConcrete scalar-fixing seed permutations"];
+ c [label="Introduced inputs\nActual selected birth variable"];
+ d [label="Actual recursively lifted ring equivalences\nActual resultant recurrence; sharp old degree 2d"];
+ e [label="Induct through every future stage\nActual sharp degree 2^(stage+1)"];
+ f [label="Lean Fin-position coverage + last-input proof\nEvery input, every arity m >= 3: degree 2^(m-2)",fillcolor="#dcf1e2"];
+ {rank=same;b;c}
+ a -> b; a -> c; b -> d; c -> d; d -> e; e -> f;
+}

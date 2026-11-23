@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T02:30:22Z",
+ "id": "PCC-20261117-afd655",
+ "kind": "execution",
+ "producer": {
+  "commit": "07a1c0894024ed6c0c57598609763c1b99b9529b",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-sparse-kernel-20261117-44/summary.json",
+    "sha256": "d7d674a44c8bed312afa34b07c17f50fba4ad1329c5b7106df6fb21abd73c38a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-sparse-kernel-20261117-44/deletion.json",
+    "sha256": "348cddfe19436d97f0694682ad58ad3b771d5afadfd081ab5f110831c003d8df"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-sparse-kernel-20261117-44/final-status.json",
+    "sha256": "344e8cdcb9c218710b4aedd77dcb5b50cbbb0eff07ca3951866481a0b275270b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-sparse-kernel-20261117-44/local-originals.sha256",
+    "sha256": "833420c7076e355412e89498fabbae73f42148fcca9114c7d99b32bfd4120f54"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-sparse-kernel-20261117-44/final-report-artifacts.sha256",
+    "sha256": "f4bc20cac76a131fd2f390825f686c6b2567123b90534ddc5dd6509b3da506db"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/extension_ic_graph_20261115/runpod-sparse-kernel-20261117-44",
+ "statement": "Runpod44 component originals: all six kernels and Lanczos traces replay at rank508; observed incomplete primitive and single elapsed results disagree in ordering; originals collected before owned-pod deletion; unsigned producer record"
+}

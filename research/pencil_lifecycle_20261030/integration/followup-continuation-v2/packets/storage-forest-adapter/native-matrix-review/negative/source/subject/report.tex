@@ -1,0 +1,18 @@
+\documentclass[10pt]{article}\usepackage[margin=0.8in]{geometry}\usepackage[T1]{fontenc}\usepackage{lmodern,amsmath,hyperref}
+\title{Retained Kummer matrix binding audit}\date{1 November 2026}\begin{document}\maketitle
+The native fixed-input audit verifies 105 ordered matrices across the exact 21 retained prime models. Every matrix is canonical $4\times4$, every prime satisfies $p\le2^{32}$, and every square is $cI$ with $c\ne0$, equal to the saved scalar at the same action index. Normalized roots retain the literal loader order and formula $(r-r_0)/\delta$.
+\section*{Source pins and revision distinction}
+All twelve historical source-digest pins match locally recovered bytes. Theta/generic data are parsed for the fixed identities; target-gate files are hashed only. There is no point enumeration or new curve computation.
+
+The historical walk source and supplied walk source have different digests: the former caches theta inverses, while the latter uses uncached inversion. Their extracted linear action and loader sections match byte-for-byte. The complete source difference is retained. This does not identify an executed binary or establish runtime input provenance.
+\section*{Arithmetic checks}
+The prime membership set is explicit, model keys are unique, and every model has exactly five ordered actions. Primality is checked by trial division. Products and square sums use widened u128 arithmetic; canonical $p\le2^{32}$ bounds each product below $2^{64}$ and each four-term sum below $2^{66}$. Normalization requires canonical nonzero $\delta$ and uses inversion in the checked prime field.
+
+These coefficients instantiate the scalar-square premise of the field repair theorem. Full native row-fold semantics, compiled binary/input provenance and geometric action interpretation remain separate obligations.
+\section*{Controls and reproducibility}
+Eleven built-in fixed controls include identity/permutation success and zero/singular-square, shape, canonicality, digest, modulus, denominator and duplicate-key failures. Three copied-input cases reject reordered scalar certificates, missing model membership and changed source digest. All negative cases fail closed with accepted=false.
+
+The final replay passes a separate exact-cardinality acceptance predicate and unchanged-input hashes. An initial unavailable local theta path failed closed; the matching preprovided theta bytes repaired the private pin index, with that failed attempt preserved. Source, Cargo lock, binary, toolchain and complete output are bound in receipts.
+
+This producer packet awaits independent review and publication binding. No scientific trials, cloud operations, timing, new cost ratios or repository edits occurred. \texttt{result-final.json}, \texttt{status.json}, \texttt{REPORT.md}, raw pins and controls preserve the result.
+\end{document}

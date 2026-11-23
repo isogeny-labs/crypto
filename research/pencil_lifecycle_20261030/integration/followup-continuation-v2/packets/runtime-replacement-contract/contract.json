@@ -1,0 +1,45 @@
+{
+  "schema": "runtime.replacement.contract/v1",
+  "admitted": false,
+  "base_image": "sha256:347667d6ecc9294ab7bfcc83411fb47f7548c8d1ca5f7d315cca23fc4b115476",
+  "context_path": "/var/tmp/pencil-context-staging-v2634y19/context",
+  "recipe_sha256": "5d86b44b9f087a430969c40882db60127d4fcfdb5934bb87cc4d2398dbcec21b",
+  "source_revision": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+  "binary_sha256": "d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b",
+  "assembly": {
+    "attempts": 1,
+    "total_seconds_proposed": 600,
+    "reconciliation_reserve_seconds": 60,
+    "build_client_seconds_max": 240,
+    "pull": false,
+    "network": false,
+    "base_rebuild": false,
+    "automatic_retry": false,
+    "reviewed_supervisor_sha256": null,
+    "owner_nonce": null,
+    "new_tag": null
+  },
+  "qualification": {
+    "attempts": 1,
+    "total_seconds_proposed": 300,
+    "cleanup_reserve_seconds": 30,
+    "active_container_seconds_max": 20,
+    "active_containers_max": 1,
+    "memory_mib": 512,
+    "pids_max": 1,
+    "strict_empty_diff": true,
+    "image_id": null,
+    "prospective_review_sha256": null
+  },
+  "scientific_execution_admitted": false,
+  "planning": {
+    "worker_seconds": 25200,
+    "deadline_utc": "2026-11-03T06:00:00Z"
+  },
+  "required_next": [
+    "amended runtime-only assembler with exact source and new ownership binding",
+    "independent prospective review and bounded assembly admission",
+    "new image readback and qualifier binding review/admission",
+    "external-job/accounting reconciliation and scientific protocol review"
+  ]
+}

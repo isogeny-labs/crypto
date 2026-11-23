@@ -1,0 +1,62 @@
+[
+  {
+    "name": "EvenJacobian.nonmonic_infinity_square",
+    "claim_path": "pcc/claims/PCC-20261112-2ac389.json",
+    "statement": "theorem nonmonic_infinity_square {R : Type} [CommRing R] (l rho leading : R) (root : rho^2=leading) : (l^2*rho)^2=l^4*leading",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenJacobian.lean",
+      "theorem": "EvenJacobian.nonmonic_infinity_square",
+      "decl_sha256": "5090bbe3d11b44ed85753083d69b732181b1fe3ad29564e700a61179345ed7ca"
+    }
+  },
+  {
+    "name": "EvenJacobian.degree_two_basepoint_cancels",
+    "claim_path": "pcc/claims/PCC-20261112-636360.json",
+    "statement": "theorem degree_two_basepoint_cancels {M : Type} [IntModule M] (s w : M) (torsion : (2 : Int) \u2022 w=0) : s-(2 : Int) \u2022 w=s",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenJacobian.lean",
+      "theorem": "EvenJacobian.degree_two_basepoint_cancels",
+      "decl_sha256": "69e84934c09478724ac4d942842684d8f419dd9dd1a197ba506a4c11fd260b94"
+    }
+  },
+  {
+    "name": "EvenJacobian.degree_one_omission_detected",
+    "claim_path": "pcc/claims/PCC-20261112-88bf4f.json",
+    "statement": "theorem degree_one_omission_detected {M : Type} [IntModule M] (s w : M) (nonzero : w\u22600) : s-w\u2260s",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenJacobian.lean",
+      "theorem": "EvenJacobian.degree_one_omission_detected",
+      "decl_sha256": "beafaf5278dde2816f9e5c86d9590572fdc0079e17c066d275f717c47a4e4561"
+    }
+  },
+  {
+    "name": "EvenJacobian.frobenius_basepoint_rebasing",
+    "claim_path": "pcc/claims/PCC-20261112-324cb4.json",
+    "statement": "theorem frobenius_basepoint_rebasing {M : Type} [IntModule M] (s oldBase newBase : M) (d : Int) : s-d \u2022 newBase=(s-d \u2022 oldBase)-d \u2022 (newBase-oldBase)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenJacobian.lean",
+      "theorem": "EvenJacobian.frobenius_basepoint_rebasing",
+      "decl_sha256": "43f1924d6dc291b5d53e5b34a7a4f749e4108991b9b15e69ccb77e61b235cdef"
+    }
+  },
+  {
+    "name": "EvenJacobian.public_unbalanced_norm_inverses",
+    "claim_path": "pcc/claims/PCC-20261112-7908b9.json",
+    "statement": "theorem public_unbalanced_norm_inverses : (6329 : Nat)%109=7 \u2227 (6329 : Nat)%113=1 \u2227 (11414 : Nat)%109=78 \u2227 (11414 : Nat)%113=1 \u2227 (6329*11414 : Nat)%12317=1 \u2227 (1357 : Nat)%109=49 \u2227 (1357 : Nat)%113=1 \u2227 (2487 : Nat)%109=89 \u2227 (2487 : Nat)%113=1 \u2227 (1357*2487 : Nat)%12317=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenJacobian.lean",
+      "theorem": "EvenJacobian.public_unbalanced_norm_inverses",
+      "decl_sha256": "e74be61834e6119ab9baed04b54c2d4bc6a7e284857547bbd8eb8a2529c44aa3"
+    }
+  },
+  {
+    "name": "EvenJacobian.uniform_mutant_coordinates",
+    "claim_path": "pcc/claims/PCC-20261112-8ba779.json",
+    "statement": "theorem uniform_mutant_coordinates : (\u2200 b : Fin 113, ((7 : Fin 113)*b=b \u2194 b=0) \u2227 ((49 : Fin 113)*b=b \u2194 b=0) \u2227 ((101 : Fin 113)*b=b \u2194 b=0) \u2227 ((10201 : Fin 113)*b=b \u2194 b=0)) \u2227 (109 : Nat)*112=12208 \u2227 (12317 : Nat)-109=12208",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/EvenJacobian.lean",
+      "theorem": "EvenJacobian.uniform_mutant_coordinates",
+      "decl_sha256": "36e4ec942225bacd43d63c6be5739581d156fed67ed40147205392ce23fff58e"
+    }
+  }
+]

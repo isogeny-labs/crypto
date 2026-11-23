@@ -1,0 +1,38 @@
+WALL_GATE_FACTS (mechanical facts; the executor does not interpret them)
+records.count 1680
+records.by_arm {"dg": {"measured": 288, "measured_verified": 288, "records": 336, "warmup": 48}, "dg-small": {"measured": 288, "measured_verified": 288, "records": 336, "warmup": 48}, "srenew": {"measured": 288, "measured_verified": 288, "records": 336, "warmup": 48}, "srenew-aa": {"measured": 288, "measured_verified": 288, "records": 336, "warmup": 48}, "walk": {"measured": 288, "measured_verified": 288, "records": 336, "warmup": 48}}
+records.measured_verified_by_arm_and_curve {"dg": {"icv1-fp28-t14677-349132c0": 144, "icv1-fp28-t22749-960afa7f": 144}, "dg-small": {"icv1-fp28-t14677-349132c0": 144, "icv1-fp28-t22749-960afa7f": 144}, "srenew": {"icv1-fp28-t14677-349132c0": 144, "icv1-fp28-t22749-960afa7f": 144}, "srenew-aa": {"icv1-fp28-t14677-349132c0": 144, "icv1-fp28-t22749-960afa7f": 144}, "walk": {"icv1-fp28-t14677-349132c0": 144, "icv1-fp28-t22749-960afa7f": 144}}
+records.isolation_levels {"L2": 1680}
+gate.executions 1680
+gate.grades [{"count": 1680, "level": "L2"}]
+gate.accepted true
+gate.below_l2_len 0
+gate.invalid_outcomes_len 0
+FACT_EXECUTIONS_1680=true
+FACT_EACH_OF_5_ARMS_336_RECORDS_288_MEASURED_288_VERIFIED=true
+cond1_facts {"exit_code": 0, "job_exit_pod_uid_equals_prefix": true, "pod_uid_prefix_count": 1, "single_pod": true}
+cond2_facts {"audit_ok": true, "problems_len": 0, "replays_identical_and_reproduced": 1440, "replays_total": 1440, "session_status": "complete"}
+AA {"a_arm": "srenew", "b_arm": "srenew-aa", "file": "compare-srenew__srenew-aa-w0.json", "ops_ci95": [1.0, 1.0], "ops_pairs": 288, "ops_ratio_b_over_a_repr": "1.0", "ops_ratio_equals_1_exactly": true, "ops_ratio_formats_as_1.000": true, "ops_status": "ok", "pricing_weight": 0.0}
+AA {"a_arm": "srenew", "b_arm": "srenew-aa", "file": "compare-srenew__srenew-aa-w0.1.json", "ops_ci95": [1.0, 1.0], "ops_pairs": 288, "ops_ratio_b_over_a_repr": "1.0", "ops_ratio_equals_1_exactly": true, "ops_ratio_formats_as_1.000": true, "ops_status": "ok", "pricing_weight": 0.1}
+AA {"a_arm": "srenew", "b_arm": "srenew-aa", "file": "compare-srenew__srenew-aa-w1.json", "ops_ci95": [1.0, 1.0], "ops_pairs": 288, "ops_ratio_b_over_a_repr": "1.0", "ops_ratio_equals_1_exactly": true, "ops_ratio_formats_as_1.000": true, "ops_status": "ok", "pricing_weight": 1.0}
+cond4_facts {"build_info_ecbench_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c", "build_info_ecbench_sha256_equals_want": true, "build_info_source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb", "build_info_source_revision_equals_want": true, "input_spec_equals_frozen_spec": true, "input_spec_present": true}
+cond5_facts {"accepted": true, "grades_all_L2_or_L3_and_sum_equals_executions": true, "invalid_outcomes_key_present_and_empty": true, "records_all_L2_or_L3": true}
+cond6_facts {"a_arm": "walk", "b_arm": "srenew-aa", "control_comparison_present": true, "wall.aa_arms": ["srenew", "srenew-aa"], "wall.aa_ci95_is_null": false, "wall.aa_pairs": 288, "wall.aa_selection": "first alphabetical", "wall.pairs": 288, "wall.pairs_below_level": 0, "wall.self_aa": false, "wall.status": "admitted"}
+cond7_facts {"wall.aa_arms": ["srenew", "srenew-aa"], "wall.aa_pairs": 288, "wall.aa_selection": "includes arm A", "wall.corrected_ci95_is_null": false, "wall.pairs": 288, "wall.pairs_below_level": 0, "wall.self_aa": false, "wall.status": "admitted", "wall_block_identical_at_w0.1": true, "wall_block_identical_at_w1": true}
+cond8_facts {"abs_ratio_minus_1_lt_0.0005": true, "ops.ci95_upper_lt_1_at_both": true, "ops.ci95_upper_w0.1_repr": "0.9662972110642217", "ops.ci95_upper_w1_repr": "0.7919030354164215", "ops.ratio_b_over_a_w0_repr": "1.0000003150596297"}
+decision_block_w0 {"aa_ratio": 0.9999403600510733, "ci95": [0.8839274876782443, 0.8883688988524178], "ci_method": "linearised_t_pairs", "corrected_ci95": [0.8836721572316844, 0.8887315910395139], "corrected_dof": 445.60583701933655, "corrected_ratio": 0.8861982635132132, "median_ratio": 0.8935191764829935, "ns_per_gae_a": 81.92937573358468, "ns_per_gae_b": 72.60134030734358, "outside_noise": true, "ratio_b_over_a": 0.8861454106940384, "total_wall_ratio": 0.8861456896940209}
+decision_resample_seed 20261002
+W_COND1=true
+W_COND2=true
+W_COND3=true
+W_COND3_ROUNDED3=true
+W_COND4=true
+W_COND5=true
+W_COND6=true
+W_COND7=true
+W_COND8=true
+W_ALL_1_TO_8=true
+W_ALL_1_TO_8_ROUNDED3=true
+CORRECTED_CI95_UPPER_LT_1=true
+CORRECTED_CI95_LOWER_GT_1=false
+WALL_GATE_OK

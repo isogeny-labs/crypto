@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, renameSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync, rmSync, renameSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
-import { classify, embeddedInputs, materializeInputs, pathDependencyDirs, scopes, select } from './ci-scope.mjs';
+import { classify, embeddedInputs, materializeInputs, pathDependencyDirs, runtimeInputs, scopes, select, sourceFiles } from './ci-scope.mjs';
 
 test('a cold root checkout resolves path crates and their embedded inputs', () => {
   const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-path-crates-'));
@@ -97,6 +97,12 @@ test('dependencies, workflow edits and frozen evidence remain applicable', () =>
   }
   assert.equal(classify(['taskq/deploy/eks-karpenter/validation/README.md']).ecbench_replay, false);
   assert.equal(classify(['taskq/deploy/example/session.json.bak']).ecbench_replay, false);
+  // Artifact-store pointers of sessions anywhere (SHF-20261106-a114e7, PPX-5).
+  for (const file of ['research/pkm_tower_rootfind_20261018/interrupted/P8-worker-restart-20261019/.artifacts.json',
+    '.artifacts.json']) {
+    assert.equal(classify([file]).ecbench_replay, true, file);
+  }
+  assert.equal(classify(['research/example/artifacts.json']).ecbench_replay, false);
   for (const file of ['analysis/src/coverage.rs', 'analysis/Cargo.toml',
     'analysis/Cargo.lock', 'runs.tar.xz', 'observations.json', 'exact-coverage.json']) {
     assert.equal(classify([`research/factor_base_shape_leads_20261018/${file}`]).ecbench_replay, true, file);
@@ -126,6 +132,7 @@ test('staged Rust release inputs select the Rust package lane', () => {
     'research/p192_p224_large_degree_isogenies_20261009/PROTOCOL.md',
     'research/p192_p224_large_degree_isogenies_20261009/verification_poly.rs',
     'research/p192_p224_large_degree_isogenies_20261009/verification_kernel.rs',
+    'research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean',
   ];
   for (const file of inputs) {
     const result = classify([file]);
@@ -312,5 +319,72 @@ test('path dependencies of the root crate are materialized, transitively', () =>
     assert.equal(existsSync(path.join(cwd, 'tools/helper/archive/raw.jsonl')), false);
     write('Cargo.toml', '[package]\nname="fixture"\nversion="0.1.0"\n[dependencies]\nup = { path = "../up" }\n');
     assert.throws(() => pathDependencyDirs(cwd), /escapes the checkout/);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
+
+test('large tracked path lists preserve source discovery beyond 16 MiB', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-large-index-'));
+  try {
+    execFileSync('git', ['init', '-q'], { cwd });
+    const oid = execFileSync('git', ['hash-object', '-w', '--stdin'],
+      { cwd, input: '', encoding: 'utf8' }).trim();
+    const files = Array.from({ length: 80000 }, (_, i) =>
+      `archive/${'x'.repeat(210)}-${String(i).padStart(6, '0')}.txt`);
+    const sources = ['src/first.rs', 'src/last ü line\nname.rs'];
+    files.push(...sources);
+    assert.ok(Buffer.byteLength(files.join('\0') + '\0') > 16 * 1024 * 1024);
+    execFileSync('git', ['update-index', '-z', '--index-info'], {
+      cwd, input: files.map(file => `100644 ${oid}\t${file}\0`).join(''),
+    });
+    mkdirSync(path.join(cwd, 'src'));
+    for (const source of sources) writeFileSync(path.join(cwd, source), '');
+    let found;
+    try { found = sourceFiles(cwd); }
+    catch (error) { assert.fail(`large Git path list failed: ${error.code ?? error.message}`); }
+    assert.deepEqual([...found].sort(), [...sources].sort());
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
+
+test('failed Git commands propagate and remove their temporary output', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-git-failure-'));
+  const scratch = path.join(cwd, 'scratch');
+  mkdirSync(scratch);
+  try {
+    const module = new URL('./ci-scope.mjs', import.meta.url).href;
+    execFileSync(process.execPath, ['--input-type=module', '-e', `
+      import assert from 'node:assert/strict';
+      import { sourceFiles } from ${JSON.stringify(module)};
+      assert.throws(() => sourceFiles(process.cwd()), /not a git repository/);
+    `], { cwd, env: { ...process.env, TMPDIR: scratch, TMP: scratch, TEMP: scratch } });
+    assert.deepEqual(readdirSync(scratch), []);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
+
+test('declared runtime inputs survive sparse materialization and reject unsafe registries', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-runtime-'));
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  const write = (file, text) => { mkdirSync(path.dirname(path.join(cwd, file)), { recursive: true }); writeFileSync(path.join(cwd, file), text); };
+  const registry = 'tests/fixtures/rust-runtime-inputs.json';
+  const declare = paths => write(registry, JSON.stringify({schema: 'crypto.rust-runtime-inputs/v1', paths}));
+  try {
+    git('init', '-q'); git('config', 'user.email', 'ci@example.invalid'); git('config', 'user.name', 'CI scope test');
+    write('src/lib.rs', 'pub fn fixture_reader() {}');
+    write('research/control.json', '{"frozen":true}');
+    write('research/archive/large.json', '{}');
+    declare(['research/control.json']);
+    git('add', '.'); git('commit', '-qm', 'runtime fixture');
+    git('sparse-checkout', 'set', '--no-cone', '/src/');
+    assert.equal(existsSync(path.join(cwd, registry)), false);
+    materializeInputs(cwd);
+    assert.equal(readFileSync(path.join(cwd, 'research/control.json'), 'utf8'), '{"frozen":true}');
+    assert.equal(existsSync(path.join(cwd, 'research/archive/large.json')), false);
+    assert.equal(classify(['research/control.json'], embeddedInputs(cwd)).rust_root, true);
+    for (const paths of [['../outside'], ['/absolute'], ['research/control.json', 'research/control.json'], ['missing.json'], ['research/../control.json']]) {
+      declare(paths);
+      assert.throws(() => runtimeInputs(cwd), /invalid or missing/);
+    }
   } finally { rmSync(cwd, { recursive: true, force: true }); }
 });

@@ -1,0 +1,20 @@
+{
+  "schema": "cover.paired-builder-checks/v1",
+  "source_commit": "00ffe72fbeadaca1eb519459b77e00717f18fda3",
+  "protocol_commit": "bf82ba3d4",
+  "standing": "unsigned producer evidence",
+  "tests": {"passed": 17, "failed": 0, "process_exit": 0},
+  "first_test_caller_status_discrepancy": {"tool_exit": 1, "explicit_process_exit": 0, "stdout_passed": 17},
+  "format_check": "pass",
+  "build_exit": 0,
+  "build_warnings": "five dead-code warnings for development evaluation controls; no solver imported",
+  "exports": {
+    "none": {"exit": 0, "direct": [18, 19, 4], "graph": [22, 23, 4]},
+    "cubic": {"exit": 0, "direct": [18, 19, 12], "graph": [22, 23, 4]},
+    "tuple_fields": ["variables", "equations", "max_input_degree"]
+  },
+  "coefficient_projection": "every graph equation checked exactly before export",
+  "scalar_control": "independent symmetric S3 on two small fields",
+  "tamper_controls": ["changed polynomial coefficient fails projection", "changed image coordinate violates graph constraint"],
+  "not_checked": ["external consumer ingestion", "genuine elliptic relation witness", "F4 output", "runtime or memory benefit", "online relation yield", "sub-exponential complexity"]
+}

@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/tmp/claude-0/-home-user/daf172a2-9908-530c-9c36-29f5d702bf30/scratchpad/pyold/optlevel.py", line 1073, in <module>
+    main()
+    ~~~~^^
+  File "/tmp/claude-0/-home-user/daf172a2-9908-530c-9c36-29f5d702bf30/scratchpad/pyold/optlevel.py", line 1069, in main
+    a.fn(a)
+    ~~~~^^^
+  File "/tmp/claude-0/-home-user/daf172a2-9908-530c-9c36-29f5d702bf30/scratchpad/pyold/optlevel.py", line 706, in cmd_score
+    rec = S.build_record(calib, meas, algorithmic=alg, extra_diag=extra, kernel=kernel)
+  File "/tmp/claude-0/-home-user/daf172a2-9908-530c-9c36-29f5d702bf30/scratchpad/pyold/score.py", line 372, in build_record
+    roofs["single"] = roof_at(1)
+                      ~~~~~~~^^^
+  File "/tmp/claude-0/-home-user/daf172a2-9908-530c-9c36-29f5d702bf30/scratchpad/pyold/score.py", line 361, in roof_at
+    peak, peak_med, m1 = class_ceiling(calib, op_class, k)
+                         ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-0/-home-user/daf172a2-9908-530c-9c36-29f5d702bf30/scratchpad/pyold/score.py", line 305, in class_ceiling
+    raise KeyError(f"calibration has no ceiling for operation class {op_class!r}; "
+                   f"classes: {sorted((calib.get('compute') or {}))}")
+KeyError: "calibration has no ceiling for operation class 'triad'; classes: ['fma_f64', 'muladd_u32', 'muladd_u64', 'popcnt_u64', 'xor_u64']"
+exit 1

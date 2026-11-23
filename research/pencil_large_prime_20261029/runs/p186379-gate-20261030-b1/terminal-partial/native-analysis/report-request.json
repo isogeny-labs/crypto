@@ -1,0 +1,45 @@
+{
+  "schema": "pencil-native-observation-report-request/v1",
+  "title": "Upper gate: terminal checkpoint observations",
+  "run_id": "pencil-p186379-20261030-b1",
+  "scope": "One archived public synthetic mathematical target; terminal controller deadline failure. Computation observations only; no measured comparisons.",
+  "source_commit": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+  "analysis": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/native-analysis/native-analysis.json",
+    "sha256": "770c40bfb7f574caa1bf5114022378a0ad72686c86f480d5fa39ad2d691e3625"
+  },
+  "sidecars": [
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/native-analysis/execution-history.json",
+      "sha256": "9c43c8f3c81661a1fe47f2ef48a0da535b10b2a53839dd6917afb1fea92ddb95"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/terminal-state-0328.json",
+      "sha256": "d3985784784f82244779f0db72bb7e996a7947f571e11fa23701bd856d9580be"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/checkpoint-g6/generations/g6/manifest.json",
+      "sha256": "7d8b415e9f38f04e631e61c6194ad2b6713c609ae4cbf8155ea9c182a0362e3d"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/controller/build-terminal.json",
+      "sha256": "659fee70aebaf8c7d1b1d09a0c9df330fedf22feb58071407fbeb757dfe1e6f6"
+    },
+    {
+      "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/reviews/pencil-upper-g6-terminal-partial-data-audit-20261030.json",
+      "sha256": "1426bb9e65691f09f49f666fa9ac78bc731cece71e37e6bb2144e33bbe18afc4"
+    }
+  ],
+  "notes": [
+    "The controller stopped with original UTC deadline expired. The inner ecbench session retained in checkpoint generation6 still says running; it has not been relabeled completed.",
+    "Two observed rows are rho and rho_AA warmups. No pencil record and no measured record were retained. Sixteen of eighteen planned execution slots are missing; all five measured pairs are unavailable.",
+    "All36 finite-model ratios are null. Missing pencil work is not a zero-cost measurement or a completed failure row. No scientific or timing admission follows from this packet.",
+    "Checkpoint generation6 was written; no restore occurred. Per-record attempts1 and resumed0 derive from terminal controller attempt0/restores0 plus the generation manifest.",
+    "Instrument source commit543a54b4b1c3be7052872af3ffe393a44c69a3c3 and binarya1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab are distinct from session artifact-child git_commit7d7f5495c5b85ae426efdbcb721b6faf72c1be14.",
+    "Computation isolation is L0 and clocks remain unqualified. No fresh benchmark epoch was created. Controller/worker allocation observations are separate; none are converted to finite algorithm cost units."
+  ],
+  "resources": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/runs/p186379-gate-20261030-b1/terminal-partial/native-analysis/resource-observations.json",
+    "sha256": "52d198affcd697231b2aaba090b0f49d503fb584efa53094b073c3b1af7792f6"
+  }
+}

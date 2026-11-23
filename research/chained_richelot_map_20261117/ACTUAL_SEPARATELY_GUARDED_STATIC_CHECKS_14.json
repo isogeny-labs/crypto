@@ -1,0 +1,33 @@
+{
+  "time": "2026-11-17T06:24:52.188597+00:00",
+  "checks": [
+    {
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--check",
+        "--edition",
+        "2021",
+        "research/chained_richelot_map_20261117/src/lib.rs"
+      ],
+      "exit": 0,
+      "complete_stdout": "",
+      "complete_stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "py_compile",
+        "research/chained_richelot_map_20261117/run_first_unit_14.py",
+        "research/chained_richelot_map_20261117/prepare_source14_metadata_only.py"
+      ],
+      "exit": 0,
+      "complete_stdout": "",
+      "complete_stderr": ""
+    }
+  ],
+  "no_new_Rust_compile_or_arithmetic": true
+}

@@ -1,0 +1,17 @@
+import Word
+namespace NormalizationInputGuardsControls
+open Polynomial AffineCoefficientLoop NormalizationInputGuards
+ theorem degree_zero : (sourcePoly (fun _=> (1:ℚ)) 1).natDegree=0 := prefix_natDegree _ 0 rfl
+ theorem degree_one : (sourcePoly (fun i=>if i=1 then (1:ℚ) else 7) 2).natDegree=1 :=
+  prefix_natDegree _ 1 (by simp)
+ theorem degree_two : (sourcePoly (fun i=>if i=2 then (1:ℚ) else 7) 3).natDegree=2 :=
+  prefix_natDegree _ 2 (by simp)
+ theorem zero_ordinate : sourcePoly (fun _=> (7:ℚ)) 0=0 := by simp [sourcePoly]
+ theorem missing_top : (sourcePoly (fun _=> (0:ℚ)) 3).natDegree≠2 := by simp [sourcePoly]
+ theorem metadata_mismatch : (sourcePoly (fun i=>if i=1 then (1:ℚ) else 7) 2).natDegree≠2 := by
+  rw [degree_one]; decide
+ theorem nonmonic_top : ¬(sourcePoly (fun _=> (2:ℚ)) 1).Monic := by
+  norm_num [sourcePoly,Monic]
+ theorem ordinate_prefix : (sourcePoly (fun _=> (99:ℚ)) 2).degree < (2:WithBot ℕ) :=
+  prefix_degree_bound _ 2
+end NormalizationInputGuardsControls

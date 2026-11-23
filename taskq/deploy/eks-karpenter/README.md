@@ -19,8 +19,9 @@ of the existing `taskq/deploy/aws` Redis/managed-worker stack.
   node access entry, SQS interruption queue and EventBridge interruption rules.
 - `cpu-spot` for ordinary commands and `cpu-l2-spot` for native benchmarks:
   x86-64 Linux, Spot only, C/M/R generation 6+, 8/16/32-vCPU instance types,
-  excluding Flex families. Each pool has a 32-vCPU / 128-GiB limit, preserving
-  the combined 64-vCPU / 256-GiB envelope. A single node must fit its pool
+  excluding Flex families. The ordinary pool is capped at 16 vCPUs / 128 GiB;
+  L2 at 8 vCPUs / 32 GiB, for 24 vCPUs / 160 GiB combined.
+  See [cost controls and GitHub custody](COST_CONTROLS.md). A single node must fit its pool
   (for example, a 256-GiB memory-optimized type cannot fit either pool).
   CPU 0's whole physical core is reserved for housekeeping. No GPU or automatic
   On-Demand fallback is enabled. Unused capacity is not borrowed across pools.

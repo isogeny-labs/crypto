@@ -1,0 +1,6 @@
+Q3 (as frozen)                                          0.003 [0.002, 0.005] (R) | 0.098 [0.069, 0.153] (R) | 0.142 [0.100, 0.222] (R)
+Q3, K at kappa=1/4 (one op per 4-lane AVX2 compare)     0.003 [0.002, 0.005] (R) | 0.180 [0.129, 0.282] (R) | 0.433 [0.307, 0.677] (R)
+Q3, plain walk without window (K_P=0), floored          0.003 [0.002, 0.005] (R) | 0.193 [0.143, 0.262] (P) | 1.049 [0.780, 1.427] (P)
+Q3, plain walk without window (K_P=0), unfloored        0.003 [0.002, 0.005] (R) | 0.212 [0.158, 0.288] (P) | 2.098 [1.560, 2.854] (P)
+break_even_kappa_R_w1                                   0.0425
+share_of_R_Q3_cost_w1_from_K                            0.8962

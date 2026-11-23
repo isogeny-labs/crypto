@@ -1,0 +1,13 @@
+digraph Audit {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", nodesep=0.25, ranksep=0.35];
+  node [shape=box,style="rounded,filled",fillcolor="#EDF4FF",fontname="Helvetica",fontsize=11];
+  edge [color="#4D607D",fontname="Helvetica",fontsize=10];
+  assumptions [label="UNPROVED algorithmic hypotheses\ny = Theta(min(1,B^m/N)); D = soft-O(B^gamma)\nSetup + sparse kernel = soft-O(B^2); suitable growing family"];
+  envelope [label="Exact rational MODEL audit\nE = max(2 beta, (1+gamma) beta + max(0,1-m beta))"];
+  four [label="Four summands, gamma=1/2\nbeta=2/9; model minimum=4/9\nNo actual solver bound"];
+  six [label="Six summands, gamma=3/2\nbeta=1/6; model minimum=5/12\nNo actual solver bound"];
+  gap [fillcolor="#FFF3D9",label="ACTUAL PARAMETER GAP\nSixth-root target: 2^42\nCurrent claimed class lower bound: >2^52\nAn admissible tunable base and its costs remain open"];
+  next [fillcolor="#FFF3D9",label="NEXT GATE\nMany-coset or other admissible base\nFixed-base batch solver + complete proof/cost\nExact controls before any large experiment"];
+  assumptions -> envelope; envelope -> four; envelope -> six;
+  six -> gap; four -> next; gap -> next;
+}

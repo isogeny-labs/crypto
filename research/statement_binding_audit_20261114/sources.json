@@ -1,0 +1,301 @@
+{
+  "schema": "statement-binding-source-plan/v1",
+  "created": "2026-11-14T14:33:28.663936+00:00",
+  "formal": {
+    "project": "research/statement_binding_audit_20261114/lean",
+    "theorem": "StatementBindingAudit.header_binding_controls_certificate",
+    "statement": "theorem header_binding_controls_certificate : (∀ n : ℤ, 0 ≤ abs n) ∧ (∀ n : ℕ, namedArgument n=n) ∧ (¬ Function.Injective (prefixBefore barDelimiter)) ∧ (¬ Function.Injective (prefixBefore namedDelimiter)) ∧ (¬ Function.Injective (prefixBefore proofDelimiter)) ∧ (barSourceA ≠ barSourceB ∧ prefixBefore barDelimiter barSourceA=prefixBefore barDelimiter barSourceB) ∧ (namedSourceA ≠ namedSourceB ∧ prefixBefore namedDelimiter namedSourceA=prefixBefore namedDelimiter namedSourceB) ∧ (proofSourceA ≠ proofSourceB ∧ prefixBefore proofDelimiter proofSourceA=prefixBefore proofDelimiter proofSourceB)",
+    "decl_sha256": "b3e3af513d61f8acbcfbca85f672699b2b8132900fdbe18a09c0208ea39c1988",
+    "scope": "Kernel-checked genuine integer absolute-value/named-argument semantic controls and explicit transparent List-Char delimiter-prefix model. For each of the three fixed delimiter constants, concrete unequal source strings have the same model prefix, and the model prefix function is not injective. Genuine default-proof/inline-by/comment/string Lean declarations also compile under standard foundations/default settings. This is a delimiter-only model, not a formal refinement of Python regex, native parser/auditor, SHA256, every Lean syntax form, theorem semantics or execution authenticity. Native bounded written-header observations are separately archived procedural evidence and are not established by this theorem. No holes/custom axioms/native proof evaluation/unsafe initializer calls/raised limits/global flags/waivers/new cryptographic experiment/paid compute/upload.",
+    "sources": [
+      {
+        "path": "research/statement_binding_audit_20261114/lean/BindingProbe.lean",
+        "bytes": 8775,
+        "sha256": "6f8540089cd34c2f30cab620a7c9520ecec17415fe0541cef476b2fb0f416f11"
+      },
+      {
+        "path": "research/statement_binding_audit_20261114/lean/HeaderCertificate.lean",
+        "bytes": 1382,
+        "sha256": "666bd5625aa88ee01e0aa59fecff1180ff1f63b29aff1f7c7c7dd0d77b0f9548"
+      },
+      {
+        "path": "research/statement_binding_audit_20261114/lean/HeaderControls.lean",
+        "bytes": 2144,
+        "sha256": "e9ebfd1f9545a0076bac134aea664c44de1284c269747025deb3f452631914e7"
+      },
+      {
+        "path": "research/statement_binding_audit_20261114/lean/lakefile.toml",
+        "bytes": 300,
+        "sha256": "0334e0e9d23215fe629bfb5a3a22d772aa26515feb774d4b12832c4336462ef6"
+      },
+      {
+        "path": "research/statement_binding_audit_20261114/lean/lake-manifest.json",
+        "bytes": 6496,
+        "sha256": "0973fbb81de0073734a6e09179f476b945890099e2c30050a757b5012ca29452"
+      },
+      {
+        "path": "research/statement_binding_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/lakefile.toml",
+        "bytes": 464,
+        "sha256": "db2f451e318521ff13f86aa556dc83c59744257c4b5131da28c5c2ec4cfae6de"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/lake-manifest.json",
+        "bytes": 5902,
+        "sha256": "371e9c13939be044b8496a8261251c671a5b57d22a6b34bf22a4362a832fe371"
+      },
+      {
+        "path": "research/support_gaussian_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/lakefile.toml",
+        "bytes": 458,
+        "sha256": "19225d6a309bbe240c70940c66cb9e3f68b5eee15892beac85cbada61f8afbef"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4666,
+        "sha256": "7baeb5cfc327926c20ab75c21bdae3bd3a17ff643a813cf233bd328b36137daa"
+      },
+      {
+        "path": "research/finite_fourier_upper_bound_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/lakefile.toml",
+        "bytes": 353,
+        "sha256": "d8997d8b100ce8e3da6f6bd04eb360f2ae4bae23a4e2273b7b59db16fa107222"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4042,
+        "sha256": "d169e80eecc0d6e301421d51547ec7bb13b50062e438c6d4ec14d2c00c1e5709"
+      },
+      {
+        "path": "research/walk_character_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 376,
+        "sha256": "e78ce13d461503c1e1cfcd78289586d99f17f00c1a757f4e0b2d61e0d430e129"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3690,
+        "sha256": "0bb802dd0905e950265a6f107ceff9f534c12d5036a89a552d643b0508f447f8"
+      },
+      {
+        "path": "research/weighted_cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lakefile.toml",
+        "bytes": 306,
+        "sha256": "5cf902fcb4908f6a1935ba0cd3735d4e91e2c4d2a1ba37617302439679d91af1"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3397,
+        "sha256": "c1f50dd86468022811659b7d11f1bc3e613ece5e63048a972635635f8bd5bb91"
+      },
+      {
+        "path": "research/cycle_coupling_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/lakefile.toml",
+        "bytes": 325,
+        "sha256": "aa47cdee2c72cf15656c69065a620af69ea1a7bd98e72b63c0f514864af3f41c"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4043,
+        "sha256": "e8067fb860c1ccd6159daa180ee871af2d94d72a3fd65cdd97f205e4f4cc6a3d"
+      },
+      {
+        "path": "research/hildebrand_cell_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/lakefile.toml",
+        "bytes": 343,
+        "sha256": "cf5f5773ce63826f5b6bac191b74157d94945ff26972b23ad8ead49927f89c68"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4825,
+        "sha256": "6351d41de90a95b7bbe7ebcf16fb5e52d419703e05d5a9b040100fc44488476e"
+      },
+      {
+        "path": "research/hildebrand_box_asymptotic_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/lakefile.toml",
+        "bytes": 347,
+        "sha256": "51f6b7a49f25e089a4d586312110e6ae7251f567e0065cf8f0de29c078f2c32a"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4412,
+        "sha256": "5cc2de693ffc8ce870fcbd704af2e4c419c7862bb13d6d30f7f5a5c5c08b9b73"
+      },
+      {
+        "path": "research/injective_box_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "BindingProbe",
+    "HeaderCertificate",
+    "HeaderControls"
+  ],
+  "artifacts": [
+    {
+      "path": "research/statement_binding_audit_20261114/evidence/attempts.tar.xz",
+      "bytes": 58788,
+      "sha256": "d3c4148f5fc6885bebf46a2556184387110a6a8caa5423c545fe4ad277077b2f"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "ece9f6f682eae74ebddff04906a936102fb3520e8afa681a2364a11550606892"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/evidence/attempts.json",
+      "bytes": 259,
+      "sha256": "9fcd04bed0855498b0ac9395bf647eb6bb4cd135e7bd2b05e7ef63e8d2c8f339"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 776,
+      "sha256": "7f63da91fda856a5ae8ee44e11a27b1491f0d14eeb10b0b6e6323106343d14f6"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/evidence/gate.json",
+      "bytes": 1250,
+      "sha256": "a3f2c524f479137658cef849fec20f02a26dd88961e13fc0ef927ddae9cf2ed9"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/evidence/source-review.json",
+      "bytes": 6757,
+      "sha256": "d03daf61e13c13809b65aab1c0e115e6997651420d982c1ece88cd0d360b3f76"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/proof-map.json",
+      "bytes": 1621,
+      "sha256": "4876699e25fe25689059ab763aee45b81aac992642232dc2d70183b1da905fb9"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/full-signature-index.json",
+      "bytes": 41949,
+      "sha256": "fd7711c6889d885238170f07f826e26735093be01b5f9cfde553c5407bf55696"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/render_report.py",
+      "bytes": 6582,
+      "sha256": "cece9380708f074d4831267f0dacba1367154598eb689c19a46afab86cd89afc"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/export_inputs.py",
+      "bytes": 3313,
+      "sha256": "06abf50c00d1e883e239252d186cf50e8b9ec2d2474ea0485dc6a263186c55ea"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/capture_frozen_controls.py",
+      "bytes": 1410,
+      "sha256": "3435a6dba3e57488012475a27c4c480ce9a5c0747bac4dd033aa4ae71745d154"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/run_audit.sh",
+      "bytes": 312,
+      "sha256": "87aa2d683b42ead8f18310950393c862861e10ce94d49c100da82f96d8574851"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/reports/layout.json",
+      "bytes": 286,
+      "sha256": "f6811b5f1b097a0988872db4d1540c804cfc8313d92ceefd34718e52dd423c8b"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/reports/report.pdf",
+      "bytes": 46251,
+      "sha256": "b683308ace66605b5b882359e06041131baf43cd7f9540ffbbdfb64dc06a04a9"
+    },
+    {
+      "path": "research/statement_binding_audit_20261114/reports/statement-binding.svg",
+      "bytes": 1460,
+      "sha256": "640d6ee42b54a56e77971f91c8e0affa068870e9224c3e82e3964ef3ec48cf60"
+    }
+  ],
+  "native_observation_summary": {
+    "audit_complete": true,
+    "cases": 62,
+    "complete": 61,
+    "summary": true,
+    "truncated_prefixes": 1,
+    "unresolved": 0
+  },
+  "assurance": {
+    "gate_declarations": 8,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "unsafe_initializer_call": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "model_is_not_parser_refinement": true,
+    "native_observations_are_not_kernel_theorems": true,
+    "written_surface_header_only": true,
+    "issued_BK_prefix_observed": true,
+    "old_math_theorem_refuted": false,
+    "BK_complete_binding_repair_closed": false,
+    "canonical_shared_verifier_modified": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

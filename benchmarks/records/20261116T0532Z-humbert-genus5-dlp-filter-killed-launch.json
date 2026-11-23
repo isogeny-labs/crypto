@@ -1,0 +1,58 @@
+{
+  "branch": "leads-ff",
+  "closed_utc": "2026-11-16T05:32:38+00:00",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "BIN=research/humbert_genus5_cover_20261021/dlp_filter_20261115/bin/humbert-v4",
+        "BIN_SHA256_PREFIX=5924fd1b",
+        "research/humbert_genus5_cover_20261021/dlp_filter_20261115/run_v4.sh",
+        "research/humbert_genus5_cover_20261021/dlp_filter_20261115/campaign"
+      ],
+      "cwd": ".",
+      "exit": null,
+      "note": "added by hand: the session's 2 h background limit killed the launcher (and benchrec run) after 117/120 rows, so benchrec could not write this entry; wall_s is the limit, not a measurement; moved on 2026-11-16 from 20261115T0731Z-humbert-genus5-dlp-filter.json into this censored record, because a measured record may list only commands that exited 0",
+      "started_utc": "2026-11-15T07:31:19+00:00",
+      "wall_s": 7200.0
+    }
+  ],
+  "commit": "af53cd4ff23d3dc68438be1a5cdbf8e43ebb00a3",
+  "commit_dirty": true,
+  "created_utc": "2026-11-16T05:32:23+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-humbert-genus5-dlp-filter"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261116T0532Z-humbert-genus5-dlp-filter-killed-launch",
+  "metrics": [],
+  "problem": "ic:humbert-genus5-toy",
+  "raw": [
+    {
+      "bytes": 196716,
+      "path": "research/humbert_genus5_cover_20261021/dlp_filter_20261115/campaign/results/v4.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3f167b49e6b44ae539ecd1c3fc1c5485470cc214ef04e188f932f7a66cc05492",
+      "sha256": "3f167b49e6b44ae539ecd1c3fc1c5485470cc214ef04e188f932f7a66cc05492",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "humbert-genus5-dlp-filter-killed-launch",
+  "status": "censored",
+  "summary": "dlp_filter_20261115 launcher killed by the 2 h background limit after 117/120 rows; the rows are complete after the resume command in 20261115T0731Z-humbert-genus5-dlp-filter.json (measured)",
+  "validation": null
+}

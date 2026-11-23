@@ -1,0 +1,39 @@
+{
+  "schema": "engineering.full-library-checkout-budget-amendment/v1",
+  "at": "2026-11-20T19:19:06.044387+00:00",
+  "parent": "ae92de7197fa5ae17f3780253aab0bcf65cd146b",
+  "observed_failure": {
+    "source_revision": "c76a9d9f7ef3dbb9d42c89aa8e04f72dfcec056a",
+    "run": 44792384374,
+    "job": 136483148319,
+    "stage": "immutable source checkout",
+    "classification": "setup timeout before library build or tests",
+    "fetch_seconds_approximately": 2,
+    "checkout_deadline_minutes": 5,
+    "log_sha256": "2e6a1bc152bb0fffaab5ebf03f9f3a81983410999db097d475c41dbac0abd022"
+  },
+  "prospective_change": {
+    "checkout_deadline_minutes": {
+      "before": 5,
+      "after": 15
+    },
+    "job_deadline_minutes": {
+      "before": 150,
+      "after": 165
+    },
+    "request_records_checkout_deadline": true
+  },
+  "unchanged": [
+    "full checkout and exact source revision selection",
+    "all non-ignored library tests",
+    "test deadline of110minutes",
+    "build deadline of25minutes",
+    "toolchains",
+    "thread counts",
+    "automatic retries zero",
+    "frozen inputs and artifacts"
+  ],
+  "scientific_measurement": false,
+  "performance_claim": null,
+  "s3_accessed": false
+}

@@ -1,0 +1,11 @@
+name = "bk_linear_audit"
+version = "0.1.0"
+defaultTargets = ["BKLinearAudit"]
+
+[[require]]
+name = "theorem_audit"
+path = "../../theorem_audit_20261108/lean"
+
+[[lean_lib]]
+name = "BKLinearAudit"
+roots = ["GenericFrobenius", "JordanException", "LinearCertificate", "RationalTorsion"]

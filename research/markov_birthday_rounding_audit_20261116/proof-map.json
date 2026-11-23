@@ -1,0 +1,676 @@
+{
+  "main": "MarkovBirthdayRoundingAudit.actual_markov_birthday_rounding_certificate",
+  "binding": "b09028b7712726177e63155f7f154897daced7cef1b86748882864e4ebd7027a",
+  "custom_imports": {
+    "FirstCollision": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+    "CollisionCertificate": "research/static_hash_collision_audit_20261114/lean/CollisionCertificate.lean",
+    "CollisionTails": "research/static_hash_collision_audit_20261114/lean/CollisionTails.lean",
+    "Cylinder": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+    "PathAgreement": "research/static_hash_collision_audit_20261114/lean/PathAgreement.lean",
+    "PostCollisionControl": "research/static_hash_collision_audit_20261114/lean/PostCollisionControl.lean",
+    "Survival": "research/static_hash_collision_audit_20261114/lean/Survival.lean",
+    "WalkBoundary": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+    "WalkWeighted": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+    "WalkWeightedGeneral": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+    "BirthdayBound": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+    "BirthdayCertificate": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayCertificate.lean",
+    "BirthdayImports": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayImports.lean",
+    "BirthdayLaw": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayLaw.lean",
+    "BirthdayWords": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayWords.lean",
+    "GreenMoment": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+    "KMPTCounter": "research/markov_birthday_rounding_audit_20261116/lean/KMPTCounter.lean",
+    "MarkovCollision": "research/markov_birthday_rounding_audit_20261116/lean/MarkovCollision.lean",
+    "UniformChain": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean"
+  },
+  "actually_imported_custom_modules": [
+    "BirthdayBound",
+    "BirthdayCertificate",
+    "BirthdayImports",
+    "BirthdayLaw",
+    "BirthdayWords",
+    "CollisionCertificate",
+    "CollisionTails",
+    "Cylinder",
+    "FirstCollision",
+    "GreenMoment",
+    "KMPTCounter",
+    "MarkovCollision",
+    "PathAgreement",
+    "PostCollisionControl",
+    "Survival",
+    "UniformChain",
+    "WalkBoundary",
+    "WalkWeighted",
+    "WalkWeightedGeneral"
+  ],
+  "claims": [
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.uniform_survival_exp",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+      "statement": "theorem uniform_survival_exp (x : ZMod p) (n : ℕ) : iidSurvival (uniformWeight p) (resetUpdate p) x n ≤ Real.exp (-((n : ℝ)*(n+1)/(2*(p : ℝ))))",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.uniform_integer_time_bound",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+      "statement": "theorem uniform_integer_time_bound (x : ZMod p) (n : ℕ) (c : ℝ) (hn : 2*(p : ℝ)*c≤(n : ℝ)*(n+1)) : 1-Real.exp (-c)≤collisionCDF p x n",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.uniform_ceiling_time_bound",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+      "statement": "theorem uniform_ceiling_time_bound (x : ZMod p) (c : ℝ) (hc : 0≤c) : 1-Real.exp (-c)≤collisionCDF p x (Nat.ceil (Real.sqrt (2*(p : ℝ)*c)))",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.fortyseven_two_step_control",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+      "statement": "theorem fortyseven_two_step_control : 1-Real.exp (-(1/44))≤collisionCDF 47 0 2",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.zero_confidence_control",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+      "statement": "theorem zero_confidence_control (x : ZMod p) : collisionCDF p x 0=1-Real.exp (-(0 : ℝ))",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.singleton_one_step_control",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+      "statement": "theorem singleton_one_step_control (x : ZMod 1) : collisionCDF 1 x 1=1",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.uniform_birthday_survival",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayLaw.lean",
+      "statement": "theorem uniform_birthday_survival (x : ZMod p) (n : ℕ) : iidSurvival (uniformWeight p) (resetUpdate p) x n= ((p-1).descFactorial n : ℝ)*(1/(p : ℝ))^n",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.uniform_birthday_cdf",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayLaw.lean",
+      "statement": "theorem uniform_birthday_cdf (x : ZMod p) (n : ℕ) : collisionCDF p x n=1-((p-1).descFactorial n : ℝ)*(1/(p : ℝ))^n",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.birthday_survival_nonnegative",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayLaw.lean",
+      "statement": "theorem birthday_survival_nonnegative (x : ZMod p) (n : ℕ) : 0 ≤ iidSurvival (uniformWeight p) (resetUpdate p) x n",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.birthday_survival_zero",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayLaw.lean",
+      "statement": "theorem birthday_survival_zero (x : ZMod p) (n : ℕ) (hn : p≤n) : iidSurvival (uniformWeight p) (resetUpdate p) x n=0",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.birthday_survival_recurrence",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayLaw.lean",
+      "statement": "theorem birthday_survival_recurrence (x : ZMod p) (n : ℕ) (hn : n+1≤p) : iidSurvival (uniformWeight p) (resetUpdate p) x (n+1)= (1-(n+1 : ℝ)/p)*iidSurvival (uniformWeight p) (resetUpdate p) x n",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.reset_word_succ",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayWords.lean",
+      "statement": "theorem reset_word_succ (x : ZMod p) {n : ℕ} (w : Fin n → ZMod p) (j : Fin n) : wordPath (resetUpdate p) x w j.succ.val=w j",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": "NeZero p",
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.reset_selfAvoiding_iff",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayWords.lean",
+      "statement": "theorem reset_selfAvoiding_iff (x : ZMod p) {n : ℕ} (w : Fin n → ZMod p) : SelfAvoiding (resetUpdate p) x w ↔ Function.Injective w ∧ ∀ j,w j≠x",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": "NeZero p",
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.complement_card",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayWords.lean",
+      "statement": "theorem complement_card (x : ZMod p) : Fintype.card {y : ZMod p // y≠x}=p-1",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.avoiding_words_card",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayWords.lean",
+      "statement": "theorem avoiding_words_card (x : ZMod p) (n : ℕ) : Fintype.card (avoidingWords p x n)=(p-1).descFactorial n",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.green_one",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+      "statement": "theorem green_one (x y : ZMod p) : green p 1 x y=(if x=y then 1 else 0)+1/(p : ℝ)",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.row_energy_one",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+      "statement": "theorem row_energy_one (x : ZMod p) : rowEnergy p 1 x=1+3/(p : ℝ)",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.green_one_symmetric",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+      "statement": "theorem green_one_symmetric (x y : ZMod p) : green p 1 x y=green p 1 y x",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.column_energy_one",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+      "statement": "theorem column_energy_one (x : ZMod p) : columnEnergy p 1 x=1+3/(p : ℝ)",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.row_maximum_one",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+      "statement": "theorem row_maximum_one : rowMaximum p 1=1+3/(p : ℝ)",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.column_maximum_one",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+      "statement": "theorem column_maximum_one : columnMaximum p 1=1+3/(p : ℝ)",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.uniform_mixing_one",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+      "statement": "theorem uniform_mixing_one (x y : ZMod p) : (1 : ℝ)/p≤(transitionMatrix p^1) x y ∧ (transitionMatrix p^1) x y≤(1 : ℝ)/p",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.source_bound_fortyseven",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/KMPTCounter.lean",
+      "statement": "theorem source_bound_fortyseven : sourceBound 47 1 1 1 (1/44)=1",
+      "section_variables": [],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.threshold_fortyseven",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/KMPTCounter.lean",
+      "statement": "theorem threshold_fortyseven : (1 : ℝ)/47<1-Real.exp (-(1/44))",
+      "section_variables": [],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.literal_uniform47_false",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/KMPTCounter.lean",
+      "statement": "theorem literal_uniform47_false : ¬LiteralUniform47Claim",
+      "section_variables": [],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.kmpt_literal_finite_counter",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/KMPTCounter.lean",
+      "statement": "theorem kmpt_literal_finite_counter : Nat.Prime 47 ∧ (∀ x : ZMod 47,(∑ y : ZMod 47,transitionMatrix 47 x y)=1) ∧ (∀ y : ZMod 47,(∑ x : ZMod 47,transitionMatrix 47 x y)=1) ∧ (∀ x y : ZMod 47,0<transitionMatrix 47 x y) ∧ (∀ x y : ZMod 47,∃ n : ℕ,0<n ∧ 0<(transitionMatrix 47^n) x y) ∧ (∀ x : ZMod 47,∀ d : ℕ,(∀ n : ℕ,0<n → 0<(transitionMatrix 47^n) x x → d∣n) → d=1) ∧ (∀ x y : ZMod 47,(1 : ℝ)/47≤(transitionMatrix 47^1) x y ∧ (transitionMatrix 47^1) x y≤(1 : ℝ)/47) ∧ rowMaximum 47 1=50/47 ∧ columnMaximum 47 1=50/47 ∧ sourceBound 47 1 1 1 (1/44)=1 ∧ collisionCDF 47 0 1=1/47 ∧ collisionCDF 47 0 1<1-Real.exp (-(1/44)) ∧ ¬LiteralUniform47Claim",
+      "section_variables": [],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.collision_by_one_iff",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/MarkovCollision.lean",
+      "statement": "theorem collision_by_one_iff (h : ZMod p → ZMod p) (x : ZMod p) : firstCollision p (staticStep (resetUpdate p) h) x≤1 ↔ h x=x",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.collision_cdf_one",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/MarkovCollision.lean",
+      "statement": "theorem collision_cdf_one (x : ZMod p) : collisionCDF p x 1=1/(p : ℝ)",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.collision_cdf_zero",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/MarkovCollision.lean",
+      "statement": "theorem collision_cdf_zero (x : ZMod p) : collisionCDF p x 0=0",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.collision_cdf_complement",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/MarkovCollision.lean",
+      "statement": "theorem collision_cdf_complement (x : ZMod p) (n : ℕ) : collisionCDF p x n=1-iidSurvival (uniformWeight p) (resetUpdate p) x n",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.modulus_positive",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem modulus_positive : (0 : ℝ)<p",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.uniform_weight_nonnegative",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem uniform_weight_nonnegative (x : ZMod p) : 0≤uniformWeight p x",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.uniform_weight_sum",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem uniform_weight_sum : (∑ x : ZMod p,uniformWeight p x)=1",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.transition_real_mass",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem transition_real_mass (x y : ZMod p) : (transitionLaw p x y).toReal=1/(p : ℝ)",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.transition_entry",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem transition_entry (x y : ZMod p) : transitionMatrix p x y=1/(p : ℝ)",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.transition_row_sum",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem transition_row_sum (x : ZMod p) : (∑ y : ZMod p,transitionMatrix p x y)=1",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.transition_column_sum",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem transition_column_sum (y : ZMod p) : (∑ x : ZMod p,transitionMatrix p x y)=1",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.transition_positive",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem transition_positive (x y : ZMod p) : 0<transitionMatrix p x y",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.uniform_stationary",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem uniform_stationary (y : ZMod p) : (∑ x : ZMod p,uniformWeight p x*transitionMatrix p x y)=uniformWeight p y",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.transition_idempotent",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem transition_idempotent : transitionMatrix p*transitionMatrix p=transitionMatrix p",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.transition_power_succ",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem transition_power_succ (n : ℕ) : transitionMatrix p^(n+1)=transitionMatrix p",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.actual_irreducible",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem actual_irreducible : ∀ x y : ZMod p,∃ n : ℕ,0<n ∧ 0<(transitionMatrix p^n) x y",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.actual_aperiodic",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem actual_aperiodic : ∀ x : ZMod p,∀ d : ℕ, (∀ n : ℕ,0<n → 0<(transitionMatrix p^n) x x → d∣n) → d=1",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovBirthdayRoundingAudit.word_real_mass",
+      "source": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+      "statement": "theorem word_real_mass (n : ℕ) (w : Fin n → ZMod p) : (wordLaw p n w).toReal=(1/(p : ℝ))^n",
+      "section_variables": [
+        "variable (p : ℕ) [NeZero p]"
+      ],
+      "omitted_section_variables": null,
+      "verification": "same-host Lean gate, signedunverified"
+    }
+  ],
+  "prior_review": {
+    "recorded_at": "2026-11-16T08:59:33.003141+00:00",
+    "kb_available": false,
+    "kb_calls": 12,
+    "all_kb_exits": 127,
+    "kb_receipt_labels": [
+      "status",
+      "mechanism",
+      "negative",
+      "application",
+      "adjacent",
+      "theorems",
+      "kb-birthday",
+      "kb-birthday-negative",
+      "kb-birthday-theorems",
+      "kb-rounding",
+      "kb-rounding-theorems",
+      "kb-uniform-birthday"
+    ],
+    "kb_exact_initial_script": "review_queries.sh retained",
+    "followup_scope": "Actual Markov birthday theorem, missing short-return hypotheses, exact finite rounding/block count and uniform iid birthday law",
+    "no_retrieval_or_absence_claim": true,
+    "conductor_initial_exit": 127,
+    "conductor_rounding_exit": 127,
+    "primary": {
+      "authors": [
+        "Kim",
+        "Montenegro",
+        "Peres",
+        "Tetali"
+      ],
+      "title": "A Birthday Paradox for Markov chains with an optimal bound for collision in the Pollard Rho algorithm for discrete logarithm",
+      "doi": "10.1214/09-AAP625",
+      "journal": "Annals of Applied Probability20(2),495–521(2010)",
+      "url": "https://arxiv.org/pdf/0712.0220",
+      "version": "arXiv0712.0220v2,27Sep2010,electronicreprint; pagination/typography differ from original",
+      "bytes": 300644,
+      "sha256": "67bd4313585101da1138a8e08bf3a3045b6347fe289d4bd076594b9d57f91b07",
+      "pdf_pages": 29,
+      "complete_bounded_text_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "partial_text_pages": [
+        9
+      ],
+      "complete_individual_visuals": [
+        6,
+        7,
+        8
+      ],
+      "full_paper_read": false,
+      "scope": "Actual Theorem3.2 Green quantities incl identity term and c>=0 finite bound; p8 integer-block proof substitution without displayed ceiling; no full general Markov second-moment proof formalized."
+    },
+    "access_failures": [
+      "Euclid download returned HTML despite curl0; PDF tools rejected, no source read from it",
+      "AMS Teske403/curl22; original Teske source unread"
+    ],
+    "metadata_checks": [
+      "Crossref exact title/DOI lookup",
+      "OpenAlex actual arXiv location",
+      "Crossref3-hit corrections query found two paper versions and unrelated entropy paper; no absence conclusion"
+    ],
+    "prior": [
+      "Fixed20 Sidon negative control already complete; not duplicated",
+      "Qualified Hildebrand random-support mixing already proved",
+      "Actual static-hash deferred decisions only until first repeat",
+      "Actual least-repeat definition and finite PMF machinery"
+    ],
+    "official": [
+      "Matrix powers/entries",
+      "Real.add_one_le_exp/exp_add",
+      "Finite embedding cardinality",
+      "Descending factorial recurrence",
+      "Nat.le_ceil/square root"
+    ],
+    "mathematical_scope": "Actual uniform-reset finite chain and its exact integer-time birthday law; literal all-c finite KMPT bound counter at actual47-state chain; no asymptotic Pollard/qualifiedaddingconstant refutation",
+    "preservation_entries": 6074,
+    "static_hash_dependency_pins": 36,
+    "all_checked_entries": 6110,
+    "frozen_plans": 47,
+    "packages": 13,
+    "copies": 0,
+    "hydration": 0,
+    "lake_update": false,
+    "novelty_claim": false,
+    "paid_compute": 0
+  },
+  "transparent_proposition_bundles": {
+    "source": "lean/BirthdayCertificate.lean",
+    "names": [
+      "ActualUniformChains",
+      "ActualGreenAtOne",
+      "ActualUniformBirthday",
+      "ActualFiniteCounterAndControls"
+    ],
+    "semantics": "Definitions expose actual quantified objects/laws/controls, not assumptions."
+  },
+  "individual_headers": "Supplemental full written-header source metadata; main frozen exporter unchanged and separately bound.",
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "schema": "markov-birthday-preflight/v1",
+    "build_snapshots": 9,
+    "failed_states": [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08"
+    ],
+    "successful_states": [
+      "09"
+    ],
+    "dependency_plans": 1,
+    "old_formal_files": 22,
+    "static_hash_dependency_pins": 36,
+    "published_preservation_entries": 6074,
+    "all_checked_entries": 6110,
+    "frozen_plans": 47,
+    "copied_modules": 0,
+    "hydrated_modules": 0,
+    "manifest_packages": 13,
+    "all6110pins_checked_every_state_and_gate": true,
+    "exact_source_roots_from01": true,
+    "all_failed_states_retained": true,
+    "known_source_methods_credited": true,
+    "actual_uniform_reset_PMF_and_matrix": true,
+    "actual_doubly_stochastic_and_stationary": true,
+    "actual_positive_reachability_and_period_one": true,
+    "actual_chronological_word_product_PMF": true,
+    "actual_Green_includes_identity": true,
+    "actual_Green_maxima_at_one": true,
+    "actual_T1_m_M_equal_one_mixing": true,
+    "actual_static_hash_first_repeat_and_iid_bridge": true,
+    "actual_first_step_collision_probability": true,
+    "literal_KMPT2010_finite_all_c_counter": true,
+    "upward_rounding_displayed_time_does_not_repair_witness": true,
+    "actual_uniform_selfavoiding_embedding_bijection": true,
+    "actual_exact_uniform_birthday_probability": true,
+    "actual_uniform_exponential_survival_bound": true,
+    "actual_integer_quadratic_time_condition": true,
+    "actual_uniform_ceiling_time_bound": true,
+    "actual_same_instance_two_step_control": true,
+    "actual_zero_and_singleton_controls": true,
+    "transparent_proposition_bundles_in_pinned_certificate": true,
+    "expanded_individual_law_headers_in_proof_map": true,
+    "general_Markov_second_moment_and_block_ceiling_repair": false,
+    "asymptotic_Pollard_square_root_order_refuted": false,
+    "qualified_large_partition_adding_constant_refuted": false,
+    "practical_hash_or_scalar_recovery_runtime": false,
+    "full14complete": false,
+    "novelty_claim": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 60,
+    "new_modules": 9,
+    "new_concrete_modules": 8,
+    "official_import_bridge_modules": 1,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "same_host_prover": true,
+    "signed_standing": "unverified",
+    "pinned_custom_source_modules": 19,
+    "actually_imported_custom_modules": 19,
+    "actually_imported_frozen_modules": 10
+  }
+}

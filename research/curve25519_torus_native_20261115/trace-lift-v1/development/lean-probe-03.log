@@ -1,0 +1,9 @@
+TraceDegree.lean:29:2: error: Type mismatch
+  Chebyshev.T_derivative_eq_U 213156431
+has type
+  derivative (Chebyshev.T F 213156431) = ↑213156431 * Chebyshev.U F (213156431 - 1)
+but is expected to have type
+  derivative (Chebyshev.T F 213156431) = 213156431 * Chebyshev.U F 213156430
+'Curve25519TraceDegree.actual_trace_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Curve25519TraceDegree.actual_lift_u_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Curve25519TraceDegree.actual_derivative_identity' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

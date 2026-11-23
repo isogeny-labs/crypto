@@ -1,0 +1,21 @@
+from pathlib import Path
+import hashlib,json
+p=Path(__file__).resolve().parent;old=p.parent/'feature-character-phase';rows=[]
+for f in sorted(old.glob('*.rs')):
+ if f.name=='driver.rs':continue
+ (p/f.name).write_bytes(f.read_bytes());rows.append({'source':f.name,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()})
+s=(old/'character-domain.rs').read_text();s=s[s.index('impl CharacterImage{'):].replace('CharacterImage','CertifiedCharacterImage')
+a=s.index('let mut ring=QuadRing::new');b=s.index('branches.push(branch);',a)
+s=s[:a]+'let ring=QuadRing::new(r,&g)?;let branch=CharacterBranch{epsilon,ring,canonical:CanonicalFiber::new(r,&g)?};'+s[b:]
+(p/'certified-initial.rs').write_text(s)
+s=(old/'character-image.rs').read_text().replace('CharacterImage','CertifiedCharacterImage')
+s=s.replace('branch.canonical.lift(&self.orientation,branch.epsilon,lift_cap,&mut branch.ring)?','certified_fiber_lift(&branch.canonical,lift_cap,&mut branch.ring)?')
+(p/'certified-image.rs').write_text(s)
+s=(old/'character-adapter.rs').read_text().replace('CharacterImage','CertifiedCharacterImage').replace('recover_character_image','recover_certified_character_image')
+(p/'certified-adapter.rs').write_text(s)
+s=(old/'character-checks.rs').read_text().replace('fn character_checks()','fn certified_checks()').replace('CharacterImage','CertifiedCharacterImage').replace('recover_character_image','recover_certified_character_image').replace('recover_split_negative_image','recover_character_image')
+s=s.replace('println!("character_factorizations=', 'certified_lift_checks();\n println!("character_factorizations=')
+(p/'certified-checks.rs').write_text(s)
+s=(old/'driver.rs').read_text();s=s[:s.index('fn main(){')]+''.join('include!("'+n+'");\n' for n in ['certified-lift.rs','certified-initial.rs','certified-image.rs','certified-adapter.rs','certified-checks.rs'])+'fn main(){if std::env::args().any(|x|x=="--inherited"){inherited_checks()}else{certified_checks()}}\n'
+(p/'driver.rs').write_text(s)
+(p/'generation.json').write_text(json.dumps({'source_commit':'84bdf57f7cb99ef35803970f3159a74542192920','copied':rows},indent=2)+'\n')

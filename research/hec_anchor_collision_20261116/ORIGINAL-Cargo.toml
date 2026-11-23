@@ -1,0 +1,10 @@
+[package]
+name="hec-anchor-collision"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="anchor-collision-gate"
+path="main.rs"

@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "FD-BINARY-CLOSURE-EXT-20261029",
-  "version": 1,
+  "version": 2,
   "created": "2026-10-29",
   "repository": "crypto",
   "study_dir": "research/fd_paper_data_request_20261029/protocols/fd-binary-closure-ext",
@@ -10,28 +10,41 @@
   ],
   "links": {
     "paper": "crypto:papers/ecdlp-index-calculus-treatise/sections/falldegree.tex (Tables 6.1-6.3, Theorems 6.10-6.11)",
-    "prior_data": "crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/ (93 m=2 instances, 12 chain instances, 13 checked certificates)",
-    "data_request": "research/fd_paper_data_request_20261029/DATA_REQUEST.md"
+    "prior_data": "crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/ (93 m=2 instances, 12 chain instances, 13 checked certificates); copied as inputs/instances_m2_recorded.json",
+    "instrument": "crypto:examples/fd_m2_degrees.rs (native Rust; replaces the draft's lfdclose2 because crypto forbids Python research tooling and the 120 GiB runner is a crypto runner)",
+    "runner": "crypto:.github/workflows/fd-paper-degrees.yml on crypto-eks-highmem; crypto:research/fd_paper_data_request_20261029/run.sh",
+    "pilot": "2026-10-30 local 4-vCPU container: native closure reproduced the recorded d_F on R11a, R13a, R15a, R19a, P17a, P21a, P21c, U33a (exact) and T33a (>=5, W_4 rank 48068 = recorded); D=4 at n=33 in 34-44 s; D=5 at n=21 (35443 columns) 117-137 s; planted controls never refuted to D=5",
+    "data_request": "research/fd_paper_data_request_20261029/DATA_REQUEST.md",
+    "v1_freeze": "protocol_sha256 d827594a6d5aff3404c49f6b252b361b9c23de260781619c10d738a52cbb8a31 at commit 5e8c0fbe (superseded by amendment A1 before any data)",
+    "export": "runs/<stage>/executions.jsonl -> experiment_protocol.py from-rows -> runs/<stage>/export.json; check-export --verify-files. Named cells (recorded instance names, R41, sat33, f4-P34, ...) sit outside the tool's numeric seed table and each arm covers its own instance set by design; those check-export findings are expected and reported, not suppressed."
   },
-  "question": "For the binary Weil descent of Semaev's S_3 (m=2, k=ceil(n/2)), (a) does the certified bound d_F >= 5 hold on every random-subspace instance and on Semaev's polynomial subspace from n=45 upward, for n up to 51; and (b) does the last fall degree reach 6 on any instance where W_5 is computable (n=33-37)?",
+  "question": "For the binary Weil descent of Semaev's S_3 (m=2, k=ceil(n/2)), measured by a second, independent closure implementation: (a) does d_F >= 5 hold on random-subspace instances at n=41-51 and on Semaev's polynomial subspace at n=47-51; and (b) does the last fall degree reach 6 on any of the 8 instances certified d_F >= 5 at n=33-37?",
   "claims": [
+    {
+      "id": "C0",
+      "class": "exact_computation",
+      "decided_by": [
+        "C-calib"
+      ],
+      "text": "On every recorded m=2 instance, the native closure gives the recorded last fall degree (exact, or >= 5 where the record says >= 5), and at D=4 the same closure rank as lfdclose2's W_4."
+    },
     {
       "id": "C1",
       "class": "exact_computation",
       "decided_by": [],
-      "text": "For each new instance with 1 not in W_4(F) by closure A, an independent certificate check (cert_check.py, own descent) accepts 1 not in W_4(F), so d_F >= 5 on that instance."
+      "text": "For each new instance, the native closure decides whether 1 lies in W_4 (d_F <= 4) or not (d_F >= 5, reported 'closure_only' until a checked certificate exists)."
     },
     {
       "id": "C2",
       "class": "exact_computation",
       "decided_by": [],
-      "text": "For each instance already certified d_F >= 5 at n=33-37 (T33a/b, R35a/b, U35a/b, R37a/b) the degree-5 closure decides 1 in W_5 (d_F = 5) or 1 not in W_5 (d_F >= 6, certified as in C1)."
+      "text": "For each instance already certified d_F >= 5 at n=33-37 (T33a/b, R35a/b, U35a/b, R37a/b) the degree-5 closure decides 1 in W_5 (d_F = 5) or 1 not in W_5 (d_F >= 6, closure_only until certified)."
     },
     {
       "id": "C3",
-      "class": "exact_computation",
+      "class": "out_of_scope",
       "decided_by": [],
-      "text": "The existing uncertified d_F >= 5 instances R39a, R39b, C21a, C21b receive checked certificates, or the record says which check failed."
+      "text": "Checked certificates (lfdclose2 + cert_check.py) for R39a/b, C21a/b and the new d_F >= 5 instances: a separate crypto-autoresearcher run, not this protocol."
     },
     {
       "id": "C4",
@@ -96,54 +109,54 @@
     {
       "id": "closureA",
       "role": "candidate",
-      "description": "lfdclose2 (M4RI dense echelon, degree-descending colex order) computes W_D for D=4 (n=37-51) and D=5 (n=33-37); writes the quotient map as a certificate when 1 is not in W_D.",
+      "description": "fd_m2_degrees --closure: builds the m=2 descent (build_decomposition_system, b = a6, x_R = z) and the full MutantXL closure at each D (= W_D); D=3..4 on new draws, D=5 on the 8 named instances.",
       "instrument": {
-        "repo": "crypto-autoresearcher",
+        "repo": "crypto",
         "commit": null,
         "build": [
           [
-            "gcc",
-            "-O3",
-            "-march=native",
-            "-fopenmp",
-            "-o",
-            "lfdclose2",
-            "analysis/semaev-m2-last-fall-degree/code/lfdclose2.c",
-            "-lm4ri",
-            "-lm"
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "fd_m2_degrees"
           ]
         ],
         "binary_sha256": null,
         "flags": {
-          "M4RI": "20200125"
+          "closure": "ReducedBasis::from_system_closed_full (full MutantXL at fixed degree = W_D)"
         },
         "env": {
-          "OMP_NUM_THREADS": "8"
+          "F4_F2_MAX_ROWS": "2000000000",
+          "F4_F2_MAX_COLS": "2000000000"
         },
-        "threads": 8
+        "threads": 16
       },
       "parameters": {
         "D": [
+          3,
           4,
           5
         ]
       }
     },
     {
-      "id": "certcheck",
+      "id": "lfdclose2-record",
       "role": "reference",
-      "description": "cert_check.py rebuilds the equations from the curve parameters with its own descent and checks the certificate (Proposition 1.5); independent of closureA's code path.",
+      "description": "lfdclose2's recorded outcomes for the 93 recorded instances (independent C/M4RI implementation, different monomial order and descent code): last fall degree and W_4 closure dimension.",
       "instrument": {
         "repo": "crypto-autoresearcher",
         "commit": null,
         "build": [
           [
-            "python3",
-            "analysis/semaev-m2-last-fall-degree/verify/cert_check.py"
+            "none: recorded values"
           ]
         ],
         "binary_sha256": null,
-        "flags": {},
+        "flags": {
+          "source": "analysis/semaev-m2-last-fall-degree/results/instances.json @ 4d3b9a29 (sha256 efc6e0d4...47a5), produced by lfdclose2.c + M4RI 20200125"
+        },
         "env": {
           "OMP_NUM_THREADS": "1"
         },
@@ -154,29 +167,28 @@
     {
       "id": "closureA-aa",
       "role": "control_aa",
-      "description": "closureA rerun on a 10% subset with OMP_NUM_THREADS=4 instead of 8: W_D dimensions must be identical (determinism floor).",
+      "description": "closureA rerun on R21a, R25a, R29a, R33a with RAYON_NUM_THREADS=4: closure ranks must be identical (determinism floor).",
       "instrument": {
-        "repo": "crypto-autoresearcher",
+        "repo": "crypto",
         "commit": null,
         "build": [
           [
-            "gcc",
-            "-O3",
-            "-march=native",
-            "-fopenmp",
-            "-o",
-            "lfdclose2",
-            "analysis/semaev-m2-last-fall-degree/code/lfdclose2.c",
-            "-lm4ri",
-            "-lm"
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "fd_m2_degrees"
           ]
         ],
         "binary_sha256": null,
         "flags": {
-          "M4RI": "20200125"
+          "closure": "ReducedBasis::from_system_closed_full (full MutantXL at fixed degree = W_D)"
         },
         "env": {
-          "OMP_NUM_THREADS": "4"
+          "RAYON_NUM_THREADS": "4",
+          "F4_F2_MAX_ROWS": "2000000000",
+          "F4_F2_MAX_COLS": "2000000000"
         },
         "threads": 4
       },
@@ -190,31 +202,29 @@
     {
       "id": "pos-known-refuting",
       "role": "control_positive",
-      "description": "Instances with recorded 1 in W_4 (P35a, P41a, S40a, U33a): closureA must report 1 in W_4 again.",
+      "description": "Every recorded instance with 1 in W_3 or W_4 (the calibrate stage): closureA must refute at the recorded degree.",
       "instrument": {
-        "repo": "crypto-autoresearcher",
+        "repo": "crypto",
         "commit": null,
         "build": [
           [
-            "gcc",
-            "-O3",
-            "-march=native",
-            "-fopenmp",
-            "-o",
-            "lfdclose2",
-            "analysis/semaev-m2-last-fall-degree/code/lfdclose2.c",
-            "-lm4ri",
-            "-lm"
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "fd_m2_degrees"
           ]
         ],
         "binary_sha256": null,
         "flags": {
-          "M4RI": "20200125"
+          "closure": "ReducedBasis::from_system_closed_full (full MutantXL at fixed degree = W_D)"
         },
         "env": {
-          "OMP_NUM_THREADS": "8"
+          "F4_F2_MAX_ROWS": "2000000000",
+          "F4_F2_MAX_COLS": "2000000000"
         },
-        "threads": 8
+        "threads": 16
       },
       "parameters": {
         "D": [
@@ -226,31 +236,29 @@
     {
       "id": "neg-satisfiable",
       "role": "control_negative",
-      "description": "Satisfiable instances (Boolean solutions planted by drawing the target as a sum of two base points), one per n: 1 can never lie in W_D, so a refutation here is an instrument fault.",
+      "description": "Planted satisfiable instances (fd_m2_degrees --planted: z a root of S_3(a, c, z) for a, c in V), one per n=33-51: 1 can never lie in W_D, so a refutation here is an instrument fault.",
       "instrument": {
-        "repo": "crypto-autoresearcher",
+        "repo": "crypto",
         "commit": null,
         "build": [
           [
-            "gcc",
-            "-O3",
-            "-march=native",
-            "-fopenmp",
-            "-o",
-            "lfdclose2",
-            "analysis/semaev-m2-last-fall-degree/code/lfdclose2.c",
-            "-lm4ri",
-            "-lm"
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "fd_m2_degrees"
           ]
         ],
         "binary_sha256": null,
         "flags": {
-          "M4RI": "20200125"
+          "closure": "ReducedBasis::from_system_closed_full (full MutantXL at fixed degree = W_D)"
         },
         "env": {
-          "OMP_NUM_THREADS": "8"
+          "F4_F2_MAX_ROWS": "2000000000",
+          "F4_F2_MAX_COLS": "2000000000"
         },
-        "threads": 8
+        "threads": 16
       },
       "parameters": {
         "D": [
@@ -269,7 +277,7 @@
     "positive": {
       "present": true,
       "arm": "pos-known-refuting",
-      "expected_detection": "1 in W_4 on all 4 instances, with W_4 dimensions equal to the recorded ones",
+      "expected_detection": "refutation at the recorded degree on every recorded instance with an exact d_F",
       "not_applicable_reason": null
     },
     "negative": {
@@ -277,7 +285,7 @@
       "arm": "neg-satisfiable",
       "null_population": {
         "description": "satisfiable descent systems: 1 never lies in W_D because a Boolean solution exists",
-        "generator": "gen2.py with the target drawn as P1+P2, P_i in the factor base (planted decomposition)",
+        "generator": "fd_m2_degrees --draw n:R:1 --planted",
         "n": 10,
         "why_n": "one per n in 33-51: any single refutation is an instrument fault, so one per size suffices",
         "matched_on": [
@@ -329,7 +337,7 @@
       {
         "name": "curve_and_target",
         "treatment": "randomized",
-        "how": "drawn by gen2.py from seeds derived from the protocol hash (protocol_hash_sha256), independent of arm"
+        "how": "fd_m2_degrees --draw: b uniform nonzero, a2 a random bit, z uniform with x(P)=z for a point of y^2+xy=x^3+a2x^2+b; seed per cell from the protocol hash (seeds.tsv); a draw with Boolean solutions is reported and replaced"
       },
       {
         "name": "subspace_basis",
@@ -343,15 +351,20 @@
         "how": "z on the curve, as in instances.json families P and R"
       },
       {
+        "name": "field_modulus",
+        "treatment": "fixed",
+        "how": "draws: find_irreducible_sparse(n); recorded instances: their own modulus_hex"
+      },
+      {
         "name": "binary",
         "treatment": "fixed",
-        "how": "one lfdclose2 build, sha256 recorded per row; M4RI 20200125"
+        "how": "one fd_m2_degrees release build from the frozen commit, sha256 in host.txt"
       },
       {
         "name": "threads",
         "treatment": "fixed",
-        "value": 8,
-        "how": "OMP_NUM_THREADS=8 except the A/A arm"
+        "value": 16,
+        "how": "rayon default on the 16-CPU runner, except the A/A arm (4)"
       },
       {
         "name": "host",
@@ -361,12 +374,12 @@
       {
         "name": "implementation",
         "treatment": "crossed",
-        "how": "closureA (C, M4RI, colex order) and certcheck (Python integers, own descent) both run on every certified instance"
+        "how": "native Rust closure against lfdclose2's recorded outcomes on every recorded instance"
       },
       {
         "name": "spot_preemption",
         "treatment": "measured",
-        "how": "attempts recorded; an interrupted closure is rerun from scratch"
+        "how": "finished instances are pushed to the results branch every 10 min; a re-dispatch skips them and reruns interrupted instances from scratch (no cross-pod checkpoint)"
       }
     ],
     "comparisons": [
@@ -382,16 +395,16 @@
         "design": "aa"
       },
       {
-        "id": "C-check",
+        "id": "C-calib",
         "arms": [
           "closureA",
-          "certcheck"
+          "lfdclose2-record"
         ],
         "differs_in": [
           "implementation"
         ],
         "design": "absolute",
-        "threshold": "certcheck accepts closureA's certificate (exact agreement on 1 not in W_D)"
+        "threshold": "exact agreement on every recorded instance (last fall degree, and W_4 rank where recorded)"
       }
     ],
     "aa_not_applicable": null,
@@ -404,10 +417,10 @@
       "method": "protocol_hash_sha256",
       "seeds": [],
       "nonce": null,
-      "note": "curve, target and subspace seeds per (n, family, index) from `experiment_protocol.py seeds --all` after freeze"
+      "note": "one seed per cell: first 8 bytes of sha256(protocol_sha256 \\n closureA \\n <cell id> \\n 0), cell ids R41..R51, P37..P51, sat33..sat51; written to seeds.tsv right after freeze; the driver derives draws from (seed, n, family, planted)"
     },
     "instance_sampling": {
-      "rule": "per cell: R 3 instances at n=41,43,45,47,49,51; P 2 instances at n=37,39,47,49,51; existing named instances for C2 and C3; an instance whose target decomposes (Boolean solution exists) is moved to the negative-control set and redrawn, and the redraw is reported",
+      "rule": "per cell: R 3 instances at n=41,43,45,47,49,51; P 2 instances at n=37,39,47,49,51; the 8 named instances for C2; all recorded instances for C0; a draw with a Boolean solution is reported (kind satisfiable) and replaced by the next draw",
       "independent_of_arm": true
     },
     "blinding": {
@@ -417,7 +430,7 @@
     }
   },
   "sample_size": {
-    "instances": 36,
+    "instances": 141,
     "replicates": 1,
     "warmups": 0,
     "power": {
@@ -428,14 +441,14 @@
       "rank_test_n": null,
       "min_attainable_two_sided_p": null,
       "passes": true,
-      "note": "every claim is an exact per-instance computation; C4's intervals are descriptive (3 instances per R cell give a Clopper-Pearson lower bound of 0.29 at 3/3)"
+      "note": "every claim is an exact per-instance computation (93 recorded + 28 drawn + 10 planted + 8 at D=5 + 4 A/A reruns, minus overlap); C4's intervals are descriptive (3 instances per R cell give a Clopper-Pearson lower bound of 0.29 at 3/3)"
     },
     "preflight_runtime": {
-      "fixed_seconds": 60,
-      "per_sample_seconds": 3600,
-      "threads": 8,
-      "estimated_total_seconds": 360000,
-      "measured_on": "recorded closures: D=4 at n=45 took 1850.7 s (P45a) and ~6000 s with certificate output; D=5 at n=35 is estimated from column count (about 0.38M columns, ~18 GB dense), not measured"
+      "fixed_seconds": 600,
+      "per_sample_seconds": 1800,
+      "threads": 16,
+      "estimated_total_seconds": 250000,
+      "measured_on": "pilot 2026-10-30 (4 vCPU): D=4 at n=33 (52,956 columns) 34-44 s; growth ~columns^1.9 from n=21; D=5 at n=21 (35,443 columns) 117-137 s. Extrapolated, not measured: D=4 at n=51 (~272k columns) about 1 h; D=5 at n=33-37 (284k-510k columns) several hours each on 16 CPUs"
     }
   },
   "metrics": {
@@ -445,18 +458,18 @@
         "name": "last fall degree",
         "unit": "degree",
         "kind": "exact",
-        "definition": "least D with 1 in W_D(F); reported as '>= D+1' when 1 not in W_D and the certificate checks",
-        "source": "closure row W_one per D",
+        "definition": "least D with 1 in W_D(F); reported as '>= D+1' when 1 not in W_D at the highest built D",
+        "source": "closure.last_fall_degree",
         "aggregation": "per_row",
         "resolution": "1",
         "uncertainty": "none_exact"
       },
       {
         "id": "codim_W",
-        "name": "certified codimension",
+        "name": "codimension of W_D",
         "unit": "dimension",
         "kind": "exact",
-        "definition": "cert_check.py's lower bound on codim W_D(F)",
+        "definition": "columns minus closure rank of W_D",
         "source": "certcheck output",
         "aggregation": "per_row",
         "resolution": "1",
@@ -467,7 +480,7 @@
         "name": "share of instances with d_F >= 5",
         "unit": "fraction",
         "kind": "rate",
-        "definition": "instances with checked 1 not in W_4 over admissible instances in the cell",
+        "definition": "instances with 1 not in W_4 (native closure) over admissible instances in the cell",
         "source": "per-row dF",
         "aggregation": "per_row",
         "resolution": "1 instance",
@@ -527,9 +540,10 @@
     "order": "sequential",
     "clock": "monotonic",
     "counters": [
-      "W_dims",
-      "ncols",
-      "iters"
+      "closure_rank",
+      "columns",
+      "closure_products",
+      "closure_word_ops"
     ],
     "record": [
       "cpu_model",
@@ -542,11 +556,11 @@
     "timed_primary_justification": null
   },
   "execution": {
-    "backend": "isolab-k8s",
-    "queue": "isolab-eks spot (throughput pool)",
+    "backend": "ephemeral",
+    "queue": "GitHub Actions ARC runner crypto-eks-highmem (Karpenter Spot on EKS, 16 CPU, 120 GiB pod), workflow fd-paper-degrees.yml",
     "placement": {
-      "instance_type": "memory-optimised, 64-128 GiB for D=5",
-      "cpus": 8,
+      "instance_type": "Karpenter-chosen x86 Spot node",
+      "cpus": 16,
       "spot": true
     },
     "measurement_class": "search",
@@ -584,22 +598,22 @@
     }
   ],
   "invalidation_rules": [
-    "a d_F >= D+1 row without an accepted certificate is reported as 'closure A only' and does not enter C1 or C2",
-    "an A/A mismatch in any W_D dimension invalidates every row from that binary",
+    "every d_F >= D+1 row is 'closure_only' until C3's certificate exists; the paper states which",
+    "an A/A mismatch in any closure rank, or any C-calib disagreement, invalidates every new row from that binary",
     "wall times are descriptive only (no isolation)"
   ],
   "decision_rule": {
-    "text": "C1/C3: per instance, certified when certcheck accepts. C2: d_F = 5 if 1 in W_5, d_F >= 6 if 1 not in W_5 and the degree-5 certificate checks. P1 holds if every admissible R instance at n=41-51 is certified >= 5; P2 holds if any named instance is certified >= 6.",
+    "text": "C0 must hold before any new row is read. C1: per instance, d_F <= 4 if 1 in W_4, else >= 5 (closure_only). C2: d_F = 5 if 1 in W_5, >= 6 (closure_only) if not. P1 holds if every admissible R instance at n=41-51 has 1 not in W_4; P2 holds if any named instance has 1 not in W_5.",
     "comparison_ids": [
-      "C-check"
+      "C-calib"
     ],
-    "threshold": "certificate accepted",
+    "threshold": "exact agreement with the record (C0)",
     "statistic": "per-instance membership of 1 in W_D",
     "interval": "Clopper-Pearson 95% for cell fractions (descriptive)",
     "multiple_comparison_correction": "none",
     "effect_size_measure": "d_F per instance and certified codimension",
     "verdict_vocabulary": [
-      "certified",
+      "exact",
       "closure_only",
       "censored",
       "refuted_at_D",
@@ -608,16 +622,18 @@
   },
   "analysis_plan": {
     "script": {
-      "path": "crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/code/mktable.py",
-      "sha256": null
+      "path": "crypto:examples/fd_m2_analyze.rs",
+      "sha256": "36503114f56b273db8af83866cae2edbe3e983bc8d9745df798994f20d9a0d38"
     },
     "inputs": [
-      "instances_ext.json",
-      "certificates_ext.txt"
+      "runs/calibrate/*.jsonl",
+      "runs/closure-d4/*.jsonl",
+      "runs/closure-d5/*.jsonl",
+      "runs/<stage>/executions.jsonl (one row per execution attempt)"
     ],
     "outputs": [
-      "crypto:papers/ecdlp-index-calculus-treatise/figures/data-falldegree-instances.json (new rows)",
-      "Table 6.1 regenerated by make_tab_fall_degrees.py"
+      "fd_m2_analyze <study dir> > analysis.json (c0, aa, negative, closure_d4, closure_d5, p1, p2, f4)",
+      "Tables 6.1-6.3 regenerated from analysis.json by papers/ecdlp-index-calculus-treatise/figures/make_tab_fall_degrees.py (layout only)"
     ],
     "blinded": false,
     "frozen_before_data": true
@@ -633,7 +649,8 @@
   },
   "inadmissible": [
     "redrawing an instance because its d_F is inconvenient (only decomposable targets are redrawn, and every redraw is reported)",
-    "calling d_F >= 6 without an accepted degree-5 certificate",
+    "calling a closure_only bound 'certified'",
+    "reading any new row before C0 passes",
     "reading the cell fractions as a growth law in n"
   ],
   "literature": [
@@ -656,12 +673,30 @@
       "verified_by": "treatise Ch. 6 re-verification of T33a, 2026-10-29"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "Code review of the frozen analysis (PR #2902, Codex findings) before any run: the admission gate checked only C0, replaced satisfiable draws could enter P1, P1/P2 could be decided on a partial panel, and no execution rows existed for the unified export.",
+      "changes": [
+        "analysis_plan.script.sha256: fd_m2_analyze.rs revised; every substantive verdict now requires C0 pass, the A/A reruns present and agreeing, and no refuted planted control (instrument.admitted); the F4 comparison requires C0 and C1",
+        "replaced (satisfiable) draws are diagnostics only and enter no verdict",
+        "P1 holds only on all 18 planned R instances (one exact d_F <= 4 refutes it); P2 fails only when all 8 panel instances are exactly 5; otherwise undecided",
+        "run.sh writes runs/<stage>/executions.jsonl (status succeeded/failed/interrupted, wall seconds, exit code) and continues past a failed instance; the export is built from it with from-rows"
+      ],
+      "supersedes_fields": [
+        "analysis_plan.script.sha256",
+        "version",
+        "freeze"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "46ee6eebd57260be0e70b027a269eb0a5beadf8342e79c21091cca6fc026a9fa",
+    "commit": "c58d38506131b50c410d16e7b4aeba0f4eaedf36",
+    "frozen_at": "2026-10-30T01:42:51Z",
+    "filed_before_affected_data": true
   }
 }

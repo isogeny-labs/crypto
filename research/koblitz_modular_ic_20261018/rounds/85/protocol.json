@@ -1,0 +1,98 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R85-DIAMOND-BASE-OVERLAP",
+  "version": 1,
+  "goal": "certify the quadratic-base diamond overlap products before transporting the rank-32 RR chart",
+  "claims": [
+    {
+      "id": "base_overlap85",
+      "class": "exact_computation",
+      "statement": "principal-open identities and transformed quadratic equation hold with full polynomial lift and corruption rejection"
+    },
+    {
+      "id": "lean_overlap85",
+      "class": "theorem",
+      "statement": "three characteristic-two polynomial overlap identities compile and pass axiom audit"
+    }
+  ],
+  "arms": {
+    "reference": "R50 accepted inverse-base source equation and R27 diamond formulas",
+    "candidate": "base overlap products and Lean identities",
+    "positive": [
+      "two principal-open products",
+      "transformed source-equation lift",
+      "Lean compile and audit"
+    ],
+    "negative": [
+      "corrupted transformed numerator rejected"
+    ],
+    "baseline": {
+      "not_applicable_reason": "exact symbolic geometry"
+    },
+    "A_A": {
+      "not_applicable_reason": "deterministic polynomial identities"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "F2 quadratic source equation",
+      "frozen z,V functions",
+      "one native thread",
+      "1200 seconds",
+      "4 GiB virtual",
+      "pinned Lean/mathlib"
+    ],
+    "measured": [
+      "full polynomial products",
+      "lift identity",
+      "native exit/errors",
+      "Lean compile/audit"
+    ],
+    "statistical": "not applicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "complete symbolic identities",
+    "seeds": [
+      85
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exact algebra"
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "not applicable"
+  },
+  "metrics": [
+    "two open products",
+    "one transformed-equation lift",
+    "one corruption rejection",
+    "three audited Lean theorems"
+  ],
+  "execution": {
+    "launchers": [
+      "REPLAY_CAS.sh diamond-base85-01 DIAMOND85.sing DIAMOND85_ALL_CHECKS_PASS",
+      "REPLAY_LEAN.sh diamond-lean85-01"
+    ],
+    "backend": "authorized local Singular and pinned Lean",
+    "timeout_seconds_per_program": 1200,
+    "virtual_KiB_native": 4194304,
+    "threads": 1,
+    "seed": 85,
+    "queue": "serial math jobs",
+    "source_gate": "frozen Git bytes and donors",
+    "checkpoint": "existing checkpoint gate; immutable raw copies"
+  },
+  "stopping": {
+    "accept": "native exit0, marker, zero ? errors, full assertions; Lean compile/audit exit0 and zero bad/trusted",
+    "failure": "retain raw; freeze repair before fresh ID"
+  },
+  "analysis": {
+    "method": "exact polynomial ideal membership and Lean kernel proof",
+    "scope": "quadratic base overlap only; not transported 32-generator upper-field map"
+  }
+}

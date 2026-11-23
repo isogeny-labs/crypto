@@ -1,0 +1,27 @@
+ops (ok): rho-neg-aa / rho-neg = 1.0000 [1.000, 1.000] (linearised_t, df 15) over 96 pairs on 16 workloads, 2 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: admitted ns/GAE rho-neg-aa/rho-neg 0.9994 [0.998, 1.001], an A/A control (nothing to correct); end-to-end wall 0.9994 [0.998, 1.001]; ns/GAE of rho-neg, rho-neg-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 82 / 100; paired attempts 96, verified 96, admitted 88; levels {"L1": 8, "L2": 88}; p95 foreign busy 2.13%, p95 run queue 0.00%
+arm rho-neg: verified 96/96 (0 censored); max/median S 2.64, top run 3% of total; unpriced: canonicalisations_uncharged=501303561
+arm rho-neg-aa: verified 96/96 (0 censored); max/median S 2.64, top run 3% of total; unpriced: canonicalisations_uncharged=501303561
+| curve | log2 r | workloads | rho-neg-aa / rho-neg | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp45-t1999407-5563cb34 | 44.53 | 8 | 1.0000 | [1.0000, 1.0000] | linearised_t |
+| icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 8 | 1.0000 | [1.0000, 1.0000] | linearised_t |
+
+| workload | curve | log2 r | rho-neg mean S | rho-neg-aa mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W0d2c00abb95d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.1065 | 1.1065 | 1.0000 |
+| W0fa9016fa3f7 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9634 | 0.9634 | 1.0000 |
+| W169d90cd868d | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0307 | 1.0307 | 1.0000 |
+| W1e29ef415f95 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9757 | 0.9757 | 1.0000 |
+| W3cab34347f85 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8629 | 0.8629 | 1.0000 |
+| W3cd27cb0c06d | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 0.9118 | 0.9118 | 1.0000 |
+| W3f78f987c9f4 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0321 | 1.0321 | 1.0000 |
+| W63628ee63ffa | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.2482 | 1.2482 | 1.0000 |
+| W6a0059227f05 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7040 | 0.7040 | 1.0000 |
+| W796ad5849cba | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.7684 | 0.7684 | 1.0000 |
+| W87733569973b | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.8558 | 0.8558 | 1.0000 |
+| Wa80f4deedf79 | icv1-fp45-t1999407-5563cb34 | 44.53 | 0.9821 | 0.9821 | 1.0000 |
+| Wb59dacf10eed | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3080 | 1.3080 | 1.0000 |
+| Wd221f9b3144c | icv1-fp45-t1999407-5563cb34 | 44.53 | 1.0608 | 1.0608 | 1.0000 |
+| Wedb865d8e94f | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.3158 | 1.3158 | 1.0000 |
+| Wff15cc4a7aa5 | icv1-fp45-tm6458695-fe3d5bd2 | 44.65 | 1.0822 | 1.0822 | 1.0000 |

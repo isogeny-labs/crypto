@@ -1,0 +1,80 @@
+{
+  "schema": "software.validation.recipe/v1",
+  "status": "prospective_unreleased",
+  "total_maximum_seconds": 1200,
+  "phases": [
+    {
+      "name": "prehash",
+      "seconds": 300,
+      "work_seconds": 290
+    },
+    {
+      "name": "controls_readback",
+      "seconds": 600,
+      "work_seconds": 570
+    },
+    {
+      "name": "posthash",
+      "seconds": 300,
+      "work_seconds": 290
+    }
+  ],
+  "source_hashes": {
+    "compiler-phase7.py": "464f8fe6e2e66268841757c039c224ee5a6b1e060e3eff6f136aa167dc3ee8e4",
+    "custody-phase7.py": "01fe2d77ccb2494852803e51b53e979f66a78693017ed07b7e541e917b23fff6",
+    "runtime-pins.json": "5e3bb64e91e80b500b5f34fb0cca602c07d44b8163d3d4a3c440e29eab53cf86",
+    "Nonbranch.lean.txt": "ef72bcbfc9ea3643ae126dfeba644c2a34a999cb34254f8b17357ddd31d6f9e1",
+    "Controls.lean.txt": "7f7a1f6dbca8845a10fa1f745b9cc03b550be5421da20ded9e1a56af0b1fa95a",
+    "original-controls.lean.txt": "b8a1dffe67a2377306dbcc373bc55e4d5c841a697c043f13ed71689cdbc51f6f",
+    "Readback.lean.txt": "6f6d2415a1a69e5a70cb4605b1589119f5d45bf029c97f1d825d8bd487c44790",
+    "ExpectedFailure.lean.txt": "f933bec409a10d64325fd75505b09446f58b4cd8dcbec57cfffa29fa304de7b1",
+    "names.json": "4315d8452a280ea5641a01ccd6648be4cac779754e8c96fc34762f8a320314c2"
+  },
+  "source_theorems": 10,
+  "controls": 4,
+  "named_readbacks": 14,
+  "compiler_invocations_maximum": 2,
+  "expected_false_invocation_included": true,
+  "attempts": 1,
+  "compiler_AS_bytes": 8589934592,
+  "lean_heap_MiB": 3500,
+  "threads": 1,
+  "internal_stack_KiB": 16384,
+  "OS_stack_MiB": 10,
+  "output_aggregate_bytes": 268435456,
+  "output_per_file_bytes": 16777216,
+  "startup_free_bytes": 1073741824,
+  "sample_ceiling": 600,
+  "posthash_even_if_compiler_fails": true,
+  "cleanup_wait_max_seconds": 10,
+  "external_each": {
+    "pre_post": [
+      "timeout",
+      "--signal=TERM",
+      "--kill-after=5s",
+      "295s"
+    ],
+    "controls": [
+      "timeout",
+      "--signal=TERM",
+      "--kill-after=5s",
+      "595s"
+    ]
+  },
+  "prior_failure_preserved": true,
+  "retained_olean": {
+    "path": "/var/tmp/nonbranch-norm-lean-00mcyk4d/Nonbranch.olean",
+    "sha256": "4b89d346bbca43df7a9d199069637a8da2b78effea0cef8c18f436578ec2b240",
+    "bytes": 416112,
+    "source_sha256": "ef72bcbfc9ea3643ae126dfeba644c2a34a999cb34254f8b17357ddd31d6f9e1",
+    "native_receipt_sha256": "6e06312604d6afd4194b39962c78dcbc4ec170aa856143418e0cb9e1a93ad8ea",
+    "module_exit": 0
+  },
+  "prior_full_custody": {
+    "path": "/var/tmp/nonbranch-custody-post-n0xceh6z/hashes.json",
+    "sha256": "a77aa5f69a670f50860ea75a74d62f06caf42a35907e5353595933ce22679b3b",
+    "files": 16736,
+    "bytes": 3111892318,
+    "source": "successful theorem compile phase4 full post-custody"
+  }
+}

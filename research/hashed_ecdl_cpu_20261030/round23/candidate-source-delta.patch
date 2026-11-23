@@ -1,0 +1,52 @@
+diff --git a/crates/hashed-ecdl-cpu/src/lib.rs b/crates/hashed-ecdl-cpu/src/lib.rs
+index 195cf717dad0..5d36193ca097 100644
+--- a/crates/hashed-ecdl-cpu/src/lib.rs
++++ b/crates/hashed-ecdl-cpu/src/lib.rs
+@@ -44,0 +45,3 @@ struct Suffix {
++    // A set bit only admits the exact lookup; it never establishes membership.
++    // Low compressed-point bits avoid computing the full hash on clear misses.
++    occupied: Vec<u64>,
+@@ -52,0 +56 @@ impl Suffix {
++                occupied: vec![],
+@@ -66,0 +71,6 @@ impl Suffix {
++        let words = size.div_ceil(64);
++        let mut occupied = Vec::new();
++        occupied
++            .try_reserve_exact(words)
++            .map_err(|_| Error::Limit("CPU suffix filter allocation"))?;
++        occupied.resize(words, 0);
+@@ -68,0 +79 @@ impl Suffix {
++            occupied,
+@@ -74,0 +86,2 @@ impl Suffix {
++            let bit = (key as usize) & (size - 1);
++            out.occupied[bit / 64] |= 1u64 << (bit % 64);
+@@ -96,0 +110,4 @@ impl Suffix {
++        let bit = (key as usize) & mask;
++        if self.occupied[bit / 64] & (1u64 << (bit % 64)) == 0 {
++            return None;
++        }
+@@ -193 +210,2 @@ impl CachedMitm {
+-                + suffix.slots.capacity() * std::mem::size_of::<(u64, usize)>(),
++                + suffix.slots.capacity() * std::mem::size_of::<(u64, usize)>()
++                + suffix.occupied.capacity() * std::mem::size_of::<u64>(),
+@@ -475,0 +494,20 @@ mod tests {
++    fn suffix_filter_collisions_never_accept_absent_points() {
++        let (c, p) = fixture();
++        let points: Vec<_> = (0..199).map(|k| c.mul(p, k).unwrap()).collect();
++        // Exercise short bitmaps, word boundaries, duplicate first witnesses,
++        // identity, and saturation (every lookup passes the filter).
++        for size in [1, 2, 31, 32, 33, 63, 64, 65, 150] {
++            let mut input = points[..size].to_vec();
++            input.extend_from_slice(&points[..size]);
++            let mut index = Suffix::new(input.clone()).unwrap();
++            for &point in &points {
++                assert_eq!(index.find(point), input.iter().position(|&x| x == point));
++            }
++            index.occupied.fill(u64::MAX);
++            for &point in &points {
++                assert_eq!(index.find(point), input.iter().position(|&x| x == point));
++            }
++        }
++    }
++
++    #[test]

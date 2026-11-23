@@ -1,0 +1,15 @@
+DEVELOPMENT CHECK ON REDUCED SPECS - NOT DATA
+XP-20261106-tm1514-recheck analysis (tm1514.analysis/v1), result.json sha256 df60692e0d6d53244294f24c6f40e0afed1549eb7786c2f1924da3bb47fed052
+C0: holds
+C1 w=0.0: D -0.0384 [-0.1338, 0.0594] (98.33%), A/A half-width 0.1228: within the sibling ratio (draw not excluded); non-overlap: within the sibling ratio (draw not excluded)
+C1 w=0.1: D -0.0413 [-0.1376, 0.0577] (98.33%), A/A half-width 0.1238: within the sibling ratio (draw not excluded); non-overlap: within the sibling ratio (draw not excluded)
+C1 w=1.0: D -0.0630 [-0.1718, 0.0489] (98.33%), A/A half-width 0.1293: within the sibling ratio (draw not excluded); non-overlap: within the sibling ratio (draw not excluded)
+C1b: R_tm1514(0) 1.7663 [1.6468, 1.8922] (95%): the earlier 1.52 was a draw
+C2: pooled plain/neg 1.2677 [1.2106, 1.3274] (95%), per-curve all > 1.1: true
+C3: w_canon 0.1431 [0.0964, 0.2092]: measured price below 0.5; w_lookup 0.6638 [0.6257, 0.7070]: measured price not resolved below 0.5; w_insert 0.9977 [0.9231, 1.0917] (reported, not in the band)
+C4: R_tm1514 own prices 1.7335 [1.5925, 1.8850], max price 1.2240 [1.1285, 1.3234]: the w = 1 flip does not survive measured pricing
+  icv1-fp24-tm1514-dce9313c R(0) 1.7663 R(0.1) 1.6465 R(1) 1.0797 plain/neg 1.2548
+  icv1-fp24-tm1578-e83ed1b2 R(0) 1.7434 R(0.1) 1.6263 R(1) 1.0724 plain/neg 1.2156
+  icv1-fp24-tm2338-191c1070 R(0) 1.9086 R(0.1) 1.7881 R(1) 1.2163 plain/neg 1.3295
+  icv1-fp24-tm3530-7cdfa218 R(0) 1.7603 R(0.1) 1.6414 R(1) 1.0800 plain/neg 1.2744
+  icv1-fp24-tm7826-eab5872b R(0) 1.9439 R(0.1) 1.8220 R(1) 1.2438 plain/neg 1.2685

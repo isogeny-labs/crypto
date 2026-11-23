@@ -1,0 +1,17 @@
+# Equal public-source normalization: qualified, not tenfold
+
+Once-onlyexecution at pushed813ff56b030 exited0. All108freshsolves recover originalsource-verified scalars;54pairedfulloperationvectors/outcometuplesmatch andallREDCidentitiespass. Folded/Expandedfirstdeterminingtuplesagreefor all18workloads. Directsource-normalizationavailabilitymatchesindependentanchor-rankgate:all6g2yes,6g3/6g4none.
+
+Sourceequation comesfromPUBLICsourceMumfordu/v,multiplicities/signs andqualifiedorbitmap. Helper reconstructssourceinoriginalgroup beforeacceptingRHS1. Itsdecomposition,coefficientworkandreconstructioncostincludingfailedoracleattemptsischargedineveryarm. Noexpectedscalar/cofactor/sourcepointindex/logtable inruntimehelper/API. Allthree methodsretain equalfastsharedsetup andfinaloriginalsourceverification.
+
+|Genus|EquallynormalizedFolded/Pencil basefieldREDC|EquallynormalizedFolded/Pencil basefieldinversecalls|
+|---|---|---|
+|2|1.236275–1.773936|0.945946–1.424000|
+|3|2.364468–8.764122|1.452323–4.957831|
+|4|2.568023–6.555429|1.392294–3.616519|
+
+Ranges represent sixseparateworkloadspergenus, notpooledmeans. Ratiosarespecifiedprimitivecounts, NOTwalltime orcompletecost. Fieldvectors overlap andomitinteger/memorywork aspreviousprotocols; nofitweights/primaryadmission/newmathclaim. Previousfailedwallqualificationunchanged.
+
+Four ofsixg2Pencilcasesnowdeterminekinthefirstanchor;twostillrequiresecondanchor. Acceptedrelationcounts(excludingchargednormalizationrow)7,7,5,6,6,5versusprevious7,9,7,8,7,9. Thismatchesnecessary-versus-sufficientdistinction: sourceequationbreaksscalingbutdoesnotguaranteefullrank. NormalizationalsobettersthecompletingFoldedcontrol,whoseg2walktrialsare29,20,26,24,30,11; noinformationadvantagegivenonlytoPencil. Inothergenerahelperreturnsnoneandchargesfailedattemptsoverhead; streamunchanged. No strongerallgenusrankgainisclaimed.
+
+Allraw/control/outcome/fixture/run/exitSHA256receiptsverify. SUMMARY.tsv/RANGES.txtderivefromretainedRustcounted/summarize.rsandshared-setup/ranges.rs; noexperimentrerun/gaterelaxation. GitcustodywhileS3unavailable, nouploadclaim. Broad10xgenus2+mathematicalbreakthroughremainsunestablished. Strongermechanismmustreduceworkbeyondpublicnormalizationandmustkeepequallyinformedcontrols.

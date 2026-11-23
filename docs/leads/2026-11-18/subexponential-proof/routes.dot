@@ -1,0 +1,22 @@
+digraph proof_routes {
+    graph [bgcolor="transparent", rankdir=TB, nodesep=0.23, ranksep=0.37, pad=0.12]
+    node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.10", color="#A6BAC7", fillcolor="#F1F7FA", fontcolor="#172E3D"]
+    edge [color="#5B7686", arrowsize=0.63]
+
+    d1 [label="OpenAI D.1\nPrecision and recurrence audit"]
+    clique [label="Anthropic Theorems A and B\nHalf-edge network reduction"]
+    fixed [label="Kaarelson fixed-arity oracle\nLean component and paper coverage", fillcolor="#F6F4FA", color="#B5ABC7"]
+    bochum [label="Full-group relation reduction\nAmbient sampling and integer recovery"]
+    schedule [label="Geometric simulation\nScalar validation and finite mean", fillcolor="#F6F4FA", color="#B5ABC7"]
+    explicit [label="Explicit expected time, arbitrary cofactor\n2^O(b / (log b)^(1/4))", fillcolor="#D8EEF0", color="#72A3AA"]
+    qualitative [label="Qualitative expected time\nr^o(1), at cofactor one", fillcolor="#EAE2F3", color="#A28CB8"]
+
+    {rank=same; d1; clique; fixed}
+    {rank=same; bochum; schedule}
+    {rank=same; explicit; qualitative}
+    d1 -> bochum
+    clique -> bochum
+    fixed -> schedule
+    bochum -> explicit
+    schedule -> qualitative
+}

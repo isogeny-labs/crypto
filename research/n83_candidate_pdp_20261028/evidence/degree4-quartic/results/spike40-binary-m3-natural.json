@@ -1,0 +1,516 @@
+{
+  "assignments_checked": 0,
+  "complete_v4_normal_forms": false,
+  "contains_one": false,
+  "exhaustive_affine_completion": null,
+  "independent_review": false,
+  "inherited_last_fall_lower_bound": 4,
+  "input_binding": {
+    "arm": "spike40-binary",
+    "complete_v3_rank": 36173,
+    "dataset": "spike40",
+    "directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/inputs/spike40-binary/binary-m3-natural",
+    "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+    "family": "binary",
+    "id": "binary-m3-natural",
+    "input_json_sha256": "912e260514a30fd6fcff7403cf14a24e47fbfc5638ef42c48338397dd9bd7851",
+    "key": "spike40-binary-m3-natural",
+    "parent_files": {
+      "basis.rows.u64le": {
+        "bytes": 3011772444,
+        "sha256": "edad8d6521f451e70db2b55d0b7a04ac371064775afe8a6f0a11047889c92fcf"
+      },
+      "closure_state.json": {
+        "bytes": 244,
+        "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+      },
+      "operations.jsonl": {
+        "bytes": 26778746,
+        "sha256": "dd4ecf7b39d5c6ece3841b623e45db9c3bc56951428eb27f6e1343d19b5fb9b4"
+      },
+      "result.json": {
+        "bytes": 37734,
+        "sha256": "e5469d68324a980b1bfecb356e7dacfe589184e857b054716da62c16bb73e0f4"
+      }
+    },
+    "parent_state": {
+      "complete": false,
+      "max_operations": 131072,
+      "max_rows": 32768,
+      "next_source": {
+        "parent": 13674,
+        "variable": 2
+      },
+      "pending_candidates": 3442,
+      "processed_candidates": 46416,
+      "rank": 32768,
+      "stop_reason": "row_cap"
+    },
+    "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/spike40-binary-m3-natural",
+    "propagation_case": {
+      "arm": "spike40-binary",
+      "complete_v3_rank": 36173,
+      "dataset": "spike40",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/inputs/spike40-binary/binary-m3-natural",
+      "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+      "family": "binary",
+      "id": "binary-m3-natural",
+      "input_json_sha256": "912e260514a30fd6fcff7403cf14a24e47fbfc5638ef42c48338397dd9bd7851",
+      "key": "spike40-binary-m3-natural",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "edad8d6521f451e70db2b55d0b7a04ac371064775afe8a6f0a11047889c92fcf"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 26778746,
+          "sha256": "dd4ecf7b39d5c6ece3841b623e45db9c3bc56951428eb27f6e1343d19b5fb9b4"
+        },
+        "result.json": {
+          "bytes": 37734,
+          "sha256": "e5469d68324a980b1bfecb356e7dacfe589184e857b054716da62c16bb73e0f4"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/spike40-binary-m3-natural",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d8d24f5c92ad1d3b05e602e481752f75468faf8afb3927e6cd4ac4837e99883b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "4706e186876918675a7cbad9a9bc256261338908962b1f979be66e01ff638562"
+        },
+        "result.json": {
+          "bytes": 38845,
+          "sha256": "11e1ca78b0ff869d59390fd62ae5f81c4d87bbbca5673658878a80b776102f0c"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5837480,
+          "sha256": "25293ef27eab7e5b6388e328b0ef97a9e101eb898d1e63c591f67619cbdc4a2e"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 312960404,
+          "sha256": "cf0f5f5b8469ccb816fdeded2c8b9286203eddb93c4e7b6e20131030949f4e99"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/spike40-binary-m3-natural",
+      "system_sha256": "a12e8fe09180f3639a6bda70811b7e49b5bc25da55ced2abb59bbbd1f4ce3676",
+      "target_kind": "natural",
+      "v2": {
+        "operations_sha256": "7b848f310b13134606482d15696101f533a81ccdb305c43913a5b4830cf253e4",
+        "result_sha256": "8e4b9c93606416e16ee52fe06a8db4784dfe3c4324b059504c4a56c3d54a0db1",
+        "rows_sha256": "be3fdeb7e4e307d519c3aa21e42f513e1b119e037fed3698246bf79562cad6f4"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/v2/spike40-binary/binary-m3-natural",
+      "witness_case": {
+        "arm": "spike40-binary",
+        "complete_v3_rank": 36173,
+        "dataset": "spike40",
+        "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/spike40-binary/binary-m3-natural",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+        "family": "binary",
+        "id": "binary-m3-natural",
+        "input_json_sha256": "912e260514a30fd6fcff7403cf14a24e47fbfc5638ef42c48338397dd9bd7851",
+        "key": "spike40-binary-m3-natural",
+        "parent_files": {
+          "basis.rows.u64le": {
+            "bytes": 3011772444,
+            "sha256": "edad8d6521f451e70db2b55d0b7a04ac371064775afe8a6f0a11047889c92fcf"
+          },
+          "closure_state.json": {
+            "bytes": 244,
+            "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+          },
+          "operations.jsonl": {
+            "bytes": 26778746,
+            "sha256": "dd4ecf7b39d5c6ece3841b623e45db9c3bc56951428eb27f6e1343d19b5fb9b4"
+          },
+          "result.json": {
+            "bytes": 37734,
+            "sha256": "e5469d68324a980b1bfecb356e7dacfe589184e857b054716da62c16bb73e0f4"
+          }
+        },
+        "parent_state": {
+          "complete": false,
+          "max_operations": 131072,
+          "max_rows": 32768,
+          "next_source": {
+            "parent": 13674,
+            "variable": 2
+          },
+          "pending_candidates": 3442,
+          "processed_candidates": 46416,
+          "rank": 32768,
+          "stop_reason": "row_cap"
+        },
+        "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/spike40-binary-m3-natural",
+        "suffix_files": {
+          "closure_state.json": {
+            "bytes": 208,
+            "sha256": "d8d24f5c92ad1d3b05e602e481752f75468faf8afb3927e6cd4ac4837e99883b"
+          },
+          "continuation.json": {
+            "bytes": 981,
+            "sha256": "4706e186876918675a7cbad9a9bc256261338908962b1f979be66e01ff638562"
+          },
+          "result.json": {
+            "bytes": 38845,
+            "sha256": "11e1ca78b0ff869d59390fd62ae5f81c4d87bbbca5673658878a80b776102f0c"
+          },
+          "suffix.operations.jsonl": {
+            "bytes": 5837480,
+            "sha256": "25293ef27eab7e5b6388e328b0ef97a9e101eb898d1e63c591f67619cbdc4a2e"
+          },
+          "suffix.rows.u64le": {
+            "bytes": 312960404,
+            "sha256": "cf0f5f5b8469ccb816fdeded2c8b9286203eddb93c4e7b6e20131030949f4e99"
+          }
+        },
+        "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/spike40-binary-m3-natural",
+        "system_sha256": "a12e8fe09180f3639a6bda70811b7e49b5bc25da55ced2abb59bbbd1f4ce3676",
+        "target_kind": "natural",
+        "v2": {
+          "operations_sha256": "7b848f310b13134606482d15696101f533a81ccdb305c43913a5b4830cf253e4",
+          "result_sha256": "8e4b9c93606416e16ee52fe06a8db4784dfe3c4324b059504c4a56c3d54a0db1",
+          "rows_sha256": "be3fdeb7e4e307d519c3aa21e42f513e1b119e037fed3698246bf79562cad6f4"
+        },
+        "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/spike40-binary/binary-m3-natural"
+      },
+      "witness_files": {
+        "U.normal.fieldpoly": {
+          "bytes": 5697139,
+          "sha256": "86a0fa6c1096e5bd565bb1fd8eeb77e2e0fb16c22b4698bf699b5a766c52b7a6"
+        },
+        "U.ordinary.fieldpoly": {
+          "bytes": 7235545,
+          "sha256": "6a73ccd6011e58ab7765182cccae6d66ae694c251ef7b7bcc9b9fc2d10353b48"
+        },
+        "X0.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "3a55babbc2d3a3e70ce22eb13d9b1c5a1df8aabb56aafe15086c36198505bcab"
+        },
+        "X0.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "8f3304a91044d9349beeadf2ce5339f466fffd02530ac472db4e91036ccf0ded"
+        },
+        "X1.normal.fieldpoly": {
+          "bytes": 2333900,
+          "sha256": "65061aa0cd105553a0035b867ca22c166300fd5b600db53c44afda434776c5cd"
+        },
+        "X1.ordinary.fieldpoly": {
+          "bytes": 3861209,
+          "sha256": "aa7fcec05c675be41b6b6d3216b3b0647023f5da498d210a5b99c2ee60f3d192"
+        },
+        "candidates.jsonl": {
+          "bytes": 96180,
+          "sha256": "81361b9f4f15f8339caa9dc62ab2ce08174dde0b60d2d24599a6646ecaedbe39"
+        },
+        "candidates.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "f5ad6d950c68b4627667fc004fdce46b7d930aef00cb817f1051ae7cf6009581"
+        },
+        "family.json": {
+          "bytes": 13378,
+          "sha256": "876fba643ed9b34c77c7f732a389779d9e92324e40c2b583549317dab4bdfbed"
+        },
+        "partial-083.json": {
+          "bytes": 91,
+          "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+        },
+        "partial-166.json": {
+          "bytes": 93,
+          "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+        },
+        "partial-249.json": {
+          "bytes": 93,
+          "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+        },
+        "remainders.rows.u64le": {
+          "bytes": 22886124,
+          "sha256": "4541a93d8db58eb7bf4883be5f3307db3bc16a8a57c3340bb4d8419cb5cb04ab"
+        },
+        "result.json": {
+          "bytes": 19211,
+          "sha256": "6e1be9d9bcde56ea1de1fce8f97a63a8bbd9af6e6ccf16d35d2739c899bf5b82"
+        },
+        "source.fieldpoly": {
+          "bytes": 1501129,
+          "sha256": "f521c323581efe713f3d4b9a0c56d1eb18a7887f2a48c154309c6ddd5e92f079"
+        }
+      },
+      "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/spike40-binary-m3-natural"
+    },
+    "propagation_files": {
+      "added.rows.u64le": {
+        "bytes": 22886132,
+        "sha256": "075b8e9d7ba2be056c70a1cd918c2c8f9a931492c4a87d796ea381921ccb62e3"
+      },
+      "affine.json": {
+        "bytes": 1629,
+        "sha256": "7d424c6adbe124b1b25d10df3752c73a8992e7d4034f1801e7232d41cc76ffa9"
+      },
+      "operations.jsonl": {
+        "bytes": 123681,
+        "sha256": "f2150923af37b7d3c58cc9e7fd3ba70e7b9e33b0747b130d671d4f1fce14ff39"
+      },
+      "pending.json": {
+        "bytes": 3,
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "progress.jsonl": {
+        "bytes": 470,
+        "sha256": "6aced38c54b8119f34ad57c19880e6e5f4647d03deba5b985d50816189f19cbe"
+      },
+      "propagation.json": {
+        "bytes": 1045,
+        "sha256": "78973da4b46892b55b5c6e8e43d3cb2855c7b1eefe034e2bb7f9666f0dc9a382"
+      },
+      "result.json": {
+        "bytes": 9694,
+        "sha256": "1e0d0fe383fe6df83be67b24090f0d1ef988493f5908569840f4c532cdded890"
+      },
+      "state.json": {
+        "bytes": 453,
+        "sha256": "f3eeb9a38c93259262c9ef01137f959b133b82f8634a457b38b06977085e081b"
+      }
+    },
+    "propagationdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/cases/spike40-binary-m3-natural",
+    "suffix_files": {
+      "closure_state.json": {
+        "bytes": 208,
+        "sha256": "d8d24f5c92ad1d3b05e602e481752f75468faf8afb3927e6cd4ac4837e99883b"
+      },
+      "continuation.json": {
+        "bytes": 981,
+        "sha256": "4706e186876918675a7cbad9a9bc256261338908962b1f979be66e01ff638562"
+      },
+      "result.json": {
+        "bytes": 38845,
+        "sha256": "11e1ca78b0ff869d59390fd62ae5f81c4d87bbbca5673658878a80b776102f0c"
+      },
+      "suffix.operations.jsonl": {
+        "bytes": 5837480,
+        "sha256": "25293ef27eab7e5b6388e328b0ef97a9e101eb898d1e63c591f67619cbdc4a2e"
+      },
+      "suffix.rows.u64le": {
+        "bytes": 312960404,
+        "sha256": "cf0f5f5b8469ccb816fdeded2c8b9286203eddb93c4e7b6e20131030949f4e99"
+      }
+    },
+    "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/spike40-binary-m3-natural",
+    "system_sha256": "a12e8fe09180f3639a6bda70811b7e49b5bc25da55ced2abb59bbbd1f4ce3676",
+    "target_kind": "natural",
+    "v2": {
+      "operations_sha256": "7b848f310b13134606482d15696101f533a81ccdb305c43913a5b4830cf253e4",
+      "result_sha256": "8e4b9c93606416e16ee52fe06a8db4784dfe3c4324b059504c4a56c3d54a0db1",
+      "rows_sha256": "be3fdeb7e4e307d519c3aa21e42f513e1b119e037fed3698246bf79562cad6f4"
+    },
+    "v2directory": "/home/ec2-user/n83-candidate-recovery/degree4-propagation-r1/v2/spike40-binary/binary-m3-natural",
+    "witness_case": {
+      "arm": "spike40-binary",
+      "complete_v3_rank": 36173,
+      "dataset": "spike40",
+      "directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/inputs/spike40-binary/binary-m3-natural",
+      "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+      "family": "binary",
+      "id": "binary-m3-natural",
+      "input_json_sha256": "912e260514a30fd6fcff7403cf14a24e47fbfc5638ef42c48338397dd9bd7851",
+      "key": "spike40-binary-m3-natural",
+      "parent_files": {
+        "basis.rows.u64le": {
+          "bytes": 3011772444,
+          "sha256": "edad8d6521f451e70db2b55d0b7a04ac371064775afe8a6f0a11047889c92fcf"
+        },
+        "closure_state.json": {
+          "bytes": 244,
+          "sha256": "eff4f6b3b4b5c6c671242d1e80717254c11cc68f57f5d8e67ec53ecceb925d73"
+        },
+        "operations.jsonl": {
+          "bytes": 26778746,
+          "sha256": "dd4ecf7b39d5c6ece3841b623e45db9c3bc56951428eb27f6e1343d19b5fb9b4"
+        },
+        "result.json": {
+          "bytes": 37734,
+          "sha256": "e5469d68324a980b1bfecb356e7dacfe589184e857b054716da62c16bb73e0f4"
+        }
+      },
+      "parent_state": {
+        "complete": false,
+        "max_operations": 131072,
+        "max_rows": 32768,
+        "next_source": {
+          "parent": 13674,
+          "variable": 2
+        },
+        "pending_candidates": 3442,
+        "processed_candidates": 46416,
+        "rank": 32768,
+        "stop_reason": "row_cap"
+      },
+      "prefixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1/cases/spike40-binary-m3-natural",
+      "suffix_files": {
+        "closure_state.json": {
+          "bytes": 208,
+          "sha256": "d8d24f5c92ad1d3b05e602e481752f75468faf8afb3927e6cd4ac4837e99883b"
+        },
+        "continuation.json": {
+          "bytes": 981,
+          "sha256": "4706e186876918675a7cbad9a9bc256261338908962b1f979be66e01ff638562"
+        },
+        "result.json": {
+          "bytes": 38845,
+          "sha256": "11e1ca78b0ff869d59390fd62ae5f81c4d87bbbca5673658878a80b776102f0c"
+        },
+        "suffix.operations.jsonl": {
+          "bytes": 5837480,
+          "sha256": "25293ef27eab7e5b6388e328b0ef97a9e101eb898d1e63c591f67619cbdc4a2e"
+        },
+        "suffix.rows.u64le": {
+          "bytes": 312960404,
+          "sha256": "cf0f5f5b8469ccb816fdeded2c8b9286203eddb93c4e7b6e20131030949f4e99"
+        }
+      },
+      "suffixdirectory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/cases/spike40-binary-m3-natural",
+      "system_sha256": "a12e8fe09180f3639a6bda70811b7e49b5bc25da55ced2abb59bbbd1f4ce3676",
+      "target_kind": "natural",
+      "v2": {
+        "operations_sha256": "7b848f310b13134606482d15696101f533a81ccdb305c43913a5b4830cf253e4",
+        "result_sha256": "8e4b9c93606416e16ee52fe06a8db4784dfe3c4324b059504c4a56c3d54a0db1",
+        "rows_sha256": "be3fdeb7e4e307d519c3aa21e42f513e1b119e037fed3698246bf79562cad6f4"
+      },
+      "v2directory": "/home/ec2-user/n83-candidate-recovery/degree3-continuation-r1/v2/spike40-binary/binary-m3-natural"
+    },
+    "witness_files": {
+      "U.normal.fieldpoly": {
+        "bytes": 5697139,
+        "sha256": "86a0fa6c1096e5bd565bb1fd8eeb77e2e0fb16c22b4698bf699b5a766c52b7a6"
+      },
+      "U.ordinary.fieldpoly": {
+        "bytes": 7235545,
+        "sha256": "6a73ccd6011e58ab7765182cccae6d66ae694c251ef7b7bcc9b9fc2d10353b48"
+      },
+      "X0.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "3a55babbc2d3a3e70ce22eb13d9b1c5a1df8aabb56aafe15086c36198505bcab"
+      },
+      "X0.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "8f3304a91044d9349beeadf2ce5339f466fffd02530ac472db4e91036ccf0ded"
+      },
+      "X1.normal.fieldpoly": {
+        "bytes": 2333900,
+        "sha256": "65061aa0cd105553a0035b867ca22c166300fd5b600db53c44afda434776c5cd"
+      },
+      "X1.ordinary.fieldpoly": {
+        "bytes": 3861209,
+        "sha256": "aa7fcec05c675be41b6b6d3216b3b0647023f5da498d210a5b99c2ee60f3d192"
+      },
+      "candidates.jsonl": {
+        "bytes": 96180,
+        "sha256": "81361b9f4f15f8339caa9dc62ab2ce08174dde0b60d2d24599a6646ecaedbe39"
+      },
+      "candidates.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "f5ad6d950c68b4627667fc004fdce46b7d930aef00cb817f1051ae7cf6009581"
+      },
+      "family.json": {
+        "bytes": 13378,
+        "sha256": "876fba643ed9b34c77c7f732a389779d9e92324e40c2b583549317dab4bdfbed"
+      },
+      "partial-083.json": {
+        "bytes": 91,
+        "sha256": "94eebab7eb5d4fd376fcaba1bc1dcee1068f122bfc787c4add77d9c87fefca05"
+      },
+      "partial-166.json": {
+        "bytes": 93,
+        "sha256": "5bd6a716e29e2162f1a4c8180b688daa80050666da117b5b409c93ac55e8b072"
+      },
+      "partial-249.json": {
+        "bytes": 93,
+        "sha256": "5c15c8a5384c62ba1c36e0a7717dd9f44f2c55473ba5cdf9e75a8a0f5b2bc8a7"
+      },
+      "remainders.rows.u64le": {
+        "bytes": 22886124,
+        "sha256": "4541a93d8db58eb7bf4883be5f3307db3bc16a8a57c3340bb4d8419cb5cb04ab"
+      },
+      "result.json": {
+        "bytes": 19211,
+        "sha256": "6e1be9d9bcde56ea1de1fce8f97a63a8bbd9af6e6ccf16d35d2739c899bf5b82"
+      },
+      "source.fieldpoly": {
+        "bytes": 1501129,
+        "sha256": "f521c323581efe713f3d4b9a0c56d1eb18a7887f2a48c154309c6ddd5e92f079"
+      }
+    },
+    "witnessdirectory": "/home/ec2-user/n83-candidate-recovery/degree4-witness-r1/cases/spike40-binary-m3-natural"
+  },
+  "key": "spike40-binary-m3-natural",
+  "last_fall_degree": null,
+  "last_fall_lower_bound": 4,
+  "last_fall_upper_bound": null,
+  "linear_rank": 1,
+  "membership_degree_bound": 4,
+  "propagation_parent_result_sha256": "1e0d0fe383fe6df83be67b24090f0d1ef988493f5908569840f4c532cdded890",
+  "schema": "n83.degree-four-quartic/v1",
+  "state": {
+    "added_rows": 3931,
+    "added_rows_by_degree": [
+      0,
+      0,
+      0,
+      0,
+      3931
+    ],
+    "attempted_products": 3932,
+    "blocked_candidate": {
+      "quartic_nonzeros": 140538,
+      "record_bytes": 654080,
+      "reduction_complete": true,
+      "remainder_sha256": "d9e72419608d6e4d5a329f1f300fc70ac17f4162d50e0f3b24d706578176ea83",
+      "source_kind": "initial_added",
+      "source_row": 36369,
+      "stop_reason": "basis_payload_cap",
+      "variable": 15,
+      "xor_basis_rows": []
+    },
+    "complete_v3_rows": 36173,
+    "complete_v4_normal_forms": false,
+    "completed_products": 3931,
+    "initial_rows": 36422,
+    "max_new_basis_payload_bytes": 2147483648,
+    "max_new_rows": 16384,
+    "max_product_attempts": 131072,
+    "max_quartic_nonzeros": 1048576,
+    "new_basis_payload_bytes": 2147265316,
+    "next_source": [
+      36369,
+      15,
+      "initial_added"
+    ],
+    "peak_quartic_nonzeros": 727272,
+    "pending_products": 5919585,
+    "rank": 40353,
+    "stop_reason": "basis_payload_cap",
+    "zero_remainders": 0
+  },
+  "upper_bound_argument": "No global upper certificate. Neither complete V4 nor a cap implies a global upper or lower5.",
+  "working_degree": 4
+}

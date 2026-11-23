@@ -1,0 +1,22 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",fontname="DejaVu Sans",nodesep=0.45,ranksep=0.35];
+ node [shape=box,style="rounded,filled",fillcolor="#eef5fd",color="#315d89",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#315d89"];
+ row [label="Actual x = r + 2^u h\nFixed retained mask"];
+ den [label="Actual e_j = 2^u / d_j\nv2(e_j) >= 1"];
+ poly [label="Finite D, D(0)=1\ncoefficient b weight >= b"];
+ inv [label="Actual invOfUnit(D,1)\ncoefficient b weight >= b"];
+ trunc [label="Construct Q_k\nfinite error >= k bits"];
+ factors [label="Integral finite factors\n2^u k labels; residual k"];
+ weight [label="Actual scalar c\nrow w+b; residual w+k",fillcolor="#eaf7ee"];
+ open [label="OPEN: all higher jets,\nall entry/recursive costs",style="rounded,dashed,filled",fillcolor="#fff2d9"];
+ {rank=same; row;den}
+ {rank=same; poly;inv}
+ {rank=same; trunc;factors}
+ {rank=same; weight;open}
+ row [group="left"]; poly [group="left"]; trunc [group="left"]; weight [group="left"];
+ den [group="right"]; inv [group="right"]; factors [group="right"]; open [group="right"];
+ row -> poly -> trunc -> weight [style=invis,weight=100];
+ den -> inv -> factors -> open [style=invis,weight=100];
+ row -> den -> poly -> inv -> trunc -> factors -> weight -> open;
+}

@@ -190,11 +190,47 @@ fn main() {
         .map(|w| w[1].clone())
         .unwrap_or_else(|| "unlabelled".into());
 
+    // `--cells a:n:factor_index:m:targets[:first],…` replaces the frozen
+    // ladders with an explicit cell list (used by the baseline panel,
+    // `tools/gb_baseline.py`).  Same harness, same rows, same skips:
+    // a cell whose curve, factor base or cofactor admissibility fails is
+    // skipped exactly as on a frozen ladder.
+    let custom: Option<&'static [Instance]> =
+        args.windows(2).find(|w| w[0] == "--cells").map(|w| {
+            let cells: Vec<Instance> = w[1]
+                .split(',')
+                .filter(|s| !s.is_empty())
+                .map(|s| {
+                    let f: Vec<u32> = s
+                        .split(':')
+                        .map(|x| {
+                            x.parse()
+                                .unwrap_or_else(|_| panic!("--cells: bad field in {s:?}"))
+                        })
+                        .collect();
+                    assert!(
+                        f.len() == 5 || f.len() == 6,
+                        "--cells: want a:n:factor_index:m:targets[:first], got {s:?}"
+                    );
+                    Instance {
+                        a: f[0] as u8,
+                        n: f[1],
+                        factor_index: f[2] as usize,
+                        m: f[3] as usize,
+                        targets: f[4],
+                        first: f.get(5).copied().unwrap_or(0),
+                    }
+                })
+                .collect();
+            &*Box::leak(cells.into_boxed_slice())
+        });
+
     let (ladder, ladder_name) = match args
         .windows(2)
         .find(|w| w[0] == "--ladder")
         .map(|w| w[1].as_str())
     {
+        _ if custom.is_some() => (custom.unwrap(), "custom"),
         Some("holdout") => (HOLDOUT, "holdout"),
         Some("chain") => (CHAIN, "chain"),
         Some("chain-holdout") => (CHAIN_HOLDOUT, "chain-holdout"),

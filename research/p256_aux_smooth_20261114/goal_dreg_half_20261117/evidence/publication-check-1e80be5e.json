@@ -1,0 +1,36 @@
+{
+  "pr": 4567,
+  "head": "1e80be5e37449c93dc2531dd68f3cf9c8e9b6212",
+  "state": "open",
+  "draft": true,
+  "mergeable_state": "dirty",
+  "auto_merge": null,
+  "returned_check_count": 2,
+  "checks": [
+    {
+      "name": "review",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/44120879096/job/134171574855"
+    },
+    {
+      "name": "migrate",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/44120879052/job/134171567124"
+    }
+  ],
+  "reviews": [],
+  "review_threads": [],
+  "copilot_request": "https://github.com/isogeny-labs/crypto/pull/4567#issuecomment-6953388090",
+  "scope": "single exact-head snapshot; no gate/size/artifacts success inferred",
+  "migrate_failure_excerpt": [
+    "2026-11-17T16:01:24.5512193Z artifacts: head-object store/sha256/af/af4c1c881abd8ef5982392cbdeb652d71fd487fad8a489fdd576af927189d119: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)",
+    "2026-11-17T16:01:24.5672883Z artifacts: head-object store/sha256/87/878124fcc18fe3a22a3822b49659bf4fe9ffa290b4e4d6433f8be59fc3c893af: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)",
+    "2026-11-17T16:01:24.5774021Z artifacts: head-object store/sha256/18/18ead43689cdfcdc6730400a3411b7ff78ce1f1493596bf8ce10943646a25581: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)",
+    "2026-11-17T16:01:24.5826836Z artifacts: head-object store/sha256/26/26d9b2d170d956837f6017934a004be76fd33f61051cd769fe072101729b357e: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)",
+    "2026-11-17T16:01:25.6172369Z artifacts: head-object store/sha256/e0/e078e3b905b13fc92e5fdc9236307ee855d38dbfb946af6b143fe1ba7c79dc3c: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)",
+    "2026-11-17T16:01:25.6846810Z artifacts: head-object store/sha256/8b/8b1fc0829781501118bb105df03e9394cba2af1b52c696be485e8d2e2b07af32: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)",
+    "2026-11-17T16:01:25.6993076Z ##[error]Process completed with exit code 2."
+  ]
+}

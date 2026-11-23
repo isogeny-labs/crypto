@@ -1,0 +1,21 @@
+[package]
+name = "twist-route-experiments"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+crypto_lib = { package = "crypto", path = "../../..", optional = true }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+num-integer = "0.1"
+hex = "0.4"
+rand = "0.8"
+rayon = "1.10"
+
+[features]
+library = ["dep:crypto_lib"]

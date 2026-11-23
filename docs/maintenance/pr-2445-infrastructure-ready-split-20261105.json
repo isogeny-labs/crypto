@@ -1,0 +1,39 @@
+{
+  "schema": "pr-maintenance/v1",
+  "standing": "unverified",
+  "date": "2026-11-05",
+  "origin_pr": 2445,
+  "origin_head": "52321cbe0a8bd884a9edbaccdeaea67444c3ffb8",
+  "base": "e6d85d82b7f08a02ccecc91f754fb2dc9b835b00",
+  "other_batch": 3455,
+  "reason": "Split existing workflow readiness edits by touched area to meet the 30-check budget without removing checks.",
+  "scope": [
+    {
+      "path": ".github/workflows/factor-base-chart-screen.yml",
+      "blob": "7fa7163b243fb2ca5acfeecd0dc710ce47f1439a"
+    },
+    {
+      "path": ".github/workflows/pqc-assay.yml",
+      "blob": "16fc1d2fb48d879660307b1bce20a32fa93ed6cf"
+    },
+    {
+      "path": ".github/workflows/isolab-experiment.yml",
+      "blob": "4fc19ffd48ab5b8938b475a43af3cb91d61f8ff3"
+    }
+  ],
+  "preserved": [
+    "all existing ready-PR software commands",
+    "permissions",
+    "runners",
+    "timeouts",
+    "event and ref restrictions",
+    "workflow_dispatch-only experiment admission"
+  ],
+  "validation": {
+    "prior": "Source-head YAML validators and PQC/isolab software workflows passed. No implementation code is changed.",
+    "current": "Fresh current-head CI, actual check count and review required before merge.",
+    "benchmark_inputs": "No record, raw, report, gate or progress input changes; previous 37-record gate pass applies only to identical inputs."
+  },
+  "no_scientific_execution": true,
+  "local_runtime": "Unavailable; no fresh local result or Conductor reservation claimed."
+}

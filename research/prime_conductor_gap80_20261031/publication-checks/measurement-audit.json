@@ -1,0 +1,27 @@
+{
+  "schema": "gap80-measurement-eligibility-audit/v1",
+  "scope": "Development/static checks; no crypto performance execution",
+  "inspected_revision": "3cf90b51139f98564e6244e54c8917f760e71e2f",
+  "sources": [
+    {
+      "path": "research/conductor_gap_cm_orbits_20261015/native/sqrt_velu.cpp",
+      "sha256": "cdef0e17896e6ced70e4b688db9ec6b1b5117187f2366d2cbeebb2da4afe6089"
+    },
+    {
+      "path": "research/conductor_gap_cm_orbits_20261015/native/sqrt_velu_batched_v4.cpp",
+      "sha256": "98ba2a963ce736cd333f83c4e649b83bcaa41bdba598ec1f1b24e7e6347ffb7f"
+    },
+    {
+      "path": "research/conductor_gap_cm_orbits_20261015/native/CONSTRUCTOR.md",
+      "sha256": "0f56b792ffcd16fce9c2747c0c6644a3f2a5eef5804d1db526dbba8713a9c3d3"
+    }
+  ],
+  "width_controls_passed": 5,
+  "source_sha256": "8d749a66186fa5d252119f057745ec780bb087ff15b4e82395bacf187db52748",
+  "binary_sha256": "6ab9e05c220c1ea2ecef4be1f8f4a89a3cca3d77af47234606690009c7936f59",
+  "readiness_sha256": "875775b8ee5bc6d15db225030c8bd2efa78cd61c2baa2eecb68b9202c250fced",
+  "full_construction_attempted": false,
+  "full_point_evaluation_attempted": false,
+  "matched_endpoint_ecdlp_attempted": false,
+  "reason": "Unchanged constructor rejects 80-bit degree, would exceed documented memory cap after widening, and has no arbitrary-point evaluator."
+}

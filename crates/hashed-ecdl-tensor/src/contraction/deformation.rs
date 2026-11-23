@@ -548,6 +548,70 @@ mod tests {
     use super::*;
     use crate::Limits;
     use num_traits::One;
+
+    #[test]
+    fn packet_entry_mutations_change_load_bearing_coefficients() {
+        let mut meter = Meter::new(Limits::default());
+        let ring = Ring::new(1, 4, &mut meter).unwrap();
+
+        let quadratic = PacketTensor {
+            ring: ring.clone(),
+            local: vec![vec![], vec![]],
+            column_count: 0,
+            incoming: vec![Incoming {
+                exponent: 2,
+                coefficients: vec![ring.one(), ring.one()],
+            }],
+            outgoing: vec![],
+        };
+        let linear_mutant = PacketTensor {
+            ring: ring.clone(),
+            local: vec![vec![], vec![]],
+            column_count: 0,
+            incoming: vec![Incoming {
+                exponent: 1,
+                coefficients: vec![ring.one(), ring.one()],
+            }],
+            outgoing: vec![],
+        };
+        assert_eq!(
+            quadratic.entry(&[true, true], &mut meter).unwrap(),
+            ring.one()
+        );
+        assert_eq!(
+            linear_mutant.entry(&[true, true], &mut meter).unwrap(),
+            ring.zero()
+        );
+
+        let outgoing = PacketTensor {
+            ring: ring.clone(),
+            local: vec![vec![ring.one()]],
+            column_count: 1,
+            incoming: vec![],
+            outgoing: vec![Outgoing {
+                exponent: 1,
+                terms: vec![(0, BigUint::from(2u8))],
+            }],
+        };
+        let dropped_outgoing_mutant = PacketTensor {
+            ring: ring.clone(),
+            local: vec![vec![ring.one()]],
+            column_count: 1,
+            incoming: vec![],
+            outgoing: vec![],
+        };
+        assert_eq!(
+            outgoing.entry(&[true, true], &mut meter).unwrap(),
+            ring.integer(&BigUint::from(2u8))
+        );
+        assert_eq!(
+            dropped_outgoing_mutant
+                .entry(&[true, true], &mut meter)
+                .unwrap(),
+            ring.one()
+        );
+    }
+
     #[test]
     fn packet_entries_keep_creation_time_representatives() {
         let mut meter = Meter::new(Limits::default());

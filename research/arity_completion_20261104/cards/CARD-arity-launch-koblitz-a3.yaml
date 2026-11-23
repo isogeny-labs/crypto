@@ -1,0 +1,102 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-arity-launch-koblitz-a3
+experiment_id: ARITY-COMPLETION-KOBLITZ-M5-M6-20261104
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3.receipt.json
+binds:
+- path: research/arity_completion_20261104/launch/request-koblitz-a3.json
+  sha256: f88f8b2727ce0eb7ebe7316a98c7111eabf3291b17367c77816a3d28eff99aaf
+- path: research/arity_completion_20261104/launch/image.json
+  sha256: 6e1ddd02ba72bef212d3caab3d688d9e1b2491964674b324af885c93e1a7714a
+- path: taskq/deploy/eks-karpenter/remote/launch-remote-command
+  sha256: 9bd99d990118937ed61aa98a4932093534e1a78c58c56a1d669d9c9ba258f781
+- path: taskq/deploy/eks-karpenter/remote/run-command
+  sha256: 1cdaa7447893fd5c2dc337d3903f8981107df1de6d77ca18cd8191cc8449ced2
+- path: taskq/deploy/eks-karpenter/remote/status-command
+  sha256: 435c9a2f35cace854534accf300402365a4f99f15babb0bbd187aa3e1ff92809
+- path: taskq/deploy/eks-karpenter/remote/current-run-request-buildspec.yml
+  sha256: 35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e
+- path: research/arity_completion_20261104/koblitz_m5_m6/protocol.json
+  sha256: 590c74d593ec00c3c18f15244816e2423b43cc30b658c0dbbcc9b031fbed8fba
+- path: research/arity_completion_20261104/launch/job-lib.sh
+  sha256: 7c1e760e87a2f2e361346669b5fb6f264c0bde846f5aeb4b0c11c4b4132c1555
+- path: research/arity_completion_20261104/launch/job-koblitz.sh
+  sha256: bf02b6c65e6c1aee515476502932e9969bfddda8128badd8d5fd07a5fa1935c3
+- path: research/arity_completion_20261104/cards/gates/source-identity.py
+  sha256: 5e4fd7e665879fa05b835bc38607357f86ae2cb618a5160e3d09e7472183fca8
+- path: research/arity_completion_20261104/cards/gates/image-identity.py
+  sha256: 37f46c66789f01db718238c4077fd284032f93b785fd9594d6491dd489e618a4
+must_not_exist:
+- research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit
+commands:
+- id: source-identity
+  argv:
+  - python3
+  - research/arity_completion_20261104/cards/gates/source-identity.py
+  - research/arity_completion_20261104/launch/request-koblitz-a3.json
+  - research/arity_completion_20261104/launch/image.json
+  - 4fa25efc0e2392b2e02e4c84253059ebc7c67e02
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+- id: image-identity
+  argv:
+  - python3
+  - research/arity_completion_20261104/cards/gates/image-identity.py
+  - research/arity_completion_20261104/launch/image.json
+  - sha256:dd52495564680cb69576321fb1d6b5239d6ab8d9929b3965292040172e644b05
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+- id: budget-readback
+  argv:
+  - aws
+  - budgets
+  - describe-budgets
+  - --account-id
+  - '104186811093'
+  - --query
+  - Budgets[].{name:BudgetName,actual:CalculatedSpend.ActualSpend.Amount,limit:BudgetLimit.Amount}
+  - --output
+  - json
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+  timeout_seconds: 120
+  success_exit_codes:
+  - 0
+  stdout: research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3-budgets.json
+  outputs:
+  - research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3-budgets.json
+- id: submit
+  argv:
+  - taskq/deploy/eks-karpenter/remote/launch-remote-command
+  - research/arity_completion_20261104/launch/request-koblitz-a3.json
+  env:
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+    ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_CLIENT_OUTPUT: research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit
+  timeout_seconds: 2400
+  success_exit_codes:
+  - 0
+  stdout: research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3-submit.stdout
+  stderr: research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3-submit.stderr
+  outputs:
+  - research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit/result.json
+  - research/arity_completion_20261104/launch/receipts/CARD-arity-launch-koblitz-a3/submit/build-start.json
+bus_address: executor-mechanical-arity-launch-koblitz
+background: true
+write_scope:
+- research/arity_completion_20261104/launch/receipts/
+stop_when:
+- Any command exits with a status other than 0, or reaches its timeout.
+- The source-identity or image-identity command exits with a status other than 0; nothing after it runs.
+- 'On any stop: report the printed text verbatim, retry nothing and edit nothing.'
+- 'Never run the submit command a second time: the launcher refuses an existing Job name and a second StartBuild is a new experiment.'

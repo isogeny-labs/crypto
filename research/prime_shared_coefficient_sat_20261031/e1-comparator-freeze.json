@@ -1,0 +1,53 @@
+{
+  "schema": "prime-shared-coefficient.e1-comparator-freeze/v1",
+  "created_utc": "2026-11-01T00:30:00Z",
+  "stage": "E1-msolve-base-field-crosscheck",
+  "performance_data": false,
+  "checkpoint_gate_required": true,
+  "source_revision": {
+    "rule": "exact 40-character lowercase Git commit supplied at launch and recorded in the aggregate",
+    "runner": "native/src/e1_msolve.rs",
+    "parser": "native/src/msolve.rs"
+  },
+  "tool": {
+    "id": "msolve-f4-base-field-crosscheck",
+    "version": "0.11.0",
+    "source_commit": "cc044551f8e202d00691990fd3fd0b1226a88ea2",
+    "binary_sha256": "7548742eb77d5f235dce7f20ae94343926f36e93edb5f371d4b11c283adb2b3c",
+    "upstream_tests": {"passed": 71, "total": 71},
+    "argv": ["-t", "1", "-c", "2", "-d", "4", "--random-seed", "0", "-f", "INPUT", "-o", "OUTPUT"]
+  },
+  "process_deadline_seconds": 300,
+  "scientific_retries": 0,
+  "timing_collected": false,
+  "targets": [
+    [0, 6], [0, 11], [3, 1], [3, 16], [5, 1], [5, 16],
+    [6, 3], [6, 14], [7, 6], [7, 11], [9, 1], [9, 16],
+    [10, 6], [10, 11], [13, 7], [13, 10], [16, 4], [16, 13]
+  ],
+  "target_spec": {"p": 17, "a": 2, "b": 2, "m": 3, "t": 3, "c": 1},
+  "expected_target_census": {"nonempty": 6, "empty": 12, "projected_models": 6},
+  "fixed_controls": {
+    "fixtures": ["m3-t4", "m5-t4", "m7-t4"],
+    "positive": "append equations fixing every canonical field to the known assignment",
+    "negative": "a0 := (a0 + 1) mod 17 and append equations fixing every canonical field"
+  },
+  "pass_verdict": "msolve_base_field_crosscheck_passed_no_unsat_certificate",
+  "independent_unsat_certificate_available": false,
+  "closes_e1_unsat_gate": false,
+  "cvc5_disposition": {
+    "version": "1.4.2",
+    "source_commit": "282d5e0c84baf49c780704c532f87ba66d8b513d",
+    "binary_sha256": "6aecddf466552b83bb5883756c7955e0c9d5ddcc6d7f45b48c2f6e06a741b102",
+    "mandatory_arm": false,
+    "reason": "finite-field UNSAT proofs require trusted THEORY_FF rewrites and Alethe rejects CONST_FINITE_FIELD"
+  },
+  "forbidden_interpretations": [
+    "msolve supplies an independently checked UNSAT proof",
+    "F4 is faster or slower",
+    "SAT beats F4",
+    "E1 is complete",
+    "index calculus improves",
+    "subexponential prime-field ECDLP"
+  ]
+}

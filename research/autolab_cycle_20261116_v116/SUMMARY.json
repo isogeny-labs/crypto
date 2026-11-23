@@ -1,0 +1,100 @@
+{
+  "oracle": {
+    "out": {
+      "root_multisets": 1104,
+      "odd_cases": 539,
+      "stratum_counts": {
+        "1": 185,
+        "3": 283,
+        "5": 71
+      },
+      "repeated_cases": 916,
+      "zero_cases": 434,
+      "affine_families": 80,
+      "affine_point_checks": 10240,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "rank_cover": {
+    "out": {
+      "strata": [
+        {
+          "k": 1,
+          "feasible": true,
+          "dimension": 61,
+          "additional_rank_vs_old67chart": 6,
+          "degree_rows": 11
+        },
+        {
+          "k": 3,
+          "feasible": true,
+          "dimension": 63,
+          "additional_rank_vs_old67chart": 4,
+          "degree_rows": 9
+        },
+        {
+          "k": 5,
+          "feasible": true,
+          "dimension": 57,
+          "additional_rank_vs_old67chart": 10,
+          "degree_rows": 14
+        }
+      ],
+      "recovered_controls": 192,
+      "original_complete": false,
+      "affine_parameter_count": 11673330234144325632,
+      "old_guarded_hull_count": 295147905179352825856,
+      "nominal_count_ratio_old_over_new_numerator": 295147905179352825856,
+      "nominal_count_ratio_old_over_new_denominator": 11673330234144325632,
+      "advancement_rule_met": true,
+      "cover_sha256": "6ecc95dadfd622a5a64e78f8fb482dafd344b17a3dce0fd8543c97f9c50437ad",
+      "total_seconds": 0.018311982013983652
+    },
+    "error": null
+  },
+  "compiler": {
+    "out": {
+      "toy_cases": 48,
+      "toy_original_assignments": 5760,
+      "toy_encoded_assignments": 5760,
+      "actual_controls": 48,
+      "original_complete": false,
+      "inputs": 65,
+      "dimensions": [
+        61,
+        63,
+        57
+      ],
+      "common_dimension": 55,
+      "variables": 48128,
+      "clauses": 177023,
+      "gate_kinds": {
+        "false": 1,
+        "true": 1,
+        "input": 65,
+        "and": 15361,
+        "xor": 32641,
+        "not": 61
+      },
+      "synthesis": {
+        "synthesis_rounds": 256,
+        "pair_events": 985235,
+        "stop_reason": "round_cap",
+        "target_forms": 405,
+        "pair_index_entries": 32546,
+        "fallback_forms": 0,
+        "shared_direction_dimension": 55,
+        "max_extra_directions": 8,
+        "primary_inputs": 65,
+        "generator_functions": 79
+      },
+      "graph_sha256": "393ef189269a0c3722e20e39c86f4312850c2655bb953d96cae256717ba27654",
+      "all_three_cases_retained": true,
+      "total_seconds": 1.6028523310087621
+    },
+    "error": null
+  },
+  "qualified_speedup": null,
+  "original_complete": false
+}

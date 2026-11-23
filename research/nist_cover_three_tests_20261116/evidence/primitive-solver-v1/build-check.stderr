@@ -1,0 +1,8 @@
+primitive_giac_check.cpp: In function ‘int main(int, char**)’:
+primitive_giac_check.cpp:57:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   57 |     for(auto& p:original)require(pb2_reduce(p,basis).terms.empty(),"native input ideal normal form");auto e=basis[0].terms.rbegin()->first,f=basis[1].terms.rbegin()->first;PBMonomial lcm{std::max(e[0],f[0]),std::max(e[1],f[1])};auto spair=pb2_monomial({lcm[0]-e[0],lcm[1]-e[1]},T24(1))*basis[0]-pb2_monomial({lcm[0]-f[0],lcm[1]-f[1]},T24(1))*basis[1];require(pb2_reduce(spair,basis).terms.empty(),"native S-pair criterion");
+      |     ^~~
+primitive_giac_check.cpp:57:102: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   57 |     for(auto& p:original)require(pb2_reduce(p,basis).terms.empty(),"native input ideal normal form");auto e=basis[0].terms.rbegin()->first,f=basis[1].terms.rbegin()->first;PBMonomial lcm{std::max(e[0],f[0]),std::max(e[1],f[1])};auto spair=pb2_monomial({lcm[0]-e[0],lcm[1]-e[1]},T24(1))*basis[0]-pb2_monomial({lcm[0]-f[0],lcm[1]-f[1]},T24(1))*basis[1];require(pb2_reduce(spair,basis).terms.empty(),"native S-pair criterion");
+      |                                                                                                      ^~~~
+cc1plus: all warnings being treated as errors

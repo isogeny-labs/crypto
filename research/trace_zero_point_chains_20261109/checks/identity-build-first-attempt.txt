@@ -1,0 +1,107 @@
+   Compiling trace-zero-point-chain-validation v0.1.0 (/workspace/crypto-trace/research/trace_zero_point_chains_20261109/native)
+error[E0599]: no variant, associated function, or constant named `constant` found for enum `Expr` in the current scope
+   --> src/bin/certify_inverse_lift.rs:16:58
+    |
+ 16 |             Expr::sum(vec![u2.clone(), su.clone(), Expr::constant(1)]),
+    |                                                          ^^^^^^^^ variant, associated function, or constant not found in `Expr`
+    |
+note: if you're trying to build a new `Expr` consider using one of the following associated functions:
+      Expr::var
+      Expr::plus
+      Expr::times
+      Expr::sum
+      and 2 others
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no variant, associated function, or constant named `constant` found for enum `Expr` in the current scope
+   --> src/bin/certify_inverse_lift.rs:17:63
+    |
+ 17 |             Expr::sum(vec![u2.clone(), Expr::minus(su), Expr::constant(1)]),
+    |                                                               ^^^^^^^^ variant, associated function, or constant not found in `Expr`
+    |
+note: if you're trying to build a new `Expr` consider using one of the following associated functions:
+      Expr::var
+      Expr::plus
+      Expr::times
+      Expr::sum
+      and 2 others
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no variant, associated function, or constant named `constant` found for enum `Expr` in the current scope
+   --> src/bin/certify_inverse_lift.rs:22:34
+    |
+ 22 |                 Expr::plus(Expr::constant(2), Expr::minus(Expr::times(s.clone(), s))),
+    |                                  ^^^^^^^^ variant, associated function, or constant not found in `Expr`
+    |
+note: if you're trying to build a new `Expr` consider using one of the following associated functions:
+      Expr::var
+      Expr::plus
+      Expr::times
+      Expr::sum
+      and 2 others
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no variant, associated function, or constant named `constant` found for enum `Expr` in the current scope
+   --> src/bin/certify_inverse_lift.rs:25:19
+    |
+ 25 |             Expr::constant(1),
+    |                   ^^^^^^^^ variant, associated function, or constant not found in `Expr`
+    |
+note: if you're trying to build a new `Expr` consider using one of the following associated functions:
+      Expr::var
+      Expr::plus
+      Expr::times
+      Expr::sum
+      and 2 others
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/identity_certificate.rs:94:5
+    |
+ 94 |     pub fn var(name: &str) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 98 |     pub fn plus(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+102 |     pub fn times(a: Expr, b: Expr) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+106 |     pub fn sum(terms: Vec<Expr>) -> Expr {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `trace-zero-point-chain-validation` (bin "certify_inverse_lift") due to 4 previous errors

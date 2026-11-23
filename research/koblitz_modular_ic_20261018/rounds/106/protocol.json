@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R106-MARKED23-BASE-LOCAL-UNIFORMIZERS",
+  "version":1,
+  "goal":"construct two exact finite-precision base-completion coordinates above x=1",
+  "claims":[{"id":"uniformizers106","class":"exact_computation","statement":"the R105 base source supports give simple-root transformed equations and verified order-32 local series"}],
+  "arms":{"reference":"R105 exact full f supports","candidate":"Hensel coefficient lifting after s=t/z","positive":["two simple-root transformed equations","f vanishes modulo s^32","valuations 2/3 and 3/4"],"negative":["changed R105 source hash rejected"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact computation"}},
+  "variables":{"fixed":["R105 SHA-256","F2","precision 32"],"measured":["transformed support","z(s)","t(s)","residual"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation"},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":2,"replicates":1,"power":"not applicable"},
+  "metrics":["simple-root derivative","series support","source residual","fresh replay"],
+  "execution":{"backend":"source-bound Python exact F2 series","source_gate":"committed source/protocol and R105 hash","queue":"one serial attempt","checkpoint":"retain raw attempts"},
+  "stopping":{"accept":"source hash, both simple roots and valuations, source residual zero, negative control, fresh replay","failure":"retain and amend before rerun"},
+  "analysis":{"method":"substitute t=s*z and solve coefficient-by-coefficient via unit derivative","scope":"base local series, not full lambda normalization"}
+}

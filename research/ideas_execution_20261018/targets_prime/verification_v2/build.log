@@ -1,0 +1,14 @@
+research/ideas_execution_20261018/targets_prime/verification_v2/verify_v2.cpp: In function ‘std::string hash_file(const std::filesystem::__cxx11::path&)’:
+research/ideas_execution_20261018/targets_prime/verification_v2/verify_v2.cpp:32:2: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+   32 |  for(unsigned i=0;i<count;++i)out<<std::hex<<std::setw(2)<<std::setfill('0')<<unsigned(digest[i]);return out.str();
+      |  ^~~
+research/ideas_execution_20261018/targets_prime/verification_v2/verify_v2.cpp:32:99: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   32 |  for(unsigned i=0;i<count;++i)out<<std::hex<<std::setw(2)<<std::setfill('0')<<unsigned(digest[i]);return out.str();
+      |                                                                                                   ^~~~~~
+research/ideas_execution_20261018/targets_prime/verification_v2/verify_v2.cpp: In function ‘int main(int, char**)’:
+research/ideas_execution_20261018/targets_prime/verification_v2/verify_v2.cpp:90:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   90 |  if(original)report["original_reference_results_sha256"]=original->digest;std::cout<<report.dump()<<"\n";return 0;
+      |  ^~
+research/ideas_execution_20261018/targets_prime/verification_v2/verify_v2.cpp:90:75: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   90 |  if(original)report["original_reference_results_sha256"]=original->digest;std::cout<<report.dump()<<"\n";return 0;
+      |                                                                           ^~~

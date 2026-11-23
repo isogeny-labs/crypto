@@ -1,0 +1,144 @@
+{
+  "schema": "isolab.eks.recovery-state/v1",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "pencil-p186379-20261030-b1",
+    "deadline_unix_seconds": 1793330900,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:13f27597322fced9230635cedc5a4e228daf2fb951f77652edbbcab17e674c1b",
+      "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+      "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+    "spec": {
+      "arms": [
+        {
+          "method": {
+            "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+            "params": {
+              "matrix_coefficient_cap": "25000000",
+              "small_denominator": "8"
+            }
+          },
+          "name": "pencil",
+          "role": "candidate"
+        },
+        {
+          "method": {
+            "id": "rho.three_leads_negation_v1",
+            "params": {
+              "trial_cap": "18668300"
+            }
+          },
+          "name": "rho",
+          "role": "reference"
+        },
+        {
+          "method": {
+            "id": "rho.three_leads_negation_v1",
+            "params": {
+              "trial_cap": "18668300"
+            }
+          },
+          "name": "rho_AA",
+          "role": "control"
+        }
+      ],
+      "description": "Prepared specification; execution requires a frozen experiment protocol and admission. Public synthetic archived targets; fixed denominator8 selected before symbolic cohort observations. Cold/online clocks, failures and memory retained; no full-price GAE claim.",
+      "label": "pencil-symbolic-gate-p186379-target0",
+      "measurement": {
+        "algorithm_seed_round": "measured_index",
+        "isolation_required": "L2",
+        "order": "shuffle",
+        "rounds": 5,
+        "seed": 2026101801,
+        "timeout_seconds": 3600,
+        "warmup": 1
+      },
+      "schema": "ecbench.spec/v1",
+      "workloads": {
+        "curves": [
+          {
+            "a": 32257112622,
+            "b": 13592517110,
+            "family": "scholten",
+            "group_order": 34737000016,
+            "gx": 9903146036,
+            "gy": 25331215426,
+            "kind": "three_leads",
+            "modulus": 1,
+            "n": 2,
+            "p": 186379,
+            "parameter": 0,
+            "r": 2171062501
+          }
+        ],
+        "target_seed": 202610181260,
+        "targets_per_curve": 1
+      }
+    },
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 300,
+    "max_restores": 1,
+    "memory": "8Gi"
+  },
+  "request_sha256": "daf54f696c9283075900b099d244dd8666e581c7726c0e502c536219d0a9a30a",
+  "owner_build": "isolab-recovery-controller:3071de75-eb33-43ca-ba92-b44fd357c7de",
+  "phase": "failed",
+  "attempt": 0,
+  "restores": 0,
+  "next_generation": 7,
+  "checkpoint_generation": null,
+  "current_pod_uid": "38146cc7-a12a-411b-94db-f9a1fc8e1ba7",
+  "current_instance": "i-027be1b63d0a94827",
+  "original_node_runtime": {
+    "architecture": "amd64",
+    "containerRuntimeVersion": "containerd://2.3.5+unknown",
+    "kernelVersion": "6.18.54-121.166.amzn2023.x86_64",
+    "osImage": "Amazon Linux 2023.12.20261012"
+  },
+  "terminated_instances": [],
+  "generations": [
+    {
+      "number": 5,
+      "request_sha256": "daf54f696c9283075900b099d244dd8666e581c7726c0e502c536219d0a9a30a",
+      "snapshot_name": "pencil-p186379-20261030-b1-g5",
+      "snapshot_id": "snap-094f703a126d941f5",
+      "archive_key": "recovery/runs/pencil-p186379-20261030-b1/generations/g5/checkpoint.tar",
+      "archive_version": "bWSSPH9sZJ9cEZXTNY.ob.0C8hYkx8Zs",
+      "archive_sha256": "8ba82b19e02847424a5a3aed5b6adafa60e1c694a53bec52718e86ee3f47dfd0",
+      "manifest_sha256": "56fd3f24980e949aa654325582297c81b35023256c9b17d87de2e7370732d6ad",
+      "archive_bytes": 490096640,
+      "source_instance": "i-027be1b63d0a94827",
+      "source_pod_uid": "38146cc7-a12a-411b-94db-f9a1fc8e1ba7",
+      "committed_unix_seconds": 1793330358,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    },
+    {
+      "number": 6,
+      "request_sha256": "daf54f696c9283075900b099d244dd8666e581c7726c0e502c536219d0a9a30a",
+      "snapshot_name": "pencil-p186379-20261030-b1-g6",
+      "snapshot_id": "snap-064f1f81a17f19f0c",
+      "archive_key": "recovery/runs/pencil-p186379-20261030-b1/generations/g6/checkpoint.tar",
+      "archive_version": "qHEeQ_J4ax0M218b5snGnvuj7tEDxOgL",
+      "archive_sha256": "e7bd3bd69a60c175759950aff34138007c51687872ed0d034bc16968a2027f13",
+      "manifest_sha256": "7d8b415e9f38f04e631e61c6194ad2b6713c609ae4cbf8155ea9c182a0362e3d",
+      "archive_bytes": 528281600,
+      "source_instance": "i-027be1b63d0a94827",
+      "source_pod_uid": "38146cc7-a12a-411b-94db-f9a1fc8e1ba7",
+      "committed_unix_seconds": 1793330740,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    }
+  ],
+  "last_checkpoint_at": 1793330740,
+  "selected_generation": null,
+  "failure": "original UTC deadline expired",
+  "benchmark_job": null,
+  "benchmark_uid": null,
+  "benchmark_manifest": null,
+  "benchmark_create_attempted": false
+}

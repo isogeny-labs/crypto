@@ -776,6 +776,36 @@ mod tests {
         .is_err());
     }
     #[test]
+    fn frozen_k13_admission_spec_passes_argument_gate_without_submission() {
+        let spec: Value = serde_json::from_str(include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../../../research/rootfind_k13_l2_admission_probe_20261116/SPEC-K13-ADMISSION-v3.json"
+        )))
+        .unwrap();
+        let input = json!({
+            "job_name": "k13-admission-argument-check",
+            "instance_type": "c8a.2xlarge",
+            "spec": spec,
+        });
+        validate("isolab_k8s_benchmark", &input).unwrap();
+        let argv = benchmark_args(&input).unwrap();
+        assert_eq!(
+            &argv[..4],
+            &[
+                "--instance-type",
+                "c8a.2xlarge",
+                "--isolation-profile",
+                "l2"
+            ]
+        );
+        let at = argv.iter().position(|arg| arg == "isolab-ecbench").unwrap() + 1;
+        let embedded: Value = serde_json::from_str(&argv[at]).unwrap();
+        assert_eq!(embedded, input["spec"]);
+        assert_eq!(embedded["measurement"]["rounds"], 5);
+        assert_eq!(embedded["measurement"]["warmup"], 1);
+        assert_eq!(embedded["measurement"]["isolation_required"], "L2");
+    }
+    #[test]
     fn benchmark_build_is_bound_to_commit_binary_and_repository() {
         let default: Value = serde_json::from_str(include_str!("../../image.json")).unwrap();
         let build = json!({"image_uri":default["image_uri"],"source_revision":"a".repeat(40),"ecbench_sha256":"b".repeat(64)});

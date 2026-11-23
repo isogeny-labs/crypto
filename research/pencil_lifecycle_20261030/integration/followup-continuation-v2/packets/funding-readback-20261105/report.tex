@@ -1,0 +1,28 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{array}
+\begin{document}
+\section*{Funding and live-cap readback: November 5, 2026}
+Read-only observation window: 15:46--15:47 UTC. No build, trial, role change or cluster mutation occurred.
+\subsection*{Delayed AWS budget observations}
+\begin{tabular}{lrrl}
+Budget & Limit USD & Reported USD & Last updated UTC\\\hline
+Daily primary & 200 & 104.44 & 11:47:42\\
+Daily alternate & 200 & 44.765 & 11:51:51\\
+Monthly & 1000 & 538.72 & 11:55:08
+\end{tabular}
+
+The two daily thresholds are nonadditive. Arithmetic residuals are 95.56 USD conservatively for the daily snapshots and 461.28 USD monthly, before billing delay and commitments. Actual available funds remain unknown.
+\subsection*{Admission observation diagram}
+\fbox{\parbox{0.94\linewidth}{AWS snapshots available, delayed $\longrightarrow$ commitments unresolved.\\
+Live NodePool, quota and ARC readbacks $\longrightarrow$ role assumption denied.\\
+Combined observation $\longrightarrow$ no execution admission.}}
+
+The configured context named \texttt{spot-job-submitter} invokes a legacy LauncherRole. The current WorkerRole was denied \texttt{sts:AssumeRole} before Kubernetes RBAC evaluation. Failed empty Lists are not evidence of an empty cluster. No additional role was attempted.
+
+The separately configured IsoLab MCP overview returned twelve retained jobs: ten failed, one succeeded and one suspended. No active pencil job was returned. This list is not an account-wide census; its compiled pool limits are not live enforcement.
+\subsection*{Next admission dependencies}
+Obtain authorized live pool/quota/ARC readback and reconcile committed, reserved, idle, storage, transfer and failed-attempt costs. Preserve the reviewed source/image/protocol/runtime gates. The time authorization alone does not allocate dollars.
+\subsection*{Evidence and editable outputs}
+Exact commands, timestamps, exits and stdout/stderr hashes are in per-command receipts. Structured values: \texttt{summary.json}; table: \texttt{budgets.csv}; editable diagram: \texttt{admission.svg}. Source runbook: \texttt{COST\_CONTROLS.md} in the owner cost-controls checkout. No comparative scientific result is asserted.
+\end{document}

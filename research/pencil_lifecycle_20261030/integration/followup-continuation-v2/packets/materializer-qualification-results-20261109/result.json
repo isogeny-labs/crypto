@@ -1,0 +1,237 @@
+{
+  "schema": "materializer.storage-fault-qualification/v1",
+  "source_sha256": "6bfc278cdfb8cd5f2adad13f5e920a2baee131be9f7dedc4b472329f2f0da4f7",
+  "reader_sha256": "021215e4b46f84c63e0b297acc427fce244bbe675647fe13b88eb60a0326e2e9",
+  "elapsed_seconds": 0.11730553704546764,
+  "cases": [
+    {
+      "case": "normal_intermediate_and_final",
+      "passed": true,
+      "details": {
+        "consistency": "storage_complete",
+        "reported_status": "passed",
+        "cleanup_semantics_verified": false,
+        "storage": "inline-final-and-journal-prefix/v1",
+        "committed_records": 2,
+        "inline_records": 2,
+        "unreferenced_tail_bytes": 0,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "interrupted_unacknowledged_tail",
+      "passed": true,
+      "details": {
+        "consistency": "storage_incomplete",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "journal-prefix/v1",
+        "committed_records": 1,
+        "inline_records": 0,
+        "unreferenced_tail_bytes": 11,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "first_file_fsync_failure",
+      "passed": true,
+      "details": {
+        "consistency": "storage_failed",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "inline-final-and-journal-prefix/v1",
+        "committed_records": 0,
+        "inline_records": 1,
+        "unreferenced_tail_bytes": null,
+        "journal_verified": false,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "first_directory_fsync_failure",
+      "passed": true,
+      "details": {
+        "consistency": "storage_failed",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "inline-final-and-journal-prefix/v1",
+        "committed_records": 0,
+        "inline_records": 1,
+        "unreferenced_tail_bytes": null,
+        "journal_verified": false,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "append_fsync_failure",
+      "passed": true,
+      "details": {
+        "consistency": "storage_failed",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "inline-final-and-journal-prefix/v1",
+        "committed_records": 1,
+        "inline_records": 2,
+        "unreferenced_tail_bytes": 39,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "append_write_failure",
+      "passed": true,
+      "details": {
+        "consistency": "storage_failed",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "inline-final-and-journal-prefix/v1",
+        "committed_records": 1,
+        "inline_records": 2,
+        "unreferenced_tail_bytes": 0,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "append_short_failure",
+      "passed": true,
+      "details": {
+        "consistency": "storage_failed",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "inline-final-and-journal-prefix/v1",
+        "committed_records": 1,
+        "inline_records": 2,
+        "unreferenced_tail_bytes": 3,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "append_flush_failure",
+      "passed": true,
+      "details": {
+        "consistency": "storage_failed",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "inline-final-and-journal-prefix/v1",
+        "committed_records": 1,
+        "inline_records": 2,
+        "unreferenced_tail_bytes": 39,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "checkpoint_replace_failure",
+      "passed": true,
+      "details": {
+        "consistency": "storage_incomplete",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "journal-prefix/v1",
+        "committed_records": 1,
+        "inline_records": 0,
+        "unreferenced_tail_bytes": 39,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "acknowledged_prefix_corruption_rejected",
+      "passed": true,
+      "details": {
+        "rejected": true
+      }
+    },
+    {
+      "case": "normal_repeat_control",
+      "passed": true,
+      "details": {
+        "consistency": "storage_complete",
+        "reported_status": "passed",
+        "cleanup_semantics_verified": false,
+        "storage": "inline-final-and-journal-prefix/v1",
+        "committed_records": 2,
+        "inline_records": 2,
+        "unreferenced_tail_bytes": 0,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "before_first_append_interruption",
+      "passed": true,
+      "details": {
+        "consistency": "storage_incomplete",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "journal-prefix/v1",
+        "committed_records": 0,
+        "inline_records": 0,
+        "unreferenced_tail_bytes": null,
+        "journal_verified": false,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "durable_append_before_checkpoint",
+      "passed": true,
+      "details": {
+        "consistency": "storage_incomplete",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "journal-prefix/v1",
+        "committed_records": 1,
+        "inline_records": 0,
+        "unreferenced_tail_bytes": 39,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false
+      }
+    },
+    {
+      "case": "checkpoint_directory_fsync_failure",
+      "passed": true,
+      "details": {
+        "consistency": "storage_incomplete",
+        "reported_status": "failed",
+        "cleanup_semantics_verified": false,
+        "storage": "journal-prefix/v1",
+        "committed_records": 2,
+        "inline_records": 0,
+        "unreferenced_tail_bytes": 0,
+        "journal_verified": true,
+        "terminal_owner_authenticated": false,
+        "terminal_established": false,
+        "persistence_after_crash_established": false
+      }
+    },
+    {
+      "case": "pointer_count_mismatch_rejected",
+      "passed": true,
+      "details": {
+        "rejected": true
+      }
+    }
+  ],
+  "passed": true,
+  "materializer_executed": false,
+  "compiler_executed": false,
+  "power_loss_durability_established": false,
+  "terminal_custody_established": false,
+  "semantics": "bounded deterministic injected storage faults; not OS/power-loss crash testing"
+}

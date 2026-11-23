@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T19:37:38Z",
+ "id": "PCC-20261116-d93b73",
+ "kind": "statement",
+ "producer": {
+  "commit": "b9791e11707281d9c84d20f5af4436debf317e2b",
+  "model": "",
+  "session": "codex-20261116-nist-differential-test"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/GIAC_CAPABILITY.giac",
+    "sha256": "d8217c2a2fc8851154d7157f927901733bc88722fbc2be8285d6ad862941ef46"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/giac-capability-v1/stdout.txt",
+    "sha256": "d796e18681a2b17cd93026f30430892026a533207e16077a15943a3058b5e6b0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/giac-capability-v1/stderr.txt",
+    "sha256": "e181bec5c9067844ee5cefda9b5606b9f3ff5e8642518f695c8fec033afd50e0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/giac-capability-v1/pre-call-manifest.sha256",
+    "sha256": "6b1a7734670d817773babff39bd30e76679598b6bc9b6591dd56818794e25ea7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The installed local Giac1.9.0 modular Groebner capability probe passes both known roots of (x+y-3,xy-2) at p109 but its returned basis fails both known roots at the actual P-192 prime. This rejects this tested backend mode for the divisor-lift solver; it is not an implementation-absence or mathematical-impossibility claim. Raw input, binary/library hashes and stdout/stderr are retained."
+}

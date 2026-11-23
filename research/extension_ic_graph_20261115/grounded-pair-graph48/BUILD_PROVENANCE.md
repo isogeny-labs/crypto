@@ -1,0 +1,7 @@
+# Native control scope and receipts
+
+The exact production graph file is included by the standalone Rust test target against immutable productionRootf28056da… using the retained build argv. Six control groups pass in the final exact-witness receipt; strict Clippy is empty/successful. Initial filter_map_bool_then lint failure is preserved in clippy.log and fixed without a broad allowance. Final source hashes cover the public export, exact graph file, standalone target and argv. [pcc:unverified]
+
+The initial development binary hashes were captured before adding the explicit−2R0+R1+R2assertion and recompiling the same LOCAL binary paths. They are retained as pre-final-build-assets.sha256 for development history, not as current/replayable assets. local-final-build-assets.sha256 binds the actual final test/Clippy executables. This is unsealed unit development, not a changed or retried scientific run. No frozen source/proof was edited. [pcc:unverified]
+
+The native renderer reads the retained final six-pass log and Clippy receipt; it launches no graph, relation finder or benchmark. One-page PDF/SVG and54815byte150dpi palette PNG were opened and inspected: exact source signs, coefficient2, zero incidence, bounds, literature/version and remaining dependencies are legible and unclipped. report-artifacts.sha256 binds final files. No benchmark index row or performance claim. [pcc:unverified]

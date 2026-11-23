@@ -1,0 +1,22 @@
+{
+  "baseline": "PASS_FOUR_INDEPENDENT_HOSTED_REPLAYS",
+  "controls": [
+    {
+      "control": "forged_successful_run",
+      "reason": "hosted run differs",
+      "status": "REJECTED"
+    },
+    {
+      "control": "one_bit_artifact_mutation",
+      "reason": "hosted artifact metadata differs: 0",
+      "status": "REJECTED"
+    },
+    {
+      "control": "forged_receipt_with_consistent_artifact_digest",
+      "reason": "hosted replay receipt differs: 0",
+      "status": "REJECTED"
+    }
+  ],
+  "schema": "n83.crossfamily-independent-hosted-audit-controls/v1",
+  "selected_best_total_runtime": null
+}

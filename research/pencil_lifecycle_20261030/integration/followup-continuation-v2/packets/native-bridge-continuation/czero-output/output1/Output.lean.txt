@@ -1,0 +1,44 @@
+import CZero
+set_option autoImplicit false
+namespace CZeroOutput
+open Polynomial CZeroInterpolation
+variable {K : Type*} [Field K]
+theorem support_bound (q r : K) : (CZeroInterpolation.support q r).natDegree≤2 := by
+ unfold CZeroInterpolation.support
+ apply le_trans (natDegree_add_le _ _)
+ apply max_le
+ · apply le_trans (natDegree_add_le _ _)
+   apply max_le
+   · simp
+   · apply le_trans natDegree_mul_le
+     simp
+ · simp
+
+theorem support_degree (q r : K) : (CZeroInterpolation.support q r).natDegree=2 := by
+ apply natDegree_eq_of_le_of_coeff_ne_zero (support_bound q r)
+ simp [CZeroInterpolation.support]
+
+theorem ordinate_bound (s t : K) : (ordinate s t).natDegree≤1 := by
+ unfold ordinate
+ apply le_trans (natDegree_add_le _ _)
+ apply max_le
+ · apply le_trans natDegree_mul_le
+   simp
+ · simp
+
+theorem interpolant_bound (q r s t a : K) :
+ (ordinate s t-C a*CZeroInterpolation.support q r).natDegree≤2 := by
+ apply le_trans (natDegree_sub_le _ _)
+ apply max_le
+ · exact le_trans (ordinate_bound s t) (by decide)
+ · apply le_trans natDegree_mul_le
+   simpa using support_bound q r
+
+theorem residual_degree (f : K[X]) (q r s t a : K) (hf:f.natDegree=5) :
+ (f-(ordinate s t-C a*CZeroInterpolation.support q r)^2).natDegree=5 := by
+ rw [natDegree_sub_eq_left_of_natDegree_lt]
+ · exact hf
+ · have h:=(interpolant_bound q r s t a)
+   have hh:=natDegree_pow_le (ordinate s t-C a*CZeroInterpolation.support q r) 2
+   rw [hf]; omega
+end CZeroOutput

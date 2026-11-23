@@ -1,0 +1,79 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "rootfind-subtract m = 2: CPU (1 thread), pooled multi-threaded CPU sweep and GPU daemon, prime-order curves 28-32 bits",
+ "description": "research/ic_gpu_rootfind_pairs_20261115, frozen 2026-11-15 before the run. The rf2mt workload of research/ic_gpu_rootfind_big_20261115 with the multi-threaded arm on a persistent thread pool. Identical relations, logarithm and S required. Public synthetic curves; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 28,
+    "seed": 20261114
+   },
+   {
+    "kind": "prime_search",
+    "bits": 30,
+    "seed": 20261114
+   },
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 20261114
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261115
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rf2-cpu-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=2",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-mt-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=daemon,backend=emulate",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-gpud-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=daemon,backend=cuda",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261124,
+  "isolation_required": "L0",
+  "timeout_seconds": 7200
+ }
+}

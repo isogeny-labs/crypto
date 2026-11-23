@@ -1,0 +1,56 @@
+    let [q2, r2, s2, t2, z2, w2] = b;
+    let z1_2 = f.sq(z1);
+    let z2_2 = f.sq(z2);
+    let z1_3 = f.mul(z1_2, z1);
+    let z2_3 = f.mul(z2_2, z2);
+    let z1_4 = f.sq(z1_2);
+    let z2_4 = f.sq(z2_2);
+    let z1_5 = f.mul(z1_4, z1);
+    let z2_5 = f.mul(z2_4, z2);
+    let q1c = f.mul(q1, z2_2);
+    let q2c = f.mul(q2, z1_2);
+    let r1c = f.mul(r1, z2_4);
+    let r2c = f.mul(r2, z1_4);
+    let s1c = f.mul(f.mul(s1, z2_3), w2);
+    let s2c = f.mul(f.mul(s2, z1_3), w1);
+    let t1c = f.mul(f.mul(t1, z2_5), w2);
+    let t2c = f.mul(f.mul(t2, z1_5), w1);
+    if q1c == q2c && r1c == r2c {
+        if s1c == f.neg(s2c) && t1c == f.neg(t2c) {
+            return (Some(ResultPoint::Identity), "same_u_inverse");
+        }
+        if s1c == s2c && t1c == t2c {
+            let (result, branch) = double22_weighted(a, curve, f);
+            return (Some(result), branch);
+        }
+        let k = f.sub(s1c, s2c);
+        if k == 0 {
+            return (None, "same_u_mixed_zero_slope_delta");
+        }
+        let x = f.mul(f.sub(t2c, t1c), k);
+        let k2 = f.sq(k);
+        let k3 = f.mul(k2, k);
+        let y = f.mul(
+            f.mul(f.add(f.mul(s1, x), f.mul(t1, f.mul(z2_2, k2))), k3),
+            z2_3,
+        );
+        return (
+            Some(dbl(
+                D1 {
+                    x,
+                    y,
+                    z: f.mul(k, f.mul(z1, z2)),
+                    w: w1,
+                },
+                curve,
+                f,
+            )),
+            "same_u_mixed",
+        );
+    }
+    let dq = f.sub(q1c, q2c);
+    let dr = f.sub(r1c, r2c);
+    let ds = f.sub(s1c, s2c);
+    let dt = f.sub(t1c, t2c);
+    let bb = f.sub(f.mul(dq, f.sub(f.mul(q2c, r1c), f.mul(q1c, r2c))), f.sq(dr));
+    if bb == 0 {

@@ -1,0 +1,29 @@
+$ rustc --version
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+
+exit=0
+$ cargo --version
+cargo 1.99.1 (5f94df478 2026-08-27)
+
+exit=0
+$ uname -a
+Linux 81358dc09712 6.18.57 #1 SMP Tue Oct 20 21:56:04 UTC 2026 x86_64 GNU/Linux
+
+exit=0
+$ git rev-parse HEAD
+3ae8b21241256517a9c867b4e78fb25e02ff502e
+
+exit=0
+
+Completed validation commands (see individual raw receipts):
+cargo test --locked --manifest-path research/trace_zero_point_chains_20261109/native/Cargo.toml -- --nocapture --test-threads=1 : exit0,20 passed
+cargo test --locked --manifest-path research/full_trace_zero_variety_20261109/native/Cargo.toml -- --nocapture --test-threads=1 : exit0,10 passed
+cargo test --locked --manifest-path research/trace_zero_leads_20261109/native/Cargo.toml -- --nocapture --test-threads=1 : exit0,7 passed
+cargo check --lib --no-default-features : exit0
+cargo run --locked --manifest-path research/trace_zero_point_chains_20261109/native/Cargo.toml --bin certify_inverse_lift : exit0
+cargo run --locked --manifest-path research/trace_zero_point_chains_20261109/native/Cargo.toml --bin certify_tau_norm : exit0
+python3 ../crypto-autoresearcher/tools/experiment_protocol.py validate research/trace_zero_experiments_20261109/protocol.json : exit0,0 findings
+
+Report rendering: initial matplotlib import unavailable; replaced plotting dependency with a standard-library SVG renderer of the same recorded counts. Typst0.15.1 renders3 A4 pages; every page rasterized at1350px and visually inspected. No clipping or overlapping labels observed.
+No experiment panel, pilot, EKS job or paid resource was launched.
+Published instrument at recorded HEAD remains unchanged; newer production sources are pinned by SOURCES.sha256.

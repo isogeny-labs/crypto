@@ -1,0 +1,25 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "sgsecant-panel-20261107",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "command": [
+      "/bin/sh",
+      "-c",
+      "set -eu; mkdir -p \"$ISOLAB_OUTPUT_DIR/panel\"; /opt/sgsecant/sgsecant panel --describe; /opt/sgsecant/sgsecant panel --threads 4 --out \"$ISOLAB_OUTPUT_DIR/panel\"; cd \"$ISOLAB_OUTPUT_DIR\"; sha256sum panel/records.jsonl panel/summary.json panel/summary.txt panel/config.txt /opt/sgsecant/sgsecant > SHA256SUMS; aws s3 cp --recursive \"$ISOLAB_OUTPUT_DIR\" \"$ISOLAB_RESULTS_URI\" --only-show-errors"
+    ],
+    "cpu": 4,
+    "memory": "8Gi",
+    "seconds": 3600,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 60
+  },
+  "provenance": {
+    "harness": "claude-code",
+    "source_revision": "0000000000000000000000000000000000000000",
+    "study": "split_graph_secant_cost_20261107",
+    "protocol_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "note": "TEMPLATE: replace image digest (published layer with /opt/sgsecant/sgsecant), source_revision (commit holding native/), protocol_sha256 (sha256 of PROTOCOL.md at freeze). Command Jobs have no L2/replay/A-A gate; the measurand is exact operation counts, wall seconds are diagnostic only."
+  }
+}

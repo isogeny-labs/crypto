@@ -1,0 +1,14 @@
+digraph relation {
+ graph [rankdir=TB,bgcolor="white",pad="0.12",nodesep="0.23",ranksep="0.27"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=11,margin="0.15,0.09"];
+ edge [color="#455566"];
+ input [label="Prime-order subgroup; Q = kP\nm parts, b random labelled records per part"];
+ base [label="Rij = aij P + bij Q\nReject infinity / repeated abscissas"];
+ cover [label="Checked finite-group bound: L = b^m\nPr[covered] ≥ L/(r+L−1) before rejection",fillcolor="#e7f4ed"];
+ select [label="Point-only signed zero-sum selector\nEffective capped cost and yield STILL OPEN",fillcolor="#fbe8df"];
+ recover [label="Check the actual relation\nα + kβ = 0; β ≠ 0 with probability 1−1/r"];
+ verify [label="Return k = −α/β; check kP = Q\nCharge all failed bases and calls"];
+ index [label="Named direct all-column implementation\nM ≥ b^m/m! ≥ r/m!\nExponential allocation at balanced m",fillcolor="#f6efde"];
+ input -> base -> cover -> select -> recover -> verify;
+ select -> index [style=dashed,label="assessed implementation",fontsize=10];
+}

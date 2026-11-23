@@ -1,0 +1,106 @@
+{
+  "branch": "claude/ecstatic-edison-cgo57l",
+  "closed_utc": "2026-11-14T21:29:33+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/tmp/claude-0/-home-user/399ffebe-249c-517d-8b4e-5c372f2544d0/scratchpad/run/go.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T20:47:36+00:00",
+      "wall_s": 1716.963
+    }
+  ],
+  "commit": "360fe03360a367792296afdce7cdbbf32a07efc1",
+  "commit_dirty": true,
+  "created_utc": "2026-11-14T20:47:15+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T2047Z-genus-ladder",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "fpm_mid_ic_over_rho_g4_p4099_c_pre",
+      "note": "hyperelliptic genus 4, p=4099, C_double_lp+pre over R_rho_neg, FPM primary reading; unverified, pre-gate",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.033,
+        0.135
+      ],
+      "unit": "ratio",
+      "value": 0.0638
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 60,
+      "name": "prefilter_rel_mul_ratio_g5",
+      "note": "parity prefilter on/off, relation-phase native multiplications, genus 5 cells; counts otherwise identical on 624/624 pairs; unverified",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.612,
+        0.673
+      ],
+      "unit": "ratio",
+      "value": 0.64
+    }
+  ],
+  "problem": "hcdlp:genus_ladder",
+  "raw": [
+    {
+      "bytes": 662895,
+      "path": "research/genus_ladder_20261114/part_a.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/32/32061f655233ca0b446446e0096d88958bdd928f3a403509b8c4aa8d4c04d8b9",
+      "sha256": "32061f655233ca0b446446e0096d88958bdd928f3a403509b8c4aa8d4c04d8b9",
+      "uploaded": false
+    },
+    {
+      "bytes": 214600,
+      "path": "research/genus_ladder_20261114/part_b.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/20/20ca15530afea82ee1b823c8cfda2aad8357fbdb94293944bb1d0f1152f40361",
+      "sha256": "20ca15530afea82ee1b823c8cfda2aad8357fbdb94293944bb1d0f1152f40361",
+      "uploaded": false
+    },
+    {
+      "bytes": 410578,
+      "path": "research/genus_ladder_20261114/amend1.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/80/80d19382d3a775ee04d69a4e333987dc127f141a13a3f0b7456697594ef93b33",
+      "sha256": "80d19382d3a775ee04d69a4e333987dc127f141a13a3f0b7456697594ef93b33",
+      "uploaded": false
+    },
+    {
+      "bytes": 113649,
+      "path": "research/genus_ladder_20261114/repro.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f2/f28da01841a30fa757fe47afbc1c66896e52a00785c567689b3fae3a36293366",
+      "sha256": "f28da01841a30fa757fe47afbc1c66896e52a00785c567689b3fae3a36293366",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/genus_ladder_20261114/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/genus_ladder_20261114/fig_cost.svg",
+      "research/genus_ladder_20261114/fig_ratio.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "genus-ladder",
+  "status": "measured",
+  "summary": "Genus ladder: HCDLP at genus 2-5 on one field, plane quartics, Smith census; 1809 runs all certified; unverified (no validator replay), no leaderboard row.",
+  "validation": null
+}

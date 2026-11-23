@@ -1,0 +1,37 @@
+base                         lifts targets  hits   F4 mul-adds(1e9)  mul-adds/target   lifts/target  hits per 1e9 mul-adds [95% Poisson]   setup_ops
+isogeny t=5 seed0            0    20000    12            3.5        1.771e+05            -        3.388 [1.751, 5.919]            0
+isogeny t=5 seed0            1    20000    99           28.3        1.413e+06        7.983        3.502 [2.846, 4.264]           34
+edwards-bits t=5             0    20000    10           60.7        3.036e+06            -        0.165 [0.079, 0.303]            0
+edwards-bits t=5             1    16464    52          399.3        2.425e+07        7.988        0.130 [0.097, 0.171]           34
+t0-bits t=5                  0    20000     6           60.7        3.036e+06            -        0.099 [0.036, 0.215]            0
+t0-bits t=5                  1    16606    10          403.2        2.428e+07        7.997        0.025 [0.012, 0.046]          381
+digits set 1 t=5             0    20000    73           60.6        3.029e+06            -        1.205 [0.945, 1.515]            0
+digits set 1 t=5             1    16488   119          398.6        2.418e+07        7.965        0.299 [0.247, 0.357]          301
+digits set 2 t=6             0     2319    21          397.8        1.715e+08            -        0.053 [0.033, 0.081]            0
+digits set 2 t=6             1      294     8          400.5        1.362e+09        7.915        0.020 [0.009, 0.039]           34
+REF bits@0 t=5               0    20000     6           60.7        3.036e+06            -        0.099 [0.036, 0.215]            0
+REF bits@0 t=5               1    20000    39          485.3        2.427e+07        7.992        0.080 [0.057, 0.110]           34
+REF square-bits@0 t=5        0    20000    37          197.5        9.877e+06            -        0.187 [0.132, 0.258]            0
+REF square-bits@0 t=5        1    20000   107          788.5        3.942e+07        3.990        0.136 [0.111, 0.164]          791
+REF square-bits@414271 t=5   0    20000    50          197.5        9.874e+06            -        0.253 [0.188, 0.334]            0
+REF square-bits@414271 t=5   1    20000   133          787.7        3.939e+07        3.987        0.169 [0.141, 0.200]          891
+
+H4: cost per target, lifts=1 over blind (bases tried here and references)
+isogeny t=5 seed0            x7.982
+edwards-bits t=5             x7.989
+t0-bits t=5                  x7.996
+digits set 1 t=5             x7.982
+digits set 2 t=6             x7.942
+REF bits@0 t=5               x7.992
+REF square-bits@0 t=5        x3.992
+REF square-bits@414271 t=5   x3.989
+
+H5: rate ratio lifts=1 / blind in hits per counted mul-add, exact conditional binomial, two-sided
+isogeny t=5 seed0            L0   12/3.5=3.3884  L1   99/28.3=3.5023  ratio 1.03  p = 1.0000
+edwards-bits t=5             L0   10/60.7=0.1647  L1   52/399.3=0.1302  ratio 0.79  p = 0.4547
+t0-bits t=5                  L0    6/60.7=0.0988  L1   10/403.2=0.0248  ratio 0.25  p = 0.0125
+digits set 1 t=5             L0   73/60.6=1.2051  L1  119/398.6=0.2985  ratio 0.25  p = 0.0000
+digits set 2 t=6             L0   21/397.8=0.0528  L1    8/400.5=0.0200  ratio 0.38  p = 0.0158
+REF bits@0 t=5               L0    6/60.7=0.0988  L1   39/485.3=0.0804  ratio 0.81  p = 0.6326
+REF square-bits@0 t=5        L0   37/197.5=0.1873  L1  107/788.5=0.1357  ratio 0.72  p = 0.0956
+REF square-bits@414271 t=5   L0   50/197.5=0.2532  L1  133/787.7=0.1688  ratio 0.67  p = 0.0163

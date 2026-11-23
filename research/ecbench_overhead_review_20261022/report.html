@@ -1,0 +1,108 @@
+<!doctype html><meta charset="utf-8"><title>ecbench harness overhead</title>
+<style>body{font-family:sans-serif;max-width:800px;margin:24px auto;color:#222;font-size:13px}td,th{padding:2px 7px;text-align:right}td:nth-child(-n+2),th:nth-child(-n+2){text-align:left}table{border-collapse:collapse;margin:8px 0}tr:nth-child(even){background:#f4f6f7}code{font-size:12px}</style>
+<h1>ecbench harness overhead: parse the registry once, allocate counter keys once</h1>
+<p>Two harness changes. <code>docs/curves/registry.json</code> (4.7 MB) is parsed once per process instead of on every registry lookup (<code>Workload::on</code> in every measured child and every planned target). <code>GenericOutcome::count</code>, called several times per BSGS and kangaroo step, allocates a counter's key only on first use. No solver, cost unit or counted result changes: 2376 records are identical to the old binary's outside timing, every session replays exactly under the other binary (<code>ecbench verify --replay-all</code>), and the §5a band is identical.</p>
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="588" font-family="sans-serif" font-size="11">
+<rect width="760" height="588" fill="#fff"/>
+<text x="110" y="18" font-size="13" fill="#222">Median solve wall time per arm, old binary vs this change (ms)</text>
+<text x="110" y="33" fill="#555">ecbench solve_wall_ns, 3 sessions each, warm-up excluded; counted results identical</text>
+<text x="110" y="56" font-weight="bold" fill="#222">smoke-prime-20</text>
+<text x="102" y="76" text-anchor="end" fill="#333">bsgs</text>
+<rect x="110" y="64" width="493.1" height="9" fill="#c0392b"/>
+<text x="607.1" y="72" font-size="9" fill="#555">3.88</text>
+<rect x="110" y="73" width="22.4" height="9" fill="#2471a3"/>
+<text x="136.4" y="81" font-size="9" fill="#555">0.18</text>
+<text x="102" y="102" text-anchor="end" fill="#333">bsgs-il</text>
+<rect x="110" y="90" width="515.6" height="9" fill="#c0392b"/>
+<text x="629.6" y="98" font-size="9" fill="#555">4.06</text>
+<rect x="110" y="99" width="18.8" height="9" fill="#2471a3"/>
+<text x="132.8" y="107" font-size="9" fill="#555">0.15</text>
+<text x="102" y="128" text-anchor="end" fill="#333">bsgs-neg</text>
+<rect x="110" y="116" width="489.3" height="9" fill="#c0392b"/>
+<text x="603.3" y="124" font-size="9" fill="#555">3.85</text>
+<rect x="110" y="125" width="15.5" height="9" fill="#2471a3"/>
+<text x="129.5" y="133" font-size="9" fill="#555">0.12</text>
+<text x="102" y="154" text-anchor="end" fill="#333">ic-mitm</text>
+<rect x="110" y="142" width="263.5" height="9" fill="#c0392b"/>
+<text x="377.5" y="150" font-size="9" fill="#555">2.08</text>
+<rect x="110" y="151" width="252.3" height="9" fill="#2471a3"/>
+<text x="366.3" y="159" font-size="9" fill="#555">1.99</text>
+<text x="102" y="180" text-anchor="end" fill="#333">kangaroo</text>
+<rect x="110" y="168" width="559.1" height="9" fill="#c0392b"/>
+<text x="673.1" y="176" font-size="9" fill="#555">4.40</text>
+<rect x="110" y="177" width="25.4" height="9" fill="#2471a3"/>
+<text x="139.4" y="185" font-size="9" fill="#555">0.20</text>
+<text x="102" y="206" text-anchor="end" fill="#333">rho-frozen</text>
+<rect x="110" y="194" width="560.1" height="9" fill="#c0392b"/>
+<text x="674.1" y="202" font-size="9" fill="#555">4.41</text>
+<rect x="110" y="203" width="39.0" height="9" fill="#2471a3"/>
+<text x="153.0" y="211" font-size="9" fill="#555">0.31</text>
+<text x="102" y="232" text-anchor="end" fill="#333">rho-neg</text>
+<rect x="110" y="220" width="547.3" height="9" fill="#c0392b"/>
+<text x="661.3" y="228" font-size="9" fill="#555">4.31</text>
+<rect x="110" y="229" width="34.5" height="9" fill="#2471a3"/>
+<text x="148.5" y="237" font-size="9" fill="#555">0.27</text>
+<text x="102" y="258" text-anchor="end" fill="#333">rho-neg-aa</text>
+<rect x="110" y="246" width="580.0" height="9" fill="#c0392b"/>
+<text x="694.0" y="254" font-size="9" fill="#555">4.57</text>
+<rect x="110" y="255" width="33.6" height="9" fill="#2471a3"/>
+<text x="147.6" y="263" font-size="9" fill="#555">0.26</text>
+<text x="102" y="284" text-anchor="end" fill="#333">rho-plain</text>
+<rect x="110" y="272" width="556.9" height="9" fill="#c0392b"/>
+<text x="670.9" y="280" font-size="9" fill="#555">4.39</text>
+<rect x="110" y="281" width="34.3" height="9" fill="#2471a3"/>
+<text x="148.3" y="289" font-size="9" fill="#555">0.27</text>
+<text x="110" y="326" font-weight="bold" fill="#222">generic-32</text>
+<text x="102" y="346" text-anchor="end" fill="#333">bsgs</text>
+<rect x="110" y="334" width="566.1" height="9" fill="#c0392b"/>
+<text x="680.1" y="342" font-size="9" fill="#555">21.85</text>
+<rect x="110" y="343" width="382.0" height="9" fill="#2471a3"/>
+<text x="496.0" y="351" font-size="9" fill="#555">14.75</text>
+<text x="102" y="372" text-anchor="end" fill="#333">bsgs-il</text>
+<rect x="110" y="360" width="401.7" height="9" fill="#c0392b"/>
+<text x="515.7" y="368" font-size="9" fill="#555">15.51</text>
+<rect x="110" y="369" width="258.8" height="9" fill="#2471a3"/>
+<text x="372.8" y="377" font-size="9" fill="#555">9.99</text>
+<text x="102" y="398" text-anchor="end" fill="#333">bsgs-neg</text>
+<rect x="110" y="386" width="375.2" height="9" fill="#c0392b"/>
+<text x="489.2" y="394" font-size="9" fill="#555">14.49</text>
+<rect x="110" y="395" width="246.3" height="9" fill="#2471a3"/>
+<text x="360.3" y="403" font-size="9" fill="#555">9.51</text>
+<text x="102" y="424" text-anchor="end" fill="#333">kangaroo</text>
+<rect x="110" y="412" width="501.7" height="9" fill="#c0392b"/>
+<text x="615.7" y="420" font-size="9" fill="#555">19.37</text>
+<rect x="110" y="421" width="386.8" height="9" fill="#2471a3"/>
+<text x="500.8" y="429" font-size="9" fill="#555">14.93</text>
+<text x="102" y="450" text-anchor="end" fill="#333">rho-frozen</text>
+<rect x="110" y="438" width="580.0" height="9" fill="#c0392b"/>
+<text x="694.0" y="446" font-size="9" fill="#555">22.39</text>
+<rect x="110" y="447" width="468.4" height="9" fill="#2471a3"/>
+<text x="582.4" y="455" font-size="9" fill="#555">18.08</text>
+<text x="102" y="476" text-anchor="end" fill="#333">rho-neg</text>
+<rect x="110" y="464" width="354.8" height="9" fill="#c0392b"/>
+<text x="468.8" y="472" font-size="9" fill="#555">13.70</text>
+<rect x="110" y="473" width="247.1" height="9" fill="#2471a3"/>
+<text x="361.1" y="481" font-size="9" fill="#555">9.54</text>
+<text x="102" y="502" text-anchor="end" fill="#333">rho-neg-aa</text>
+<rect x="110" y="490" width="356.5" height="9" fill="#c0392b"/>
+<text x="470.5" y="498" font-size="9" fill="#555">13.76</text>
+<rect x="110" y="499" width="246.3" height="9" fill="#2471a3"/>
+<text x="360.3" y="507" font-size="9" fill="#555">9.51</text>
+<text x="102" y="528" text-anchor="end" fill="#333">rho-plain</text>
+<rect x="110" y="516" width="485.7" height="9" fill="#c0392b"/>
+<text x="599.7" y="524" font-size="9" fill="#555">18.75</text>
+<rect x="110" y="525" width="386.7" height="9" fill="#2471a3"/>
+<text x="500.7" y="533" font-size="9" fill="#555">14.93</text>
+<rect x="110" y="566" width="10" height="10" fill="#c0392b"/><text x="124" y="575" fill="#333">main 412b60289</text>
+<rect x="240" y="566" width="10" height="10" fill="#2471a3"/><text x="254" y="575" fill="#333">this change</text>
+</svg>
+
+<h2>Old binary vs this change</h2>
+<p>Median over 3 sessions per binary, alternated old/new, warm-up excluded. <em>solve</em> is the method's timed window (<code>solve_wall_ns</code>); <em>process</em> is the whole measured child.</p>
+<table><tr><th>spec</th><th>arm</th><th>n</th><th>solve old ms</th><th>solve new ms</th><th>new/old</th><th>process old ms</th><th>process new ms</th><th>new/old</th></tr><tr><td>smoke-prime-20</td><td>bsgs</td><td>18</td><td>3.884</td><td>0.176</td><td>0.045</td><td>34.2</td><td>26.8</td><td>0.784</td></tr><tr><td>smoke-prime-20</td><td>bsgs-il</td><td>18</td><td>4.062</td><td>0.148</td><td>0.037</td><td>34.5</td><td>26.9</td><td>0.779</td></tr><tr><td>smoke-prime-20</td><td>bsgs-neg</td><td>18</td><td>3.854</td><td>0.122</td><td>0.032</td><td>34.6</td><td>26.6</td><td>0.768</td></tr><tr><td>smoke-prime-20</td><td>ic-mitm</td><td>18</td><td>2.076</td><td>1.987</td><td>0.957</td><td>41.5</td><td>33.5</td><td>0.806</td></tr><tr><td>smoke-prime-20</td><td>kangaroo</td><td>18</td><td>4.404</td><td>0.200</td><td>0.045</td><td>34.6</td><td>26.6</td><td>0.768</td></tr><tr><td>smoke-prime-20</td><td>rho-frozen</td><td>18</td><td>4.412</td><td>0.307</td><td>0.070</td><td>34.5</td><td>27.1</td><td>0.785</td></tr><tr><td>smoke-prime-20</td><td>rho-neg</td><td>18</td><td>4.311</td><td>0.272</td><td>0.063</td><td>34.4</td><td>26.7</td><td>0.776</td></tr><tr><td>smoke-prime-20</td><td>rho-neg-aa</td><td>18</td><td>4.569</td><td>0.265</td><td>0.058</td><td>35.1</td><td>26.4</td><td>0.753</td></tr><tr><td>smoke-prime-20</td><td>rho-plain</td><td>18</td><td>4.387</td><td>0.270</td><td>0.062</td><td>34.5</td><td>26.5</td><td>0.769</td></tr><tr><td>generic-32</td><td>bsgs</td><td>45</td><td>21.855</td><td>14.747</td><td>0.675</td><td>55.9</td><td>46.1</td><td>0.825</td></tr><tr><td>generic-32</td><td>bsgs-il</td><td>45</td><td>15.507</td><td>9.991</td><td>0.644</td><td>49.5</td><td>38.9</td><td>0.785</td></tr><tr><td>generic-32</td><td>bsgs-neg</td><td>45</td><td>14.486</td><td>9.509</td><td>0.656</td><td>47.5</td><td>37.7</td><td>0.794</td></tr><tr><td>generic-32</td><td>kangaroo</td><td>45</td><td>19.367</td><td>14.934</td><td>0.771</td><td>51.5</td><td>43.0</td><td>0.834</td></tr><tr><td>generic-32</td><td>rho-frozen</td><td>45</td><td>22.391</td><td>18.084</td><td>0.808</td><td>57.0</td><td>47.4</td><td>0.831</td></tr><tr><td>generic-32</td><td>rho-neg</td><td>45</td><td>13.696</td><td>9.540</td><td>0.697</td><td>47.1</td><td>38.1</td><td>0.808</td></tr><tr><td>generic-32</td><td>rho-neg-aa</td><td>45</td><td>13.763</td><td>9.509</td><td>0.691</td><td>46.9</td><td>37.4</td><td>0.799</td></tr><tr><td>generic-32</td><td>rho-plain</td><td>45</td><td>18.752</td><td>14.928</td><td>0.796</td><td>51.7</td><td>43.8</td><td>0.847</td></tr></table>
+<h2>Which change does what</h2>
+<p>Median solve ms, one binary per change, 2 sessions each. The registry change removes 3.5–4 ms from every timed solve window and about 7 ms from every measured child; the counter change removes 1.8–2.8 ms from each BSGS arm at 32 bits (no visible effect at 20 bits); a word Euclid inverse in <code>prime_fast</code>, 2.3–2.9× faster per inversion in isolation, moved nothing and is not part of the change.</p>
+<table><tr><th>spec</th><th>arm</th><th>old</th><th>registry once</th><th>counter keys</th><th>Euclid inverse</th><th>all three</th></tr><tr><td>smoke-prime-20</td><td>bsgs</td><td>3.54</td><td>0.21</td><td>3.66</td><td>3.54</td><td>0.18</td></tr><tr><td>smoke-prime-20</td><td>bsgs-il</td><td>3.62</td><td>0.18</td><td>3.76</td><td>3.74</td><td>0.15</td></tr><tr><td>smoke-prime-20</td><td>bsgs-neg</td><td>3.54</td><td>0.13</td><td>3.70</td><td>3.54</td><td>0.12</td></tr><tr><td>smoke-prime-20</td><td>ic-mitm</td><td>1.98</td><td>1.90</td><td>2.01</td><td>1.91</td><td>2.03</td></tr><tr><td>smoke-prime-20</td><td>kangaroo</td><td>4.10</td><td>0.21</td><td>4.35</td><td>3.97</td><td>0.20</td></tr><tr><td>smoke-prime-20</td><td>rho-frozen</td><td>4.13</td><td>0.30</td><td>4.29</td><td>4.09</td><td>0.32</td></tr><tr><td>smoke-prime-20</td><td>rho-neg</td><td>4.19</td><td>0.26</td><td>4.26</td><td>4.03</td><td>0.28</td></tr><tr><td>smoke-prime-20</td><td>rho-neg-aa</td><td>4.07</td><td>0.25</td><td>4.21</td><td>4.04</td><td>0.26</td></tr><tr><td>smoke-prime-20</td><td>rho-plain</td><td>4.09</td><td>0.30</td><td>4.19</td><td>4.17</td><td>0.29</td></tr><tr><td>generic-32</td><td>bsgs</td><td>20.20</td><td>19.04</td><td>17.39</td><td>21.02</td><td>14.51</td></tr><tr><td>generic-32</td><td>bsgs-il</td><td>14.51</td><td>14.39</td><td>12.69</td><td>15.39</td><td>9.74</td></tr><tr><td>generic-32</td><td>bsgs-neg</td><td>13.97</td><td>10.97</td><td>11.94</td><td>13.38</td><td>9.11</td></tr><tr><td>generic-32</td><td>kangaroo</td><td>18.78</td><td>15.12</td><td>18.59</td><td>19.07</td><td>15.30</td></tr><tr><td>generic-32</td><td>rho-frozen</td><td>22.11</td><td>17.96</td><td>21.57</td><td>21.79</td><td>17.14</td></tr><tr><td>generic-32</td><td>rho-neg</td><td>12.87</td><td>9.40</td><td>13.30</td><td>12.62</td><td>9.17</td></tr><tr><td>generic-32</td><td>rho-neg-aa</td><td>13.09</td><td>9.38</td><td>12.96</td><td>12.96</td><td>9.09</td></tr><tr><td>generic-32</td><td>rho-plain</td><td>18.45</td><td>14.03</td><td>18.40</td><td>17.89</td><td>14.71</td></tr></table>
+<h2>Why the solve window was affected</h2>
+<p>Nothing in the solve path reads the registry. Callgrind counts the same instructions inside the window for both binaries (1.110 M vs 1.112 M on a 20-bit <code>rho.negation</code> solve), and the old child executes 44 M more instructions before it (193 M vs 149 M: the second parse). The old binary drops its freshly parsed copy of the registry immediately before the solve; the 3.5–4 ms it then loses inside the window is wall time with no extra instructions and no syscalls. Disabling glibc fast bins did not remove it; the exact memory-system cause was not isolated. Wall times recorded by the old binary on small curves therefore carry this offset; counted results do not.</p>
+<p>Host: Intel Xeon @ 2.10 GHz, 4 vCPU cloud container; sessions pinned by ecbench (<code>--cpus auto</code>) with <code>--allow-busy</code>, so below L2. Engineering change to harness overhead, not an index-calculus result.</p>

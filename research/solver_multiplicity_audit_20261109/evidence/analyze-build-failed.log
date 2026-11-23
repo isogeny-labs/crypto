@@ -1,0 +1,76 @@
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp: In function ‘Poly times(const Poly&, Mon, int)’:
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:23:3: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   23 |   for(auto [m,c]:a) term(b,{m.first+n.first,m.second+n.second},mod(c*k)); return b; }
+      |   ^~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:23:75: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   23 |   for(auto [m,c]:a) term(b,{m.first+n.first,m.second+n.second},mod(c*k)); return b; }
+      |                                                                           ^~~~~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp: In function ‘Poly polynomial(std::string)’:
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:51:31: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   51 |         if(factor.size()>1) { if(factor[1]!='^' || factor.size()==2)
+      |                               ^~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:53:11: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   53 |           auto n=factor.substr(2); if(n.find_first_not_of("0123456789")!=std::string::npos)
+      |           ^~~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:53:36: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   53 |           auto n=factor.substr(2); if(n.find_first_not_of("0123456789")!=std::string::npos)
+      |                                    ^~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:54:62: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   54 |             throw std::runtime_error("bad exponent digits"); degree=std::stoi(n); }
+      |                                                              ^~~~~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:57:16: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   57 |       } else { if(factor.find_first_not_of("0123456789")!=std::string::npos)
+      |                ^~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:58:64: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   58 |           throw std::runtime_error("unsupported coefficient"); c=mod(c*std::stoll(factor)); }
+      |                                                                ^
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp: In function ‘bool sameBasis(std::vector<std::map<std::pair<int, int>, int> >, std::vector<std::map<std::pair<int, int>, int> >)’:
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:74:3: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   74 |   for(auto& f:a) f=monic(f); for(auto& f:b) f=monic(f);
+      |   ^~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:74:30: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   74 |   for(auto& f:a) f=monic(f); for(auto& f:b) f=monic(f);
+      |                              ^~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp: In function ‘int standardMonomials(const std::vector<std::map<std::pair<int, int>, int> >&)’:
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:85:3: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   85 |   if(bx==9 || by==9) throw std::runtime_error("no bounded finite staircase"); int n=0;
+      |   ^~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:85:79: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   85 |   if(bx==9 || by==9) throw std::runtime_error("no bounded finite staircase"); int n=0;
+      |                                                                               ^~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp: In function ‘int value(const Poly&, int, int)’:
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:91:3: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   91 |   for(auto [m,c]:f) r=mod(r+c*power(x,m.first)*power(y,m.second)); return r; }
+      |   ^~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:91:68: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   91 |   for(auto [m,c]:f) r=mod(r+c*power(x,m.first)*power(y,m.second)); return r; }
+      |                                                                    ^~~~~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp: In function ‘int pointCount(const std::vector<std::map<std::pair<int, int>, int> >&)’:
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:94:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   94 |     for(auto& f:fs) if(value(f,x,y)) zero=false; n+=zero; } return n; }
+      |     ^~~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:94:50: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   94 |     for(auto& f:fs) if(value(f,x,y)) zero=false; n+=zero; } return n; }
+      |                                                  ^
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp: In function ‘Node parseNode(const std::string&, size_t&)’:
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:103:54: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  103 |   } else if(s[i]=='\'') { size_t j=s.find('\'',++i); if(j==std::string::npos)
+      |                                                      ^~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:104:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  104 |       throw std::runtime_error("unterminated string"); v.s=s.substr(i,j-i); i=j+1; return v;
+      |                                                        ^
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp: In function ‘std::string quote(const std::string&)’:
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:121:3: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  121 |   if(c=='"'||c=='\\') r+='\\'; if(c>=32) r+=char(c); else r+=' '; } return r+'"'; }
+      |   ^~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:121:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  121 |   if(c=='"'||c=='\\') r+='\\'; if(c>=32) r+=char(c); else r+=' '; } return r+'"'; }
+      |                                ^~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp: In function ‘int main(int, char**)’:
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:124:3: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  124 |   if(argc!=2) throw std::runtime_error("usage: analyze STUDY_DIR"); std::string base=argv[1];
+      |   ^~
+/workspace/crypto-audit/research/solver_multiplicity_audit_20261109/native/analyze.cpp:124:69: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  124 |   if(argc!=2) throw std::runtime_error("usage: analyze STUDY_DIR"); std::string base=argv[1];
+      |                                                                     ^~~
+cc1plus: all warnings being treated as errors

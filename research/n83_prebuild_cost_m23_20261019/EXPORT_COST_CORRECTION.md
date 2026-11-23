@@ -1,0 +1,5 @@
+# Versioned cgroup-path correction before archive export retry
+
+The first frozen export-cost arm at `export-cost-v1` exited 1 before invoking the native exporter. Its input SHA-256 checks all passed. The worker assumed `memory.max` lived at the cgroup mount root and failed with `cat: /sys/fs/cgroup/memory.max: No such file or directory`. The host uses cgroup v2, and the scoped process's limit files live under the path in `/proc/self/cgroup`. The failed output and time record are retained.
+
+The version-2 worker reads that process-specific path and records `memory.max`, `memory.swap.max` and `cpu.max`, then invokes the unchanged binary with the same selected CSV, host, CPU affinity, systemd limits, expected object hash, and 1,800-second ceiling. Its fresh output is `export-cost-v2`. If any cgroup file is unavailable or differs from 4,294,967,296 bytes memory, zero swap and one CPU quota, do not interpret the timing. This correction does not change the archive contents or construction algorithm.

@@ -1,0 +1,5859 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/prime_centered_witness.rs",
+      "sha256": "afbc8f403ec525aab2095360de1f807835301b4006df540ba6b6d07e3e0c638b",
+      "bytes": 20593,
+      "kind": "analysis"
+    },
+    "outputs": [
+      {
+        "path": "evidence/centered-panel-r2/summary.json",
+        "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+        "bytes": 29449,
+        "kind": "raw"
+      }
+    ],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "original",
+      "role": "baseline",
+      "commit": "a27e8321d7f12657d98732a8d7ca972095fa3d56",
+      "binary_sha256": "080a52ba5c0d41d4c8c2e7e9b3a7198acb8ce0d0fa197e4ea81cced3de25a342",
+      "image_digest": "sha256:dc4df3f5da5d33678682437ca26b8c54dbc47e82f4328c3ab9f7b4f9d3405780"
+    },
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "commit": "a27e8321d7f12657d98732a8d7ca972095fa3d56",
+      "binary_sha256": "080a52ba5c0d41d4c8c2e7e9b3a7198acb8ce0d0fa197e4ea81cced3de25a342",
+      "image_digest": "sha256:dc4df3f5da5d33678682437ca26b8c54dbc47e82f4328c3ab9f7b4f9d3405780"
+    },
+    {
+      "id": "spike40",
+      "role": "candidate",
+      "commit": "a27e8321d7f12657d98732a8d7ca972095fa3d56",
+      "binary_sha256": "080a52ba5c0d41d4c8c2e7e9b3a7198acb8ce0d0fa197e4ea81cced3de25a342",
+      "image_digest": "sha256:dc4df3f5da5d33678682437ca26b8c54dbc47e82f4328c3ab9f7b4f9d3405780"
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-30T22:12:50.031824+00:00",
+  "export_id": "N83-CENTERED-PANEL-20261030-R2",
+  "files": [
+    {
+      "path": "evidence/centered-panel-r2/README.md",
+      "sha256": "44f37ac5a36832c6439dd79deff626145fb859a0958b5ef1f57668ebc970425a",
+      "bytes": 1082,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/centered-panel-r2-collected.json",
+      "sha256": "af05cecc607cbb6cb7931a92c4cb2feeba8daf7a1939c5a4236de92b713d6b69",
+      "bytes": 104425,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/centered-panel-r2-restore-final.log",
+      "sha256": "264d42ef1ad539e1d49b398a2e792e69169a8c6aef5df40a6bae1bed18f3c9a4",
+      "bytes": 853,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/centered-panel-r2-restored-hashes-after-warning.log",
+      "sha256": "eb18521c37ad27670d14410c5f507d199c0aa299af531489719038f42d382253",
+      "bytes": 50400,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/centered-panel-r2-s3-replay.log",
+      "sha256": "7f6903b835817d436860e4e70386dbae9aaae16192a5b22c2f39ebc0a97606b1",
+      "bytes": 4340,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/certificate-index.json",
+      "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+      "bytes": 55303,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/custody.json",
+      "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+      "bytes": 626,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/host.txt",
+      "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a",
+      "bytes": 3504,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/manifest.sha256",
+      "sha256": "284fbbb1cb7b8275a48c463b693b2f63f3d75b62a3f3c564327644c6b05cb9cd",
+      "bytes": 104464,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/producer-rows.jsonl",
+      "sha256": "c19c49606fb20646969e543fcf999d505b6959b342120a551f3cde8295d6e4c4",
+      "bytes": 19411,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/producer-status.json",
+      "sha256": "b620d3f039a8748938b837aa5481ed0d9ca4c670bb228918cdecaedc572b0d95",
+      "bytes": 40,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/producer.log",
+      "sha256": "5aaa350a88f137b7211ac554ff7866b0a64f366de29ca52de3d4b7e943724029",
+      "bytes": 18256,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/replay-rows.jsonl",
+      "sha256": "0dc7da5c6eb2d591b7eeeda3a0318c9753542ce848c465e3ade40efbd70f910e",
+      "bytes": 19243,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/replay-status.json",
+      "sha256": "b620d3f039a8748938b837aa5481ed0d9ca4c670bb228918cdecaedc572b0d95",
+      "bytes": 40,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/replay.log",
+      "sha256": "3ff5d5997466b8615dd219d39f4b0881eb39835ba80bab454a7bee9fd8d29df8",
+      "bytes": 18172,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/summary.json",
+      "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+      "bytes": 29449,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/centered-panel-r2/terminal.json",
+      "sha256": "39ba5f34ad21228e5613fd681adc1290e5aee076cc6e79de7e65b038d141d691",
+      "bytes": 301,
+      "kind": "raw"
+    }
+  ],
+  "flow": {
+    "planned": 84,
+    "attempted": 84,
+    "completed": 84,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "host": {
+    "path": "evidence/centered-panel-r2/host.txt",
+    "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a",
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0"
+    }
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "executor",
+      "text": "All84 source-bound coefficient/projection records passed producer,fresh and S3-restored replay.21 degree15 and63 degree16 remainders;84 nonzero projections. Exact LFD and regularity remain null."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "T-1008",
+    "role": "executor"
+  },
+  "protocol": {
+    "path": "protocol-centered-panel-local.json",
+    "sha256": "cd0e2cc82c7d967e0482adc55053f5f55175f5d347d411ae93832126c9b671cc",
+    "protocol_id": "N83-CENTERED-PANEL-20261030",
+    "version": 2
+  },
+  "reviews_dir": "reviews-centered-r2",
+  "runs": [
+    {
+      "run_id": "original-prime-m3-planted-retained",
+      "arm": "original",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m3-natural-retained",
+      "arm": "original",
+      "instance_id": "1",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m3-natural-centered",
+      "arm": "original",
+      "instance_id": "2",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m3-natural-adjacent",
+      "arm": "original",
+      "instance_id": "3",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m4-planted-retained",
+      "arm": "original",
+      "instance_id": "4",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m4-natural-retained",
+      "arm": "original",
+      "instance_id": "5",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m4-natural-centered",
+      "arm": "original",
+      "instance_id": "6",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m4-natural-adjacent",
+      "arm": "original",
+      "instance_id": "7",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m5-planted-retained",
+      "arm": "original",
+      "instance_id": "8",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m5-natural-retained",
+      "arm": "original",
+      "instance_id": "9",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m5-natural-centered",
+      "arm": "original",
+      "instance_id": "10",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m5-natural-adjacent",
+      "arm": "original",
+      "instance_id": "11",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m6-planted-retained",
+      "arm": "original",
+      "instance_id": "12",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m6-natural-retained",
+      "arm": "original",
+      "instance_id": "13",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m6-natural-centered",
+      "arm": "original",
+      "instance_id": "14",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m6-natural-adjacent",
+      "arm": "original",
+      "instance_id": "15",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m7-planted-retained",
+      "arm": "original",
+      "instance_id": "16",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m7-natural-retained",
+      "arm": "original",
+      "instance_id": "17",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m7-natural-centered",
+      "arm": "original",
+      "instance_id": "18",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m7-natural-adjacent",
+      "arm": "original",
+      "instance_id": "19",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m8-planted-retained",
+      "arm": "original",
+      "instance_id": "20",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m8-natural-retained",
+      "arm": "original",
+      "instance_id": "21",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m8-natural-centered",
+      "arm": "original",
+      "instance_id": "22",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m8-natural-adjacent",
+      "arm": "original",
+      "instance_id": "23",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m9-planted-retained",
+      "arm": "original",
+      "instance_id": "24",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m9-natural-retained",
+      "arm": "original",
+      "instance_id": "25",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m9-natural-centered",
+      "arm": "original",
+      "instance_id": "26",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "original-prime-m9-natural-adjacent",
+      "arm": "original",
+      "instance_id": "27",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m3-planted-retained",
+      "arm": "baseline",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m3-natural-retained",
+      "arm": "baseline",
+      "instance_id": "1",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m3-natural-centered",
+      "arm": "baseline",
+      "instance_id": "2",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m3-natural-adjacent",
+      "arm": "baseline",
+      "instance_id": "3",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m4-planted-retained",
+      "arm": "baseline",
+      "instance_id": "4",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m4-natural-retained",
+      "arm": "baseline",
+      "instance_id": "5",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m4-natural-centered",
+      "arm": "baseline",
+      "instance_id": "6",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m4-natural-adjacent",
+      "arm": "baseline",
+      "instance_id": "7",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m5-planted-retained",
+      "arm": "baseline",
+      "instance_id": "8",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m5-natural-retained",
+      "arm": "baseline",
+      "instance_id": "9",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m5-natural-centered",
+      "arm": "baseline",
+      "instance_id": "10",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m5-natural-adjacent",
+      "arm": "baseline",
+      "instance_id": "11",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m6-planted-retained",
+      "arm": "baseline",
+      "instance_id": "12",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m6-natural-retained",
+      "arm": "baseline",
+      "instance_id": "13",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m6-natural-centered",
+      "arm": "baseline",
+      "instance_id": "14",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m6-natural-adjacent",
+      "arm": "baseline",
+      "instance_id": "15",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m7-planted-retained",
+      "arm": "baseline",
+      "instance_id": "16",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m7-natural-retained",
+      "arm": "baseline",
+      "instance_id": "17",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m7-natural-centered",
+      "arm": "baseline",
+      "instance_id": "18",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m7-natural-adjacent",
+      "arm": "baseline",
+      "instance_id": "19",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m8-planted-retained",
+      "arm": "baseline",
+      "instance_id": "20",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m8-natural-retained",
+      "arm": "baseline",
+      "instance_id": "21",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m8-natural-centered",
+      "arm": "baseline",
+      "instance_id": "22",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m8-natural-adjacent",
+      "arm": "baseline",
+      "instance_id": "23",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m9-planted-retained",
+      "arm": "baseline",
+      "instance_id": "24",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m9-natural-retained",
+      "arm": "baseline",
+      "instance_id": "25",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m9-natural-centered",
+      "arm": "baseline",
+      "instance_id": "26",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "baseline-prime-m9-natural-adjacent",
+      "arm": "baseline",
+      "instance_id": "27",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m3-planted-retained",
+      "arm": "spike40",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m3-natural-retained",
+      "arm": "spike40",
+      "instance_id": "1",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m3-natural-centered",
+      "arm": "spike40",
+      "instance_id": "2",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m3-natural-adjacent",
+      "arm": "spike40",
+      "instance_id": "3",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m4-planted-retained",
+      "arm": "spike40",
+      "instance_id": "4",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m4-natural-retained",
+      "arm": "spike40",
+      "instance_id": "5",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m4-natural-centered",
+      "arm": "spike40",
+      "instance_id": "6",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m4-natural-adjacent",
+      "arm": "spike40",
+      "instance_id": "7",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m5-planted-retained",
+      "arm": "spike40",
+      "instance_id": "8",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m5-natural-retained",
+      "arm": "spike40",
+      "instance_id": "9",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m5-natural-centered",
+      "arm": "spike40",
+      "instance_id": "10",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m5-natural-adjacent",
+      "arm": "spike40",
+      "instance_id": "11",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m6-planted-retained",
+      "arm": "spike40",
+      "instance_id": "12",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m6-natural-retained",
+      "arm": "spike40",
+      "instance_id": "13",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m6-natural-centered",
+      "arm": "spike40",
+      "instance_id": "14",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m6-natural-adjacent",
+      "arm": "spike40",
+      "instance_id": "15",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m7-planted-retained",
+      "arm": "spike40",
+      "instance_id": "16",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m7-natural-retained",
+      "arm": "spike40",
+      "instance_id": "17",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m7-natural-centered",
+      "arm": "spike40",
+      "instance_id": "18",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m7-natural-adjacent",
+      "arm": "spike40",
+      "instance_id": "19",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m8-planted-retained",
+      "arm": "spike40",
+      "instance_id": "20",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m8-natural-retained",
+      "arm": "spike40",
+      "instance_id": "21",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m8-natural-centered",
+      "arm": "spike40",
+      "instance_id": "22",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m8-natural-adjacent",
+      "arm": "spike40",
+      "instance_id": "23",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m9-planted-retained",
+      "arm": "spike40",
+      "instance_id": "24",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m9-natural-retained",
+      "arm": "spike40",
+      "instance_id": "25",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m9-natural-centered",
+      "arm": "spike40",
+      "instance_id": "26",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 15,
+          "projection_nonzero": 1,
+          "centered_target": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    },
+    {
+      "run_id": "spike40-prime-m9-natural-adjacent",
+      "arm": "spike40",
+      "instance_id": "27",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "remainder_degree": 16,
+          "projection_nonzero": 1,
+          "centered_target": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_replays": 2
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Exact native source-bound centered arithmetic, fresh-process replay and S3-restored replay; filtered-space proof remains separate"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/centered-panel-r2/summary.json",
+          "sha256": "1d007e2904814d6ae44c7096c6f3b3072a1faeb9fa0fed097b347e659f75d79c",
+          "bytes": 29449,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/certificate-index.json",
+          "sha256": "65a8c94b730831bfba2a163d6126e69c118bfc87eb10fcba01ba9ca37f6d32eb",
+          "bytes": 55303,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/centered-panel-r2/custody.json",
+          "sha256": "b29153daf4a5776985c3350d5b0b995015010b9fbc8b159ce434ec437f0fac82",
+          "bytes": 626,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:04:27Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-centered-panel-20261030-r2"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "a27e8321d7f12657d98732a8d7ca972095fa3d56",
+    "dirty": false
+  },
+  "backend_record": {
+    "terminal": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T21:55:27Z",
+      "finished_at": "2026-10-30T22:04:27Z",
+      "backend": "local",
+      "wall_valid": false,
+      "phases": {
+        "producer": {
+          "started": true,
+          "exit_code": 0
+        },
+        "replay": {
+          "started": true,
+          "exit_code": 0
+        }
+      }
+    },
+    "custody": {
+      "raw_uri": "s3://setec-astronomy-artifacts/runs/n83-centered-panel-20261030-r2/raw/",
+      "raw_manifest_sha256": "284fbbb1cb7b8275a48c463b693b2f63f3d75b62a3f3c564327644c6b05cb9cd",
+      "raw_manifest_roundtrip_byte_identical": true,
+      "raw_payload_hashes_verified": 872,
+      "s3_restored_native_cases_verified": 84,
+      "restored_native_replay_exit_code": 0,
+      "producer_and_first_replay_exit_code": 0,
+      "download_warning": "Final AWS sync exited2 for five transient temporary transfer paths. All872 final payload hashes subsequently passed and all84 cases replayed from the restored executable; original warning log retained."
+    },
+    "prior_attempt": "evidence/centered-panel-r1/outcome.json"
+  }
+}

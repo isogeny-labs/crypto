@@ -1,0 +1,58 @@
+ideal cmRelations39=std(ideal(a^2-a+2,t^4-t^3+t^2-t+1));
+if(reduce(t^10-1,cmRelations39)!=0 || reduce(t^5+1,cmRelations39)!=0){ERROR("JOINT39_CYCLOTOMIC");}
+poly f1Direct39=reduce(-a*t^4,cmRelations39);poly f0Direct39=reduce(-(1-a)*t^7,cmRelations39);
+poly f1Inverse39=reduce(-a*t^6,cmRelations39);poly f0Inverse39=reduce(-(1-a)*t^3,cmRelations39);
+proc quad39(poly f,poly u){return(f^2+f*u+2*u^2);}
+if(reduce(quad39(f1Direct39,t^4),cmRelations39)!=0 || reduce(quad39(f0Direct39,t^7),cmRelations39)!=0 || reduce(quad39(f1Inverse39,t^6),cmRelations39)!=0 || reduce(quad39(f0Inverse39,t^3),cmRelations39)!=0){ERROR("JOINT39_GLOBAL_ANNIHILATORS");}
+poly char1Direct39=resultant(t^4-t^3+t^2-t+1,resultant(a^2-a+2,X+a*t^4,a),t);
+poly char0Direct39=resultant(t^4-t^3+t^2-t+1,resultant(a^2-a+2,X+(1-a)*t^7,a),t);
+if(char1Direct39!=subst(sourceE1Polynomial39,X,-X) || char0Direct39!=subst(sourceE0Polynomial39,X,-X) || char1Direct39!=sourceE0Polynomial39 || char0Direct39!=sourceE1Polynomial39){ERROR("JOINT39_TWIST_POLYNOMIAL_BINDING");}
+poly qbTwist39=0;poly co39;int i39;int j39;int k39;
+for(i39=0;i39<=32;i39++){co39=jet(complementaryEuler37,i39);if(i39>0){co39=co39-jet(complementaryEuler37,i39-1);}qbTwist39=qbTwist39+number(co39/X^i39)*(-1)^i39*X^(32-i39);}
+if(deg(qbTwist39)!=32 || leadcoef(qbTwist39)!=1 || subst(qbTwist39,X,1)!=3721){ERROR("JOINT39_COMPLEMENTARY_TWIST");}
+poly projectorE39=(1-t^5)*(5-(1+t^2+t^4+t^6+t^8));
+if(reduce(projectorE39-10,cmRelations39)!=0){ERROR("JOINT39_MIXED_PROJECTOR");}
+poly crossed7Factor39=quad39(X,t^7)*quad39(X,t^6);
+poly crossed8Factor39=quad39(X,t^4)*quad39(X,t^3);
+poly operator7Full39=projectorE39*qbTwist39*crossed7Factor39;
+poly operator8Full39=projectorE39*qbTwist39*crossed8Factor39;
+proc evalCM39(poly p,poly f){poly ans=0;int i;poly c;for(i=deg(p);i>=0;i--){c=jet(p,i);if(i>0){c=c-jet(p,i-1);}ans=reduce(ans*f+number(c/X^i),cmRelations39);}return(ans);}
+poly qb1d39=evalCM39(qbTwist39,f1Direct39);poly qb0d39=evalCM39(qbTwist39,f0Direct39);
+poly qb1i39=evalCM39(qbTwist39,f1Inverse39);poly qb0i39=evalCM39(qbTwist39,f0Inverse39);
+poly op7on1d39=reduce(projectorE39*qb1d39*quad39(f1Direct39,t^7)*quad39(f1Direct39,t^6),cmRelations39);
+poly op7on0d39=reduce(projectorE39*qb0d39*quad39(f0Direct39,t^7)*quad39(f0Direct39,t^6),cmRelations39);
+poly op7on1i39=reduce(projectorE39*qb1i39*quad39(f1Inverse39,t^7)*quad39(f1Inverse39,t^6),cmRelations39);
+poly op7on0i39=reduce(projectorE39*qb0i39*quad39(f0Inverse39,t^7)*quad39(f0Inverse39,t^6),cmRelations39);
+poly op8on1d39=reduce(projectorE39*qb1d39*quad39(f1Direct39,t^4)*quad39(f1Direct39,t^3),cmRelations39);
+poly op8on0d39=reduce(projectorE39*qb0d39*quad39(f0Direct39,t^4)*quad39(f0Direct39,t^3),cmRelations39);
+poly op8on1i39=reduce(projectorE39*qb1i39*quad39(f1Inverse39,t^4)*quad39(f1Inverse39,t^3),cmRelations39);
+poly op8on0i39=reduce(projectorE39*qb0i39*quad39(f0Inverse39,t^4)*quad39(f0Inverse39,t^3),cmRelations39);
+if(op7on1d39==0 || op7on0d39!=0 || op7on1i39!=0 || op7on0i39==0 || op8on1d39!=0 || op8on0d39==0 || op8on1i39==0 || op8on0i39!=0){ERROR("JOINT39_CROSSED_SEPARATION");}
+short=0;link out39="ASCII:w integral-operators.sing";open(out39);
+write(out39,"poly complementaryTwistCharacteristic39="+string(qbTwist39)+";poly mixedProjector39="+string(projectorE39)+";poly crossedSeven39="+string(crossed7Factor39)+";poly crossedEight39="+string(crossed8Factor39)+";");
+write(out39,"poly operatorSeven39="+string(operator7Full39)+";poly operatorEight39="+string(operator8Full39)+";");
+write(out39,"poly directOneImage39="+string(op7on1d39)+";poly inverseZeroImage39="+string(op7on0i39)+";");close(out39);
+print("JOINT39_GLOBAL all_four_annihilators=pass full_twist_characteristics=pass crossed_operators=separate_in_both_conventions complementary_order=3721");
+proc pmod39(int x,int n){int v=1;int i;for(i=0;i<n;i++){v=(v*x)%11;}return(v);}
+int oldShared39;int twistedShared39;int fixedShared39;int fixedOne39;int fixedZero39;int f1t39;int f0t39;int d39;int alpha39;int exponent39;
+for(i39=1;i39<=8;i39++){
+ d39=systems39[i39,1];alpha39=systems39[i39,2];exponent39=systems39[i39,3];
+ if(pmod39(2,exponent39)!=d39 || (alpha39*alpha39-alpha39+2)%11!=0 || (alpha39*pmod39(d39,4))%11!=systems39[i39,4] || (((1-alpha39+11)*pmod39(d39,7))%11)!=systems39[i39,5]){ERROR("JOINT39_RETAINED_ROW_BINDING");}
+ f1t39=(pmod39(d39,5)*systems39[i39,4])%11;f0t39=(pmod39(d39,5)*systems39[i39,5])%11;
+ if(f1t39==1){fixedOne39++;print("JOINT39_FIXED branch=E1_twist direct_D="+string(d39)+" inverse_D="+string(pmod39(d39,9)));}
+ if(f0t39==1){fixedZero39++;print("JOINT39_FIXED branch=E0_twist direct_D="+string(d39)+" inverse_D="+string(pmod39(d39,9)));}
+ for(j39=1;j39<=8;j39++){if(d39==systems39[j39,1]){
+  if(systems39[i39,4]==systems39[j39,5]){oldShared39++;}
+  if(f1t39==(pmod39(d39,5)*systems39[j39,5])%11){twistedShared39++;if(f1t39==1){fixedShared39++;}}
+ }}
+}
+if(oldShared39!=2 || twistedShared39!=2 || fixedOne39!=1 || fixedZero39!=1 || fixedShared39!=0){ERROR("JOINT39_COLLISION_COUNTS");}
+ring residual39=11,(t),dp;
+poly e39=(1-t^5)*(5-(1+t^2+t^4+t^6+t^8));
+poly q739=(1+t^7+2*t^14)*(1+t^6+2*t^12);
+poly q839=(1+t^4+2*t^8)*(1+t^3+2*t^6);
+number p7on739=number(subst(3721*e39*q739,t,7));number p7on839=number(subst(3721*e39*q739,t,8));
+number p8on739=number(subst(3721*e39*q839,t,7));number p8on839=number(subst(3721*e39*q839,t,8));
+if(p7on739!=9 || p7on839!=0 || p8on739!=0 || p8on839!=9 || number(5)*p7on739!=1){ERROR("JOINT39_RATIONAL_UNIT_ACTION");}
+print("JOINT39_RESULT old_shared_joint_systems=2 twisted_shared_joint_systems=2 twisted_shared_rational_systems=0 direct_fixed_E1_D=7 direct_fixed_E0_D=8 operator7_on_D7=9 operator7_on_D8=0 operator8_on_D7=0 operator8_on_D8=9 recovery_scalar=5 observed_character7_consistent=true actual_Koblitz_target_map_evaluated=false");
+print("JOINT39_ALL_CHECKS_PASS");quit;

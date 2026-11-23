@@ -1,0 +1,14 @@
+digraph G {
+ rankdir=TB; node [shape=box,style="rounded,filled",fillcolor="#eaf2f8",fontname="Helvetica",fontsize=12];
+ a[label="Actual completeEntry words
+at fixed creation pc"];
+ b[label="Retained f mod 2^pc quotient
+then quotient by V^ell"];
+ c[label="Finite nilpotent evaluation
+canonical actual right polynomial"];
+ d[label="Explicit U/V normal coordinates
+reuse same integers at later P"];
+ e[label="Full packet / actual higher modes /
+complete costs OPEN",fillcolor="#fff1da"];
+ a->c; b->c; c->d; d->e [style=dashed];
+}

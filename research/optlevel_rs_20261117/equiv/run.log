@@ -1,0 +1,23 @@
+20:04:03 load 0.46 0.79 0.61 python calibrate
+20:06:03 load 1.71 1.14 0.76 rust calibrate --c-kernels (same C builds plus the Rust kernels)
+20:09:41 load 1.97 1.47 0.97 round 1 positive-simd-incache py
+20:09:56 load 1.96 1.50 1.00 round 1 positive-simd-incache rs
+20:10:11 load 1.95 1.52 1.01 round 1 scalar-incache py
+20:10:27 load 1.94 1.55 1.03 round 1 scalar-incache rs
+20:10:42 load 1.94 1.57 1.04 round 1 serial-dependency py
+20:10:57 load 1.97 1.59 1.06 round 1 serial-dependency rs
+20:11:12 load 1.99 1.61 1.07 round 1 stream-daxpy py
+20:11:42 load 1.93 1.64 1.10 round 1 stream-daxpy rs
+20:12:12 load 2.08 1.72 1.14 round 1 pointer-chase py
+20:12:54 load 2.23 1.82 1.20 round 1 pointer-chase rs
+20:13:37 load 1.78 1.76 1.21 round 2 positive-simd-incache rs
+20:13:52 load 1.96 1.81 1.23 round 2 positive-simd-incache py
+20:14:07 load 1.99 1.82 1.25 round 2 scalar-incache rs
+20:14:22 load 2.01 1.83 1.26 round 2 scalar-incache py
+20:14:38 load 2.03 1.84 1.27 round 2 serial-dependency rs
+20:14:53 load 2.04 1.84 1.28 round 2 serial-dependency py
+20:15:08 load 1.73 1.79 1.27 round 2 stream-daxpy rs
+20:15:37 load 1.88 1.83 1.30 round 2 stream-daxpy py
+20:16:06 load 1.97 1.86 1.33 round 2 pointer-chase rs
+20:16:49 load 1.70 1.80 1.33 round 2 pointer-chase py
+20:17:32 load 1.58 1.75 1.34 done

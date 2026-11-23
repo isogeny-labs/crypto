@@ -1,0 +1,102 @@
+module
+public import OrientationLeading
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationHierarchy
+import all OrientationResidue
+import all OrientationDiagonal
+import all OrientationJet
+import all OrientationLeading
+public section
+noncomputable section
+namespace OrientationRefinement
+open Polynomial Finset OrientationAnchor OrientationResidue OrientationDiagonal OrientationJet OrientationLeading
+
+def NearOne (k : ℤ) (q : ℚ) : Prop := VBound k (q-1)
+
+theorem NearOne.integral {k : ℤ} {q : ℚ} (hk : 0 ≤ k) (h : NearOne k q) :
+    VBound 0 q := by
+  simpa only [sub_add_cancel] using
+    (h.mono hk).add (Or.inr (by simp) : VBound 0 (1:ℚ))
+
+theorem NearOne.one (k : ℤ) : NearOne k 1 := by simp [NearOne,VBound]
+
+theorem NearOne.mul {k : ℤ} {q r : ℚ} (hk : 0 ≤ k)
+    (hq : NearOne k q) (hr : NearOne k r) : NearOne k (q*r) := by
+  have h := (show VBound k ((q-1)*r) by
+    simpa only [add_zero] using VBound.mul hq (hr.integral hk)).add hr
+  unfold NearOne
+  convert h using 1
+  ring
+
+theorem NearOne.pow {k : ℤ} {q : ℚ} (hk : 0 ≤ k) (h : NearOne k q)
+    (n : ℕ) : NearOne k (q^n) := by
+  induction n with
+  | zero => simpa using NearOne.one k
+  | succ n ih => simpa only [pow_succ] using ih.mul hk h
+
+theorem NearOne.prod {ι : Type*} (S : Finset ι) (q : ι → ℚ) (k : ℤ)
+    (hk : 0 ≤ k) (h : ∀ j ∈ S, NearOne k (q j)) : NearOne k (∏ j ∈ S,q j) := by
+  classical
+  induction S using Finset.induction_on with
+  | empty => simpa using NearOne.one k
+  | @insert j S hj ih =>
+    rw [prod_insert hj]
+    exact (h j (mem_insert_self _ _)).mul hk
+      (ih (by intro z hz; exact h z (mem_insert_of_mem hz)))
+
+theorem masks_stable (u v x z y : ℕ) (hu : u ≤ v)
+    (h : x % 2^v = z % 2^v) : mask u x y = mask u z y := by
+  ext j
+  by_cases hj : j < u
+  · have hb := matching_bits v x z j (by omega) h
+    simp [mask,mem_range,hj,hb]
+  · simp [mask,mem_range,hj]
+
+theorem displacement_difference (x z y : ℕ) :
+    delta x y-delta z y = delta x z := by unfold delta; ring
+
+/-- A literal denominator ratio; the precision cost is its actual valuation. -/
+theorem denominator_ratio (v x z y : ℕ) (q : ℚ)
+    (h : x % 2^v = z % 2^v) (hd : q-delta x y ≠ 0) :
+    NearOne ((v:ℤ)-padicValRat 2 (q-delta x y))
+      ((q-delta z y)/(q-delta x y)) := by
+  have he : (q-delta z y)/(q-delta x y)-1 =
+      (delta x y-delta z y)/(q-delta x y) := by field_simp [hd]; ring
+  unfold NearOne
+  rw [he,displacement_difference]
+  exact vbound_div (displacement_bound v x z h)
+
+theorem selected_denominator_le (u x y j : ℕ) (hj : j ∈ mask u x y) :
+    padicValRat 2 ((2:ℚ)^j-delta x y) ≤ (j:ℤ) := by
+  rw [selected_denominator_valuation u x y j hj]
+  exact_mod_cast min_le_left j (chartOrder u x y)
+
+theorem anchor_denominator_ratio (u v x z y j : ℕ) (hu : u ≤ v)
+    (h : x % 2^v = z % 2^v) (hj : j ∈ mask u x y) :
+    NearOne ((v:ℤ)-u+1) (((2:ℚ)^j-delta z y)/((2:ℚ)^j-delta x y)) := by
+  have hh := denominator_ratio v x z y ((2:ℚ)^j) h (denominator_ne_zero u x y j hj)
+  have hv := selected_denominator_le u x y j hj
+  have hju : j < u := mem_range.mp (mem_filter.mp hj).1
+  exact hh.mono (by omega)
+
+theorem crossing_denominator_le (x y i : ℕ) (hc : x.testBit i = y.testBit i) :
+    padicValRat 2 (poleQ i-delta x y) ≤ (i:ℤ) := by
+  by_cases he : x=y
+  · subst y
+    simp only [delta,sub_self,sub_zero,poleQ_value]
+    rfl
+  · rw [crossing_denominator x y i he hc]
+    exact min_le_left _ _
+
+theorem base_denominator_ratio (u v i x z y : ℕ) (hi : i < u)
+    (h : x % 2^v = z % 2^v) (hc : x.testBit i = y.testBit i) :
+    NearOne ((v:ℤ)-u+1) ((poleQ i-delta z y)/(poleQ i-delta x y)) := by
+  have hh := denominator_ratio v x z y (poleQ i) h
+    (sub_ne_zero.mpr (Ne.symm (crossing_displacement_ne_pole x y i hc)))
+  have hv := crossing_denominator_le x y i hc
+  exact hh.mono (by omega)
+
+end OrientationRefinement

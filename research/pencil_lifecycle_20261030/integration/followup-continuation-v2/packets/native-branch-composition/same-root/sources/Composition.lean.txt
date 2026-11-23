@@ -1,0 +1,62 @@
+import Forest
+set_option autoImplicit false
+namespace GraphForest
+open SignedGraphAlgebra GraphFind GraphUnion
+variable {K : Type*} [Field K] [DecidableEq K] {n : Nat}
+def lifted (s : GraphUnion.State K n) (g : GraphFind.State K n) : GraphUnion.State K n :=
+ ⟨g,s.fixed⟩
+
+theorem two_finds (s : GraphUnion.State K n) (t w : GraphFind.State K n)
+ (u v ru rv : Fin n) (pu pv : Potential K) (rank : Fin n → Nat)
+ (value : Fin n → K) (k : K)
+ (hf : Forest s.graph rank) (hv : Valid s value k)
+ (h1 : Run s.graph u t ru pu) (h2 : Run t v w rv pv) :
+ Forest w rank ∧ Valid (lifted s w) value k ∧
+ w.parent ru=ru ∧ w.parent rv=rv ∧
+ value u=eval pu (value ru) k ∧ value v=eval pv (value rv) k := by
+ obtain ⟨htf,htv,htru,hu,_,_⟩ := run_preserves _ _ _ _ _ h1 rank value k hf hv.1
+ obtain ⟨hwf,hwv,hwrv,hv',_,_⟩ := run_preserves _ _ _ _ _ h2 rank value k htf htv
+ exact ⟨hwf,⟨hwv,hv.2⟩,find_preserves_roots t w v rv ru pv h2 rank htf htru,hwrv,hu,hv'⟩
+
+def branch (s : GraphUnion.State K n) (ru rv : Fin n) (p : Potential K) (forward : Bool) :=
+ if forward then joined s ru rv p else joined s rv ru (reverse p)
+
+theorem branch_preserves (s : GraphUnion.State K n) (ru rv : Fin n)
+ (p : Potential K) (rank : Fin n → Nat) (value : Fin n → K) (k : K)
+ (hf : Forest s.graph rank) (hv : Valid s value k)
+ (hru : s.graph.parent ru=ru) (hrv : s.graph.parent rv=rv) (hd : ru≠rv)
+ (hs : p.s*p.s=1) (he : value ru=eval p (value rv) k) (forward : Bool) :
+ ∃rank',Forest (branch s ru rv p forward).graph rank' ∧
+ Valid (branch s ru rv p forward) value k := by
+ cases forward
+ · refine ⟨bumped s.graph rank rv ru,?_,?_⟩
+   · exact attach_forest s.graph rank rv ru (reverse p) hf hru hd
+   · exact join_preserves s rv ru (reverse p) value k hv hs (reversal p _ _ _ hs he)
+ · refine ⟨bumped s.graph rank ru rv,?_,?_⟩
+   · exact attach_forest s.graph rank ru rv p hf hrv (Ne.symm hd)
+   · exact join_preserves s ru rv p value k hv hs he
+
+def reducedPotential (pu pv : Potential K) (su sv a b : K) : Potential K :=
+ unionPotential (su*pu.s) (sv*pv.s)
+ (a-su*pu.a-sv*pv.a) (b-su*pu.b-sv*pv.b)
+
+theorem edge_after_two_finds (s : GraphUnion.State K n) (t w : GraphFind.State K n)
+ (u v ru rv : Fin n) (pu pv : Potential K) (rank : Fin n → Nat)
+ (value : Fin n → K) (su sv a b k : K)
+ (hf : Forest s.graph rank) (hv : Valid s value k)
+ (h1 : Run s.graph u t ru pu) (h2 : Run t v w rv pv) (hd : ru≠rv)
+ (hsu : (su*pu.s)*(su*pu.s)=1) (hsv : (sv*pv.s)*(sv*pv.s)=1)
+ (he : su*value u+sv*value v=a+b*k) (forward : Bool) :
+ ∃rank',Forest (branch (lifted s w) ru rv (reducedPotential pu pv su sv a b) forward).graph rank' ∧
+ Valid (branch (lifted s w) ru rv (reducedPotential pu pv su sv a b) forward) value k := by
+ obtain ⟨hwf,hwv,hru,hrv,hu,hv'⟩ := two_finds s t w u v ru rv pu pv rank value k hf hv h1 h2
+ have hr := edge_reduction pu pv su sv (value u) (value v) (value ru) (value rv) a b k hu hv' he
+ exact branch_preserves (lifted s w) ru rv _ rank value k hwf hwv hru hrv hd
+   (union_sign _ _ hsu hsv) (union_forward _ _ _ _ _ _ _ hsu hr) forward
+
+theorem next_find_exists (s : GraphUnion.State K n)
+ (h : ∃rank,Forest s.graph rank) (x : Fin n) :
+ ∃t r p,Run s.graph x t r p := by
+ obtain ⟨rank,hf⟩:=h
+ exact run_exists s.graph rank hf x
+end GraphForest

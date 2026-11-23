@@ -1,0 +1,9 @@
+# F631 principal kernel functions and full theta normalization gate
+
+Input is the complete fresh F631kernel serialization from hec_kernel631_20261115, certified PUBLIC source copied here. No F127principalfunctions, normalization, images or logs. Fixed newfield631 and sourceconstant49, not genericfield support.
+
+Adapt original principal-function construction and theta gate. Replace the embedded F127inverse-of-two64 in Hensel lifting by (P+1)/2=316. Load and validate all54serializedpoints, derive group/negationtables, construct fresh functiona(x)+b(x)yfor each nonzero3torsiondivisor. Require52principalnorm/divisibility/lift identities. Corrupt constantcoefficient in a; require rejection. Explicitly test the stale half64 formula and require at least one failed curve lift; report count, do not treat it as candidatefailure. This negativecontrol distinguishes a real fieldport from constant substitution alone.
+
+Independently evaluate functions by splitpoint product/determinant formula versus root-free norm formula on8fixed consecutive factor-base triples; log all unsupported cases, require>=200comparisons. Then unchanged full theta gate searches multiples1..32for first4regular samples, records exclusions, checks cocycle constancy/symmetry/associativity, normality, normalization sample independence, Frobenius and theta symmetry/translation action. Corruptedweightnormality/actionmustfail. Aggregate600s cap retained. ALPHA lines serialize fresh coefficients on stdout.
+
+Build/source/lock/copiedinputs/binaryhash commit and freshS3checkpoint/gate BEFORE once-only RUN.txt/stderr/exit. Stopunexpectedfailureandretain;no silent rerun/retune withoutamendment. No quotientgeometry, targetcurve, maps, DLP, timing or10xclaim. Principalfunctions/normalizationare candidate construction costs and controls charged in any later comparison. Original F127results and larger-fieldkernelresults remain separate. Genus2/4and fullobjectiveopen.

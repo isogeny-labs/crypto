@@ -1,0 +1,450 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-FIXED-FACTOR-BASE-E27-20261028-R1",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/n83_fixed_factor_base_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "DESIGN.md"
+  },
+  "question": "Enumerate every affine lift of x in [0,2^27) on each original n83 curve, one unchanged base per curve for all m2..9.",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "All candidate x-values are enumerated; complete valid sign pairs are stored and all absent x-values checked.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "A single content-addressed family manifest is reused across all m2..9.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "No new degree, subgroup, timing or ECDLP result.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "koblitz",
+      "role": "reference",
+      "description": "Exhaustive koblitz base; absolute computation",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2bd3ed8e780d77098780eae9290719ef8ed1db66",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_fixed_factor_base_20261028/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "dea894c5bd3cf7e718a235c2a9335f6a2b2896036c0118bacbe22fc103d1e55b",
+        "threads": 16
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true
+      }
+    },
+    {
+      "id": "binary",
+      "role": "candidate",
+      "description": "Exhaustive binary base; absolute computation",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2bd3ed8e780d77098780eae9290719ef8ed1db66",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_fixed_factor_base_20261028/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "dea894c5bd3cf7e718a235c2a9335f6a2b2896036c0118bacbe22fc103d1e55b",
+        "threads": 16
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true
+      }
+    },
+    {
+      "id": "prime",
+      "role": "candidate",
+      "description": "Exhaustive prime base; absolute computation",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2bd3ed8e780d77098780eae9290719ef8ed1db66",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_fixed_factor_base_20261028/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "dea894c5bd3cf7e718a235c2a9335f6a2b2896036c0118bacbe22fc103d1e55b",
+        "threads": 16
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "candidate_x_count": 134217728,
+        "shards": 128,
+        "chunk_candidates": 1048576,
+        "reuse_for_m": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "both_signs": true
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact enumeration and equation/existence checks; no clock comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Pre-run selfcheck enumerates all three curves on x0..63 and validates complete points; development arithmetic and endpoint tests pass. These are mandatory checks, not comparison arms."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Pre-run selfcheck must reject altered y and deleted point on each family."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary",
+          "prime"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "2bd3ed8e780d77098780eae9290719ef8ed1db66",
+        "how": "Committed native enumerator and verifier, binary hash bound"
+      },
+      {
+        "name": "domain",
+        "treatment": "fixed",
+        "value": "[0,134217728)",
+        "how": "Every x, no sampling or dependence on m"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 16,
+        "how": "Disjoint deterministic shards, dynamically assigned workers"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "uname and lscpu; no performance clock claim"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Prime/Koblitz/binary interleaved by shard; output sorted by x and y"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "All-candidate validation, no exclusions"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "16CPU8Gi3600s job,3300s producer plus20s grace; no retries; periodic completed-shard upload"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "koblitz",
+          "binary",
+          "prime"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "384 validated shards; exhaustive contiguous domain per family, manifest hashes bound"
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computation",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic complete enumeration, no timing comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261028
+      ],
+      "nonce": null,
+      "note": "Development test seed only; production enumeration has no randomness."
+    },
+    "instance_sampling": {
+      "rule": "All128 disjoint contiguous x ranges per curve, no sampling",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact point validity and completeness criteria",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 128,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "3 curves times128 exhaustive shards; no statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.02,
+      "per_sample_seconds": 8.59375,
+      "threads": 16,
+      "estimated_total_seconds": 3600,
+      "measured_on": "Unit suite completed in0.02s;3300/384 is a budget allowance, not a measured full-shard time."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "point_count",
+        "name": "Stored affine points",
+        "unit": "points",
+        "kind": "counted",
+        "definition": "Number of20-byte records after32-byte header, both distinct signs included",
+        "source": "shard point_count",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "liftable_x",
+        "name": "Liftable x-values",
+        "unit": "x-values",
+        "kind": "counted",
+        "definition": "Candidate x-values with one or two affine lifts",
+        "source": "shard liftable_x",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "point_count",
+      "liftable_x"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab",
+    "placement": {
+      "cpus": 16,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All384 shards validated and family/index manifests written, then stop",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "3600s job,3300s producer plus20s grace,8Gi memory,no automatic retries",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any failed arithmetic/control, point-equation, sign-pair, omission or hash check invalidates its shard",
+    "Missing shards prevent complete=true",
+    "No clock, degree or subgroup inference"
+  ],
+  "decision_rule": {
+    "text": "Report counts and immutable file locations only after complete validated coverage",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact counts",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "complete",
+      "incomplete",
+      "invalid"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/main.rs",
+      "sha256": "7c44a81e44aefd66794a6bcd38915bd30f94106c1d5e40bcf3b796015a164cfc"
+    },
+    "inputs": [
+      "Original curve parameters",
+      "All x0..134217727"
+    ],
+    "outputs": [
+      "data/index.json",
+      "data/{family}/manifest.json",
+      "data/{family}/part-NNNN.bin.zst",
+      "data/{family}/part-NNNN.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Exact factor-base point counts per curve; reuse across m2..9"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Incomplete enumeration called complete",
+    "Candidate x-count confused with point count",
+    "Old varying-ell degrees presented for the new fixed base",
+    "Performance, subgroup or ECDLP claims"
+  ],
+  "literature": [
+    {
+      "ref": "https://www.secg.org/sec1-v2.pdf",
+      "provenance": "retrieved",
+      "claim": "Point lifting and validation",
+      "verified_by": "Read sections2.2 and2.3.4 including binary x0 exception"
+    },
+    {
+      "ref": "https://cacr.uwaterloo.ca/techreports/2011/cacr2011-07.pdf",
+      "provenance": "retrieved",
+      "claim": "Carry-less multiplication and half-trace",
+      "verified_by": "Read section2 and verified odd degree83 assumptions"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "fad4ce71a7de8a177ea5b7ec22428cb463c9d645c35200bfe11d03feb347f6a8",
+    "commit": "2bd3ed8e780d77098780eae9290719ef8ed1db66",
+    "frozen_at": "2026-10-28T01:53:14Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "field_source_sha256": "9d8c1c7b480990d8c8b47deccfb9f5b2f07d0f9ad93ad813338125a188dbc873",
+    "ordinary_job_nonresumable": true,
+    "periodic_upload_seconds": 30,
+    "storage_bucket": "setec-astronomy-artifacts",
+    "same_base_for_all_m": true
+  }
+}

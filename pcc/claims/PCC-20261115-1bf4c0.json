@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T16:49:54Z",
+ "id": "PCC-20261115-1bf4c0",
+ "kind": "execution",
+ "producer": {
+  "commit": "6f1bd2d9c2c7426f3c8d64b12b73bfd30bcc24c5",
+  "model": "GPT-6",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/build-001.txt",
+    "sha256": "66615a1ee3b724c9bd81a4a70a6301e1de2758dc1d66e2c402d41d31d9a1bc3e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/clippy-001.txt",
+    "sha256": "70e27c11b6edcc8208246edba18468e1ca070816562fdb7039a1b203c40cc731"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/build-001.sha256",
+    "sha256": "a1d531f7388ddfd1b302abeb50d302d7f20d3130db6539800e4d91bb346230b0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/minimal_transport/checks/checkpoint-gate-001.txt",
+    "sha256": "2f1014b06fd1d5dbb602d7aef98a2e484b85b75101c52555f59d783097048012"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_genus_dlp_20261115/minimal_transport",
+ "statement": "The new native Eisenstein transport source compiles in release mode and passes strict package Clippy. Numerical qualification and timing have not run: the mandatory checkpoint gate failed for missing upload credentials and the RunPod API returned401."
+}

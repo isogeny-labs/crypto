@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.3,ranksep=0.3];
+ node [shape=box,style="rounded,filled",fillcolor="#e9f2f8",fontname="DejaVu Sans",fontsize=10];
+ edge [color="#34556b"];
+ a [label="Actual fixed-size Sylvester matrix\nFirst size D; second size 2"];
+ b [label="Column degree bounds\nD columns at most 2; two columns 0"];
+ c [label="Leading coefficient matrix\nSylvester(f, (X-Z)^2; D, 2)"];
+ d [label="General one-step theorem\nCoefficient at T^(2D) = f(Z)^2\nDegree = 2D if domain and f nonzero",fillcolor="#d4eedb"];
+ e [label="Actual incoming canonical S4\nThree independent formal inputs; degree 4"];
+ f [label="Canonical S5\nLast-input degree 8 only",fillcolor="#d4eedb"];
+ g [label="Reset-of-size negative control\nf=1: declared D=2 gives degree 4\nReset D=0 gives degree 0",fillcolor="#fff2cf"];
+ a -> b; a -> c; b -> d; c -> d; d -> f; e -> f; d -> g;
+}

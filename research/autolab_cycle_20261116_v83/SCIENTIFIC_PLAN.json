@@ -1,0 +1,93 @@
+[
+  {
+    "id": "rationality-trace-oracles-20261116-v83",
+    "registered_at": "2026-11-16T05:02:12.081919+00:00",
+    "fingerprint": "f4940d1470fbe4839771589904f7609b44f57f16624c1c74bbaac048f2d688cf",
+    "preregistration_sha256": "8e00d1ff280409f4505e2b6e62db681f72df982b40aafd5b637be7d1f07f19d4",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.rationality_trace_integration_20261116_v83.oracles",
+      "rationality-trace-oracles-20261116-v83",
+      "oracles_raw"
+    ],
+    "seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "depends_on": [],
+    "selected_frozen_files_sha256": {
+      "research/rationality_trace_integration_20261116_v83/DATA.json": "15845a5d60ca7e31a35729fe405d335de4d56251cbfea6a1a12f9cd7bb51fa1b",
+      "research/rationality_trace_integration_20261116_v83/PROOF.md": "6d7464abca02bb368fff933e9cc59bd1b298f1650361055c56e833b4d7f1e3ea",
+      "research/rationality_trace_integration_20261116_v83/child.py": "2915e5d3ea542d502b320c82bb0bc0ddeb24dd5e724061a13d6b37effa2f7eff",
+      "research/rationality_trace_integration_20261116_v83/cold.py": "14bd1ee9cc303bb53d76a21f529fbf963904e3fca8c33b8521be98d59fa18594",
+      "research/rationality_trace_integration_20261116_v83/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/rationality_trace_integration_20261116_v83/kernel.py": "2918bf197557649665a8a083ec923469125b1cb2186bb06ac4cc9a8361d25c37",
+      "research/rationality_trace_integration_20261116_v83/oracles.py": "3041c888c432d759f3019b5307d8fa30c562277e63d24307185c6b5ffd5b9475",
+      "research/rationality_trace_integration_20261116_v83/supervisor.py": "16d5bcf53f2780755505713bdf7e0ae3b8815f70951995909b9fff4269f8dbb9",
+      "research/rationality_trace_review_20261116_v83/REVIEW.md": "d9ea6f78157cd258ce11e0608b69945264b44c6473669595f93254dba8946ffe"
+    }
+  },
+  {
+    "id": "rationality-trace-cold-20261116-v83",
+    "registered_at": "2026-11-16T05:02:12.091383+00:00",
+    "fingerprint": "3433255d4cef78d2c804eb41fb7d214e6e3aa8a4b61c9fb441a09b48523e9bb3",
+    "preregistration_sha256": "f2f1c823e43e40df1cffefd21d7996e33786b7b3b14c6d6bf0a4059f56b55b4b",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.rationality_trace_integration_20261116_v83.cold",
+      "rationality-trace-cold-20261116-v83",
+      "cold_raw"
+    ],
+    "seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "depends_on": [
+      "rationality-trace-oracles-20261116-v83"
+    ],
+    "selected_frozen_files_sha256": {
+      "research/rationality_trace_integration_20261116_v83/DATA.json": "15845a5d60ca7e31a35729fe405d335de4d56251cbfea6a1a12f9cd7bb51fa1b",
+      "research/rationality_trace_integration_20261116_v83/PROOF.md": "6d7464abca02bb368fff933e9cc59bd1b298f1650361055c56e833b4d7f1e3ea",
+      "research/rationality_trace_integration_20261116_v83/child.py": "2915e5d3ea542d502b320c82bb0bc0ddeb24dd5e724061a13d6b37effa2f7eff",
+      "research/rationality_trace_integration_20261116_v83/cold.py": "14bd1ee9cc303bb53d76a21f529fbf963904e3fca8c33b8521be98d59fa18594",
+      "research/rationality_trace_integration_20261116_v83/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/rationality_trace_integration_20261116_v83/kernel.py": "2918bf197557649665a8a083ec923469125b1cb2186bb06ac4cc9a8361d25c37",
+      "research/rationality_trace_integration_20261116_v83/oracles.py": "3041c888c432d759f3019b5307d8fa30c562277e63d24307185c6b5ffd5b9475",
+      "research/rationality_trace_integration_20261116_v83/supervisor.py": "16d5bcf53f2780755505713bdf7e0ae3b8815f70951995909b9fff4269f8dbb9",
+      "research/rationality_trace_review_20261116_v83/REVIEW.md": "d9ea6f78157cd258ce11e0608b69945264b44c6473669595f93254dba8946ffe"
+    }
+  },
+  {
+    "id": "norm-common-root-gate-20261116-v83b",
+    "registered_at": "2026-11-16T05:06:54.150383+00:00",
+    "fingerprint": "d2acd0594c444d5ba12e3c31d53df7bcd2385ea421734501ff8b907e57c409eb",
+    "preregistration_sha256": "a42292833a14e2077bd9846815fd10bb6dab1f692e8fcebe4ae6d9223143327d",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.norm_common_root_gate_20261116_v83b.worker",
+      "norm-common-root-gate-20261116-v83b",
+      "raw"
+    ],
+    "seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "depends_on": [],
+    "selected_frozen_files_sha256": {
+      "research/norm_common_root_gate_20261116_v83b/DATA.json": "ac4ab872123ef07fd1d9a0942c44ef44061aac6b5360464e28d9876cd6bc38ec",
+      "research/norm_common_root_gate_20261116_v83b/PROOF.md": "38701fb1de006e2263aa793800290f0e2cb730c417de97054a4339a416129b00",
+      "research/norm_common_root_gate_20261116_v83b/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/norm_common_root_gate_20261116_v83b/kernel.py": "4cb731aebd88b8e57bde17b30b47f9beb3d9edb859feb0d66eef91d3544cdf6d",
+      "research/norm_common_root_gate_20261116_v83b/worker.py": "32a9bf7b97efe0d7a98f1be62f73c70705d06d4c690ef3ecde59fe154bec4eca",
+      "research/norm_common_root_gate_review_20261116_v83b/REVIEW.md": "bc33df4257424b5a7286c8dcab77c185d7b6b51f36cceb05d7dcfc8f89f136f9",
+      "research/rationality_trace_integration_20261116_v83/PROOF.md": "6d7464abca02bb368fff933e9cc59bd1b298f1650361055c56e833b4d7f1e3ea",
+      "research/rationality_trace_integration_20261116_v83/child.py": "2915e5d3ea542d502b320c82bb0bc0ddeb24dd5e724061a13d6b37effa2f7eff",
+      "research/rationality_trace_integration_20261116_v83/cold.py": "14bd1ee9cc303bb53d76a21f529fbf963904e3fca8c33b8521be98d59fa18594",
+      "research/rationality_trace_integration_20261116_v83/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/rationality_trace_integration_20261116_v83/kernel.py": "2918bf197557649665a8a083ec923469125b1cb2186bb06ac4cc9a8361d25c37",
+      "research/rationality_trace_integration_20261116_v83/oracles.py": "3041c888c432d759f3019b5307d8fa30c562277e63d24307185c6b5ffd5b9475",
+      "research/rationality_trace_integration_20261116_v83/supervisor.py": "16d5bcf53f2780755505713bdf7e0ae3b8815f70951995909b9fff4269f8dbb9",
+      "research/rationality_trace_review_20261116_v83/REVIEW.md": "d9ea6f78157cd258ce11e0608b69945264b44c6473669595f93254dba8946ffe"
+    }
+  }
+]

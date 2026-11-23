@@ -18,7 +18,37 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+/// The isolation level a wall-clock figure needs (`docs/ecbench/README.md`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum Level {
+    L0,
+    L1,
+    L2,
+    L3,
+}
+
+impl Level {
+    pub fn name(self) -> &'static str {
+        match self {
+            Level::L0 => "L0",
+            Level::L1 => "L1",
+            Level::L2 => "L2",
+            Level::L3 => "L3",
+        }
+    }
+    pub fn parse(s: &str) -> Option<Self> {
+        match s {
+            "L0" => Some(Level::L0),
+            "L1" => Some(Level::L1),
+            "L2" => Some(Level::L2),
+            "L3" => Some(Level::L3),
+            _ => None,
+        }
+    }
+}
+
 /// Checked native PMU lifecycle; legacy counters below retain their API.
+#[path = "isolation/checked.rs"]
 pub mod checked;
 
 /// One logical CPU's place in the machine.
@@ -397,19 +427,39 @@ pub fn plan_cpus(
 /// take, so a session and those tools never time at once.
 pub const DEFAULT_LOCK: &str = "/tmp/crypto-bench.lock";
 
-/// An exclusive `flock`, held until dropped.
+/// An exclusive `flock`, owned by the acquiring process until dropped.
+/// An inherited descriptor is not an ownership transfer to a forked child.
 pub struct BenchLock {
     _file: std::fs::File,
+    #[cfg(unix)]
+    owner_pid: libc::pid_t,
     pub path: String,
 }
 
 impl BenchLock {
     pub fn acquire(path: &str, wait: bool) -> Result<Self, String> {
-        let file = std::fs::OpenOptions::new()
-            .create(true)
-            .truncate(false)
-            .write(true)
-            .open(path)
+        // Linux protected_regular can reject O_CREAT on somebody else's
+        // existing file in /tmp even for root. Open the existing inode
+        // without O_CREAT; create exclusively only when it is absent.
+        // A competing creator wins the same inode, which we then open.
+        let existing = || std::fs::OpenOptions::new().write(true).open(path);
+        let file = existing()
+            .or_else(|error| {
+                if error.kind() != std::io::ErrorKind::NotFound {
+                    return Err(error);
+                }
+                std::fs::OpenOptions::new()
+                    .write(true)
+                    .create_new(true)
+                    .open(path)
+                    .or_else(|error| {
+                        if error.kind() == std::io::ErrorKind::AlreadyExists {
+                            existing()
+                        } else {
+                            Err(error)
+                        }
+                    })
+            })
             .map_err(|e| format!("cannot open lock {path}: {e}"))?;
         #[cfg(unix)]
         {
@@ -420,9 +470,13 @@ impl BenchLock {
                 if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } == 0 {
                     break;
                 }
+                let error = std::io::Error::last_os_error();
+                if error.kind() != std::io::ErrorKind::WouldBlock {
+                    return Err(format!("cannot lock {path}: {error}"));
+                }
                 if !wait {
                     return Err(format!(
-                        "another benchmark holds {path}; pass --wait to queue behind it"
+                        "another benchmark holds {path}; pass --wait to queue behind it: {error}"
                     ));
                 }
                 if let Some(sig) = crate::cryptanalysis::ecbench::signals::interrupted() {
@@ -435,8 +489,34 @@ impl BenchLock {
         }
         Ok(Self {
             _file: file,
+            #[cfg(unix)]
+            // SAFETY: getpid has no preconditions.
+            owner_pid: unsafe { libc::getpid() },
             path: path.to_string(),
         })
+    }
+}
+
+impl BenchLock {
+    fn release_owner_lock(&self) {
+        #[cfg(unix)]
+        {
+            use std::os::unix::io::AsRawFd;
+            // A child dropping its inherited guard must not unlock the owner.
+            // SAFETY: getpid has no preconditions; _file still owns its fd.
+            if unsafe { libc::getpid() } == self.owner_pid {
+                // Release the shared open-file-description lock even if an
+                // unrelated concurrent child has not yet exec'd/closed its fd.
+                // Drop cannot report errors; File closure remains the fallback.
+                let _ = unsafe { libc::flock(self._file.as_raw_fd(), libc::LOCK_UN) };
+            }
+        }
+    }
+}
+
+impl Drop for BenchLock {
+    fn drop(&mut self) {
+        self.release_owner_lock();
     }
 }
 
@@ -1178,6 +1258,60 @@ pub fn cpu_settings(cpu: u32) -> CpuSettings {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(unix)]
+    #[test]
+    fn benchmark_lock_preserves_inode_contents_and_exclusion() {
+        use std::os::unix::fs::MetadataExt;
+        let path = std::env::temp_dir().join(format!(
+            "bench-lock-exclusion-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let name = path.to_str().unwrap();
+        let first = super::BenchLock::acquire(name, false).unwrap();
+        std::fs::write(&path, b"sentinel").unwrap();
+        let inode = std::fs::metadata(&path).unwrap().ino();
+        assert!(super::BenchLock::acquire(name, false).is_err());
+        drop(first);
+        let second = super::BenchLock::acquire(name, false).unwrap();
+        assert_eq!(std::fs::metadata(&path).unwrap().ino(), inode);
+        assert_eq!(std::fs::read(&path).unwrap(), b"sentinel");
+        drop(second);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn root_can_open_foreign_lock_in_sticky_directory() {
+        use std::os::unix::fs::PermissionsExt;
+        if unsafe { libc::geteuid() } != 0 {
+            return;
+        }
+        let dir = std::env::temp_dir().join(format!(
+            "bench-lock-protected-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir(&dir).unwrap();
+        std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o1777)).unwrap();
+        let path = dir.join("lock");
+        std::fs::write(&path, b"foreign owner").unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600)).unwrap();
+        let cpath = std::ffi::CString::new(path.to_str().unwrap()).unwrap();
+        assert_eq!(unsafe { libc::chown(cpath.as_ptr(), 65534, 65534) }, 0);
+        let lock = super::BenchLock::acquire(path.to_str().unwrap(), false).unwrap();
+        assert!(super::BenchLock::acquire(path.to_str().unwrap(), false).is_err());
+        assert_eq!(std::fs::read(&path).unwrap(), b"foreign owner");
+        drop(lock);
+        std::fs::remove_file(path).unwrap();
+        std::fs::remove_dir(dir).unwrap();
+    }
     use super::*;
 
     #[test]
@@ -1610,6 +1744,7 @@ pub struct HwCounters {
     #[cfg(target_os = "linux")]
     fds: Vec<(libc::c_int, u64)>,
     error: Option<String>,
+    #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
     inherit: bool,
 }
 

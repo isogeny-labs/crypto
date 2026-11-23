@@ -1,0 +1,61 @@
+{
+  "cases": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--lib",
+        "--",
+        "--test-threads=4"
+      ],
+      "elapsed_wall_seconds_L0": 355.87336683399997,
+      "exit_code": 0,
+      "log_gzip_sha256": "b764586a3ca52bc0310fb0419feda25db15961326f2853e6c1301be04af852e5",
+      "name": "lib",
+      "stdout_sha256": "af4db0ea2122e90d91effb4df8e82225b9a7551c0f42d0d1573eebab6f77bcf0",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--example",
+        "koblitz_n83_mixed_orbit_worker"
+      ],
+      "elapsed_wall_seconds_L0": 104.10594803600003,
+      "exit_code": 0,
+      "log_gzip_sha256": "9d8ead04578d73476021e11141ee87833c126be9a69c99a7b60f19f4f87e9587",
+      "name": "worker-example",
+      "stdout_sha256": "57fd1b5560e9189ac91b13d08a20102114998b0a0f8acaa8c2fe9758aebd9410",
+      "timed_out": false
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "research/koblitz_n83_factor_base_sweep_20261008",
+        "-p",
+        "test_*.py"
+      ],
+      "elapsed_wall_seconds_L0": 6.219398113000011,
+      "exit_code": 1,
+      "log_gzip_sha256": "ebbe472dff8b1c90b376694a1624a0203861623987fe641204080ca1130d6438",
+      "name": "n83-python",
+      "stdout_sha256": "1b8ac89bd7258f8d876acc55df110498924d1530f7207acc072275538bba64c0",
+      "timed_out": false
+    }
+  ],
+  "image": "rust:1.98.1-bookworm@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e",
+  "machine": "Linux-4.19.0-gvisor-x86_64-with-glibc2.36",
+  "rustc_version": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "schema": "n83.modal-prepush-validation/v1",
+  "source_archive_sha256": "56c9d2cb62d8ad63355961c98a80843815f5447bd078da235e8ea5ce5a0f6bad",
+  "source_commit": "cdaa0a96391084de881064e99ca7a8da0f527370"
+}

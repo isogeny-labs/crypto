@@ -1,0 +1,210 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-11T05:42:15+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/chained_transfer_bench",
+        "run",
+        "--json",
+        "research/chained_prime_transfer_20261111/results.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-11T05:40:14+00:00",
+      "wall_s": 0.242
+    }
+  ],
+  "commit": "12439ac5d9554282593820325466e82f356d726e",
+  "commit_dirty": true,
+  "created_utc": "2026-11-11T05:40:09+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-chained-prime-transfer"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261111T0540Z-chained-prime-transfer",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_p211",
+      "note": "genus-2 IC on J(C) after verified pull-back, full degree-1 base; reference = counted rho on E1, same r",
+      "reference": 428.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 4184.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "rho_jac_p211",
+      "note": "rho on order-r subgroup of J(C) after verified pull-back",
+      "reference": 428.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 396.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "rho_isog_p211",
+      "note": "rho on isogenous E1' after verified Velu hop",
+      "reference": 428.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 530.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_p419",
+      "note": "genus-2 IC on J(C) after verified pull-back, full degree-1 base; reference = counted rho on E1, same r",
+      "reference": 357.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 9366.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "rho_jac_p419",
+      "note": "rho on order-r subgroup of J(C) after verified pull-back",
+      "reference": 357.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 497.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "rho_isog_p419",
+      "note": "rho on isogenous E1' after verified Velu hop",
+      "reference": 357.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 562.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_p821",
+      "note": "genus-2 IC on J(C) after verified pull-back, full degree-1 base; reference = counted rho on E1, same r",
+      "reference": 370.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 13313.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "rho_jac_p821",
+      "note": "rho on order-r subgroup of J(C) after verified pull-back",
+      "reference": 370.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 389.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "rho_isog_p821",
+      "note": "rho on isogenous E1' after verified Velu hop",
+      "reference": 370.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 274.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "ic_jac_p1619",
+      "note": "genus-2 IC on J(C) after verified pull-back, full degree-1 base; reference = counted rho on E1, same r",
+      "reference": 847.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 36363.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "rho_jac_p1619",
+      "note": "rho on order-r subgroup of J(C) after verified pull-back",
+      "reference": 847.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 560.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "rho_isog_p1619",
+      "note": "rho on isogenous E1' after verified Velu hop",
+      "reference": 847.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 649.0
+    }
+  ],
+  "problem": "transfer:prime-bielliptic-genus2",
+  "raw": [
+    {
+      "bytes": 1506,
+      "path": "research/chained_prime_transfer_20261111/results.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fb/fbe6197a79c1508061ea90c1ea764c2c5b76a3ee26ed4380b979d9d1690abc34",
+      "sha256": "fbe6197a79c1508061ea90c1ea764c2c5b76a3ee26ed4380b979d9d1690abc34",
+      "uploaded": false
+    },
+    {
+      "bytes": 927,
+      "path": "research/chained_prime_transfer_20261111/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c4/c49bd6d266fc8641221ea5cdb597c2e730b42f721a91893fd12d5d9573c31fb5",
+      "sha256": "c49bd6d266fc8641221ea5cdb597c2e730b42f721a91893fd12d5d9573c31fb5",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261111-chained-prime-transfer/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261111-chained-prime-transfer/cost-vs-p.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "chained-prime-transfer",
+  "status": "measured",
+  "summary": "Verified chain E1->E1'->J(C) at p=211..1619: destination rho near source rho (n=1); genus-2 IC 9.8x-42.9x matched rho, growing with p (boundary, not an improvement)",
+  "validation": null
+}

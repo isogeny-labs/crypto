@@ -1,0 +1,27 @@
+# 2026-11-17 — Prime31 RR9 projective D9 separator (ChatGPT automation)
+
+## 2026-11-17 14:30–14:38 UTC
+
+### What was done (commands, files, features)
+- Read live GitHub PRs #4545, #4546, #4547, #4548, #4549, #4532; docs/ACTIVE.md, AGENTS.md and latest 2026-11-17 session logs before designing next experiment. Reviewed original parent Rust `prime31_rr9_public_macaulay.rs`, pinned 1.100 native project and prior degree-5/6 results. Queried repo y-coordinate/factor-base leads, PKM 2016, APS 2018, Kudo et al. 2018 and Macaulay2 resultant documentation. Research-KB MCP/CLI not available; used bounded GitHub and publication/primary-doc fallback. Did not assert exhaustiveness.
+- Created `research/prime31-rr9-degree9-separator-20261117` based on exact #4549 head `e6553e6c1f86`; committed tracking line alone, opened **draft PR #4550** stacked on #4549, and committed frozen `RR9_PROJECTIVE_D9_PROTOCOL_20261117.md` before editing the Rust candidate.
+- Derived and committed exact two-part proof: (i) no projective common zeros at h=0 of the eight B8 quadrics, by the squarefree cubic nonsquare identity; (ii) projective-root-free iff the homogeneous degree-nine Macaulay span is full, via regular-sequence Hilbert series (1+t)^8. A positive affine root forces deficient degree-nine rank. The two frozen negatives are off all 256 signs over the algebraic closure, so their D9 full-rank property follows mathematically, **not from a measured rank**.
+- Appended source-specific Rust `projective_degree_nine_witness_controls()` reusing original prime31 field/group arithmetic and the existing public RR9 quadrics. New example `prime31_rr9_projective_d9_witness.rs`, pinned CI `prime31-rr9-projective-d9-witness.yml`. Test-only signs yield exact chart coefficients; 8 q_i, M=H_B, original E(Fp) group sum, and each sparse D9 row are independently checked. No masked support passes into a public-only candidate. No expensive dense D9 matrix built.
+- **SUCCESS** exact-source [Actions #44104421359](https://github.com/isogeny-labs/crypto/actions/runs/44104421359) on `32d6ba5489dbf69f0fa2bc98556fff315a23a80f`. Rust 1.100 library, example unit tests, release build, bounded CLI and raw JSON checks passed. [Artifact #14337801335](https://github.com/isogeny-labs/crypto/actions/runs/44104421359/artifacts/14337801335) downloaded; local SHA256 `12f74c30d341c53def98c226bbf149eee6c9eb0a711d2b2082776d9c269e7f3e` matches Actions digest. ZIP 822 bytes contains original JSON.
+- Raw producer result on original p31 cofactor-one curve: public positive R=(1911579686,548820096); test-only coefficient chart [455835358,518652820,754716693,932383545,62510441,1884059825,1142049404]; 27,456 sparse D9 rows, 240,240 nonzero terms, all evaluate to zero against nonzero 11,440-column chart evaluation vector; wall 6,846,317 ns **for bounded positive witness only**. Hence positive D9 rank ≤11,439. Frozen negative-rank values are null; no D9 full negative-rank algorithm run. Complete unknown ECDLP solves = 0.
+- Committed `RR9_PROJECTIVE_D9_THEOREM_20261117.md` with exact proof, known scope, prior-lead audit, raw result, checksum and sparse next gates. Prior same-curve different-run 1,024-target mixed IC 2,221.474 ms vs cached BSGS 170.113 ms from #4532, **not** a new matched solver benchmark.
+
+### Decisions made (and why)
+- Degree nine is the **first mathematically guaranteed** membership/rank separator in this eight-quadric family; degree-seven/eight divergence is possible but unproved. Avoid blind D7+ dense extrapolation. The positive evaluation null certificate is a measurable inexpensive *falsifier* of a wrong full-rank claim, not an extractor and not an attack speedup.
+- Do not misstate the 6.846317ms known-support witness as a public-residual-only relation cost; sign support and chart were supplied by the independent **test oracle**. No independent PCC signature, no leaderboard, no merge and no paid compute.
+- Retain stacked PR until #4549 and parents integrate, no feature-stack auto merge. Scoped task is complete when exact-source checks and report are published; prepare review.
+
+### Open threads (unfinished, pick up next time)
+- Build **actual public-R-only sparse degree-nine negative rank or unit-certificate solver** using existing Rust F4/quotient/black-box linear algebra. Frozen positives must return coefficient witness, negatives must produce reproducible algebraic certificate. No signed-test-oracle access to the candidate.
+- Test seven-quadrics quotient / eighth multiplication, handling irrelevant ideal saturation/infinity branches and memory cap.
+- Extend to B31 repeated-root/exceptional RR9 and complete blinded logs; charge all failures, setup, linear algebra, sign recovery and memory versus same-host cached BSGS/tuned rho plus external IC frontier.
+- Independent signed PCC, cross-field/curve validation and merging the existing RR9 PR chain are still open.
+
+### Errors (what went wrong, how it was handled)
+- No cargo toolchain or public git networking in this container; reused the existing pinned Rust GitHub Actions runner and retrieved raw artifact. CI returned success. One initial attempt to browse a workflow-runs URL with unsupported parameters was rejected; used connector's allowed `/actions/runs` route.
+- An intermediate report-update JavaScript call had a syntax error **before** any GitHub mutation; corrected it and committed the successful report update. No frozen tests, fixtures or acceptance thresholds changed after measurements.

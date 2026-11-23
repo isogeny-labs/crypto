@@ -1,0 +1,18 @@
+\documentclass[11pt]{article}\usepackage[margin=1in]{geometry}\begin{document}\sloppy\title{Branch-point norm orders: independent derivation}\author{Mathematical source review}\date{5 November 2026}\maketitle
+\textbf{Derived distinction.} At a simple rational branch point, the curve-stalk order of the norm is twice the order of the selected numerator. The base-polynomial order of that same norm equals the numerator order. These are different valuations.
+\paragraph{Setting.} Let $K$ be a field of characteristic different from two, $f\in K[x]$ a separable quintic, $P=(a,0)$ with $f(a)=0$, and $R=\mathcal O_{C,P}$ for $C:y^2=f(x)$. Write $v_P$ for its normalized DVR order and $v_a$ for polynomial multiplicity at $a$. Let $b\in K^\times$, $n\in K[x]$, $h=by-n(x)$ and $N=n^2-b^2f$.
+\paragraph{Local geometry.} Write $f=(x-a)g$. Since $g(a)=f'(a)\ne0$, $g$ is a local unit and $x-a=y^2/g$. The maximal ideal is $(y)$; the actual smooth curve local ring is a DVR. Hence
+\[v_P(y)=1,\qquad v_P(x-a)=2,\qquad v_P(A(x))=2v_a(A).\]
+If $n(a)\ne0$, $h$ is a unit. If $n(a)=0$, write $n=(x-a)k$ and obtain $h=y(b-yk/g)$, with unit second factor. Its conjugate is $y(-b-yk/g)$, also of order one. Thus
+\[v_P(h)=v_a(N)\in\{0,1\},\qquad v_P(N)=2v_P(h).\]
+The norm is nonzero: at a selected branch its base order is one because $n^2$ has order at least two while $b^2f$ has order one; otherwise its residue is $n(a)^2\ne0$.
+\paragraph{Factored source norm.} If the exact identity is $N=c u_1u_2U$ with $c\in K^\times$, all factors are nonzero and
+\[v_a(u_1)+v_a(u_2)+v_a(U)=v_P(h),\]
+\[v_P(u_1(x))+v_P(u_2(x))+v_P(U(x))=2v_P(h).\]
+At a selected branch these sums are one and two respectively. Exactly one factor has a simple base root; simultaneous roots of two factors contradict the premises. The sign convention $n-by$ changes no order. A source support-root condition implies $n(a)=0$ by evaluating the norm identity.
+\paragraph{Worked counterexample.} Over $\mathbf Q$, take $f=x^5+x$, $a=0$, $b=1$, $n=x$. The polynomial is separable: at a nonzero root $\alpha^4=-1$, its derivative is $-4$; at zero it is one. Here
+\[h=y-x,\qquad N=x^2-x^5-x=-x(1-x+x^4).\]
+Thus $v_P(h)=1$, $v_a(N)=1$, and $v_P(N)=2$. Both transplanting the nonbranch formula $v_P(h)=v_P(N)$ and blindly asserting $v_P(h)=2v_a(N)$ would give $1=2$. This is a general polynomial-factor example, not a claimed coefficientData fixture.
+\paragraph{Premise attacks.} If $b=0$ and $n=x-a$, numerator order is two: the zero-or-one bound needs $b\ne0$. Repeated roots can destroy the DVR/uniformizer argument. Characteristic two changes the distinct-conjugate interpretation, although some elementary local identities can survive. Infinity and nonrational closed points require separate definitions and proofs.
+\paragraph{Primary source correspondence.} Existing WeightedProjFiniteBranchDVR constructs the actual branch stalk, DVR and orders of $y$ and $x-a$. WeightedProjSourceBranchActualQuintic proves source numerator order one under determinant, input-congruence and support-root premises. Exact source hashes are retained in derivation.json. No new producer candidate was read; no compiler or trial was run. This report is a hand derivation and source inspection, not fresh kernel evidence or a global divisor-class result.
+\end{document}

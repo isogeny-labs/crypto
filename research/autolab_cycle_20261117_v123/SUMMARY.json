@@ -1,0 +1,131 @@
+{
+  "oracle": {
+    "out": {
+      "exhaustive_assignments": 32768,
+      "planted_assignments": 200,
+      "random_assignments": 128,
+      "accepted": 212,
+      "q_alias_checks": 1,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "profile": {
+    "out": {
+      "actual_controls": 48,
+      "accepted_controls": 0,
+      "original_complete": false,
+      "formulations": {
+        "candidate": {
+          "inputs": 63,
+          "variables": 53794,
+          "clauses": 192485,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 184,
+            "xor": 31222,
+            "and": 22325
+          },
+          "graph_sha256": "1f77cc2df83d9ec0d4d7cb42f6ad0b795b75da40f061cfe4cf78c6a84b6b8733"
+        },
+        "control": {
+          "inputs": 63,
+          "variables": 77953,
+          "clauses": 278047,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 177,
+            "xor": 41721,
+            "and": 35992
+          },
+          "graph_sha256": "1f1fba37b684af3885fb50dfc2e9f123d3f7f6c3ec4dc37c0b79530a933e0793"
+        }
+      },
+      "control_isolated": true,
+      "same_exact_conditional_contract": true,
+      "total_seconds": 1.766312747990014,
+      "scope": "exactfullprefixsupport/recoveryforoneconditionalnormfamily;notoriginalchain/outercases"
+    },
+    "error": null
+  },
+  "search": {
+    "out": {
+      "models": [],
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "scope": "conditional k3only,fixednecessarynormfamily;otherstrata/outerfamilies/source/Uunresolved",
+      "inputs": 63,
+      "variables": 53794,
+      "cold_compile_seconds": 0.1981484699936118,
+      "soft_total_target_seconds": 40,
+      "backend_configuration_readback": {
+        "threads": "1",
+        "cut": "true",
+        "cut.xor": "true",
+        "cut.aig": "true",
+        "cut.delay": "0",
+        "anf": "false"
+      },
+      "formulation_seconds": 3.5681071849830914,
+      "version": "4.15.4",
+      "cpu_affinity": [
+        0
+      ],
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "202377",
+        "sat mk clause 3ary": "84486",
+        "sat mk clause nary": "358114",
+        "sat mk var": "107343",
+        "sat gc clause": "104401",
+        "sat del clause": "259469",
+        "sat conflicts": "130325",
+        "sat decisions": "246204",
+        "sat propagations 2ary": "24535479",
+        "sat propagations nary": "180670757",
+        "sat restarts": "15185",
+        "sat minimized lits": "1740462",
+        "sat subs resolution dyn": "6119",
+        "sat units": "525",
+        "sat elim bool vars res": "25814",
+        "sat backjumps": "130322",
+        "sat backtracks": "3",
+        "sat elim clauses": "581",
+        "sat elim literals": "597",
+        "sat subsumed": "3451",
+        "sat subs resolution": "7119",
+        "sat scc elim vars": "53832",
+        "sat scc elim binary": "1",
+        "sat tr": "44",
+        "sat probing assigned": "3",
+        "sat-cut.eqs": "182",
+        "sat-cut.cuts": "96581",
+        "sat-cut.ands": "22325",
+        "sat-cut.xors": "31222",
+        "sat-cut.xands": "5444",
+        "sat-cut.xites": "6718",
+        "sat-cut.xxors": "11710",
+        "sat-cut.dc-reduce": "2669",
+        "rlimit count": "202545005",
+        "max memory": "241.43",
+        "memory": "85.03",
+        "num allocs": "14166535334.0",
+        "time": "36.497"
+      },
+      "engine_seconds": 40.071697976993164,
+      "soft_target_overshoot_seconds": 0.07169797699316405,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "original_complete": false,
+  "qualified_speedup": null
+}

@@ -1,0 +1,712 @@
+{
+ "schema": "validator-report/v1 (validation-gate/v1 companion)",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_scope": "T9 exploratory lead only: (a) the exact census selection at t in {5,6,7} on five k-miniatures, (b) the three f4cost engine cells at k=20 t=6 G=4, (c) ecbench session ECBS1hce736ca27358 (k=20, 16 public targets x 2 rounds, 5 arms incl. rho-neg reference and proj-a baseline), and the 11 frozen verdicts C0, P1-P10 (P7 failed, the other ten held, none inconclusive). Every README number was recomputed from the artifacts and agrees. The result is a constant-factor change of the pkm-iso-t6-g4 arm on one curve (k=20), t=6, G=4; the s1308 arm remains 1.415x (w=0) to 3.8e5x (w=1) behind proj-a and 10.7x to 2.9e6x behind rho-neg. This is NOT a pass of the IC validation gate: the replay audit is same-host-class, there is no VALIDATION.json, and no row may reach docs/ic or benchmarks/README.md from this lead (the README says so). The errata are reporting and provenance errata; none changes a number a verdict depends on.",
+ "independent": true,
+ "validator": "validator subagent (core tier, claude-opus-5-5). Not the producer of T9.",
+ "date": "2026-11-04",
+ "validated_commit": "2993713af847e19024a8c569a83403223c95938d",
+ "protocol_freeze_commit": "505ecbb154f907657e6b3865699d41a54c550406",
+ "tree_state": "Validation began at HEAD 2993713af847e19024a8c569a83403223c95938d on branch claude/curve25519-index-calculus-i674j4 (git status --porcelain empty). During validation another session committed 91996ac7ef08cdfd89cdf6914a27940a9f33e992 (01:47:12Z), which adds only research/curve25519_t10_winner_ecbench_20261104/{PROTOCOL.md, ecbench/spec.json, scripts/run.sh}; nothing under this lead, src/ or the binaries, so the validated tracked files are identical at both commits. Tracked files of this lead (PROTOCOL.md, scripts/run.sh, scripts/select_seeds.py) are byte-identical to their 505ecbb blobs (sha256 below) and unchanged 505ecbb..HEAD. 505ecbb is dated 2026-11-03T21:59:32Z; run.sh logged 'identity ok' at 21:59:54Z, so the freeze precedes all data (commit dates are author-supplied metadata). README.md, data/, analysis/ and ecbench/ (incl. the frozen spec.json) are untracked and excluded by .git/info/exclude ('TEMP: until wave-3 validation finishes'); this validation is bound to the sha256 values in artifact_hashes_at_validation. Git was used read-only; nothing was staged, committed or pushed.",
+ "artifact_hashes_at_validation": {
+  "PROTOCOL.md": "631f6214873de6bd9410fb2bb9df53d7bd0b3f935fddd6b0d7755b6fc280533d",
+  "README.md": "f58903336dc47f5c6b9fcc7cc273c6b24c3f15131c24858ec1916704e3ac308c",
+  "scripts/run.sh": "796ea66110683fa76ac39517f2227b8f79f9da53c475a10ff6f246f0a79efea6",
+  "scripts/select_seeds.py": "7694c25d6e9cb9f6d4657e0e899cf8f9d6b4859b61fbf7bdca755e0afb2222e8",
+  "ecbench/spec.json": "f5b110d552cc6ed6eb56e6e7663ee917b506cbc132f7bc9fc56c06fa8e0c360c",
+  "analysis/census_t9.json": "e1c8f0625be9b0f7b83908325697bcf1ae07acf208d3bb213f47157643925b5c",
+  "data/SHA256SUMS": "dafc4f7af0a9f820843ef15c0cf7f336738ef9e5163c756cd54608150619b02b",
+  "data/run.log": "c7a64d9a072ac47956555025ea50825b0923c283ecee2d6ed958247732bca767",
+  "data/ecbench/run.log": "cf37dc39a1b6908e27fffa7cb60e989a2e736094dd3e79f2684147f5f77d2db0",
+  "data/ecbench_attempt0_refused_busy_host/run.log": "0752b9203e467fe0e783b1833cb82353e50983910a9711b8cd37424d4e68175a",
+  "data/run_c_allowbusy.sh.used": "fdd5db211d562740dc75bcddb70d4d3d34e6b8d36a4735b84f9d908fb235a809",
+  "data/census_t9.txt": "cc012646799e9864e4927f60e265afe87a16a43672d7402a49490bcdbfd1dbaa",
+  "data/census_t9.json": "e1c8f0625be9b0f7b83908325697bcf1ae07acf208d3bb213f47157643925b5c",
+  "data/engine_k20_t6_g4_s0.json": "1438bb26aabda59a66ca4b2784dbd3f876fa2aeabd6e3bca98e8289f7f55771b",
+  "data/engine_k20_t6_g4_s1093.json": "fce28a2e635400f87f75a6fc093500708539d62f12a2c8cd2883e3584e47f1c4",
+  "data/engine_k20_t6_g4_s1308.json": "44d1ccd301e365a2721bb6dccb7678a2daa0b860b705c8162afcfb25c8b3b6db",
+  "data/ecbench/band.json": "8a7560a97e553e76efc0f8fa12ec4dc811c8b93c3ae80e55adf4e30fc874ed07",
+  "data/ecbench/verify.json": "9a7a2d823a5c489d5981467d144369f97ea66d2001a8d7617e69fa6092849cb5",
+  "data/ecbench/s1/records.jsonl": "067a07ad1cb647107aa4e4a79dace88797f892c02a4d0a01dd5d89914e5c5aa5",
+  "data/ecbench/s1/session.json": "2c09ef3e595c19efcdcac703d7ac1c23a76808b40ac30f2dd2235088d10925b1",
+  "data/ecbench/s1/plan.json": "ec424da6adc78ba0b7bb900b814c107314fc48b6c7a1e95ce5eb22411569a1fe",
+  "data/ecbench/s1/host.json": "3d7d8315b6e88f8f9b3cecaf50c1a3554a4863615221fcd065964fe9d393c355",
+  "data/ecbench/s1/spec.json": "f5b110d552cc6ed6eb56e6e7663ee917b506cbc132f7bc9fc56c06fa8e0c360c"
+ },
+ "instrument": {
+  "curve25519_family": {
+   "path": "/home/user/ctarget/release/curve25519_family",
+   "sha256": "ba1e3c0518eae58ae39a9b08e1f757c7e9fe1eb02c86b158b883244bc6a5ecef",
+   "frozen": "ba1e3c0518eae58ae39a9b08e1f757c7e9fe1eb02c86b158b883244bc6a5ecef"
+  },
+  "ecbench": {
+   "path": "/home/user/ctarget/release/ecbench",
+   "sha256": "54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b",
+   "frozen": "54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b"
+  },
+  "checks": "Both binaries hash to the values frozen in the committed scripts/run.sh, data/binary.sha256 and the session's binary_sha256; re-hashed by the validator before the reruns. Census inputs k16..k24.jsonl hash to the values in run.sh and the parent data/SHA256SUMS. The binaries' source commit and toolchain are not recorded (session git_commit and git_dirty are null), see errata."
+ },
+ "requirements": [
+  {
+   "id": "R1",
+   "requirement": "data files match data/SHA256SUMS",
+   "result": "pass",
+   "evidence": "data/SHA256SUMS; sha256sum -c: 118/118 OK, no listed file missing",
+   "detail": "Unlisted files: SHA256SUMS itself, data/run.log, data/ecbench/run.log, data/ecbench_attempt0_refused_busy_host/run.log (find ! -name run.log). Their hashes at validation are recorded above."
+  },
+  {
+   "id": "R2a",
+   "requirement": "re-run engine cells with the same command, compare all count fields except wall time",
+   "result": "pass",
+   "evidence": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/engine/engine_k20_t6_g4_s{0,1093,1308}.json vs data/engine_k20_t6_g4_s{0,1093,1308}.json",
+   "detail": "curve25519_family f4cost 20 {isogeny,isogeny@1093,isogeny@1308} 6 4 100 2026111506 3600 2 full 0 30000000, run sequentially: all 42 non-wall fields identical in each of the 3 cells; only wall_s differs."
+  },
+  {
+   "id": "R2b",
+   "requirement": "ecbench verify --dir <session> --replay 4 --out <file> with the lead's binary",
+   "result": "pass",
+   "evidence": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/verify_replay4.json, /tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/verify_replay4.txt",
+   "detail": "receipt sha256 73ce0884998c3b034bac6c223d3cdc498750d8a24886986e38d474d7f962a337 / replay seed 7754635076196871553 (160 eligible runs) / audit OK: 160 records, 160 verified, 4 replays reproduced, 0 problems | exit rc=0; replay_seed 7754635076196871553; auditor binary 54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b; receipt sha256 73ce0884998c3b034bac6c223d3cdc498750d8a24886986e38d474d7f962a337; replayed [{'seq': 72, 'arm': 'pkm-iso-t6-g4', 'target_index': 14, 'round': 0, 'reproduced': True, 'detail': 'identical'}, {'seq': 95, 'arm': 'pkm-iso-t6-g4-s1308', 'target_index': 3, 'round': 1, 'reproduced': True, 'detail': 'identical'}, {'seq': 141, 'arm': 'pkm-iso-t6-g4-s1093', 'target_index': 12, 'round': 1, 'reproduced': True, 'detail': 'identical'}, {'seq': 148, 'arm': 'proj-a', 'target_index': 13, 'round': 1, 'reproduced': True, 'detail': 'identical'}]; session files byte-identical before/after: True."
+  },
+  {
+   "id": "R3",
+   "requirement": "independent [d]G = Q certificate for every discrete-log solve",
+   "result": "pass",
+   "evidence": "data/ecbench/s1/records.jsonl; validator ecb_check.py (own affine short-Weierstrass arithmetic, not the solver)",
+   "detail": "p=1048573 and r=131203 prime, #E=1049624=8r, G on curve with [r]G=O; 16 distinct targets, each on the curve with [r]Q=O; for all 160 records status verified and [recovered]G == Q, 0 <= d < r. 0 failures."
+  },
+  {
+   "id": "R4",
+   "requirement": "recompute every README number and verdict from the data",
+   "result": "pass_with_errata",
+   "evidence": "README.md vs census_t9.*, engine_*.json, s1/records.jsonl, band.json, compare_*.json, verify.json",
+   "detail": "Census: independent integer re-implementation of both rules over 2,000 seeds x 15 cells reproduces every PROTOCOL.md row, the lead JSON, the 4 same-seed cells, 14/15 best-of-2000, (20,7) 1.0006x, Jc<=J in 15/15, M range 0.793-0.972, search 13,528,559; a scratch-copy run of select_seeds.py is byte-identical to data/census_t9.{txt,json}, and the README census block is verbatim. Engine: C0, P1, P2, P3, all E values and ratios reproduce exactly. ecbench: per-record S = (total_gae + w * sum of the record's unpriced counters)/sqrt(r) reproduces every band mean (rel err <= 3.2e-16), GAE and native sums, and all 15 compare point ratios and linearised-t intervals (K=16 workloads, t(15)=2.13145, rel err <= 6e-14); my own two-stage cluster bootstrap (different RNG) gives intervals within Monte-Carlo noise of the reported ones; per-workload win counts and ranges, search-charged rows, distance table and band ranks all reproduce. No numeric discrepancy found."
+  },
+  {
+   "id": "R5",
+   "requirement": "claims stay in scope; failed predictions reported as failed",
+   "result": "pass_with_errata",
+   "evidence": "README.md Predictions, Headline, Distance remaining, Deviations",
+   "detail": "P7 (0.9047 > 0.90) is reported as failed and not retuned; 'Rho remains ahead' and no leaderboard claim; result limited to k=20, t=6, G=4. Exploratory items are labelled. Errata: headline qualifier on the amortised seed search, vacuous census cmp claim, missing section-3 class label."
+  },
+  {
+   "id": "R6",
+   "requirement": "controls priced: reference, baseline, incumbent, band",
+   "result": "pass",
+   "evidence": "data/ecbench/band.json, compare_*__over__{rho-neg,proj-a}_w*.json",
+   "detail": "rho-neg (reference) and proj-a (baseline) ran on the same 16 targets and seeds (same_seeds true) and are priced at w=0, 0.1, 1 with their own unpriced counters (canonicalisations; lookups, row ops, base maps); all 10 band pairs are ordered at every weight. The seed search is reported separately, amortised and charged to one target, as the protocol prescribed."
+  },
+  {
+   "id": "R7",
+   "requirement": "reproducibility bindings (commit, dirty state, seeds, commands, versions)",
+   "result": "pass_with_errata",
+   "evidence": "scripts/run.sh (committed), data/run.log, data/run_c_allowbusy.sh.used, s1/session.json",
+   "detail": "Seeds (f4cost 2026111506; target_seed 2026111509, used by no other research spec; measurement seed 2026111510; bootstrap 20261002) and commands match the protocol. diff run.sh vs run_c_allowbusy.sh.used = only the --allow-busy flag and an absolute D=. Errata: spec.json uncommitted (bound by hash only); binary source commit unrecorded."
+  },
+  {
+   "id": "R8",
+   "requirement": "reporting contract: one table, one unit, ratios, phases, m=83/ECC2K-130 rules",
+   "result": "pass",
+   "evidence": "README.md (c) tables",
+   "detail": "All arms incl. reference in one band table in S at three weights, with paired ratios and correctness column (verified/runs). Census and engine use their own declared units (M proxy, F4 muladds) and are not mixed into S. m=83 / ECC2K-130 disclosure rules not applicable (prime-field Curve25519 miniature k=20)."
+  }
+ ],
+ "predictions": [
+  {
+   "id": "C0",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "seed-0 and s1093 engine outputs equal the parent files on all 7 frozen fields; the only differing key is wall_s"
+  },
+  {
+   "id": "P1",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "s1308: columns 36, covered 498, solving_degree_max 5, terms 16.0, capped false, undecided 0, hits 0 = hits_verified 0"
+  },
+  {
+   "id": "P2",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "710095.08/710094.0 = 1.0000015 in [0.90, 1.10]"
+  },
+  {
+   "id": "P3",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "E ratios 0.497350 <= 0.55 and 0.837119 <= 0.90"
+  },
+  {
+   "id": "P4",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "32/32 verified in each of 5 arms, 160/160; independent [d]G=Q 160/160; lead audit 16 replays identical, 0 problems; validator audit 4 replays, see R2b"
+  },
+  {
+   "id": "P5",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "0.560505 (w=0.1), 0.560503 (w=1) <= 0.60"
+  },
+  {
+   "id": "P6",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "linearised-t upper 0.746665 (w=0.1), 0.746664 (w=1) < 1 (bootstrap uppers 0.7525 also < 1)"
+  },
+  {
+   "id": "P7",
+   "claimed": "failed",
+   "validator": "failed",
+   "recomputed": "0.904738 (w=0.1), 0.904742 (w=1) > 0.90; interval [0.7398, 1.1065] includes 1 (reported, not predicted); band order s1308 < s1093 at every weight"
+  },
+  {
+   "id": "P8",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "0.643060 < 1 at w=0"
+  },
+  {
+   "id": "P9",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "0.619522 <= 0.75 at w=0.1"
+  },
+  {
+   "id": "P10",
+   "claimed": "held",
+   "validator": "held",
+   "recomputed": "validator band ranks: proj-a < each PKM arm and rho-neg < each PKM arm at w=0, 0.1, 1"
+  }
+ ],
+ "errata": [
+  "E1 (README (a), wording/evidence; minor): 'data/census_t9.json is byte-identical to the design-time analysis/census_t9.json (cmp passed)' is vacuous. scripts/select_seeds.py writes analysis/census_t9.json (OUT = ../analysis/census_t9.json), so stage (a) overwrote the design-time file at 2026-11-03T21:59:54Z (same mtime as data/census_t9.txt) and run.sh then cp'd it into data/. The cmp compared a file with its own copy. analysis/ is git-ignored, so the design-time bytes are not preserved. The substantive claim does hold: the validator's independent re-implementation and a scratch-copy run of select_seeds.py reproduce data/census_t9.{txt,json} byte-for-byte, and they match all 15 rows of the frozen PROTOCOL.md table.",
+  "E2 (README Files; minor): 'SHA256SUMS covers every file under data/ except run.log and itself' is inaccurate. The find ! -name run.log rule also leaves out data/ecbench/run.log (the ecbench run stdout, 14,208 bytes) and data/ecbench_attempt0_refused_busy_host/run.log. These three logs are unhashed in the lead. Their sha256 at validation is recorded in this report. All 118 listed files verify.",
+  "E3 (README Headline and band verdicts; scope qualifier): the headline 'end-to-end S 0.5605x seed 0' and 's1308 < seed 0 at every weight' hold only with the 13,528,559-group-op (37,349 S) seed search amortised, i.e. left out. Charged to one target, s1308/seed 0 is 1397.6x at w=0, 0.586x at w=0.1 and 0.563x at w=1, so it is not ordered across the band. The README discloses this in 'Seed search, reported separately', as the protocol prescribed, but the headline does not carry the qualifier. s1308 vs s1093 is unaffected because both rules pay the same search.",
+  "E4 (procedure; non-material to counts): adding --allow-busy to 'ecbench run' changed the frozen command after the refused attempt. PROTOCOL.md requires such changes in a dated addendum written before the data. None was written; the change is disclosed only after the fact in README Deviations 1, with the exact diff kept in data/run_c_allowbusy.sh.used (the flag plus an absolute D=). It does not change counted units: the lead's 16 replays, the validator's 4 replays and the engine reruns are all count-identical. The protocol's isolation level was L0 in any case.",
+  "E5 (reproducibility binding): the frozen spec ecbench/spec.json is git-ignored and was never committed. It is bound only by its sha256 f5b110d5...0c360c in the committed scripts/run.sh, and it matches. README.md, data/ and analysis/ are uncommitted as well. The source commit and toolchain of both prebuilt binaries are unrecorded (session git_commit and git_dirty are null). src/cryptanalysis/{ecbench/methods.rs, ic_boundary.rs, ic_framework/pkm_semaev.rs} changed between 505ecbb and HEAD, so the binaries cannot be rebuilt from a named commit. Only their sha256 identifies them.",
+  "E6 (classification; minor): the README calls the change 'a constant-factor change' but gives no AGENTS.md section-3 class label (advance, engineering, relabelling or accounting). The validator does not assign one. Choosing the class is left to the core tier."
+ ],
+ "notes": [
+  "Classification and interpretation stay with the producer/core tier; the validator only checked that numbers and verdicts follow from the artifacts.",
+  "The lead's audit (replay seed 3858208747647974989; 16 runs covering all 5 arms: seed-0 x2, s1093 x7, s1308 x1, proj-a x4, rho-neg x3) is same-host-class (auditor env class ECBENV3h5a2b0fa7dba5 = session env class). The validator's audit (replay seed 7754635076196871553; seqs 72 seed-0, 95 s1308, 141 s1093, 148 proj-a; rho-neg not drawn) ran with the same binary after the container restart, on env class ECBENV3h053a967ffbcf / hardware class ECBHW1hc00b2367431c (kernel 6.18.44-fc-v233, 3 CPUs; the session host was fc-v230, 4 CPUs), and reproduced all 4 count-identically. That is a different host class, but it is not an ecbench independent-runner receipt covering an IC run and a strong-rho run, so it does not make this lead eligible for a vs_rho claim or a leaderboard row; the README claims neither.",
+  "The host was shared during validation (another lead's ecbench session and a cargo test ran concurrently); this affects wall time only, and the replays compare counts.",
+  "Process items for the main session (disclosed in README Deviations 2 and 6): .resume/RESUME.md was not filled for this run, and no research-visuals report/graph/PDF exists for this lead."
+ ],
+ "recompute_agrees": true,
+ "recompute_agrees_detail": "All headline entries agree within rel_tol (claimed values are the README's rounded figures).",
+ "headline": [
+  {
+   "name": "S(s1308)/S(seed0) w=0.1 point",
+   "claimed": 0.5605,
+   "recomputed": 0.560504670836749,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1308)/S(seed0) w=0.1 95% upper",
+   "claimed": 0.7467,
+   "recomputed": 0.7466653209525406,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1308)/S(seed0) w=1 point",
+   "claimed": 0.5605,
+   "recomputed": 0.5605033043820369,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1308)/S(seed0) w=1 95% upper",
+   "claimed": 0.7467,
+   "recomputed": 0.7466641772845255,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1308)/S(seed0) w=0 point",
+   "claimed": 0.6431,
+   "recomputed": 0.6430602122709246,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1308)/S(s1093) w=0.1 point (P7, threshold 0.90)",
+   "claimed": 0.9047,
+   "recomputed": 0.9047378839870883,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1308)/S(s1093) w=1 point (P7)",
+   "claimed": 0.9047,
+   "recomputed": 0.904742199207794,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1308)/S(s1093) w=0.1 95% interval",
+   "claimed": [
+    0.7398,
+    1.1065
+   ],
+   "recomputed": [
+    0.7397875623481361,
+    1.1064671540614963
+   ],
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1308)/S(s1093) w=0 point",
+   "claimed": 0.7231,
+   "recomputed": 0.7231175089538753,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1093)/S(seed0) w=0.1 point (P9)",
+   "claimed": 0.6195,
+   "recomputed": 0.6195216103548816,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1093)/S(seed0) w=0.1 95% interval",
+   "claimed": [
+    0.4891,
+    0.7847
+   ],
+   "recomputed": [
+    0.4891111957243315,
+    0.7847030062935294
+   ],
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "S(s1093)/S(seed0) w=0 point",
+   "claimed": 0.8893,
+   "recomputed": 0.8892886761948711,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "distance: S(s1308)/S(proj-a) w=0",
+   "claimed": 1.415,
+   "recomputed": 1.4150009585957637,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "distance: S(s1308)/S(proj-a) w=0.1",
+   "claimed": 62347.0134,
+   "recomputed": 62347.01341063067,
+   "rel_tol": 1e-06,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "distance: S(s1308)/S(proj-a) w=1",
+   "claimed": 381802.2968,
+   "recomputed": 381802.29682573053,
+   "rel_tol": 1e-06,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "distance: S(s1308)/S(rho-neg) w=0",
+   "claimed": 10.7005,
+   "recomputed": 10.7005316007088,
+   "rel_tol": 0.0001,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "distance: S(s1308)/S(rho-neg) w=0.1",
+   "claimed": 472666.9011,
+   "recomputed": 472666.90106348373,
+   "rel_tol": 1e-06,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "distance: S(s1308)/S(rho-neg) w=1",
+   "claimed": 2932319.4036,
+   "recomputed": 2932319.4036264285,
+   "rel_tol": 1e-06,
+   "evidence": "data/ecbench/compare_*.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "band mean S rho-neg (w=0, 0.1, 1)",
+   "claimed": [
+    1.607,
+    1.724,
+    2.779
+   ],
+   "recomputed": [
+    1.6066740608772996,
+    1.7238768054244618,
+    2.7787015063489267
+   ],
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/band.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "band mean S proj-a (w=0, 0.1, 1)",
+   "claimed": [
+    12.15,
+    13.069,
+    21.341
+   ],
+   "recomputed": [
+    12.150003472448637,
+    13.069102477589814,
+    21.3409935238604
+   ],
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/band.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "band mean S pkm-iso-t6-g4 (w=0, 0.1, 1)",
+   "claimed": [
+    26.735,
+    1453724.741,
+    14537006.794
+   ],
+   "recomputed": [
+    26.735080529618415,
+    1453724.7409888583,
+    14537006.794163821
+   ],
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/band.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "band mean S pkm-iso-t6-g4-s1093 (w=0, 0.1, 1)",
+   "claimed": [
+    23.775,
+    900613.893,
+    9005924.949
+   ],
+   "recomputed": [
+    23.775204372147627,
+    900613.8925501509,
+    9005924.94866216
+   ],
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/band.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "band mean S pkm-iso-t6-g4-s1308 (w=0, 0.1, 1)",
+   "claimed": [
+    17.192,
+    814819.507,
+    8148040.344
+   ],
+   "recomputed": [
+    17.192266560456677,
+    814819.5074351988,
+    8148040.343952941
+   ],
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/band.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "GAE summed over 32 runs: s1308, s1093, seed0",
+   "claimed": [
+    199276,
+    275579,
+    309887
+   ],
+   "recomputed": [
+    199276,
+    275579,
+    309887
+   ],
+   "rel_tol": 0,
+   "evidence": "data/ecbench/band.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "F4 elimination muladds summed over 32 runs: seed0, s1093, s1308",
+   "claimed": [
+    168430000000.0,
+    104340000000.0,
+    94403000000.0
+   ],
+   "recomputed": [
+    168428506623,
+    104342488825,
+    94403399367
+   ],
+   "rel_tol": 0.0001,
+   "evidence": "records solver.ops"
+  },
+  {
+   "name": "seed search group ops (20,6) and in S",
+   "claimed": [
+    13528559,
+    37349.06
+   ],
+   "recomputed": [
+    13528559,
+    37349.05839247921
+   ],
+   "rel_tol": 1e-06,
+   "evidence": "census k20.jsonl t=6 build+selector"
+  },
+  {
+   "name": "s1308 search charged to one target S (w=0, 0.1, 1)",
+   "claimed": [
+    37366.25,
+    852168.57,
+    8185389.4
+   ],
+   "recomputed": [
+    37366.250659039666,
+    852168.565827678,
+    8185389.40234542
+   ],
+   "rel_tol": 1e-06,
+   "evidence": "data/ecbench/band.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "s1093 search charged to one target S (w=0, 0.1, 1)",
+   "claimed": [
+    37372.83,
+    937962.95,
+    9043274.01
+   ],
+   "recomputed": [
+    37372.83359685136,
+    937962.9509426301,
+    9043274.00705464
+   ],
+   "rel_tol": 1e-06,
+   "evidence": "data/ecbench/band.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "seed0/rho-neg at w=0.1",
+   "claimed": 843000.0,
+   "recomputed": 843288.0681580461,
+   "rel_tol": 0.001,
+   "evidence": "data/ecbench/band.json + s1/records.jsonl (validator recompute)"
+  },
+  {
+   "name": "E(s1308)/E(s0) (P3, <= 0.55)",
+   "claimed": 0.49735,
+   "recomputed": 0.4973501540216922,
+   "rel_tol": 0.0001,
+   "evidence": "data/engine_*.json"
+  },
+  {
+   "name": "E(s1308)/E(s1093) (P3, <= 0.90)",
+   "claimed": 0.83712,
+   "recomputed": 0.8371189512754267,
+   "rel_tol": 0.0001,
+   "evidence": "data/engine_*.json"
+  },
+  {
+   "name": "E(s1093)/E(s0)",
+   "claimed": 0.59412,
+   "recomputed": 0.594121245569622,
+   "rel_tol": 0.0001,
+   "evidence": "data/engine_*.json"
+  },
+  {
+   "name": "muladds_per_target s1308/s0 (P2, in [0.90,1.10])",
+   "claimed": 1.0000015,
+   "recomputed": 1.0000015209253985,
+   "rel_tol": 1e-06,
+   "evidence": "data/engine_*.json"
+  },
+  {
+   "name": "E values s0, s1093, s1308",
+   "claimed": [
+    13542000000.0,
+    8045400000.0,
+    6734900000.0
+   ],
+   "recomputed": [
+    13541637075.872093,
+    8045374286.568902,
+    6734935285.390843
+   ],
+   "rel_tol": 0.0001,
+   "evidence": "data/engine_*.json"
+  },
+  {
+   "name": "per-workload wins w=0.1: s1308<s0, s1308<s1093, s1093<s0 (of 16)",
+   "claimed": [
+    14,
+    9,
+    14
+   ],
+   "recomputed": [
+    14,
+    9,
+    14
+   ],
+   "rel_tol": 0,
+   "evidence": "compare JSON workloads + validator recompute"
+  },
+  {
+   "name": "per-workload ranges w=0.1 s1308/s0, s1308/s1093",
+   "claimed": [
+    [
+     0.219,
+     2.209
+    ],
+    [
+     0.417,
+     1.646
+    ]
+   ],
+   "recomputed": [
+    [
+     0.21897732450728188,
+     2.209177537254197
+    ],
+    [
+     0.4174112033959471,
+     1.6457433938858341
+    ]
+   ],
+   "rel_tol": 0.002,
+   "evidence": "validator recompute"
+  },
+  {
+   "name": "w=0: s1308<s1093 on workloads (of 16), range",
+   "claimed": [
+    15,
+    0.441,
+    1.05
+   ],
+   "recomputed": [
+    15,
+    0.44102893374533486,
+    1.0498554913294798
+   ],
+   "rel_tol": 0.002,
+   "evidence": "validator recompute"
+  },
+  {
+   "name": "end-to-end wall ratio s1308/seed0 (diagnostic only, L0)",
+   "claimed": [
+    0.5594,
+    0.434,
+    0.721
+   ],
+   "recomputed": [
+    0.5594394406555155,
+    0.43433649295877985,
+    0.7205760806072963
+   ],
+   "rel_tol": 0.002,
+   "evidence": "compare JSON wall.total_wall_ratio (transcription only)"
+  },
+  {
+   "name": "measured/model s1308 (0.5605/0.497), s1093 (0.6195/0.599)",
+   "claimed": [
+    1.13,
+    1.03
+   ],
+   "recomputed": [
+    1.1277759976594548,
+    1.034259783564076
+   ],
+   "rel_tol": 0.005,
+   "evidence": "validator recompute"
+  }
+ ],
+ "reruns": {
+  "engine": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/engine/",
+  "ecbench_verify_replay4": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/verify_replay4.json",
+  "commands": [
+   "/home/user/ctarget/release/curve25519_family f4cost 20 <form> 6 4 100 2026111506 3600 2 full 0 30000000 (form in isogeny, isogeny@1093, isogeny@1308; sequential)",
+   "/home/user/ctarget/release/ecbench verify --dir /home/user/crypto/research/curve25519_leads_wave3_20261103/t9_seed_per_column/data/ecbench/s1 --replay 4 --out /tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/verify_replay4.json"
+  ]
+ },
+ "raw_data": [
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t9_seed_per_column/data/ecbench/s1/records.jsonl",
+   "sha256": "067a07ad1cb647107aa4e4a79dace88797f892c02a4d0a01dd5d89914e5c5aa5"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t9_seed_per_column/data/ecbench/s1/session.json",
+   "sha256": "2c09ef3e595c19efcdcac703d7ac1c23a76808b40ac30f2dd2235088d10925b1"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t9_seed_per_column/data/ecbench/band.json",
+   "sha256": "8a7560a97e553e76efc0f8fa12ec4dc811c8b93c3ae80e55adf4e30fc874ed07"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t9_seed_per_column/data/ecbench/verify.json",
+   "sha256": "9a7a2d823a5c489d5981467d144369f97ea66d2001a8d7617e69fa6092849cb5"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t9_seed_per_column/data/engine_k20_t6_g4_s0.json",
+   "sha256": "1438bb26aabda59a66ca4b2784dbd3f876fa2aeabd6e3bca98e8289f7f55771b"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t9_seed_per_column/data/engine_k20_t6_g4_s1093.json",
+   "sha256": "fce28a2e635400f87f75a6fc093500708539d62f12a2c8cd2883e3584e47f1c4"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t9_seed_per_column/data/engine_k20_t6_g4_s1308.json",
+   "sha256": "44d1ccd301e365a2721bb6dccb7678a2daa0b860b705c8162afcfb25c8b3b6db"
+  },
+  {
+   "path": "research/curve25519_leads_wave3_20261103/t9_seed_per_column/data/census_t9.json",
+   "sha256": "e1c8f0625be9b0f7b83908325697bcf1ae07acf208d3bb213f47157643925b5c"
+  },
+  {
+   "path": "research/curve25519_isogeny_seed_20261103/data/k16.jsonl",
+   "sha256": "3935c968587dd631c7cebfaaa4f530b03a5ed6da4045ab9cf9ba14504699d498"
+  },
+  {
+   "path": "research/curve25519_isogeny_seed_20261103/data/k18.jsonl",
+   "sha256": "4e670176d073d90c7f7dd7a6cd951f25072330128794e981eeb48181696d84cf"
+  },
+  {
+   "path": "research/curve25519_isogeny_seed_20261103/data/k20.jsonl",
+   "sha256": "bc74d8ac5151713c59f6c6d5bf58df1c0bf5e3442c6b50c7d234163c4c807adc"
+  },
+  {
+   "path": "research/curve25519_isogeny_seed_20261103/data/k22.jsonl",
+   "sha256": "11903b11c6d1f2eccfadd27b058e95fb2410999b21e22afc3a9854220c770e9e"
+  },
+  {
+   "path": "research/curve25519_isogeny_seed_20261103/data/k24.jsonl",
+   "sha256": "39c7543607717def3ff68ef852151f482ea6ff0a13b33a9bd00bc34a2329eba0"
+  },
+  {
+   "path": "research/curve25519_isogeny_seed_20261103/engine/isogeny_t6_g4.json",
+   "sha256": "586ef8d6bd80e332c22af339755ccbb41000665e4598d16b4ef44c982d9b76fa"
+  },
+  {
+   "path": "research/curve25519_isogeny_seed_20261103/engine/isogeny_1093_t6_g4.json",
+   "sha256": "56dd9f451fd41ae930b7969100dfc2d2e74d9558e058b6c29420709b98aeb3f1"
+  }
+ ],
+ "validator_scripts": [
+  {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/code/boot_check.py",
+   "sha256": "16c3bc3208b2388e472fd5702006cbbc84cb6a79e0bcd9b799cb075d1d5e7230"
+  },
+  {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/code/census_check.py",
+   "sha256": "501c3dd27024d388781b929c1e61b05eff5fda29322be7a57051a63ff54de222"
+  },
+  {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/code/ecb_check.py",
+   "sha256": "fdad8ea9feb6eb476925cd16c107c38221160f9b747d8740f820dc5ec92dd86d"
+  },
+  {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/code/engine_check.py",
+   "sha256": "1966f69a4dc8200ebf8e653151a44fa55776fdd6e63727303bf9e7844467ca07"
+  },
+  {
+   "path": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/code/write_report.py",
+   "sha256": "9b96603179d8ca5e9ebf2a5c87f88696891cb53914eb1e0f5bd3b0bfa3e0ae41"
+  }
+ ]
+}

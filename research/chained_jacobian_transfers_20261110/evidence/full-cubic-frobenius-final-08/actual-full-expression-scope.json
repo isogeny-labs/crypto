@@ -1,0 +1,26 @@
+{
+  "at": "2026-11-16T15:06:48.570675+00:00",
+  "sha256": "5198ffb8ef0945dd4754255ef2f37d420ca9ad7f4064d03f799c8ca593011edf",
+  "original_prefix_sha256": "e81532c9df6d5c416f26693ed7849d70e512d5225558adbab5147266f1e59738",
+  "dual_original_gates": "24 audited theorems/0 trusted each; 12old named+11new named+1old generated equation",
+  "toolchains": [
+    "leanprover/lean4:v4.35.0",
+    "leanprover/lean4:v4.34.1"
+  ],
+  "workers": 1,
+  "timeout_seconds_each": 120,
+  "memory": "original default unchanged",
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "explicit_hypotheses": [
+    "CommRing R",
+    "IsCharP R223",
+    "z^3=3 for full cubic formula",
+    "encode z injective only for fixed-point converse"
+  ],
+  "next": "derive encode injectivity with three Frobenius equations and generator cancellation; freeze this02 module unchanged",
+  "gaps": "field construction/native refinement/Jacobian transfer/cost remain separate; no223^3 population enumerated"
+}

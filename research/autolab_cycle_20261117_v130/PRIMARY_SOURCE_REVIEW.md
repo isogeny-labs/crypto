@@ -1,0 +1,3 @@
+# Prior-art boundary
+
+PolyBoRi's official [features](https://polybori.sourceforge.net/features.html)and[ZDD tutorial](https://polybori.sourceforge.net/zdd.html)establish compressed Boolean-polynomial storage and variable-order dependence as prior art. C130does not claim the representation or the tested order heuristics are novel. Liveness tracing/compaction/cache invalidation are standard decision-diagram engineering. The program hypothesis is that the proved correction-basis projection makes those exact methods useful on this fixed family. The twelve capped profiles do not yet show that. No Groebner routine was invoked,no full-text novelty certification is asserted,and no larger-family or qualified speed conclusion follows.

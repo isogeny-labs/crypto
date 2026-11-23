@@ -32,8 +32,21 @@
 //!
 //! The binary group batches through [`FastCurve::add_many`]; the prime
 //! group uses the default one-inversion-an-addition path, so on a prime
-//! curve the two ids measure the same additions as `mitm` and `subtract`
-//! with the memoryless three-summand arm added.
+//! curve the two ids measure the same additions as `mitm:batch=0` and
+//! `subtract:batch=0` with the memoryless three-summand arm added (the
+//! default `mitm` and `subtract` share an inversion over a block,
+//! [`CountedGroup::add_each_batched`]).
+//!
+//! **`rootfind-mitm-prime-batch`** (prime curves): `rootfind-mitm` with each
+//! block's additions done by one shared inversion
+//! ([`PairedAdd::add_many_batched`], `prime_fast`'s Montgomery-form batch
+//! addition).  The same points, probes, relations and charged additions;
+//! the field tally is the batched one (docs/perf/20261112-rust-deep-audit.md).
+//!
+//! On binary curves, `rootfind-mitm` prepares through
+//! [`PairTable::build_negation_folded_binary_batch`] (PLAN lever 6) and
+//! keeps a word Bloom filter in front of each probe (same layout as
+//! `rootfind-floor` / `rootfind-kmitm`).
 //!
 //! [`FastCurve::add_many`]: crate::cryptanalysis::koblitz_fast::FastCurve::add_many
 
@@ -42,8 +55,50 @@ use std::collections::BTreeMap;
 use super::stages::{DecompositionOracle, InstanceCtx, Params};
 use crate::cryptanalysis::ic_boundary::{
     BinaryGroup, CountedGroup, FactorBase, GroupOps, OracleCounters, PairTable, PrimeCurve,
+    PrimePoint,
 };
-use crate::cryptanalysis::koblitz_fast::BatchScratch;
+use crate::cryptanalysis::koblitz_fast::{BatchScratch, FastPoint};
+
+/// Word-blocked Bloom filter: one 64-bit word a key, five bits in it
+/// (same layout as `rootfind-floor` / `rootfind-kmitm`).
+struct WordBloom {
+    words: Vec<u64>,
+    mask: usize,
+}
+
+impl WordBloom {
+    fn new(keys: usize) -> Self {
+        let words = (keys / 4).next_power_of_two().max(64);
+        Self {
+            words: vec![0; words],
+            mask: words - 1,
+        }
+    }
+
+    #[inline(always)]
+    fn slot(&self, key: u64) -> (usize, u64) {
+        let h = key.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        let h2 = (h ^ (h >> 29)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        let mut bits = 0u64;
+        let mut g = h2;
+        for _ in 0..5 {
+            bits |= 1u64 << (g & 63);
+            g >>= 6;
+        }
+        ((h >> 34) as usize & self.mask, bits)
+    }
+
+    fn insert(&mut self, key: u64) {
+        let (w, bits) = self.slot(key);
+        self.words[w] |= bits;
+    }
+
+    #[inline(always)]
+    fn maybe(&self, key: u64) -> bool {
+        let (w, bits) = self.slot(key);
+        self.words[w] & bits == bits
+    }
+}
 
 /// `R + Q_j` for every `j`, appended to `out`, charged one addition
 /// each.  A group that can share one field inversion over the slice
@@ -62,9 +117,137 @@ pub trait PairedAdd: CountedGroup {
         }
         let _ = counters;
     }
+
+    /// The additions of `rootfind-mitm-prime-batch`: the default is
+    /// [`PairedAdd::add_many`], so only a group that overrides this one (the
+    /// prime curve) behaves differently, and every existing oracle keeps
+    /// calling `add_many`.
+    fn add_many_batched(
+        &self,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        r: Self::Elt,
+        qs: &[Self::Elt],
+        out: &mut Vec<Self::Elt>,
+    ) {
+        self.add_many(ops, counters, r, qs, out);
+    }
+
+    /// Negation-folded pair table for `rootfind-mitm` prepare. Binary
+    /// curves override with the abscissa-row batched builder (PLAN lever 6).
+    fn build_negation_folded_table(&self, fb: &FactorBase<Self::Elt>) -> PairTable
+    where
+        Self: Sized,
+    {
+        PairTable::build_negation_folded(self, fb)
+    }
 }
 
-impl PairedAdd for PrimeCurve {}
+impl PairedAdd for PrimeCurve {
+    /// `R + Q_j` through `prime_fast`'s Montgomery-form batch addition: one
+    /// field inversion over the slice's ordinary additions (Montgomery's
+    /// trick), the same points as the serial group law in the same order.
+    /// Charged one addition each, as the default; the field tally books
+    /// what the batched path performs, as
+    /// [`CountedGroup::native_lane_walk_adder`] does: `2M` per point
+    /// converted into Montgomery form (`R` once a call, each finite `Q_j`),
+    /// `2M + 1S` per ordinary addition and, for the slice, one inversion and
+    /// `3k + 1` multiplications; an exceptional addition (a doubling) pays
+    /// its own inversion; `2` Montgomery reductions per finite output
+    /// converted back.  A curve whose `p` exceeds `prime_fast::MAX_BITS`
+    /// bits takes the serial path.
+    fn add_many_batched(
+        &self,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        r: Self::Elt,
+        qs: &[Self::Elt],
+        out: &mut Vec<Self::Elt>,
+    ) {
+        use crate::cryptanalysis::prime_fast::{BatchAddScratch, FastCurve, Pt, MAX_BITS};
+        if qs.is_empty() {
+            return;
+        }
+        if self.p >= (1u64 << MAX_BITS) {
+            self.add_many(ops, counters, r, qs, out);
+            return;
+        }
+        struct Native {
+            key: (u64, u64, u64),
+            fast: FastCurve,
+            scratch: BatchAddScratch,
+            left: Vec<Option<Pt>>,
+            right: Vec<Option<Pt>>,
+        }
+        thread_local! {
+            static NATIVE: std::cell::RefCell<Option<Native>> = const { std::cell::RefCell::new(None) };
+        }
+        NATIVE.with(|cell| {
+            let mut slot = cell.borrow_mut();
+            let key = (self.p, self.a, self.b);
+            if slot.as_ref().is_none_or(|n| n.key != key) {
+                *slot = Some(Native {
+                    key,
+                    fast: FastCurve::new("rootfind-batch", self.p, self.a, self.b, 1),
+                    scratch: BatchAddScratch::default(),
+                    left: Vec::new(),
+                    right: Vec::new(),
+                });
+            }
+            let n = slot.as_mut().expect("set above");
+            let fr = if r.infinity {
+                None
+            } else {
+                ops.field_ops.muls += 2;
+                Some(n.fast.point(r.x, r.y))
+            };
+            n.left.clear();
+            n.right.clear();
+            for &q in qs {
+                let fq = if q.infinity {
+                    None
+                } else {
+                    ops.field_ops.muls += 2;
+                    Some(n.fast.point(q.x, q.y))
+                };
+                ops.adds += 1;
+                match (fr, fq) {
+                    (Some(a), Some(b)) if a.x != b.x => {
+                        ops.field_ops.muls += 2;
+                        ops.field_ops.sqrs += 1;
+                    }
+                    (Some(a), Some(b)) if a.y == b.y && a.y != 0 => {
+                        ops.field_ops.muls += 2;
+                        ops.field_ops.sqrs += 2;
+                        ops.field_ops.invs += 1;
+                        ops.field_ops.muls += 1; // Fp64::inv Montgomery correction.
+                    }
+                    _ => {}
+                }
+                n.left.push(fr);
+                n.right.push(fq);
+            }
+            let stats = n
+                .fast
+                .add_many_batched(&mut n.left, &n.right, &mut n.scratch);
+            if stats.ordinary > 0 {
+                ops.field_ops.invs += 1;
+                ops.field_ops.muls += 3 * stats.ordinary as u64 + 1;
+            }
+            for &s in &n.left {
+                out.push(match s {
+                    Some(pt) => {
+                        ops.montgomery_reductions += 2;
+                        let (x, y) = n.fast.canonical(pt);
+                        PrimePoint::affine(x, y)
+                    }
+                    None => PrimePoint::INFINITY,
+                });
+            }
+        });
+        let _ = counters;
+    }
+}
 
 impl PairedAdd for BinaryGroup<'_> {
     fn add_many(
@@ -80,8 +263,21 @@ impl PairedAdd for BinaryGroup<'_> {
         }
         ops.adds += qs.len() as u64;
         let _ = counters;
-        let mut scratch = BatchScratch::default();
-        self.0.add_many(r, qs, out, &mut scratch);
+        // One batch-inversion scratch a thread, reused across calls
+        // (`FastCurve::add_many` clears what it uses), instead of a fresh
+        // one a block (assessment 2026-11-10, R5).
+        thread_local! {
+            static SCRATCH: std::cell::RefCell<BatchScratch> =
+                std::cell::RefCell::new(BatchScratch::default());
+        }
+        SCRATCH.with(|s| self.0.add_many(r, qs, out, &mut s.borrow_mut()));
+    }
+
+    /// PLAN lever 6: one shared inversion per abscissa row (and the
+    /// paired SIMD path when the layout allows), same first witnesses
+    /// and charged additions as serial `build_negation_folded`.
+    fn build_negation_folded_table(&self, fb: &FactorBase<FastPoint>) -> PairTable {
+        PairTable::build_negation_folded_binary_batch(self, fb)
     }
 }
 
@@ -121,10 +317,37 @@ impl<E: Copy> Reps<E> {
     }
 }
 
+/// Reusable buffers of [`row_points`], held by an oracle so that a block
+/// allocates nothing (assessment 2026-11-10, R5): the sums are the same
+/// points in the same order as the allocating version returned.
+struct RowBufs<E> {
+    minus: Vec<E>,
+    plus_src: Vec<E>,
+    plus: Vec<E>,
+    out: Vec<(usize, E)>,
+}
+
+impl<E> Default for RowBufs<E> {
+    fn default() -> Self {
+        Self {
+            minus: Vec::new(),
+            plus_src: Vec::new(),
+            plus: Vec::new(),
+            out: Vec::new(),
+        }
+    }
+}
+
 /// `R ∓ P_k` for every representative, as `(signed index of P_k, R − P_k)`
 /// pairs: `R − P_k` carries `k`'s own index, `R + P_k` the index of `−P_k`,
-/// so that `R = P_{index} + (the returned point)` in both cases.
-fn row_points<G: PairedAdd>(
+/// so that `R = P_{index} + (the returned point)` in both cases.  The
+/// pairs are left in `bufs.out`.
+///
+/// `BATCHED` selects the adder at compile time: a runtime flag here made
+/// every instantiation reach both `add_many` and `add_many_batched`, which
+/// cost the serial oracles about 0.9% more instructions in the pairs solve
+/// (crypto #3991, Callgrind on `ic-rf-pairs`, audit-ir seq 41/51/61).
+fn row_points<G: PairedAdd, const BATCHED: bool>(
     g: &G,
     reps: &Reps<G::Elt>,
     fb: &FactorBase<G::Elt>,
@@ -133,51 +356,89 @@ fn row_points<G: PairedAdd>(
     r: G::Elt,
     from: usize,
     to: usize,
-) -> Vec<(usize, G::Elt)> {
-    let mut minus = Vec::with_capacity(to - from);
-    g.add_many(ops, counters, r, &reps.negated[from..to], &mut minus);
-    let plus_src: Vec<G::Elt> = (from..to)
-        .filter(|&k| !reps.self_negated[k])
-        .map(|k| reps.point[k])
-        .collect();
-    let mut plus = Vec::with_capacity(plus_src.len());
-    g.add_many(ops, counters, r, &plus_src, &mut plus);
-    let mut out = Vec::with_capacity(minus.len() + plus.len());
-    for (k, s) in (from..).zip(minus) {
-        out.push((reps.index[k], s));
+    bufs: &mut RowBufs<G::Elt>,
+) {
+    let add = |ops: &mut GroupOps,
+               counters: &mut OracleCounters,
+               qs: &[G::Elt],
+               out: &mut Vec<G::Elt>| {
+        if BATCHED {
+            g.add_many_batched(ops, counters, r, qs, out);
+        } else {
+            g.add_many(ops, counters, r, qs, out);
+        }
+    };
+    bufs.minus.clear();
+    add(ops, counters, &reps.negated[from..to], &mut bufs.minus);
+    bufs.plus_src.clear();
+    bufs.plus_src.extend(
+        (from..to)
+            .filter(|&k| !reps.self_negated[k])
+            .map(|k| reps.point[k]),
+    );
+    bufs.plus.clear();
+    add(ops, counters, &bufs.plus_src, &mut bufs.plus);
+    bufs.out.clear();
+    for (k, &s) in (from..).zip(&bufs.minus) {
+        bufs.out.push((reps.index[k], s));
     }
-    let mut it = plus.into_iter();
+    let mut it = bufs.plus.iter();
     for k in from..to {
         if !reps.self_negated[k] {
-            out.push((
+            bufs.out.push((
                 fb.neg_index[reps.index[k]],
-                it.next().expect("one sum a point"),
+                *it.next().expect("one sum a point"),
             ));
         }
     }
-    out
 }
 
 /// The `rootfind-mitm` oracle.
 pub struct RootfindMitmOracle<E> {
     m: u32,
+    /// `rootfind-mitm-prime-batch`: the row additions through
+    /// [`PairedAdd::add_many_batched`].
+    batched: bool,
     table: Option<PairTable>,
+    /// Word Bloom over folded table keys (`g.key >> 1`); miss skips probe.
+    bloom: Option<WordBloom>,
     reps: Option<Reps<E>>,
+    bufs: RowBufs<E>,
 }
 
 impl<E> RootfindMitmOracle<E> {
     pub fn new(m: u32) -> Self {
         Self {
             m,
+            batched: false,
             table: None,
+            bloom: None,
             reps: None,
+            bufs: RowBufs::default(),
+        }
+    }
+
+    /// `rootfind-mitm-prime-batch`: `rootfind-mitm`'s table, blocks, probes
+    /// and charge, with each block's `R ∓ P_k` computed by one batched
+    /// inversion ([`PairedAdd::add_many_batched`]).  On a prime curve the
+    /// field tally changes (an inversion a block instead of an addition);
+    /// the points, their order, the relations and the charged additions are
+    /// `rootfind-mitm`'s.
+    pub fn new_prime_batch(m: u32) -> Self {
+        Self {
+            batched: true,
+            ..Self::new(m)
         }
     }
 }
 
 impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
     fn name(&self) -> &str {
-        "rootfind-mitm"
+        if self.batched {
+            "rootfind-mitm-prime-batch"
+        } else {
+            "rootfind-mitm"
+        }
     }
 
     fn summands(&self) -> u32 {
@@ -220,9 +481,14 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
         let table = if params.flag("full_table") {
             PairTable::build(ctx.group, fb)
         } else {
-            PairTable::build_negation_folded(ctx.group, fb)
+            // Binary: `build_negation_folded_binary_batch`; prime: serial
+            // folded (prime-batch table build lives on floor/subtract).
+            ctx.group.build_negation_folded_table(fb)
         };
         ops.merge(table.build_ops);
+        let mut bloom = WordBloom::new(table.entries.max(1) as usize);
+        table.for_each_folded_key(|k| bloom.insert(k));
+        self.bloom = Some(bloom);
         self.table = Some(table);
         self.reps = Some(Reps::of(ctx.group, fb));
         Ok(())
@@ -232,9 +498,15 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
         let mut counts = BTreeMap::new();
         if let Some(table) = &self.table {
             counts.insert("pair_table_entries".into(), table.entries);
+            if table.kind.contains("binary_batch") {
+                counts.insert("binary_batch_table".into(), 1);
+            }
         }
         if let Some(reps) = &self.reps {
             counts.insert("abscissae".into(), reps.index.len() as u64);
+        }
+        if self.bloom.is_some() {
+            counts.insert("probe_bloom".into(), 1);
         }
         counts
     }
@@ -263,8 +535,13 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
     ) -> Option<Vec<usize>> {
         let g = ctx.group;
         let table = self.table.as_ref()?;
+        let bloom = self.bloom.as_ref();
         let reps = self.reps.as_ref()?;
         if self.m == 2 {
+            let folded = g.key(&point) >> 1;
+            if bloom.is_some_and(|b| !b.maybe(folded)) {
+                return None;
+            }
             return table
                 .probe(g, fb, ops, &mut counters.lookups, point)
                 .map(|(j, l)| vec![j, l]);
@@ -273,8 +550,17 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
         let mut from = 0;
         while from < a {
             let to = (from + BLOCK).min(a);
-            for (k, s) in row_points(g, reps, fb, ops, counters, point, from, to) {
+            if self.batched {
+                row_points::<G, true>(g, reps, fb, ops, counters, point, from, to, &mut self.bufs);
+            } else {
+                row_points::<G, false>(g, reps, fb, ops, counters, point, from, to, &mut self.bufs);
+            }
+            for &(k, s) in &self.bufs.out {
                 if g.is_identity(&s) {
+                    continue;
+                }
+                let folded = g.key(&s) >> 1;
+                if bloom.is_some_and(|b| !b.maybe(folded)) {
                     continue;
                 }
                 if let Some((j, l)) = table.probe(g, fb, ops, &mut counters.lookups, s) {
@@ -291,11 +577,21 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindMitmOracle<G::Elt> {
 pub struct RootfindPairsOracle<E> {
     m: u32,
     reps: Option<Reps<E>>,
+    /// Representative position of each signed index, built in `prepare`.
+    position: BTreeMap<usize, usize>,
+    rows: RowBufs<E>,
+    cands: RowBufs<E>,
 }
 
 impl<E> RootfindPairsOracle<E> {
     pub fn new(m: u32) -> Self {
-        Self { m, reps: None }
+        Self {
+            m,
+            reps: None,
+            position: BTreeMap::new(),
+            rows: RowBufs::default(),
+            cands: RowBufs::default(),
+        }
     }
 }
 
@@ -330,7 +626,18 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindPairsOracle<G::Elt> {
         if self.m != 3 {
             return Err(format!("rootfind-pairs runs at m = 3, not {}", self.m));
         }
-        self.reps = Some(Reps::of(ctx.group, fb));
+        let reps = Reps::of(ctx.group, fb);
+        // Row `i` pairs with the abscissae `x_j ≥ x_i`; the position of a
+        // row point's abscissa among the representatives is recovered
+        // from its index.  Built once here, not once a target (it depends
+        // only on the base, as `reps` does).
+        self.position = reps
+            .index
+            .iter()
+            .enumerate()
+            .flat_map(|(pos, &i)| [(i, pos), (fb.neg_index[i], pos)])
+            .collect();
+        self.reps = Some(reps);
         Ok(())
     }
 
@@ -363,22 +670,14 @@ impl<G: PairedAdd> DecompositionOracle<G> for RootfindPairsOracle<G::Elt> {
         let g = ctx.group;
         let reps = self.reps.as_ref()?;
         let a = reps.index.len();
-        let rows = row_points(g, reps, fb, ops, counters, point, 0, a);
-        // Row `i` pairs with the abscissae `x_j ≥ x_i`; the position of a
-        // row point's abscissa among the representatives is recovered
-        // from its index.
-        let position: BTreeMap<usize, usize> = reps
-            .index
-            .iter()
-            .enumerate()
-            .flat_map(|(pos, &i)| [(i, pos), (fb.neg_index[i], pos)])
-            .collect();
-        for (si, u) in rows {
+        row_points::<G, false>(g, reps, fb, ops, counters, point, 0, a, &mut self.rows);
+        for &(si, u) in &self.rows.out {
             if g.is_identity(&u) {
                 continue;
             }
-            let from = position[&si];
-            for (sj, c) in row_points(g, reps, fb, ops, counters, u, from, a) {
+            let from = self.position[&si];
+            row_points::<G, false>(g, reps, fb, ops, counters, u, from, a, &mut self.cands);
+            for &(sj, c) in &self.cands.out {
                 counters.lookups += 1;
                 if g.is_identity(&c) {
                     continue;
@@ -477,6 +776,77 @@ mod tests {
             })
             .collect();
         check(&ctx, &fb, &targets);
+
+        // PLAN lever 6: prepare uses the binary batched PairTable + Bloom.
+        let mut rf = RootfindMitmOracle::new(3);
+        let mut prep = GroupOps::default();
+        rf.prepare(&ctx, &fb, &Params::default(), &mut prep)
+            .unwrap();
+        let setup = DecompositionOracle::<BinaryGroup<'_>>::setup_native(&rf);
+        assert_eq!(setup.get("binary_batch_table"), Some(&1));
+        assert_eq!(setup.get("probe_bloom"), Some(&1));
+        assert_eq!(
+            rf.table.as_ref().map(|t| t.kind),
+            Some("negation_folded_binary_batch")
+        );
+    }
+
+    /// PLAN lever 6 falsifier: batched binary prepare wall vs serial.
+    /// Shared host (`[pcc:unverified]`); fail-closed if median batch is
+    /// not strictly faster than serial over cold repeats.
+    #[test]
+    fn binary_batch_prepare_wall_beats_serial_on_koblitz_n23() {
+        use std::time::Instant;
+
+        let inst = koblitz_instance(0, 23).expect("registered n23 Koblitz instance");
+        let g = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &g,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let (_, params) = Params::parse_spec("binary-subspace:dimension=8").unwrap();
+        let mut ops = GroupOps::default();
+        let fb = BinarySubspaceBase { instance: &inst }
+            .build(&ctx, &params, &mut ops)
+            .unwrap();
+
+        let reps = 9usize;
+        let mut serial_ns = Vec::with_capacity(reps);
+        let mut batch_ns = Vec::with_capacity(reps);
+        for _ in 0..reps {
+            let t0 = Instant::now();
+            let serial = PairTable::build_negation_folded(&g, &fb);
+            serial_ns.push(t0.elapsed().as_nanos() as u64);
+            std::hint::black_box(serial.entries);
+
+            let t1 = Instant::now();
+            let batch = PairTable::build_negation_folded_binary_batch(&g, &fb);
+            batch_ns.push(t1.elapsed().as_nanos() as u64);
+            std::hint::black_box(batch.entries);
+        }
+        serial_ns.sort_unstable();
+        batch_ns.sort_unstable();
+        let med = |v: &[u64]| v[v.len() / 2];
+        let (s_med, b_med) = (med(&serial_ns), med(&batch_ns));
+        eprintln!(
+            "lever6 prepare wall n23 d=8: serial_med_ns={s_med} batch_med_ns={b_med} ratio={:.3}",
+            s_med as f64 / b_med.max(1) as f64
+        );
+        assert!(
+            b_med < s_med,
+            "binary batch prepare not faster: serial_med={s_med} batch_med={b_med} \
+             (shared host; fail-closed for lever 6)"
+        );
+        assert_eq!(
+            PairTable::build_negation_folded(&g, &fb).entries,
+            PairTable::build_negation_folded_binary_batch(&g, &fb).entries
+        );
     }
 
     #[test]
@@ -508,5 +878,34 @@ mod tests {
             })
             .collect();
         check(&ctx, &fb, &targets);
+
+        // rootfind-mitm-prime-batch: the same witnesses, the same charged
+        // additions and lookups on every target, and fewer inversions.
+        let mut plain = RootfindMitmOracle::new(3);
+        let mut batch = RootfindMitmOracle::new_prime_batch(3);
+        assert_eq!(
+            DecompositionOracle::<PrimeCurve>::name(&batch),
+            "rootfind-mitm-prime-batch"
+        );
+        let (mut p_ops, mut b_ops) = (GroupOps::default(), GroupOps::default());
+        plain.prepare(&ctx, &fb, &params, &mut p_ops).unwrap();
+        batch.prepare(&ctx, &fb, &params, &mut b_ops).unwrap();
+        assert_eq!(p_ops, b_ops, "the table build is shared");
+        let (mut p_inv, mut b_inv) = (0u64, 0u64);
+        for &t in &targets {
+            let (mut o1, mut o2) = (GroupOps::default(), GroupOps::default());
+            let (mut c1, mut c2) = (OracleCounters::default(), OracleCounters::default());
+            let a = plain.decompose(&ctx, &fb, &mut o1, &mut c1, t);
+            let b = batch.decompose(&ctx, &fb, &mut o2, &mut c2, t);
+            assert_eq!(a, b, "witnesses differ");
+            assert_eq!((o1.adds, o1.doubles), (o2.adds, o2.doubles));
+            assert_eq!(c1.lookups, c2.lookups);
+            p_inv += o1.field_ops.invs;
+            b_inv += o2.field_ops.invs;
+        }
+        assert!(
+            b_inv * 4 < p_inv,
+            "batched {b_inv} vs serial {p_inv} inversions"
+        );
     }
 }

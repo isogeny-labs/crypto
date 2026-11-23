@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T10:09:50Z",
+ "id": "PCC-20261116-7a1ea8",
+ "kind": "measurement",
+ "producer": {
+  "commit": "608ac0fd4da04c6bae0a01b352220fc023bf03c0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/kernel-development/root-tests-02.log",
+    "sha256": "348823921b801d887365c5accd38f9fb76c4d2fd9c2c0cd0cdd841d0b951c681"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/kernel-development/root-clippy-02.log",
+    "sha256": "592c1ad4b6508e140ff5547e149cc6c54208d4916d05c141e8a488b3e254da7b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/kernel-development/capture-tests-01.log",
+    "sha256": "137b3e51c31f039dd63789d8b9728ccf4bd2bdc52637a197c34aa1da99973cda"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/kernel-development/capture-clippy-01.log",
+    "sha256": "809adc214167c513a67c7a81145044017de6335dbccdbf27b5526ff52896dce8"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Exact kernel actual-root integration passes9 API tests and3 worker checks, including full-root replay of all four wire-identical modes and changed-proof rejection; strict lint of four matched adapters passes. New23 capture20 release checks and strict lint/build pass. Scoped qualification only, no native speed result."
+}

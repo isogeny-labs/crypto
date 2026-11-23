@@ -1,0 +1,345 @@
+{
+  "main": "2b892458bed473e46b02fb9ca73de2c76e6819d5",
+  "lean": {
+    "actual_tested_head": "aee5dbf0986ba51e1c91a472db3f8edba1a4e314",
+    "actual_workflow_run": 40859758531,
+    "successful_jobs": 120,
+    "changed_proof_context_inputs": [],
+    "new_run_claimed": false
+  },
+  "views": {
+    "path_controls": 16,
+    "parser_controls": 8,
+    "browser_controls": 4,
+    "builder_inputs_covered": 961,
+    "all_old_roster_rows_semantically_unchanged": true,
+    "old_roster": 20787,
+    "new_roster": 20809
+  },
+  "runtime_files_reserved_before_materialization": 2920,
+  "full_library": [
+    {
+      "stage": "initial_missing_runtime_inputs",
+      "tested_source": "6cc5f642f56c9f0ba0f174fa97341dd03eddf779",
+      "status": {
+        "source_head": "6cc5f642f56c9f0ba0f174fa97341dd03eddf779",
+        "cargo_exit_code": 101,
+        "seconds": 1622,
+        "log": "/workspace/integration-current-main-full-library-20261029.log"
+      },
+      "raw_log_sha256": "367d4b877c509092902105e50df9c206c1b826a59ab9af258d4e23c14daa1583",
+      "log": "initial_missing_runtime_inputs-library.log.gz",
+      "compressed_bytes": 89065,
+      "compressed_sha256": "2df39eaaf784d24d6c047ab00227b6c2457dab0091f713cb204026649e608ef0"
+    },
+    {
+      "stage": "complete_runtime_inputs",
+      "tested_source": "6cc5f642f56c9f0ba0f174fa97341dd03eddf779",
+      "status": {
+        "source_head": "6cc5f642f56c9f0ba0f174fa97341dd03eddf779",
+        "cargo_exit_code": 0,
+        "seconds": 1920,
+        "log": "/workspace/integration-complete-input-full-library-20261029.log",
+        "complete_runtime_inventory": "/workspace/integration-complete-runtime-restoration-20261029.json"
+      },
+      "raw_log_sha256": "0c5f50386b7835e5cf30246bf55a5b7d474dec4310b507874f1d5dd98fff955a",
+      "log": "complete_runtime_inputs-library.log.gz",
+      "compressed_bytes": 89013,
+      "compressed_sha256": "6f044132c72644674ed04c3f20c079ff977c985658d0dd11e00def37c9acc215"
+    }
+  ],
+  "subsequent_main_integration": {
+    "main": "992c2579e2891c1c58ee70183888d3a9ce1d32e4",
+    "merge": "159d69ecbb3637b18c9c52983106b535da014625",
+    "validation": "Fresh final combined-source validation pending; earlier successful run is retained under its actual source."
+  },
+  "backend_fixture_recovery": {
+    "run": 40916008080,
+    "artifact": 12915602619,
+    "source": "ee600ba1d5011ae0a544aca7af8363cfbfe5db44",
+    "sha256": "cf1ca93d708e020ca89257bd883002849c4b878185545cfa29c1f9ea09f3db9b",
+    "bytes": 8451778,
+    "exact_canonical_bytes_restored": true
+  },
+  "site_repairs": {
+    "tests": 51,
+    "exit_code": 0,
+    "log_sha256": "1e21de5ceb5769c147d0e43818d583cd6605f552f266f023de038b6d9f693285",
+    "canonical_timeline_points": 89,
+    "indexed_panels": 310,
+    "historical_three_leads_sha256": "23ee9d71ab77e9a5673fd8c15aa8edad06da22ad4c1cd0f798b932b3c01f8084",
+    "frozen_inputs_recovered_exactly": true
+  },
+  "latest_normal_main_refresh": {
+    "main": "78f84234e18facfc46be52741d7fa6acadc92b88",
+    "view_controls": {
+      "path": 16,
+      "parser": 8,
+      "browser": 4,
+      "builder_inputs_covered": 980
+    },
+    "full_combined_library": "5263 passed, 0 failed, 123 existing ignored on actual6a31be8; see final_combined_library",
+    "catalog_integration": "complete20811 canonical source5ffe branch merged; complete unchanged combined harvester yields byte-identical generation; fresh native checks pass"
+  },
+  "final_combined_library": {
+    "source_head": "6a31be8f971040f0b3824b421e67d358d64fcb0a",
+    "cargo_exit_code": 0,
+    "seconds": 1952,
+    "source_inventory": "integration-complete-cargo-source-restoration-20261029.json",
+    "runtime_inventory": "integration-main78-preserved-inputs-20261029.json",
+    "passed": 5263,
+    "failed": 0,
+    "ignored_existing": 123,
+    "test_seconds": 1482.76,
+    "log": "final-combined-source-library.log.gz",
+    "raw_log_sha256": "ae1488dc2927440fe7662b89595c9559a7a486ba2f44161d01b2f5ca9061dec1",
+    "compressed_log_sha256": "aa172cc3aa49c491b6af30b4a225c27b383cb483d512d0eb9ca531f8768c8c04"
+  },
+  "fresh_native_plan_tests": {
+    "passed": 45,
+    "failed": 0,
+    "log_sha256": "96972dfd4238c60eff4e6cc722d2345da2168d58d72fc3e8bd3b5c6bbf89a903"
+  },
+  "final_operational_controls": {
+    "library_source": "6a31be8f971040f0b3824b421e67d358d64fcb0a",
+    "cli": {
+      "passed": 92,
+      "failed": 0,
+      "ignored_existing": 1,
+      "same_original_integration_assertions": true,
+      "scope": "selected IC binary unit tests includes both original integration suites"
+    },
+    "site": {
+      "passed": 51,
+      "failed": 0,
+      "initial_sparse_missing_inputs_retained": true
+    },
+    "catalog_snapshot": {
+      "passed": 6,
+      "failed": 0
+    },
+    "assessment_delta": "Only dynamic SHA256 fingerprints for Cargo.toml, Cargo.lock and src/cryptanalysis/mod.rs; all dated catalog pins and scientific fields preserved",
+    "native_catalogs": {
+      "cover_check": 0,
+      "transfer_check": 0,
+      "traits_complete_input_check": 0,
+      "initial_traits_missing_provider_exit": 1,
+      "provider_input_hashes_verified": 7
+    },
+    "logs": {
+      "final-native-cli-contract-tests": {
+        "log": "final-native-cli-contract-tests.log.gz",
+        "raw_sha256": "bdbbb62e463c353d6a3c28e2702c3a9bf932eb4e131e73a932655f38355d8955",
+        "gzip_sha256": "53d2abbe338c27f76929394b31036351db42a02b7e35545c28eb4df02e421bcc"
+      },
+      "final-site-complete-input-controls": {
+        "log": "final-site-complete-input-controls.log.gz",
+        "raw_sha256": "803eb551f1a847512d18726be8a0f3280a3aab7be9cfbe32bcf34e6e410640ad",
+        "gzip_sha256": "60b58e1ede8bb39d76246fa86c283278447d83cecaf964eefbe4205a73c12b27"
+      },
+      "final-catalog-snapshot-controls": {
+        "log": "final-catalog-snapshot-controls.log.gz",
+        "raw_sha256": "4ae24a21cecb1fba5a2bd7dba4663f4a8bb2269759dbf66ae0008b5306cf3684",
+        "gzip_sha256": "0fed59af7cd6a6811cc191b0de8311aa3a00577778945ae2ee245d5baca34846"
+      },
+      "final-cover-assessment-check": {
+        "log": "final-cover-assessment-check.log.gz",
+        "raw_sha256": "1858c259715378bd52cb6c00dc8063409dd55d7dd41f36f3378ba45b9e949215",
+        "gzip_sha256": "d50a993447e42cf32b13d49e17e944eb0f8ce084744eb5c7fb0202781d0ff2c4"
+      },
+      "final-native-cover-check": {
+        "log": "final-native-cover-check.log.gz",
+        "raw_sha256": "650649c33139fb486dbfbf6ca323acac315f39b671dc41c94d38229a0888d390",
+        "gzip_sha256": "38b0e899bb0b6f907c3cefc9522c0c1a909067c4ea930e47e9f90d864fe1939d"
+      },
+      "final-native-transfer-check": {
+        "log": "final-native-transfer-check.log.gz",
+        "raw_sha256": "eacfe19df088eabd193b35e0a5572fd71d3f31de2e7d08011c8007654e0bc453",
+        "gzip_sha256": "676e2e27dbceafea13fdb766d0e7d199df7bf3d85ef3bc174060130bae7c4e2c"
+      },
+      "final-native-trait-complete-inputs-check": {
+        "log": "final-native-trait-complete-inputs-check.log.gz",
+        "raw_sha256": "c251808618c28099745046fc185eb2e55640cdadedb671586c6974fc53313114",
+        "gzip_sha256": "f7accbe2498caf57737a6f263a6bcbc30ddad73c88fa42429034331bfd5fa120"
+      }
+    }
+  },
+  "new_main_observed_not_yet_integrated": "8eb04d5e97a157072190892a29435c373b13ecc4",
+  "replay_remaining": {
+    "required_sessions": 115,
+    "saved_old_full_receipts": 9,
+    "saved_new_full_receipts": 21,
+    "recovered_rootfind_v2": {
+      "verified_records": 224,
+      "replays": 168,
+      "reproduced": 144,
+      "inherited_f4_counter_drifts": 24
+    },
+    "full_plan_finished": false,
+    "restart_interrupted_running_audits": true,
+    "expectations_not_relaxed": true
+  },
+  "main8eb_full_library": {
+    "source_head": "49b92189c98e2339f6293318b9cd15291fda4c9a",
+    "cargo_exit_code": 0,
+    "seconds": 2595,
+    "previous_attempt_interrupted": true,
+    "passed": 5323,
+    "failed": 0,
+    "ignored_existing": 123,
+    "test_seconds": 2594.51,
+    "logs": [
+      {
+        "name": "main8eb-full-library",
+        "file": "main8eb-full-library.log.gz",
+        "raw_sha256": "4bfac0b638013f90e4d94fe13de529c5df7fb47d375618a885171f9c38ff0fd4",
+        "gzip_sha256": "f21dac43296f0798c54d1346ff76a6f64f82da0ccf9de2e60053f5632e45c8af",
+        "retention": "Existing trusted artifact-autofix uploads and replays data, then commits pointers; final artifact check remains required."
+      },
+      {
+        "name": "main8eb-interrupted-library",
+        "file": "main8eb-interrupted-library.log.gz",
+        "raw_sha256": "37967423c9d56c90170aa21fc1906552fdd88618e6ea3ee86f6a7f275f6fe389",
+        "gzip_sha256": "2eec50fc2e173cecaa4d03e062482cab433925cc83f0f75acde60b6bd063cf61",
+        "retention": "Existing trusted artifact-autofix uploads and replays data, then commits pointers; final artifact check remains required."
+      }
+    ],
+    "later_changes": "Only orchestration, metadata and one dynamic fingerprint; no Rust library source change since actual tested49b."
+  },
+  "main8eb_complete_registry": {
+    "head": "91a933c9838729b517e00c0344f2d9e9d8f036d9",
+    "seconds": 145.29081100899202,
+    "read_paths": 92644,
+    "bytes_read_including_repeats": 4455844353,
+    "unavailable": [],
+    "curves": 20811,
+    "changed": 0,
+    "added": 0,
+    "removed": 0,
+    "registry_sha256": "71f25635fd07878cc216a8b24521c45d32ccf7366220192fcc627ef9f91ef35c",
+    "native_catalog_inputs_unchanged": true,
+    "original_existing_notes": 463,
+    "initial_missing_object_attempt_retained": true,
+    "curve_aliases_sha256": "642e0e11b412177849b6d489bfe81771830373b42f91b179e9293b32173e6220",
+    "curve_aliases_byte_identical": true
+  },
+  "main8eb_final_views": {
+    "ic_currentness_exit": 0,
+    "browser_currentness_exit": 0,
+    "site_tests": 51,
+    "site_failed": 0,
+    "assessment_only_source_fingerprint_delta": [
+      {
+        "path": "src/cryptanalysis/mod.rs",
+        "old": "65e4b931b2e79d538deaa9ffa78eb90767120444daeb4fa59381e96556472236",
+        "new": "ca1ca397de670ec94f1a44fbe5002172b2f1b81387dfc82fcb76d75cee87fc43"
+      }
+    ]
+  },
+  "partition_controls": {
+    "passed": 56,
+    "failed": 0,
+    "existing_serial_controls": 30,
+    "peak_matrix_concurrency": 4,
+    "session_groups": 8,
+    "record_partitions": 4,
+    "full_replay_finished": false
+  },
+  "later_main_observed_not_integrated": "57bb19c4847a5d331f5fa04268f20abffd42c7aa; final ordinary main integration and affected validation remain pending.",
+  "main8eb_scoped_native_tests": {
+    "source_head": "91a933c9838729b517e00c0344f2d9e9d8f036d9",
+    "exit_code": 0,
+    "seconds": 13,
+    "restored_exact_tracked_aps_fixtures": true,
+    "passed": 155,
+    "failed": 0,
+    "ignored_existing": 1,
+    "suites": {
+      "ecdlp_audit": 45,
+      "ic_with_original_cli_integration_assertions": 92,
+      "aps_single_relation_check": 10,
+      "hecke_target_router": 4,
+      "pkm_symmetric_complete": 4
+    },
+    "log_sha256": "e80b677a6cacb551f576d874e3b48f973439f691d333809f9bfc752c609b3bae",
+    "earlier_sparse_setup_errors_retained": true
+  },
+  "main_f7e8_integration": {
+    "main": "f7e8ea8a64",
+    "source": "de22d9b482cde663217c69bd411482b0ec35f9f6",
+    "full_library": "Fresh complete cargo --release --lib is compiling; no result claimed.",
+    "registry": {
+      "head": "de22d9b482cde663217c69bd411482b0ec35f9f6",
+      "seconds": 84.00440276700829,
+      "read_paths": 92709,
+      "bytes_read_including_repeats": 4456635858,
+      "unavailable": [],
+      "unresolved": [],
+      "before": 20811,
+      "after": 20811,
+      "changed": 0
+    },
+    "registry_existing_notes": 463,
+    "aliases_and_registry_byte_identical": true,
+    "proof_run": 40962505458,
+    "proof_source": "ea31b9b0073917e05ad3bf1203def57b05b65a6c",
+    "proof_status": "All124 hosted jobs passed on actual sourceea31b9b0; later-main added contexts remain separate and pending.",
+    "proof_evidence": "hosted-proof-main8eb.json"
+  },
+  "native_checkpoint_controls": {
+    "passed": 91,
+    "failed": 0,
+    "existing_serial_passed": 30,
+    "actual_all115_native_coverage_complete": false,
+    "local_chunk_size": 1,
+    "production_default_chunk_size": 0,
+    "native_binary_source": "6f4422422a3a4efa1688763b9f2c127ddfea1952",
+    "native_binary_sha256": "accb2469b84edc9423b18da17979b40bfec41e1967776fadaba69918a5300646",
+    "worker_script_at_launch": "bde4789dff5595336ce126beccaab2536bcbc537c0d2101b6279c337886c7ad1  scripts/ic_audit/replay_partition.sh\nd7538f1812f24c854feea68a4f1a04b6f24e75c4ce162ee5d8af706bbe9f029b  scripts/ic_audit/check_replay_partitions.sh\nba5a44f5a249f2f4ad1a87a1b665018079167c13b9e34ce8230690b136ba3a90  scripts/ic_audit/test_replay_partitions.sh\n",
+    "all_sessions_in_plan": 115,
+    "precisely_pinned_known_counter_drift_sessions": 3,
+    "historical_drift_entries_pending_current_native_receipts": 3,
+    "all_drift_pin_requirement_pending": true,
+    "logs": {
+      "checkpoint-initial-metadata-failure": {
+        "file": "checkpoint-initial-metadata-failure.log.gz",
+        "raw_sha256": "23031c70701b3cb9d090d064b1986e0a91de5e9197e2c8b99240cefc5f1d8ad9",
+        "gzip_sha256": "07ad43a99c6bcf8583b89ab7fb35c85e37ce98d1917660fa9c42710d0d7a5fb3"
+      },
+      "checkpoint-and-pins-final-controls": {
+        "file": "checkpoint-and-pins-final-controls.log.gz",
+        "raw_sha256": "26bdd4bcd7966705c0ee0f7a5f7eeef10ea5ebfc04ce9a0e962af977f99a18bc",
+        "gzip_sha256": "74b5a9ecac01f2f3d47d809f0735df64e8b5f5cb109398c99490d34604884f64"
+      },
+      "pinned-serial-existing-controls": {
+        "file": "pinned-serial-existing-controls.log.gz",
+        "raw_sha256": "75be979b051bf2aaacf69c2932351f7b6659cfcf3588c939c0d594cd046317d6",
+        "gzip_sha256": "53f79be16a0cc5da0bea334647518dd7bfc38caea0fbd984b170b8d7b15c73e9"
+      },
+      "complete115-plan-coverage": {
+        "file": "complete115-plan-coverage.log.gz",
+        "raw_sha256": "53047c3b078ec7ca7a1c2fa5a19f3698f2dc5acccd6bfee3c30d4833072b1176",
+        "gzip_sha256": "1be9ebf7dbcbde7d9c5e0703ddd1885cb85aabe82fa413e0d498d1e1abdcf308"
+      }
+    }
+  },
+  "current_library_failure_under_investigation": {
+    "source": "de22d9b482cde663217c69bd411482b0ec35f9f6",
+    "test": "ml_dataset::restore::tests::cross_host_roundtrip_replays_solved_cells_and_preserves_binding",
+    "parent_run_status": "Still active; final failure diagnostics pending. No pass claimed.",
+    "isolated_original_test": "1 passed,0 failed",
+    "entire_dataset_suite": "212 passed,0 failed,1existing ignored",
+    "restore_with_isolation_suite": "46 passed,0 failed",
+    "source_edits": "No Rust source or fixture change; no failure waived."
+  },
+  "sparse_component_guard": {
+    "regression": "Missing transitive raw inputs previously silently demoted a validated engineering component",
+    "new_controls_passed": 4,
+    "existing_parser_controls_passed": 8,
+    "existing_path_controls_passed": 16,
+    "current_board_still_byte_current": true,
+    "actionlint_passed": true,
+    "actual_merged_study_verified": "aimed-gather-merged-source-verification.json",
+    "new_test_wired_to_workflow": true
+  }
+}

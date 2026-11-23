@@ -1,0 +1,119 @@
+{
+  "main": "MomoseCubicHomographyAudit.momose_cubic_homography_certificate",
+  "binding": "180630ee33d7ebd4be7786362c32efdafdb2f0cc7802f6e698432768f72fdc2a",
+  "custom_imports": {
+    "CubicUniqueness": "research/momose_cubic_homography_audit_20261114/lean/CubicUniqueness.lean",
+    "CubicGenerator": "research/momose_cubic_homography_audit_20261114/lean/CubicGenerator.lean",
+    "QuadraticControl": "research/momose_cubic_homography_audit_20261114/lean/QuadraticControl.lean",
+    "MomoseCertificate": "research/momose_cubic_homography_audit_20261114/lean/MomoseCertificate.lean",
+    "FiniteSource": "research/momose_cubic_homography_audit_20261114/lean/FiniteSource.lean",
+    "HomographyBasics": "research/momose_cubic_homography_audit_20261114/lean/HomographyBasics.lean",
+    "CubicExistence": "research/momose_cubic_homography_audit_20261114/lean/CubicExistence.lean"
+  },
+  "claims": [
+    {
+      "declaration": "MomoseCubicHomographyAudit.cubic_generates",
+      "hypotheses": "Actualextensiondegree3/actualpointoutsidebase",
+      "conclusion": "ActualIntermediateFieldgeneratediswholeL."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.cubic_coordinates",
+      "hypotheses": "Actualcubicpowerbasisderived",
+      "conclusion": "Everyactualtargethasquadraticpowercoordinates."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.quadratic_relation_zero",
+      "hypotheses": "Actualcubicfield/nonbasepoint",
+      "conclusion": "Allquadraticrelationcoefficientszero."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.determinant_ne_zero",
+      "hypotheses": "Actualfractionalrelation/nonbase target/nonzero denominator",
+      "conclusion": "Actualmatrixdeterminantnonzero."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.cubic_homography_exists",
+      "hypotheses": "Actualcubicextension/nonbasepointandtarget",
+      "conclusion": "ActualinvertibleGL2matrixsendsonepointtotheother."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.source_explicit_matrix",
+      "hypotheses": "Actualcubicpoint/rootrelation/coefficientsnotbothzero",
+      "conclusion": "Printedmatrixhasnonzerodet/denominatorandcorrectvalue."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.cubic_stabilizer_scalar",
+      "hypotheses": "ActualGL2/cubicpoint",
+      "conclusion": "ActualGL2stabilizerisunit-scalarmatrix."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.cubic_homography_unique_up_to_scalar",
+      "hypotheses": "TwoactualGL2maps/samesourceandtargetoutsidebase",
+      "conclusion": "Actualunit-scalarproportionalityandPGLquotientuniqueness."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.source_extension_degree",
+      "hypotheses": "ActualfinitecardK=q2/cardL=q6/q>=2",
+      "conclusion": "Actualextensiondegree3."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.source_generator_outside",
+      "hypotheses": "ActualcardK=q2/epsilonq3fixed/qnotfixed",
+      "conclusion": "ActualepsilonoutsideimageofK."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.momose_lemma_one",
+      "hypotheses": "Actualsourcefinitefieldandgeneratordomains",
+      "conclusion": "CompleteprimaryLemma1existence/denominators/actualPGLandscalaruniqueness."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.quadratic_stabilizer_control",
+      "hypotheses": "ActualF9card9/degree2",
+      "conclusion": "ActualnonbasepointfixedbynonidentityPGLmatrix."
+    },
+    {
+      "declaration": "MomoseCubicHomographyAudit.uniqueness_without_cubic_degree_false",
+      "hypotheses": "ActualF9/nonbasepoint/GL2(F3)",
+      "conclusion": "Directnegationafterdeletingcubicdegree;qualifiedprimaryretained."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 40,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "source_lemma_one_proved": true,
+    "actual_GL2_PGL_scalar_uniqueness_proved": true,
+    "finite_source_card_and_generator_bridge_proved": true,
+    "source_explicit_matrix_proved": true,
+    "actual_quadratic_negative_control_and_hypothesis_deletion_refutation_proved": true,
+    "qualified_primary_lemma_refuted": false,
+    "whole_cover_classification_density_verified": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

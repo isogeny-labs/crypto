@@ -1,0 +1,642 @@
+[
+ {
+  "lead": "LEAD-ICB-koblitz-rho-reference",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-koblitz-rho-reference/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-koblitz-rho-reference && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/candidate_matches.json"
+  ],
+  "hypothesis": "On y^2+xy=x^3+x^2+1 over GF(2^m), m in {11,13,17}, signed-Frobenius canonicalisation (2m-element orbit) in a 16-way Floyd rho walk cuts mean f-evaluations versus negation-only by a factor R_m >= 0.6*sqrt(2m).",
+  "prediction": "R_m >= 2.81, 3.12, 3.50 for m = 11, 13, 17. Controls: the A/A CI contains 1, and the none/neg ratio lies in [1.1, 1.8]. The claim is falsified if a valid-control CI upper limit falls below the threshold.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-koblitz-setup-phase-cost",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-koblitz-setup-phase-cost/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-koblitz-setup-phase-cost && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "In a toy F_{2^n} Koblitz-curve m=2 index calculus (n=11,13,17), the reusable set-up (sums table, relations, rank finder, elimination) is at least 95% of one-target cost at every unpriced-work weight w in {0,0.1,1}, with break-even target count at least 10.",
+  "prediction": "Median set-up share f >= 0.95 and break-even K* >= 10 in every (n,w) cell. Falsified if any cell median f < 0.90. Controls: all targets recovered (positive), corrupted log table fails (null), A/A seed set agrees within 0.02. Labelled [pcc:unverified].",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-large-prime-variants",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-large-prime-variants/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-large-prime-variants && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-10-29.md"
+  ],
+  "hypothesis": "The 2LP-over-plain gain in raw samples per usable relation under an aimed sampler is at least 0.8x the unaimed gain (and the aimed gain exceeds 1.2), in a stdlib smoothness and cycle-graph toy model of the double-large-prime collector.",
+  "prediction": "R = G_aimed/G_unaimed >= 0.8 and G_aimed > 1.2 gives consistent_with_prediction. Otherwise falsified. A failed null (G=1 at L=B), positive control (G_unaimed > 1.2) or A/A (deviation < 0.15) gives inconclusive. The smoke run, a tiny size, gave R=0.74 (falsified), which is not the preregistered size.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-learned-cost-model-factor-base-selection",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-learned-cost-model-factor-base-selection/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-learned-cost-model-factor-base-selection && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "A gated log-linear ridge trained on factor-base subspaces of dimension l in {3,4,5} of GF(2^13) on one binary curve ranks the held-out relation yield of subspaces of dimension l in {6,7,8} on a different curve with mean within-l Spearman rho >= 0.5 and above the 95th percentile of a permuted-label null.",
+  "prediction": "Transfer-curve held-out Spearman >= 0.5 and above the null p95, with the positive control >= 0.5 and A/A difference <= 0.2. Otherwise the verdict is falsified, or inconclusive if a control fails. The smoke run gave inconclusive, as designed, at a trivial size.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-multi-target-and-portfolio",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-multi-target-and-portfolio/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-multi-target-and-portfolio && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/status/IC_STATUS_REPORT_20261031.md",
+   "/home/user/crypto/research/prime_field_leads_20261031/C3_heavy_tail_ceiling/REPORT.md"
+  ],
+  "hypothesis": "(a) Per-target cost of shared-table multi-target walks scales as K^(-1/2) (slope in [-0.65,-0.35]) while independent solving is flat. (b) With IC attempt cost floor ratio r>=1 vs mean rho (Pareto 1.5 tail), no rho/IC time-sharing and restart portfolio beats pure rho by more than 2 SE; a floor r=0.1 does beat it.",
+  "prediction": "Controls pass (null slope |S2|<=0.15, A/A within 0.1, r=0.1 gain below -0.2); shared slope S1 in [-0.65,-0.35]; for r=1.0 and 1.5 the best portfolio ratio-1 exceeds -2SE-0.01. Verdict consistent_with_prediction, re-deriving the recorded closed_obstructed bound.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-nonlinear-frob-stable-bases",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-nonlinear-frob-stable-bases/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-nonlinear-frob-stable-bases && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "At toy sizes on y^2+xy=x^3+x^2+1 over GF(2^n), n in {11,13,15,17}, the Hamming-ball B_3 factor base (weight <= 3 in a normal basis, Frobenius-stable) has no m=2 sumset-efficiency advantage over a size-matched union of random Frobenius orbits. The ratio R = E(B_3)/mean E(control) lies in [0.90, 1.10] for every n.",
+  "prediction": "All R fall in [0.90, 1.10]. Falsified if some n has R > 1.10 with z > 3. The positive control (arithmetic progression) must give a ratio below 0.2 and the A/A split of the controls must give a ratio within 5% of 1. If either check fails, the verdict is inconclusive.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-oakley-quintic-tower",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-oakley-quintic-tower/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-oakley-quintic-tower && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "For a toy GF(2^20) binary curve with factor base the points with x in F_16, sums of 5-subsets collide no more often than sums of 5-subsets of a random negation-closed set of the same size. In other words, the Gaudry-Diem n=5 uniformity heuristic holds at toy size.",
+  "prediction": "Collision ratio R (factor base over null mean) falls in [0.7, 1.4] on both curves. The positive control (arithmetic progression set) gives at least 3x the null mean, and the A/A ratio is in [0.6, 1.67].",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-orbit-linear-algebra",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-orbit-linear-algebra/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-orbit-linear-algebra && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md"
+  ],
+  "hypothesis": "Folding a free 6-element-orbit relation matrix over Z_r to orbit-representative columns cuts dense Gaussian-elimination mulmod cost by |Aut|^3 = 216 (within 0.7x to 1.3x) at n=216 unfolded columns, with exact log recovery in both arms.",
+  "prediction": "Median unfolded/folded mulmod ratio over 5 seeds at m=36 lies in [151, 281]. Controls: wrong-eigenvalue fold fails to recover logs, A/A seed-shift differs by 10% or less, and both main solves recover all logs. Outside the range with valid controls: falsified.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-quasi-subfield-polynomials",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-quasi-subfield-polynomials/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-quasi-subfield-polynomials && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/candidate_matches.json"
+  ],
+  "hypothesis": "At prime n and k in {2,3}, the sparse QSP x^(2^k+1)+ax+b over F_{2^n} has at most 3 roots (Bluher, gcd(k,n)=1), far below the 2^k needed for a subspace-like factor base, and its root-count distribution matches random same-degree polynomials.",
+  "prediction": "Max root count is at most 3 in every cell (n=11,13; k=2,3), mean is about 1, and the A/A split-half means differ by less than 0.35. The positive control (n=12, k=2) reaches 5 roots. Any QSP with more than 3 roots at prime n would falsify the hypothesis.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-prime-degree-algebraic-decomposition",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-prime-degree-algebraic-decomposition/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-prime-degree-algebraic-decomposition && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "In toy Weil-descended Semaev S_3 decomposition over GF(2^n), n in {11,13}, with 2l<n subspace variables, boolean-ring Macaulay closure at degree 6 refutes at least 50% of unsolvable instances in every cell, and beats a same-shape random-system null by more than 0.2.",
+  "prediction": "R6 >= 0.5 in each of cells (n,l) = (13,5), (11,5), (13,6), with A/A agreement within 0.25 and zero unsound refutations. Any cell with R6 < 0.5 falsifies.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-retained-setup-online",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-retained-setup-online/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-retained-setup-online && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/status/IC_STATUS_REPORT_20261031.md"
+  ],
+  "hypothesis": "Bernstein-Lange tradeoff: generic precomputed-table rho has S*T^2/r >= 0.5 in a toy generic model, while a non-generic online IC (retained factor-base logs, 1-op smoothness oracle) reaches S*T^2/r <= 0.25. A non-generic oracle is therefore the only way to meet the lead's revisit condition.",
+  "prediction": "Minimum generic R over 9 cells x 2 seed sets is >= 0.5, IC control R <= 0.25, and the A/A max ratio-of-ratios is <= 2.0, giving consistent_with_prediction. Falsified if generic min R < 0.25. Otherwise inconclusive.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICB-tau-horner-chain",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-tau-horner-chain/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICB-tau-horner-chain && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "With a tau-closed factor base on a toy Koblitz curve over GF(2^13), the Horner chain tau^2P1+tauP2+P3=R yields exactly the same distinct relations as the plain sum, so it is a relabelling. It costs about 2x the group additions per distinct relation. With a non-closed factor base it loses most relations.",
+  "prediction": "The distinct-relation ratio D_horner/D_plain is exactly 1.0 in the closed arm and in the A/A arm. The control (random FB of the same size) gives a ratio below 0.5. Adds per distinct relation, Horner over plain, fall in [1.5, 2.5].",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-boolean-f4-f5-f6-engines",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-boolean-f4-f5-f6-engines/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-boolean-f4-f5-f6-engines && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md",
+   "/home/user/crypto/docs/session-logs/2026-11-02.md"
+  ],
+  "hypothesis": "Replaying a pivot trace from one same-support Macaulay GF(2) matrix on another (re-drawn coefficients) cuts counted elimination cost by a median factor in [1.0, 2.3], matching the recorded 1.4-2.3x trace-reuse bound, with an unrelated-shape trace giving no larger gain.",
+  "prediction": "Median same-support replay ratio is at most 2.3. A value above 2.3 falsifies it. The positive control (own trace) must exceed 1, the A/A ratio must equal 1, and the unrelated-trace null must not exceed the same-support ratio. The smoke run gave about 1.02, which is consistent with the prediction.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-chained-semaev-dreg-vs-semiregular",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-chained-semaev-dreg-vs-semiregular/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-chained-semaev-dreg-vs-semiregular && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-11-06.md"
+  ],
+  "hypothesis": "In a toy GF(2^6) chained binary Semaev system (two S_3 polynomials sharing a full-field variable, l=2 factor-base bits per variable, bit-descended), the degree-5 Macaulay rank ratio against the semi-regular Hilbert-series prediction is at least 0.02 below that of a random cubic null of the same shape.",
+  "prediction": "The null minus chain difference in mean rank ratio at D=5 exceeds max(0.02, 3x the A/A noise), with the planted-syzygy positive control detected. Falsified if the difference is within A/A noise.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-charged-toy-ic-exponent-vs-rho",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-charged-toy-ic-exponent-vs-rho/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-charged-toy-ic-exponent-vs-rho && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md",
+   "/home/user/crypto/docs/session-logs/2026-10-31.md"
+  ],
+  "hypothesis": "In a stdlib Z_p^* toy proxy (16..32 bit safe primes), fully charged classical IC costs more than matched Pollard rho at every ladder size at w=1 trial-division weight, so the crossover is empty on the ladder.",
+  "prediction": "Median IC/rho cost ratio > 1 at all five sizes at w=1; rho slope within 0.1 of 0.5 (positive control); A/A slope differences under 0.15 (rho) and 0.3 (IC). Falsified if IC beats rho at any size at w=1.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-curve-presentation-invariance",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-curve-presentation-invariance/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-curve-presentation-invariance && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-11-06.md"
+  ],
+  "hypothesis": "Among same-order prime-field curves (same trace, different j), 2-decomposition coverage of a fixed-size x-window factor base has no between-curve component beyond within-curve window noise (ICC < 0.05).",
+  "prediction": "consistent_with_prediction: the xwindow arm shows ICC < 0.05 or permutation p >= 0.01 at both primes, the positive control (15% larger base on one curve) is detected, and the random-subset null is clean.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-decomposition-probability-audit",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-decomposition-probability-audit/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-decomposition-probability-audit && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "For a size-matched negation-closed small-x factor base on toy prime-field curves (n 2^12..2^16), the index of dispersion of 2-point decomposition counts over targets lies within the random-base null band (no target-conditional excess variance beyond the random-base null).",
+  "prediction": "Stouffer |z| < 3 and each per-curve |z| < 4 for x-small vs random-base null. The interval-base positive control must give z > 5 on every curve, and the A/A Stouffer |z| must be < 3. Otherwise the verdict is inconclusive or falsified.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-descent-closure-degree-at-scale",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-descent-closure-degree-at-scale/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-descent-closure-degree-at-scale && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-11-06.md"
+  ],
+  "hypothesis": "For Weil-descended Semaev S_3 systems over GF(2^n) (m=2, n=2l+1, random l-dim F2 subspace), XL refutation degree is <=4 for l=3..6 and mean slope <=0.2 per l.",
+  "prediction": "max closure degree <=4 and slope <=0.2 per unit l across l=3..6, with A/A gap <=0.5 and positive controls passing; falsified if max>=5 and slope>0.2.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-first-fall-degree-assumptions",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-first-fall-degree-assumptions/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-first-fall-degree-assumptions && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-11-06.md"
+  ],
+  "hypothesis": "For Weil-descended binary Semaev S_3 systems over GF(2^n) (n in 6,8,10, x1 and x2 in an n/2-dimensional F_2-subspace), the Boolean Macaulay rank-defect first-fall degree is lower than for random quadratic systems of identical shape by at least 1 on average at every n.",
+  "prediction": "delta (mean D_ff structured minus null) <= -1.0 at every n with controls valid gives consistent_with_prediction. delta > -0.5 at every n gives falsified. Anything else, or a failed positive control or A/A arm, gives inconclusive. Both the S_3 form and the choice of null are unverified, so results carry [pcc:unverified]. The recorded refutation of a uniform degree-two bridge suggests falsified or inconclusive is the likelier outcome.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-gag-contraction-planner",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-gag-contraction-planner/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-gag-contraction-planner && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-11-01.md"
+  ],
+  "hypothesis": "A pure counted-Macaulay-matrix proxy (first degree D with rows>=cols) ranks monolithic Semaev S_{m+1} as more expensive than the chained S_3 presentation and cannot tell chain from tree (ratio exactly 1). That contradicts the recorded msolve result (mono 0.110x chain, tree 1.095x), so the proxy is not a usable contraction planner.",
+  "prediction": "mono_over_chain > 1 for all five (m,n) configs and tree_over_chain == 1.0 exactly. The chain-vs-chain A/A arm must give 1.0 and the duplicated-equation positive control must give a ratio other than 1. Falsified if any mono_over_chain < 1 or tree_over_chain != 1. The smoke test (m=3, n=3) gave mono/chain of about 2.6e7 and tree/chain of 1.0, with verdict consistent_with_prediction.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-gpu-rootfind-oracle",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-gpu-rootfind-oracle/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-gpu-rootfind-oracle && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "The Semaev S3 root-finding oracle returns exactly x(R-P1) and x(R+P1) for every factor-base cell, and the 2-decomposition yield per random target equals |FB|^2/N within sampling error (|z|<4) on a ~2^16 toy prime curve.",
+  "prediction": "Zero oracle-vs-direct mismatches, all planted decompositions found, |z_yield|<4 and |z_AA|<4. The wrong-b negative control mismatches. Anything else falsifies, or is inconclusive if only a control fails.",
+  "blocked_on": "The recorded next step (GPU bench throughput and validation harness on a real sm device) is blocked here. The toy covers only the oracle algebra and the yield model."
+ },
+ {
+  "lead": "LEAD-ICE-generic-oracle-arity-cost-floor",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-generic-oracle-arity-cost-floor/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-generic-oracle-arity-cost-floor && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/prime_field_leads_20261031/L1_lower_bound/atlas_update.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "In a generic cyclic group of order N (2^12..2^22), ENUM/MITM decomposition oracles at arity m=2..5 and a free oracle at m=3, with B optimised and linear algebra charged m*B^2, cost more counted group ops than ideal birthday rho in every cell (ratio > 1), with ENUM/MITM slope >= 0.5.",
+  "prediction": "Minimum cost ratio to rho over decision cells is > 1 (no sub-rho cell). Falsified if any ratio <= 1 with controls passing. Controls are rho-vs-rho A/A within [0.8,1.25], a positive control (free oracle m=4 with linear algebra uncharged is sub-rho at n=22), and model-vs-simulation agreement within a factor of 2.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-hybrid-guess-determine-l7",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-hybrid-guess-determine-l7/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-hybrid-guess-determine-l7 && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "On determined random quadratic GF(2) systems (n=12,14), the hybrid guess-and-determine cost 2^k*cols(D_min)^2.37 is minimised at k*>=1; falsified if k*=0 at all n>=12.",
+  "prediction": "k*(12)>=1 and k*(14)>=1, A/A k* within 1, positive control (linear system, D=2) and negative control (underdetermined, unsolved) pass.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-linearization-excess-fb-prior",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-linearization-excess-fb-prior/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-linearization-excess-fb-prior && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-10-26.md"
+  ],
+  "hypothesis": "Among equal-size F_p-subspaces of x-coordinates (l=2) over F_{p^n}, those with linearization excess e = l(l+1)/2 - dim(V*V) >= 1 have higher m=3 and m=4 sumset coverage than the size-matched e=0 baseline, by mean residual >= 0.01.",
+  "prediction": "Pooled over 8 units (4 cells x 2 curves), permutation p <= 0.01, observed mean residual >= 0.01, at least 75% of units positive, positive control (|S| vs coverage Spearman > 0.3) passing. Falsified if p > 0.05 or the residual is <= 0. The smoke test (one unit, tiny sample) gave a falsified verdict, which is not informative.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-prime-field-semaev-solving-degree",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-prime-field-semaev-solving-degree/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-prime-field-semaev-solving-degree && timeout 660 python3 -I run.py",
+  "est_minutes": 6,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/notes/ecdlp-general/RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md",
+   "/home/user/crypto/research/prime_field_leads_20261031/L1_lower_bound/atlas_update.md"
+  ],
+  "hypothesis": "For m=2 direct S_3 plus factor-base equations over small F_p, Macaulay solving degree D_sol >= v (factor base size) in at least 80% of instances, matching the recorded obstruction.",
+  "prediction": "Pooled fraction with D_sol >= v is >= 0.80 for the S_3 arm; the planted single-point positive control gives < 0.5 and the A/A arm agrees within 0.15. Falsified if the S_3 fraction is < 0.50.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-relation-graph-rank-large-prime",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-relation-graph-rank-large-prime/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-relation-graph-rank-large-prime && timeout 660 python3 -I run.py",
+  "est_minutes": 4,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-10-26.md"
+  ],
+  "hypothesis": "In a toy F_p* integer-smoothness relation stage (p~2^18,2^20; B=1.5p^(1/4); L=B^2.5), the 2LP cycle-basis arm needs <=0.8x the trials of the full-smooth-only arm to reach usable rank |FB|, and that gain equals a configuration-model null (real/null ratio within 5% of 1), so 2LP enrichment is explained by degree statistics alone.",
+  "prediction": "R2=median(T_2LP/T_full) upper 95% CI <=0.8 and |median(T_real/T_null)-1|<=0.05 at both sizes; 1LP beats full-smooth as positive control. Falsified if R2 lower CI>=0.95 or the gain clearly exceeds the null.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-sat-xor-pdp-oracle",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-sat-xor-pdp-oracle/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-sat-xor-pdp-oracle && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-10-30.md"
+  ],
+  "hypothesis": "With SAT propagations and conflicts priced at 1 GAE each, a DPLL one-hot point-decomposition oracle (m=2) costs more than the F-addition hash-table oracle even with a free encoding, and at every weight in {0,0.1,1} when the R-dependent encoding is charged.",
+  "prediction": "Median S = SAT_GAE / table_adds exceeds 1 for every factor-base size B in {8,16,24,32} for the free-encoding arm at w=1 and for the naive-encoding arm at all w. The controls must pass: 0 SAT-vs-table disagreements and A/A within 25%. Falsified if S_free(w=1) is at most 1 at any B.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-rootfind-pairtable-oracle",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-rootfind-pairtable-oracle/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-rootfind-pairtable-oracle && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "At toy prime-field sizes (n = 2^12..2^20) the m=2 negation-folded pair-table IC costs more than negation-fold rho at every size and native-primitive price w in {0, 0.1, 1} GAE, and log2(IC/rho) grows with log2 n (bootstrap 95% CI lower bound of the slope above 0).",
+  "prediction": "The ratio R_w(b) is above 1 at all sizes and all w, and the slope CI lower bound is above 0 for all w. Falsified if R_w < 1 at both of the two largest sizes for any w with controls passing. Controls are rho/rho A/A, a random-table yield null, a planted-d recovery check and a native-pricing visibility check.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-semaev-cover-monodromy",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-semaev-cover-monodromy/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-semaev-cover-monodromy && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "For m=3 at p=4093, the S_3 split/inert cycle-type fraction is curve-uniform (binomial dispersion D<1.6 on two independent 60-curve populations) and uncorrelated with the per-curve factor-base relation rate (permutation p>0.01), so the cycle-type census is no relation-rate gate.",
+  "prediction": "Consistent: D_A and D_B (A/A arm) below 1.6 with |log(D_A/D_B)|<0.5, positive-control planted-bias population D>3.2, and corr(split fraction, relation rate) permutation p>0.01. Falsified if either dispersion is high or the correlation is significant. Inconclusive if the positive control or A/A arm fails. The smoke test already returned inconclusive because its positive control was too weak at the tiny size. The full run has not been tried.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-semaev-chain-cost-model",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-semaev-chain-cost-model/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-semaev-chain-cost-model && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/data/atlas_tally.json"
+  ],
+  "hypothesis": "The recorded topology-blind result is a property of the fixed-degree Semaev cost model: relation yield and Semaev-model degree are identical across all merge trees, while a topology-aware degree model (2^max leaf depth) varies with topology for m>=4, so the obstruction does not exclude a topology-dependent solver.",
+  "prediction": "S1=1 distinct Semaev degrees per m (3..8), S2=1 distinct relation count across the 5 trees at m=4, S3>=2 topology-aware degrees for every m>=4; the naive 2^leaves positive control is topology-dependent and the A/A shuffled-order arm matches. Falsified if S1>1 or S2>1.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-semaev-yield-model-coset-typing",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-semaev-yield-model-coset-typing/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-semaev-yield-model-coset-typing && timeout 660 python3 -I run.py",
+  "est_minutes": 2,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-11-07.md"
+  ],
+  "hypothesis": "On prime-field toys (N ~ 2^12..2^18, m=3), coset-typing an x-prefix factor base by Legendre(x) only changes tuple count T (the m! trade), not yield per tuple: distinct covered targets match N(1-exp(-T/N)) within the random-base null band, for typed and untyped arms.",
+  "prediction": "Both x_untyped and x_typed mean R lie within max(3*sd, 0.02) of the random-base null mean; the arithmetic-progression positive control falls well below; A/A within band. Verdict consistent_with_prediction. Smoke run at 2^10 already shows x arms R about 1.005 vs null about 0.91 (not inside the smoke band by much, so full run decides).",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICE-syzygy-cascade-signatures",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-syzygy-cascade-signatures/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICE-syzygy-cascade-signatures && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md"
+  ],
+  "hypothesis": "A Macaulay-matrix rank-deficit detector over F_10007 (n=5, 5 quadrics) gives D_3=0 and D_4=10 (Koszul only) on generic systems, and each planted non-Koszul syzygy adds exactly 1 to D_3 (unit slope).",
+  "prediction": "Null arms A and B (A/A) have D_3=0 and D_4=10 in all 20 trials each. Planted arm k has D_3=k in all trials, so the slope is exactly 1. Any null deviation falsifies (after a reseed check); a non-unit slope is inconclusive.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-char0-lifting-xedni-smoothness",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-char0-lifting-xedni-smoothness/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-char0-lifting-xedni-smoothness && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "B=300-smooth rate of integer lifts x+kp (k in 1..63) of curve-point x-coordinates over F_p (p near 2^16/2^20/2^22) equals the uniform-integer null: ratio within 1 +/- (3 SE + 0.03).",
+  "prediction": "Ratio R ~ 1.00, A/A within 3 SE of 1, planted positive control R > 3; verdict consistent_with_prediction. Falsified only if R - 3 SE > 1.10.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-algebraic-membership-factor-base",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-algebraic-membership-factor-base/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-algebraic-membership-factor-base && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/README.md"
+  ],
+  "hypothesis": "At m=2 on cyclic toy EC groups (N ~ 2^11..2^17), size-B (1.5 sqrt N) bases selected by algebraic x-locus membership (QR, cubes, Dickson D3 image, t^2 image, t^2+t image, low-x interval) have the same coverage of Z_N by +-f_i +-f_j as size-matched random bases: pooled mean ratio < 1.02 for every family.",
+  "prediction": "No family shows pooled coverage ratio >= 1.02 with Stouffer z > 5; A/A pooled |z| <= 4; planted-subgroup positive control shows ratio < 0.8. Any family exceeding the gain threshold falsifies the prediction.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-coincidence-harvest-structured-base",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-coincidence-harvest-structured-base/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-coincidence-harvest-structured-base && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/README.md",
+   "/home/user/crypto/docs/session-logs/2026-10-31.md"
+  ],
+  "hypothesis": "For a window base (n = 2*floor(sqrt p) points with smallest x) on random E(F_p) at p ~ 2^12..2^17, kappa_rel = pair-sum x-key coincidences relative to a same-size random base stays within 1 +- 0.1 and has log-log slope in N within +-0.03 of 0 (no growth, conservation holds).",
+  "prediction": "consistent_with_prediction: all |kappa_rel - 1| <= 0.1, |slope| < 0.03, log-GAP positive control kappa >= 3, A/A random-vs-random ratio in [0.85, 1.15]. Falsified only if mean slope > 0.05 at > 3 SE.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-construction-normal-form",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-construction-normal-form/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-construction-normal-form && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "Toy stand-in for the normal-form dedup and estimator-bias check. Naive (a,b) dedup overcounts isomorphic proposals, while an x-interval factor base that is not isomorphism-invariant gives two-point decomposition coverage that varies across isomorphic copies about as much as random equal-size factor bases do (variance ratio R in [0.5, 2]).",
+  "prediction": "R = var(interval FB across isomorphic copies) / var(random FB) lies in [0.5, 2]. Falsified if R < 0.1 or R > 10. The A/A variance ratio must be in [0.5, 2]. The transported-FB control must have zero variance. A 25% larger FB must raise mean coverage by more than 3 standard errors.",
+  "blocked_on": "The full H-PFDR-6189d0 normal form and the PFDR/PATH proposal texts were not found within the bounded search. The truncated next-step excerpt also hid the second half of the lead's step. The toy tests only the dedup and estimator-bias part."
+ },
+ {
+  "lead": "LEAD-ICP-coppersmith-smallroot-semaev",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-coppersmith-smallroot-semaev/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-coppersmith-smallroot-semaev && timeout 660 python3 -I run.py",
+  "est_minutes": 1,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md"
+  ],
+  "hypothesis": "The Newton-polytope volumes of generic Semaev S_3 are 14/3 (3 unknowns) and 4 (2 unknowns), so the equal-bound Coppersmith reach is 0.3293 and 0.3536, both far below the IC demand of 8/9 at (m,w)=(4,2). This reproduces the recorded obstruction at the level of the equal-bound formula.",
+  "prediction": "|reach_3 - 0.3293| < 5e-4 and |reach_2 - 0.35355| < 5e-4, both below 8/9. Positive controls (univariate degree 2 gives 1/2, bivariate linear gives 1) and the S_3 curve-validity check (0 failures) must pass. Smoke run already gives reach_3 = 0.329317, reach_2 = 0.353553.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-digit-presentation-solving-degree",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-digit-presentation-solving-degree/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-digit-presentation-solving-degree && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "On a toy digit system (m=2, B=3, p=13, Semaev S_3 of random curves with digit-range polynomials), degree-d (3..5) Macaulay-matrix ranks equal those of a support-matched random-coefficient null, so there is no curve-specific early fall, consistent with the recorded curve-independent d_ff.",
+  "prediction": "D = max |rank(real) - rank(null)| over 4 curves and d=3..5 is at most the A/A spread of two independent null draws (consistent). If D exceeds it, falsified. If the planted-dependency positive control shows no rank change, inconclusive.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-elliptic-code-list-decoding",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-elliptic-code-list-decoding/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-elliptic-code-list-decoding && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/README.md"
+  ],
+  "hypothesis": "Signed k-subset-sum solution counts over an IC-style factor base match the random-label Poisson mean C(B,k)2^k/n (no code structure), and the GS threshold sqrt(Bk) exceeds k for all k<B, so list decoding reduces to enumeration.",
+  "prediction": "Pooled observed/expected ratio for factor base within [0.75,1.33] and within 25% of the random-label null; GS fails for all k; planted control found. Otherwise falsified (ratio >1.5 or <0.5) or inconclusive.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-full-width-arity-grid",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-full-width-arity-grid/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-full-width-arity-grid && timeout 660 python3 -I run.py",
+  "est_minutes": 4,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-11-05.md"
+  ],
+  "hypothesis": "At toy prime-order groups (N ~ 4e4..6.6e4) a small-x signed factor base (~40 points) has m-fold sumset coverage within 5% of a random symmetric subset of equal size for m=2,3,4, so relation yield is generic.",
+  "prediction": "|coverage ratio - 1| <= 0.05 in all informative cells (null coverage < 0.9); positive control (arithmetic-progression base) deviates by >0.2 at m=2; A/A within 5%.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-generic-table-decomposition",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-generic-table-decomposition/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-generic-table-decomposition && timeout 660 python3 -I run.py",
+  "est_minutes": 3,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/docs/session-logs/2026-11-01.md"
+  ],
+  "hypothesis": "For arity-2 pair-table IC on prime-order E(F_p) with N in 2^12..2^18, the relation-phase cost (table build plus walk, minimised over B=N^0.25..N^0.5, linear algebra excluded) scales as N^e with bootstrap 95% lower bound e > 0.55. The heuristic is B^2 + N/B, which gives e = 2/3 against rho's 0.5. This re-derives the recorded obstruction as a lower bound.",
+  "prediction": "The IC slope CI lower bound is above 0.55, the rho slope CI contains 0.5, and the free-table positive control sits more than 0.08 below the IC slope. The A/A slope difference is under 0.1. Falsified if the IC CI upper bound is below 0.55 with all controls passing. Inconclusive otherwise, or if any control fails.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-gfp5-oa-sdhp-jv",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-gfp5-oa-sdhp-jv/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-gfp5-oa-sdhp-jv && timeout 660 python3 -I run.py",
+  "est_minutes": 5,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "On random E over F_{p^5} (p=7,11), the number of distinct sums of four factor-base points (x in F_p) is within 10% of that from a random negation-closed base of equal size, so decomposition density is generic and any gain must come from C_pdp4.",
+  "prediction": "All per-curve ratios FB/null lie in [0.9,1.1], with positive control (AP base) below 0.5 of null and A/A relative difference below 0.05. Falsified if any ratio is outside the band while controls pass.",
+  "blocked_on": ""
+ },
+ {
+  "lead": "LEAD-ICP-extension-field-embedding",
+  "kind": "runnable_local",
+  "protocol_path": "/home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-extension-field-embedding/PROTOCOL.md",
+  "run_cmd": "cd /home/user/crypto/research/lead_sweep_20261110/LEAD-ICP-extension-field-embedding && timeout 660 python3 -I run.py",
+  "est_minutes": 4,
+  "files_read": [
+   "/home/user/crypto/research/lead_sweep_20261110/leads.json",
+   "/home/user/crypto/research/prime_field_lead_assessment_20261107/atlas_survey.md",
+   "/home/user/crypto/research/ecdlp_subexp_desk_20261101/README.md"
+  ],
+  "hypothesis": "At n=2 over toy primes p=3 mod 4, a Gaudry-style subfield-factor-base IC with a free decomposition oracle still has counted cost (natives priced at 0.1 and 1 GAE) growing faster than Pollard rho on E(F_{p^2}): slope of ln(IC/rho) vs ln N >= 0.4, so the recorded obstruction holds at toy scale.",
+  "prediction": "Both slopes (w=0.1, w=1) >= 0.4 with IC/rho > 1 over the larger sizes; subfield-FB yield about 1.0 vs about 0.86 random-FB Poisson null; A/A ratio within 0.7 to 1.43. Falsified if min slope < 0.1 or ratio_0.1 < 1 at the largest size.",
+  "blocked_on": ""
+ }
+]

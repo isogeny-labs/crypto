@@ -1,0 +1,54 @@
+execute(read("../../source-data/compact-pid51.sing"));
+execute(read("../../source-data/nu-pid-certificate51.sing"));
+execute(read("../../source-data/rr-table50.sing"));intmat parents52=parents50;
+execute(read("../../source-data/relative-infinity50.sing"));
+execute(read("../closure52-02/closure-certificate52.sing"));
+int savedExtensions52=extensions52;intvec savedLengths52=lengths52;
+setring compactPid51;short=0;option(redSB);
+matrix donorH52=matrix(basis51);
+map saved52=closureCertificate52,u;matrix T52=saved52(T52);matrix initial52=saved52(initial52);
+map nu52=nuPidCertificate51,u;matrix nc52=nu52(lift51);map table52=tablePidCertificate50,u;matrix coefficients52=table52(table50);
+if(initial52!=sourceLift51){ERROR("RELOAD52_INITIAL_BINDING");quit;}
+matrix expected52[32][32];int i52;int j52;int r52;int p52=0;
+for(i52=1;i52<=32;i52++){for(j52=i52;j52<=32;j52++){
+ p52++;if(parents52[p52,1]!=i52 || parents52[p52,2]!=j52){ERROR("RELOAD52_PARENTS");quit;}
+ for(r52=1;r52<=32;r52++){
+ expected52[r52,j52]=expected52[r52,j52]+nc52[i52,1]*coefficients52[r52,p52];
+ if(i52!=j52){expected52[r52,i52]=expected52[r52,i52]+nc52[j52,1]*coefficients52[r52,p52];}
+ }
+}}
+if(expected52!=T52){ERROR("RELOAD52_FULL_ACTION_TABLE_BINDING");quit;}
+matrix current52=saved52(basis0_52);matrix initialForward52=saved52(initialForward52);matrix initialReverse52=saved52(initialReverse52);
+if(initial52*initialForward52!=current52 || current52*initialReverse52!=initial52 || vdim(std(module(current52)))!=376){ERROR("RELOAD52_INITIAL_TWO_PRODUCTS");quit;}
+matrix next52;matrix forward52;matrix reverse52;matrix combined52;int step52;
+for(step52=1;step52<=savedExtensions52;step52++){
+ setring closureCertificate52;
+ execute("matrix nextNative52=basis"+string(step52)+"_52;matrix forwardNative52=forward"+string(step52)+"_52;matrix reverseNative52=reverse"+string(step52)+"_52;");
+ setring compactPid51;
+ next52=saved52(nextNative52);forward52=saved52(forwardNative52);reverse52=saved52(reverseNative52);
+ module combinedModule52=module(current52),module(T52*current52);combined52=matrix(combinedModule52);
+ if(combined52*forward52!=next52 || next52*reverse52!=combined52 || vdim(std(module(next52)))!=savedLengths52[step52+1]){ERROR("RELOAD52_STEP_PRODUCTS_OR_LENGTH");quit;}
+ current52=next52;
+}
+matrix final52=saved52(final52);matrix stability52=saved52(stableLift52);poly determinant52=saved52(determinant52);ideal factorPolys52=saved52(factorPolys52);
+if(current52!=final52 || final52*stability52!=T52*final52 || det(final52)!=determinant52 || deg(determinant52)!=savedLengths52[size(savedLengths52)]){ERROR("RELOAD52_FINAL_PRODUCTS");quit;}
+matrix bad52=stability52;bad52[1,1]=bad52[1,1]+1;
+if(final52*bad52==T52*final52){ERROR("RELOAD52_CORRUPTION_ACCEPTED");quit;}
+intvec savedPowers52=powers52;poly rebuilt52=1;
+for(i52=1;i52<=size(factorPolys52);i52++){rebuilt52=rebuilt52*factorPolys52[i52]^savedPowers52[i52];}
+if(rebuilt52!=determinant52){ERROR("RELOAD52_DETERMINANT_FACTORS");quit;}
+execute(read("../closure52-02/action-field-certificate52.sing"));
+setring actionFieldCertificate52;
+if(matrix(source52)*actionLifts52!=matrix(actionResiduals52)){ERROR("RELOAD52_FULL_SERIALIZED_SOURCE_PRODUCTS");quit;}
+map boundSource52=relativeInfinity50,l,v,u;
+if(matrix(boundSource52(relativeInfinityIdeal50))!=matrix(source52)){ERROR("RELOAD52_ACTUAL_SOURCE_BINDING");quit;}
+map fromPid52=compactPid51,u;matrix H52=fromPid52(donorH52);matrix fieldT52=fromPid52(T52);poly D52=fromPid52(commonDenominator51);
+map fromNu52=nuPidCertificate51,u;vector nuVector52=fromNu52(target51);poly numerator52=0;poly input52;poly output52;matrix outputs52=H52*fieldT52;
+for(i52=1;i52<=32;i52++){numerator52=numerator52+nuVector52[i52]*l^((i52-1)%16)*v^((i52-1) div 16);}
+for(j52=1;j52<=32;j52++){
+ input52=0;output52=0;
+ for(i52=1;i52<=32;i52++){input52=input52+H52[i52,j52]*l^((i52-1)%16)*v^((i52-1) div 16);output52=output52+outputs52[i52,j52]*l^((i52-1)%16)*v^((i52-1) div 16);}
+ if(numerator52*input52+D52*output52!=actionResiduals52[j52]){ERROR("RELOAD52_ACTION_RESIDUAL_BINDING");quit;}
+}
+print("RELOAD52_RESULT all32_actual_source_products=true complete_table_action=true all_closure_products=true final_determinant_and_stability=true corrupted_witness_rejected=true");
+print("RELOAD52_ALL_CHECKS_PASS");quit;

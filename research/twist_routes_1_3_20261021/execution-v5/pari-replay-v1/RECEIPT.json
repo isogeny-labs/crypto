@@ -1,0 +1,32 @@
+{
+  "schema": "twist.PARI-receipt/v1",
+  "argv": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "300s",
+    "/workspace/shared/twist-tools-20261023/cas/root/usr/bin/gp",
+    "-f",
+    "-q",
+    "-s",
+    "64000000",
+    "research/twist_routes_1_3_20261021/execution-v5/polynomial-remainder.gp",
+    "research/twist_routes_1_3_20261021/execution-v5/overlap-audit-v1/verify.gp"
+  ],
+  "started_epoch_s": 1793085290,
+  "finished_epoch_s": 1793085311,
+  "exit_code": 0,
+  "signal": null,
+  "script_sha256": "7bf29f8c21b3fa8f6a98c0301a6857926193b5d50505635e2cdfa0773301751c",
+  "gp_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+  "stdout": "research/twist_routes_1_3_20261021/execution-v5/pari-replay-v1/pari.stdout",
+  "stderr": "research/twist_routes_1_3_20261021/execution-v5/pari-replay-v1/pari.stderr",
+  "stdout_sha256": "1ed1e18f19b14d26d709e5dd20bc4ea24c4f5c568ec2a82dd672be135df65edc",
+  "stderr_sha256": "8971d27eaec8de44fdae5dedb6bf4e0c3b40c12527d074dfbb390b381dd7a040",
+  "initial_stack_bytes": 64000000,
+  "original_script_unchanged": true,
+  "preload": {
+    "path": "research/twist_routes_1_3_20261021/execution-v5/polynomial-remainder.gp",
+    "sha256": "6634bfe14aa4a153267b32014730e11759ce69215da500bb69f6ceb201efc0a9"
+  }
+}

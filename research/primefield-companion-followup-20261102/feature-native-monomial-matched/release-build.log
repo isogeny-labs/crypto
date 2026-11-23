@@ -1,0 +1,306 @@
+warning: field `terms` is never read
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/recovery.rs:11:50
+   |
+11 | pub struct Program{r:u64,q:usize,max_extra:usize,terms:Vec<(u64,Vec<usize>)>,corrections:Vec<Correction>,decoder:decoder::Program}
+   |            ------- field in this struct          ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `rank` and `columns` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/collapse.rs:8:99
+  |
+8 | #[derive(Debug)]pub struct Collapsed{pub terms:Vec<(u64,Vec<usize>)>,pub fibers:Vec<Vec<u64>>,pub rank:usize,pub columns:usize}
+  |                            --------- fields in this struct                                        ^^^^           ^^^^^^^
+  |
+  = note: `Collapsed` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `matrix_entries` and `elimination_updates` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/target.rs:4:105
+  |
+4 | ...uct Program{pub terms:Vec<(u64,Vec<usize>)>,pub rank:usize,pub columns:usize,pub matrix_entries:usize,pub elimination_updates:u64}
+  |        ------- fields in this struct                                                ^^^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `Program` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `product` is never used
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/target.rs:7:4
+  |
+7 | fn product(a:&[u64],b:&[u64],r:u64)->Vec<u64>{
+  |    ^^^^^^^
+
+warning: function `shifted_power` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/target.rs:12:4
+   |
+12 | fn shifted_power(r:u64,a:usize)->Vec<u64>{
+   |    ^^^^^^^^^^^^^
+
+warning: enum `Error` is never used
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/decoder.rs:4:10
+  |
+4 | pub enum Error { Modulus, Width, Coefficient, Offset, Sign, Size }
+  |          ^^^^^
+
+warning: struct `Program` is never constructed
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/decoder.rs:5:12
+  |
+5 | pub struct Program {
+  |            ^^^^^^^
+
+warning: associated items `new` and `evaluate` are never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/decoder.rs:14:12
+   |
+13 | impl Program {
+   | ------------ associated items in this implementation
+14 |     pub fn new(modulus: u64, width: usize, terms: &[(u64, Vec<usize>)]) -> Result<Self, Error> {
+   |            ^^^
+...
+46 |     pub fn evaluate(&self, mut oracle: impl FnMut(usize) -> i8) -> Result<u64, Error> {
+   |            ^^^^^^^^
+
+warning: function `fold_digits` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/decoder.rs:75:4
+   |
+75 | fn fold_digits(digits: &[i128]) -> i128 {
+   |    ^^^^^^^^^^^
+
+warning: fields `points` and `ratios` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/source.rs:24:39
+   |
+24 | #[derive(Debug)]pub struct Window{pub points:Vec<Point>,pub signs:Vec<i8>,pub ratios:Vec<Pair>,pub direct_initializations:usize,pub ...
+   |                            ------     ^^^^^^                                  ^^^^^^
+   |                            |
+   |                            fields in this struct
+   |
+   = note: `Window` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `ratio`, `point`, `pairs`, `lane_updates`, and `conversion_batches` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/source_extra.rs:3:62
+  |
+3 | ...ct Extension{pub sign:Option<i8>,pub ratio:Option<Pair>,pub point:Point,pub method:&'static str,pub pairs:Vec<Pair>,pub converted_points:usize,pub lane_updates:usize,pub conversion_batches:us...
+  |       --------- fields in this struct   ^^^^^                  ^^^^^                                   ^^^^^                                          ^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^
+  |
+  = note: `Extension` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `window` is never used
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/source_extra.rs:8:9
+  |
+7 | impl<'a> Prepared<'a>{
+  | --------------------- method in this implementation
+8 |  pub fn window(&self,q:Point,length:usize)->Result<Window,Error>{self.begin(q,length,0).map(|(w,_)|w)}
+  |         ^^^^^^
+
+warning: fields `projective` and `inverse_z` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/geometry.rs:18:41
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ---- fields in this struct   ^^^^^^^^^^                                          ^^^^^^^^^
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `initialization`, `snapshots`, and `conversion_batches` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/geometry.rs:68:43
+   |
+68 | ...ct Window{pub labels:Vec<u64>,pub initialization:&'static str,pub snapshots:Vec<Vec<Option<[u64;3]>>>,pub slots:Vec<Slot>,pub conversion_batches:us...
+   |       ------ fields in this struct   ^^^^^^^^^^^^^^                  ^^^^^^^^^                                                   ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `Window` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `window` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/geometry.rs:97:9
+   |
+94 | impl Prepared<'_>{
+   | ----------------- method in this implementation
+...
+97 |  pub fn window(&self,shifts:&[Option<[u64;2]>])->Result<Window,Error>{
+   |         ^^^^^^
+
+warning: methods `value` and `retained_indices` are never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/jets.rs:61:9
+   |
+37 | impl Division {
+   | ------------- methods in this implementation
+...
+61 |  pub fn value(&mut self,n:u64)->u64{self.jet(n).v.v}
+   |         ^^^^^
+62 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: method `retained_indices` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/value.rs:52:9
+   |
+25 | impl ValueDivision{
+   | ------------------ method in this implementation
+...
+52 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: variant `ZeroDivisor` is never constructed
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/polynomial.rs:4:37
+  |
+4 | pub enum Error{Domain,Nonunit,Order,ZeroDivisor,EmptyTree,Invariant}
+  |          ----- variant in this enum ^^^^^^^^^^^
+  |
+  = note: `Error` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `divrem` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-baseline/polynomial.rs:55:9
+   |
+ 8 | impl Poly{
+   | --------- method in this implementation
+...
+55 |  pub fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{
+   |         ^^^^^^
+
+warning: field `terms` is never read
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/recovery.rs:11:50
+   |
+11 | pub struct Program{r:u64,q:usize,max_extra:usize,terms:Vec<(u64,Vec<usize>)>,corrections:Vec<Correction>,decoder:decoder::Program}
+   |            ------- field in this struct          ^^^^^
+
+warning: fields `rank` and `columns` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/collapse.rs:8:99
+  |
+8 | #[derive(Debug)]pub struct Collapsed{pub terms:Vec<(u64,Vec<usize>)>,pub fibers:Vec<Vec<u64>>,pub rank:usize,pub columns:usize}
+  |                            --------- fields in this struct                                        ^^^^           ^^^^^^^
+  |
+  = note: `Collapsed` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `matrix_entries` and `elimination_updates` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/target.rs:4:105
+  |
+4 | ...uct Program{pub terms:Vec<(u64,Vec<usize>)>,pub rank:usize,pub columns:usize,pub matrix_entries:usize,pub elimination_updates:u64}
+  |        ------- fields in this struct                                                ^^^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `Program` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `product` is never used
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/target.rs:7:4
+  |
+7 | fn product(a:&[u64],b:&[u64],r:u64)->Vec<u64>{
+  |    ^^^^^^^
+
+warning: function `shifted_power` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/target.rs:12:4
+   |
+12 | fn shifted_power(r:u64,a:usize)->Vec<u64>{
+   |    ^^^^^^^^^^^^^
+
+warning: enum `Error` is never used
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/decoder.rs:4:10
+  |
+4 | pub enum Error { Modulus, Width, Coefficient, Offset, Sign, Size }
+  |          ^^^^^
+
+warning: struct `Program` is never constructed
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/decoder.rs:5:12
+  |
+5 | pub struct Program {
+  |            ^^^^^^^
+
+warning: associated items `new` and `evaluate` are never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/decoder.rs:14:12
+   |
+13 | impl Program {
+   | ------------ associated items in this implementation
+14 |     pub fn new(modulus: u64, width: usize, terms: &[(u64, Vec<usize>)]) -> Result<Self, Error> {
+   |            ^^^
+...
+46 |     pub fn evaluate(&self, mut oracle: impl FnMut(usize) -> i8) -> Result<u64, Error> {
+   |            ^^^^^^^^
+
+warning: function `fold_digits` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/decoder.rs:75:4
+   |
+75 | fn fold_digits(digits: &[i128]) -> i128 {
+   |    ^^^^^^^^^^^
+
+warning: fields `points` and `ratios` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/source.rs:25:39
+   |
+25 | #[derive(Debug)]pub struct Window{pub points:Vec<Point>,pub signs:Vec<i8>,pub ratios:Vec<Pair>,pub direct_initializations:usize,pub ...
+   |                            ------     ^^^^^^                                  ^^^^^^
+   |                            |
+   |                            fields in this struct
+   |
+   = note: `Window` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `ratio`, `point`, `pairs`, `lane_updates`, and `conversion_batches` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/source_extra.rs:3:62
+  |
+3 | ...ct Extension{pub sign:Option<i8>,pub ratio:Option<Pair>,pub point:Point,pub method:&'static str,pub pairs:Vec<Pair>,pub converted_points:usize,pub lane_updates:usize,pub conversion_batches:us...
+  |       --------- fields in this struct   ^^^^^                  ^^^^^                                   ^^^^^                                          ^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^
+  |
+  = note: `Extension` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `window` is never used
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/source_extra.rs:8:9
+  |
+7 | impl<'a> Prepared<'a>{
+  | --------------------- method in this implementation
+8 |  pub fn window(&self,q:Point,length:usize)->Result<Window,Error>{self.begin(q,length,0).map(|(w,_)|w)}
+  |         ^^^^^^
+
+warning: fields `projective` and `inverse_z` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/geometry.rs:18:41
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ---- fields in this struct   ^^^^^^^^^^                                          ^^^^^^^^^
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `initialization`, `snapshots`, and `conversion_batches` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/geometry.rs:68:43
+   |
+68 | ...ct Window{pub labels:Vec<u64>,pub initialization:&'static str,pub snapshots:Vec<Vec<Option<[u64;3]>>>,pub slots:Vec<Slot>,pub conversion_batches:us...
+   |       ------ fields in this struct   ^^^^^^^^^^^^^^                  ^^^^^^^^^                                                   ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `Window` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `window` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/geometry.rs:97:9
+   |
+94 | impl Prepared<'_>{
+   | ----------------- method in this implementation
+...
+97 |  pub fn window(&self,shifts:&[Option<[u64;2]>])->Result<Window,Error>{
+   |         ^^^^^^
+
+warning: methods `value` and `retained_indices` are never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/jets.rs:61:9
+   |
+37 | impl Division {
+   | ------------- methods in this implementation
+...
+61 |  pub fn value(&mut self,n:u64)->u64{self.jet(n).v.v}
+   |         ^^^^^
+62 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: method `retained_indices` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/value.rs:52:9
+   |
+25 | impl ValueDivision{
+   | ------------------ method in this implementation
+...
+52 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: variant `ZeroDivisor` is never constructed
+ --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/polynomial.rs:4:37
+  |
+4 | pub enum Error{Domain,Nonunit,Order,ZeroDivisor,EmptyTree,Invariant}
+  |          ----- variant in this enum ^^^^^^^^^^^
+  |
+  = note: `Error` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `divrem` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-monomial-matched/generated-candidate/polynomial.rs:55:9
+   |
+ 8 | impl Poly{
+   | --------- method in this implementation
+...
+55 |  pub fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{
+   |         ^^^^^^
+
+warning: 38 warnings emitted
+

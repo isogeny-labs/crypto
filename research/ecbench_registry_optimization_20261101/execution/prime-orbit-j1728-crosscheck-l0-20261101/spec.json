@@ -1,0 +1,61 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: prime-orbit j=1728 cross-check",
+  "description": "Prospective count-first L0 cross-family check of the generic-grid winner against quartic-symmetry rho. Local wall clocks are diagnostic only and cannot promote a leaderboard row.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "j1728",
+        "bits": 16,
+        "seed": 202611019300
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 202611019301,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "rho-quartic-reference",
+      "role": "reference",
+      "method": {"id": "rho.quartic_v2"}
+    },
+    {
+      "name": "orbit-affine-o8-r1_5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "8",
+          "relations_per_orbit": "1.5",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    },
+    {
+      "name": "orbit-affine-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.prime_orbit_relations_v1",
+        "params": {
+          "coordinates": "affine",
+          "orbits": "8",
+          "relations_per_orbit": "1.5",
+          "max_ops": "1048576",
+          "max_descent_ops": "1048576"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611019302,
+    "isolation_required": "L2",
+    "timeout_seconds": 30
+  }
+}

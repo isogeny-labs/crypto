@@ -19,16 +19,13 @@ converts results back to the selected EFD model and chart.
 Every EFD model record pins the long-Weierstrass invariants and the two
 affine maps:
 
-```text
 a0 y^2 + a1 x y + a3 y = x^3 + a2 x^2 + a4 x + a6
 (u, v) = toweierstrass(x, y)
 (x, y) = fromweierstrass(u, v)
-```
 
 `Model::weierstrass_bridge` evaluates those records over `F_p` and performs
 the standard transformations:
 
-```text
 X = a0·u,          W = a0^2·v
 B2 = a0·a2 + a1^2/4
 B4 = a0^2·a4 + a1·a0·a3/2
@@ -37,16 +34,13 @@ A  = B4 - B2^2/3
 B  = B6 - B2·B4/3 + 2·B2^3/27
 X' = X + B2/3
 Y  = W + (a1·X + a0·a3)/2
-```
 
 The inverse is
 
-```text
 X  = X' - B2/3
 W  = Y - (a1·X + a0·a3)/2
 u  = X/a0
 v  = W/a0^2
-```
 
 This covers all ten models, including the ones with non-zero `a1` or `a3`
 (twisted Hessian).  `a0` must be invertible and `p > 3`; the EFD affine maps
@@ -74,7 +68,6 @@ have exceptional points (identity, 2-torsion, chart boundaries) which return
 coordinates.  Quotient charts return only what they retain:
 
 | chart | retained |
-| --- | --- |
 | `shortw/xz`, `montgom/xz` | `x` |
 | `edwards/yz` | `y` |
 | `edwards/yzsquared` | `y^2` |
@@ -95,7 +88,6 @@ ic prime --efd-model montgom --efd-p 1019 --efd-order 269 --efd-cofactor 4 \
   --efd-param a=131 --efd-param b=1 --size 6
 
 # Montgomery xz (the EFD Montgomery representation)
-ic prime --efd-model montgom --efd-p 1019 --efd-order 269 --efd-cofactor 4 \
   --efd-param a=131 --efd-param b=1 --efd-chart xz --size 6 \
   --efd-generator 604,1 --efd-target 855,1 \
   --setup-candidates 32 --target-candidates 32
@@ -111,8 +103,6 @@ ic prime --efd-model edwards --efd-p 1019 --efd-order 131 --efd-cofactor 8 \
 ic prime --efd-model twisted --efd-p 1019 --efd-order 257 --efd-cofactor 4 \
   --efd-param a=2 --efd-param d=12 --efd-chart extended \
   --efd-generator 893,734,1,245 --efd-target 795,916,1,654 \
-  --setup-candidates 32 --target-candidates 32
-```
 
 `--efd-model` ignores `--curve`; the factor base is always the small-x base
 of the short-Weierstrass S3 coordinate.  The JSON report carries a
@@ -150,7 +140,6 @@ cargo test --lib efd_representations     # 5 tests: models, charts, IC, invalid 
 cargo test --bin ic parses_efd_integers  # CLI parsing
 cargo test --bin ic efd_catalogue_lists  # model/chart catalogue
 cargo run --release --example efd_ic     # library use on Montgomery xz
-```
 
 The tests check:
 
@@ -181,3 +170,77 @@ Observed exact probes on `F_1019`:
   the input, not inferred.
 - Exceptional points of a rational model map are outside its domain.
 - Binary-field EFD data is not used here; `ic prime` is the prime-field path.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## `ic bench`
+
+A prime instance can be built directly from an EFD model/chart, so sweeps and
+end-to-end pipelines use the same representation layer:
+
+ic bench --efd-model montgom --efd-p 1019 \
+  --efd-param a=131 --efd-param b=1 \
+  --efd-chart xz --efd-order 269 --efd-cofactor 4 \
+  --efd-generator 604,1 \
+  --factor-base prime-abscissa:size=8 --oracle subtract --targets walk
+
+The instance name is `EFD <model>/<chart> over F_p`; the JSON report carries a
+`representation` block with the chart, parameters, affine map and the derived
+short-Weierstrass `(A, B)`.  `PrimeInstance::from_efd` decodes the generator in
+the chart, checks it on the short-Weierstrass curve and checks `[n]G = O`
+before the bench starts.  `decode_efd_point` and `encode_efd_point` expose the
+conversion to callers; instances without a representation keep
+`representation: None`, which is omitted from serialized output.
+
+## `ecbench` and boundary records
+
+`ecbench` accepts an EFD instance as a `CurveSpec::Efd` JSON:
+
+ecbench fb --curve '{"kind":"efd","model":"montgom","chart":"xz","p":1019,
+  "params":{"a":131,"b":1},"r":269,"cofactor":4,"generator":[604,1],"lift":0}' \
+  --factor-base prime-abscissa:size=6
+
+The workload and factor-base dump carry a `representation` block (model,
+chart, parameters, lift); the curve facts still describe the derived
+short-Weierstrass curve.  Boundary ledger rows carry the same block on the
+prime regime.
+
+## Chart arithmetic
+
+`EfdRepresentation::chart_add` and `chart_double` evaluate the imported EFD
+formula in the selected chart and project the result back to the
+short-Weierstrass point.  `formula_ids(operation)` lists the available
+formulas.  This uses the 471-formula catalogue directly; it does not replace
+the optimized engine arithmetic.
+
+
+
+
+
+
+
+

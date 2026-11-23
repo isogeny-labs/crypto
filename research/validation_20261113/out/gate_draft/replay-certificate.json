@@ -1,0 +1,93 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "status_note": "commit binding checked",
+ "independent": true,
+ "scalars_verified": true,
+ "validator": "validator role (Claude Opus 5.5), not the producer; 2026-11-13",
+ "standing": "[pcc:unverified]: no pcc claim id; no keyring signature",
+ "source": {
+  "commit": "8bf77ba333645b98136d0be242ba8a9a1dca5649",
+  "dirty": false,
+  "commit_note": "artifact set and measuring code as committed; all 25 target lines of research/validation_20261113/out/snapshot_start.sha256 (the bytes validated and replayed) hash equal to the blobs of 8bf77ba333645b98136d0be242ba8a9a1dca5649; the record is closed in 4c6db51b17e5e2242db44ccbeb4b9f83a757c22d, which changes only its keys ['closed_utc', 'reports', 'status', 'summary']",
+  "record_close_commit": "4c6db51b17e5e2242db44ccbeb4b9f83a757c22d",
+  "validated_at_head": "4c6db51b17e5e2242db44ccbeb4b9f83a757c22d",
+  "replay_build_tree": "47dc95a934eff93f8b1e0a72d487439872a44392 plus the then-uncommitted working tree (per-file SHA-256 in research/validation_20261113/out/snapshot_tree.sha256). 3,651 of its 3,656 files equal the blobs of 8bf77ba333645b98136d0be242ba8a9a1dca5649; the other 5 (src/bin/ic/bench.rs, src/bin/icx/prime_external.rs, src/cryptanalysis/fes_gpu.rs, src/cryptanalysis/ic_framework/solvers.rs, src/cryptanalysis/ic_run.rs) changed on the base (F2 descent solvers, the fes GPU engine, the ic CLI) and are not referenced from src/cryptanalysis/chained_transfer/ (static check, no rebuild at the commit)",
+  "source_files": [
+   {
+    "path": "src/cryptanalysis/chained_transfer/negation_remeasure.rs",
+    "sha256": "aacb9dac55d3895849c378d9e929ccdc558bf7d9be43b800781356c6aa00dca4"
+   },
+   {
+    "path": "src/bin/negation_remeasure.rs",
+    "sha256": "c650f770747b7a6cd061f62b77067eeafd96223dfbd66a12337ca6e6b64bb1f8"
+   },
+   {
+    "path": "src/cryptanalysis/chained_transfer/mod.rs",
+    "sha256": "d338e206530b95c6f03fed7e4de6230a610f8fa563f0f64bbf19cad7de7913c3"
+   }
+  ],
+  "note": "the measured parts were produced by an earlier build of this code (RESULTS.md Deviation 6: rustfmt and a curves_checked field were added after the runs); the replay below shows the committed code reproduces every non-timing value"
+ },
+ "build": {
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+  "profile": "release",
+  "binaries_sha256": [
+   "97ba6257255b1eec9e982e2ae1b2ce17b4604b50deff6fe6e05bc74d64067790  /tmp/claude-0/-home-user/b3fd4014-06f7-5e0c-8338-36d52644c351/scratchpad/validator2/target/release/negation_remeasure",
+   "9eb802b01b9a66c32748616215dfd37544c46651b84e2d282a0200193b25f084  /tmp/claude-0/-home-user/b3fd4014-06f7-5e0c-8338-36d52644c351/scratchpad/validator2/target/release/val_nr_dump",
+   "9b17c38c326084b9da6525e2b5f986d54260cf236a65f45ed58e86d14d343f4c  /tmp/claude-0/-home-user/b3fd4014-06f7-5e0c-8338-36d52644c351/scratchpad/validator2/target/release/val_nr_dump"
+  ]
+ },
+ "runs": [
+  {
+   "command": "negation_remeasure v3 cover --out-dir <scratch>",
+   "recorded_command": [
+    "./target/release/negation_remeasure",
+    "v3",
+    "cover",
+    "--out-dir",
+    "research/negation_remeasure_20261113"
+   ],
+   "exit": 0,
+   "result": "every non-timing value identical: v3 840 values, cover 2492 values, 0 differences; reproduction gates pass"
+  },
+  {
+   "command": "negation_remeasure tower --out-dir <scratch> (p = 251 ... 16001, 3 instances, 8/4/64 seeds)",
+   "recorded_command": [
+    "./target/release/negation_remeasure",
+    "tower",
+    "--out-dir",
+    "research/negation_remeasure_20261113"
+   ],
+   "exit": 0,
+   "result": "every non-timing value identical: 2373 values, 0 differences (the replay adds the curves_checked field the rebuilt binary writes; equal to remeasure.json curves_checked_all)"
+  },
+  {
+   "command": "negation_remeasure tower --out-dir <scratch> --tag _p32003 --tower-primes 32003",
+   "recorded_command": [
+    "./target/release/negation_remeasure",
+    "tower",
+    "--out-dir",
+    "research/negation_remeasure_20261113",
+    "--tag",
+    "_p32003",
+    "--tower-primes",
+    "32003"
+   ],
+   "exit": 0,
+   "result": "every non-timing value identical: 339 values, 0 differences"
+  },
+  {
+   "command": "val_nr_dump v3 | cover | tower (validator tool: the same library calls and seeds; every returned log and the instance data)",
+   "exit": 0,
+   "result": "v3: 364/364 logs certified by vlib, 72 means equal to the parts, errors 0; cover: 784/784 logs certified by vlib, 336 means equal to the parts, errors 0; tower_le4001: 3480/3480 logs certified by vlib, 135 means equal to the parts, errors 0; tower_8009_16001: 1392/1392 logs certified by vlib, 54 means equal to the parts, errors 0"
+  }
+ ],
+ "not_verified": [
+  "tower p = 64007 runs (not replayed; its instances, #E and j-invariants were rebuilt and checked)",
+  "wall-clock and calibration timings (best-of-N on a shared VM; replay w_cal within about 10 percent, calibrated classes unchanged)",
+  "the solvers' operation counts were reproduced by re-running the producer's code, not by an independent implementation",
+  "S3 copies of the raw files (uploaded: false in the record)",
+  "a rebuild and replay at the artifact commit itself (the replay binary was built from the snapshot tree; see source.replay_build_tree)"
+ ]
+}

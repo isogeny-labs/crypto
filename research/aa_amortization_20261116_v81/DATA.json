@@ -1,0 +1,46 @@
+{
+  "base": {
+    "p": 65537,
+    "A": 1,
+    "B": 1,
+    "z": 1,
+    "beta": [
+      0,
+      1,
+      2
+    ],
+    "shift_low": 0,
+    "shift_high": 65534
+  },
+  "batch_sizes": [
+    1,
+    5,
+    25,
+    125,
+    625
+  ],
+  "pairs_per_size": 3,
+  "aa_threshold": 0.1,
+  "child_seconds": 8,
+  "base_roots": [
+    [
+      13762,
+      22967
+    ],
+    [
+      35333,
+      32373
+    ]
+  ],
+  "input_root_provenance": "research/signed_prime_power_20261116_v78/cold_raw.json",
+  "selection": "fixed startup ladder;every size/failure retained;no per-instance hardness or optimized speed claim",
+  "memory_mb": 4096,
+  "cores": 1,
+  "input_hashes": {
+    "1": "a1e3de0f53026a59d1e9387469b034c192e074096ff83bbdc3cb3e4f2a12bca6",
+    "5": "05370353dbe0600bd911df0a86981789fd76f070805e360a5d4834e9baf6dafa",
+    "25": "7f0deee278bb39ccbb5dde1187c3c4ca69c628b5d161772b70411680d281ffd7",
+    "125": "2d9e5133c7c6b48dca2871d1964e443aad301edd2cebc19d30273060fcd85cf0",
+    "625": "4f6e19f764fd26f0de11106d7ab33d1092a3b23b72e5b80291ba9fb8df708356"
+  }
+}

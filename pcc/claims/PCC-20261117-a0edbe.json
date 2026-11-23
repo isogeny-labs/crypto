@@ -1,0 +1,28 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-17T21:22:31Z",
+ "id": "PCC-20261117-a0edbe",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4ce098bdb050a46ca425fe75b0db87edcf0ac059",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1f9dcf323d98bbc899a2d5e6ee72af23fddea25eba6ff0c497391b2cf830c226",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "FiatShamirEncoding.raw_encoding_alias"
+  },
+  {
+   "decl_sha256": "8e61ab7a8b7ac3fd5c1ac49b17a4fed0a7d8dc8fceeea259d635867085b60aee",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "FiatShamirEncoding.encode_injective"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean v4.34.1 / Mathlib v4.34.1; logical Nat tokens only; no hash collision, byte codec, prefix-freeness, transcript reachability, random oracle, or Fiat--Shamir security theorem.",
+ "statement": "Two distinct typed list pairs have the same raw concatenation, while the defined ordered tagged-length whole-transcript logical-token codec is injective."
+}

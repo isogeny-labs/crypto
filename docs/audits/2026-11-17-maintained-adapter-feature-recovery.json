@@ -1,0 +1,50 @@
+{
+  "at": "2026-11-17T20:28:27.026431+00:00",
+  "frozen_originals_rewritten": false,
+  "recoveries": [
+    {
+      "maintained": "examples/maintained/dreg_score.rs",
+      "source_revision": "833a35d21ec2368ab081b2083d7762ed0bfd2bbc",
+      "source_blob": "c4511441d3f3af09c799aefdd929be2d2751ad34",
+      "restored_commands": [
+        "slope",
+        "target_free",
+        "s4_free"
+      ]
+    },
+    {
+      "maintained": "examples/maintained/nonisomorphic_extension_isogeny.rs",
+      "source_revision": "e7ebc3cfc46d207b5ccfdb8c68c83068ed3052ec",
+      "source_blob": "8a89440ae60509b17f0d2ed496951188feb452ab",
+      "independent_copy_revision": "dc955125b1eb9736dfe5d60b42450d7195ab31ef",
+      "restored_commands": [
+        "freeze-batch",
+        "batch-run",
+        "batch-replay"
+      ]
+    },
+    {
+      "maintained": "examples/maintained/primary_adapter.rs",
+      "supplement_revision": "dc955125b1eb9736dfe5d60b42450d7195ab31ef",
+      "supplement_blob": "e1b11f569a7d04f9a1c140da4da4bbfbaf5fe443",
+      "restored": "exact two continuation wall tuples and original admission controls",
+      "port": "existing Karatsuba flags remain false in original controls; long-duration admission rejects both added Karatsuba variants"
+    }
+  ],
+  "inventory_limit": "The Linux fixture includes its original source. Thirteen partial N83 extension functions remain archived and have no active maintained CLI command. No research run was launched.",
+  "validation": {
+    "integration_default_clippy": "passed",
+    "integration_wide_clippy": "passed",
+    "functional_examples_default": {
+      "harnesses": 42,
+      "passed": 193,
+      "ignored": 1
+    },
+    "functional_examples_wide": {
+      "harnesses": 42,
+      "passed": 204,
+      "ignored": 1
+    },
+    "ci": "pending; no merge condition waived"
+  }
+}

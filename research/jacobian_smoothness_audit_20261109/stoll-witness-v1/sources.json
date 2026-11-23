@@ -1,0 +1,36 @@
+{
+  "schema": "stoll-witness-source-plan/v1",
+  "created": "2026-11-09T23:29:33.416Z",
+  "status": "Built source/draftprotocol; no native generator curve call yet.",
+  "sources": [
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/stoll-witness-v1/Cargo.toml",
+      "sha256": "84809b2bdc7cf6e886ff0a52f8881a2d2dce927fea9f99a4fef9ba4595dd7bdd"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/stoll-witness-v1/Cargo.lock",
+      "sha256": "9539e729a411556ef7b444cdb0cbe1c95f945393eac11d5b35e120360256a275"
+    },
+    {
+      "path": "research/jacobian_smoothness_audit_20261109/stoll-witness-v1/src/main.rs",
+      "sha256": "b800fd4cb7ac72afa9132c63dbc7a1f5f565557f3205dfda47a1879c43384c24"
+    }
+  ],
+  "binary": {
+    "path": "research/jacobian_smoothness_audit_20261109/stoll-witness-v1/target/release/stoll-cantor-witness",
+    "sha256": "69cb98ed2ebaaef80d37fe6fb91ef77f6f431e969b044d457bcf408aa2b7c787"
+  },
+  "raw_reference": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "parent_population_protocol": "a7bc5ba9f6af90f196155a4ff30093f4bd47701568c4c58cfc01b3bfc42828dc",
+    "raw_reference_path": "research/jacobian_smoothness_audit_20261109/native-census-v1/artifacts/census-v1-p3-r0/raw.jsonl",
+    "raw_reference_sha256": "cf8ec5cfcabb091625e87e73bca3a8aa51585a52716db464ffbfeca0ebb40231",
+    "reference_manifest": "../evidence/census-v1/raw-manifest.json",
+    "reference_cpp_sha256": "f761f1252d9a64efce50c6768f019e1af74b639bd75fd2ba7abb802447f91ce1",
+    "formal_definition": "../lean/MumfordStollGeneral.lean",
+    "formal_definition_sha256": "18251bbe5736ac0e5759b9127799ac726f58e299ddd59d0af82cb3c7e3fb4775"
+  },
+  "formal_scope": "GeneralCantorRun uniqueness is separately Leanproved. Full100existence/group and geometry remain open; generated candidates must be kernel checked.",
+  "native_curve_calls": 0,
+  "paid_compute": false
+}

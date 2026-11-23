@@ -1,0 +1,161 @@
+{
+  "schema": "n83.s3-publication-round-trip/v1",
+  "status": "PASS_UPLOAD_AND_FRESH_DOWNLOAD",
+  "recorded_at_utc": "2026-10-18T20:34:39.642797+00:00",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "archive_sha256": "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a",
+  "archive_blake3": "82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851",
+  "archive_bytes": 10313647,
+  "archive_uri": "s3://setec-astronomy-artifacts/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz",
+  "receipts_uri": "s3://setec-astronomy-artifacts/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/receipts/21b6c7379003a0ac5cdc4545be13c2d93fccd4bc29cc2adb70438ce32f2f29b6.json",
+  "receipts_sha256": "21b6c7379003a0ac5cdc4545be13c2d93fccd4bc29cc2adb70438ce32f2f29b6",
+  "steps": [
+    {
+      "label": "base-put",
+      "command": [
+        "aws",
+        "s3api",
+        "put-object",
+        "--bucket",
+        "setec-astronomy-artifacts",
+        "--key",
+        "factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz",
+        "--body",
+        "/home/ec2-user/scratch/n83-resume-20261018/reconstructed-k2048/objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz",
+        "--if-none-match",
+        "*",
+        "--server-side-encryption",
+        "AES256",
+        "--metadata",
+        "{\"sha256\": \"aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a\"}",
+        "--region",
+        "us-east-2",
+        "--output",
+        "json"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "label": "base-head",
+      "command": [
+        "aws",
+        "s3api",
+        "head-object",
+        "--bucket",
+        "setec-astronomy-artifacts",
+        "--key",
+        "factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz",
+        "--region",
+        "us-east-2",
+        "--output",
+        "json"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "label": "base-get",
+      "command": [
+        "aws",
+        "s3api",
+        "get-object",
+        "--bucket",
+        "setec-astronomy-artifacts",
+        "--key",
+        "factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz",
+        "/home/ec2-user/scratch/n83-resume-20261018/setec-publication/base-downloaded.jsonl.gz",
+        "--region",
+        "us-east-2",
+        "--output",
+        "json"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "label": "base-round-trip",
+      "status": "PASS_HASH_VERIFIED",
+      "sha256": "aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a",
+      "bytes": 10313647,
+      "etag": "\"c4524a933c6f73f9514f48b451fc71e2\"",
+      "version_id": null,
+      "s3_uri": "s3://setec-astronomy-artifacts/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/objects/82990cda5d57b1c4c4b635673a881ad233c24f707e7ac644a11478aeddddf851.jsonl.gz"
+    },
+    {
+      "label": "receipts-put",
+      "command": [
+        "aws",
+        "s3api",
+        "put-object",
+        "--bucket",
+        "setec-astronomy-artifacts",
+        "--key",
+        "factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/receipts/21b6c7379003a0ac5cdc4545be13c2d93fccd4bc29cc2adb70438ce32f2f29b6.json",
+        "--body",
+        "/home/ec2-user/scratch/n83-resume-20261018/setec-publication/21b6c7379003a0ac5cdc4545be13c2d93fccd4bc29cc2adb70438ce32f2f29b6.json",
+        "--if-none-match",
+        "*",
+        "--server-side-encryption",
+        "AES256",
+        "--metadata",
+        "{\"sha256\": \"21b6c7379003a0ac5cdc4545be13c2d93fccd4bc29cc2adb70438ce32f2f29b6\"}",
+        "--region",
+        "us-east-2",
+        "--output",
+        "json"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "label": "receipts-head",
+      "command": [
+        "aws",
+        "s3api",
+        "head-object",
+        "--bucket",
+        "setec-astronomy-artifacts",
+        "--key",
+        "factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/receipts/21b6c7379003a0ac5cdc4545be13c2d93fccd4bc29cc2adb70438ce32f2f29b6.json",
+        "--region",
+        "us-east-2",
+        "--output",
+        "json"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "label": "receipts-get",
+      "command": [
+        "aws",
+        "s3api",
+        "get-object",
+        "--bucket",
+        "setec-astronomy-artifacts",
+        "--key",
+        "factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/receipts/21b6c7379003a0ac5cdc4545be13c2d93fccd4bc29cc2adb70438ce32f2f29b6.json",
+        "/home/ec2-user/scratch/n83-resume-20261018/setec-publication/receipts-downloaded.json",
+        "--region",
+        "us-east-2",
+        "--output",
+        "json"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "label": "receipts-round-trip",
+      "status": "PASS_HASH_VERIFIED",
+      "sha256": "21b6c7379003a0ac5cdc4545be13c2d93fccd4bc29cc2adb70438ce32f2f29b6",
+      "bytes": 4205,
+      "etag": "\"fde5fc1fd13f67c3d9eb76e7fc6852c6\"",
+      "version_id": null,
+      "s3_uri": "s3://setec-astronomy-artifacts/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/a0/receipts/21b6c7379003a0ac5cdc4545be13c2d93fccd4bc29cc2adb70438ce32f2f29b6.json"
+    }
+  ],
+  "wall_seconds_informational": 2.190386629000386,
+  "selected_best_total_runtime": null
+}

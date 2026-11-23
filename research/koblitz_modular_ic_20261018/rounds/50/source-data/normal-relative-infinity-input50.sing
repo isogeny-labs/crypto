@@ -1,0 +1,59 @@
+ring relativeInfinity50=2,(T,V,z),wp(4,2,1);short=0;ideal relativeInfinityIdeal50;relativeInfinityIdeal50[1]=V^2+(z^2)*V+(z^3+z);relativeInfinityIdeal50[2]=T^16+(z^30+z^22)*T^8*V+(z^32+z^31+z^30+z^29+z^28+z^26+z^23+z^22+z^21+z^18+z^12+z^8+1)*T^8+(z^35+z^33+z^32+z^30+z^29+z^27+z^16+z^15+z^14+z^9+z^7+z^5)*T^4*V+(z^37+z^36+z^34+z^33+z^32+z^31+z^30+z^29+z^27+z^26+z^25+z^24+z^23+z^22+z^20+z^17+z^14+z^11+z^9+z^6)*T^4+(z^47+z^46+z^43+z^37+z^33+z^32+z^31+z^30+z^29+z^28+z^27+z^26+z^23+z^22+z^20+z^17+z^13+z^10+z^8+z^7+z^6+z^5)*T*V+(z^49+z^45+z^40+z^38+z^37+z^32+z^30+z^29+z^27+z^26+z^19+z^18+z^17+z^14+z^13+z^6)*T+(z^62+z^54+z^50+z^49+z^48+z^47+z^46+z^45+z^44+z^43+z^41+z^38+z^32+z^26+z^24+z^23+z^22+z^19+z^17+z^14+z^13+z^12+z^9+z^8)*V+(z^64+z^63+z^62+z^61+z^60+z^58+z^55+z^54+z^53+z^52+z^48+z^47+z^44+z^42+z^40+z^39+z^38+z^36+z^35+z^33+z^32+z^31+z^29+z^27+z^24+z^20+z^19+z^15+z^14+z^13+z^12+z^11+z^9+z^8+1);
+
+ring normalizationInput50=2,(x,y,p),wp(4,2,1);short=0;map actualModel50=relativeInfinity50,x,y,p;ideal sourceIdeal50=actualModel50(relativeInfinityIdeal50);
+LIB "normal.lib";
+LIB "primdec.lib";
+option(redSB);short=0;
+if(size(sourceIdeal50)!=2 || lead(sourceIdeal50[1])!=y^2 || lead(sourceIdeal50[2])!=x^16 || deg(sourceIdeal50[2])!=64){ERROR("NORMAL_RELATIVE50_WEIGHTED_INPUT");quit;}
+print("NORMAL_RELATIVE50_STAGE weighted_projection_degree=32 minimal_primes_begin=true");
+list primes50=minAssGTZ(sourceIdeal50);
+print("NORMAL_RELATIVE50_COMPONENT_COUNT "+string(size(primes50)));
+link primeOut50="ASCII:w prime-components50.sing";open(primeOut50);
+write(primeOut50,"ring components50=2,(x,y,p),wp(4,2,1);list primes50;");
+int idx50;int gen50;ideal candidate50;int selected50=0;int matches50=0;
+for(idx50=1;idx50<=size(primes50);idx50++){
+ candidate50=primes50[idx50];
+ write(primeOut50,"ideal component50_"+string(idx50)+";");
+ for(gen50=1;gen50<=size(candidate50);gen50++){write(primeOut50,"component50_"+string(idx50)+"["+string(gen50)+"]="+string(candidate50[gen50])+";");}
+ ring probe50=(2,parameter50),(x,y,p),dp;
+ ideal probeIdeal50=imap(normalizationInput50,candidate50),p-parameter50;
+ int degree50=vdim(std(probeIdeal50));
+ print("NORMAL_RELATIVE50_COMPONENT index="+string(idx50)+" generic_degree="+string(degree50));
+ if(degree50==32){setring normalizationInput50;matches50++;selected50=idx50;}else{setring normalizationInput50;}
+ kill probe50;
+}
+close(primeOut50);
+if(matches50!=1){ERROR("NORMAL_RELATIVE50_UNIQUE_DEGREE32_COMPONENT");quit;}
+ideal selectedPrime50=primes50[selected50];ideal selectedStd50=std(selectedPrime50);
+if(size(reduce(sourceIdeal50,selectedStd50))!=0){ERROR("NORMAL_RELATIVE50_SOURCE_CONTAINMENT");quit;}
+link selectedOut50="ASCII:w selected-prime50.sing";open(selectedOut50);
+write(selectedOut50,"ring selected50=2,(x,y,p),wp(4,2,1);ideal selectedPrime50;ideal originalIdeal50;");
+for(gen50=1;gen50<=size(selectedPrime50);gen50++){write(selectedOut50,"selectedPrime50["+string(gen50)+"]="+string(selectedPrime50[gen50])+";");}
+for(gen50=1;gen50<=size(sourceIdeal50);gen50++){write(selectedOut50,"originalIdeal50["+string(gen50)+"]="+string(sourceIdeal50[gen50])+";");}
+close(selectedOut50);
+print("NORMAL_RELATIVE50_STAGE selected_prime_exported=true normalization_begin=true");
+list normalizedOutput50=normalP(selectedPrime50,"withRing");
+if(size(normalizedOutput50[1])!=1){ERROR("NORMAL_RELATIVE50_COMPONENT_NOT_ONE");quit;}
+ideal module50=normalizedOutput50[2][1];
+if(reduce(module50[size(module50)],selectedStd50)==0){ERROR("NORMAL_RELATIVE50_ZERO_DENOMINATOR");quit;}
+link moduleOut50="ASCII:w fractional-module50.sing";open(moduleOut50);
+write(moduleOut50,"ideal module50;");
+for(gen50=1;gen50<=size(module50);gen50++){write(moduleOut50,"module50["+string(gen50)+"]="+string(module50[gen50])+";");}
+write(moduleOut50,"int delta50="+string(normalizedOutput50[3][2])+";");close(moduleOut50);
+int sourceDelta50=normalizedOutput50[3][2];
+def normalRing50=normalizedOutput50[1][1];setring normalRing50;
+print("NORMAL_RELATIVE50_COEFFICIENT_FIELD charstr="+charstr(basering)+" characteristic="+string(char(basering))+" parameters="+string(npars(basering)));
+if(char(basering)!=2 || npars(basering)!=0){ERROR("NORMAL_RELATIVE50_COEFFICIENT_DESCENT");quit;}
+link normalOut50="ASCII:w normalization50.sing";open(normalOut50);
+write(normalOut50,"ring normalized50=2,("+varstr(basering)+"),("+ordstr(basering)+");ideal norid;ideal normap;");
+int entry50;
+for(entry50=1;entry50<=size(norid);entry50++){write(normalOut50,"norid["+string(entry50)+"]="+string(norid[entry50])+";");}
+for(entry50=1;entry50<=size(normap);entry50++){write(normalOut50,"normap["+string(entry50)+"]="+string(normap[entry50])+";");}
+close(normalOut50);
+execute(read("normalization50.sing"));
+ideal reloadIdeal50=imap(normalRing50,norid);ideal reloadMap50=imap(normalRing50,normap);
+if(size(reloadIdeal50)!=size(norid) || size(reloadMap50)!=size(normap)){ERROR("NORMAL_RELATIVE50_EXPORT_SIZE");quit;}
+for(entry50=1;entry50<=size(norid);entry50++){if(norid[entry50]!=reloadIdeal50[entry50]){ERROR("NORMAL_RELATIVE50_EXPORT_IDEAL");quit;}}
+for(entry50=1;entry50<=size(normap);entry50++){if(normap[entry50]!=reloadMap50[entry50]){ERROR("NORMAL_RELATIVE50_EXPORT_MAP");quit;}}
+print("NORMAL_RELATIVE50_RESULT normalization_output_computed=true delta="+string(sourceDelta50)+" output_variables="+string(nvars(basering))+" serialization_checked=true independent_verification_required=true");
+print("NORMAL_RELATIVE50_PRODUCER_PASS");quit;

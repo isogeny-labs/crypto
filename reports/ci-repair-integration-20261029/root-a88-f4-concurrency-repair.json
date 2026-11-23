@@ -1,0 +1,52 @@
+{
+  "recorded_at": "2026-10-30T06:49:18.490395+00:00",
+  "failed_source": "a88ae7a32fa7378696bb10560caa7b9ad9561caa",
+  "complete_library_actual": {
+    "passed": 5447,
+    "failed": 1,
+    "existing_ignored": 123,
+    "cargo_exit": 101,
+    "test_seconds": 1169.09
+  },
+  "concurrent_diagnostic_actual": {
+    "passed": 25,
+    "failed": 1,
+    "threads": 32,
+    "cheaper": 18
+  },
+  "isolated_diagnostic_actual": {
+    "passed": 1,
+    "failed": 0,
+    "qualification": "diagnosis only, not a repaired/full pass"
+  },
+  "root_cause": "Hilbert savings comparison reads process-wide field-operation differences, including unrelated concurrent solves. Existing thread-local counter plus a one-worker Rayon pool isolates the comparison.",
+  "repair": "Only that test function changes: preserve all basis equalities, regularity checks and applicability/savings thresholds, compare existing thread-local counts within one worker. Production F4 source outside that test is byte-identical.",
+  "primary_source": "https://docs.rs/rayon/latest/rayon/struct.ThreadPool.html#method.install",
+  "next_validation": "Fresh release full library with repaired test and complete regenerated registry/alias inputs; pending, no pass claimed.",
+  "logs": [
+    {
+      "log": "root-a88-full-library-20261030.log.gz",
+      "raw_bytes": 489110,
+      "raw_sha256": "a2e22601862b3d6a075c10da1426bac292589ffd68ca294fa0c10bf614880d42",
+      "gzip_sha256": "0a21ca8983ff81b5d993112f22acafc12f1c1faf6807800b921c40b7a1505245"
+    },
+    {
+      "log": "root-a88-initial-missing-aps-inputs-20261030.log.gz",
+      "raw_bytes": 1179,
+      "raw_sha256": "7aa14260354826306f983405b76c04b5dadf6bcb7acb8281eeae40e76c95ee31",
+      "gzip_sha256": "aa13f65c3968072c567b5c65cc82f1c9d0dd680ed43f944567729e299846a58f"
+    },
+    {
+      "log": "root-a88-f4-concurrent-diagnostic-20261030.log.gz",
+      "raw_bytes": 3036,
+      "raw_sha256": "9500f61e2c557752d488f4eda91d81f58ebf5a8fc08f327b672642ee7bade26f",
+      "gzip_sha256": "76669eef7253c3c2b297722912d7b3e3fa1ed5c16d36f8d3ce365a14aafa151a"
+    },
+    {
+      "log": "root-a88-hilbert-focused-reproduction-20261030.log.gz",
+      "raw_bytes": 215,
+      "raw_sha256": "4c7e67d35573de58032b48c5e305edf41ac184a2b5c7da998e1e366b8a47d981",
+      "gzip_sha256": "7f1514c89dbc90ea7b2eb8f7fe2c40594c023501e3cb14638d00aaf3d39cb7a0"
+    }
+  ]
+}

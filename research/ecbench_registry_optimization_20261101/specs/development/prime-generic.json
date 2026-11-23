@@ -1,0 +1,32 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Registry optimization development: generic prime implementations",
+  "description": "Count-first development roster on a tiny public prime-field workload. These observations may select candidates but cannot establish a frontier claim.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 12, "seed": 5}],
+    "targets_per_curve": 1,
+    "target_seed": 202611010101,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-neg-reference", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}},
+    {"name": "rho-frozen", "role": "baseline", "method": {"id": "rho.frozen_reference"}},
+    {"name": "rho-plain", "role": "candidate", "method": {"id": "rho.plain"}},
+    {"name": "bsgs-textbook", "role": "baseline", "method": {"id": "bsgs.textbook"}},
+    {"name": "bsgs-interleaved", "role": "candidate", "method": {"id": "bsgs.interleaved"}},
+    {"name": "bsgs-negation", "role": "candidate", "method": {"id": "bsgs.negation"}},
+    {"name": "bsgs-neg-table", "role": "candidate", "method": {"id": "bsgs.negation_table", "params": {"baby": "16"}}},
+    {"name": "kangaroo", "role": "candidate", "method": {"id": "kangaroo.vow"}},
+    {"name": "rho-pooled-l4", "role": "candidate", "method": {"id": "rho.multitarget_pooled", "params": {"batch": "4"}}},
+    {"name": "rho-preprocessing-s8", "role": "candidate", "method": {"id": "rho.preprocessing", "params": {"entries": "8"}}},
+    {"name": "rho-plus-model", "role": "baseline", "method": {"id": "rho.plus_model_v1", "params": {"jumps": "8", "walks": "4", "dp_bits": "2", "cap_multiple": "64"}}},
+    {"name": "rho-best2-model", "role": "candidate", "method": {"id": "rho.best2_model_v1", "params": {"jumps": "8", "walks": "4", "dp_bits": "2", "cap_multiple": "64"}}},
+    {"name": "aps-exact", "role": "candidate", "method": {"id": "ic.aps_v1", "params": {"encoding": "partitioned3", "roots": "exact", "stop": "first_informative", "labels": "guaranteed", "subset_size": "1", "attempts": "2", "degree": "4", "budget_ms": "100", "sampling_draws": "32", "orbit": "none", "beta": "0", "lambda": "0", "prune": "false"}}},
+    {"name": "tensor-m2", "role": "candidate", "method": {"id": "ic.tensor_contraction_v1", "params": {"m": "2", "max_restarts": "2"}}},
+    {"name": "known-log-ksum", "role": "candidate", "method": {"id": "ic.known_log_ksum_v1", "params": {"size": "4", "k": "3", "base_seed": "17", "max_sums": "64", "max_trials": "4096"}}},
+    {"name": "quartic-cover-v1", "role": "baseline", "method": {"id": "transfer.quartic_cover"}},
+    {"name": "quartic-cover-v2", "role": "candidate", "method": {"id": "transfer.quartic_cover_v2"}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 1, "order": "alternate", "seed": 202611010102, "isolation_required": "L2", "timeout_seconds": 60}
+}

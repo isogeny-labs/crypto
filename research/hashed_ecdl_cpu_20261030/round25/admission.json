@@ -1,0 +1,20 @@
+{
+  "schema": "cpu-panel-admission/v1",
+  "date": "2026-11-05",
+  "job_name": "hashed-ecdl-cpu-round25-20261030",
+  "status": "not_admitted",
+  "submitted": false,
+  "attempts_used": 0,
+  "cost_ceiling_usd": 2,
+  "cost_reservation_admitted": false,
+  "unreserved_shared_funds_verified": false,
+  "live_nodepool_and_namespace_limits_verified": false,
+  "blockers": [
+    "Shared outstanding spend reservations have not been reconciled; delayed AWS Budget totals are insufficient.",
+    "Direct live resource-limit read failed: worker is denied sts:AssumeRole into configured cluster role.",
+    "Whole-worker maximum idle lifetime and cost exposure must fit the all-in ceiling before admission."
+  ],
+  "next_action": "Obtain existing operator readback and authoritative shared reservation ledger; verify publication receipt and exact immutable inputs before staging or submission.",
+  "capacity_changed": false,
+  "privileged_workaround_attempted": false
+}

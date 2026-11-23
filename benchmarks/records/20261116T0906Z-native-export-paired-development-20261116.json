@@ -1,0 +1,133 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T09:09:18+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/native-export-paired-isolation-7cb431bf0-01.jsonl",
+        "--label",
+        "native-export-paired-development",
+        "--",
+        "/workspace/relation-native-qualifiers/paired-driver-7cb431bf0-09",
+        "root-paired",
+        "/workspace/root-paid-inputs-723f4c2dd-01",
+        "/workspace/native-export-paired-results-7cb431bf0-01",
+        "research/relation_degree_trace_20261115/native-export-development/paired-config-15.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T09:06:45+00:00",
+      "wall_s": 22.922
+    }
+  ],
+  "commit": "b2f32242572997d1b37d397546f257defa5c9cc5",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T09:06:28+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T0906Z-native-export-paired-development-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "complete_matching_answers",
+      "note": "Warmup3+A/A42+main63, all complete and match, actual root zero-export candidate checked",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 108.0
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 21,
+      "name": "f4_regeneration_over_candidate_full_paid",
+      "note": "Named original paid workflow, ordinary95%; adjusted lower19.107152365993294. No fastest-control/fresh-family/signed standing.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        20.33070388786237,
+        22.21359720268042
+      ],
+      "unit": "ratio",
+      "value": 21.36063824522828
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 21,
+      "name": "expanded_regeneration_over_candidate_full_paid",
+      "note": "Named original paid workflow, ordinary95%; adjusted lower12.791811100561661.10partial passes15fails, no fastest/fresh/signed standing.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        13.15047293237767,
+        14.791731812987711
+      ],
+      "unit": "ratio",
+      "value": 14.259076120119785
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 47496,
+      "path": "research/relation_degree_trace_20261115/native-export-paired-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/26/2666290f05c101628167bab5e80551599cd7b273a2856f4a01880b13a725ab70",
+      "sha256": "2666290f05c101628167bab5e80551599cd7b273a2856f4a01880b13a725ab70",
+      "uploaded": false
+    },
+    {
+      "bytes": 463,
+      "path": "research/relation_degree_trace_20261115/native-export-paired-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1e/1ed380bc98dea0c2ff84e91ce637e712ef00fcd44c63a00933b35b26c4e9a7ee",
+      "sha256": "1ed380bc98dea0c2ff84e91ce637e712ef00fcd44c63a00933b35b26c4e9a7ee",
+      "uploaded": false
+    },
+    {
+      "bytes": 2282,
+      "path": "research/relation_degree_trace_20261115/native-export-paired-01/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ae/aebe63d7816d93da1374120e13efc65e0766cb1fef10fb7c6d08fcaab49cb3e2",
+      "sha256": "aebe63d7816d93da1374120e13efc65e0766cb1fef10fb7c6d08fcaab49cb3e2",
+      "uploaded": false
+    },
+    {
+      "bytes": 1868026,
+      "path": "research/relation_degree_trace_20261115/native-export-paired-01/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7a/7ac57017f3dfb9f14d8145c1ec0a24937c8acf9764ace419dad0d4c38be1f4f6",
+      "sha256": "7ac57017f3dfb9f14d8145c1ec0a24937c8acf9764ace419dad0d4c38be1f4f6",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/native-export-paired-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/native-export-paired-01/report-01/ratios.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/native-export-paired-01/report-01/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "native-export-paired-development-20261116",
+  "status": "measured",
+  "summary": "All A/A gates,21 blocks108 matching outputs,0 monitor contention, exports0 allpanels. Paid adjusted lowerF419.107/E12.792:10partial true15false. Every raw cost/guard/cap retained. PCCfa96a5/952d7c unsigned L0.",
+  "validation": null
+}

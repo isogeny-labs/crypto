@@ -1,0 +1,2118 @@
+{
+ "schema": "validator.report/v1",
+ "status": "pass",
+ "independent": true,
+ "verdict": "validated_with_amendments: the headline replays, its certificates verify and every headline number recomputes exactly under the pre-registered rule; RESULTS.md has three secondary prose errors and omits one convention sensitivity (non-blocking amendments)",
+ "disposition": "validated",
+ "validator": "independent validator subagent (claude-opus-5-5), 2026-11-12; validator code in validation/scripts/, not the producer's",
+ "validated_commit": "2729e252e2e66196cd48bb1a3b58cb3dc1cc8cf0",
+ "protocol_commit": "5aab996e554e9b1212c86bbe88d136c1c68ed547",
+ "claim_scope": "icbest = min(ic5, ic5ks, ic5w, ic5rw) vs rhobest = min of 10 runs (rho2xks x 4 kappa, rhodpu x 6) per configuration and price, and vs bsgs2; primary rule cost/target = [(cI I + M + S)/(cI + 3) + h (H + L + N)]/T with N = counted native work (rho2xks step index 1/step, rhodpu canonicalisation + one hash of x = 2/generated point, ic5w/ic5rw W-step index 1/step); secondary = v4 rule (h on H + L); decision per (cell, cI): cheaper/dearer only if the bootstrap 95% bound is on one side of 1 at h = 0, 0.1 and 1",
+ "scoped_dispositions": {
+  "measurement (replay, scalars, accounting of what is counted, recompute)": "validated: 3366/3366 rows replay exactly (instrumented build), 51-row nonce sample on a pristine source build and 17-row sample on the producer binary match, 1,096,704 recovered logs of 153 runs verified with the validator's EC code, 972/972 entries of summary.json and of summary_v4rule.json recompute exactly",
+  "icbest vs rhobest unranked in all 27 section-5a decisions": "validated (protocol bootstrap and an independent numpy bootstrap agree on every decision)",
+  "the order flips with h (I = 10M: 1.06-1.16x at h = 0, dearer in all 9; 1.00-1.05x at h = 0.1; 0.71-0.80x at h = 1, cheaper in all 9, every upper bound < 1)": "validated under the pre-registered native-work convention (1.0633-1.1586 / 0.9983-1.0539 / 0.7135-0.7995); the flip holds in every one of the 27 (cell, cI). Robust to rho2xks's step index priced 0 or doubled, rhodpu at 4/point, kappa up to 1.0, rho2x without retention, a modelled non-negation DP rho, cross-fitted parameter choice and a two-probe count for the retention IC arms; NOT robust to charging a distinguished-point rho one native operation per point instead of two (V5-F5)",
+  "under the v4 rule (native work unpriced) dearer in all 27, 1.05-2.02x at I = 10M": "validated (1.0475-2.0184)",
+  "icbest 1.11-1.47x a paired BSGS, dearer in all 27": "validated (1.1114-1.4709)",
+  "ic5rw vs rhobest unranked in all 27": "validated",
+  "RESULTS 'Which arm wins'": "two statements are wrong: rhodpu is the cheapest rho in 4 of 198 configurations at I = 10M, h = 1 (27 of 198 at I = 3M), not never; at h = 1 the best kappa is the top of the grid (0.5) in 36 of 198, not interior (the validator's kappa 0.75/1.0 panel shows the edge does not matter)",
+  "RESULTS noverify ranges": "h = 1 range is 0.70-0.73 (minimum 0.70499), not 0.71-0.73; the h = 0 and h = 0.1 ranges are right"
+ },
+ "raw_data": [
+  {
+   "path": "../../research/mt_fieldops_v5_20261112/results/holdout/runs.json",
+   "sha256": "a623ad9ae7fa608c2bbe47e5b2a0f44bd5d8bd7e6674fd28b395f43d9cf633ef"
+  }
+ ],
+ "supporting_data": [
+  {
+   "path": "../results/holdout/rows.jsonl",
+   "sha256": "36ab358b789f2c2cac86a943f9a6fc83c4e05247eb541fbb4fc2b34e9ff020a4",
+   "note": "full rows with phases and argv; replayed; in Git, not the artifact store (V5-F7)"
+  },
+  {
+   "path": "native_work.json",
+   "sha256": "7c98b892ca3969c06133682a4ae13e1b0fa76e30ac7da1d202174f5e1c6e4c49",
+   "note": "instrumented replay of every row: HashMap calls, step-index, canonicalisation, hash, DP-test, W-step and restart-RNG tallies; identity checks against H and N"
+  },
+  {
+   "path": "scalar_check.json",
+   "sha256": "c74113a172147657f7804a26643cdd33fb0f48eae76725e286d3f1e34ace573b",
+   "note": "validator EC verification of every target of 153 dumped runs"
+  },
+  {
+   "path": "instances_check.json",
+   "sha256": "3f16f7f9455af7b2d82050784dfa0bf674b38e8cb20776eeb5bcf6992262e477",
+   "note": "instance validity, regeneration and freshness"
+  },
+  {
+   "path": "recompute.json",
+   "sha256": "75ff54b4e913fe55f4138b912e6830aca322130bde91c823385dd9066b617c88",
+   "note": "scripts/recompute.py: decisions, ranges, winners, noverify, comparison with summary.json and summary_v4rule.json"
+  },
+  {
+   "path": "results_check.json",
+   "sha256": "4dda8158c31c9708dd0724f68d646c4a4f7f214538010740f5b7e839a49a612a",
+   "note": "every number of RESULTS.md's table and ranges and of noverify.txt against the recompute"
+  },
+  {
+   "path": "sensitivity.json",
+   "sha256": "dc23f72455bb680cd3ae562658e3678e19f55e7b78e672b5cc88c62e02c1125d",
+   "note": "scripts/sens_analysis.py: N conventions, kappa above the grid, rho2x, modelled non-negation DP rho, cross-fit, two-probe IC count"
+  },
+  {
+   "path": "sens_runs.json",
+   "sha256": "401e8c61037371ac9cf09e18fecfd26a228770b0b68277d8f5f92ba3315e9f58",
+   "note": "validator sensitivity panels (792 runs, all targets verified by the harness)"
+  },
+  {
+   "path": "v4_crosscheck.json",
+   "sha256": "a9588642f51426d5542efbea67aa43515da1bf07b56e7ac8a0cdb1b245284d29",
+   "note": "v5 binary on v4 rows and on the v4 validator's sensitivity rows: I, M, S, H, L, ok unchanged; N vs the v4 validator's instrumented counts"
+  },
+  {
+   "path": "claim_check.json",
+   "sha256": "d5c36c569755833e40fca3a3a4faca2120bb5d347d83fcd0d405bc4ac0ff0700",
+   "note": "clause-by-clause check of the claim statement"
+  }
+ ],
+ "checks": {
+  "freeze_order": true,
+  "no_post_freeze_change_to_protocol_runner_analysis_harness": true,
+  "instances_valid": true,
+  "instances_fresh_pab": true,
+  "instances_regenerate_byte_identical": true,
+  "grid_complete_3366": true,
+  "seeds_as_protocol": true,
+  "every_target_verified_by_harness": true,
+  "replay_all_rows": true,
+  "replay_pristine_sample": true,
+  "replay_producer_binary_sample": true,
+  "runs_json_projection": true,
+  "scalars_verified": true,
+  "harness_equals_v4_plus_v4_validator_patches_plus_N": true,
+  "IMSHL_unchanged_vs_v4_rows": true,
+  "ic5w_ic5rw_rhodpu_equal_v4_validator_arms": true,
+  "N_counts_match_definition_every_row": true,
+  "rhodpu_2_per_point_matches_code": true,
+  "H_counts_hash_table_operations": true,
+  "no_free_information": true,
+  "ic_trials_have_no_uncounted_native_work_beyond_H": true,
+  "summary_json_recomputed": true,
+  "summary_v4rule_json_recomputed": true,
+  "decisions_reproduced": true,
+  "decisions_independent_of_bootstrap_draw": true,
+  "results_md_table": true,
+  "results_prose_exact": false,
+  "noverify_txt": true,
+  "kappa_grid_edge_irrelevant_at_h1": true,
+  "headline_robust_within_section5a_conventions": true,
+  "headline_robust_to_one_native_op_per_dp_point": false,
+  "artifact_policy": false,
+  "bench_record_complete_at_validated_commit": false,
+  "leaderboard_pointed_only_after_validation": false
+ },
+ "recompute": {
+  "method": "scripts/recompute.py (validator's own code) from runs.json; the protocol's bootstrap (random.Random(1).choices, B = 4000, order statistics 100 and 3899) and an independent numpy bootstrap (B = 20000, nonce-seeded)",
+  "summary_5a": {
+   "entries": 972,
+   "mismatching_fields": 0,
+   "max_rel_diff": 0.0
+  },
+  "summary_v4rule": {
+   "entries": 972,
+   "mismatching_fields": 0,
+   "max_rel_diff": 0.0
+  },
+  "decisions_5a": {
+   "icbest vs rhobest": {
+    "unranked": 27
+   },
+   "icbest vs rho2xks": {
+    "unranked": 27
+   },
+   "icbest vs rhodpu": {
+    "cheaper": 27
+   },
+   "icbest vs bsgs2": {
+    "dearer": 27
+   },
+   "ic5 vs rhobest": {
+    "unranked": 27
+   },
+   "ic5 vs rho2xks": {
+    "unranked": 27
+   },
+   "ic5 vs rhodpu": {
+    "cheaper": 27
+   },
+   "ic5 vs bsgs2": {
+    "dearer": 27
+   },
+   "ic5rw vs rhobest": {
+    "unranked": 27
+   },
+   "ic5rw vs rho2xks": {
+    "unranked": 27
+   },
+   "ic5rw vs rhodpu": {
+    "cheaper": 27
+   },
+   "ic5rw vs bsgs2": {
+    "dearer": 27
+   }
+  },
+  "decisions_v4": {
+   "icbest vs rhobest": {
+    "dearer": 27
+   },
+   "icbest vs rho2xks": {
+    "unranked": 27
+   },
+   "icbest vs rhodpu": {
+    "unranked": 27
+   },
+   "icbest vs bsgs2": {
+    "dearer": 27
+   },
+   "ic5 vs rhobest": {
+    "dearer": 27
+   },
+   "ic5 vs rho2xks": {
+    "unranked": 27
+   },
+   "ic5 vs rhodpu": {
+    "unranked": 27
+   },
+   "ic5 vs bsgs2": {
+    "dearer": 27
+   },
+   "ic5rw vs rhobest": {
+    "dearer": 27
+   },
+   "ic5rw vs rho2xks": {
+    "unranked": 13,
+    "dearer": 14
+   },
+   "ic5rw vs rhodpu": {
+    "unranked": 27
+   },
+   "ic5rw vs bsgs2": {
+    "dearer": 27
+   }
+  },
+  "numpy_bootstrap_decision_disagreements": 0,
+  "ranges_5a": {
+   "icbest/rhobest all": [
+    0.7130890302049135,
+    1.19809888186533
+   ],
+   "icbest/rhobest I=10M h=0": [
+    1.0633041958270446,
+    1.158579184182293
+   ],
+   "icbest/rhobest I=10M h=0.1": [
+    0.9982748614200442,
+    1.053892705698582
+   ],
+   "icbest/rhobest I=10M h=1": [
+    0.7134754461762702,
+    0.7994536270504513
+   ],
+   "icbest/rhobest I=10M h=0 lo>1 cells": 9,
+   "icbest/rhobest I=10M h=0.1 lo>1 cells": 8,
+   "icbest/rhobest I=10M h=1 lo>1 cells": 0,
+   "icbest/rhobest I=10M h=0 hi<1 cells": 0,
+   "icbest/rhobest I=10M h=0.1 hi<1 cells": 0,
+   "icbest/rhobest I=10M h=1 hi<1 cells": 9,
+   "icbest/rhobest h=0 hi<1 (all cI)": 0,
+   "icbest/rhobest h=0.1 hi<1 (all cI)": 3,
+   "icbest/rhobest h=1 hi<1 (all cI)": 27,
+   "icbest/rhobest h=0 lo>1 (all cI)": 27,
+   "icbest/rhobest h=0.1 lo>1 (all cI)": 21,
+   "icbest/rhobest h=1 lo>1 (all cI)": 0,
+   "icbest/bsgs2 all": [
+    1.1114411197344132,
+    1.470881952853129
+   ],
+   "icbest/bsgs2 I=10M h=0": [
+    1.1144444893061398,
+    1.358678205750362
+   ],
+   "icbest/rhobest I=10M all h": [
+    0.7134754461762702,
+    1.158579184182293
+   ]
+  },
+  "ranges_v4": {
+   "icbest/rhobest all": [
+    1.0164257115985884,
+    2.079414605857391
+   ],
+   "icbest/rhobest I=10M h=0": [
+    1.0633041958270446,
+    1.158579184182293
+   ],
+   "icbest/rhobest I=10M h=0.1": [
+    1.0475119037901148,
+    1.1033212473623897
+   ],
+   "icbest/rhobest I=10M h=1": [
+    1.2149710912916825,
+    2.0183506686481314
+   ],
+   "icbest/rhobest I=10M h=0 lo>1 cells": 9,
+   "icbest/rhobest I=10M h=0.1 lo>1 cells": 9,
+   "icbest/rhobest I=10M h=1 lo>1 cells": 9,
+   "icbest/rhobest I=10M h=0 hi<1 cells": 0,
+   "icbest/rhobest I=10M h=0.1 hi<1 cells": 0,
+   "icbest/rhobest I=10M h=1 hi<1 cells": 0,
+   "icbest/rhobest h=0 hi<1 (all cI)": 0,
+   "icbest/rhobest h=0.1 hi<1 (all cI)": 0,
+   "icbest/rhobest h=1 hi<1 (all cI)": 0,
+   "icbest/rhobest h=0 lo>1 (all cI)": 27,
+   "icbest/rhobest h=0.1 lo>1 (all cI)": 27,
+   "icbest/rhobest h=1 lo>1 (all cI)": 27,
+   "icbest/bsgs2 all": [
+    1.1114411197344132,
+    1.47018443369676
+   ],
+   "icbest/bsgs2 I=10M h=0": [
+    1.1144444893061398,
+    1.358678205750362
+   ],
+   "icbest/rhobest I=10M all h": [
+    1.0475119037901148,
+    2.0183506686481314
+   ]
+  },
+  "winners_I10M_5a": {
+   "0": {
+    "rho_arm": {
+     "rho2xks": 198
+    },
+    "rho2xks_kappa": {
+     "0.1": 69,
+     "0.05": 126,
+     "0.25": 3
+    },
+    "ic_arm": {
+     "ic5rw": 198
+    }
+   },
+   "0.1": {
+    "rho_arm": {
+     "rho2xks": 198
+    },
+    "rho2xks_kappa": {
+     "0.1": 111,
+     "0.25": 24,
+     "0.05": 63
+    },
+    "ic_arm": {
+     "ic5rw": 197,
+     "ic5": 1
+    }
+   },
+   "1": {
+    "rho_arm": {
+     "rho2xks": 194,
+     "rhodpu": 4
+    },
+    "rho2xks_kappa": {
+     "0.25": 147,
+     "0.5": 36,
+     "0.05": 3,
+     "0.1": 8
+    },
+    "ic_arm": {
+     "ic5": 98,
+     "ic5w": 100
+    }
+   }
+  },
+  "noverify_I10M": {
+   "24/1024": [
+    1.2069784878309768,
+    1.0701317028712336,
+    0.7262083896299121
+   ],
+   "24/4096": [
+    1.1730622818205516,
+    1.0446905818048111,
+    0.7245012067893357
+   ],
+   "24/16384": [
+    1.164294160906619,
+    1.0433871184283288,
+    0.7303251432317255
+   ],
+   "28/1024": [
+    1.1565790199566561,
+    1.0319058720802585,
+    0.7237679104694869
+   ],
+   "28/4096": [
+    1.1700046575085647,
+    1.0412885092457747,
+    0.7169347557566073
+   ],
+   "28/16384": [
+    1.1448985502737878,
+    1.0207026034601125,
+    0.7121021279983422
+   ],
+   "32/1024": [
+    1.164387718127233,
+    1.0379184580568408,
+    0.7263490464715356
+   ],
+   "32/4096": [
+    1.1392656301668609,
+    1.0150246501319335,
+    0.7125755164982672
+   ],
+   "32/16384": [
+    1.1162066245210707,
+    0.9980955526175334,
+    0.7049913767244322
+   ]
+  },
+  "noverify_ranges": {
+   "0": [
+    1.1162066245210707,
+    1.2069784878309768
+   ],
+   "0.1": [
+    0.9980955526175334,
+    1.0701317028712336
+   ],
+   "1": [
+    0.7049913767244322,
+    0.7303251432317255
+   ]
+  },
+  "verify_gae_per_target_I10M": {
+   "ic5": [
+    34.48557692307692,
+    47.42493614783654
+   ],
+   "ic5ks": [
+    34.48557692307692,
+    47.42493614783654
+   ],
+   "ic5w": [
+    34.48557692307692,
+    47.42493614783654
+   ],
+   "ic5rw": [
+    34.48557692307692,
+    47.42493614783654
+   ],
+   "rho2xks": [
+    34.48557692307692,
+    47.42493614783654
+   ],
+   "rhodpu": [
+    34.48557692307692,
+    47.42493614783654
+   ],
+   "bsgs2": [
+    34.48557692307692,
+    47.42493614783654
+   ]
+  },
+  "phase_violations": 0,
+  "results_md_and_noverify_checks": 167,
+  "results_md_mismatches": [
+   {
+    "name": "noverify I=10M h=1 min",
+    "claimed": 0.71,
+    "recomputed": 0.7049913767244322,
+    "decimals": 2,
+    "ok": false
+   },
+   {
+    "name": "rho2xks wins h=1 (198: 'in all 198 configurations; rhodpu never')",
+    "claimed": 198,
+    "recomputed": 194,
+    "decimals": 0,
+    "ok": false
+   }
+  ]
+ },
+ "accounting": {
+  "native_work_identity_checks": {
+   "other arms: H == hashmap calls": 2970,
+   "N == expected native count": 3366,
+   "no_native_outside_declared": 3366,
+   "ic5ks/ic5rw: 0 <= H - hashmap calls <= targets": 396,
+   "ic5ks/ic5rw: H <= hashmap calls incl. ret probes": 396
+  },
+  "rows": 3366,
+  "totals_by_arm": {
+   "ic5": {
+    "runs": 198,
+    "H": 605624036,
+    "N": 0,
+    "xc_hashmap_calls": 605624036,
+    "xc_ret_probe": 0,
+    "xc_hidx": 0,
+    "xc_canon": 0,
+    "xc_idx": 0,
+    "xc_is_dp": 0,
+    "xc_wstep": 0,
+    "xc_restart_rng": 0,
+    "xc_rhodpu_setup_set": 0
+   },
+   "ic5ks": {
+    "runs": 198,
+    "H": 889027399,
+    "N": 0,
+    "xc_hashmap_calls": 888989693,
+    "xc_ret_probe": 285622822,
+    "xc_hidx": 0,
+    "xc_canon": 0,
+    "xc_idx": 0,
+    "xc_is_dp": 0,
+    "xc_wstep": 0,
+    "xc_restart_rng": 0,
+    "xc_rhodpu_setup_set": 0
+   },
+   "ic5w": {
+    "runs": 198,
+    "H": 604970332,
+    "N": 287272,
+    "xc_hashmap_calls": 604970332,
+    "xc_ret_probe": 0,
+    "xc_hidx": 0,
+    "xc_canon": 0,
+    "xc_idx": 0,
+    "xc_is_dp": 0,
+    "xc_wstep": 287272,
+    "xc_restart_rng": 0,
+    "xc_rhodpu_setup_set": 0
+   },
+   "ic5rw": {
+    "runs": 198,
+    "H": 772788261,
+    "N": 239813,
+    "xc_hashmap_calls": 772484258,
+    "xc_ret_probe": 227611335,
+    "xc_hidx": 0,
+    "xc_canon": 0,
+    "xc_idx": 0,
+    "xc_is_dp": 0,
+    "xc_wstep": 239813,
+    "xc_restart_rng": 0,
+    "xc_rhodpu_setup_set": 0
+   },
+   "rho2xks": {
+    "runs": 792,
+    "H": 3328741271,
+    "N": 932642597,
+    "xc_hashmap_calls": 3328741271,
+    "xc_ret_probe": 0,
+    "xc_hidx": 932642597,
+    "xc_canon": 0,
+    "xc_idx": 0,
+    "xc_is_dp": 0,
+    "xc_wstep": 0,
+    "xc_restart_rng": 32384938,
+    "xc_rhodpu_setup_set": 0
+   },
+   "rhodpu": {
+    "runs": 1188,
+    "H": 496906034,
+    "N": 5541825146,
+    "xc_hashmap_calls": 496906034,
+    "xc_ret_probe": 0,
+    "xc_hidx": 0,
+    "xc_canon": 2770912573,
+    "xc_idx": 5246348962,
+    "xc_is_dp": 2623174484,
+    "xc_wstep": 0,
+    "xc_restart_rng": 144400826,
+    "xc_rhodpu_setup_set": 1693350
+   },
+   "bsgs2": {
+    "runs": 594,
+    "H": 1319005604,
+    "N": 0,
+    "xc_hashmap_calls": 1319005604,
+    "xc_ret_probe": 0,
+    "xc_hidx": 0,
+    "xc_canon": 0,
+    "xc_idx": 0,
+    "xc_is_dp": 0,
+    "xc_wstep": 0,
+    "xc_restart_rng": 0,
+    "xc_rhodpu_setup_set": 0
+   }
+  },
+  "v4_crosscheck": {
+   "binary_sha256": "e7ac3c4525f0cfecc237c3e76b548260c2d810b7fb73742bd3ab448face848f5",
+   "nonce": "fc12f5fd8a83efeadcac54dc5d6c889f",
+   "rows": 72,
+   "mismatching": 0,
+   "per_arm": {
+    "bsgs2": 9,
+    "ic5": 9,
+    "ic5ks": 9,
+    "rho2xks": 9,
+    "rhodp": 9,
+    "ic5rw": 9,
+    "ic5w": 9,
+    "rhodpu": 9
+   },
+   "N_checks": {
+    "None": 54,
+    "True": 18
+   }
+  }
+ },
+ "sensitivity": {
+  "method": "scripts/sens_analysis.py; protocol decision rule and bootstrap; not pre-registered",
+  "variants": {
+   "V0_frozen": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      0.9983,
+      1.0539
+     ],
+     "1": [
+      0.7135,
+      0.7995
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.05:None": 3,
+     "rho2xks:0.1:None": 8,
+     "rho2xks:0.25:None": 147,
+     "rho2xks:0.5:None": 36,
+     "rhodpu:0.0:-1": 2,
+     "rhodpu:0.0:0": 2
+    }
+   },
+   "V1_rho2xks_index_free": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      1.0475,
+      1.1035
+     ],
+     "1": [
+      0.8697,
+      0.9178
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.1:None": 1,
+     "rho2xks:0.25:None": 56,
+     "rho2xks:0.5:None": 141
+    }
+   },
+   "V1b_rho2xks_restarts_only": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      1.0455,
+      1.1014
+     ],
+     "1": [
+      0.8633,
+      0.9083
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.1:None": 1,
+     "rho2xks:0.25:None": 58,
+     "rho2xks:0.5:None": 139
+    }
+   },
+   "V2_rhodpu_1_per_point": {
+    "decisions": {
+     "unranked": 24,
+     "dearer": 3
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      0.9983,
+      1.0539
+     ],
+     "1": [
+      0.8329,
+      1.0594
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 19,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rhodpu:0.0:-1": 3,
+     "rhodpu:0.0:0": 102,
+     "rhodpu:0.0:1": 75,
+     "rhodpu:0.25:0": 13,
+     "rhodpu:0.25:1": 5
+    }
+   },
+   "V3_minimal_rho_native": {
+    "decisions": {
+     "unranked": 20,
+     "dearer": 7
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      1.0475,
+      1.1033
+     ],
+     "1": [
+      0.9008,
+      1.059
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 19,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.25:None": 28,
+     "rho2xks:0.5:None": 22,
+     "rhodpu:0.0:-1": 3,
+     "rhodpu:0.0:0": 79,
+     "rhodpu:0.0:1": 55,
+     "rhodpu:0.25:0": 7,
+     "rhodpu:0.25:1": 4
+    }
+   },
+   "V3b_rho2xks0_rhodpu0": {
+    "decisions": {
+     "dearer": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      1.0475,
+      1.1033
+     ],
+     "1": [
+      1.215,
+      2.0184
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 0,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rhodpu:0.0:0": 33,
+     "rhodpu:0.0:1": 109,
+     "rhodpu:0.25:0": 17,
+     "rhodpu:0.25:1": 39
+    }
+   },
+   "V4_rhodpu_4_per_point": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      0.9983,
+      1.0539
+     ],
+     "1": [
+      0.7135,
+      0.7995
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.05:None": 3,
+     "rho2xks:0.1:None": 8,
+     "rho2xks:0.25:None": 149,
+     "rho2xks:0.5:None": 38
+    }
+   },
+   "V5_rho2xks_2_per_step": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      0.9471,
+      1.0086
+     ],
+     "1": [
+      0.6435,
+      0.7162
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.05:None": 1,
+     "rho2xks:0.1:None": 8,
+     "rho2xks:0.25:None": 47,
+     "rho2xks:0.5:None": 1,
+     "rhodpu:0.0:-1": 12,
+     "rhodpu:0.0:0": 88,
+     "rhodpu:0.0:1": 31,
+     "rhodpu:0.25:-1": 1,
+     "rhodpu:0.25:0": 5,
+     "rhodpu:0.25:1": 4
+    }
+   },
+   "V6_v4_rule_N_unpriced": {
+    "decisions": {
+     "dearer": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      1.0475,
+      1.1033
+     ],
+     "1": [
+      1.215,
+      2.0184
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 0,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rhodpu:0.0:0": 33,
+     "rhodpu:0.0:1": 109,
+     "rhodpu:0.25:0": 17,
+     "rhodpu:0.25:1": 39
+    }
+   },
+   "V7_crossfit_frozen": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0632,
+      1.1518
+     ],
+     "0.1": [
+      0.9948,
+      1.0418
+     ],
+     "1": [
+      0.7147,
+      0.8018
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": null
+   },
+   "V10_model_nonnegation_dp_rho_added": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      0.9983,
+      1.0539
+     ],
+     "1": [
+      0.7135,
+      0.7995
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.05:None": 2,
+     "rho2xks:0.1:None": 8,
+     "rho2xks:0.25:None": 127,
+     "rho2xks:0.5:None": 23,
+     "rhodpn_model:0.0:-1": 3,
+     "rhodpn_model:0.0:0": 25,
+     "rhodpn_model:0.0:1": 10
+    }
+   },
+   "V11_ic5rw_ic5ks_two_probes": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      1.0349,
+      1.077
+     ],
+     "1": [
+      0.7135,
+      0.7995
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.05:None": 3,
+     "rho2xks:0.1:None": 8,
+     "rho2xks:0.25:None": 147,
+     "rho2xks:0.5:None": 36,
+     "rhodpu:0.0:-1": 2,
+     "rhodpu:0.0:0": 2
+    }
+   },
+   "V8_kappa_to_1.0_frozen": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      0.9983,
+      1.0539
+     ],
+     "1": [
+      0.7135,
+      0.7995
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.05:None": 3,
+     "rho2xks:0.1:None": 8,
+     "rho2xks:0.25:None": 147,
+     "rho2xks:0.5:None": 36,
+     "rhodpu:0.0:-1": 2,
+     "rhodpu:0.0:0": 2
+    }
+   },
+   "V9_kappa_to_1.0_minimal_native": {
+    "decisions": {
+     "unranked": 20,
+     "dearer": 7
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      1.0475,
+      1.1033
+     ],
+     "1": [
+      0.9008,
+      1.059
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 19,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2x:0.5:None": 15,
+     "rho2x:1.0:None": 1,
+     "rho2xks:0.25:None": 22,
+     "rho2xks:0.5:None": 16,
+     "rhodpu:0.0:-1": 3,
+     "rhodpu:0.0:0": 77,
+     "rhodpu:0.0:1": 53,
+     "rhodpu:0.25:0": 7,
+     "rhodpu:0.25:1": 4
+    }
+   },
+   "V12_kappa_to_1.0_rho2xks_index_free": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      1.0475,
+      1.1035
+     ],
+     "1": [
+      0.875,
+      0.9186
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2x:0.5:None": 47,
+     "rho2x:1.0:None": 63,
+     "rho2xks:0.25:None": 30,
+     "rho2xks:0.5:None": 58
+    }
+   },
+   "V13_all_extra_and_model_frozen": {
+    "decisions": {
+     "unranked": 27
+    },
+    "I10M_median_range": {
+     "0": [
+      1.0633,
+      1.1586
+     ],
+     "0.1": [
+      0.9983,
+      1.0539
+     ],
+     "1": [
+      0.7135,
+      0.7995
+     ]
+    },
+    "h1_cells_hi_below_1_of_27": 27,
+    "h0_cells_lo_above_1_of_27": 27,
+    "rho_winner_I10M_h1": {
+     "rho2xks:0.05:None": 2,
+     "rho2xks:0.1:None": 8,
+     "rho2xks:0.25:None": 127,
+     "rho2xks:0.5:None": 23,
+     "rhodpn_model:0.0:-1": 3,
+     "rhodpn_model:0.0:0": 25,
+     "rhodpn_model:0.0:1": 10
+    }
+   }
+  }
+ },
+ "headline": [
+  {
+   "name": "rows",
+   "claimed": 3366,
+   "recomputed": 3366
+  },
+  {
+   "name": "unverified rows",
+   "claimed": 0,
+   "recomputed": 0
+  },
+  {
+   "name": "summary.json entries recomputed exactly",
+   "claimed": 972,
+   "recomputed": 972
+  },
+  {
+   "name": "summary_v4rule.json entries recomputed exactly",
+   "claimed": 972,
+   "recomputed": 972
+  },
+  {
+   "name": "icbest vs rhobest unranked (of 27), section 5a rule",
+   "claimed": 27,
+   "recomputed": 27
+  },
+  {
+   "name": "ic5rw vs rhobest unranked (of 27)",
+   "claimed": 27,
+   "recomputed": 27
+  },
+  {
+   "name": "icbest vs rhobest dearer (of 27), v4 rule",
+   "claimed": 27,
+   "recomputed": 27
+  },
+  {
+   "name": "icbest vs bsgs2 dearer (of 27)",
+   "claimed": 27,
+   "recomputed": 27
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 h=0 median",
+   "claimed": 1.146,
+   "recomputed": 1.146394603062989,
+   "rel_tol": 0.00043630021815008733
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 h=0 lo",
+   "claimed": 1.138,
+   "recomputed": 1.137586486185548,
+   "rel_tol": 0.0004393673550087874
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 h=0 hi",
+   "claimed": 1.152,
+   "recomputed": 1.1520018742669178,
+   "rel_tol": 0.0004340278211805556
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 h=0.1 median",
+   "claimed": 1.054,
+   "recomputed": 1.053892705698582,
+   "rel_tol": 0.00047438334914611007
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 h=0.1 lo",
+   "claimed": 1.046,
+   "recomputed": 1.0461959857397467,
+   "rel_tol": 0.00047801152007648185
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 h=0.1 hi",
+   "claimed": 1.062,
+   "recomputed": 1.0622314607060053,
+   "rel_tol": 0.00047080983992467044
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 h=1 median",
+   "claimed": 0.748,
+   "recomputed": 0.7482948336136207,
+   "rel_tol": 0.0006684492647058824
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 h=1 lo",
+   "claimed": 0.742,
+   "recomputed": 0.7424020471201148,
+   "rel_tol": 0.0006738545148247979
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 h=1 hi",
+   "claimed": 0.755,
+   "recomputed": 0.7551937212946973,
+   "rel_tol": 0.0006622517218543047
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 icbest/bsgs2 h=0",
+   "claimed": 1.282,
+   "recomputed": 1.2822933658336342,
+   "rel_tol": 0.00039001563962558504
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 GAE/t icbest h=0.1",
+   "claimed": 158.0,
+   "recomputed": 157.99299879807694,
+   "rel_tol": 0.0003164557278481013
+  },
+  {
+   "name": "RESULTS/noverify: table 24/1024 GAE/t rhobest h=0.1",
+   "claimed": 149.4,
+   "recomputed": 149.40036057692308,
+   "rel_tol": 0.0003346720548862115
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 h=0 median",
+   "claimed": 1.095,
+   "recomputed": 1.0946663857891794,
+   "rel_tol": 0.00045662105022831054
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 h=0 lo",
+   "claimed": 1.089,
+   "recomputed": 1.0894803830017443,
+   "rel_tol": 0.00045913686868686877
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 h=0 hi",
+   "claimed": 1.096,
+   "recomputed": 1.096140701799329,
+   "rel_tol": 0.00045620442518248176
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 h=0.1 median",
+   "claimed": 1.028,
+   "recomputed": 1.0280343764863544,
+   "rel_tol": 0.00048638137159533076
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 h=0.1 lo",
+   "claimed": 1.022,
+   "recomputed": 1.0223829184333768,
+   "rel_tol": 0.0004892368395303327
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 h=0.1 hi",
+   "claimed": 1.031,
+   "recomputed": 1.030531519282044,
+   "rel_tol": 0.000484966100872939
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 h=1 median",
+   "claimed": 0.765,
+   "recomputed": 0.765033084276542,
+   "rel_tol": 0.0006535948366013072
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 h=1 lo",
+   "claimed": 0.761,
+   "recomputed": 0.7609055803447055,
+   "rel_tol": 0.0006570302890932983
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 h=1 hi",
+   "claimed": 0.768,
+   "recomputed": 0.7683747860672856,
+   "rel_tol": 0.0006510417317708334
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 icbest/bsgs2 h=0",
+   "claimed": 1.181,
+   "recomputed": 1.1808164003797454,
+   "rel_tol": 0.00042337006773920406
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 GAE/t icbest h=0.1",
+   "claimed": 95.6,
+   "recomputed": 95.59935584435097,
+   "rel_tol": 0.0005230126046025105
+  },
+  {
+   "name": "RESULTS/noverify: table 24/4096 GAE/t rhobest h=0.1",
+   "claimed": 93.0,
+   "recomputed": 92.99101938100961,
+   "rel_tol": 0.0005376344623655914
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 h=0 median",
+   "claimed": 1.063,
+   "recomputed": 1.0633041958270446,
+   "rel_tol": 0.00047036693320790223
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 h=0 lo",
+   "claimed": 1.06,
+   "recomputed": 1.0598370227486866,
+   "rel_tol": 0.0004716981603773585
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 h=0 hi",
+   "claimed": 1.064,
+   "recomputed": 1.0643097965256707,
+   "rel_tol": 0.0004699248590225564
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 h=0.1 median",
+   "claimed": 1.02,
+   "recomputed": 1.0201008429907867,
+   "rel_tol": 0.0004901961274509805
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 h=0.1 lo",
+   "claimed": 1.016,
+   "recomputed": 1.0155509313754723,
+   "rel_tol": 0.0004921260334645669
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 h=0.1 hi",
+   "claimed": 1.022,
+   "recomputed": 1.0217931968510436,
+   "rel_tol": 0.0004892368395303327
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 h=1 median",
+   "claimed": 0.799,
+   "recomputed": 0.7994536270504513,
+   "rel_tol": 0.0006257822903629537
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 h=1 lo",
+   "claimed": 0.796,
+   "recomputed": 0.7962938037140141,
+   "rel_tol": 0.0006281407663316583
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 h=1 hi",
+   "claimed": 0.802,
+   "recomputed": 0.8016974719197135,
+   "rel_tol": 0.0006234414588528679
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 icbest/bsgs2 h=0",
+   "claimed": 1.114,
+   "recomputed": 1.1144444893061398,
+   "rel_tol": 0.000448833078994614
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 GAE/t icbest h=0.1",
+   "claimed": 65.9,
+   "recomputed": 65.8837672306941,
+   "rel_tol": 0.0007587254172989378
+  },
+  {
+   "name": "RESULTS/noverify: table 24/16384 GAE/t rhobest h=0.1",
+   "claimed": 64.6,
+   "recomputed": 64.58135657677283,
+   "rel_tol": 0.0007739938854489166
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 h=0 median",
+   "claimed": 1.139,
+   "recomputed": 1.1390581098837038,
+   "rel_tol": 0.0004389816066725198
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 h=0 lo",
+   "claimed": 1.131,
+   "recomputed": 1.1308318733137972,
+   "rel_tol": 0.0004420866931918657
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 h=0 hi",
+   "claimed": 1.151,
+   "recomputed": 1.1506182519138304,
+   "rel_tol": 0.0004344049087749783
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 h=0.1 median",
+   "claimed": 1.029,
+   "recomputed": 1.0292744673842293,
+   "rel_tol": 0.00048590869776482027
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 h=0.1 lo",
+   "claimed": 1.02,
+   "recomputed": 1.0201697741896087,
+   "rel_tol": 0.0004901961274509805
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 h=0.1 hi",
+   "claimed": 1.04,
+   "recomputed": 1.0403030417827948,
+   "rel_tol": 0.0004807692788461538
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 h=1 median",
+   "claimed": 0.731,
+   "recomputed": 0.7307263253189455,
+   "rel_tol": 0.0006839945964432285
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 h=1 lo",
+   "claimed": 0.724,
+   "recomputed": 0.724097539709772,
+   "rel_tol": 0.0006906078038674034
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 h=1 hi",
+   "claimed": 0.736,
+   "recomputed": 0.7357270237824357,
+   "rel_tol": 0.0006793478940217392
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 icbest/bsgs2 h=0",
+   "claimed": 1.314,
+   "recomputed": 1.3140804618662618,
+   "rel_tol": 0.0003805175418569254
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 GAE/t icbest h=0.1",
+   "claimed": 508.7,
+   "recomputed": 508.7346379206731,
+   "rel_tol": 9.828976803617064e-05
+  },
+  {
+   "name": "RESULTS/noverify: table 28/1024 GAE/t rhobest h=0.1",
+   "claimed": 493.9,
+   "recomputed": 493.8691631610577,
+   "rel_tol": 0.00010123507795100224
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 h=0 median",
+   "claimed": 1.136,
+   "recomputed": 1.1356838915624818,
+   "rel_tol": 0.00044014088908450713
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 h=0 lo",
+   "claimed": 1.127,
+   "recomputed": 1.127105094242638,
+   "rel_tol": 0.0004436557675244011
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 h=0 hi",
+   "claimed": 1.142,
+   "recomputed": 1.141808224819223,
+   "rel_tol": 0.00043782841506129607
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 h=0.1 median",
+   "claimed": 1.035,
+   "recomputed": 1.0349665268634576,
+   "rel_tol": 0.00048309183574879233
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 h=0.1 lo",
+   "claimed": 1.029,
+   "recomputed": 1.029217101081767,
+   "rel_tol": 0.00048590869776482027
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 h=0.1 hi",
+   "claimed": 1.037,
+   "recomputed": 1.0369035725736908,
+   "rel_tol": 0.00048216012536162015
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 h=1 median",
+   "claimed": 0.731,
+   "recomputed": 0.7308292729319978,
+   "rel_tol": 0.0006839945964432285
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 h=1 lo",
+   "claimed": 0.724,
+   "recomputed": 0.7235497420821655,
+   "rel_tol": 0.0006906078038674034
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 h=1 hi",
+   "claimed": 0.736,
+   "recomputed": 0.7364073461250149,
+   "rel_tol": 0.0006793478940217392
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 icbest/bsgs2 h=0",
+   "claimed": 1.274,
+   "recomputed": 1.2741419626734913,
+   "rel_tol": 0.00039246471742543175
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 GAE/t icbest h=0.1",
+   "claimed": 276.6,
+   "recomputed": 276.6261333759014,
+   "rel_tol": 0.00018076646782357197
+  },
+  {
+   "name": "RESULTS/noverify: table 28/4096 GAE/t rhobest h=0.1",
+   "claimed": 267.9,
+   "recomputed": 267.8722290039062,
+   "rel_tol": 0.00018663682344158272
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 h=0 median",
+   "claimed": 1.096,
+   "recomputed": 1.0964244975905726,
+   "rel_tol": 0.00045620442518248176
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 h=0 lo",
+   "claimed": 1.09,
+   "recomputed": 1.0903732461072604,
+   "rel_tol": 0.00045871564220183484
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 h=0 hi",
+   "claimed": 1.1,
+   "recomputed": 1.0997081723322442,
+   "rel_tol": 0.0004545455
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 h=0.1 median",
+   "claimed": 1.015,
+   "recomputed": 1.0152261847607849,
+   "rel_tol": 0.0004926108866995075
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 h=0.1 lo",
+   "claimed": 1.01,
+   "recomputed": 1.0097603585480919,
+   "rel_tol": 0.0004950495544554455
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 h=0.1 hi",
+   "claimed": 1.018,
+   "recomputed": 1.018289339252647,
+   "rel_tol": 0.000491159184675835
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 h=1 median",
+   "claimed": 0.739,
+   "recomputed": 0.738886044305358,
+   "rel_tol": 0.0006765900541271991
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 h=1 lo",
+   "claimed": 0.735,
+   "recomputed": 0.7347930406809999,
+   "rel_tol": 0.0006802721768707484
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 h=1 hi",
+   "claimed": 0.743,
+   "recomputed": 0.7428244486413518,
+   "rel_tol": 0.0006729475773889637
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 icbest/bsgs2 h=0",
+   "claimed": 1.204,
+   "recomputed": 1.2035620579739033,
+   "rel_tol": 0.0004152824335548173
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 GAE/t icbest h=0.1",
+   "claimed": 157.7,
+   "recomputed": 157.72747849684495,
+   "rel_tol": 0.0003170577362079899
+  },
+  {
+   "name": "RESULTS/noverify: table 28/16384 GAE/t rhobest h=0.1",
+   "claimed": 155.2,
+   "recomputed": 155.24926077035758,
+   "rel_tol": 0.0003221649806701032
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 h=0 median",
+   "claimed": 1.159,
+   "recomputed": 1.158579184182293,
+   "rel_tol": 0.0004314064279551338
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 h=0 lo",
+   "claimed": 1.143,
+   "recomputed": 1.1431148749941502,
+   "rel_tol": 0.0004374453630796151
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 h=0 hi",
+   "claimed": 1.173,
+   "recomputed": 1.1732084533151033,
+   "rel_tol": 0.0004262575021312873
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 h=0.1 median",
+   "claimed": 1.037,
+   "recomputed": 1.0369573376346612,
+   "rel_tol": 0.00048216012536162015
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 h=0.1 lo",
+   "claimed": 1.024,
+   "recomputed": 1.0238084791848356,
+   "rel_tol": 0.000488281298828125
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 h=0.1 hi",
+   "claimed": 1.052,
+   "recomputed": 1.0515625790299818,
+   "rel_tol": 0.00047528521863117874
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 h=1 median",
+   "claimed": 0.728,
+   "recomputed": 0.7283849123797193,
+   "rel_tol": 0.0006868132554945056
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 h=1 lo",
+   "claimed": 0.717,
+   "recomputed": 0.7174033954522626,
+   "rel_tol": 0.0006973501394700141
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 h=1 hi",
+   "claimed": 0.735,
+   "recomputed": 0.7346401045659077,
+   "rel_tol": 0.0006802721768707484
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 icbest/bsgs2 h=0",
+   "claimed": 1.359,
+   "recomputed": 1.358678205750362,
+   "rel_tol": 0.0003679176232523915
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 GAE/t icbest h=0.1",
+   "claimed": 1929.8,
+   "recomputed": 1929.8450533353366,
+   "rel_tol": 2.5909423256295994e-05
+  },
+  {
+   "name": "RESULTS/noverify: table 32/1024 GAE/t rhobest h=0.1",
+   "claimed": 1856.1,
+   "recomputed": 1856.0588754507212,
+   "rel_tol": 2.6938206454393625e-05
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 h=0 median",
+   "claimed": 1.13,
+   "recomputed": 1.129743907842724,
+   "rel_tol": 0.00044247792035398236
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 h=0 lo",
+   "claimed": 1.126,
+   "recomputed": 1.126204326208239,
+   "rel_tol": 0.00044404977797513333
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 h=0 hi",
+   "claimed": 1.138,
+   "recomputed": 1.1375045193021267,
+   "rel_tol": 0.0004393673550087874
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 h=0.1 median",
+   "claimed": 1.014,
+   "recomputed": 1.0142815957869056,
+   "rel_tol": 0.0004930966962524656
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 h=0.1 lo",
+   "claimed": 1.01,
+   "recomputed": 1.00980543227498,
+   "rel_tol": 0.0004950495544554455
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 h=0.1 hi",
+   "claimed": 1.021,
+   "recomputed": 1.0208388762021177,
+   "rel_tol": 0.0004897160137120471
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 h=1 median",
+   "claimed": 0.717,
+   "recomputed": 0.7167658174117686,
+   "rel_tol": 0.0006973501394700141
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 h=1 lo",
+   "claimed": 0.71,
+   "recomputed": 0.7101511425615358,
+   "rel_tol": 0.0007042254225352113
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 h=1 hi",
+   "claimed": 0.718,
+   "recomputed": 0.7182114167206066,
+   "rel_tol": 0.0006963788997214485
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 icbest/bsgs2 h=0",
+   "claimed": 1.306,
+   "recomputed": 1.3059206509725962,
+   "rel_tol": 0.0003828484303215927
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 GAE/t icbest h=0.1",
+   "claimed": 970.1,
+   "recomputed": 970.0584237905648,
+   "rel_tol": 5.154108339346459e-05
+  },
+  {
+   "name": "RESULTS/noverify: table 32/4096 GAE/t rhobest h=0.1",
+   "claimed": 955.4,
+   "recomputed": 955.3815871018629,
+   "rel_tol": 5.233410613355663e-05
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 h=0 median",
+   "claimed": 1.101,
+   "recomputed": 1.1014295831326215,
+   "rel_tol": 0.00045413265213442333
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 h=0 lo",
+   "claimed": 1.097,
+   "recomputed": 1.0971757630744272,
+   "rel_tol": 0.00045578855970829544
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 h=0 hi",
+   "claimed": 1.108,
+   "recomputed": 1.1078540594650765,
+   "rel_tol": 0.00045126358303249097
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 h=0.1 median",
+   "claimed": 0.998,
+   "recomputed": 0.9982748614200442,
+   "rel_tol": 0.0005010020541082165
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 h=0.1 lo",
+   "claimed": 0.992,
+   "recomputed": 0.9921920881018265,
+   "rel_tol": 0.000504032308467742
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 h=0.1 hi",
+   "claimed": 1.005,
+   "recomputed": 1.005104215206104,
+   "rel_tol": 0.0004975124875621892
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 h=1 median",
+   "claimed": 0.713,
+   "recomputed": 0.7134754461762702,
+   "rel_tol": 0.0007012623422159889
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 h=1 lo",
+   "claimed": 0.711,
+   "recomputed": 0.7110945889612069,
+   "rel_tol": 0.0007032349507735585
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 h=1 hi",
+   "claimed": 0.716,
+   "recomputed": 0.716267954089623,
+   "rel_tol": 0.000698324092178771
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 icbest/bsgs2 h=0",
+   "claimed": 1.261,
+   "recomputed": 1.261126289135534,
+   "rel_tol": 0.000396510745440127
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 GAE/t icbest h=0.1",
+   "claimed": 501.7,
+   "recomputed": 501.7461939885066,
+   "rel_tol": 9.96611620490333e-05
+  },
+  {
+   "name": "RESULTS/noverify: table 32/16384 GAE/t rhobest h=0.1",
+   "claimed": 503.8,
+   "recomputed": 503.80091881385215,
+   "rel_tol": 9.924574235807862e-05
+  },
+  {
+   "name": "RESULTS/noverify: I=10M h=0 min",
+   "claimed": 1.06,
+   "recomputed": 1.0633041958270446,
+   "rel_tol": 0.004716981603773585
+  },
+  {
+   "name": "RESULTS/noverify: I=10M h=0 max",
+   "claimed": 1.16,
+   "recomputed": 1.158579184182293,
+   "rel_tol": 0.004310345258620691
+  },
+  {
+   "name": "RESULTS/noverify: I=10M h=0.1 min",
+   "claimed": 1.0,
+   "recomputed": 0.9982748614200442,
+   "rel_tol": 0.005000000500000001
+  },
+  {
+   "name": "RESULTS/noverify: I=10M h=0.1 max",
+   "claimed": 1.05,
+   "recomputed": 1.053892705698582,
+   "rel_tol": 0.004761905238095238
+  },
+  {
+   "name": "RESULTS/noverify: I=10M h=1 min",
+   "claimed": 0.71,
+   "recomputed": 0.7134754461762702,
+   "rel_tol": 0.007042254225352113
+  },
+  {
+   "name": "RESULTS/noverify: I=10M h=1 max",
+   "claimed": 0.8,
+   "recomputed": 0.7994536270504513,
+   "rel_tol": 0.006250000625
+  },
+  {
+   "name": "RESULTS/noverify: v4 rule I=10M min (all h)",
+   "claimed": 1.05,
+   "recomputed": 1.0475119037901148,
+   "rel_tol": 0.004761905238095238
+  },
+  {
+   "name": "RESULTS/noverify: v4 rule I=10M max (all h)",
+   "claimed": 2.02,
+   "recomputed": 2.0183506686481314,
+   "rel_tol": 0.0024752477722772277
+  },
+  {
+   "name": "RESULTS/noverify: icbest/bsgs2 min (all cI, h)",
+   "claimed": 1.11,
+   "recomputed": 1.1114411197344132,
+   "rel_tol": 0.004504504954954955
+  },
+  {
+   "name": "RESULTS/noverify: icbest/bsgs2 max (all cI, h)",
+   "claimed": 1.47,
+   "recomputed": 1.470881952853129,
+   "rel_tol": 0.003401360884353742
+  },
+  {
+   "name": "RESULTS/noverify: noverify I=10M h=0 min",
+   "claimed": 1.12,
+   "recomputed": 1.1162066245210707,
+   "rel_tol": 0.004464286160714286
+  },
+  {
+   "name": "RESULTS/noverify: noverify I=10M h=0 max",
+   "claimed": 1.21,
+   "recomputed": 1.2069784878309768,
+   "rel_tol": 0.004132231818181818
+  },
+  {
+   "name": "RESULTS/noverify: noverify I=10M h=0.1 min",
+   "claimed": 1.0,
+   "recomputed": 0.9980955526175334,
+   "rel_tol": 0.005000000500000001
+  },
+  {
+   "name": "RESULTS/noverify: noverify I=10M h=0.1 max",
+   "claimed": 1.07,
+   "recomputed": 1.0701317028712336,
+   "rel_tol": 0.004672897663551402
+  },
+  {
+   "name": "RESULTS/noverify: noverify I=10M h=1 max",
+   "claimed": 0.73,
+   "recomputed": 0.7303251432317255,
+   "rel_tol": 0.0068493157534246585
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 24/1024 h#0",
+   "claimed": 1.207,
+   "recomputed": 1.2069784878309768,
+   "rel_tol": 0.0004142502485501243
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 24/1024 h#1",
+   "claimed": 1.07,
+   "recomputed": 1.0701317028712336,
+   "rel_tol": 0.00046728976635514017
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 24/1024 h#2",
+   "claimed": 0.726,
+   "recomputed": 0.7262083896299121,
+   "rel_tol": 0.0006887053030303031
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 24/4096 h#0",
+   "claimed": 1.173,
+   "recomputed": 1.1730622818205516,
+   "rel_tol": 0.0004262575021312873
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 24/4096 h#1",
+   "claimed": 1.045,
+   "recomputed": 1.0446905818048111,
+   "rel_tol": 0.00047846894736842114
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 24/4096 h#2",
+   "claimed": 0.725,
+   "recomputed": 0.7245012067893357,
+   "rel_tol": 0.0006896552413793105
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 24/16384 h#0",
+   "claimed": 1.164,
+   "recomputed": 1.164294160906619,
+   "rel_tol": 0.0004295533075601375
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 24/16384 h#1",
+   "claimed": 1.043,
+   "recomputed": 1.0433871184283288,
+   "rel_tol": 0.0004793864333652925
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 24/16384 h#2",
+   "claimed": 0.73,
+   "recomputed": 0.7303251432317255,
+   "rel_tol": 0.0006849315753424658
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 28/1024 h#0",
+   "claimed": 1.157,
+   "recomputed": 1.1565790199566561,
+   "rel_tol": 0.0004321521607605878
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 28/1024 h#1",
+   "claimed": 1.032,
+   "recomputed": 1.0319058720802585,
+   "rel_tol": 0.0004844961724806202
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 28/1024 h#2",
+   "claimed": 0.724,
+   "recomputed": 0.7237679104694869,
+   "rel_tol": 0.0006906078038674034
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 28/4096 h#0",
+   "claimed": 1.17,
+   "recomputed": 1.1700046575085647,
+   "rel_tol": 0.0004273504700854702
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 28/4096 h#1",
+   "claimed": 1.041,
+   "recomputed": 1.0412885092457747,
+   "rel_tol": 0.00048030744476464945
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 28/4096 h#2",
+   "claimed": 0.717,
+   "recomputed": 0.7169347557566073,
+   "rel_tol": 0.0006973501394700141
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 28/16384 h#0",
+   "claimed": 1.145,
+   "recomputed": 1.1448985502737878,
+   "rel_tol": 0.0004366812663755459
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 28/16384 h#1",
+   "claimed": 1.021,
+   "recomputed": 1.0207026034601125,
+   "rel_tol": 0.0004897160137120471
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 28/16384 h#2",
+   "claimed": 0.712,
+   "recomputed": 0.7121021279983422,
+   "rel_tol": 0.0007022472612359552
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 32/1024 h#0",
+   "claimed": 1.164,
+   "recomputed": 1.164387718127233,
+   "rel_tol": 0.0004295533075601375
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 32/1024 h#1",
+   "claimed": 1.038,
+   "recomputed": 1.0379184580568408,
+   "rel_tol": 0.0004816956165703276
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 32/1024 h#2",
+   "claimed": 0.726,
+   "recomputed": 0.7263490464715356,
+   "rel_tol": 0.0006887053030303031
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 32/4096 h#0",
+   "claimed": 1.139,
+   "recomputed": 1.1392656301668609,
+   "rel_tol": 0.0004389816066725198
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 32/4096 h#1",
+   "claimed": 1.015,
+   "recomputed": 1.0150246501319335,
+   "rel_tol": 0.0004926108866995075
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 32/4096 h#2",
+   "claimed": 0.713,
+   "recomputed": 0.7125755164982672,
+   "rel_tol": 0.0007012623422159889
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 32/16384 h#0",
+   "claimed": 1.116,
+   "recomputed": 1.1162066245210707,
+   "rel_tol": 0.0004480287186379928
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 32/16384 h#1",
+   "claimed": 0.998,
+   "recomputed": 0.9980955526175334,
+   "rel_tol": 0.0005010020541082165
+  },
+  {
+   "name": "RESULTS/noverify: noverify.txt 32/16384 h#2",
+   "claimed": 0.705,
+   "recomputed": 0.7049913767244322,
+   "rel_tol": 0.0007092199290780143
+  },
+  {
+   "name": "RESULTS: h=0 lo>1 cells (dearer in all 9)",
+   "claimed": 9,
+   "recomputed": 9
+  },
+  {
+   "name": "RESULTS: h=0.1 lo>1 cells (dearer in 8 of 9)",
+   "claimed": 8,
+   "recomputed": 8
+  },
+  {
+   "name": "RESULTS: h=1 hi<1 cells (cheaper in all 9)",
+   "claimed": 9,
+   "recomputed": 9
+  },
+  {
+   "name": "RESULTS: rho2xks wins h=0 (198)",
+   "claimed": 198,
+   "recomputed": 198
+  },
+  {
+   "name": "RESULTS: rho2xks wins h=0.1 (198)",
+   "claimed": 198,
+   "recomputed": 198
+  },
+  {
+   "name": "RESULTS: best kappa h=0 kappa=0.05",
+   "claimed": 126,
+   "recomputed": 126
+  },
+  {
+   "name": "RESULTS: best kappa h=0 kappa=0.1",
+   "claimed": 69,
+   "recomputed": 69
+  },
+  {
+   "name": "RESULTS: best kappa h=0.1 kappa=0.1",
+   "claimed": 111,
+   "recomputed": 111
+  },
+  {
+   "name": "RESULTS: best kappa h=0.1 kappa=0.05",
+   "claimed": 63,
+   "recomputed": 63
+  },
+  {
+   "name": "RESULTS: best kappa h=1 kappa=0.25",
+   "claimed": 147,
+   "recomputed": 147
+  },
+  {
+   "name": "RESULTS: best kappa h=1 kappa=0.5",
+   "claimed": 36,
+   "recomputed": 36
+  },
+  {
+   "name": "RESULTS: ic5rw wins h=0 (198)",
+   "claimed": 198,
+   "recomputed": 198
+  },
+  {
+   "name": "RESULTS: ic5rw wins h=0.1 (197)",
+   "claimed": 197,
+   "recomputed": 197
+  },
+  {
+   "name": "RESULTS: ic5w wins h=1 (100)",
+   "claimed": 100,
+   "recomputed": 100
+  },
+  {
+   "name": "RESULTS: ic5 wins h=1 (98)",
+   "claimed": 98,
+   "recomputed": 98
+  }
+ ],
+ "findings": [
+  {
+   "id": "V5-F1",
+   "severity": "pass",
+   "check": "2 replay and certificates",
+   "finding": "All 3366 rows replay exactly on the validator's instrumented build (every printed field except ms: I, M, S, H, L, N, ok, every phase snapshot and arm extra); a 51-row nonce sample (1 per arm-parameter x bits, 17 at 32 bits) on a pristine build from the frozen source and a 17-row nonce sample on the producer's binary (sha256 c55c87dd..., equal to bin_sha256 of every row) match too. 153 dumped runs (one nonce-drawn configuration per cell, all 17 runs) carry 1,096,704 recovered logs: every one equals the planted log, Q_t is on the curve and [log]G = Q_t under the validator's own Jacobian EC code (64,504 distinct scalar multiplications; negative controls reject off-by-one and negated logs); the planted lists are identical across the 17 runs of each configuration. 0 failures."
+  },
+  {
+   "id": "V5-F2",
+   "severity": "pass",
+   "check": "1 harness and native-work accounting",
+   "finding": "The v5 harness is the v4 harness (bb3d2bc40e) plus the v4 validator's patch_ic5rw.py and patch_rhodpu.py arms plus the N counter, and nothing else: after whitespace normalisation the only differences are the cn field, fn native(), the native() calls (rho-family hidx x4, rhodp/rhodpu canon x2 each, ic5w/ic5rw W-step x1 each) and the N output field; rustfmt reflowed the closures it touched. Empirically the v5 binary reproduces I, M, S, H, L and ok of 72 nonce-drawn v4 rows (ic5, ic5ks, rho2xks, rhodp, bsgs2 from the v4 holdout; ic5w, ic5rw, rhodpu from the v4 validator's sensitivity runs) and its N equals the v4 validator's instrumented step-index counts (rho2xks) and 2 x canonicalisation counts (rhodp) in 18 of 18 rows with such counts. On the v5 holdout the instrumented replay confirms in every row: N = step-index calls (rho2xks, 932,642,597 in total), N = 2 x canonicalisations (rhodpu, 2 x 2,770,912,573), N = W-step indices (ic5w 287,272; ic5rw 239,813), N = 0 for ic5, ic5ks and bsgs2; H = HashMap calls in every row of ic5, ic5w, rho2xks, rhodpu and bsgs2. 'Two per generated point' for rhodpu is right for this code: each generated point is canonicalised once and its x is mixed into one 64-bit value whose bits give the step index, the look-ahead test and the DP test (the code evaluates that same mix 5.25e9 + 2.62e9 times, i.e. three times per point; an implementation needs it once). The IC trials do only xpair (counted I, M, S) and table probes (counted H): there is no per-trial index, canonicalisation or other native step; the W offsets are shared by all targets (ic5/ic5ks arithmetic progression with no index; ic5w/ic5rw one counted index per W). No free information: the planted logs are used only to plant the targets (uncounted field copy) and in the final counted check; ic5rw's retained hits use only logs it has already solved."
+  },
+  {
+   "id": "V5-F3",
+   "severity": "pass",
+   "check": "3 recompute",
+   "finding": "scripts/recompute.py (validator code, from runs.json) reproduces all 972 entries of summary.json and all 972 of summary_v4rule.json with maximum relative difference 0, every decision of analysis.txt and analysis_v4rule.txt, and (independent numpy bootstrap, B = 20000) the same decisions. icbest vs rhobest: unranked 27 (5a rule), dearer 27 (v4 rule); vs bsgs2 dearer 27; ic5rw vs rhobest unranked 27. I = 10M ranges: 1.0633-1.1586 (h = 0, lower bound > 1 in 9/9), 0.9983-1.0539 (h = 0.1, lower bound > 1 in 8/9), 0.7135-0.7995 (h = 1, upper bound < 1 in 9/9); in all 27 (cell, cI) the lower bound is > 1 at h = 0 and the upper bound < 1 at h = 1. v4 rule at I = 10M 1.0475-2.0184; icbest/bsgs2 1.1114-1.4709. The 108 numbers of the RESULTS table and the 27 of noverify.txt match. Shared verification phase 34.5-47.4 GAE per target at I = 10M in every arm."
+  },
+  {
+   "id": "V5-F4",
+   "severity": "minor",
+   "check": "3 RESULTS prose",
+   "finding": "Three statements in RESULTS.md are not supported: (a) 'Rho: rho2xks at every price, in all 198 configurations; rhodpu never': at I = 10M, h = 1 rhodpu is the cheapest rho in 4 of 198 configurations (all 32 b, T = 1024; by 0.2-0.7%), and at I = 3M, h = 1 in 27 of 198; (b) 'At h = 1 the best kappa is interior': kappa = 0.5, the top of the frozen grid, is best in 36 of 198 (the conclusion that the h = 1 result does not rest on the grid edge is nevertheless right, V5-F6); (c) noverify 'h = 1: 0.71-0.73': the minimum is 0.70499 (32 b, T = 16384), so 0.70-0.73. No headline number is affected."
+  },
+  {
+   "id": "V5-F5",
+   "severity": "major (disclosure; non-blocking)",
+   "check": "5 robustness of 'IC cheaper at h = 1 in all 9 cells'",
+   "finding": "The h = 1 result is a property of the pricing convention, which the protocol pre-registered and which matches AGENTS.md 5a and ecbench's counters (canonicalisations_uncharged per point and partition_hashes_uncharged per step, priced separately; ecbench's negation_strong also charges dp_tests_uncharged, which v5 does not). Within such conventions it is robust: rho2xks's step index priced 0 (it could reuse the hash of the per-point table lookup): IC/rho at h = 1, I = 10M 0.870-0.918, unranked 27; only restart starts charged: 0.863-0.908; rho2xks index doubled: 0.644-0.716; rhodpu at 4 per point (v4 validator's count): unchanged. It is not robust to charging a distinguished-point rho one native operation per point instead of two (canonicalisation or point hash taken as free): then rhodpu is the cheapest rho at h = 1 in all 198 configurations, IC/rho at h = 1, I = 10M is 0.833-1.059 (28 b T = 1024 0.991 [0.984, 1.002], 32 b T = 4096 1.010 [1.008, 1.013], 32 b T = 1024 1.059 [1.043, 1.065]), the IC is cheaper at h = 1 in only 19 of 27 (cell, cI), and 3 decisions become dearer (32 b T = 1024 at I = 10M and 30M, 32 b T = 4096 at I = 10M); with rho2xks's index free as well, 7 dearer and 20 unranked. Under that reading the IC's h = 1 ratio also grows with the group (T = 1024, I = 10M: 0.908, 0.991, 1.059 at 24, 28, 32 b), whereas under the frozen convention it does not (0.748, 0.731, 0.728). RESULTS' Limits mentions only that 2 per point favours rho over the v4 validator's 4."
+  },
+  {
+   "id": "V5-F6",
+   "severity": "pass",
+   "check": "4 grid edges and stronger references",
+   "finding": "Validator panels (not pre-registered; 792 runs, every target verified by the harness): rho2xks at kappa 0.75 and 1.0 on all 198 configurations is never the cheapest rho at any price under the frozen convention (decisions and ranges unchanged), so the h = 1 result does not rest on the top grid edge; rho2xks's h = 0 optimum at the floor (0.05 in 126/198) can only make rho cheaper at h = 0, which widens the IC's h = 0 loss and cannot change an unranked decision. rho2x without retention at kappa 0.5 and 1.0 never wins under the frozen convention (it wins 110/198 at h = 1 only when rho2xks's index is free, where the IC stays at 0.875-0.919). A modelled distinguished-point rho without the negation map (one native operation per point, sqrt 2 more walk work; a model from rhodpu's kappa = 0 phases, not a measurement) wins 38/198 at h = 1 but leaves the ranges and all 27 decisions unchanged. Cross-fitting every arm's parameter choice on the other seed (removing the min-of-10 vs min-of-4 selection asymmetry): unranked 27, I = 10M ranges 1.0632-1.1518 / 0.9948-1.0418 / 0.7147-0.8018. Counting the retention IC arms' two probes per trial class (ret and table) as two hash operations: unranked 27, h = 0.1 range 1.035-1.077, h = 1 unchanged. A standard pseudo-random-walk rho cannot avoid a per-step partition decision; the generic method with no per-step native work in this panel is BSGS, which the IC does not beat at any price (1.11-1.47x)."
+  },
+  {
+   "id": "V5-F7",
+   "severity": "info",
+   "check": "1 uncounted work and its direction",
+   "finding": "Uncounted on the rho side: the walk-restart RNG draws (rho2xks 32,384,938 = 3.5% of steps; rhodpu 144,400,826 = 5.2% of points), which favours rho. Uncounted on both sides: F_p and mod-n additions and the solver's zero tests, by the harness's stated convention. Undercounted for the IC: ic5ks/ic5rw count one H for the retained-table and table probe of one x (merged-table equivalent; the instrumented replay shows 0 <= H - HashMap calls <= targets in all 396 such rows); counting both changes no decision (V5-F6). The IC's mu = 1.0 is frozen from v3 and not re-tuned for h = 1 (favours rho)."
+  },
+  {
+   "id": "V5-F8",
+   "severity": "process",
+   "check": "4 protocol and evidence policy",
+   "finding": "Freeze order holds: PROTOCOL.md, run.py, analyze.py, noverify.py, mk_runs.py, plot.py, the instances and the harness are in 5aab996e55 (03:11:47Z) and unchanged through 2729e252e2; the bench record shows the holdout started at 03:12:01Z; the rows record commit 59e4e892b3 (bench-record-only). Gaps: rows.jsonl (2,547,056 bytes, .jsonl) is committed to Git instead of the artifact store (AGENTS.md 13; the bench record at 1f85ca3678 lists it with uploaded: false); the bench record at the validated commit is open with no commands, metrics or raw data (1f85ca3678 adds them; closed_utc still null); the leaderboard builder was pointed at v5 (1f85ca3678) before this validation; the smoke runs behind the protocol's predictions (instances, seeds, outputs) are not committed."
+  },
+  {
+   "id": "V5-F9",
+   "severity": "info",
+   "check": "4 instances",
+   "finding": "All 33 curves are valid (p and n prime, nonsingular, G and the fixture point on the curve, nG = O, n the only multiple of n in the Hasse interval so #E = n, fixture log correct) and regenerate byte-identically (33 files and MANIFEST.json) from gen_instances.py --families W --bits 24,28,32 --per 11 --seed mtfo-v5-20261112. 0 (p, a, b) overlap with 116,860 curve records in 107,880 JSON files under research/ and docs/curves. One (p, n) coincidence: v5 W32-4 has the same p and group order as v4 W32-4 but a different j-invariant (not isomorphic; a different curve and different targets)."
+  }
+ ],
+ "required_amendments": [
+  "V5-F4 (non-blocking): in RESULTS 'Which arm wins', replace 'rho2xks at every price, in all 198 configurations; rhodpu never' with 'rho2xks in all 198 configurations at h = 0 and 0.1 and in 194 at h = 1 (rhodpu in 4: 32 b, T = 1024; 27 of 198 at I = 3 M)', and replace 'At h = 1 the best kappa is interior' with 'At h = 1 kappa = 0.5, the top of the grid, is best in 36 configurations; the validator's kappa = 0.75 and 1.0 runs never win, so the h = 1 result does not rest on the grid edge'. Correct the noverify h = 1 range to 0.70-0.73.",
+  "V5-F5 (non-blocking, disclosure): add to Limits (and to the Answer's h = 1 sentence) that the h = 1 advantage holds under the pre-registered convention (a distinguished-point rho pays one canonicalisation and one point hash per point, rho2xks one step index per step, each at h) and is robust to pricing rho2xks's index at 0, but that with one native operation per distinguished-point rho point the IC is not cheaper at h = 1 in 8 of 27 (cell, I/M), 3 decisions become dearer (32 b, T <= 4096) and at I = 10M the IC/rho ratio at h = 1 is 0.83-1.06; replace 'a choice that favours rho over the v4 validator's count' by this two-sided statement.",
+  "V5-F8 (process): move rows.jsonl to the artifact store with a .artifacts.json manifest; close the bench record; keep the leaderboard's v5 multi-target section 'not validated' until VALIDATION.json passes the gate and cites this report; record the pre-freeze smoke runs or drop 'from one smoke run per arm' from PROTOCOL's predictions in a dated note (not by editing the frozen file)."
+ ],
+ "accepted_results_headline": "On 33 fresh prime-order curves (group orders about 2^24-2^32, T = 1024-16384, 22 paired configurations per cell), with counted field and mod-n operations and every arm's hash-table and native work (rho step indices, distinguished-point canonicalisations and point hashes, IC offset-step indices) priced at h = 0, 0.1 and 1 GAE each, the cheapest of four multi-target IC variants is unranked against the cheapest of ten runs of this harness's multi-target rho in all 27 (cell, I/M) decisions because the order flips with h: at I = 10 M it is 1.06-1.16x at h = 0 (dearer in all 9 cells), 1.00-1.05x at h = 0.1 and 0.71-0.80x at h = 1 (cheaper in all 9 cells). With native work unpriced it is dearer in all 27 (1.05-2.02x at I = 10 M); it is 1.11-1.47x a paired BSGS at every price. The h = 1 advantage rests on charging a distinguished-point rho two native operations per point: at one per point the IC is not cheaper at h = 1 at 28-32 bits with T = 1024-4096 (0.83-1.06x at I = 10 M) and 3 of the 27 decisions become dearer.",
+ "path_rebase": {
+  "from": "research/mt_fieldops_v5_20261112/validation/validator-report.json",
+  "from_sha256": "743ddee98132d4638871dfc0eeb27da5fc09ecd401663fd5020948780f638c77",
+  "change": "raw_data paths rebased from the validation/ directory to this benchmarks directory; nothing else changed"
+ }
+}

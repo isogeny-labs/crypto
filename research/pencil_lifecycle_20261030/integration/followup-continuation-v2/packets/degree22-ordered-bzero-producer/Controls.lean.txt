@@ -1,0 +1,23 @@
+import OrderedBZero
+import BZeroFixtures
+set_option autoImplicit false
+open PencilWordRefinement BZeroWordControls
+namespace OrderedBZeroControls
+def b : WeightedWord := ⟨4,0,1,0,1,1⟩
+example : crossPreludeWord 5 a b=some .sameUDouble ∧ guardBWord 5 a=0 := by decide
+example : let d := (bzeroWords 5 a).point
+ let c := dblWordPayload 5 0 4 1 0 d
+ a.s≠0 ∧ d.canonical 5 ∧ d.y≠0 ∧ bzeroWordDispatch 5 0 4 1 0 a=some c ∧
+ c.canonical 5 ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid 5 (WeightedDoubling.curve (0:ZMod 5) 4 1 0) := by
+ exact ordered_double_bzero_preserves 5 (by decide) (by decide) 0 4 1 0 a b
+  (by decide) (by decide) (by decide) (by decide)
+  (by norm_num [WeightedWord.canonical,a]) (by norm_num [WeightedWord.canonical,b])
+  (by decide) (by decide) (by decide) (by decide) va hg
+example : let c := dblWordPayload 5 0 4 1 0 (bzeroWords 5 a).point
+ c.q=2 ∧ c.r=1 ∧ c.s=3 ∧ c.t=2 ∧ c.z=3 ∧ c.w=3 := by decide
+example : crossPreludeWord 5 ⟨0,0,0,0,1,1⟩ ⟨0,0,0,0,1,1⟩=some .sameUInverse := by decide
+example : crossPreludeWord 5 ⟨0,1,1,0,1,1⟩ ⟨0,1,1,0,1,1⟩=some .sameUDouble ∧
+ guardBWord 5 ⟨0,1,1,0,1,1⟩=3 := by decide
+example : ¬(5≤(2:UInt64).toNat) := by decide
+end OrderedBZeroControls

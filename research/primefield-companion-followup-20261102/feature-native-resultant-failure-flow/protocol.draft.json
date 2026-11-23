@@ -1,0 +1,1294 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "PF-projected-resultant-counts-20261107",
+  "version": 2,
+  "created": "2026-11-07",
+  "repository": "crypto",
+  "study_dir": "research/primefield-companion-followup-20261102/feature-native-resultant-failure-flow",
+  "authors": [
+    "native prime-field research"
+  ],
+  "links": {
+    "status": "DRAFT NOT ADMITTED: new journal source revision/production binary binding, admitted preflight, freeze/publication and actual funds/capacity evidence still missing."
+  },
+  "question": "For the fixed48 polynomial cases, how do projected-resultant backends change separate counted arithmetic and observed allocation dimensions?",
+  "claims": [
+    {
+      "id": "C-values",
+      "text": "All240 prospective arm/case values match the separately computed direct-product oracle.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-deltas",
+      "text": "Report exact per-case named-counter deltas for Euclidean and half-GCD backends versus scalar accumulation.",
+      "class": "comparative",
+      "decided_by": [
+        "euclid-v-scalar",
+        "half-v-scalar"
+      ],
+      "if_supported": "Retain every separate signed delta, including regressions and zero cases.",
+      "if_not_supported": "Invalid panel is not a comparison; preserve failed attempt and raw rows."
+    }
+  ],
+  "arms": [
+    {
+      "id": "scalar",
+      "role": "reference",
+      "description": "Scalar remainder-tree accumulation and terminal projection",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-C",
+            "opt-level=2",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-resultant-failure-flow/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "2",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "backend": "scalar"
+      }
+    },
+    {
+      "id": "euclid",
+      "role": "candidate",
+      "description": "Ordinary Euclidean multiplicative quotient classes",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-C",
+            "opt-level=2",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-resultant-failure-flow/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "2",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "backend": "euclid"
+      },
+      "same_instrument_as": "scalar"
+    },
+    {
+      "id": "half",
+      "role": "candidate",
+      "description": "Half-GCD multiplicative quotient classes, cutoff8",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-C",
+            "opt-level=2",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-resultant-failure-flow/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "2",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "backend": "half"
+      },
+      "same_instrument_as": "scalar"
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "Identical scalar path",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-C",
+            "opt-level=2",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-resultant-failure-flow/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "2",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "backend": "aa"
+      },
+      "same_instrument_as": "scalar"
+    },
+    {
+      "id": "positive",
+      "role": "control_positive",
+      "description": "Scalar path plus one explicitly counted modular product by1",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-C",
+            "opt-level=2",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-resultant-failure-flow/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "2",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "backend": "positive"
+      },
+      "same_instrument_as": "scalar"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "repeat",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "positive",
+      "expected_detection": "Identical value and all metrics except exactly +1 Product versus scalar.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Finite deterministic counter comparison, no null-population detection claim. Disjoint/common-root input pairs, exact A/A and malformed-row rejection are retained."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "backend",
+        "levels": [
+          "scalar",
+          "euclid",
+          "half"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "48 exact TSV cases, seed20261107",
+        "how": "Native generator/oracle file hash pinned"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One compiler/binary/flags/System allocator",
+        "how": "Bind production binary and all source closure before freeze"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Admitted CPU Spot job",
+        "how": "Retain CPU/kernel/image/job/pod, environment and memory-layout observations; no timing inference"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": "Rotate five-arm order by case index",
+        "how": "Within each case, arm[(offset+case_id)%5]"
+      },
+      {
+        "name": "lifetime",
+        "treatment": "fixed",
+        "value": "Borrowed inputs outside, context/root work through temporary destruction inside",
+        "how": "Scalar-only accounting boundary"
+      },
+      {
+        "name": "warmup",
+        "treatment": "fixed",
+        "value": 0,
+        "how": "No timed primary metric"
+      },
+      {
+        "name": "preemption",
+        "treatment": "measured",
+        "value": "No retry or resume",
+        "how": "Partial rows invalidate comparison; retain failure receipt"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Unblinded exact per-case analysis",
+        "how": "Hash-bound parser and no selected metric weighting"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "euclid-v-scalar",
+        "arms": [
+          "scalar",
+          "euclid"
+        ],
+        "differs_in": [
+          "backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "half-v-scalar",
+        "arms": [
+          "scalar",
+          "half"
+        ],
+        "differs_in": [
+          "backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "repeat",
+        "arms": [
+          "scalar",
+          "aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Fixed rotated order by case index; deterministic counted metrics, exact A/A, no clock inference.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261107
+      ],
+      "nonce": null,
+      "note": "Seed20261107 initializes native input xorshift64*; all arms receive identical frozen arrays. No stochastic backend work."
+    },
+    "instance_sampling": {
+      "rule": "All48 predeclared cases: p509/1000003, n16/32/64/128, m=n/2,n,2n, disjoint/common-root pairs.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact event counts with fixed analysis and no sampling inference",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 48,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact fixed-fixture integer comparison; no population-power or significance claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "Product",
+        "name": "Product",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. Product",
+        "source": "rows.jsonl metrics.Product",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "Add",
+        "name": "Add",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. Add",
+        "source": "rows.jsonl metrics.Add",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "Subtract",
+        "name": "Subtract",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. Subtract",
+        "source": "rows.jsonl metrics.Subtract",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "Negate",
+        "name": "Negate",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. Negate",
+        "source": "rows.jsonl metrics.Negate",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "Normalize",
+        "name": "Normalize",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. Normalize",
+        "source": "rows.jsonl metrics.Normalize",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "Inverse",
+        "name": "Inverse",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. Inverse",
+        "source": "rows.jsonl metrics.Inverse",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "EuclidStep",
+        "name": "EuclidStep",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. EuclidStep",
+        "source": "rows.jsonl metrics.EuclidStep",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "Projection",
+        "name": "Projection",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. Projection",
+        "source": "rows.jsonl metrics.Projection",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_new",
+        "name": "call_new",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_new",
+        "source": "rows.jsonl metrics.call_new",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_fm",
+        "name": "call_fm",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_fm",
+        "source": "rows.jsonl metrics.call_fm",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_inverse",
+        "name": "call_inverse",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_inverse",
+        "source": "rows.jsonl metrics.call_inverse",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_trim",
+        "name": "call_trim",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_trim",
+        "source": "rows.jsonl metrics.call_trim",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_add",
+        "name": "call_add",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_add",
+        "source": "rows.jsonl metrics.call_add",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_sub",
+        "name": "call_sub",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_sub",
+        "source": "rows.jsonl metrics.call_sub",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_mul",
+        "name": "call_mul",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_mul",
+        "source": "rows.jsonl metrics.call_mul",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_mul_low",
+        "name": "call_mul_low",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_mul_low",
+        "source": "rows.jsonl metrics.call_mul_low",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_inv_series",
+        "name": "call_inv_series",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_inv_series",
+        "source": "rows.jsonl metrics.call_inv_series",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_divrem",
+        "name": "call_divrem",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_divrem",
+        "source": "rows.jsonl metrics.call_divrem",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_product_tree",
+        "name": "call_product_tree",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_product_tree",
+        "source": "rows.jsonl metrics.call_product_tree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_monic_remainder",
+        "name": "call_monic_remainder",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_monic_remainder",
+        "source": "rows.jsonl metrics.call_monic_remainder",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_values",
+        "name": "call_values",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_values",
+        "source": "rows.jsonl metrics.call_values",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_value_product",
+        "name": "call_value_product",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_value_product",
+        "source": "rows.jsonl metrics.call_value_product",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_root_resultant",
+        "name": "call_root_resultant",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_root_resultant",
+        "source": "rows.jsonl metrics.call_root_resultant",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_combine",
+        "name": "call_combine",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_combine",
+        "source": "rows.jsonl metrics.call_combine",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_square",
+        "name": "call_square",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_square",
+        "source": "rows.jsonl metrics.call_square",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_negate",
+        "name": "call_negate",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_negate",
+        "source": "rows.jsonl metrics.call_negate",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_is_zero",
+        "name": "call_is_zero",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_is_zero",
+        "source": "rows.jsonl metrics.call_is_zero",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_project",
+        "name": "call_project",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_project",
+        "source": "rows.jsonl metrics.call_project",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_resultant_class",
+        "name": "call_resultant_class",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_resultant_class",
+        "source": "rows.jsonl metrics.call_resultant_class",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_image_class",
+        "name": "call_image_class",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_image_class",
+        "source": "rows.jsonl metrics.call_image_class",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_projected_resultant",
+        "name": "call_projected_resultant",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_projected_resultant",
+        "source": "rows.jsonl metrics.call_projected_resultant",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_root_product",
+        "name": "call_root_product",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_root_product",
+        "source": "rows.jsonl metrics.call_root_product",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_root_resultant_class",
+        "name": "call_root_resultant_class",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_root_resultant_class",
+        "source": "rows.jsonl metrics.call_root_resultant_class",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_root_projected_resultant",
+        "name": "call_root_projected_resultant",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_root_projected_resultant",
+        "source": "rows.jsonl metrics.call_root_projected_resultant",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_matrix_mul",
+        "name": "call_matrix_mul",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_matrix_mul",
+        "source": "rows.jsonl metrics.call_matrix_mul",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_matrix_apply",
+        "name": "call_matrix_apply",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_matrix_apply",
+        "source": "rows.jsonl metrics.call_matrix_apply",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_step_matrix",
+        "name": "call_step_matrix",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_step_matrix",
+        "source": "rows.jsonl metrics.call_step_matrix",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_lifted",
+        "name": "call_lifted",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_lifted",
+        "source": "rows.jsonl metrics.call_lifted",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_half_gcd",
+        "name": "call_half_gcd",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_half_gcd",
+        "source": "rows.jsonl metrics.call_half_gcd",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_identity",
+        "name": "call_identity",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_identity",
+        "source": "rows.jsonl metrics.call_identity",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_degree",
+        "name": "call_degree",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_degree",
+        "source": "rows.jsonl metrics.call_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_polynomial",
+        "name": "call_polynomial",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_polynomial",
+        "source": "rows.jsonl metrics.call_polynomial",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_reset_projections",
+        "name": "call_reset_projections",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_reset_projections",
+        "source": "rows.jsonl metrics.call_reset_projections",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_projections",
+        "name": "call_projections",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_projections",
+        "source": "rows.jsonl metrics.call_projections",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_reset_batches",
+        "name": "call_reset_batches",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_reset_batches",
+        "source": "rows.jsonl metrics.call_reset_batches",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "call_batches",
+        "name": "call_batches",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. call_batches",
+        "source": "rows.jsonl metrics.call_batches",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "alloc_calls",
+        "name": "alloc_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. alloc_calls",
+        "source": "rows.jsonl metrics.alloc_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "zeroed_calls",
+        "name": "zeroed_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. zeroed_calls",
+        "source": "rows.jsonl metrics.zeroed_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "realloc_calls",
+        "name": "realloc_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. realloc_calls",
+        "source": "rows.jsonl metrics.realloc_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "dealloc_calls",
+        "name": "dealloc_calls",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. dealloc_calls",
+        "source": "rows.jsonl metrics.dealloc_calls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "requested_bytes",
+        "name": "requested_bytes",
+        "unit": "requested bytes",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. requested_bytes",
+        "source": "rows.jsonl metrics.requested_bytes",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "live_bytes",
+        "name": "live_bytes",
+        "unit": "requested bytes",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. live_bytes",
+        "source": "rows.jsonl metrics.live_bytes",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "peak_live_bytes",
+        "name": "peak_live_bytes",
+        "unit": "requested bytes",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. peak_live_bytes",
+        "source": "rows.jsonl metrics.peak_live_bytes",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "allocation_failures",
+        "name": "allocation_failures",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. allocation_failures",
+        "source": "rows.jsonl metrics.allocation_failures",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "accounting_invalid",
+        "name": "accounting_invalid",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. accounting_invalid",
+        "source": "rows.jsonl metrics.accounting_invalid",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "counter_overflow",
+        "name": "counter_overflow",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Arithmetic/event, helper-entry or observed allocator dimension defined in the pinned accounting README. Dimensions remain separate and are not summed; allocator observations are compiler-bound. counter_overflow",
+        "source": "rows.jsonl metrics.counter_overflow",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L1",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "Product",
+      "Add",
+      "Subtract",
+      "Negate",
+      "Normalize",
+      "Inverse",
+      "EuclidStep",
+      "Projection",
+      "call_new",
+      "call_fm",
+      "call_inverse",
+      "call_trim",
+      "call_add",
+      "call_sub",
+      "call_mul",
+      "call_mul_low",
+      "call_inv_series",
+      "call_divrem",
+      "call_product_tree",
+      "call_monic_remainder",
+      "call_values",
+      "call_value_product",
+      "call_root_resultant",
+      "call_combine",
+      "call_square",
+      "call_negate",
+      "call_is_zero",
+      "call_project",
+      "call_resultant_class",
+      "call_image_class",
+      "call_projected_resultant",
+      "call_root_product",
+      "call_root_resultant_class",
+      "call_root_projected_resultant",
+      "call_matrix_mul",
+      "call_matrix_apply",
+      "call_step_matrix",
+      "call_lifted",
+      "call_half_gcd",
+      "call_identity",
+      "call_degree",
+      "call_polynomial",
+      "call_reset_projections",
+      "call_projections",
+      "call_reset_batches",
+      "call_batches",
+      "alloc_calls",
+      "zeroed_calls",
+      "realloc_calls",
+      "dealloc_calls",
+      "requested_bytes",
+      "live_bytes",
+      "peak_live_bytes",
+      "allocation_failures",
+      "accounting_invalid",
+      "counter_overflow"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel",
+      "binary_sha256",
+      "source_commit",
+      "protocol_sha256",
+      "image_digest",
+      "job_uid",
+      "pod_uid",
+      "environment",
+      "memory_layout",
+      "admission_receipt",
+      "raw_sha256",
+      "external_exit_status"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
+    "placement": {
+      "cpus": 1,
+      "memory_mib": 1024,
+      "spot": true,
+      "max_total_usd": 1,
+      "reservation_status": "PROPOSED ceiling including build, idle, failures, storage and transfer; no reserved funds, no submission authority",
+      "concurrency": 1
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly5 arms x48 cases,240 rows; one attempt120s, no retry/resume/replacement. Preserve partial rows on failure.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Missing/extra/duplicate/reordered rows; wrong values/metadata/pins; invalid counter types, overflow, allocation failures or nonzero final-live bytes invalidate panel.",
+    "A/A must match every metric; positive must differ only by +1 Product; all Projection counts1.",
+    "Require actual production binary pin, successful producer exit and canonical frozen protocol with authentic external admission.",
+    "Missing/truncated/contradictory journal or absent completion markers invalidates successful comparison; failure exports never authorize retry."
+  ],
+  "decision_rule": {
+    "text": "Validate entire panel and controls, then report all per-case separate signed deltas. No weighted total or timing inference.",
+    "comparison_ids": [
+      "euclid-v-scalar",
+      "half-v-scalar"
+    ],
+    "threshold": "Exact signed deltas in named event dimensions",
+    "statistic": "Per-case backend-minus-scalar metric vector",
+    "interval": "Exact fixed-fixture values; no confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Separate signed integers; no selective weighting",
+    "verdict_vocabulary": [
+      "valid_counted_deltas",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../feature-native-resultant-panel/analyze.py",
+      "sha256": "2a28a9cb2eddb10d3fc94be7542f54a35abe89fb01d0ce76cc2c9027d0926dd7"
+    },
+    "inputs": [
+      "rows.jsonl and external receipt; input/metric/binary/protocol pins",
+      "All source and adapter bindings in extensions must match"
+    ],
+    "outputs": [
+      "comparison.json and canonical export.json, new output directory only"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-case deltas by dimension, disjoint/common-root classes separate; A/A and positive controls"
+    ],
+    "report_dir": "future-panel-report"
+  },
+  "inadmissible": [
+    "Running before canonical freeze, production publication, admitted preflight and authoritative remaining budget/capacity evidence",
+    "Substituting this48-case component panel for original4563-case cohort",
+    "Treating synthetic software tests as comparative data",
+    "Combining helper/arithmetic/allocator dimensions into a weighted total or timing claim",
+    "Retrying or renaming an attempt to evade the one-attempt ceiling"
+  ],
+  "literature": [
+    {
+      "ref": "../feature-native-resultant-accounting/README.md",
+      "provenance": "internal",
+      "claim": "Reversible source instrumentation and counter/lifetime definitions",
+      "verified_by": "Source review"
+    },
+    {
+      "ref": "../feature-native-resultant-panel/README.md",
+      "provenance": "internal",
+      "claim": "Deterministic panel, oracle and strict controls",
+      "verified_by": "Source review"
+    },
+    {
+      "ref": "authority/docs/experiment-protocol.md",
+      "provenance": "internal",
+      "claim": "Canonical protocol/export semantics at pinned upstream revision",
+      "verified_by": "Source review"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "bindings": {
+      "inputs": {
+        "path": "../feature-native-resultant-panel/inputs.tsv",
+        "sha256": "ade4adbda52cfc01290b5262eca1fa258e2407d42a527ce417e480764f478575"
+      },
+      "metrics": {
+        "path": "../feature-native-resultant-panel/metrics.txt",
+        "sha256": "5de4571ed18f0142b807a198c20bb1f4945ea3cdd7f71f392bc121ff16cb4640"
+      },
+      "analysis": {
+        "path": "../feature-native-resultant-panel/analyze.py",
+        "sha256": "2a28a9cb2eddb10d3fc94be7542f54a35abe89fb01d0ce76cc2c9027d0926dd7"
+      },
+      "panel_main": {
+        "path": "main.rs",
+        "sha256": "410158c17262ce05911a83815c58bb424fdf6103cb475c3c79d4b35a27dd4728"
+      },
+      "panel_generator": {
+        "path": "../feature-native-resultant-panel/panel.rs",
+        "sha256": "c64418ce6fc3d30fa7b07e973acf1fadb2e6c996206d02ccc445eb9998d2de00"
+      },
+      "counter_definitions": {
+        "path": "../feature-native-resultant-accounting/README.md",
+        "sha256": "0615b67de4037abf887baf81d3ebf23284cc9d827a264d7e6b3d37c70a22d7cb"
+      },
+      "meter": {
+        "path": "../feature-native-resultant-accounting/meter.rs",
+        "sha256": "99443bf3affb9a19c6dc3c014b33923255c7fc8ff23c5eb31983fd24a83c46c8"
+      },
+      "names": {
+        "path": "../feature-native-resultant-accounting/names.rs",
+        "sha256": "ca2f39c064827c488cbf0fc64043ad241148c61302b03636ec166613d881b810"
+      },
+      "authority": {
+        "path": "../feature-native-resultant-protocol/authority.json",
+        "sha256": "aa66f939fe8d47a0e25f4dfeadaf8ed8ded1ed6dcaea775b418a7ad5a8756c0a"
+      },
+      "adapter": {
+        "path": "../feature-native-resultant-protocol/export.py",
+        "sha256": "f8e66d378b086ace31caa708fd226070f73b612fda4e95dc9a321d9f01258bea"
+      },
+      "capture": {
+        "path": "capture.py",
+        "sha256": "d74f4ceaf0474a43b72aa36b4a52cc46d87dad1990459700d5c0a76da97d0e78"
+      },
+      "common": {
+        "path": "../feature-native-resultant-protocol/common.py",
+        "sha256": "1e8af5f95aa18b67a7003b049bb15d1663d3c7a4ccb1b8e133a654d8ab2cd4d0"
+      },
+      "backend_scalar": {
+        "path": "../feature-native-resultant-accounting/generated/scalar.rs",
+        "sha256": "978093fb1bdd5e847f6c094e241b6524486bff1e065ec609a57f4c8d346f54cb"
+      },
+      "backend_euclid": {
+        "path": "../feature-native-resultant-accounting/generated/euclid.rs",
+        "sha256": "81c327ea821163701f0a9fdd29a8a2c6db9e3ea78b509ecac194dd8d73c2b85b"
+      },
+      "backend_half": {
+        "path": "../feature-native-resultant-accounting/generated/half.rs",
+        "sha256": "96afe40aeab98356548528bce6074bcf9886f997e49082ab37193d0b5879fb20"
+      },
+      "journal": {
+        "path": "journal.rs",
+        "sha256": "d648c97f64c85bb45c04b76b168092a4b90d98cf928ede6894cacd09d084e5bb"
+      },
+      "success_adapter": {
+        "path": "success.py",
+        "sha256": "b7168aa829e164e2bb44f7a02eb431cfd57acc070cd1ae8e43900bb2ba99683b"
+      },
+      "failure_adapter": {
+        "path": "failure.py",
+        "sha256": "97bcda047af2a3b9bcf73473c3ec4203fe50f1280d0fde6d842f8dc2c9b8f45b"
+      },
+      "predecessor_draft": {
+        "path": "../feature-native-resultant-protocol/protocol.draft.json",
+        "sha256": "99b70cd046bf762dd117eeb7bee98eeeb6acb3c61fc8228a0929735b6ca86e9d"
+      }
+    },
+    "canonical_authority": {
+      "repo": "isogeny-labs/crypto-autoresearcher",
+      "commit": "41bfaed260093c69da299cbad936205530909b6f",
+      "files": [
+        {
+          "path": "tools/experiment_protocol.py",
+          "git_blob": "9917acf83f0eeb37a249d3c822cbd422117d461a",
+          "sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+          "bytes": 64811
+        },
+        {
+          "path": "schemas/experiment-protocol.v1.json",
+          "git_blob": "9d8543e6b448264c333649e1a4dfd83a2a297bd5",
+          "sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+          "bytes": 37583
+        },
+        {
+          "path": "schemas/experiment-export.v1.json",
+          "git_blob": "707ebf6f814d96bb44b36a9ccb3e25128e1aaf5e",
+          "sha256": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+          "bytes": 11875
+        },
+        {
+          "path": "docs/experiment-protocol.md",
+          "git_blob": "0830f344b30e6d4386eec7be071d3cb7a94f4b3a",
+          "sha256": "111beee86ce91364cc23098ab232a151b1ece271eabdc544df49ba56067fecf2",
+          "bytes": 15572
+        }
+      ]
+    },
+    "production_binary_status": "Unbuilt/unbound; development validation binary is not silently promoted",
+    "reserved_usd": 0,
+    "failure_export_policy": "Export only journal-started cells; list never-started cells separately. Failed exports are schema-valid but retain canonical completeness findings and exclude all rows. Complete success requires all240 completion markers."
+  }
+}

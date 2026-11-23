@@ -16,9 +16,11 @@
 //! The class is a single isogeny class over `F_p`: all curves share the
 //! order, trace and Frobenius discriminant.  When the order is prime the
 //! order audit proves each recorded model has it ([`curve::audit_order`]).
-//! What the walk does **not** establish: a discrete-log transport between
-//! generators (the recorded generator follows a fixed rule, not the
-//! isogeny), or any change in DLP cost.
+//! The walk record does not itself map the recorded generators or establish
+//! any change in DLP cost. `icx solve-prime --route-file ... --route-id ...`
+//! separately re-verifies a root-origin route, transports caller-supplied
+//! generator and target points through its kernel maps, and checks any scalar
+//! answer back on the caller's original curve.
 
 pub mod checkpoint;
 pub mod curve;

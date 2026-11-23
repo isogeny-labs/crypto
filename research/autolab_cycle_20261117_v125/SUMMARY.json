@@ -1,0 +1,136 @@
+{
+  "recipe_oracles": {
+    "out": {
+      "circuits": 80,
+      "configurations": 400,
+      "assignments": 12000,
+      "value_checks": 288000,
+      "forced_cuts": 1143,
+      "nongrowth_checks": 401,
+      "deep_checks": 64,
+      "work_cap_checks": 1,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "recipe_profile": {
+    "out": {
+      "variants": {
+        "32": {
+          "status": "complete",
+          "inputs": 63,
+          "variables": 53316,
+          "clauses": 190667,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "not": 184,
+            "xor": 30838,
+            "and": 22231
+          },
+          "graph_sha256": "40692788bf56f73731a43c6262cdc98b0756c2cdbc37f1da9b8046fe52a4e9cb",
+          "rewrite_and_check_seconds": 2.3439756229927298,
+          "stats": {
+            "support_work": 422276,
+            "cuts": 1243,
+            "introduced_atoms": 23561,
+            "emitted_recipes": 29779
+          },
+          "actual_controls": 32
+        },
+        "64": {
+          "status": "complete",
+          "inputs": 63,
+          "variables": 53291,
+          "clauses": 190570,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "xor": 30818,
+            "and": 22226,
+            "not": 184
+          },
+          "graph_sha256": "6dc2eb8eacb46c317a4bed014e7dd892c33309c936333518f3a37d6928767a2e",
+          "rewrite_and_check_seconds": 2.0516804679937195,
+          "stats": {
+            "support_work": 722377,
+            "cuts": 894,
+            "introduced_atoms": 23212,
+            "emitted_recipes": 30108
+          },
+          "actual_controls": 32
+        },
+        "128": {
+          "status": "complete",
+          "inputs": 63,
+          "variables": 53280,
+          "clauses": 190526,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "xor": 30807,
+            "and": 22226,
+            "not": 184
+          },
+          "graph_sha256": "beea3463cb922635b0f69bf33934fe3f5466fcf9db5007961584f44fb3310145",
+          "rewrite_and_check_seconds": 1.4676132279855665,
+          "stats": {
+            "support_work": 1140147,
+            "cuts": 462,
+            "introduced_atoms": 22780,
+            "emitted_recipes": 30529
+          },
+          "actual_controls": 32
+        }
+      },
+      "original_complete": false,
+      "cost_improved": true,
+      "selected_terms": 128,
+      "source": {
+        "inputs": 63,
+        "variables": 53794,
+        "clauses": 192485,
+        "graph_sha256": "1f77cc2df83d9ec0d4d7cb42f6ad0b795b75da40f061cfe4cf78c6a84b6b8733"
+      },
+      "total_seconds": 6.517155495996121,
+      "scope": "trainingrepresentationcalibrationonly;selectionbypreregisteredclauses/vars/termsrule;notqualifiedperformanceholdout"
+    },
+    "error": null
+  },
+  "degree_clipped_oracles_profile": {
+    "out": {
+      "actual_controls": 32,
+      "formulation": {
+        "inputs": 63,
+        "variables": 47663,
+        "clauses": 170851,
+        "gate_kinds": {
+          "false": 1,
+          "true": 1,
+          "input": 63,
+          "not": 184,
+          "xor": 27981,
+          "and": 19435
+        },
+        "graph_sha256": "dbadc6bc3cbfa5d304262f20143ea00cc5c8a2dedd70173ebf1bef13d56865d1",
+        "source_variables": 53794,
+        "source_clauses": 192485
+      },
+      "exhaustive_assignments": 32768,
+      "planted_assignments": 200,
+      "random_assignments": 128,
+      "accepted": 212,
+      "q_alias_checks": 1,
+      "original_complete": false,
+      "cold_compile_seconds": 0.3473343680088874,
+      "total_seconds": 2.288491987012094
+    },
+    "error": null
+  },
+  "original_complete": false,
+  "qualified_speedup": null,
+  "goal_active": true
+}

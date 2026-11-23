@@ -1,0 +1,82 @@
+{
+ "toy_primes": [
+  8191,
+  41011,
+  65519
+ ],
+ "velu_identity_p8191": 200,
+ "doubling_identity_p8191": 200,
+ "velu_identity_p41011": 200,
+ "doubling_identity_p41011": 200,
+ "velu_identity_p65519": 200,
+ "doubling_identity_p65519": 200,
+ "velu_identity_P192": 20,
+ "doubling_identity_P256": 20,
+ "fibre_sizes_p8191": {
+  "1": {
+   "expected": 2,
+   "min": 2,
+   "max": 2,
+   "draws": 20
+  },
+  "2": {
+   "expected": 4,
+   "min": 4,
+   "max": 4,
+   "draws": 20
+  },
+  "3": {
+   "expected": 8,
+   "min": 8,
+   "max": 8,
+   "draws": 20
+  },
+  "4": {
+   "expected": 16,
+   "min": 16,
+   "max": 16,
+   "draws": 20
+  },
+  "5": {
+   "expected": 32,
+   "min": 32,
+   "max": 32,
+   "draws": 20
+  },
+  "6": {
+   "expected": 64,
+   "min": 64,
+   "max": 64,
+   "draws": 20
+  }
+ },
+ "nist": {
+  "P-192": {
+   "v2_p_minus_1": 1,
+   "v2_p_plus_1": 64,
+   "t": 12,
+   "distinct_a": 4096,
+   "expected": 4096,
+   "tower_hits_c_on_all": true,
+   "seconds": 3.95
+  },
+  "P-256": {
+   "v2_p_minus_1": 1,
+   "v2_p_plus_1": 96,
+   "t": 12,
+   "distinct_a": 4096,
+   "expected": 4096,
+   "tower_hits_c_on_all": true,
+   "seconds": 6.54
+  },
+  "P-521": {
+   "v2_p_minus_1": 1,
+   "v2_p_plus_1": 521,
+   "t": 12,
+   "distinct_a": 4096,
+   "expected": 4096,
+   "tower_hits_c_on_all": true,
+   "seconds": 37.82
+  }
+ }
+}

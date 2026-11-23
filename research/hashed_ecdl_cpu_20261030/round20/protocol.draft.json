@@ -1,0 +1,658 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "HASHED-ECDL-CPU-STREAM-ENDPOINTS-20261030",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/hashed_ecdl_cpu_20261030/round20",
+  "authors": [
+    "Codex"
+  ],
+  "links": {},
+  "question": "What complete cost and certificate behavior do streamed incidence staging and batch inversion endpoints exhibit on all three fixed fixtures?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "All six arms recover identical full certificates on all three fixed fixtures.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Matched integrated parents isolate streamed incidence staging and residual batch endpoints while preserving exact full certificates.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C3",
+      "text": "L0 durations are diagnostics; isolated performance improvement and largest feasible scale are outside this panel.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "u",
+      "role": "baseline",
+      "description": "Pinned optimized CPU baseline batch64",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "d5d6c0e1164a805d7c2ea45ee128d8a2da1160bf5109203c01947ad176e505d6",
+        "flags": {
+          "arm": "v"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Pinned optimized CPU baseline batch64"
+      }
+    },
+    {
+      "id": "v",
+      "role": "candidate",
+      "description": "Accumulated CPU candidate",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "fab61dde9ada8fafcaa4d15af735f3b422e886d0",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "332430e3d711b96d57568243942f7ac27be8fbf0c712417fe9eb6fefe03dade9",
+        "flags": {
+          "arm": "v",
+          "materialization": "candidate-materialization.json"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Projective relation checks batch64"
+      }
+    },
+    {
+      "id": "w",
+      "role": "reference",
+      "description": "Accumulated CPU candidate",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "fab61dde9ada8fafcaa4d15af735f3b422e886d0",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "332430e3d711b96d57568243942f7ac27be8fbf0c712417fe9eb6fefe03dade9",
+        "flags": {
+          "arm": "w",
+          "materialization": "candidate-materialization.json"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Projective relation checks batch1"
+      }
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "description": "Pinned optimized CPU baseline batch64",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "d5d6c0e1164a805d7c2ea45ee128d8a2da1160bf5109203c01947ad176e505d6",
+        "flags": {
+          "arm": "v"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Pinned optimized CPU baseline batch64"
+      },
+      "same_instrument_as": "u"
+    },
+    {
+      "id": "y",
+      "role": "reference",
+      "description": "Before endpoint-product removal",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a6117b9ec7743d879223806b1cc28556ba83903e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "ee641162129944ac3955a9455d2c89007b3280c484e50715da20da0da6f1d5a2",
+        "flags": {
+          "arm": "v",
+          "materialization": "previous-materialization.json"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Before endpoint-product removal"
+      }
+    },
+    {
+      "id": "z",
+      "role": "reference",
+      "description": "Before streamed matrix staging",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "5cb7a4072078c0eadabd9aabfcc3be3baaa14d37",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--example",
+            "complete",
+            "--manifest-path",
+            "crates/hashed-ecdl-cpu/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "3391976b69981891ccb5f133cfa8aeb54201e29b48c77e3c322dd5a2414753e8",
+        "flags": {
+          "arm": "v",
+          "materialization": "inverse-materialization.json"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "oracle": "Before streamed matrix staging"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Each fixed public target is constructed from a known scalar before solver invocation; solver sees only P,Q. Exact recovery and independent replay must pass every execution."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Every execution corrupts the recovered scalar after timing and requires rejection. All-target unit tests also compare exhaustive positive and negative relation answers; no random-population claim."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "implementation",
+        "levels": [
+          "original baseline",
+          "accumulated candidate batch64",
+          "accumulated candidate batch1",
+          "before endpoints",
+          "before streaming"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "Pinned original baseline and three integrated source snapshots",
+        "how": "y/v differs only in CPU endpoint products; z/y differs only in shared streamed reduction. Source-delta files and manifests bind each contrast. u/v measures the whole accumulated implementation, not an individual change."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "case0 p211,a0,b7,r199,P3:33,k42,m3,tau40; case1 p65521,a65518,b3,r65563,P0:64894,k45678,m3,tau80; case2 same curve,k54321,m4,tau64",
+        "how": "Public software fixtures; seeds111,222,333; max_trials16,max_work1000000,one target per execution."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Same EKS job, CPU2,memory4Gi; one software thread per cell; shared VM L0. Capture CPUinfo, affinity, kernel, cgroups. No certified clocks."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "Fresh process per cell; same tuple-row cap. Auxiliary allocations and inverse cache are included in setup but excluded from retained sum-table bytes. No total-memory equality claim."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Six-arm rotation with alternating reversal by round and case, exactly as run.sh; ten rounds do not form complete balanced cycles."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Analyst is unblinded. Frozen native analyzer computes exact certificate checks and descriptive ranges from neutral labels; labels do not provide human blinding."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-native",
+        "arms": [
+          "u",
+          "v"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-batch",
+        "arms": [
+          "w",
+          "v"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "u",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-endpoints",
+        "arms": [
+          "y",
+          "v"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-streaming",
+        "arms": [
+          "z",
+          "y"
+        ],
+        "differs_in": [
+          "implementation"
+        ],
+        "design": "one_factor"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "seed=111*(case+1), fixed across arms and rounds. Target scalar construction is solely a public known-answer fixture and excluded from solver inputs."
+    },
+    "instance_sampling": {
+      "rule": "Three fixed complete-recovery software fixtures, covering 8/16-bit fields and 3/4 slots; no population or scale extrapolation.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Unblinded analysis with fixed neutral machine labels; producer knows source mapping.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 3,
+    "replicates": 9,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact source-level counts and deterministic equality need no sampling power. Nine repeats characterize descriptive ranges only; no timed significance test or equivalence claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 300,
+      "measured_on": "Unmeasured conservative allocation, not evidence. Round0 is fixed per-arm/case warmup/preflight. No timing data existed at freeze."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "preparations",
+        "name": "Reusable table preparations",
+        "unit": "preparations",
+        "kind": "exact",
+        "definition": "Cumulative successful MITM preparations, including discarded trials; all arms use cached MITM.",
+        "source": "rows.csv preparations",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "query_inversions",
+        "name": "Residual batch inversions",
+        "unit": "inversions",
+        "kind": "exact",
+        "definition": "Cumulative residual inversion requests, including cached field-inverse lookups in candidate; excludes other arithmetic and is not total work. All arms are instrumented.",
+        "source": "rows.csv query_inversions",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "complete_ms",
+        "name": "complete_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Fresh-process algorithm interval: curve construction and known-target construction, solve including all base/table setup, discarded trials, target queries, reduction and internal verification, second independent replay, certificate serialization. Excludes process launch, archive I/O and negative control. Not the primary IC-online interval.",
+        "source": "rows.csv complete_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "oracle_ms",
+        "name": "oracle_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "All oracle queries, including cold table preparation, discarded trials and witness checks.",
+        "source": "rows.csv oracle_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "bases_ms",
+        "name": "bases_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "All base enumeration across all trials.",
+        "source": "rows.csv bases_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "reduction_other_ms",
+        "name": "reduction_other_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Solve remainder excluding bases and oracle: target generation, elimination, scalar recovery and internal replay; not a pure linear-algebra timer.",
+        "source": "rows.csv reduction_other_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "curve_ms",
+        "name": "curve_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Curve validation and known-target construction.",
+        "source": "rows.csv curve_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      },
+      {
+        "id": "replay_ms",
+        "name": "replay_ms",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Second complete independent certificate verification.",
+        "source": "rows.csv replay_ms",
+        "aggregation": "median",
+        "resolution": "Rust Instant, nanosecond representation; effective host precision not established",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "oracle_calls",
+      "preparations",
+      "built_rows",
+      "probed_rows",
+      "query_inversions",
+      "table_bytes",
+      "digest"
+    ],
+    "record": [
+      "CPUinfo, kernel, process affinity and cgroups",
+      "rustc and executable/source hashes",
+      "every complete certificate",
+      "all stage durations and cumulative structural counters"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab CPU Spot",
+    "placement": {
+      "cpu": 2,
+      "memory": "4Gi",
+      "threads": 1,
+      "runtime_image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "runtime_source": "cb2ec6873f30 (crypto main ancestor)",
+      "binary_source": {
+        "candidate": "fab61dde9ada8fafcaa4d15af735f3b422e886d0",
+        "previous": "a6117b9ec7743d879223806b1cc28556ba83903e",
+        "inverse": "5cb7a4072078c0eadabd9aabfcc3be3baaa14d37",
+        "baseline": "2bd4588fba603ba1787e1d8ad82f084ef461d7cf"
+      },
+      "candidate_materialization": {
+        "path": "candidate-materialization.json",
+        "sha256": "db715b8b07ef4acc2cf7d4546cecbf5a40bae5da421af8b6a22ddff51e8882ed",
+        "integrated": true
+      },
+      "previous_materialization": {
+        "path": "previous-materialization.json",
+        "sha256": "37e8813794e3bfb76fc9f3b1d45f79a29025afddd3bda9db197d1bc44f58525e",
+        "integrated": true
+      },
+      "inverse_materialization": {
+        "path": "inverse-materialization.json",
+        "sha256": "8f3bb9fe56f5bb22b4d6a9895f1f11325d138ef763c00a206c454e0e5e203519",
+        "integrated": true
+      }
+    },
+    "measurement_class": "throughput",
+    "timeout_seconds": 300,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "6arms x3instances x(1warmup+9rounds)=180 rows:162 measured and18 warmups; no extra repeats after viewing results.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any incorrect output, timeout or missing cell invalidates panel; preserve failures. Per-cell60s, whole job300s, one attempt, no automatic reruns.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any full certificate mismatch, missing/duplicate cell, failed known scalar or negative replay, source/hash mismatch or deadline invalidates the panel."
+  ],
+  "decision_rule": {
+    "text": "All180cells must complete with full certificate equality and negative controls. L0 durations only guide optimization; they cannot complete the further10x performance goal.",
+    "comparison_ids": [
+      "C-native",
+      "C-batch",
+      "C-endpoints",
+      "C-streaming"
+    ],
+    "threshold": "All fixed cells complete with identical certificates; expected batching and reuse counters are consistent.",
+    "statistic": "exact certificate equality and structural counters; descriptive stage median/min/max",
+    "interval": "exact counts; diagnostic full observed range, no confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact counters and descriptive complete-cost ranges; no performance acceptance from L0 clocks.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.rs",
+      "sha256": "1a6956c274199a8bf2205abc20fed29b3e98a9cc5ebd8eec514d29fbee0b1c2e"
+    },
+    "inputs": [
+      "rows.csv"
+    ],
+    "outputs": [
+      "summary.csv",
+      "latency.svg",
+      "analysis.log"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-arm complete CPU recovery diagnostic median and full observed range"
+    ],
+    "report_dir": "research/hashed_ecdl_cpu_20261030/reports/round20"
+  },
+  "inadmissible": [
+    "Certified speedup from L0 clocks",
+    "Calling retained table capacity total peak memory",
+    "Ignoring preparation or discarded trials",
+    "Calling cached MITM tensor contraction or algebraic progress",
+    "Claiming largest feasible scale or rho/external advantage without matched measurements"
+  ],
+  "literature": [
+    {
+      "ref": "https://cacr.uwaterloo.ca/hac/about/chap14.pdf",
+      "provenance": "retrieved",
+      "claim": "Section14.3.3 motivates amortizing reciprocal reduction. Existing ceiling variant retains its separately proved bound and wide remainder fallback.",
+      "verified_by": "Primary section read before implementation; reciprocal-candidate.md and curve-reciprocal/README.md document bounds."
+    },
+    {
+      "ref": "research/hashed_ecdl_cpu_20261030/hash-enumeration/README.md",
+      "provenance": "retrieved",
+      "claim": "The supplied paper Section3.5/Lemma13 defines inverse-hash listing; its exact first difference advances encodings by modular addition. Invocation-local validation preserves full parameter checks. Verifier base reconstruction changes, but both independent certificate replays remain charged.",
+      "verified_by": "Read implementation notes and validation records:37 standalone release tests, strict Clippy and format checks. No new novelty or performance claim."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

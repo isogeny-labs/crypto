@@ -1,0 +1,298 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h0e27b483c3989bcd",
+  "statement": {
+    "name": "Integer quartic root-difference expansion",
+    "source": "CONSTRUCTOR_EXCLUSION.md; faithful Lean theorem ICConstructor.quartic_difference_identity over every commutative ring. This integer identity is one dependency, not the entire finite-field irreducibility exclusion.",
+    "variables": [
+      "a",
+      "u",
+      "c1",
+      "c0"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "u"
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "u"
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "u"
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "u"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "c1"
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "a"
+                    },
+                    {
+                      "op": "var",
+                      "args": "u"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "c0"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "add",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "var",
+                    "args": "a"
+                  },
+                  {
+                    "op": "var",
+                    "args": "a"
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "c1"
+                  },
+                  {
+                    "op": "var",
+                    "args": "a"
+                  }
+                ]
+              },
+              {
+                "op": "var",
+                "args": "c0"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "u"
+            },
+            {
+              "op": "var",
+              "args": "u"
+            },
+            {
+              "op": "var",
+              "args": "u"
+            },
+            {
+              "op": "var",
+              "args": "u"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "c1"
+            },
+            {
+              "op": "var",
+              "args": "u"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 4
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "u"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 6
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "u"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 4
+            },
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "u"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 202610250004,
+  "value_digest": "f5329cae0484d8487f3dd34209fdf305345854ecccdfb43b85c5ef71337fdbae",
+  "independence": "Native certificate issuer; 256 extra domain-separated checks; faithful commutative-ring Lean proof built and axiom-audited separately. Fixed v1 evaluation modulus does not itself certify characteristic-two specialization.",
+  "proof": {
+    "kind": "lean4-v4.34.1",
+    "path": "research/ic_algebraic_crossover_20261023/lean/ConstructorCore.lean",
+    "sha256": "37530fe6bbb211bc42fea399a58559ac17d63d5e509e12b63297092bb0bc4267"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "regular-two-frobenius-inputs/v1",
+  "small": [
+    {
+      "n": 2,
+      "modulus": 7,
+      "basis": [
+        2
+      ],
+      "A": 0,
+      "B": 1
+    },
+    {
+      "n": 3,
+      "modulus": 11,
+      "basis": [
+        1,
+        2
+      ],
+      "A": 1,
+      "B": 1
+    },
+    {
+      "n": 4,
+      "modulus": 19,
+      "basis": [
+        1,
+        2,
+        8
+      ],
+      "A": 0,
+      "B": 1
+    }
+  ],
+  "small_selection": "all rational targets outsideV, all nonzero rational source lifts inV, all admittedh, everyk; preflight100000totalstates; exact tinyproducts/orderings",
+  "actual_instance": "research/advance/instances/n83-d18-m5-T001-offset0.json",
+  "actual_h": "0x4208336d0d441df79c400",
+  "actual_a": 1,
+  "actual_ya": 0,
+  "arms": [
+    "literal",
+    "fast"
+  ],
+  "repetitions": 3,
+  "orders": [
+    [
+      "literal",
+      "fast"
+    ],
+    [
+      "fast",
+      "literal"
+    ],
+    [
+      "literal",
+      "fast"
+    ]
+  ],
+  "timing": "same process; notcold; outergzip/crossarm/reportoverhead onlyinworkerwall",
+  "max_nullity": 12,
+  "max_candidates": 4096,
+  "retain": "everyboundedk,Q,LVrem,R4residue,support,recoveryandexcluded-commonfactorflag",
+  "Delta_optimization": "identitiesverified; no87coordinateimplementation",
+  "max_predicates": 200000,
+  "timeout_seconds": 90,
+  "work_seconds": 80,
+  "demote_seconds": 84,
+  "print_seconds": 88,
+  "memory_limit_mb": 4096,
+  "cores": 1,
+  "global_original_completion": false,
+  "qualified_speedup_claim": false,
+  "pre_freeze_fixture_reason": "Trace-mixed nonprefix GF16 domain fixed before any execution; generic product spans used; actual fixture unchanged",
+  "pre_freeze_fixture_corrections": [
+    "Original GF16 span[1,2] rational sources confined small torsion subgroup; independent static review broadened to span[1,2,4].",
+    "Independent static review then refuted low3: every generator has absolute trace0, so exterior targets cannot admit h. Before any execution/freeze, use fixed trace-mixed nonprefix span[1,2,8]."
+  ],
+  "positive_coverage_admission": "Everyfield ncells>0 and overall positives>0 required; per-field positive gaps explicitly retained, never claimed covered"
+}

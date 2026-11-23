@@ -1,0 +1,87 @@
+{
+  "status": "unsigned_producer_observation",
+  "passed": 5,
+  "failed": 0,
+  "filtered": 62,
+  "scope": "Standalone native workload candidate. Actual Fp256 and curve source, extracted group ledger/trait, unused panic-only Fp64 primality shim. Not actual-crate dispatch or a performance experiment.",
+  "sources": {
+    "src/cryptanalysis/curve25519_wide.rs": "d9671086380789e83ed5cfb518cb054a53d3dfda4d7e2e3d957ad4ac48d6039a",
+    "src/cryptanalysis/fp_backend.rs": "2722bbf0c1e58a079772af71680aabc514f7354e8b51bb3ed10ca5729a0da0e1",
+    "src/hash/sha256.rs": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf",
+    "src/cryptanalysis/ecbench/canonical.rs": "15d6b796983fadbd99b028b953355abddcc16ecf89e8b88fd8ca284ea2351918",
+    "src/cryptanalysis/ecbench/exact_scalar.rs": "53dcca1d5e743893745a3c8bb46267510a6b28e20912d1d0dfb52e06b3679093",
+    "research/curve25519_autolab_parity_20261105/next-integration/exact-sampling/candidate.rs": "400d72b92cd5b2d71e79ff17bc3275e8a66982358c3414aaf8ae9ea6bcca57c8"
+  },
+  "dependencies": {
+    "num_bigint": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libnum_bigint-81de55576f38f61f.rlib",
+      "sha256": "c1e88018c8e61d61aa45ba5460a7917da807cc214df9444ae0af23cce5a62274"
+    },
+    "num_traits": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libnum_traits-b3c4044e620ded21.rlib",
+      "sha256": "4731e0d5f6469c613ce8d01aa3957902520b9385f2b06ac56871d179e10e50bc"
+    },
+    "num_integer": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libnum_integer-16881460656efab2.rlib",
+      "sha256": "547334f262bf47c272c417799deebd5fdf2c7f157be56853a739b595ba832fc2"
+    },
+    "serde": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libserde-0bf82e85196bd177.rlib",
+      "sha256": "cbac69b55153b66829730eadf96cebdab42790a455f762d476b44f4113f14168"
+    },
+    "serde_json": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libserde_json-458049281485fb75.rlib",
+      "sha256": "688d29f94eb42520a78a31271704f90a8b370dbce6f8c65551fc1cf41b002019"
+    },
+    "hex": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libhex-06ecfa8b1b55f264.rlib",
+      "sha256": "a606b3dc553060ec919d70496df47f29396985f9daf1d1892ed27f3ae083d8e1"
+    },
+    "rand": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/librand-98bec4b7760c7532.rlib",
+      "sha256": "81082d3eb55bbbe4ea27717ef9f0e6c083f997d16964b5af7d574a26900f5c5b"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "boundary-extraction.rs",
+      "sha256": "d0a21f462a570a8e0faf13820f936c7e5d62a1729efc41f57c89569369ef006b",
+      "bytes": 5089
+    },
+    {
+      "path": "build-attempt2.log",
+      "sha256": "57c947ade4c8c0731cd5349c5fe9602e9c0edbb56e4bbd16e110705a69ff57ed",
+      "bytes": 6647
+    },
+    {
+      "path": "build-command-attempt2.json",
+      "sha256": "35a30f9966bda6e59917fb0ac2c81c70fc1154e74f7ce5055d376c61c4dcda85",
+      "bytes": 981
+    },
+    {
+      "path": "build-command.json",
+      "sha256": "2c7d88f4d96dcc259afcec8d5fc0767d56841f303340da976a1bf915d3e0300a",
+      "bytes": 981
+    },
+    {
+      "path": "build.log",
+      "sha256": "78b633108c949d8bc497b761de7d042f728dcaeee466c5ebeaadd257e9a4b396",
+      "bytes": 4630
+    },
+    {
+      "path": "candidate.rs",
+      "sha256": "87a1982bbdbe24d0fe9156039b711396ea73ffe6dc927d2a182c5a5de58231a0",
+      "bytes": 9042
+    },
+    {
+      "path": "harness.rs",
+      "sha256": "9d367f69e83c6eedd6263e428aea571868720d5a59bce13317cba46769f41410",
+      "bytes": 1224
+    },
+    {
+      "path": "tests-attempt2.log",
+      "sha256": "664b4ba96a9d753908f6ea26adca91b1f1696d576e16d74c8ae63250786c6a3b",
+      "bytes": 682
+    }
+  ]
+}

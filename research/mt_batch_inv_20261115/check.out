@@ -1,0 +1,18 @@
+# Pre-run checks, 2026-11-15T18:46:55Z
+old binary sha256 b1450fc237e303f3  new ea2f038e5bee00a2
+## 1. ic5b plain, W28-0, T=1024: new vs old (all fields but times and inv)
+identical: PASS
+## 2. ic5b bi vs plain, T=1024
+W32-4.json {'table': (1085717, 1085717), 'trials': (1904484, 1904484), 'relations': (49, 49), 'p1_trials': (94732, 94732), 'ok': (1024, 1024), 'targets': (1024, 1024)}
+ counts plain: {'I': 1626189, 'M': 3319633, 'S': 3235155}  bi: {'I': 213589, 'M': 7557433, 'S': 3235155}  ms_arm 504.6 237.7
+ PASS
+W36-0.json {'table': (4462447, 4462447), 'trials': (8092020, 8092020), 'relations': (84, 84), 'p1_trials': (711182, 711182), 'ok': (1024, 1024), 'targets': (1024, 1024)}
+ counts plain: {'I': 6797275, 'M': 13776234, 'S': 13555360}  bi: {'I': 801990, 'M': 31762089, 'S': 13555360}  ms_arm 2657.2 1079.6
+ PASS
+## 3. rhodpb recovers every target (offset 0, 32 lanes)
+W24-0.json k=0.0 ok 1024 / 1024 ms 13.4 PASS
+W24-0.json k=0.25 ok 1024 / 1024 ms 12.1 PASS
+W32-4.json k=0.0 ok 1024 / 1024 ms 175.8 PASS
+W32-4.json k=0.25 ok 1024 / 1024 ms 162.2 PASS
+W36-0.json k=0.0 ok 1024 / 1024 ms 670.1 PASS
+W36-0.json k=0.25 ok 1024 / 1024 ms 632.2 PASS

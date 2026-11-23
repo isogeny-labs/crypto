@@ -1,0 +1,22 @@
+   Compiling vieta-coset-lab v0.1.0 (/workspace/crypto/research/vieta_coset_rust_20261115/native)
+    Finished `release` profile [optimized] target(s) in 2.88s
+     Running unittests lib.rs (research/vieta_coset_rust_20261115/native/target/release/build/vieta-coset-lab/4a6812ae23922ddb/out/vieta_coset_lab-4a6812ae23922ddb)
+
+running 1 test
+test vieta_coset::tests::half_gcd_matches_literal_euclidean_matrices_and_gcd ... FAILED
+
+failures:
+
+---- vieta_coset::tests::half_gcd_matches_literal_euclidean_matrices_and_gcd stdout ----
+
+thread 'vieta_coset::tests::half_gcd_matches_literal_euclidean_matrices_and_gcd' (7176) panicked at ../../../src/cryptanalysis/vieta_coset.rs:1066:31:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    vieta_coset::tests::half_gcd_matches_literal_euclidean_matrices_and_gcd
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

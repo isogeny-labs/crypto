@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T17:32:16Z",
+ "id": "PCC-20261116-18eae5",
+ "kind": "theorem",
+ "producer": {
+  "commit": "b8462a65d882de1069dd863a3b8de4a3b6ba8cbb",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "2c03db164404da988bacff2b19db07cbd3780a4e282190f7511c49f65da84de0",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+   "theorem": "CubicRelativeNorm22304.full_relative_norm"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact characteristic223 commutative ring/cubic-relation encoding arithmetic, full relative trace/norm/cofactor, schoolbook product and conditional two-sided inverse with an explicitly supplied base-norm inverse; finite norm multiplicativity/nonadditivity/zero controls. Both unchanged original gates55/0 underj1/120s/default memory. No field/nonzero-norm/native program/Jacobian/ECDLP/cost or signed standing.",
+ "statement": "theorem full_relative_norm {R : Type} [CommRing R] [IsCharP R 223] (z : R) (hz : z^3=3) (x : Fin 223 \u00d7 Fin 223 \u00d7 Fin 223) : encode z x*(encode z x)^223*((encode z x)^223)^223= (embed (coefficientNorm x) : R)"
+}

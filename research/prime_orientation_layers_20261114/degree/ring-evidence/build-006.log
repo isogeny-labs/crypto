@@ -1,0 +1,43 @@
+../ring-evidence/draft-006.lean.txt:120:61: error: Invalid `⟨...⟩` notation: The expected type of this term could not be determined
+../ring-evidence/draft-006.lean.txt:124:26: error: Application type mismatch: The argument
+  hz
+has type
+  P.coeff n = 0
+but is expected to have type
+  ↑?m.13 = ↑0
+in the application
+  Subtype.ext hz
+../ring-evidence/draft-006.lean.txt:126:0: error: Not a definitional equality: the left-hand side
+  ↑((liftPoly P hP).coeff n)
+is not definitionally equal to the right-hand side
+  P.coeff n
+../ring-evidence/draft-006.lean.txt:127:47: error: Type mismatch
+  rfl
+has type
+  ?m.14 = ?m.14
+but is expected to have type
+  ↑((liftPoly P hP).coeff n) = P.coeff n
+../ring-evidence/draft-006.lean.txt:133:2: error: Tactic `rfl` failed: The left-hand side
+  integralRationals.subtype ((liftPoly P hP).coeff n)
+is not definitionally equal to the right-hand side
+  P.coeff n
+
+P : ℚ[X]
+hP : Content 0 P
+n : ℕ
+⊢ integralRationals.subtype ((liftPoly P hP).coeff n) = P.coeff n
+../ring-evidence/draft-006.lean.txt:159:10: error: invalid `▸` notation, expected result type of cast is 
+  VBound ↑p ↑(E.coeff n)
+however, the equality 
+  Eq.symm H
+of type 
+  (W - A * B).coeff n = integralRationals.subtype (E.coeff n)
+does not contain the expected result type on either the left or the right hand side
+'OrientationCoefficientReduction.reduce_zero_of_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.integral_den_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.reduce_compatible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.reduce_finite_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientReduction.actual_integral_polynomial_product' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

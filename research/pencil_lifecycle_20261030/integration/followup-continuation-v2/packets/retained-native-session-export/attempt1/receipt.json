@@ -1,0 +1,62 @@
+{
+  "schema": "software.retained-export-check/v1",
+  "status": "failed",
+  "error": "AssertionError({'argv': ['/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc', '--edition=2021', '--test', '--crate-name', 'retained_native_export', '/var/tmp/retained-native-export-20261103-v1/lib.rs', '-o', '/var/tmp/retained-native-export-20261103-v1/controls', '-L', 'dependency=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps', '-C', 'codegen-units=1', '-C', 'debuginfo=0', '-C', 'opt-level=0', '-C', 'linker=/usr/bin/cc', '-C', 'link-arg=-fuse-ld=bfd', '--extern', 'crypto_lib=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/libcrypto_lib-daf9fdac4ff20898.rlib', '--extern', 'serde_json=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/libserde_json-458049281485fb75.rlib', '--extern', 'serde=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/libserde-0bf82e85196bd177.rlib', '--extern', 'libc=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/liblibc-56ab79ec8afd5c44.rlib', '--extern', 'sha2=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/libsha2-d9f2e7249be3be6b.rlib'], 'reaped': True, 'pid': 55671, 'exit': 1})",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc",
+        "-Vv"
+      ],
+      "reaped": true,
+      "pid": 55645,
+      "exit": 0
+    },
+    {
+      "argv": [
+        "/home/ec2-user/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc",
+        "--edition=2021",
+        "--test",
+        "--crate-name",
+        "retained_native_export",
+        "/var/tmp/retained-native-export-20261103-v1/lib.rs",
+        "-o",
+        "/var/tmp/retained-native-export-20261103-v1/controls",
+        "-L",
+        "dependency=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "debuginfo=0",
+        "-C",
+        "opt-level=0",
+        "-C",
+        "linker=/usr/bin/cc",
+        "-C",
+        "link-arg=-fuse-ld=bfd",
+        "--extern",
+        "crypto_lib=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/libcrypto_lib-daf9fdac4ff20898.rlib",
+        "--extern",
+        "serde_json=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/libserde_json-458049281485fb75.rlib",
+        "--extern",
+        "serde=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/libserde-0bf82e85196bd177.rlib",
+        "--extern",
+        "libc=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/liblibc-56ab79ec8afd5c44.rlib",
+        "--extern",
+        "sha2=/home/ec2-user/crypto-pencil-signed-graph-20261029/target/release/deps/libsha2-d9f2e7249be3be6b.rlib"
+      ],
+      "reaped": true,
+      "pid": 55671,
+      "exit": 1
+    }
+  ],
+  "elapsed_seconds": 4.153429619007511,
+  "pending_signal": null,
+  "changed_inputs": [],
+  "cached_dependencies_rebuilt": false,
+  "scientific_runs": 0,
+  "outer_ceiling_seconds": 120,
+  "hard_address_space_bytes_per_process": 2147483648,
+  "build_jobs": 1,
+  "offline": true
+}

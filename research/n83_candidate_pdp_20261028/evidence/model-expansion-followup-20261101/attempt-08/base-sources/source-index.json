@@ -1,0 +1,82 @@
+{
+  "schema": "n83.full-domain-factor-base-sources/v2",
+  "protocol_sha256": "3a041db64c7d6d70aa99200fe46500770998de5faffaf2acb7a2e366c855eb57",
+  "prepared_bases": [
+    {
+      "candidate_id": "spike35",
+      "coordinate_bit": 35,
+      "index_sha256": "85c7603d7a37575906efb3e7bdb268563b515ff00508d1c1ebd11c34dfe95b28",
+      "family_manifests": {
+        "koblitz": {
+          "path": "evidence/n83-factorbase-variants/r35-attempt-01/terminal-20261101T0633Z/restored/data/koblitz/manifest.json",
+          "sha256": "0b84e067e11596f24c50513d5ea696634c58c940777d9ac0760bf1857e322fc4",
+          "bytes": 213472
+        },
+        "binary": {
+          "path": "evidence/n83-factorbase-variants/r35-attempt-01/terminal-20261101T0633Z/restored/data/binary/manifest.json",
+          "sha256": "c4c0a16e02da7eb2d0ae908c788ff788c8da13da0b0fe7039a1905ab5ba9a907",
+          "bytes": 213416
+        },
+        "prime": {
+          "path": "evidence/n83-factorbase-variants/r35-attempt-01/terminal-20261101T0633Z/restored/data/prime/manifest.json",
+          "sha256": "52169126febd512ae00b232ab39c753371b6808c67910f71a42ea501d78dd28e",
+          "bytes": 213139
+        }
+      },
+      "s3_file_index_sha256": "d0b78cab215c8dd6467786ddf3bde24e84183cb67500e7cd6c0f3e448ed27bf7",
+      "s3_file_count": 786,
+      "s3_file_index_schema": "n83.factor-base-s3-file-index/v2"
+    },
+    {
+      "candidate_id": "spike36",
+      "coordinate_bit": 36,
+      "index_sha256": "b2c2bafa2a9d8a7153ca0ee0addee5f82a20d3c34a9c9f6be607c698187e0cff",
+      "family_manifests": {
+        "koblitz": {
+          "path": "evidence/n83-factorbase-variants/r36-attempt-01/terminal-failure-20261101T0715Z/restored/data/koblitz/manifest.json",
+          "sha256": "a255a665d63b4283f9177f3a288fdf5df27da1470553d14e3869f252c9fd0465",
+          "bytes": 213458
+        },
+        "binary": {
+          "path": "evidence/n83-factorbase-variants/r36-attempt-01/terminal-failure-20261101T0715Z/restored/data/binary/manifest.json",
+          "sha256": "1d60d9efd311360dba04324ff082099274e2cc46e4ad78b7f54f1ce8dcff8b45",
+          "bytes": 213422
+        },
+        "prime": {
+          "path": "evidence/n83-factorbase-variants/r36-attempt-01/terminal-failure-20261101T0715Z/restored/data/prime/manifest.json",
+          "sha256": "9cd5db26297ed49ce6acc256372161ce4727ffd79bdcb3e2f1185aacfef344b0",
+          "bytes": 213140
+        }
+      },
+      "s3_file_index_sha256": "7fb30c8e29908d3d0b9e7c8f130bd7e8b3cd9610469810d2b625328916b04bc9",
+      "s3_file_count": 785,
+      "s3_file_index_schema": "n83.factor-base-recovered-index/v1"
+    },
+    {
+      "candidate_id": "spike37",
+      "coordinate_bit": 37,
+      "index_sha256": "707cb7275edc9d02a5d05c970b4e2affd819f3ef9562ad159fd372710dca9a4f",
+      "family_manifests": {
+        "koblitz": {
+          "path": "evidence/n83-factorbase-variants/r37-attempt-01/terminal-recovery-20261101T1835Z/restored/data/koblitz/manifest.json",
+          "sha256": "91bb6bf5399653deb5a15f2d98542b7c288ea8b56e151b269962fedd6d4c265d",
+          "bytes": 213720
+        },
+        "binary": {
+          "path": "evidence/n83-factorbase-variants/r37-attempt-01/terminal-recovery-20261101T1835Z/restored/data/binary/manifest.json",
+          "sha256": "0c0e29f3d13f6d87522dc8c15322e218e24270ae5aa976fe7a823589bbcd3952",
+          "bytes": 213690
+        },
+        "prime": {
+          "path": "evidence/n83-factorbase-variants/r37-attempt-01/terminal-recovery-20261101T1835Z/restored/data/prime/manifest.json",
+          "sha256": "e7274f7bbd6d560faf7639dfa28cee246d49c348443620aa9c91c40c93c0d5e3",
+          "bytes": 213391
+        }
+      },
+      "s3_file_index_sha256": "7ee28b23f21d4853d043b0ddc20e94b938a99ab7a8ea1a81056b424f95618281",
+      "s3_file_count": 786,
+      "s3_file_index_schema": "n83.factor-base-s3-file-index/v2"
+    }
+  ],
+  "shard_policy": "Fetch only selected immutable S3 shards; verify bytes and SHA-256 before decoding."
+}

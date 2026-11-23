@@ -1,0 +1,52 @@
+{
+  "schema": "pencil.combined-predecessor-terminal/v1",
+  "predecessor": "signed-kummer-combined-runner-v7-20261111",
+  "source_publication_commit": "6a180a4da4ec5f75acb66a4a850cf29aae9b406f",
+  "caller": {
+    "path": "/var/tmp/pencil-combined-v7-caller-20261111/caller-result.json",
+    "sha256": "7f2cb96a0c5de4c8950a55e9557455d1ecb567760779a285525a37f044059c1c",
+    "exit_code": 1,
+    "elapsed_seconds": 387.150838412
+  },
+  "completion": {
+    "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v7-20261111/completion.json",
+    "sha256": "8726f00c6776aa6280542681766014b59eb9684e1111413c6720314cb3642267",
+    "status": "failed",
+    "seal_status": "passed",
+    "elapsed_seconds": 387.0096686129691
+  },
+  "terminal_output_manifest": {
+    "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v7-20261111/terminal-output-manifest.json",
+    "sha256": "a80a1560b287437ee052cd5c45aec3cc882e8a64779dd5ad35cfb86a273cfa30",
+    "sealed_after_owned_cgroup_empty": true
+  },
+  "worker_receipt": {
+    "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v7-20261111/worker/worker-receipt.json",
+    "sha256": "6d747a6455ad0847ac3bf18b176241823f68bb28d3134f54cf3871fafe33931b",
+    "materialize_exit_code": 0,
+    "compile_reaped_exit_code": -9,
+    "tests_run": 0
+  },
+  "supervisor_receipt": {
+    "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v7-20261111/supervisor/launch-receipt.json",
+    "sha256": "123dd5bce19db495db9883904cc1fcd90fa80db44bfdde3c2db063157f26e427",
+    "cleanup_complete": true
+  },
+  "materialization": {
+    "status": "passed",
+    "elapsed_seconds": 36.524531087023206,
+    "receipt_sha256": "cb86ff627675c464eec1995f67dedb07815b209582893c7c3ba7e29311722d6a",
+    "cache_modes_preserved": true
+  },
+  "failure": {
+    "stage": "compiler_target_monitor_during_rustc_temporary_directory_removal",
+    "message": "os.walk encountered ENOENT for cache/target/release/deps/rmetaOgIf8S",
+    "compile_stdout_sha256": "7538b5f47746d851872c01365fd53747f44fc28a65030a51b4a6757417c04026",
+    "compile_stderr_sha256": "4e21b94b0f0701a4d96240294c1e0ebf1995ab063606a959998278f33885473f",
+    "compiler_elapsed_seconds": 287.0881788529805,
+    "peak_observed_target_bytes": 2622112333
+  },
+  "automatic_retry": false,
+  "compiler_reached_rust_source": true,
+  "scientific_payload_executed": false
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "validator-report/v1",
+  "track": "f1-oracle",
+  "track_dir": "research/curve25519_f1_walk_20261107",
+  "validator": "independent adversarial validator (Claude Opus 5.5, workflow subagent), 2026-11-07",
+  "status": "pass_with_errata",
+  "checks": [
+    {"check": "protocol frozen before data", "result": "pass", "evidence": "PROTOCOL.md mtime 19:38:48Z, specs 19:38:20Z, first session started 19:45:57Z (plan-k20-s0.txt); `sha256sum -c data/frozen.sha256` run from the repo root: 17/17 OK (PROTOCOL.md + 16 specs). Note: file mtimes can be forged; there is no external timestamp."},
+    {"check": "single-target sessions", "result": "pass", "evidence": "all 16 spec.json files have targets_per_curve=1 and one curve; each session's records carry exactly one workload_id and one target point; 8 distinct workloads and targets per k; own measurement seed and target seed per session"},
+    {"check": "records verified, audits", "result": "pass", "evidence": "16 x 390 records, every outcome verified with matches_target=true; the records.jsonl SHA-256 equals the audited hash in verify-*.json and the tarball copies, 16/16; every session was run and audited by binary 44442a4b..., which matches data/binary.sha256 and the binary on disk (unchanged after my test build). Independent re-audit of a copy of k24-s5 (replay seed 777 plus explicit f1-x07, f1-x05 and f2-inc runs): 10/10 replays identical, 0 problems"},
+    {"check": "pooled numbers recomputed with my own code", "result": "pass (tiny deviation, see errata)", "evidence": "own unpriced resolver plus a log-ratio t interval (df=7). Including warm-ups I reproduce every README figure to 3 d.p. (k20 f1-x07/f2-inc 0.807 [0.777,0.839]/0.814/0.866; rho distance 1.495/1.429/1.082; k24 0.859/0.871/0.963 [0.898,1.030]). With measured rounds only: k20 0.809 [0.776,0.842], 0.816, 0.869 [0.820,0.921]; k24 0.855 [0.814,0.897], 0.867, 0.956 [0.891,1.024]; rho distance k20 1.496/1.429/1.083. Every prediction verdict is unchanged."},
+    {"check": "w band", "result": "pass", "evidence": "every comparison is reported at w=0, 0.1 and 1; the k=24 w=1 overlap with 1 is disclosed; this is not a w=0-only claim"},
+    {"check": "model (PROTOCOL section 4)", "result": "pass", "evidence": "own Monte Carlo (200k draws): F=1 1.572/1.548/1.568, F=2 1.765/1.762/1.769; floor Gamma(F+3/2)/(Gamma(F+1)Gamma(3/2)) = 1.500 (F=1) and 1.875 (F=2); 1.548/1.768 = 0.876"},
+    {"check": "A/A", "result": "confirmed degenerate", "evidence": "rho-aa equals rho-neg run for run, 65/65 in all 16 sessions (same algorithm_seed). The three F=1 arms and f2-inc also share seeds by round, so the comparison is paired on seed"},
+    {"check": "code change and tests", "result": "pass", "evidence": "the diff is limited to the 1-seed branch in WalkTable::build_with (2-seed draws: same rng call order; seeds [0,1] unchanged), doc/help text, and a new test. `CARGO_TARGET_DIR=/home/user/ctarget-f1 cargo test --release --lib wwalk` on the current tree: 7 passed, 0 failed (scratchpad cargo-wwalk.txt). ic_boundary.rs mtime 19:59:24Z is after the binary (19:45:28Z); the current diff shows only F=1 changes, but byte identity between the source and the binary is not proven"},
+    {"check": "relabelling", "result": "flag (not refuted, not an IC decomposition result)", "evidence": "F=1 has one base point P1 of unknown log, pinned by a walk self-collision; the target is then found by a generic table hit. No decomposition is done. With P1 := G (known log) the method becomes F=0, a rho/BSGS-style walk table, which costs less. The measured gain, three collisions down to two, moves the arm toward rho, not toward better index calculus. The README discloses this and makes no leaderboard claim"}
+  ],
+  "errata": [
+    {"claim": "64 measured rounds per arm; mean S over 3,120 records; pooled ratios", "problem": "analyse.py/pooled_compare.py pool the 1 warm-up round per arm per session (6 of 390 records) into the means and ratios, against the frozen design of 64 measured rounds plus 1 warm-up", "fix": "recompute with warmup=false: k20 f1-x07/f2-inc 0.809 [0.776,0.842] / 0.816 [0.782,0.851] / 0.869 [0.820,0.921]; k24 0.855 [0.814,0.897] / 0.867 [0.823,0.912] / 0.956 [0.891,1.024]; or state that warm-ups are included. No verdict changes"},
+    {"claim": "The w = 0 distance of 1.495x sits on the derived F = 1 collision floor of 1.5x; under the generic model no generic F = 1 variant can go much lower", "problem": "This is a numerical coincidence. The floor is relative to model rho (0.886), but the k=20 rho-neg reference measures S=1.55 (1.75x model) because of set-up overhead, and at k=24 the distance is 1.58. The coincidence does not show that the floor binds", "fix": "say the measured ratio is numerically close to 1.5 at k=20 because of overhead cancellation, and drop the inference that the floor binds (or compare model-normalised costs)"},
+    {"claim": "F=1 is an improvement over the index-calculus baseline (success criterion)", "problem": "The comparator is the generic wwalk incumbent, which the README notes is a generic walk. The F=1 arm does no decomposition and dominates F=2 only by being closer to F=0 (rho). The IC leaderboard's decomposition-based prime-field rows at k=20 sit around 8x rho, which is a different baseline", "fix": "label it a generic walk-table variant (F=1), not an index-calculus improvement, unless the owner rules otherwise; no IC leaderboard row without that ruling and the validation gate"},
+    {"claim": "share of the incumbent's gap closed: 40% at k=20", "problem": "(1.852-1.495)/0.852 = 41.9%, which rounds to 42%, not 40%; the figure is also for w=0 only", "fix": "report 42% (w=0), and give the w=0.1/1 values (about 43% and 67%) or mark the figure as w=0 only"},
+    {"claim": "P4 (A/A) held", "problem": "degenerate: rho-aa and rho-neg are bit-identical (65/65 runs, all sessions), so the check is not informative", "fix": "already disclosed; score P4 as uninformative, not held"},
+    {"claim": "binary built from this working tree", "problem": "ic_boundary.rs was modified at 19:59:24Z, after the binary (19:45:28Z), the runs and the recorded test log; no source hash ties the binary to the source", "fix": "record a source tree hash (git diff sha) at build time, or rebuild and confirm the ecbench sha matches"}
+  ],
+  "refuted_claims": [
+    "The w=0 distance of 1.495x sits on the derived F=1 collision floor of 1.5x (as evidence that the floor binds): refuted as an inference; the numbers agree only through rho-neg's small-r overhead"
+  ],
+  "upheld_claims": [
+    "wwalk 1-seed mode with g=1, 2-seed path unchanged, tests pass (7/7, re-run)",
+    "k20 F=1 (x=0.7) / F=2 below 1 at w=0, 0.1 and 1 (P1 held), within rounding of the warm-up issue",
+    "k24 P6 held at w=0; the w=1 interval includes 1 for x=0.5 and 0.7",
+    "rho-neg ahead at all w with intervals excluding parity (P3)",
+    "P5 held; ordering among x values unresolved",
+    "16/16 sessions audited, 390/390 verified, replays reproduced (independently re-checked on k24-s5)"
+  ],
+  "pcc": "Every number here is an unverified assertion [pcc:unverified]; no pcc claim id exists for this track"
+}

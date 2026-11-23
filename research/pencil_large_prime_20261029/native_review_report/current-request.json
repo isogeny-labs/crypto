@@ -1,0 +1,127 @@
+{
+  "schema": "pencil-native-review-report-request/v1",
+  "title": "Pencil mathematical study: native preparation evidence",
+  "snapshot": "2026-10-29T22:49:35Z",
+  "plan_summary": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/accounting/aggregate/actual-plan-only-summary-final.json",
+    "sha256": "9c0d055e2af7f6f79ce201b9b0c2a22691da0af55e8f6f127acec7070bb7e665"
+  },
+  "observations": [
+    {
+      "id": "first-gate",
+      "scope": "Explicit user approval of larger FIRST gate only; cumulative budget, original deadline, IAM/controller, freeze and launch remain pending.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/protocol_draft/accounting_amendment_20261029/first_gate_authorization.json",
+        "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600"
+      },
+      "fields": {
+        "targets": "/scope/target_count",
+        "coefficient_cap": "/scope/matrix_coefficient_cap",
+        "seconds_per_execution": "/scope/timeout_seconds_per_execution"
+      }
+    },
+    {
+      "id": "native-preparation",
+      "scope": "Current native preparation software and run-free parity only; actual frozen archive reextracted with current source543 instrument. Does not independently reproduce the instrument build.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_preparation/validation/receipt.json",
+        "sha256": "46843c028008698dc4eaa47370191904cf274791402d8953e23868e725d62ea3"
+      },
+      "fields": {
+        "software_tests": "/software_checks/1/tests_passed",
+        "tests_failed": "/software_checks/1/tests_failed",
+        "archive_reextracted": "/archive_extraction_validation/actual_frozen_archive_reextracted_in_this_validation",
+        "archive_workloads": "/archive_plan_parity/observed_workloads",
+        "cohort_slots": "/prepared_plan_parity/cohort_planned_executions",
+        "exact_retained_specs": "/prepared_plan_parity/prepared_specs_and_manifest_exact_retained_bytes",
+        "solver_executions": "/execution_boundary/solver_executions_performed"
+      }
+    },
+    {
+      "id": "native-canonical",
+      "scope": "Native canonical packaging/protocol software fixtures only; distinct from empirical targets and previous producer/analyzer suites.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/validation/receipt.json",
+        "sha256": "aeef1f2bc1984f248121a786996cfb6ed5008750a825d47712e53092ad4ea0f6"
+      },
+      "fields": {
+        "tests_passed": "/release_tests/passed",
+        "tests_failed": "/release_tests/failed",
+        "clippy_passed": "/clippy/passed",
+        "empirical_targets": "/cohort_targets_executed",
+        "qualified_cost_ratio": "/qualified_cost_ratio"
+      }
+    },
+    {
+      "id": "native-report",
+      "scope": "Native renderer software fixtures only; includes pdflatex PDF test and historical validation-scope preservation.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_review_report/validation-layout.json",
+        "sha256": "37da6488934ed19fb48102e16de777a0c7935519f36245bd31399e4708864023"
+      },
+      "fields": {
+        "tests_passed": "/tests_passed",
+        "tests_failed": "/tests_failed",
+        "clippy_exit_code": "/clippy_exit_code",
+        "empirical_targets": "/empirical_targets"
+      }
+    },
+    {
+      "id": "instrument543",
+      "scope": "Previously verified static ecbench build source543, separate from native tooling; plan-only checks and no solver execution.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/instrument_build_40938439022/receipt.json",
+        "sha256": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1"
+      },
+      "fields": {
+        "source": "/source_revision",
+        "archive_targets": "/archive_targets_matched",
+        "prepared_plans": "/prepared_plans_exactly_equal",
+        "solver_executions": "/solver_executions_performed"
+      }
+    },
+    {
+      "id": "root-full",
+      "scope": "Source0cd test-only correction validation lane: full default-parallel release suite failed. Exact source-file hashes are retained in receipt; focused passes do not replace this result.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/hash_one_ci_20261029/correction.json",
+        "sha256": "2c83885fbefef25323bf968aefdb1ea96c1b67bdd4ed7dcae84cb7c5d68014fe"
+      },
+      "fields": {
+        "passed": "/release_validation/passed",
+        "failed": "/release_validation/failed",
+        "ignored": "/release_validation/ignored",
+        "exit_code": "/release_validation/exit_code"
+      }
+    },
+    {
+      "id": "root-focused",
+      "scope": "Separate bounded serial reruns of the two failed tests from the exact same compiled binary; not a passing full-suite result.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/validation/hash_one_ci_20261029/correction.json",
+        "sha256": "2c83885fbefef25323bf968aefdb1ea96c1b67bdd4ed7dcae84cb7c5d68014fe"
+      },
+      "fields": {
+        "allocator_passed": "/bounded_same_binary_confirmation/allocator/passed",
+        "allocator_failed": "/bounded_same_binary_confirmation/allocator/failed",
+        "gpu_passed": "/bounded_same_binary_confirmation/gpu/passed",
+        "gpu_failed": "/bounded_same_binary_confirmation/gpu/failed",
+        "exit_code": "/bounded_same_binary_confirmation/exit_code"
+      }
+    },
+    {
+      "id": "canonical-hash",
+      "scope": "Separate supplemental historical hash test, not a rerun or total of the 28-test suite. Earlier category-confusion failure retained; raw-file digest differs from canonical body digest by definition.",
+      "source": {
+        "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/validation/historical-hash-receipt.json",
+        "sha256": "6fe3e515c1c2a5ba81116d4c93ea95e16313fc2781e9fbf19c8c0180a94dc6c2"
+      },
+      "fields": {
+        "targeted_test_passed": "/additional_software_tests_passed",
+        "independent_bytes_match": "/independent_bytes_match_rust",
+        "runtime_source_changed": "/runtime_source_changed",
+        "empirical_executions": "/cohort_executions"
+      }
+    }
+  ]
+}

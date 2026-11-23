@@ -1,0 +1,20 @@
+// basesize.sing -- round 7c: factor-base sizes per arm (number of base classes), native Singular.
+// T  (round-1 curve y^2 = x^3 + 779083 x + 163026, x = 780070*w):  points/+-  = usable x
+// E1 (Edwards, v = 2 w): usable v; classes modulo {+-, T2} = usable v / 2 (v ~ -v)
+// TW (Montgomery, x = w): usable x (x != +-1); classes modulo {+-, T2} = usable x / 2 (x ~ 1/x)
+ring r = 786433, z, dp;
+proc issq(number c) { if (c == 0) { return(0); } return(c^393216 == 1); }
+number a = 779083; number b = 163026; number g = 780070; number A = 629144; number B = 629146; number d = 11;
+int t; int j; int D; number w; number zw; number x; int nT; int nE; int nM; int h;
+for (t = 3; t <= 5; t++)
+{
+  D = 2^t;
+  for (h = 2; h < 100; h++) { zw = number(h)^(786432 div D); if (zw^(D div 2) != 1) { break; } }   // as inst.sing
+  nT = 0; for (j = 0; j < D; j++) { x = g*zw^j; if (issq(x^3 + a*x + b)) { nT++; } }
+  zw = number(5)^(786432 div D);
+  nE = 0; for (j = 0; j < D; j++) { x = 2*zw^j; if (x != 1 and x != -1) { if (issq((1 - x^2)/(1 - d*x^2))) { nE++; } } }
+  nM = 0; for (j = 0; j < D; j++) { x = zw^j; if (x != 1 and x != -1) { if (issq((x^3 + A*x^2 + x)/B)) { nM++; } } }
+  print("t=" + string(t) + "  T: " + string(nT) + " x-values (= classes)   E1: " + string(nE) + " v-values, "
+        + string(nE div 2) + " classes mod T2   TW: " + string(nM) + " x-values, " + string(nM div 2) + " classes mod T2");
+}
+quit;

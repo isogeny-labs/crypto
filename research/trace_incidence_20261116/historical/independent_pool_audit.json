@@ -1,0 +1,1427 @@
+{
+  "schema": "independent-prime-pool-audit/v1",
+  "scope": "Independent Jacobian point arithmetic and validation-only scalar sum oracle; no attack uses secret values.",
+  "status": "passed",
+  "fixture_count": 90,
+  "point_labels_checked": 13392,
+  "mutation_checks": 313,
+  "cpu_seconds": 0.886707524,
+  "results": [
+    {
+      "id": "b008_c0_natural_s0",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "fe682825d4897bfb6853b065a470452e60ad62a990635c172d5e9821ad8352b5",
+      "point_labels_checked": 24,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          2,
+          3,
+          7
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b008_c0_natural_s1",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "c0676e85c6deb4acd8433be39bea882c984aa068bb14006d141e85f5400d5b03",
+      "point_labels_checked": 24,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          7,
+          5,
+          5
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b008_c0_natural_s2",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "ecc0093a723f88980ca31fc7107c75322f7030b3220950caf627063049bcf899",
+      "point_labels_checked": 24,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          4,
+          0
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b008_c0_natural_s3",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "4c12c0e3b0a37883da137c8989121dbcd6d29e23999071a76a50a633174a279c",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c0_negative_control",
+      "B": 8,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "354087e3037d0e3dbec7fb7513b49b7fc0d3840b0ebb702f83ff44f571e551e9",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c0_planted_control",
+      "B": 8,
+      "kind": "planted_control",
+      "fixture_sha256": "ccd781014dc0a322117de1dd2a830b2bff9b948c7322d6bcbb69ea6101f87c43",
+      "point_labels_checked": 24,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          7
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b008_c1_natural_s0",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "67e1bdf6ddb439c6836aee3d04530086302d8247b6a42bcbd07d08e50189b58b",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c1_natural_s1",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "c495c70d9027bdd869ce4338e067bb09be7aa5816a11525e6adb73fd6a1f6dc8",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c1_natural_s2",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "233d95905bbe40236f6e13843d6d0b7371b5fb5f721dd907444761a632297a90",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c1_natural_s3",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "aa38afd72d3af94d56bf87619b4a669b1232632037ecee40227974330a4a8a1a",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c1_negative_control",
+      "B": 8,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "c600958582fd03e9c1a1fb8d019e995f5e1d17334c83fa84c0e36c87fd49cea8",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c1_planted_control",
+      "B": 8,
+      "kind": "planted_control",
+      "fixture_sha256": "6161b0389383b1b2bfd30439e16bd7f03506c4942ee74b80418959c6773277fd",
+      "point_labels_checked": 24,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          7
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b008_c2_natural_s0",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "42cdf1299dd56942d10556b541aa8d3e2a3de40557a0a5744c96b735d51890f3",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c2_natural_s1",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "b35984c232fa72650e14f856fb655095bf56f028941bb692d94861c6d41867d2",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c2_natural_s2",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "b2d96294a298dd639d953b6334ca30dd397a5c34cbde78a03d11f0797efaeaa7",
+      "point_labels_checked": 24,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          2,
+          0,
+          1
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b008_c2_natural_s3",
+      "B": 8,
+      "kind": "natural",
+      "fixture_sha256": "ee50a4c113604846e8f9abbb35c7857cab3e2e9128f3df24f4b5c4c29f3654ef",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c2_negative_control",
+      "B": 8,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "4f4eeb0ee6db4cd62b08b94c24dd8075729b08ea0d5239cb15590468a4e3acc8",
+      "point_labels_checked": 24,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b008_c2_planted_control",
+      "B": 8,
+      "kind": "planted_control",
+      "fixture_sha256": "e2cf97e0b4d69c3242bb1cfa50f3fbdea0902a4ba1b08a68e65f275773b5de1b",
+      "point_labels_checked": 24,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          7
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c0_natural_s0",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "363245825c8d62a99bd95db3b872a0032508452a36b7f3b16fd7e5cb58a4ec9b",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          8,
+          2,
+          5
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c0_natural_s1",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "d2f94d735f242d12e938644145705427735db0ef493e55736af409cbda7eed97",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          9,
+          12,
+          3
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c0_natural_s2",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "d1c1fecea831e831fc9d612e60bea654da7ff7e16dffd4e52faabc663bdba55d",
+      "point_labels_checked": 48,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b016_c0_natural_s3",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "ab18e19d1ff772021850f89a0a0fe3763709d33b5b3276dbeeac439ee6fabb89",
+      "point_labels_checked": 48,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b016_c0_negative_control",
+      "B": 16,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "6611d8ad12b0488da73089ab5f305ef84675963139055b34bc6e61e357645ff9",
+      "point_labels_checked": 48,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b016_c0_planted_control",
+      "B": 16,
+      "kind": "planted_control",
+      "fixture_sha256": "124d8b1f3ea8fcad32781af8be1035be1e5b8dce71d303e863ecd952202fbddb",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          15
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c1_natural_s0",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "1523e1c3dce75a672598bb7f30cf23d37308de835ba0f4188641f9c842f6e3fc",
+      "point_labels_checked": 48,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b016_c1_natural_s1",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "25e84bb34fbb8eda7717bd9867d21977c5933fae60dd1a6a6163ae895b66a565",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          10,
+          2,
+          10
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c1_natural_s2",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "94ac6228840238dd4865f8099be5f13aaabd158835422a8233215f4f521bd8ea",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          6,
+          8,
+          7
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c1_natural_s3",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "e84b3864e7c8eba04940c4ff7a77c6a0d7159e02083f7f824c1deb132dcdbcc8",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          10,
+          7,
+          4
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c1_negative_control",
+      "B": 16,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "ff2e5ab7f7ac37b8eaf7f0fdb1c667c9b0f040d56f7b121f3b9253864683bd95",
+      "point_labels_checked": 48,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b016_c1_planted_control",
+      "B": 16,
+      "kind": "planted_control",
+      "fixture_sha256": "a87eba344eb17478a4f7481f9342fba56066f60929d773d1b8dc8a2f52c3ec43",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          15
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c2_natural_s0",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "5996185f47603a40fb46e0d0d4accf4c5df8abf05e88387147bad211a6051a59",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          4,
+          6,
+          13
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c2_natural_s1",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "3132a4f9fb397bc8ce6c5cde6f3b81c155ce55dd3455182a112afeb687e92099",
+      "point_labels_checked": 48,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b016_c2_natural_s2",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "38dff636b229fa9037237b7189adc6e66d2e24cad3730f40ed9fad1f7130f893",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          11,
+          15,
+          4
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b016_c2_natural_s3",
+      "B": 16,
+      "kind": "natural",
+      "fixture_sha256": "d27fb4b848a04926dfeaee4bc1507bb590d60932f13b7fd2a3e9c96cad109c3e",
+      "point_labels_checked": 48,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b016_c2_negative_control",
+      "B": 16,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "37440221d11d1edbf5a3cce7b56ca6fae0af6aed11ca3533f46ea438314ee55f",
+      "point_labels_checked": 48,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b016_c2_planted_control",
+      "B": 16,
+      "kind": "planted_control",
+      "fixture_sha256": "34599e792b4da80707ce77ec8e47c758d7b94d2e40ef3a9ce3dc749d532b29c2",
+      "point_labels_checked": 48,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          15
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b032_c0_natural_s0",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "a29e730d51ffd9247ffaf087fc50e634bc17f875fb7dc9bf97e954e7cee9614c",
+      "point_labels_checked": 96,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          9,
+          23
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b032_c0_natural_s1",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "f30069a4d8885db81f34f7d69e71880919f42a609192063eccbe9331b64d7665",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c0_natural_s2",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "f277f475eca880016ac6eafca4b78733f9d43c57fd6a01ecbd98a41bc301af67",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c0_natural_s3",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "0b9f76d9b1d3af1b88ae5c6b4aa9b06ddb3e8faaaee3fda540269391037da4cc",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c0_negative_control",
+      "B": 32,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "be0d89ebe275a325896ee7ce4222a3287525d2a3c9ad93165f3a7c4bd8735a1e",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c0_planted_control",
+      "B": 32,
+      "kind": "planted_control",
+      "fixture_sha256": "5ad0ae99752d5061e4d7e6fc13871384f4b71a396d6377264dce2665cca2e2e6",
+      "point_labels_checked": 96,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          31
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b032_c1_natural_s0",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "a94b545db2b41f0d11db1926cc69d487edce3b6c28cca4cc2ad6e53b52f1b1a1",
+      "point_labels_checked": 96,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          25,
+          9,
+          20
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b032_c1_natural_s1",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "ec2a224b8428254a50df490652f2474f590b57b4dcee9e32ea9cbb7733d416e4",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c1_natural_s2",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "aff254fa9b4aabd5c7c9bfa8de3a83e9d05f0967501ef1f495d343cbaded5063",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c1_natural_s3",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "d0f4866b8f5cecadbea6e7541895050002327bc81306146ac1b4b8f714c147c3",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c1_negative_control",
+      "B": 32,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "cfdcf9fb3925dac3dcc7144284d2f443e52defc256eae05392a2ba041b06dc3f",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c1_planted_control",
+      "B": 32,
+      "kind": "planted_control",
+      "fixture_sha256": "01fde703abffb0571606541b8149b0805afa00414082b4988e8a4c8be94ce99d",
+      "point_labels_checked": 96,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          31
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b032_c2_natural_s0",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "3808bda66c802a4864d144b469b8ff29b32b29ddc3cfa4c02a494e9e98fa8dda",
+      "point_labels_checked": 96,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          25,
+          29,
+          4
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b032_c2_natural_s1",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "e6939e9b5757969a50207fb645330e7bc54c0d7b968af1d0225b3342375dfbf0",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c2_natural_s2",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "aaa0e8e90de491cb42e670a4db277d6fb1aa5dfb6f6dc8cfd47b4ae6a1846e78",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c2_natural_s3",
+      "B": 32,
+      "kind": "natural",
+      "fixture_sha256": "53653fa6a42abdab3c83ac72990be8a4ab7769a986cf55914d173eaf2d5575c4",
+      "point_labels_checked": 96,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          11,
+          1,
+          21
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b032_c2_negative_control",
+      "B": 32,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "1fdc1fde1b1ee879bf66813132d16b57f4d97e7d2d02cbae2c95430ba29ed5d6",
+      "point_labels_checked": 96,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b032_c2_planted_control",
+      "B": 32,
+      "kind": "planted_control",
+      "fixture_sha256": "ff020aa18b4e08bb5b5d47c7f4544072c257f0dc819643685d5db5332bb832e1",
+      "point_labels_checked": 96,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          31
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b064_c0_natural_s0",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "0c906f627c211bbf7fa1ec4861bcb38b1979fbc8f9ae9babd990a02df8ae32f1",
+      "point_labels_checked": 192,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          17,
+          30,
+          54
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b064_c0_natural_s1",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "629e5c3f1bac9c35b8c07bba88ef7f5925e31782715e2bbb6cf88b220fbf80e9",
+      "point_labels_checked": 192,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          47,
+          3,
+          7
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b064_c0_natural_s2",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "c6d73149caf9345d1e4cd3a520372139a9a9c718f260226dbc9bd497c652b2b2",
+      "point_labels_checked": 192,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b064_c0_natural_s3",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "1ca286ccf6c4e7a02ba815b8a750c1c01ca8fa1bc838a88ba7606fd4e3f04e30",
+      "point_labels_checked": 192,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b064_c0_negative_control",
+      "B": 64,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "9a1b25fb56cc1a83135e3e75205860ac88f9ec385b61e10c85acd84506fdddf8",
+      "point_labels_checked": 192,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b064_c0_planted_control",
+      "B": 64,
+      "kind": "planted_control",
+      "fixture_sha256": "d95e84bc5afba207319ae38ead1f44a57c1176fa99b1a7e8179daebe3a1f2f68",
+      "point_labels_checked": 192,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          63
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b064_c1_natural_s0",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "e026e4021836b6afdbd5eab5003a8977a80aac58dfdb77d91b257be57bd1699a",
+      "point_labels_checked": 192,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b064_c1_natural_s1",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "f7229079969c3bbcccfe03ca8e846d8e88784db7d3deba81422d433d134dd421",
+      "point_labels_checked": 192,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b064_c1_natural_s2",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "d41b0adce430179aef29ad23c5f59219d3c59fc9084b2948c710ded147143898",
+      "point_labels_checked": 192,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          45,
+          62,
+          47
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b064_c1_natural_s3",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "6b7a509fde38d4ab4b78bddc9b85671b07932e6c6b90c3e5722d1bddcf27ad1d",
+      "point_labels_checked": 192,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          60,
+          40,
+          25
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b064_c1_negative_control",
+      "B": 64,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "0f1a841e1dfd1a46b964e45eb8a582eb829eec516290239d84ea67eaf7f118f9",
+      "point_labels_checked": 192,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b064_c1_planted_control",
+      "B": 64,
+      "kind": "planted_control",
+      "fixture_sha256": "cb222807eb27bf5996ca090bade2c5cdcba86dcc4c50787ed7e2965634710755",
+      "point_labels_checked": 192,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          63
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b064_c2_natural_s0",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "2769031a37cf3c56e391a9c3378ca0a11e4c74f8570c855963f31f2df948da7c",
+      "point_labels_checked": 192,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          37,
+          59,
+          55
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b064_c2_natural_s1",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "8bc32a5842fa2e2b72e9ce4f4840c2e4a8f506bb964cb8781cea7162073c51c8",
+      "point_labels_checked": 192,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b064_c2_natural_s2",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "a8b52afaa9835c1367668ad1885104cc1420f3fb9accad8f9ea744a04a1054ab",
+      "point_labels_checked": 192,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          36,
+          17,
+          16
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b064_c2_natural_s3",
+      "B": 64,
+      "kind": "natural",
+      "fixture_sha256": "b0481e9c4a8d075b71ba35bf8f1f6eec0d9569661a1526b2f12dfa040dba3c3e",
+      "point_labels_checked": 192,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b064_c2_negative_control",
+      "B": 64,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "61b8b6ce6819133054a59b5ccf6186486415148dbfd50887abc28dd6a3fadbf9",
+      "point_labels_checked": 192,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b064_c2_planted_control",
+      "B": 64,
+      "kind": "planted_control",
+      "fixture_sha256": "95d39f5247bc61b85d7cea8a23fe11e0f62ec3eebb99114b97d5a7c88d79e2d3",
+      "point_labels_checked": 192,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          63
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c0_natural_s0",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "b26fde653f5321d818199cd967265f1f61f97c368f4720b5770f04888d60d7ec",
+      "point_labels_checked": 384,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b128_c0_natural_s1",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "294e68c38b702846d26ae9a829240494ed7a33b043df74691b8e345cbf983de5",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          36,
+          126,
+          40
+        ],
+        "signs": [
+          1,
+          -1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c0_natural_s2",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "e41c1534a635edf7c012d8c6aa4c2d7ffa6e9d5eb9574aee51b045398eb5cce5",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          99,
+          108,
+          117
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c0_natural_s3",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "5dd154864fdc7cedb11bbe4395403e9898cfb735629d190c2ce91cf1f9fc3a4e",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          11,
+          8,
+          14
+        ],
+        "signs": [
+          1,
+          -1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c0_negative_control",
+      "B": 128,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "661aac5c9613354091d47606ff346628cc68508a08c0dc8435927afec8376ab1",
+      "point_labels_checked": 384,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b128_c0_planted_control",
+      "B": 128,
+      "kind": "planted_control",
+      "fixture_sha256": "f5bb684ff639b7a50643c1876aa246a6d401741e879412856d83ac2be784262e",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          127
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c1_natural_s0",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "96e8b0d5135bc41c397fa1f6f6b1429486772298bfe0e14f33f5a332ee8e12a6",
+      "point_labels_checked": 384,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b128_c1_natural_s1",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "e630770cec8f553e35798041f68bd30f7a4c1d65ad670c9d94de62a3fe35176f",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          56,
+          100,
+          59
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c1_natural_s2",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "f02ab2baa3de833bf156ca273903dd6778f2391205c8765aa7c3bbb2530b95d8",
+      "point_labels_checked": 384,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b128_c1_natural_s3",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "0cebb3924df9169e3ef866ab6a0bbf39fa1dc697ef07ab977e7290484fc30442",
+      "point_labels_checked": 384,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b128_c1_negative_control",
+      "B": 128,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "fb6e8a52747c75ecc83a66b4815ef8640354d083adf5b77c1f37ed80de69a94f",
+      "point_labels_checked": 384,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b128_c1_planted_control",
+      "B": 128,
+      "kind": "planted_control",
+      "fixture_sha256": "009585e770a9009d68f58eb87675d237a1b04b6854d888b31408a765a114d058",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          127
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c2_natural_s0",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "f9382ba9873307693301122c61bb12f75f6f32faae8b50e7353ac8f22c7c59f6",
+      "point_labels_checked": 384,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b128_c2_natural_s1",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "f3170d96e27b8839a74e39ec19093ac7b3b60255f748b2dd8e5ab6002fa55b10",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          47,
+          97,
+          95
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c2_natural_s2",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "18cd244d19cf80d9d9ad37f3e172d537d582576e60f3f9250fd8826b0d037cd1",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          91,
+          4,
+          123
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c2_natural_s3",
+      "B": 128,
+      "kind": "natural",
+      "fixture_sha256": "d55cf0d963c5d49362c81e2896631f5a466b9dc118adb6182bb022c401a2dbeb",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          20,
+          78,
+          108
+        ],
+        "signs": [
+          1,
+          1,
+          -1
+        ]
+      },
+      "recovery_verified": true
+    },
+    {
+      "id": "b128_c2_negative_control",
+      "B": 128,
+      "kind": "exact_negative_control",
+      "fixture_sha256": "1791b0c61508e79e7e6b9ece1fd8c035c4073f174a20d481b7df2e373542d347",
+      "point_labels_checked": 384,
+      "geometric_exists": false,
+      "informative_exists": false,
+      "witness": null
+    },
+    {
+      "id": "b128_c2_planted_control",
+      "B": 128,
+      "kind": "planted_control",
+      "fixture_sha256": "7f859f181149ac5924cea97fb5dd652114aba1e297bf3bd41c1579fe008820ae",
+      "point_labels_checked": 384,
+      "geometric_exists": true,
+      "informative_exists": true,
+      "witness": {
+        "positions": [
+          0,
+          0,
+          127
+        ],
+        "signs": [
+          1,
+          1,
+          1
+        ]
+      },
+      "recovery_verified": true
+    }
+  ]
+}

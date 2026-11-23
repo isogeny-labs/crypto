@@ -1,0 +1,34 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Part E: rho with the negation map, m = 17, h = 2, a second target (seed 202610150302)",
+  "description": "PROTOCOL.md amendment: the rho half of SPEC-E-m17b-ic.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "f2m4_torsion",
+        "m": 17,
+        "seed": 1,
+        "max_cofactor": 2
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 202610150302
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 202610150413,
+    "isolation_required": "L2",
+    "timeout_seconds": 259200
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime medium rho CPC M2: 45-bit curves",
+  "description": "research/prime_medium_rho_cpc_20261109/PROTOCOL.md. Curves from research/prime_medium_tier_rho_20261107/curves.json; seeds from seeds.json.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 27611383581911,
+        "a": 12878670601399,
+        "b": 4914515096856,
+        "group_order": 27611390040607,
+        "r": 27611390040607,
+        "gx": 4,
+        "gy": 7577605687942
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 25361112161527,
+        "a": 20787366627629,
+        "b": 12019143787601,
+        "group_order": 25361110162121,
+        "r": 25361110162121,
+        "gx": 1,
+        "gy": 11221611220376
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 4704550062423,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "bsgs-neg",
+      "role": "baseline",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 176556980215943,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

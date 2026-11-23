@@ -44,6 +44,12 @@ int main(int argc, char **argv) {
       fprintf(stderr, "fes_metal: could not parse %s\n", in_path);
       return 2;
     }
+    // fes.metal keeps the derivatives in `thread ulong df[40]`; the contract
+    // allows n <= 62, which would write past it.
+    if (sys.n > 40) {
+      fprintf(stderr, "fes_metal: n=%d exceeds the shader's 40-variable scratch\n", sys.n);
+      return 2;
+    }
 
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     if (!device) {

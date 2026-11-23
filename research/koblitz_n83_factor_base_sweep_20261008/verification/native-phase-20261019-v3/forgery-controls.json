@@ -1,0 +1,27 @@
+{
+  "schema": "n83.native-forgery-controls/v1",
+  "controls": [
+    {
+      "mutation": "selector phase+1 modulo83",
+      "custody_hash_updated": true,
+      "rejected": true,
+      "native_exit": 1,
+      "error": "Error: \"independent selector/phase replay mismatch\"\n"
+    },
+    {
+      "mutation": "terminal conflict count1000to999",
+      "cross_receipt_replay": true,
+      "rejected": true,
+      "native_exit": 1,
+      "error": "Error: \"solver-cap counters disagree\"\n"
+    },
+    {
+      "mutation": "actual public query coefficient a changed to0",
+      "custody_hash_updated": true,
+      "rejected": true,
+      "native_exit": 1,
+      "error": "Error: \"independent public query replay mismatch\"\n"
+    }
+  ],
+  "original_records_unchanged": true
+}

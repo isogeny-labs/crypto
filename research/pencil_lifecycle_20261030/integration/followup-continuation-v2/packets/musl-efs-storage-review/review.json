@@ -1,0 +1,38 @@
+{
+  "schema": "independent.source-amendment-review/v1",
+  "reviewed_at_utc": "2026-10-31T01:53:53.880955+00:00",
+  "scope": "Two storage path substitutions only; source review, no execution admission",
+  "candidate": "/var/tmp/pencil-musl-efs-storage-proposal-20261031-v3",
+  "wrapper_sha256": "dc4192adb31c7327c41da49394d4cad55639185e2120399478a420837fd7a950",
+  "previous_wrapper_sha256": "4b2fe7efea27b92aebdc42d46371f1fdcfe4f0a93a4e037285f6e443c78118b4",
+  "status": "no_new_blocking_discrepancy",
+  "exact_two_substitutions": true,
+  "python_ast_parse": true,
+  "manifest_checks": {
+    "build-receipted-isolated.py": {
+      "sha256": "dc4192adb31c7327c41da49394d4cad55639185e2120399478a420837fd7a950",
+      "bytes": 6576,
+      "matches": true
+    },
+    "PLAN.md": {
+      "sha256": "83d98ea0dba80d369d9c20a68a7146e599f60fac550c84a10807a6463909b17a",
+      "bytes": 1246,
+      "matches": true
+    }
+  },
+  "native_execution": false,
+  "checkout_or_cache_mutation": false,
+  "current_free_space_observation": {
+    "root_available": "8.8 GiB from df -h",
+    "home_mount": "127.0.0.1:/agent-migration/home",
+    "proposal_3_3_GiB": "historical; not current observation"
+  },
+  "remaining_preparation_obligations": [
+    "Bind exact detached commit and clean complete consumed source closure, including external path dependencies, symlinks and build inputs.",
+    "Review effective source, ancestor and CARGO_HOME Cargo configurations because source parent changed.",
+    "Prepare fresh direct non-symlink target directory with exclusive ownership; cooperative lock does not prove absence of remote or noncooperating writers.",
+    "If copying old cache, finish before admission with old cache owner reconciled; preserve old cache and existing fingerprints/timestamps.",
+    "Fresh local-space check for receipts, logs, map and final copied binary; build cap and post-build qualification remain unchanged."
+  ],
+  "scientific_budget_change": false
+}

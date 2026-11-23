@@ -1,0 +1,6 @@
+# The tested image is data: no command from it runs in the credentialed publisher.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+COPY runtime/ /opt/isolab/recovery/
+USER 0:0
+ENTRYPOINT []

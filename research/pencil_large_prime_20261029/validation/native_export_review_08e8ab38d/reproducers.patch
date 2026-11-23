@@ -1,0 +1,97 @@
+--- /home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export/tests/contracts.rs	2026-10-29 22:43:10.450000000 +0000
++++ /tmp/native-canonical-export-review.0bCMzx/tests/contracts.rs	2026-10-29 23:01:01.665291972 +0000
+@@ -415,3 +415,94 @@
+     assert!(!negative.status.success());
+     assert!(String::from_utf8_lossy(&negative.stderr).contains("unknown comparison"));
+ }
++
++#[test]
++fn review_reproducer_arbitrary_counter_string_is_accepted() {
++    let mut f = Fixture::new();
++    f.rows[0]["counters"]["actual"] = json!("not-a-nonnegative-integer");
++    f.refresh();
++    let (e, findings) = f.run().unwrap();
++    assert!(findings.is_empty());
++    assert_eq!(
++        e["runs"][0]["measurements"]["counters"]["native.actual"],
++        "not-a-nonnegative-integer"
++    );
++}
++
++#[test]
++fn review_reproducer_impossible_restore_history_is_accepted() {
++    let mut f = Fixture::new();
++    f.edit("history.json", "execution_history", |h| {
++        h["records"][0]["attempts"] = json!(1);
++        h["records"][0]["resumed"] = json!(2);
++        h["records"][0]["checkpoint"] = json!({
++            "policy": "criu",
++            "generations_written": 0,
++            "restored_from_generation": 99
++        });
++    });
++    let (e, findings) = f.run().unwrap();
++    assert!(findings.is_empty());
++    assert_eq!(e["runs"][0]["attempts"], 1);
++    assert_eq!(e["runs"][0]["resumed"], 2);
++    assert_eq!(
++        e["runs"][0]["checkpoint"]["restored_from_generation"],
++        99
++    );
++}
++
++#[test]
++fn review_reproducer_protocol_warmups_can_be_omitted_without_finding() {
++    let mut f = Fixture::new();
++    f.rows.retain(|r| r["warmup"] == false);
++    let mut plan = load(&f.path("plan.json")).unwrap();
++    plan["executions"]
++        .as_array_mut()
++        .unwrap()
++        .retain(|e| e["warmup"] == false);
++    f.write("plan.json", &plan);
++    let mut receipt = load(&f.path("receipt.json")).unwrap();
++    receipt["files"]["plan.json"] = json!(digest(&f.path("plan.json")).unwrap());
++    f.write("receipt.json", &receipt);
++    f.refresh();
++    f.edit("native.json", "native_analysis", |n| {
++        n["expected_executions"] = json!(15);
++        n["observed_executions"] = json!(15);
++        n["missing_executions"] = json!([]);
++    });
++    let (e, findings) = f.run().unwrap();
++    assert!(findings.is_empty(), "{findings:?}");
++    assert_eq!(e["runs"].as_array().unwrap().len(), 15);
++    assert!(e["runs"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .all(|r| r["warmup"] == false));
++}
++
++#[test]
++fn review_reproducer_backend_record_can_be_rewritten_without_finding() {
++    let f = Fixture::new();
++    let (mut e, findings) = f.run().unwrap();
++    assert!(findings.is_empty());
++    e["backend_record"]["qualified"] = json!(true);
++    e["backend_record"]["expected_execution_slots"] = json!(0);
++    e["backend_record"]["missing_slots"] = json!([{"fabricated": true}]);
++    e["backend_record"]["diagnostics"] = json!([]);
++    e["backend_record"]["native_analysis_sha256"] = json!("0".repeat(64));
++    assert!(check_export(&e, &f.p).unwrap().is_empty());
++}
++
++#[test]
++fn review_reproducer_missing_planted_check_is_marked_verified() {
++    let mut f = Fixture::new();
++    f.rows[0]["outcome"]
++        .as_object_mut()
++        .unwrap()
++        .remove("matches_planted");
++    f.refresh();
++    let (e, findings) = f.run().unwrap();
++    assert!(findings.is_empty());
++    assert_eq!(e["runs"][0]["status"], "succeeded");
++    assert_eq!(e["runs"][0]["verification"]["status"], "verified");
++}

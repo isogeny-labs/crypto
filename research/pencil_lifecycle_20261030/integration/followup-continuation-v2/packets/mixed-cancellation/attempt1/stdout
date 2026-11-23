@@ -1,0 +1,75 @@
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:7:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instAdd', which is 'noncomputable'
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:8:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instAdd', which is 'noncomputable'
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:12:30: error: unknown tactic
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:12:26: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+x q r : K
+hx : x ^ 2 + q * x + r = 0
+⊢ r = -x ^ 2 - q * x
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:11:39: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+x q r : K
+hx : x ^ 2 + q * x + r = 0
+hr : r = -x ^ 2 - q * x
+⊢ support q r = (X - C x) * (X - C (-q - x))
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:31:54: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:32:59: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:45:44: error: unknown tactic
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:43:50: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+x y q r s t : K
+hx : x ^ 2 + q * x + r = 0
+hp : X - C x ∣ f - C y ^ 2
+hv : support q r ∣ f - ordinate s t ^ 2
+he : X - C x ∣ f - C (s * x + t) ^ 2
+hd : X - C x ∣ C ((s * x + t) ^ 2 - y ^ 2)
+hid : f - C y ^ 2 - (f - C (s * x + t) ^ 2) = C ((s * x + t) ^ 2 - y ^ 2)
+hdeg : (X - C x).natDegree = 1
+⊢ ((C s * C x + C t) ^ 2 - C y ^ 2).natDegree = 0
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:44:33: error: Type mismatch: After simplification, term
+  congrArg (fun p => p.coeff 0) hzero
+ has type
+  ((C s * C x + C t) ^ 2).coeff 0 - (C y ^ 2).coeff 0 = 0
+but is expected to have type
+  (s * x + t) ^ 2 - y ^ 2 = 0
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:45:40: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+x y q r s t : K
+hx : x ^ 2 + q * x + r = 0
+hp : X - C x ∣ f - C y ^ 2
+hv : support q r ∣ f - ordinate s t ^ 2
+he : X - C x ∣ f - C (s * x + t) ^ 2
+hd : X - C x ∣ C ((s * x + t) ^ 2 - y ^ 2)
+hid : f - C y ^ 2 - (f - C (s * x + t) ^ 2) = C ((s * x + t) ^ 2 - y ^ 2)
+hdeg : (X - C x).natDegree = 1
+hzero : C ((s * x + t) ^ 2 - y ^ 2) = 0
+hs : (s * x + t) ^ 2 - y ^ 2 = 0
+⊢ (y + (s * x + t)) * (y - (s * x + t)) = 0
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:36:68: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+x y q r s t : K
+hx : x ^ 2 + q * x + r = 0
+hp : X - C x ∣ f - C y ^ 2
+hv : support q r ∣ f - ordinate s t ^ 2
+he : X - C x ∣ f - C (s * x + t) ^ 2
+hd : X - C x ∣ C ((s * x + t) ^ 2 - y ^ 2)
+hid : f - C y ^ 2 - (f - C (s * x + t) ^ 2) = C ((s * x + t) ^ 2 - y ^ 2)
+hdeg : (X - C x).natDegree = 1
+hzero : C ((s * x + t) ^ 2 - y ^ 2) = 0
+hs : (s * x + t) ^ 2 - y ^ 2 = 0
+hf : (y + (s * x + t)) * (y - (s * x + t)) = 0
+⊢ y = -(s * x + t) ∨ y = s * x + t
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:83:15: error: No goals to be solved
+/var/tmp/pencil-mixed-cancellation-20261031-v1/MixedCancellation.lean:85:15: error: No goals to be solved

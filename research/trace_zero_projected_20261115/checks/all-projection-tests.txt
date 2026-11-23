@@ -1,0 +1,46 @@
+   Compiling trace-zero-projected v0.1.0 (/workspace/crypto-trace/research/trace_zero_projected_20261115/native)
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend)
+   Compiling trace-zero-leads v0.1.0 (/workspace/crypto-trace/research/trace_zero_leads_20261109/native)
+   Compiling trace-zero-experiments v0.1.0 (/workspace/crypto-trace/research/trace_zero_experiments_20261109/native)
+warning: struct `TraceZeroLinearizedReport` is never constructed
+  --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:19:12
+   |
+19 | pub struct TraceZeroLinearizedReport {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `point_key` is never used
+   --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:599:4
+    |
+599 | fn point_key(p: &BinaryPoint) -> (BigUint, BigUint) {
+    |    ^^^^^^^^^
+
+warning: function `decompose_trace_zero_linearized` is never used
+   --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:610:8
+    |
+610 | pub fn decompose_trace_zero_linearized(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `trace-zero-projected` (lib test) generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.82s
+     Running unittests src/lib.rs (research/trace_zero_projected_20261115/native/target/debug/deps/trace_zero_projected-e9c3be0990b5c5df)
+
+running 8 tests
+test projected_unit_tests::tests::batched_residuals_match_scalar_group_law_including_all_exceptions ... ok
+test projected_unit_tests::tests::packed_elimination_matches_generic_solutions_kernels_and_inconsistency ... ok
+test projected_unit_tests::tests::projected_unique_inconsistent_and_deficient_results_match_complete_s3_spaces ... ok
+test projected_unit_tests::tests::specialized_monic_roots_match_complete_field_enumeration_and_old_solver ... ok
+test tests::half_trace_product_elimination_is_exact_for_all_small_s3_candidates ... ok
+test v1::tests::batched_residuals_match_scalar_group_law_including_all_exceptions ... ok
+test v1::tests::packed_elimination_matches_generic_solutions_kernels_and_inconsistency ... ok
+test v1::tests::specialized_monic_roots_match_complete_field_enumeration_and_old_solver ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+   Doc-tests trace_zero_projected
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

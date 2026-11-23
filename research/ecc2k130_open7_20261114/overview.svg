@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="470" viewBox="0 0 900 470" font-family="Helvetica, Arial, sans-serif">
+  <rect width="900" height="470" fill="#ffffff"/>
+  <text x="20" y="32" font-size="19" font-weight="bold" fill="#1a1a1a">ECC2K-130 open-items sweep (2026-11-14): seven lanes, verdicts</text>
+  <text x="20" y="54" font-size="12" fill="#555">Toy scale, counted operations decide; all claims [pcc:unverified]. Source: README.md and each lane's SUMMARY.md.</text>
+  <g font-size="13">
+    <text x="20" y="86" font-weight="bold" fill="#333">Lane</text>
+    <text x="250" y="86" font-weight="bold" fill="#333">Verdict</text>
+    <text x="460" y="86" font-weight="bold" fill="#333">Key number</text>
+  </g>
+  <line x1="20" y1="94" x2="880" y2="94" stroke="#bbb"/>
+  <!-- rows: y step 50 -->
+  <g font-size="13" fill="#1a1a1a">
+    <text x="20" y="124">L1 Frobenius/±-closed base</text>
+    <rect x="250" y="108" width="190" height="24" rx="4" fill="#d9d9d9"/><text x="260" y="125">CLOSED-BY-PRIOR</text>
+    <text x="460" y="124">built and measured; still 1.6–18× above rho-frob, gap grows with r</text>
+
+    <text x="20" y="174">L2 UNSAT pre-solve filters</text>
+    <rect x="250" y="158" width="190" height="24" rx="4" fill="#f2d7a6"/><text x="260" y="175">NO-CHANGE</text>
+    <text x="460" y="174">no deg≤3 filter beyond null (exact); 0/694 m=3 refuted at D≤4</text>
+
+    <text x="20" y="224">L3 incremental SAT</text>
+    <rect x="250" y="208" width="190" height="24" rx="4" fill="#f2d7a6"/><text x="260" y="225">NO-CHANGE</text>
+    <text x="460" y="224">B/A0 conflicts 1.02 [0.93,1.12]; propagations 2.23×</text>
+
+    <text x="20" y="274">L4 missing baselines</text>
+    <rect x="250" y="258" width="190" height="24" rx="4" fill="#e8a39b"/><text x="260" y="275">NEGATIVE (a); (b,c) prior</text>
+    <text x="460" y="274">gcd-with-L_V 7–14× (m=2), 300–1500× (m=3) vs pair table</text>
+
+    <text x="20" y="324">L5 F2[t] Coppersmith on S3</text>
+    <rect x="250" y="308" width="190" height="24" rx="4" fill="#cfd8e8"/><text x="260" y="325">INCONCLUSIVE (gap measured)</text>
+    <text x="460" y="324">n=131: reach l=22 vs existence l≈66 (3.1× in L)</text>
+
+    <text x="20" y="374">L6 dissection splitting</text>
+    <rect x="250" y="358" width="190" height="24" rx="4" fill="#d9d9d9"/><text x="260" y="375">CLOSED-BY-PRIOR</text>
+    <text x="460" y="374">per-orbit shared pair table is incumbent; dissection is memory-only</text>
+
+    <text x="20" y="424">L7 end-to-end units vs rho</text>
+    <rect x="250" y="408" width="190" height="24" rx="4" fill="#d9d9d9"/><text x="260" y="425">CLOSED-BY-PRIOR (+gaps)</text>
+    <text x="460" y="424">147 rows: IC/rho grows 0.05–0.15 bits per bit of r</text>
+  </g>
+  <text x="20" y="458" font-size="12" fill="#555">No lane improves the index-calculus baseline; no row reaches the leaderboard (validation gate not met).</text>
+</svg>

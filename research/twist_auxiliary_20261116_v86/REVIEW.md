@@ -1,0 +1,6 @@
+# Pre-execution review
+Same-agent review after environment recovery. The vanished C85 source/proof/runner command was not executed/registered; this is a fresh self-contained version with an isolated continuation ledger. Prior persistent evidence stays untouched and lost RAM receipts are not claimed recovered.
+
+Exercise all small S3 triples, ordinary/Koblitz-shaped binary curves, prime characteristic3,GF9/GF27, zero coordinates,torsion,repetitions,kernel poles and all original inverse fibers. Compare group homomorphism on every source point pair; compare complete finite-source triple relations after reconstruction. Original equations remain required. Keep auxiliary false positives and failed assumptions. No unsupported all-roots speed claim follows from finite-field point tests. Canonicalize full polynomial/domain inputs in later benchmarks: binary A0/A1 metadata alone does not make distinct S3 systems.
+
+Source/input hashes freeze before two90s experiments,4096MiB per-process address space and CPU0.65s phase guards;78s completion demotion;84s reporting guard; outer runner charges process startup,stdout and exit. No runtime speed comparison on this recovered host; preserve wall/CPU/peak-RSS measurements as diagnostic scopes.

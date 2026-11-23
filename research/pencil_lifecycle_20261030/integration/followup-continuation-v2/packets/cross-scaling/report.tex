@@ -1,0 +1,20 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath}
+\begin{document}
+\title{Weighted cross-scaling and branch composition}
+\author{Producer proof packet; independent review pending}
+\date{30 October 2026}\maketitle
+\section*{Component checked}
+The explicit UInt64 straight-line cross-scaling computation now connects to the weighted field expressions and the same-support classifier. The final theorem includes the outer equality tests on the two support coefficients: it returns the same optional prelude branch in the word and field descriptions. None means the distinct-support path is entered, not an arithmetic failure.
+\section*{Literal expressions}
+For each side use the other point's weights. Compute
+\[z_2=z z\bmod p,\quad z_3=z_2z\bmod p,\quad z_4=z_2z_2\bmod p,\quad z_5=z_4z\bmod p.\]
+The four word outputs are $qz_2$, $rz_4$, $(sz_3)w$ and $(tz_5)w$, with remainder after every multiplication. Their decoded values are respectively $qz^2$, $rz^4$, $sz^3w$, $tz^5w$. All outputs remain canonical. The two sides then compare support coefficients and use inverse-first, equal-second, zero-subtraction-third branch order.
+\section*{Assumptions and proof mechanism}
+Every coordinate is canonical modulo p, and the classifier theorem assumes a prime $5\le p<2^{31}$. A finite multiplication-expression induction composes the already checked no-wrap primitive; the final theorem is about the explicit straight-line word function. Nonzero weights and Mumford validity are unnecessary for these polynomial value identities, but remain required by downstream geometric and error-exclusion statements.
+\section*{Native evidence}
+Three successive source stages compiled with native exit zero. A separate process checks the final types and four named axiom readbacks. Existing compiler/dependency pins are reused; no new installation, network fetch, scientific trial or cost comparison is performed. Earlier stage sources and receipts remain preserved.
+\section*{Source correspondence and limits}
+The source is add22\_weighted at projective\_law\_gate.rs:903--933. Multiplication and square providers are the table-free, n=1 UInt64 field route. The polynomial expression tree is a proof device; no operation-count claim is made from its evaluator or from Lean evaluation order. Counter side effects, checked-panic semantics, compiler correctness, reachability, and delegated branch payloads remain separate. In particular sameUDouble identifies delegation to double22\_weighted, not its eventual returned label. The final theorem establishes value composition and admission to the same-support branch, not complete addition-law correctness.
+\end{document}

@@ -1,0 +1,42 @@
+{
+  "decision": "accepted_exact_twelve_software_controls",
+  "reviewer": "assembler_independent_review_v2",
+  "independent": true,
+  "artifact_hashes": {
+    "exporter3-attempt1/receipt.json": "3220d130f8cf72872a1e7dddcf7784bd9514cb70161c1d6051768bd6aca30e3b",
+    "exporter3-attempt1/cleanup-receipt.json": "f58d635c06c43ef8c131a2c281f7cd4ac64cd8fb7485f867944412c3d410d7c7",
+    "exporter3-attempt1/1.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exporter3-attempt1/1.stderr": "617640f9ad0ae68374b85e8c78a5c497c1395b7e00ffbe0e092e6a5f8c4e3a19",
+    "exporter3-attempt1/2.stdout": "5108ec06d58b80482360f78922106d2b91087754f40f3a031b08a8acba8741b3",
+    "exporter3-attempt1/2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exporter3-execution.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "exporter3-freeze.json": "71a8b2502c67347a0284729888627fcc6af701c9bb15340c867f534e0dc82a12"
+  },
+  "compiled_test_binary_sha256": "e75a4db55fd99ed4ba29f65bcb1e6848e8f30ff59ae31e82fd9e738bdd9f0e9f",
+  "binary_independently_rehashed": true,
+  "passed_test_names": [
+    "controls::changed_starttime_rejected_by_external_receipt_pin",
+    "controls::exact_native_fixture_structural_export",
+    "controls::independent_expected_pins_are_required",
+    "controls::native_file_joins_reject_changes",
+    "controls::observer_semantics_reject_even_with_updated_comparison_digest",
+    "controls::prelaunch_session_is_not_postrun",
+    "controls::self_asserted_controller_authentication_never_promoted",
+    "controls::symlink_native_input_rejected",
+    "custody::tests::fresh_cli_dispatch_closes_only_pinned_run_files",
+    "custody::tests::fresh_controller_pin_binds_exact_run_receipt_config_pod_and_job",
+    "custody::tests::known_custody_still_requires_exact_owner_and_pod",
+    "custody::tests::self_asserted_custody_is_not_an_external_pin"
+  ],
+  "elapsed_seconds": 82.5159387489839,
+  "outer_exit": 0,
+  "compiler_exit": 0,
+  "test_exit": 0,
+  "native_pre_post_changes": [],
+  "frozen_files_still_match": true,
+  "owned_groups_empty": true,
+  "children_reaped": true,
+  "scope": "Synthetic retained metadata exported through actual owner/session/custody/file validation APIs; no authenticated real owner/session closure, no scientific run.",
+  "prior_failure": "Exporter2 E0624 and missed private API review retained unchanged.",
+  "review_actions": "Read-only native receipt/argv/name/freeze comparison and generated binary hash; no test invocation."
+}

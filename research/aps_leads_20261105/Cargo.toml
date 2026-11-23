@@ -1,0 +1,22 @@
+[package]
+name = "aps-lead-identity-records"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lints.clippy]
+# The imported native SHA-256 uses the root crate's existing policy for
+# fixed-size chunks. Keep its source unchanged; this standalone manifest
+# does not inherit the parent package's lint configuration.
+chunks_exact_to_as_chunks = "allow"
+
+[workspace]
+
+[[bin]]
+name = "aps-lead-identities"
+path = "identity_records.rs"
+
+[dependencies]
+hex = "0.4"
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"

@@ -1,0 +1,31 @@
+name: Rootfind round78 end-to-end solve+verify A/B
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round78_full_ab.py'
+      - '.github/workflows/rootfind-trace-round78-full.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-solve-verify-ab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round78_full_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Full producer plus independent verifier, paired A/B
+        run: |
+          set -euo pipefail
+          cargo --version
+          python3 research/amm_digit_perf_20261118/round78_full_ab.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: round78-full-solve-verify-raw-csv
+          path: research/amm_digit_perf_20261118/round78_full_ab_results.csv

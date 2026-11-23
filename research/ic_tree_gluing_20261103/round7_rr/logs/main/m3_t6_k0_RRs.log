@@ -1,0 +1,48 @@
+
+--------------- INPUT DATA ---------------
+#variables                      32
+#equations                      34
+#invalid equations               0
+field characteristic        786433
+homogeneous input?               0
+signature-based computation      0
+monomial order                 DRL
+basis hash table resetting     OFF
+linear algebra option            2
+initial hash table size     131072 (2^17)
+max pair selection             ALL
+reduce gb                        1
+#threads                         1
+info level                       2
+generate pbm files               0
+------------------------------------------
+
+Legend for f4 information
+--------------------------------------------------------
+deg       current degree of pairs selected in this round
+sel       number of pairs selected in this round
+pairs     total number of pairs in pair list
+mat       matrix dimensions (# rows x # columns)
+density   density of the matrix
+new data  # new elements for basis in this round
+          # zero reductions during linear algebra
+time(rd)  time of the current f4 round in seconds given
+          for real and cpu time
+--------------------------------------------------------
+
+deg     sel   pairs        mat          density            new data         time(rd) in sec (real|cpu)
+------------------------------------------------------------------------------------------------------
+  2       3      28      10 x 15         23.33%        2 new       1 zero         0.00 | 0.00         
+  2       1      29       3 x 5          46.67%        1 new       0 zero         0.00 | 0.00         
+  3      30      30     113 x 219         1.37%       28 new       2 zero         0.00 | 0.00         
+  3      32     224     169 x 230         1.91%       16 new      16 zero         0.00 | 0.00         
+  3      56     316     295 x 409         2.29%       23 new      33 zero         0.00 | 0.00         
+  3      20     516     270 x 402         2.86%        8 new      12 zero         0.00 | 0.00         
+  4     424     600    2480 x 3631        0.38%      183 new     241 zero         0.03 | 0.03         
+  4    1036    2686    5647 x 7424        0.71%      279 new     757 zero         0.23 | 0.22         
+  4     666    6129    5695 x 7858        1.36%      197 new     469 zero         0.31 | 0.31         
+  4     693    7859    7293 x 9857        1.49%      328 new     367 zero         1.02 | 1.00         
+  4     120   13443    6753 x 9587        2.08%       38 new      82 zero         0.21 | 0.21         
+  5   12226   14113   70672 x 78501       0.43%     2544 new    9696 zeroEnlarging exponent vector for hash table failed
+for esz = 2097152, segmentation fault will follow.
+exit=139 wall=104.299981998

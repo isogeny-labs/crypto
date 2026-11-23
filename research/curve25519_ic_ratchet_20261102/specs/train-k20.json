@@ -1,0 +1,83 @@
+{
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "proj-11",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=11,scan_cap=176",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "proj-16",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=16,scan_cap=256",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "proj-22",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=22,scan_cap=352",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "proj-32",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    }
+  ],
+  "description": "research/curve25519_ic_ratchet_20261102/PROTOCOL.md Part 1 (train). Public synthetic curve and targets; no security claim.",
+  "label": "Curve25519-family ratchet 1, train, k = 20",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 2026110430,
+    "timeout_seconds": 1800,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 63700,
+        "b": 872826,
+        "group_order": 1049624,
+        "gx": 349837,
+        "gy": 122,
+        "kind": "prime_explicit",
+        "p": 1048573,
+        "r": 131203
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026110420,
+    "targets_per_curve": 16
+  }
+}

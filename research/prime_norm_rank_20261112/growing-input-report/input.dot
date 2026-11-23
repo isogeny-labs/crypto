@@ -1,0 +1,14 @@
+digraph input {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.28"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fc",color="#305f90",fontname="Helvetica",fontsize=13,margin="0.16"];
+ edge [color="#305f90",fontname="Helvetica",fontsize=11];
+ a [label="Literal coefficient variables\nA_j: weight 2(a-j)\nB_j: weight 2a-3-2j\nexactly weights 1,...,2a-2"];
+ b [label="Actual target completion A\nN = A^2 - f B^2\ncoefficient budget 4a"];
+ c [label="Computed U = N divMonic(X-r)\nmonic degree m=2a-1\ncoefficient budget 2m"];
+ d [label="Computed R = P modMonic U\ncoefficient j: weighted degree <= 2 deg(P)-2j"];
+ e [label="Exact four-variable ring renaming\nweights (4,2,3,1)\nsame norm, support, full remainder"];
+ a -> b -> c -> d;
+ d -> e;
+ f [label="OPEN: constructive full-closure cutoff\nPublic finder, coverage, extraction/retries\nComplete expected bit cost",fillcolor="#fff3dc",color="#a07020"];
+ d -> f [style=dashed,label="separate obligation"];
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "formal.source-review-preparation/v1",
+  "task": "T-1577",
+  "producer_source_sha256": "ef72bcbfc9ea3643ae126dfeba644c2a34a999cb34254f8b17357ddd31d6f9e1",
+  "reviewer_independent_of_producer": true,
+  "blind": false,
+  "machine_status": "not_verified_by_reviewer",
+  "fidelity": "provisionally_faithful_scoped_source",
+  "review_outcome": "inconclusive_pending_fresh_machine_checks",
+  "source_findings": [
+    "rho composes actual affine-localization map with actual weighted-Proj stalk equivalence.",
+    "Source theorem derives norm identity from input divisibilities, determinant and quintic head; generic theorem still states norm identity as premise.",
+    "Branch equality supplies numerator nonunit; complementary factor unit follows from local-ring nonunits and2,b,y units.",
+    "DVR comes from separable actual curve and2*y0 nonzero, not an assumed order function.",
+    "Valuation codomain is extended naturals; no automatic finite/global divisor conclusion."
+  ],
+  "independent_fixture": {
+    "field": "Q",
+    "quintic": "X^5-5*X^3+4*X+1",
+    "u1": "X^2-1",
+    "u2": "X^2-4",
+    "v1": "1",
+    "v2": "1",
+    "coefficientData": [
+      "-9",
+      "0",
+      "0",
+      "-81",
+      "0"
+    ],
+    "numerator": "-9",
+    "residual": "-81*X",
+    "point": [
+      "1",
+      "1"
+    ],
+    "selected_order": 1,
+    "wrong_branch": [
+      "1",
+      "-1"
+    ],
+    "wrong_branch_selected_order": 0,
+    "wrong_branch_rhs_order": 1,
+    "status": "hand-derived exact mathematical fixture, not Lean-checked"
+  },
+  "producer_control_failure": "zero_scalar_not_unit by simp left unsolved goal and sorryAx; full14-readback validation unaccepted.",
+  "new_compiler_invocations": 0,
+  "proposed_sequence_seconds": 600,
+  "proposed_AS_GiB": 8,
+  "proposal_frozen": false,
+  "execution_authorized": false,
+  "pending": [
+    "Corrected producer control evidence and publication.",
+    "Exact reviewer wrapper/dependency/source closure freeze and finite release.",
+    "Fresh source rebuild, named axiom audit, positive/negative controls.",
+    "Final reviewed PDF/SVG/JSON and scoped commit after index grant."
+  ]
+}

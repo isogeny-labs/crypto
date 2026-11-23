@@ -1,0 +1,23 @@
+from pathlib import Path
+import json,hashlib
+D=Path(__file__).parent
+s='''# Independent retained pre-exec gate software audit
+
+Result: retained fixed software execution is supported by its source, admission and native receipts. All27 proposal files and364 compiler/header/tool bindings hash-match. Admission joins match the exact v2 control proposal and prospective root review. No compile, gate/helper rerun, Docker action or tested payload execution was performed by this review.
+
+The root run compiled pristine gate.c and a separate control translation unit with exact static compiler commands, -O2,-Wall,-Wextra,-Werror,-static and x86-64 baseline flags. The helper includes the same gate source with main renamed and only the mountinfo open redirected. The fixed fixture directory is compile-time pinned. The runner checks proposal/compiler identities before and after execution and uses a restricted child environment.
+
+All45 assertions passed in five groups: nonce7; mountinfo9; exact-value parsing including descriptor open/close11; bounded-reader12; host/fixed-case rejection6. The counts derive independently from the control source loops. The pristine gate separately exited126 with 'qualification gate: PID/UID/GID boundary'. The controls deliberately refuse hostPID1 and do not reach the production kernel/exec path. They do not simulate successful kernel enforcement.
+
+Binary digests match retained receipts: gate65f521d50818f593f5bc844eb26115bffd9866d4059a9ab5efee46df67d00377; controls1976faae3ceabd51f17125f356552993df5acca89c3e50447ac749101567d102. Independent byte parsing confirms both are ELF64 little-endian x86-64 EXEC with no interpreter or dynamic segment, agreeing with retained readelf output. No executable was run to obtain this independent readback.
+
+The link map loads private musl Scrt1/crti/crtn and libc.a, with GCC11 crtbeginS/crtendS. This is the private-musl C gate lineage, distinct from the Rust target's bundled libc selected by the earlier ecbench build. Current compiler/header/tool hashes match the bound compilation inputs; this is custody consistency, not a fresh reproducible-build demonstration or complete historical header-access trace.
+
+Disassembly of main follows the source identity, cgroup mapping, exact controller reads, bounded receipt write and two execve branches. No fork/clone/thread-creation call is present in the gate source or observed main call sequence. Runtime tm_clone registration symbols are CRT bookkeeping, not process cloning. This source/disassembly inspection is not an exhaustive formal machine-code proof of all transitive library behavior. The source separately requires PID1/UID1000, private read-only cgroup2 mapping and pids.max/current1 before tested exec.
+
+Verdict scope: fixed software controls and retained binary provenance validated; actual container kernel qualification remains unperformed here. The qualifier must bind this exact gate digest, stage the immutable read-only executable and validate its live nonce/case/pre-exec receipt in each active case. Reviewer previously authored the private musl compiler prerequisite and reviewed qualifier source; this involvement is disclosed. Root produced these execution receipts. No scientific timing or cost ratio is inferred.
+'''
+(D/'REVIEW.md').write_text(s);(D/'review.json').write_text(json.dumps({'schema':'software.execution-review/v1','verdict':'validated_scoped','gate_binary_sha256':'65f521d50818f593f5bc844eb26115bffd9866d4059a9ab5efee46df67d00377','proposal_files_matched':27,'compiler_inputs_matched':364,'fixed_assertions':45,'groups':5,'pristine_host_negative_exit':126,'independent_elf_byte_parse':True,'reviewer_executions':0,'actual_kernel_container_qualification':False,'source_no_fork_scope':'gate source and observed main call sequence; not exhaustive machine proof','cost_ratio':None},indent=2))
+t='#set page(paper:"a4",margin:16mm)\n#set text(size:10pt)\n'
+for p in s.split('\n\n'):t+='#text('+json.dumps(p.removeprefix('# '),ensure_ascii=False)+')\n#parbreak()\n'
+(D/'report.typ').write_text(t);(D/'diagram.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" width="920" height="300"><rect width="920" height="300" fill="#f4f7fb"/><g font-family="sans-serif" fill="#1c3045"><text x="25" y="45" font-size="23">Retained gate audit: source → binary → fixed controls</text><text x="25" y="100" font-size="18">27 proposal files + 364 compiler inputs match</text><text x="25" y="145" font-size="18">2 static x86-64 binaries; private musl CRT/libc link map</text><text x="25" y="190" font-size="18">45 assertions / 5 groups; pristine host-negative exit126</text><text x="25" y="250" font-size="17">Next boundary: actual per-case kernel observation before tested exec</text></g></svg>')

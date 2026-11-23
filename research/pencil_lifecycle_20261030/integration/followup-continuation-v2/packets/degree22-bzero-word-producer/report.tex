@@ -1,0 +1,17 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage{amsmath,amssymb}
+\begin{document}\section*{B-zero UInt64 branch correspondence}
+\textbf{Producer checks passed; independent review pending.}
+
+Two declarations compiled. Fixed controls and separate axiom readback passed, reporting only \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}. The field-level dependency also remains pending independent review.
+\subsection*{Proved component}
+The exact-associated word trees for $n_1,n_2,B,x,y,z,w$ decode to the retained field expressions and remain canonical. Under original validity, canonical inputs and curve coefficients, nonzero input weights, literal $B=0$ and $s\ne0$, and explicit global coprimality, the selected doubled output is canonical, has nonzero weights and retains normalized Mumford validity.
+
+The statement requires a prime $5\le p<2^{31}$ and the degree-one route without lookup tables. It reuses the existing explicit no-overflow arithmetic bridge and literal-five doubling treatment. The restricted dispatcher uses None outside this branch; those markers are not claims about other native branch payloads.
+\subsection*{Fixed positive and boundary controls}
+At $p=5$, curve coefficients $(0,4,1,0)$ and input $(q,r,s,t,z,w)=(1,0,4,0,2,3)$ give $B=0$. The point is $(x,y,z,w)=(4,4,3,3)$, normalizing to $(1,1)$ using $x/z^2$ and $y/(z^5w)$. The doubled raw payload is $(2,1,3,2,3,3)$ in $(q,r,s,t,z,w)$ order. The complete original-input proposition was checked, including its coprimality certificate.
+
+Additional controls check the zero-$s$ route, a nonzero-$B$ route, a noncanonical input and exclusion of $p=2$. Machine-readable inputs, outputs and coordinate order are in \texttt{control-data.json}.
+\subsection*{Evidence and limits}
+Main attempt2, field-fixtures1, controls1 and readback1 passed. The failed first main attempt is retained; it exposed a simplified numeral bound and a record-wrapper projection mismatch. Passing files retain tactic-style warnings. No scientific payload, timing measurement or cost ratio was generated. No canonical integration has occurred. Independent literal-source and statement review is the next required step.
+\end{document}

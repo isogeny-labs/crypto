@@ -1,0 +1,62 @@
+[
+  {
+    "name": "PartialFrobenius.frobenius_preserves_form",
+    "claim_path": "pcc/claims/PCC-20261112-e9174e.json",
+    "statement": "theorem frobenius_preserves_form : \u2200 a b c d : Fin 4, omega (frobenius4 (a,b)) (frobenius4 (c,d))=omega (a,b) (c,d)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/PartialFrobenius.lean",
+      "theorem": "PartialFrobenius.frobenius_preserves_form",
+      "decl_sha256": "7ae1b0622ae1003fdc58f1de8e2448b2ae0e948ecb46c0ddd7ea448b702b841d"
+    }
+  },
+  {
+    "name": "PartialFrobenius.partial_preserves_product_form",
+    "claim_path": "pcc/claims/PCC-20261112-e19537.json",
+    "statement": "theorem partial_preserves_product_form (p q : V4 \u00d7 V4) : productForm (partialAction p) (partialAction q)=productForm p q",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/PartialFrobenius.lean",
+      "theorem": "PartialFrobenius.partial_preserves_product_form",
+      "decl_sha256": "a45154dccf65940f88d5483bd8d0dcd7f64e48354e6403b704405d721ffac245"
+    }
+  },
+  {
+    "name": "PartialFrobenius.finite_sign_orbit",
+    "claim_path": "pcc/claims/PCC-20261112-106caa.json",
+    "statement": "theorem finite_sign_orbit : (\u2200 a b : Fin 4, iterate frobenius4 3 (a,b)=opposite4 (a,b)) \u2227 (\u2200 a b : Fin 4, iterate frobenius4 6 (a,b)=(a,b)) \u2227 (\u2200 k : Fin 2, (\u2203 a b : Fin 4, iterate frobenius4 (k.val+1) (a,b)\u2260(a,b)) \u2227 (\u2203 a b : Fin 4, iterate frobenius4 (k.val+1) (a,b)\u2260opposite4 (a,b)))",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/PartialFrobenius.lean",
+      "theorem": "PartialFrobenius.finite_sign_orbit",
+      "decl_sha256": "5d41901aadbbace0d517bc9249d3997069c2692d9de0f3545df0b70dcf5285f2"
+    }
+  },
+  {
+    "name": "PartialFrobenius.public_moduli_and_norms",
+    "claim_path": "pcc/claims/PCC-20261112-72739d.json",
+    "statement": "theorem public_moduli_and_norms : (6103 : Nat)%109=108 \u2227 (6103 : Nat)%113=1 \u2227 (6214 : Nat)%109=1 \u2227 (6214 : Nat)%113=112 \u2227 (2826 : Nat)%109=101 \u2227 (2826 : Nat)%113=1 \u2227 (4973 : Nat)%109=68 \u2227 (4973 : Nat)%113=1 \u2227 (2826*4973 : Nat)%12317=1 \u2227 (4860 : Nat)%109=101^2%109 \u2227 (4860 : Nat)%113=1 \u2227 (10510 : Nat)%109=46 \u2227 (10510 : Nat)%113=1 \u2227 (4860*10510 : Nat)%12317=1 \u2227 (101 : Nat)%113\u22601 \u2227 (101^2 : Nat)%113\u22601",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/PartialFrobenius.lean",
+      "theorem": "PartialFrobenius.public_moduli_and_norms",
+      "decl_sha256": "3e132c8d6bb42f320b5868ebcc64dd49d7b1d482cf40b3446e8a18ba69fdeec6"
+    }
+  },
+  {
+    "name": "PartialFrobenius.public_inverse_halves_quarters",
+    "claim_path": "pcc/claims/PCC-20261112-4b1b04.json",
+    "statement": "theorem public_inverse_halves_quarters {M : Type} [IntModule M] (killed : \u2200 x : M, (12317 : Int) \u2022 x=0) : (\u2200 x : M, (6159 : Int) \u2022 ((2 : Int) \u2022 x)=x) \u2227 (\u2200 x : M, (9238 : Int) \u2022 ((4 : Int) \u2022 x)=x)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/PartialFrobenius.lean",
+      "theorem": "PartialFrobenius.public_inverse_halves_quarters",
+      "decl_sha256": "765b2a15b713e4a3061c0789bbaf066c4182071e827caba71ede2ef2cbb12338"
+    }
+  },
+  {
+    "name": "PartialFrobenius.rational_bridge_agreement",
+    "claim_path": "pcc/claims/PCC-20261112-f99da7.json",
+    "statement": "theorem rational_bridge_agreement {J E T : Type} [IntModule T] (n r : Int) (norm : J \u2192 E) (pull : E \u2192 T) (phi : E \u2192 E) (transfer : J \u2192 T) (fixed : \u2200 x, phi (norm x)=norm x) (cleared : \u2200 x, n \u2022 transfer x=pull (phi (norm x))) (inverse : \u2200 y : T, r \u2022 (n \u2022 y)=y) : \u2200 x, transfer x=r \u2022 pull (norm x)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/PartialFrobenius.lean",
+      "theorem": "PartialFrobenius.rational_bridge_agreement",
+      "decl_sha256": "3d228184b32342d6d72165d5c6f322364473e92ca161837d7d7bfc166ee6298e"
+    }
+  }
+]

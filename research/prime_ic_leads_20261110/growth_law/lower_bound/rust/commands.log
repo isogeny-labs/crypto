@@ -1,0 +1,134 @@
+# commands.log: native Rust re-run of the lower-bound scripts (2026-11-15)
+date: 2026-11-15T00:41:14Z
+host: Linux 6.18.44-fc-v470 x86_64, 4 cpus
+rustc: rustc 1.97.0 (2d8144b78 2026-07-07)
+repo HEAD (base): d2a16c723d87ad4b7517783c6fb075077218532f (examples/growth_lower_bound.rs is uncommitted at run time)
+binary sha256: 41c264f3d13dc0bf5a05a55ff4a5247481d6baa6e8cb42edafe5698d3a8e3083
+source sha256: 89f1ace8433d2cd6ddc9cd344c9f1f963a309c00011d8fc8c37c8fd2215d2d88
+
+$ cargo clippy --release --example growth_lower_bound -- -D warnings   (clean for this example; one unrelated unknown-lint warning comes from the crate's lint configuration)
+$ cargo test --release --example growth_lower_bound   (11 passed, 0 failed)
+$ cargo build --release --example growth_lower_bound
+
+$ target/release/examples/growth_lower_bound all research/prime_ic_leads_20261110/growth_law/lower_bound/rust   (stderr below)
+[closure t=2 c=2 twist=(1, 1) dim=1 N=11 one=false 0.0s]
+[closure t=2 c=3 twist=(1, 1) dim=15 N=15 one=true 0.0s]
+[closure t=3 c=2 twist=(1, 1) dim=1 N=22 one=false 0.0s]
+[closure t=3 c=3 twist=(1, 1) dim=42 N=42 one=true 0.0s]
+[closure t=4 c=2 twist=(1, 1) dim=1 N=37 one=false 0.0s]
+[closure t=4 c=3 twist=(1, 1) dim=70 N=93 one=false 0.0s]
+[closure t=4 c=4 twist=(1, 1) dim=163 N=163 one=true 0.0s]
+[closure t=5 c=2 twist=(1, 1) dim=1 N=56 one=false 0.0s]
+[closure t=5 c=3 twist=(1, 1) dim=98 N=176 one=false 0.0s]
+[closure t=5 c=4 twist=(1, 1) dim=386 N=386 one=true 0.0s]
+[closure t=6 c=2 twist=(1, 1) dim=1 N=79 one=false 0.0s]
+[closure t=6 c=3 twist=(1, 1) dim=126 N=299 one=false 0.0s]
+[closure t=6 c=4 twist=(1, 1) dim=794 N=794 one=true 0.0s]
+[closure t=7 c=2 twist=(1, 1) dim=1 N=106 one=false 0.0s]
+[closure t=7 c=3 twist=(1, 1) dim=154 N=470 one=false 0.0s]
+[closure t=7 c=4 twist=(1, 1) dim=1471 N=1471 one=true 0.2s]
+[closure t=2 c=4 twist=(1, 1) dim=16 N=16 one=true 0.0s]
+[closure t=3 c=4 twist=(1, 1) dim=57 N=57 one=true 0.0s]
+[closure t=2 c=2 twist=(5, 7) dim=1 N=11 one=false 0.0s]
+[closure t=2 c=3 twist=(5, 7) dim=15 N=15 one=true 0.0s]
+[closure t=2 c=2 twist=(602931, 438086) dim=1 N=11 one=false 0.0s]
+[closure t=2 c=3 twist=(602931, 438086) dim=14 N=15 one=false 0.0s]
+[closure t=2 c=4 twist=(602931, 438086) dim=15 N=16 one=false 0.0s]
+[closure t=2 c=5 twist=(602931, 438086) dim=15 N=16 one=false 0.0s]
+[closure t=3 c=2 twist=(5, 7) dim=1 N=22 one=false 0.0s]
+[closure t=3 c=3 twist=(5, 7) dim=42 N=42 one=true 0.0s]
+[closure t=3 c=2 twist=(282243, 593375) dim=1 N=22 one=false 0.0s]
+[closure t=3 c=3 twist=(282243, 593375) dim=41 N=42 one=false 0.0s]
+[closure t=3 c=4 twist=(282243, 593375) dim=56 N=57 one=false 0.0s]
+[closure t=3 c=5 twist=(282243, 593375) dim=62 N=63 one=false 0.0s]
+[closure t=4 c=2 twist=(5, 7) dim=1 N=37 one=false 0.0s]
+[closure t=4 c=3 twist=(5, 7) dim=70 N=93 one=false 0.0s]
+[closure t=4 c=4 twist=(5, 7) dim=163 N=163 one=true 0.0s]
+[closure t=4 c=2 twist=(166747, 758628) dim=1 N=37 one=false 0.0s]
+[closure t=4 c=3 twist=(166747, 758628) dim=70 N=93 one=false 0.0s]
+[closure t=4 c=4 twist=(166747, 758628) dim=162 N=163 one=false 0.0s]
+[closure t=4 c=5 twist=(166747, 758628) dim=218 N=219 one=false 0.0s]
+[closure t=5 c=2 twist=(5, 7) dim=1 N=56 one=false 0.0s]
+[closure t=5 c=3 twist=(5, 7) dim=98 N=176 one=false 0.0s]
+[closure t=5 c=4 twist=(5, 7) dim=386 N=386 one=true 0.0s]
+[closure t=5 c=2 twist=(223294, 54386) dim=1 N=56 one=false 0.0s]
+[closure t=5 c=3 twist=(223294, 54386) dim=98 N=176 one=false 0.0s]
+[closure t=5 c=4 twist=(223294, 54386) dim=385 N=386 one=false 0.0s]
+[closure t=5 c=5 twist=(223294, 54386) dim=637 N=638 one=false 0.0s]
+[closure t=6 c=2 twist=(5, 7) dim=1 N=79 one=false 0.0s]
+[closure t=6 c=3 twist=(5, 7) dim=126 N=299 one=false 0.0s]
+[closure t=6 c=4 twist=(5, 7) dim=794 N=794 one=true 0.0s]
+[closure t=6 c=2 twist=(358236, 62483) dim=1 N=79 one=false 0.0s]
+[closure t=6 c=3 twist=(358236, 62483) dim=126 N=299 one=false 0.0s]
+[closure t=6 c=4 twist=(358236, 62483) dim=793 N=794 one=false 0.0s]
+[closure t=6 c=5 twist=(358236, 62483) dim=1585 N=1586 one=false 0.1s]
+[closure t=7 c=2 twist=(5, 7) dim=1 N=106 one=false 0.0s]
+[closure t=7 c=3 twist=(5, 7) dim=154 N=470 one=false 0.0s]
+[closure t=7 c=4 twist=(5, 7) dim=1471 N=1471 one=true 0.2s]
+[closure t=7 c=2 twist=(535457, 271877) dim=1 N=106 one=false 0.0s]
+[closure t=7 c=3 twist=(535457, 271877) dim=154 N=470 one=false 0.0s]
+[closure t=7 c=4 twist=(535457, 271877) dim=1470 N=1471 one=false 0.2s]
+[closure t=8 c=4 twist=(1, 1) dim=2110 N=2517 one=false 0.3s]
+[closure t=9 c=4 twist=(1, 1) dim=2809 N=4048 one=false 0.6s]
+[closure t=3 c=2 twist=(1, 1) dim=1 N=22 one=false 0.0s]
+[closure t=3 c=3 twist=(1, 1) dim=42 N=42 one=true 0.0s]
+[closure t=4 c=3 twist=(1, 1) dim=70 N=93 one=false 0.0s]
+[closure t=5 c=3 twist=(1, 1) dim=98 N=176 one=false 0.0s]
+[closure t=6 c=3 twist=(1, 1) dim=126 N=299 one=false 0.0s]
+[closure t=7 c=4 twist=(1, 1) dim=1471 N=1471 one=true 0.2s]
+[closure t=8 c=4 twist=(1, 1) dim=2110 N=2517 one=false 0.4s]
+[closure t=4 c=3 twist=(1, 1) dim=70 N=93 one=false 0.0s]
+[closure t=8 c=4 twist=(1, 1) dim=2110 N=2517 one=false 0.3s]
+[closure t=2 c=3 twist=(1, 1) dim=5 N=15 one=false 0.0s]
+[closure t=3 c=3 twist=(1, 1) dim=7 N=42 one=false 0.0s]
+[closure t=5 c=3 twist=(1, 1) dim=11 N=176 one=false 0.0s]
+[closure t=5 c=4 twist=(1, 1) dim=386 N=386 one=true 0.0s]
+[closure t=6 c=4 twist=(1, 1) dim=605 N=794 one=false 0.0s]
+[closure t=7 c=4 twist=(1, 1) dim=829 N=1471 one=false 0.0s]
+[closure t=4 c=4 twist=(1, 1) dim=1 N=163 one=false 0.0s]
+[closure t=6 c=4 twist=(1, 1) dim=1 N=794 one=false 0.0s]
+[closure t=7 c=4 twist=(1, 1) dim=1 N=1471 one=false 0.0s]
+[hsupp2 t=4 c=3 used-set 0.0s]
+[hsupp2 t=5 c=3 used-set 0.0s]
+[hsupp2 t=6 c=3 used-set 0.0s]
+[hsupp2 t=8 c=4 used-set 1.6s]
+[thmb t=4 c=3 kerdim 0.0s]
+[thmb t=5 c=3 kerdim 0.0s]
+[thmb t=6 c=3 kerdim 0.0s]
+[thmb t=8 c=4 kerdim 1.9s]
+[hsupp2 t=9 c=4 used-set 10.0s]
+[all done in 19.0s]
+
+real	0m18.962s
+user	0m57.649s
+sys	0m0.046s
+
+$ target/release/examples/growth_lower_bound closure 8 5 3 1234 5678 9012   (extension beyond the Python: c=5 at t=8)
+[closure t=8 c=2 twist=(1, 1) dim=1 N=137 one=false 0.0s]
+[closure t=8 c=3 twist=(1, 1) dim=182 N=697 one=false 0.0s]
+[closure t=8 c=4 twist=(1, 1) dim=2110 N=2517 one=false 0.5s]
+[closure t=8 c=5 twist=(1, 1) dim=6885 N=6885 one=true 10.4s]
+c=2 dim V=1 / 137  one=False
+c=3 dim V=182 / 697  one=False
+c=4 dim V=2110 / 2517  one=False
+c=5 dim V=6885 / 6885  one=True
+d_F = 5
+
+real	0m10.854s
+user	0m10.772s
+sys	0m0.052s
+
+$ target/release/examples/growth_lower_bound closure 9 5 3 1234 5678 9012   (extension beyond the Python: c=5 at t=9; ran once earlier from a scratch rustc build of the same source for timing, rerun here with the cargo binary)
+[closure t=9 c=2 twist=(1, 1) dim=1 N=172 one=false 0.0s]
+[closure t=9 c=3 twist=(1, 1) dim=210 N=988 one=false 0.0s]
+[closure t=9 c=4 twist=(1, 1) dim=2809 N=4048 one=false 0.6s]
+[closure t=9 c=5 twist=(1, 1) dim=12616 N=12616 one=true 134.4s]
+c=2 dim V=1 / 172  one=False
+c=3 dim V=210 / 988  one=False
+c=4 dim V=2809 / 4048  one=False
+c=5 dim V=12616 / 12616  one=True
+d_F = 5
+
+real	2m15.041s
+user	2m14.245s
+sys	0m0.227s

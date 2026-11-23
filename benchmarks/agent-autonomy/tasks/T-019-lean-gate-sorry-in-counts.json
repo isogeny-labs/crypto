@@ -1,0 +1,39 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-019",
+  "title": "Close a `sorry` in a small arithmetic Lean file",
+  "class": "lean",
+  "difficulty": 1,
+  "source": [
+    "research/ghs_degree3_q8_screen_20261026/Counts.lean",
+    "tools/lean/proof-gate.sh",
+    "tools/lean/README.md"
+  ],
+  "prompt": "A Lean 4 toolchain is available; the gate is `tools/lean/proof-gate.sh`. Follow the repository's Lean rules (AGENTS.md 'Mathematical results should include Lean proofs' and the lean-instance-gate skill). `benchmarks/agent-autonomy/fixtures/T-019/Counts.lean` fails the proof gate. Repair the proof without changing any statement.",
+  "setup": "Harness copies research/ghs_degree3_q8_screen_20261026/Counts.lean to benchmarks/agent-autonomy/fixtures/T-019/Counts.lean, replaces the proof of `fiveSupport` by `sorry`, and commits it.",
+  "acceptance": [
+    "tools/lean/proof-gate.sh on the file exits 0",
+    "no `sorry`, `native_decide` or `axiom` in the file",
+    "the file still has 7 theorems with the original names and statements"
+  ],
+  "check_command": "tools/lean/proof-gate.sh benchmarks/agent-autonomy/fixtures/T-019/Counts.lean && ! grep -Eq 'sorry|native_decide|axiom' benchmarks/agent-autonomy/fixtures/T-019/Counts.lean && [ \"$(grep -c '^theorem' benchmarks/agent-autonomy/fixtures/T-019/Counts.lean)\" = 7 ] && diff <(grep '^theorem' benchmarks/agent-autonomy/fixtures/T-019/Counts.lean | sed 's/ :=.*//') <(git show \"$T_BASE:research/ghs_degree3_q8_screen_20261026/Counts.lean\" | grep '^theorem' | sed 's/ :=.*//')",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "adding `sorry`, `axiom`, `native_decide` or a new trusted-native entry",
+    "changing a theorem statement to make its proof easier",
+    "raising maxHeartbeats or maxRecDepth"
+  ],
+  "max_wall_minutes": 20,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [
+    "lean",
+    "lake"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Needs bash (process substitution). Not executed: no Lean toolchain here."
+}

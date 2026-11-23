@@ -1,0 +1,60 @@
+{
+  "schema": "simulated-source-controls/v1",
+  "status": "passed",
+  "launcher_sha256": "a0b961ebd5df3527e930c090641870712e5fa0137d6d6178c0e06220a5c1b6d1",
+  "cases": [
+    {
+      "name": "valid_gc",
+      "status": "passed"
+    },
+    {
+      "name": "wrong_uid",
+      "status": "passed"
+    },
+    {
+      "name": "wrong_pid",
+      "status": "passed"
+    },
+    {
+      "name": "wrong_boot",
+      "status": "passed"
+    },
+    {
+      "name": "wrong_unit",
+      "status": "passed"
+    },
+    {
+      "name": "wrong_invocation",
+      "status": "passed"
+    },
+    {
+      "name": "missing_start",
+      "status": "passed"
+    },
+    {
+      "name": "missing_success",
+      "status": "passed"
+    },
+    {
+      "name": "reversed_order",
+      "status": "passed"
+    },
+    {
+      "name": "live_replacement",
+      "status": "passed"
+    },
+    {
+      "name": "cgroup_remains",
+      "status": "passed"
+    },
+    {
+      "name": "phase_gc_success_path",
+      "status": "passed"
+    }
+  ],
+  "compiler_invocations": 0,
+  "systemd_invocations": 0,
+  "journal_queries": 0,
+  "scope": "Exact source helpers with mocked manager records, services and clock; not live runtime qualification",
+  "pcc": "unverified"
+}

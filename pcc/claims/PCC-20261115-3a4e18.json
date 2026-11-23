@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-15T05:10:54Z",
+ "id": "PCC-20261115-3a4e18",
+ "kind": "statement",
+ "producer": {
+  "commit": "0a59fd3ebcdaf13f3dbf72f2b72ce62711b0f547",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_comparisons_20261115/integrity-audit.json",
+    "sha256": "c6a02039d16a5a3f1d3d050d8c1b4dc6a5b1a6867cba9a2b74d72f597d67016b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_comparisons_20261115/native/src/bin/audit.rs",
+    "sha256": "d42e2ee7a615db1a80990d63e82abfb9ef40886a1802c4801985dd1e7ebc9d92"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Producer-run integrity audit, not an independent signed review; exact small d4/d5 finite bases and no natural-target full-DLP claim.",
+ "statement": "Post-run native audit rechecks all33 instance truths and replays314 saved original point tuples from the encoding and tau panels without mismatch. Original-panel raw records omit point tuples, so its audit checks truth/replay flags only. At n131,d5 all three panels remain capped; successful wide S3 relations are singleton-x controls."
+}

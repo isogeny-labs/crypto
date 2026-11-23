@@ -1,0 +1,157 @@
+{
+  "recorded_at": "2026-11-07T02:33:49.950851+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-half-gcd/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "tests::projected_split_windows",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "limits",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "tests::limits_and_rejection",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "factors",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "source::transport::factor_tests::omitted_direct_factors",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "closure",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "source::transport::seed_tests::closure_and_mutation",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "subgroup",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "tests::subgroup_acceptance_matches_phase_and_affine",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "cache",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "source::transport::cache_tests::one_engine_and_binding",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "half",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "source::residual::polynomial::half_tests::lifted_batches_match_exact_trace",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "class",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "source::residual::polynomial::class_tests::quotient_composition_and_context",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "euclid",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "source::residual::polynomial::euclid_tests::projected_euclid_matches_determinants_and_roots",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "product",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "source::residual::polynomial::product_tests::product_matches_vector_and_direct",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "residual",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-half-gcd-20261107/tests",
+        "source::residual_tests::projected_residual_matches_full_ratio",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 33,
+  "binary_sha256": "5089e7eefa13d47833ea6aec4d11d0e8b52aca89fc82e7676064db7e60942495",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

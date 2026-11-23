@@ -1,0 +1,44 @@
+{
+  "schema": "runtime.source-comparison-review/v1",
+  "task": "T-1963",
+  "reviewer": "/root/materializer_qualification",
+  "utc": "2026-11-09T17:35:35.623529+00:00",
+  "producer_bindings_sha256": "868876b7c4eb2cee0ddea859bb85c1ecb510e1f044d96cc82a89bce0ad0d3994",
+  "producer_diff_sha256": "5d3492c74d2c9c407f05e29ab088104a63b6ba4288358e89322e47ff0d761549",
+  "verdict": "source_change_classification_and_local_counter_derivation_supported",
+  "checked_git_blobs": 20,
+  "findings": [
+    {
+      "id": "R1",
+      "finding": "All20 declared old/new selected Git blob hashes independently matched. pencil.rs same bytes. Candidate555a beforecfg(test) same bytes; testmodule diff adds actualSome/None control, production portion unchanged."
+    },
+    {
+      "id": "R2",
+      "finding": "Actual adapter dispatch sends None to native_solver::solve_one and Some to progress_native::solve_one_with_progress. Both routes contain finite-difference replacement; Some/None control compares these new routes, not old Horner against new recurrence."
+    },
+    {
+      "id": "R3",
+      "finding": "For u(x)=u0+u1*x+u2*x^2, initial first difference u1+u2 and second difference2u2 give u(x+1); linearv advancesv1. Updates occur before any continue and stored ux/vx retain current values. Canonical residues,0<p<=2^63 ensure a+b<=2p-2<2^64. Degree0/1 absentcoefficients paddedzero, inactive tails excluded."
+    },
+    {
+      "id": "R4",
+      "finding": "Horner fold startszero and charges M+A+entryvisit for every coefficient, including leadingzero multiply. Active coefficient total k=2d+1. New setup2adds+kvisits; piterations3adds each, including finalunusedadvance. Thus new-old: M=-kp,A=3p+2-kp,visits=-k(p-1). Other progress-route branch bodies unchanged. These are local ledger formulas, not timing or fullsolver ratios."
+    },
+    {
+      "id": "R5",
+      "finding": "Native tracing/capture and callable applicability path also change. Timing storage changes from Instant/Duration to CLOCK_MONOTONIC u64nanoseconds on64bitLinux. Neither selecteddiff nor local arithmetic proof establishes whole-instrument equivalence."
+    },
+    {
+      "id": "R6",
+      "finding": "Existing component result reports6398orderedpairs/20207sequences/134067samples/32boundaries/3wrongcontrols; retained independent rootreview reports parsedpairs and counterdeltas. Those reports were read, not replayed in this review, and exclude fullrootintegration."
+    }
+  ],
+  "required_classification": "algorithm_and_instrument_change_not_diagnostic_only",
+  "launch_authorized": false,
+  "tests_executed": 0,
+  "compiler_invoked": false,
+  "scientific_measurement": false,
+  "scope": "Source inspection, selected Git blob digest checks and symbolic local-operation derivation. No runtime or scientific speed claim.",
+  "next_action": "Amend affected candidate instrument/source-counter mapping while preserving original rows and runtime; separately qualify changed executable/image using exact prospective bindings. Reuse unchanged helpers only where identity proven.",
+  "knowledge": "Exact repository source/retained reviews; KB unavailable. No new mechanism or novelty claim."
+}

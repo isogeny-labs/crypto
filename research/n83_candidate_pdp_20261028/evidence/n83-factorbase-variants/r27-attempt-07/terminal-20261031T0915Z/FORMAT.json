@@ -1,0 +1,24 @@
+{
+  "schema": "n83.factor-base-terminal-evidence/v1",
+  "files": {
+    "status-tool.json": "terminal Kubernetes status response",
+    "logs-tool.json": "bounded retained Pod logs",
+    "results-pages/page-NN.json": "all paginated S3 output objects at terminal state",
+    "s3-file-index.json": "final content-addressed file index downloaded from the indexed S3 object",
+    "index-object-verification.json": "all 786 file-index entries joined to result-listing key and byte size",
+    "DATA_INDEX.json": "compact file inventory and final run facts",
+    "manifest.sha256": "checksum list for every package file except itself"
+  },
+  "acceptance": [
+    "Job succeeded",
+    "producer run exit code 0",
+    "complete producer index",
+    "384/384 shard entries with S3 key and expected size",
+    "786/786 final output-index keys and sizes matched"
+  ],
+  "scope_exclusions": [
+    "DoR or solving-degree measurement",
+    "training or ranking factor bases",
+    "cryptographic performance or attack claim"
+  ]
+}

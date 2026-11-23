@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title> </title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title"> </h1>
+</header>
+<style>body{font-family:Helvetica,Arial,sans-serif;font-size:10.5pt;max-width:none;line-height:1.35}table{border-collapse:collapse;font-size:9.5pt}td,th{border:1px solid #999;padding:2px 6px}img{width:100%}</style>
+<h1
+id="lead-sweep-2026-11-10-173-ecdlp-leads-one-frozen-protocol-each-executed-once-at-toy-scale">Lead
+sweep 2026-11-10: 173 ECDLP leads, one frozen protocol each, executed
+once at toy scale</h1>
+<p><strong>What this is.</strong> The owner asked to run every lead of
+the ECDLP atlas in a parallel Sonnet 5.5 workflow, with the experiments
+checked in before they started. This report is the synthesis.
+<strong>Classification: sweep of single, local, toy-scale runs. No
+improvement is claimed, no atlas disposition changes, every number is
+<code>[pcc:unverified]</code></strong> (one run, no independent replay,
+no validation gate, no isolab).</p>
+<p><strong>Provenance.</strong> - Lead index: <code>leads.json</code>
+(173 ids = the 160 leads of the 2026-11-07 review plus 13 ids that were
+merged or renamed between the two in-repo atlas snapshots). The atlas
+YAML in <code>crypto-autoresearcher</code> is vaulted
+(<code>VLT1</code>) and unreadable in this session; lead fields come
+from the verbatim <code>--pursuit</code> dump and table B of
+<code>research/prime_field_lead_assessment_20261107/</code> and the
+2026-11-01 tally; next-step text is truncated at ~100 chars in the
+source. - Phase 1 (check-in): 173 Sonnet 5.5 agents, four workflow
+shards, wrote <code>PROTOCOL.md</code> (+ stdlib <code>run.py</code>
+with <code>--smoke</code>) per lead; frozen by
+<code>MANIFEST.sha256</code> (343 files) at commit
+<code>f4bc8d406c</code>, merged to <code>main</code> in PR #3849 before
+any execution. ~16M tokens, 0 agent errors. - Phase 2 (execution): 173
+Sonnet 5.5 agents, two shards, one run per lead under
+<code>timeout 660</code>, no retries, no edits to hashed files
+(<code>sha256sum -c MANIFEST.sha256</code> passes after execution).
+~14.5M tokens, 0 agent errors. Total <code>run.py</code> wall time 2,796
+s (median 4 s, max 221 s). - Per-lead evidence:
+<code>&lt;LEAD&gt;/RESULT.md</code>, <code>RESULT.json</code> (the
+single JSON object <code>run.py</code> printed),
+<code>run.status</code>, <code>run.stderr</code>; structured summaries
+in <code>phase2_index.json</code>; raw shard outputs in
+<code>phase1_shard*.json</code>, <code>phase2_shard*.json</code>.</p>
+<h2 id="outcomes">1. Outcomes</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">leads</td>
+<td style="text-align: right;">173</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>runnable_local</code> /
+<code>desk_only</code> / <code>blocked</code> (Phase 1
+classification)</td>
+<td style="text-align: right;">170 / 1 / 2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ran to completion / timed out (660 s) /
+crashed / blocked / desk</td>
+<td style="text-align: right;">167 / 2 / 1 / 2 / 1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">verdict
+<code>consistent_with_prediction</code></td>
+<td style="text-align: right;">98</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">verdict <code>falsified</code> (26 with
+all controls passing, 2 with a failed control)</td>
+<td style="text-align: right;">28</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">verdict <code>inconclusive</code> (30 of
+them because a null, positive or A/A control failed)</td>
+<td style="text-align: right;">42</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>not_run</code> (timeout, crash,
+blocked)</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">agent reading: confirms or re-derives a
+recorded obstruction</td>
+<td style="text-align: right;">80</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">agent reading: constant factor only</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">agent reading: toy does not bear on the √p
+question</td>
+<td style="text-align: right;">82</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">agent reading: possible signal, needs
+replication</td>
+<td style="text-align: right;">2 (both read as artefacts in §3)</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img src="figures/sweep_outcomes.svg" alt="Sweep outcomes" />
+<figcaption aria-hidden="true">Sweep outcomes</figcaption>
+</figure>
+<p><em>A: verdict by family. B: the executing agent’s own reading of
+what the toy says about the sub-√p question. Drawn from
+<code>phase2_index.json</code> by <code>plot_sweep.py</code>.</em></p>
+<p>Per family (verdict: consistent / falsified / inconclusive / not
+run): exotic 22/6/3/1 · ic-prime 18/5/5/2 · generic (rho) 9/3/14/0 ·
+transfer 16/5/3/0 · ic-binary 10/4/9/0 · ic-engine 13/2/5/0 · structure
+10/3/3/2.</p>
+<h2 id="what-the-sweep-establishes-and-what-it-does-not">2. What the
+sweep establishes, and what it does not</h2>
+<ol type="1">
+<li><strong>No lead produced evidence of a below-√p exponent.</strong>
+The two “possible signal” flags (§3) are, on the executing agents’ own
+readings and on mine, finite-size and reference-arm artefacts. Eighty
+toy runs re-derived or were consistent with the obstruction the atlas
+already records (Shoup/CGK bounds, class-invariance of generic cost,
+√|Aut| ceiling, torsion-lifts-to-torsion, embedding-degree barriers,
+yield conservation <code>C(B+m−1,m)/N</code>, Coppersmith reach, the
+<code>p^{2−2/g}</code> cover floor). That is a consistency check on the
+atlas, not new knowledge.</li>
+<li><strong>The 28 falsifications are falsifications of toy predictions,
+not of leads.</strong> Reading each <code>RESULT.md</code>: 7 come from
+a single marginal cell or a one-count excess at a preregistered
+threshold (e.g. <code>TRF-mov-small-embedding-degree</code>: 4 hits vs
+3.27 expected; <code>ICB-large-prime-variants</code>: R = 0.784 vs 0.8;
+<code>STR-class-representative-ic-selection</code>: 0.0034 above a
+20-replicate null max); 9 are finite-size effects that decay or saturate
+with <code>p</code> (<code>EXO-lossy-object-propagation</code>,
+<code>EXO-gag-holant-semaev-chain</code>,
+<code>TRF-second-torsion-direction</code>,
+<code>TRF-jv-sieve-fp6-weak-class</code>,
+<code>ICP-residual-partial-relations</code>, …); 6 are instrument
+defects the agents diagnosed but were forbidden to fix (a reversed
+monotonicity test in <code>STR-isogeny-transport-preprocessing</code>, a
+mis-specified rank criterion in
+<code>ICP-prym-witness-relation-diversity</code>, a weak/heavy-tailed
+rho reference in <code>RHO-ecc2k130-gpu-fpga-throughput</code> and
+<code>ICP-retained-setup-online</code>, a non-comparable proxy in
+<code>ICE-chained-semaev-dreg-vs-semiregular</code>, a
+transcript-identity flag in <code>EXO-augmented-oracle-ggm</code>); the
+remaining ones are “falsified in the direction of the recorded
+obstruction”
+(e.g. <code>ICB-learned-cost-model-factor-base-selection</code>: the
+ridge ranks in the wrong direction;
+<code>STR-endo-scalar-action-generic</code>: more speed-up than 1/√k
+against a mis-calibrated baseline). None is a measured gain over any
+baseline.</li>
+<li><strong>The 42 inconclusives are mostly control failures</strong>
+(30), which is the preregistration working as intended: a failed A/A or
+positive control voids the run instead of letting a noisy number
+through. The rho-family rows are the clearest case (14 of 26
+inconclusive): single-core stdlib walks at 2<sup>12–2</sup>20 with
+hashed partitions and trap restarts do not reproduce the random-mapping
+constants to the ±10% the protocols asked for.</li>
+<li><strong>What a toy sweep cannot do.</strong> 82 agents said in their
+own reading that the stdlib toy does not test the lead’s actual claim
+(it tests a stand-in: <code>Z_N</code> for a curve, <code>n = 3</code>
+for <code>n = 5</code>, a filter for Semaev, an op-count formula for a
+pipeline). Those rows are coverage, not evidence. The two blocked leads
+(<code>ICP-icperf-binary-pdp-solver</code>,
+<code>ICE-gpu-rootfind-oracle</code>) need Gröbner builds, GPU or
+large-memory hosts; the two timeouts
+(<code>ICP-representation-subset-sum</code>,
+<code>STR-isogeny-class-generic-invariance</code>) and the crash
+(<code>STR-secp256k1-cm-class-audit</code>, no prime-order
+<code>j = 0</code> twist found for one <code>p</code>) are protocol
+cost-estimate failures, recorded as such.</li>
+</ol>
+<h2 id="the-two-possible-signal-flags-scrutinised">3. The two “possible
+signal” flags, scrutinised</h2>
+<p><strong><code>LEAD-ICE-rootfind-pairtable-oracle</code></strong> —
+toy IC/rho ratio <code>R_w(b)</code> falls from 2.2 at 12 bits to 0.82
+(w = 0), 0.71 (w = 0.1), 0.45 (w = 1) at 20 bits, slope CIs negative;
+preregistered falsifier (R &lt; 1 at both largest sizes) not met,
+verdict inconclusive. Reading: 5 replicates per size, a non-monotone
+16-bit bump (3.85), a rho reference inflated at small sizes by DP
+overhead and restarts (<code>DP bits = bits//2 − 4</code>), and a
+pair-table cost that is only 5% of the arm — i.e. the arm’s charged cost
+is dominated by <code>n^{1/3}</code>-scaled table work against
+<code>n^{1/2}</code> walk work exactly in the regime where the walk’s
+constants are worst. This is the pre-asymptotic crossing the program’s
+cost model predicts for a free table (<code>S·T² ≈ n</code>, program
+note §1), not an exponent. The lead’s own atlas next step (price every
+native primitive, second-host replay) is the right test; this toy
+neither replaces nor advances it.</p>
+<p><strong><code>LEAD-STR-class-representative-ic-selection</code></strong>
+— best-of-K yield gain <code>S_obs = 0.2895</code> vs null
+<code>q99 = 0.2861</code> (the max of 20 replicates), A/A range reaching
+0.2857. Reading: a 1.2% exceedance of a 20-sample maximum (≈ 1-in-21
+under the null), in a toy that relabels <code>x ↦ u²x</code> on one
+curve and does not measure index-calculus cost. Constant factor at most,
+and not established by this run.</p>
+<p>Neither flag should move a disposition. Both are recorded here so
+that nobody later mistakes the label in <code>phase2_index.json</code>
+for a finding.</p>
+<h2 id="what-the-sweep-is-worth">4. What the sweep is worth</h2>
+<ul>
+<li>As a <strong>check-in discipline</strong> it did what was asked: 173
+protocols with hypothesis, prediction, threshold and three controls each
+were frozen and merged before a single run, the hash manifest proves
+nothing was tuned after the fact, and one run per lead with no retries
+means every number here is a first look, not a best-of.</li>
+<li>As <strong>evidence</strong> it is weak by construction: single
+runs, stdlib toys, group orders ≤ 2^22, no validation gate, no replay,
+the atlas text read through a truncated snapshot. Its proper use is
+triage: (i) the 30 control failures and 6 instrument defects say which
+<code>run.py</code> files are not yet instruments; (ii) the 82 “does not
+bear” readings say which leads cannot be touched without their real
+engine (Gröbner, GPU, isolab, the vaulted atlas); (iii) the 80
+obstruction confirmations are cheap regression tests for the atlas’s
+closed and exhausted rows.</li>
+<li>It does <strong>not</strong> change the state of the prime-field
+question: the open algebraic levers
+(<code>ICP-digit-presentation-solving-degree</code>,
+<code>ICP-pkm-tower-algebraic-oracle</code>,
+<code>ICP-coppersmith-smallroot-semaev</code> with a new lattice,
+<code>EXO-global-lift-height</code>,
+<code>STR-class-group-ecdlp-bridge</code>) all ran as stand-ins here
+(and <code>pkm-tower</code>’s positive control failed), and each still
+needs the measurement its atlas entry names.</li>
+</ul>
+<h2 id="recommended-next-actions-ranked">5. Recommended next actions
+(ranked)</h2>
+<ol type="1">
+<li>Fix the six diagnosed instrument defects in a <em>new</em> protocol
+revision (never the frozen files), re-freeze, re-run those six.</li>
+<li>For the rho family, replace the stdlib walk with the repository’s
+<code>ecbench</code> reference
+(<code>LEAD-RHO-matched-rho-calibration</code>) before any rho-ratio
+claim; 14 inconclusives are instrument noise.</li>
+<li>Promote at most the two blocked leads and the five open algebraic
+leads to isolab task cards through <code>experiment-director</code>;
+everything else in this sweep is closed-consistent or
+stand-in-only.</li>
+<li>Run the knowledge-base review (unavailable in this session) over the
+sweep before any of the above is scheduled.</li>
+</ol>
+<h2 id="files">6. Files</h2>
+<p><code>leads.json</code>, <code>phase1_index.json</code>,
+<code>phase1_shard{1..4}.json</code>, <code>phase2_index.json</code>,
+<code>phase2_shard{A,B}.json</code>, <code>MANIFEST.sha256</code>,
+<code>&lt;LEAD&gt;/{PROTOCOL.md,run.py,RESULT.md,RESULT.json,run.status,run.stderr,BLOCKED.md}</code>,
+<code>plot_sweep.py</code>, <code>render.js</code>,
+<code>figures/sweep_outcomes.{svg,png}</code>,
+<code>SWEEP_REPORT.{md,html,pdf}</code>.</p>
+</body>
+</html>

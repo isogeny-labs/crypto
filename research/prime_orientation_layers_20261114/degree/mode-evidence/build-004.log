@@ -1,0 +1,141 @@
+'OrientationModeProfile.actual_weighted_left_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.actual_right_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.weight_fiber_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModeProfile.negative_pole_polynomial_width' depends on axioms: [propext, Classical.choice, Quot.sound]
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:151:33: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat (Graph ?m.6 ?m.7) 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Graph ?m.6 ?m.7
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:151:36: error: Function expected at
+  chedule
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `chedule` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:153:2: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  d ≥ 0
+  c ≥ 0
+  c - d - e ≥ 0
+  b ≥ 0
+  b - c ≥ 1
+  b - d ≤ 0
+where
+ b := ↑u
+ c := ↑i
+ d := ↑a
+ e := schedule u i m
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:171:33: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat (Graph ?m.6 ?m.7) 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Graph ?m.6 ?m.7
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:171:36: error: Function expected at
+  chedule
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `chedule` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:173:13: error(lean.unknownIdentifier): Unknown identifier `actual_weight_positive`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:172:52: error: unsolved goals
+x✝ : Sort u_1
+chedule : x✝
+a u i p : ℕ
+t : ℤ
+m : ℕ → ℕ
+hiu : i < u
+hu : u ≤ a
+hG : sorry ≤s sorry
+rb : LabelsAt a u i p m
+y : Ports a
+⊢ (absoluteRight a u i p t m rb y).natDegree ≤ p
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:189:33: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat (Graph ?m.6 ?m.7) 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Graph ?m.6 ?m.7
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:189:36: error: Function expected at
+  chedule
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `chedule` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:190:13: error(lean.unknownIdentifier): Unknown identifier `actual_weight_positive`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:189:96: error: unsolved goals
+x✝ : Sort u_1
+chedule : x✝
+a u i p : ℕ
+m : ℕ → ℕ
+hiu : i < u
+hu : u ≤ a
+hG : sorry ≤s sorry
+⊢ Fintype.card (LabelsAt a u i p m) ≤ 2 ^ u * p
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:195:33: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat (Graph ?m.6 ?m.7) 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Graph ?m.6 ?m.7
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:195:36: error: Function expected at
+  chedule
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `chedule` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:197:39: error(lean.unknownIdentifier): Unknown identifier `actual_weight_positive`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:197:26: error: unsolved goals
+x✝ : Sort u_1
+chedule : x✝
+a u i p : ℕ
+m : ℕ → ℕ
+hiu : i < u
+hu : u ≤ a
+hG : sorry ≤s sorry
+rb : LabelsAt a u i p m
+⊢ 1 ≤ jetWeight a u i m
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:239:33: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat (Graph ?m.15 ?m.16) 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Graph ?m.15 ?m.16
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:239:36: error: Function expected at
+  chedule
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  u
+
+Hint: The identifier `chedule` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:249:4: error(lean.unknownIdentifier): Unknown identifier `actual_absolute_right_degree`
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:251:4: error(lean.unknownIdentifier): Unknown identifier `actual_absolute_label_bound`
+'OrientationAbsolutePrecision.creation_index_covers' depends on axioms: [propext, Quot.sound]
+'OrientationAbsolutePrecision.actual_absolute_polynomial_precision' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationAbsolutePrecision.actual_absolute_rational_precision' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_layers_20261114/degree/mode-evidence/draft-004.lean.txt:258:14: error(lean.unknownIdentifier): Unknown constant `OrientationAbsolutePrecision.actual_absolute_rational_profile`

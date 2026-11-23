@@ -1,0 +1,35 @@
+name: Rootfinding Round125 source-exact native Rust A/B
+on:
+  push:
+    branches:
+      - 'automation/rootfind-round125-canonical-trim-20261122'
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - 'research/amm_digit_perf_20261118/round125_native_trim_ab.py'
+      - '.github/workflows/radical-root-round125.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-rust-root-normalization:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round125_native_trim_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-exact Rust correctness and 13-trial alternating A/B
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round125_native_trim_ab.py | tee round125_native_rust.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round125-native-rust
+          path: round125_native_rust.txt
+          if-no-files-found: warn

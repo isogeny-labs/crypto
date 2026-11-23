@@ -121,6 +121,9 @@ pub struct CorpusEntry {
     /// this crate's solver; an unsatisfiable one's by the complete
     /// pairs-and-solve refutation.
     pub checked: bool,
+    /// For a planted instance, how many degenerate draws were rejected
+    /// before it (see [`PLANTING`]).
+    pub planting_redraws: Option<usize>,
 }
 
 fn elt(v: u64, n: u32) -> F2mElement {
@@ -253,9 +256,130 @@ fn planted_true_variables(xs: &[u64; 3], l: u32) -> Vec<u32> {
     out
 }
 
+/// How satisfiable instances are planted.  Written as the `planting`
+/// line of every `INFO` file so that corpora made before the rule (no
+/// such line) can be told apart from corpora made under it.
+///
+/// Before `v2` the three points were drawn independently, with
+/// replacement, from a base holding both `±P` above each abscissa, so
+/// some plants were `R = P + Q − Q`: the target was itself a
+/// factor-base point (`x_R < 2^l`), at a rate of 10–30 % at `l = 4, 5`.
+/// Such targets are trivially decomposable and differ in distribution
+/// from the certified-unsatisfiable ones, which leaks the label.
+pub const PLANTING: &str = "v2 three pairwise-distinct factor-base abscissae (no P_i = +-P_j), x_R outside the subspace; degenerate draws redrawn";
+
+/// `y² + xy = x³ + a·x² + 1` over `F_{2^n}`; only the field and the
+/// coefficients are used (no generator or order).
+fn koblitz_curve(irr: &IrreduciblePoly, n: u32, a: u8) -> BinaryCurve {
+    BinaryCurve {
+        m: n,
+        irreducible: irr.clone(),
+        a: elt(u64::from(a), n),
+        b: F2mElement::one(n),
+        generator: BinaryPoint::Infinity,
+        order: BigUint::from(1u32),
+        cofactor: BigUint::from(1u32),
+    }
+}
+
+/// Factor-base points: every rational point above a non-zero subspace
+/// element, both `±P` for each abscissa.
+fn factor_base(curve: &BinaryCurve, n: u32, l: u32) -> Vec<BinaryPoint> {
+    (1..1u64 << l)
+        .flat_map(|x| points_with_x(curve, &elt(x, n)))
+        .collect()
+}
+
+/// A planted target and its witness.
+#[derive(Clone, Debug)]
+pub struct Plant {
+    /// The three factor-base points, `R = P1 + P2 + P3`.
+    pub points: [BinaryPoint; 3],
+    /// Their abscissae as words.
+    pub xs: [u64; 3],
+    pub x_r: F2mElement,
+    /// Degenerate draws rejected before this one was accepted.
+    pub redraws: usize,
+}
+
+/// The abscissa of an affine point as a word; `None` at infinity.
+fn x_word(p: &BinaryPoint) -> Option<u64> {
+    match p {
+        BinaryPoint::Affine { x, .. } => Some(word(x)),
+        BinaryPoint::Infinity => None,
+    }
+}
+
+/// Draw three factor-base points and sum them, redrawing until the plant
+/// is non-degenerate (see [`PLANTING`]):
+///
+/// - the three abscissae are pairwise distinct.  This excludes a
+///   cancelling pair `P_i = −P_j` (then `R` is the third point, a
+///   factor-base point) and also a repeated point `P_i = P_j`.  The
+///   repeated point would give a valid relation `2P + Q`. It is still
+///   excluded, because the `INFO` witness records abscissae only:
+///   `P + P` and `P − P` look the same there, so a downstream check
+///   could not tell a sound plant from a cancelling one.  A repeated
+///   root is also itself a visible feature of the witness;
+/// - `R` is affine and `x_R ∉ V`, i.e. `x_R ≥ 2^l`.  Distinct points
+///   can still sum into the factor base, and a target already in `V`
+///   decomposes trivially.
+pub fn plant_nondegenerate(
+    curve: &BinaryCurve,
+    base: &[BinaryPoint],
+    l: u32,
+    rng: &mut StdRng,
+) -> Result<Plant, String> {
+    let mut abscissae: Vec<u64> = base.iter().filter_map(x_word).collect();
+    abscissae.sort_unstable();
+    abscissae.dedup();
+    if abscissae.len() < 3 {
+        return Err(
+            "the subspace carries fewer than three abscissae; no non-degenerate plant exists"
+                .into(),
+        );
+    }
+    const MAX_REDRAWS: usize = 100_000;
+    for redraws in 0..MAX_REDRAWS {
+        let pick = |rng: &mut StdRng| base[rng.gen_range(0..base.len())].clone();
+        let points = [pick(rng), pick(rng), pick(rng)];
+        let xs = points.clone().map(|p| x_word(&p).unwrap_or(0));
+        if xs[0] == xs[1] || xs[0] == xs[2] || xs[1] == xs[2] {
+            continue;
+        }
+        let r = point_add(curve, &point_add(curve, &points[0], &points[1]), &points[2]);
+        let Some(xr) = x_word(&r) else {
+            continue;
+        };
+        if xr < 1u64 << l {
+            continue;
+        }
+        let BinaryPoint::Affine { x: x_r, .. } = r else {
+            unreachable!()
+        };
+        return Ok(Plant {
+            points,
+            xs,
+            x_r,
+            redraws,
+        });
+    }
+    Err(format!(
+        "no non-degenerate plant in {MAX_REDRAWS} draws (l = {l})"
+    ))
+}
+
+/// Whether two points cancel, `P = −Q`.
+pub fn cancels(p: &BinaryPoint, q: &BinaryPoint) -> bool {
+    *p == point_neg(q)
+}
+
 /// **Generate the corpus.**  Deterministic in the seed.  Satisfiable
-/// instances plant a sum of three factor-base points; unsatisfiable
-/// ones take random targets the complete oracle refutes.
+/// instances plant a non-degenerate sum of three factor-base points (see
+/// [`PLANTING`]); unsatisfiable ones take random targets the complete
+/// oracle refutes.  Because degenerate draws are redrawn, a seed yields
+/// different instances than it did before `v2`, unsatisfiable ones
+/// included (they share the random stream).
 pub fn generate(cfg: &CorpusConfig) -> Result<Vec<CorpusEntry>, String> {
     let n = cfg.n;
     let l = cfg.l;
@@ -267,47 +391,23 @@ pub fn generate(cfg: &CorpusConfig) -> Result<Vec<CorpusEntry>, String> {
     }
     let irr: IrreduciblePoly = find_irreducible_sparse(n).ok_or("no irreducible polynomial")?;
     let gf = Gf2::new(&irr);
-    let curve = BinaryCurve {
-        m: n,
-        irreducible: irr.clone(),
-        a: elt(u64::from(cfg.a), n),
-        b: F2mElement::one(n),
-        generator: BinaryPoint::Infinity,
-        order: BigUint::from(1u32),
-        cofactor: BigUint::from(1u32),
-    };
+    let curve = koblitz_curve(&irr, n, cfg.a);
     let prefix = if cfg.prefix.is_empty() {
         format!("n{n}l{l}")
     } else {
         cfg.prefix.clone()
     };
     let mut rng = StdRng::seed_from_u64(cfg.seed ^ ((n as u64) << 32) ^ ((l as u64) << 16));
-    let span = 1u64 << l;
-    // Factor-base points: every rational point above a non-zero
-    // subspace element.
-    let base: Vec<BinaryPoint> = (1..span)
-        .flat_map(|x| points_with_x(&curve, &elt(x, n)))
-        .collect();
-    if base.len() < 3 {
-        return Err("the subspace carries too few points to plant a sum".into());
-    }
+    let base = factor_base(&curve, n, l);
     let mut entries = Vec::new();
     let mut index = 1usize;
     let mut planted_count = 0usize;
     while planted_count < cfg.satisfiable {
-        let pick = |rng: &mut StdRng| base[rng.gen_range(0..base.len())].clone();
-        let (p1, p2, p3) = (pick(&mut rng), pick(&mut rng), pick(&mut rng));
-        let r = point_add(&curve, &point_add(&curve, &p1, &p2), &p3);
-        let BinaryPoint::Affine { x: xr, .. } = r else {
-            continue;
-        };
-        let xs = [p1, p2, p3].map(|p| match p {
-            BinaryPoint::Affine { x, .. } => word(&x),
-            BinaryPoint::Infinity => 0,
-        });
-        let _ = point_neg;
+        let plant = plant_nondegenerate(&curve, &base, l, &mut rng)?;
         let name = format!("{prefix}-{index}-S");
-        entries.push(build_entry(&name, cfg, &irr, &gf, &xr, Some(xs))?);
+        let mut entry = build_entry(&name, cfg, &irr, &gf, &plant.x_r, Some(plant.xs))?;
+        entry.planting_redraws = Some(plant.redraws);
+        entries.push(entry);
         planted_count += 1;
         index += 1;
     }
@@ -454,6 +554,9 @@ fn build_entry(
             "complete pairs-and-solve search over the subspace (semaev_decomp::decompose)"
         }
     );
+    // Written on every instance, unsatisfiable ones included, so the
+    // whole corpus carries the generator version.
+    let _ = writeln!(info, "planting {PLANTING}");
     if let Some(xs) = &planted_hex {
         let _ = writeln!(info, "witness X1 {} X2 {} X3 {}", xs[0], xs[1], xs[2]);
         let _ = writeln!(
@@ -508,6 +611,7 @@ fn build_entry(
         anf_equations: lines.len(),
         anf_monomials,
         checked,
+        planting_redraws: None,
     })
 }
 
@@ -583,6 +687,95 @@ mod tests {
                 assert_eq!(solver.solve(), SolveResult::Sat, "{}", e.name);
                 let xs = e.planted.as_ref().unwrap();
                 assert!(!e.planted_true_variables.is_empty() || xs.iter().all(|x| x == "0x0"));
+            }
+        }
+    }
+
+    /// Many draws at n = 23, l = 4, where the old sampler produced
+    /// x_R < 2^l in 13-28 % of plants and repeated abscissae in 29-54 %:
+    /// every accepted plant has three pairwise-distinct abscissae, no
+    /// cancelling or equal pair, sums to the recorded target, and has a
+    /// target outside the factor base.
+    #[test]
+    fn plants_are_never_degenerate() {
+        let (n, l) = (23u32, 4u32);
+        let irr = find_irreducible_sparse(n).unwrap();
+        for a in [0u8, 1] {
+            let curve = koblitz_curve(&irr, n, a);
+            let base = factor_base(&curve, n, l);
+            let mut rng = StdRng::seed_from_u64(0x5eed ^ u64::from(a));
+            let mut redraws = 0usize;
+            for _ in 0..2_000 {
+                let p = plant_nondegenerate(&curve, &base, l, &mut rng).expect("plant");
+                redraws += p.redraws;
+                assert!(p.points.iter().all(|q| base.contains(q)));
+                assert!(p.xs.iter().all(|&x| x > 0 && x < 1 << l));
+                for i in 0..3 {
+                    for j in i + 1..3 {
+                        assert_ne!(p.xs[i], p.xs[j], "repeated abscissa {:?}", p.xs);
+                        assert!(
+                            !cancels(&p.points[i], &p.points[j]),
+                            "cancelling pair {:?}",
+                            p.xs
+                        );
+                        assert_ne!(p.points[i], p.points[j]);
+                    }
+                }
+                let r = point_add(
+                    &curve,
+                    &point_add(&curve, &p.points[0], &p.points[1]),
+                    &p.points[2],
+                );
+                let BinaryPoint::Affine { x, .. } = r else {
+                    panic!("plant summed to infinity")
+                };
+                assert_eq!(x, p.x_r);
+                assert!(word(&p.x_r) >= 1 << l, "x_R 0x{:x} in V", word(&p.x_r));
+            }
+            // The old sampler's degenerate rate is far from zero here, so
+            // the redraw path is exercised.
+            assert!(redraws > 0, "a = {a}: no draw was rejected");
+        }
+    }
+
+    /// End to end at n = 23, l = 4: the written INFO of every planted
+    /// instance has a non-degenerate witness and target, the S₄ check
+    /// and the solver confirmation still pass, and every instance
+    /// carries the `planting` line.
+    #[test]
+    fn generated_corpus_has_no_degenerate_plants() {
+        for a in [0u8, 1] {
+            let cfg = CorpusConfig {
+                n: 23,
+                l: 4,
+                a,
+                seed: 7,
+                satisfiable: 40,
+                unsatisfiable: 2,
+                prefix: String::new(),
+                include_cnf: false,
+            };
+            let entries = generate(&cfg).expect("corpus");
+            assert_eq!(entries.len(), 42);
+            for e in &entries {
+                assert!(e.checked);
+                assert!(
+                    e.info.contains(&format!("planting {PLANTING}\n")),
+                    "{}",
+                    e.name
+                );
+                let x_r = u64::from_str_radix(e.x_r.trim_start_matches("0x"), 16).unwrap();
+                assert!(x_r >= 1 << cfg.l, "{}: x_R {} in V", e.name, e.x_r);
+                if let Some(xs) = &e.planted {
+                    assert!(e.planting_redraws.is_some());
+                    assert!(
+                        xs[0] != xs[1] && xs[0] != xs[2] && xs[1] != xs[2],
+                        "{}: {xs:?}",
+                        e.name
+                    );
+                } else {
+                    assert!(e.planting_redraws.is_none());
+                }
             }
         }
     }

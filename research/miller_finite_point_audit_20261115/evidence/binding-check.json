@@ -1,0 +1,36 @@
+{
+  "schema": "native-miller-finite-point-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "miller-finite-point-certificate",
+      "expected_decl_sha256": "140ca58f39c177a432e21f1aee49ae26a9e3075c50cced761301751b1db04b09",
+      "full_characters": 1652,
+      "full_decl_sha256": "140ca58f39c177a432e21f1aee49ae26a9e3075c50cced761301751b1db04b09",
+      "full_normalized_signature": "theorem miller_finite_point_certificate : (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K), (∀ (x y : K) (h : W.Nonsingular x y), IsDiscreteValuationRing (PointLocalRing W x y h.1) ∧ IsFractionRing (PointLocalRing W x y h.1) W.FunctionField ∧ IsLocalRing.maximalIdeal (PointLocalRing W x y h.1) = Ideal.span {pointParameter W h}) ∧ (∀ (x₁ y₁ x₂ y₂ : K) (h₁ : W.Nonsingular x₁ y₁) (h₂ : W.Nonsingular x₂ y₂) (hxy : ¬ (x₁ = x₂ ∧ y₁ = W.negY x₂ y₂)), principalPointDivisor W (MillerNormValuationAudit.lineFunction W x₁ y₁ (W.slope x₁ x₂ y₁ y₂)) (chord_support_finite W h₁ h₂ hxy) = chordDivisor W (Point.some x₁ y₁ h₁) (Point.some x₂ y₂ h₂)) ∧ (∀ (x y : K) (h : W.Nonsingular x y), principalPointDivisor W (MillerNormValuationAudit.verticalFunction W x) (vertical_support_finite W h) = verticalDivisor W (Point.some x y h)) ∧ (∀ (x y : K) (h : W.Nonsingular x y) (h3 : (3 : ℕ) • Point.some x y h = 0), principalPointDivisor W (MillerNormValuationAudit.lineFunction W x y (W.slope x x y y)) (chord_support_finite W h h (fun hn => three_tangent_nonvertical W h h3 hn.2)) = Finsupp.single (Point.some x y h) 3 - Finsupp.single 0 3)) ∧ controlCurve.Δ ≠ 0 ∧ IsLocalRing.maximalIdeal (PointLocalRing controlCurve 4 0 control_two_nonsingular.1) ≠ Ideal.span {localU controlCurve control_two_nonsingular.1} ∧ -WithZero.log (finiteAdic controlCurve control_negative_nonsingular (MillerNormValuationAudit.lineFunction controlCurve 2 2 (controlCurve.slope 2 2 2 2))) = (2 : ℤ) ∧ -WithZero.log (finiteAdic controlCurve control_positive_nonsingular (MillerNormValuationAudit.lineFunction controlCurve 2 2 (controlCurve.slope 2 2 2 2))) = (1 : ℤ)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "miller_finite_point_certificate",
+        "end_byte": 2612,
+        "file": "/workspace/scratch/miller-finite-binding-input01/FinitePointCertificate.lean",
+        "qualified_decl_id": "MillerFinitePointAudit.miller_finite_point_certificate",
+        "signature": "theorem miller_finite_point_certificate :\n    (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K),\n      (∀ (x y : K) (h : W.Nonsingular x y),\n        IsDiscreteValuationRing (PointLocalRing W x y h.1) ∧\n        IsFractionRing (PointLocalRing W x y h.1) W.FunctionField ∧\n        IsLocalRing.maximalIdeal (PointLocalRing W x y h.1) = Ideal.span {pointParameter W h}) ∧\n      (∀ (x₁ y₁ x₂ y₂ : K) (h₁ : W.Nonsingular x₁ y₁) (h₂ : W.Nonsingular x₂ y₂)\n        (hxy : ¬ (x₁ = x₂ ∧ y₁ = W.negY x₂ y₂)),\n        principalPointDivisor W\n          (MillerNormValuationAudit.lineFunction W x₁ y₁ (W.slope x₁ x₂ y₁ y₂))\n          (chord_support_finite W h₁ h₂ hxy) =\n          chordDivisor W (Point.some x₁ y₁ h₁) (Point.some x₂ y₂ h₂)) ∧\n      (∀ (x y : K) (h : W.Nonsingular x y),\n        principalPointDivisor W (MillerNormValuationAudit.verticalFunction W x)\n          (vertical_support_finite W h) = verticalDivisor W (Point.some x y h)) ∧\n      (∀ (x y : K) (h : W.Nonsingular x y) (h3 : (3 : ℕ) • Point.some x y h = 0),\n        principalPointDivisor W (MillerNormValuationAudit.lineFunction W x y (W.slope x x y y))\n          (chord_support_finite W h h (fun hn => three_tangent_nonvertical W h h3 hn.2)) =\n          Finsupp.single (Point.some x y h) 3 - Finsupp.single 0 3)) ∧\n    controlCurve.Δ ≠ 0 ∧\n    IsLocalRing.maximalIdeal (PointLocalRing controlCurve 4 0 control_two_nonsingular.1) ≠\n      Ideal.span {localU controlCurve control_two_nonsingular.1} ∧\n    -WithZero.log (finiteAdic controlCurve control_negative_nonsingular\n      (MillerNormValuationAudit.lineFunction controlCurve 2 2 (controlCurve.slope 2 2 2 2))) =\n      (2 : ℤ) ∧\n    -WithZero.log (finiteAdic controlCurve control_positive_nonsingular\n      (MillerNormValuationAudit.lineFunction controlCurve 2 2 (controlCurve.slope 2 2 2 2))) =\n      (1 : ℤ)",
+        "start_byte": 668
+      },
+      "recorded_statement": "theorem miller_finite_point_certificate : (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K), (∀ (x y : K) (h : W.Nonsingular x y), IsDiscreteValuationRing (PointLocalRing W x y h.1) ∧ IsFractionRing (PointLocalRing W x y h.1) W.FunctionField ∧ IsLocalRing.maximalIdeal (PointLocalRing W x y h.1) = Ideal.span {pointParameter W h}) ∧ (∀ (x₁ y₁ x₂ y₂ : K) (h₁ : W.Nonsingular x₁ y₁) (h₂ : W.Nonsingular x₂ y₂) (hxy : ¬ (x₁ = x₂ ∧ y₁ = W.negY x₂ y₂)), principalPointDivisor W (MillerNormValuationAudit.lineFunction W x₁ y₁ (W.slope x₁ x₂ y₁ y₂)) (chord_support_finite W h₁ h₂ hxy) = chordDivisor W (Point.some x₁ y₁ h₁) (Point.some x₂ y₂ h₂)) ∧ (∀ (x y : K) (h : W.Nonsingular x y), principalPointDivisor W (MillerNormValuationAudit.verticalFunction W x) (vertical_support_finite W h) = verticalDivisor W (Point.some x y h)) ∧ (∀ (x y : K) (h : W.Nonsingular x y) (h3 : (3 : ℕ) • Point.some x y h = 0), principalPointDivisor W (MillerNormValuationAudit.lineFunction W x y (W.slope x x y y)) (chord_support_finite W h h (fun hn => three_tangent_nonvertical W h h3 hn.2)) = Finsupp.single (Point.some x y h) 3 - Finsupp.single 0 3)) ∧ controlCurve.Δ ≠ 0 ∧ IsLocalRing.maximalIdeal (PointLocalRing controlCurve 4 0 control_two_nonsingular.1) ≠ Ideal.span {localU controlCurve control_two_nonsingular.1} ∧ -WithZero.log (finiteAdic controlCurve control_negative_nonsingular (MillerNormValuationAudit.lineFunction controlCurve 2 2 (controlCurve.slope 2 2 2 2))) = (2 : ℤ) ∧ -WithZero.log (finiteAdic controlCurve control_positive_nonsingular (MillerNormValuationAudit.lineFunction controlCurve 2 2 (controlCurve.slope 2 2 2 2))) = (1 : ℤ)",
+      "recorded_text_sha256": "140ca58f39c177a432e21f1aee49ae26a9e3075c50cced761301751b1db04b09",
+      "source_plan": "research/miller_finite_point_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "MillerFinitePointAudit.miller_finite_point_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

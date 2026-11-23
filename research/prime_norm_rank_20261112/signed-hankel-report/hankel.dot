@@ -1,0 +1,14 @@
+digraph public_hankel {
+ graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.2",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=11,margin="0.14,0.09"];
+ edge [fontname="Helvetica",fontsize=10,color="#526273"];
+ input [label="Public curve and 2a distinct abscissas\nChosen branches z(x)²=f(x)"];
+ matrix [label="Actual barycentric Hankel matrix\nM(j,k) = sum w(x) z(x) x^(j+k)\nDimension (a-1) x (a-1)"];
+ kernel [label="det M=0 -> nonzero kernel vector\nofFn gives bounded B",fillcolor="#e9f5ee"];
+ interpolate [label="Construct s by public interpolation\nA = sB mod G; moment test gives deg A <= a"];
+ norm [label="Full nonzero norm A²-fB² = cG\nNo supplied successful A/B or moments",fillcolor="#e9f5ee"];
+ flip [label="Branch change at t\nM_new-M = delta*w(t)*v(t)*v(t)^T"];
+ open [label="Open: choose signs to reach det M=0\nCharge all visits and preserve target branch",style="rounded,dashed",fillcolor="white"];
+ input -> matrix; matrix -> kernel; kernel -> interpolate; interpolate -> norm;
+ matrix -> flip; flip -> open; open -> matrix [style=dashed,label="search rule missing"];
+}

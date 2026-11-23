@@ -60,7 +60,10 @@ impl GenericOutcome {
 /// fails is booked in `failed_candidates` and kept for the runner to
 /// grade.  A solve with no candidate (exhausted) pays nothing.  This is the
 /// rule of every `_v2` method: rho and index calculus have always paid it
-/// for the answer they return, BSGS, the kangaroo and the claw had not.
+/// for the answer they return, BSGS, the kangaroo and the claw had not.  The
+/// final point equality is classified by `verification_checks` as outcome
+/// shape under the repository's verification convention; the scalar replay
+/// carries the charged group work.
 pub fn verify_candidate<G: CountedGroup>(
     g: &G,
     gen: G::Elt,
@@ -90,6 +93,35 @@ pub fn ceil_sqrt(r: u64) -> u64 {
     s.max(1)
 }
 
+/// The per-step counters of the three BSGS forms, kept in words during the
+/// search and written to [`GenericOutcome::counters`] once at the end.
+/// Every per-step call adds 1, so a counter is in the map exactly when it
+/// is non-zero, and [`StepCounters::flush`] writes only those: the map
+/// ends with the keys and values the per-step `count` calls produced,
+/// without a string-keyed map lookup per step.
+#[derive(Default)]
+struct StepCounters {
+    inserts: u64,
+    baby: u64,
+    lookups: u64,
+    giant: u64,
+}
+
+impl StepCounters {
+    fn flush(self, out: &mut GenericOutcome) {
+        for (name, v) in [
+            ("inserts_uncharged", self.inserts),
+            ("baby_steps", self.baby),
+            ("lookups_uncharged", self.lookups),
+            ("giant_steps", self.giant),
+        ] {
+            if v > 0 {
+                out.count(name, v);
+            }
+        }
+    }
+}
+
 /// **Textbook BSGS.**  Baby steps `jG`, `0 ≤ j < m = ⌈√r⌉`, all stored
 /// first; giant steps `Q − i·mG` until one lands in the table.  Worst
 /// case `2√r` operations, average `1.5√r`.
@@ -100,13 +132,14 @@ pub fn bsgs_textbook<G: CountedGroup>(
     r: u64,
 ) -> GenericOutcome {
     let mut out = GenericOutcome::default();
+    let mut c = StepCounters::default();
     let m = ceil_sqrt(r);
     let mut table: FastMap<u64> = fast_map(m as usize);
     let mut p = g.identity();
     for j in 0..m {
         table.entry(g.key(&p)).or_insert(j);
-        out.count("inserts_uncharged", 1);
-        out.count("baby_steps", 1);
+        c.inserts += 1;
+        c.baby += 1;
         if j + 1 < m {
             p = g.add(&mut out.setup, p, gen);
         }
@@ -114,16 +147,20 @@ pub fn bsgs_textbook<G: CountedGroup>(
     let stride = g.mul(&mut out.setup, gen, m);
     let back = g.neg(stride);
     let mut y = target;
-    for i in 0..=m {
-        out.count("lookups_uncharged", 1);
-        if let Some(&j) = table.get(&g.key(&y)) {
-            out.recovered = Some(addmod(mulmod(i, m, r), j, r));
-            return out;
+    let found = 'search: {
+        for i in 0..=m {
+            c.lookups += 1;
+            if let Some(&j) = table.get(&g.key(&y)) {
+                break 'search Some(addmod(mulmod(i, m, r), j, r));
+            }
+            c.giant += 1;
+            y = g.add(&mut out.search, y, back);
         }
-        out.count("giant_steps", 1);
-        y = g.add(&mut out.search, y, back);
-    }
-    out.exhausted = true;
+        None
+    };
+    c.flush(&mut out);
+    out.recovered = found;
+    out.exhausted = found.is_none();
     out
 }
 
@@ -147,29 +184,33 @@ pub fn bsgs_interleaved<G: CountedGroup>(
     let mut giant: FastMap<u64> = fast_map((m as usize).div_ceil(3) * 2);
     let mut b = g.identity();
     let mut y = target;
-    for t in 0..m {
-        // Baby step t: tG against the giant table.
-        out.count("lookups_uncharged", 1);
-        if let Some(&i) = giant.get(&g.key(&b)) {
-            out.recovered = Some(addmod(mulmod(i, m, r), t, r));
-            return out;
+    let mut c = StepCounters::default();
+    let found = 'search: {
+        for t in 0..m {
+            // Baby step t: tG against the giant table.
+            c.lookups += 1;
+            if let Some(&i) = giant.get(&g.key(&b)) {
+                break 'search Some(addmod(mulmod(i, m, r), t, r));
+            }
+            baby.entry(g.key(&b)).or_insert(t);
+            c.inserts += 1;
+            // Giant step t: Q − t·mG against the baby table.
+            c.lookups += 1;
+            if let Some(&j) = baby.get(&g.key(&y)) {
+                break 'search Some(addmod(mulmod(t, m, r), j, r));
+            }
+            giant.entry(g.key(&y)).or_insert(t);
+            c.inserts += 1;
+            c.baby += 1;
+            c.giant += 1;
+            b = g.add(&mut out.search, b, gen);
+            y = g.add(&mut out.search, y, back);
         }
-        baby.entry(g.key(&b)).or_insert(t);
-        out.count("inserts_uncharged", 1);
-        // Giant step t: Q − t·mG against the baby table.
-        out.count("lookups_uncharged", 1);
-        if let Some(&j) = baby.get(&g.key(&y)) {
-            out.recovered = Some(addmod(mulmod(t, m, r), j, r));
-            return out;
-        }
-        giant.entry(g.key(&y)).or_insert(t);
-        out.count("inserts_uncharged", 1);
-        out.count("baby_steps", 1);
-        out.count("giant_steps", 1);
-        b = g.add(&mut out.search, b, gen);
-        y = g.add(&mut out.search, y, back);
-    }
-    out.exhausted = true;
+        None
+    };
+    c.flush(&mut out);
+    out.recovered = found;
+    out.exhausted = found.is_none();
     out
 }
 
@@ -204,13 +245,14 @@ pub fn bsgs_negation_table<G: CountedGroup>(
     m: u64,
 ) -> GenericOutcome {
     let mut out = GenericOutcome::default();
+    let mut c = StepCounters::default();
     let m = m.max(1);
     let mut table: FastMap<(u64, u64)> = fast_map(m as usize + 1);
     let mut p = g.identity();
     for j in 0..=m {
         table.entry(class_key(g, &p)).or_insert((j, g.key(&p)));
-        out.count("inserts_uncharged", 1);
-        out.count("baby_steps", 1);
+        c.inserts += 1;
+        c.baby += 1;
         if j < m {
             p = g.add(&mut out.setup, p, gen);
         }
@@ -220,22 +262,130 @@ pub fn bsgs_negation_table<G: CountedGroup>(
     let back = g.neg(stride);
     let mut y = target;
     let giants = r / s + 1;
-    for i in 0..=giants {
-        out.count("lookups_uncharged", 1);
-        if let Some(&(j, key)) = table.get(&class_key(g, &y)) {
-            let is = mulmod(i, s, r);
-            out.recovered = Some(if g.key(&y) == key {
-                addmod(is, j, r)
-            } else {
-                submod(is, j, r)
-            });
-            return out;
+    let found = 'search: {
+        for i in 0..=giants {
+            c.lookups += 1;
+            if let Some(&(j, key)) = table.get(&class_key(g, &y)) {
+                let is = mulmod(i, s, r);
+                break 'search Some(if g.key(&y) == key {
+                    addmod(is, j, r)
+                } else {
+                    submod(is, j, r)
+                });
+            }
+            c.giant += 1;
+            y = g.add(&mut out.search, y, back);
         }
-        out.count("giant_steps", 1);
-        y = g.add(&mut out.search, y, back);
-    }
-    out.exhausted = true;
+        None
+    };
+    c.flush(&mut out);
+    out.recovered = found;
+    out.exhausted = found.is_none();
     out
+}
+
+/// Target-independent advice for [`bsgs_negation_table`].
+///
+/// Building this value performs every baby step and constructs the giant
+/// stride from `G` alone.  [`NegationBabyTable::solve`] is consequently the
+/// exact online boundary for a cached-table query: its first operation reads
+/// `target`, while the cold one-target cost remains the sum of `setup` and
+/// `search` in the returned [`GenericOutcome`].
+pub struct NegationBabyTable<E> {
+    table: FastMap<(u64, u64)>,
+    back: E,
+    giant_stride: u64,
+    order: u64,
+    setup: GroupOps,
+    inserts: u64,
+    baby_steps: u64,
+    point_negations: u64,
+}
+
+/// Build the target-independent half-width-`m` negation table used by
+/// [`bsgs_negation_table`].  The table is reusable only for the same group,
+/// generator, order and `m`; callers comparing a cold one-target solve must
+/// still charge this complete build once.
+pub fn build_negation_table<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    r: u64,
+    m: u64,
+) -> NegationBabyTable<G::Elt> {
+    let mut setup = GroupOps::default();
+    let m = m.max(1);
+    let mut table: FastMap<(u64, u64)> = fast_map(m as usize + 1);
+    let mut p = g.identity();
+    for j in 0..=m {
+        table.entry(class_key(g, &p)).or_insert((j, g.key(&p)));
+        if j < m {
+            p = g.add(&mut setup, p, gen);
+        }
+    }
+    let s = 2 * m + 1;
+    let stride = g.mul(&mut setup, gen, s);
+    let back = g.neg(stride);
+
+    NegationBabyTable {
+        table,
+        back,
+        giant_stride: s,
+        order: r,
+        setup,
+        inserts: m + 1,
+        baby_steps: m + 1,
+        // `back = -stride` is target-independent native work outside the
+        // counted group-operation ledger.  Per-entry class negations are
+        // carried by `inserts_uncharged` instead.
+        point_negations: 1,
+    }
+}
+
+impl<E: Copy> NegationBabyTable<E> {
+    /// Query one target against this table.  The returned outcome includes
+    /// the table's complete setup ledger and insert count, so it is a cold
+    /// one-target record even when the caller clocks this method alone as
+    /// the cached online interval.
+    pub fn solve<G: CountedGroup<Elt = E>>(&self, g: &G, target: E) -> GenericOutcome {
+        let mut out = GenericOutcome {
+            setup: self.setup,
+            ..Default::default()
+        };
+        let mut c = StepCounters {
+            inserts: self.inserts,
+            baby: self.baby_steps,
+            ..Default::default()
+        };
+        out.count("point_negations_uncharged", self.point_negations);
+        let mut y = target;
+        let giants = self.order / self.giant_stride + 1;
+        let found = 'search: {
+            for i in 0..=giants {
+                c.lookups += 1;
+                if let Some(&(j, key)) = self.table.get(&class_key(g, &y)) {
+                    // One key equality chooses the sign, then one multiply
+                    // and one add/subtract modulo the subgroup order recover
+                    // the scalar.  These happen only on a table hit.
+                    out.count("recovery_key_comparisons_uncharged", 1);
+                    out.count("recovery_modr_muls_uncharged", 1);
+                    out.count("recovery_modr_adds_uncharged", 1);
+                    let is = mulmod(i, self.giant_stride, self.order);
+                    break 'search Some(if g.key(&y) == key {
+                        addmod(is, j, self.order)
+                    } else {
+                        submod(is, j, self.order)
+                    });
+                }
+                c.giant += 1;
+                y = g.add(&mut out.search, y, self.back);
+            }
+            None
+        };
+        c.flush(&mut out);
+        out.recovered = found;
+        out.exhausted = found.is_none();
+        out
+    }
 }
 
 /// Kangaroo parameters chosen from `r`.
@@ -260,6 +410,37 @@ impl KangarooShape {
             jumps: k,
             dp_bits: (bits / 4).saturating_sub(1),
         }
+    }
+}
+
+/// `h mod d` for a fixed `d ≥ 1` without a division instruction: Lemire,
+/// Kaser and Kurz, "Faster remainder by direct computation" (2019), the
+/// 64-bit case with the 128-bit constant `M = ⌈2^128 / d⌉`, which is exact
+/// for every 64-bit `h` and every `d < 2^64` (their Theorem 1 with
+/// `F = 128 ≥ N + log₂ d`).  `d = 1` wraps `M` to 0 and returns 0.  The
+/// kangaroo's jump index was a 64-bit `div` per step; the value is the
+/// same remainder.
+#[derive(Clone, Copy)]
+struct FastMod {
+    m: u128,
+    d: u64,
+}
+
+impl FastMod {
+    fn new(d: u64) -> Self {
+        assert!(d > 0, "FastMod of a zero modulus");
+        Self {
+            m: (u128::MAX / d as u128).wrapping_add(1),
+            d,
+        }
+    }
+
+    #[inline]
+    fn rem(self, h: u64) -> u64 {
+        let low = self.m.wrapping_mul(h as u128);
+        let bottom = ((low as u64) as u128 * self.d as u128) >> 64;
+        let top = (low >> 64) * self.d as u128;
+        ((bottom + top) >> 64) as u64
     }
 }
 
@@ -307,6 +488,7 @@ pub fn kangaroo_with<G: CountedGroup>(
     let shape = KangarooShape::of(r);
     out.count("jump_count", shape.jumps as u64);
     out.count("dp_bits", shape.dp_bits as u64);
+    let jump_of = FastMod::new(shape.jumps as u64);
     let mut jumps: Vec<(G::Elt, u64)> = Vec::with_capacity(shape.jumps as usize);
     let mut p = gen;
     for i in 0..shape.jumps {
@@ -355,43 +537,68 @@ pub fn kangaroo_with<G: CountedGroup>(
         }
         point
     };
-    let mut roo = [start(0, &mut out, 0, false), start(1, &mut out, 0, false)];
+    // Each kangaroo carries the mixed key of its point (the jump index's
+    // input), computed once when the point is reached rather than again at
+    // the start of its next step.
+    let place = |(p, d): (G::Elt, u64)| (p, d, mix(g.key(&p)));
+    let mut roo = [
+        place(start(0, &mut out, 0, false)),
+        place(start(1, &mut out, 0, false)),
+    ];
+    // The per-distinguished-point counters, kept in words and written to
+    // the map once at each exit: a counter is in the map exactly when the
+    // per-event `count` calls would have created it (it is non-zero), so
+    // the map ends with the same keys and values.  `steps` is always
+    // written, as before.
+    let (mut dps, mut inserts, mut collisions) = (0u64, 0u64, 0u64);
+    let flush = |out: &mut GenericOutcome, steps: u64, dps: u64, inserts: u64, collisions: u64| {
+        for (name, v) in [
+            ("distinguished_points", dps),
+            ("lookups_uncharged", dps),
+            ("same_kind_collisions", collisions),
+            ("inserts_uncharged", inserts),
+        ] {
+            if v > 0 {
+                out.count(name, v);
+            }
+        }
+        out.count("steps", steps);
+    };
     let mut steps = 0u64;
     while steps < max_steps {
         for kind in 0..2u8 {
-            let (pos, dist) = roo[kind as usize];
-            let h = mix(g.key(&pos));
-            let (jp, jd) = jumps[(h % shape.jumps as u64) as usize];
+            let (pos, dist, h) = roo[kind as usize];
+            let (jp, jd) = jumps[jump_of.rem(h) as usize];
             let np = g.add(&mut out.search, pos, jp);
             let nd = addmod(dist, jd, r);
             steps += 1;
-            roo[kind as usize] = (np, nd);
-            if mix(g.key(&np) ^ 0xD15C) & dp_mask != 0 {
+            let nk = g.key(&np);
+            roo[kind as usize] = (np, nd, mix(nk));
+            if mix(nk ^ 0xD15C) & dp_mask != 0 {
                 continue;
             }
-            out.count("distinguished_points", 1);
-            out.count("lookups_uncharged", 1);
-            match table.get(&g.key(&np)) {
+            dps += 1;
+            match table.get(&nk) {
                 Some(&(other, od)) if other != kind => {
                     // tame: P = [dt]G; wild: P = Q + [dw]G  ⇒  k = dt − dw.
                     let (dt, dw) = if kind == 0 { (nd, od) } else { (od, nd) };
-                    out.count("steps", steps);
+                    flush(&mut out, steps, dps, inserts, collisions);
                     out.recovered = Some(submod(dt, dw, r));
                     return out;
                 }
                 Some(_) => {
-                    out.count("same_kind_collisions", 1);
+                    collisions += 1;
                     let off = next() % r.max(2);
-                    roo[kind as usize] = start(kind, &mut out, off, true);
+                    roo[kind as usize] = place(start(kind, &mut out, off, true));
                 }
                 None => {
-                    table.insert(g.key(&np), (kind, nd));
-                    out.count("inserts_uncharged", 1);
+                    table.insert(nk, (kind, nd));
+                    inserts += 1;
                 }
             }
         }
     }
-    out.count("steps", steps);
+    flush(&mut out, steps, dps, inserts, collisions);
     out.exhausted = true;
     out
 }
@@ -402,6 +609,39 @@ mod tests {
     use crate::cryptanalysis::ic_boundary::{
         find_prime_order_curve, koblitz_instance, BinaryGroup,
     };
+
+    #[test]
+    fn fast_mod_is_the_remainder() {
+        let mut s = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            s
+        };
+        let edges = [
+            0u64,
+            1,
+            2,
+            3,
+            u64::MAX,
+            u64::MAX - 1,
+            1 << 63,
+            (1 << 63) - 1,
+        ];
+        let mut moduli: Vec<u64> = (1..=64).collect();
+        moduli.extend([u64::MAX, u64::MAX - 1, 1 << 63, (1 << 63) + 1, 1_000_003]);
+        for d in moduli {
+            let f = FastMod::new(d);
+            for &h in &edges {
+                assert_eq!(f.rem(h), h % d, "d={d} h={h}");
+            }
+            for _ in 0..4096 {
+                let h = next();
+                assert_eq!(f.rem(h), h % d, "d={d} h={h}");
+            }
+        }
+    }
 
     fn check_all_prime(bits: u32, seed: u64) {
         let inst = find_prime_order_curve(bits, seed);
@@ -418,6 +658,90 @@ mod tests {
             ] {
                 assert_eq!(out.recovered, Some(k), "{name} k={k} r={}", inst.r);
             }
+        }
+    }
+
+    #[test]
+    fn negation_table_is_target_independent_reusable_advice() {
+        let inst = find_prime_order_curve(14, 59297);
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let m = ceil_sqrt(inst.r).div_ceil(2);
+        let table = build_negation_table(g, gen, inst.r, m);
+        let mut setup = None;
+        for k in [1, inst.r / 3, inst.r / 2 + 7, inst.r - 1] {
+            let q = g.mul(&mut GroupOps::default(), gen, k);
+            let cached = table.solve(g, q);
+            let direct = bsgs_negation_table(g, gen, q, inst.r, m);
+            assert_eq!(cached.recovered, Some(k));
+            assert_eq!(cached.recovered, direct.recovered);
+            assert_eq!(cached.setup, direct.setup);
+            assert_eq!(cached.search, direct.search);
+            for name in [
+                "inserts_uncharged",
+                "baby_steps",
+                "lookups_uncharged",
+                "giant_steps",
+            ] {
+                assert_eq!(cached.counters.get(name), direct.counters.get(name), "{name}");
+            }
+            assert_eq!(cached.counters["point_negations_uncharged"], 1);
+            assert_eq!(cached.counters["recovery_key_comparisons_uncharged"], 1);
+            assert_eq!(cached.counters["recovery_modr_muls_uncharged"], 1);
+            assert_eq!(cached.counters["recovery_modr_adds_uncharged"], 1);
+            assert_eq!(
+                cached.counters["inserts_uncharged"],
+                m + 1,
+                "one insert attempt per baby-table entry"
+            );
+            match setup {
+                Some(want) => assert_eq!(want, cached.setup),
+                None => setup = Some(cached.setup),
+            }
+        }
+    }
+
+    #[test]
+    fn cached_negation_table_counts_recovery_only_on_a_hit() {
+        struct Cyclic(u64);
+        impl CountedGroup for Cyclic {
+            type Elt = u64;
+            fn identity(&self) -> u64 {
+                0
+            }
+            fn is_identity(&self, p: &u64) -> bool {
+                *p == 0
+            }
+            fn add(&self, ops: &mut GroupOps, p: u64, q: u64) -> u64 {
+                ops.adds += 1;
+                (p + q) % self.0
+            }
+            fn double(&self, ops: &mut GroupOps, p: u64) -> u64 {
+                ops.doubles += 1;
+                (2 * p) % self.0
+            }
+            fn neg(&self, p: u64) -> u64 {
+                (self.0 - p) % self.0
+            }
+            fn key(&self, p: &u64) -> u64 {
+                *p
+            }
+        }
+
+        // The declared order deliberately bounds the search before target 50
+        // in Z/101 can reach the table.  This exercises the exhausted path,
+        // not a valid DLP instance under the declared order.
+        let group = Cyclic(101);
+        let out = build_negation_table(&group, 1, 5, 1).solve(&group, 50);
+        assert!(out.exhausted);
+        assert_eq!(out.recovered, None);
+        assert_eq!(out.counters["point_negations_uncharged"], 1);
+        for name in [
+            "recovery_key_comparisons_uncharged",
+            "recovery_modr_muls_uncharged",
+            "recovery_modr_adds_uncharged",
+        ] {
+            assert!(!out.counters.contains_key(name), "{name}");
         }
     }
 

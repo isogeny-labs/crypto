@@ -1,0 +1,38 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-041",
+  "title": "Report the distance remaining to the matched rho from a validated entry",
+  "class": "research",
+  "difficulty": 2,
+  "source": [
+    "AGENTS.md 'Success criterion' and section 5a",
+    "benchmarks/20261114-wallfix-runpod-abab/VALIDATION.json (rho_reference.gae_band)",
+    "CLAUDE.md success criterion"
+  ],
+  "prompt": "The research-kb server may be unreachable in this environment; if so, record that under 'Sources checked' and use the repository's own files. Every number you report is an unverified assertion unless a pcc claim says otherwise; tag it. `benchmarks/20261114-wallfix-runpod-abab/VALIDATION.json` holds, for the tensor spec, the IC arm's cost and the matched rho's cost at weights 0, 0.1 and 1 GAE per unpriced native operation. Report the gap to the matched rho as the repository's success criterion asks: as a distance remaining, not a pass or fail. Write `$T_OUT/gap.json` with keys `w0`, `w0_1`, `w1` (IC cost over rho cost at each weight) and `$T_OUT/gap.md` that states the three ratios, whether the order holds across the band, and what the evidence does not show. Do not edit the entry. The harness sets T_OUT (an output directory outside git); write every report file there.",
+  "setup": "Fresh checkout; no fixture.",
+  "acceptance": [
+    "$T_OUT/gap.json has w0, w0_1, w1",
+    "w0 within 1% of 120194, w0_1 within 1% of 134583, w1 within 1% of 209730",
+    "$T_OUT/gap.md contains no pass/fail wording ('fail', 'pass') about the gap, carries [pcc:unverified], passes lint-prose",
+    "benchmarks/20261114-wallfix-runpod-abab unchanged"
+  ],
+  "check_command": "python3 -c \"import json,os;r=json.load(open(os.environ['T_OUT']+'/gap.json'));e={'w0':120194,'w0_1':134583,'w1':209730};assert all(abs(r[k]-v)/v<0.01 for k,v in e.items())\" && grep -q 'pcc:unverified' \"$T_OUT/gap.md\" && ! grep -Eqi '\\b(pass|fail)(ed|es)?\\b' \"$T_OUT/gap.md\" && python3 tools/pcc/pcc.py lint-prose \"$T_OUT/gap.md\" && git diff --quiet \"$T_BASE\" HEAD -- benchmarks/20261114-wallfix-runpod-abab",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "citing a result as verified without a pcc claim id (use [pcc:unverified])",
+    "editing the study or evidence you are checking",
+    "inventing a source id, claim id or number",
+    "turning the distance into a pass or fail statement"
+  ],
+  "max_wall_minutes": 30,
+  "status": "DRAFT",
+  "grounding": "strong",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Ratios computed from the committed gae_band: 120194.5, 134582.9, 209729.7. The entry's raw data is in the artifact store and is not needed."
+}

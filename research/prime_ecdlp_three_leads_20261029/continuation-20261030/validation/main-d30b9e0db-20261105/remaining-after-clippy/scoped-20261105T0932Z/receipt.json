@@ -1,0 +1,214 @@
+{
+  "schema": "pkm.not-reached-phase-scoped-check/v1",
+  "recorded_utc": "2026-11-05T09:34:59.886771+00:00",
+  "source_objects": {
+    "src": "b044c4974fe2dbbf2a4da2280de1b9e96b063bb0",
+    "crates": "cb0a697e787d418fbeb448a606102b46630528b4",
+    "Cargo.toml": "4863d96e15c3fe919e4b744f2a246d55fc1b8104",
+    "Cargo.lock": "426a5848aa26aecc9325b763b496c4761f413455",
+    "examples/pkm_oracle_program.rs": "bdaa4046505d6ff28fdc8fa6f49bbeee79f042b2",
+    "examples/pkm_oracle_program": "48de282425badd5a70d8143c00d4a73047b54ad4",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/factor-base": "7ddafa821c968783132462b62f2e051c508e7172",
+    "tools/volcano-cli": "52b1c64049002561f3ff55b149c300cdb4656f34",
+    "scripts/checkpoint.sh": "41fe3054e9ec1a980677b95c6000daa51208c0c7",
+    "tools/lean": "ba3a29487f9b75366f56ce5213eb73dcbc4f1fb9",
+    "tests": "5a5ccad9afd3d9cd1771c00f79900c0359c3dc35",
+    "research/prime_ecdlp_three_leads_20261029/lean": "1c366822536c08b212a7d36045580ee715f327a0",
+    "research/aps_measurement_20261029/spec-controls.json": "c11e5f1515b0080aae37539e8321cc82be573f3c",
+    "research/aps_measurement_20261029/spec-orbit-controls.json": "4f832f6190d8347f42892e304fec986453e59f66",
+    "backlog/XP-20261029-pkm-verified-oracle-program/card.json": "e99f0d598cd89d839060e991b9b157efbd6f286a",
+    "isogeny_algos": "8b57bb4a80eac0e2ec1f254fbf82a01aeb2a4baa",
+    "research/pencil_large_prime_20261029": "adfb8daf1615549a49ecbd00e3d90a3989c41438",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/durable_attempt.rs": "0d4acf23d34597507ecd2518e372d31f494eac51"
+  },
+  "all20_objects_clean_and_equal": true,
+  "phases": {
+    "rustfmt": {
+      "exit": 0,
+      "started": "2026-11-05T09:31:03Z",
+      "finished": "2026-11-05T09:31:03Z"
+    },
+    "cli-build": {
+      "exit": 0,
+      "started": "2026-11-05T09:31:05Z",
+      "finished": "2026-11-05T09:31:16Z"
+    },
+    "cli-gate": {
+      "exit": 1,
+      "started": "2026-11-05T09:31:19Z",
+      "finished": "2026-11-05T09:31:26Z"
+    },
+    "backlog-build": {
+      "exit": 0,
+      "started": "2026-11-05T09:31:28Z",
+      "finished": "2026-11-05T09:31:35Z"
+    },
+    "backlog-validate": {
+      "exit": 0,
+      "started": "2026-11-05T09:31:38Z",
+      "finished": "2026-11-05T09:31:38Z"
+    }
+  },
+  "cli_refusal_message_verified": true,
+  "actual_binaries": [
+    {
+      "path": "target/release/examples/pkm_oracle_program",
+      "bytes": 6853584,
+      "sha256": "da0da9037515c8e60ec1db3388870d7de487a4e3562a0b43da7e107657321321"
+    },
+    {
+      "path": "target/release/backlog",
+      "bytes": 5998280,
+      "sha256": "9be6126cf8f249743da7913756176169dea7ad2cd9aa09356280f4e2a06dfb06"
+    }
+  ],
+  "captures": {
+    "rustfmt.log": {
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored_bytes": 0,
+      "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_is_exact_prefix": true
+    },
+    "rustfmt.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "01aa89005ce859d0320893c91cc44ba5714f1603de212e2e71f0e82c1151b8cc",
+      "stored_bytes": 21,
+      "stored_sha256": "01aa89005ce859d0320893c91cc44ba5714f1603de212e2e71f0e82c1151b8cc",
+      "raw_is_exact_prefix": true
+    },
+    "rustfmt.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stored_bytes": 2,
+      "stored_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_is_exact_prefix": true
+    },
+    "rustfmt.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "01aa89005ce859d0320893c91cc44ba5714f1603de212e2e71f0e82c1151b8cc",
+      "stored_bytes": 21,
+      "stored_sha256": "01aa89005ce859d0320893c91cc44ba5714f1603de212e2e71f0e82c1151b8cc",
+      "raw_is_exact_prefix": true
+    },
+    "cli-build.log": {
+      "raw_bytes": 479,
+      "raw_sha256": "5fc52f21a19ac66b9b8ed5a49c88f6df2ae6abde8c17980de9cf79a09f813d81",
+      "stored_bytes": 479,
+      "stored_sha256": "5fc52f21a19ac66b9b8ed5a49c88f6df2ae6abde8c17980de9cf79a09f813d81",
+      "raw_is_exact_prefix": true
+    },
+    "cli-build.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "1832fe0238cfdde6ee32740137324f865573d9d2ec5b1b59919cb418c3ff2356",
+      "stored_bytes": 21,
+      "stored_sha256": "1832fe0238cfdde6ee32740137324f865573d9d2ec5b1b59919cb418c3ff2356",
+      "raw_is_exact_prefix": true
+    },
+    "cli-build.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stored_bytes": 2,
+      "stored_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_is_exact_prefix": true
+    },
+    "cli-build.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "efdaa5acb3eeaf3144b9ac9b3a7ac62d31d9fd75a101eac303891e0410412ec9",
+      "stored_bytes": 21,
+      "stored_sha256": "efdaa5acb3eeaf3144b9ac9b3a7ac62d31d9fd75a101eac303891e0410412ec9",
+      "raw_is_exact_prefix": true
+    },
+    "cli-gate.log": {
+      "raw_bytes": 251,
+      "raw_sha256": "a89f01f0046ad87792f10745e614b650f3ab2f8c6c8129ef26aede343c438b33",
+      "stored_bytes": 251,
+      "stored_sha256": "a89f01f0046ad87792f10745e614b650f3ab2f8c6c8129ef26aede343c438b33",
+      "raw_is_exact_prefix": true
+    },
+    "cli-gate.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "6c2b290f46a7ecc06e96cefa24fa196ff2f46cc2b8117d7e5c2a24affa062b8c",
+      "stored_bytes": 21,
+      "stored_sha256": "6c2b290f46a7ecc06e96cefa24fa196ff2f46cc2b8117d7e5c2a24affa062b8c",
+      "raw_is_exact_prefix": true
+    },
+    "cli-gate.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "stored_bytes": 2,
+      "stored_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "raw_is_exact_prefix": true
+    },
+    "cli-gate.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "755c48e1d6d85184672d023a52742073280932a000cfbff66b47f8e8002d74cf",
+      "stored_bytes": 21,
+      "stored_sha256": "755c48e1d6d85184672d023a52742073280932a000cfbff66b47f8e8002d74cf",
+      "raw_is_exact_prefix": true
+    },
+    "backlog-build.log": {
+      "raw_bytes": 478,
+      "raw_sha256": "4d096ac4e15f75fa2f0ea66d6a7298059fd57deac5cd61c17fb9ea1c6e127abb",
+      "stored_bytes": 478,
+      "stored_sha256": "4d096ac4e15f75fa2f0ea66d6a7298059fd57deac5cd61c17fb9ea1c6e127abb",
+      "raw_is_exact_prefix": true
+    },
+    "backlog-build.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "e9edf803b3ed54549181e8fc54fa9d902d207462a3474e58a55b1950e2d9b7ac",
+      "stored_bytes": 21,
+      "stored_sha256": "e9edf803b3ed54549181e8fc54fa9d902d207462a3474e58a55b1950e2d9b7ac",
+      "raw_is_exact_prefix": true
+    },
+    "backlog-build.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stored_bytes": 2,
+      "stored_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_is_exact_prefix": true
+    },
+    "backlog-build.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "f574eac09ae5e1d4bd67e3b74da38f32e1d0ce5f08adfa323fef98ee3c5a3135",
+      "stored_bytes": 21,
+      "stored_sha256": "f574eac09ae5e1d4bd67e3b74da38f32e1d0ce5f08adfa323fef98ee3c5a3135",
+      "raw_is_exact_prefix": true
+    },
+    "backlog-validate.log": {
+      "raw_bytes": 44,
+      "raw_sha256": "00c228dbeecbb17c54e2ba4cba835117d7849e10c05f255aec11e31877b78e2e",
+      "stored_bytes": 44,
+      "stored_sha256": "00c228dbeecbb17c54e2ba4cba835117d7849e10c05f255aec11e31877b78e2e",
+      "raw_is_exact_prefix": true
+    },
+    "backlog-validate.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "a20cbe05163960e2b6e004606ea66da8f9fc85fd8ad14cf0d5fb9ecffcb357a3",
+      "stored_bytes": 21,
+      "stored_sha256": "a20cbe05163960e2b6e004606ea66da8f9fc85fd8ad14cf0d5fb9ecffcb357a3",
+      "raw_is_exact_prefix": true
+    },
+    "backlog-validate.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stored_bytes": 2,
+      "stored_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_is_exact_prefix": true
+    },
+    "backlog-validate.finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "a20cbe05163960e2b6e004606ea66da8f9fc85fd8ad14cf0d5fb9ecffcb357a3",
+      "stored_bytes": 21,
+      "stored_sha256": "a20cbe05163960e2b6e004606ea66da8f9fc85fd8ad14cf0d5fb9ecffcb357a3",
+      "raw_is_exact_prefix": true
+    }
+  },
+  "prior_required_clippy": "FAIL101; unchanged and not waived",
+  "global_pcc": "FAIL13inheritedmain claims; not waived",
+  "library_state": "not qualified by this scoped receipt",
+  "aggregate_validation": "FAIL pending upstream lint/PCC repair plus remaining outcomes",
+  "pcc_standing": "unverified producer observations"
+}

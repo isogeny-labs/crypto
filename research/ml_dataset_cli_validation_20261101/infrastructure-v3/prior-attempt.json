@@ -1,0 +1,54 @@
+{
+  "schema": "crypto.ml-dataset.prior-attempt-carry-forward/v1",
+  "original_fixture": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101",
+  "original_protocol_file_sha256": "e339243e6bd927985797faa78464ce5060d925112a4ac6242f72f1d4231833ab",
+  "original_canonical_protocol_sha256": "68537167b14a3033d16dc80e1e11f9a5b2513f38145fb5fae6fb190fa5df1198",
+  "original_version": 1,
+  "verdict": "FAIL",
+  "failure": {
+    "at": "2026-11-01T04:47:05.408755Z",
+    "cleanup": {
+      "actions": [],
+      "direct_child_live": false,
+      "errors": [],
+      "settled": true,
+      "unresolved": []
+    },
+    "error": "non-vacuous causal/algebraic CLI coverage missing; retain failure, no resample",
+    "no_retry": true,
+    "scientific_corpus_rows": 0
+  },
+  "original_case_states": {
+    "attempt_status_unknown": 4,
+    "attempted_unverified": 37,
+    "attempted_terminal_failure": 5
+  },
+  "derived_case_states": {
+    "verified_completed": 4,
+    "attempted_unverified": 37,
+    "attempted_terminal_failure": 5
+  },
+  "original_canonical_observations": 5,
+  "derived_canonical_observations": 13,
+  "derived_native_observations": 8,
+  "derived_reconciliation": {
+    "path": "/home/ec2-user/ml-dataset-resume-20261029/cli46-failure-export-fix/derived-reconciliation.json",
+    "sha256": "1418a91005d28b3f765e6ffa215764ec3ab57caeb669e69266cafd462b15744a",
+    "replacement_export": false
+  },
+  "causal_panel": {
+    "cases": 4,
+    "verified_solver_outcomes": 3,
+    "budget_exhausted_solver_outcomes": 1,
+    "independent_root_ideal_audits_unknown": 4,
+    "public_prefix_rows": 0,
+    "public_algebraic_rows": 0
+  },
+  "original_files": {
+    "protocol.json": "e339243e6bd927985797faa78464ce5060d925112a4ac6242f72f1d4231833ab",
+    "prepared.json": "9ff935628540727b71a34d62cda24ca9088988f0f0cbfe4fc733da7420911540",
+    "failure-flow.json": "7e9a9e65af4497dc56d12ddcdfe839e1a4245787a46162075c1fbfe2ba330287",
+    "execution-failed.json": "a5403e2e0b406c4bf68b4ad05b8e996dfd7ae4ea5a567a38bedb692a4f0aeba5",
+    "failure.experiment.export.json": "7c101f12cef74568c4c820b099fb6ed63e1e9912a4033da368a1d767e0932ee5"
+  }
+}

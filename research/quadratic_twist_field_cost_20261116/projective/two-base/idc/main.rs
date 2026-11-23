@@ -1,0 +1,17 @@
+// Thin source/proof binding and CLI around UNMODIFIED official identity module.
+#[path="/tmp/twist-two-base-20261116/canonical/identity_certificate.rs"]mod certificate;
+mod hash{#[path="/tmp/twist-two-base-20261116/canonical/sha256.rs"]pub mod sha256;}
+use certificate::{Expr as E,IdentityStatement,IdentityCertificate,ProofRef,Verdict};
+use std::{fs,path::Path};
+const SOURCE:&str="research/quadratic_twist_field_cost_20261116/projective/two-base/TwoBase.lean";
+fn sha(b:&[u8])->String{hash::sha256::sha256(b).iter().map(|x|format!("{x:02x}")).collect()}
+fn v(n:&str)->E{E::var(n)}fn mul(a:E,b:E)->E{E::times(a,b)}fn add(a:E,b:E)->E{E::plus(a,b)}fn sub(a:E,b:E)->E{add(a,E::minus(b))}
+fn q(a:&str,b:&str,c:&str)->E{add(add(mul(v(a),mul(v("x"),v("x"))),mul(v(b),v("x"))),v(c))}
+fn statement(head:&str)->IdentityStatement{IdentityStatement{name:"Two membership quadratics: linear original-input cover".into(),source:format!("{SOURCE}#TwistTwoBase.original_input_identity; checkpoint={head}; source_sha256={}",sha(&fs::read(SOURCE).unwrap())),variables:["a","b","c","d","e","f","x"].iter().map(|x|x.to_string()).collect(),degree_bound:4,lhs:sub(mul(v("d"),q("a","b","c")),mul(v("a"),q("d","e","f"))),rhs:add(mul(sub(mul(v("d"),v("b")),mul(v("a"),v("e"))),v("x")),sub(mul(v("d"),v("c")),mul(v("a"),v("f"))))}}
+fn write(p:&str,b:&[u8]){assert!(!Path::new(p).exists());fs::write(p,b).unwrap();}
+fn main(){let args:Vec<_>=std::env::args().collect();let r=std::panic::catch_unwind(||{
+ assert!(args.len()>=4);let mode=&args[1];let head=&args[3];assert_eq!(head.len(),40);
+ if mode=="issue"||mode=="false-issue"{let mut s=statement(head);if mode=="false-issue"{s.rhs=add(s.rhs,E::Const(1));}let cert=certificate::issue(s,0x54574f4241534532,32,"Official native module with32additional domain-separated checker points; producer observations, not signedPCC",Some(ProofRef{kind:"lean4".into(),path:SOURCE.into(),sha256:sha(&fs::read(SOURCE).unwrap())})).expect("false identities must not seal");assert!(matches!(certificate::check_with_extra(&cert,Some((0x4944434558545241,32))).unwrap(),Verdict::Accept{..}));write(&args[2],serde_json::to_string_pretty(&cert).unwrap().as_bytes());return}
+ if mode=="check"{let c:IdentityCertificate=serde_json::from_slice(&fs::read(&args[2]).unwrap()).unwrap();let official=certificate::check_with_extra(&c,Some((0x4944434558545241,32))).expect("official malformed certificate rejection");eprintln!("Official verdict: {official:?}");assert!(matches!(official,Verdict::Accept{..}));assert_eq!(c.statement,statement(head),"exact source-bound statement");let proof=c.proof.as_ref().unwrap();assert_eq!(proof.path,SOURCE);assert_eq!(proof.sha256,sha(&fs::read(SOURCE).unwrap()));assert!(matches!(certificate::check_with_extra(&c,Some((0x4944434558545241,32))).unwrap(),Verdict::Accept{..}));println!("{}",serde_json::json!({"id":c.id,"official_module":"unmodified","extra_points":32,"signed_verdict":false}));return}
+ assert!(args.len()==6&&mode=="forge");let mut c:IdentityCertificate=serde_json::from_slice(&fs::read(&args[2]).unwrap()).unwrap();match args[4].as_str(){"sign"=>{c.statement.rhs=add(c.statement.rhs,E::Const(1));c.id=certificate::statement_id(&c.statement)},"degree"=>{c.statement.degree_bound=1;c.id=certificate::statement_id(&c.statement)},"digest"=>c.value_digest="0".repeat(64),_=>panic!("unknown control")};write(&args[5],serde_json::to_string_pretty(&c).unwrap().as_bytes());
+ });if r.is_err(){std::process::exit(101)}}

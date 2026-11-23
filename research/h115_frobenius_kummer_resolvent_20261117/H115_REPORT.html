@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>H115 — Frobenius–Kummer resolvent moments</title>
+<style>
+  @page { size: A4; margin: 15mm 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #172033; font: 10.2pt/1.42 Arial, sans-serif; }
+  h1, h2, h3 { color: #102a43; margin: 0 0 7px; }
+  h1 { font-size: 25pt; line-height: 1.08; letter-spacing: -0.5px; }
+  h2 { font-size: 16pt; padding-bottom: 4px; border-bottom: 2px solid #c8d8e8; }
+  h3 { font-size: 11.5pt; margin-top: 10px; }
+  p { margin: 5px 0 8px; }
+  a { color: #0b67a3; text-decoration: none; }
+  .page { break-after: page; min-height: 257mm; position: relative; }
+  .page:last-child { break-after: auto; }
+  .eyebrow { color: #276b8a; font-weight: 700; letter-spacing: 1.4px; font-size: 8.5pt; }
+  .subtitle { margin-top: 9px; color: #43596d; font-size: 12pt; max-width: 155mm; }
+  .status { display: inline-block; margin: 14px 0 16px; padding: 6px 10px;
+    background: #fff4dc; color: #7a4b00; border: 1px solid #e6c986; border-radius: 4px; font-weight: 700; }
+  .hero { width: 100%; margin: 9px 0 10px; border: 1px solid #b8cada; border-radius: 5px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { border: 1px solid #cbd8e4; border-radius: 5px; padding: 9px 10px; background: #f7fafc; }
+  .equation { margin: 8px 0; padding: 8px 11px; background: #eef6fb; border-left: 4px solid #20749d;
+    font: 12pt/1.45 "DejaVu Sans", sans-serif; text-align: center; }
+  .warning { background: #fff1ef; border-color: #d96b5f; }
+  .exact { background: #eef8f1; border-color: #4f9562; }
+  table { width: 100%; border-collapse: collapse; margin: 7px 0 11px; font-size: 9pt; }
+  th { background: #173f5f; color: white; text-align: left; }
+  th, td { padding: 5px 6px; border: 1px solid #c8d5e0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f5f8fa; }
+  ul, ol { margin: 5px 0 8px 18px; padding: 0; }
+  li { margin: 2px 0; }
+  code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.8pt; }
+  .tag { display: inline-block; padding: 2px 6px; border-radius: 10px; font-size: 8pt; font-weight: 700; }
+  .known { background: #dbeef7; color: #195a78; }
+  .tested { background: #fff0cf; color: #775000; }
+  .open { background: #f8deda; color: #8a2e25; }
+  .footer { position: absolute; bottom: 0; width: 100%; border-top: 1px solid #d2dce5;
+    padding-top: 4px; color: #637586; font-size: 8pt; display: flex; justify-content: space-between; }
+  .small { font-size: 8.5pt; color: #526679; }
+  .sources li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+
+<section class="page">
+  <div class="eyebrow">ECDLP RESEARCH NOTE · H115 · 18 NOVEMBER 2026</div>
+  <h1>Frobenius–Kummer<br>resolvent moments</h1>
+  <p class="subtitle">An exact degree reduction, a frozen finite falsification experiment, and the unresolved cost barrier separating the two from a subexponential algorithm.</p>
+  <div class="status">SOURCE COMPLETE · MEASUREMENT BLOCKED BEFORE SCORING</div>
+
+  <img class="hero" src="mechanism.png" alt="H115 mechanism and evidence gates">
+
+  <div class="grid2">
+    <div class="card exact">
+      <h3><span class="tag known">PROVED ALGEBRA</span></h3>
+      <p>For an ordinary prime-field curve with <code>r=#E(Fp)=p+1−t</code>, Frobenius <code>π</code> and Verschiebung <code>V</code> give</p>
+      <div class="equation">(V − 1)(π − 1) = [r].</div>
+      <p>The <code>r²</code>-point division torsor maps with multiplicity <code>r</code> onto one <code>r</code>-point fiber.</p>
+    </div>
+    <div class="card warning">
+      <h3><span class="tag open">NOT ESTABLISHED</span></h3>
+      <p>The frozen producer enumerates all <code>r</code> fiber points for every target. This is <code>Θ(r)</code>, exponential in the input length <code>log r</code>.</p>
+      <p>A subexponential result still needs a uniform <code>r<sup>o(1)</sup></code> moment construction and complete decoder cost.</p>
+    </div>
+  </div>
+
+  <div class="footer"><span>H115 technical evidence note</span><span>1 / 3</span></div>
+</section>
+
+<section class="page">
+  <h2>1. Exact mechanism and algorithmic role</h2>
+  <p>Let <code>Q∈E(Fp)</code> and choose <code>R</code> with <code>[r]R=Q</code>. Its Frobenius cocycle <code>cR=(π−1)R</code> satisfies</p>
+  <div class="equation">(V − 1)c<sub>R</sub> = Q.</div>
+  <p>Changing <code>R</code> by <code>T∈E[r]</code> changes the cocycle by <code>(π−1)T</code>. With the checked rank/cardinality premises,</p>
+  <div class="equation">H = image(π−1 | E[r]) = kernel(V−1 | E[r]), &nbsp; |H|=r.</div>
+  <p>A public section is <code>c0(Q)=[(p−1)<sup>−1</sup> mod r]Q</code>, so the complete fiber is <code>c0(Q)+H</code>. The Lean layer proves the group identities, exact fiber/coset equivalence, nonempty-fiber/kernel cardinality equivalence, CRT-6 reconstruction and a conditional scalar-blind group update. It deliberately assumes—rather than manufactures—the exact digit premise and subexponential cost premise.</p>
+
+  <h3>Frozen observable</h3>
+  <div class="equation">X<sub>j</sub>(Q)=Σ x(C)<sup>j</sup>, &nbsp; Y<sub>j</sub>(Q)=Σ y(C)x(C)<sup>j−1</sup>, &nbsp; 1≤j≤8, &nbsp; C∈c0(Q)+H.</div>
+  <p>Sixteen raw moments feed 38 generator-normalized ratio/cross/mixed channels. Each of 54 channels is reduced modulo two and three under every alphabet permutation, giving <code>54·2!·3!=648</code> fixed public IDs.</p>
+
+  <h3>Frozen cohort</h3>
+  <table>
+    <thead><tr><th>p</th><th>curve (a,b)</th><th>r</th><th>t</th><th>d=ord<sub>r</sub>(p)</th><th>p<sup>d</sup></th><th>N<sub>d</sub>/r²</th></tr></thead>
+    <tbody>
+      <tr><td>7</td><td>(1,1)</td><td>5</td><td>3</td><td>4</td><td>2,401</td><td>99</td></tr>
+      <tr><td>5</td><td>(2,1)</td><td>7</td><td>−1</td><td>6</td><td>15,625</td><td>320</td></tr>
+      <tr><td>13</td><td>(2,4)</td><td>17</td><td>−3</td><td>4</td><td>28,561</td><td>99</td></tr>
+      <tr><td>31</td><td>(1,19)</td><td>37</td><td>−5</td><td>4</td><td>923,521</td><td>675</td></tr>
+      <tr><td>47</td><td>(1,38)</td><td>61</td><td>−13</td><td>3</td><td>103,823</td><td>28</td></tr>
+    </tbody>
+  </table>
+
+  <div class="grid2">
+    <div class="card">
+      <h3><span class="tag tested">FINITE TEST</span></h3>
+      <ul><li>5 curves × 3 generator labels = 15 rows</li><li>366 nonidentity targets</li><li>same ID must be exact on every row</li><li>independent <code>[m]G=Q</code> replay</li></ul>
+    </div>
+    <div class="card">
+      <h3>Controls</h3>
+      <ul><li>seeded non-eigen lines and shuffled labels</li><li>rational-line null control</li><li>five coordinate isomorphisms</li><li>raw/normalized ablations and forbidden oracle</li><li>eight verifier tamper classes</li></ul>
+    </div>
+  </div>
+  <div class="footer"><span>Exact representation compression ≠ runtime improvement</span><span>2 / 3</span></div>
+</section>
+
+<section class="page">
+  <h2>2. Evidence ledger and cost boundary</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>Status</th><th>What it establishes</th><th>What it does not</th></tr></thead>
+    <tbody>
+      <tr><td>Prior-art screen</td><td><span class="tag known">SCOPED</span></td><td>Torsor/Kummer/biextension/EDS overlap documented.</td><td>External novelty proof.</td></tr>
+      <tr><td>Lean, 526 lines</td><td><span class="tag known">PASS</span></td><td>Generic identities, fibers, multiplicity premise, score handoff and decoder.</td><td>Exact predicate or efficient moments.</td></tr>
+      <tr><td>Rust source, 2,200 lines</td><td><span class="tag known">PASS</span></td><td>Strict compile; five-curve unlabeled structural selftest.</td><td>Candidate score; <code>--run</code> unexecuted.</td></tr>
+      <tr><td>Independent verifier</td><td><span class="tag known">PASS</span></td><td>Separate tuple-field reconstruction; 8/8 synthetic tampers rejected.</td><td>Real packet handshake (no packet exists).</td></tr>
+      <tr><td>Checkpoint / EKS</td><td><span class="tag open">BLOCKED</span></td><td>Nothing measured.</td><td>No score, selected ID, decoder result or timing.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Cost ledger required before any speed claim</h3>
+  <table>
+    <thead><tr><th>Object or phase</th><th>Geometric size</th><th>Frozen implementation</th><th>Open obligation</th></tr></thead>
+    <tbody>
+      <tr><td>Full division torsor</td><td>r²</td><td>Not enumerated by H115</td><td>Baseline only</td></tr>
+      <tr><td>Frobenius cocycle fiber</td><td>r</td><td>Construct H, enumerate every element</td><td>Uniform construction</td></tr>
+      <tr><td>One target moment</td><td>r terms</td><td>Θ(r) point/field work</td><td>r<sup>o(1)</sup> shortcut</td></tr>
+      <tr><td>Full digit decoder</td><td>O(log r) queries if oracle exact</td><td>Conditional group update proved</td><td>Public exact oracle plus total cost</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card warning">
+    <h3>Current conclusion</h3>
+    <p>H115 is a fully specified and independently checkable toy experiment around an exact algebraic compression. It is not yet an empirical result because the mandatory checkpoint transport is unavailable, and it is not a subexponential algorithm even if the frozen digit test later succeeds.</p>
+  </div>
+
+  <h3>Primary sources and overlap boundaries</h3>
+  <ol class="sources small">
+    <li>Lauter &amp; Stange, “The ECDLP and Equivalent Hard Problems for Elliptic Divisibility Sequences,” <a href="https://arxiv.org/abs/0803.0728">arXiv:0803.0728</a>.</li>
+    <li>D. Robert, “Some notes on algorithms for abelian varieties,” §7.4.1, <a href="https://eprint.iacr.org/2024/406">IACR 2024/406</a>.</li>
+    <li>Dartois–De Feo–Maino–Pope–Robert, “On the efficient representation of isogenies,” <a href="https://eprint.iacr.org/2024/1071">IACR 2024/1071</a>.</li>
+    <li>D. Robert, “The geometric interpretation of the Tate pairing,” <a href="https://eprint.iacr.org/2023/177">IACR 2023/177</a>.</li>
+    <li>Lombardo &amp; Tronto, “Explicit Kummer Theory for Elliptic Curves,” <a href="https://arxiv.org/abs/1909.05376">arXiv:1909.05376</a>.</li>
+    <li>K. Stange, “The Tate Pairing via Elliptic Nets,” <a href="https://eprint.iacr.org/2006/392">IACR 2006/392</a>.</li>
+  </ol>
+  <p class="small">Internal bindings: crypto PR #4625, producer source <code>6d8def5473</code>; cryptanalysis PR #1739, verifier <code>ed206d8d</code>. Scoped search found no source stating this exact frozen moment family; absence is not a novelty proof.</p>
+
+  <div class="footer"><span>Source-linked; no empirical H115 claim</span><span>3 / 3</span></div>
+</section>
+
+</body>
+</html>

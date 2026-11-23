@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T14:11:51Z",
+ "id": "PCC-20261112-586ae2",
+ "kind": "statement",
+ "producer": {
+  "commit": "0796b36df6ee9712bfa335d81191abc26ed937ce",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cycle-formal-failed-01/build.txt",
+    "sha256": "489938e502508e197ccf07d7c55173ba6055274cfd5f3e0067c1a175aca2d6c0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cycle-formal-failed-01/gate.txt",
+    "sha256": "2f71affcd43fa5bf7872e9f5bad87f2a128c286f1a725965e77edb7c7579529d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cycle-formal-failed-01/source.lean",
+    "sha256": "9c3fd164eb7e7afb828e8374bd16ff27be49d4a0a14d5598091e032bf7cdbd24"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cycle-formal-failed-01/status.txt",
+    "sha256": "0c6532fbd1cb7b97b6781811241a4e7dcaebf0e3ff758f7054a3038de5d2281f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned first IsogenyCycles formal module FAIL_build: core Lean cannot synthesize decidable universal/existential quantification over a product of two Fin4 types. Both finite declarations have compiler error placeholders/sorryAx and are NOT accepted proofs; no binding attempted. Complete source/build/gate/status retained. Rephrase same complete16-vector quantifiers as two nested Fin4 quantifiers; do not shrink domain or substitute native evaluation. Other successful declarations do not promote the failed module."
+}

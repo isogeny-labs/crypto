@@ -1,0 +1,38 @@
+{
+ "schema": "e32-validator-build/v1",
+ "recorded_binary_commit": "e757710521b28668c834d227588389abff164fc7",
+ "runner_source": "examples/e32_ladder.rs from the pre-registration commit 246460f094e98e51da97a7ae325f1d1ee2b049e2 (git blob 86e922b3c3ee69cad72200c92c5f8b758c3f5a47, sha256 a093a902e9e0958eea405678eb3f1e52e8bceb1fbce125b56b6ce4562a5ff756, equal to the hash binary_commit.txt records for the untracked file the producer built)",
+ "repository_head_at_start": "c8a2209f36e3936b3e8884fb9f363954e7ef7e21 (branch claude/glv-endomorphism-index-calculus-pe7ige); E32's records and the results commit 8afc92781b are ancestors; the shared working tree had other agents' (E33) untracked files, none under experiments/36_handover_ladder",
+ "source": "git archive e757710521 of the build inputs only (replay/build_inputs.txt, 144 paths): Cargo.toml, Cargo.lock, src/, every explicit [[bin]]/[[example]]/[[bench]] path of Cargo.toml, the six path dependencies (crates/hashed-ecdl-tensor, crates/ecdl-tensor-ic, tools/factor-base, tools/volcano-cli, isogeny_algos without docs/ and results/, research/pencil_large_prime_20261029 Cargo.toml + Cargo.lock + src) and every literal include_str!/include_bytes!/include! target of those sources; plus examples/e32_ladder.rs from 246460f094. Extracted to /dev/shm/e32val-tree: 1,479 files; each of the 1,478 archived files equals its e757710521 blob (git hash-object; sorted blob list sha256 59d0c99401442eda75829f87bc334a062a600aacfcbe8c7981b1d33c8bbeb426). Not built in the shared working tree (E33/E34 were editing src/ and running cargo there).",
+ "target_dir": "/dev/shm/e32val-target: a fresh, empty target directory on tmpfs. Nothing was reused from the producer's or the shared target/ directory (a shared target would also have re-linked target/release/examples/e32_ladder under the other agents, and the root filesystem had ~0.8 GB free). Deleted after the build; the binary was copied to the session scratchpad and run from there.",
+ "command": "cd /dev/shm/e32val-tree && CARGO_TARGET_DIR=/dev/shm/e32val-target CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 taskset -c 3 cargo build --release --offline --locked -j1 --example e32_ladder",
+ "started": "2026-11-01T19:09:45Z",
+ "finished": "2026-11-01T19:48:04Z",
+ "result": "exit 0; 231 crates compiled; `Finished release profile [optimized] target(s) in 38m 19s`; no warnings or errors in the log",
+ "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30); the producer's toolchain is not recorded in its records",
+ "binaries": [
+  {
+   "name": "e32_ladder",
+   "sha256": "78fcc2845dadfa95a7d4bdd8c0a5ad43e86a77a07a11ef92e321f84a2285812e",
+   "bytes": 5869168,
+   "role": "replay"
+  },
+  {
+   "name": "j_invariant_probe",
+   "sha256": "a2177a90eec61c95ba96811f01649f926443cae965542e3047e5fae6091b5027",
+   "bytes": 4664800,
+   "role": "validator probe (replay/j_invariant_probe.rs), built after e32_ladder in the same target; e32_ladder's hash unchanged afterwards"
+  }
+ ],
+ "producer_binary": {
+  "name": "e32_ladder",
+  "sha256": "1713471e6f446f296271476bb845400e8ad36d22fc47e1786af49105329234d4",
+  "bytes": 5869152,
+  "pinned_copy_verified": "sha256sum -c SHA256SUMS on the producer's pinned copies: OK for all three; not run by this validator",
+  "note": "The fresh binary is not byte-identical to the producer's (16 bytes longer). Byte identity is not expected from a different source path and an unrecorded producer toolchain, and is not relied on: identity is established on the records, leaf by leaf."
+ },
+ "host": "Intel(R) Xeon(R) Processor @ 2.10GHz, 4 vCPU, Linux 6.18.44-fc-v185, 15.7 GiB RAM: the validator's local container, not isolab-eks (unreachable from this container). Operation counts only; no wall time is compared or claimed.",
+ "run_command": "BIN=<scratchpad copy of the fresh e32_ladder> research/e32_handover_ladder_20261031/replay/replay.sh (phase 1, 2026-11-01T19:48:35Z-21:02:36Z: the nonce-selected IC run of every size and all 33 walk pools), then the same BIN with replay/replay_rest.sh (phase 2, 21:02:55Z-23:23:42Z: the other 22 IC runs; its last run, p = 3089 seed 3, was killed once by the validator harness's 2 h background limit with no output and rerun whole, see replay.log), both from the repository root",
+ "environment": "RAYON_NUM_THREADS=4 (as the producer's run_ladder.sh; it fixes the pipeline's target stream, note §9.19), taskset -c 3 (one core; the producer used taskset -c 1-3), one process at a time; arguments exactly run_ladder.sh's",
+ "concurrency": "E33's runs used cores 0-1 and E34's agent another core during the replay; only wall-clock fields (wall_ms, solve_ms, wall_s) are affected, and they are listed, not compared."
+}

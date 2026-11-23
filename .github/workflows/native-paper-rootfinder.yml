@@ -1,0 +1,41 @@
+name: Native paper rootfinder development checks
+
+# Correctness only. This is not a performance experiment or an EKS substitute.
+on:
+  push:
+    branches: [main, lane/trace-incidence]
+    paths:
+      - research/trace_incidence_20261116/native/**
+      - .github/workflows/native-paper-rootfinder.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  development:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      FLINT_PREFIX: /usr
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/trace_incidence_20261116/native/
+      - name: Install native development dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libflint-dev libgmp-dev libmpfr-dev jq
+      - name: Check full divisor translation
+        run: bash research/trace_incidence_20261116/native/check-translation.sh
+      - name: Check literal paper and source-pullback root finding
+        run: bash research/trace_incidence_20261116/native/check-paper.sh
+      - name: Check isogeny, twist, incidence and original-curve recovery
+        run: bash research/trace_incidence_20261116/native/check-integration.sh
+      - name: Check native CLI and fixed paper input
+        run: bash research/trace_incidence_20261116/native/check-cli.sh
+      - name: Check actual characteristic-p auxiliary torsion
+        run: bash research/trace_incidence_20261116/native/check-edge.sh

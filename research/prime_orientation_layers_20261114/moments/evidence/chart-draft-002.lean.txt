@@ -1,0 +1,108 @@
+module
+public import OrientationMoment
+import all LocalIntegral
+import all LocalCharts
+import all OrientationAnchor
+import all OrientationValuation
+import all OrientationContent
+import all OrientationProduct
+import all OrientationResidue
+import all OrientationDiagonal
+import all OrientationBaseBridge
+import all OrientationJet
+import all OrientationLeading
+import all OrientationRefinement
+public section
+noncomputable section
+namespace OrientationFullChart
+open Polynomial Finset OrientationAnchor OrientationResidue OrientationDiagonal OrientationBaseBridge OrientationJet OrientationLeading OrientationRefinement OrientationMoment
+
+theorem mapped_integral_content (P : Polynomial LocalIntegral.integralRing) :
+    Content 0 (P.map LocalIntegral.integralRing.subtype) := by
+  intro n
+  rw [coeff_map]
+  exact vbound_of_norm_le_one _ (P.coeff n).property
+
+def restPolynomial (a : ℕ) (m s : Nodes a) : Polynomial LocalIntegral.integralRing :=
+  ∏ j ∈ (univ.erase m).erase s,(1+C (LocalIntegral.chartRatio a m j)*X)
+
+theorem chartRatio_value (a : ℕ) (m s : Nodes a) :
+    ((LocalIntegral.chartRatio a m s:LocalIntegral.integralRing):ℚ) =
+      (2:ℚ)^(a+1)/(node a m-node a s) := by
+  change (((2^(a+1):ℕ):ℚ)/((m.val:ℚ)-s.val)) = _
+  simp only [Nat.cast_pow,Nat.cast_ofNat,node]
+  congr 1
+  ring
+
+theorem mapped_localBase_factor (a : ℕ) (m s : Nodes a) (hsm : s ≠ m) :
+    (LocalCharts.localBase a m s).map LocalIntegral.integralRing.subtype =
+      C ((LocalIntegral.rhoUnit a m:LocalIntegral.integralRing):ℚ)*
+        (C ((LocalIntegral.chartRatio a m s:LocalIntegral.integralRing):ℚ)*X)*
+          (restPolynomial a m s).map LocalIntegral.integralRing.subtype := by
+  simp only [LocalCharts.localBase,hsm,ite_false,Polynomial.map_mul,Polynomial.map_C,
+    Polynomial.map_X,restPolynomial]
+  rfl
+
+theorem indexed_crossing_base_content (a i : ℕ) (m s : Nodes a) (hsm : s ≠ m)
+    (hv : padicValRat 2 (node a m-node a s) ≤ (i:ℤ)) :
+    Content ((a:ℤ)+1-i) ((base (grid a) (node a s)).comp
+      (C (node a m)+C ((2:ℚ)^(a+1))*X)) := by
+  have hr : VBound ((a:ℤ)+1-i)
+      ((LocalIntegral.chartRatio a m s:LocalIntegral.integralRing):ℚ) := by
+    rw [chartRatio_value]
+    have hb := vbound_div (power_integral (a+1)) (r:=node a m-node a s)
+    exact hb.mono (by omega)
+  have hu : VBound 0 ((LocalIntegral.rhoUnit a m:LocalIntegral.integralRing):ℚ) :=
+    vbound_of_norm_le_one _ (LocalIntegral.rhoUnit a m:LocalIntegral.integralRing).property
+  rw [← chart_polynomial,mapped_localBase_factor a m s hsm]
+  have hx : Content ((a:ℤ)+1-i)
+      (C ((LocalIntegral.chartRatio a m s:LocalIntegral.integralRing):ℚ)*X) := by
+    simpa only [add_zero] using (Content.C hr).mul Content.X
+  have hfirst := (Content.C hu).mul hx
+  simpa only [zero_add,add_zero] using hfirst.mul (mapped_integral_content (restPolynomial a m s))
+
+/-- Strong actual base content at a retained crossing, without a content premise. -/
+theorem actual_crossing_base_content (a u i x y : ℕ)
+    (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u ≤ a)
+    (hc : x.testBit i = y.testBit i) :
+    Content ((a:ℤ)+1-i) (chart a (pole i) (base (grid a) (delta x y))) := by
+  have ht := pole_member a i (by omega)
+  have hd := delta_in_grid a x y hx hy
+  rw [grid_eq_image] at ht hd
+  obtain ⟨m,_,hm⟩ := mem_image.mp ht
+  obtain ⟨s,_,hs⟩ := mem_image.mp hd
+  have hsm : s ≠ m := by
+    intro he
+    subst s
+    exact crossing_displacement_ne_pole x y i hc (hs.symm.trans hm)
+  have hv : padicValRat 2 (node a m-node a s) ≤ (i:ℤ) := by
+    rw [hm,hs]
+    exact crossing_denominator_le x y i hc
+  have hh := indexed_crossing_base_content a i m s hsm hv
+  rw [hm,hs] at hh
+  simpa only [chart,pole_cast] using hh
+
+/-- Whole actual crossing chart at its derived diagonal weight, all coefficients. -/
+theorem actual_completed_crossing_jetWeight (a u i x y : ℕ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u ≤ a)
+    (hc : x.testBit i = y.testBit i) :
+    Content (jetWeight a u i m) (chart a (pole i) (completed (grid a) u x y m)) := by
+  have hb := actual_crossing_base_content a u i x y hx hy hi hu hc
+  have hh := completed_crossing_content_from_base a u x y i (pole i) m
+    ((a:ℤ)+1-i) (schedule u i m) (pole_ne_zero i) (pole_valuation i)
+    (by omega) hi hc le_rfl hb
+  exact hh
+
+/-- Dividing the WHOLE actual crossing chart by the actual diagonal is integral. -/
+theorem normalized_crossing_chart_integral (a u i x y : ℕ) (m : ℕ → ℕ)
+    (hx : x < 2^a) (hy : y < 2^a) (hi : i < u) (hu : u ≤ a)
+    (hc : x.testBit i = y.testBit i) :
+    Content 0 (C ((diagonalJet a u i m)⁻¹)*
+      chart a (pole i) (completed (grid a) u x y m)) := by
+  have hv : VBound (-jetWeight a u i m) ((diagonalJet a u i m)⁻¹) := Or.inr (by
+    rw [padicValRat.inv,diagonalJet_valuation a u i m hi hu]
+    rfl)
+  have hh := (Content.C hv).mul (actual_completed_crossing_jetWeight a u i x y m hx hy hi hu hc)
+  simpa only [neg_add_cancel] using hh
+
+end OrientationFullChart

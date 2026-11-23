@@ -1,0 +1,126 @@
+{
+  "schema": "branch.native-archival-review/v1",
+  "recorded_machine_status": "failed",
+  "runtime_rerun": false,
+  "independent_kernel_replay": false,
+  "freeze_sha256": "73e8ac05216643331d21dff877677b2a605a5731920546100046a01080891eca",
+  "planned_calls": 5,
+  "actual_calls": 1,
+  "successful_calls": 0,
+  "failed_module": "BranchRootMultiplicity",
+  "failed_call": 1,
+  "errors": [
+    "/home/ec2-user/pencil-native-branch-helper-20261109/BranchRootMultiplicity.lean:153:4: error: Type mismatch: After simplification, term"
+  ],
+  "local_failed_axiom_output_contains_sorryAx": true,
+  "planned_readback_names": 13,
+  "actual_planned_readback_names": null,
+  "planned_readback_status": "not_reached",
+  "expected_failure_control_status": "not_reached",
+  "target_theorem_compile_status": "not_reached",
+  "pre_post_dependency_hashes_equal": true,
+  "dependency_files": 16736,
+  "dependency_bytes": 3111892318,
+  "all_copied_source_hashes_match": true,
+  "runtime_pre_post_hashes_match": true,
+  "all_phase_terminal_owners_confirmed": true,
+  "phases": [
+    {
+      "phase": "pre",
+      "passed": true,
+      "elapsed_seconds": 47.84699292504229,
+      "invocation_id": "4e239dce22d5437a86b83c0e89228e8a"
+    },
+    {
+      "phase": "compiler",
+      "passed": false,
+      "elapsed_seconds": 35.76358104700921,
+      "invocation_id": "fff5075b655b41a397ba14dc15a0c9e0"
+    },
+    {
+      "phase": "post",
+      "passed": true,
+      "elapsed_seconds": 27.499789992987644,
+      "invocation_id": "acaf3085ce1d4d319a9a2ed20e1d710c"
+    }
+  ],
+  "attempt_elapsed_seconds": 111.22517741197953,
+  "charged_seconds": 2400,
+  "campaign_charged_after_attempt_seconds": 20640,
+  "resources": {
+    "cpu": 1,
+    "memory_gib": 8,
+    "swap": 0,
+    "tasks": 128
+  },
+  "archived_files": 73,
+  "archive_sha256": "ef3f1b05b1ecb2c74f1f7720f159952bc0c21cc96457694608afdb62fa8dd9e7",
+  "archive_bytes": 2995533,
+  "limitations": [
+    "Source review supports scoped statement but native replay exposes dependency elaboration defects",
+    "No independent binary kernel rechecker",
+    "Shared-cache pre/post identity does not exclude transient concurrent modification",
+    "No target theorem or final thirteen-name audit was reached"
+  ],
+  "private_retained_source_and_artifact_count": 26,
+  "private_retained_pre_post_equal": true,
+  "local_readbacks": [
+    {
+      "name": "BranchRootMultiplicity.support_base_multiplicity_sum",
+      "axioms": [
+        "propext",
+        "sorryAx",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "BranchRootMultiplicity.branch_scalar",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "BranchRootMultiplicity.branch_affine_eval",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "BranchRootMultiplicity.rho_unit_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "BranchRootMultiplicity.polynomial_germ_unit_iff",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "BranchRootMultiplicity.polynomial_germ_order",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "BranchRootMultiplicity.polynomial_germ_order_nat",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ]
+}

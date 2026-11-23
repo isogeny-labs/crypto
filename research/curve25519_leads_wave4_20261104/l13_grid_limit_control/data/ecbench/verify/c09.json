@@ -1,0 +1,54 @@
+{
+  "schema": "ecbench.audit/v1",
+  "session_id": "ECBS1h05ca4f84b7fe",
+  "session_status": "complete",
+  "records_bound": true,
+  "ok": true,
+  "problems": [],
+  "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+  },
+  "records": 10,
+  "verified_records": 10,
+  "planned_executions": 10,
+  "regraded": true,
+  "replays": [
+    {
+      "seq": 1,
+      "record_id": "ECR1h8330e384cbdc",
+      "reproduced": true,
+      "detail": "identical"
+    }
+  ],
+  "replay_selection": "sample",
+  "replay_seed": 18217316871669987560,
+  "replay_candidates": 10,
+  "files": {
+    "host.json": "83195bf15f162559bd95fc2b8f65bf5c214b8f3b3c38b2a3d47891f041a04d55",
+    "plan.json": "1d904a557a602c8f0dd696b5e833a24d4be014b80dafb7db34b8105d4d670be7",
+    "records.jsonl": "86ec5801ec368fc91118e26ee25a8c9cb39289e473cf8cfa4aded798cafdecd6",
+    "session.json": "9d80acb22bb275b2291633dc366d50bd338fd288e574988f8a9126764a2d9c96",
+    "spec.json": "f9c11773837c73ead7150d19cac3380acb5a89617de0270399eb5784686578a8"
+  },
+  "auditor_binary_sha256": "54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b",
+  "auditor_env_class_id": "ECBENV3hd5fb9faff3bf",
+  "auditor_hardware_class_id": "ECBHW1h3937d921311d",
+  "audited_unix_ms": 1793808882899
+}

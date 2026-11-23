@@ -1,0 +1,37 @@
+{
+  "recorded_at": "2026-11-07T00:59:43.709228+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-monomial-progress/main.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-monomial-progress-20261107/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-monomial-progress-20261107/tests",
+        "tests::matched_instrument_correctness",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 64,
+  "binary_sha256": "20a70e379a285bcb82b844f2ece8d14fb133110822a24a173672e4e914d2d618",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

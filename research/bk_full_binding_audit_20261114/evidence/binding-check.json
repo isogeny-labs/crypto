@@ -1,0 +1,36 @@
+{
+  "schema": "native-wrapper-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "explicit-bk-wrapper",
+      "expected_decl_sha256": "255334b4de88ddc92803431efa042b40aa02db63affd414666c7a20c01cb02ed",
+      "full_characters": 934,
+      "full_decl_sha256": "255334b4de88ddc92803431efa042b40aa02db63affd414666c7a20c01cb02ed",
+      "full_normalized_signature": "theorem full_bk_certificate : ∀ (L : Type*) [Field L] [Algebra F L] [DecidableEq L] [IsAlgClosed L], curve.Δ ≠ 0 ∧ Nat.card curve.Point = 6 ∧ Nat.Prime 3 ∧ Nat.Coprime 3 5 ∧ 3 ∣ Nat.card curve.Point ∧ ¬3 ∣ 5 - 1 ∧ (∀ k : ℕ, (∀ P : (curve.baseChange L).Point, (3 : ℕ) • P = 0 → (pointFrobenius curve)^[k] P = P) ↔ 3 ∣ 5 ^ k - 1) ∧ (∃ P : (curve.baseChange L).Point, addOrderOf P = 3 ∧ pointFrobenius curve P = -P ∧ pointFrobenius curve P ≠ P ∧ ¬∃ Q : curve.Point, rationalPointMap L Q = P) ∧ (∀ (K : Type*) [Field K] [Fintype K] [Algebra F K] [Algebra K L] [IsScalarTower F K L] [DecidableEq K] (k : ℕ), Fintype.card K = 5 ^ k → ((∀ P : (curve.baseChange L).Point, (3 : ℕ) • P = 0 → P ∈ Set.range (extensionPointMap L K)) ↔ 3 ∣ 5 ^ k - 1)) ∧ (∀ k : ℕ, 0 < k → Nat.card (GaloisField 5 k) = 5 ^ k ∧ ∃ ι : GaloisField 5 k →ₐ[F] L, (∀ P : (curve.baseChange L).Point, (3 : ℕ) • P = 0 → P ∈ Set.range (galoisPointMap L k ι)) ↔ 3 ∣ 5 ^ k - 1)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "full_bk_certificate",
+        "end_byte": 1661,
+        "file": "/workspace/scratch/bk-full-binding-input01/FullBKCertificate.lean",
+        "qualified_decl_id": "BKFullBindingAudit.full_bk_certificate",
+        "signature": "theorem full_bk_certificate :\n    ∀ (L : Type*) [Field L] [Algebra F L] [DecidableEq L] [IsAlgClosed L],\n    curve.Δ ≠ 0 ∧ Nat.card curve.Point = 6 ∧ Nat.Prime 3 ∧\n    Nat.Coprime 3 5 ∧ 3 ∣ Nat.card curve.Point ∧ ¬3 ∣ 5 - 1 ∧\n    (∀ k : ℕ,\n      (∀ P : (curve.baseChange L).Point, (3 : ℕ) • P = 0 →\n        (pointFrobenius curve)^[k] P = P) ↔ 3 ∣ 5 ^ k - 1) ∧\n    (∃ P : (curve.baseChange L).Point, addOrderOf P = 3 ∧\n      pointFrobenius curve P = -P ∧ pointFrobenius curve P ≠ P ∧\n      ¬∃ Q : curve.Point, rationalPointMap L Q = P) ∧\n    (∀ (K : Type*) [Field K] [Fintype K] [Algebra F K] [Algebra K L]\n      [IsScalarTower F K L] [DecidableEq K] (k : ℕ), Fintype.card K = 5 ^ k →\n      ((∀ P : (curve.baseChange L).Point, (3 : ℕ) • P = 0 →\n        P ∈ Set.range (extensionPointMap L K)) ↔ 3 ∣ 5 ^ k - 1)) ∧\n    (∀ k : ℕ, 0 < k → Nat.card (GaloisField 5 k) = 5 ^ k ∧\n      ∃ ι : GaloisField 5 k →ₐ[F] L,\n        (∀ P : (curve.baseChange L).Point, (3 : ℕ) • P = 0 →\n          P ∈ Set.range (galoisPointMap L k ι)) ↔ 3 ∣ 5 ^ k - 1)",
+        "start_byte": 522
+      },
+      "recorded_statement": "theorem full_bk_certificate : ∀ (L : Type*) [Field L] [Algebra F L] [DecidableEq L] [IsAlgClosed L], curve.Δ ≠ 0 ∧ Nat.card curve.Point = 6 ∧ Nat.Prime 3 ∧ Nat.Coprime 3 5 ∧ 3 ∣ Nat.card curve.Point ∧ ¬3 ∣ 5 - 1 ∧ (∀ k : ℕ, (∀ P : (curve.baseChange L).Point, (3 : ℕ) • P = 0 → (pointFrobenius curve)^[k] P = P) ↔ 3 ∣ 5 ^ k - 1) ∧ (∃ P : (curve.baseChange L).Point, addOrderOf P = 3 ∧ pointFrobenius curve P = -P ∧ pointFrobenius curve P ≠ P ∧ ¬∃ Q : curve.Point, rationalPointMap L Q = P) ∧ (∀ (K : Type*) [Field K] [Fintype K] [Algebra F K] [Algebra K L] [IsScalarTower F K L] [DecidableEq K] (k : ℕ), Fintype.card K = 5 ^ k → ((∀ P : (curve.baseChange L).Point, (3 : ℕ) • P = 0 → P ∈ Set.range (extensionPointMap L K)) ↔ 3 ∣ 5 ^ k - 1)) ∧ (∀ k : ℕ, 0 < k → Nat.card (GaloisField 5 k) = 5 ^ k ∧ ∃ ι : GaloisField 5 k →ₐ[F] L, (∀ P : (curve.baseChange L).Point, (3 : ℕ) • P = 0 → P ∈ Set.range (galoisPointMap L k ι)) ↔ 3 ∣ 5 ^ k - 1)",
+      "recorded_text_sha256": "255334b4de88ddc92803431efa042b40aa02db63affd414666c7a20c01cb02ed",
+      "source_plan": "research/bk_full_binding_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "BKFullBindingAudit.full_bk_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned procedural evidence, not proved by wrapper theorem. Complete written header includes explicit L/class binders; referenced definitions/dependencies supplied by separate immutable source pins."
+}

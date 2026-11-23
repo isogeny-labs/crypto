@@ -172,6 +172,63 @@ fn a_resumed_run_is_the_uninterrupted_run() {
             in_step += 1;
         }
     }
+    // A run resumed from a step-top checkpoint and stopped again inside the same step
+    // must leave a snapshot the next resume uses: the snapshot binds to the checkpoint
+    // that is on disk, which the resumed run does not rewrite.
+    let mut rebound = 0;
+    for &(n, p, seed) in &[(5usize, 786_433u64, 4u64), (6, 786_433, 9)] {
+        let sys = random_quadrics(n, p, seed);
+        let plain = f4(&sys, n, p, &F4Options::new(Ordering::Grevlex, 24));
+        for k2 in [3usize, 15, 60] {
+            let path = dir.join(format!("rb-{n}-{seed}-{k2}.ckpt"));
+            for ext in ["", ".prev", ".rref"] {
+                let _ = std::fs::remove_file(format!("{}{ext}", path.display()));
+            }
+            // stop 1: at a step top (the checkpoint of that step's top is the file)
+            let mut o = F4Options::new(Ordering::Grevlex, 24)
+                .checkpointing(path.clone(), Duration::ZERO)
+                .checkpointing_in_step(Duration::ZERO);
+            o.checkpoint_stop_after = Some(2);
+            if !f4(&sys, n, p, &o).timed_out {
+                continue;
+            }
+            let at_top = checkpoint_elapsed(&path).expect("a checkpoint");
+            let top_file = std::fs::metadata(&path).and_then(|m| m.modified()).unwrap();
+            // stop 2: resume, and stop inside that step after k2 snapshots
+            let mut o = F4Options::new(Ordering::Grevlex, 24)
+                .checkpointing(path.clone(), hour)
+                .checkpointing_in_step(Duration::ZERO);
+            o.checkpoint_stop_in_rref = Some(k2);
+            if !f4(&sys, n, p, &o).timed_out {
+                continue;
+            }
+            // the resumed run started from this very file, so it does not write it again
+            assert_eq!(
+                std::fs::metadata(&path).and_then(|m| m.modified()).unwrap(),
+                top_file,
+                "the checkpoint a run resumed from was rewritten (k2={k2})"
+            );
+            // final resume: it must start from the snapshot, not from the step top, so
+            // the time it resumes with is later than the checkpoint's
+            let o = F4Options::new(Ordering::Grevlex, 24)
+                .checkpointing(path.clone(), hour)
+                .checkpointing_in_step(hour);
+            let resumed = f4(&sys, n, p, &o);
+            same(
+                &plain,
+                &resumed,
+                &format!("rebound: n={n} seed={seed} k2={k2}"),
+            );
+            if resumed.resumed_ms / 1e3 > at_top.as_secs_f64() {
+                rebound += 1;
+            }
+        }
+    }
+    assert!(
+        rebound >= 2,
+        "only {rebound} resumes started from an in-step snapshot"
+    );
+
     assert!(in_step >= 6, "only {in_step} runs stopped inside a step");
 
     // A checkpoint of another system is refused and the run starts afresh.

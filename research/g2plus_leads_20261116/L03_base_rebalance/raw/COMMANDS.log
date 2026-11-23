@@ -1,0 +1,97 @@
+2026-11-16T20:20:19Z CMD: grep instances
+exit 0
+2026-11-16T20:20:19Z CMD: sha256sum instances.jsonl | tee raw/instances.sha256
+exit 0 sha=91ddea89649a852f9b8c73e6a7affa4e2adde701624db0700e282f0846517148  instances.jsonl
+2026-11-16T20:20:19Z CMD: cd sim && cargo build --release --offline (tee raw/build.log) exit 0 sha=60621a5fce1688789ff41d66554500996c120c870dcc4c8f45150d24ab805a1b
+--- earlier commands (this session, before log existed in this form) ---
+cargo build --release --offline exit 0; cargo test --release --offline: first run 11 passed 1 failed (t13_wiedemann), see DEVIATIONS.md D1; second run 12 passed exit 0 (raw/test.log)
+python3 analyze.py --selftest exit 0 (raw/analyze_selftest.log)
+sha256sum sim/target/release/l03sim: e2d0c5e22b9ac019d2039d9effd86a70e518414b93407be6027e60773be20ecc  sim/target/release/l03sim
+l03sim selftest --instances instances.jsonl --out raw/selftest.jsonl exit 0 sha=365d11b2eafda96e4e5072184baf86d547876db21fe9361c6aa6c37588dd69fb  raw/selftest.jsonl
+2026-11-16T20:21:38Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 6 --seed 1 --set V --verify-relations --out raw/verify_8209_c6.jsonl
+  exit 0 sha=83341a504bf9df43b3c244b60721efc1d9fd5b68417def115605c910ddf64a78  raw/verify_8209_c6.jsonl
+2026-11-16T20:21:44Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 18 --seed 1 --set V --verify-relations --out raw/verify_8209_c18.jsonl
+  exit 0 sha=cb9c4ea4e582bbb2b33f327be5f00644412568e13969c5d6b4350b8d01a6463d  raw/verify_8209_c18.jsonl
+2026-11-16T20:21:50Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 23 --seed 1 --set V --verify-relations --out raw/verify_8209_c23.jsonl
+  exit 0 sha=2a54d328557bc4d986682cf1a994ac9340583525c80c522a8bb46c039096a114  raw/verify_8209_c23.jsonl
+2026-11-16T20:21:56Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 6 --seed 1 --set S --out raw/runs_p8209_c6_s1.jsonl 2> raw/runs_p8209_c6_s1.log
+  exit 0 sha=02c261544de9c1b81a9f974029a5e2e2127c44953520e219c4d03c4650fa23f5  raw/runs_p8209_c6_s1.jsonl
+2026-11-16T20:22:01Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 6 --seed 2 --set S --out raw/runs_p8209_c6_s2.jsonl 2> raw/runs_p8209_c6_s2.log
+  exit 0 sha=69c752af998cd4a59b0de3abdb7d7e0ccee1e59c5e6e5eb0a6cd190924f8710e  raw/runs_p8209_c6_s2.jsonl
+2026-11-16T20:22:07Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 6 --seed 3 --set E --out raw/runs_p8209_c6_s3.jsonl 2> raw/runs_p8209_c6_s3.log
+  exit 0 sha=96e8aeb34a104e134d42946f1302a948f9f756b652ffe660f928be097d8be0b2  raw/runs_p8209_c6_s3.jsonl
+2026-11-16T20:22:13Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 6 --seed 4 --set E --out raw/runs_p8209_c6_s4.jsonl 2> raw/runs_p8209_c6_s4.log
+  exit 0 sha=eb95bf0d89506627480a6c19562bffa85315b6aa2876dfc7c9dd51060617715d  raw/runs_p8209_c6_s4.jsonl
+2026-11-16T20:22:18Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 18 --seed 1 --set S --out raw/runs_p8209_c18_s1.jsonl 2> raw/runs_p8209_c18_s1.log
+  exit 0 sha=1b66b9b9ccf9b0254a9dc448c13c5bbdcaba5b9e6540df95288d1a037de63ef4  raw/runs_p8209_c18_s1.jsonl
+2026-11-16T20:22:25Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 18 --seed 2 --set S --out raw/runs_p8209_c18_s2.jsonl 2> raw/runs_p8209_c18_s2.log
+  exit 0 sha=f6ebb5cc6ebffea1c5170e2ba170eee7ac8476cd5736914120ecccc5aaaabebc  raw/runs_p8209_c18_s2.jsonl
+2026-11-16T20:22:31Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 18 --seed 3 --set E --out raw/runs_p8209_c18_s3.jsonl 2> raw/runs_p8209_c18_s3.log
+  exit 0 sha=9bceb35173866412d3fdb0ac50a43bdf22ee6e953ca59bb6c70d328ebf82f188  raw/runs_p8209_c18_s3.jsonl
+2026-11-16T20:22:37Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 18 --seed 4 --set E --out raw/runs_p8209_c18_s4.jsonl 2> raw/runs_p8209_c18_s4.log
+  exit 0 sha=d00859b95424cf779a94707155d73bf7dbf8a7c06a1c299443569db703c3158a  raw/runs_p8209_c18_s4.jsonl
+2026-11-16T20:22:42Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 23 --seed 1 --set S --out raw/runs_p8209_c23_s1.jsonl 2> raw/runs_p8209_c23_s1.log
+  exit 0 sha=69796dffbd13a0e0c6ce8dfd020f956f6bff3152e1366a3933404a813cea26d6  raw/runs_p8209_c23_s1.jsonl
+2026-11-16T20:22:48Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 23 --seed 2 --set S --out raw/runs_p8209_c23_s2.jsonl 2> raw/runs_p8209_c23_s2.log
+  exit 0 sha=6f8549d86a34d0d71bf654b300598342a5d1fee3e9adae7f31148626af3f62ee  raw/runs_p8209_c23_s2.jsonl
+2026-11-16T20:22:54Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 23 --seed 3 --set E --out raw/runs_p8209_c23_s3.jsonl 2> raw/runs_p8209_c23_s3.log
+  exit 0 sha=cf68b25699e5a10a549f66f5c7014314287d50975ae6a78135a1fdba49251502  raw/runs_p8209_c23_s3.jsonl
+2026-11-16T20:23:00Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 8209 --curve-seed 23 --seed 4 --set E --out raw/runs_p8209_c23_s4.jsonl 2> raw/runs_p8209_c23_s4.log
+  exit 0 sha=b25ce2f5a812e2781edeb24059807b2f539335a2fb5ff5af71d928c87da2c160  raw/runs_p8209_c23_s4.jsonl
+2026-11-16T20:23:06Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 8 --seed 1 --set S --out raw/runs_p16411_c8_s1.jsonl 2> raw/runs_p16411_c8_s1.log
+  exit 0 sha=0edd994ba443bee9cce2106dc6d104a699521017bee2ecb64f019d1ebb8782f6  raw/runs_p16411_c8_s1.jsonl
+2026-11-16T20:23:20Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 8 --seed 2 --set S --out raw/runs_p16411_c8_s2.jsonl 2> raw/runs_p16411_c8_s2.log
+  exit 0 sha=60737504f33c5e3abe979a01b1ba5c9860a622fb5a61c82b887cd6ded376e2b6  raw/runs_p16411_c8_s2.jsonl
+2026-11-16T20:23:35Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 8 --seed 3 --set E --out raw/runs_p16411_c8_s3.jsonl 2> raw/runs_p16411_c8_s3.log
+  exit 0 sha=bdd9148eb4797ee35dc084ecee03e0bc604949b96ecdff236e7c3a4093136368  raw/runs_p16411_c8_s3.jsonl
+2026-11-16T20:23:50Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 8 --seed 4 --set E --out raw/runs_p16411_c8_s4.jsonl 2> raw/runs_p16411_c8_s4.log
+  exit 0 sha=deb0206866e553eef8f6d2099f665dafcb3d4535891e92bfc484184ba0c930e7  raw/runs_p16411_c8_s4.jsonl
+2026-11-16T20:24:05Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 27 --seed 1 --set S --out raw/runs_p16411_c27_s1.jsonl 2> raw/runs_p16411_c27_s1.log
+  exit 0 sha=88be686f23aa3fa776dc2e79f9e059ee3315e0916e88ef74c11826f6848d27b7  raw/runs_p16411_c27_s1.jsonl
+2026-11-16T20:24:20Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 27 --seed 2 --set S --out raw/runs_p16411_c27_s2.jsonl 2> raw/runs_p16411_c27_s2.log
+  exit 0 sha=4d9daf8e4de44855042a469803fa7ba4e184086f2e2128e4e006cbe2f899d872  raw/runs_p16411_c27_s2.jsonl
+2026-11-16T20:24:35Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 27 --seed 3 --set E --out raw/runs_p16411_c27_s3.jsonl 2> raw/runs_p16411_c27_s3.log
+  exit 0 sha=63f5bf44b4e3923009f2c04e3dbae31f08083dead57d4523182023453779d511  raw/runs_p16411_c27_s3.jsonl
+2026-11-16T20:24:50Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 27 --seed 4 --set E --out raw/runs_p16411_c27_s4.jsonl 2> raw/runs_p16411_c27_s4.log
+  exit 0 sha=49eb76e6857d949bfb26cd9d789b457ffd74bf80b85a27cbe80c957556de399e  raw/runs_p16411_c27_s4.jsonl
+2026-11-16T20:25:05Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 43 --seed 1 --set S --out raw/runs_p16411_c43_s1.jsonl 2> raw/runs_p16411_c43_s1.log
+  exit 0 sha=dff85872f1f6949ba18c14eb8d2ea520d805e936082956c6ee3807b62e7d6fdd  raw/runs_p16411_c43_s1.jsonl
+2026-11-16T20:25:21Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 43 --seed 2 --set S --out raw/runs_p16411_c43_s2.jsonl 2> raw/runs_p16411_c43_s2.log
+  exit 0 sha=d0cd2a346f5bdd3ab7813ecb1510262b44d85b1637c40f473a7673176f08c189  raw/runs_p16411_c43_s2.jsonl
+2026-11-16T20:25:35Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 43 --seed 3 --set E --out raw/runs_p16411_c43_s3.jsonl 2> raw/runs_p16411_c43_s3.log
+  exit 0 sha=d31af39fc9009530eab418fab9f747288479705ce931e88dd7b4f5582424811c  raw/runs_p16411_c43_s3.jsonl
+2026-11-16T20:25:51Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 16411 --curve-seed 43 --seed 4 --set E --out raw/runs_p16411_c43_s4.jsonl 2> raw/runs_p16411_c43_s4.log
+  exit 0 sha=29972c6e11abb6d8518855aeb5e855429d1ef2bdc64e9aa9102a709b6cc390bc  raw/runs_p16411_c43_s4.jsonl
+2026-11-16T20:26:06Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 8 --seed 1 --set S --out raw/runs_p32771_c8_s1.jsonl 2> raw/runs_p32771_c8_s1.log
+  exit 0 sha=a445cb535da2c8fa3efc57321719e42b63aec1f8c0187316c9cc77cc3318318d  raw/runs_p32771_c8_s1.jsonl
+2026-11-16T20:26:46Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 8 --seed 2 --set S --out raw/runs_p32771_c8_s2.jsonl 2> raw/runs_p32771_c8_s2.log
+  exit 0 sha=de74a1118fcfafedfdebef504bf4a8d99c2547ea42b909cee36175c097efe9d8  raw/runs_p32771_c8_s2.jsonl
+2026-11-16T20:27:25Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 8 --seed 3 --set E --out raw/runs_p32771_c8_s3.jsonl 2> raw/runs_p32771_c8_s3.log
+  exit 0 sha=71a669a4776e5f77f763f5e910a57bad322834b9d1c06ba02d3ed87859e18110  raw/runs_p32771_c8_s3.jsonl
+2026-11-16T20:28:05Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 8 --seed 4 --set E --out raw/runs_p32771_c8_s4.jsonl 2> raw/runs_p32771_c8_s4.log
+  exit 0 sha=2ff61c5f50d1d0fa1fb44e976ee60d34b7879f6caf14a12aa6a7c3215cc06cbb  raw/runs_p32771_c8_s4.jsonl
+2026-11-16T20:28:45Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 16 --seed 1 --set S --out raw/runs_p32771_c16_s1.jsonl 2> raw/runs_p32771_c16_s1.log
+  exit 0 sha=8e050bcfda3e7462501580ddee5763fb269d2b0d548d400afc0e08e8422498da  raw/runs_p32771_c16_s1.jsonl
+2026-11-16T20:29:24Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 16 --seed 2 --set S --out raw/runs_p32771_c16_s2.jsonl 2> raw/runs_p32771_c16_s2.log
+  exit 0 sha=cbbbecacb2cb1bd8658864a5c24519c733c516d81a7047272520346e30fe32a8  raw/runs_p32771_c16_s2.jsonl
+2026-11-16T20:30:04Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 16 --seed 3 --set E --out raw/runs_p32771_c16_s3.jsonl 2> raw/runs_p32771_c16_s3.log
+  exit 0 sha=81dbec4b03d584b8b3b6dc4d7b61b59ee69be5716bf9ec3ce2ed2037d57f6acc  raw/runs_p32771_c16_s3.jsonl
+2026-11-16T20:30:43Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 16 --seed 4 --set E --out raw/runs_p32771_c16_s4.jsonl 2> raw/runs_p32771_c16_s4.log
+  exit 0 sha=8537ed9667e72b6ccb711c2420e569a1ce739c450275bae715cec51693010908  raw/runs_p32771_c16_s4.jsonl
+2026-11-16T20:31:23Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 31 --seed 1 --set S --out raw/runs_p32771_c31_s1.jsonl 2> raw/runs_p32771_c31_s1.log
+  exit 0 sha=41294ffc83227fc32b1ebc850d5b977a4854632cca7db2c297bf0f994630d701  raw/runs_p32771_c31_s1.jsonl
+2026-11-16T20:32:02Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 31 --seed 2 --set S --out raw/runs_p32771_c31_s2.jsonl 2> raw/runs_p32771_c31_s2.log
+  exit 0 sha=8bfed465a283c53199408ac482dab0940f11e9aa5fea2aa992289ff367951d48  raw/runs_p32771_c31_s2.jsonl
+2026-11-16T20:32:43Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 31 --seed 3 --set E --out raw/runs_p32771_c31_s3.jsonl 2> raw/runs_p32771_c31_s3.log
+  exit 0 sha=7b106f24ad01b11e47af36ff1f57ef6c11db6ddd4c1f8c3f28c54328ae177f5f  raw/runs_p32771_c31_s3.jsonl
+2026-11-16T20:33:22Z CMD: sim/target/release/l03sim run --instances instances.jsonl --p 32771 --curve-seed 31 --seed 4 --set E --out raw/runs_p32771_c31_s4.jsonl 2> raw/runs_p32771_c31_s4.log
+  exit 0 sha=a8e2b3c211d128fcf474e96d1d016c663fce4d6a2d929d2ba69e7a0b44162e79  raw/runs_p32771_c31_s4.jsonl
+2026-11-16T20:34:15Z CMD: sha256sum raw/*.jsonl > raw/data.sha256
+  exit 0 sha=2c95228adcd730ce70f0b81d4c57c31a93cba486eae77da79fed86421f57d312  raw/data.sha256
+2026-11-16T20:34:15Z CMD: python3 analyze.py raw/runs_*.jsonl --verify raw/verify_8209_c*.jsonl --out analysis/analysis.json --tables analysis/tables.md
+  exit 0 sha(analysis.json)=592f1f172fee88aae087e6793ef20b821d25ce0aa8b597633ceb9aa99dd4b1c3 sha(tables.md)=ec3ecfb2329081a271ce020634e3be4121e40c7c9c294e12b88d71eb148af9d7
+plot.py -> plot.svg sha=cfefed865a73451f32d833d1509fc26c545563f1632e542eeede31fc3d03fc6c  plot.svg
+(RESULTS.md written from analysis/tables.md by an inline python snippet; plot.svg by plot.py)
+2c95228adcd730ce70f0b81d4c57c31a93cba486eae77da79fed86421f57d312  raw/data.sha256
+cfefed865a73451f32d833d1509fc26c545563f1632e542eeede31fc3d03fc6c  plot.svg
+970de8955bdbbfe5d45d0a074eb93d61c9efdd0cbc8b79aeadc6ee5ff7a7094c  RESULTS.md

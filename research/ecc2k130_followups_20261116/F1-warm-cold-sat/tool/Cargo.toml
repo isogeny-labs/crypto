@@ -1,0 +1,17 @@
+[package]
+name = "f1_warmcold"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cadical-sys = "=0.8.0"
+serde_json = "=1.0.140"
+
+# The F1 bridge patch (tool/cadical-sys-f1.patch) adds a read-only saved-phase getter and a
+# saved-phase seeder to the cxx bridge; CaDiCaL sources are unchanged.  Set up with
+# tool/vendor.sh, which copies the registry crate to the lane scratch directory and applies it.
+[patch.crates-io]
+cadical-sys = { path = "/tmp/claude-0/-home-user/e01afaa4-f4f8-52ad-ba5a-6c307eb9b47e/scratchpad/lanes/F1/vendor/cadical-sys" }
+
+[profile.release]
+opt-level = 3

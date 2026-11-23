@@ -1,0 +1,61 @@
+import FastPreludeExpr
+set_option autoImplicit false
+namespace FastPrelude
+open PencilWordRefinement
+
+def normField (p : UInt64) (w : Inputs) : ZMod p.toNat :=
+ FastCRT.norm ((w.qa.toNat : ZMod p.toNat)-w.qb.toNat) ((w.ra.toNat : ZMod p.toNat)-w.rb.toNat)
+ w.qb.toNat w.rb.toNat
+
+def s1Field (p : UInt64) (w : Inputs) : ZMod p.toNat :=
+ FastCRT.slopeOne ((w.qa.toNat : ZMod p.toNat)-w.qb.toNat) ((w.ra.toNat : ZMod p.toNat)-w.rb.toNat)
+ ((w.sb.toNat : ZMod p.toNat)-w.sa.toNat) ((w.tb.toNat : ZMod p.toNat)-w.ta.toNat)
+
+def s0Field (p : UInt64) (w : Inputs) : ZMod p.toNat :=
+ FastCRT.slopeZero ((w.qa.toNat : ZMod p.toNat)-w.qb.toNat) ((w.ra.toNat : ZMod p.toNat)-w.rb.toNat)
+ ((w.sb.toNat : ZMod p.toNat)-w.sa.toNat) ((w.tb.toNat : ZMod p.toNat)-w.ta.toNat) w.qb.toNat w.rb.toNat
+
+theorem norm_decode (p : UInt64) (w : Inputs) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hw : w.canonical p) :
+ (normWord p w).toNat<p.toNat ∧ ((normWord p w).toNat : ZMod p.toNat)=normField p w := by
+ have h:=Expr.composition p hp hb (normExpr w) (expressions_good p w hw).1
+ rw [literal_norm]
+ refine ⟨h.1,?_⟩
+ simpa only [normExpr,aa,bb,Expr.field,normField,FastCRT.norm,pow_two] using h.2
+
+theorem s1_decode (p : UInt64) (w : Inputs) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hw : w.canonical p) :
+ (s1Word p w).toNat<p.toNat ∧ ((s1Word p w).toNat : ZMod p.toNat)=s1Field p w := by
+ have h:=Expr.composition p hp hb (s1Expr w) (expressions_good p w hw).2.1
+ rw [literal_s1]
+ refine ⟨h.1,?_⟩
+ simpa only [s1Expr,aa,bb,cc,dd,Expr.field,s1Field,FastCRT.slopeOne] using h.2
+
+theorem s0_decode (p : UInt64) (w : Inputs) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hw : w.canonical p) :
+ (s0Word p w).toNat<p.toNat ∧ ((s0Word p w).toNat : ZMod p.toNat)=s0Field p w := by
+ have h:=Expr.composition p hp hb (s0Expr w) (expressions_good p w hw).2.2
+ rw [literal_s0]
+ refine ⟨h.1,?_⟩
+ simpa only [s0Expr,aa,bb,cc,dd,Expr.field,s0Field,FastCRT.slopeZero] using h.2
+
+theorem guarded_batch_from_inputs (p : UInt64) (w : Inputs) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) :
+ normField p w≠0 ∧ s1Field p w≠0 ∧
+ FastBatch.product p (normWord p w) (s1Word p w)≠0 ∧
+ (FastBatch.ni p (normWord p w) (s1Word p w)).toNat<p.toNat ∧
+ (FastBatch.si p (normWord p w) (s1Word p w)).toNat<p.toNat ∧
+ ((FastBatch.ni p (normWord p w) (s1Word p w)).toNat : ZMod p.toNat)=(normField p w)⁻¹ ∧
+ ((FastBatch.si p (normWord p w) (s1Word p w)).toNat : ZMod p.toNat)=(s1Field p w)⁻¹ := by
+ have hnD := norm_decode p w (by omega) hb hw
+ have hsD := s1_decode p w (by omega) hb hw
+ have hnF := canonical_word_nonzero p _ (by omega) hnD.1 hn
+ have hsF := canonical_word_nonzero p _ (by omega) hsD.1 hs
+ rw [hnD.2] at hnF
+ rw [hsD.2] at hsF
+ obtain ⟨hprod,_,hnc,hsc,_,hni,hsi⟩ := FastBatch.batch_decode p _ _ hp hb hnD.1 hsD.1 hn hs
+ rw [hnD.2] at hni
+ rw [hsD.2] at hsi
+ exact ⟨hnF,hsF,hprod,hnc,hsc,hni,hsi⟩
+end FastPrelude

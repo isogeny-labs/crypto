@@ -1,0 +1,106 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-14-R01
+experiment_id: BLINDSPOT-14
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+# Replay of card-01 (selftest, arm (a) and matched rho) at the smallest (16-bit) and largest (28-bit) field sizes, plus the 16-bit bx = 3 paired cell.
+# Instrument source read from its frozen path research/blindspots_20261018/instruments/ (sha256 unchanged from the original cards). Outputs are new files under replay/raw/.
+
+receipt: research/blindspots_20261018/14-prime-m4-cells/replay/raw/receipt-card-r01.json
+must_not_exist:
+  - research/blindspots_20261018/14-prime-m4-cells/replay/raw/receipt-card-r01.json
+  - research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b16.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b28.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b28.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16-bx3.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b28.jsonl
+  - research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16-bx3.jsonl
+binds:
+  - {path: research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs, sha256: f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376}
+commands:
+  - id: make-dirs
+    argv: ["mkdir", "-p", "research/blindspots_20261018/14-prime-m4-cells/replay/raw", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-build.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-build.stderr.log
+  - id: selftest
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "selftest", "--deep"]
+    timeout_seconds: 180
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-selftest.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-selftest.stderr.log
+  - id: rho-b16
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "rho", "--bits", "16", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b16.jsonl"]
+    timeout_seconds: 90
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-rho-b16.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b16.jsonl"]
+  - id: rho-b28
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "rho", "--bits", "28", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b28.jsonl"]
+    timeout_seconds: 90
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-rho-b28.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b28.jsonl"]
+  - id: tdec-a-b16
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "tdec", "--bits", "16", "--arms", "a", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16.jsonl"]
+    timeout_seconds: 90
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-tdec-a-b16.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16.jsonl"]
+  - id: tdec-a-b28
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "tdec", "--bits", "28", "--arms", "a", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b28.jsonl"]
+    timeout_seconds: 90
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-tdec-a-b28.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b28.jsonl"]
+  - id: tdec-a-b16-bx3
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "tdec", "--bits", "16", "--arms", "a", "--bx", "3", "--targets", "16", "--planted", "4", "--check", "--out", "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16-bx3.jsonl"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-tdec-a-b16-bx3.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16-bx3.jsonl"]
+  - id: fullic-a-b16
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "fullic", "--bits", "16", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16.jsonl"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-fullic-a-b16.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16.jsonl"]
+  - id: fullic-a-b28
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "fullic", "--bits", "28", "--arm", "a", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b28.jsonl"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-fullic-a-b28.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b28.jsonl"]
+  - id: fullic-a-b16-bx3
+    argv: ["prlimit", "--as=4294967296", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14", "fullic", "--bits", "16", "--arm", "a", "--bx", "3", "--runs", "16", "--out", "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16-bx3.jsonl"]
+    timeout_seconds: 90
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-fullic-a-b16-bx3.stderr.log
+    outputs: ["research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16-bx3.jsonl"]
+  - id: remove-bin
+    argv: ["rm", "-f", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-14
+background: false
+write_scope:
+  - research/blindspots_20261018/14-prime-m4-cells/replay/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000. Run the cards one after another, never at the same time."

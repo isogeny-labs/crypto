@@ -1,0 +1,17 @@
+[package]
+name="hec-repeatedbase13"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="repeatedbase13"
+path="main.rs"
+
+[[bin]]
+name="repeatedbase-all13"
+path="main_v2.rs"
+[[bin]]
+name="cohort13"
+path="collect.rs"

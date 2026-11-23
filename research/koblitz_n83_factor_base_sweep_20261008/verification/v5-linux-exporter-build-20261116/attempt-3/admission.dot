@@ -1,0 +1,11 @@
+digraph admission {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", label="N83 V5 Linux exporter build | attempt 3", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", color="#344054", fillcolor="#eef2f6"];
+  source [label="Pinned source\nlocked crate present", fillcolor="#dcfce7"];
+  copy [label="Registry copy\npreserved src symlink", fillcolor="#dbeafe"];
+  verify [label="Dry-run verifier\nskipped symlink", fillcolor="#fef3c7"];
+  stop [label="STOP: exit 103\nregistry copy differs", fillcolor="#fee2e2", color="#b42318"];
+  build [label="Offline Linux build\nnot reached", fillcolor="#f3f4f6", color="#98a2b3"];
+  source -> copy -> verify -> stop [color="#b42318"];
+  verify -> build [style=dashed, color="#98a2b3", label="only if verified"];
+}

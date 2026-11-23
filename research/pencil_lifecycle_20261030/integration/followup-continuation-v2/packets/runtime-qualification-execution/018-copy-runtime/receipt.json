@@ -1,0 +1,29 @@
+{
+  "exit_code": 0,
+  "client_terminal_exit": 0,
+  "argv": [
+    "/usr/bin/sudo",
+    "-n",
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin:/bin",
+    "HOME=/var/tmp/pencil-runtime-qualification-execution-20261031-v5/empty-docker-config",
+    "DOCKER_CONFIG=/var/tmp/pencil-runtime-qualification-execution-20261031-v5/empty-docker-config",
+    "/usr/bin/docker",
+    "--host",
+    "unix:///var/run/docker.sock",
+    "cp",
+    "0b8ac008507f0556c98d3aa450d0182681e8a87423b397ed991a532fdac768b1:/opt/isolab/recovery",
+    "-"
+  ],
+  "started_monotonic": 195297.841910794,
+  "ended_monotonic": 195297.937146943,
+  "cap_seconds": 20,
+  "environment_names": [
+    "HOME",
+    "LANG",
+    "PATH"
+  ],
+  "docker_environment": "empty allowlist; no endpoint/TLS/proxy/credential selectors",
+  "supervisor_deadline": 195595.848124873
+}

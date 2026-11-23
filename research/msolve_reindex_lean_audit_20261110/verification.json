@@ -1,0 +1,55 @@
+{
+  "schema": "msolve-reindex-verification/v1",
+  "source_commit": "78222deeb621291d918d7dd625c4315f7ec2adef",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 4,
+  "claim_id": "PCC-20261110-9f17a1",
+  "declaration_sha256": "f34238c8a4d123f21036b88d47b3c5620ddde4b8d7b15ba5e17e176b43486a4c",
+  "actual_verdict": {
+    "claim_id": "PCC-20261110-9f17a1",
+    "claim_sha256": "527fe7b500d207a571844eaeca3ed188827567611655fc8771e8a5bd6db265d2",
+    "commit": "78222deeb621291d918d7dd625c4315f7ec2adef",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/msolve_reindex_lean_audit_20261110/lean (Reindex.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T17:51:02Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-9f17a1",
+    "claim_sha256": "527fe7b500d207a571844eaeca3ed188827567611655fc8771e8a5bd6db265d2",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "gate": {
+    "archive": "research/msolve_reindex_lean_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 14,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/msolve_reindex_lean_audit_20261110/evidence/attempts.tar.gz",
+    "files": 2,
+    "roundtrip_equal": true
+  },
+  "report": {
+    "path": "reports/proof-20261110/report.pdf",
+    "pages": 2,
+    "bytes": 50611,
+    "all_pages_visually_inspected": true
+  },
+  "paid_compute": 0
+}

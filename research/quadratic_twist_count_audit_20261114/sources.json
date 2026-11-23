@@ -1,0 +1,641 @@
+{
+  "schema": "quadratic-twist-count-source-plan/v1",
+  "created": "2026-11-14T07:20:22.877748+00:00",
+  "formal": {
+    "project": "research/quadratic_twist_count_audit_20261114/lean",
+    "theorem": "QuadraticTwistCountAudit.twist_count_trace_certificate",
+    "statement": "theorem twist_count_trace_certificate : (∀ (K : Type) [Field K] [Fintype K] [DecidableEq K],ringChar K≠2 → ∀ a b c d : K,(cubicModel a b c).Δ≠0 → ¬IsSquare d → Nat.card (cubicModel a b c).Point+Nat.card (twistModel a b c d).Point=2*(Fintype.card K+1) ∧ fieldTrace (twistModel a b c d)= -fieldTrace (cubicModel a b c) ∧ (sourceSupersingular (twistModel a b c d) ↔ sourceSupersingular (cubicModel a b c))) ∧ (sourceCurve.Δ≠0 ∧ scaledCurve.Δ≠0 ∧ sourceCurve.j=(1728:F7) ∧ ¬IsSquare (3:F7) ∧ specialChange • sourceCurve=scaledCurve ∧ Nonempty (sourceCurve.Point ≃+ scaledCurve.Point) ∧ Function.LeftInverse backwardPoint forwardPoint ∧ Function.RightInverse backwardPoint forwardPoint ∧ (∀ P Q : sourceCurve.Point,forwardPoint (P+Q)=forwardPoint P+forwardPoint Q) ∧ Nat.card sourceCurve.Point=8 ∧ Nat.card scaledCurve.Point=8) ∧ (∀ (R : Type) [CommRing R] [CharP R 7],∀ x y z : R, 2*(4*x)=x ∧ 4*(2*x)=x ∧ y^2*z-(4*x)^3-2*(4*x)*z^2=y^2*z-x^3-x*z^2 ∧ y^2*z-(2*x)^3-(2*x)*z^2=y^2*z-x^3-2*x*z^2) ∧ (¬∀ a b d : F7,(cubicModel 0 a b).Δ≠0 → d≠0 → ¬IsSquare d → ¬∃ C : WeierstrassCurve.VariableChange F7,C • cubicModel 0 a b=twistModel 0 a b d) ∧ (¬∀ a b c d : ZMod 3,(cubicModel a b c).Δ≠0 → d≠0 → Nat.card (cubicModel a b c).Point+Nat.card (twistModel a b c d).Point= 2*(Fintype.card (ZMod 3)+1)) ∧ (¬∀ a b c d : ZMod 5,¬IsSquare d → Nat.card (cubicModel a b c).Point+Nat.card (twistModel a b c d).Point= 2*(Fintype.card (ZMod 5)+1))",
+    "decl_sha256": "b58b303b769b3481b65b0cdd7536744a62d4a3573bf823b89ff116762f8a5b8e",
+    "scope": "Everyfiniteoddfield/everyactualnonsingularcubicmodely²=x³+a*x²+b*x+c, nonsquaredscaling(d*a,d²*b,d³*c): actualpointcountsum2(q+1), actualtracenegationandactualsourcegcdpredicateinvariance. Actualequation/sigma-rootfibersemantics, exactfibercomplement2, x-reindexingandDeltascalesd6; no nonisomorphism/Frobeniustrace/pointcountpremise. ProvesGalbraithshortcountEx9.5.4andexplicitcubic-x²extension. LiteralGalbraithauthorversion2Ex9.5.3no-basefield-isomorphismiffnonsquareclaimcounter: F7y²=x³+x,j1728,nonsquared3,scaledcurvey²=x³+2x, actualadmissibleC(u4), explicitforward(4x,y)/inverse(2x,y)/actualAddEquiv/bothcards8; universalhomogeneouscubicandcoordinateinverseidentitiesforallcommringchar7. Directuniversalno-admissible-changeclaimnegation. Qualifiedgeneric-jLemma9.5.7exceptionsretained; no novelty/pre-unreportedcorrection/fullbookread/corpuspromotionclaim, authoradjacent9.5.8erratareviewcredited. ActualF3#5/d1controlrefutesdroppingnonsquare(count10not8); actualF5cusp#5/d2nonsquarecontrolrefutesdroppingDelta(count10not12). PrioractualF3/F5/F7models/countscredited. Nextgeneralchar3trace-geometricbridgeopen, no Hasse/Endrank/embedding/fulltorsionfield/original14completion. No holes/customaxioms/nativeeval/raisedlimits/newglobalflags/waivers/nativeexperiment/spend/upload.",
+    "sources": [
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualCriterion.lean",
+        "bytes": 4882,
+        "sha256": "f3ba6212a416b534a4841417745ebe3d73ed1c02888abb8ed2cf2fea7a8ed2cd"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualFrobenius.lean",
+        "bytes": 2094,
+        "sha256": "7f19c4896dcb2f348fef4fb18de4d7764e97b76303101c22863d7e9d1edaaf5c"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/ActualMatrix.lean",
+        "bytes": 3338,
+        "sha256": "dc1118fec71e3e25a176da44e798721baba5385efc0e16aa14ad46edefca00f5"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/GenericFrobenius.lean",
+        "bytes": 2580,
+        "sha256": "15975255d4f4ac1d84be82f104c4f339c5e752923a1881b446766a883c1d464e"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/RationalTorsion.lean",
+        "bytes": 1492,
+        "sha256": "0c146876e71121a4716165bce9e3125e65cce4e9de466ab72aa9bc129835aaa4"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/CharTwoAllFields.lean",
+        "bytes": 1398,
+        "sha256": "e2ffea650fdc3845003e0bbfa9f4de9a0281244710b6eefc6c7796df205c7b09"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/DirectSource.lean",
+        "bytes": 5061,
+        "sha256": "fc6893a1647abea211501d0eec3ce48d667d8d8a8baf64e28d8909638c9f2a8a"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/GeneralThreeBKCertificate.lean",
+        "bytes": 6082,
+        "sha256": "f6934ac0e1d3a99ff5ae357a2eb081504d0ae423860f146ff0db88c1d2196167"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ShiftCoordinates.lean",
+        "bytes": 2923,
+        "sha256": "497e5d338b380a13392407438663a4e238f73c9de1ee81f86df8bcdf0353893c"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ShiftDescent.lean",
+        "bytes": 6809,
+        "sha256": "d6889ff5327f3ad43d9bb72e522505178a3caa8b7afc7d5f3b256317f8c51dd3"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ShiftPointGroup.lean",
+        "bytes": 5690,
+        "sha256": "35980d3f1169af1462f658b52193b64613c6d789d6411762add15a30454c27e2"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ThreeCountBridge.lean",
+        "bytes": 2355,
+        "sha256": "fdc6ea9d81c705bf70f9f097f9950e65fbb224dceb80bfd537d7179dfe018817"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/ThreeNormalForm.lean",
+        "bytes": 2244,
+        "sha256": "64f11c4dffbc1520e3f21df243e1f8235748a37d5de7a66f0a5506fb2e3fb34d"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/FiveSeven.lean",
+        "bytes": 3100,
+        "sha256": "574e45cf705b8a29ea804ffb1765c5e31bef3f93679dc305ec0beba61397f427"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/PrimeFieldTraceCertificate.lean",
+        "bytes": 7006,
+        "sha256": "c86ddc8f3488cfd1810d4dd860e6393d275a81264c660a02d0745df6fa1eeff9"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/ShortNormalization.lean",
+        "bytes": 3772,
+        "sha256": "cf9235fd81674936fd181898a19614108c5d95fe9a1d07419a1eb3b426d039a0"
+      },
+      {
+        "path": "research/quadratic_twist_count_audit_20261114/lean/CubicTwistCount.lean",
+        "bytes": 4534,
+        "sha256": "c85997e62b9e090b50ce8312f61e05b7cee9eef38a7811bb976457146a66ca83"
+      },
+      {
+        "path": "research/quadratic_twist_count_audit_20261114/lean/LiteralTwistControl.lean",
+        "bytes": 6388,
+        "sha256": "1732b5ec7ea175f9cbe584c223e1253e891af8d703da7b3dd0d932d261d3fdf4"
+      },
+      {
+        "path": "research/quadratic_twist_count_audit_20261114/lean/SquareFibers.lean",
+        "bytes": 3117,
+        "sha256": "95d26713e6cda152614a5e95c69b553b2ac1c9da4a043c28815c8b9d32662913"
+      },
+      {
+        "path": "research/quadratic_twist_count_audit_20261114/lean/TwistCountCertificate.lean",
+        "bytes": 2595,
+        "sha256": "3037f2401cd1fd84b1c70c801f9668b0d627dc989bf625b65e8a8cfd84d85798"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/CharThreeCoefficient.lean",
+        "bytes": 3046,
+        "sha256": "78bdda8fbbb9250f6d09d535c2794631743decbb23b17ff3738606269c3e3566"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/GeometricJ.lean",
+        "bytes": 5510,
+        "sha256": "01497d095d0c8fc6ee58335777465f9700e0a606991ba059ca5ffc1e3129e407"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/SmallCharacteristicCertificate.lean",
+        "bytes": 5030,
+        "sha256": "45f61fc3a6ed980f34ec57378f01cbd2cc56594aab66d91e583358247400f74e"
+      },
+      {
+        "path": "research/small_prime_trace_geometry_audit_20261114/lean/EquationCount.lean",
+        "bytes": 3670,
+        "sha256": "04bf6f3bf4310ac73a2e184a689768646ab3b7e18011da9a5611b9cec6e3b163"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+        "bytes": 8610,
+        "sha256": "71cc43700fceabc138db6ad52f4e41449c1a7b440f92054d582836e2571eeb9a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/SupersingularTraceClasses.lean",
+        "bytes": 7821,
+        "sha256": "6f50f299794aecf2e85e42ffa651001f4a7a69b3f7e0f7daf3a6f8ef5aaff275"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/GeneralCharThree.lean",
+        "bytes": 3178,
+        "sha256": "c0a51918922624288db9038f67f1205b4ac6dc5a88cf2b8d2cc1033796fcd51e"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/NormalFormCharThree.lean",
+        "bytes": 3791,
+        "sha256": "50ca726ca484ba04c2302cef8f88c1d6083d2a9d40c4c5d56b827b67b3775023"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/SourceThreeCriterion.lean",
+        "bytes": 5354,
+        "sha256": "a5973512b6a5fca625ab95e6bc1cb8baf8a2736afd635954a1b8ae88c7648f93"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterControls.lean",
+        "bytes": 7752,
+        "sha256": "e9cdcfe6993511dd3d84838cbfb20ee3ea2ff57684b9613880874127cc116dcd"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterFrobenius.lean",
+        "bytes": 4672,
+        "sha256": "31ce844af27e7fc15d473409b05d9974e6617ce8d0b4a5444fd6aebe77172357"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterModule.lean",
+        "bytes": 7522,
+        "sha256": "62e7974780d85bb57951cf47e64cbd6456c7e33a1b60f8da0a6e3c9fcd651b42"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterPoint.lean",
+        "bytes": 8681,
+        "sha256": "897bf21ecd85d70e6e65f1678de86df2610367e73a00f9a6acdbd78294b6f093"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/ThreeCharacterScalar.lean",
+        "bytes": 4757,
+        "sha256": "181b7e59dfcac10f50993b108e3d084cd2df4520dc9238aaaef807a3cff0dd6d"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/CharacteristicThree.lean",
+        "bytes": 2653,
+        "sha256": "187b01e8b72494449ceb9f2fd42cd33fd10b09f85b57d14a0d695688ec8b9550"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/DivisionQuartic.lean",
+        "bytes": 2734,
+        "sha256": "b91669f10694a42c73ea6712da413ae4ff2ed3fe9e5d84fd5c9189cfaa189a73"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralBasis.lean",
+        "bytes": 5157,
+        "sha256": "44c162daf6bc9ea3bacb0a3e5b965d8572f4f097d60aaa215df81a452bfbbab3"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralCardinality.lean",
+        "bytes": 2400,
+        "sha256": "5caa1d00afe151a6259dc659c40295afcb128a3b3fc6234f7c27e68a8e926cd2"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralRoots.lean",
+        "bytes": 6143,
+        "sha256": "ae23e54b95ea98aa9f98d1a7f3a22d2c4fb0c4321330dd2dc36a4579e88c7f72"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeneralTriplePoint.lean",
+        "bytes": 4722,
+        "sha256": "f61099252ac9f05b6482e4f19559f02e9ef199fc7d44395dbb599c650bb0beb6"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/GeometricCardinality.lean",
+        "bytes": 2294,
+        "sha256": "139ff737ff154ca1f3952d82b4dab42512ddf382a977f76fc8e4ec301d4b2339"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/QuarticRoots.lean",
+        "bytes": 3190,
+        "sha256": "c93226b190f59c494c6b01beaeaa71c9a01036edfea09d35ebabf64915bfc1dc"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TernaryBasis.lean",
+        "bytes": 2533,
+        "sha256": "32894b1a1e4f10e6a04d06ebf02324ff999442826f4cb3a8e548a4abddbb01b9"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/TriplePoint.lean",
+        "bytes": 3715,
+        "sha256": "1dadaec158b5091e91533cf53563a17ebb39c15638ebf86587d76b893e0bf471"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/CharTwoCardinality.lean",
+        "bytes": 1677,
+        "sha256": "27aa487fde2820f78381e8033d59d5cf95e0511e15e9b3f81a5079df1eced85e"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/CharTwoGeometry.lean",
+        "bytes": 3565,
+        "sha256": "aec6bce4be662854a1fda7a20b7248a4ef3da57e12e15bd97ea4ab85c00e16f7"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/CharTwoModels.lean",
+        "bytes": 4074,
+        "sha256": "38fa13035c6b37fc443cafd3aea48b4211dd70bba7b0affe0e1b44bfab30867a"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/OddCardinality.lean",
+        "bytes": 3448,
+        "sha256": "9074d16dfeadb1cc900d93efe1d1b15edbe2225515aefef292310062a0ad0204"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/RootEquiv.lean",
+        "bytes": 3174,
+        "sha256": "664b7a1779ed8c0873aad0635229a5067b80c6bf53b0389707cfab2e96a3a7c2"
+      },
+      {
+        "path": "research/quadratic_twist_count_audit_20261114/lean/lakefile.toml",
+        "bytes": 340,
+        "sha256": "91cf5ffb30ec7a4ceb4943eb4105ffab338de9b4eb4c83c26df60e43dbcc5906"
+      },
+      {
+        "path": "research/quadratic_twist_count_audit_20261114/lean/lake-manifest.json",
+        "bytes": 9548,
+        "sha256": "523b8e22bb18a35068e10a229de5055a3dca58dc34af3a863912fadcccf6af33"
+      },
+      {
+        "path": "research/quadratic_twist_count_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/lakefile.toml",
+        "bytes": 328,
+        "sha256": "6a749f92e57ae2c9bfe1b6bdfa3436110b39d762f9104f0e1356b913a5294c52"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/lake-manifest.json",
+        "bytes": 8767,
+        "sha256": "40ab7f7a80d88ee7c95bc47b3dd3fa12fb82b75c2e09c4c333d3b64ce722fb09"
+      },
+      {
+        "path": "research/prime_field_trace_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/small_prime_trace_geometry_audit_20261114/lean/lakefile.toml",
+        "bytes": 353,
+        "sha256": "55d6a23b6ec75d27cdb047f54fb7dd4f08f00a5a1fd41680d7160f2c48d7dc65"
+      },
+      {
+        "path": "research/small_prime_trace_geometry_audit_20261114/lean/lake-manifest.json",
+        "bytes": 7926,
+        "sha256": "aa8f2f0132ddbd267c9f62f81f9014f15d928bdc905ed3f4efea5ba10ce5da74"
+      },
+      {
+        "path": "research/small_prime_trace_geometry_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/lakefile.toml",
+        "bytes": 340,
+        "sha256": "d781a42c7a470c2c7afd2820ea29f34b0e978d5b8a299cef99b22d9fa12f7c3f"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/lake-manifest.json",
+        "bytes": 7173,
+        "sha256": "e608e29a37c08ae2b9ce72651485bbdd709ee887d71b93f850e55d910b409c7c"
+      },
+      {
+        "path": "research/small_characteristic_j_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/lakefile.toml",
+        "bytes": 392,
+        "sha256": "df4308ff06eb65627194a0dbd23a9c40b4a586cb0bec4a74ee094767f28f2ddc"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/lake-manifest.json",
+        "bytes": 6481,
+        "sha256": "a8e99ab09620f78c5d36a89fc78a036beef83bb0cd0752cd9ec7f0271f5b5f19"
+      },
+      {
+        "path": "research/bk_small_prime_source_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/lakefile.toml",
+        "bytes": 336,
+        "sha256": "516a5534ecbf74cac547d4650e79b089254bc4c6d616320ef9a00fc7ef047a5e"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/lake-manifest.json",
+        "bytes": 5659,
+        "sha256": "613b91dd6351960909fee544cff4f7d9615b9ba0e793acc7c9bb3caac4d23802"
+      },
+      {
+        "path": "research/three_torsion_char3_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/lakefile.toml",
+        "bytes": 395,
+        "sha256": "38f4ff5da23bd75c602f06ae62ff82a6404ca10cd3640f65f357fb2854441ad0"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/lake-manifest.json",
+        "bytes": 5109,
+        "sha256": "36439b5916281050c33f7d50b635cb5ca8d7fdfcf1678b5a23052d019f8a1cee"
+      },
+      {
+        "path": "research/bk_three_normalization_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/lakefile.toml",
+        "bytes": 420,
+        "sha256": "735b3aab39dd0d098d60c9ea782d6c853b3dd72e5e15d39f2e038e8ed75a5937"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4599,
+        "sha256": "318bc66aa76c02fb7cccccf4b6bf23c7a46f4c0292a6c94fe6969fae984ff1ae"
+      },
+      {
+        "path": "research/three_torsion_character_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lakefile.toml",
+        "bytes": 519,
+        "sha256": "af999734bbc208c01f4a5d309c6794a74fefc4af4a759d0dc966bfc35f87687d"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lake-manifest.json",
+        "bytes": 4154,
+        "sha256": "7b264e6be03b8ef82293d0897a321bfdb3a244b4a301ca374dba1182b6a831cf"
+      },
+      {
+        "path": "research/bk_frobenius_bridge_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lakefile.toml",
+        "bytes": 520,
+        "sha256": "75482bba02323d8372112c526c6ac31c5c9ab728dc2644d23b2bf39be8fa8f42"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3245,
+        "sha256": "2cdb762e99019400e5f5792dd18fe8bbfd9056d528666fb0143f93088475213b"
+      },
+      {
+        "path": "research/three_torsion_rank_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lakefile.toml",
+        "bytes": 282,
+        "sha256": "a8b213339113a23409463c0085eeb018856674ecb04338455d072c3d22a242d1"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3810,
+        "sha256": "eb1cf595e6547efb084a2f16644bdbd3d6a9ddd5752f9d1639396e94217bc2ea"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/lakefile.toml",
+        "bytes": 421,
+        "sha256": "ab06a27f68c0ad83c5f5de173173ddda7194a66eaffbdfbba8be0659feaa8203"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3243,
+        "sha256": "a3c183cf78076c7fcde3e998b4527060d213addf37bc2106dfad04e157c219b2"
+      },
+      {
+        "path": "research/two_torsion_rank_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualCriterion",
+    "ActualFrobenius",
+    "ActualMatrix",
+    "CharThreeCoefficient",
+    "CharTwoAllFields",
+    "CharTwoCardinality",
+    "CharTwoGeometry",
+    "CharTwoModels",
+    "CharacteristicThree",
+    "CubicTwistCount",
+    "DirectSource",
+    "DivisionQuartic",
+    "EquationCount",
+    "FiveSeven",
+    "FrobeniusFiniteExtension",
+    "FrobeniusPointDescent",
+    "GeneralBasis",
+    "GeneralCardinality",
+    "GeneralCharThree",
+    "GeneralRoots",
+    "GeneralThreeBKCertificate",
+    "GeneralTriplePoint",
+    "GenericFrobenius",
+    "GeometricCardinality",
+    "GeometricJ",
+    "LiteralTwistControl",
+    "NormalFormCharThree",
+    "OddCardinality",
+    "PrimeFieldTraceCertificate",
+    "QuarticRoots",
+    "RationalCounterexample",
+    "RationalTorsion",
+    "RootEquiv",
+    "S3Completion",
+    "S3Roots",
+    "ShiftCoordinates",
+    "ShiftDescent",
+    "ShiftPointGroup",
+    "ShortNormalization",
+    "SmallCharacteristicCertificate",
+    "SourceThreeCriterion",
+    "SquareFibers",
+    "StructuralAudit",
+    "SupersingularTraceClasses",
+    "TernaryBasis",
+    "ThreeCharacterControls",
+    "ThreeCharacterFrobenius",
+    "ThreeCharacterModule",
+    "ThreeCharacterPoint",
+    "ThreeCharacterScalar",
+    "ThreeCountBridge",
+    "ThreeNormalForm",
+    "TorsionBoundaries",
+    "TriplePoint",
+    "TwistCountCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/evidence/attempts.tar.gz",
+      "bytes": 36300,
+      "sha256": "c946557cee1102693a28a7746cf3f9c40969cd3e9391505964473e0d9f7dde00"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/evidence/attempts.json",
+      "bytes": 12008,
+      "sha256": "0a4f133c1e1d2300d9e28d5346f7a6e7457a7833e3e9668beeca9757c3a78fa0"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 7652,
+      "sha256": "9339e53277bf471359fbaf2ba76d33da1058bd8c58f05b19baa695110a957205"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/evidence/gate.json",
+      "bytes": 1255,
+      "sha256": "4d9e94dd60af036282d3c75fef09f4b940ed0bea00ae46e0e48d57e8d4e89616"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/evidence/source-review.json",
+      "bytes": 6914,
+      "sha256": "cd4991dfcd8c86a857e7feabf08d6573fb17bba3286d3ae51bdcd2ae00fa1584"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/proof-map.json",
+      "bytes": 6564,
+      "sha256": "351e4da2a7846f09187782df475b8048759642e47aca7c91b7d1e5ab3264198e"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/render_report.py",
+      "bytes": 6535,
+      "sha256": "41289ec5c6c98105c12bb174e6eebdad25c4e31c1fada721ed634cfe639c6835"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/restore_attempts.py",
+      "bytes": 1016,
+      "sha256": "f7f877a20ba801a14592f27377e5ec1d142d77fd91e8346130995731b8adfbe4"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/reports/layout.json",
+      "bytes": 260,
+      "sha256": "e0a53bcdf59157c5674f8bd3af492f5e5727f360a7432a91517f27d833634930"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/reports/report.pdf",
+      "bytes": 47600,
+      "sha256": "5d19ce10775aa272cb1ddb77808f5ad5074548cfc433dce4d319b21ebe69bfc8"
+    },
+    {
+      "path": "research/quadratic_twist_count_audit_20261114/reports/twist-count-counterexample.svg",
+      "bytes": 1358,
+      "sha256": "d7cf511af25c44ad06d776a6a7ac5d121cc93074e7b8bad8c27c3f8687696875"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 42,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_generic_odd_field_twist_counts_trace_source_invariance_proved": true,
+    "literal_galbraith_ex9_5_3_refuted": true,
+    "actual_coordinate_AddEquiv_and_universal_homogeneous_inverse_identities_proved": true,
+    "qualified_generic_j_lemma9_5_7_refuted": false,
+    "fst_embedding_theorem_refuted": false,
+    "nonsquare_and_nonsingularity_deletion_universal_negations_proved": true,
+    "general_char3_Hasse_Endrank_embedding_closed": false,
+    "full_paper_read": false,
+    "full_book_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

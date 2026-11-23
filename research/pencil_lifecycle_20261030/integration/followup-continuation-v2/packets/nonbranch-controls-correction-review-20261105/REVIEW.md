@@ -1,0 +1,9 @@
+# Independent source review of control corrections
+
+Disposition: scoped source fidelity supported; machine status not verified. Exact published correction7863b3ea2c5bacc4a2bddd926d3a9bca1ca414d2 and candidate448d5ab601e955b93a9071d6b5f932b38850f5728c9cf2c3fc3eb5b3742bb35d. No compiler or replay. Reviewer knew the prior diagnostics and did not author the correction.
+
+All twenty theorem statements are textually unchanged; fixture coefficients, hypotheses and controls are preserved. Exact packet manifest and Git bytes match. No sorry, admit or axiom is introduced. The separate thirty-name readback and intended negative control are untouched.
+
+The four correction groups directly match prior diagnostics. Fully qualifying ActualNonbranchNorm.residual chooses the intended polynomial definition rather than an unrelated residual simp theorem. Polynomial.C_ofNat converts constant-polynomial numerals to polynomial numerals before ring normalization in the divisibility and Bezout goals; it does not alter coefficients. Indenting selected_order arguments preserves the same application while keeping it within the exact expression. AddValuation.map_mul states v(x*y)=v(x)+v(y), making the product valuation a sum and matching he.symm.trans conjugate_order_zero. Generic multiplicative map_mul was the wrong API.
+
+Primary source inspection used pinned Mathlib/Algebra/Polynomial/Basic.lean:451 and Mathlib/RingTheory/Valuation/Basic.lean:1160. Both source hashes match the native custody dictionary. This source check supports the intended correction without claiming Lean will elaborate the entire candidate; additional errors may become visible. Existing three-attempt ceiling remains exhausted. Any new execution needs a distinct approved protocol with all four calls, thirty names, intended negative control and full custody preserved.

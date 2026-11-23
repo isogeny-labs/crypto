@@ -1,0 +1,31 @@
+{
+  "base_commit": "d06c4a82808701ede1aca1a64ebb7f861b0eade5",
+  "inspected_branch_commit": "9681ff7e0e79548698bcc8edc1589726af24aa5b",
+  "upstream_missing_scripts": [
+    ".github/scripts/ci-scope.mjs",
+    "tools/artifacts/artifacts.py"
+  ],
+  "branch_changes_to_these_paths": [],
+  "failed_check_names": [
+    "scope",
+    "harness",
+    "factor-base sweep CLI",
+    "gate"
+  ],
+  "same_failures_on_base": true,
+  "scope_cause": "ci-scope.mjs missing",
+  "dependent_failures": [
+    "harness",
+    "factor-base sweep CLI"
+  ],
+  "gate_cause": "tools/artifacts/artifacts.py missing",
+  "pr_run_ids": [
+    43987578874,
+    43987578722
+  ],
+  "base_run_ids": [
+    43982592108,
+    43982592133
+  ],
+  "gates_bypassed": false
+}

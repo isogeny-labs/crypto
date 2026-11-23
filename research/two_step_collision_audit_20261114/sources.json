@@ -1,0 +1,158 @@
+{
+  "schema": "degree-two-collision-source-plan/v1",
+  "created": "2026-11-14T17:28:32.774121+00:00",
+  "formal": {
+    "project": "research/two_step_collision_audit_20261114/lean",
+    "theorem": "TwoStepCollisionAudit.degree_two_collision_certificate",
+    "statement": "theorem degree_two_collision_certificate : (∀ (I : Type*) [Fintype I] [DecidableEq I] (p : I → ℝ), (∑ i, p i) = 1 → labelCoefficient p = 1 - secondMoment p - (secondMoment p)^2 + fourthMoment p) ∧ (Nat.Prime 7 ∧ Fintype.card Hash = 128 ∧ Fintype.card Sample = 6272 ∧ DegreeTwoGeneric goodIncrements ∧ (oneSamples goodIncrements).card = 448 ∧ (twoSamples goodIncrements).card = 336 ∧ (∀ z : Sample, sampleLaw z = (∏ _ : G, (2 : ENNReal)⁻¹) * (7 : ENNReal)⁻¹ * (7 : ENNReal)⁻¹) ∧ sampleLaw.toOuterMeasure (oneSamples goodIncrements : Set Sample) = (1 : ENNReal) / 14 ∧ sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) = (3 : ENNReal) / 56 ∧ labelCoefficient uniformLabel = 3 / 8 ∧ sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) = ENNReal.ofReal (labelCoefficient uniformLabel) / 7 ∧ sampleLaw.toOuterMeasure (twoSamples goodIncrements : Set Sample) ≠ sampleLaw.toOuterMeasure (oneSamples goodIncrements : Set Sample)) ∧ (Function.Injective badIncrements ∧ (∀ i, badIncrements i ≠ 0) ∧ ¬DegreeTwoGeneric badIncrements ∧ (twoSamples badIncrements).card = 112 ∧ sampleLaw.toOuterMeasure (twoSamples badIncrements : Set Sample) = (1 : ENNReal) / 56 ∧ (¬∀ g : Label → G, Function.Injective g → (∀ i, g i ≠ 0) → sampleLaw.toOuterMeasure (twoSamples g : Set Sample) = ENNReal.ofReal (labelCoefficient uniformLabel) / 7))",
+    "decl_sha256": "4c1acf0fd9722f21066a7ce0cb3de28321e7e626a7fbb2eaa2efafd2c441c000",
+    "scope": "Generic finite normalized real label-weight inclusion-exclusion identity: the actual admissible degree-two label sum is1−I2−I2²+I4, with I2=sum p_i² and I4=sum p_i⁴. Independent exact actual graph checks on prime Z7: all128staticlabelmaps and49orderedstartingpairs,6272samples. Steps1,3 satisfy literal source distinctness of degree0/1/2 sums modulo commutativity. Kernel-checked one-step fresh collision count448 and two-step fresh count336 yield actual PMF event rates1/14 and3/56; actual uniform sample-law pointmass factors as seven uniform vertex-label and two uniform-start factors. Uniform label coefficient3/8 matches the actual two-step rate after division by7. Steps1,2 remain distinct/nonzero but violate source degree≤2genericity; actual two-step count112/rate1/56 directly disproves the coefficient after dropping that condition. No count/probability/sourcegenericity/coefficient is assumed as a premise. Bernstein–Lange2013§§3–4 known correction credited, no novelty/source-refutation claim. Generic label identity and exact ground-group probability check do not prove the actual-group coefficient for all groups/supports, the limiting firstcollision penalty or practical keyedhash refinement. Independent native written-header check is procedural, not kernel parser/hash/execution refinement. Standard foundations/defaults, all actual enumeration by kernel-checked decisions; no holes/custom axioms/native proof evaluation/global flags/raised limits/waivers/new native cryptographic experiment/paid compute/agent upload.",
+    "sources": [
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/ActualProbability.lean",
+        "bytes": 2933,
+        "sha256": "ad0819034cbd514141cd30b5ad5e27123de60dc199146d858a7e53d46fe1f0ff"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/FiniteGraphs.lean",
+        "bytes": 2253,
+        "sha256": "d9657405ea83afa6c1b6c6e1f67cd2afd513550173536d6a9d323a802ac883c5"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/LabelCoefficient.lean",
+        "bytes": 3642,
+        "sha256": "43dd2c4a1c8c5cfc49aabe8d2759dc39cdf2ddaa59ef1be3d167db2098a95771"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/TwoStepCertificate.lean",
+        "bytes": 3706,
+        "sha256": "c3255c14193871c9d388500e81255b0f500baf82e8b3e88726342c64dd6e1fab"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/lakefile.toml",
+        "bytes": 368,
+        "sha256": "4ea703b59eb2190c0141993d51e2b9dcbd969da3ac614df42cdb34ca2a4ea35f"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3175,
+        "sha256": "9ed2b7892af613969a6f6db81e30aa4cf4e3e298d7e5a33003a0ada8e9102442"
+      },
+      {
+        "path": "research/two_step_collision_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualProbability",
+    "FiniteGraphs",
+    "LabelCoefficient",
+    "TwoStepCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/two_step_collision_audit_20261114/evidence/attempts.tar.xz",
+      "bytes": 12128,
+      "sha256": "25eb979591531182d417f294b332795c710f307caa8615d7e04dd0229e5f96bd"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "147312822d2b38b8b688d6e67144fac691ccba0953320daa27b48b5b03a7fcda"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/evidence/attempts.json",
+      "bytes": 227,
+      "sha256": "add31077b7cb048bdcd3ccac51fa4bd5af6f3f646625dd0d0a662a7718adf3e0"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/evidence/gate.tar.gz",
+      "bytes": 1151,
+      "sha256": "6ab3af9719a84622cbe48ab4c351476c7c933f362d0c216064a0871a9b74e8dc"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/evidence/gate.json",
+      "bytes": 1235,
+      "sha256": "8c65f580cde779625b096e3f2125e10893d5e4692abd55ca52d083fe3dc3685e"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/evidence/source-review.json",
+      "bytes": 8203,
+      "sha256": "b89fd91eb74a9855cf3807cd0aae40e56d112d6350d2ec1ca09b167c7f439c60"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/evidence/binding-check.json",
+      "bytes": 5945,
+      "sha256": "d007448b650b6b9d38bf96cae64a1187049c8a39df9fad3fffa47bc9edcac3a1"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/proof-map.json",
+      "bytes": 3463,
+      "sha256": "e2261437cb2e77c2920b9f31fb0549406eec668248a7b98818283b1984bf7bf7"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/render_report.py",
+      "bytes": 7083,
+      "sha256": "30cd6907949051515395bf7768d3fba14b0621b29866b9df840f118436b1296a"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/export_binding_input.py",
+      "bytes": 1736,
+      "sha256": "ac5a0c9643f6dd1879f950372d2f7b249b9bd1fbac111b07922262577538f321"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/reports/layout.json",
+      "bytes": 360,
+      "sha256": "7115cea68b66cd275dcf0cd0c9e62877e2d32362a1b7482513ba6e9cb8991110"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/reports/report.pdf",
+      "bytes": 47371,
+      "sha256": "054c931381a6144dd8d618e83e1fd8c84dbca2585963643bce8697e4c598d7db"
+    },
+    {
+      "path": "research/two_step_collision_audit_20261114/reports/two-step-collision.svg",
+      "bytes": 1432,
+      "sha256": "f1cf5cccdeac5f6e512079f801495fb5479abba4a1ed6ac928185ca05bfb71a1"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 26,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "kernel_checked_finite_decisions": true,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "generic_weighted_label_coefficient_proved": true,
+    "actual_Z7_complete_population_proved": true,
+    "actual_uniform_PMF_product_and_rates_proved": true,
+    "source_degree_two_genericity_verified": true,
+    "hypothesis_deletion_counterexample_proved": true,
+    "general_actual_group_coefficient_proved": false,
+    "limiting_random_table_collision_penalty_proved": false,
+    "practical_hash_refinement_proved": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

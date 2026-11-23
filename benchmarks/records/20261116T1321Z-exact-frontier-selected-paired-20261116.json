@@ -1,0 +1,112 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T13:26:26+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/frontier-paired-isolation-6f3f14d0d-01.jsonl",
+        "--label",
+        "selected-LAST-frontier-unchanged-paired-gates",
+        "--",
+        "/workspace/relation-native-qualifiers/update-paired-driver-6f3f14d0d-27",
+        "update-paired",
+        "/workspace/root-paid-inputs-723f4c2dd-01",
+        "/workspace/frontier-paired-results-6f3f14d0d-01",
+        "research/relation_degree_trace_20261115/frontier-development/paired-config-41.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T13:21:11+00:00",
+      "wall_s": 18.631
+    }
+  ],
+  "commit": "b07ab881b491d7d55aed1afe59eaec026f8d362d",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T13:21:11+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T1321Z-exact-frontier-selected-paired-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "complete_matching_answers",
+      "note": "Warmup3+A/A42+main63, exactLAST/frontier mode/zero exports/all complete and matching",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 108.0
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 21,
+      "name": "last_star_n16_s7_f4_regeneration_over_candidate_full_paid",
+      "note": "FixedLAST original fully paid workflow; adjusted lower 20.579510262650988. Strict15 passes; unsigned known fixture. Separate target series from priorFIRST results; no fastest-control/fresh/signed standing.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        20.881658886835677,
+        23.838810858477782
+      ],
+      "unit": "ratio",
+      "value": 22.418113595636463
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 21,
+      "name": "last_star_n16_s7_expanded_regeneration_over_candidate_full_paid",
+      "note": "FixedLAST original fully paid workflow; adjusted lower 15.841748657660663. Strict15 passes; unsigned known fixture. Separate target series from priorFIRST results; no fastest-control/fresh/signed standing.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        16.106180418585414,
+        17.749762518404783
+      ],
+      "unit": "ratio",
+      "value": 16.91998407691807
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 49048,
+      "path": "research/relation_degree_trace_20261115/frontier-paired-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b5/b58d06f62e1cc8e3e44a3938f04ea57d0458e8f918620ecf28f626822f394de1",
+      "sha256": "b58d06f62e1cc8e3e44a3938f04ea57d0458e8f918620ecf28f626822f394de1",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/frontier-paired-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/frontier-paired-01/report-01/ratios.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/frontier-paired-01/report-01/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "exact-frontier-selected-paired-20261116",
+  "status": "measured",
+  "summary": "All6AAgates pass/21blocks/108matching/pinsunchanged/0contention. Both original full-paid adjustedlowers>15, registered numeric15flagtrue; unsigned knownLASTfixture, no fastest/fresh/signed claim. PCC370e58/fd9d91.",
+  "validation": null
+}

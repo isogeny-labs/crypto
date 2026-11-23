@@ -1,0 +1,639 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-15T22:26:02+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/ic_ksum_prune_20261115/run_all.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T22:12:07+00:00",
+      "wall_s": 319.929
+    }
+  ],
+  "commit": "fff219f63f8e961adff9131201912457ea781fda",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T22:11:59+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-ksum-prune-tableb"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T2211Z-ksum-prune-tableb",
+  "metrics": [
+    {
+      "baseline": 7.1114,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0_p20",
+      "note": "[pcc:unverified] icv1-fp20-t1293-3c2999ba counted cost GAE/sqrt(r), w=0; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9057 [0.9046, 0.9069]; reference = rho-neg",
+      "reference": 1.2691,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.4409
+    },
+    {
+      "baseline": 7.859,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0p1_p20",
+      "note": "[pcc:unverified] icv1-fp20-t1293-3c2999ba counted cost GAE/sqrt(r), w=0.1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9147 [0.9136, 0.9158]; reference = rho-neg",
+      "reference": 1.3797,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 7.1886
+    },
+    {
+      "baseline": 14.5876,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w1_p20",
+      "note": "[pcc:unverified] icv1-fp20-t1293-3c2999ba counted cost GAE/sqrt(r), w=1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9540 [0.9533, 0.9548]; reference = rho-neg",
+      "reference": 2.3746,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 13.9172
+    },
+    {
+      "baseline": 6.6352,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4p_w0_p20",
+      "note": "[pcc:unverified] icv1-fp20-t1293-3c2999ba counted cost GAE/sqrt(r), w=0; ksum4-p (prune=1); baseline = ksum4 (prune=0); paired ratio 0.9738 [0.9734, 0.9742]; reference = rho-neg",
+      "reference": 1.2691,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.4613
+    },
+    {
+      "baseline": 6.6493,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0_p22",
+      "note": "[pcc:unverified] icv1-fp22-tm1267-a5acaf6d counted cost GAE/sqrt(r), w=0; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9191 [0.9181, 0.9201]; reference = rho-neg",
+      "reference": 1.1719,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.1113
+    },
+    {
+      "baseline": 7.3909,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0p1_p22",
+      "note": "[pcc:unverified] icv1-fp22-tm1267-a5acaf6d counted cost GAE/sqrt(r), w=0.1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9272 [0.9263, 0.9282]; reference = rho-neg",
+      "reference": 1.2796,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.8529
+    },
+    {
+      "baseline": 14.0654,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w1_p22",
+      "note": "[pcc:unverified] icv1-fp22-tm1267-a5acaf6d counted cost GAE/sqrt(r), w=1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9618 [0.9611, 0.9624]; reference = rho-neg",
+      "reference": 2.2491,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 13.5275
+    },
+    {
+      "baseline": 6.2839,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4p_w0_p22",
+      "note": "[pcc:unverified] icv1-fp22-tm1267-a5acaf6d counted cost GAE/sqrt(r), w=0; ksum4-p (prune=1); baseline = ksum4 (prune=0); paired ratio 0.9770 [0.9767, 0.9774]; reference = rho-neg",
+      "reference": 1.1719,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.1395
+    },
+    {
+      "baseline": 6.383,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0_p24",
+      "note": "[pcc:unverified] icv1-fp24-t1577-77336155 counted cost GAE/sqrt(r), w=0; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9366 [0.9358, 0.9374]; reference = rho-neg",
+      "reference": 1.0872,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 5.9784
+    },
+    {
+      "baseline": 7.1579,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0p1_p24",
+      "note": "[pcc:unverified] icv1-fp24-t1577-77336155 counted cost GAE/sqrt(r), w=0.1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9435 [0.9427, 0.9443]; reference = rho-neg",
+      "reference": 1.1848,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.7532
+    },
+    {
+      "baseline": 14.1315,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w1_p24",
+      "note": "[pcc:unverified] icv1-fp24-t1577-77336155 counted cost GAE/sqrt(r), w=1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9714 [0.9709, 0.9719]; reference = rho-neg",
+      "reference": 2.0626,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 13.7269
+    },
+    {
+      "baseline": 6.3651,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4p_w0_p24",
+      "note": "[pcc:unverified] icv1-fp24-t1577-77336155 counted cost GAE/sqrt(r), w=0; ksum4-p (prune=1); baseline = ksum4 (prune=0); paired ratio 0.9828 [0.9826, 0.9830]; reference = rho-neg",
+      "reference": 1.0872,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.2556
+    },
+    {
+      "baseline": 13.4685,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0_b15",
+      "note": "[pcc:unverified] icv1-f2m15-t131-ed7256f0 counted cost GAE/sqrt(r), w=0; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.8314 [0.8304, 0.8325]; reference = rho-neg",
+      "reference": 1.966,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 11.1984
+    },
+    {
+      "baseline": 14.1857,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0p1_b15",
+      "note": "[pcc:unverified] icv1-f2m15-t131-ed7256f0 counted cost GAE/sqrt(r), w=0.1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.8400 [0.8389, 0.8410]; reference = rho-neg",
+      "reference": 2.106,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 11.9155
+    },
+    {
+      "baseline": 20.6397,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w1_b15",
+      "note": "[pcc:unverified] icv1-f2m15-t131-ed7256f0 counted cost GAE/sqrt(r), w=1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.8900 [0.8890, 0.8910]; reference = rho-neg",
+      "reference": 3.3655,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 18.3695
+    },
+    {
+      "baseline": 11.1939,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4p_w0_b15",
+      "note": "[pcc:unverified] icv1-f2m15-t131-ed7256f0 counted cost GAE/sqrt(r), w=0; ksum4-p (prune=1); baseline = ksum4 (prune=0); paired ratio 0.9427 [0.9421, 0.9432]; reference = rho-neg",
+      "reference": 1.966,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 10.552
+    },
+    {
+      "baseline": 11.2571,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0_b18",
+      "note": "[pcc:unverified] icv1-f2m18-t393-d2c04152 counted cost GAE/sqrt(r), w=0; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.8576 [0.8560, 0.8592]; reference = rho-neg",
+      "reference": 1.877,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 9.6538
+    },
+    {
+      "baseline": 11.9812,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0p1_b18",
+      "note": "[pcc:unverified] icv1-f2m18-t393-d2c04152 counted cost GAE/sqrt(r), w=0.1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.8662 [0.8646, 0.8678]; reference = rho-neg",
+      "reference": 2.0226,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 10.378
+    },
+    {
+      "baseline": 18.4983,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w1_b18",
+      "note": "[pcc:unverified] icv1-f2m18-t393-d2c04152 counted cost GAE/sqrt(r), w=1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9133 [0.9120, 0.9147]; reference = rho-neg",
+      "reference": 3.333,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 16.8951
+    },
+    {
+      "baseline": 9.7891,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4p_w0_b18",
+      "note": "[pcc:unverified] icv1-f2m18-t393-d2c04152 counted cost GAE/sqrt(r), w=0; ksum4-p (prune=1); baseline = ksum4 (prune=0); paired ratio 0.9537 [0.9530, 0.9544]; reference = rho-neg",
+      "reference": 1.877,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 9.3358
+    },
+    {
+      "baseline": 7.007,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0_b21",
+      "note": "[pcc:unverified] icv1-f2m21-t2591-de54d72e counted cost GAE/sqrt(r), w=0; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9043 [0.9032, 0.9055]; reference = rho-neg",
+      "reference": 1.2609,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.3367
+    },
+    {
+      "baseline": 7.733,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0p1_b21",
+      "note": "[pcc:unverified] icv1-f2m21-t2591-de54d72e counted cost GAE/sqrt(r), w=0.1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9133 [0.9122, 0.9144]; reference = rho-neg",
+      "reference": 1.3707,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 7.0626
+    },
+    {
+      "baseline": 14.2665,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w1_b21",
+      "note": "[pcc:unverified] icv1-f2m21-t2591-de54d72e counted cost GAE/sqrt(r), w=1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9530 [0.9522, 0.9538]; reference = rho-neg",
+      "reference": 2.3586,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 13.5961
+    },
+    {
+      "baseline": 6.7274,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4p_w0_b21",
+      "note": "[pcc:unverified] icv1-f2m21-t2591-de54d72e counted cost GAE/sqrt(r), w=0; ksum4-p (prune=1); baseline = ksum4 (prune=0); paired ratio 0.9741 [0.9737, 0.9746]; reference = rho-neg",
+      "reference": 1.2609,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.5535
+    },
+    {
+      "baseline": 6.9905,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0_b24",
+      "note": "[pcc:unverified] icv1-f2m24-tm3047-2d0c0e8c counted cost GAE/sqrt(r), w=0; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9322 [0.9310, 0.9335]; reference = rho-neg",
+      "reference": 1.2105,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.5169
+    },
+    {
+      "baseline": 7.8725,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0p1_b24",
+      "note": "[pcc:unverified] icv1-f2m24-tm3047-2d0c0e8c counted cost GAE/sqrt(r), w=0.1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9398 [0.9386, 0.9410]; reference = rho-neg",
+      "reference": 1.3198,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 7.3988
+    },
+    {
+      "baseline": 15.8102,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w1_b24",
+      "note": "[pcc:unverified] icv1-f2m24-tm3047-2d0c0e8c counted cost GAE/sqrt(r), w=1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9700 [0.9693, 0.9707]; reference = rho-neg",
+      "reference": 2.3034,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 15.3365
+    },
+    {
+      "baseline": 6.5766,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4p_w0_b24",
+      "note": "[pcc:unverified] icv1-f2m24-tm3047-2d0c0e8c counted cost GAE/sqrt(r), w=0; ksum4-p (prune=1); baseline = ksum4 (prune=0); paired ratio 0.9725 [0.9722, 0.9728]; reference = rho-neg",
+      "reference": 1.2105,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.3957
+    },
+    {
+      "baseline": 6.4143,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0_b27",
+      "note": "[pcc:unverified] icv1-f2m27-t12543-569dca8b counted cost GAE/sqrt(r), w=0; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9413 [0.9407, 0.9420]; reference = rho-neg",
+      "reference": 1.0687,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.038
+    },
+    {
+      "baseline": 7.1677,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w0p1_b27",
+      "note": "[pcc:unverified] icv1-f2m27-t12543-569dca8b counted cost GAE/sqrt(r), w=0.1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9475 [0.9469, 0.9481]; reference = rho-neg",
+      "reference": 1.1677,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.7914
+    },
+    {
+      "baseline": 13.9483,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum5p_w1_b27",
+      "note": "[pcc:unverified] icv1-f2m27-t12543-569dca8b counted cost GAE/sqrt(r), w=1; ksum5-p (prune=1); baseline = ksum5 (prune=0); paired ratio 0.9730 [0.9726, 0.9734]; reference = rho-neg",
+      "reference": 2.0587,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 13.572
+    },
+    {
+      "baseline": 6.7022,
+      "better": "lower",
+      "n": 432,
+      "name": "s_ksum4p_w0_b27",
+      "note": "[pcc:unverified] icv1-f2m27-t12543-569dca8b counted cost GAE/sqrt(r), w=0; ksum4-p (prune=1); baseline = ksum4 (prune=0); paired ratio 0.9849 [0.9848, 0.9851]; reference = rho-neg",
+      "reference": 1.0687,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 6.6012
+    }
+  ],
+  "problem": "ic:ksum_prune_tableb",
+  "raw": [
+    {
+      "bytes": 41240,
+      "path": "research/ic_ksum_prune_20261115/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/31/31f140297b9e4bd6e8137a7b0bc823173200414de8f4140130d0d4dd236cd32a",
+      "sha256": "31f140297b9e4bd6e8137a7b0bc823173200414de8f4140130d0d4dd236cd32a",
+      "uploaded": false
+    },
+    {
+      "bytes": 85361,
+      "path": "research/ic_ksum_prune_20261115/results.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f4/f42c06a03bea2da32e055c27824efd51b21c4ebbaf1d891ab88253f86bec08c8",
+      "sha256": "f42c06a03bea2da32e055c27824efd51b21c4ebbaf1d891ab88253f86bec08c8",
+      "uploaded": false
+    },
+    {
+      "bytes": 2724,
+      "path": "research/ic_ksum_prune_20261115/data/correctness.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ed/ed19552730158285b790d49690227e2a00c7979ac25213e27d2ffd4a68a71df6",
+      "sha256": "ed19552730158285b790d49690227e2a00c7979ac25213e27d2ffd4a68a71df6",
+      "uploaded": false
+    },
+    {
+      "bytes": 321,
+      "path": "research/ic_ksum_prune_20261115/data/runlog.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d3/d3e82718222ba1fccbf83b7810d116775026f79de1192b2deeeb2b12e7634c78",
+      "sha256": "d3e82718222ba1fccbf83b7810d116775026f79de1192b2deeeb2b12e7634c78",
+      "uploaded": false
+    },
+    {
+      "bytes": 456,
+      "path": "research/ic_ksum_prune_20261115/data/verify.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/88/88676385792da740d89b143778cc9d2473433b122296025b35ad8c4626db5c35",
+      "sha256": "88676385792da740d89b143778cc9d2473433b122296025b35ad8c4626db5c35",
+      "uploaded": false
+    },
+    {
+      "bytes": 610283,
+      "path": "research/ic_ksum_prune_20261115/sessions/B15-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2c/2c8a1dc66a6c259c64ce46aa17e444b03c0b707f3c688a8d4ab4b31da9dcf344",
+      "sha256": "2c8a1dc66a6c259c64ce46aa17e444b03c0b707f3c688a8d4ab4b31da9dcf344",
+      "uploaded": false
+    },
+    {
+      "bytes": 614789,
+      "path": "research/ic_ksum_prune_20261115/sessions/B15-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f1/f125f0f3566b252135d240f8830775e13e81f72c77e1b1e9b56b5031cc4c7667",
+      "sha256": "f125f0f3566b252135d240f8830775e13e81f72c77e1b1e9b56b5031cc4c7667",
+      "uploaded": false
+    },
+    {
+      "bytes": 615138,
+      "path": "research/ic_ksum_prune_20261115/sessions/B15-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ef/efce389b990a795f087191c5443d3da04b7ceafd7e3203c615e316632886087d",
+      "sha256": "efce389b990a795f087191c5443d3da04b7ceafd7e3203c615e316632886087d",
+      "uploaded": false
+    },
+    {
+      "bytes": 618529,
+      "path": "research/ic_ksum_prune_20261115/sessions/B18-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bb/bb4eb631edbfbc9ef7e84fe4cfcf6563975967964e5ad7d04c798d94f68f1e35",
+      "sha256": "bb4eb631edbfbc9ef7e84fe4cfcf6563975967964e5ad7d04c798d94f68f1e35",
+      "uploaded": false
+    },
+    {
+      "bytes": 619634,
+      "path": "research/ic_ksum_prune_20261115/sessions/B18-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b2/b27303f523dd0dafb1ca469672e28ea98731ccbd1198ee288936c4c08cfafcf6",
+      "sha256": "b27303f523dd0dafb1ca469672e28ea98731ccbd1198ee288936c4c08cfafcf6",
+      "uploaded": false
+    },
+    {
+      "bytes": 619439,
+      "path": "research/ic_ksum_prune_20261115/sessions/B18-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2d/2df0514fc4c9f47e501d6272a7fd9c90dab7e2ec8bad31de267f4e5fcfe30438",
+      "sha256": "2df0514fc4c9f47e501d6272a7fd9c90dab7e2ec8bad31de267f4e5fcfe30438",
+      "uploaded": false
+    },
+    {
+      "bytes": 718191,
+      "path": "research/ic_ksum_prune_20261115/sessions/B21-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3b/3b7ba23ae928c9fddefe5c34858532e6ca740ec5f3f5fd8c592505a12c32184a",
+      "sha256": "3b7ba23ae928c9fddefe5c34858532e6ca740ec5f3f5fd8c592505a12c32184a",
+      "uploaded": false
+    },
+    {
+      "bytes": 721355,
+      "path": "research/ic_ksum_prune_20261115/sessions/B21-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cc/cc39692c79b88581c5a375f7f030dbf6bc8705a0347c0180ae0abf3173f96a30",
+      "sha256": "cc39692c79b88581c5a375f7f030dbf6bc8705a0347c0180ae0abf3173f96a30",
+      "uploaded": false
+    },
+    {
+      "bytes": 720706,
+      "path": "research/ic_ksum_prune_20261115/sessions/B21-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/03/03222396bf76448e2a3758e1cc55e040c4d09a1cb40eb1b5742691bdf00bcb8c",
+      "sha256": "03222396bf76448e2a3758e1cc55e040c4d09a1cb40eb1b5742691bdf00bcb8c",
+      "uploaded": false
+    },
+    {
+      "bytes": 728188,
+      "path": "research/ic_ksum_prune_20261115/sessions/B24-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e7e8a347df19d938126700706af31db47ddd90506a058cbe246cdc4e79c71e97",
+      "sha256": "e7e8a347df19d938126700706af31db47ddd90506a058cbe246cdc4e79c71e97",
+      "uploaded": false
+    },
+    {
+      "bytes": 730515,
+      "path": "research/ic_ksum_prune_20261115/sessions/B24-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9b/9be3512ad7ab37593e3a4a53d7810d7806cdc5e45eb6de9460a3af097fc77f82",
+      "sha256": "9be3512ad7ab37593e3a4a53d7810d7806cdc5e45eb6de9460a3af097fc77f82",
+      "uploaded": false
+    },
+    {
+      "bytes": 730038,
+      "path": "research/ic_ksum_prune_20261115/sessions/B24-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d0/d0a9f79f96de40bd6d4930fd185ed2c7a1e289b905cf117886459ebc5aa8ad50",
+      "sha256": "d0a9f79f96de40bd6d4930fd185ed2c7a1e289b905cf117886459ebc5aa8ad50",
+      "uploaded": false
+    },
+    {
+      "bytes": 743457,
+      "path": "research/ic_ksum_prune_20261115/sessions/B27-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/af/afbe4757d614ab139d6b7e9edc66c98187b207d99ffc88d7b70cd30c1da04c81",
+      "sha256": "afbe4757d614ab139d6b7e9edc66c98187b207d99ffc88d7b70cd30c1da04c81",
+      "uploaded": false
+    },
+    {
+      "bytes": 742963,
+      "path": "research/ic_ksum_prune_20261115/sessions/B27-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a8/a8b1f2e43d63a24d94965671dead20f91394baa11b65e10c82f6d49388d50f4a",
+      "sha256": "a8b1f2e43d63a24d94965671dead20f91394baa11b65e10c82f6d49388d50f4a",
+      "uploaded": false
+    },
+    {
+      "bytes": 744466,
+      "path": "research/ic_ksum_prune_20261115/sessions/B27-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ac/ac530b26fa0066c92fe813b96c119bdba2868aa27408a1f2d564a7b9dc4d2170",
+      "sha256": "ac530b26fa0066c92fe813b96c119bdba2868aa27408a1f2d564a7b9dc4d2170",
+      "uploaded": false
+    },
+    {
+      "bytes": 728447,
+      "path": "research/ic_ksum_prune_20261115/sessions/P20-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/52/52c04233d4be564efca46a4cb7bb2f2040c6eb51451ffd27d7a407851e4e9d2c",
+      "sha256": "52c04233d4be564efca46a4cb7bb2f2040c6eb51451ffd27d7a407851e4e9d2c",
+      "uploaded": false
+    },
+    {
+      "bytes": 727835,
+      "path": "research/ic_ksum_prune_20261115/sessions/P20-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b3/b3643425596ea35fe63361a1891afb7aee043a1a661d52f01c18cb3fb122d832",
+      "sha256": "b3643425596ea35fe63361a1891afb7aee043a1a661d52f01c18cb3fb122d832",
+      "uploaded": false
+    },
+    {
+      "bytes": 732316,
+      "path": "research/ic_ksum_prune_20261115/sessions/P20-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9edb71b720bb3300f2fca328d860eea1bdfa80d20c1f76c72f768acec0d64600",
+      "sha256": "9edb71b720bb3300f2fca328d860eea1bdfa80d20c1f76c72f768acec0d64600",
+      "uploaded": false
+    },
+    {
+      "bytes": 733388,
+      "path": "research/ic_ksum_prune_20261115/sessions/P22-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/53/53c4198e2cb278c76fba5025f64fedcd9aa14d318ab73b94153c8664727498a7",
+      "sha256": "53c4198e2cb278c76fba5025f64fedcd9aa14d318ab73b94153c8664727498a7",
+      "uploaded": false
+    },
+    {
+      "bytes": 732679,
+      "path": "research/ic_ksum_prune_20261115/sessions/P22-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/734b2a17a39d212369fec2af96bb79a2de24a0fe801fb4fc4029faefc04643f0",
+      "sha256": "734b2a17a39d212369fec2af96bb79a2de24a0fe801fb4fc4029faefc04643f0",
+      "uploaded": false
+    },
+    {
+      "bytes": 734753,
+      "path": "research/ic_ksum_prune_20261115/sessions/P22-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/13/1385454c75ce6411b044e5ecb07390f4e6a7d67281c99953d8966b2847bba560",
+      "sha256": "1385454c75ce6411b044e5ecb07390f4e6a7d67281c99953d8966b2847bba560",
+      "uploaded": false
+    },
+    {
+      "bytes": 746540,
+      "path": "research/ic_ksum_prune_20261115/sessions/P24-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bc/bca015853e5fff012c342e38da353693b6f55c959fb8e30df5fb03183fac3bcc",
+      "sha256": "bca015853e5fff012c342e38da353693b6f55c959fb8e30df5fb03183fac3bcc",
+      "uploaded": false
+    },
+    {
+      "bytes": 746876,
+      "path": "research/ic_ksum_prune_20261115/sessions/P24-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/05/0517120b8010cfc9b8b1fdbd99876330c6397baf2a7a6c6d41a65dd662942403",
+      "sha256": "0517120b8010cfc9b8b1fdbd99876330c6397baf2a7a6c6d41a65dd662942403",
+      "uploaded": false
+    },
+    {
+      "bytes": 746877,
+      "path": "research/ic_ksum_prune_20261115/sessions/P24-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7c/7c7d05ad85d569f86b5183945b4423c2796719a40ea26789c5f845ed439b30a3",
+      "sha256": "7c7d05ad85d569f86b5183945b4423c2796719a40ea26789c5f845ed439b30a3",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-ksum-prune-tableb/report.pdf",
+    "png": [
+      "benchmarks/20261115-ksum-prune-tableb/ratios.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-ksum-prune-tableb/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ksum-prune-tableb",
+  "status": "measured",
+  "summary": "[pcc:unverified] ksum prune=1 vs prune=0, 8 Table B curves, counted cost at L0: ksum5-p/ksum5 0.83-0.94 (w=0), 0.84-0.95 (w=0.1), 0.89-0.97 (w=1); ksum4-p/ksum4 0.94-0.99 (w=0); identical outputs on 9216 per-target pairs (no mismatch); 24/24 sessions replay-verified (same host); matched rho still 5.0-5.7x ahead of ksum5-p at w=0. S3 upload not done (no AWS credentials here; raw data in Git, gzip). Local L0 route, not isolab-eks; validation gate not met.",
+  "validation": null
+}

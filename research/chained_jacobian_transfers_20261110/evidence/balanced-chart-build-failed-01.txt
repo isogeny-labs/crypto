@@ -1,0 +1,34 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/BalancedChart.lean:24:2: error: `grind` failed
+case grind
+H : Type
+inst : IntModule H
+finite qplus qminus : H
+m n : Int
+hminus : qminus = -qplus
+h : ¬finite + (n + -1) • qplus + (-1 * m + -1 * n + 1) • -qplus = finite + (m + 2 * n + -2) • qplus
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] qminus = -qplus
+    [prop] ¬finite + (n + -1) • qplus + (-1 * m + -1 * n + 1) • -qplus = finite + (m + 2 * n + -2) • qplus
+  [eqc] False propositions
+    [prop] finite + (n + -1) • qplus + (-1 * m + -1 * n + 1) • -qplus = finite + (m + 2 * n + -2) • qplus
+  [eqc] Equivalence classes
+    [eqc] {qminus, -qplus}
+  [cutsat] Assignment satisfying linear constraints
+    [assign] m := 0
+    [assign] n := 0
+  [linarith] Linarith assignment for `H`
+    [assign] finite := 0
+    [assign] qplus := 0
+    [assign] qminus := 0
+[grind] Issues
+  [issue] `grind linarith` term with unexpected instance
+        (n + -1) • qplus
+  [issue] `grind linarith` term with unexpected instance
+        (-1 * m + -1 * n + 1) • -qplus
+  [issue] `grind linarith` term with unexpected instance
+        (m + 2 * n + -2) • qplus
+'BalancedChart.linear_support_transform' depends on axioms: [propext, Classical.choice, Quot.sound]
+'BalancedChart.balanced_infinity_images' depends on axioms: [sorryAx]
+toolchain pin: leanprover/lean4:v4.35.0

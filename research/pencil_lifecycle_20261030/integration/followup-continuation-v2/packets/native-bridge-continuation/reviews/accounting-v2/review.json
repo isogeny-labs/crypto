@@ -1,0 +1,43 @@
+{
+  "schema": "research.readonly-checker-review/v1",
+  "positive_output_byte_identical": true,
+  "positive_sha256": "76ee1c5a15fb613cbe98e59042e9f6b202254dbeb43243f1e9e3778926ec8ebb",
+  "independent_controls": [
+    {
+      "case": "receipt_hash_mismatch",
+      "exit": 1,
+      "provenance_pass": false,
+      "errors": [
+        {
+          "receipt_manifest_hash_mismatch": true
+        }
+      ]
+    },
+    {
+      "case": "manifest_archive_hash_mismatch",
+      "exit": 1,
+      "provenance_pass": false,
+      "errors": [
+        {
+          "manifest_input_binding_failed": "archive.jsonl"
+        }
+      ]
+    }
+  ],
+  "originals_unchanged": true,
+  "original_hashes": {
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/archive.jsonl": "2ebe38227ee9b2bd8cfcc460dfa0766804e650a962972a2b5054cfb74c4ef54a",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/input-index.jsonl": "c70569a37dbf1310f9a0abf7faa329d69cb4353f45ecc9c982d553f872c75c13",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/run.stdout": "2588e09ad67de7433a256a9c3b19687796b568e0085af224902fb7961e939a48",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/run.stderr": "700a8955b4cbfd4ef5f956850e1405249a8c9244c0644588b24f0923a8ba8e43",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/receipt.json": "0df13877c7d7e167eb39c385bc174755768e5c2b3463fa15287a806aaf1ace8c",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/analysis.json": "7024ed785cade871769b90a8d983a7e1828ccc59289c0f1225091a7a98f33fef",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/run.py": "15b1bf61f5106d1ac8a40ea03fff0ae404a81377cd12e51928d812518b4639f6",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/src/pruned.rs": "e77db9e741da1d74b3dad97bf8f52c1128d4ac9e61eb0ea8dd62ddc923c21fcf",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/src/duplicate.rs": "33e74627a4b513b932e10b65f52fb5952ff8bc0473b3e0e76366689dc2494fd9",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/src/graph.rs": "805c404c708095d55339c564aad3830e95728d7ac23c6baf79ffe0c7ab12d650",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-duplicate-executed/pre-execution-manifest.json": "33aa7bd47e204c1b9f70c3ba2e58095975ae4c81ff08792a13ddb9953cf7aac4"
+  },
+  "scope": "recorded hash chain and required identities; not receipt authenticity or execution proof",
+  "scientific_execution": false
+}

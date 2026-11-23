@@ -1,0 +1,94 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.03,
+    0.1,
+    0.3,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m23-tm5197-1f85e9e1",
+      "log2_r": 22.00089368896064,
+      "arm": "c3",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.4239159999806106,
+        1.598642757445451,
+        2.0063385248634096,
+        3.171183574629008,
+        7.248141248808602
+      ],
+      "charged_sum": 70010.0,
+      "native_sum": 286361,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "factor_base_vec_bytes_floor_uncharged": 6624.0
+      }
+    },
+    {
+      "curve": "icv1-f2m23-tm5197-1f85e9e1",
+      "log2_r": 22.00089368896064,
+      "arm": "plan",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.2703991028537196,
+        1.4600852155127564,
+        1.9026861450505093,
+        3.167260229444088,
+        7.593269524821615
+      ],
+      "charged_sum": 62462.0,
+      "native_sum": 310878,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "factor_base_vec_bytes_floor_uncharged": 8832.0
+      }
+    },
+    {
+      "curve": "icv1-f2m23-tm5197-1f85e9e1",
+      "log2_r": 22.00089368896064,
+      "arm": "rho",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.5063738987504252,
+        0.5161712787868581,
+        0.5390318322052011,
+        0.6043476991147531,
+        0.832953233298185
+      ],
+      "charged_sum": 24897.0,
+      "native_sum": 16057,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m23-tm5197-1f85e9e1",
+      "a": "c3",
+      "b": "plan",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m23-tm5197-1f85e9e1",
+      "a": "c3",
+      "b": "rho",
+      "verdict": "rho < c3"
+    },
+    {
+      "curve": "icv1-f2m23-tm5197-1f85e9e1",
+      "a": "plan",
+      "b": "rho",
+      "verdict": "rho < plan"
+    }
+  ]
+}

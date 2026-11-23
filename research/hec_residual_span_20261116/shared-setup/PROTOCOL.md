@@ -1,0 +1,7 @@
+# Equal shared setup in all three completing solvers
+
+Prospective aftersetup/320modelgatepass. Same18publicworkloads andfixedseeds/anchors/budgets. Applyexactsamefastprepare toPencil/Folded/Expanded; preserveallotherarithmetic/walk/oracle/rows/LA/finalverify. Fastsetup outputs exactFB/z/a alreadyqualified. NoexclusivePencilcredit. PublicC,D,T,ell APIsunchanged; expectedscalar/referencecoeffs onlydriverchecks.
+
+For each54workload/arm pair runoriginal as reference outsidecountinterval; compare fastresult exacttuple(k,relations,trials,anchor,parameter) atfirstdeterminingprefix. Twofreshfastcalls=108countedsolves plus54referencecalls. Everyansweroriginalsourceverified, exactprefixmatches, repeatvectors/REDCidentities mustpass. Collectfull16dimension p/ellvectors ascountedprotocol; no fittedweights/nestedcounteraggregation/wall/novelty/primarycompletecostclaim. Commonfixturequalification/targetconstruction outsideeacharmequally; allfastsetupcostinsideeachsolve. No cache/adaptiveworkloads/retries. Preservepriorfailedwallrun.
+
+Compile/freezeallsource/counter/import/native/binary and320gatehashes,pushHEADbeforeonce-only180srun;clean/nooverwrite/Gitrawcustody whileS3down. Retainallfailures. PostrunRustsummary cancompareequallyoptimizedcontrols; improvementsagainstoldcontrolmustlabelexplicitly. Broad10xgoalremainsopenunlessfullobjectiveindependentlyproven, notjustsetupcomponent.

@@ -1,0 +1,85 @@
+{
+  "schema": "n83.factor-base-recovery-audit/v1",
+  "run_id": "n83-fb-variants-r39-20261031-r1",
+  "candidate_id": "spike39",
+  "source_index_sha256": "0baee0b147a21fb2921d3fb897598c5596ce3defdd61e6321984ad677f052b30",
+  "protocol_sha256": "7276bd557a5625c358a4d063366a415a0265c078ffb2eddaa74dee40174529b2",
+  "producer_index_files": 786,
+  "noncompressed_restored_and_hash_verified": 402,
+  "compressed_shards": 384,
+  "family_results": {
+    "koblitz": {
+      "shards": 128,
+      "candidate_count": 134217728,
+      "contiguous": true,
+      "liftable_x": 67102103,
+      "point_count": 134204205,
+      "compressed_bytes": 1363040706,
+      "shard_manifest_matches_index": true,
+      "all_candidate_receipts_verified": true,
+      "coordinate_bit": 39,
+      "reused_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    "binary": {
+      "shards": 128,
+      "candidate_count": 134217728,
+      "contiguous": true,
+      "liftable_x": 67114049,
+      "point_count": 134228097,
+      "compressed_bytes": 1363292324,
+      "shard_manifest_matches_index": true,
+      "all_candidate_receipts_verified": true,
+      "coordinate_bit": 39,
+      "reused_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    "prime": {
+      "shards": 128,
+      "candidate_count": 134217728,
+      "contiguous": true,
+      "liftable_x": 67108971,
+      "point_count": 134217942,
+      "compressed_bytes": 1849550223,
+      "shard_manifest_matches_index": true,
+      "all_candidate_receipts_verified": true,
+      "coordinate_bit": 39,
+      "reused_m": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    }
+  },
+  "metadata_inconsistencies": [
+    {
+      "path": "restored/FORMAT.json",
+      "observed_candidate_id": "spike40",
+      "observed_moved_bit": "moved coordinate bit, must40",
+      "conflict": "Stale descriptor; data/index.json, all family manifests and sampled shard headers bind spike39 and bit39. Original retained unchanged."
+    }
+  ],
+  "errors": [],
+  "valid": true
+}

@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T07:24:20Z",
+ "id": "PCC-20261112-412aba",
+ "kind": "statement",
+ "producer": {
+  "commit": "8487859d7aa48d13b0defe7928d915d67352c01f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-quartic-25/native.txt",
+    "sha256": "cddfe80285a1020ab3269e7c7d43aa9d4da3a9331153865e53c3155c8b729d97"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-quartic-25/clippy.txt",
+    "sha256": "879f09e596fc54a2501d5aa2b9b9250fbea3ee1d8ffdf6e77fad83ecdca9d5e0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-quartic-25/source.sha256",
+    "sha256": "d2d989e06780325c173f579868598534c524bd7efbb3b4aa1406f9f76aa9acfb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-quartic-25/ct28_quartic.rs",
+    "sha256": "e81aa8dcbe3189b0998154494a40ca4ebd436310efb8f5917a68b6d2272dde87"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/t2-quartic-25/ct30_t2_quartic.rs",
+    "sha256": "15888c888ffe4f969fad3d5f357072303a005aa1f7d3aa355746f69a9bf6c9d5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned T2 native construction25 strictClippy/one named test pass:single existing quartic reconstruction body with exact oldH2=N2R2hat adapter yields E109second N[97,93,7,0,97],Q[55,0,1],M[71,49,20,63],q(97,63),118finite/no rationalpoles;E113second N[74,0,81,42,64],Q[23,0,1],M[37,9,9,35],q(64,35),116finite/two poles(49,12)/(49,89). Exact polynomial identities/gcd/smoothness/separabledegree4 and all118 finite source inputs checked. Independent replay/global identification and regression of original three constructor tests remain separate;no timing result."
+}

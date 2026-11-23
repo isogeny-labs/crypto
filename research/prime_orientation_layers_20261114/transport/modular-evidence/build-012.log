@@ -1,0 +1,85 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.integer_bivariate_clearing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.Rep.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.geometric_denominator_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actual_geometric_denominator_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.numerator_divisible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.quotientResidue_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.reduceCleared_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.bivariate_coefficient_modular' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_denominator_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.actual_geometric_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.rowNumeratorRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.approximationRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_absolute_right_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.chartRootRep_den_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_right_modular_with_budget' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.finiteExtract_intCast' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_finite_right_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+../modular-evidence/draft-012.lean.txt:1032:34: warning: `Polynomial.finset_sum_coeff` has been deprecated: Use `Polynomial.finsetSum_coeff` instead
+
+Hint: Replace the deprecated name:
+  finset_̵s̵S̲um_coeff
+../modular-evidence/draft-012.lean.txt:1038:6: error: overloaded, errors 
+  Unknown constant `HasAntidiagonal.antidiagonal.fst_le`
+  
+  Unknown constant `Finset.antidiagonal.fst_le`
+../modular-evidence/draft-012.lean.txt:1038:50: error: overloaded, errors 
+  Unknown constant `HasAntidiagonal.antidiagonal.fst_le`
+  
+  Unknown constant `Finset.antidiagonal.fst_le`
+../modular-evidence/draft-012.lean.txt:1040:6: error: overloaded, errors 
+  Unknown constant `HasAntidiagonal.antidiagonal.snd_le`
+  
+  Unknown constant `Finset.antidiagonal.snd_le`
+../modular-evidence/draft-012.lean.txt:1040:50: error: overloaded, errors 
+  Unknown constant `HasAntidiagonal.antidiagonal.snd_le`
+  
+  Unknown constant `Finset.antidiagonal.snd_le`
+../modular-evidence/draft-012.lean.txt:1081:37: warning: This simp argument is unused:
+  Polynomial.coe_mapRingHom
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [fullEval, map_C, map_intCast]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-012.lean.txt:1081:63: warning: This simp argument is unused:
+  map_C
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [fullEval, Polynomial.coe_mapRingHom, map_intCast]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-012.lean.txt:1089:4: error: Function expected at
+  boxEval h z e
+but this term has type
+  Box (ZMod (2 ^ q)) h z
+
+Note: Expected a function because this term is being applied to the argument
+  b
+'OrientationCoefficientBox.boxEval_correct' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.modular_box_coefficient' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.multiplicationProducts_bound' depends on axioms: [propext, Classical.choice, Quot.sound]

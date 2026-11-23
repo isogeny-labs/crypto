@@ -1,0 +1,116 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-15T06:12:21+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/ic_gpu_rootfind_big_20261115/analyze.py",
+        "/tmp/claude-0/-home-user/648c3177-6621-55ff-b9d8-09ead07ab678/scratchpad/rbigres"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T06:12:21+00:00",
+      "wall_s": 0.087
+    }
+  ],
+  "commit": "7417c99292c9372269d2c7f9a6372fe79b72bad0",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T04:32:41+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0432Z-ic-gpu-rootfind-big",
+  "metrics": [
+    {
+      "baseline": 32.639,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_gpu_solve_s_r39_f2048",
+      "note": "complete m=3 solve, rootfind-subtract-gpu daemon cuda device-built table vs rootfind-subtract (1 thread), log2 r=39.3 (prime_explicit), |F_x|=2048: 11.1x; multi-threaded arm 7.74 s; identical S 567.3 (521x matched rho); CPU A/A within 16%",
+      "reference": 0.41737,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 2.929
+    },
+    {
+      "baseline": 30.217,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_gpu_relations_s_r39_f2048",
+      "note": "m=3 relation phase on the device vs 1 CPU thread (123x)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.245
+    },
+    {
+      "baseline": 2.058,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_device_table_setup_s_f2048",
+      "note": "oracle set-up at log2 r=39.3, |F_x|=2048: device-built probe table vs host-built (same session); worker create median 0.185 vs 0.780 s",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 1.285
+    },
+    {
+      "baseline": 7.809,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf2_gpu_vs_mt_solve_s_r31",
+      "note": "m=2 complete solve, GPU daemon vs multi-threaded CPU arm (host emulation on 96 threads, a weak baseline: ~5x one thread), log2 r=31.3: 24.2x",
+      "reference": 0.01449,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.323
+    },
+    {
+      "baseline": 567.3,
+      "better": "lower",
+      "n": 4,
+      "name": "ic_rf3_s_r39_f2048",
+      "note": "counted S identical on all arms; 521x the matched rho mean S",
+      "reference": 1.089,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 567.3
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 223485,
+      "path": "research/ic_gpu_rootfind_big_20261115/raw/out_rbig.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/41/4144d0495ca2696a942b51f736e7195aff3cce3dbbe58c774cea643533a33f3c",
+      "sha256": "4144d0495ca2696a942b51f736e7195aff3cce3dbbe58c774cea643533a33f3c",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_rootfind_big_20261115/REPORT.md",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_rootfind_big_20261115/fig_big.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-rootfind-big",
+  "status": "measured",
+  "summary": "rootfind-subtract-gpu on an A100, round 3: 240/240 records verified and replayed, 136 pair checks equal S. m=3 above 32 bits (prime_explicit 34-40 bits): GPU daemon with a device-built probe table solves 11.1x faster than one CPU thread and 2.6x than the multi-threaded arm at log2 r=39.3, |F_x|=2048 (relation phase 123x); at |F_x|=4096 the CPU pair table and LA bound the solve (0.97-2.72x). Device-built table cuts set-up by 0.46-0.77 s. m=2: GPU 4.1-24.2x the multi-threaded CPU arm (a weak baseline). S unchanged (m=3 107-521x rho). The pod job was launched without the benchrec wrapper; the recorded command is the analysis of its tarball.",
+  "validation": null
+}

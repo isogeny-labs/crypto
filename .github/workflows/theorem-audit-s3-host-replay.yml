@@ -1,0 +1,45 @@
+name: Independent S3 hosted continuation
+# Research runs on main, per AGENTS.md. This path change admits one frozen job.
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/theorem-audit-s3-host-replay.yml]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: independent-s3-hosted-continuation
+  cancel-in-progress: false
+
+jobs:
+  hosted-known-answer:
+    if: ${{ github.repository == 'isogeny-labs/crypto' && github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/workflows/theorem-audit-s3-host-replay.yml
+            /research/s3_host_replay_20261113/
+      - name: Check frozen continuation and record public event identity
+        run: node research/s3_host_replay_20261113/check-plan.mjs
+      - uses: actions/checkout@v4
+        with:
+          ref: e3658b4d6ffc6839e32bad1f5f732f796a2c8e4d
+          path: frozen-source
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/independent_s3_validator_20261109/
+            /research/theorem_census_20261109/native/
+            /research/theorem_census_20261109/evidence/semaev-native.jsonl
+            /.github/workflows/theorem-audit-independent-s3.yml
+      - name: Compile both languages and retain complete correctness outputs
+        run: |
+          bash research/s3_host_replay_20261113/run-hosted.sh \
+            "$GITHUB_WORKSPACE/frozen-source" "$RUNNER_TEMP/s3-hosted-continuation"
+      # Public logs only. No secrets, paid runner, cache or artifact upload.

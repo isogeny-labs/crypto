@@ -1,0 +1,86 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T20:45:07Z",
+ "id": "PCC-20261116-b30090",
+ "kind": "statement",
+ "producer": {
+  "commit": "9431595e13681eb8db08159df1b997a03911b026",
+  "model": "",
+  "session": "codex-20261116-nist-kummer-lift"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/GIAC_GF_PROTOCOL.md",
+    "sha256": "f8377527432ee042d1e5e93fc78380416210a90abdfcda88494464f8c4de1ec0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/GIAC_GF_GENERATOR_PROTOCOL.md",
+    "sha256": "0c4cfcb13442c9d9bda98c7db27f88e7ad16d1a294b3d6a878aecffe59f30f1a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/GIAC_GF_CAPABILITY.giac",
+    "sha256": "a26ca8f16e569609a9aa6758bdf7fbe3a58fdf2f3eda9b1aa041d9348e189629"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/GIAC_GF_GENERATOR.giac",
+    "sha256": "993fead5d4e73c057640b9fae44f519e704ce8964a7c807f2ed69670979e716f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/GIAC_GF_TYPES.giac",
+    "sha256": "68cbeb7740b0d3d7b198ecaec2990660546dfd6ec5706fde9995fc5793db61f5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/giac-gf-generator-v1/stdout.txt",
+    "sha256": "2982b2ea8bc94d9cfcba0dd6d863d26525283573928e0e82c0dc5fd11e1b7078"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/giac-gf-generator-v1/stderr.txt",
+    "sha256": "b7bb477774f8ec8b4218a9f8c8131b3acfaecd6053ffb43b1e8f8e7eb038d1c9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/giac-gf-v1/stdout.txt",
+    "sha256": "6bf5c5d5153e053875d9d6a26eb244a756f50cd5604cfbab2ee78719eeb8a0dc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/giac-gf-v1/stderr.txt",
+    "sha256": "3f977aa03b45d60c108b2252a3ec1f03cf82c2b014f7fc5bed6e67485454df81"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/giac-gf-types-v1/stderr.txt",
+    "sha256": "3f3904ee8ff302cdb00176bc21d30c44060608fa5fd793f2f2a6e366224d9170"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "A separate Giac GF(p,2) diagnostic at the exact P192 prime reports a typed nonconstant field generator,returns both prescribed roots for x+y-g-1,xy-g and a nonzero residual at0,0. The earlier explicit constructor left G(1) symbolic. These raw CLI checks are producer-unverified and do not independently qualify the solver or solve the actual inverse system."
+}

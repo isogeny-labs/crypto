@@ -1,0 +1,131 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261101-ecdlp-mechanism-falsifiers",
+  "title": "Falsify or delimit ten proposed ECDLP mechanism closures",
+  "created": "2026-11-01",
+  "authors": [
+    "Codex ECDLP mechanism-audit lane"
+  ],
+  "status": "draft",
+  "status_note": "Planning only: fifteen controlled experiments are specified, but no native campaign driver, independent verifier, frozen experiment.protocol/v1 record, source-matched image, lease, funded task, or scientific row exists. Split this umbrella into focused cards before ready promotion.",
+  "blocked_on": [
+    "note:split the umbrella into focused protocol-compatible cards and implement their native producers and independent verifiers",
+    "note:obtain and read the complete Lange-Winterhof COCOON 2002 chapter before freezing the interpolation cell",
+    "note:preflight each cell and freeze its controls, sample size, source identity, analysis, resource ceiling, stop rule and backend"
+  ],
+  "links": {
+    "lead": "research/ecdlp_mechanism_falsifiers_20261101/PLAN.md",
+    "notes": [
+      "research/prime_fourier_flatness_exp7_20261007/RESULT.md",
+      "research/prime_ksum_k5_20261028/README.md",
+      "research/prime_ksum_pooled_20261029/README.md",
+      "research/ic_prime_eth_leads_20261031/SYNTHESIS.md",
+      "problems/hashed-ecdl-tensor-backend.md",
+      "quantum_circuit_secp256k1/README.md",
+      "tools/twist-relations/README.md"
+    ],
+    "prs": []
+  },
+  "question": "Which supplied exact identities are false, which named implementations have a measured finite advantage, and which proposed closures remain unsupported after matched controls?",
+  "decision_value": "Verified counterexamples immediately correct literal identities; passing controls plus held-out measurements decide whether a named algorithm warrants a focused follow-up; bounded nulls delimit only their declared family, while proof-kind closure remains gated on an exact theorem or checked proof.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/ecdlp-mechanism-falsifiers",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--bin",
+        "ecdlp-mechanism-audit"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 8,
+    "ram_gb": 64,
+    "disk_gb": 100,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Provisional umbrella ceilings only, not a feasibility estimate. Each focused card must use a measured preflight and the smallest matching EKS placement; heterogeneous cells may not share these limits or one protocol."
+  },
+  "run": {
+    "argv": [
+      "target/release/ecdlp-mechanism-audit",
+      "--case",
+      "{case}",
+      "--out",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 86400
+  },
+  "shards": {
+    "count": 15,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {"name": "holant-semantics", "vars": {"case": "holant-semantics"}},
+        {"name": "holant-rank", "vars": {"case": "holant-rank"}},
+        {"name": "holant-rewrite", "vars": {"case": "holant-rewrite"}},
+        {"name": "ecode-lists", "vars": {"case": "ecode-lists"}},
+        {"name": "ecode-decoder", "vars": {"case": "ecode-decoder"}},
+        {"name": "ksum-bakeoff", "vars": {"case": "ksum-bakeoff"}},
+        {"name": "ksum-structure", "vars": {"case": "ksum-structure"}},
+        {"name": "algq-fixed", "vars": {"case": "algq-fixed"}},
+        {"name": "algq-adaptive", "vars": {"case": "algq-adaptive"}},
+        {"name": "interpolation-reproduction", "vars": {"case": "interpolation-reproduction"}},
+        {"name": "x1-cost", "vars": {"case": "x1-cost"}},
+        {"name": "zx-cost", "vars": {"case": "zx-cost"}},
+        {"name": "lift-compatibility", "vars": {"case": "lift-compatibility"}},
+        {"name": "ordering-ablation", "vars": {"case": "ordering-ablation"}},
+        {"name": "twist-sharing", "vars": {"case": "twist-sharing"}}
+      ],
+      "argv_note": "Proposed interface only. The umbrella is deliberately not runnable; focused cards must replace it before any producer is implemented or protocol frozen."
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "experiment.export/v1 plus case-specific exact certificates (proposed; not implemented)",
+    "verify": [],
+    "land": "research/ecdlp_mechanism_falsifiers_20261101/results"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261101-ecdlp-mechanism-falsifiers/shard-{k}"
+    ],
+    "ttl_s": 86400,
+    "env": {
+      "name": "ecdlp-mechanism-falsifiers-pending",
+      "recipe": "Draft only: focused cards must pin a merged source commit, tested native binaries, independent checkers, external-tool versions where used, and immutable image digests."
+    },
+    "exec": {
+      "cpus": 8,
+      "memory_mb": 65536,
+      "timeout_s": 86400,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261101-ecdlp-mechanism-falsifiers/shard-{k}"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unfunded design only; no queue reward, lab lease, cloud launch or spend is requested."
+    },
+    "notes": "No task has been posted. This umbrella records requested scope and must be split because its cases have different instruments, controls, measurement classes and resource envelopes."
+  },
+  "owner_hint": "ECDLP mechanism falsification and prime-field index-calculus research"
+}

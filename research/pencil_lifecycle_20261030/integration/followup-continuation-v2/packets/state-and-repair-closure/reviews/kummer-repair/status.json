@@ -1,0 +1,43 @@
+{
+  "schema": "pencil.formal-review/v1",
+  "machine": "passed",
+  "main": 10,
+  "producer_controls": 9,
+  "reviewer_controls": 5,
+  "readbacks": 24,
+  "publication_binding": [
+    {
+      "name": "Repair.lean",
+      "sha256": "bd11b235307b443fc00ec87edd70da8e674b8d0f1d6939debbf661de6849930a",
+      "matches_publication": true
+    },
+    {
+      "name": "RepairControls.lean",
+      "sha256": "0ea4ee9ef323ad89d1c5fdc3eb1b8173f54b6a5b9171e9b06d90b0498ec2d336",
+      "matches_publication": true
+    },
+    {
+      "name": "RepairReadback.lean",
+      "sha256": "f9712432bebac92fa8a7d54c650d72bc5ab280debb78d6d1845999ad37f2a972",
+      "matches_publication": true
+    },
+    {
+      "name": "walk-source.rs.txt",
+      "sha256": "0bd17210577ba0107c28082318c91b8acc6b375760ba30c3761199a6ffd72ff7",
+      "matches_publication": true
+    }
+  ],
+  "source_fidelity": "field row-fold correspondence checked; complete word and geometric bridge unproved",
+  "reviewer": "monic_review",
+  "producer": "portfolio_audit",
+  "prior_familiarity": true,
+  "source_first_plan": true,
+  "published_prospective_plan": true,
+  "scientific_execution": false,
+  "independent_kernel_binary_checker": false,
+  "failures": [
+    "reviewer collapse control simplifier left Fin conditional goal, corrected by finite cases",
+    "initial publication lookup omitted archival .txt suffix",
+    "initial replay helper returned zero after recorded failing module; module native exit1 retained, final six module receipts all zero"
+  ]
+}

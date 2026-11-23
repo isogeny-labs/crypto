@@ -1,0 +1,111 @@
+{
+  "observed_utc": "2026-10-31T03:27:32Z",
+  "overview": {
+    "namespace": "isolab",
+    "jobs_observed": 49,
+    "pencil_matches": [],
+    "caller_role_exposed": false,
+    "recovery_system_coverage": false
+  },
+  "recovery_status_exact_request_error": {
+    "content": [
+      {
+        "type": "text",
+        "text": "isolab-eks-recovery exited exit status: 1: isolab-eks-recovery: unknown field `memory`, expected one of `schema`, `run_name`, `deadline_unix_seconds`, `build`, `runtime_image_uri`, `spec`, `instance_type`, `checkpoint_interval_seconds`, `max_restores` at line 1 column 424\n. For submission timeouts, check job_name before retrying."
+      }
+    ],
+    "isError": true
+  },
+  "request": {
+    "build": {
+      "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:13f27597322fced9230635cedc5a4e228daf2fb951f77652edbbcab17e674c1b",
+      "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3"
+    },
+    "checkpoint_interval_seconds": 300,
+    "deadline_unix_seconds": 1793347824,
+    "instance_type": "c8a.2xlarge",
+    "max_restores": 1,
+    "memory": "8Gi",
+    "run_name": "pencil-p186379-20261030-c1",
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:e82333a5e77a03270335589848783e1d0cf55e42c7c2f5f35732ee8ba54523fd",
+    "schema": "isolab.eks.resumable/v1",
+    "spec": {
+      "arms": [
+        {
+          "method": {
+            "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+            "params": {
+              "matrix_coefficient_cap": "25000000",
+              "small_denominator": "8"
+            }
+          },
+          "name": "pencil",
+          "role": "candidate"
+        },
+        {
+          "method": {
+            "id": "rho.three_leads_negation_v1",
+            "params": {
+              "trial_cap": "18668300"
+            }
+          },
+          "name": "rho",
+          "role": "reference"
+        },
+        {
+          "method": {
+            "id": "rho.three_leads_negation_v1",
+            "params": {
+              "trial_cap": "18668300"
+            }
+          },
+          "name": "rho_AA",
+          "role": "control"
+        }
+      ],
+      "description": "Prepared specification; execution requires a frozen experiment protocol and admission. Public synthetic archived targets; fixed denominator8 selected before symbolic cohort observations. Cold/online clocks, failures and memory retained; no full-price GAE claim.",
+      "label": "pencil-symbolic-gate-p186379-target0",
+      "measurement": {
+        "algorithm_seed_round": "measured_index",
+        "isolation_required": "L2",
+        "order": "shuffle",
+        "rounds": 5,
+        "seed": 2026101801,
+        "timeout_seconds": 3600,
+        "warmup": 1
+      },
+      "schema": "ecbench.spec/v1",
+      "workloads": {
+        "curves": [
+          {
+            "a": 32257112622,
+            "b": 13592517110,
+            "family": "scholten",
+            "group_order": 34737000016,
+            "gx": 9903146036,
+            "gy": 25331215426,
+            "kind": "three_leads",
+            "modulus": 1,
+            "n": 2,
+            "p": 186379,
+            "parameter": 0,
+            "r": 2171062501
+          }
+        ],
+        "target_seed": 202610181260,
+        "targets_per_curve": 1
+      }
+    }
+  },
+  "provider_tools": [
+    {
+      "name": "mcp__isolab_eks__isolab_k8s_overview",
+      "description": "Run trusted lab commands as Kubernetes Jobs in the isolab namespace on CPU Spot nodes. Start with isolab_k8s_overview. Submit with a unique job_name; on timeout check that name before retrying. Poll isolab_k8s_status for completion, then read logs and results. Commands receive temporary /work/results and ISOLAB_RESULTS_URI; they must upload outputs before exiting. Spot interruptions can lose unuploaded data. These VM pods do not establish legacy Iso Lab strict fidelity. No cryptographic performance claim follows from job success.\n\nList lab Jobs and their current Kubernetes state. Workers scale from zero when Jobs arrive.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__isolab_eks__isolab_k8s_overview(args: {}): Promise<CallToolResult>; };\n```"
+    },
+    {
+      "name": "mcp__isolab_eks__isolab_k8s_recovery_status",
+      "description": "Run trusted lab commands as Kubernetes Jobs in the isolab namespace on CPU Spot nodes. Start with isolab_k8s_overview. Submit with a unique job_name; on timeout check that name before retrying. Poll isolab_k8s_status for completion, then read logs and results. Commands receive temporary /work/results and ISOLAB_RESULTS_URI; they must upload outputs before exiting. Spot interruptions can lose unuploaded data. These VM pods do not establish legacy Iso Lab strict fidelity. No cryptographic performance claim follows from job success.\n\nRead the durable S3 state of the original resumable request, binding its source, image, spec and deadline. A pending receipt is not success. Succeeded means the controller verified computation and a distinct fresh L2/replay/A-A/S3 epoch.\n\nexec tool declaration:\n```ts\ndeclare const tools: { mcp__isolab_eks__isolab_k8s_recovery_status(args: { request: {\n  build: { ecbench_sha256: string; image_uri: string; source_revision: string; };\n  checkpoint_interval_seconds: number;\n  // Original absolute UTC deadline; never reset by retries. New runs need 180..86400 seconds.\n  deadline_unix_seconds: number;\n  instance_type: \"c8a.2xlarge\";\n  max_restores: number;\n  run_name: string;\n  // Trusted recovery layer over the build image. The native binary hash must match build.ecbench_sha256.\n  runtime_image_uri: string;\n  schema: \"isolab.eks.resumable/v1\";\n  // Original ecbench.spec/v1 requiring L2, warmup >=1, rounds >=5, reference and matching A/A. Native controller and ecbench apply semantic validation.\n  spec: { [key: string]: unknown; };\n}; }): Promise<CallToolResult>; };\n```"
+    }
+  ]
+}

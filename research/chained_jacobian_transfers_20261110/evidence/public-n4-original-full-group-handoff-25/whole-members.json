@@ -1,0 +1,3827 @@
+{
+  "all_declared_whole_roots": [
+    "ct89-original-full-evaluator-compiled02-publication-01",
+    "ct89-original-full-evaluator-corrected04-publication-01",
+    "ct89-original-full-group-result01-publication-01",
+    "ct90-checkpoint18-dispatch-01",
+    "ct90-checkpoint19-dispatch-01",
+    "ct90-current-original-checkpoint-18",
+    "ct90-current-original-checkpoint-18-import-failed01",
+    "ct90-current-original-checkpoint-19",
+    "ct90-original-full-chain-proof-01",
+    "ct90-original-full-chain-proof-source-01",
+    "ct90-original-full-evaluator-build-01",
+    "ct90-original-full-evaluator-build-02",
+    "ct90-original-full-evaluator-build-03",
+    "ct90-original-full-evaluator-native-01",
+    "ct90-original-full-evaluator-native-02",
+    "ct90-original-full-evaluator-native-supervisor-01",
+    "ct90-original-full-evaluator-native-supervisor-02",
+    "ct90-original-full-prime-recovery-proof-01",
+    "ct90-original-full-result-report-01",
+    "ct90-prime-descent-primary-review-01",
+    "ct90-root-full-result-mirror-publication-01",
+    "ct91-unheld-tool-pycache-cleanup-11"
+  ],
+  "all_nonsecret_scientific_members_no_filter": true,
+  "only_private_transport_exclusions": [
+    {
+      "local_path": "/workspace/scratch/private-ct90-checkpoint18-download-api.json",
+      "bytes": 2069,
+      "reason": "private original-checkpoint transport download metadata retained locally"
+    },
+    {
+      "local_path": "/workspace/scratch/private-ct90-checkpoint19-download-api.json",
+      "bytes": 2069,
+      "reason": "private original-checkpoint transport download metadata retained locally"
+    }
+  ],
+  "all_members_roundtripped": true,
+  "members": [
+    {
+      "path": "actual-consumer-proof-source/OriginalFullChain.lean",
+      "bytes": 13197,
+      "sha256": "16c66886a7632cbfadae5072995dadf2280abf4bc288408a0b6d683ad5c55b3c",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/original-full-evaluator-01/lean/OriginalFullChain.lean",
+      "held_original": true
+    },
+    {
+      "path": "actual-consumer-proof-source/PROOF_MAP.md",
+      "bytes": 3179,
+      "sha256": "36de4f410c9b11628f7c2954dfb03c3f5594700448801e9ecd40d37474f5e38c",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/original-full-evaluator-01/PROOF_MAP.md",
+      "held_original": true
+    },
+    {
+      "path": "actual-consumer-proof-source/PrimeRecovery.lean",
+      "bytes": 1441,
+      "sha256": "ab8f1c6fcd714f512f4b17ccd9af1952778fc5c88306bec75a63de411f3a4d81",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/original-full-evaluator-01/lean/PrimeRecovery.lean",
+      "held_original": true
+    },
+    {
+      "path": "actual-producer-proof-stage/OriginalFullChain.lean",
+      "bytes": 13197,
+      "sha256": "16c66886a7632cbfadae5072995dadf2280abf4bc288408a0b6d683ad5c55b3c",
+      "local_original": "/workspace/crypto/target/ct90-original-full-chain-proof-stage-01/OriginalFullChain.lean",
+      "held_original": true
+    },
+    {
+      "path": "actual-producer-proof-stage/PrimeRecovery.lean",
+      "bytes": 1441,
+      "sha256": "ab8f1c6fcd714f512f4b17ccd9af1952778fc5c88306bec75a63de411f3a4d81",
+      "local_original": "/workspace/crypto/target/ct90-original-full-prime-recovery-proof-stage-01/PrimeRecovery.lean",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint18-artifacts-api.json",
+      "bytes": 161,
+      "sha256": "c3d575098a5138bf89dbf56b7529efa03609f2b319900cff0771df212f13b177",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-artifacts-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint18-artifacts-final-api.json",
+      "bytes": 1098,
+      "sha256": "43a8ef2e90ec85c0a8ae45e4f5e0cc696ac25fc4159cfca3bae0348466eed670",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-artifacts-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint18-import-caller-01.txt",
+      "bytes": 982,
+      "sha256": "aea30c72cf7e118361fdfc3af8a0df2628f508553db3ebb7500097aa0b82666c",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-import-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint18-import-caller-02.txt",
+      "bytes": 219,
+      "sha256": "784acd6de9f581eec213c9e7cf48fbb8a82f0981b66f82909048e6998d8e2085",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-import-caller-02.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint18-importer-materialization-failure-01.txt",
+      "bytes": 252,
+      "sha256": "c50d56a01c49ba3495c44657f9ad4b1b2d591b4fecfde46c05138f81d0fd7f9c",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-importer-materialization-failure-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint18-jobs-api.json",
+      "bytes": 2154,
+      "sha256": "4573c4f90b4b10834a041a4fdbd4d61dab55ff587afd3da9ed151afbb4cace35",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-jobs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint18-jobs-final-api.json",
+      "bytes": 2339,
+      "sha256": "f012c888aa1bb52dcc46281c5f57504b30f7c3b517b010d96f4644540d2af4aa",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-jobs-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint18-whole-log-final-api.json",
+      "bytes": 236283,
+      "sha256": "10d8ebefe1271c3ae66f5d3fb626a7145750a1b6e6b480e93a1388bb6e7ed455",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-whole-log-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint19-artifacts-final-api.json",
+      "bytes": 1098,
+      "sha256": "fc485e3916da3580b0b00e1da6e0a0a4a3f86757e1dcdd8ced06157e2b36ebe2",
+      "local_original": "/workspace/scratch/ct90-checkpoint19-artifacts-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint19-import-caller-01.txt",
+      "bytes": 219,
+      "sha256": "536f02fd2ab640c4eb8017a04632c6cf6b6898b7b432ceac839fb5448457a5c4",
+      "local_original": "/workspace/scratch/ct90-checkpoint19-import-caller-01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint19-jobs-final-api.json",
+      "bytes": 2339,
+      "sha256": "651011d3bf16e99cf09fd23a33a5da95f8c7c8de08dd92375c19aaed6166e7b0",
+      "local_original": "/workspace/scratch/ct90-checkpoint19-jobs-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-checkpoint19-whole-log-final-api.json",
+      "bytes": 236101,
+      "sha256": "30e54425afbda759854cfc83fe33cc0ba14eb92a2f85f45017d09122a24fed5f",
+      "local_original": "/workspace/scratch/ct90-checkpoint19-whole-log-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-closed-root-compiler-link-cache-cleanup-10.json.xz",
+      "bytes": 1848,
+      "sha256": "2b827eb9a3d910639b4b1755cb336b12fc8e7672142b054f504936d022b98a9a",
+      "local_original": "/workspace/scratch/ct90-closed-root-compiler-link-cache-cleanup-10.json.xz",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-chain-proof01-record-caller.txt",
+      "bytes": 2007,
+      "sha256": "6f1ee93b44b899ca0ebd0c4c0e3c765a3dafcd7dc4f4ebdbe8b3d53fd18e31c3",
+      "local_original": "/workspace/scratch/ct90-full-chain-proof01-record-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-chain-proof01.claim.txt",
+      "bytes": 36,
+      "sha256": "a3c1d411ea7456e2a5e7eed0120a1188aab8c3349f6e2323f870cdaf99ee4f1d",
+      "local_original": "/workspace/scratch/ct90-full-chain-proof01.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-compiled01-governance-caller.txt",
+      "bytes": 5186,
+      "sha256": "306605c575699941b42005f78e64fc7007c0504fb13d072291dbb710d64547e9",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-compiled01-governance-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-compiled01.claim.txt",
+      "bytes": 36,
+      "sha256": "14af2d5c3ae47a8dade12f94c3a29f6da44ce6782819b9e61f62bebd435a2e4e",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-compiled01.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-compiled02-governance-caller.txt",
+      "bytes": 1936,
+      "sha256": "6302ba6a8809bb03224876b0d3e02a3289e14bc16e84c50971e4785d115d538a",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-compiled02-governance-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-compiled02.claim.txt",
+      "bytes": 36,
+      "sha256": "8863fc6006a7e809084f8575365b1b812dfdd2cc5897ce726ec6352b767a923f",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-compiled02.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-compiled03-record-caller.txt",
+      "bytes": 36,
+      "sha256": "4cea338eb6c1be1940477fb7a681d40cb000db65d2c71a940481842a30665441",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-compiled03-record-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-compiled03.claim.txt",
+      "bytes": 36,
+      "sha256": "4cea338eb6c1be1940477fb7a681d40cb000db65d2c71a940481842a30665441",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-compiled03.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-corrected03-governance-caller.txt",
+      "bytes": 4839,
+      "sha256": "11629d4ac487b90f6d118ec0663eba85d112cc216071a0fa8291bbd3c9ed99dc",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-corrected03-governance-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-corrected04-governance-caller.txt",
+      "bytes": 1936,
+      "sha256": "02b57efd9138b43bbbba7c827b71a4ccbd5bbe0cd1c559fd949be931e9e3aef7",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-corrected04-governance-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-native-supervisor-01.sh",
+      "bytes": 715,
+      "sha256": "560feadc7335be4559d6a7a1a42322c34c97fb5a1892a67dcff7948eb49381e8",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-native-supervisor-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-evaluator-native-supervisor-02.sh",
+      "bytes": 715,
+      "sha256": "45b9c174d8b59ede28848dc2e795a7fae2a2985bf8075398bf0ce613734c323f",
+      "local_original": "/workspace/scratch/ct90-full-evaluator-native-supervisor-02.sh",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-group-result01-governance-caller.txt",
+      "bytes": 1936,
+      "sha256": "d034c8f6c75e01b67764f3015b8c6fcb0c9ab8a9ef1cfe674740886c1d39fc04",
+      "local_original": "/workspace/scratch/ct90-full-group-result01-governance-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-native-failure01.claim.txt",
+      "bytes": 36,
+      "sha256": "b38930076f89ccf703a9beae84cd695a9ec6860dd17f1f7c8b80116c864d9f60",
+      "local_original": "/workspace/scratch/ct90-full-native-failure01.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-native02-record-caller.txt",
+      "bytes": 36,
+      "sha256": "6ea8a084b69beb9d64e11741b29f3310f41316f4238a0c57d5e8b808d67a1a7a",
+      "local_original": "/workspace/scratch/ct90-full-native02-record-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-native02.claim.txt",
+      "bytes": 36,
+      "sha256": "6ea8a084b69beb9d64e11741b29f3310f41316f4238a0c57d5e8b808d67a1a7a",
+      "local_original": "/workspace/scratch/ct90-full-native02.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-prime-recovery-proof01.claim.txt",
+      "bytes": 36,
+      "sha256": "31ec40479f89d83c364550aad71644304bc64ad4c90c9c79bbeff53680bfbb9a",
+      "local_original": "/workspace/scratch/ct90-full-prime-recovery-proof01.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-result-report01-record-caller.txt",
+      "bytes": 36,
+      "sha256": "e488096d584986019f1bebccf9f680699848fd59d371c263f5ea4c40ec905f32",
+      "local_original": "/workspace/scratch/ct90-full-result-report01-record-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-full-result-report01.claim.txt",
+      "bytes": 36,
+      "sha256": "e488096d584986019f1bebccf9f680699848fd59d371c263f5ea4c40ec905f32",
+      "local_original": "/workspace/scratch/ct90-full-result-report01.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-native02-binaries-closed-dedup-01.json",
+      "bytes": 756,
+      "sha256": "d5e29b7118e994320624b1e7708c80d29a7d08a34a8cb55e6de09ef20772e1d8",
+      "local_original": "/workspace/scratch/ct90-native02-binaries-closed-dedup-01.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-native02-closed-dedup-01.json",
+      "bytes": 358,
+      "sha256": "48ee7a4e6bbbeb7b5bace3151fefdf281efff467a024430251fd03ada28fbb0a",
+      "local_original": "/workspace/scratch/ct90-native02-closed-dedup-01.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-build-01-caller.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01-caller.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-build-01-caller.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-build-02-caller.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02-caller.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-build-02-caller.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-build-03-caller.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03-caller.exit",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-build-03-caller.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-native-supervisor-01-caller.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-01-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-native-supervisor-01.pid",
+      "bytes": 7,
+      "sha256": "5ee7a2eee0708291602ff866470611a405c2f40347fd97843808188318ba778c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-01.pid",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-native-supervisor-02-caller.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-02-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-original-full-evaluator-native-supervisor-02.pid",
+      "bytes": 7,
+      "sha256": "d2b5c0e40b913cfa65f53745c36e4952469d10bba4fe7195ca7f8dfab600555d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-02.pid",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-prime-descent-primary-open-01.json",
+      "bytes": 8075,
+      "sha256": "9c7026153873dc440ce280f4dba776aa57d187215dcd80384c001365c96d02a1",
+      "local_original": "/workspace/scratch/ct90-prime-descent-primary-open-01.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-prime-descent-primary-open-02.json",
+      "bytes": 4182,
+      "sha256": "0a8924a205c1eb9bf806902af1916f1644592d46cc2119be17fe8b377dffbdd1",
+      "local_original": "/workspace/scratch/ct90-prime-descent-primary-open-02.json",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-prime-recovery-proof01-record-caller.txt",
+      "bytes": 281,
+      "sha256": "982e1a0a3981f10f05123ecf3ffac616d5a099fbbf511de22e1977405ab245fc",
+      "local_original": "/workspace/scratch/ct90-prime-recovery-proof01-record-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-render-original-full-result-01.typ",
+      "bytes": 7728,
+      "sha256": "7adb7ff9f598dd7f393d38c6d570c49024051e1b0cb4c9ca7bef85477c0666aa",
+      "local_original": "/workspace/scratch/ct90-render-original-full-result-01.typ",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-root-full-result-governance-caller.txt",
+      "bytes": 162,
+      "sha256": "a058ac45e6602a541716f68754b4e57e1ff1c3f9a60b1ff80722dbaf31d69758",
+      "local_original": "/workspace/scratch/ct90-root-full-result-governance-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-root-full-result-mirror-01.paths0",
+      "bytes": 5694,
+      "sha256": "a72f00677760ff3412a8423d1a895d72ebcef6f2b065e2ba1d3685af4d3656e4",
+      "local_original": "/workspace/scratch/ct90-root-full-result-mirror-01.paths0",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-root-full-result-mirror-publication-caller01.txt",
+      "bytes": 104,
+      "sha256": "3ef1ff163c8e2e9c98140d8ced49b83df5c1932f3f7d6c6f701f0bcddaef3761",
+      "local_original": "/workspace/scratch/ct90-root-full-result-mirror-publication-caller01.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90-root-full-result-mirror.claim.txt",
+      "bytes": 36,
+      "sha256": "0d58466514e34440bb9760351a801b6d6d06cff9fe96500d032c6fd03506ce54",
+      "local_original": "/workspace/scratch/ct90-root-full-result-mirror.claim.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_checkpoint_root_full_result_01.py",
+      "bytes": 5250,
+      "sha256": "649eaeb9874246ebddbb97621e88beca0bba891dc59e1b69495c71f7818e538b",
+      "local_original": "/workspace/scratch/ct90_checkpoint_root_full_result_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_cleanup_closed_root_compiler_link_cache_10.py",
+      "bytes": 3610,
+      "sha256": "11a7117e4d266d35e484d21d064cf2c0584bb0e1afa805d252c944235531cd8d",
+      "local_original": "/workspace/scratch/ct90_cleanup_closed_root_compiler_link_cache_10.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_commit_full_evaluator_01.py",
+      "bytes": 21144,
+      "sha256": "9713bad8a5c0892de86e5240633d4635e4b86b80adfde22f6d309de429d0c61a",
+      "local_original": "/workspace/scratch/ct90_commit_full_evaluator_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_import_original_checkpoint_18.py",
+      "bytes": 5937,
+      "sha256": "b4bd305c3515b33af520a75378058b03b61a615fb90a06da3d46e5ace99d1280",
+      "local_original": "/workspace/scratch/ct90_import_original_checkpoint_18.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_import_original_checkpoint_18_02.py",
+      "bytes": 5931,
+      "sha256": "1d3841b7c0c068298fde45b10a8cee09ce8ef87660084eefb9e574b65ead4a4e",
+      "local_original": "/workspace/scratch/ct90_import_original_checkpoint_18_02.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_import_original_checkpoint_19.py",
+      "bytes": 5931,
+      "sha256": "3a68f4b6edd55c91143a0f62fcc24cd2d23900b3f1dfe09e606f680c02feeffd",
+      "local_original": "/workspace/scratch/ct90_import_original_checkpoint_19.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_mirror_full_result_root_01.py",
+      "bytes": 6464,
+      "sha256": "4ad8f9d288837b374fd29c16dd39b48c4922ec0b8640a51bfc546c6039ea57f2",
+      "local_original": "/workspace/scratch/ct90_mirror_full_result_root_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_prepare_full_chain_proof_01.py",
+      "bytes": 2996,
+      "sha256": "f1ccfa7cf5d8986491f9262bd1368d657febc6d8c8d858c10e4a21f5fcbfd7a9",
+      "local_original": "/workspace/scratch/ct90_prepare_full_chain_proof_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_record_full_chain_proof_01.py",
+      "bytes": 4741,
+      "sha256": "b2e93e589b5a008bafdba2d891dcbf42a615c557d2d9ed7c40a74cdb8c6dc3b9",
+      "local_original": "/workspace/scratch/ct90_record_full_chain_proof_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_record_full_evaluator_compiled_01.py",
+      "bytes": 6646,
+      "sha256": "d24bc8e8efbe399b97f5ee56f71759eb95250a0f0b22dbfce274beb48a6143e1",
+      "local_original": "/workspace/scratch/ct90_record_full_evaluator_compiled_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_record_full_evaluator_compiled_02.py",
+      "bytes": 6702,
+      "sha256": "895c07c3d597fa53a25573b292f836a56be0b78a7819bbb9e33244ebaa14470f",
+      "local_original": "/workspace/scratch/ct90_record_full_evaluator_compiled_02.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_record_full_evaluator_compiled_03.py",
+      "bytes": 6894,
+      "sha256": "aa00360a054dcfcc7015533cdfcc290d9bf203945c6a7bd0d994146258561a6b",
+      "local_original": "/workspace/scratch/ct90_record_full_evaluator_compiled_03.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_record_full_native_02.py",
+      "bytes": 8765,
+      "sha256": "0575e6ab524da47e03e59f6f4862e8f14010bef26375d3e3ff68de07e8850800",
+      "local_original": "/workspace/scratch/ct90_record_full_native_02.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_record_full_native_failure_01.py",
+      "bytes": 3856,
+      "sha256": "cc1d8940f8d2266e8e3814c317f1fe8af50d106f04f45475711decba9d0298be",
+      "local_original": "/workspace/scratch/ct90_record_full_native_failure_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_record_full_result_report_01.py",
+      "bytes": 10412,
+      "sha256": "cc0c6276a53fcb1416c231c9a3d342e0d6b77872e93d4d7003f912691f0d3263",
+      "local_original": "/workspace/scratch/ct90_record_full_result_report_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct90_record_prime_recovery_proof_01.py",
+      "bytes": 3603,
+      "sha256": "c2ee07493241585f1639b55649625c914d206505568bd03ec27b74720ca360dc",
+      "local_original": "/workspace/scratch/ct90_record_prime_recovery_proof_01.py",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct91-pycache-cleanup11-caller.txt",
+      "bytes": 1075,
+      "sha256": "1051c71bcae1de0c21bbe0c9a407b2d9a66ca0391ad89e48cc3aa9e3201c9794",
+      "local_original": "/workspace/scratch/ct91-pycache-cleanup11-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "closed-controls/ct91_cleanup_unheld_tool_pycache_11.py",
+      "bytes": 4128,
+      "sha256": "2420f62e608c4d340a0a71d219ecde87a753e5fdcefafa287af80e18edabadde",
+      "local_original": "/workspace/scratch/ct91_cleanup_unheld_tool_pycache_11.py",
+      "held_original": true
+    },
+    {
+      "path": "consumer-complete-report/original-full-group-result-01/REPORT.md",
+      "bytes": 2376,
+      "sha256": "92430b94cb3b1a9493cccf352938db3153f599c9e2b3c43f570faff435017569",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/original-full-group-result-01/REPORT.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-complete-report/original-full-group-result-01/original-record-command.py",
+      "bytes": 10412,
+      "sha256": "cc0c6276a53fcb1416c231c9a3d342e0d6b77872e93d4d7003f912691f0d3263",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/original-full-group-result-01/original-record-command.py",
+      "held_original": true
+    },
+    {
+      "path": "consumer-complete-report/original-full-group-result-01/original-render.py",
+      "bytes": 146,
+      "sha256": "7da35a883847c7a35fb0a1fd3cd74a2b87a7d0d80fa4247ffc4c6036b7d61b96",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/original-full-group-result-01/original-render.py",
+      "held_original": true
+    },
+    {
+      "path": "consumer-complete-report/original-full-group-result-01/render-inputs.json",
+      "bytes": 438798,
+      "sha256": "70828f9f619936b804ad48ad4842ef5cb54a83201fdd4991525611f8dac8a77f",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/original-full-group-result-01/render-inputs.json",
+      "held_original": true
+    },
+    {
+      "path": "consumer-complete-report/original-full-group-result-01/report.pdf",
+      "bytes": 58175,
+      "sha256": "5030bbad838d012d9c95b40f82b5cd3f114d4f24f4fd56587cfe4bd313e88750",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/original-full-group-result-01/report.pdf",
+      "held_original": true
+    },
+    {
+      "path": "consumer-complete-report/original-full-group-result-01/report.typ",
+      "bytes": 7728,
+      "sha256": "7adb7ff9f598dd7f393d38c6d570c49024051e1b0cb4c9ca7bef85477c0666aa",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/original-full-group-result-01/report.typ",
+      "held_original": true
+    },
+    {
+      "path": "consumer-complete-report/original-full-group-result-01/visual-inspection.json",
+      "bytes": 885,
+      "sha256": "8f56923fd870b05c8828f802d531babdff8421642b701cc72ddb8e102c3a3905",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/reports/original-full-group-result-01/visual-inspection.json",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/.resume/RESUME.md",
+      "bytes": 289050,
+      "sha256": "496d121334a4a7834c6bbd5fdcb300c8dac659ceafbec1f91fd22c2f9520f0c7",
+      "local_original": "/workspace/cryptanalysis/.resume/RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/docs/session-logs/2026-11-15.md",
+      "bytes": 87128,
+      "sha256": "dd316469aaa037f7a4c12afdae3d82209641a4d8cfc8ce95fd91adca4032c803",
+      "local_original": "/workspace/cryptanalysis/docs/session-logs/2026-11-15.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/experiments/chained-transfer-public-target/CHECKPOINT.md",
+      "bytes": 254540,
+      "sha256": "0c4191c5a33ca9c67bceefe79147b3a8b23442b45682c785da5dd70408dbb142",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/CHECKPOINT.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/experiments/chained-transfer-public-target/RESEARCH_QUEUE.md",
+      "bytes": 244381,
+      "sha256": "eb6c412045c1dec2412b09b2f43f2f143d943e4f31dcae66bcb28d5e914d0d7f",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/RESEARCH_QUEUE.md",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/experiments/chained-transfer-public-target/evidence/unheld-tool-pycache-cleanup-11/native02-closed-binary-dedup.json",
+      "bytes": 756,
+      "sha256": "d5e29b7118e994320624b1e7708c80d29a7d08a34a8cb55e6de09ef20772e1d8",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/evidence/unheld-tool-pycache-cleanup-11/native02-closed-binary-dedup.json",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/experiments/chained-transfer-public-target/evidence/unheld-tool-pycache-cleanup-11/original-command.py",
+      "bytes": 4128,
+      "sha256": "2420f62e608c4d340a0a71d219ecde87a753e5fdcefafa287af80e18edabadde",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/evidence/unheld-tool-pycache-cleanup-11/original-command.py",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/experiments/chained-transfer-public-target/evidence/unheld-tool-pycache-cleanup-11/outcome.json",
+      "bytes": 1119,
+      "sha256": "935fdaec2d9f54635d134333017ccac6dfc4087f68b7f76796b61548cdfcac33",
+      "local_original": "/workspace/cryptanalysis/experiments/chained-transfer-public-target/evidence/unheld-tool-pycache-cleanup-11/outcome.json",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/pcc/claims/PCC-20261115-cf5550.json",
+      "bytes": 1818,
+      "sha256": "be2003bfbcfc8a98d3e5ec76736019dd0123b694833c122a591c0e739e6bbb3c",
+      "local_original": "/workspace/cryptanalysis/pcc/claims/PCC-20261115-cf5550.json",
+      "held_original": true
+    },
+    {
+      "path": "consumer-pending/pcc/ledger.jsonl",
+      "bytes": 456087,
+      "sha256": "a7486373bced9ecf5abf8758a610c458032ff0936d9a099eafa7fda46e4585c9",
+      "local_original": "/workspace/cryptanalysis/pcc/ledger.jsonl",
+      "held_original": true
+    },
+    {
+      "path": "control/genuine24-payload-reference.json",
+      "bytes": 2964,
+      "sha256": "52e04cf935b44b7aa5fb676e78f85f7c44ad86d943d128c5481babcf6a759fda",
+      "local_original": "/workspace/scratch/ct91-whole-closed-science-handoff-25/genuine24-payload-reference.json",
+      "held_original": true
+    },
+    {
+      "path": "control/original-genuine24-archive-parts.json",
+      "bytes": 2724,
+      "sha256": "d966f4e5e46c4cbe9b829eb4695a9f253c4d6f52c950202f111f8e70ca0e1a1e",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/archive-parts.json",
+      "held_original": true
+    },
+    {
+      "path": "control/original-genuine24-manifest.json",
+      "bytes": 918,
+      "sha256": "1db2098ae470249edca57354e209dd012a5601755d80e908eb84396e6edd01af",
+      "local_original": "/workspace/crypto/research/chained_jacobian_transfers_20261110/evidence/public-n4-original-prime-kernel-geometry-handoff-24/.artifacts.json",
+      "held_original": true
+    },
+    {
+      "path": "control/original-prepare-command.py",
+      "bytes": 23006,
+      "sha256": "57544963662ea095a64bd4e72fd6ace358b7e2768590e31075c1098765f55b70",
+      "local_original": "/workspace/scratch/ct91_prepare_handoff25_01.py",
+      "held_original": false
+    },
+    {
+      "path": "control/previous24-inputs.json",
+      "bytes": 9838812,
+      "sha256": "92717383a48d23ed70a32796e6d50707629c9bcbfc6090633d9a71a5262f579f",
+      "local_original": "/workspace/scratch/ct89-whole-closed-science-handoff-24/current-inputs.json",
+      "held_original": true
+    },
+    {
+      "path": "control/privacy-exclusions.json",
+      "bytes": 556,
+      "sha256": "5f5d5aaf8818f655c8145e19dcff65f75aef0acb3003083699b1f73f65d71f07",
+      "local_original": "/workspace/scratch/ct91-whole-closed-science-handoff-25/privacy-exclusions.json",
+      "held_original": true
+    },
+    {
+      "path": "control/scientific-root-declaration.json",
+      "bytes": 1020,
+      "sha256": "64d5f7d5e736536f865da341f9c8e7739522b88b2eb7c384d43d36b2e5a6d6b7",
+      "local_original": "/workspace/scratch/ct91-scientific-roots25-01.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct89-original-full-evaluator-compiled02-publication-01/expected-head-lookup.log",
+      "bytes": 101,
+      "sha256": "c05a2d285cfea74a026c4fed17554720f3e92f3df0d023d412d90bf3598c5ab8",
+      "local_original": "/workspace/scratch/ct89-original-full-evaluator-compiled02-publication-01/expected-head-lookup.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct89-original-full-evaluator-compiled02-publication-01/push.log",
+      "bytes": 427,
+      "sha256": "ea45a080a3243a9ac34bb08b72fe9aa95def500536f69b223f9ef93069f383fb",
+      "local_original": "/workspace/scratch/ct89-original-full-evaluator-compiled02-publication-01/push.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct89-original-full-evaluator-compiled02-publication-01/receipt.json",
+      "bytes": 674,
+      "sha256": "afa2ff412886ea77769a05790f7e37ab282166f7c2835af3b8f899e8c1213273",
+      "local_original": "/workspace/scratch/ct89-original-full-evaluator-compiled02-publication-01/receipt.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct89-original-full-evaluator-corrected04-publication-01/expected-head-lookup.log",
+      "bytes": 101,
+      "sha256": "b1b7bc1b2f7818b2c3a9fe081d70588886242c111bb13a6b832fcec852a3e11e",
+      "local_original": "/workspace/scratch/ct89-original-full-evaluator-corrected04-publication-01/expected-head-lookup.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct89-original-full-evaluator-corrected04-publication-01/push.log",
+      "bytes": 427,
+      "sha256": "0cff646588f6917caaef9663c2d37561391d0c1df26b0d9f5c76c5d5dc27bf9a",
+      "local_original": "/workspace/scratch/ct89-original-full-evaluator-corrected04-publication-01/push.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct89-original-full-evaluator-corrected04-publication-01/receipt.json",
+      "bytes": 674,
+      "sha256": "dc9b855d88122e64faf97fa67c8fe5a0b12d508d2f33ac1ad2cd57498fad7d12",
+      "local_original": "/workspace/scratch/ct89-original-full-evaluator-corrected04-publication-01/receipt.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct89-original-full-group-result01-publication-01/expected-head-lookup.log",
+      "bytes": 101,
+      "sha256": "83fb25930cf09419b94303eea8eafcaf1b5f28620f3eb0ea9a6712a776a7723d",
+      "local_original": "/workspace/scratch/ct89-original-full-group-result01-publication-01/expected-head-lookup.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct89-original-full-group-result01-publication-01/push.log",
+      "bytes": 427,
+      "sha256": "d127d4ff77202015f59eb47668fffe6519a4bd1badde822e3837387c32a024f0",
+      "local_original": "/workspace/scratch/ct89-original-full-group-result01-publication-01/push.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct89-original-full-group-result01-publication-01/receipt.json",
+      "bytes": 674,
+      "sha256": "1d0e6480c1490dadafdb902e37693a64df2024f474c5a05cfbd75d3fe31ee651",
+      "local_original": "/workspace/scratch/ct89-original-full-group-result01-publication-01/receipt.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-checkpoint18-dispatch-01/original-command.json",
+      "bytes": 172,
+      "sha256": "a9d815f2f06e4a5c381a4dc2c98de72523fc2bbd2f09c82c72d042f4f4e0deec",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-dispatch-01/original-command.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-checkpoint18-dispatch-01/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-dispatch-01/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-checkpoint18-dispatch-01/whole-output.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-checkpoint18-dispatch-01/whole-output.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-checkpoint19-dispatch-01/before-runs.json",
+      "bytes": 36,
+      "sha256": "a2790a384d7d281e7395679000c35d27768d89dbd7052f725b8f4688beb59915",
+      "local_original": "/workspace/scratch/ct90-checkpoint19-dispatch-01/before-runs.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-checkpoint19-dispatch-01/original-command.json",
+      "bytes": 172,
+      "sha256": "a9d815f2f06e4a5c381a4dc2c98de72523fc2bbd2f09c82c72d042f4f4e0deec",
+      "local_original": "/workspace/scratch/ct90-checkpoint19-dispatch-01/original-command.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-checkpoint19-dispatch-01/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-checkpoint19-dispatch-01/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-checkpoint19-dispatch-01/whole-output.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-checkpoint19-dispatch-01/whole-output.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18-import-failed01/actual-failed-importer.py",
+      "bytes": 5937,
+      "sha256": "b4bd305c3515b33af520a75378058b03b61a615fb90a06da3d46e5ace99d1280",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18-import-failed01/actual-failed-importer.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18-import-failed01/artifacts-final-api.json",
+      "bytes": 1098,
+      "sha256": "43a8ef2e90ec85c0a8ae45e4f5e0cc696ac25fc4159cfca3bae0348466eed670",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18-import-failed01/artifacts-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18-import-failed01/before-Git-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18-import-failed01/before-Git-status.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18-import-failed01/jobs-final-api.json",
+      "bytes": 2339,
+      "sha256": "f012c888aa1bb52dcc46281c5f57504b30f7c3b517b010d96f4644540d2af4aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18-import-failed01/jobs-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18-import-failed01/whole-caller.txt",
+      "bytes": 982,
+      "sha256": "aea30c72cf7e118361fdfc3af8a0df2628f508553db3ebb7500097aa0b82666c",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18-import-failed01/whole-caller.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18-import-failed01/whole-log-final-api.json",
+      "bytes": 236283,
+      "sha256": "10d8ebefe1271c3ae66f5d3fb626a7145750a1b6e6b480e93a1388bb6e7ed455",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18-import-failed01/whole-log-final-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/after-Git-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/after-Git-status.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/artifacts-api.json",
+      "bytes": 1098,
+      "sha256": "43a8ef2e90ec85c0a8ae45e4f5e0cc696ac25fc4159cfca3bae0348466eed670",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/artifacts-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/before-Git-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/before-Git-status.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/jobs-api.json",
+      "bytes": 2339,
+      "sha256": "f012c888aa1bb52dcc46281c5f57504b30f7c3b517b010d96f4644540d2af4aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/jobs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/boot-id.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/boot-id.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/boot-id.log",
+      "bytes": 37,
+      "sha256": "52ea9d30349405c9c7b188dbb1894d369a9bb0fc81eff42c5867b46c7f5e23c3",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/boot-id.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/kernel.txt",
+      "bytes": 23,
+      "sha256": "311c760e365846e58740176d212ad01995d2f5b6b2ab41541b807d4bab46c071",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/kernel.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/original-RESUME.md",
+      "bytes": 278217,
+      "sha256": "9a6540a09d1ea65bec33e690b53549eefb427ad9847d4a39e622511ca1f10104",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/original-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/original-final-status.log",
+      "bytes": 361,
+      "sha256": "992965cadf00bdea602feb70ded8513e6c92f9da8bf249991e5367f6e2b879fc",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/original-final-status.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/original-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/original-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/original-gate.log",
+      "bytes": 189,
+      "sha256": "05b4b2df49ca1275b2050aaf38d27224591dab4c794a675ee6e75b6eab8cd2d0",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/original-gate.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/original-last-push.txt",
+      "bytes": 233,
+      "sha256": "f77f490eea2d9508c6b08a197b304980b5d350c2f48af81bc5a18625e7013e06",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/original-last-push.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/pack-RESUME.md",
+      "bytes": 278217,
+      "sha256": "9a6540a09d1ea65bec33e690b53549eefb427ad9847d4a39e622511ca1f10104",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/pack-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/pack-meta.json",
+      "bytes": 915,
+      "sha256": "3e2f23ede2411db2d35bc4d51d37e3821909d31c082ef6d7277174feb82fad17",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/pack-meta.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/readback-meta.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/readback-meta.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/readback-meta.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/readback-meta.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/readback-pack.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/readback-pack.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/readback-pack.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/readback-pack.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/readback-resume.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/readback-resume.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/readback-resume.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/readback-resume.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/remote-RESUME.md",
+      "bytes": 278217,
+      "sha256": "9a6540a09d1ea65bec33e690b53549eefb427ad9847d4a39e622511ca1f10104",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/remote-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/remote-checkpoint.tar.gz",
+      "bytes": 86558,
+      "sha256": "dd8a75b5f4e386bb58176089641f7257cd81ef2cbf04b0941a797da8efba11a0",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/remote-checkpoint.tar.gz",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/remote-inputs.sha256",
+      "bytes": 413,
+      "sha256": "b47c89b742691365d74aa29537cb022d16f1895e0c387d2f765f15dcb02c4f5c",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/remote-inputs.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/remote-members.txt",
+      "bytes": 27,
+      "sha256": "5a0a767e57348eea0fc85336d44ca9b4ae9d7fc017b6138118f392a9a9c6261f",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/remote-members.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/remote-meta.json",
+      "bytes": 915,
+      "sha256": "3e2f23ede2411db2d35bc4d51d37e3821909d31c082ef6d7277174feb82fad17",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/remote-meta.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/source-branch.txt",
+      "bytes": 49,
+      "sha256": "e6571014388bfa4c46c7f297143bb8350772a197d2c4c2360019793e9a708873",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/source-branch.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/source-head.txt",
+      "bytes": 41,
+      "sha256": "2b9bfa3b57516516de1b18267bd56b836cf79cbb25f0afca39155f863fc8e6bd",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/source-head.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/source-inputs.sha256",
+      "bytes": 373,
+      "sha256": "3deeca6a85156c6b55a4e418b8593af5a956d082649f7ebe0a7f8ade0cdb61bf",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/source-inputs.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/time-namespace.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/time-namespace.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/time-namespace.log",
+      "bytes": 18,
+      "sha256": "a4f4417c3fcb6187539627ed27d186fc669f8d750ec81843dd40cc46485e65d2",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/time-namespace.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/time-offsets.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/time-offsets.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/members/time-offsets.log",
+      "bytes": 64,
+      "sha256": "bd9f74ac5eaa3df538867b32ee7d9240020020a199963645d7ab92f008209ac5",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/members/time-offsets.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/observation.json",
+      "bytes": 1123,
+      "sha256": "81991f989899a00d72f0ee12ce1e44b0e3545f724517dfc9e2ebb2a7e851d037",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/observation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/original-import-command.py",
+      "bytes": 5931,
+      "sha256": "1d3841b7c0c068298fde45b10a8cee09ce8ef87660084eefb9e574b65ead4a4e",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/original-import-command.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/original-local-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/original-local-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/original-local-gate.log",
+      "bytes": 196,
+      "sha256": "9cd8d50193c1858f31bd7627135b9d180b0c2e7d29fc5060cdc6622f62e5896a",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/original-local-gate.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/original-local-status.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/original-local-status.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/original-local-status.log",
+      "bytes": 14165,
+      "sha256": "4b63ecbdbad66bdbd251f32944a9e1ba196034af3487862010dff53efdb5cd37",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/original-local-status.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/previous-local-last-push.txt",
+      "bytes": 233,
+      "sha256": "1725878b2555d704c192db839fa6e4922bb92839b3e19eedd193e0857854bdde",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/previous-local-last-push.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/whole-log-api.json",
+      "bytes": 236283,
+      "sha256": "10d8ebefe1271c3ae66f5d3fb626a7145750a1b6e6b480e93a1388bb6e7ed455",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/whole-log-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/whole-members.json",
+      "bytes": 3609,
+      "sha256": "7a1026cc4e0ebbc2ab1050be4c8947301c4f455eec165d9e6fb05f0a0c32ec12",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/whole-members.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-18/whole-original-GitHub-artifact.zip",
+      "bytes": 350849,
+      "sha256": "ade0f2847bee6c6a0ba8328848408aaf9234fb95878761feb16b6728dc160cd4",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-18/whole-original-GitHub-artifact.zip",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/after-Git-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/after-Git-status.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/artifacts-api.json",
+      "bytes": 1098,
+      "sha256": "fc485e3916da3580b0b00e1da6e0a0a4a3f86757e1dcdd8ced06157e2b36ebe2",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/artifacts-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/before-Git-status.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/before-Git-status.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/jobs-api.json",
+      "bytes": 2339,
+      "sha256": "651011d3bf16e99cf09fd23a33a5da95f8c7c8de08dd92375c19aaed6166e7b0",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/jobs-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/boot-id.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/boot-id.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/boot-id.log",
+      "bytes": 37,
+      "sha256": "cbb31174a89300b40d2969efe7c1705a53adac2a0d45b92c5339df8424aab836",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/boot-id.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/kernel.txt",
+      "bytes": 23,
+      "sha256": "311c760e365846e58740176d212ad01995d2f5b6b2ab41541b807d4bab46c071",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/kernel.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/original-RESUME.md",
+      "bytes": 283005,
+      "sha256": "fb9c46f1ca3c9c4070a4958fc2225eefef8bd307e64e37a0b60b91d35c80fe5f",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/original-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/original-final-status.log",
+      "bytes": 361,
+      "sha256": "8954ed66b725d2c1dda6c88347daf8021cd52338d0e678180132986517aa4c23",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/original-final-status.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/original-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/original-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/original-gate.log",
+      "bytes": 189,
+      "sha256": "398ff1a1f1d048690541a0cdc3934b0fc281e459a79afd6a89fcb7fbccd8219b",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/original-gate.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/original-last-push.txt",
+      "bytes": 233,
+      "sha256": "73c630e2d6762d920275749d9babd94b524bb09ff69cec9a223f6e1301e7e982",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/original-last-push.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/pack-RESUME.md",
+      "bytes": 283005,
+      "sha256": "fb9c46f1ca3c9c4070a4958fc2225eefef8bd307e64e37a0b60b91d35c80fe5f",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/pack-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/pack-meta.json",
+      "bytes": 915,
+      "sha256": "5646bd31e4c482db537f897eebd8096bafc27cb22fcc7145b629befc2276d3ab",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/pack-meta.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/readback-meta.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/readback-meta.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/readback-meta.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/readback-meta.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/readback-pack.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/readback-pack.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/readback-pack.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/readback-pack.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/readback-resume.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/readback-resume.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/readback-resume.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/readback-resume.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/remote-RESUME.md",
+      "bytes": 283005,
+      "sha256": "fb9c46f1ca3c9c4070a4958fc2225eefef8bd307e64e37a0b60b91d35c80fe5f",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/remote-RESUME.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/remote-checkpoint.tar.gz",
+      "bytes": 87202,
+      "sha256": "23e9cbd1ee2463e82a86b533bf7687877904621d4c99adc64b1415decfcb4968",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/remote-checkpoint.tar.gz",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/remote-inputs.sha256",
+      "bytes": 413,
+      "sha256": "ab756a9a47a3647d450a7ff6b48e9a08f5980a7befa18f25c776cfaf19cc59df",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/remote-inputs.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/remote-members.txt",
+      "bytes": 27,
+      "sha256": "5a0a767e57348eea0fc85336d44ca9b4ae9d7fc017b6138118f392a9a9c6261f",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/remote-members.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/remote-meta.json",
+      "bytes": 915,
+      "sha256": "5646bd31e4c482db537f897eebd8096bafc27cb22fcc7145b629befc2276d3ab",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/remote-meta.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/source-branch.txt",
+      "bytes": 49,
+      "sha256": "e6571014388bfa4c46c7f297143bb8350772a197d2c4c2360019793e9a708873",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/source-branch.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/source-head.txt",
+      "bytes": 41,
+      "sha256": "265c9abccf0e4236ff41a33f6e1e1a6e88884c855efc820871d97a850e41b059",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/source-head.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/source-inputs.sha256",
+      "bytes": 373,
+      "sha256": "5cbe1abf9a677715e4e4461aad43c289d868d51816f5444a56cd84b44fedfec7",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/source-inputs.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/time-namespace.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/time-namespace.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/time-namespace.log",
+      "bytes": 18,
+      "sha256": "a4f4417c3fcb6187539627ed27d186fc669f8d750ec81843dd40cc46485e65d2",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/time-namespace.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/time-offsets.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/time-offsets.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/members/time-offsets.log",
+      "bytes": 64,
+      "sha256": "bd9f74ac5eaa3df538867b32ee7d9240020020a199963645d7ab92f008209ac5",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/members/time-offsets.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/observation.json",
+      "bytes": 1123,
+      "sha256": "a491ffa179061c14a4ee309b0fba2ff28899d2bed0aaf01501be2e78043c4beb",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/observation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/original-import-command.py",
+      "bytes": 5931,
+      "sha256": "3a68f4b6edd55c91143a0f62fcc24cd2d23900b3f1dfe09e606f680c02feeffd",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/original-import-command.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/original-local-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/original-local-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/original-local-gate.log",
+      "bytes": 196,
+      "sha256": "97cd1ccd2667da323ffb41d5c8adc853a84c285d28b0477c8b0eb8c5f75a3649",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/original-local-gate.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/original-local-status.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/original-local-status.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/original-local-status.log",
+      "bytes": 14165,
+      "sha256": "8f484716f1e33226ce51f805cac6a2c3cd587eaa22142d2ec7d11e1b2fa4cd7e",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/original-local-status.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/previous-local-last-push.txt",
+      "bytes": 233,
+      "sha256": "f77f490eea2d9508c6b08a197b304980b5d350c2f48af81bc5a18625e7013e06",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/previous-local-last-push.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/whole-log-api.json",
+      "bytes": 236101,
+      "sha256": "30e54425afbda759854cfc83fe33cc0ba14eb92a2f85f45017d09122a24fed5f",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/whole-log-api.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/whole-members.json",
+      "bytes": 3609,
+      "sha256": "d15bdb93247466488b46cf5ce0b332ec9b3d2527e3441750e027bc5533e81af7",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/whole-members.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-current-original-checkpoint-19/whole-original-GitHub-artifact.zip",
+      "bytes": 353672,
+      "sha256": "8a453a1e31ac82251858ee78114c6c61cbc6b0bee7eec15457777761667b5da8",
+      "local_original": "/workspace/scratch/ct90-current-original-checkpoint-19/whole-original-GitHub-artifact.zip",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/consumer-whole.txt",
+      "bytes": 143,
+      "sha256": "d6f3132f417cec23d3346049e3c8997a69d7913b00330951ea51bed9e843abbf",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/consumer-whole.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/consumer.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/consumer.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_OriginalFullChain_lean/audit.log",
+      "bytes": 1700,
+      "sha256": "3c818b5ad42e550be694e9dd6c992e591a1aa83f862bcca434b5ccceea6903f1",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_OriginalFullChain_lean/audit.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_OriginalFullChain_lean/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_OriginalFullChain_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_OriginalFullChain_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_OriginalFullChain_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/producer-whole.txt",
+      "bytes": 115,
+      "sha256": "952708968c3be253098d0bba85b37ce18a86b02d2ee60537bd0e04f3e5907e4d",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/producer-whole.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/producer.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/producer.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/producer/target_ct90-original-full-chain-proof-stage-01_OriginalFullChain_lean/audit.log",
+      "bytes": 1651,
+      "sha256": "8a298fdb480c96771dbf81885b8c624fbd131412fa8605b8675fe1b5a9279cae",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/producer/target_ct90-original-full-chain-proof-stage-01_OriginalFullChain_lean/audit.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/producer/target_ct90-original-full-chain-proof-stage-01_OriginalFullChain_lean/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/producer/target_ct90-original-full-chain-proof-stage-01_OriginalFullChain_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-01/producer/target_ct90-original-full-chain-proof-stage-01_OriginalFullChain_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-01/producer/target_ct90-original-full-chain-proof-stage-01_OriginalFullChain_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-source-01/OriginalFullChain.lean",
+      "bytes": 13197,
+      "sha256": "16c66886a7632cbfadae5072995dadf2280abf4bc288408a0b6d683ad5c55b3c",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-source-01/OriginalFullChain.lean",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-source-01/literal-actual-inverse-inputs.json",
+      "bytes": 11799146,
+      "sha256": "3cf35fdf560a0cd250a0021efe8424b8a850b040326aa711c6e4608a2020d970",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-source-01/literal-actual-inverse-inputs.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-source-01/literal-source-custody.json",
+      "bytes": 574,
+      "sha256": "2bab452163efa429f312897dd23b1266fa8006879ae4de089c11f345006f8f33",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-source-01/literal-source-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-chain-proof-source-01/whole-literal-actual-inverse-inputs.before-compact-metadata.json",
+      "bytes": 11799146,
+      "sha256": "3cf35fdf560a0cd250a0021efe8424b8a850b040326aa711c6e4608a2020d970",
+      "local_original": "/workspace/scratch/ct90-original-full-chain-proof-source-01/whole-literal-actual-inverse-inputs.before-compact-metadata.json",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-chain-proof-source-01/literal-actual-inverse-inputs.json"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "bytes": 8306696,
+      "sha256": "bc0eb459fb4959fd22afef379eaa30ef4b226729177a023075d916b75d1bb416",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "bytes": 49789168,
+      "sha256": "15e4ed73ecf373485f8ec408dc8ec31c3ac3e9cd0e1fc472ebc6a7798a971a0c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/.gitignore",
+      "bytes": 9,
+      "sha256": "306fd52e74fca6746e12acc750f232de15e71da917756a1270d74c91f5eb7368",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/.gitignore",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/Cargo.lock",
+      "bytes": 7568,
+      "sha256": "80cf0457ec4cb77c7b2de6e34678ac81c4f02ed1e069fefc3ae54e428fe386ae",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/Cargo.lock",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/Cargo.toml",
+      "bytes": 804,
+      "sha256": "be3c239404d1749d9bcc4ec9f1b9e2cda5edbb296c71eed992eb748a785fdc20",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/Cargo.toml",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/README.md",
+      "bytes": 2203,
+      "sha256": "df03db072204f8c4c548e7657fb16fed7289b8cd70c5f546a1279082087cc95b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/README.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/build-only-01.sh",
+      "bytes": 1846,
+      "sha256": "a87fe53bf5b2fdfe382f0996b35fe9e839ffabe75c71f282674b7af3b978e70b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/build-only-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/capture_binary.py",
+      "bytes": 889,
+      "sha256": "4d0261a9622d1a6049760ddffe35682ce5ac2d89debce56d06d5a30de7450a0e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/capture_binary.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/capture_engine.py",
+      "bytes": 2855,
+      "sha256": "d6ad2b6626e8e2cc7feef5ec32d6544adc6be040ceca9cf150a2b5f5a25b178d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/capture_engine.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/frozen-prior-inputs-01.sha256",
+      "bytes": 173276,
+      "sha256": "135b4e187767de9183c7c8c659ee9b3d95c0a05746be2e67346ac9a2b61ecfaf",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/frozen-prior-inputs-01.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/generated/curve_residual.rs",
+      "bytes": 610,
+      "sha256": "ab29e27eb14658a0d409f18cf2b9be784cd9640b9f5273fba217863aa09374dd",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/generated/curve_residual.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/generated/custody.json",
+      "bytes": 3212,
+      "sha256": "508eeffc85b638890fbd8d59913585ad328c5f2db023d79f094bee5535f2c59c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/generated/custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/generated/encoding.rs",
+      "bytes": 517,
+      "sha256": "82604bce1992f8172d244ce0994aa7b0ff8510a6866517f8e6b942100d351de4",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/generated/encoding.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/generated/eval_rational.rs",
+      "bytes": 689,
+      "sha256": "7c901f0e1eb222395b6d28cb11e499097ca09dca8c4f0057bc6f5cb8b62d7f95",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/generated/eval_rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/generated/halving.rs",
+      "bytes": 1343,
+      "sha256": "909d269795be3cba718cecd0c66ccaa60b77826e59e21358d44cb75ae8848003",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/generated/halving.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/generated/literal_halves.rs",
+      "bytes": 1512,
+      "sha256": "1acbcfcf8ba95f3dd489b49df32fd789574e9340133882f3620f987cb5d933a4",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/generated/literal_halves.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/generated/parse_packet.rs",
+      "bytes": 708,
+      "sha256": "22e2eeed7d63c5570a8e1a4b662307f97daa39c43f30195a631f20979f56a77b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/generated/parse_packet.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/generated/polynomial.rs",
+      "bytes": 517,
+      "sha256": "782c0ee85216824242a36d097f1761d770e8f40654323a4b7c9fe740f8a2f049",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/generated/polynomial.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/generated/rational.rs",
+      "bytes": 1985,
+      "sha256": "fa332b8799f834ed2fddd175317a6a69194c8c30f8f360a8e4086b34452dfb2f",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/generated/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/inherit_prepared.py",
+      "bytes": 2105,
+      "sha256": "883613805995362d55b012eb2eec3cebd2ccb898332c52ac69df0171efd3d52e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/inherit_prepared.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/materialize.py",
+      "bytes": 2076,
+      "sha256": "8841732ec9863b118bed4890f06be6a6cb3b87bf39d9c3855e9324950cf31869",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/materialize.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/run-native-01.sh",
+      "bytes": 2286,
+      "sha256": "db69506c7360ac91044943444523668cb72d508808d84b749ec6ad8ab3fb6635",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/run-native-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/runtime_custody.py",
+      "bytes": 1998,
+      "sha256": "b6f4f8d70c40079fdf2ef5ad002f877c67e3c96b38f80167f4764a464a27a3cc",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/runtime_custody.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/source-derivation.json",
+      "bytes": 985,
+      "sha256": "c94e479049537f7e4ee5c769f66e91865a53f45c17501b556e239bddad9f8fe6",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/source-derivation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/src/bin/audit_chain.rs",
+      "bytes": 6159,
+      "sha256": "142b77bbe79c637a47f56ee572434f081d62c3a0742c54cb1b3c44a8321cdcbd",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/src/bin/audit_chain.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/src/known_point.rs",
+      "bytes": 2167,
+      "sha256": "7ef1c96ff87e952892b1443973a12731a193c9d8b81c697a219dd9107d3d425c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/src/known_point.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/src/known_tests.rs",
+      "bytes": 8841,
+      "sha256": "b83c026dd636819eba31a735270c6458565b40aea4afb805b61a89c8030d1fdc",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/src/known_tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/src/lib.rs",
+      "bytes": 19496,
+      "sha256": "2b1a51257ae741fe48f49e4d9fa3aecaeee6399ee9937224888e06ce41a4e02f",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/src/lib.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/src/rational.rs",
+      "bytes": 4579,
+      "sha256": "8fe19e74ea9478871521c6956be66344740de19ac83ef3852217eb2995d708d5",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/src/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/actual-source/src/tests.rs",
+      "bytes": 17735,
+      "sha256": "9fd94d4db70144778a28c4b862a3e7939e892721e1794eb145224e71c8f4987d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/actual-source/src/tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/auditor-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/auditor-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/auditor-compile.stderr.txt",
+      "bytes": 214,
+      "sha256": "4a27a5e617b1e720905b8c9bd6258c7bf6dc91f117c069e64eb26449cd9d2a85",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/auditor-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/auditor-compile.txt",
+      "bytes": 98814,
+      "sha256": "0fcd6426c045272cf58f99149513317996a06cc7f49c72677db1add8d0e26de0",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/auditor-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/auditor-compiled-custody.json",
+      "bytes": 1467,
+      "sha256": "92b2bfddff7d6f961552bb7479549fafe73f59b7ff9f5ef99798f3194dce90ba",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/auditor-compiled-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/auditor-original-compiled.bin",
+      "bytes": 640248,
+      "sha256": "84c59836e03c3dd7d39dbd7d83e25d44af390fd4ba138dfe3fde0de466c16e2a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/auditor-original-compiled.bin",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/chain-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/chain-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/chain-compile.stderr.txt",
+      "bytes": 364,
+      "sha256": "ca69bb6c3863e882ba0bb6f4fe7c117b37a0ef3281fab3ee4e06f11e99a1cbf4",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/chain-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/chain-compile.txt",
+      "bytes": 95774,
+      "sha256": "c4607d58ad11cbd97f64bcf13239ccbc16a0bf93a028bd9575a93224063a3c5d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/chain-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/chain-compiled-custody.json",
+      "bytes": 1554,
+      "sha256": "5fc30f38eccba52836acb6bd691cfe8ea88cd4ba3735273339335c4fa29405ee",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/chain-compiled-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/chain-original-compiled.bin",
+      "bytes": 4799112,
+      "sha256": "069f8534365e4f93ffe58368ffd38b48187506c86c7fc553c1b35c20f963314e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/chain-original-compiled.bin",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/engine-prepared.json",
+      "bytes": 1802,
+      "sha256": "5d92163d4f1815be49387a6b6ab0dfaa597f78efafc5998fa9832d60934f0974",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/engine-prepared.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/engine-reused.json",
+      "bytes": 2044,
+      "sha256": "e5d886ce19fe22497af4b2542dc090afdb66fa8e9791ff488c1e142419f2b72d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/engine-reused.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/final-prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/final-prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/final-prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/final-prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/final-prior-inputs.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/final-prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/finish.txt",
+      "bytes": 21,
+      "sha256": "b135f0621d06c997275a569f9a90ad5ea1d8c5a178b7c2cfb00b4d7c33be9b03",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/inherited-preparation.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/inherited-preparation.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/inherited-preparation.json",
+      "bytes": 31789,
+      "sha256": "a0375b1568c1b15a8215cc95aee907036bc362bc0a636e3b6109317428082b47",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/inherited-preparation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/inherited-preparation.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/inherited-preparation.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/inherited-preparation.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/inherited-preparation.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/locked-graph.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/locked-graph.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/locked-graph.stderr.txt",
+      "bytes": 273,
+      "sha256": "93a4436471dc24143d528ce52c4703a2c972b4e0ab3e9ec52a72b56fb1ebda18",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/locked-graph.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/locked-graph.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/locked-graph.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/metadata.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/metadata.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/metadata.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/metadata.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/metadata.txt",
+      "bytes": 162390,
+      "sha256": "7a8e29a076cedb3f22a89051a4398316625be4c1a09bf15bf2078ce65672097e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/metadata.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/original-command.sh",
+      "bytes": 1846,
+      "sha256": "a87fe53bf5b2fdfe382f0996b35fe9e839ffabe75c71f282674b7af3b978e70b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/prior-inputs.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-01/start.txt",
+      "bytes": 21,
+      "sha256": "290717066d4e5fbd26b70b63c22438c67ad6deb8b95dc5242f9803aab314f0bb",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-01/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "bytes": 8306696,
+      "sha256": "bc0eb459fb4959fd22afef379eaa30ef4b226729177a023075d916b75d1bb416",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "bytes": 49789168,
+      "sha256": "15e4ed73ecf373485f8ec408dc8ec31c3ac3e9cd0e1fc472ebc6a7798a971a0c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos.rlib"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/.gitignore",
+      "bytes": 9,
+      "sha256": "306fd52e74fca6746e12acc750f232de15e71da917756a1270d74c91f5eb7368",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/.gitignore",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/Cargo.lock",
+      "bytes": 7568,
+      "sha256": "80cf0457ec4cb77c7b2de6e34678ac81c4f02ed1e069fefc3ae54e428fe386ae",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/Cargo.lock",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/Cargo.toml",
+      "bytes": 804,
+      "sha256": "be3c239404d1749d9bcc4ec9f1b9e2cda5edbb296c71eed992eb748a785fdc20",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/Cargo.toml",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/README.md",
+      "bytes": 2203,
+      "sha256": "df03db072204f8c4c548e7657fb16fed7289b8cd70c5f546a1279082087cc95b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/README.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/build-only-01.sh",
+      "bytes": 1846,
+      "sha256": "a87fe53bf5b2fdfe382f0996b35fe9e839ffabe75c71f282674b7af3b978e70b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/build-only-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/capture_binary.py",
+      "bytes": 889,
+      "sha256": "4d0261a9622d1a6049760ddffe35682ce5ac2d89debce56d06d5a30de7450a0e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/capture_binary.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/capture_engine.py",
+      "bytes": 2855,
+      "sha256": "d6ad2b6626e8e2cc7feef5ec32d6544adc6be040ceca9cf150a2b5f5a25b178d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/capture_engine.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/frozen-prior-inputs-01.sha256",
+      "bytes": 173276,
+      "sha256": "135b4e187767de9183c7c8c659ee9b3d95c0a05746be2e67346ac9a2b61ecfaf",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/frozen-prior-inputs-01.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/generated/curve_residual.rs",
+      "bytes": 610,
+      "sha256": "ab29e27eb14658a0d409f18cf2b9be784cd9640b9f5273fba217863aa09374dd",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/generated/curve_residual.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/generated/custody.json",
+      "bytes": 3212,
+      "sha256": "508eeffc85b638890fbd8d59913585ad328c5f2db023d79f094bee5535f2c59c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/generated/custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/generated/encoding.rs",
+      "bytes": 517,
+      "sha256": "82604bce1992f8172d244ce0994aa7b0ff8510a6866517f8e6b942100d351de4",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/generated/encoding.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/generated/eval_rational.rs",
+      "bytes": 689,
+      "sha256": "7c901f0e1eb222395b6d28cb11e499097ca09dca8c4f0057bc6f5cb8b62d7f95",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/generated/eval_rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/generated/halving.rs",
+      "bytes": 1343,
+      "sha256": "909d269795be3cba718cecd0c66ccaa60b77826e59e21358d44cb75ae8848003",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/generated/halving.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/generated/literal_halves.rs",
+      "bytes": 1512,
+      "sha256": "1acbcfcf8ba95f3dd489b49df32fd789574e9340133882f3620f987cb5d933a4",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/generated/literal_halves.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/generated/parse_packet.rs",
+      "bytes": 708,
+      "sha256": "22e2eeed7d63c5570a8e1a4b662307f97daa39c43f30195a631f20979f56a77b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/generated/parse_packet.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/generated/polynomial.rs",
+      "bytes": 517,
+      "sha256": "782c0ee85216824242a36d097f1761d770e8f40654323a4b7c9fe740f8a2f049",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/generated/polynomial.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/generated/rational.rs",
+      "bytes": 1985,
+      "sha256": "fa332b8799f834ed2fddd175317a6a69194c8c30f8f360a8e4086b34452dfb2f",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/generated/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/inherit_prepared.py",
+      "bytes": 2105,
+      "sha256": "883613805995362d55b012eb2eec3cebd2ccb898332c52ac69df0171efd3d52e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/inherit_prepared.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/lean/OriginalFullChain.lean",
+      "bytes": 13197,
+      "sha256": "16c66886a7632cbfadae5072995dadf2280abf4bc288408a0b6d683ad5c55b3c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/lean/OriginalFullChain.lean",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/lean/PrimeRecovery.lean",
+      "bytes": 1441,
+      "sha256": "ab8f1c6fcd714f512f4b17ccd9af1952778fc5c88306bec75a63de411f3a4d81",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/lean/PrimeRecovery.lean",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/lean/literal-actual-inverse-inputs.json",
+      "bytes": 11799146,
+      "sha256": "3cf35fdf560a0cd250a0021efe8424b8a850b040326aa711c6e4608a2020d970",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/lean/literal-actual-inverse-inputs.json",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-chain-proof-source-01/literal-actual-inverse-inputs.json"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/lean/literal-source-custody.json",
+      "bytes": 574,
+      "sha256": "2bab452163efa429f312897dd23b1266fa8006879ae4de089c11f345006f8f33",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/lean/literal-source-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/materialize.py",
+      "bytes": 2076,
+      "sha256": "8841732ec9863b118bed4890f06be6a6cb3b87bf39d9c3855e9324950cf31869",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/materialize.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/run-native-01.sh",
+      "bytes": 2286,
+      "sha256": "db69506c7360ac91044943444523668cb72d508808d84b749ec6ad8ab3fb6635",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/run-native-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/runtime_custody.py",
+      "bytes": 1998,
+      "sha256": "b6f4f8d70c40079fdf2ef5ad002f877c67e3c96b38f80167f4764a464a27a3cc",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/runtime_custody.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/source-derivation.json",
+      "bytes": 1376,
+      "sha256": "6ab2ffd5f4796812fb864bf80bac1b96ff8eadf473f7835d4f3631b815855a5a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/source-derivation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/src/bin/audit_chain.rs",
+      "bytes": 6159,
+      "sha256": "142b77bbe79c637a47f56ee572434f081d62c3a0742c54cb1b3c44a8321cdcbd",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/src/bin/audit_chain.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/src/known_point.rs",
+      "bytes": 2167,
+      "sha256": "7ef1c96ff87e952892b1443973a12731a193c9d8b81c697a219dd9107d3d425c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/src/known_point.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/src/known_tests.rs",
+      "bytes": 8841,
+      "sha256": "b83c026dd636819eba31a735270c6458565b40aea4afb805b61a89c8030d1fdc",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/src/known_tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/src/lib.rs",
+      "bytes": 19496,
+      "sha256": "2b1a51257ae741fe48f49e4d9fa3aecaeee6399ee9937224888e06ce41a4e02f",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/src/lib.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/src/rational.rs",
+      "bytes": 4579,
+      "sha256": "8fe19e74ea9478871521c6956be66344740de19ac83ef3852217eb2995d708d5",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/src/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/actual-source/src/tests.rs",
+      "bytes": 17967,
+      "sha256": "f69c3110a6b4479b4c3c0bceeaf279934fba962b9108ad0ec9dc2ced3aa9eb95",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/actual-source/src/tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/auditor-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/auditor-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/auditor-compile.stderr.txt",
+      "bytes": 62,
+      "sha256": "90c8a1a69c0155761cff4bfe0e61bbee007961d2b96729d2127c2e0c291489dd",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/auditor-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/auditor-compile.txt",
+      "bytes": 98812,
+      "sha256": "e78d67dbe9483102a14c395057541d9b277d19dab310b44fa7a1fe60ba827d13",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/auditor-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/auditor-compiled-custody.json",
+      "bytes": 1466,
+      "sha256": "c71893378ed900aa44052bac72623edf2134e1ec35b1526d6b3b8c1f6774f211",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/auditor-compiled-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/auditor-original-compiled.bin",
+      "bytes": 640248,
+      "sha256": "84c59836e03c3dd7d39dbd7d83e25d44af390fd4ba138dfe3fde0de466c16e2a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/auditor-original-compiled.bin",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-01/auditor-original-compiled.bin"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/chain-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/chain-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/chain-compile.stderr.txt",
+      "bytes": 214,
+      "sha256": "2b25ace9ab4c2bd427b6e23743f5ada4202d79bd8b8a8df844814e79659f764d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/chain-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/chain-compile.txt",
+      "bytes": 95773,
+      "sha256": "5f864033a500853293c791b1e14b939324125cebfe5e6953f39771930d8ca5b6",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/chain-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/chain-compiled-custody.json",
+      "bytes": 1554,
+      "sha256": "1278efa56149e71697abc88674d1ce7c9e1f1fec24bcd67c722b853b2d5498db",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/chain-compiled-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/chain-original-compiled.bin",
+      "bytes": 4799944,
+      "sha256": "49a04b91e5d5bdf69d58d8cbae87b7f9f73f6c29c7dfce0c80ed3f1551174a63",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/chain-original-compiled.bin",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/engine-prepared.json",
+      "bytes": 1802,
+      "sha256": "89ea19a73ff3c6b3d7d6e86d54033650f88fa8867af1e28e81268850359ab024",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/engine-prepared.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/engine-reused.json",
+      "bytes": 2044,
+      "sha256": "e5d886ce19fe22497af4b2542dc090afdb66fa8e9791ff488c1e142419f2b72d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/engine-reused.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/final-prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/final-prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/final-prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/final-prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/final-prior-inputs.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/final-prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/finish.txt",
+      "bytes": 21,
+      "sha256": "6996b5819fbf3703fe2e54f6076b99e586574dcce7260a04a09284b9fd1b753f",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/inherited-preparation.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/inherited-preparation.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/inherited-preparation.json",
+      "bytes": 31789,
+      "sha256": "81de15d851db33731be0be17ed4a6605730bc85b9f7d559029a68f6e91e0d392",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/inherited-preparation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/inherited-preparation.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/inherited-preparation.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/inherited-preparation.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/inherited-preparation.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/locked-graph.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/locked-graph.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/locked-graph.stderr.txt",
+      "bytes": 273,
+      "sha256": "93a4436471dc24143d528ce52c4703a2c972b4e0ab3e9ec52a72b56fb1ebda18",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/locked-graph.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/locked-graph.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/locked-graph.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/metadata.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/metadata.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/metadata.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/metadata.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/metadata.txt",
+      "bytes": 162390,
+      "sha256": "7a8e29a076cedb3f22a89051a4398316625be4c1a09bf15bf2078ce65672097e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/metadata.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/original-command.sh",
+      "bytes": 1846,
+      "sha256": "a87fe53bf5b2fdfe382f0996b35fe9e839ffabe75c71f282674b7af3b978e70b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/prior-inputs.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-02/start.txt",
+      "bytes": 21,
+      "sha256": "311c0886e767297929123af241e0baeb3b9c18966c4e43aadd3f644fbff7c97e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-02/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "bytes": 8306696,
+      "sha256": "bc0eb459fb4959fd22afef379eaa30ef4b226729177a023075d916b75d1bb416",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos-e97507d926e5798a.rmeta"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "bytes": 49789168,
+      "sha256": "15e4ed73ecf373485f8ec408dc8ec31c3ac3e9cd0e1fc472ebc6a7798a971a0c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-prepared-original-engine/libisogeny_algos.rlib",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-01/actual-prepared-original-engine/libisogeny_algos.rlib"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/.gitignore",
+      "bytes": 9,
+      "sha256": "306fd52e74fca6746e12acc750f232de15e71da917756a1270d74c91f5eb7368",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/.gitignore",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/Cargo.lock",
+      "bytes": 7568,
+      "sha256": "80cf0457ec4cb77c7b2de6e34678ac81c4f02ed1e069fefc3ae54e428fe386ae",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/Cargo.lock",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/Cargo.toml",
+      "bytes": 804,
+      "sha256": "be3c239404d1749d9bcc4ec9f1b9e2cda5edbb296c71eed992eb748a785fdc20",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/Cargo.toml",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/README.md",
+      "bytes": 2203,
+      "sha256": "df03db072204f8c4c548e7657fb16fed7289b8cd70c5f546a1279082087cc95b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/README.md",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/build-only-01.sh",
+      "bytes": 1846,
+      "sha256": "a87fe53bf5b2fdfe382f0996b35fe9e839ffabe75c71f282674b7af3b978e70b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/build-only-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/capture_binary.py",
+      "bytes": 889,
+      "sha256": "4d0261a9622d1a6049760ddffe35682ce5ac2d89debce56d06d5a30de7450a0e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/capture_binary.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/capture_engine.py",
+      "bytes": 2855,
+      "sha256": "d6ad2b6626e8e2cc7feef5ec32d6544adc6be040ceca9cf150a2b5f5a25b178d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/capture_engine.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/frozen-prior-inputs-01.sha256",
+      "bytes": 173276,
+      "sha256": "135b4e187767de9183c7c8c659ee9b3d95c0a05746be2e67346ac9a2b61ecfaf",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/frozen-prior-inputs-01.sha256",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/generated/curve_residual.rs",
+      "bytes": 610,
+      "sha256": "ab29e27eb14658a0d409f18cf2b9be784cd9640b9f5273fba217863aa09374dd",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/generated/curve_residual.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/generated/custody.json",
+      "bytes": 3212,
+      "sha256": "508eeffc85b638890fbd8d59913585ad328c5f2db023d79f094bee5535f2c59c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/generated/custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/generated/encoding.rs",
+      "bytes": 517,
+      "sha256": "82604bce1992f8172d244ce0994aa7b0ff8510a6866517f8e6b942100d351de4",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/generated/encoding.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/generated/eval_rational.rs",
+      "bytes": 689,
+      "sha256": "7c901f0e1eb222395b6d28cb11e499097ca09dca8c4f0057bc6f5cb8b62d7f95",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/generated/eval_rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/generated/halving.rs",
+      "bytes": 1343,
+      "sha256": "909d269795be3cba718cecd0c66ccaa60b77826e59e21358d44cb75ae8848003",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/generated/halving.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/generated/literal_halves.rs",
+      "bytes": 1512,
+      "sha256": "1acbcfcf8ba95f3dd489b49df32fd789574e9340133882f3620f987cb5d933a4",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/generated/literal_halves.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/generated/parse_packet.rs",
+      "bytes": 708,
+      "sha256": "22e2eeed7d63c5570a8e1a4b662307f97daa39c43f30195a631f20979f56a77b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/generated/parse_packet.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/generated/polynomial.rs",
+      "bytes": 517,
+      "sha256": "782c0ee85216824242a36d097f1761d770e8f40654323a4b7c9fe740f8a2f049",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/generated/polynomial.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/generated/rational.rs",
+      "bytes": 1985,
+      "sha256": "fa332b8799f834ed2fddd175317a6a69194c8c30f8f360a8e4086b34452dfb2f",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/generated/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/inherit_prepared.py",
+      "bytes": 2105,
+      "sha256": "883613805995362d55b012eb2eec3cebd2ccb898332c52ac69df0171efd3d52e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/inherit_prepared.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/lean/OriginalFullChain.lean",
+      "bytes": 13197,
+      "sha256": "16c66886a7632cbfadae5072995dadf2280abf4bc288408a0b6d683ad5c55b3c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/lean/OriginalFullChain.lean",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/lean/PrimeRecovery.lean",
+      "bytes": 1441,
+      "sha256": "ab8f1c6fcd714f512f4b17ccd9af1952778fc5c88306bec75a63de411f3a4d81",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/lean/PrimeRecovery.lean",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/lean/literal-actual-inverse-inputs.json",
+      "bytes": 777,
+      "sha256": "610c8ceb5a094ad584db1d32ed4984b04acda4494c84f83c783c3e773417aa11",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/lean/literal-actual-inverse-inputs.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/lean/literal-source-custody.json",
+      "bytes": 574,
+      "sha256": "2bab452163efa429f312897dd23b1266fa8006879ae4de089c11f345006f8f33",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/lean/literal-source-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/materialize.py",
+      "bytes": 2076,
+      "sha256": "8841732ec9863b118bed4890f06be6a6cb3b87bf39d9c3855e9324950cf31869",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/materialize.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/run-native-01.sh",
+      "bytes": 2286,
+      "sha256": "db69506c7360ac91044943444523668cb72d508808d84b749ec6ad8ab3fb6635",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/run-native-01.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/runtime_custody.py",
+      "bytes": 1998,
+      "sha256": "b6f4f8d70c40079fdf2ef5ad002f877c67e3c96b38f80167f4764a464a27a3cc",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/runtime_custody.py",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/source-derivation.json",
+      "bytes": 1376,
+      "sha256": "6ab2ffd5f4796812fb864bf80bac1b96ff8eadf473f7835d4f3631b815855a5a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/source-derivation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/src/bin/audit_chain.rs",
+      "bytes": 6159,
+      "sha256": "142b77bbe79c637a47f56ee572434f081d62c3a0742c54cb1b3c44a8321cdcbd",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/src/bin/audit_chain.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/src/known_point.rs",
+      "bytes": 2167,
+      "sha256": "7ef1c96ff87e952892b1443973a12731a193c9d8b81c697a219dd9107d3d425c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/src/known_point.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/src/known_tests.rs",
+      "bytes": 8841,
+      "sha256": "b83c026dd636819eba31a735270c6458565b40aea4afb805b61a89c8030d1fdc",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/src/known_tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/src/lib.rs",
+      "bytes": 19496,
+      "sha256": "2b1a51257ae741fe48f49e4d9fa3aecaeee6399ee9937224888e06ce41a4e02f",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/src/lib.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/src/rational.rs",
+      "bytes": 4579,
+      "sha256": "8fe19e74ea9478871521c6956be66344740de19ac83ef3852217eb2995d708d5",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/src/rational.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/actual-source/src/tests.rs",
+      "bytes": 17967,
+      "sha256": "f69c3110a6b4479b4c3c0bceeaf279934fba962b9108ad0ec9dc2ced3aa9eb95",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/actual-source/src/tests.rs",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/auditor-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/auditor-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/auditor-compile.stderr.txt",
+      "bytes": 62,
+      "sha256": "90c8a1a69c0155761cff4bfe0e61bbee007961d2b96729d2127c2e0c291489dd",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/auditor-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/auditor-compile.txt",
+      "bytes": 98812,
+      "sha256": "47dc20c082a044e71fa4e14a9de0bcada89c51552bb8c834c3a23ff249c0ba27",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/auditor-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/auditor-compiled-custody.json",
+      "bytes": 1466,
+      "sha256": "318b219bc48fe212d91c7cada7309eb57dadf6c6417bd9cbf15b7a13db8820aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/auditor-compiled-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/auditor-original-compiled.bin",
+      "bytes": 640248,
+      "sha256": "84c59836e03c3dd7d39dbd7d83e25d44af390fd4ba138dfe3fde0de466c16e2a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/auditor-original-compiled.bin",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-01/auditor-original-compiled.bin"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/chain-compile.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/chain-compile.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/chain-compile.stderr.txt",
+      "bytes": 62,
+      "sha256": "90c8a1a69c0155761cff4bfe0e61bbee007961d2b96729d2127c2e0c291489dd",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/chain-compile.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/chain-compile.txt",
+      "bytes": 95772,
+      "sha256": "0cdd19ac240fee323365ee89adc98006debf292969b27cabd3ffe322c8e0cf34",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/chain-compile.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/chain-compiled-custody.json",
+      "bytes": 1553,
+      "sha256": "5cabfcebc7fac96c44a201d1cfcce196139709f37777667ba11fc8d325e065c3",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/chain-compiled-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/chain-original-compiled.bin",
+      "bytes": 4799944,
+      "sha256": "49a04b91e5d5bdf69d58d8cbae87b7f9f73f6c29c7dfce0c80ed3f1551174a63",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/chain-original-compiled.bin",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-02/chain-original-compiled.bin"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/engine-prepared.json",
+      "bytes": 1802,
+      "sha256": "c0aee3d0ff7b9a02d3067b497d0447fb8ac0b2a53adf03e71ec5cdefb940a9f4",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/engine-prepared.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/engine-reused.json",
+      "bytes": 2044,
+      "sha256": "e5d886ce19fe22497af4b2542dc090afdb66fa8e9791ff488c1e142419f2b72d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/engine-reused.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/final-prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/final-prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/final-prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/final-prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/final-prior-inputs.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/final-prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/finish.txt",
+      "bytes": 21,
+      "sha256": "0ae71c3c92fcfa1aaf48f106ef67ed30e77adcecde976ac9736a9d3a8cf06b9d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/inherited-preparation.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/inherited-preparation.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/inherited-preparation.json",
+      "bytes": 31789,
+      "sha256": "a554647d28fd4d5ec8c562f251d642efda998a6557687c690c3bfa0a11ed4c06",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/inherited-preparation.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/inherited-preparation.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/inherited-preparation.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/inherited-preparation.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/inherited-preparation.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/locked-graph.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/locked-graph.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/locked-graph.stderr.txt",
+      "bytes": 273,
+      "sha256": "93a4436471dc24143d528ce52c4703a2c972b4e0ab3e9ec52a72b56fb1ebda18",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/locked-graph.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/locked-graph.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/locked-graph.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/metadata.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/metadata.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/metadata.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/metadata.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/metadata.txt",
+      "bytes": 162390,
+      "sha256": "7a8e29a076cedb3f22a89051a4398316625be4c1a09bf15bf2078ce65672097e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/metadata.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/original-command.sh",
+      "bytes": 1846,
+      "sha256": "a87fe53bf5b2fdfe382f0996b35fe9e839ffabe75c71f282674b7af3b978e70b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/prior-inputs.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/prior-inputs.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/prior-inputs.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/prior-inputs.stderr.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/prior-inputs.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/prior-inputs.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-build-03/start.txt",
+      "bytes": 21,
+      "sha256": "b628064c4d27e23c78b2ad0c6cf778da4771c76a7c434b61a59a400dcea98d62",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-build-03/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/actual-before-native-auditor.bin",
+      "bytes": 640248,
+      "sha256": "84c59836e03c3dd7d39dbd7d83e25d44af390fd4ba138dfe3fde0de466c16e2a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/actual-before-native-auditor.bin",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-01/auditor-original-compiled.bin"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/actual-before-native-chain.bin",
+      "bytes": 4799112,
+      "sha256": "069f8534365e4f93ffe58368ffd38b48187506c86c7fc553c1b35c20f963314e",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/actual-before-native-chain.bin",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-01/chain-original-compiled.bin"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/after-failure-all1270-prior.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/after-failure-all1270-prior.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/after-failure-all1270-prior.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/after-failure-all1270-prior.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/after-failure-auditor-bytes.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/after-failure-auditor-bytes.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/after-failure-auditor-bytes.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/after-failure-auditor-bytes.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/after-failure-chain-bytes.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/after-failure-chain-bytes.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/after-failure-chain-bytes.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/after-failure-chain-bytes.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/auditor-actual-path.txt",
+      "bytes": 86,
+      "sha256": "2c68dbb7def2baaa0465a609ab2c52aaf058fc0fc630dee9b1a0b622a0abe806",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/auditor-actual-path.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/chain-actual-path.txt",
+      "bytes": 117,
+      "sha256": "c28b544ee80ab4652cbf8173ad1ff04ab47e9a369f619e8c2aa521ce31f6e5b1",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/chain-actual-path.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/completed-whole-records.json",
+      "bytes": 14506179,
+      "sha256": "6ef0eb2e9fe5e6911cef9a7bd25c70e5f52500bc47efbcc8ba693fd35a388a4b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/completed-whole-records.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/failure-summary.json",
+      "bytes": 808,
+      "sha256": "2d05e505241f6d4dbfc5a428d22301f9d852cd144dc2eb0ccee58e0b35bbaeb4",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/failure-summary.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/finish.txt",
+      "bytes": 21,
+      "sha256": "4d796110e167ce6c03b2da7b3c9e133cb30dc57dd2eca440a34e8eccdcaeebbf",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/immediate-original-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/immediate-original-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/immediate-original-gate.txt",
+      "bytes": 196,
+      "sha256": "9cd8d50193c1858f31bd7627135b9d180b0c2e7d29fc5060cdc6622f62e5896a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/immediate-original-gate.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/initial-prior.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/initial-prior.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/initial-prior.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/initial-prior.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/native.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/native.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/native.txt",
+      "bytes": 14498340,
+      "sha256": "d71f599a7f0e8337e20abaf11d1ea946a5e6784d4bc151e827bd647451c0473d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/native.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/old-sixteen.json",
+      "bytes": 43111384,
+      "sha256": "f8c77d8aa6a0a134aa7836fc9d4f2be662bb5eee9da6bf33770a934d11296312",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/old-sixteen.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/original-command.sh",
+      "bytes": 2286,
+      "sha256": "db69506c7360ac91044943444523668cb72d508808d84b749ec6ad8ab3fb6635",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/original.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/phases.txt",
+      "bytes": 79,
+      "sha256": "3994ba8c495cde7fcb604b7d0ededc9f7c7681107e19cd9bbc66f4997c85e975",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/phases.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/runtime-custody.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/runtime-custody.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/runtime-custody.json",
+      "bytes": 7869,
+      "sha256": "c8699754e5d2e5ff31ce78f01ba6ccb211659cb625c40d2fa7274f662655482a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/runtime-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/runtime-custody.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/runtime-custody.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-01/start.txt",
+      "bytes": 21,
+      "sha256": "f50d7e2aa9a1f4ac166866454a65adc7ca6bc8a75d28b772938a646854bced04",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-01/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-entire-actual-records-omitted.txt",
+      "bytes": 11209822,
+      "sha256": "5687f4303675191b9837def5499e9d3d575548d3fb6f6ca72019ca13f6b3d32a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-entire-actual-records-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-omission.txt",
+      "bytes": 271,
+      "sha256": "870de5473e8c1300acb9c3e3feee6fdec289bf59b7e41df5fd9149365a1ab597",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_EXCEPTIONALS-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_PUBLIC-entire-actual-records-omitted.txt",
+      "bytes": 16850630,
+      "sha256": "e71ca277709bd5cd0180c226bb4b9cae5a3302ebee6c2bcab721860c95917857",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_PUBLIC-entire-actual-records-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_PUBLIC-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_PUBLIC-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_PUBLIC-omission.txt",
+      "bytes": 271,
+      "sha256": "e930915704186afe3ebd4dc27db2707dba67e2f1226bbfbdc5a779dfe8e9d263",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_ALL_PUBLIC-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-entire-actual-records-omitted.txt",
+      "bytes": 11159284,
+      "sha256": "81bfb0ce4fab94aa69a8ceab1fe34c825d9e20de2c39f859c100a4efdfa30b54",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-entire-actual-records-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-omission.txt",
+      "bytes": 270,
+      "sha256": "2747ceb1122384d049ec20b2ef83492f28ee180643a81fb0410919d983c30bdc",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_EXCEPTIONAL_CASE-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-entire-actual-records-omitted.txt",
+      "bytes": 17355898,
+      "sha256": "96c5994b3ee09938e98911d4e2a62cc4c582958a37ee39ea8deca6e87fab4107",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-entire-actual-records-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-omission.txt",
+      "bytes": 271,
+      "sha256": "ad1fdbf5bae62db712d12723c75cd8bcba01445cddd5f802580d81e23dd176c9",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_FIXED_CHAIN_SELECTED_CALL_VECTORS-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_ORIGINAL_FULL_KNOWN_POINT_VECTORS-entire-actual-records-omitted.txt",
+      "bytes": 17320382,
+      "sha256": "69096296edb3a889b056a91348655ebb80e0ce19fd21c9d9bcd9bc2b4009fdad",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_ORIGINAL_FULL_KNOWN_POINT_VECTORS-entire-actual-records-omitted.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_ORIGINAL_FULL_KNOWN_POINT_VECTORS-omission.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_ORIGINAL_FULL_KNOWN_POINT_VECTORS-omission.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/N4_ORIGINAL_FULL_KNOWN_POINT_VECTORS-omission.txt",
+      "bytes": 271,
+      "sha256": "66679fb3ed1516889af6013dd3d0bc3378d9735bfcd3c312514c8cd21c24539a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/N4_ORIGINAL_FULL_KNOWN_POINT_VECTORS-omission.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/actual-before-native-auditor.bin",
+      "bytes": 640248,
+      "sha256": "84c59836e03c3dd7d39dbd7d83e25d44af390fd4ba138dfe3fde0de466c16e2a",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/actual-before-native-auditor.bin",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-01/auditor-original-compiled.bin"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/actual-before-native-chain.bin",
+      "bytes": 4799944,
+      "sha256": "49a04b91e5d5bdf69d58d8cbae87b7f9f73f6c29c7dfce0c80ed3f1551174a63",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/actual-before-native-chain.bin",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-build-02/chain-original-compiled.bin"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/all701-compared.json",
+      "bytes": 17471632,
+      "sha256": "8e639af3c3eed2c79ae07e77e8857d9c465609f8dd70eff57f5bc0e366b40e8d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/all701-compared.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/all701-expected.json",
+      "bytes": 17471632,
+      "sha256": "8e639af3c3eed2c79ae07e77e8857d9c465609f8dd70eff57f5bc0e366b40e8d",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/all701-expected.json",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-native-02/all701-compared.json"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/auditor-actual-path.txt",
+      "bytes": 86,
+      "sha256": "2c68dbb7def2baaa0465a609ab2c52aaf058fc0fc630dee9b1a0b622a0abe806",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/auditor-actual-path.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/chain-actual-path.txt",
+      "bytes": 117,
+      "sha256": "c28b544ee80ab4652cbf8173ad1ff04ab47e9a369f619e8c2aa521ce31f6e5b1",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/chain-actual-path.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/compare701.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/compare701.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/compare701.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/compare701.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/final-auditor-bytes.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/final-auditor-bytes.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/final-auditor-bytes.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/final-auditor-bytes.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/final-prior.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/final-prior.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/final-prior.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/final-prior.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/final-test-bytes.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/final-test-bytes.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/final-test-bytes.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/final-test-bytes.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/finish.txt",
+      "bytes": 21,
+      "sha256": "06af7a341ce846493b1eb2ba27958acb245364781b3f20fedec3703a7179582b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/freeze701.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/freeze701.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/freeze701.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/freeze701.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/immediate-original-gate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/immediate-original-gate.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/immediate-original-gate.txt",
+      "bytes": 196,
+      "sha256": "97cd1ccd2667da323ffb41d5c8adc853a84c285d28b0477c8b0eb8c5f75a3649",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/immediate-original-gate.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/initial-prior.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/initial-prior.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/initial-prior.txt",
+      "bytes": 94536,
+      "sha256": "5fa044b2667e5ccd67e4aa1d3b6070327d550a6c489b24e5d96f4b57fd7f0413",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/initial-prior.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/native.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/native.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/native.txt",
+      "bytes": 17463024,
+      "sha256": "37c509c25ade5cc309a81e90d32d8422a926944554803a420c169b765fe7e2b3",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/native.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/old-sixteen.json",
+      "bytes": 43111384,
+      "sha256": "f8c77d8aa6a0a134aa7836fc9d4f2be662bb5eee9da6bf33770a934d11296312",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/old-sixteen.json",
+      "held_original": true,
+      "archive_hardlink_target": "whole-science/ct90-original-full-evaluator-native-01/old-sixteen.json"
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/original-command.sh",
+      "bytes": 2286,
+      "sha256": "db69506c7360ac91044943444523668cb72d508808d84b749ec6ad8ab3fb6635",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/original.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/original.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/phases.txt",
+      "bytes": 416,
+      "sha256": "968a5dff39e9e9e09914fdf466a85611b22f95e7ca8e3d24226f646caaaef25c",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/phases.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/runtime-custody.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/runtime-custody.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/runtime-custody.json",
+      "bytes": 8472,
+      "sha256": "b8cd766c43f4dad61ae3bedd909952f1a63b17678269e8c06af5913b9d6650b7",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/runtime-custody.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/runtime-custody.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/runtime-custody.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-02/start.txt",
+      "bytes": 21,
+      "sha256": "51788a4579082fc8438f65a6ecd0535c51b496cb0cef7866c8e3d20fea7dedd7",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-02/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-01/finish.txt",
+      "bytes": 21,
+      "sha256": "4d796110e167ce6c03b2da7b3c9e133cb30dc57dd2eca440a34e8eccdcaeebbf",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-01/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-01/original-command.sh",
+      "bytes": 715,
+      "sha256": "560feadc7335be4559d6a7a1a42322c34c97fb5a1892a67dcff7948eb49381e8",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-01/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-01/start.txt",
+      "bytes": 21,
+      "sha256": "d4b0aa504fc47e80906b1df73745eeb86d57e89c015c3ae6a6c8491f7d8d101f",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-01/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-01/whole-worker.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-01/whole-worker.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-01/worker.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-01/worker.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-02/finish.txt",
+      "bytes": 21,
+      "sha256": "06af7a341ce846493b1eb2ba27958acb245364781b3f20fedec3703a7179582b",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-02/finish.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-02/original-command.sh",
+      "bytes": 715,
+      "sha256": "45b9c174d8b59ede28848dc2e795a7fae2a2985bf8075398bf0ce613734c323f",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-02/original-command.sh",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-02/start.txt",
+      "bytes": 21,
+      "sha256": "164d60d637a54ba1fb0372cad3f33957f696bf7f171c8ec8360660e4630a9ea3",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-02/start.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-02/whole-worker.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-02/whole-worker.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-evaluator-native-supervisor-02/worker.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-evaluator-native-supervisor-02/worker.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/consumer-whole.txt",
+      "bytes": 139,
+      "sha256": "9a4628afaf55278c527a592317a6faccfeb29f258305df47d450da19f998cab1",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/consumer-whole.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/consumer.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/consumer.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_PrimeRecovery_lean/audit.log",
+      "bytes": 490,
+      "sha256": "1953dfeda968150d4299cc903a76144c9c2338505c3d00faeeaff07d966e9ae2",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_PrimeRecovery_lean/audit.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_PrimeRecovery_lean/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_PrimeRecovery_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_PrimeRecovery_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/consumer/experiments_chained-transfer-public-target_original-full-evaluator-01_lean_PrimeRecovery_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/producer-launch-failure01.txt",
+      "bytes": 242,
+      "sha256": "dfe3092af831b41c3c9f1ea6748a092fc648238f989b101f89d1c5ed3e7ba6c0",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/producer-launch-failure01.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/producer-whole.txt",
+      "bytes": 120,
+      "sha256": "777b5775724c3987f542977c3883f6692b4eeeb4cc931ab6ad40404b5c226598",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/producer-whole.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/producer.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/producer.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/producer/target_ct90-original-full-prime-recovery-proof-stage-01_PrimeRecovery_lean/audit.log",
+      "bytes": 441,
+      "sha256": "16839a178f3ea4445bfbbe423ee3dc053e8f61f208fdb7b1ec400f5a2907ba23",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/producer/target_ct90-original-full-prime-recovery-proof-stage-01_PrimeRecovery_lean/audit.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/producer/target_ct90-original-full-prime-recovery-proof-stage-01_PrimeRecovery_lean/build.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/producer/target_ct90-original-full-prime-recovery-proof-stage-01_PrimeRecovery_lean/build.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-prime-recovery-proof-01/producer/target_ct90-original-full-prime-recovery-proof-stage-01_PrimeRecovery_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "local_original": "/workspace/scratch/ct90-original-full-prime-recovery-proof-01/producer/target_ct90-original-full-prime-recovery-proof-stage-01_PrimeRecovery_lean/status",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/failed01/actual-draft-report.typ",
+      "bytes": 7692,
+      "sha256": "d0166ae71504b256e413d214d0373faf1dfab792b32dbee86125f7b075b57bc8",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/failed01/actual-draft-report.typ",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/failed01/actual-observation.txt",
+      "bytes": 401,
+      "sha256": "8e62eafeaca3b0fa4335db013c961ce5c8818dfa9aff13f295d7744859345a36",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/failed01/actual-observation.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/failed01/raster.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/failed01/raster.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/failed01/raster.txt",
+      "bytes": 126,
+      "sha256": "8af89374d98af9db9afbeae98a1bab99090af161403d65ce0af2d62d7c4d09f7",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/failed01/raster.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/failed01/render.exit",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/failed01/render.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/page-1.png",
+      "bytes": 235357,
+      "sha256": "7b9fd21009b3c6ee12625ed724fba858cbafa30b10a53cb7b05ea632790dd8e7",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/page-1.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/page-2.png",
+      "bytes": 274305,
+      "sha256": "6793753b9a76122cf9f782751b460ecb686e37e6113273fe4288f2322f018f3f",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/page-2.png",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/pdfinfo.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/pdfinfo.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/pdfinfo.txt",
+      "bytes": 437,
+      "sha256": "e49bd6137fb3081abdcb719a2c61c3f3aa713daf41a3299f55368548ab7a0b2c",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/pdfinfo.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/pdftext.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/pdftext.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/pdftext.txt",
+      "bytes": 6733,
+      "sha256": "07ea293b2bdc32329bc6fc7c5e8a47f07d4bdc6dc87e45f78223969c60ed5dce",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/pdftext.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/raster.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/raster.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/raster.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/raster.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/render-inputs.json",
+      "bytes": 438798,
+      "sha256": "70828f9f619936b804ad48ad4842ef5cb54a83201fdd4991525611f8dac8a77f",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/render-inputs.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/render.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/render.exit",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/report.pdf",
+      "bytes": 58175,
+      "sha256": "5030bbad838d012d9c95b40f82b5cd3f114d4f24f4fd56587cfe4bd313e88750",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/report.pdf",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-original-full-result-report-01/report.typ",
+      "bytes": 7728,
+      "sha256": "7adb7ff9f598dd7f393d38c6d570c49024051e1b0cb4c9ca7bef85477c0666aa",
+      "local_original": "/workspace/scratch/ct90-original-full-result-report-01/report.typ",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-prime-descent-primary-review-01/diem-plane-curves-2012-extract.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-prime-descent-primary-review-01/diem-plane-curves-2012-extract.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-prime-descent-primary-review-01/diem-plane-curves-2012.pdf",
+      "bytes": 951448,
+      "sha256": "cdbd69bf98354b5c640cf00ca562593dfaf76cdb6b82c9e79cc701d89c73579f",
+      "local_original": "/workspace/scratch/ct90-prime-descent-primary-review-01/diem-plane-curves-2012.pdf",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-prime-descent-primary-review-01/diem-plane-curves-2012.txt",
+      "bytes": 85151,
+      "sha256": "a2580bc75e8aff7983bc944a43e86972780c59ea5f5681592e992c96bd232d9e",
+      "local_original": "/workspace/scratch/ct90-prime-descent-primary-review-01/diem-plane-curves-2012.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-prime-descent-primary-review-01/downloads.json",
+      "bytes": 603,
+      "sha256": "c7b53618467ee68651593f050304119623cd5dfa4aae02a2d4431287d64a433a",
+      "local_original": "/workspace/scratch/ct90-prime-descent-primary-review-01/downloads.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-prime-descent-primary-review-01/tian-cover-2020v1-extract.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "local_original": "/workspace/scratch/ct90-prime-descent-primary-review-01/tian-cover-2020v1-extract.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-prime-descent-primary-review-01/tian-cover-2020v1.pdf",
+      "bytes": 253618,
+      "sha256": "b7748c551bea45474f3785cb21c86987449ab858438719300f9273c3f6b9cb5d",
+      "local_original": "/workspace/scratch/ct90-prime-descent-primary-review-01/tian-cover-2020v1.pdf",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-prime-descent-primary-review-01/tian-cover-2020v1.txt",
+      "bytes": 58222,
+      "sha256": "a2c67868c933554e077d1998de9745d808377a9da880cbd9a483279e3bbab082",
+      "local_original": "/workspace/scratch/ct90-prime-descent-primary-review-01/tian-cover-2020v1.txt",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-root-full-result-mirror-publication-01/expected-head-lookup.log",
+      "bytes": 96,
+      "sha256": "800fcd44cd97d94d3d4b768cebdae275738322a4367c75cf1414f29abcaef8bf",
+      "local_original": "/workspace/scratch/ct90-root-full-result-mirror-publication-01/expected-head-lookup.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-root-full-result-mirror-publication-01/push.log",
+      "bytes": 396,
+      "sha256": "cfcd77348fda0b72039918afd61dd37758308d74c032924785dbae370ce4af2b",
+      "local_original": "/workspace/scratch/ct90-root-full-result-mirror-publication-01/push.log",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct90-root-full-result-mirror-publication-01/receipt.json",
+      "bytes": 657,
+      "sha256": "2ec902b918f9b6ce8bbacb34ef542591f258f6ecec919eace4c2b197bd5ae97f",
+      "local_original": "/workspace/scratch/ct90-root-full-result-mirror-publication-01/receipt.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct91-unheld-tool-pycache-cleanup-11/outcome.json",
+      "bytes": 1119,
+      "sha256": "935fdaec2d9f54635d134333017ccac6dfc4087f68b7f76796b61548cdfcac33",
+      "local_original": "/workspace/scratch/ct91-unheld-tool-pycache-cleanup-11/outcome.json",
+      "held_original": true
+    },
+    {
+      "path": "whole-science/ct91-unheld-tool-pycache-cleanup-11/whole-removed-bytecode-inventory.json.xz",
+      "bytes": 237376,
+      "sha256": "e718115285cf48b4a6c3f9bba6e01f4c9c6d3167787a6af2c3a7e361f6ec49b7",
+      "local_original": "/workspace/scratch/ct91-unheld-tool-pycache-cleanup-11/whole-removed-bytecode-inventory.json.xz",
+      "held_original": true
+    },
+    {
+      "path": "control/root-base.txt",
+      "bytes": 41,
+      "sha256": "65fde1cff046c24255a6ebf68745a2d9411847f63fb7ff5de301d035c9550818"
+    },
+    {
+      "path": "control/consumer-base.txt",
+      "bytes": 41,
+      "sha256": "febd353ee27461ae99fab1f8c1ef4a56630dbb1d6ff71f5361086bab6de28e86"
+    },
+    {
+      "path": "control/consumer-pending.patch",
+      "bytes": 11904,
+      "sha256": "93d2e7394bd37ff181bd62042c118d3a18318a0ff94782fe2c4f3a9d69724fbb"
+    },
+    {
+      "path": "control/old-prior24-consumer-ledger.jsonl",
+      "bytes": 440331,
+      "sha256": "14f65e42227a2c1cfc72a75b617ab89e418214394521d253bf8f2bcd8348bc39"
+    },
+    {
+      "path": "control/published675-consumer-ledger.jsonl",
+      "bytes": 455683,
+      "sha256": "aa042ae447b3718bf3213ca2bbd05ad0ea6b9366483feb49a1884d99f2f573ba"
+    }
+  ]
+}

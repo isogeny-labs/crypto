@@ -1,0 +1,93 @@
+{
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "baseline",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "candidate",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  }
+ ],
+ "description": "research/curve25519_autolab_20261104/bsgs: measured bsgs.negation against rho-neg (time-memory, excluded from the IC ratchet, reported as a boundary reference for the 0.75x goal). Public synthetic targets; no security claim.",
+ "label": "BSGS-class boundary panel k = 20: bsgs.negation vs rho-neg on five fresh family curves",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 2,
+  "seed": 20263030,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 88607,
+    "b": 585530,
+    "gx": 843,
+    "gy": 233392,
+    "group_order": 1048888,
+    "p": 1047989,
+    "r": 131111,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 821384,
+    "b": 972474,
+    "gx": 349895,
+    "gy": 279173,
+    "group_order": 1049192,
+    "p": 1047941,
+    "r": 131149,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 957688,
+    "b": 264532,
+    "gx": 698997,
+    "gy": 350792,
+    "group_order": 1049368,
+    "p": 1047701,
+    "r": 131171,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 525700,
+    "b": 559179,
+    "gx": 939,
+    "gy": 394388,
+    "group_order": 1048808,
+    "p": 1047589,
+    "r": 131101,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 140034,
+    "b": 681489,
+    "gx": 557,
+    "gy": 306933,
+    "group_order": 1049032,
+    "p": 1047533,
+    "r": 131129,
+    "kind": "prime_explicit"
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20263020,
+  "targets_per_curve": 12
+ }
+}

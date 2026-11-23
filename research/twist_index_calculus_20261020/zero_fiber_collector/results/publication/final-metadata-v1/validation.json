@@ -1,0 +1,61 @@
+{
+  "schema": "zero-fiber-publication-metadata/v1",
+  "status": "pass",
+  "checked_publication_commit": "9da8fbefe552de8aac196181dbdec713f6177365",
+  "phases": {
+    "large-files": {
+      "exit": 0,
+      "stdout": "large-files.stdout",
+      "stderr": "large-files.stderr"
+    },
+    "root-library-parity": {
+      "exit": 0,
+      "stdout": "root-library-parity.stdout",
+      "stderr": "root-library-parity.stderr"
+    },
+    "validation-metadata-parity": {
+      "exit": 0,
+      "stdout": "validation-metadata-parity.stdout",
+      "stderr": "validation-metadata-parity.stderr"
+    },
+    "frozen-native-sources": {
+      "exit": 0,
+      "stdout": "frozen-native-sources.stdout",
+      "stderr": "frozen-native-sources.stderr"
+    },
+    "linked-archive": {
+      "exit": 0,
+      "stdout": "linked-archive.stdout",
+      "stderr": "linked-archive.stderr"
+    },
+    "protected-unrelated": {
+      "exit": 0,
+      "stdout": "protected-unrelated.stdout",
+      "stderr": "protected-unrelated.stderr"
+    },
+    "diff-check": {
+      "exit": 0,
+      "stdout": "diff-check.stdout",
+      "stderr": "diff-check.stderr"
+    }
+  },
+  "native_source_manifest_sha256": "f495c163e9c0ea4bb3d6792b4e8832605543285e5a3a1da5a98f1049c35dce1c",
+  "native_summary_sha256": "a472fa455a2da6c691729f82b5be10f78da2cd66a700f9dba9298f763f11a2e1",
+  "native_gate": "../../native-journal-gate-v1/metadata",
+  "root_library_gate_reused": {
+    "source_commit": "1055dcbcdb4998e78e22c900ab737ddc9913de70",
+    "exact_Cargo_src_examples_parity_exit": 0,
+    "new_library_test_run_claimed": false
+  },
+  "validation_gate_metadata_reused": {
+    "base": "5abfb020dd7e993eb315d34f93beacc2200e1585",
+    "exact_listed_metadata_and_checker_parity_exit": 0,
+    "new_rows_promoted": false,
+    "parent_receipt_repo_relative": "research/twist_index_calculus_20261020/joint_image_elimination/results/publication/final-metadata-v2"
+  },
+  "archive_publication_receipt": "../store-publication-v2.json",
+  "archive_sha256": "86a7f68e331a24c4bb1048aab3932ce9b30901c7f64def2cae1f617f93ce8bb8",
+  "archive_bytes": 105608944,
+  "inspected_pdfs": "../../pdf-inspection-v1.json",
+  "scope": "Artifact/source/metadata publication checks only; actual native tests and physical/RREF audits retain their separate frozen sources. This is not a complete IC VALIDATION.json or a GitHub CI pass."
+}

@@ -1,0 +1,86 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "target-pin sparse solver, F(p^4) k=4 ladder: pin-wiedemann against structured-gauss and the baseline incremental-gauss on the D4 recipe",
+  "description": "PROTOCOL: research/sparse_la_target_pin_20261104/PROTOCOL.md. Workload, target seed and the D4 recipe copied from research/sparse_la_timing_20261018/specs/SPEC-fp4-p29.json; only linalg varies. pin-wiedemann spaces its attempts by the work of the last failed one; pin-wiedemann-every attempts after every row (relation-count diagnostic). row_ops are unpriced native work priced by the AGENTS.md 5a band at 0, 0.1, 1 GAE.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "fp4_torsion",
+        "p": 29,
+        "seed": 1,
+        "max_cofactor": 16
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 202610134029
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "sg",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "structured-gauss"
+        }
+      }
+    },
+    {
+      "name": "ig",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "pin-wiedemann",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "pin-wiedemann"
+        }
+      }
+    },
+    {
+      "name": "pin-wiedemann-every",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "20000",
+          "linalg": "pin-wiedemann-every"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "shuffle",
+    "seed": 202611040,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

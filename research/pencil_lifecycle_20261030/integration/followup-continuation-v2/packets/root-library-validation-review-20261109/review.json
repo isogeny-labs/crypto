@@ -1,0 +1,37 @@
+{
+  "schema": "source.review/v1",
+  "task": "T-1960",
+  "reviewer": "/root/renew_norm",
+  "recorded_utc": "2026-11-09T17:29:15.224095+00:00",
+  "verdict": "narrow_waiver_source_supported_bounded_qualification_pending",
+  "tests_run": false,
+  "payload_run": false,
+  "snapshot": "snapshot",
+  "source_hashes": {
+    "durable_io.py": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c",
+    "durable-launcher.py": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c",
+    "durable-worker.py": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e",
+    "owner-waiver.patch": "6ea4e02e6f149da78437e6e4647a2bd14e4f88b3218413693de3e6825f39c36b",
+    "admission-draft.json": "aa3329a634336b5e420061cadb8fbc8c9dff72cc675720ee17cab7f9614e2f15"
+  },
+  "findings": [
+    "Dollar waiver branch requires null dollar quantities and hashed approved receipt scoped exactly to this campaign deadline43200 allowance and1800 attempt; resource, publication, controls, hashes and lease gates remain. Ordinary finite-cost branch retained.",
+    "Launcher and worker byte-identical to prior reviewed final source; exact4tests followed by full unfiltered suite,1800 seconds2CPU16GiB unchanged.",
+    "All currently listed admission recipe hashes match snapshot. Missing admission.json/materialized-inputs are intentional unreleased gates.",
+    "Read-only current-host systemctl show of target absent unit returned0 withLoadState=not-found. This is observation only, not native wrapper execution."
+  ],
+  "required_next": [
+    "Independent source review of26case harness and publish before one60second qualification; no execution while materializer active.",
+    "After actual materializer completion bind exact manifest and current ledger1800reservation, live lease and publication; root retains native source/runtime guard and terminal custody evidence."
+  ],
+  "untested_native_failure_paths": [
+    "supervisor kill",
+    "systemd lease-loss cleanup",
+    "descendant termination",
+    "cgroup OOM",
+    "disk exhaustion",
+    "completion-marker persistence failure",
+    "physical crash durability"
+  ],
+  "kb": "No exposed KB tool and wrapper absent; exact prior source/review and current packet used."
+}

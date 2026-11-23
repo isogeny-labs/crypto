@@ -1,0 +1,91 @@
+-- Prospective source only; no compiler or axiom readback performed.
+import Nonbranch
+import Mathlib.Algebra.Polynomial.FieldDivision
+import Mathlib.Algebra.Polynomial.RingDivision
+import Mathlib.Tactic.Ring
+import Lean.Elab.Tactic.Omega
+
+set_option autoImplicit false
+noncomputable section
+namespace DirectBranchCoefficientMultiplicity
+open Polynomial Common22BranchStalk WeightedProjSmoothPoints
+variable {K : Type*} [Field K]
+
+theorem identity_support_multiplicity_sum
+    (F N u1 u2 U : K[X]) (a b : K)
+    (hid : N^2 - (u1*u2)*U = C (b^2)*F)
+    (hroot : F.eval a = 0)
+    (hsimple : F.derivative.eval a ≠ 0)
+    (hb : b ≠ 0)
+    (hsupport : u1.eval a * u2.eval a * U.eval a = 0) :
+    u1 ≠ 0 ∧ u2 ≠ 0 ∧ U ≠ 0 ∧
+      u1.rootMultiplicity a + u2.rootMultiplicity a + U.rootMultiplicity a = 1 := by
+  have hp : (u1*u2)*U = N^2 - C (b^2)*F := by
+    calc
+      (u1*u2)*U = N^2 - (N^2 - (u1*u2)*U) := by ring
+      _ = N^2 - C (b^2)*F := by rw [hid]
+  have hn_sq : N.eval a ^ 2 = 0 := by
+    have he := congrArg (fun f : K[X] => f.eval a) hid
+    simpa only [eval_sub, eval_pow, eval_mul, eval_C, hroot,
+      hsupport, mul_zero, sub_zero] using he
+  have hn : N.eval a = 0 := pow_eq_zero hn_sq
+  have hd : (((u1*u2)*U).derivative).eval a = -(b^2 * F.derivative.eval a) := by
+    rw [hp, derivative_sub, derivative_sq, derivative_C_mul]
+    simp [hn]
+  have hdne : (((u1*u2)*U).derivative).eval a ≠ 0 := by
+    rw [hd]
+    exact neg_ne_zero.mpr (mul_ne_zero (pow_ne_zero 2 hb) hsimple)
+  have hpne : (u1*u2)*U ≠ 0 := by
+    intro hz
+    apply hdne
+    simp [hz]
+  have h12 : u1*u2 ≠ 0 := left_ne_zero_of_mul hpne
+  have h1 : u1 ≠ 0 := left_ne_zero_of_mul h12
+  have h2 : u2 ≠ 0 := right_ne_zero_of_mul h12
+  have hU : U ≠ 0 := right_ne_zero_of_mul hpne
+  have hr : ((u1*u2)*U).IsRoot a := by
+    simpa only [IsRoot, eval_mul] using hsupport
+  have hpos : 0 < ((u1*u2)*U).rootMultiplicity a := (rootMultiplicity_pos hpne).2 hr
+  have hnot : ¬ 1 < ((u1*u2)*U).rootMultiplicity a := by
+    intro hgt
+    exact hdne ((one_lt_rootMultiplicity_iff_isRoot hpne).1 hgt).2
+  have hm : ((u1*u2)*U).rootMultiplicity a = 1 := by omega
+  rw [rootMultiplicity_mul hpne, rootMultiplicity_mul h12] at hm
+  exact ⟨h1,h2,hU,hm⟩
+
+theorem source_support_base_multiplicity_sum
+    (a3 a2 a1 a0 a q1 r1 s1 t1 q2 r2 s2 t2 : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0)
+    (hs : (quintic a3 a2 a1 a0).Separable)
+    (hb : (Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1 ≠ 0)
+    (valid1 : Common22Coprime.firstSupport q1 r1 ∣
+      quintic a3 a2 a1 a0 - (C s1 * X + C t1)^2)
+    (valid2 : Common22Coprime.secondSupport q2 r2 ∣
+      quintic a3 a2 a1 a0 - (C s2 * X + C t2)^2)
+    (hsupport : (Common22Coprime.firstSupport q1 r1).eval a *
+      (Common22Coprime.secondSupport q2 r2).eval a *
+      (ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2).eval a = 0) :
+    Common22Coprime.firstSupport q1 r1 ≠ 0 ∧
+      Common22Coprime.secondSupport q2 r2 ≠ 0 ∧
+      ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2 ≠ 0 ∧
+      (Common22Coprime.firstSupport q1 r1).rootMultiplicity a +
+        (Common22Coprime.secondSupport q2 r2).rootMultiplicity a +
+        (ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2).rootMultiplicity a = 1 := by
+  apply identity_support_multiplicity_sum
+    (quintic a3 a2 a1 a0)
+    (ActualNonbranchNorm.numerator q1 r1 s1 t1 q2 r2 s2 t2)
+    (Common22Coprime.firstSupport q1 r1)
+    (Common22Coprime.secondSupport q2 r2)
+    (ActualNonbranchNorm.residual q1 r1 s1 t1 q2 r2 s2 t2) a
+    (Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1
+  · exact ActualNonbranchNorm.source_norm_identity
+      a3 a2 a1 a0 q1 r1 s1 t1 q2 r2 s2 t2 hb valid1 valid2
+  · rw [WeightedProjQuinticHead.quintic_eval_eq_fAt]
+    exact hroot
+  · rw [WeightedProjQuinticHead.quintic_derivative_eval_eq_derivativeAt]
+    exact WeightedProjQuinticHead.derivativeAt_ne_zero_of_separable
+      a3 a2 a1 a0 a hs hroot
+  · exact hb
+  · exact hsupport
+
+end DirectBranchCoefficientMultiplicity

@@ -1,0 +1,8 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", label="N83 K600 preflight prepare · 2026-11-16 07:40:43 UTC", labelloc=t, fontsize=16];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4ff", color="#3970a3", fontname="Helvetica", fontsize=13];
+  a [label="Frozen worker/source\nLinux ARM64 ELF supervisor"];
+  b [label="macOS direct exec\nno lock written", fillcolor="#fff1e8", color="#ba5d2d"];
+  c [label="exit 126\nplatform mismatch", fillcolor="#fce7e7", color="#bb3e3e"];
+  a -> b -> c;
+}

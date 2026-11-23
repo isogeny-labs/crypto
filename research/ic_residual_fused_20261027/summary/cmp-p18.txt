@@ -1,0 +1,33 @@
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|
+| ECBS1h339fa84d70d5 | rho | rho.negation | icv1-fp18-tm337-d28d5e09 | 17.70 | 32/32 | 1.400 | [1.250, 1.568] | 0.886 | 1.580 | 1.580 | 1.000 | yes | 0.213 | L0×32 |
+| ECBS1h339fa84d70d5 | res2 | ic.pipeline | icv1-fp18-tm337-d28d5e09 | 17.70 | 32/32 | 4.954 | [4.601, 5.335] | – | – | 5.590 | 3.539 | yes | 0.565 | L0×32 |
+| ECBS1h339fa84d70d5 | res2f | ic.pipeline | icv1-fp18-tm337-d28d5e09 | 17.70 | 32/32 | 3.824 | [3.655, 4.000] | – | – | 4.315 | 2.731 | yes | 0.585 | L0×32 |
+
+ops (ok): res2f / res2 = 0.7718 [0.712, 0.837] (linearised_t, df 15) over 32 pairs on 16 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.7718, w=0.1: 1.5853, w=1: 2.2506): unresolved inside the band; wall: admitted ns/GAE res2f/res2 1.3466 [1.266, 1.432], no admitted A/A: not corrected for bias, noise test unavailable; end-to-end wall 1.0392 [0.953, 1.134]; ns/GAE of res2, res2f is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 0 / 100; paired attempts 32, verified 32, admitted 0; levels {"L0": 32}; p95 foreign busy unknown%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm res2: verified 32/32 (0 censored); max/median S 1.45, top run 5% of total; unpriced: legendre_symbols_uncharged=96, lookups_uncharged=43133, residual_table_bytes_uncharged=687072, row_ops_uncharged=806, sqrt_solves_uncharged=64
+arm res2f: verified 32/32 (0 censored); max/median S 1.22, top run 4% of total; unpriced: legendre_symbols_uncharged=96, lookups_uncharged=48712, residual_table_bytes_uncharged=1703944, row_ops_uncharged=776, sqrt_solves_uncharged=64
+| curve | log2 r | workloads | res2f / res2 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp18-tm337-d28d5e09 | 17.70 | 16 | 0.7718 | [0.7116, 0.8370] | linearised_t |
+
+| workload | curve | log2 r | res2 mean S | res2f mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W0d92aa5ef28a | icv1-fp18-tm337-d28d5e09 | 17.70 | 4.1407 | 4.0008 | 0.9662 |
+| W27588fd63b22 | icv1-fp18-tm337-d28d5e09 | 17.70 | 5.9643 | 3.7751 | 0.6330 |
+| W49ee06391301 | icv1-fp18-tm337-d28d5e09 | 17.70 | 5.3308 | 3.9802 | 0.7466 |
+| W52f35d6c1c13 | icv1-fp18-tm337-d28d5e09 | 17.70 | 5.0032 | 3.4497 | 0.6895 |
+| W8b4c66adf922 | icv1-fp18-tm337-d28d5e09 | 17.70 | 5.7538 | 3.5831 | 0.6227 |
+| Wa63ffd3325d4 | icv1-fp18-tm337-d28d5e09 | 17.70 | 4.4380 | 3.9682 | 0.8942 |
+| Waeba0f3408d8 | icv1-fp18-tm337-d28d5e09 | 17.70 | 5.1626 | 3.8272 | 0.7413 |
+| Wb11c7432bbd3 | icv1-fp18-tm337-d28d5e09 | 17.70 | 4.5063 | 3.5929 | 0.7973 |
+| Wb66c43f9bcfd | icv1-fp18-tm337-d28d5e09 | 17.70 | 4.7775 | 3.4269 | 0.7173 |
+| Wba3ebf35beaa | icv1-fp18-tm337-d28d5e09 | 17.70 | 4.1570 | 3.9596 | 0.9525 |
+| Wc694cdbf8de7 | icv1-fp18-tm337-d28d5e09 | 17.70 | 4.1331 | 4.0171 | 0.9719 |
+| Wc93719a1ddae | icv1-fp18-tm337-d28d5e09 | 17.70 | 5.1236 | 4.6094 | 0.8996 |
+| Wd8241fba47d1 | icv1-fp18-tm337-d28d5e09 | 17.70 | 5.4631 | 3.7632 | 0.6888 |
+| Wde344584abee | icv1-fp18-tm337-d28d5e09 | 17.70 | 4.2080 | 3.2848 | 0.7806 |
+| Weab10cda23b0 | icv1-fp18-tm337-d28d5e09 | 17.70 | 6.3321 | 4.1548 | 0.6562 |
+| Wf1e603554c24 | icv1-fp18-tm337-d28d5e09 | 17.70 | 4.7743 | 3.7849 | 0.7928 |

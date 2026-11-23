@@ -1,0 +1,60 @@
+{
+  "schema": "software.source-review/v1",
+  "verdict": "changes_required_before_execution",
+  "producer_manifest": "500131026a86be4d65de93164cc7a78509f4433bbedaa08c7858c89e9020e15d",
+  "hash_bindings_checked": 19,
+  "all_hashes_match": true,
+  "executions": 0,
+  "reviewer_prior_role": "runtime route inspection and compiler prerequisite preparation; not supervisor producer",
+  "findings": [
+    {
+      "id": "R1",
+      "lines": "37,98\u2013103,145,174",
+      "title": "Manifest identity is not member identity",
+      "impact": "The fixed fixture manifest itself is hashed, but no manifest member hashes are verified. The pre/post snapshot allows preexisting changes; preparation.json and expected-report.json are read without comparison to their frozen hashes. A coherent changed fixture/expected report could pass the software comparisons.",
+      "action": "Verify all consumed manifest members and exact fixture membership against the bound manifest before Docker; retain before/after identity checks."
+    },
+    {
+      "id": "R2",
+      "lines": "55\u201375,148\u2013149,180\u2013183",
+      "title": "Interrupted Docker client remains owned but unreaped",
+      "impact": "The signal handler raises Stop while command is running. Generic exceptions enter finally, which writes only a receipt. Only timeout/output-cap code terminates the process group. Container cleanup may race a still-running create/start client; the direct child can remain unreaped.",
+      "action": "On every exceptional exit, terminate and reap the owned client before container reconciliation; preserve interruption and incomplete-client-cleanup receipts. Do not equate client termination with container death."
+    },
+    {
+      "id": "R3",
+      "lines": "119\u2013122,163\u2013171",
+      "title": "Runtime expected files can pass as directories",
+      "impact": "Actual archive kind is never compared with runtime-members kind. For an expected executable file with mode0755, an actual directory with mode0755 passes the mode test and bypasses its SHA via x.directory or hash==expected. Q1/Q3 do not execute the recovery/progress runtime files.",
+      "action": "Require exact expected file/directory kind, expected file length, and SHA for every ordinary file before acceptance."
+    },
+    {
+      "id": "R4",
+      "lines": "57,67\u201375",
+      "title": "Inspect redaction is not exception-safe",
+      "impact": "Full inspect stdout is first written to stdout.raw. Timeout, output cap or JSON parsing failure leaves that raw file; redaction/unlink occurs only on the successful normal path. This contradicts unconditional redacted inspection-receipt scope.",
+      "action": "Use private transient capture with guaranteed cleanup/sanitization on every path; retain digest/error metadata without raw environment values."
+    },
+    {
+      "id": "R5",
+      "lines": "109\u2013114",
+      "title": "Isolation assertions cover only part of actual configuration",
+      "impact": "Mount checking filters only bind mounts, so anonymous/image-declared volumes are not rejected. Tmpfs checks names only, not options. IPC mode, CapAdd and DeviceRequests are unasserted. Command arguments request restrictive values but inspection does not prove the full declared contract.",
+      "action": "Compare an exact approved mount inventory and tmpfs values; reject extra volumes/devices/capabilities and validate IPC/seccomp/configuration as applicable. Preserve requested-versus-effective distinction."
+    },
+    {
+      "id": "R6",
+      "lines": "159\u2013161",
+      "title": "Executable archive ownership claim exceeds checks",
+      "impact": "Executable archives verify bytes and0755 but omit uid/gid checks. The /opt ownership loop does not cover /usr/local/bin/ecbench or isolab-fresh-owner.",
+      "action": "Check root uid/gid for both executable archives, or narrow the stated ownership claim. Scope /opt ancestor checks explicitly to /opt rather than all executable ancestors."
+    }
+  ],
+  "pids_gate": "correctly disclosed unresolved; HostConfig and after-start observation do not prove before-start effective limit",
+  "opt_scope": "prospective widening from explicit members to bounded full /opt tar; requires independent admission, may fail on legitimate unrelated /opt members; no extraction fallback",
+  "non_claims": [
+    "No Docker/client/container/cloud launch",
+    "No measured cleanup or timing validation",
+    "No admission of revised or original source"
+  ]
+}

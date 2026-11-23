@@ -1,0 +1,7 @@
+# Fresh F631 destination relation kernel
+
+Compute all target rational points in two independent ways and require equal sorted lists of597points. Reorder only to put the four freshly discovered split canonical-line points first; append remaining points lexicographically. Fix factor-base size128before execution. Require its points affine and first four collinear on their explicitly computed nonzero line. No x=0 assumption remains.
+
+Collect each distinct line through a pair of factor-base points once. Retain only four distinct rational intersections. Subtract the reference canonical-line divisor, storing original rows sparsely with at most eight entries. Apply the existing LP trace eliminator and scalar Lanczos core with fixed seed20261115/retrycap32. Accept only a nonzero core vector satisfying the original core matrix. Reconstruct eliminated columns, require all597point values known and every original relation residual zero. Serialize exact point ordering and values. No precomputed point-log table, source images or scalar supplied.
+
+Freeze all source/dependency/input/binary hashes and lock; commit and S3 checkpoint/gate before one execution. Retain insufficient coverage/rank/retries and unsupported cases without changing factor-base size. This gate establishes a relation kernel only, not its global one-dimensionality or correctness as Jacobian logs. Geometric reconstruction checks, conic descent and final source/destination scalar verification remain required. No timing or tenfold claim.

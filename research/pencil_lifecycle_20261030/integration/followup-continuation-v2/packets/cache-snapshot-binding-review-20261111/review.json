@@ -1,0 +1,26 @@
+{
+  "schema": "operational-binding-review/v1",
+  "status": "checked_pending_final_publication_and_immediate_owner_refresh",
+  "release_sha256": "7d9faf119888a0b2da56c141fc8bb5d11e26aec82c1f8846eafa6702e3bb6ba9",
+  "receipts": {
+    "execution-command.json": "ea0cf28896ff3beb835f345def39e3f2c28c85d324b795391217887de3abc244",
+    "source-review.json": "8bba15a88074c78cd250990fc2af93fbdb8ea9d5282f9a7d0b3b8da8d623e223",
+    "lease.json": "29535911f58d5f89d11a7a81e232c978bd2b3797e09be157f4d9695b96eabf3c",
+    "publication.json": "862fa093f65dfc972b0a40fae6ffe7853b05a9a71eaebaaf368a73f00a679204",
+    "serial-terminal.json": "a4ec9c32df087336fb4a0982495b691b96d2af89f1acf2f524976121ea0b2020",
+    "current-ledger.json": "d3703f78066497bd9c9fd6f7ff8c84588dcb673e8a150f4eeeafb103695a39b6"
+  },
+  "checks": [
+    "All release/source/command/qualification and five receipt pins match.",
+    "Ledger 3720 charged + 60 reserved + 125820 unreserved = 129600.",
+    "Current claimed T-2141 matches exact fence and lease remains unexpired.",
+    "Fresh output/control absent, snapshot unit not-found, no running pencil service observed.",
+    "Prior lock native terminal digest and empty-cgroup check match.",
+    "Remote current branch matches published source 36b55a2fb224720fd043b5728cb15c84f79646d1."
+  ],
+  "success_predicate": "Require native result passed AND caller terminal.status passed AND owned cgroup empty; caller exit zero alone is insufficient.",
+  "independence_scope": "Root-authored operational bindings only; reviewer authored snapshot source, root separately reviewed that source.",
+  "cache_scanned": false,
+  "execution_performed": false,
+  "observed_utc": "2026-11-11T01:13:10.884976+00:00"
+}

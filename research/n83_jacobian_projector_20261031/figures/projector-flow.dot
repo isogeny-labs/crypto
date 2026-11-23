@@ -1,0 +1,26 @@
+digraph projector {
+  graph [rankdir=LR, bgcolor="white", margin="0.18", nodesep="0.55", ranksep="0.72",
+         fontname="Helvetica", label="n=83 cubic-cover projector and Prym audit",
+         labelloc="t", fontsize=18];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11,
+        color="#24324a", penwidth=1.2, fillcolor="#eef4ff"];
+  edge [fontname="Helvetica", fontsize=10, color="#40516f", penwidth=1.2];
+
+  E [label="E / GF(2^83)\n#E = 4r\ntrace = -6151469093347", fillcolor="#dceaff"];
+  J [label="J(C)\ngenus 3"];
+  I [label="elliptic image\np = [3^-1] phi* phi_*", fillcolor="#dff6e7"];
+  P [label="Prym / kernel\nP(T)=T^4+q^2", fillcolor="#fff0dc"];
+  Fp [label="elliptic factor\ntrace +2^42\ngcd(order,r)=1", fillcolor="#fff7ea"];
+  Fm [label="elliptic factor\ntrace -2^42\ngcd(order,r)=1", fillcolor="#fff7ea"];
+  V [label="No shared r\nNo source-isogenous factor", shape=octagon,
+     fillcolor="#ffe1e1", color="#9f2f35"];
+
+  E -> J [label="phi*"];
+  J -> E [label="phi_*"];
+  J -> I [label="p"];
+  J -> P [label="1-p"];
+  P -> Fp [label="isogeny"];
+  P -> Fm [label="isogeny"];
+  Fp -> V;
+  Fm -> V;
+}

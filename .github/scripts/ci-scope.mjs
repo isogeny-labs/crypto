@@ -2,7 +2,8 @@
 // Local, NUL-delimited git diffs avoid the API's 300-file path-filter limit.
 // Missing comparisons select every check; they must never silently skip work.
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, existsSync, readFileSync } from 'node:fs';
+import { appendFileSync, closeSync, existsSync, mkdtempSync, openSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -29,6 +30,12 @@ const isogenyEmbeddedInputs = new Set([
   'research/p192_p224_large_degree_isogenies_20261009/PROTOCOL.md',
   'research/p192_p224_large_degree_isogenies_20261009/verification_poly.rs',
   'research/p192_p224_large_degree_isogenies_20261009/verification_kernel.rs',
+]);
+// The odd-transfer release binary compile-time embeds this conditional Lean
+// artifact. Keep the release classification explicit as a fail-safe in
+// addition to automatic include_str! discovery.
+const oddTransferEmbeddedInputs = new Set([
+  'research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean',
 ]);
 const prose = /\.(md|rst|txt|pdf|svg|png|jpg|jpeg|gif)$/i;
 const control = /^\.github\/scripts\/.*ci-scope.*$/;
@@ -58,7 +65,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       || rustReleasePayload.test(file) || rustReleaseRootPayload.test(file)
       || releaseAttributes || embedded.has(file)
       || isogenyCliRust.test(file) || isogenyAlgosInputs.test(file)
-      || isogenyEmbeddedInputs.has(file);
+      || isogenyEmbeddedInputs.has(file) || oddTransferEmbeddedInputs.has(file);
     // Both Makefile targets compile src/main.cu against include/ and the
     // committed generated headers; research benchmark sources are separate.
     const client = file === 'ecc2k130/src/main.cu' || file === 'ecc2k130/Makefile'
@@ -74,8 +81,11 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       // ecbench.yml audits every committed session by schema, wherever it
       // lives (research/, taskq/deploy/, ...), so its files select the audit
       // anywhere in the tree (sheriff SHF-20261028-0f3f64, PPN-6). Large
-      // sessions commit their records gzip-compressed.
-      || /(^|\/)(session\.json|(ecbench_)?records\.jsonl(\.gz)?)$/.test(file);
+      // sessions commit their records gzip-compressed. Sessions whose records
+      // live in the artifact store keep only an .artifacts.json pointer in Git;
+      // re-pointing it changes the session's bytes, so it selects the audit too
+      // (sheriff SHF-20261106-a114e7, PPX-5).
+      || /(^|\/)(session\.json|(ecbench_)?records\.jsonl(\.gz)?|\.artifacts\.json)$/.test(file);
     result.actions ||= /^\.github\/(workflows|actions)\//.test(file);
     result.c_cpp ||= /\.(c|cc|cpp|cxx|h|hh|hpp|hxx|cu|cuh)$/.test(file)
       || /(^|\/)(Makefile|CMakeLists\.txt)$|\.cmake$/.test(file);
@@ -91,7 +101,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
     if (/^\.github\/workflows\/release\.ya?ml$/.test(file)) {
       result.release_rust = result.release_native = result.release_cuda = true;
     }
-    if (/^\.github\/workflows\/ecbench\.ya?ml$/.test(file)) result.ecbench_replay = true;
+    if (/^\.github\/workflows\/ecbench(-smoke)?\.ya?ml$/.test(file)) result.ecbench_replay = true;
     if (/^\.github\/workflows\/codeql\.ya?ml$/.test(file)) {
       result.actions = result.c_cpp = result.javascript = result.python = result.rust = true;
     }
@@ -100,8 +110,21 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
 }
 
 function git(args, cwd) {
-  return execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
-    env: { ...process.env, GIT_TERMINAL_PROMPT: '0' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  // The tracked-path list can exceed child_process's buffered stdout limit.
+  // Keep every NUL-delimited path; spool stdout rather than truncating it or
+  // treating a complete checkout as an unavailable scope comparison.
+  const directory = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-git-'));
+  const output = path.join(directory, 'stdout');
+  let descriptor;
+  try {
+    descriptor = openSync(output, 'wx', 0o600);
+    execFileSync('git', args, { cwd, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
+      env: { ...process.env, GIT_TERMINAL_PROMPT: '0' }, stdio: ['ignore', descriptor, 'pipe'] });
+    return readFileSync(output, 'utf8');
+  } finally {
+    if (descriptor !== undefined) closeSync(descriptor);
+    rmSync(directory, { recursive: true, force: true });
+  }
 }
 
 function trackedFiles(cwd) {
@@ -157,9 +180,18 @@ export function sourceFiles(cwd) {
   for (const source of pathDependencyFiles(cwd, tracked)) {
     if (!source.endsWith('/Cargo.toml')) sources.add(source);
   }
+  // Materialize the known sources in one batch before reading them. In the
+  // scope job's blob-less partial clone, `git show HEAD:<file>` fetches one
+  // missing blob per call, a round trip each; the path-dependency crates
+  // alone took the `scope` job past its 5-minute cap on every pull request
+  // on 2026-11-03. A sparse-checkout add fetches every missing blob at once.
+  materializeSources(cwd, sources);
   const queue = [...sources];
   for (let index = 0; index < queue.length; index++) {
     const file = queue[index];
+    // Dependencies discovered while walking modules arrive in small groups;
+    // fetch everything still unread the first time one is missing.
+    if (!existsSync(path.join(cwd, file))) materializeSources(cwd, new Set(queue.slice(index)));
     const text = sourceText(cwd, file);
     const dir = path.posix.dirname(file);
     const add = dependency => {
@@ -195,11 +227,33 @@ export function sourceFiles(cwd) {
   return sources;
 }
 
+// Runtime readers do not use include_str!, so declare their exact tracked
+// fixtures. Retain them without hydrating a whole archive or generating data.
+export function runtimeInputs(cwd) {
+  const registry = 'tests/fixtures/rust-runtime-inputs.json';
+  const tracked = new Set(trackedFiles(cwd));
+  if (!tracked.has(registry)) return new Set();
+  const record = JSON.parse(sourceText(cwd, registry));
+  if (record.schema !== 'crypto.rust-runtime-inputs/v1' || !Array.isArray(record.paths)) {
+    throw new Error('invalid Rust runtime input registry');
+  }
+  const inputs = new Set([registry]);
+  for (const file of record.paths) {
+    if (typeof file !== 'string' || !/^[A-Za-z0-9._/-]+$/.test(file)
+        || path.posix.normalize(file) !== file || file.startsWith('/')
+        || file.split('/').includes('..') || !tracked.has(file) || inputs.has(file)) {
+      throw new Error('invalid or missing tracked Rust runtime input');
+    }
+    inputs.add(file);
+  }
+  return inputs;
+}
+
 // Compile-time include inputs are dependencies even when they are JSON,
 // SQL or historical research fixtures. Keep them derived from source rather
 // than a hand-maintained exclusion list that can miss the next include_str!.
 export function embeddedInputs(cwd, sources = sourceFiles(cwd)) {
-  const inputs = new Set();
+  const inputs = runtimeInputs(cwd);
   for (const file of sources) {
     const text = sourceText(cwd, file);
     for (const match of text.matchAll(/include_(?:str|bytes)!\(\s*"([^"\n]+)"/g)) {
@@ -263,7 +317,7 @@ export function materializeInputs(cwd = process.cwd()) {
     throw new Error('compile-time input escapes the checkout');
   }
   if (inputs.length) git(['sparse-checkout', 'add', ...inputs.map(input => `/${input}`)], cwd);
-  console.log(`materialized ${inputs.length} compile-time inputs`);
+  console.log(`materialized ${inputs.length} compile-time and declared runtime inputs`);
 }
 
 export function select({ event, base, head = 'HEAD', cwd = process.cwd() }) {

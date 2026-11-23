@@ -1,0 +1,1497 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-CHAIN-EXACT-20261029-R1",
+  "version": 1,
+  "created": "2026-10-29",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "CHAIN_EXACT_DESIGN.md"
+  },
+  "question": "Can the overlap-aware proof certify exact original-top regularity on every84 unchanged saved binary/Koblitz m3..9 system?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exact_computation",
+      "text": "All original top coefficients, complete cyclic Moore windows and embedding identities check the hypotheses of the written overlap proof; matching original-source projection and augmented/kernel degree bounds certify exact original-top regularity. Full Lean algebraic formalization and independent scientific review remain pending.",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "class": "out_of_scope",
+      "text": "No affine solving degree, full n83 Hilbert function, FFD/LFD, timing, elite-base gain, prime-field transfer or universal ECDLP inference.",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "original-koblitz",
+      "role": "baseline",
+      "description": "original retained koblitz m3..9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "15b67074130e90f92852b261f46e253b74eab338",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "chain_exact"
+          ]
+        ],
+        "binary_sha256": "4d3a9bd5e70802237b041abd6a57a6605f4f12edc61e8ab03349e5fecfc331cb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m_values": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "family": "koblitz",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "original-binary",
+      "role": "baseline",
+      "description": "original retained binary m3..9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "15b67074130e90f92852b261f46e253b74eab338",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "chain_exact"
+          ]
+        ],
+        "binary_sha256": "4d3a9bd5e70802237b041abd6a57a6605f4f12edc61e8ab03349e5fecfc331cb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m_values": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "family": "binary",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "baseline-koblitz",
+      "role": "baseline",
+      "description": "baseline retained koblitz m3..9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "15b67074130e90f92852b261f46e253b74eab338",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "chain_exact"
+          ]
+        ],
+        "binary_sha256": "4d3a9bd5e70802237b041abd6a57a6605f4f12edc61e8ab03349e5fecfc331cb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m_values": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "family": "koblitz",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "baseline-binary",
+      "role": "baseline",
+      "description": "baseline retained binary m3..9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "15b67074130e90f92852b261f46e253b74eab338",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "chain_exact"
+          ]
+        ],
+        "binary_sha256": "4d3a9bd5e70802237b041abd6a57a6605f4f12edc61e8ab03349e5fecfc331cb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m_values": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "family": "binary",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "spike40-koblitz",
+      "role": "candidate",
+      "description": "spike40 retained koblitz m3..9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "15b67074130e90f92852b261f46e253b74eab338",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "chain_exact"
+          ]
+        ],
+        "binary_sha256": "4d3a9bd5e70802237b041abd6a57a6605f4f12edc61e8ab03349e5fecfc331cb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m_values": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "family": "koblitz",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    },
+    {
+      "id": "spike40-binary",
+      "role": "candidate",
+      "description": "spike40 retained binary m3..9 inputs",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "15b67074130e90f92852b261f46e253b74eab338",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "chain_exact"
+          ]
+        ],
+        "binary_sha256": "4d3a9bd5e70802237b041abd6a57a6605f4f12edc61e8ab03349e5fecfc331cb",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "ell": 27,
+        "m_values": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "family": "binary",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "44 runtime independent small mixed-degree Hilbert controls:36 satisfy hypotheses and match exact formula; all cases include augmented/truncated quotients and exhaustive support/rank-density checks. Full controls saved."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Eight outside-hypothesis cases compute degree7 rather than formula6 and are refused. Native tests reject singular/corrupt inverses and wrong/duplicate source top coefficients. Zero target is supported and checked."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "dataset",
+        "levels": [
+          "original",
+          "baseline",
+          "spike40"
+        ]
+      },
+      {
+        "name": "target_kind",
+        "levels": [
+          "planted",
+          "natural"
+        ]
+      },
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "One pinned Rust binary, source commit and single thread"
+      },
+      {
+        "name": "input",
+        "treatment": "fixed",
+        "how": "84 pinned source/input pairs, all highest coefficients and supports checked; no sampling or affine preprocessing"
+      },
+      {
+        "name": "dataset",
+        "treatment": "crossed",
+        "how": "Original fixed-base and paired baseline/spike40; duplicates are retained identities, not independent samples"
+      },
+      {
+        "name": "characteristic",
+        "treatment": "fixed",
+        "how": "F2 and checked extension K=F2[z]/f83; full Rabin certificate"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing-host fallback after retained EKS shared-bucket denial; no timing comparison"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Unchanged original,baseline,spike40; koblitz,binary; m3..9; planted,natural"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "1800s producer and1800s fresh replay,8GiB1thread,no retries;3600s is a cap, not a timing prediction"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Written overlap proof and exact source/coefficient/transform checks frozen; no claim based on control fit alone"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "original-koblitz",
+          "original-binary",
+          "baseline-koblitz",
+          "baseline-binary",
+          "spike40-koblitz",
+          "spike40-binary"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Every original top support, all83 cyclic windows/embeddings, quadratic relation, lower projection, parameter guard and replay passes"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Exact deterministic computation, no clock comparison",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "SplitMix64: seed xor m<<32 xor family tag; source defines all draws."
+    },
+    "instance_sampling": {
+      "rule": "Entire existing84-ID panel fixed; no new target draws. Original planted targets differ from paired targets; natural duplicates are provenance identities. No statistical comparison.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 14,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Six dataset/family arms times14 m/target identities; exact certificates, no statistical test"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 3700,
+      "measured_on": "Five native tests passed including44 exact mixed-degree controls in0.36s; production limit is a budget, not a speed prediction"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "dreg_exact",
+        "name": "Exact original-top regularity",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Matching source-projection lower and overlap-plus-kernel upper n(m-2)+ell+1; explicit hypotheses and written proof",
+        "source": "certificates/summary.json rows dreg_exact",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "dreg_lower_bound",
+        "name": "dreg_lower_bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Source-projection lower",
+        "source": "certificates/summary.json rows dreg_lower_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "dreg_upper_bound",
+        "name": "dreg_upper_bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Overlap proof upper",
+        "source": "certificates/summary.json rows dreg_upper_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "prior_disjoint_upper_bound",
+        "name": "prior_disjoint_upper_bound",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Preserved previous disjoint component upper",
+        "source": "certificates/summary.json rows prior_disjoint_upper_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "defect_socle_upper",
+        "name": "defect_socle_upper",
+        "unit": "degree",
+        "kind": "counted",
+        "definition": "Degree-two shifted truncated-chain kernel upper",
+        "source": "certificates/summary.json rows defect_socle_upper",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "dreg_exact",
+      "dreg_lower_bound",
+      "dreg_upper_bound",
+      "prior_disjoint_upper_bound",
+      "defect_socle_upper"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 3700,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All84 pinned inputs, full overlap proof hypothesis checks, then84 fresh-process replays. Preserve per-case failures and continue remaining cases."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "1800s producer and1800s replay,8GiB1thread,no retries; immutable progress snapshots uploaded every30s and at termination"
+    }
+  ],
+  "invalidation_rules": [
+    "Any input/source/base/hash/field/support/suffix mismatch invalidates the case",
+    "Any matrix, embedding, cyclic-window, lower-projection or theorem-guard failure invalidates",
+    "Any replay mismatch invalidates; cap/error is not a degree",
+    "No timing, FFD/LFD or elite-base claim from these computations"
+  ],
+  "decision_rule": {
+    "text": "Report exact degree only after all source and theorem hypothesis checks and matching lower/upper certificate plus replay; unknown/error remains explicit",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Per-input exact original-top degree or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "exact_original_top",
+      "error",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/chain_exact.rs",
+      "sha256": "9ea4e172ac5bd4daace9bcae0f31580f55361cdede06baebe475ff8f286193af"
+    },
+    "inputs": [
+      "84 pinned input.json/system.sing pairs"
+    ],
+    "outputs": [
+      "certificates/*.json",
+      "replay.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Recorded prior bounds and exact new source-matched degrees by m; no base-quality ranking"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/1503.08001",
+      "provenance": "retrieved",
+      "claim": "Coefficient Frobenius and affine-versus-original-top caveat",
+      "verified_by": "Primary relevant sections read before implementation; CHAIN_EXACT_DESIGN.md"
+    },
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "Original-top regularity and LFD definitions",
+      "verified_by": "Primary relevant sections read before implementation; CHAIN_EXACT_DESIGN.md"
+    },
+    {
+      "ref": "https://www.lebesgue.fr/sites/default/files/proceedings_WCC/WCC_2019_paper_9.pdf",
+      "provenance": "retrieved",
+      "claim": "Section2.2 Moore invertibility; all needed inverses also verified",
+      "verified_by": "Primary relevant sections read before implementation; CHAIN_EXACT_DESIGN.md"
+    },
+    {
+      "ref": "https://d-nb.info/1372445935/34",
+      "provenance": "retrieved",
+      "claim": "Lemma2.1/Remark2.2 graded exact sequence; later retrieval429 recorded",
+      "verified_by": "Primary relevant sections read before implementation; CHAIN_EXACT_DESIGN.md"
+    }
+  ],
+  "extensions": {
+    "cases": [
+      {
+        "key": "original-koblitz-m3-planted",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m3-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m3-planted",
+        "input_sha256": "a124fa0bf4db31742b52fc220866d9e50e9beb5510ff62183edd6e7fe1ab2cd9",
+        "source_sha256": "0283370eaec54fc4da455ed371acd7573e61950e44253c10022258a893d6724d",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m3-natural",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m3-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m3-natural",
+        "input_sha256": "aa09768eb7e1c0a9cf2393314de3923294910e3dc2abfdac7eed0c4bcbf26a51",
+        "source_sha256": "6b4a7da1d137a1cb955ef9f43cb3f4c631b91b9638df5ac178e5f92dcc34e635",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m4-planted",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m4-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m4-planted",
+        "input_sha256": "a3c549cca9e8be5e9f46db26134e65083bfe5d9af6e3bbfdd7b9c3ef68b007e9",
+        "source_sha256": "adc88268b8c8420d04785984d62495477fb66bc4a3abc98f6b86843a2837c28b",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m4-natural",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m4-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m4-natural",
+        "input_sha256": "af4f9bb647379545ad7f498d4b1799d6074389611e96dbac99cadf08af9ff3bf",
+        "source_sha256": "f2d1c23f9906aab1e133c9680bdb0e85abfdfe84b5fb8214f1bfd91c6d814a99",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m5-planted",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m5-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m5-planted",
+        "input_sha256": "083fe05f91f7e004d77c5409e9ca4a254f6ba8b2f6744dac6a3b06f13ce9f623",
+        "source_sha256": "1b752cff62274bacb4e96e1b6a3d8ccf13f978e740337fff1fd3dec1a1f3987a",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m5-natural",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m5-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m5-natural",
+        "input_sha256": "a7451f020f51e3e8816fcde914a5e78265a04591fe8026ba15895dfd8147c857",
+        "source_sha256": "27ddd6d7889e316dd906e29bd4ae934f9a2c78b397425f98d5ea7fc0e0912608",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m6-planted",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m6-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m6-planted",
+        "input_sha256": "feab42a15989e89551030cbc0f4765ff092498820b5d58384ba87de82bc10f11",
+        "source_sha256": "ebcf5cf3d2b770a16a7d83291c6cc9fabf41c3615cbd89273fa12d86ae5ce1e0",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m6-natural",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m6-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m6-natural",
+        "input_sha256": "47df57d3a0a2fd571bf92cb9b5785f6ea951319ceb34712e74d7ff3b755d1c74",
+        "source_sha256": "906e5383c1c3ecfb4e19278b6ba678076e550616569ce9c6b6fe1e2dd2755ad3",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m7-planted",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m7-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m7-planted",
+        "input_sha256": "1db444f1bb93356c25768b14337d23fa8dcf6e9ef5b780d03924cb1a61b4e263",
+        "source_sha256": "260ca22285da29493915f2ff0da33114a6b3eabbe151f082f2390b62d1c47eb2",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m7-natural",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m7-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m7-natural",
+        "input_sha256": "5243c6d86abccefbfc22268c62112f4da35061a8be56b3945a6cae9b25aaf598",
+        "source_sha256": "b44613543d53561f34ea56bb510454a75569e4ebda03033b19023ea7f7b09aa5",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m8-planted",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m8-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m8-planted",
+        "input_sha256": "f8ad01184dce7d75bce3b9aafb572797eb90f07daafc34b261a1a9f03a563688",
+        "source_sha256": "29236b64f29d131f2279cb00068940c6e47d2218a019f1bb37642e8a58d5eebe",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m8-natural",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m8-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m8-natural",
+        "input_sha256": "e9400bca1e8b6c21d8a22f9aa673fc342e7b735a977ca8b0cc274a3bdb944427",
+        "source_sha256": "c4f115e8a4b457e6b2192afeeefcee51ed8ccc69a4a9d40c1cb2aa66bd387f63",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m9-planted",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m9-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m9-planted",
+        "input_sha256": "b1d29b4130c6af00739360c9152acca8ab42e3bbc322cbe3244de0b46ebb62ba",
+        "source_sha256": "33de717eb413dc7c7d2ef5b00895c9e94675ba4c7b1a6eb718ff7dfb84bad566",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-koblitz-m9-natural",
+        "arm": "original-koblitz",
+        "dataset": "original",
+        "id": "koblitz-m9-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/koblitz-m9-natural",
+        "input_sha256": "92bb3de73ec6f07a4ecf5ff423b7a4712852c29c6b75a2a0922b07d7fbc51708",
+        "source_sha256": "16473b888c5cbb0dcfb976f5484bb56941fbef71d13f28eca62dee8b0d93cde5",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "original-binary-m3-planted",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m3-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m3-planted",
+        "input_sha256": "824e38fe2e36c3a73b189fcbb1608292b78486bea0c49d1b50b5907a50e2c43a",
+        "source_sha256": "8963f6bf596dec633086c81f90d7246c858f83880839c542dcc4626e81812c03",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m3-natural",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m3-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m3-natural",
+        "input_sha256": "1a23e4de28cb63de7131c487b1e14a09887b96b01595240dff5a7d04377033de",
+        "source_sha256": "490eb1e70c156faed40b5576dd35c6d5ed6b4885ac3415faf29f7b503c1e4dbd",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m4-planted",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m4-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m4-planted",
+        "input_sha256": "64ee44c5a3a2524274d35a37ce4a7e24db09d61dba0130634425c3642297d202",
+        "source_sha256": "f1ca9651256b08dd6729e563eb32a619cd8ab12a6305deeb708c61049c96846e",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m4-natural",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m4-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m4-natural",
+        "input_sha256": "cb5431ee10975bd3fb6f743d5d001fd86be550e0dd9ccab093cee9d3cd348938",
+        "source_sha256": "445525dd02a8281edaae69253ee2b57abe5b0286d06e95e355aedf5c07498ee0",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m5-planted",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m5-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m5-planted",
+        "input_sha256": "35a2fa371cd4c5ab0e1a50f67236ad91586189d64b619537b474001ca09a5b32",
+        "source_sha256": "af714f17533d1b3f2de47d4661f860857ae1dd54335468b9c8e5620e94de352e",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m5-natural",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m5-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m5-natural",
+        "input_sha256": "8b253bcf9ed647d30a89c22388d5615358201747d799d4f531344e0f678d67b3",
+        "source_sha256": "a7da39e3cb91921e1a7d38a14a1d2914b215bb2562163cccbc64cafa17a05671",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m6-planted",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m6-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m6-planted",
+        "input_sha256": "39c801e3916afc3112eea032699118895c3be4fdac401f4450a852fc2b387308",
+        "source_sha256": "782d41b8a88364ea33450579f16d14d50e02997e5eef17866af66f794f01ad45",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m6-natural",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m6-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m6-natural",
+        "input_sha256": "9fa353d91d9020f023404df0f6af5c0113099678b2217d1ac47d9736e07c6bda",
+        "source_sha256": "29bb0306575ecc7c3de4924f14df1241a333a1b6167089cd302abe874ed9acf5",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m7-planted",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m7-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m7-planted",
+        "input_sha256": "bdd2b53c97efe3a6cd16aa574f8efe89c10f681b0fc32da5da17a16047a968b0",
+        "source_sha256": "339fdb1c1b1090970111d701b72e62dd787e8b414570b5ea7b39acd8719f4310",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m7-natural",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m7-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m7-natural",
+        "input_sha256": "6078f3682e333d2476aa51e7b786bbc13fdd6765ff6b44813d2b9a689ac3a512",
+        "source_sha256": "0263fe27645091fdcf6377aa636027c6a9f97ab14a3f8940ad44867c918bb6d3",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m8-planted",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m8-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m8-planted",
+        "input_sha256": "adbed446ef08e110813d1ebf63bb46371448c0844c6d1bfb1afd37a50164d240",
+        "source_sha256": "dbfcd8a0bf5b451e5cdf3d10c368ce198d7778425e89fda9fab38535b4de1242",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m8-natural",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m8-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m8-natural",
+        "input_sha256": "e8e1da8490dbfa3f71df79058d7b302c19712b8d03ff746ea62826100a50bd32",
+        "source_sha256": "c884223dd057a84bcb5503611ad742f325d9ea1bb80abed14e8a9eb0c05177d8",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m9-planted",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m9-planted",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m9-planted",
+        "input_sha256": "cd14c839a22588baa3743d8e059d02430ca5951c36504c272b26d6ce048223da",
+        "source_sha256": "a81951312bc79f7413a62b478ac2f94746ae258ac562292681e4e9d47a698a95",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "original-binary-m9-natural",
+        "arm": "original-binary",
+        "dataset": "original",
+        "id": "binary-m9-natural",
+        "directory": "/home/ec2-user/n83-fixed-degree-recovery/r1/results/inputs/binary-m9-natural",
+        "input_sha256": "b65078a2b4786b36c9fd283bd54d0f27d2464756c38f9ca7cef30669448e096d",
+        "source_sha256": "0768e95d2310a41a886dd95b7a1ef3c3fce67990729cc007bffbb1e5ca7a5f7b",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-koblitz-m3-planted",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m3-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m3-planted",
+        "input_sha256": "bbd5ed57754b9be49eccc81b3f69185651f163c6be964214e9c7c7a7b73fe24f",
+        "source_sha256": "cf8749c346c9e66e6a83e044c45a9c43d2214da300d1f78c1fceec153386c5ad",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m3-natural",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m3-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m3-natural",
+        "input_sha256": "a2572b4bdcdca1db8bc938c02bcc5c58deec4ed0efb8d9b9904fa8d718a24806",
+        "source_sha256": "6b4a7da1d137a1cb955ef9f43cb3f4c631b91b9638df5ac178e5f92dcc34e635",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m4-planted",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m4-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m4-planted",
+        "input_sha256": "6e3f783fa45e424024f3b749072b661bf3ed40d6a6c637c160fdc8ffdb4a13df",
+        "source_sha256": "fb987d495a51bd7dfe5be5e4437960fd91ee6a58ae5b736eab8c56477f9ea36b",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m4-natural",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m4-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m4-natural",
+        "input_sha256": "40f1cd92f1693841009318d9549651751c9532bfe8a7ed468340d47f0a76a03a",
+        "source_sha256": "f2d1c23f9906aab1e133c9680bdb0e85abfdfe84b5fb8214f1bfd91c6d814a99",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m5-planted",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m5-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m5-planted",
+        "input_sha256": "381527807276f69982912fe2804c10d840a303f4f2809cb3ef1e031ff8cf3a66",
+        "source_sha256": "a8bb4b333730db09e0fcfca275f69b7ef1bc1c53aab71959cce07e11588e1723",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m5-natural",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m5-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m5-natural",
+        "input_sha256": "2904c2f5a4e182ca009f0493712e9ee2c519d2bf8b8838d099a9d5607bd5701c",
+        "source_sha256": "27ddd6d7889e316dd906e29bd4ae934f9a2c78b397425f98d5ea7fc0e0912608",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m6-planted",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m6-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m6-planted",
+        "input_sha256": "36790f5bbe621fee11b27a2076b07eacfa8790abb1e3fd0eb3c14ecec025914f",
+        "source_sha256": "68e2f9a3a18e50a2562bd6a50ca6f1ca660cad01dc8c7b32987ac39369cc779c",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m6-natural",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m6-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m6-natural",
+        "input_sha256": "4d9bca9b106eb5150e520bd9d5d1562a091e6ca590e9b9f66300c51a51246cf3",
+        "source_sha256": "906e5383c1c3ecfb4e19278b6ba678076e550616569ce9c6b6fe1e2dd2755ad3",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m7-planted",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m7-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m7-planted",
+        "input_sha256": "b0f0b1f6722ab11e69883533b59d4c0ba900118abfc333a483b82dba48b264ca",
+        "source_sha256": "214465dbbf4e8b3e8aa3dfef855a79428edd29b96d5caab943368a4e460bb6bf",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m7-natural",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m7-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m7-natural",
+        "input_sha256": "d29a12c7fe05d280691beeebc97c40b54c6e6ebbcc63585d27b165f21bdf4394",
+        "source_sha256": "b44613543d53561f34ea56bb510454a75569e4ebda03033b19023ea7f7b09aa5",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m8-planted",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m8-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m8-planted",
+        "input_sha256": "c6f57d2028efb1da05abf49f95fbab96d1eec0d1a20068540a0a31bcdcb715ae",
+        "source_sha256": "2756fdd5d4e81c1d5034e5145a453f1ef69b05dcb529237c419ac664c75ddf54",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m8-natural",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m8-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m8-natural",
+        "input_sha256": "ca2f3b53450ebc9ab042d0b01d46369b97d08fbd5fc49dce5d3ceb8641bda959",
+        "source_sha256": "c4f115e8a4b457e6b2192afeeefcee51ed8ccc69a4a9d40c1cb2aa66bd387f63",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m9-planted",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m9-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m9-planted",
+        "input_sha256": "3436b7e1e730063cb250bd4fb02e461d1874d8c9fbf7a419b1afedf559046970",
+        "source_sha256": "08bfaa2778cad6f655b02800ea0c0841ef67451bb3600da6e8cbdc32ce623b18",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-koblitz-m9-natural",
+        "arm": "baseline-koblitz",
+        "dataset": "baseline",
+        "id": "koblitz-m9-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/koblitz-m9-natural",
+        "input_sha256": "3e6e33d3789a2bfa1e411092d7fe8c51afa71956c495afed2ec9ad432dea2a4c",
+        "source_sha256": "16473b888c5cbb0dcfb976f5484bb56941fbef71d13f28eca62dee8b0d93cde5",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b"
+      },
+      {
+        "key": "baseline-binary-m3-planted",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m3-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m3-planted",
+        "input_sha256": "e9619e308ad1b19155551c3a80fc1c9a6c49faaeb080bee68e500797fef4894a",
+        "source_sha256": "f6261f88dba5334afba16b1871dc58875bebbb77d89999a654b21fc8211d4abf",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m3-natural",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m3-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m3-natural",
+        "input_sha256": "c53dbfdcecfe31b9e70af5a3ba5ad77b78731b5fb58204ab6c8dd27db7665b7b",
+        "source_sha256": "490eb1e70c156faed40b5576dd35c6d5ed6b4885ac3415faf29f7b503c1e4dbd",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m4-planted",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m4-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m4-planted",
+        "input_sha256": "4a553b3a1a74d00252711bee0ee26773c1e123db3a8fc373b74d6f9c8f03df3e",
+        "source_sha256": "cbe17e1bb75927b10f733ac9b5bab11ef921a3a4300e11da32c354b382fe492a",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m4-natural",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m4-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m4-natural",
+        "input_sha256": "e17cd841a37ecbeb9f5363e41eb9140940dcc3d772fac8a1500b762ccb98dd00",
+        "source_sha256": "445525dd02a8281edaae69253ee2b57abe5b0286d06e95e355aedf5c07498ee0",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m5-planted",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m5-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m5-planted",
+        "input_sha256": "3cd138b10a8cb6c7e710622445070f654035f5a3ab97e0ba57a4186730aa5e0d",
+        "source_sha256": "5c058ff515bffaf6f352f068b547fa7675df48c2958442a76c0802b8a2efced8",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m5-natural",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m5-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m5-natural",
+        "input_sha256": "f5dfe0102cbf7cd7017ea29cad7046a474cf7d0a7543abff3229b8a1f3d1dcb3",
+        "source_sha256": "a7da39e3cb91921e1a7d38a14a1d2914b215bb2562163cccbc64cafa17a05671",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m6-planted",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m6-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m6-planted",
+        "input_sha256": "3ae43ac021c4ce6ca17b65d73a12a48fab2a48b427b618cdf05c66ef7c0262b2",
+        "source_sha256": "1a3fcfc03a454c430073ab39d371c9df9ac3a120dc27695804c3bbcbbeb1977f",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m6-natural",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m6-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m6-natural",
+        "input_sha256": "60550f65feec2f55672d1a01beffc25f81958c9f34513eff8d526d71d1cc6ece",
+        "source_sha256": "29bb0306575ecc7c3de4924f14df1241a333a1b6167089cd302abe874ed9acf5",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m7-planted",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m7-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m7-planted",
+        "input_sha256": "a1e606e6167dda7180760752dbf3ec49df2397746f08b7ba83491cfcb01d495a",
+        "source_sha256": "51b64fd3468089feb4cbd59979f8d96a4a0b7eda76692048a3e93b2111e886b6",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m7-natural",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m7-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m7-natural",
+        "input_sha256": "1a181cab60a0e9b0a0b738877a2d417fed4e7bf2c377211a593682767f0c0bad",
+        "source_sha256": "0263fe27645091fdcf6377aa636027c6a9f97ab14a3f8940ad44867c918bb6d3",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m8-planted",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m8-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m8-planted",
+        "input_sha256": "b355c440ad9337e69c6040bf4e389256e964b6af35fee68abc6970a9c5ca70d8",
+        "source_sha256": "b85c0864ee154b278465b09287484ebff1bac15f3972119c18e2178ada9b0695",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m8-natural",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m8-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m8-natural",
+        "input_sha256": "b9f882173527b812d5ebb031fee273c0c584e408a1a63e60ad034076a1d6c5f7",
+        "source_sha256": "c884223dd057a84bcb5503611ad742f325d9ea1bb80abed14e8a9eb0c05177d8",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m9-planted",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m9-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m9-planted",
+        "input_sha256": "fb1d86548d5a5fb762b8f5e7778b5717ce4f1e7d29d4db1bc14e774d669609c3",
+        "source_sha256": "ce96ac49f4062d8f1cd3e962029513fe02fe2832c41deae0ffa18d0d15cb5eed",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "baseline-binary-m9-natural",
+        "arm": "baseline-binary",
+        "dataset": "baseline",
+        "id": "binary-m9-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/baseline/inputs/binary-m9-natural",
+        "input_sha256": "c17f78db5ee73a5f18ccd4052f87232a880b0ac6642da2126b36523d62e01bbf",
+        "source_sha256": "0768e95d2310a41a886dd95b7a1ef3c3fce67990729cc007bffbb1e5ca7a5f7b",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d"
+      },
+      {
+        "key": "spike40-koblitz-m3-planted",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m3-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m3-planted",
+        "input_sha256": "c989fbe15c64657a44d849c84f50437f3ece5b9bd189611c1656bc3969cd122b",
+        "source_sha256": "7698c2a5e749ecd8776a2b059ec134d82a9e3faa6dce82369468b4796671d455",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m3-natural",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m3-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m3-natural",
+        "input_sha256": "20e18534251a21d0b204c6f75cb8ac0b7d69bbd69985a403c6e4ed0bbefe74b5",
+        "source_sha256": "48416fc837f14eb6d3dfeb37ec5aee4b0079f95d3f81458bf2b351ef6613abb9",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m4-planted",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m4-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m4-planted",
+        "input_sha256": "9fef55f27ab217c27d53bef7cff5eb7c86d15274a62e57a2774e03328b52a4b5",
+        "source_sha256": "c2943f50284d89a859f19ebe4e390cd299d841afc85d0f4c56176e5ddc2a6be6",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m4-natural",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m4-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m4-natural",
+        "input_sha256": "62b8cb4e2b2f34c682c16739e59fce6dda599177fa83db24d837ff4c0e5987e0",
+        "source_sha256": "3b76e29139839acae1fb5de0d66d0cbd6d43f7e4e28d5fc845d6a463671de8f7",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m5-planted",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m5-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m5-planted",
+        "input_sha256": "01fb1ec1be8d610c9d7a335850cc513ae6aad2bebec51beb2281f531f669e99f",
+        "source_sha256": "b1c19301a766054a26a65c0d32f6cf6c1cf27b671a7206b2d98a7039e99ddce6",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m5-natural",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m5-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m5-natural",
+        "input_sha256": "21ad662ff679e49393b152c120136308a6620b7faa98ff17a828830996ad870b",
+        "source_sha256": "f974bf70083d1bd4a234717bc390cc9dab60ca2430a62967cae1cfb84a5c6db1",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m6-planted",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m6-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m6-planted",
+        "input_sha256": "7c52e74d57e88530ff94e95f815ba876ecc1aff2fda3789535d32cbfba44cdc5",
+        "source_sha256": "bf7f5e06611ffdd5e2a4acd754dce9ce9cccdef60b8ba0ad10e3b5fca4514db1",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m6-natural",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m6-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m6-natural",
+        "input_sha256": "7baf8852d4af7d077220f462d986e92fda93888ebaaca8303aaada5ce34fb48e",
+        "source_sha256": "a64ab29290eb77a2f82e8e913f7b34237deb43111057ca4df616ea84bcae25c4",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m7-planted",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m7-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m7-planted",
+        "input_sha256": "a46d7ba1cee08dfbd46ecc18f988a2bc45c6bb8d5ee42b0ad3b07a46ee903473",
+        "source_sha256": "45dc451aa793a44ecd5a3fcb89f3f5e28461288de133b2ed540112a9465b38b8",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m7-natural",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m7-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m7-natural",
+        "input_sha256": "e36e6250033d65e3c2324e2634bc671aec852842bb8940c4e16fb10395fa6733",
+        "source_sha256": "7512afdcac27a9aad5166d086e7b7bdd9f0ae39a48ded842da681b3318122cb3",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m8-planted",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m8-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m8-planted",
+        "input_sha256": "5edbfa60614cf73b0f75d7024e093c7179209cb75fa9e77f89b443bcfc397b27",
+        "source_sha256": "186e648ba043491a419421fda7e98b99863499beb41bacc408033cec98a32df7",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m8-natural",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m8-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m8-natural",
+        "input_sha256": "b07f04eb9eacadc650e32ec9c6e8034c15db8883df5f3978fb6bdb908ce3599c",
+        "source_sha256": "b00ecd0d4605b35680e1838f5375c5c6f937a309601b74d7383a0683c5871cb0",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m9-planted",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m9-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m9-planted",
+        "input_sha256": "2a4d03642750e42976e382484ad4315b752fba786c91a5112e32749962c05db5",
+        "source_sha256": "fbb64aacfb2eefb13345d2b3917b039ce350aed8caa2ef739700ef5003ad708c",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-koblitz-m9-natural",
+        "arm": "spike40-koblitz",
+        "dataset": "spike40",
+        "id": "koblitz-m9-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/koblitz-m9-natural",
+        "input_sha256": "5f8269c9bdd5d617c2592b3cc59957648753809fa27a8318fe4c438408918294",
+        "source_sha256": "909a31f023a6aefbe6d6ce118362057ba5dbe3346de54533df9c8d4f55292f54",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6"
+      },
+      {
+        "key": "spike40-binary-m3-planted",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m3-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m3-planted",
+        "input_sha256": "75c3330da55082219ebd182af6092f8982b9dad3e2d5b76b6bc19e01ff78e4b1",
+        "source_sha256": "73b090ea1a19ebccd6ff1e1b0860f74bbc632a3a56fe4a3bbd4e2e971c4eddc7",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m3-natural",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m3-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m3-natural",
+        "input_sha256": "912e260514a30fd6fcff7403cf14a24e47fbfc5638ef42c48338397dd9bd7851",
+        "source_sha256": "a12e8fe09180f3639a6bda70811b7e49b5bc25da55ced2abb59bbbd1f4ce3676",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m4-planted",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m4-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m4-planted",
+        "input_sha256": "0f44d15949b4ad408876be74fa4f08719fdc30c61570b4ea1a9fc4bed691a12e",
+        "source_sha256": "24f9408988914bfaa9c2100a05d46978ffe042a1614f66c7a12e9f88bee557b1",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m4-natural",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m4-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m4-natural",
+        "input_sha256": "78e57d3d9f397bfb25402e6a25cc64c79355a482bcac6e31157e4b8fe95827ec",
+        "source_sha256": "520ee71597bfaf9fd41088e1e4666f7ced9279b46a7f35c14fd329e5c9b4b9d7",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m5-planted",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m5-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m5-planted",
+        "input_sha256": "e53da0e8da1f91bfd9e933b4cd301577eb870978179a94abf4f8eab2c58ba277",
+        "source_sha256": "785250cd3e44e8230d9f6e7f998cdb852e020b38228226f1be388762ee9a3c62",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m5-natural",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m5-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m5-natural",
+        "input_sha256": "b4e2a024b168cae1db106fbb9f52504162a956d420e57417b645d18f1b0e63c8",
+        "source_sha256": "5fc7865eedba2ac50ed97127940741b3f1e7a4c728d7e1346b00d419e547eeb9",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m6-planted",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m6-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m6-planted",
+        "input_sha256": "e28eea88b6fba69151d9b493e5db2d08f060eef8a1fb6272fe10db8234aa44cc",
+        "source_sha256": "5cfe5eb07ad8571d3c30c78546e713250cb300f61b8a49edd2dae0df33c71b63",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m6-natural",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m6-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m6-natural",
+        "input_sha256": "5f74c2d70d40c93f5b70ea9c88babc11b921a3ed8da281e5d353a79a28f80ba4",
+        "source_sha256": "64de2ba8bd12e0b1cb6bf6b0dc3ac4221d31a5a7ca3eccb21d96c9213882a3e4",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m7-planted",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m7-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m7-planted",
+        "input_sha256": "6f2f1f15790403d6f18bf311c71f18990159f565643d0dfe8dd9a517276ef1b8",
+        "source_sha256": "1e6a370ca3d08a2fd35839cc87db876dce1c6402eab99fd30147716926246cb5",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m7-natural",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m7-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m7-natural",
+        "input_sha256": "833193549788685b38ac1655c4867a061f8be0912c64de9ba504d6821d999ee6",
+        "source_sha256": "3e43affe56f098e7b23d44e51dfa0440272acb691a8808c94526ab357b240024",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m8-planted",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m8-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m8-planted",
+        "input_sha256": "ec36444a6ef1477999ed8c7af4ed7ff38366d57caaa68d7bf819bea4a17a6080",
+        "source_sha256": "6c8f983863dc57f64715e1a01caa9103ae8c60b65f5aae800f09ca72055d8c1f",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m8-natural",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m8-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m8-natural",
+        "input_sha256": "45f38d85411f9f1e6c94a4442f520830cfe5aa20b5cb6a1e8da08d913f616141",
+        "source_sha256": "07b4d8d50ea67f2597e65b7488b089b1ebd377c20e54a152b964ead30170d106",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m9-planted",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m9-planted",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m9-planted",
+        "input_sha256": "2237535bc98ef094e63aaa12fcc94cbc5908e27be865bc69d6588b9a8f083e79",
+        "source_sha256": "a50757ccfcd2a8199f9ff8db8255dd0141379e0fb60b6f49aa3115738a0819bd",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      },
+      {
+        "key": "spike40-binary-m9-natural",
+        "arm": "spike40-binary",
+        "dataset": "spike40",
+        "id": "binary-m9-natural",
+        "directory": "/home/ec2-user/n83-candidate-recovery/pdp-r1/spike40/inputs/binary-m9-natural",
+        "input_sha256": "825d76b6f3c40519aa5ede11d085769e4a470f5de0b2795f02449c97fd3d02a6",
+        "source_sha256": "d0e0e6a0d2264cca504706598ec9f41b0c9cecbaafb4a2410e1f23c3f16f569f",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe"
+      }
+    ],
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-chain-exact-20261029-r1/local/",
+    "detailed_design": "CHAIN_EXACT_DESIGN.md",
+    "file_layout": "CHAIN_EXACT_FORMAT.json",
+    "backend_reason": "Existing-host fallback: prior n83 EKS storage probe18249a5f failed; fresh logs empty, cause unconfirmed; no duplicate active job. No IAM/capacity changes or timing claim.",
+    "formalization": "Two checked arithmetic consequences only; all polynomial/graded-module bridges written and independent review pending",
+    "preservation": "All84 cumulative partial summaries immutable; all prior data retained",
+    "retained_objective": "All n83 families m2..9, FFD/LFD and elite-base goal remain; this panel determines original-top binary/Koblitz m3..9 degrees only"
+  },
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "35d448ff9521388239b6aaca3cb6efaeca9a354b0d32d7d97a7ccf44fffd5c29",
+    "commit": "15b67074130e90f92852b261f46e253b74eab338",
+    "frozen_at": "2026-10-29T16:00:28Z",
+    "filed_before_affected_data": true
+  }
+}

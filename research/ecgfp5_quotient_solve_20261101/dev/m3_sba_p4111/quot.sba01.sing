@@ -1,0 +1,7 @@
+int t0 = timer; system("--ticks-per-sec", 1000); t0 = timer;
+ring r = 4111, (s1,s2,s3,w), dp;
+option(redSB); option(prot);
+ideal i = 3601*s1^2+1659*s1*s2+423*s1*s3+3009*s1*w+3112*s2^2+1490*s2*s3+2330*s2*w+149*s3^2+3553*s3*w+3571*s1+2046*s2+2179*s3+2515*w+1515,3347*s1^2+2172*s1*s2+3005*s1*s3+479*s1*w+2861*s2^2+807*s2*s3+3364*s2*w+88*s3^2+4023*s3*w+2128*s1+3374*s2+2114*s3+2684*w+2696,1250*s1^2+722*s1*s2+39*s1*s3+818*s1*w+3809*s2^2+2877*s2*s3+519*s2*w+454*s3^2+3657*s3*w+1559*s1+500*s2+2704*s3+2657*w+187,3967*s1^2+4087*s1*s3+12*s2^2+4110*s3^2+1*w^2+288*s2+1728;
+ideal g = sba(i, 0, 1);
+print("RESULT vdim=" + string(vdim(g)) + " size=" + string(size(g)) + " ms=" + string(timer - t0));
+quit;

@@ -1,0 +1,62 @@
+[
+  {
+    "name": "T20Whole.rational_half_recovery",
+    "claim_path": "pcc/claims/PCC-20261112-d01c21.json",
+    "statement": "theorem rational_half_recovery {M : Type} [IntModule M] (x : M) (order : (12317 : Int) \u2022 x=0) : (6159 : Int) \u2022 ((2 : Int) \u2022 x)=x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Whole.lean",
+      "theorem": "T20Whole.rational_half_recovery",
+      "decl_sha256": "ed28cf66fce042fc7c0ee7bd06867f8acb014a835a7ae5dc19846f5ff57b8f09"
+    }
+  },
+  {
+    "name": "T20Whole.wrong_transpose_only_identity",
+    "claim_path": "pcc/claims/PCC-20261112-2de44b.json",
+    "statement": "theorem wrong_transpose_only_identity {M : Type} [IntModule M] (x : M) (order : (12317 : Int) \u2022 x=0) : -((2 : Int) \u2022 x)=(2 : Int) \u2022 x \u2194 x=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Whole.lean",
+      "theorem": "T20Whole.wrong_transpose_only_identity",
+      "decl_sha256": "b7b39d9b2d8cc9b176ec06680a56765508645a55a203bb1af17cd1993a848ffb"
+    }
+  },
+  {
+    "name": "T20Whole.recovery_and_chain_constants",
+    "claim_path": "pcc/claims/PCC-20261112-507bb7.json",
+    "statement": "theorem recovery_and_chain_constants : (2 : Nat)*6159%12317=1 \u2227 (98 : Nat)*99%109=1 \u2227 (2 : Nat)*57%113=1 \u2227 (49 : Nat)*4=196 \u2227 (12317 : Nat)-1=12316",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Whole.lean",
+      "theorem": "T20Whole.recovery_and_chain_constants",
+      "decl_sha256": "1ef5bb56555f2271e14f98d21fae86cbb24f5c349730fd989a7ba1b71d74a7d6"
+    }
+  },
+  {
+    "name": "T20Whole.branch_permutation_cubes",
+    "claim_path": "pcc/claims/PCC-20261112-f2b3ce.json",
+    "statement": "theorem branch_permutation_cubes : \u2200 i : Fin 6, sourcePermutation (sourcePermutation (sourcePermutation i.val))=i.val \u2227 targetPermutation (targetPermutation (targetPermutation i.val))=opposite i.val",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Whole.lean",
+      "theorem": "T20Whole.branch_permutation_cubes",
+      "decl_sha256": "80477b6dc77b26f7ff593d18b8b241b41baada5c31707b67a8436c6dc6277662"
+    }
+  },
+  {
+    "name": "T20Whole.actual_target_fixed_pairs",
+    "claim_path": "pcc/claims/PCC-20261112-87bce9.json",
+    "statement": "theorem actual_target_fixed_pairs : pairs.filter fixedPair=[(0,3),(1,4),(2,5)]",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Whole.lean",
+      "theorem": "T20Whole.actual_target_fixed_pairs",
+      "decl_sha256": "91d57015742cde37313534fde564b52944f572f92db8390e28e37390262eca4a"
+    }
+  },
+  {
+    "name": "T20Whole.fixed_two_torsion_counts",
+    "claim_path": "pcc/claims/PCC-20261112-b7ad54.json",
+    "statement": "theorem fixed_two_torsion_counts : 1+pairs.length=16 \u2227 1+(pairs.filter fixedPair).length=4",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/T20Whole.lean",
+      "theorem": "T20Whole.fixed_two_torsion_counts",
+      "decl_sha256": "52823cb67bce7ce45fea5ae79a8f6fa6ddcb67b8ba35eaa5e6f4c9879a346bb7"
+    }
+  }
+]

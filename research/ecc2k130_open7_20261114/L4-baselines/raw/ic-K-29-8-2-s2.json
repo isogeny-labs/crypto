@@ -1,0 +1,898 @@
+{
+  "cells": [
+    {
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "d_semireg_max": 4,
+      "d_semireg_min": 4,
+      "engines": [
+        {
+          "agrees_with_reference": true,
+          "d_learn_max": null,
+          "d_learn_mean": null,
+          "d_reach_max": 3,
+          "d_reach_mean": 2.125,
+          "decided": 8,
+          "declined": false,
+          "engine": "inherited-f4",
+          "ms_max": 0.5150870000000001,
+          "ms_mean": 0.100739875,
+          "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+          "ops_mean": 9170.125,
+          "over_budget": 0,
+          "peak_kib_max": 0.0,
+          "wall_over_reference": 0.652735385984784,
+          "workload": "complete enumeration"
+        },
+        {
+          "agrees_with_reference": true,
+          "d_learn_max": null,
+          "d_learn_mean": null,
+          "d_reach_max": null,
+          "d_reach_mean": null,
+          "decided": 8,
+          "declined": false,
+          "engine": "fes-f2",
+          "ms_max": 0.1917225,
+          "ms_mean": 0.1543349375,
+          "op_unit": "word XORs (Gray-code steps)",
+          "ops_mean": 132175.5,
+          "over_budget": 0,
+          "peak_kib_max": 0.0,
+          "wall_over_reference": 1.0,
+          "workload": "complete enumeration"
+        }
+      ],
+      "equations": 29,
+      "family": "K",
+      "n": 29,
+      "n_prime": 8,
+      "n_vars": 16,
+      "per_target": [
+        {
+          "runs": {
+            "fes-f2": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 394533,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132179,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 154236
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 394533,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132179,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 156538
+              }
+            ],
+            "inherited-f4": [
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 2295,
+                  "bitop_word_ops": 19248,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 325,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 133920
+              },
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 1107,
+                  "bitop_word_ops": 11074,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 325,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 39374
+              }
+            ]
+          },
+          "semi_regular_degree": 4,
+          "system_blake3": "311791c3764624db634eb6c70e8ac948984ba4fadeea96b5028bc60562bb1550",
+          "terms": 1107,
+          "x_r": 73011894
+        },
+        {
+          "runs": {
+            "fes-f2": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 407464,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132372,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 166395
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 407464,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132372,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 188615
+              }
+            ],
+            "inherited-f4": [
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 1300,
+                  "bitop_word_ops": 12628,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 341,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 34440
+              },
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 1300,
+                  "bitop_word_ops": 12628,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 341,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 39433
+              }
+            ]
+          },
+          "semi_regular_degree": 4,
+          "system_blake3": "92bbc887c796688a24f3ed7dfadf9a887792586d7ca4fc90ed1a902c86d1e41c",
+          "terms": 1300,
+          "x_r": 434742738
+        },
+        {
+          "runs": {
+            "fes-f2": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 401635,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132285,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 153381
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 401635,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132285,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 155664
+              }
+            ],
+            "inherited-f4": [
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 1213,
+                  "bitop_word_ops": 11927,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 328,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 29059
+              },
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 1213,
+                  "bitop_word_ops": 11927,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 328,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 33943
+              }
+            ]
+          },
+          "semi_regular_degree": 4,
+          "system_blake3": "a1a857778b816d5d7d63d44678755880612b48dd7e1c92ad375f33ea0d974136",
+          "terms": 1213,
+          "x_r": 173888852
+        },
+        {
+          "runs": {
+            "fes-f2": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 410211,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132413,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 165288
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 410211,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132413,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 218157
+              }
+            ],
+            "inherited-f4": [
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 1341,
+                  "bitop_word_ops": 12959,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 326,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 28849
+              },
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 1341,
+                  "bitop_word_ops": 12959,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 326,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 30409
+              }
+            ]
+          },
+          "semi_regular_degree": 4,
+          "system_blake3": "9f37982dce5819d35dffc39f293b73d249cd72b03b763ad071a77bc6069e6cbd",
+          "terms": 1341,
+          "x_r": 62772908
+        },
+        {
+          "runs": {
+            "fes-f2": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 408938,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132394,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 171015
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 408938,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132394,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 164500
+              }
+            ],
+            "inherited-f4": [
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 1322,
+                  "bitop_word_ops": 12802,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 343,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 26864
+              },
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 1322,
+                  "bitop_word_ops": 12802,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 343,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 27121
+              }
+            ]
+          },
+          "semi_regular_degree": 4,
+          "system_blake3": "c21f85b81c3a994f9842aa429a2b14518838b3997e2c3011e9c96780b7abac5f",
+          "terms": 1322,
+          "x_r": 326621238
+        },
+        {
+          "runs": {
+            "fes-f2": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 376979,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 131917,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 129368
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 376979,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 131917,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 126948
+              }
+            ],
+            "inherited-f4": [
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 926,
+                  "bitop_word_ops": 6479,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 342,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 43958
+              },
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 926,
+                  "bitop_word_ops": 6349,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 342,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 63073
+              }
+            ]
+          },
+          "semi_regular_degree": 4,
+          "system_blake3": "c6680c4b747a4f997f88aa8a8fab493d7532a32ab35baebd309546a8ae04d6f9",
+          "terms": 845,
+          "x_r": 243297729
+        },
+        {
+          "runs": {
+            "fes-f2": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 371887,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 131841,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 126918
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 371887,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 131841,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 123756
+              }
+            ],
+            "inherited-f4": [
+              {
+                "degree_reached": 3,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 13668,
+                  "bitop_word_ops": 257513,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 71045,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 516363
+              },
+              {
+                "degree_reached": 3,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 13668,
+                  "bitop_word_ops": 257371,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 71045,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 513811
+              }
+            ]
+          },
+          "semi_regular_degree": 4,
+          "system_blake3": "f6b904aa874397177b62cbfcdb584bd7a80e2fa544d032a490d6a8c2a88c7aa2",
+          "terms": 769,
+          "x_r": 25267360
+        },
+        {
+          "runs": {
+            "fes-f2": [
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 382741,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132003,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 131661
+              },
+              {
+                "degree_reached": null,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_word_ops": 382741,
+                  "points": 65536,
+                  "verification_tests": 0
+                },
+                "ops": 132003,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 136919
+              }
+            ],
+            "inherited-f4": [
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 931,
+                  "bitop_word_ops": 9645,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 311,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 24348
+              },
+              {
+                "degree_reached": 2,
+                "extra": {
+                  "bitop_complete": 1,
+                  "bitop_field_adds": 0,
+                  "bitop_field_invs": 0,
+                  "bitop_field_muls": 0,
+                  "bitop_field_sqrs": 0,
+                  "bitop_hash_probes": 931,
+                  "bitop_word_ops": 9645,
+                  "eliminated": 0,
+                  "engine_overridden_by_environment": 0,
+                  "infeasible_branches": 1,
+                  "max_degree": 3,
+                  "oversize": 0,
+                  "propagations": 0,
+                  "reduction_cache_on": 0,
+                  "reductions": 1,
+                  "splits": 0,
+                  "verification_tests": 0
+                },
+                "ops": 311,
+                "peak_bytes": 0,
+                "solutions": [],
+                "solving_degree": null,
+                "verdict": "unsatisfiable",
+                "wall_ns": 26873
+              }
+            ]
+          },
+          "semi_regular_degree": 4,
+          "system_blake3": "68bf471c6bae99a2e69c9fe4b3df11ff8b626e86daeee98353f3724365af2d1e",
+          "terms": 931,
+          "x_r": 177751220
+        }
+      ],
+      "reference_engine": "fes-f2",
+      "repeats": 2,
+      "summands": 2,
+      "targets": 8,
+      "verdict_digest": "f01ecd669b05f8cb179f67548eb0c60ca655a4b944e82ee9dfb0a27f716ca9f1"
+    }
+  ],
+  "cells_measured": 1,
+  "cells_skipped": [],
+  "config": {
+    "budget_seconds_per_call": 120,
+    "cells": [
+      {
+        "m": 2,
+        "n": 29,
+        "n_prime": 8
+      }
+    ],
+    "engines": [
+      {
+        "describe": "the same with each child specialising its parent's reduced basis (InheritedF4, the Koblitz oracle's default), with the next kernels since 2026-11-12: SIMD re-reduction, fused tallies, exact fused builders, reused Four Russians tables",
+        "engine": "inherited-f4",
+        "finds_every_solution": true,
+        "spec": "inherited-f4"
+      },
+      {
+        "describe": "fast exhaustive search (libfes-lite Gray code): two word XORs per point, quadratic systems only",
+        "engine": "fes-f2",
+        "finds_every_solution": true,
+        "spec": "fes-f2"
+      }
+    ],
+    "families": [
+      "K"
+    ],
+    "repeats": 2,
+    "seed": 2,
+    "targets": 8,
+    "worker_threads": 1
+  },
+  "disagreements": [],
+  "elapsed_seconds": 0.005010526,
+  "markdown": "| E | n | n' | m | vars | engine | finds | decided | over budget | D_learn | D_reach | D_sr | ops | ms | wall / reference | agrees |\n|:--|--:|--:|--:|--:|:--|:--|--:|--:|--:|--:|:--|--:|--:|--:|:--|\n| K | 29 | 8 | 2 | 16 | inherited-f4 | all | 8/8 | 0 | — | 2.1 | 4 | 9.170e3 wx | 0.1 | 0.7× | yes |\n| K | 29 | 8 | 2 | 16 | fes-f2 | all | 8/8 | 0 | — | — | 4 | 1.322e5 wx | 0.2 | ref | yes |\n",
+  "operation": "descent-engines",
+  "schema_version": 1,
+  "software": {
+    "arch": "x86_64",
+    "binary_blake3": "447efbc872be429ccf855491870f01af3ac7f02867ddf53868445d114c1ba1e1",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "linux",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "For each (curve family, n, n', m) cell: the Weil descent of the Semaev polynomial over the same seeded targets as the descent-degrees table, solved by every listed engine in every repetition, interleaved per target with the engine order rotated each repetition. Each engine's answers are checked against the reference engine's (fes-f2 where it applies, else exhaustive); each system carries a blake3 fingerprint and each cell a digest of the reference answers, so a rerun can prove it solved the same inputs and decided them the same way. The ms column is the mean over targets of the per-target median over repetitions.",
+  "what_this_is_not": [
+    "not a speed: this prices one decomposition oracle call on one target, which AGENTS.md section 2 calls a stage diagnostic and never a speed",
+    "not a common unit: each engine counts in its own unit (ops column, unit named per engine); only wall time is common, and it is a host-dependent practicality note",
+    "not a group relation: a boolean root is not yet a point decomposition until it is lifted and checked on the curve, which the whole-pipeline run does",
+    "not one leaderboard: a first-solution engine (sat-cdcl) and the complete-enumeration engines are different workloads and are listed apart"
+  ]
+}

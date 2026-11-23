@@ -1,0 +1,36 @@
+{
+  "schema": "prospective-preread-review-plan/v1",
+  "task": "T-1711",
+  "created_utc": "2026-11-05T19:47:26.041242+00:00",
+  "candidate_read": false,
+  "announced_candidate_sha256": "4e01f95cde6fe851a656819133ff22cf0b65d20e39fe9227ee6bce24ba557b71",
+  "prior_review": "root-materializer-additional-admission-review-20261105 remains immutable pending commit",
+  "independence": "Reviewer identified prior qualification gap; producer described a 22-line insertion and conservative infinity policy. Reviewer has not read successor source.",
+  "scope": "Native pre-child effective-limit delta and unchanged operational boundaries; no runtime admission",
+  "checks": [
+    "Exact published source hash and minimal delta to frozen prior materializer",
+    "Guard precedes every cmd/subprocess path including findmnt and Git; no prior helper starts a child",
+    "Both soft/hard AS and DATA obtained natively with raw values and explicit RLIM_INFINITY policy; do not infer from manager defaults",
+    "Record worker PID, raw /proc/self/limits and getrlimit observations; preserve partial observations and read errors",
+    "Checkpoint errors/failure disposition through exception paths, with no later child on failed qualification",
+    "No setrlimit or limit widening; physical cgroup limits unchanged and checked before guard",
+    "No false passed status prior to all required observations/policy checks",
+    "Config and source hash bindings updated; disabled/null admission, one additional attempt pending, deadline/cost/caps retained",
+    "Operator terminal identity/cgroup cleanup remains required independently of local PID receipt"
+  ],
+  "attacks": [
+    "Finite soft only",
+    "Finite hard only",
+    "/proc read error",
+    "getrlimit read error",
+    "Checkpoint write failure",
+    "PID/identity incomplete",
+    "Exception caught then child allowed",
+    "Limit setting side effect",
+    "Flag-only disabled semantics confused with authorization"
+  ],
+  "knowledge": "Published exact previous sources and primary source APIs; KB tools/executable catalog unavailable per parent",
+  "executions_allowed": false,
+  "compiler_allowed": false,
+  "await_exact_publication": true
+}

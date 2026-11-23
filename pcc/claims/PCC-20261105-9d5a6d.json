@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-05T08:45:05Z",
+ "id": "PCC-20261105-9d5a6d",
+ "kind": "statement",
+ "producer": {
+  "commit": "63f168e4aaad06dc1d6999d8e814891140c081ee",
+  "model": "codex",
+  "session": "aps3453-pcc-type-repair"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_leads_20261105/certificates/line-chart.json",
+    "sha256": "12fb28f8a865c9445c3c44d115a5040e5c6a1d53e21f3f13721981ea394b0762"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_leads_20261105/certificates/frontier-count.json",
+    "sha256": "68a461493f985abd5499b0d7adeed9ac6f69ab633e09a53dda6066fd0b1c8ce6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "APS next-lead proposal report and identity-record wrapper; current-source observations are bounded, full-text CANS2018 gap remains, all future solver mechanisms and performance checks pending",
+ "statement": "Bounded APS source review compared main 2d33e9c068c0f2b3226893017c8ea48548cc0749 with matching local APS/F4/adapter/identity/SHA-256 blobs. The native trace primitives exist but APS does not call them; the adapter uses one subset_size. The proposal wrapper final build, replay, formatting and strict Clippy under Rust 1.98.0 and 1.99.1 passed using the root existing fixed-chunks policy, after documented initial dependency, lint and rendering failures. The four-page report and all pages were visually inspected; identity replay output matches its committed receipt. This records only source/identity/document validation, with no APS solve, benchmark, timing, scalability or independent verification claim."
+}

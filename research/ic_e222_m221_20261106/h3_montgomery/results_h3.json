@@ -1,0 +1,173 @@
+{
+ "status": "unvalidated (pre-gate)",
+ "curve": "other/M-221",
+ "p_bits": 221,
+ "r_bits": 219,
+ "seed": "h3-v1",
+ "order_check": {
+  "affine_mont_rG_is_O": true,
+  "xonly_ladder_Z_is_0": true,
+  "weierstrass_jacobian_rG_is_O": true
+ },
+ "ladder_vs_weierstrass_20": 20,
+ "route_agreement_with_reference": "200/200",
+ "euclid_exec_check_small": "15/15",
+ "euclid_golden": {
+  "k_candidates": 2000,
+  "pairs": 100,
+  "steps_mean": 394.07,
+  "steps_min": 375,
+  "steps_max": 423,
+  "steps_formula_equals_executed": true,
+  "x_matches_reference": "100/100",
+  "log_phi_bound_steps": 314.01157970993734
+ },
+ "euclid_uniform": {
+  "pairs": 200,
+  "steps_median": 1210.5,
+  "steps_mean": 2051.92,
+  "steps_min": 583,
+  "steps_max": 40707
+ },
+ "dadd_projective_diff": {
+  "M": 4,
+  "S": 2,
+  "I": 0,
+  "D": 0,
+  "A": 6
+ },
+ "dadd_affine_diff": {
+  "M": 3,
+  "S": 2,
+  "I": 0,
+  "D": 0,
+  "A": 6
+ },
+ "xdbladd_affine_diff": {
+  "M": 5,
+  "S": 4,
+  "I": 0,
+  "D": 1,
+  "A": 8
+ },
+ "jdbl": {
+  "M": 2,
+  "S": 8,
+  "I": 0,
+  "D": 0,
+  "A": 17
+ },
+ "jmadd": {
+  "M": 7,
+  "S": 4,
+  "I": 0,
+  "D": 0,
+  "A": 14
+ },
+ "jadd": {
+  "M": 11,
+  "S": 5,
+  "I": 0,
+  "D": 0,
+  "A": 13
+ },
+ "summary": {
+  "a0": {
+   "label": "(a0) producer shape: 2 scalar mults to affine + affine add",
+   "counts_mean": {
+    "M": 2382.255,
+    "S": 4321.18,
+    "I": 3,
+    "D": 0,
+    "A": 10368.95
+   },
+   "m_eq": {
+    "I=20M": 5899.1990000000005,
+    "I=80M": 6079.1990000000005,
+    "I=100M": 6139.1990000000005
+   },
+   "n": 200
+  },
+  "a": {
+   "label": "(a) Jacobian: 2 scalar mults + 1 Jacobian add, x only",
+   "counts_mean": {
+    "M": 2386.255,
+    "S": 4324.18,
+    "I": 1,
+    "D": 0,
+    "A": 10375.95
+   },
+   "m_eq": {
+    "I=20M": 5865.599,
+    "I=80M": 5925.599,
+    "I=100M": 5945.599
+   },
+   "n": 200
+  },
+  "c": {
+   "label": "(c) Jacobian Shamir interleaved (table G, Q, G+Q)",
+   "counts_mean": {
+    "M": 1575.34,
+    "S": 2386.12,
+    "I": 1,
+    "D": 0,
+    "A": 5964.935
+   },
+   "m_eq": {
+    "I=20M": 3504.236,
+    "I=80M": 3564.236,
+    "I=100M": 3584.236
+   },
+   "n": 200
+  },
+  "b1": {
+   "label": "(b1) 2 x-only ladders + y-recovery + 1 affine add",
+   "counts_mean": {
+    "M": 2186.4,
+    "S": 1740.52,
+    "I": 3,
+    "D": 435.88,
+    "A": 3492.04
+   },
+   "m_eq": {
+    "I=20M": 3682.4040000000005,
+    "I=80M": 3862.4040000000005,
+    "I=100M": 3922.4040000000005
+   },
+   "n": 200
+  },
+  "b2_golden": {
+   "label": "(b2) Euclid differential chain, golden-selected pair",
+   "counts_mean": {
+    "M": 1574.28,
+    "S": 788.14,
+    "I": 1,
+    "D": 0,
+    "A": 2364.42
+   },
+   "m_eq": {
+    "I=20M": 2224.792,
+    "I=80M": 2284.792,
+    "I=100M": 2304.792
+   },
+   "n": 100
+  },
+  "b2_uniform": {
+   "label": "(b2u) Euclid differential chain, uniform random pair",
+   "counts_mean": {
+    "M": 8207.68,
+    "S": 4103.84,
+    "I": 1,
+    "D": 0,
+    "A": 12311.52
+   },
+   "m_eq": {
+    "I=20M": 11510.752,
+    "I=80M": 11570.752,
+    "I=100M": 11590.752
+   },
+   "n": 200
+  }
+ },
+ "pricing_convention": "M-eq = M + 0.8*S + 0.1*D + (I/M ratio)*I ; A (add/sub) not priced; scalars uniform in [1, r-1] (219-bit order)"
+}

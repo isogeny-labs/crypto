@@ -1,0 +1,55 @@
+{
+  "schema": "research.formal-component-result/v1",
+  "scope": "literal UInt64 tripling tree and original-input repeated-support conditional branch",
+  "theorems": [
+    "small_literal_mul_reduce",
+    "triple_literal_tree",
+    "triple_word_decode",
+    "repeated_word_preserves"
+  ],
+  "premises": [
+    "prime5<=p<2^31",
+    "canonical original coordinates and coefficients a1,a2,a3",
+    "four nonzero input word weights",
+    "original normalized point/divisor validity",
+    "word outerK0,cancellationfalse,equalother guards"
+  ],
+  "source_route": {
+    "Field.n": 1,
+    "Field.tables": null,
+    "odd_characteristic": true,
+    "table_backend": "excluded"
+  },
+  "literal_constants": [
+    5,
+    8,
+    10
+  ],
+  "constant_bound": "c<=10, a<p<2^31 implies c*a<2^64",
+  "derived": [
+    "exact literal tree equivalence",
+    "canonical payload",
+    "decode to rawOutput",
+    "original word y nonzero",
+    "Some scoped return",
+    "output weights nonzero",
+    "normalized output validity"
+  ],
+  "native_receipts": {
+    "attempt1": 0,
+    "attempt2": 0,
+    "controls1": 1,
+    "readback1": 0,
+    "controls2": 1,
+    "controls3": 0
+  },
+  "independent_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "pdf_pages": 1,
+  "pdf_visual_inspection": true,
+  "scope_exclusions": [
+    "other dispatcher branches",
+    "compiler/counter/class-sum/whole-walk behavior"
+  ]
+}

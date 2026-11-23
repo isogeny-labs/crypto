@@ -1,0 +1,493 @@
+{
+ "what_this_is": "Rule v9: main's binary against rule v8's binary run in the same session (rule v9c), each against its own in-process matched rho, rows paired by target",
+ "bootstrap": {
+  "resamples": 10000,
+  "seed": 2310000
+ },
+ "sizes": [
+  {
+   "a": 1,
+   "n": 47,
+   "r": 106781081677.0,
+   "log2_r": 36.64,
+   "targets_paired": 64,
+   "walks_checked": {
+    "rows": 64,
+    "same_rho_steps": 64,
+    "same_logarithms_and_target_hash": 64,
+    "differing": []
+   },
+   "cold_ratio_matched": {
+    "value": 4.07593714999039,
+    "ci95": [
+     3.7662912033168223,
+     4.4477264497967255
+    ]
+   },
+   "cold_ratio_control": {
+    "value": 4.0251491178490335,
+    "ci95": [
+     3.7176683827154724,
+     4.394009479982108
+    ]
+   },
+   "cold_matched_over_control": {
+    "value": 1.012617677172789,
+    "ci95": [
+     1.0116548609423273,
+     1.0135759110856195
+    ]
+   },
+   "rho_online_control_over_matched": {
+    "value": 0.9380335584422663,
+    "ci95": [
+     0.9369863312184786,
+     0.9390916328145995
+    ]
+   },
+   "ic_online_matched_over_control": {
+    "value": 1.0694001476315844,
+    "ci95": [
+     1.0607792726171765,
+     1.0770743240018457
+    ]
+   },
+   "rho_units_per_step_median": {
+    "matched": 5.559277418346092,
+    "control": 5.216419621835458
+   },
+   "setup_units_median": {
+    "ic_matched": 1342878.060419925,
+    "ic_control": 1238627.0566493908,
+    "rho_matched": 88583.4025893848,
+    "rho_control": 81798.23621536256
+   }
+  },
+  {
+   "a": 0,
+   "n": 57,
+   "r": 275295876199.0,
+   "log2_r": 38.0,
+   "targets_paired": 64,
+   "walks_checked": {
+    "rows": 64,
+    "same_rho_steps": 64,
+    "same_logarithms_and_target_hash": 64,
+    "differing": []
+   },
+   "cold_ratio_matched": {
+    "value": 4.731180628132081,
+    "ci95": [
+     4.395632944215586,
+     5.1110850616644745
+    ]
+   },
+   "cold_ratio_control": {
+    "value": 4.829978789888934,
+    "ci95": [
+     4.4836996273428005,
+     5.2220395095721965
+    ]
+   },
+   "cold_matched_over_control": {
+    "value": 0.9795448042207395,
+    "ci95": [
+     0.9784374931298244,
+     0.9805764150031979
+    ]
+   },
+   "rho_online_control_over_matched": {
+    "value": 0.941533325038023,
+    "ci95": [
+     0.9405858357939043,
+     0.9424675721985517
+    ]
+   },
+   "ic_online_matched_over_control": {
+    "value": 1.0664141488868473,
+    "ci95": [
+     1.0647084331184637,
+     1.0681960407515398
+    ]
+   },
+   "rho_units_per_step_median": {
+    "matched": 5.7960155130230735,
+    "control": 5.456023097702013
+   },
+   "setup_units_median": {
+    "ic_matched": 2275955.1168521093,
+    "ic_control": 2165632.829920753,
+    "rho_matched": 146501.0130279631,
+    "rho_control": 133271.35061948962
+   }
+  },
+  {
+   "a": 0,
+   "n": 41,
+   "r": 549756390943.0,
+   "log2_r": 39.0,
+   "targets_paired": 64,
+   "walks_checked": {
+    "rows": 64,
+    "same_rho_steps": 64,
+    "same_logarithms_and_target_hash": 64,
+    "differing": []
+   },
+   "cold_ratio_matched": {
+    "value": 6.142826875178376,
+    "ci95": [
+     5.548851912422879,
+     6.841848438525863
+    ]
+   },
+   "cold_ratio_control": {
+    "value": 6.38136114077367,
+    "ci95": [
+     5.76103329251517,
+     7.111759286123881
+    ]
+   },
+   "cold_matched_over_control": {
+    "value": 0.9626201588762654,
+    "ci95": [
+     0.9616972249497376,
+     0.9635171343887505
+    ]
+   },
+   "rho_online_control_over_matched": {
+    "value": 0.945485424333391,
+    "ci95": [
+     0.9446644489458915,
+     0.9463170694159173
+    ]
+   },
+   "ic_online_matched_over_control": {
+    "value": 1.0656693650708533,
+    "ci95": [
+     1.0641108873472664,
+     1.067347464498928
+    ]
+   },
+   "rho_units_per_step_median": {
+    "matched": 4.817734076739294,
+    "control": 4.55578631706245
+   },
+   "setup_units_median": {
+    "ic_matched": 3271938.85986973,
+    "ic_control": 3205748.8813496213,
+    "rho_matched": 63915.39867817456,
+    "rho_control": 58851.76265745496
+   }
+  },
+  {
+   "a": 0,
+   "n": 53,
+   "r": 21044858204113.0,
+   "log2_r": 44.26,
+   "targets_paired": 64,
+   "walks_checked": {
+    "rows": 64,
+    "same_rho_steps": 64,
+    "same_logarithms_and_target_hash": 64,
+    "differing": []
+   },
+   "cold_ratio_matched": {
+    "value": 7.458472722152139,
+    "ci95": [
+     6.66397231967245,
+     8.418275842939357
+    ]
+   },
+   "cold_ratio_control": {
+    "value": 7.708757441662707,
+    "ci95": [
+     6.890103283348094,
+     8.70435281943184
+    ]
+   },
+   "cold_matched_over_control": {
+    "value": 0.9675324173312446,
+    "ci95": [
+     0.9661195901981345,
+     0.9688312944472309
+    ]
+   },
+   "rho_online_control_over_matched": {
+    "value": 0.944391938618392,
+    "ci95": [
+     0.9429430549526594,
+     0.9457133866712326
+    ]
+   },
+   "ic_online_matched_over_control": {
+    "value": 1.0579543079968943,
+    "ci95": [
+     1.0473837668376444,
+     1.0673962720177599
+    ]
+   },
+   "rho_units_per_step_median": {
+    "matched": 4.645103570789463,
+    "control": 4.386205644803963
+   },
+   "setup_units_median": {
+    "ic_matched": 20171130.09906221,
+    "ic_control": 19679582.607599914,
+    "rho_matched": 142732.9502019093,
+    "rho_control": 133160.6941269072
+   }
+  },
+  {
+   "a": 1,
+   "n": 59,
+   "r": 25179555920633.0,
+   "log2_r": 44.52,
+   "targets_paired": 64,
+   "walks_checked": {
+    "rows": 64,
+    "same_rho_steps": 64,
+    "same_logarithms_and_target_hash": 64,
+    "differing": []
+   },
+   "cold_ratio_matched": {
+    "value": 6.827982501917709,
+    "ci95": [
+     6.005725686861089,
+     7.826465891636434
+    ]
+   },
+   "cold_ratio_control": {
+    "value": 7.020517964842789,
+    "ci95": [
+     6.173573749122404,
+     8.050641288850738
+    ]
+   },
+   "cold_matched_over_control": {
+    "value": 0.9725753193867952,
+    "ci95": [
+     0.9716104311833096,
+     0.9735511468236068
+    ]
+   },
+   "rho_online_control_over_matched": {
+    "value": 0.9427682235313252,
+    "ci95": [
+     0.9418090799482685,
+     0.9437789506090661
+    ]
+   },
+   "ic_online_matched_over_control": {
+    "value": 1.0735226041178414,
+    "ci95": [
+     1.0705614001097334,
+     1.0767196027320098
+    ]
+   },
+   "rho_units_per_step_median": {
+    "matched": 4.764820828135761,
+    "control": 4.486353712092925
+   },
+   "setup_units_median": {
+    "ic_matched": 21150151.053067878,
+    "ic_control": 20470777.659833204,
+    "rho_matched": 209852.25074195446,
+    "rho_control": 192817.6028367409
+   }
+  },
+  {
+   "a": 0,
+   "n": 61,
+   "r": 162888033982417.0,
+   "log2_r": 47.21,
+   "targets_paired": 64,
+   "walks_checked": {
+    "rows": 64,
+    "same_rho_steps": 64,
+    "same_logarithms_and_target_hash": 64,
+    "differing": []
+   },
+   "cold_ratio_matched": {
+    "value": 11.132498522598459,
+    "ci95": [
+     9.914753735698515,
+     12.622708519204684
+    ]
+   },
+   "cold_ratio_control": {
+    "value": 11.887828094071676,
+    "ci95": [
+     10.587537851755137,
+     13.47965037501969
+    ]
+   },
+   "cold_matched_over_control": {
+    "value": 0.9364619369075592,
+    "ci95": [
+     0.9351776370450694,
+     0.9377161919504289
+    ]
+   },
+   "rho_online_control_over_matched": {
+    "value": 0.9441117860461924,
+    "ci95": [
+     0.9428211481821217,
+     0.9453844122163673
+    ]
+   },
+   "ic_online_matched_over_control": {
+    "value": 1.073025816538115,
+    "ci95": [
+     1.066390288767185,
+     1.0809940555278434
+    ]
+   },
+   "rho_units_per_step_median": {
+    "matched": 4.771159485904684,
+    "control": 4.505223147811703
+   },
+   "setup_units_median": {
+    "ic_matched": 74870067.30136171,
+    "ic_control": 75475404.60625584,
+    "rho_matched": 182654.56250299618,
+    "rho_control": 168881.77287326547
+   }
+  }
+ ],
+ "slope_of_ln_cold_ratio_on_ln_r": {
+  "matched": {
+   "points": 6,
+   "slope": 0.11261710054356038,
+   "intercept": -1.395159653467034,
+   "t_interval_over_sizes": {
+    "slope": 0.11261710054356039,
+    "ci95": [
+     0.05582390167828831,
+     0.16941029940883245
+    ],
+    "points": 6
+   },
+   "bootstrap_over_targets_ci95": [
+    0.097002597479738,
+    0.12880107825455483
+   ],
+   "leave_one_size_out": [
+    {
+     "left_out_log2_r": 36.64,
+     "slope": 0.10432814902393225
+    },
+    {
+     "left_out_log2_r": 38.0,
+     "slope": 0.11120897994137229
+    },
+    {
+     "left_out_log2_r": 39.0,
+     "slope": 0.12160982703013497
+    },
+    {
+     "left_out_log2_r": 44.26,
+     "slope": 0.11540477445013393
+    },
+    {
+     "left_out_log2_r": 44.52,
+     "slope": 0.12248017225710808
+    },
+    {
+     "left_out_log2_r": 47.21,
+     "slope": 0.09096773814532182
+    }
+   ],
+   "ln_r_and_n_together": {
+    "intercept": -1.360407291499178,
+    "coefficient_on_ln_r": 0.13022197429040527,
+    "coefficient_on_n": -0.01023467812824575,
+    "note": "six points, three parameters: descriptive, no interval; n and log2 r are not separated by these curves"
+   },
+   "extrapolation": [
+    {
+     "log2_r": 50.0,
+     "point": 12.278522928183104,
+     "through_centroid_slope_ci": [
+      8.822801547140914,
+      17.08778379434065
+     ]
+    },
+    {
+     "log2_r": 60.0,
+     "point": 26.8013937030351,
+     "through_centroid_slope_ci": [
+      12.99131758006757,
+      55.29190553598597
+     ]
+    }
+   ]
+  },
+  "control": {
+   "points": 6,
+   "slope": 0.1193301455466541,
+   "intercept": -1.5599680991198401,
+   "t_interval_over_sizes": {
+    "slope": 0.1193301455466541,
+    "ci95": [
+     0.05587410014052563,
+     0.18278619095278256
+    ],
+    "points": 6
+   },
+   "bootstrap_over_targets_ci95": [
+    0.10404803845749427,
+    0.13580884618519745
+   ],
+   "leave_one_size_out": [
+    {
+     "left_out_log2_r": 36.64,
+     "slope": 0.10850737206598374
+    },
+    {
+     "left_out_log2_r": 38.0,
+     "slope": 0.11863299577371672
+    },
+    {
+     "left_out_log2_r": 39.0,
+     "slope": 0.12948328371556944
+    },
+    {
+     "left_out_log2_r": 44.26,
+     "slope": 0.12256797516743019
+    },
+    {
+     "left_out_log2_r": 44.52,
+     "slope": 0.1300953437858057
+    },
+    {
+     "left_out_log2_r": 47.21,
+     "slope": 0.09573228887738922
+    }
+   ],
+   "ln_r_and_n_together": {
+    "intercept": -1.5228773949758616,
+    "coefficient_on_ln_r": 0.13811957816827744,
+    "coefficient_on_n": -0.01092332713428982,
+    "note": "six points, three parameters: descriptive, no interval; n and log2 r are not separated by these curves"
+   },
+   "extrapolation": [
+    {
+     "log2_r": 50.0,
+     "point": 13.140507015331437,
+     "through_centroid_slope_ci": [
+      9.083072327221446,
+      19.010409517766796
+     ]
+    },
+    {
+     "log2_r": 60.0,
+     "point": 30.049112828532127,
+     "through_centroid_slope_ci": [
+      13.37921317875475,
+      67.48895990503192
+     ]
+    }
+   ]
+  }
+ }
+}

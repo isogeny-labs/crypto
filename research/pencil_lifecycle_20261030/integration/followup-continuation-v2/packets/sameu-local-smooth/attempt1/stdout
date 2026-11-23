@@ -1,0 +1,42 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/var/tmp/pencil-sameu-local-smooth-20261031-v1/LocalSmooth.lean:53:85: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a0 a1 a2 a3 x : K
+h : (X - C x) ^ 2 ∣ WeightedDoubling.curve a0 a1 a2 a3
+v : K := WeightedDoubling.value a0 a1 a2 a3 x
+d : K := WeightedDoubling.deriv a1 a2 a3 x
+hi :
+  WeightedDoubling.curve a0 a1 a2 a3 =
+    (X - C x) ^ 2 * (X ^ 3 + C (2 * x) * X ^ 2 + C (3 * x ^ 2 + a3) * X + C (4 * x ^ 3 + 2 * a3 * x + a2)) +
+        C (WeightedDoubling.value a0 a1 a2 a3 x) +
+      C (WeightedDoubling.deriv a1 a2 a3 x - 2 * 0 * 0) * (X - C x)
+hm :
+  (X - C x) ^ 2 ∣ (X - C x) ^ 2 * (X ^ 3 + C (2 * x) * X ^ 2 + C (3 * x ^ 2 + a3) * X + C (4 * x ^ 3 + 2 * a3 * x + a2))
+hd :
+  (X - C x) ^ 2 ∣
+    WeightedDoubling.curve a0 a1 a2 a3 -
+      (X - C x) ^ 2 * (X ^ 3 + C (2 * x) * X ^ 2 + C (3 * x ^ 2 + a3) * X + C (4 * x ^ 3 + 2 * a3 * x + a2))
+⊢ -(X * C 2 * C 0 ^ 2) + X * C (WeightedDoubling.deriv a1 a2 a3 x) + C x * C 2 * C 0 ^ 2 -
+        C x * C (WeightedDoubling.deriv a1 a2 a3 x) +
+      C (WeightedDoubling.value a0 a1 a2 a3 x) =
+    X * C (WeightedDoubling.deriv a1 a2 a3 x) - C x * C (WeightedDoubling.deriv a1 a2 a3 x) +
+      C (WeightedDoubling.value a0 a1 a2 a3 x)
+/var/tmp/pencil-sameu-local-smooth-20261031-v1/LocalSmooth.lean:62:2: error: Type mismatch: After simplification, term
+  natDegree_quadratic one_ne_zero
+ has type
+  (X ^ 2 + -(C 2 * C x * X)).natDegree = 2
+but is expected to have type
+  (X ^ 2 + -(C 2 * C x * X) + C x ^ 2).natDegree = 2
+/var/tmp/pencil-sameu-local-smooth-20261031-v1/LocalSmooth.lean:49:21: warning: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [zero_mul, sub_zero, zero_pow (by decide : (2 : Nat) ≠ 0), C_0, add_zero] at hi
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

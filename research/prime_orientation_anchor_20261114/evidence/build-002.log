@@ -1,0 +1,22 @@
+✖ [9056/9057] Building OrientationAnchor (10s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean -o /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/lib/lean/OrientationAnchor.olean -i /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/lib/lean/OrientationAnchor.ilean -c /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/ir/OrientationAnchor.c --setup /workspace/audit/norm-recovery-completion-worktree/research/prime_orientation_anchor_20261114/lean/.lake/build/ir/OrientationAnchor.setup.json --json
+error: OrientationAnchor.lean:35:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instMul', which is 'noncomputable'
+error: OrientationAnchor.lean:39:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'commRing', which is 'noncomputable'
+error: OrientationAnchor.lean:56:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'divByMonic', which is 'noncomputable'
+error: OrientationAnchor.lean:66:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'commRing', which is 'noncomputable'
+error: OrientationAnchor.lean:69:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'commRing', which is 'noncomputable'
+error: OrientationAnchor.lean:72:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'derivative', which is 'noncomputable'
+error: OrientationAnchor.lean:74:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instMul', which is 'noncomputable'
+error: OrientationAnchor.lean:77:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instMul', which is 'noncomputable'
+error: OrientationAnchor.lean:80:4: failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instMul', which is 'noncomputable'
+error: OrientationAnchor.lean:86:30: Application type mismatch: The argument
+  fun t => X - C t
+has type
+  ?m.25 → ℚ[X]
+but is expected to have type
+  Finset ?m.21
+in the application
+  prod_erase_mul fun t => X - C t
+Some required targets logged failures:
+- OrientationAnchor
+error: build failed

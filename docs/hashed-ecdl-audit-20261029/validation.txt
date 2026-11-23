@@ -1,0 +1,187 @@
+Native hashed ECDL sampling / recursive audit, 2026-10-29
+Scope: development correctness only. No isolated timing or speed claim.
+Bases:
+  crypto 037bfc872342ff66a0cc4c6a5e1d46b1efac3029
+  cryptanalysis 0366546e2a26c4acc8d3a32890b2427fb9d6a844
+Host: managed Linux x86-64 development container; four-vCPU quota.
+Compiler: rustc 1.99.1 (58cf8f9c3 2026-10-13)
+MSRV compiler: rustc 1.78.0 (9b00956e5 2024-04-29)
+
+Observed commands and outcomes:
+1. Unmodified crypto:
+   cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml
+   PASS: 27 tests, zero failed; runner/doc targets pass.
+2. New targeted recursion control:
+   cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml both_taper_levels
+   PASS: one test containing nine direct-count comparisons.
+3. New exact sampling controls:
+   cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml sampling_
+   PASS: two tests, exact draw enumeration and failure/pin controls.
+4. Final crypto:
+   cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml
+   PASS: 30 tests, zero failed, zero ignored; runner/doc targets pass.
+   Compact transcript (terminal separator blank line omitted): crypto-native-tests.txt.
+5. Final mirror (CARGO_TARGET_DIR reused development build cache):
+   cargo test --locked --release --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor
+   PASS: 30 tests, zero failed, zero ignored; runner/doc targets pass.
+   Compact transcript (terminal separator blank line omitted): mirror-native-tests.txt.
+6. Native strict lint and formatting, both manifests:
+   cargo clippy --locked --manifest-path <crate Cargo.toml> --all-targets -- -D warnings
+   cargo fmt --manifest-path <crate Cargo.toml> --check
+   PASS: exit 0 in both repositories.
+7. Minimum supported Rust:
+   cargo +1.78.0 check --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --all-targets
+   cargo +1.78.0 check --locked --manifest-path bindings/rust/Cargo.toml -p hashed-ecdl-tensor --all-targets
+   PASS: exit 0 for each.
+8. Strict API docs:
+   RUSTDOCFLAGS='-D warnings' cargo doc --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --no-deps
+   PASS: exit 0.
+9. Independent C/Rust integration:
+   cargo test --locked --release --manifest-path bindings/rust/Cargo.toml -p cryptanalysis
+   PASS after restoring tracked CUDA header: 20 unit, 19 FFI parity, 14 doc tests.
+   Compact transcript (terminal separator blank line omitted): binding-tests.txt.
+10. diff -ru --exclude=target between standalone and mirrored crate trees:
+    PASS: byte-identical, including README, lock, metadata and all sources.
+    sha256sum -c sources.sha256 from each crate directory: all 16 hashes PASS.
+11. Typst compile of report.typ, PDF render and visual inspection:
+    PASS: one inspected page; 40651-byte PDF, below 64 KiB policy.
+12. crypto root cargo test --locked --release --lib:
+    PENDING: full regression compiling; no pass claimed yet.
+13. Selected binding/core strict Clippy:
+    PASS: cargo clippy --locked --manifest-path bindings/rust/Cargo.toml -p cryptanalysis -p hashed-ecdl-tensor --all-targets -- -D warnings; exit 0.
+
+Setup failures retained (none was hidden by skipping a test):
+- Initial rustfmt invocation lacked the optional component; installed rustfmt
+  and clippy, then reran the unchanged native format/lint commands successfully.
+- Initial root invocation could not resolve the sparse isogeny_algos path crate.
+  Restored tracked source/path crates. The compile-input materializer next
+  failed because cone mode rejects its /file patterns. The first local config
+  update was shadowed by config.worktree. Switched the actual worktree setting
+  to non-cone and reran the existing materializer successfully: 187 compile-time
+  inputs restored. No research archive or source input was declared absent.
+- Initial mirror invocation lacked workspace-member manifests; restored the
+  tracked bindings/rust tree, then ran the final native suite successfully.
+- The first C/Rust integration build lacked cuda/ca_device.cuh in the sparse
+  checkout. Restored tracked cuda/ and reran the exact command successfully.
+- A redundant format command used a root-relative manifest from the crate
+  directory and failed path lookup; root-relative format checks already pass.
+- Conductor is not installed. The attempted conductor check returned exit 127;
+  docs/CONDUCTOR.md documents a warning-and-allow fallback in this situation.
+
+Historical receipts and manifests are preserved. General external-theorem
+correctness, admitted-recursion complexity and performance are unresolved;
+forced small parameters are correctness controls only. No cloud experiment,
+benchmark, deployed-curve input or leaderboard promotion was performed.
+
+Root runtime-fixture follow-up (23:43 UTC):
+The first broad root run reached execution of 5512 tests and exposed 14 missing
+sparse runtime-fixture failures. A focused diagnostic confirmed a missing tracked
+records.jsonl. Terminated that already-failing test process with SIGTERM; parent
+exit 101. That incomplete attempt is NOT a complete root regression result.
+Raw incomplete trace: /tmp/crypto-root-sparse-incomplete.log, 219964 bytes,
+SHA-256 97b5fb3e29e638f7de0884cb66da3dd7417e9f00fb54707c43e45cd1e316331c,
+NOT_UPLOADED (local trace, not a durable remote artifact).
+Applied scripts/sparse-checkout.sh apply --profile minimal with required native
+path crates and gpu/certicom; then added the exact nested archived session:
+research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/.
+All 14 observed failures now pass focused rechecks: 13 after the standard profile,
+and the final version-1 bounds case after restoring its dynamic nested path.
+No code, assertion, ignored-test annotation or frozen fixture was changed.
+A fresh FULL cargo test --locked --release --lib is executing using the cached
+build, output /tmp/crypto-root-tests-restored.log. Its wrapper records the actual
+exit status in /tmp/crypto-root-tests-restored.exit. No final pass is claimed.
+The earlier item 12's compiling status is superseded by this executing rerun.
+
+2026-10-30 recovery (00:29 UTC):
+The restored run did not leave its promised parent exit marker. Tool session
+20447 is no longer available; its cargo/test processes are zombies. Its trace
+ends without a full-suite summary. The isolated one-test summary embedded in
+that trace is not a full-suite result. Completion and parent exit are UNKNOWN.
+Trace: /tmp/crypto-root-tests-restored.log, 300952 bytes,
+SHA-256 1f6feada84a48d54dea3ec6caac5e0ba398ae39c14526193ec4797a33e96960c,
+NOT_UPLOADED. No source, fixture or assertion was changed during recovery.
+Restarted the unchanged mandatory command cargo test --locked --release --lib
+with output /tmp/crypto-root-tests-20261030.log and actual exit marker
+/tmp/crypto-root-tests-20261030.exit. Its result is pending. Earlier statements
+that the 23:43 run is executing are superseded by this recovery observation.
+
+Mirror publication:
+cryptanalysis PR1302 head b27ae2e5f525dc5a5a28d5fa935f67c9eeab965f has all
+applicable hosted checks successful, no unresolved review threads, and the
+completed automatic code review reports no findings. The opcounts job is
+legitimately skipped because its condition excludes pull_request events.
+A guarded merge attempt was rejected because current main cannot merge cleanly.
+Auto-merge remains enabled. Per AGENTS.md, asked Copilot once to merge main into
+the PR without rebasing/force-pushing or changing scope; resolution pending:
+https://github.com/isogeny-labs/cryptanalysis/pull/1302#issuecomment-6511852645
+No conflicting file was edited while that request is pending.
+
+2026-10-30 recovery (01:17 UTC):
+Session 25769 is unavailable and its cargo/test processes are zombies. No parent
+exit marker or full-suite summary exists. Result UNKNOWN, not a pass. Retained
+482016-byte trace SHA-256
+019547df1e055cc32182b0247885f4b5e488ea4bea4da7d71f5df5d9c2bc56b2,
+NOT_UPLOADED. See root-regression-recovery.txt for the exact source snapshot,
+observations, and detached restart's log/metadata/exit-receipt paths. The same
+unchanged full command restarted at 01:16:30 UTC and is pending. All earlier
+failure and incomplete-run receipts remain valid historical evidence. Crypto
+publication remains blocked on a complete required root result.
+At this check PR1302 remains at b27ae2e with passing applicable CI, no review
+findings, a merge conflict, and auto-merge enabled. Copilot has not responded;
+no conflicted peer files were edited. No crypto PR exists for the branch yet.
+
+2026-10-30 complete root result (recovered 02:15 UTC):
+PASS: cargo test --locked --release --lib, tested HEAD
+6c11977e1546dd9cc0556aa1fe2e227cafe979da, actual wrapper exit 0.
+Full parent summary: 5389 passed; 0 failed; 123 ignored; 0 measured;
+0 filtered out. Completed 02:01:21 UTC. The previously outstanding isogeny-walk
+test passed. See root-tests-complete.txt for exact command, times, raw-output
+size/hash and runtime receipts. Raw output remains local, NOT_UPLOADED.
+The earlier failed/incomplete histories are preserved; this result supersedes
+the pending status of the detached run only. No code/check/fixture/assertion
+was changed during the run. Subsequent publication edits are documentation only.
+
+2026-10-30 03:30 UTC: combined current-main integration supersedes the earlier
+parity-pending working-tree status. Both native trees now agree across28files;
+combined native/binding and root verification is pending. See
+combined-main-integration.txt and sources-union.sha256. Earlier receipts remain
+scoped to their historical revisions; none is overwritten or broadened.
+
+2026-10-30 03:32 UTC: combined native/binding/lint/MSRV/docs complete and
+passing (40core/5runner/3panel/3JSON per native panel, bindings20/19/14).
+All28file byte-parity checks pass. New complete root result is still pending.
+See combined-main-integration.txt for exact scope, setup failure and live receipt.
+
+2026-10-30 04:37 UTC: FULL combined root PASS, actual exit0,5430passed,0failed,
+123existingignored,0filtered. See root-union-complete.txt. Actual merged peer
+head018fd41b matches all28 publication files after a blank-line-only adjustment;
+new sources-merged-peer.sha256 preserves publication hashes separately.
+
+Publication file-count correction, 2026-10-30 04:41 UTC:
+The historical prose said28 native files. Both actual sources-union.sha256 and
+sources-merged-peer.sha256 contain26 entries, and git's tracked-tree count is26.
+Every manifest entry and actual merged-peer byte comparison passes; the error
+was the prose count, not the hashes or tested source. Earlier receipts remain
+as historical records with this explicit correction. Publication parity is26files.
+
+2026-10-30 04:46 UTC: published head3575a10a retains complete5430pass receipt.
+Advanced main has a different path-dependency source. Its standalone34tests
+pass with actual exit0; new complete root validation at local9f0835c26 is LIVE
+and not yet a pass. See advanced-base-validation.txt; no earlier result widened.
+
+2026-10-30 05:44 UTC: advanced-base FULL ROOT PASS at9f0835c26: actual exit0,
+5430passed/0failed/123existingignored/0filtered, finished05:43:26Z. Final case
+completed. New precise raw-output hash/size are in advanced-root-complete.txt.
+Later changes are receipts only. Every earlier result retains its own scope.
+
+2026-10-30 05:59 UTC: current36-file native source tests51core/5runner/3panel/
+6certified/9finite/3JSON/4width pass in both trees; bindings20/19/14 and changed
+dependency40tests pass. Lint/MSRV/format pass. Strict API docs FAIL on unchanged
+peer55f65930 (two broken links); recorded as upstream, no checks suppressed.
+Fresh complete root sourcebdfbad667 remains pending after tracked-fixture restore.
+See current-native-main-integration.txt and its separate success/error transcripts.
+
+2026-10-30 07:00 UTC: COMPLETE current-root PASS at sourcebdfbad667, actual
+exit0,5444passed/0failed/123existingignored/0filtered, completed06:49:02Z.
+See native-main-root-complete.txt. This supersedes PENDING for that run only.
+Strict API docs remain an upstream failure; no aggregate all-checks pass claimed.

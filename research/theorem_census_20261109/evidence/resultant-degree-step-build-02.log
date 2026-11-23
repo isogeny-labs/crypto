@@ -1,0 +1,23 @@
+ResultantDegreeStep.lean:50:50: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  det ?M
+in the target expression
+  ∑ b, (Equiv.Perm.sign b • ∏ i, M (b i) i).coeff (∑ j, d j) = det fun i j => (M i j).coeff (d j)
+
+R : Type u_1
+inst✝² : CommRing R
+n : Type u_2
+inst✝¹ : Fintype n
+inst✝ : DecidableEq n
+M : Matrix n n R[X]
+d : n → ℕ
+h : ∀ (i j : n), (M i j).natDegree ≤ d j
+⊢ ∑ b, (Equiv.Perm.sign b • ∏ i, M (b i) i).coeff (∑ j, d j) = det fun i j => (M i j).coeff (d j)
+
+Note: The target expression is not type-correct under the `implicit` transparency level, which may have triggered the failure. This is usually caused by unfolding of semireducible definitions in prior tactic steps. Use `set_option linter.tacticCheckInstances true` to investigate the source of the issue.
+Full error:
+  function expected
+    M (b i)
+'ResultantDegreeStepAudit.determinant_coeff_column_bounds' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

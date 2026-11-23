@@ -1,0 +1,8 @@
+module
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Tactic.FinCases
+public section
+example (x : ZMod 3) : x = 0 ∨ x = 1 ∨ x = 2 := by
+  fin_cases x <;> simp
+example : (1 : ZMod 3) ≠ 0 := by decide
+example : (1 : ZMod 3) + 1 = 2 := by decide

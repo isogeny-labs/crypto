@@ -1,0 +1,51 @@
+{
+  "card_changed": false,
+  "card_id": "CARD-n83-native-phase-20261019-v2-k4096",
+  "card_path": "/home/ec2-user/scratch/n83-native-phase-20261019/v2/cards/k4096.json",
+  "card_sha256": "52e8477c7e6a65070b8440b3bd8ec9520acff195ad0ffa2570005c729a3daef8",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-native-phase-20261019/runner-v2-target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-native-phase-20261019/v2/specs/k4096.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/k4096"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 1.761747625,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "k4096",
+      "index": 1,
+      "outputs": {
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/k4096/audit.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/k4096/config.json": "22baea9b704e7c6a1899f00545f451a0fab42b39efd19c78a02d739a1cbf60dd",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/k4096/inspect-final.json": "96646a18fb664069550aa2788e46b2d10033f618fbd3952396075e6adf58f06a",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/k4096/inspect-live.json": "98d64a7afcb334d51f0957e6325d437ae490cd28eda091f393bb6f8f17656363",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/k4096/outer.json": "ad7041e07aa6958d225345fef731e28cc953d37809aef8a3d1e5cc61eb7408b7"
+      },
+      "seconds": 1.761747625,
+      "stderr_sha256": "115782b509c1fb81946a125e151fd3596634c5eec34498b5d6f11eb2cacaf894",
+      "stderr_tail": [
+        "Error: \"missing terminal without wall censoring\""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "c259497ec9cf1fde358ffc91eabe8c2cff242f95",
+  "dirty_after": "",
+  "dirty_before": "",
+  "native_executor": "n83-sweep-runner strict frozen-command subset/v1",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 1"
+}

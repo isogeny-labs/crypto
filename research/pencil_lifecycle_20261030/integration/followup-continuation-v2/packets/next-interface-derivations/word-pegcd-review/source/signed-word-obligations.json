@@ -1,0 +1,19 @@
+{
+ "schema":"source-composition-obligations/v1",
+ "kind":"written source derivation; no new formal acceptance",
+ "publication_context":"5cd0a45205",
+ "invariant":{"signs":"i8 +/-1","offsets":"0<=a,b<r","fixed":"canonical pair when present","modulus":"prime 2<r<=2^63"},
+ "obligations":[
+  {"id":"sign-base","source":"three_leads.rs1543-1579","status":"source-derived","claim":"ID and node creation satisfy +/-1"},
+  {"id":"find-word-preservation","source":"three_leads.rs1582-1597","status":"written induction; formal composition pending","reuse":["GraphRingWord.signed_correct","GraphRingWord.add_correct","reviewed post-recursion Run"]},
+  {"id":"union-word-preservation","source":"three_leads.rs1658-1711","status":"written induction; formal composition pending","claim":"cu,cv,s,-s stay +/-1; cu+cv fits i8; offsets and anchors canonical"},
+  {"id":"inverse-two","source":"three_leads.rs1678","status":"written closed formula; new Lean specialization pending","formula_positive":"r/2+1","formula_negative":"r/2","reuse":["WideModPow.generator_decode","canonical_equality"]},
+  {"id":"constraint-word-answer","source":"three_leads.rs1598-1606","status":"existing primitives; whole transformer composition pending","claim":"canonical nonzero b permits generated inverse; returned word decodes to field answer"},
+  {"id":"caller-scope","source":"three_leads.rs1908-1921; frozen graph.rs11; pruned.rs814-817","status":"sign construction checked by reading; bound is entry-point-specific"},
+  {"id":"invalid-sign","source":"three_leads.rs1660-1679","status":"explicit written counterexample","r":101,"edge":["x",0,"x",1,1,0],"intended_root":1,"stored_anchor":[50,0]},
+  {"id":"native-totality","source":"graph counters, size and Vec accesses","status":"separate obligations","claim":"forest/index validity and counter/size headroom remain necessary"}
+ ],
+ "scientific_execution":false,
+ "formal_checks_executed":false,
+ "python_research_used":false
+}

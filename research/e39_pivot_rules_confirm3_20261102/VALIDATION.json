@@ -1,0 +1,36 @@
+{
+  "schema": "validation-gate/v1",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "7e8e201364d87a7285c98be06ae6e57f7a65948737f4484411cb427e25c13746"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "451414ae4273fc72794c8b76857a14dcc5d89a0ba2bbcbe85f4aa4e485bc546a"
+  },
+  "rho_reference": {
+    "kind": "negation_frobenius",
+    "protocol": "Named by the protocol (note §9.48, registered at 16d17d2462 before any E39 code or run): walk (iii), the matched rho of this line since §9.25/§9.29 and §9.44. On the 20 GLS rows (E25's ten curves, pipeline arms A and B) E27's <±psi> walk, psi the GLS endomorphism (psi^2 = -1), class {±P, ±psi P}, Karatsuba F_p4 products with the norm inversions of a 16-walk lockstep pool batched by Montgomery's trick (experiments/32_walk_karatsuba/stage_w.json); on the 12 E24 rows the same walk (iii) with the negation fold on E24's curves (experiments/44_pivot_rules_confirm/walk_e24.json). rho = mean over the 16 batched walks of their F_p multiplications without the [d]G = Q check (E25/E27 convention), recomputed by the validator from the per-walk records. Strongest available: GLS curves have j in F_p2 but not F_p, Aut(E) = {±1}, so <±psi> is the largest fold (E25 validator); E24 curves have j outside F_p2, so negation is the strongest fold (E24 validator); walk (iii) is the cheapest arithmetic implemented for these folds (E27); the order-24 walks of E34/E41 apply to E18's j = 0 curves only. Unpriced native work (AGENTS.md §5a): the index calculus leaves its Macaulay-matrix entries (rows*cols per call, x2 on a chain fallback, identical for every chain arm) and each rule's counted pivot-selection operations (F, L 0; S about 512, H about 846, B'' about 12,700 per call; A and E25 0, A's bucket sort being common bookkeeping per E33's convention) unpriced in F_p multiplications; lead-scan reads, A's/S's/H's bucket ordering and F/S/H/L's contested-column touches are priced only in the sensitivities sigma1-sigma3, none of which changes an order; the walks leave each step's hash lookup/insert and partition unpriced, emitted as steps. Band: S(g) = total_muls + g * 97 * (macaulay_entries + selection), rho(g) = rho + g * 97 * steps, GAE = 97 F_p multiplications (E25's affine addition, the registered primary), g = 0, 0.1, 1. gae_band values: the row the note names as the distance remaining, GLS p = 397 seed 1 arm B, rule F (chain-fifo, Karatsuba), against its walk (iii); per-row values for every arm on all 32 rows in validator-report.json gae_band_rows. Rho is below every arm on all 32 rows at every weight (S_F/rho 5.18e3-2.32e5 at 0, 2.37e4-1.09e6 at 0.1, 9.40e4-5.62e6 at 1 GAE; 0 of 672 row-arm-weight cells at or below rho), so the order rho < IC holds across the band. Within the index calculus: F, S and H are each cheaper than A and E25 at all three weights on 32/32 rows (S_A/S_F 1.457-1.537 / 1.094-1.106 / 1.0115-1.0130; S_A/S_S 1.402-1.449 / 1.083-1.091 / 1.0077-1.0086; S_A/S_H 1.497-1.542 / 1.096-1.103 / 1.0076-1.0083), the registered rank G2.201; against B'' each is unresolved (B'' cheaper at 0 GAE, dearer at 0.1 and 1).",
+    "unit": "F_p multiplications: every arm counted by the same crypto_lib Fp4 counters with Karatsuba F_p4 products (13 per product), F_p4 inversions as recorded, the solve's F_p multiplications counted directly (one per nonzero pivot entry in each normalisation and each row update, the counter verified equal to E33's A counted on 10,000/10,000 calls under A's own rule), the Wiedemann matrix at 16 per multiplication mod n; walk set-up included, the walk's [d]G = Q check excluded; native operations priced at g * 97 per Macaulay entry, per counted selection operation and per walk step",
+    "binary_or_process": "One crypto_lib build: the validator rebuilt quartic_pipeline_gls / quartic_pipeline_v4 (all IC arms, sha256 20b73242... / 5eb643ab..., equal to the producer's pinned binaries) and e37_walk_e24 (sha256 39e81e81..., equal) plus e27_walk (walk (iii)) from one clean export of e1cd726577 in one target directory; the rebuilt walk examples reproduce E27's stage_w.json and E37's walk_e24.json raw byte for byte, and the rebuilt pipelines reproduce every replayed record leaf for leaf (timing aside): A, F, S, H and L end to end on the fresh stream, and all seven arms (B'' and E25 included) in the identity configurations, on the same instances (n equal on every row). The IC records' own in-process walks (16 per row) are bit-identical walks under costlier arithmetic and are not the reference.",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 13129688644,
+        "rho": 2532750.875
+      },
+      "0.1": {
+        "ic": 65802336868.0,
+        "rho": 2767428.43125
+      },
+      "1": {
+        "ic": 539856170884,
+        "rho": 4879526.4375
+      }
+    },
+    "order_holds_across_band": true
+  }
+}

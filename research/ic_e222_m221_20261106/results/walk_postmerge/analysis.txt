@@ -1,0 +1,15 @@
+post-merge binary: rows 360 verified 360 | same frozen settings (Eh fb256 hoisted sweep extra2, D fb48 table, Dw fb16 table+walk), same instances v5 idx 10-29, seeds 1,2
+BEFORE the merge (previous binary, old relation point and Point arithmetic)
+   Eh solver ms 26.9 process ms 50.5 trials 262
+   D solver ms 13.9 process ms 37.8 trials 377
+   Dw solver ms 3.3 process ms 27.1 trials 1113
+   Dw/D solver 0.249 [0.235,0.259] | process 0.720 [0.691,0.752]
+   Dw/Eh solver 0.124 [0.110,0.132] | process 0.520 [0.492,0.564]
+   D/Eh solver 0.494 [0.459,0.526] | process 0.718 [0.691,0.773]
+AFTER the merge (main's faster relation point / Point arithmetic)
+   Eh solver ms 24.8 process ms 51.1 trials 262
+   D solver ms 6.2 process ms 30.4 trials 377
+   Dw solver ms 3.7 process ms 28.6 trials 1113
+   Dw/D solver 0.587 [0.541,0.659] | process 0.937 [0.908,0.959]
+   Dw/Eh solver 0.152 [0.131,0.170] | process 0.537 [0.487,0.600]
+   D/Eh solver 0.260 [0.218,0.299] | process 0.593 [0.534,0.649]

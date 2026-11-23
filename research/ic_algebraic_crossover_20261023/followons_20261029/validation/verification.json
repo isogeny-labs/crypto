@@ -1,0 +1,137 @@
+{
+  "schema": "ic-three-lead-component-verification/v1",
+  "date": "2026-10-29",
+  "source_directory": "research/ic_algebraic_crossover_20261023/followons_20261029",
+  "rust_toolchain": "rustc1.99.1 (58cf8f9c3 2026-10-13)",
+  "lean_toolchain": "leanprover/lean4:v4.34.1",
+  "native_tests": {
+    "passed": 6,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "test_threads": 1,
+    "exit_code": 0
+  },
+  "strict_clippy": {
+    "all_targets": true,
+    "deny_warnings": true,
+    "exit_code": 0,
+    "final_current_source_log": "strict-clippy-final.log",
+    "final_current_source_exit_code": 0
+  },
+  "lean": {
+    "theorems_checked": 7,
+    "exit_code": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "kernel_and_subgroup_bridge_axioms": [],
+    "sorryAx": false,
+    "native_decide": false,
+    "fresh_lean4checker": "unavailable"
+  },
+  "identity_checks": {
+    "ids": [
+      "IDC1h02c42d4a878d05d0",
+      "IDC1hf913cc1220ef209b"
+    ],
+    "issued_points_each": 32,
+    "extra_checker_points_each": 64,
+    "added_one_negative_controls": "rejected",
+    "external_independent_runner": false
+  },
+  "execution_class": "local development software conformance; not a priced research experiment",
+  "wall_time_valid_for_performance": false,
+  "complete_query_cost": null,
+  "complete_branch_set_cost": null,
+  "speedup": null,
+  "cloud_jobs_launched": false,
+  "cloud_submission_observation": "existing AWS CLI STS call returned NoCredentials; no EKS or workflow-dispatch connected tool; current workflow builds ecbench, not this standalone crate",
+  "frozen_original_deadline_unchanged": "2026-10-29T20:02:21Z",
+  "extra_cloud_total_ceiling_usd": 100,
+  "scientific_process_liveness_checked": false,
+  "public_log_views": [
+    {
+      "file": "native-tests.log",
+      "original_sha256": "af8f45cd185ec32f72b735c3aad5fda6fac44f8d1abb4af3441610e8ab014993",
+      "public_view_sha256": "91dc757f286d929805dcfe05eebca32c8b0f3599740562166580c3d4b74519da",
+      "redaction": "repository absolute build root replaced by <repository>; test/error content unchanged; terminal blank lines normalized"
+    },
+    {
+      "file": "lean-proof-check.log",
+      "original_sha256": "098db23a860468bea3d9cf780b031af0d8956604655bc59c2dd390b84ba9485b",
+      "public_view_sha256": "098db23a860468bea3d9cf780b031af0d8956604655bc59c2dd390b84ba9485b",
+      "redaction": "repository absolute build root replaced by <repository>; test/error content unchanged"
+    },
+    {
+      "file": "strict-clippy.log",
+      "original_sha256": "45c993d8de7fdabdc684993ff13cd9f1980bc582beb4c0fd06be5a523eb776bf",
+      "public_view_sha256": "61607f255417c0d73271d3c1b89da94aca66e1f40a60d6cc6ddff08ac4888b12",
+      "redaction": "repository absolute build root replaced by <repository>; test/error content unchanged"
+    },
+    {
+      "file": "first-build-failure.log",
+      "original_sha256": "39065a220ce05c5b7cc98970343eb0d91d65d6c130a0a3b8630df495a8ec3a8e",
+      "public_view_sha256": "a4ab20da58ae00cbbe1279e8a9d2f3d24bac1db7a1c1dc432cec78af8119da8b",
+      "redaction": "repository absolute build root replaced by <repository>; test/error content unchanged"
+    },
+    {
+      "file": "first-lean-failure.log",
+      "original_sha256": "5f9891c6704d4350a30bbb0dfe40f8cb20925c56a6c989e1099bf10d99e7bb38",
+      "public_view_sha256": "5f9891c6704d4350a30bbb0dfe40f8cb20925c56a6c989e1099bf10d99e7bb38",
+      "redaction": "repository absolute build root replaced by <repository>; test/error content unchanged"
+    },
+    {
+      "file": "first-clippy-failure.log",
+      "original_sha256": "e08ebaea23b22c8f35746655946eadc15db3d9571d3ccce0700fe37d0be3f537",
+      "public_view_sha256": "53545ade972a5565dc05b98bbb5aebb14a286355ccad3d0dc99971ac904fbdbd",
+      "redaction": "repository absolute build root replaced by <repository>; test/error content unchanged"
+    }
+  ],
+  "tested_input_files": {
+    "Cargo.lock": {
+      "sha256": "bd058033de05e750f1473916ccf774d1a11496d293527f7ba4409dff5f217fae",
+      "bytes": 5098
+    },
+    "Cargo.toml": {
+      "sha256": "88c0cc04c9f5eb35b4dd2e144ef6b1022bf9ad3ed7be0abf6ac1a992ac199687",
+      "bytes": 202
+    },
+    "ThreeLeads.lean": {
+      "sha256": "9b736c71806fbddeaded513f2a9bf5726a0815faf93776c97914393032a771f8",
+      "bytes": 3039
+    },
+    "lean-toolchain": {
+      "sha256": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+      "bytes": 25
+    },
+    "src/boolean.rs": {
+      "sha256": "5cd76a80b62385ed0487d10ec77e230bb5572bd3e2afdd5da84125d42a0bd2be",
+      "bytes": 14664
+    },
+    "src/field.rs": {
+      "sha256": "923bcd0e9802a821d48964a801ea8747cf44592f7603597a34d623bd2b47ad56",
+      "bytes": 5116
+    },
+    "src/identity.rs": {
+      "sha256": "4e321e456412b1d2ac2e592f75bd04c07994151a40a2104c8d1e7650f1543507",
+      "bytes": 19951
+    },
+    "src/lib.rs": {
+      "sha256": "ce645b71370f22d0841482ff706c0c5cbde3fea42b0fd33219970d61377ca7a5",
+      "bytes": 17770
+    },
+    "src/main.rs": {
+      "sha256": "8893eef5eb3ce2417aa9740c0b1c43c86571e0193818e768c7cb650ec95f74fe",
+      "bytes": 223
+    },
+    "src/quotient.rs": {
+      "sha256": "06a3e78fe83ff0166a65f2be34fe2e16b324a31af8c3937616c2272e199125e3",
+      "bytes": 9479
+    }
+  },
+  "source_binding": "Published tested-input bytes are verified against this inventory; local_tested_source_pin is not asserted to be a remote commit.",
+  "local_tested_source_pin": "9f5b149f9ee7a19a5c85f1e4cf7ca89c32143721"
+}

@@ -1,0 +1,28 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-17T21:22:13Z",
+ "id": "PCC-20261117-a627cf",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4ce098bdb050a46ca425fe75b0db87edcf0ac059",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1b6551e6fb9f5696103f3ae6bdbc7ba48a6816c06d90badd64963e3336280082",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "ZKSeparation.completeness_and_simulation_do_not_imply_soundness_or_global_extraction"
+  },
+  {
+   "decl_sha256": "21e6f6bb3315ae57ccb142d3988f27ec68bd05cf211441acacc2e52673f059d7",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "ZKSeparation.globalAcceptedTranscriptWitness_implies_sound"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean v4.34.1 / Mathlib v4.34.1; finite transcript semantics only; no interactive verifier-view, oracle, probability, knowledge-error, or efficiency model.",
+ "statement": "In the finite Bool/Unit transcript semantics defined by ZKSeparation, completeness and deterministic pointwise transcript equality coexist with failed perfect soundness and failed accepted-pair witness extraction; accepted-pair witness extraction implies perfect soundness. This is not GMR zero knowledge or Bellare--Goldreich proof of knowledge."
+}

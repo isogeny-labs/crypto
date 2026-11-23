@@ -1,0 +1,36 @@
+{
+  "schema": "native-momose-cubic-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "momose-cubic-homography",
+      "expected_decl_sha256": "180630ee33d7ebd4be7786362c32efdafdb2f0cc7802f6e698432768f72fdc2a",
+      "full_characters": 1206,
+      "full_decl_sha256": "180630ee33d7ebd4be7786362c32efdafdb2f0cc7802f6e698432768f72fdc2a",
+      "full_normalized_signature": "theorem momose_cubic_homography_certificate : (∀ (K L : Type) [Field K] [Field L] [Algebra K L] [Fintype K] [Fintype L] (q : ℕ), 2 ≤ q → Fintype.card K = q^2 → Fintype.card L = q^6 → ∀ z w : L, z^(q^3) = z → z^q ≠ z → outsideBase K L w → ∃ A : GL2 K, denominator K L A.val z ≠ 0 ∧ fractional K L A.val z = w ∧ ∀ B : GL2 K, fractional K L B.val z = w → Matrix.ProjGenLinGroup.mk B = Matrix.ProjGenLinGroup.mk A ∧ ∃ u : Kˣ, B * Matrix.GeneralLinearGroup.scalar (Fin 2) u = A) ∧ (∀ (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L], Module.finrank K L = 3 → ∀ z : L, outsideBase K L z → ∀ r e a b c : K, z^3 = algebraMap K L r*z + algebraMap K L e → (a ≠ 0 ∨ b ≠ 0) → (momoseMatrix K r e a b c).det ≠ 0 ∧ denominator K L (momoseMatrix K r e a b c) z ≠ 0 ∧ fractional K L (momoseMatrix K r e a b c) z = algebraMap K L a*z^2 + algebraMap K L b*z + algebraMap K L c) ∧ (Fintype.card F9 = 9 ∧ Module.finrank (ZMod 3) F9 = 2 ∧ ∃ a : F9, outsideBase (ZMod 3) F9 a ∧ fractional (ZMod 3) F9 quadraticSwap.val a = a ∧ Matrix.ProjGenLinGroup.mk quadraticSwap ≠ 1) ∧ (¬ (∀ a : F9, outsideBase (ZMod 3) F9 a → ∀ A : GL2 (ZMod 3), fractional (ZMod 3) F9 A.val a = a → Matrix.ProjGenLinGroup.mk A = 1))",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "momose_cubic_homography_certificate",
+        "end_byte": 1850,
+        "file": "/workspace/scratch/momose-cubic-native-input01/MomoseCertificate.lean",
+        "qualified_decl_id": "MomoseCubicHomographyAudit.momose_cubic_homography_certificate",
+        "signature": "theorem momose_cubic_homography_certificate :\n    (∀ (K L : Type) [Field K] [Field L] [Algebra K L] [Fintype K] [Fintype L]\n      (q : ℕ), 2 ≤ q → Fintype.card K = q^2 → Fintype.card L = q^6 →\n      ∀ z w : L, z^(q^3) = z → z^q ≠ z → outsideBase K L w →\n      ∃ A : GL2 K, denominator K L A.val z ≠ 0 ∧ fractional K L A.val z = w ∧\n        ∀ B : GL2 K, fractional K L B.val z = w →\n          Matrix.ProjGenLinGroup.mk B = Matrix.ProjGenLinGroup.mk A ∧\n          ∃ u : Kˣ, B * Matrix.GeneralLinearGroup.scalar (Fin 2) u = A) ∧\n    (∀ (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L],\n      Module.finrank K L = 3 → ∀ z : L, outsideBase K L z →\n      ∀ r e a b c : K, z^3 = algebraMap K L r*z + algebraMap K L e →\n      (a ≠ 0 ∨ b ≠ 0) → (momoseMatrix K r e a b c).det ≠ 0 ∧\n        denominator K L (momoseMatrix K r e a b c) z ≠ 0 ∧\n        fractional K L (momoseMatrix K r e a b c) z =\n          algebraMap K L a*z^2 + algebraMap K L b*z + algebraMap K L c) ∧\n    (Fintype.card F9 = 9 ∧ Module.finrank (ZMod 3) F9 = 2 ∧\n      ∃ a : F9, outsideBase (ZMod 3) F9 a ∧\n        fractional (ZMod 3) F9 quadraticSwap.val a = a ∧\n        Matrix.ProjGenLinGroup.mk quadraticSwap ≠ 1) ∧\n    (¬ (∀ a : F9, outsideBase (ZMod 3) F9 a → ∀ A : GL2 (ZMod 3),\n      fractional (ZMod 3) F9 A.val a = a → Matrix.ProjGenLinGroup.mk A = 1))",
+        "start_byte": 416
+      },
+      "recorded_statement": "theorem momose_cubic_homography_certificate : (∀ (K L : Type) [Field K] [Field L] [Algebra K L] [Fintype K] [Fintype L] (q : ℕ), 2 ≤ q → Fintype.card K = q^2 → Fintype.card L = q^6 → ∀ z w : L, z^(q^3) = z → z^q ≠ z → outsideBase K L w → ∃ A : GL2 K, denominator K L A.val z ≠ 0 ∧ fractional K L A.val z = w ∧ ∀ B : GL2 K, fractional K L B.val z = w → Matrix.ProjGenLinGroup.mk B = Matrix.ProjGenLinGroup.mk A ∧ ∃ u : Kˣ, B * Matrix.GeneralLinearGroup.scalar (Fin 2) u = A) ∧ (∀ (K L : Type) [Field K] [Field L] [Algebra K L] [FiniteDimensional K L], Module.finrank K L = 3 → ∀ z : L, outsideBase K L z → ∀ r e a b c : K, z^3 = algebraMap K L r*z + algebraMap K L e → (a ≠ 0 ∨ b ≠ 0) → (momoseMatrix K r e a b c).det ≠ 0 ∧ denominator K L (momoseMatrix K r e a b c) z ≠ 0 ∧ fractional K L (momoseMatrix K r e a b c) z = algebraMap K L a*z^2 + algebraMap K L b*z + algebraMap K L c) ∧ (Fintype.card F9 = 9 ∧ Module.finrank (ZMod 3) F9 = 2 ∧ ∃ a : F9, outsideBase (ZMod 3) F9 a ∧ fractional (ZMod 3) F9 quadraticSwap.val a = a ∧ Matrix.ProjGenLinGroup.mk quadraticSwap ≠ 1) ∧ (¬ (∀ a : F9, outsideBase (ZMod 3) F9 a → ∀ A : GL2 (ZMod 3), fractional (ZMod 3) F9 A.val a = a → Matrix.ProjGenLinGroup.mk A = 1))",
+      "recorded_text_sha256": "180630ee33d7ebd4be7786362c32efdafdb2f0cc7802f6e698432768f72fdc2a",
+      "source_plan": "research/momose_cubic_homography_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "MomoseCubicHomographyAudit.momose_cubic_homography_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native source processing, not kernel parser/hash/physicalhost/execution refinement."
+}

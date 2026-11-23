@@ -1,0 +1,451 @@
+[
+  {
+    "name": "custody-create",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "--sat-replay-policy",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/custody-create.json",
+        "--sat-replay-receipt",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/custody-create.json",
+        "custody",
+        "create",
+        "--out",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run",
+        "--bundle",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle",
+        "--include",
+        "export=/var/tmp/sat-cli-custody-acceptance-20261103-v1/export",
+        "--include",
+        "report=/var/tmp/sat-cli-custody-acceptance-20261103-v1/report",
+        "--max-bytes",
+        "1073741824",
+        "--max-files",
+        "10000"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:28.960268Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:28.705093Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "a11458a82d42dd2ff1fa7d685df197f764d66365afb6c399d8e6105588be77b8",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "custody-restore",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "--sat-replay-policy",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/custody-restore.json",
+        "--sat-replay-receipt",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/custody-restore.json",
+        "custody",
+        "restore",
+        "--bundle",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle",
+        "--destination",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:29.287654Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:29.082519Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "a033897a7bf927c20c2208b2ea7145d55b4da5a33ab5673d9bb9c6437e6cd841",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "custody-verify",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "verify",
+        "--bundle",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/bundle"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:29.045292Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:28.997401Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "96bd2e49d94087770bdb956f9c791bcca00685e207662f64c8168aa60cb018ee",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "export",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "--sat-replay-policy",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/export.json",
+        "--sat-replay-receipt",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/export.json",
+        "export",
+        "--out",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run",
+        "--destination",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/export"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:28.667947Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:28.563037Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "b85f117b2115e4d43be9f9d54c6a256d66b2e4a5bb1efd6d18fbb68565ee9682",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "generate",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "--sat-replay-policy",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/generate.json",
+        "--sat-replay-receipt",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/generate.json",
+        "generate",
+        "--plan",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/plan.json",
+        "--protocol",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/protocol.json",
+        "--out",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run",
+        "--max-cases",
+        "2",
+        "--shard-index",
+        "0",
+        "--shard-count",
+        "1",
+        "--seconds-per-case",
+        "60",
+        "--memory-mib",
+        "256",
+        "--trace-mib",
+        "128"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:28.045740Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:27.537931Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "2b54d2f8ef6148d18c4131a0f8ff42161be5f2a9483b695aa4cd46f23e061cb7",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "plan",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "plan",
+        "--out",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/plan.json",
+        "--n",
+        "23",
+        "--m",
+        "3",
+        "--families",
+        "binary",
+        "--solvers",
+        "sat",
+        "--curve-seeds",
+        "1",
+        "--generators",
+        "1",
+        "--keys",
+        "1",
+        "--seed",
+        "42",
+        "--factor-base-size",
+        "4",
+        "--factor-base-policies",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/factor-base-policies.json",
+        "--degree-bound",
+        "3",
+        "--work-limit",
+        "16384",
+        "--channels",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/channels.json",
+        "--protocol-sha256",
+        "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:27.345065Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:27.295849Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "c321f11f6526cf25b7540473539a472d5f2ea9bb9d77ccb6bc76e04de6ac42cf",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "preflight",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "preflight",
+        "--plan",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/plan.json",
+        "--protocol",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/protocol.json"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:27.490479Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:27.383811Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "0fbea5b07fdaaa394c3a8265688f5c0dd0dc8f4dd7a96be1460999763c9da781",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "report",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "--sat-replay-policy",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/report.json",
+        "--sat-replay-receipt",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/report.json",
+        "report",
+        "--out",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run",
+        "--destination",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/report"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:28.525673Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:28.370146Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "7c064e0a8caeb50dd41a812ab5323390f86df555606b2d185a5997f7501c7a48",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "restored-verify",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "--sat-replay-policy",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/restored-verify.json",
+        "--sat-replay-receipt",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/restored-verify.json",
+        "verify",
+        "--out",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/restored/run"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:29.430485Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:29.325135Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "cab110c8888107eab3540b2eef86032df48c3b86c4b265d7c86d4157ca668f44",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "status",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "--sat-replay-policy",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/status.json",
+        "--sat-replay-receipt",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/status.json",
+        "status",
+        "--out",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:28.332625Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:28.226979Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "92c361263b9207dba8693af36d92b83c9808025d6e17417ca38520081e9a8f11",
+      "timed_out": false
+    }
+  },
+  {
+    "name": "verify",
+    "receipt": {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "--sat-replay-policy",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/policies/verify.json",
+        "--sat-replay-receipt",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/replay/verify.json",
+        "verify",
+        "--out",
+        "/var/tmp/sat-cli-custody-acceptance-20261103-v1/run"
+      ],
+      "binary_sha256_after": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "binary_sha256_before": "e5a594ce5cfa3dd1701c429d174c885cbfa845584c1458f8a2f90a1105217d26",
+      "checker_sha256": {},
+      "cleanup": {
+        "actions": [],
+        "direct_child_live": false,
+        "errors": [],
+        "settled": true,
+        "unresolved": []
+      },
+      "exception": null,
+      "exit_code": 0,
+      "finished_at": "2026-11-05T15:30:28.189558Z",
+      "interruption": null,
+      "protocol_sha256_after": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "protocol_sha256_before": "808d166936024767fc62057728a73128cdfa8957feae6833f3c8488b9fdf82ac",
+      "started_at": "2026-11-05T15:30:28.084140Z",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "cab110c8888107eab3540b2eef86032df48c3b86c4b265d7c86d4157ca668f44",
+      "timed_out": false
+    }
+  }
+]

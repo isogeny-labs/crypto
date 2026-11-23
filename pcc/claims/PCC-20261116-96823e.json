@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:23:01Z",
+ "id": "PCC-20261116-96823e",
+ "kind": "statement",
+ "producer": {
+  "commit": "575b3cf41082596ebf8757a4974d1a27bdcd0301",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/normal-CLI-merge-stash-index-capacity-failure-24/ACTUAL_STASH_INDEX_CAPACITY_FAILURE.json",
+    "sha256": "44333e8dba238e0264c37566b08c69946022b25f3c26f7843f3475e491e88359"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/normal-CLI-merge-stash-index-capacity-failure-24/ENTIRE_CURRENT_HOLD_BEFORE.json.xz",
+    "sha256": "92f402722fbf6d43c247d48402f7fcd7af08b439ec2fcc05fade07a66ad4a92c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/normal-CLI-merge-stash-index-capacity-failure-24/actual-command.json.xz",
+    "sha256": "e8030d5aa506fe4226c272bec93b8a4820b1e815cab44679fa4b1117502facb5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/normal-CLI-merge-stash-index-capacity-failure-24/actual-normal-merge.exit.xz",
+    "sha256": "6572b0a8bca1464a1fcc02b7c7cfde7e8e695e8def7de53e5906deeecf3f4c62"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/normal-CLI-merge-stash-index-capacity-failure-24/entire-actual-normal-merge.stderr.xz",
+    "sha256": "ee123d594ebe5ff731bfc5e33f4ab38b16184a96dd057e54e7c3d3ccabd80547"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/normal-CLI-merge-stash-index-capacity-failure-24/entire-actual-normal-merge.stdout.xz",
+    "sha256": "0040f94d11d0039505328a90b2ff48968db873e9e7967307631bf40ef5679275"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/normal-CLI-merge-stash-index-capacity-failure-24/entire-official-Git2.52-merge.json.xz",
+    "sha256": "65c77096d104ba13ff254a840719ad04ef36a4e14bb75677c85390a5c007cfe9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Changed normal CLI-c/compressed-guard attempt455 fails128 in stash create before checkout: temporary full index.lock exceeds RAM at alternate path, while workspace remains available. Entire source/current guard/commands/outputs retained; all current byte/shape/mode rows, HEAD575b3/canonical raw index and complete297432-entry logical tables unchanged, MERGE_HEAD absent. Official Git2.52 builtin/merge.c read: real merges unconditionally call save_state and stash create independently of optional autostash. Therefore no untested no-autostash workaround or shared-index prevention claim. Next reserves full-index temporary capacity or first commits clean working state through normal hooks, without repeating unchanged command or altering proof/CI/admission requirements. Prior both checkout128 failures/partial copies/legacy binding negatives remain, no reset/rechain/native/paid/signed promotion."
+}

@@ -1,0 +1,13 @@
+card_id: CARD-prime-medium-tier-rho-20261107-2
+relay_verbatim: not_checked
+outcome: stopped
+stopped_at_step: launch-j1
+recommendation: rerun_after_infrastructure_fix
+reasons:
+  - "receipt status is 'stopped at command 12'; commands 1-11 (checkpoint-gate, protocol-check, protocol-frozen-hash, validate-j1..j6, receipt-identity, build-identity) each exit 0 (cards/CARD-...-2.receipt.json)"
+  - "launch-j1 exit 255 in 3.743 s, not timed out; stderr 'You must specify a region. You can also configure your region by running \"aws configure\".' (cards/CARD-...-2.launch-j1.stderr); a host aws-cli v1 environment cause, not a card or spec fault"
+  - "no EKS Job was submitted: receipts/attempt-card2-J1/build-start.json is empty (0 bytes), so no CodeBuild id exists; the launcher never printed a Launcher line (launch-j1.stdout empty)"
+  - "commands 13-23 (record-j1 and J2..J6) are not in the receipt (12 command results of 23), consistent with the stop"
+  - "no executor-report file was supplied, so relay_verbatim was not checked; the receipt shows only the card's argv ran, in order"
+  - "tool quirk: dirty_after lists 'enchmarks/records/...bound.json' with its first character stripped (task_card strips the leading space of the first git status line), so a mechanical write-scope check would misread that path as outside scope; the path is the benchmark record, which write_scope allows"
+interpretation: not_assessed

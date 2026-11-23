@@ -1,0 +1,50 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc | 32/32 | 5.489 | 5.735 | 7.951 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | mitmbatch-n32 | 32/32 | 11.769 | 12.631 | 20.389 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | mitmblocked-n32 | 32/32 | 11.769 | 12.631 | 20.389 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 32/32 | 1.470 | 1.573 | 2.505 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum-b16-n3 | 32/32 | 83.185 | 86.489 | 116.227 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum-b24-n3 | 32/32 | 379.385 | 406.458 | 650.112 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum-b30-n3 | 32/32 | 911.758 | 1000.782 | 1801.998 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum-b5-n4 | 32/32 | 22.826 | 22.883 | 23.393 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wsum-b8-n3 | 32/32 | 9.467 | 9.541 | 10.206 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | inc vs mitmbatch-n32 | inc < mitmbatch-n32 |
+| icv1-fp20-tm1050-4295f05e | inc vs mitmblocked-n32 | inc < mitmblocked-n32 |
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum-b16-n3 | inc < wsum-b16-n3 |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum-b24-n3 | inc < wsum-b24-n3 |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum-b30-n3 | inc < wsum-b30-n3 |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum-b5-n4 | inc < wsum-b5-n4 |
+| icv1-fp20-tm1050-4295f05e | inc vs wsum-b8-n3 | inc < wsum-b8-n3 |
+| icv1-fp20-tm1050-4295f05e | mitmbatch-n32 vs mitmblocked-n32 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | mitmbatch-n32 vs rho-neg | rho-neg < mitmbatch-n32 |
+| icv1-fp20-tm1050-4295f05e | mitmbatch-n32 vs wsum-b16-n3 | mitmbatch-n32 < wsum-b16-n3 |
+| icv1-fp20-tm1050-4295f05e | mitmbatch-n32 vs wsum-b24-n3 | mitmbatch-n32 < wsum-b24-n3 |
+| icv1-fp20-tm1050-4295f05e | mitmbatch-n32 vs wsum-b30-n3 | mitmbatch-n32 < wsum-b30-n3 |
+| icv1-fp20-tm1050-4295f05e | mitmbatch-n32 vs wsum-b5-n4 | mitmbatch-n32 < wsum-b5-n4 |
+| icv1-fp20-tm1050-4295f05e | mitmbatch-n32 vs wsum-b8-n3 | wsum-b8-n3 < mitmbatch-n32 |
+| icv1-fp20-tm1050-4295f05e | mitmblocked-n32 vs rho-neg | rho-neg < mitmblocked-n32 |
+| icv1-fp20-tm1050-4295f05e | mitmblocked-n32 vs wsum-b16-n3 | mitmblocked-n32 < wsum-b16-n3 |
+| icv1-fp20-tm1050-4295f05e | mitmblocked-n32 vs wsum-b24-n3 | mitmblocked-n32 < wsum-b24-n3 |
+| icv1-fp20-tm1050-4295f05e | mitmblocked-n32 vs wsum-b30-n3 | mitmblocked-n32 < wsum-b30-n3 |
+| icv1-fp20-tm1050-4295f05e | mitmblocked-n32 vs wsum-b5-n4 | mitmblocked-n32 < wsum-b5-n4 |
+| icv1-fp20-tm1050-4295f05e | mitmblocked-n32 vs wsum-b8-n3 | wsum-b8-n3 < mitmblocked-n32 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum-b16-n3 | rho-neg < wsum-b16-n3 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum-b24-n3 | rho-neg < wsum-b24-n3 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum-b30-n3 | rho-neg < wsum-b30-n3 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum-b5-n4 | rho-neg < wsum-b5-n4 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wsum-b8-n3 | rho-neg < wsum-b8-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b16-n3 vs wsum-b24-n3 | wsum-b16-n3 < wsum-b24-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b16-n3 vs wsum-b30-n3 | wsum-b16-n3 < wsum-b30-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b16-n3 vs wsum-b5-n4 | wsum-b5-n4 < wsum-b16-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b16-n3 vs wsum-b8-n3 | wsum-b8-n3 < wsum-b16-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b24-n3 vs wsum-b30-n3 | wsum-b24-n3 < wsum-b30-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b24-n3 vs wsum-b5-n4 | wsum-b5-n4 < wsum-b24-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b24-n3 vs wsum-b8-n3 | wsum-b8-n3 < wsum-b24-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b30-n3 vs wsum-b5-n4 | wsum-b5-n4 < wsum-b30-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b30-n3 vs wsum-b8-n3 | wsum-b8-n3 < wsum-b30-n3 |
+| icv1-fp20-tm1050-4295f05e | wsum-b5-n4 vs wsum-b8-n3 | wsum-b8-n3 < wsum-b5-n4 |

@@ -1,0 +1,66 @@
+import WordFind
+set_option autoImplicit false
+namespace SignedWord
+open GraphRingWord
+abbrev F (r : UInt64) := ZMod r.toNat
+def wd (r a : UInt64) : F r := (a.toNat : F r)
+def outDecode (r : UInt64) : GraphSameRoot.Result UInt64 → GraphSameRoot.Result (F r)
+ | .none => .none
+ | .inconsistent => .inconsistent
+ | .answer a => .answer (wd r a)
+def constraint (r a b : UInt64) : GraphSameRoot.Result UInt64 :=
+ if b=0 then if a=0 then .none else .inconsistent else
+ .answer (GraphRingWord.mul r (GraphRingWord.neg r a) (WideModPow.inverseGenerator r b))
+theorem zero_reflect (r a : UInt64) (hp : 0<r.toNat) (ha : a.toNat<r.toNat) :
+ wd r a=0 ↔ a=0 := by
+ constructor
+ · intro h
+   by_contra hn
+   exact PencilWordRefinement.canonical_word_nonzero r a hp ha hn h
+ · intro h; simp [wd,h]
+theorem constraint_refines (r a b : UInt64) [Fact r.toNat.Prime]
+ (hp : 1<r.toNat) (ha : a.toNat<r.toNat) (hb : b.toNat<r.toNat) :
+ outDecode r (constraint r a b)=GraphSameRoot.constraint (wd r a) (wd r b) := by
+ have za:=zero_reflect r a (by omega) ha
+ have zb:=zero_reflect r b (by omega) hb
+ by_cases h : b=0
+ · by_cases h' : a=0 <;> simp [constraint,GraphSameRoot.constraint,outDecode,za,zb,h,h',wd]
+ · have hn:=GraphRingWord.neg_correct r a (by omega)
+   have hm:=GraphRingWord.mul_correct r (GraphRingWord.neg r a) (WideModPow.inverseGenerator r b) (by omega)
+   have hi:=WideModPow.generator_decode r b hp hb h
+   simp only [constraint,if_neg h,outDecode,GraphSameRoot.constraint,zb,if_neg h]
+   congr 1
+   simpa only [wd,(hn ha).2,hi] using hm.2
+theorem constraint_answer_canonical (r a b x : UInt64) (hp : 0<r.toNat)
+ (h : constraint r a b=.answer x) : x.toNat<r.toNat := by
+ unfold constraint at h
+ split_ifs at h with hb
+ · split_ifs at h <;> contradiction
+ · cases h
+   exact (GraphRingWord.mul_correct r _ _ hp).1
+
+def denominator (r : UInt64) (c : Int8) : UInt64 := if c=1 then 2 else r-2
+theorem denominator_correct (r : UInt64) (c : Int8) (hp : 2<r.toNat) (hc : Sign c) :
+ (denominator r c).toNat<r.toNat ∧ denominator r c≠0 ∧
+ wd r (denominator r c)=(if sd r c=1 then (2:F r) else -2) := by
+ have h2 : (2:F r)≠0 := by
+   simpa [F] using PencilWordRefinement.canonical_word_nonzero r (2:UInt64) (by omega) (by simpa using hp) (by decide)
+ have hs:=WideModPow.inverse_exponent r (by omega)
+ rcases hc with rfl|rfl
+ · simp [denominator,wd,sd]
+   exact hp
+ · have hz : r-2≠(0:UInt64) := by intro h; have := congrArg UInt64.toNat h; rw [hs] at this; simp at this; omega
+   have hd : wd r (r-2)=(-2:F r) := by
+     unfold wd F
+     rw [hs,Nat.cast_sub (by omega : 2≤r.toNat)]
+     simp
+   have hm : (-1:F r)≠1 := by
+     intro h
+     apply h2
+     calc (2:F r)=1+1 := by ring
+          _= -1+1 := by rw [h]
+          _=0 := by ring
+   simp only [denominator,show (-1:Int8)≠1 by decide,if_false]
+   refine ⟨by rw [hs]; omega,hz,?_⟩
+   simpa [sd,hm] using hd
+end SignedWord

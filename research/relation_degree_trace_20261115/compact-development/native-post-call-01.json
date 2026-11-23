@@ -1,0 +1,51 @@
+{
+  "schema": "compact-native-post-call/v1",
+  "class": "producer actual-root development checks, not runtime comparison",
+  "source_commit": "96f0c814d928f07e96e15361cc43a35fe7306377",
+  "captured_utc": "2026-11-15T22:58:26.333856+00:00",
+  "pre_call": {
+    "path": "research/relation_degree_trace_20261115/compact-development/native-pre-call-01.json",
+    "sha256": "d941199fb9b33ec4872fd7b20f3a82ea6921ecc49babe7df4275d03d832202ae",
+    "bytes": 1252
+  },
+  "executables_after": {
+    "worker": {
+      "path": "/workspace/relation-native-qualifiers/compact-worker-96f0c814d-01",
+      "sha256": "4377360b85319884221fe8a0efaf17d4671ba8322342056ca494f11202a63d22",
+      "bytes": 17921192
+    },
+    "api": {
+      "path": "/workspace/relation-native-qualifiers/compact-api-96f0c814d-01",
+      "sha256": "594abe4c41ed2c80281171531b2da194039540d4607769ddad1234fd314ffb22",
+      "bytes": 19015056
+    },
+    "cli": {
+      "path": "/workspace/relation-native-qualifiers/compact-cli-96f0c814d-01",
+      "sha256": "cce8e010638c7ab748de2714a66440af86c0a7e1d712c34b76db6d07ff402e95",
+      "bytes": 2172624
+    }
+  },
+  "api_exit_code": 0,
+  "cli_exit_code": 0,
+  "api_log": {
+    "path": "research/relation_degree_trace_20261115/compact-development/native-api-tests-01.log",
+    "sha256": "9fa88d9e122dd9b57717fab82c511faf599b4bf519a2cff68650fbd4534e8fcf",
+    "bytes": 1235
+  },
+  "cli_log": {
+    "path": "research/relation_degree_trace_20261115/compact-development/native-cli-tests-01.log",
+    "sha256": "f67f5d544f3880eae0d2075f70cc7f4768dd7ff62888b3bbd932b3c7ffb6e312",
+    "bytes": 300
+  },
+  "clippy_log": {
+    "path": "research/relation_degree_trace_20261115/compact-development/native-clippy-01.log",
+    "sha256": "2042762b29188193c4567ad0d567236d384d787673d0d5bc329f4289730c0737",
+    "bytes": 364
+  },
+  "observed_tests": {
+    "native_api_passed": 6,
+    "cli_passed": 3,
+    "failed": 0
+  },
+  "inference_limit": "all three CLI arms agree on fixed complete 31-bit basis; compact six-variable certificates pass native boundary checks on both fields; no clock-value comparison or signed execution verdict"
+}

@@ -1,0 +1,11 @@
+digraph G {
+ graph [rankdir=LR,bgcolor="white",pad="0.1",nodesep="0.15",ranksep="0.2"];
+ node [shape=box,style="rounded,filled",fillcolor="#e5f0f5",fontname="Helvetica",fontsize=10,margin="0.08,0.06"];
+ edge [fontname="Helvetica",fontsize=8,color="#53687d"];
+ original [label="Shared original System\nPublic roles + exact trail"];
+ columns [label="32-row connected slice\nQuadratic monomials first\nNo degree growth/products"];
+ checked [label="Original-row weights\nDirect coefficient check\nUnit / constant only"];
+ search [label="Original search/cache\nLabelled unit; Drop/Undo\nOriginal root + row replay"];
+ original -> columns -> checked -> search;
+ search -> original [label="bounded recomputation at quiescence"];
+}

@@ -1,0 +1,14 @@
+digraph admission {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", label="N83 V5 Linux binding | attempt 1", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", color="#344054", fillcolor="#eef2f6"];
+  s3 [label="Fresh S3 GET\n3,025,798 bytes; SHA-256 PASS", fillcolor="#dcfce7"];
+  binary [label="Pinned Linux ARM64 ELF\nsource and binary hashes PASS", fillcolor="#dcfce7"];
+  exact [label="V5 ordinal 26960859236\nPASS_EXACT_ADAPTER_BINDING", fillcolor="#dcfce7"];
+  adjacent [label="Adjacent ordinal\nrejected, exit 1", fillcolor="#fef3c7"];
+  altered [label="Changed manifest digest\nrejected, exit 1", fillcolor="#fef3c7"];
+  next [label="Relation/rank/target/rho\nnot run here", fillcolor="#f3f4f6", color="#98a2b3"];
+  s3 -> binary -> exact [color="#15803d"];
+  binary -> adjacent [color="#b45309"];
+  binary -> altered [color="#b45309"];
+  exact -> next [style=dashed, color="#98a2b3", label="separate frozen gate"];
+}

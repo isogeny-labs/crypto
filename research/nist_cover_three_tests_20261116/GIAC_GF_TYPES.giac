@@ -1,0 +1,9 @@
+taskprime:=6277101735386680763835789423207666416083908700390324961279;
+smallfield:=GF(7,2);
+largefield:=GF(taskprime,2);
+print("SMALL_FIELD",smallfield,type(smallfield));
+print("LARGE_FIELD",largefield,type(largefield));
+print("SMALL_UNIT",smallfield(1),type(smallfield(1)));
+print("LARGE_UNIT",largefield(1),type(largefield(1)));
+print("SMALL_REDUCED",smallfield(8));
+print("LARGE_REDUCED",largefield(taskprime+1));

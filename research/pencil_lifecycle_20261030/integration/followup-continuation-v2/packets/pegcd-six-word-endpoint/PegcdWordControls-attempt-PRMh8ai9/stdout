@@ -1,0 +1,44 @@
+/var/tmp/pencil-pegcd-six-word-20261101-v1/PegcdWordControls.lean:15:74: error: Tactic `decide` failed for proposition
+  finish 17 w2 = some ([1], [9], [9, 8])
+because its `Decidable` instance
+  (finish 17 w2).instDecidableEq (some ([1], [9], [9, 8]))
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match scale 17 (WideModPow.inverseGenerator 17 ([2].getLast ⋯)) w2.s0 with
+  | [] =>
+    match [9] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [9] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯
+/var/tmp/pencil-pegcd-six-word-20261101-v1/PegcdWordControls.lean:16:69: error: Tactic `decide` failed for proposition
+  w1.t1 = [1, 16] ∧ w1.t1 ≠ [16, 1]
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+Reduction got stuck at the `Decidable` instance
+  match w1.t1 with
+  | [] =>
+    match [1, 16] with
+    | [] => isTrue ⋯
+    | head :: tail => isFalse ⋯
+  | a :: as =>
+    match [1, 16] with
+    | [] => isFalse ⋯
+    | b :: bs =>
+      match decEq a b with
+      | isTrue hab =>
+        match as.hasDecEq bs with
+        | isTrue habs => isTrue ⋯
+        | isFalse nabs => isFalse ⋯
+      | isFalse nab => isFalse ⋯

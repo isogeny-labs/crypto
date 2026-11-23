@@ -1,0 +1,111 @@
+{
+ "note": "Distance to matched rho-neg at k = 20 (S(arm)/S(rho-neg)) per track and arm, w = 0 and w = 0.1. w01 is the pre-2026-11-08 band reading (table inserts unpriced). For the three F = 1 walk rows w01_priced is the reading that prices the table oracles' counted inserts (owner ruling 2026-11-08), copied from the same source files. Rows 7-10 have no w = 0.1 distance in their sources (the autolab README gives a w = 0 distance and a w = 1 ratio only), so w01 is null and no w = 0.1 marker is drawn. Validator erratum E1/E3 applied 2026-11-08. Every value is copied from the named source file; none is new.",
+ "rows": [
+  {
+   "arm": "pkm-iso t6 G4 seed 0 (F4)",
+   "track": "algebraic",
+   "w0": 20.0,
+   "w01": 1050000.0,
+   "source": "curve25519_ic_atlas_20261104/REPORT.md section 6, T12 (30.906/1.544; 1.735e6/1.654 = 1.049e6)"
+  },
+  {
+   "arm": "pkm-iso t5 G4 seed 1307 (T10 winner)",
+   "track": "algebraic",
+   "w0": 17.1,
+   "w01": 60600.0,
+   "source": "atlas section 6, T12"
+  },
+  {
+   "arm": "t4 G3 seed 1193 + trace replay (T13)",
+   "track": "algebraic",
+   "w0": 27.9,
+   "w01": 18300.0,
+   "source": "atlas section 6/11.6, T13"
+  },
+  {
+   "arm": "grid (exhaustive) on the winner base (L13)",
+   "track": "algebraic",
+   "w0": 17.5,
+   "w01": 1490.0,
+   "source": "atlas section 11.3 (27.036/1.544; 2462.7/1.654)"
+  },
+  {
+   "arm": "pair table on the winner base (L13)",
+   "track": "generic",
+   "w0": 18.3,
+   "w01": 19.5,
+   "source": "atlas section 11.3 (28.310/1.544; 32.33/1.654)"
+  },
+  {
+   "arm": "proj-a (projected base + mitm, N = 32)",
+   "track": "generic",
+   "w0": 8.18,
+   "w01": 8.24,
+   "source": "atlas section 6, T12 (12.633/1.544; 13.625/1.654)"
+  },
+  {
+   "arm": "ksum3 N = 11 (autolab seed incumbent)",
+   "track": "generic",
+   "w0": 6.0,
+   "w01": null,
+   "source": "autolab README round 16 (8.89 -> distance 6.0x) (no w = 0.1 distance in the source; w01 absent)"
+  },
+  {
+   "arm": "wsum C = 3, B = 5 (round 16)",
+   "track": "generic",
+   "w0": 3.6,
+   "w01": null,
+   "source": "autolab README round 16 (no w = 0.1 distance in the source; w01 absent)"
+  },
+  {
+   "arm": "wsum2 C = 2, B = 15 (round 25)",
+   "track": "generic (BSGS boundary)",
+   "w0": 3.2,
+   "w01": null,
+   "source": "autolab README round 25 (no w = 0.1 distance in the source; w01 absent)"
+  },
+  {
+   "arm": "wsum2g stride-generator (round 28)",
+   "track": "generic (BSGS boundary)",
+   "w0": 1.76,
+   "w01": null,
+   "source": "autolab README round 28 (fixed table draw) (no w = 0.1 distance in the source; w01 absent)"
+  },
+  {
+   "arm": "wwalk C = 2, g=1, grow=2, seed=run (F = 2)",
+   "track": "generic (BSGS boundary)",
+   "w0": 1.85,
+   "w01": 1.75,
+   "source": "curve25519_f1_walk_20261107/README.md section 3"
+  },
+  {
+   "arm": "F = 1 table then probes (f1-x07)",
+   "track": "generic (F = 1)",
+   "w0": 1.5,
+   "w01": 1.43,
+   "source": "curve25519_f1_walk_20261107 section 3 (w01_priced = insert-priced w = 0.1: 1.49)",
+   "w01_priced": 1.49
+  },
+  {
+   "arm": "F = 1 target in walk + chained jumps (twcj)",
+   "track": "generic (F = 1)",
+   "w0": 1.4,
+   "w01": 1.31,
+   "source": "curve25519_f1_targetwalk_20261108 section 3 (w01_priced = insert-priced w = 0.1: 1.39)",
+   "w01_priced": 1.39
+  },
+  {
+   "arm": "twcj, fresh seeds (this session, jumps study)",
+   "track": "generic (F = 1)",
+   "w0": 1.36,
+   "w01": 1.27,
+   "source": "curve25519_tw_jumps_20261108 section 2 (w01_priced = insert-priced w = 0.1: 1.35)",
+   "w01_priced": 1.35
+  }
+ ],
+ "floors": {
+  "F=1": 1.5,
+  "F=2": 1.875,
+  "F=3": 2.188
+ }
+}

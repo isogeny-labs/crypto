@@ -1,0 +1,45 @@
+{
+  "schema": "operational-binding-review/v1",
+  "task": "T-2099",
+  "reviewed_at_utc": "2026-11-10T23:57:43.358896+00:00",
+  "status": "no_blocking_binding_finding",
+  "release_sha256": "c0f2f57efc4e2316083b48e6b0f3319e9c65d5b9398af60e94b61862cda7b55c",
+  "execution_command_sha256": "50d563545692d2c1dfe1526f77aaec1885ea41ff4455756141172901cf326f62",
+  "source_commit": "0f637dd630b3c68082b22c09f358ea1b2f79f722",
+  "independent_review_commit": "be3c46ef6613a21df2245d311c4846c8dc151f2d",
+  "receipt_hashes_checked": 5,
+  "nested_terminal_hashes_checked": 3,
+  "ledger": {
+    "charged": 0,
+    "reserved": 600,
+    "unreserved": 129000,
+    "release_prior": 0,
+    "release_remaining_before": 129600
+  },
+  "campaign_seconds": 129600,
+  "deadline": "2026-11-11T12:00:00Z",
+  "attempt_seconds": 600,
+  "attempt_limit": 1,
+  "automatic_retry": false,
+  "lease": {
+    "task_id": "cc53dd03-b274-4225-9496-5f34b97dc167",
+    "attempt_id": "36a7cd86-bed2-4e72-b15e-ffb54799eb55",
+    "lease_id": "0eb209bd-8100-4473-b138-41a00b7066e4",
+    "fencing_epoch": 1
+  },
+  "archived_lease_expired": true,
+  "fresh_same_fence_lease": {
+    "path": "/var/tmp/pencil-cast-renewal-live-lease.json",
+    "sha256": "b6a6ee5dd62fe183c78ced3590d88fa18f7ca33eb59ea07097ef6a3ca408f9af",
+    "expires_at": "2026-11-10T23:58:46.075595Z",
+    "unexpired_at_review": true
+  },
+  "findings": [],
+  "limits": [
+    "Publication identities read from published-bound receipt and parent remote readback; this record does not perform a separate GitHub API query.",
+    "Archived lease is historical; fresh same-fence lease was unexpired now. Root must refresh immediately before launch and throughout runtime.",
+    "Materializer900 is historical provenance, not a debit against renewed campaign.",
+    "No payload, compiler or kernel check run; final runtime ownership and caps checked by coordinator and runner."
+  ],
+  "no_execution_performed": true
+}

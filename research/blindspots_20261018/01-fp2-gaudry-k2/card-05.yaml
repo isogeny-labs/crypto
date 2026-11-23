@@ -1,0 +1,49 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-01-05
+experiment_id: BLINDSPOT-01
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-05.json
+must_not_exist:
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-05.json
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i0.jsonl
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i1.jsonl
+binds:
+  - {path: examples/blindspots_01_fp2_gaudry.rs, sha256: 0629a73c7ff443e70c6ce16c0872b98a5aebc5a71d25f7bff60156c8693ff559}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, "-p", target/blindspots-01/card-05]
+    timeout_seconds: 15
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=4294967296, rustc, --edition, "2021", "-C", opt-level=3, "-C", codegen-units=1, "-o", target/blindspots-01/card-05/b01, examples/blindspots_01_fp2_gaudry.rs]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+  - id: torsion-b40-i0
+    argv: [prlimit, --as=4294967296, target/blindspots-01/card-05/b01, run, --family, torsion, --bits, "40", --idx, "0", --arms, "ic-a:0-1,ic-b:0-1,ic-c1:0-1,ic-c2:0-1,rho-neg:0-7", --inv-cost, "4", --crosscheck, "10", --quiet, --out, research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i0.jsonl]
+    timeout_seconds: 220
+    success_exit_codes: [0]
+    outputs: [research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i0.jsonl]
+  - id: torsion-b40-i1
+    argv: [prlimit, --as=4294967296, target/blindspots-01/card-05/b01, run, --family, torsion, --bits, "40", --idx, "1", --arms, "ic-a:0-1,ic-b:0-1,ic-c1:0-1,ic-c2:0-1,rho-neg:0-7", --inv-cost, "4", --crosscheck, "10", --quiet, --out, research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i1.jsonl]
+    timeout_seconds: 220
+    success_exit_codes: [0]
+    outputs: [research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i1.jsonl]
+  - id: remove-bin
+    argv: [rm, "-f", target/blindspots-01/card-05/b01]
+    timeout_seconds: 15
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-01
+background: false
+write_scope:
+  - research/blindspots_20261018/01-fp2-gaudry-k2/raw/
+  - target/blindspots-01/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

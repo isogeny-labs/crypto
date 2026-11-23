@@ -1,0 +1,225 @@
+{
+    "apiVersion": "batch/v1",
+    "kind": "Job",
+    "metadata": {
+        "creationTimestamp": "2026-10-31T07:21:28Z",
+        "generation": 1,
+        "labels": {
+            "isolab.dev/job": "true"
+        },
+        "name": "n83-fb-variants-r27-20261031-r3",
+        "namespace": "isolab",
+        "resourceVersion": "7978114",
+        "uid": "903977ac-244f-4b32-b986-72fe0b6e8388"
+    },
+    "spec": {
+        "activeDeadlineSeconds": 5700,
+        "backoffLimit": 0,
+        "completionMode": "NonIndexed",
+        "completions": 1,
+        "manualSelector": false,
+        "parallelism": 1,
+        "podReplacementPolicy": "TerminatingOrFailed",
+        "selector": {
+            "matchLabels": {
+                "batch.kubernetes.io/controller-uid": "903977ac-244f-4b32-b986-72fe0b6e8388"
+            }
+        },
+        "suspend": false,
+        "template": {
+            "metadata": {
+                "annotations": {
+                    "karpenter.sh/do-not-disrupt": "true"
+                },
+                "labels": {
+                    "batch.kubernetes.io/controller-uid": "903977ac-244f-4b32-b986-72fe0b6e8388",
+                    "batch.kubernetes.io/job-name": "n83-fb-variants-r27-20261031-r3",
+                    "controller-uid": "903977ac-244f-4b32-b986-72fe0b6e8388",
+                    "isolab.dev/job": "true",
+                    "job-name": "n83-fb-variants-r27-20261031-r3"
+                }
+            },
+            "spec": {
+                "affinity": {
+                    "podAntiAffinity": {
+                        "requiredDuringSchedulingIgnoredDuringExecution": [
+                            {
+                                "labelSelector": {
+                                    "matchLabels": {
+                                        "isolab.dev/job": "true"
+                                    }
+                                },
+                                "topologyKey": "kubernetes.io/hostname"
+                            }
+                        ]
+                    }
+                },
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "bash",
+                            "-lc",
+                            "set -euo pipefail; src=\"${ISOLAB_RESULTS_URI%/}/source-v3\"; mkdir -p /work/source/src/bin /work/source/target/release /work/results; aws s3 cp \"$src/BUNDLE_FORMAT.json\" /work/source/BUNDLE_FORMAT.json --only-show-errors --region us-east-2; aws s3 cp \"$src/BUNDLE_INDEX.json\" /work/source/BUNDLE_INDEX.json --only-show-errors --region us-east-2; aws s3 cp \"$src/bundle-manifest.sha256\" /work/source/bundle-manifest.sha256 --only-show-errors --region us-east-2; aws s3 cp \"$src/src/bin/factor_base.rs\" /work/source/src/bin/factor_base.rs --only-show-errors --region us-east-2; aws s3 cp \"$src/src/field.rs\" /work/source/src/field.rs --only-show-errors --region us-east-2; aws s3 cp \"$src/FORMAT.json\" /work/source/FORMAT.json --only-show-errors --region us-east-2; aws s3 cp \"$src/FACTOR_BASE_VARIANT_SWEEP_DESIGN.md\" /work/source/FACTOR_BASE_VARIANT_SWEEP_DESIGN.md --only-show-errors --region us-east-2; aws s3 cp \"$src/RUN_OUTPUT_FORMAT.json\" /work/source/RUN_OUTPUT_FORMAT.json --only-show-errors --region us-east-2; aws s3 cp \"$src/run-base-variant-v2.sh\" /work/source/run-base-variant-v2.sh --only-show-errors --region us-east-2; aws s3 cp \"$src/protocol-factor-base-variants-v3.json\" /work/source/protocol-factor-base-variants-v3.json --only-show-errors --region us-east-2; aws s3 cp \"$src/protocol-factor-base-variants-v3.sha256\" /work/source/protocol-factor-base-variants-v3.sha256 --only-show-errors --region us-east-2; aws s3 cp \"$src/factor-base-variant-source-index-v3.json\" /work/source/factor-base-variant-source-index-v3.json --only-show-errors --region us-east-2; aws s3 cp \"$src/factor-base-variant-source-index-v3.sha256\" /work/source/factor-base-variant-source-index-v3.sha256 --only-show-errors --region us-east-2; aws s3 cp \"$src/target/release/factor_base\" /work/source/target/release/factor_base --only-show-errors --region us-east-2; cd /work/source; sha256sum -c bundle-manifest.sha256; sha256sum -c protocol-factor-base-variants-v3.sha256; sha256sum -c factor-base-variant-source-index-v3.sha256; jq -r '.entries[] | \"\\(.sha256)  \\(.path)\"' factor-base-variant-source-index-v3.json \u003e source-files.sha256; sha256sum -c source-files.sha256; chmod 755 run-base-variant-v2.sh target/release/factor_base; exec ./run-base-variant-v2.sh ./target/release/factor_base 27 /work/results/r27 /work/source/protocol-factor-base-variants-v3.json \"$ISOLAB_RESULTS_URI\""
+                        ],
+                        "env": [
+                            {
+                                "name": "HOME",
+                                "value": "/work"
+                            },
+                            {
+                                "name": "AWS_REGION",
+                                "value": "us-east-2"
+                            },
+                            {
+                                "name": "AWS_DEFAULT_REGION",
+                                "value": "us-east-2"
+                            },
+                            {
+                                "name": "POD_UID",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "metadata.uid"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "NODE_NAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "apiVersion": "v1",
+                                        "fieldPath": "spec.nodeName"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "ISOLAB_JOB_ID",
+                                "value": "n83-fb-variants-r27-20261031-r3"
+                            },
+                            {
+                                "name": "ISOLAB_OUTPUT_DIR",
+                                "value": "/work/results"
+                            },
+                            {
+                                "name": "ISOLAB_RESULTS_URI",
+                                "value": "s3://isolab-results-104186811093-us-east-2/runs/n83-fb-variants-r27-20261031-r3/$(POD_UID)/"
+                            },
+                            {
+                                "name": "RAYON_NUM_THREADS",
+                                "value": "6"
+                            },
+                            {
+                                "name": "OMP_NUM_THREADS",
+                                "value": "6"
+                            }
+                        ],
+                        "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:c044fe7656fffe45a5ced4b7b5c6ebe6cdd4ada5815fe254c6e657fe92535fa2",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "task",
+                        "resources": {
+                            "limits": {
+                                "cpu": "6",
+                                "ephemeral-storage": "10Gi",
+                                "memory": "8Gi"
+                            },
+                            "requests": {
+                                "cpu": "6",
+                                "ephemeral-storage": "10Gi",
+                                "memory": "8Gi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/work",
+                                "name": "work"
+                            },
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ],
+                        "workingDir": "/work"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                    "isolab.dev/pool": "cpu-spot"
+                },
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 1000,
+                    "runAsGroup": 1000,
+                    "runAsNonRoot": true,
+                    "runAsUser": 1000,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "runner",
+                "serviceAccountName": "runner",
+                "terminationGracePeriodSeconds": 60,
+                "tolerations": [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "isolab.dev/workload",
+                        "operator": "Equal",
+                        "value": "cpu"
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "8Gi"
+                        },
+                        "name": "work"
+                    },
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "1Gi"
+                        },
+                        "name": "tmp"
+                    }
+                ]
+            }
+        },
+        "ttlSecondsAfterFinished": 86400
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastProbeTime": "2026-10-31T07:22:31Z",
+                "lastTransitionTime": "2026-10-31T07:22:31Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "FailureTarget"
+            },
+            {
+                "lastProbeTime": "2026-10-31T07:22:31Z",
+                "lastTransitionTime": "2026-10-31T07:22:31Z",
+                "message": "Job has reached the specified backoff limit",
+                "reason": "BackoffLimitExceeded",
+                "status": "True",
+                "type": "Failed"
+            }
+        ],
+        "failed": 1,
+        "ready": 0,
+        "startTime": "2026-10-31T07:21:28Z",
+        "terminating": 0,
+        "uncountedTerminatedPods": {}
+    }
+}

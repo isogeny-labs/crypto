@@ -1,0 +1,19 @@
+[package]
+name = "binwcal"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Lane-local crate: not a member of the crypto workspace.
+[workspace]
+
+[dependencies]
+crypto = { path = "/tmp/claude-0/-home-user/e01afaa4-f4f8-52ad-ba5a-6c307eb9b47e/scratchpad/lanes/F2/crypto-src", default-features = false }
+serde_json = "1.0"
+
+[profile.release]
+opt-level = 3
+debug = false
+
+[profile.release.package.binwcal]
+codegen-units = 1

@@ -1,0 +1,36 @@
+{
+  "schema": "source-review-bindings/v1",
+  "created_utc": "2026-11-11T00:15:00Z",
+  "subject": {
+    "path": "signed-kummer-combined-runner-20261110",
+    "manifest_sha256": "a5f6c051e925a06adb45edb8610d3dd3ae3343f0eaf36a2c944973bccce4d4ae",
+    "durable_worker_sha256": "9aa4389355009eeef641b63a5247d5f7a394165e7722ff5042ec5926bb14eff0",
+    "panel_acceptance_sha256": "b5aa6b93af5abd12847e9aec3f9fd240b219e331bbe807946f0faa3471b27f52",
+    "driver_inputs_sha256": "b1aff1db9f2433ee4b67c7b6c884bf95fa21b562f7eee1d88680c254cba4abe5",
+    "admission_draft_sha256": "77602c52f8b369c419c41a4c41ce61865169795b0c6317a0a76c8f4520065947",
+    "omitted_driver_controls_sha256": "854c8219f8aaef926b026d3ca101bca6992414b3a666f7a17f505105611b2f9b",
+    "driver_cargo_toml_sha256": "a23852199afe78c85654727350901ba65b0207bfd511f297a13e53358b02fa12",
+    "pencil_cargo_toml_sha256": "0127aa740fb5cc2ca661173f3498f5635a10e0cfa4fecc570a1dfd7e3e7ce18a"
+  },
+  "prior_reviews": [
+    {
+      "path": "kummer-signed-driver-review-20261109/review.json",
+      "sha256": "40d3011ed79aae932dff26c0d4ae84758efa13266b04891aefbd092ba3fceeae"
+    },
+    {
+      "path": "signed-kummer-lock-review-20261109/review.json",
+      "sha256": "da1332dee96b0889227b02e0c14e25c457922d301e94811ea3d4653ab3c4fd49"
+    },
+    {
+      "path": "signed-producer-build-review-20261109/review.json",
+      "sha256": "7a870b008e3eb22a995b17a303e54f5258e55511e59b1b1e08ff2ef96ef89642"
+    }
+  ],
+  "review_boundaries": {
+    "compile": false,
+    "tests": false,
+    "lock_generation": false,
+    "solver": false,
+    "cloud": false
+  }
+}

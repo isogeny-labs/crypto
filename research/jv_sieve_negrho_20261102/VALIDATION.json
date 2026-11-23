@@ -1,0 +1,37 @@
+{
+  "schema": "validation-gate/v1",
+  "note": "Validator VAL-20261103-c31c76 (review/validator/validation_report.yaml). Scope: plain JV sieve route (V2 ic_1511_sparse rows, seeds 17-24) against the matched negation-map rho at p = 1511, weak class only (full rational 2-torsion, #E = 4l, genus-3 cover). Accounting, not an improvement. Primary cell: S/rho U1 0.00647 [0.00546, 0.00802]. The band below is layer A in U1 (V2 upper-bound convention on the cover side, all F_p additions and the six native counters on the rho side); layer B and unit U2 are in the validator report and recompute.json, and the order holds in all four.",
+  "replay_certificate": {
+    "path": "review/validator/replay-certificate.json",
+    "sha256": "d2358f0444551b0bb65da1aaba9e1fb4f3d902fb819d1622fe414901eb748cd2"
+  },
+  "validator_report": {
+    "path": "review/validator/validator-report.json",
+    "sha256": "1438ca410714677920021920c43662afb2964c3fced76f83def6138f2d1d5b9f"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "PROTOCOL.md (frozen 2026-11-02T19:01:32Z): rhostrong --neg 1 --batch 16 --r 256 --dp-bits 16 on V2 seeds 17-24, runs 0 and 1; pooled with #3278 (126 runs) iff homogeneous (permutation p >= 0.05 on mean and KS) -> pooled 142 runs",
+    "unit": "GAE at the harness price: F_p multiplications / (c_add_e = 331) per sqrt(l) (U1: rho muls_harness; cover total_muls), native operations priced at w GAE each",
+    "binary_or_process": "examples/jv_cover (crypto_lib): --exp sieve (cover) and --exp rhostrong (rho). Cover rows: V2 build, reproduced 16/16 by the study-A build (C1) and 2 rows by the main build d21002a3; rho runs: jv_cover_rho_frozen 2a61a521 (3764c93e98), 1 new and 1 #3278 run reproduced by the same main build d21002a3",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 0.005942685329622352,
+        "rho": 0.9179564055802338
+      },
+      "0.1": {
+        "ic": 0.7089162778579141,
+        "rho": 6.619337422118236
+      },
+      "1": {
+        "ic": 7.034336285834211,
+        "rho": 57.93176657096026
+      }
+    },
+    "order_holds_across_band": true
+  }
+}

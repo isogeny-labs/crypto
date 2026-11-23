@@ -1,0 +1,34 @@
+[
+  [
+    "from pivot import permute",
+    "from pivot import permute\nfrom pair import BorderPair"
+  ],
+  [
+    "'row_tail', 'column_tail',",
+    "'pair',"
+  ],
+  [
+    "        self.row_tail = tuple(schur.first_row[1:])\n        self.column_tail = tuple(schur.first_column[1:])",
+    "        self.pair = BorderPair(schur.first_row[1:], schur.first_column[1:], schur.a, m)"
+  ],
+  [
+    "retained_field_entries=2*n,\n                            peak_field_entries=2*n, copied_border_entries=2*(n-1),",
+    "retained_field_entries=self.pair.profile['retained_field_entries']+2,\n                            border_profile=self.pair.profile,"
+  ],
+  [
+    "        m.add('compact_frame_border_copies', 2*(n-1))\n",
+    ""
+  ],
+  [
+    "len(self.row_tail)",
+    "self.pair.size"
+  ],
+  [
+    "        border = self.column_tail if dual else self.row_tail\n        value = 0\n        for coefficient, entry in zip(border, tail):\n            value = m.plus(value, m.mul(coefficient, entry))\n            self.profile['dot_products'] += 1\n            self.profile['dot_additions'] += 1",
+    "        value = self.pair.dot(tail, dual, m)\n        self.profile['dot_products'] = self.pair.profile['dot_products']\n        self.profile['dot_additions'] = self.pair.profile['dot_additions']"
+  ],
+  [
+    "        self.row_tail = self.column_tail = None",
+    "        self.pair.profile['retained_field_entries'] = 0\n        self.pair = None"
+  ]
+]

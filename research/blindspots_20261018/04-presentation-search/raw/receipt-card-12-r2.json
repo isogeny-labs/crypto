@@ -1,0 +1,262 @@
+{
+  "card_id": "CARD-BLINDSPOT-04-12-r2",
+  "card_path": "research/blindspots_20261018/04-presentation-search/card-12-r2.yaml",
+  "card_sha256": "e6bc5ebf106f8f5d476448d1c38470914e266f9c3b6091a054e74cf8d4703a8b",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-04/card-12-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-04/card-12-r2/b04",
+        "examples/blindspots_04_presentation_search.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.045,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 10.045,
+      "stderr_sha256": "610eba7c7b2233aabbb9eee40bb5c55b03a81bb2d6037d2453f29b6dd9562d60",
+      "stderr_tail": [
+        "138 |     low: u64,",
+        "    |     ^^^",
+        "    |",
+        "    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: fields `rss_kb` and `seed_rows` are never read",
+        "    --> examples/blindspots_04_presentation_search.rs:2661:5",
+        "     |",
+        "2652 | struct DegreeResult {",
+        "     |        ------------ fields in this struct",
+        "...",
+        "2661 |     rss_kb: u64,",
+        "     |     ^^^^^^",
+        "2662 |     seed_rows: usize,",
+        "     |     ^^^^^^^^^",
+        "     |",
+        "     = note: `DegreeResult` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis",
+        "",
+        "warning: 2 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-12-r2/b04",
+        "cell",
+        "--n",
+        "15",
+        "--l",
+        "3",
+        "--m",
+        "4",
+        "--arms",
+        "b",
+        "--dmax-b",
+        "3",
+        "--first",
+        "0",
+        "--random",
+        "1",
+        "--planted",
+        "0",
+        "--time-limit",
+        "330",
+        "--job-time",
+        "320"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 241.601,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "b-cell4-t0",
+      "index": 3,
+      "outputs": {},
+      "seconds": 241.601,
+      "stderr_sha256": "ea28d124459a85fb05064faf36fea7a7de9076c6f0c29af1703f3fe357c9042b",
+      "stderr_tail": [
+        "cell n=15 l=3 m=4 draw=0 curve d1=9852 d2=16801 a=19593 b=3931 basis=[1, 30005, 26016] setup 0.0s",
+        "cell done in 241.5s"
+      ],
+      "stdout_sha256": "d008c72dd234968778c1ee8ada52d105d7ccd074da20f1eec114fb12c4ced56f",
+      "stdout_tail": [
+        "{\"tool\":\"b04\",\"n\":15,\"l\":3,\"m\":4,\"draw\":0,\"arm\":\"b\",\"kind\":\"random\",\"t\":0,\"nv0\":118,\"elim\":15,\"nv\":103,\"eqs\":120,\"ech_rows\":120,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"not-reached\",\"D\":null,\"D_lb\":4,\"last_degree\":3,\"recovered_ok\":null,\"matrix_rows\":433219,\"matrix_cols\":182208,\"word_ops_last\":289096445700,\"word_ops_total\":289096522191,\"peak_basis_bytes\":2019469728,\"secs\":241.441,\"rss_peak_kb\":2093948,\"degrees\":[{\"d\":2,\"cols\":5357,\"rank\":120,\"target\":5357,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":120,\"products\":0,\"falls\":0,\"word_ops\":76491,\"peak_basis_bytes\":58928,\"rows_total\":120},{\"d\":3,\"cols\":182208,\"rank\":170781,\"target\":182208,\"out\":\"saturated\",\"secs\":241.372,\"seed_rows\":120,\"products\":433099,\"falls\":4225,\"word_ops\":289096445700,\"peak_basis_bytes\":2019469728,\"rows_total\":433219}]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-12-r2/b04",
+        "cell",
+        "--n",
+        "15",
+        "--l",
+        "3",
+        "--m",
+        "4",
+        "--arms",
+        "b",
+        "--dmax-b",
+        "2",
+        "--random",
+        "0",
+        "--planted",
+        "2",
+        "--time-limit",
+        "40",
+        "--job-time",
+        "30"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.079,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "b-cell4-planted",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.079,
+      "stderr_sha256": "e85d05d9b5b7404556cf3611a9a23307fadedf0bbcb309abb40a1a4b0447c417",
+      "stderr_tail": [
+        "cell n=15 l=3 m=4 draw=0 curve d1=9852 d2=16801 a=19593 b=3931 basis=[1, 30005, 26016] setup 0.0s",
+        "cell done in 0.1s"
+      ],
+      "stdout_sha256": "cb88b8741c6de135eb1038233a2f5189b088ec9a83fa5e34b9b4a60a40624b45",
+      "stdout_tail": [
+        "{\"tool\":\"b04\",\"n\":15,\"l\":3,\"m\":4,\"draw\":0,\"arm\":\"b\",\"kind\":\"planted\",\"t\":0,\"nv0\":118,\"elim\":15,\"nv\":103,\"eqs\":120,\"ech_rows\":120,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":48,\"n_z\":24,\"n_truth_any\":24,\"n_truth_gen\":24,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":true,\"status\":\"not-reached\",\"D\":null,\"D_lb\":3,\"last_degree\":2,\"recovered_ok\":null,\"matrix_rows\":120,\"matrix_cols\":5357,\"word_ops_last\":76491,\"word_ops_total\":76491,\"peak_basis_bytes\":58928,\"secs\":0.015,\"rss_peak_kb\":4304,\"degrees\":[{\"d\":2,\"cols\":5357,\"rank\":120,\"target\":5311,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":120,\"products\":0,\"falls\":0,\"word_ops\":76491,\"peak_basis_bytes\":58928,\"rows_total\":120}]}",
+        "{\"tool\":\"b04\",\"n\":15,\"l\":3,\"m\":4,\"draw\":0,\"arm\":\"b\",\"kind\":\"planted\",\"t\":1,\"nv0\":118,\"elim\":15,\"nv\":103,\"eqs\":120,\"ech_rows\":120,\"mindeg\":2,\"maxdeg\":2,\"n_sols\":48,\"n_z\":24,\"n_truth_any\":24,\"n_truth_gen\":24,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":true,\"status\":\"not-reached\",\"D\":null,\"D_lb\":3,\"last_degree\":2,\"recovered_ok\":null,\"matrix_rows\":120,\"matrix_cols\":5357,\"word_ops_last\":76491,\"word_ops_total\":76491,\"peak_basis_bytes\":58928,\"secs\":0.014,\"rss_peak_kb\":4356,\"degrees\":[{\"d\":2,\"cols\":5357,\"rank\":120,\"target\":5311,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":120,\"products\":0,\"falls\":0,\"word_ops\":76491,\"peak_basis_bytes\":58928,\"rows_total\":120}]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-04/card-12-r2/b04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-04/card-12-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "6fdfa99f773c62200f7033b9f2a2f56d10825b12",
+  "dirty_after": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-12-r2-b-cell4-planted.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-12-r2-b-cell4-planted.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-12-r2-b-cell4-t0.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-12-r2-b-cell4-t0.log"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

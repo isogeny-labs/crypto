@@ -1,0 +1,69 @@
+"""Owned Git/CI metadata checkpoint only; no mathematical/native execution."""
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,lzma,os,re,shutil,subprocess
+r=Path('/workspace/crypto');p=r/'research/chained_jacobian_transfers_20261110';base='292abb6a209601b0ad78be4621da7ad85bcf64b2';published='b8462a65d882de1069dd863a3b8de4a3b6ba8cbb'
+h=Path('/workspace/scratch/ct491-norm-trace-current-CI-source-checkpoint');h.mkdir()
+shutil.copyfile(r/'.git/index',h/'entire-canonical-index-before');shutil.copyfile(r/'.git/index',h/'actual-current-index')
+env={**os.environ,'GIT_OPTIONAL_LOCKS':'0','GIT_TERMINAL_PROMPT':'0','GIT_INDEX_FILE':str(h/'actual-current-index')}
+def git(*a):return ['git','-c','gc.auto=0','-c','splitIndex.maxPercentChange=100','-c','splitIndex.sharedIndexExpire=never',*a]
+assert subprocess.check_output(git('rev-parse','HEAD'),cwd=r,env=env,text=True).strip()==base
+assert subprocess.run(git('diff','--cached','--quiet'),cwd=r,env=env).returncode==0
+g=p/'evidence/combined-norm-trace-current-CI-source-governance-36';g.mkdir();shutil.copyfile(__file__,g/'entire-original-checkpoint-caller.py.txt')
+def run(n,args,want=0):
+ q=subprocess.run(args,cwd=r,env=env,capture_output=True,timeout=120)
+ (g/(n+'.stdout.xz')).write_bytes(lzma.compress(q.stdout));(g/(n+'.stderr.xz')).write_bytes(lzma.compress(q.stderr));(g/(n+'.exit')).write_text(str(q.returncode)+'\n');print(n,q.returncode,flush=True);assert q.returncode==want,(n,q.stdout[-500:],q.stderr[-500:]);return q.stdout+q.stderr
+scope=['research/chained_jacobian_transfers_20261110','pcc/claims','pcc/ledger.jsonl','docs/session-logs/2026-11-16.md','.resume/RESUME.md','.github/workflows/pcc-gate.yml','.github/workflows/chained-transfer-cubic-frobenius-trace-proof-05.yml','problems/README.md','problems/chained-transfer-current-store-and-startup.md']
+def stage():
+ ns=sorted((set(subprocess.check_output(git('ls-files','--modified','--others','--exclude-standard','-z','--',*scope),cwd=r,env=env).split(b'\0'))|set(subprocess.check_output(git('diff','--cached','--name-only','-z'),cwd=r,env=env).split(b'\0')))-{b''})
+ (h/'selected-paths0').write_bytes(b'\0'.join(x for x in ns if x!=b'.resume/RESUME.md')+b'\0');subprocess.run(git('add','--sparse','--pathspec-from-file='+str(h/'selected-paths0'),'--pathspec-file-nul'),cwd=r,env=env,check=True);subprocess.run(git('add','--sparse','-u','--','.resume/RESUME.md'),cwd=r,env=env,check=True)
+ assert set(subprocess.check_output(git('diff','--cached','--name-only','-z'),cwd=r,env=env).split(b'\0'))-{b''}==set(ns)
+ return ns
+run('original-local292-ledger-prefix',['python3','tools/pcc/pcc.py','ledger','verify','--base',base])
+run('original-publishedb846-ledger-prefix',['python3','tools/pcc/pcc.py','ledger','verify','--base',published])
+run('current-authored-prose',['python3','tools/pcc/pcc.py','lint-prose','docs/session-logs/2026-11-16.md','.resume/RESUME.md',str(p/'QUEUE.md'),str(p/'CUBIC_FROBENIUS_TRACE_DESCENT_05.md'),'problems/chained-transfer-current-store-and-startup.md'])
+stage();run('first-cached-whitespace',git('diff','--cached','--check'))
+tree=subprocess.check_output(git('write-tree'),cwd=r,env=env,text=True).strip()
+raw=run('original-new-current-four-whole-archive-policy',['python3','tools/artifacts/artifacts.py','check',base,tree],1)
+payloads={m.group(2).decode():int(m.group(1).replace(b',',b''))for m in re.finditer(rb'^ +([0-9,]+)  (.+)$',raw,re.M)}
+custody=json.loads((p/'evidence/current-b846-whole-proof-CI-and-store-failure-34/ACTUAL_ENTIRE_CURRENT_CI_CUSTODY.json').read_text());expected={str((p/'evidence/current-b846-whole-proof-CI-and-store-failure-34'/(x['case']+'-entire-original-artifact.zip')).relative_to(r)):x for x in custody['archives']if x['case']!='pcc'}
+assert set(payloads)==set(expected)and len(payloads)==4
+for n,z in payloads.items():assert z==expected[n]['bytes']and hashlib.sha256((r/n).read_bytes()).hexdigest()==expected[n]['sha256']
+(g/'EXACT_FOUR_WHOLE_NEW_CI_ARCHIVES.json').write_text(json.dumps([dict(path=n,bytes=z,sha256=expected[n]['sha256'],scope='entire original Actions ZIP, no member selection or sharding')for n,z in sorted(payloads.items())],indent=2)+'\n')
+w=r/'.github/workflows/pcc-gate.yml';prior=w.read_text();assert prior==subprocess.check_output(git('show',base+':.github/workflows/pcc-gate.yml'),cwd=r,env=env,text=True)
+assert all(n not in prior for n in payloads);lines=prior.splitlines(keepends=True);changed=0
+for i,line in enumerate(lines):
+ if 'python3 tools/artifacts/artifacts.py pull --jobs 16 'in line and 'whole-Consumer-original-docs-payloads-30/payloads/'in line:lines[i]=line.rstrip('\n')+' '+' '.join(sorted(payloads))+'\n';changed+=1
+assert changed==2;w.write_text(''.join(lines));assert all(w.read_text().count(n)==2 for n in payloads)
+(g/'ACTUAL_ADDITIVE_FOUR_WHOLE_ARCHIVE_HYDRATION.json').write_text(json.dumps(dict(original292_sha256=hashlib.sha256(prior.encode()).hexdigest(),current_sha256=hashlib.sha256(w.read_bytes()).hexdigest(),only_two_original_pull_lines_extended=True,all_four_whole_archive_paths_in_each_original_job=True,original_policy_verifiers_keyring_Consumer_frozen_workflow_unchanged=True),indent=2)+'\n')
+run('current-PCC-actionlint',['/workspace/scratch/actionlint-bin/actionlint','-shellcheck=','.github/workflows/pcc-gate.yml'])
+oldw=h/'actual-base-workflow/pcc-gate.yml';oldw.parent.mkdir();oldw.write_text(prior)
+a=run('original292-PCC-wiring-diagnostic',['python3','tools/artifacts/wire_workflows.py','--check',str(oldw)],1)
+b=run('current-PCC-wiring-diagnostic',['python3','tools/artifacts/wire_workflows.py','--check','.github/workflows/pcc-gate.yml'],1);assert a==b
+for name in ['tools/pcc/pcc.py','pcc/keyring.json','tools/lean/proof-gate.sh','tools/lean/AuditAxioms.lean','tools/artifacts/artifacts.py','.artifacts/config.json','.github/workflows/chained-transfer-cubic-full-frobenius-proof-02.yml','.github/workflows/chained-transfer-cubic-basis-injectivity-proof-03.yml','.github/workflows/chained-transfer-cubic-relative-norm-proof-04.yml']:assert(r/name).read_bytes()==subprocess.check_output(git('show',base+':'+name),cwd=r,env=env)
+assert hashlib.sha256((p/'lean/CubicRelativeNorm22304.lean').read_bytes()).hexdigest()=='e804f278901b824feaa29361636ba5c6f20dc41015a72a0196816d6df13556e7'
+assert hashlib.sha256((p/'lean/CubicFrobeniusTraceDescent05.lean').read_bytes()).hexdigest()=='46e4993775a2c0c64f1aa079b28fb1d13b6e671df035a182f038a16f2e07ef43'
+stage();run('final-cached-whitespace',git('diff','--cached','--check'))
+tree=subprocess.check_output(git('write-tree'),cwd=r,env=env,text=True).strip()
+raw=run('original-published-b846-four-new-archive-policy',['python3','tools/artifacts/artifacts.py','check',published,tree],1)
+assert {m.group(2).decode():int(m.group(1).replace(b',',b''))for m in re.finditer(rb'^ +([0-9,]+)  (.+)$',raw,re.M)}==payloads
+raw=run('original-cumulative-fifteen-whole-object-policy',['python3','tools/artifacts/artifacts.py','check','d3c9dc35627dae5b058e1b1396fdbcca87af6b4a',tree],1)
+cumulative={m.group(2).decode():int(m.group(1).replace(b',',b''))for m in re.finditer(rb'^ +([0-9,]+)  (.+)$',raw,re.M)}
+old=json.loads((p/'evidence/combined-frobenius-basis-genuine-store-publication-28/EXACT_ELEVEN_WHOLE_NEW_POLICY_PAYLOADS.json').read_text());assert len(cumulative)==15 and all(cumulative[x['path']]==x['bytes']for x in old)and all(cumulative[n]==z for n,z in payloads.items())
+(g/'EXACT_FIFTEEN_PENDING_WHOLE_POLICY_OBJECTS.json').write_text(json.dumps([dict(path=n,bytes=z,sha256=hashlib.sha256((r/n).read_bytes()).hexdigest())for n,z in sorted(cumulative.items())],indent=2)+'\n')
+args=['python3','tools/pcc/pcc.py','claim','new','--kind','statement','--claim-type','data','--statement','Combined substantive norm04/trace05/current-ownCI source checkpoint: frozen e804 original dual55/0/fourteen bindings60bdae/inspected47098B report18ade2 plus46e499 original dual17/0/seventeen bindings1421da/inspected45090B report582327. Whole current b846 four exact-source proof workflows/all five ZIPs/276 literal members/complete logs115681 retained; PCC/validation403 and original non-rerequestable zero-job startup remain explicit merge blockers, new scoped problem preserves earlier resolved address history. All source/proof/rewrite/render/workflow-path/metadata/storage/signed-URL negatives retained, exact49,790,976B closed-output capacitybe1b7a preserved without lost paths/bytes/modes. Original292/b846 prefixes/prose/cached/PCC actionlint0; generic PCC wiring1 is exactly unchanged292/not green. Original policy selects four entire new original CI archives and cumulatively15 pending whole objects; both original Root jobs append only those four exact hydration paths, no sharding/exemption/verifier/keyring/policy/Consumer workflow change. Normal authored child292 and expected-b846 descendant FF with new substantive proofs, original migration/current ownCI/reviews still required before merge. No unchanged failed suite rerun or role/identity/provider/routing/cost/paid/native/signed promotion.']
+for f in sorted(g.iterdir()):args+=['--proof','attestation:'+str(f.relative_to(r))]
+c=subprocess.check_output(args,cwd=r,env=env,text=True).strip();e=f'''\n---\n\n{datetime.now(timezone.utc).isoformat()}\n# Checkpoint substantive norm04 and trace05 with complete current CI custody\n\n## What was done\n{c}: frozen04 dual55/0/fourteen bindings/report and05 dual17/0/seventeen bindings/report complete. Whole currentb846 CI115681/all5 ZIPs/276 members retained; four proof workflows succeed, PCC/validation403 and non-rerequestable startup0jobs still block merge. Original292/b846 prefix/prose/cached/PCC actionlint0; generic wiring1 unchanged292/not green. Exact four new whole archives/cumulative15 selected by original policy; only two Root pull lines append four exact inputs. [pcc:unverified]\n\n## Decisions made\nNormal authored child292/expected-b846 descendant FF/new immutable tag and update existing ready4425 for substantive final scope. Original policy/store migration/current final-head CI/reviews/guard still required; no unchanged failed suite retry or role/identity/provider/policy bypass. [pcc:unverified]\n\n## Open threads\nNormal publication/new ownCI/original authenticated store/startup restoration/full15 replay/normal merge; current Consumer first18:15; native cofactor refinement and original full scientific/runtime/admission/matched cost requirements. [pcc:unverified]\n\n## Errors\nAll rejected sources, metadata/index/storage/expiry/provisional path diagnostics remain. Object absence and startup/permission causes unknown, no signed/native/paid promotion or oldCI substitution. [pcc:unverified]\n'''
+for f in[r/'docs/session-logs/2026-11-16.md',r/'.resume/RESUME.md']:
+ with f.open('a')as out:out.write(e)
+ns=stage()
+for n in ns:
+ if n.startswith(b'pcc/claims/'):
+  for proof in json.loads((r/n.decode()).read_text()).get('proofs',[]):
+   if proof.get('kind')=='attestation':x=proof['subject'];assert hashlib.sha256((r/x['path']).read_bytes()).hexdigest()==x['sha256']
+subprocess.run(git('diff','--cached','--check'),cwd=r,env=env,check=True)
+subprocess.run(git('commit','--quiet','-m','research: prove cubic trace descent and preserve complete current CI'),cwd=r,env=env,check=True)
+head=subprocess.check_output(git('rev-parse','HEAD'),cwd=r,env=env,text=True).strip();assert subprocess.check_output(git('rev-parse','HEAD^'),cwd=r,env=env,text=True).strip()==base
+shutil.copyfile(h/'actual-current-index',r/'.git/index');assert(r/'.git/index').read_bytes()==(h/'actual-current-index').read_bytes()
+(h/'ACTUAL_NORMAL_COMPLETE_COMMIT.json').write_text(json.dumps(dict(time=datetime.now(timezone.utc).isoformat(),head=head,parent=base,paths=len(ns),claim=c,remote_expected=published,pending_original_whole_objects=15),indent=2)+'\n')
+print(c,head,'paths',len(ns),flush=True)

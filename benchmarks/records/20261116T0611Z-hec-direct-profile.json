@@ -1,0 +1,179 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-16T06:24:57+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/perl",
+        "-e",
+        "alarm 180; exec @ARGV",
+        "/Volumes/SSD990-2/hec-direct-profile-timing-target/release/direct-profile-compare",
+        "collect",
+        "/Volumes/SSD990-2/hec-inverse-work/research/hec_direct_profile_20261116/timing"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T06:13:07+00:00",
+      "wall_s": 7.41
+    }
+  ],
+  "commit": "5efdf3e7ec5d7f15a10fd521c7a840a09b5c2f69",
+  "commit_dirty": true,
+  "created_utc": "2026-11-16T06:11:41+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-hec-direct-profile"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261116T0611Z-hec-direct-profile",
+  "metrics": [
+    {
+      "baseline": 0.000104872437,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_target0_full_solve_wall",
+      "note": "Median of five batch means; sixteen fresh setups per batch. Compact baseline. Frozen spread and A/A qualification failed; unqualified L0 observation.",
+      "reference": 0.000104872437,
+      "reference_kind": "baseline",
+      "spread": [
+        0.000673927063,
+        0.000853559875
+      ],
+      "unit": "wall_s",
+      "value": 0.000696510375
+    },
+    {
+      "baseline": 0.000120726562,
+      "better": "lower",
+      "n": 5,
+      "name": "g2_target1_full_solve_wall",
+      "note": "Median of five batch means; sixteen fresh setups per batch. Compact baseline. Frozen spread and A/A qualification failed; unqualified L0 observation.",
+      "reference": 0.000120726562,
+      "reference_kind": "baseline",
+      "spread": [
+        0.000589260375,
+        0.000613252625
+      ],
+      "unit": "wall_s",
+      "value": 0.000591815062
+    },
+    {
+      "baseline": 0.000385765625,
+      "better": "lower",
+      "n": 5,
+      "name": "g3_target0_full_solve_wall",
+      "note": "Median of five batch means; sixteen fresh setups per batch. Compact baseline. Frozen spread and A/A qualification failed; unqualified L0 observation.",
+      "reference": 0.000385765625,
+      "reference_kind": "baseline",
+      "spread": [
+        0.001151596375,
+        0.001474177125
+      ],
+      "unit": "wall_s",
+      "value": 0.001412171875
+    },
+    {
+      "baseline": 0.0003678255,
+      "better": "lower",
+      "n": 5,
+      "name": "g3_target1_full_solve_wall",
+      "note": "Median of five batch means; sixteen fresh setups per batch. Compact baseline. Frozen spread and A/A qualification failed; unqualified L0 observation.",
+      "reference": 0.0003678255,
+      "reference_kind": "baseline",
+      "spread": [
+        0.001095096375,
+        0.001177830688
+      ],
+      "unit": "wall_s",
+      "value": 0.001108880187
+    },
+    {
+      "baseline": 0.000323950563,
+      "better": "lower",
+      "n": 5,
+      "name": "g4_target0_full_solve_wall",
+      "note": "Median of five batch means; sixteen fresh setups per batch. Compact baseline. Frozen spread and A/A qualification failed; unqualified L0 observation.",
+      "reference": 0.000323950563,
+      "reference_kind": "baseline",
+      "spread": [
+        0.000912596375,
+        0.001129984375
+      ],
+      "unit": "wall_s",
+      "value": 0.000979958313
+    },
+    {
+      "baseline": 0.000299070313,
+      "better": "lower",
+      "n": 5,
+      "name": "g4_target1_full_solve_wall",
+      "note": "Median of five batch means; sixteen fresh setups per batch. Compact baseline. Frozen spread and A/A qualification failed; unqualified L0 observation.",
+      "reference": 0.000299070313,
+      "reference_kind": "baseline",
+      "spread": [
+        0.000926304688,
+        0.000983901063
+      ],
+      "unit": "wall_s",
+      "value": 0.000929976563
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "verified_complete_calls",
+      "note": "All charged calls verify; correctness does not qualify a speed result.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 8160.0
+    }
+  ],
+  "problem": "ic:hec-direct-profile-g234",
+  "raw": [
+    {
+      "bytes": 83764,
+      "path": "benchmarks/20261115-hec-direct-profile/RAW.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5e/5e3e39c0b788ab689b08b5621ab9549870e2c928e9fae3db6a0951e37e0fcd46",
+      "sha256": "5e3e39c0b788ab689b08b5621ab9549870e2c928e9fae3db6a0951e37e0fcd46",
+      "uploaded": true
+    },
+    {
+      "bytes": 21487,
+      "path": "research/hec_direct_profile_20261116/timing/CELLS.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fd/fdc2e335b845c478214cd3b999b9a96a6c72c009e66b647f998b68da234e47ce",
+      "sha256": "fdc2e335b845c478214cd3b999b9a96a6c72c009e66b647f998b68da234e47ce",
+      "uploaded": true
+    },
+    {
+      "bytes": 822,
+      "path": "research/hec_direct_profile_20261116/timing/SUMMARY.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bd/bdc64dd4b4a2c8f41c0ce3fb17bbff188467ee3474be36314bb6252ea99e344e",
+      "sha256": "bdc64dd4b4a2c8f41c0ce3fb17bbff188467ee3474be36314bb6252ea99e344e",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/hec_direct_profile_20261116/reports/run-20261116T0611Z/REPORT.pdf",
+    "png": [
+      "research/hec_direct_profile_20261116/timing/COST.png"
+    ],
+    "svg": [
+      "research/hec_direct_profile_20261116/timing/COST.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-direct-profile",
+  "status": "measured",
+  "summary": "All 8160 complete calls verify. Unqualified L0 observations: Direct lower than Gaussian, Compact lower on all six inputs; spread and Direct A/A qualification fail, numerical tenfold gate fails. No independent validation or leaderboard promotion.",
+  "validation": null
+}

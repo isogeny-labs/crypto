@@ -1,0 +1,21 @@
+digraph Optimizations {
+  graph [rankdir=TB, bgcolor=white, nodesep=0.3, ranksep=0.3];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fa", color="#30516c", fontname="Helvetica", fontsize=10];
+  edge [color="#30516c", fontname="Helvetica", fontsize=9];
+  input [label="Public native input\nExact ECCp-131 parameters; no scalar supplied"];
+  small [label="u64 values\nTwelve deterministic prime bases"];
+  proof [label="Supplied large-prime proof\nVerify dependency primes, F, Fermat and gcd"];
+  fallback [label="Uncovered large values\nExisting exact AKS fallback"];
+  curve [label="Existing curve / generator / cofactor / target checks\nECCp-131 proof input passes its parameter budget"];
+  guard [label="Same contraction admission guards\nFunctional metadata available in leaf range?"];
+  ordered [label="Free-input interface\nOrdered search; first valid word"];
+  derived [label="Derived interface\nOne complete pass; least valid word"];
+  prefix [label="Other graphs / control option\nOriginal prefix counts / recursion"];
+  replay [label="Full graph and relation-certificate replay\nSame selected word and complete seeded certificate"];
+  pending [label="Matched profiling and performance evaluation\nBLOCKED: checkpoint / authenticated execution",fillcolor="#fff1d6",color="#916315"];
+  input -> small; input -> proof; input -> fallback;
+  small -> curve; proof -> curve; fallback -> curve;
+  curve -> guard; guard -> ordered; guard -> derived; guard -> prefix;
+  ordered -> replay; derived -> replay; prefix -> replay;
+  replay -> pending [style=dashed];
+}

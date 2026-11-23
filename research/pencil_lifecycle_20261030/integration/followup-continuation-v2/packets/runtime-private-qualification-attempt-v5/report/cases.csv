@@ -1,0 +1,6 @@
+case,control,status,meaning,evidence
+Q0,Static image audit,passed,Exact local image/config and executable/runtime/metadata custody; no Q0 payload execution,qualifier-receipt.stdout; published supervise.py
+Q1,Diagnostic preflight positive control,passed,Expected exit0 for request with matching digest,qualifier-receipt.stdout; published supervise.py
+Q2,Wrong request digest rejection,passed,Expected exit2 and request hash mismatch message,qualifier-receipt.stdout; published supervise.py
+Q3,Wrong owner config digest rejection,passed,Expected exit125 and fresh owner config digest mismatch message,qualifier-receipt.stdout; published supervise.py
+Q4,Fixture and gate preservation,passed,Fixture snapshot and gate digest unchanged at final check,qualifier-receipt.stdout; published supervise.py

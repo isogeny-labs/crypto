@@ -1,0 +1,301 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-p2-lift-linear-complexity-20261110-F2-RUN-01",
+  "experiment_id": "p2_lift_linear_complexity_20261110",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "commit": "6930d073e258b4e62ed0b06e7e9993eae1facf77",
+  "receipt": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.receipt.json",
+  "binds": [
+    {
+      "path": "/home/user/crypto/research/p2_lift_linear_complexity_20261110/PROTOCOL.md",
+      "sha256": "a9e727d29fca88dded3f9f5a2939e32dd23b8e1b10c6b0d93f35a27b6e185ebb"
+    },
+    {
+      "path": "/home/user/crypto/research/p2_lift_linear_complexity_20261110/FREEZE.sha256",
+      "sha256": "62747ae66cdb94051a59a3015a5722b8a0942674b0761f9c64f1f1ca86941401"
+    },
+    {
+      "path": "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/Cargo.toml",
+      "sha256": "5b16e1f3400b2160c73d45f0944508717cd9f5bd8d1def45e57f4787c743e755"
+    },
+    {
+      "path": "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/Cargo.lock",
+      "sha256": "288c3b68cbbbafdb8615627c9c398b36bd518177a5cb104e8e31cb080b4fd416"
+    },
+    {
+      "path": "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/src/main.rs",
+      "sha256": "72dadcb9416a7facb4e6cdb6eb9aa0794ebe646179481d370c4f8d5eaf1d1fe6"
+    },
+    {
+      "path": "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/target/release/p2_lift_linear_complexity",
+      "sha256": "172f1f4dc2db4e0a0d263ad0de4f4439d6d750fa2dce08e0dfe82ebad2ea19d2"
+    }
+  ],
+  "must_not_exist": [
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.receipt.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run",
+    "research/p2_lift_linear_complexity_20261110/results/run.json",
+    "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt",
+    "research/p2_lift_linear_complexity_20261110/results/run.stderr.txt",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-sha256.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-table.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-sha256.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-table.stderr"
+  ],
+  "commands": [
+    {
+      "id": "verify-freeze",
+      "argv": [
+        "sha256sum",
+        "-c",
+        "FREEZE.sha256"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "cwd": "research/p2_lift_linear_complexity_20261110",
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stdout"
+      ]
+    },
+    {
+      "id": "git-head",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stdout"
+      ]
+    },
+    {
+      "id": "rustc-version",
+      "argv": [
+        "rustc",
+        "-Vv"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stdout"
+      ]
+    },
+    {
+      "id": "cargo-version",
+      "argv": [
+        "cargo",
+        "-V"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stdout"
+      ]
+    },
+    {
+      "id": "nproc",
+      "argv": [
+        "nproc"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stdout"
+      ]
+    },
+    {
+      "id": "uname",
+      "argv": [
+        "uname",
+        "-a"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stdout"
+      ]
+    },
+    {
+      "id": "cpu-model",
+      "argv": [
+        "lscpu"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stdout"
+      ]
+    },
+    {
+      "id": "build",
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stdout"
+      ]
+    },
+    {
+      "id": "test",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stdout"
+      ]
+    },
+    {
+      "id": "binary-sha256",
+      "argv": [
+        "sha256sum",
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/target/release/p2_lift_linear_complexity"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stdout"
+      ]
+    },
+    {
+      "id": "run-full",
+      "argv": [
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/tool/target/release/p2_lift_linear_complexity",
+        "--protocol",
+        "/home/user/crypto/research/p2_lift_linear_complexity_20261110/PROTOCOL.md",
+        "--null",
+        "200",
+        "--out",
+        "research/p2_lift_linear_complexity_20261110/results/run.json"
+      ],
+      "timeout_seconds": 28800,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt",
+      "stderr": "research/p2_lift_linear_complexity_20261110/results/run.stderr.txt",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/results/run.json",
+        "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt"
+      ]
+    },
+    {
+      "id": "result-sha256",
+      "argv": [
+        "sha256sum",
+        "research/p2_lift_linear_complexity_20261110/results/run.json"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-sha256.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-sha256.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-sha256.stdout"
+      ]
+    },
+    {
+      "id": "result-table",
+      "argv": [
+        "cat",
+        "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-table.stdout",
+      "stderr": "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-table.stderr",
+      "outputs": [
+        "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.result-table.stdout"
+      ]
+    }
+  ],
+  "bus_address": "executor-mechanical-p2-lift-linear-complexity",
+  "background": true,
+  "write_scope": [
+    "research/p2_lift_linear_complexity_20261110/"
+  ],
+  "stop_when": [
+    "Any command exits with a status other than 0 or reaches its timeout; report the printed text verbatim, retry nothing and edit nothing.",
+    "The verify-freeze command prints any line not ending in OK, or the test command prints a line starting with test result that does not read test result: ok. 7 passed; 0 failed; report the printed text verbatim.",
+    "The run-full command exits with status 2; report the printed text verbatim, it is an instrument fatal recorded in the fatal array of results/run.json."
+  ],
+  "notes": "Frozen full run of study p2_lift_linear_complexity_20261110 (PROTOCOL.md sections 2, 9, 10; FREEZE.sha256). Exact integer computation, no timing is a result. Execution route: local host. The isolab-eks route is unavailable from this session (no aws CLI) and the GitHub route takes only ecbench specs, so this is local evidence; the section 9a confirmatory EKS run is open. The run-full command takes about 3 to 4 hours on the 4-core host and has an 8-hour limit, so it runs detached: run the card, then run wait until the receipt status is no longer detached. The cpu-model step runs lscpu in place of reading /proc/cpuinfo, because the card runner takes no shell pipe. The binary bound in binds is the build already on disk before this card; the binary-sha256 step records the digest of the binary this card builds."
+}

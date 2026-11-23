@@ -1,0 +1,413 @@
+{
+  "schema": "validator-report/v1",
+  "lead": "research/curve25519_leads_wave4_20261104/l12_f4_trace_replay",
+  "validated_utc": "2026-11-04T06:50:00Z",
+  "validator": "validator (independent; did not produce the lead)",
+  "verdict": "pass_with_errata",
+  "status": "pass_with_errata",
+  "status_scope": "both stages: engine P1-P6 (validated 2026-11-04T06:50:00Z, pass_with_errata) and end-to-end P7-P10 (validated 2026-11-04T15:50:25Z, pass_with_errata; see end_to_end_stage). Disposition for both: validated with errata; no stage is invalid_measurement.",
+  "disposition": {
+    "engine_stage_P1_P6": "validated",
+    "end_to_end_stage_P7_P10": "validated_with_errata (re-validated 2026-11-04T15:50:25Z after the chunks landed; see end_to_end_stage). Superseded value at 2026-11-04T06:50:00Z: insufficient_evidence (not run at validation time; declared undecided by the producer, no end-to-end number claimed)"
+  },
+  "commits": {
+    "protocol_and_scripts_frozen": "5a800bb3d06c69b32f32195c3aebccdfb3fee31e",
+    "head_at_validation": "1c1175180fabdc9b4a93007022f0d0bdb9b4a33f",
+    "working_tree": "clean (git status --short empty); git diff 5a800bb3 -- <lead dir> is empty, so PROTOCOL.md and scripts/* are byte-identical to the frozen commit",
+    "not_committed": "README.md, data/, ecbench/ are excluded by .git/info/exclude (lines 16,17,20) and exist in no commit; the ecbench spec's freeze rests on mtime 06:07Z and hash identity with data/ecbench/spec.frozen.json (ed9ad013725655601b05e6d824a84bc65b23dc8a479b9ee218345e04bd0fb2a5)"
+  },
+  "artifact_set": {
+    "sha256sums": "data/SHA256SUMS: 42 files, sha256sum -c all OK; file set under data/ identical to the listing; no file newer than SHA256SUMS at 06:41Z",
+    "moving_parts": "scripts/run.sh (pid 14413) and chunked_run.py (pid 14833) are alive; ecbench chunk c00 (pid 14834) has been queued behind /tmp/crypto-bench.lock since 06:33:16Z (T11 c03 held the lock, L13 also waiting). data/ecbench/chunks/ will change when the lock frees; this report covers only the hashed set as of 06:35Z"
+  },
+  "instruments": {
+    "curve25519_family": "ba1e3c0518eae58ae39a9b08e1f757c7e9fe1eb02c86b158b883244bc6a5ecef (recomputed, = frozen = T10)",
+    "ecbench": "54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b (recomputed, = frozen = T12)",
+    "census_k20": "bc74d8ac5151713c59f6c6d5bf58df1c0bf5e3442c6b50c7d234163c4c807adc (recomputed, = frozen)",
+    "scripts": {
+      "chunked_run.py": "e8edaa81... = T12 copy (verified)",
+      "pooled_compare.py": "061b11b0... = T12 copy (verified)"
+    }
+  },
+  "replication": {
+    "command": "F4COST_PLANTED=16 /home/user/ctarget/release/curve25519_family f4cost 20 <form> <t> <G> 100 <2026111500+t> 3600 2 full 0 - <0|1>",
+    "cells_rerun": 8,
+    "fields_compared_excluding_wall_s": 432,
+    "fields_differing": 0,
+    "binary_hash_before_and_after": "ba1e3c05... unchanged",
+    "outputs": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/rerun/"
+  },
+  "recomputed": {
+    "r": 131203, "sqrt_r": 362.2195, "coverage_winner": 0.001601,
+    "cells": {
+      "t5_g4_s1307": {"cols": 22, "covered": 210, "census_match": true, "mpt_plain": 52816.0, "mpt_trace": 24912.0, "rho": 0.471675, "learn": 52816, "learn_over_mpt": 1.0, "learn_over_E0": 7.275e-05, "E0_plain": 725959944.1, "E0_trace": 342417338.1, "T10_mpt_reldev": 0.0, "replays": 1600, "refuted": 1600, "fallbacks": 0, "untraced": 0, "learned": "16/16", "kept_rows": 768, "rows": "42->27", "nnz": "306->181", "planted_muladds": "255468 vs 175740", "verdict_diffs": {}},
+      "t5_g3_s1307": {"cols": 22, "covered": 210, "census_match": true, "mpt_plain": 177112.0, "mpt_trace": 100208.0, "rho": 0.565789, "learn": 177112, "learn_over_mpt": 1.0, "learn_over_E0": 7.275e-05, "E0_plain": 2434417934.2, "E0_trace": 1377366594.9, "T10_mpt_reldev": 0.0, "replays": 800, "refuted": 800, "fallbacks": 0, "untraced": 0, "learned": "8/8", "kept_rows": 800, "rows": "66->47", "nnz": "817->548", "planted_muladds": "961118 vs 911596", "verdict_diffs": {}},
+      "t6_g4_s1308": {"cols": 36, "covered": 498, "census_match": true, "mpt_plain": 710095.08, "mpt_trace": 322703.82, "rho": 0.454452, "learn": 710096, "learn_over_mpt": 1.0000013, "learn_over_E0": 1.054e-04, "E0_plain": 6734935285.4, "E0_trace": 3060701876.8, "T10_mpt_reldev": 0.0, "replays": 1600, "refuted": 1600, "fallbacks": 0, "untraced": 0, "learned": "16/16", "kept_rows": 2688, "rows": "105->57", "nnz": "1341->662", "planted_muladds": "3002999 vs 2090891", "verdict_diffs": {}},
+      "t6_g4_s0": {"cols": 25, "covered": 172, "census_match": true, "mpt_plain": 710094.0, "mpt_trace": 322701.91, "rho": 0.45445, "learn": 710096, "learn_over_mpt": 1.0000028, "learn_over_E0": 5.244e-05, "E0_plain": 13541637075.9, "E0_trace": 6153991089.8, "T10_mpt_reldev": 0.0, "replays": 1600, "refuted": 1600, "fallbacks": 0, "untraced": 0, "learned": "16/16", "kept_rows": 2688, "rows": "105->57", "nnz": "1341->662", "planted_muladds": "4023741 vs 2554757", "verdict_diffs": {}}
+    },
+    "predictions": {"P1": "held", "P2": "held (rho_win 0.471675 <= 0.5; GATE open)", "P3": "failed (t5 G3 rho 0.5658 > 0.5; seed deviation 2.0e-6 <= 0.02 holds)", "P4": "held", "P5": "held", "P6": "held (also checked against T10's actual cell JSONs: every count field identical; only planted_* (T10: 0) and max_nnz_cap (3e7 vs none) differ)", "point_guess_0.15_0.35": "missed (0.472)", "P7_P10": "undecided (no chunk complete)"},
+    "cost_sums": {"random_target_F4_muladds": 242064281, "planted_F4_muladds": 13976310, "trace_learning_muladds": 1650120},
+    "consistency": "pkm_trace_replay_muladds == f4_muladds in all trace cells (0 fallbacks); amortised_muladds_per_target == mpt_trace + learn/100; learn == 2^G x (mpt_plain/2^G) i.e. exactly one try per branch; kept_rows/branch 48/100/168",
+    "T12_cross_check": {"S_winner_w0_w0.1_w1": [26.404, 100277.2, 1002534.4], "rho_neg": [1.544, 1.654, 2.651], "proj_a": [12.633, 13.625, 22.554], "distances": {"w0_vs_rho_neg": 17.11, "w0.1_vs_rho_neg": 60613, "w0.1_vs_proj_a": 7360}, "c00_round0_winner": {"solver_ops": 612625192, "trials": 12116, "relations": 13, "pkm_system_fp_mults_uncharged": 2598218, "pkm_grid_fp_mults_uncharged": 16224}, "nonF4_unpriced_over_F4": 0.0043},
+    "model_projection": {"README_formula_value": 47314.6, "README_formula_ratio": 0.4718, "protocol_table_model_427.5+100215rho": 47696.4, "protocol_table_model_ratio": 0.4756, "T12_decomposition_model_455.5+99822rho": 47530, "distance_to_rho_neg_w0.1_modelled": "2.86e4 to 2.87e4 (README 2.9e4: consistent)"},
+    "accounting_source_check": "src/cryptanalysis/ecbench/methods.rs:1844 unpriced_of prices only counters ending in _uncharged with v>0; pkm_semaev.rs:1158 records pkm_trace_learn_muladds (no suffix) in trace_setup natives, so the band does not price learning, as PROTOCOL section 2 states. pkm_semaev.rs:1009 accepts trace=0|1 only and requires engine f4 without staircase stop."
+  },
+  "controls": {
+    "null_or_reference_arm_engine_stage": "trace-0 cell of each pair is the unmodified baseline and replicates T10 exactly (P6)",
+    "end_to_end_arms": "rho-neg (reference), proj-a (baseline), plain PKM, trace PKM all in the frozen spec; none measured yet",
+    "boundary_declared_before_run": "yes (PROTOCOL sections 1-2, commit 5a800bb3 at 06:32:32Z, first cell 06:32:56Z)"
+  },
+  "errata": [
+    "README 'Model of the end-to-end effect': the displayed formula 0.4717 x 100,277 + 26.4 x (1 - 0.4717) evaluates to 47,314.6 and a ratio of 0.472, while the README quotes S_trace/S_plain ~ 0.476; 0.476 comes from the protocol section-2 model (427.5 + 100,215 rho), which itself gives 100,642 at rho = 1 instead of S_plain 100,277.2 (0.36% high). Projection only; the modelled distance 2.9e4x is unaffected (2.86e4-2.87e4).",
+    "README states 'load 1.74 at launch'; data/env.txt and data/run.log record loadavg 1.76.",
+    "PROTOCOL section 7 lists ecbench/spec.json and ecbench/plan_design_check.txt as frozen, but they are not in commit 5a800bb3 (excluded by .git/info/exclude); their freeze is attested only by mtime 06:07Z and the launch copy's identical sha256. README.md and data/ are likewise in no commit.",
+    "End-to-end stage (P7-P10) is not validated: no chunk had started executing at validation time (c00 queued behind /tmp/crypto-bench.lock since 06:33:16Z). The README declares this honestly and quotes no end-to-end number; data/SHA256SUMS was hand-written over the partial tree (disclosed) and will be rewritten by the runner.",
+    "Process deviations disclosed by the producer (no isolab-eks route, no resume checkpoint, no Conductor check, no session log, no visual report) are noted; they do not affect the counted-unit engine measurement."
+  ],
+  "scope_and_honesty": "P3 failure and the missed point guess are reported as failed/missed with the numbers retained; nothing retuned; no leaderboard row proposed; rho stated ahead on every track; w = 0 identity and learning charge treated as accounting, not improvement. Scope statement matches the artifacts.",
+  "evidence_paths": {
+    "engine_json": "data/engine/<cell>_tr{0,1}.json", "summary": "data/engine/summary.json", "gate": "data/engine/GATE", "log": "data/run.log", "env": "data/env.txt", "sha": "data/SHA256SUMS",
+    "T10_cells": "research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/{t5_g4_s1307,t5_g3_s1307,t6_g4_s1308,t6_g4_s0}.json",
+    "T12_band": "research/curve25519_t10_winner_ecbench_20261104/ecbench/band_pooled.json", "T12_c00": "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c00/records.jsonl"
+  },
+  "end_to_end_stage": {
+    "status": "pass_with_errata",
+    "disposition": "validated (P7-P10 all held as stated; every headline number reproduced by independent code; errata are wording, coverage and evidence-binding items, none changes a verdict)",
+    "validated_utc": "2026-11-04T15:50:25Z",
+    "validator": "validator (independent; did not produce the lead; own code, not the producer's pooled_compare.py / learn_charge.py)",
+    "scope": "End-to-end stage P7-P10 of PROTOCOL.md (8 one-target chunk sessions, 64 runs, 16 per arm) and the README addendum 2026-11-04T15:36Z. The engine stage P1-P6 is reported above under its existing keys and was not re-validated here.",
+    "commits": {
+      "frozen_protocol_and_scripts": "5a800bb3d06c69b32f32195c3aebccdfb3fee31e (2026-11-04T06:32:32Z); git diff 5a800bb3d0 HEAD -- PROTOCOL.md scripts/ is empty",
+      "validated_commit": "a611a7bdec70b0aa65de7bd1d25c9aeccee4e17c (HEAD at the end of validation, 2026-11-04T15:48:16Z)",
+      "head_history_during_validation": "e57798a82e (README/SHA256SUMS/env.txt/run.log/run.out modified, ALL_DONE untracked: moving tree at first look) -> 035dad5b0a (15:37:11Z, addendum + SHA256SUMS + ALL_DONE committed, data/ecbench still uncommitted/excluded) -> a611a7bdec (15:48:16Z, adds the 85 data/ecbench files)",
+      "working_tree_state": "git status of the lead directory is empty at a611a7bdec; all 119 files under data/ are byte-identical to the blobs of a611a7bdec (0 differences); README.md and validator-report.json were unchanged between 035dad5b0a and a611a7bdec; data/SHA256SUMS in the working tree is byte-identical to the committed one",
+      "note": "The result commit (035dad5b0a) precedes the data commit (a611a7bdec) by 11 minutes, but the committed SHA256SUMS of 035dad5b0a already bound every data/ecbench file by hash, and those hashes verify against the files committed later (see checks.sha256sums)."
+    },
+    "checks": [
+      {
+        "id": "1_freeze_order",
+        "result": "pass",
+        "evidence": "data/ecbench/chunks/c0*/session.json started_unix_ms -> 2026-11-04T08:10:48Z (c00), 08:33:16Z, 08:41:29Z, 08:56:10Z, 09:03:05Z, 09:07:34Z, 09:13:16Z, 09:17:55Z (c07): all after the protocol commit 5a800bb3d0 at 06:32:32Z and after run.sh launch 06:32:56Z / GATE=open 06:33:16Z (data/run.log). cmp ecbench/spec.json data/ecbench/spec.frozen.json: identical (sha256 ed9ad013725655601b05e6d824a84bc65b23dc8a479b9ee218345e04bd0fb2a5, = the blob committed in 8d1257cead and in HEAD). Each chunk's spec.json equals spec.frozen.json with exactly these four edits, re-derived by my code from chunked_run.py: workloads.targets_per_curve=1, workloads.target_seed=2026110421+c, measurement.seed=2026110422+c, description + ' [chunk c of 8, Addendum C]' (8/8 chunks exact). The spec's content (curve, 4 arms, trace=1 on the trace arm, 2 rounds, alternate_measured, 1800 s, base seeds 2026110421 / 2026110422) matches PROTOCOL.md section 3.2 line by line; its curve block is identical to T12's. data/ecbench/plan.txt is byte-identical to ecbench/plan_design_check.txt. PROTOCOL.md and scripts/* are byte-identical to 5a800bb3d0; scripts/chunked_run.py (e8edaa81...) and pooled_compare.py (061b11b0...) equal T12's. Disclosure: ecbench/spec.json itself is not in 5a800bb3d0 (first committed in 8d1257cead at 07:13:56Z, after launch); its pre-run freeze rests on mtime 06:07:21Z, the identical hash of the launch copy and the textual description in the frozen PROTOCOL (carried from the engine-stage erratum 3)."
+      },
+      {
+        "id": "2_binary_identities",
+        "result": "pass",
+        "evidence": "all 8 session.json binary_sha256 = 54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b; all 64 records carry the same value; the binary on disk re-hashes to it before and after my replays; verify receipts auditor_binary_sha256 = same. curve25519_family ba1e3c05..., census k20.jsonl bc74d8ac... re-hash to the frozen values. session.json git_commit / git_dirty are null in all 8 sessions (ecbench recorded no source commit; the binary hash is the only build binding, as in T12)."
+      },
+      {
+        "id": "2b_sha256sums",
+        "result": "pass_with_note",
+        "evidence": "data/SHA256SUMS lists 117 files; sha256sum -c: 114 OK, 3 FAILED (env.txt, run.log, run.out). Cause: run.sh finish() writes SHA256SUMS first, then appends 'end_utc ...' to env.txt and 'L12: ALL_DONE' to run.log and run.out. For all three, the hash of the file minus its last line equals the recorded hash, so they differ only by that appended line. data/ALL_DONE (empty, 118th file) is not listed. File set otherwise equals the directory listing. None of the 85 data/ecbench files differs."
+      },
+      {
+        "id": "3_P7_verification",
+        "result": "pass",
+        "evidence": "records.jsonl: rho-neg 16, proj-a 16, pkm plain 16, pkm trace 16, all outcome.status = verified, 0 warm-ups, 0 interrupted chunks (chunks/interrupted/ empty). verify/c00..c07.json: ok=true, problems=[], regraded=true, verified_records 8/8, records.jsonl sha256 equals session.json records_sha256 and the receipt in every chunk; verify/rc.txt c00..c07 rc=0; replay detail 'identical' in 8/8. INDEPENDENT CERTIFICATE (own affine arithmetic on y^2=x^3+63700x+872826 mod 1048573, G=(349837,122), r=131203 prime, 8r=group_order, rG=O): for all 64 records, outcome.recovered * G equals the record's target point exactly (0 failures); each target is on the curve and in the order-r subgroup; 8 distinct targets; one recovered scalar per workload across all arms and rounds; no planted targets; detail.calibration_pinned_units empty in every record (calibrated C = n_C = 0). Replay coverage in the producer receipts is 1 sampled run per chunk: rho-neg 5, trace arm 3 (c00 seq3, c05 seq4, c06 seq4), plain PKM 0, proj-a 0. Validator added replays on scratch copies (evidence untouched): c05 seq 2 (plain r0), seq 3 (trace r0), seq 5 (plain r1) and c07 seq 2 (plain r0), seq 3 (trace r0): audit OK, 5/5 reproduced identical (/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/replay/c05_receipt.json, c07_receipt.json)."
+      },
+      {
+        "id": "4_P8_ratio",
+        "result": "pass",
+        "evidence": "Own band (Rust band.rs semantics: priced S = (G + w*U)/sqrt(131203), U = sum of cost.unpriced counters resolved counters -> phase natives -> solver.ops, byte counters exempt, calibration none): means over 16 runs agree with data/ecbench/band_pooled.json to 2.2e-16 relative; charged_sum and native_sum equal in integers for all 4 arms. Pooled paired ratio of totals per workload (K=8, df=7, linearised log-scale t interval with my own t quantile 2.3646243, checked by numeric integration): S(trace)/S(plain) = 0.474214 [0.474179, 0.474248] at w=0.1 and 0.474087 [0.474060, 0.474115] at w=1, trace lower in 8/8 workloads at both; 1.000000 [1.000000, 1.000000] at w=0. P8 thresholds: ratio <= 0.6 and upper < 1 hold. Hand-charged (adds pkm_trace_learn_muladds = 52,816 per trace run, 845,056 in all, as native work; the plain arm has none): 0.474372 [0.474288, 0.474455] at w=0.1 and 0.474245 [0.474171, 0.474319] at w=1, upper < 1. All nine rows of data/ecbench/pooled_compare.jsonl and both charged ratios of learn_charge.json reproduce to >= 6 digits. Per-workload ratios at w=0.1 span 0.47417-0.47444."
+      },
+      {
+        "id": "5_P9_w0_identity",
+        "result": "pass",
+        "evidence": "16/16 (workload, round) pairs: total_gae, recovered scalar, algorithm_seed equal between plain and trace arms; in addition per-phase adds/doubles/scalar_mults/gae, top-level counters, trials, relations, walk steps, pkm_guess_branches_solved and solver.calls are equal in 16/16. algorithm_seed is a real record field (not None), identical across all four arms in every (workload, round), 16 distinct values, so seeds_paired=true is not vacuous. Why w=0 is exactly 1: the solver term is removed from total_gae (detail.framework_total_gae_before_solver_removal), so the two arms differ only in unpriced native counters."
+      },
+      {
+        "id": "6_P10_ranks_and_distance",
+        "result": "pass",
+        "evidence": "Own means (S at w=0 / 0.1 / 1): rho-neg 1.5567 / 1.6684 / 2.6733; proj-a 11.8518 / 12.7301 / 20.6356; plain 24.7164 / 92,455.9975 / 924,337.5278; trace 24.7164 / 43,843.9157 / 438,216.7102. Order rho-neg < proj-a < {plain, trace} holds at all three weights; the Rust ranks in band_pooled.json agree. Trace distance to rho-neg (pooled ratio, 95%): 15.88 [9.79, 25.75] at w=0; 2.628e4 [1.521e4, 4.541e4] at w=0.1; 1.639e5 [9.11e4, 2.95e5] at w=1. To proj-a: 2.085 [1.54, 2.82] at w=0 (trace lower on 1 of 8 workloads), 3,444 [2,365, 5,015] at w=0.1, 21,236 at w=1. The README's rounded values (15.9, 2.63e4, 1.64e5, 3.44e3, 2.12e4, 2.09) all match. The band's verdict for the pair plain vs trace is 'unresolved inside the band' (tie at w=0), which the README does not state (see errata E7)."
+      },
+      {
+        "id": "7_addendum_counters",
+        "result": "pass",
+        "evidence": "Summed over the 16 trace runs (own sums): pkm_trace_replays 1,615,843; refuted 1,615,620; fallbacks 223 (fallback/replay 1.380e-4); failure 'new leads differ from the trace' 222 plus 'step degree differs' 1; fallback plain mul-adds 775,268; learn runs 256 = 16 x 16, branches learned 256/256, learn mul-adds 845,056 = 16 x 52,816; replay mul-adds 2,515,834,336. Per run solver.ops = pkm_trace_replay_muladds + pkm_trace_fallback_plain_muladds exactly (0 violations in 16), so a failed replay and its plain fallback are both charged and the learning mul-adds are not inside solver.ops (hand charge does not double count; pkm_trace_learn_muladds is absent from cost.unpriced, pkm_trace_learn_spec_fp_mults_uncharged is present and priced). Refutation counts equal between arms: plain 1,615,679, trace 1,615,679; relations 164 and consistent systems 164 in both arms. A consistent (hit) system cannot be refuted, so each of the 164 hits is necessarily a fallback; the other 59 fallbacks (= 1,615,679 plain refutations - 1,615,620 replay refutations) are refutable systems on which the replay failed (3.7e-5 of refutable systems). The 'mismatch step8 got2 want3' counter is 164, equal to the hit count. Per-run F4 ratio solver.ops trace/plain 0.47177-0.47225; pooled 0.471811 (0.471970 with learning)."
+      },
+      {
+        "id": "8_plain_arm_vs_T12",
+        "result": "pass (claim holds, and more strongly than stated)",
+        "evidence": "T12 has 16 workloads (target seeds 2026110411-2026110426), L12 has 8 (2026110421-2026110428): 6 in common (2026110421-2026110426 = T12 chunks c10-c15 = L12 chunks c00-c05), 2 L12-only, 10 T12-only. On the 6 common workloads the L12 runs of the unmodified arm pkm-iso-t5-g4-s1307 are bit-identical to T12's (12/12 runs: total_gae, solver.ops, solver.calls, recovered scalar, algorithm_seed); rho-neg and proj-a also identical in total_gae and seed (12/12 each). Plain S at w=0.1: L12 all 8 workloads 92,455.998; L12 6 common 92,624.111; T12 same 6 common 92,624.111; T12 all 16 100,277.209 (reproduces the T12 value 100,277.2); T12-only 10 workloads 104,869.068. So the difference 92,456 vs 100,277 is entirely the workload set; the plain arm is deterministic across sessions."
+      },
+      {
+        "id": "9_controls_and_reporting_contract",
+        "result": "pass_with_notes",
+        "evidence": "All four arms priced in one table and one unit (S, sqrt r = 362.2195), reference rho-neg and baseline proj-a measured in the same sessions on the same workloads, the unmodified plain PKM arm is the matched baseline for the trace arm, phases separated (engine stage vs end-to-end; learning shown as its own hand-charged column), progress stated as ratios with 95% intervals, distance to rho-neg stated, no leaderboard row proposed, Rho stated ahead. Unpriced counters per arm, all counted (band 'uncounted' = none): rho-neg canonicalisations 6,471; proj-a 50,907 (sqrt_solves 512, lookups 21,408, row_ops 4,119, legendre 1,296, target_guard_probes 21,524, base map entries 1,024, dedup probes 512, membership checks 512); plain 5,356,866,681 (solver F4 5,333,932,583; pkm_system_fp_mults 22,621,802; pkm_grid_fp_mults 204,672; target_guard 104,164; others small); trace 2,539,547,286 (solver F4 2,516,609,604; plus learn spec fp mults 3,584; plus 845,056 learn mul-adds charged by hand). The README addendum does not list these per-arm counters (E8). External fastest implementation: not applicable, the claim compares the trace engine with the plain engine of the same code base and makes no claim against an external F4. m=83 / ECC2K-130 rules: not triggered, a prime-curve k=20 miniature with no transfer claim (README has no ECC2K or m=83 statement). Counted units only; no wall-time claim is made in the addendum."
+      },
+      {
+        "id": "10_overclaim_review",
+        "result": "pass_with_errata",
+        "evidence": "No headline number is unsupported. Wording/coverage issues are E1-E8 below. Diagnostic not in the README: solver wall time, trace/plain, pooled 0.952 (per pair 0.896-0.999), 118.6 vs 239.3 ns per counted F4 mul-add, all PKM runs isolation level L0 on a shared host; so the 2.11x reduction is in counted mul-adds priced at w >= 0.1 and is not a 2x wall-time gain here (E7)."
+      }
+    ],
+    "recomputed": {
+      "r": 131203,
+      "sqrt_r": 362.2195467,
+      "band_S_w0_w0.1_w1": {
+        "rho-neg": [
+          1.556722,
+          1.668377,
+          2.673275
+        ],
+        "proj-a": [
+          11.851755,
+          12.730142,
+          20.63562
+        ],
+        "pkm-iso-t5-g4-s1307 (plain)": [
+          24.716364,
+          92455.99751,
+          924337.527827
+        ],
+        "pkm-iso-t5-g4-s1307-trace": [
+          24.716364,
+          43843.915749,
+          438216.710219
+        ]
+      },
+      "ratio_trace_over_plain": {
+        "w0": [
+          1.0,
+          [
+            1.0,
+            1.0
+          ]
+        ],
+        "w0.1": [
+          0.474214,
+          [
+            0.474179,
+            0.474248
+          ]
+        ],
+        "w1": [
+          0.474087,
+          [
+            0.47406,
+            0.474115
+          ]
+        ],
+        "wins_trace_8_of_8_workloads": [
+          0.1,
+          1.0
+        ]
+      },
+      "ratio_hand_charged_trace_over_plain": {
+        "w0.1": [
+          0.474372,
+          [
+            0.474288,
+            0.474455
+          ]
+        ],
+        "w1": [
+          0.474245,
+          [
+            0.474171,
+            0.474319
+          ]
+        ]
+      },
+      "distance_trace_over_rho_neg": {
+        "w0": [
+          15.877,
+          [
+            9.79,
+            25.749
+          ]
+        ],
+        "w0.1": [
+          26279.4,
+          [
+            15206.8,
+            45414.3
+          ]
+        ],
+        "w1": [
+          163925.0,
+          [
+            91059.0,
+            295098.9
+          ]
+        ]
+      },
+      "distance_trace_over_proj_a": {
+        "w0": [
+          2.0855,
+          [
+            1.5418,
+            2.8208
+          ]
+        ],
+        "w0.1": [
+          3444.1,
+          [
+            2365.39,
+            5014.75
+          ]
+        ],
+        "w1": [
+          21235.9,
+          [
+            14392.1,
+            31334.2
+          ]
+        ]
+      },
+      "same_session_distance_plain_over_rho_neg": {
+        "w0": [
+          15.88,
+          [
+            9.79,
+            25.75
+          ]
+        ],
+        "w0.1": [
+          55420,
+          [
+            32070,
+            95770
+          ]
+        ],
+        "w1": [
+          345800,
+          [
+            192100,
+            622500
+          ]
+        ]
+      },
+      "learning": {
+        "per_trace_run_muladds": 52816,
+        "total_16_runs": 845056,
+        "over_plain_F4_total": 0.0001584,
+        "over_trace_F4_total": 0.0003358
+      },
+      "F4_solver_ops_totals": {
+        "plain": 5333932583,
+        "trace": 2516609604,
+        "ratio": 0.471811,
+        "plain_over_trace": 2.1195,
+        "plain_over_trace_with_learning": 2.1188,
+        "S_ratio_inverse_w0.1": 2.1088
+      },
+      "model_vs_measured": {
+        "README_model_ratio": 0.4718,
+        "measured": 0.474214,
+        "diff_pct": 0.51,
+        "model_distance_6.06e4_x_0.4717": 28585,
+        "measured_distance_w0.1": 26279,
+        "reason_for_gap": "the model starts from T12's plain distance 6.06e4 (16 workloads); the same-session plain distance is 5.54e4, and 5.54e4 x 0.4742 = 2.63e4"
+      },
+      "wall_time_diagnostic_not_a_claim": {
+        "solver_wall_ratio_trace_over_plain": 0.9522,
+        "per_pair_min_median_max": [
+          0.896,
+          0.952,
+          0.999
+        ],
+        "ns_per_counted_mul_add": {
+          "plain": 118.6,
+          "trace": 239.3
+        }
+      },
+      "T12_cross_check": {
+        "common_workloads": 6,
+        "runs_bit_identical": "12/12 plain, 12/12 rho-neg (gae, seed), 12/12 proj-a (gae, seed)",
+        "plain_S_w0.1": {
+          "L12_8": 92455.998,
+          "L12_6_common": 92624.111,
+          "T12_6_common": 92624.111,
+          "T12_16": 100277.209,
+          "T12_10_only": 104869.068
+        }
+      }
+    },
+    "disagreeing_numbers": "none: every README addendum number reproduces at the printed precision; the nearest items are the model-vs-measured gaps listed under recomputed.model_vs_measured (0.51% in the ratio, 2.9e4 vs 2.63e4 in the distance, both explained)",
+    "errata": [
+      {
+        "id": "E1",
+        "severity": "minor",
+        "location": "README.md addendum 2026-11-04T15:36Z, first paragraph ('completed after two container restarts', 'first verify pass was killed after c00')",
+        "issue": "data/run.log and data/env.txt show two launches (06:32:56Z and 15:30:08Z, uptime 2 min at 15:30:09Z) and chunks/driver.log shows no interrupted or restarted chunk: one relaunch, not two restarts. 'Killed after c00' cannot be checked: verify/rc.txt lists c00..c07 once each and all verify outputs are stamped 15:33-15:35Z (second pass).",
+        "fix": "Write 'after one relaunch (two launches in run.log)' and drop or source the 'after c00' detail."
+      },
+      {
+        "id": "E2",
+        "severity": "minor",
+        "location": "README.md addendum, 'Reading', first bullet ('a measured improvement over the T12 incumbent arm')",
+        "issue": "The comparison arm is pkm-iso-t5-g4-s1307, T12's winner (a candidate), not T12's incumbent (t=6, G=4, seed 0), which is not in this session. Against the incumbent the trace arm is not measured here (a product with T12's 0.0578 would compose two sessions).",
+        "fix": "Say 'over the same arm without trace (T12's winner)'."
+      },
+      {
+        "id": "E3",
+        "severity": "minor",
+        "location": "README.md addendum, 'Distance remaining' (rho-neg 2.63e4 ... (model 2.9e4))",
+        "issue": "The model figure is built from T12's plain distance (6.06e4, 16 workloads); in this session the plain arm is 5.54e4 [3.2e4, 9.6e4] from rho-neg at w=0.1, so the trace gain in distance is the 0.474 factor and the 2.9e4 vs 2.63e4 gap is the workload sample, not the trace. The same-session plain distance is not printed.",
+        "fix": "Print the plain row's distance in the same table (5.54e4 at w=0.1, 3.46e5 at w=1, 15.9 at w=0)."
+      },
+      {
+        "id": "E4",
+        "severity": "minor",
+        "location": "README.md addendum P7 row ('8/8 replays rc = 0', 'every receipt ok')",
+        "issue": "Accurate, but the replay covers 8 of 64 runs (1 sampled per chunk): trace 3, rho-neg 5, plain PKM 0, proj-a 0. The README does not say so. Validator replays of 3 plain and 2 trace runs reproduced identically.",
+        "fix": "State the replay coverage (1 run per chunk, 8 of 64, no plain-PKM run), or add replays of the plain arm."
+      },
+      {
+        "id": "E5",
+        "severity": "minor",
+        "location": "data/SHA256SUMS vs data/env.txt, data/run.log, data/run.out; scripts/run.sh finish()",
+        "issue": "SHA256SUMS is written before finish() appends 'end_utc' to env.txt and 'L12: ALL_DONE' to run.log and run.out, so sha256sum -c fails on those three files; ALL_DONE is not listed. Contents are otherwise unchanged (hash of file minus last line matches).",
+        "fix": "Disclose in the README, or regenerate SHA256SUMS after the final appends in a later run (do not edit evidence in place)."
+      },
+      {
+        "id": "E6",
+        "severity": "minor",
+        "location": "README.md sections 'Status of the end-to-end stage (written 06:35Z)', 'Costs' (Ecbench stage ... in flight), 'Distance remaining to rho-neg' ('until the L12 chunks land'), 'Deviations' (End-to-end stage not complete), 'Files' (chunks in flight), 'Validator errata' item 4",
+        "issue": "Left as written at 06:35Z; the addendum supersedes them but no line says so, so the document contains both 'P7-P10 undecided' and 'P7-P10 held'. The header lines 5-6 and the P7-P10 row of the prediction table were updated.",
+        "fix": "Mark those sections 'superseded by the addendum of 15:36Z' (do not delete frozen text)."
+      },
+      {
+        "id": "E7",
+        "severity": "wording",
+        "location": "README.md addendum, 'Reading' ('F4 work per solve falls by 2.11x', 'a measured improvement')",
+        "issue": "True in counted F_p mul-adds priced at w >= 0.1 (S ratio 0.4742, F4 ops ratio 0.4718 pooled). Not stated: (a) at w=0 the arms are identical by construction and the band's own verdict for the pair is 'unresolved inside the band' (AGENTS 5a ranks only where the order holds at every weight); (b) solver wall time moved only 0.952 trace/plain (118.6 vs 239.3 ns per counted mul-add), so the counted gain is not a wall-clock gain on this host (diagnostic only; the protocol makes no wall-time claim).",
+        "fix": "Add one sentence: improvement is in counted mul-adds at w >= 0.1, tie at w=0 (band: unresolved), wall time not shown to follow."
+      },
+      {
+        "id": "E8",
+        "severity": "minor",
+        "location": "README.md addendum, band table",
+        "issue": "AGENTS 5a asks for every arm's unpriced counters with counts; the addendum shows the three S columns only (counts are in records.jsonl and band_pooled.json native_sum: rho-neg 6,471; proj-a 50,907; plain 5,356,866,681; trace 2,539,547,286, plus 845,056 learn mul-adds charged by hand).",
+        "fix": "Add a native-ops column or cite band_pooled.json native_sum."
+      },
+      {
+        "id": "E9",
+        "severity": "disclosure",
+        "location": "evidence binding (carried from engine-stage erratum 3, now partly resolved)",
+        "issue": "ecbench/spec.json reached git only at 8d1257cead (after launch) and data/ecbench only at a611a7bdec (after the result commit); the 8 sessions record git_commit = null. The freeze order is established by the 06:32:32Z protocol commit, the run.log/driver.log times, session start times, and hash identity of spec.frozen.json; the sessions' source revision is not recorded (binary hash only). records.jsonl files are 80-82 KB each (AGENTS 13 data-file threshold 64 KiB; T12 committed its chunks the same way).",
+        "fix": "None required for this lead; note the large-files check when opening the PR."
+      },
+      {
+        "id": "E10",
+        "severity": "wording",
+        "location": "README.md addendum, 'Reading' second bullet ('223 fallbacks to plain F4 (1.4e-4 of replays...)')",
+        "issue": "164 of the 223 fallbacks are the 164 decomposable (hit) targets, which no refutation trace can refute and which must fall back; only 59 are genuine replay failures on refutable systems (59 / 1,615,679 = 3.7e-5 of refutable systems, 3.7e-5 of replays). The sentence presents all 223 as replay unreliability, overstating it about 4x; it is far below the P4 bound (0.01) either way.",
+        "fix": "Split the 223 into 164 hits (expected) and 59 replay failures."
+      }
+    ],
+    "scope_and_honesty": "The addendum reports P7-P10 as held with the verbatim numbers, quotes intervals and the distance with a stated 'Rho remains ahead', discloses that ecbench does not price the learning cost and charges it by hand, labels the gain a component speed-up, and proposes no leaderboard row. Nothing was retuned. The engine-stage failure of P3 and the missed point guess are unchanged and not re-opened here.",
+    "evidence_paths": {
+      "records": "data/ecbench/chunks/c0{0..7}/records.jsonl",
+      "sessions": "data/ecbench/chunks/c0*/session.json",
+      "receipts": "data/ecbench/verify/c0*.json, rc.txt",
+      "band": "data/ecbench/band_pooled.{txt,json}",
+      "pooled_compare": "data/ecbench/pooled_compare.jsonl",
+      "learning": "data/ecbench/learn_charge.json",
+      "sha": "data/SHA256SUMS",
+      "log": "data/run.log, data/ecbench/chunks/driver.log",
+      "T12_records": "research/curve25519_t10_winner_ecbench_20261104/ecbench/chunks/c{00..15}/records.jsonl",
+      "validator_code_and_outputs": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/val/{common,cert,p8,p9,p10,t12}.py (session-local, not in the repository); validator replays: /tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/replay/{c05,c07}_receipt.json"
+    }
+  }
+}

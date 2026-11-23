@@ -1,0 +1,7 @@
+# Independent semantic replay composition review
+
+No concrete mathematical claim or lineage-gating blocker found in the reviewed root adapter. Global lineage mismatch/refusal stops before row replay; only verified node locations are admitted. Native committed basis rows alone are replayed, excluding current/staged/scratch rows whose construction may be partial. Remaining work and row-allocation budgets are passed through cumulatively across rows and snapshots. Capture extraction supplies its separate shared retention cap. Wire-only variable override requires an exact integer and matches any present expansion count; capture CLI exposes no override.
+
+The output scope is identities relative to captured normalized equations and branch constraints. Partial lineage admits only selected complete nodes, without asserting search completeness. Original descent, signed lifts, GB/search completion and degree conclusions remain false/null. Source identities mean agreement with supplied hashes, not authenticated original algebra.
+
+Reporting precision suggestion sent to root: allocation_units aggregates polynomial replay allocations only, not lineage or decoder allocations. Label this explicitly; decoder has a separate retention budget and lineage allocations are bounded by its input/work caps. Suggested additional controls are shared row-allocation cap across snapshots and wire-variable absent/present expansion cases. No full compile or test run was performed by this review; source-only inspection of the exact files hashed alongside this note.

@@ -1,0 +1,301 @@
+{
+  "branch": "ecbench/stats-evidence",
+  "closed_utc": "2026-11-05T18:55:08+00:00",
+  "commands": [
+    {
+      "argv": [
+        "sh",
+        "research/ecbench_statistics_v2_20261105/extract.sh",
+        "/tmp/claude-0/-home-user/a477b36e-1e68-57a8-8d9c-3a3874164236/scratchpad/old_target/release/ecbench",
+        "/tmp/claude-0/-home-user/a477b36e-1e68-57a8-8d9c-3a3874164236/scratchpad/ecbench_new"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-05T18:55:07+00:00",
+      "wall_s": 1.309
+    }
+  ],
+  "commit": "18bbecb9d75818954b9f001b7b3c2d21cd368b41",
+  "commit_dirty": false,
+  "created_utc": "2026-11-05T18:54:36+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261105-ecbench-statistics-v2"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v236-x86_64-with-glibc2.39"
+  },
+  "id": "20261105T1854Z-ecbench-statistics-v2",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "ops_interval_width_k2_new_over_old",
+      "note": "linearised t(K-1) width / pre-#2442 bootstrap width, sat_pdp pilot ic-mitm, K=2 (data/comparisons.tsv); not reference/candidate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 13.1
+    },
+    {
+      "baseline": 6.98,
+      "better": "neutral",
+      "n": 48,
+      "name": "censored_ratio_lower_bound_ic_sub6_mitm",
+      "note": "followup-3 ic-sub6-mitm/rho-strong, 24 of 48 runs exhausted: censored lower bound (v2) vs verified-only ratio (v1)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        419.6,
+        1001.0
+      ],
+      "unit": "ratio",
+      "value": 648.2
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 71,
+      "name": "heavy_tail_rows_flagged_n4_before_fix",
+      "note": "4-run table rows flagged by the 25% rule before the 2/n fix in this PR (all of them)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 71.0
+    }
+  ],
+  "problem": "analysis:ecbench_statistics_v2",
+  "raw": [
+    {
+      "bytes": 7596,
+      "path": "research/ecbench_statistics_v2_20261105/data/comparisons.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/71ffc6f00a8ccc07621c2ae8ab4d2c6e7edb03365262ddb22de7a4e30a39bec6",
+      "sha256": "71ffc6f00a8ccc07621c2ae8ab4d2c6e7edb03365262ddb22de7a4e30a39bec6",
+      "uploaded": false
+    },
+    {
+      "bytes": 474,
+      "path": "research/ecbench_statistics_v2_20261105/data/coverage.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/96/96022b1392fa4245fbea5008ca6c1f899ffb32faad0bd7890f36065ddfce3e98",
+      "sha256": "96022b1392fa4245fbea5008ca6c1f899ffb32faad0bd7890f36065ddfce3e98",
+      "uploaded": false
+    },
+    {
+      "bytes": 7342,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/followup3.rho-strong.ic-sub6-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9c/9cb8505da556aea409b4fd02d68f7b0955aa13798eec548cc994465bb93a17ab",
+      "sha256": "9cb8505da556aea409b4fd02d68f7b0955aa13798eec548cc994465bb93a17ab",
+      "uploaded": false
+    },
+    {
+      "bytes": 7634,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/followup3.rho-strong.ic-sub8-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d1/d1b60cca74453b17aaa371d69432200b3c61cc0ff28f96fca347ad23d0c6a315",
+      "sha256": "d1b60cca74453b17aaa371d69432200b3c61cc0ff28f96fca347ad23d0c6a315",
+      "uploaded": false
+    },
+    {
+      "bytes": 7269,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/followup3.rho-strong.rho-strong-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f4/f464361869f7642166fc2fc1c45f710c1a9910c0d2146d639520a2df0d1da143",
+      "sha256": "f464361869f7642166fc2fc1c45f710c1a9910c0d2146d639520a2df0d1da143",
+      "uploaded": false
+    },
+    {
+      "bytes": 14512,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/ghs-panel01.bsgs-neg.rho-frob.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ae/ae63b6797fcc133163d414554ca3310b6d19247fe962a71ad3b65fa06064cb31",
+      "sha256": "ae63b6797fcc133163d414554ca3310b6d19247fe962a71ad3b65fa06064cb31",
+      "uploaded": false
+    },
+    {
+      "bytes": 14901,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/ghs-panel01.bsgs-neg.rho-neg.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/29/29f48e017ac72954816c5377a98eda1a478dcc5a8bca64177d55ad01843191dd",
+      "sha256": "29f48e017ac72954816c5377a98eda1a478dcc5a8bca64177d55ad01843191dd",
+      "uploaded": false
+    },
+    {
+      "bytes": 2951,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/satpdp-pilot.rho-strong.ic-buchberger.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d1/d173a77140ef364fd7518914db3d9a3e51da1227359a30131d4c6af3bc9227be",
+      "sha256": "d173a77140ef364fd7518914db3d9a3e51da1227359a30131d4c6af3bc9227be",
+      "uploaded": false
+    },
+    {
+      "bytes": 3351,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/satpdp-pilot.rho-strong.ic-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f3/f30ce7e3762c4babe82dde913b820ce27af616016b091d99a07c3e36a0548829",
+      "sha256": "f30ce7e3762c4babe82dde913b820ce27af616016b091d99a07c3e36a0548829",
+      "uploaded": false
+    },
+    {
+      "bytes": 3240,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/satpdp-pilot.rho-strong.rho-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f0/f0ed3fcc210abe69ce7834acc239cb604a7b267cd112d435d7c0da9f816385e4",
+      "sha256": "f0ed3fcc210abe69ce7834acc239cb604a7b267cd112d435d7c0da9f816385e4",
+      "uploaded": false
+    },
+    {
+      "bytes": 7969,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/yield-koblitz.rho-strong.sub6-da-sat.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9b/9b0ce5c7c14fbe8679bd1dc28fd4c306ddee7e8a221ce6ff707afd65a6f3b2b8",
+      "sha256": "9b0ce5c7c14fbe8679bd1dc28fd4c306ddee7e8a221ce6ff707afd65a6f3b2b8",
+      "uploaded": false
+    },
+    {
+      "bytes": 8076,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/yield-koblitz.rho-strong.sub8-da-f4.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4a/4a2bd49a55175e13c2aa3b5e203b810059baedd498ee5e102b98bbeb591e7cd2",
+      "sha256": "4a2bd49a55175e13c2aa3b5e203b810059baedd498ee5e102b98bbeb591e7cd2",
+      "uploaded": false
+    },
+    {
+      "bytes": 7834,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/yield-koblitz.rho-strong.sub8-da-sat.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dd/dd85a0f64e3c4e11717aab381e0ba0646b2a48b255571b42b87b139cbec5a39d",
+      "sha256": "dd85a0f64e3c4e11717aab381e0ba0646b2a48b255571b42b87b139cbec5a39d",
+      "uploaded": false
+    },
+    {
+      "bytes": 8080,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/yield-koblitz.rho-strong.sub8-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0b/0b0f834479c0383dbabe3ff1afae238775f986c03abb1bf74420e752d40d547e",
+      "sha256": "0b0f834479c0383dbabe3ff1afae238775f986c03abb1bf74420e752d40d547e",
+      "uploaded": false
+    },
+    {
+      "bytes": 6606,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/yield-prime.rho-neg.abs16-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2f/2f6c903a533b67979fe98d88e14eb9c4627606d8d606083628c9d4c0773b59d0",
+      "sha256": "2f6c903a533b67979fe98d88e14eb9c4627606d8d606083628c9d4c0773b59d0",
+      "uploaded": false
+    },
+    {
+      "bytes": 6623,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/old/yield-prime.rho-neg.abs64-subtract.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c4/c4148629f80ca9e27a0db09b257c8d769a25c86d3481a415f5083a210610a8e6",
+      "sha256": "c4148629f80ca9e27a0db09b257c8d769a25c86d3481a415f5083a210610a8e6",
+      "uploaded": false
+    },
+    {
+      "bytes": 12012,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/followup3.rho-strong.ic-sub6-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1d/1d31442e80e31db357052d44b9d1d33b33116c95e0a85fe334c839913855e975",
+      "sha256": "1d31442e80e31db357052d44b9d1d33b33116c95e0a85fe334c839913855e975",
+      "uploaded": false
+    },
+    {
+      "bytes": 11655,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/followup3.rho-strong.ic-sub8-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c2/c246bcab90f8e2807e9ac326c8ab1bebf1f9ab138e9842209b678ad85c042768",
+      "sha256": "c246bcab90f8e2807e9ac326c8ab1bebf1f9ab138e9842209b678ad85c042768",
+      "uploaded": false
+    },
+    {
+      "bytes": 10811,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/followup3.rho-strong.rho-strong-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/58/58034d1a288cf22560f826b282d44e421eca2ae304d679d2f5dbec733f4291bc",
+      "sha256": "58034d1a288cf22560f826b282d44e421eca2ae304d679d2f5dbec733f4291bc",
+      "uploaded": false
+    },
+    {
+      "bytes": 19901,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/ghs-panel01.bsgs-neg.rho-frob.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/17/176cb26a66dde625f93869892f9c550c7c3ef732a449bd040583b087bb40ea23",
+      "sha256": "176cb26a66dde625f93869892f9c550c7c3ef732a449bd040583b087bb40ea23",
+      "uploaded": false
+    },
+    {
+      "bytes": 19414,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/ghs-panel01.bsgs-neg.rho-neg.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/31/31de47684d118c8b2ef7bf07b16e29f82da95cbc25bb690186ef8f4c90b5a3e6",
+      "sha256": "31de47684d118c8b2ef7bf07b16e29f82da95cbc25bb690186ef8f4c90b5a3e6",
+      "uploaded": false
+    },
+    {
+      "bytes": 4663,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/satpdp-pilot.rho-strong.ic-buchberger.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b7/b7e630ec51bcc467ea13b0258bd29ec2c1420ef3c0ee8b4194ffd7e9c4f49bce",
+      "sha256": "b7e630ec51bcc467ea13b0258bd29ec2c1420ef3c0ee8b4194ffd7e9c4f49bce",
+      "uploaded": false
+    },
+    {
+      "bytes": 6021,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/satpdp-pilot.rho-strong.ic-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9e2d2d5499c6b1af41e8890acbb87e1c4b9b9a562c025ea26df028d3294d99fa",
+      "sha256": "9e2d2d5499c6b1af41e8890acbb87e1c4b9b9a562c025ea26df028d3294d99fa",
+      "uploaded": false
+    },
+    {
+      "bytes": 5960,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/satpdp-pilot.rho-strong.rho-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d8/d8454f003571be70cc61607a03e13705e1da3a05e31eac49bdd03cdd69ac8008",
+      "sha256": "d8454f003571be70cc61607a03e13705e1da3a05e31eac49bdd03cdd69ac8008",
+      "uploaded": false
+    },
+    {
+      "bytes": 12432,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/yield-koblitz.rho-strong.sub6-da-sat.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6f/6fa38ff0ae233c38029f50bef66c7ada3ada67a8d38cedeb953a25b37b872835",
+      "sha256": "6fa38ff0ae233c38029f50bef66c7ada3ada67a8d38cedeb953a25b37b872835",
+      "uploaded": false
+    },
+    {
+      "bytes": 12073,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/yield-koblitz.rho-strong.sub8-da-f4.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/74/74a82a08083578aeaa7ed702e636ad8cdcafe79ca80501799b085eab61cdb17d",
+      "sha256": "74a82a08083578aeaa7ed702e636ad8cdcafe79ca80501799b085eab61cdb17d",
+      "uploaded": false
+    },
+    {
+      "bytes": 12440,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/yield-koblitz.rho-strong.sub8-da-sat.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/82/825c556014ecfc35146de1f8cd18d04bb7db828c5e92978d0d67a16af6497978",
+      "sha256": "825c556014ecfc35146de1f8cd18d04bb7db828c5e92978d0d67a16af6497978",
+      "uploaded": false
+    },
+    {
+      "bytes": 12019,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/yield-koblitz.rho-strong.sub8-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/23/23d6efc6a0d3175b3bedb9f92dc03c5860ef30ac5a79d6aecd2d53603accf363",
+      "sha256": "23d6efc6a0d3175b3bedb9f92dc03c5860ef30ac5a79d6aecd2d53603accf363",
+      "uploaded": false
+    },
+    {
+      "bytes": 10203,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/yield-prime.rho-neg.abs16-mitm.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1bcdc64a69d118d69b6e40607e2e540b7b7f0c45e31ab4dd11456b4e9145d32e",
+      "sha256": "1bcdc64a69d118d69b6e40607e2e540b7b7f0c45e31ab4dd11456b4e9145d32e",
+      "uploaded": false
+    },
+    {
+      "bytes": 10247,
+      "path": "research/ecbench_statistics_v2_20261105/data/raw/new/yield-prime.rho-neg.abs64-subtract.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f8/f8f62eb5a8b5d976cd5398a38798c635f4d8f4202d1540ec2bb53801a3ded032",
+      "sha256": "f8f62eb5a8b5d976cd5398a38798c635f4d8f4202d1540ec2bb53801a3ded032",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ecbench_statistics_v2_20261105/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/ecbench_statistics_v2_20261105/figures/fig1_ops_intervals.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecbench-statistics-v2",
+  "status": "measured",
+  "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+  "validation": null
+}

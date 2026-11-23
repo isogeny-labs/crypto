@@ -1,0 +1,14 @@
+import ZeroTest
+open MonicRemainder
+-- Internal zeros do not invalidate monicity; division by X removes the zero constant.
+theorem internal_zero_divisor : checkedPrem 17 [0,1] [0,0,3] 3 = some [] := by decide
+-- Fuel zero is sufficient when the initialized input is already shorter.
+theorem terminal_zero_fuel : checkedPrem 17 [1,0,1] [2] 0 = some [2] := by decide
+-- No oddness premise is needed by the mathematical word model itself.
+theorem characteristic_two_model : checkedPrem 2 [1,1] [1,0,1] 3 = some [] := by decide
+-- All-zero input trims before checking fuel.
+theorem trimmed_zero_zero_fuel : checkedPrem 17 [0,1] [0,0,0] 0 = some [] := by decide
+#print axioms internal_zero_divisor
+#print axioms terminal_zero_fuel
+#print axioms characteristic_two_model
+#print axioms trimmed_zero_zero_fuel

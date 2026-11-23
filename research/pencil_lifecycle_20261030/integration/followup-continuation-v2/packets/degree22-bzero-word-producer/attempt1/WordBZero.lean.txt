@@ -1,0 +1,108 @@
+import WordPositive
+import BZero
+set_option autoImplicit false
+set_option maxRecDepth 6000
+set_option maxHeartbeats 1600000
+namespace PencilWordRefinement
+structure BZeroTrees where
+ b : FieldExpr
+ x : FieldExpr
+ y : FieldExpr
+ z : FieldExpr
+ w : FieldExpr
+structure BZeroWords where
+ b : UInt64
+ point : WordD1
+
+def bzeroTrees (a : WeightedWord) : BZeroTrees :=
+ let n1 := FieldExpr.sub (.mul (.leaf a.q) (.leaf a.s)) (.leaf a.t)
+ let n2 := FieldExpr.mul (.leaf a.r) (.leaf a.s)
+ let b := FieldExpr.mul (.leaf 2) (.sub (.mul n1 (.leaf a.t)) (.mul n2 (.leaf a.s)))
+ let x := FieldExpr.neg (.mul n1 (.leaf a.s))
+ let s2 := FieldExpr.mul (.leaf a.s) (.leaf a.s)
+ let y := FieldExpr.mul (.add (.mul (.leaf a.s) (.leaf a.t)) x) (.mul s2 s2)
+ ⟨b,x,y,.mul (.leaf a.s) (.leaf a.z),.leaf a.w⟩
+def bzeroWords (p : UInt64) (a : WeightedWord) : BZeroWords :=
+ let n1 := wordSub p ((a.q*a.s)%p) a.t
+ let n2 := (a.r*a.s)%p
+ let b := (2*(wordSub p ((n1*a.t)%p) ((n2*a.s)%p)))%p
+ let x := wordNeg p ((n1*a.s)%p)
+ let s2 := (a.s*a.s)%p
+ let y := ((wordAdd p ((a.s*a.t)%p) x)*((s2*s2)%p))%p
+ ⟨b,⟨x,y,(a.s*a.z)%p,a.w⟩⟩
+
+theorem bzero_point_decode (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hbound : p.toNat<2^31) (a : WeightedWord)
+ (ha : a.canonical p) :
+ let d := bzeroWords p a
+ d.b.toNat<p.toNat ∧ d.point.canonical p ∧
+ (d.b.toNat:ZMod p.toNat)=BZero.sourceB (a.decodeTwo p) ∧
+ d.point.decode p=BZero.point (a.decodeTwo p) := by
+ have htwo : (2:UInt64).toNat<p.toNat := by change 2<p.toNat;omega
+ have hg : (bzeroTrees a).b.good p ∧ (bzeroTrees a).x.good p ∧
+  (bzeroTrees a).y.good p ∧ (bzeroTrees a).z.good p ∧ (bzeroTrees a).w.good p := by
+  rcases ha with ⟨aq,ar,ass,att,az,aw⟩
+  simp [bzeroTrees,FieldExpr.good,aq,ar,ass,att,az,aw,htwo]
+ have b := FieldExpr.composition p hfive hbound _ hg.1
+ have x := FieldExpr.composition p hfive hbound _ hg.2.1
+ have y := FieldExpr.composition p hfive hbound _ hg.2.2.1
+ have z := FieldExpr.composition p hfive hbound _ hg.2.2.2.1
+ have w := FieldExpr.composition p hfive hbound _ hg.2.2.2.2
+ refine ⟨b.1,⟨x.1,y.1,z.1,w.1⟩,?_,?_⟩
+ · change (((bzeroTrees a).b.word p).toNat:ZMod p.toNat)=_
+   rw [b.2];rfl
+ · change WeightedAdd11.Input.mk
+    (((bzeroTrees a).x.word p).toNat:ZMod p.toNat)
+    (((bzeroTrees a).y.word p).toNat:ZMod p.toNat)
+    (((bzeroTrees a).z.word p).toNat:ZMod p.toNat)
+    (((bzeroTrees a).w.word p).toNat:ZMod p.toNat)=_
+   rw [x.2,y.2,z.2,w.2];rfl
+
+def bzeroWordDispatch (p a0 a1 a2 a3 : UInt64) (a : WeightedWord) : Option WeightedWord :=
+ if (bzeroWords p a).b=0 then
+  if a.s=0 then none
+  else some (dblWordPayload p a0 a1 a2 a3 (bzeroWords p a).point)
+ else none
+attribute [local irreducible] bzeroWords dblWordPayload
+
+theorem bzero_word_preserves (p : UInt64) [Fact p.toNat.Prime]
+ (hfive : 5≤p.toNat) (hbound : p.toNat<2^31) (a0 a1 a2 a3 : UInt64) (a : WeightedWord)
+ (h0 : a0.toNat<p.toNat) (h1 : a1.toNat<p.toNat) (h2 : a2.toNat<p.toNat) (h3 : a3.toNat<p.toNat)
+ (ha : a.canonical p) (hz : a.z≠0) (hw : a.w≠0) (hs : a.s≠0)
+ (hb : (bzeroWords p a).b=0)
+ (hv : a.normalizedValid p (WeightedDoubling.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)))
+ (hg : IsCoprime (WeightedDoubling.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat))
+  (WeightedDoubling.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)).derivative) :
+ let d := (bzeroWords p a).point
+ let c := dblWordPayload p a0 a1 a2 a3 d
+ d.canonical p ∧ d.y≠0 ∧ bzeroWordDispatch p a0 a1 a2 a3 a=some c ∧
+ c.canonical p ∧ c.z≠0 ∧ c.w≠0 ∧
+ c.normalizedValid p (WeightedDoubling.curve (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)) := by
+ have hp : 0<p.toNat := by omega
+ obtain ⟨bc,dc,bd,dd⟩ := bzero_point_decode p hfive hbound a ha
+ have az := canonical_word_nonzero p a.z hp ha.2.2.2.2.1 hz
+ have aw := canonical_word_nonzero p a.w hp ha.2.2.2.2.2 hw
+ have ass := canonical_word_nonzero p a.s hp ha.2.2.1 hs
+ have two : (2:ZMod p.toNat)≠0 := by
+  have tt := canonical_word_nonzero p (2:UInt64) hp (by change 2<p.toNat;omega) (by decide)
+  simpa using tt
+ have fb : BZero.sourceB (a.decodeTwo p)=0 := by rw [←bd,hb];simp
+ obtain ⟨py,oz,ow,ov⟩ := BZero.doubling
+  (a0.toNat:ZMod p.toNat) (a1.toNat:ZMod p.toNat) (a2.toNat:ZMod p.toNat) (a3.toNat:ZMod p.toNat)
+  (a.decodeTwo p) az aw ass two fb hv hg
+ have yw : (bzeroWords p a).point.y≠0 := by
+  intro yy;apply py;rw [←dd]
+  change (((bzeroWords p a).point.y.toNat:ZMod p.toNat))=0
+  rw [yy];simp
+ obtain ⟨cc,cd⟩ := doubled_decode p hfive hbound a0 a1 a2 a3 (bzeroWords p a).point h0 h1 h2 h3 dc
+ rw [dd] at cd
+ refine ⟨dc,yw,?_,cc,?_,?_,?_⟩
+ · simp [bzeroWordDispatch,hb,hs]
+ · intro zz;apply oz;rw [←cd]
+   change (((dblWordPayload p a0 a1 a2 a3 (bzeroWords p a).point).z.toNat:ZMod p.toNat))=0
+   rw [zz];simp
+ · intro ww;apply ow;rw [←cd]
+   change (((dblWordPayload p a0 a1 a2 a3 (bzeroWords p a).point).w.toNat:ZMod p.toNat))=0
+   rw [ww];simp
+ · exact positive_valid_transport p _ _ _ cd ov
+end PencilWordRefinement

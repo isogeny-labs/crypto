@@ -81,7 +81,7 @@ pub fn replay<G: CountedGroup>(
 
 pub struct AuditedMatrix<'a, G: CountedGroup> {
     ctx: &'a InstanceCtx<'a, G>,
-    inner: Box<dyn RelationSolver>,
+    inner: Box<dyn RelationSolver + 'a>,
     columns: Vec<G::Elt>,
     base_matrix: IncrementalGauss,
     seen: BTreeSet<Vec<u64>>,
@@ -96,7 +96,7 @@ impl<'a, G: CountedGroup> AuditedMatrix<'a, G> {
     pub fn new(
         ctx: &'a InstanceCtx<'a, G>,
         fb: &FactorBase<G::Elt>,
-        inner: Box<dyn RelationSolver>,
+        inner: Box<dyn RelationSolver + 'a>,
     ) -> Result<Self, String> {
         let started = Instant::now();
         if fb.columns == 0 || fb.columns > 4096 {

@@ -1,0 +1,50 @@
+{
+  "uname": [
+    "Linux",
+    "d0fa21992282",
+    "6.18.57",
+    "#1 SMP Tue Oct 20 21:56:04 UTC 2026",
+    "x86_64",
+    ""
+  ],
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "python_flint": "0.9.0",
+  "flint_threads": 1,
+  "benchmark_cpu": 0,
+  "allowed_cpus": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "native_build_command": [
+    "g++",
+    "-O3",
+    "-std=c++17",
+    "-shared",
+    "-fPIC",
+    "recurrence.cpp",
+    "-o",
+    "recurrence.so"
+  ],
+  "gxx_version": "g++ (Debian 14.2.0-19) 14.2.0",
+  "worker_thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "cpu": {
+    "vendor_id": "AuthenticAMD",
+    "cpu family": "25",
+    "model": "17",
+    "model name": "AMD EPYC 9V74 80-Core Processor",
+    "stepping": "1",
+    "microcode": "0x1000065",
+    "flags": "fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext cpuid_fault vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr arat npt nrip_save tsc_scale vmcb_clean flushbyasid pausefilter pfthreshold v_vmsave_vmload avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm arch_capabilities"
+  },
+  "shared_environment": true,
+  "memory_accounting": "Linux ru_maxrss KiB, fresh worker process peak includes interpreter, imports and post-call checking; not incremental algorithm allocation.",
+  "input_boundary": "Monic split divisor polynomials u,v and Q; fixture point enumeration/interpolation excluded equally, full polynomial conversion/checks/maps/reconstruction/collision lifting/exception handling inside timed translate.",
+  "build_boundary": "native helper compilation and imports excluded from complete_call, but imports/startup included in fresh_child; build not repeated per algorithm."
+}

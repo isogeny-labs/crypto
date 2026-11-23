@@ -1,0 +1,749 @@
+{
+  "card_id": "CARD-semaev-qubo-annealing-20261110-F6-RUN-01",
+  "card_path": "research/semaev_qubo_annealing_20261110/cards/F6-RUN-01.json",
+  "card_sha256": "2ba610affa718256691e81900195fff1b7c6a9859b44ef8c6a8e7a2d72bd9ece",
+  "commands": [
+    {
+      "argv": [
+        "sha256sum",
+        "-c",
+        "FREEZE.sha256"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": "research/semaev_qubo_annealing_20261110",
+      "exit_code": 0,
+      "id": "verify-freeze",
+      "index": 1,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stdout": "00790b2bf36c168ad9eee6d96ed7d87cc21185746fbb2d4a175c7fb564174aec"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "00790b2bf36c168ad9eee6d96ed7d87cc21185746fbb2d4a175c7fb564174aec",
+      "stdout_tail": [
+        "PROTOCOL.md: OK",
+        "tool/src/main.rs: OK",
+        "tool/Cargo.toml: OK",
+        "tool/Cargo.lock: OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "git-head",
+      "index": 2,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stdout": "5e7c5c2b89537c69ab78ee1b73ac77ae91c1c3401de2db284916dc5d9bb6bb1e"
+      },
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5e7c5c2b89537c69ab78ee1b73ac77ae91c1c3401de2db284916dc5d9bb6bb1e",
+      "stdout_tail": [
+        "8c3b356ff45ec268ea7d0a21f28050200aa4c515"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rustc",
+        "-Vv"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.061,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "rustc-version",
+      "index": 3,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stdout": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8"
+      },
+      "seconds": 0.061,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a90721a3b031e0e1c8bfc34ece79b6608d2ae53166cfb77dad281a0eb5fa6bc8",
+      "stdout_tail": [
+        "rustc 1.97.0 (2d8144b78 2026-07-07)",
+        "binary: rustc",
+        "commit-hash: 2d8144b7880597b6e6d3dfd63a9a9efae3f533d3",
+        "commit-date: 2026-07-07",
+        "host: x86_64-unknown-linux-gnu",
+        "release: 1.97.0",
+        "LLVM version: 22.1.6"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "-V"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.042,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cargo-version",
+      "index": 4,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stdout": "f4f564f8936fa8eb53bca8bbe50666489252bbcbeaae0cb0dd54682444697e52"
+      },
+      "seconds": 0.042,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f4f564f8936fa8eb53bca8bbe50666489252bbcbeaae0cb0dd54682444697e52",
+      "stdout_tail": [
+        "cargo 1.97.0 (c980f4866 2026-06-30)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "nproc"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "nproc",
+      "index": 5,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stdout": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d"
+      },
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+      "stdout_tail": [
+        "4"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "uname",
+        "-a"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "uname",
+      "index": 6,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stdout": "87acb6d8e0df581dcd096927bca215414185c23d0a6daacf339ad54b1e8f3676"
+      },
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "87acb6d8e0df581dcd096927bca215414185c23d0a6daacf339ad54b1e8f3676",
+      "stdout_tail": [
+        "Linux vm 6.18.44-fc-v338 #1 SMP @0 x86_64 x86_64 x86_64 GNU/Linux"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "lscpu"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.009,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "cpu-model",
+      "index": 7,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stdout": "18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1"
+      },
+      "seconds": 0.009,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "18269c4df3e10f9a7ceccc769e9a0e4351de77618a6c51c2cc178fb979d0c0e1",
+      "stdout_tail": [
+        "NUMA node0 CPU(s):                       0-3",
+        "Vulnerability Gather data sampling:      Not affected",
+        "Vulnerability Ghostwrite:                Not affected",
+        "Vulnerability Indirect target selection: Not affected",
+        "Vulnerability Itlb multihit:             Not affected",
+        "Vulnerability L1tf:                      Not affected",
+        "Vulnerability Mds:                       Not affected",
+        "Vulnerability Meltdown:                  Not affected",
+        "Vulnerability Mmio stale data:           Not affected",
+        "Vulnerability Old microcode:             Not affected",
+        "Vulnerability Reg file data sampling:    Not affected",
+        "Vulnerability Retbleed:                  Not affected",
+        "Vulnerability Spec rstack overflow:      Not affected",
+        "Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl",
+        "Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization",
+        "Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable",
+        "Vulnerability Srbds:                     Not affected",
+        "Vulnerability Tsa:                       Not affected",
+        "Vulnerability Tsx async abort:           Not affected",
+        "Vulnerability Vmscape:                   Not affected"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/Cargo.toml"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 7.537,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "build",
+      "index": 8,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "pid_file": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.pid.json",
+      "seconds": 7.537,
+      "stderr_sha256": "0ef4430fcb5519223ffbffbdf0c04d87dda979a84639f7b3822fef966fab92f1",
+      "stderr_tail": [
+        "   Compiling semaev_qubo_annealing v0.1.0 (/home/user/crypto/research/semaev_qubo_annealing_20261110/tool)",
+        "    Finished `release` profile [optimized] target(s) in 7.41s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/Cargo.toml"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.171,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "test",
+      "index": 9,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stdout": "1f8d87f536ff0143765a2e29b1787ff0e0321ff777f62d30967ba73ad4050924"
+      },
+      "pid_file": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.pid.json",
+      "seconds": 0.171,
+      "stderr_sha256": "66f0fd90aceac891e37379050ea288ea7912cf31f61eb1285cb16a5b9c27b4ca",
+      "stderr_tail": [
+        "    Finished `release` profile [optimized] target(s) in 0.02s",
+        "     Running unittests src/main.rs (research/semaev_qubo_annealing_20261110/tool/target/release/deps/semaev_qubo_annealing-64cc8f2c3569a545)"
+      ],
+      "stdout_sha256": "1f8d87f536ff0143765a2e29b1787ff0e0321ff777f62d30967ba73ad4050924",
+      "stdout_tail": [
+        "",
+        "running 8 tests",
+        "test tests::gray_roundtrip_and_neighbors ... ok",
+        "test tests::generator_reproduces_committed_rungs ... ok",
+        "test tests::all_solvers_find_verified_solutions_at_n12 ... ok",
+        "test tests::planted_instance_zero_cost_and_root_enum ... ok",
+        "test tests::s3_vanishes_on_sums_both_signs ... ok",
+        "test tests::tonelli_shanks ... ok",
+        "test tests::sha256_vector ... ok",
+        "test tests::curve_order_matches_exhaustive_count ... ok",
+        "",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s",
+        ""
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/target/release/semaev_qubo_annealing"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "binary-sha256",
+      "index": 10,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stdout": "3c7849ccc1dace6c9b9886a81155c6983e1af4b9e241c25fd6ecd8d747522f6c"
+      },
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3c7849ccc1dace6c9b9886a81155c6983e1af4b9e241c25fd6ecd8d747522f6c",
+      "stdout_tail": [
+        "07371fffa1bb890de18d3d000ee5418987499e01bc78e9526f96a6653a3d9cae  /home/user/crypto/research/semaev_qubo_annealing_20261110/tool/target/release/semaev_qubo_annealing"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/tool/target/release/semaev_qubo_annealing",
+        "--protocol",
+        "/home/user/crypto/research/semaev_qubo_annealing_20261110/PROTOCOL.md",
+        "--n",
+        "12,16,20,24,28",
+        "--instances",
+        "20",
+        "--boot",
+        "1000",
+        "--out",
+        "research/semaev_qubo_annealing_20261110/results/run.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4500.14,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "detached": true,
+      "exit_code": 0,
+      "id": "run-full",
+      "index": 11,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/results/run.json": "9bbea2ea5dd017b85461ce9fc619cf99768bcdc2cdfb0a0a9e58586d786b3cdd",
+        "research/semaev_qubo_annealing_20261110/results/run.stdout.txt": "3203d777a825ecbc959096e7ba2c5ce64b89f23e7e40a834737f4dd922df55c4"
+      },
+      "pid_file": "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.pid.json",
+      "seconds": 4500.14,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3203d777a825ecbc959096e7ba2c5ce64b89f23e7e40a834737f4dd922df55c4",
+      "stdout_tail": [
+        "  greedy     all    e =   1.820  CI [1.668, 2.003]",
+        "  greedy     n>=20  e =   1.851  CI [1.614, 2.105]",
+        "  sa_B       all    e =   2.197  CI [2.050, 2.321]",
+        "  sa_B       n>=20  e =   2.095  CI [1.761, 2.440]",
+        "  sa_4B      all    e =   2.192  CI [1.993, 2.372]",
+        "  sa_4B      n>=20  e =   2.199  CI [1.875, 2.486]",
+        "  sa_16B     all    e =   2.058  CI [1.835, 2.304]",
+        "  sa_16B     n>=20  e =   2.171  CI [1.593, 2.474]",
+        "  pt         all    e =   2.124  CI [1.981, 2.325]",
+        "  pt         n>=20  e =   2.179  CI [1.791, 2.506]",
+        "  root_enum  all    e =   0.901  CI [0.797, 1.038]",
+        "  root_enum  n>=20  e =   0.879  CI [0.626, 1.135]",
+        "",
+        "landscape lag-1 autocorrelation (bit-flip walks vs random landscape; band = random mean +- 3 sd)",
+        "  n=12 walk -0.0006  rand +0.0003 (sd 0.0313)  in_band=true",
+        "  n=16 walk +0.0003  rand +0.0012 (sd 0.0316)  in_band=true",
+        "  n=20 walk -0.0012  rand -0.0004 (sd 0.0315)  in_band=true",
+        "",
+        "verification_failures=0 instrument_errors=0 P3_uniform_slope=1.948 verdict=closed",
+        "wrote research/semaev_qubo_annealing_20261110/results/run.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "sha256sum",
+        "research/semaev_qubo_annealing_20261110/results/run.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "result-sha256",
+      "index": 12,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-sha256.stdout": "494bcb1a734e0309c49e023cf6960051b12a122964847bddbf94837ac7631522"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "494bcb1a734e0309c49e023cf6960051b12a122964847bddbf94837ac7631522",
+      "stdout_tail": [
+        "9bbea2ea5dd017b85461ce9fc619cf99768bcdc2cdfb0a0a9e58586d786b3cdd  research/semaev_qubo_annealing_20261110/results/run.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cat",
+        "research/semaev_qubo_annealing_20261110/results/run.stdout.txt"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "result-table",
+      "index": 13,
+      "outputs": {
+        "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-table.stdout": "3203d777a825ecbc959096e7ba2c5ce64b89f23e7e40a834737f4dd922df55c4"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3203d777a825ecbc959096e7ba2c5ce64b89f23e7e40a834737f4dd922df55c4",
+      "stdout_tail": [
+        "  greedy     all    e =   1.820  CI [1.668, 2.003]",
+        "  greedy     n>=20  e =   1.851  CI [1.614, 2.105]",
+        "  sa_B       all    e =   2.197  CI [2.050, 2.321]",
+        "  sa_B       n>=20  e =   2.095  CI [1.761, 2.440]",
+        "  sa_4B      all    e =   2.192  CI [1.993, 2.372]",
+        "  sa_4B      n>=20  e =   2.199  CI [1.875, 2.486]",
+        "  sa_16B     all    e =   2.058  CI [1.835, 2.304]",
+        "  sa_16B     n>=20  e =   2.171  CI [1.593, 2.474]",
+        "  pt         all    e =   2.124  CI [1.981, 2.325]",
+        "  pt         n>=20  e =   2.179  CI [1.791, 2.506]",
+        "  root_enum  all    e =   0.901  CI [0.797, 1.038]",
+        "  root_enum  n>=20  e =   0.879  CI [0.626, 1.135]",
+        "",
+        "landscape lag-1 autocorrelation (bit-flip walks vs random landscape; band = random mean +- 3 sd)",
+        "  n=12 walk -0.0006  rand +0.0003 (sd 0.0313)  in_band=true",
+        "  n=16 walk +0.0003  rand +0.0012 (sd 0.0316)  in_band=true",
+        "  n=20 walk -0.0012  rand -0.0004 (sd 0.0315)  in_band=true",
+        "",
+        "verification_failures=0 instrument_errors=0 P3_uniform_slope=1.948 verdict=closed",
+        "wrote research/semaev_qubo_annealing_20261110/results/run.json"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 13,
+  "commit": "8c3b356ff45ec268ea7d0a21f28050200aa4c515",
+  "dirty_after": [
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.binary-sha256.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.binary-sha256.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.build.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.build.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cargo-version.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cargo-version.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cpu-model.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.cpu-model.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.git-head.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.git-head.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.nproc.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.nproc.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.receipt.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.child.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.exit.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.pid.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.spec.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/08-build.supervisor.log",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.child.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.exit.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.pid.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.spec.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/09-test.supervisor.log",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/11-run-full.child.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/11-run-full.pid.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/11-run-full.spec.json",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.run/11-run-full.supervisor.log",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.rustc-version.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.rustc-version.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.test.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.test.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.uname.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.uname.stdout",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.verify-freeze.stderr",
+    "research/coord_spectrum_20261110/cards/receipts/F3-RUN-01.verify-freeze.stdout",
+    "research/coord_spectrum_20261110/results/run.stderr.txt",
+    "research/coord_spectrum_20261110/results/run.stdout.txt",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.receipt.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.exit.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.exit.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stdout",
+    "research/p2_lift_linear_complexity_20261110/results/run.stderr.txt",
+    "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.binary-sha256.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.binary-sha256.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.build.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.build.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.cargo-version.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.cargo-version.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.cpu-model.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.cpu-model.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.git-head.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.git-head.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.nproc.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.nproc.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.receipt.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/08-build.child.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/08-build.exit.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/08-build.pid.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/08-build.spec.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/08-build.supervisor.log",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/09-test.child.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/09-test.exit.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/09-test.pid.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/09-test.spec.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/09-test.supervisor.log",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/11-run-full.child.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/11-run-full.pid.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/11-run-full.spec.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.run/11-run-full.supervisor.log",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.rustc-version.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.rustc-version.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.test.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.test.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.uname.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.uname.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.verify-freeze.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-01.verify-freeze.stdout",
+    "research/sat_ladder_scaling_20261110/results/run.stderr.txt",
+    "research/sat_ladder_scaling_20261110/results/run.stdout.txt",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.binary-sha256.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.build.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cargo-version.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.cpu-model.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.git-head.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.nproc.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.receipt.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-sha256.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-sha256.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-table.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.result-table.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.child.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.exit.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.pid.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.spec.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/08-build.supervisor.log",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.child.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.exit.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.pid.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.spec.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/09-test.supervisor.log",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.child.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.exit.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.pid.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.spec.json",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.run/11-run-full.supervisor.log",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.rustc-version.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.test.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.uname.stdout",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stderr",
+    "research/semaev_qubo_annealing_20261110/cards/receipts/F6-RUN-01.verify-freeze.stdout",
+    "research/semaev_qubo_annealing_20261110/results/run.json",
+    "research/semaev_qubo_annealing_20261110/results/run.stderr.txt",
+    "research/semaev_qubo_annealing_20261110/results/run.stdout.txt",
+    "resume/RESUME.md"
+  ],
+  "dirty_before": [
+    "research/compiled_advice_robdd_20261110/cards/F5-RUN-01.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.binary-sha256.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.binary-sha256.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.build.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.build.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cargo-version.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cargo-version.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cpu-model.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.cpu-model.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.git-head.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.git-head.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.nproc.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.nproc.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.receipt.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/08-build.child.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/08-build.exit.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/08-build.pid.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/08-build.spec.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/08-build.supervisor.log",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/09-test.child.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/09-test.exit.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/09-test.pid.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/09-test.spec.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/09-test.supervisor.log",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/11-run-full.child.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/11-run-full.pid.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/11-run-full.spec.json",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.run/11-run-full.supervisor.log",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.rustc-version.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.rustc-version.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.test.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.test.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.uname.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.uname.stdout",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.verify-freeze.stderr",
+    "research/compiled_advice_robdd_20261110/cards/receipts/F5-RUN-01.verify-freeze.stdout",
+    "research/compiled_advice_robdd_20261110/results/run.stderr.txt",
+    "research/compiled_advice_robdd_20261110/results/run.stdout.txt",
+    "research/coord_spectrum_20261110/tool/.gitignore",
+    "research/coord_spectrum_20261110/tool/Cargo.toml",
+    "research/coord_spectrum_20261110/tool/src/main.rs",
+    "research/dp_hybrid_ic_design_20261110/DESIGN.md",
+    "research/lattice_bnb_design_20261110/DESIGN.md",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.binary-sha256.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.build.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cargo-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.cpu-model.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.git-head.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.nproc.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.receipt.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.exit.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/08-build.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.exit.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/09-test.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.child.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.pid.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.spec.json",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.run/11-run-full.supervisor.log",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.rustc-version.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.test.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.uname.stdout",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stderr",
+    "research/p2_lift_linear_complexity_20261110/cards/receipts/F2-RUN-01.verify-freeze.stdout",
+    "research/p2_lift_linear_complexity_20261110/results/run.stderr.txt",
+    "research/p2_lift_linear_complexity_20261110/results/run.stdout.txt",
+    "research/sat_ladder_scaling_20261110/tool/.gitignore",
+    "research/sat_ladder_scaling_20261110/tool/Cargo.toml",
+    "research/sat_ladder_scaling_20261110/tool/src/main.rs",
+    "research/semaev_qubo_annealing_20261110/cards/F6-RUN-01.json",
+    "resume/RESUME.md"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

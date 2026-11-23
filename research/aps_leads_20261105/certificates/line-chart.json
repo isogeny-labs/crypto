@@ -1,0 +1,254 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h9e131e5cd24a395f",
+  "statement": {
+    "name": "APS nonhorizontal chart: substituted intersection cubic",
+    "source": "research/aps_leads_20261105/README.md L1; substitution U=t^2,c=tV; proposed by this research round",
+    "variables": [
+      "X",
+      "t",
+      "V",
+      "a",
+      "b"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "t"
+                  },
+                  {
+                    "op": "var",
+                    "args": "t"
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "X"
+                      },
+                      {
+                        "op": "var",
+                        "args": "V"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "X"
+                      },
+                      {
+                        "op": "var",
+                        "args": "V"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "b"
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "X"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "t"
+                  },
+                  {
+                    "op": "var",
+                    "args": "t"
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "X"
+                  },
+                  {
+                    "op": "var",
+                    "args": "X"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "const",
+                        "args": 2
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "t"
+                          },
+                          {
+                            "op": "var",
+                            "args": "t"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "var",
+                        "args": "V"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "X"
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "b"
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "t"
+                  },
+                  {
+                    "op": "var",
+                    "args": "t"
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "V"
+                  },
+                  {
+                    "op": "var",
+                    "args": "V"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2316557771501207553,
+  "value_digest": "d767f82aa791a509f2c5a00998e4650230cd63a5cbd81ff18dc03b43771db5d7",
+  "independence": "Producer-issued and producer-replayed with the existing native checker; no independent signer or formal proof",
+  "proof": null
+}

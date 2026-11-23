@@ -1,0 +1,57 @@
+[
+    {
+        "Id": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+        "RepoTags": [
+            "n83-k600-m6-toolchain:colima-20261116"
+        ],
+        "RepoDigests": [
+            "n83-k600-m6-toolchain@sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573"
+        ],
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-11-15T16:14:41.533977212-08:00",
+        "Config": {
+            "Env": [
+                "PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "RUSTUP_HOME=/usr/local/rustup",
+                "CARGO_HOME=/usr/local/cargo",
+                "RUST_VERSION=1.99.1"
+            ],
+            "Cmd": [
+                "bash"
+            ],
+            "Labels": {
+                "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust"
+            }
+        },
+        "Architecture": "arm64",
+        "Os": "linux",
+        "Size": 614099488,
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:fb1e44e72313b37386067b4aca2efb392ab72561e7fd16a75de13621a0b0846b",
+                "sha256:44ab488e65bf6e4d4a20f146adbcef27d202fb9ea8306d4e901c79cbb0d59099",
+                "sha256:5f6a487cd2494b110debb8d6751c14ec9d61365e07e9cc5b6c702759ccdea83c",
+                "sha256:ae05f479153f6e0409b97e0d540caabae67611200753bef680470a1bb411f2a9",
+                "sha256:99a315d9c892551001c6d2c3ae60b5224147f6253c752d30ced53ed3f2f3c39c",
+                "sha256:c3d44017172268473a937d28dd32f2616846b445a3c39e8dad71f0778f893d6b"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-11-16T00:14:46.870292733Z"
+        },
+        "Descriptor": {
+            "mediaType": "application/vnd.oci.image.index.v1+json",
+            "digest": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+            "size": 856
+        },
+        "Identity": {
+            "Build": [
+                {
+                    "Ref": "l45vt6e32b6mw0thc9xjllosy",
+                    "CreatedAt": "2026-11-15T16:14:47.732951823-08:00"
+                }
+            ]
+        }
+    }
+]

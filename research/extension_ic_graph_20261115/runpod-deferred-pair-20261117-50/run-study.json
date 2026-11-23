@@ -1,0 +1,620 @@
+{
+  "automatic_retries": 0,
+  "cheapest_observed_rho_mode": "rho-plain-b16",
+  "complete_cost": false,
+  "complete_total": null,
+  "completed": 8,
+  "deferred_observed_saving_percent_vs_grounded": 5.165387152918289,
+  "deferred_observed_saving_vs_grounded": "322112932750",
+  "excluded": 0,
+  "fastest_observed_rho_mode": "rho-plain-b16",
+  "matched_original_proof": {
+    "checkpoint_elapsed_times_compared": false,
+    "common_b_count": 155648,
+    "common_candidate_prefix": 297157,
+    "equal_original_source_prefix": 90877,
+    "exact_common_cohorts": true,
+    "exact_split_and_screen_prefix": true,
+    "graph_and_rank_replayed_separately": true,
+    "post_collection": {
+      "all_other_primitive_phases_identical": true,
+      "descents_and_affine_rows_identical": true,
+      "normalized_kernel_identical": true,
+      "post_collection_LA_primitives_identical": true
+    }
+  },
+  "original_qualified_summary_sha256": "35a272e78e4cf2b8fba4f6ad1f04d690fcf0b6619b85a5cdd1fa342365c918a9",
+  "original_qualifier_exit_code": 0,
+  "outcomes": [
+    {
+      "accepted_descents": null,
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": null,
+      "descent_residuals": 1728,
+      "early_refusals": null,
+      "graph_stats": null,
+      "inner_wall_ns_practicality_only": 18552874025,
+      "mode": "original-ic",
+      "observed_incomplete_bitops": "4525556132414",
+      "original_sha256": "c29272ae549f11dccf3b652aa399339c11801166fa5ef13950791aceebbc23f8",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "observed_incomplete_bitops": "546251740",
+          "phase": "model"
+        },
+        {
+          "observed_incomplete_bitops": "691123606",
+          "phase": "factor_base"
+        },
+        {
+          "observed_incomplete_bitops": "2444913670026",
+          "phase": "relations"
+        },
+        {
+          "observed_incomplete_bitops": "1734424925904",
+          "phase": "descent"
+        },
+        {
+          "observed_incomplete_bitops": "344888797878",
+          "phase": "linear_algebra"
+        },
+        {
+          "observed_incomplete_bitops": "91363260",
+          "phase": "verification"
+        }
+      ],
+      "process_real_seconds_practicality_only": 18.558,
+      "producer_verified": true,
+      "projections": null,
+      "rank_checks": [],
+      "rho_options": null,
+      "rho_steps": null,
+      "screen_calls": null,
+      "slow_split_records": null,
+      "sources": null,
+      "stop": null
+    },
+    {
+      "accepted_descents": 2,
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": {
+        "b_count": 225280,
+        "candidates": 11849,
+        "collisions": 217,
+        "duplicates": 0,
+        "full_rows": 299,
+        "lines": 113173,
+        "normalization_products": 0,
+        "partial_rows": 11523,
+        "products": 0,
+        "rank": 508,
+        "refused": 27,
+        "subtractions": 0,
+        "vertices": 11306
+      },
+      "descent_residuals": 3415,
+      "early_refusals": null,
+      "graph_stats": null,
+      "inner_wall_ns_practicality_only": 14952630909,
+      "mode": "quadratic-table",
+      "observed_incomplete_bitops": "5230830441710",
+      "original_sha256": "f6bec70f3636be454cd8970694a105b2895c5618d249bfbdee7c7656958f9b0a",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "observed_incomplete_bitops": "586808692",
+          "phase": "model"
+        },
+        {
+          "observed_incomplete_bitops": "719628892",
+          "phase": "factor_base"
+        },
+        {
+          "observed_incomplete_bitops": "1476022439520",
+          "phase": "relations"
+        },
+        {
+          "observed_incomplete_bitops": "3426280619436",
+          "phase": "descent"
+        },
+        {
+          "observed_incomplete_bitops": "327129581910",
+          "phase": "linear_algebra"
+        },
+        {
+          "observed_incomplete_bitops": "91363260",
+          "phase": "verification"
+        }
+      ],
+      "process_real_seconds_practicality_only": 15.116,
+      "producer_verified": true,
+      "projections": 516,
+      "rank_checks": [
+        {
+          "b_count": 225280,
+          "inner_wall_ns": "38173730",
+          "observed_incomplete_bitops": "327128033886",
+          "rank_certificate": 508,
+          "rows": 516
+        }
+      ],
+      "rho_options": null,
+      "rho_steps": null,
+      "screen_calls": null,
+      "slow_split_records": null,
+      "sources": 11822,
+      "stop": "sparse homogeneous rank certified at complete batch"
+    },
+    {
+      "accepted_descents": 2,
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": {
+        "b_count": 185344,
+        "candidates": 353012,
+        "collisions": 272,
+        "duplicates": 0,
+        "full_rows": 250,
+        "lines": 93079,
+        "normalization_products": 0,
+        "one_class_rows": 9535,
+        "partial_rows": 107808,
+        "products": 0,
+        "rank": 508,
+        "refused": 244954,
+        "subtractions": 0,
+        "two_class_rows": 98273,
+        "vertices": 13896
+      },
+      "descent_residuals": 3415,
+      "early_refusals": 198848,
+      "graph_stats": {
+        "anchored_cycles": 272,
+        "discarded_ungrounded": 93640,
+        "full_rows": 250,
+        "max_emitted_witness": 7,
+        "max_stored_witness": 6,
+        "one_class_anchors": 9334,
+        "sources": 108058,
+        "two_class_extensions": 4562,
+        "vertex_refusals": 0,
+        "vertices": 13896,
+        "witness_refusals": 0
+      },
+      "inner_wall_ns_practicality_only": 27726465702,
+      "mode": "pair-discriminant",
+      "observed_incomplete_bitops": "6235988188572",
+      "original_sha256": "fa429f41124fbfb6eee3117823b4ec375c19f807893923a2ed852b6a1c6e7f94",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "observed_incomplete_bitops": "586808692",
+          "phase": "model"
+        },
+        {
+          "observed_incomplete_bitops": "719628892",
+          "phase": "factor_base"
+        },
+        {
+          "observed_incomplete_bitops": "2428576689912",
+          "phase": "relations"
+        },
+        {
+          "observed_incomplete_bitops": "3426280619436",
+          "phase": "descent"
+        },
+        {
+          "observed_incomplete_bitops": "379733078380",
+          "phase": "linear_algebra"
+        },
+        {
+          "observed_incomplete_bitops": "91363260",
+          "phase": "verification"
+        }
+      ],
+      "process_real_seconds_practicality_only": 31.531,
+      "producer_verified": true,
+      "projections": 522,
+      "rank_checks": [
+        {
+          "b_count": 185344,
+          "inner_wall_ns": "43477042",
+          "observed_incomplete_bitops": "379731530356",
+          "rank_certificate": 508,
+          "rows": 522
+        }
+      ],
+      "rho_options": null,
+      "rho_steps": null,
+      "screen_calls": 298778,
+      "slow_split_records": 99930,
+      "sources": 108058,
+      "stop": "sparse homogeneous rank certified at complete batch"
+    },
+    {
+      "accepted_descents": 2,
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": {
+        "b_count": 155648,
+        "candidates": 297157,
+        "collisions": 303,
+        "duplicates": 0,
+        "full_rows": 215,
+        "lines": 78332,
+        "normalization_products": 0,
+        "one_class_rows": 8013,
+        "partial_rows": 90662,
+        "products": 0,
+        "rank": 508,
+        "refused": 206280,
+        "subtractions": 0,
+        "two_class_rows": 82649,
+        "vertices": 125491
+      },
+      "descent_residuals": 3415,
+      "early_refusals": 167516,
+      "graph_stats": {
+        "activated": 8145,
+        "anchors": 20510,
+        "cycles": 303,
+        "deferred": 77994,
+        "edge_refusals": 0,
+        "full_sources": 215,
+        "live_deferred": 69849,
+        "max_emitted_witness": 13,
+        "max_stored_witness": 16,
+        "one_class_anchors": 7796,
+        "sources": 90877,
+        "two_class_anchors": 12714,
+        "vertex_refusals": 0,
+        "vertices": 125491,
+        "witness_refusals": 0
+      },
+      "inner_wall_ns_practicality_only": 24727454734,
+      "mode": "pair-deferred",
+      "observed_incomplete_bitops": "5913875255822",
+      "original_sha256": "9e2c0a73cb8b83781d7b0f3c95e624e7a4097e6a55696406abda5253179c254a",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "unattributed"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "0",
+          "phase": "transport"
+        },
+        {
+          "observed_incomplete_bitops": "586808692",
+          "phase": "model"
+        },
+        {
+          "observed_incomplete_bitops": "719628892",
+          "phase": "factor_base"
+        },
+        {
+          "observed_incomplete_bitops": "2042699070612",
+          "phase": "relations"
+        },
+        {
+          "observed_incomplete_bitops": "3426280619436",
+          "phase": "descent"
+        },
+        {
+          "observed_incomplete_bitops": "443497764930",
+          "phase": "linear_algebra"
+        },
+        {
+          "observed_incomplete_bitops": "91363260",
+          "phase": "verification"
+        }
+      ],
+      "process_real_seconds_practicality_only": 27.829,
+      "producer_verified": true,
+      "projections": 518,
+      "rank_checks": [
+        {
+          "b_count": 155648,
+          "inner_wall_ns": "49784250",
+          "observed_incomplete_bitops": "443496216906",
+          "rank_certificate": 508,
+          "rows": 518
+        }
+      ],
+      "rho_options": null,
+      "rho_steps": null,
+      "screen_calls": 251537,
+      "slow_split_records": 84021,
+      "sources": 90877,
+      "stop": "sparse homogeneous rank certified at complete batch"
+    },
+    {
+      "accepted_descents": null,
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": null,
+      "descent_residuals": null,
+      "early_refusals": null,
+      "graph_stats": null,
+      "inner_wall_ns_practicality_only": 119764170452,
+      "mode": "rho-plain-b1",
+      "observed_incomplete_bitops": "196545134504212",
+      "original_sha256": "031d6228d38ef13b91b466514f9d6246bfa0737acfdec27dcee71038391b03f2",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "18600779836",
+          "phase": "precompute"
+        },
+        {
+          "observed_incomplete_bitops": "196263131004928",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "263320383260",
+          "phase": "collision"
+        },
+        {
+          "observed_incomplete_bitops": "82336188",
+          "phase": "verification"
+        }
+      ],
+      "process_real_seconds_practicality_only": 119.768,
+      "producer_verified": true,
+      "projections": null,
+      "rank_checks": [],
+      "rho_options": {
+        "batch": 1,
+        "dp_bits": 16,
+        "negation": false,
+        "r": 256
+      },
+      "rho_steps": 587751424,
+      "screen_calls": null,
+      "slow_split_records": null,
+      "sources": null,
+      "stop": null
+    },
+    {
+      "accepted_descents": null,
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": null,
+      "descent_residuals": null,
+      "early_refusals": null,
+      "graph_stats": null,
+      "inner_wall_ns_practicality_only": 117560155208,
+      "mode": "rho-neg-b1",
+      "observed_incomplete_bitops": "181105019144798",
+      "original_sha256": "de359d7da408b90e6d2e536c8673287025d16f333062d17f7f818e2231718ee9",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "18600779836",
+          "phase": "precompute"
+        },
+        {
+          "observed_incomplete_bitops": "180846446924138",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "239889104636",
+          "phase": "collision"
+        },
+        {
+          "observed_incomplete_bitops": "82336188",
+          "phase": "verification"
+        }
+      ],
+      "process_real_seconds_practicality_only": 117.565,
+      "producer_verified": true,
+      "projections": null,
+      "rank_checks": [],
+      "rho_options": {
+        "batch": 1,
+        "dp_bits": 16,
+        "negation": true,
+        "r": 256
+      },
+      "rho_steps": 535450837,
+      "screen_calls": null,
+      "slow_split_records": null,
+      "sources": null,
+      "stop": null
+    },
+    {
+      "accepted_descents": null,
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": null,
+      "descent_residuals": null,
+      "early_refusals": null,
+      "graph_stats": null,
+      "inner_wall_ns_practicality_only": 36901889916,
+      "mode": "rho-plain-b16",
+      "observed_incomplete_bitops": "109992238398614",
+      "original_sha256": "cd488cdcb14d2d7d00a00839cd472ac5e39211bf7c596804f6a24abe6f7e1d6c",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "19683264996",
+          "phase": "precompute"
+        },
+        {
+          "observed_incomplete_bitops": "109860730372666",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "111742424764",
+          "phase": "collision"
+        },
+        {
+          "observed_incomplete_bitops": "82336188",
+          "phase": "verification"
+        }
+      ],
+      "process_real_seconds_practicality_only": 36.908,
+      "producer_verified": true,
+      "projections": null,
+      "rank_checks": [],
+      "rho_options": {
+        "batch": 16,
+        "dp_bits": 16,
+        "negation": false,
+        "r": 256
+      },
+      "rho_steps": 249417689,
+      "screen_calls": null,
+      "slow_split_records": null,
+      "sources": null,
+      "stop": null
+    },
+    {
+      "accepted_descents": null,
+      "actual_scalar": 242624768583643540,
+      "capped": false,
+      "counts": null,
+      "descent_residuals": null,
+      "early_refusals": null,
+      "graph_stats": null,
+      "inner_wall_ns_practicality_only": 102918401313,
+      "mode": "rho-neg-b16",
+      "observed_incomplete_bitops": "274525819370690",
+      "original_sha256": "572753eb7977d0025b8e8a18c467b7dc481ed14b87167ae3f627a6e129701c00",
+      "phases": [
+        {
+          "observed_incomplete_bitops": "19683264996",
+          "phase": "precompute"
+        },
+        {
+          "observed_incomplete_bitops": "274229526810166",
+          "phase": "walk"
+        },
+        {
+          "observed_incomplete_bitops": "276526959340",
+          "phase": "collision"
+        },
+        {
+          "observed_incomplete_bitops": "82336188",
+          "phase": "verification"
+        }
+      ],
+      "process_real_seconds_practicality_only": 102.924,
+      "producer_verified": true,
+      "projections": null,
+      "rank_checks": [],
+      "rho_options": {
+        "batch": 16,
+        "dp_bits": 16,
+        "negation": true,
+        "r": 256
+      },
+      "rho_steps": 617229160,
+      "screen_calls": null,
+      "slow_split_records": null,
+      "sources": null,
+      "stop": null
+    }
+  ],
+  "phase_comparison": [
+    {
+      "deferred_observed_bitops": "0",
+      "grounded_observed_bitops": "0",
+      "observed_saving": "0",
+      "phase": "unattributed"
+    },
+    {
+      "deferred_observed_bitops": "0",
+      "grounded_observed_bitops": "0",
+      "observed_saving": "0",
+      "phase": "walk"
+    },
+    {
+      "deferred_observed_bitops": "0",
+      "grounded_observed_bitops": "0",
+      "observed_saving": "0",
+      "phase": "transport"
+    },
+    {
+      "deferred_observed_bitops": "586808692",
+      "grounded_observed_bitops": "586808692",
+      "observed_saving": "0",
+      "phase": "model"
+    },
+    {
+      "deferred_observed_bitops": "719628892",
+      "grounded_observed_bitops": "719628892",
+      "observed_saving": "0",
+      "phase": "factor_base"
+    },
+    {
+      "deferred_observed_bitops": "2042699070612",
+      "grounded_observed_bitops": "2428576689912",
+      "observed_saving": "385877619300",
+      "phase": "relations"
+    },
+    {
+      "deferred_observed_bitops": "3426280619436",
+      "grounded_observed_bitops": "3426280619436",
+      "observed_saving": "0",
+      "phase": "descent"
+    },
+    {
+      "deferred_observed_bitops": "443497764930",
+      "grounded_observed_bitops": "379733078380",
+      "observed_saving": "-63764686550",
+      "phase": "linear_algebra"
+    },
+    {
+      "deferred_observed_bitops": "91363260",
+      "grounded_observed_bitops": "91363260",
+      "observed_saving": "0",
+      "phase": "verification"
+    }
+  ],
+  "planned": 8,
+  "postexecution_analysis_only": true,
+  "ratios": null,
+  "rho_parity": false,
+  "sample_size_per_arm": 1,
+  "schema": "cover.deferred-pair.run-study/v1",
+  "signed_independent_verdict": false,
+  "source_revision": "11c9a0312f0b0a8ae85be325e72cbf9602d9d777"
+}

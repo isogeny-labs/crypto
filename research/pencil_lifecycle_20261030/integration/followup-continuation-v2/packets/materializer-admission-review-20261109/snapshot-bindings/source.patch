@@ -1,0 +1,16 @@
+--- materializer-source-successor-20261107/materialize.py
++++ materializer-admission-20261109/materialize.py
+@@ -71,11 +71,11 @@
+   cleanup=cleanup_owned_group(owned);record_cleanup(cleanup);checkpoint()
+   assert not cleanup['errors'],'owned subprocess cleanup incomplete'
+ try:
+- assert F['revision']==REV and F['absolute_deadline']=='2026-11-06T04:00:00+00:00'
++ assert F['revision']==REV and F['absolute_deadline']=='2026-11-10T05:11:39+00:00'
+  assert F['published_github_commit'] and F['reviewed'] is True
+  assert set(F['lease'])=={'task_id','attempt_id','lease_id','fencing_epoch'}
+  assert F['campaign_remaining_worker_seconds']>=900 and type(F['campaign_remaining_worker_seconds']) is int
+- assert F['campaign_remaining_worker_seconds']<=46500
++ assert F['campaign_remaining_worker_seconds']<=43200
+  assert W.is_absolute() and OUT.is_absolute() and not W.is_relative_to(OUT) and not OUT.is_relative_to(W)
+  assert str(OUT).startswith('/home/ec2-user/pencil-validation-receipts/')
+  OUT.mkdir(mode=0o700,exist_ok=False);OWN=True;checkpoint()

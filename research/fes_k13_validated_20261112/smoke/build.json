@@ -1,0 +1,11 @@
+{
+  "what": "Local smoke binary, not the measured binary",
+  "source": "git archive e9d5dbdccdeb55b6d8527ebae1113135b42b26bf -- <87 build paths, list in export-paths.txt>",
+  "command": "CARGO_TARGET_DIR=<scratch>/target cargo build --release --offline --bin ecbench",
+  "toolchain": "rustc 1.97.0 (2d8144b78 2026-07-07)",
+  "ecbench_sha256": "8f9576b5bf81819274cc6049eb671c6d97f0bc6660f99d0445448edb4e5130f4",
+  "built": "2026-11-12T16:34:39Z",
+  "build_wall": "18m 39s (nice 10, 4 vCPU)",
+  "host_env_class_id": "ECBENV3h019d40ac615e",
+  "note": "glibc release build with rustc 1.97.0; the Iso Lab image is a static musl build with Rust 1.99.1, so its ecbench_sha256 differs. session.json git_commit is null because the export has no .git."
+}

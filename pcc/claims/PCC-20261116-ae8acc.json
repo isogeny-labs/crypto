@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T07:40:34Z",
+ "id": "PCC-20261116-ae8acc",
+ "kind": "statement",
+ "producer": {
+  "commit": "2d54889ac1032d59fe8b5410ad26ff705cec5bd7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-first-compile-failure-01/actual-first-compile.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-first-compile-failure-01/entire-first-compile.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-first-compile-failure-01/entire-first-compile.stdout",
+    "sha256": "effcd726f95e3591c640318f1cf73d2b80e76d352950d831c438ec49198092c5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-norm-first-compile-failure-01/entire-first-source.lean.txt",
+    "sha256": "aef6c0f9d65915b529296f1fd839c8e8ba8eb189e51135744238ae95232c16aa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Cubic norm descent first static Lean4.35 -j1 compile fails1: simp does not reduce zero powers/products in the abstract Lean.Grind.CommRing norm-of-constant step. Whole exact source/stdout/stderr/exit retained, including emitted sorryAx on the erroneous dependency. This is a rejected proof attempt, not accepted mathematical standing or a native historical computation. The proposed correction preserves every definition/statement and uses ring normalization for those zero terms. The candidate norm-square identity and concrete base residues were compiled within the failed module but the complete module is not accepted. No new paid workload."
+}

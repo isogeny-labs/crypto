@@ -1,5 +1,11 @@
 # ECC2K-130 index-calculus feasibility and unexplored areas
 
+> **Current status (2026-11-17):** see the
+> [evidence-linked ECC2K-130 assessment](research/notes/ecc2k130/STATUS_20261117.md).
+> This October memo remains useful historical analysis, but its implementation
+> gaps and frontier descriptions are superseded where the dated assessment
+> cites newer committed evidence.
+
 **Date:** 2026-10-05 (formulas and §3 operation counts corrected
 2026-10-07; see `docs/ic/PLAN_IC_ACCOUNTING_FIXES_20261007.md` F5)
 **Scope:** Where the compact-orbit Koblitz index-calculus ladder stands

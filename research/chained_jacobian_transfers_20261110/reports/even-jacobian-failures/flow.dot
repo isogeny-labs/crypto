@@ -1,0 +1,9 @@
+digraph failures {
+  graph [rankdir=TB,bgcolor="white",pad="0.12",nodesep="0.45",ranksep="0.3"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,fillcolor="#fff0e7",color="#885e48"];
+  edge [color="#49616c"];
+  p [label="ProtocolV1 /73b7dc\nOne missing standing tag\nV2 adds annotation only"];
+  l [label="Lean01 /044c8c\nVariable-scalar grind normalization fails\nFailed recovery sorryAx is not accepted"];
+  ok [label="V2/6f1e93 · statements/criteria unchanged\nExplicit zsmul_sub + additive cancellation\nGate02/6 bound local passes ·0trusted\nNativefull37/3c1cb7 ·624unchanged inputs",fillcolor="#e5f2e8",color="#49616c"];
+  p -> ok;l -> ok;
+}

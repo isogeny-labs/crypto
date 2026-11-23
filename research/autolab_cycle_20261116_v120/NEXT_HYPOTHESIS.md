@@ -1,0 +1,13 @@
+# Prepared C121: exact binary-prefix quadratic roots without ambient-field inversion
+
+Status: new derived prototype, AST/global-name preflight ONLY, not scientifically executed. This is a specialized linearized-polynomial solver, not certified novel mathematics or a measured speedup.
+
+Let D_m={r∈F2[X]:deg(r)<m}; take A(T)=T²+aT+b with deg(a)<m,deg(b)≤2m−2. Seek every root in D_m, including multiplicity. For a=0, a root exists iff every odd coefficient of b is0; the unique square root has multiplicity2. For a≠0, k=deg(a). The F2-linear map L(r)=r²+ar has kernel{0,a}. Since a∈D_m, the two roots (when present) both lie in D_m. Fix r_k=0to select the unique canonical smaller root.
+
+Recover r_j descending for j>k: after higher coefficients are removed, coefficient2jof the residual is exactly r_j, because ar has degree at most k+j<2j. Remove L(r_jX^j). Skip j=k. Then recover j<kdescending from residual coefficientk+j: the leading coefficient of a is1and r²has degree at most2j<k+j. Remove L(r_jX^j). The final residual vanishes iff b lies in the image. This constructs every domain root without scanning2^mvalues or inverting in the ambient field. StorageO(m)bits,naiveO(m²)bitoperations using shifts/XOR; the return value is an exact all-roots result only for this DECLAREDquadratic/domain, not the full original system.
+
+For GF(2^n) represented by a monic irreducible degree-nmodulus, if n>2m−2then all residual degrees are<n, so raw polynomial equality is equivalent to finite-field equality onD_m. In the actual lower factor, m=17,n=83, so this is an exact full-prefix-support test for the quadratic factor. Repeated roots are preserved. Beyond that degree threshold, include reduction modulo the actual field modulus; the raw solver is not authorized as a general unrestricted-field solver.
+
+Next independent oracle: exhaust all a,b for m1through5and compare every literal r∈D_m with returned roots/multiplicities, including a=0and empty/full fibers. Cross-check a separate bitmatrix linear solver. Then profile m17actualfactor-coefficient inputs. A Boolean implementation can guard one triangular recurrence for each possible leading degree of a (plus a=0), with no guessed leading-degree selector; enforce exactly the appropriate branch. Measure all branch/gate costs and recovered roots before replacing the quadratic's14weak residue tests with this EXACTprefix predicate. The cubic still needs its own support condition, and all other leading strata/source/U/outerfamilies remain.
+
+The characteristic-two linearity is essential. Odd-prime interval domains require separately lifted signed integer coefficients/discriminant square and parity checks, with coefficient-wrap variables retained; no binary proof is transferred to NISTintervals.

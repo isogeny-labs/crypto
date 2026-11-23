@@ -1,0 +1,104 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261031-prime-shared-coeff-sat-tournament",
+  "title": "Discriminate SAT/XOR on the prime-field shared-coefficient predicate",
+  "created": "2026-10-31",
+  "authors": [
+    "Codex prime-field IC research lane"
+  ],
+  "status": "draft",
+  "status_note": "E0 canonical-IR and complete F17 correctness gates pass. E1 CNF/CNF-XOR equivalence, proof checking, solver pinning, E2 preflight/power and protocol freeze are open. No scientific solver run, lease, task or funding action is claimed.",
+  "blocked_on": [],
+  "question": "Does a correctness-certified CDCL, CNF-XOR or QF_FF bundle have lower complete-work growth than exact enumeration and F4 on held-out shared-coefficient instances?",
+  "decision_value": "A positive result advances one exact bundle to complete relation collection; a bounded negative result retires the SAT lead on the declared ladder without claiming a universal impossibility theorem.",
+  "owner_hint": "prime-field index-calculus solver research",
+  "links": {
+    "lead": "research/prime_shared_coefficient_sat_20261031/README.md",
+    "notes": [
+      "research/prime_shared_coefficient_sat_20261031/PROTOCOL.md",
+      "research/prime_shared_coefficient_sat_20261031/experiment-matrix.json",
+      "research/prime_ic_lead_review_20261031/protocol.draft.json"
+    ],
+    "prs": []
+  },
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/prime-shared-coeff-sat-20261031",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/prime_shared_coefficient_sat_20261031/native/Cargo.toml"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 8,
+    "disk_gb": 16,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Draft only. E2 must set equal per-arm memory, disk, timeout and measured cost before ready promotion. Planned execution is isolated EKS Spot, single-thread solver processes."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/prime_shared_coefficient_sat_20261031/run-tournament.sh",
+      "{shard}",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 1800
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "prime-shared-coefficient.tournament-row/v1 (proposed; not implemented)",
+    "verify": [],
+    "land": "research/prime_shared_coefficient_sat_20261031/results/tournament"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": [
+      "XP-20261031-prime-shared-coeff-sat-tournament"
+    ],
+    "ttl_s": 7200,
+    "env": {
+      "name": "prime-shared-coeff-solvers",
+      "recipe": "Draft only: pin merged code, Rust, msolve, cvc5, CaDiCaL, CryptoMiniSat, certificate checkers, perf and image digest after E1/E2."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 8192,
+      "timeout_s": 1800,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261031-prime-shared-coeff-sat-tournament"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Draft unfunded experiment; no resource or task reservation requested."
+    },
+    "notes": "No task has been posted. The runner argv, shard manifest, memory and verifier are placeholders until E1/E2 and protocol freeze."
+  }
+}

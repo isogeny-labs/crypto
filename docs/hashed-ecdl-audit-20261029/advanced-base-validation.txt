@@ -1,0 +1,39 @@
+Advanced base integration, 2026-10-30 04:46 UTC
+
+Published crypto PR2909 head3575a10a has the verified native implementation,
+complete root5430-pass receipt at source08557506b, and actual26-file parity
+with merged peer018fd41b. Peer PR1302 merge3cc4cad5 is final; its local private
+receipt commits are not pushed to a merged PR.
+
+GitHub still reported a conflict because main advanced toedf3db445 during the
+root run. Normally merged that base into local9f0835c26e1b2102c421674ed120e2c2e7f91485,
+retaining both complete journals. Existing unanswered-Copilot fallback explained
+on the PR; no rebase/force push and no frozen evidence selected away.
+
+Scope correction: first narrow comparison correctly found no change in root
+src/Cargo files/hashed-tensor crate, but omitted changes in another path crate,
+ecdl-tensor-ic. This was corrected publicly. The earlier full root result is
+not broadened to that new dependency source.
+
+Actual completed dependency check:
+cargo test --locked --release --manifest-path crates/ecdl-tensor-ic/Cargo.toml
+Final recheck actual parent exit0;34 tests pass, zero failed/ignored. Compact
+transcript advanced-dependency-tests.txt omits only terminal separator blanks.
+The first wrapper returned1 despite internal status receipt0 and all test
+summaries passing; retained advanced-dependency-initial.txt and repeated the
+unchanged command to obtain an unambiguous actual parent result. No code or
+assertion was changed between those invocations.
+
+LIVE full root command, not yet a pass:
+cargo test --locked --release --lib
+Source HEAD:9f0835c26e1b2102c421674ed120e2c2e7f91485
+Started:2026-10-30T04:43:47Z
+Detached wrapper PID/SID68490, parent1.
+Output/metadata/actual exit prefix:/tmp/crypto-root-advanced-base-20261030
+Do not restart a live run. Require actual exit0 AND full parent summary.
+This source-dependent merge remains local until required full validation.
+All later edits are receipts only. No scientific experiment or benchmark.
+
+Completed05:43:26Z: actual root exit0;5430passed/0failed/123existingignored/
+0filtered. See advanced-root-complete.txt. Earlier PENDING statements are
+superseded by this actual result for source9f0835c26 only.

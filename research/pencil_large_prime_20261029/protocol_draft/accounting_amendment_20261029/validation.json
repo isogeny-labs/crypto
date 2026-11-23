@@ -1,0 +1,246 @@
+{
+  "schema": "pencil-protocol-amendment-validation/v1",
+  "canonical_validation": {
+    "implementation": "native Rust",
+    "command": [
+      "native_canonical_export/target/release/pencil-native-canonical-export",
+      "validate-protocol",
+      "protocol_draft/accounting_amendment_20261029/protocol.json"
+    ],
+    "exit_code": 0,
+    "result": {
+      "document_modified": false,
+      "freeze_status": "draft",
+      "launch_authorized": false,
+      "passed": true,
+      "schema": "pencil-native-protocol-validation/v1"
+    },
+    "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1"
+  },
+  "protocol_sha256_integrity_only": "bf4bc00435a1c0d9972a8e73889779d6b0f541f2e622c8665a812e8b1aa469fe",
+  "preservation_checks": {
+    "sample_size": true,
+    "randomization": true,
+    "controls": true,
+    "execution": true,
+    "stopping_rules": true,
+    "invalidation_rules": true,
+    "prepared_manifest_unchanged": true,
+    "freeze_remains_draft": true,
+    "no_qualified_results": true,
+    "all_three_arm_binary_hashes_match_completed_build": true,
+    "all_arm_images_pending": true
+  },
+  "expected_pending_bindings": {
+    "image_digest": null,
+    "independent_coverage_review": null,
+    "cumulative_authorized_budget": {
+      "status": "resolved_first_gate_only",
+      "worker_execution_elapsed_seconds": 14400,
+      "accounting": "additive across all attempts, controls, recovery and fresh validation",
+      "later_gates_and_full_cohort": "unresolved"
+    },
+    "original_absolute_deadline": {
+      "status": "resolved_first_gate_only",
+      "utc": "2026-10-30T03:32:22Z",
+      "basis_clock_utc": "2026-10-29T23:32:22Z",
+      "legacy_Diem_and_other_deadlines": "unchanged",
+      "later_gates_and_full_cohort": "unresolved"
+    },
+    "cap_provenance": "Resolved for the first p739 gate only by explicit user approval first-gate-limits-20261029: all60 prescribed targets and25000000coefficients. Historical10m small-gate limit is preserved as provenance, superseded only within this approval. Later-stage authorization is not inferred.",
+    "launch_authorization": null,
+    "execution_time_envelope": "First p739 gate:3600seconds per execution, cumulative14400worker-execution seconds across all attempts/controls/recovery/fresh validation, fixed UTCdeadline2026-10-30T03:32:22Z. Stop at either cumulative cap or absolute deadline. Full60-target denominator retained; later-stage budgets and legacy deadlines are not changed.",
+    "runtime_image_and_request_binding": null,
+    "iam_controller_authorization": {
+      "status": "authorized_for_exact_reviewed_actions",
+      "authorization": {
+        "path": "infrastructure_authorization.json",
+        "sha256": "d3c22c9c8060af187ebf2aaedbb235487b1f7c2f38a6a105d3f766fd9a6cd32e",
+        "authority": "explicit_user_approval",
+        "scope": "Reviewed artifact publication, package-key/version-only controller update after change-set review, and pinned runtime image publication; no IAM permissions or RBAC expansion"
+      },
+      "trust_subject_correction": "applied and readback verified",
+      "controller_and_runtime_execution_receipts": "pending",
+      "iam_permissions_or_rbac_expansion": false,
+      "additional_approval_for_exact_listed_actions_required": false
+    }
+  },
+  "initial_schema_or_semantic_defect": "Derived finite_algorithm_gae metric initially lacked formula; corrected before final validation. Raw first finding retained.",
+  "freeze_or_authorization_performed": false,
+  "analysis_binding_checks": {
+    "source_files_verified_against_commit": 13,
+    "binary_hashes_and_sizes_verified": 2,
+    "mapping_matches": true,
+    "receipt_sha256": "dd1f6084d437491400e4618aa5a0466d28a4b3be506ac7f203d5f615b0df34c3",
+    "plan_only_observed_slots": 0,
+    "earlier_validation_preserved": "pre-analysis-binding-validation.json",
+    "instrument_build_unchanged": true,
+    "no_solver_executions_or_approval": true
+  },
+  "instrument_binding_checks": {
+    "binary_hash_and_size_verified": true,
+    "evidence_file_hashes_verified": 4,
+    "generated_plan_hashes_verified": 9,
+    "retained_cohort_plan_digests_matched": 7,
+    "archive_parity_receipt_targets": 1260,
+    "receipt_sha256": "59fd9e0e1f4573d9492bcca710b5351cd0175f788b197a7c82939e177ab1a1a1",
+    "earlier_validation_preserved": "pre-instrument-binding-validation.json",
+    "no_solver_executions_or_approval": true
+  },
+  "packaging_binding_checks": {
+    "status": "native_software_validated_packaging_only_not_qualification",
+    "language": "Rust",
+    "adapter": "research/pencil_large_prime_20261029/native_canonical_export",
+    "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1",
+    "canonical_tool": "research/pencil_large_prime_20261029/native_canonical_export/tools/experiment_protocol.reference.txt",
+    "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "canonical_reference_execution": false,
+    "export_schema": "research/pencil_large_prime_20261029/native_canonical_export/schemas/experiment-export.v1.json",
+    "software_tests": 40,
+    "receipt": "../../native_canonical_export/validation/review-fixes-20261029T2324Z-receipt.json",
+    "receipt_sha256": "6e2d21878f2ee47ed8b4951506e29b1fb3d09317b8195afe038ad7b6c10fc9a7",
+    "explicit_execution_history_required": true,
+    "wall_valid": false,
+    "experiment_executions": 0,
+    "required_contract": {
+      "analysis_provenance": "sources exact protocol analysis_support_sha256 map; hash-bound build_receipt and both analyze_pair/analyze_cohort binaries",
+      "compiled_source_pins": "all13 linked native analysis sources must match declared protocol pins",
+      "request_binding": "CLI attaches hash-bound _request_binding; check_export reconstructs complete export from immutable request",
+      "deterministic_replay": "public package/check_export execute linked native aggregate over bound records/plans and require exact output equality; private unit test callbacks are not runtime bypasses",
+      "limits": "Source-linked software consistency, not independent mathematical implementation, original analyzer binary execution attestation, clock qualification or cost-ratio qualification"
+    }
+  },
+  "first_gate_authorization_checks": {
+    "binding": {
+      "path": "first_gate_authorization.json",
+      "sha256": "e04f26d0cab6850f3c477e9521ea4359c46f64ec436ce899b3b4049867710600",
+      "scope": "first p739 gate only; all60targets,25000000coefficients,3600seconds per execution",
+      "authority": "explicit_user_approval"
+    },
+    "preservation_checks": {
+      "sample_size": true,
+      "randomization": true,
+      "controls": true,
+      "execution": true,
+      "stopping_rules": true,
+      "invalidation_rules": true,
+      "arms": true,
+      "freeze": true,
+      "prepared_manifest_unchanged": true,
+      "budget_and_deadline_remain_pending": true,
+      "launch_authorization_remains_pending": true
+    },
+    "freeze_or_launch_performed": false
+  },
+  "native_tool_bindings": {
+    "canonical_export": {
+      "receipt": "../../native_canonical_export/validation/review-fixes-20261029T2324Z-receipt.json",
+      "receipt_sha256": "6e2d21878f2ee47ed8b4951506e29b1fb3d09317b8195afe038ad7b6c10fc9a7",
+      "adapter_sha256": "fc96a3d15f1a50e255a86870fea3b351d655a674b09f4b6d05f3befa573b39f1",
+      "source_manifest": {
+        "path": "validation/review-fixes-source-files.sha256",
+        "sha256": "6a1cfa53e9e490022090a81f6b4a745edaaaabd6aaaef0bca369e54af00be05d"
+      },
+      "software_tests": 40,
+      "test_scopes": {
+        "command": "cargo +1.99.1 test --release --locked",
+        "passed": 40,
+        "failed": 0,
+        "ignored": 0,
+        "private_unit_contracts": 37,
+        "native_protocol_cli": 1,
+        "historical_digest_semantics": 1,
+        "production_full_denominator_replay": 1,
+        "production_seconds": 205.38,
+        "log": "validation/review-fixes-final-tests.log",
+        "sha256": "8cbcfd0d790c4f4a91e4866540dbc9cb4cf4f1df67500e683d16dae744b30e83"
+      },
+      "independent_corrected_source_review": {
+        "path": "../../validation/native_export_correction_fc96a3d1/review.json",
+        "sha256": "ed436aef0cbe8ea7f380767bcade130ded56c54de875950bf6c80a081ad65927",
+        "scope": "Software packaging and deterministic source-linked replay only; not independent mathematical implementation or empirical qualification"
+      }
+    },
+    "preparation": {
+      "receipt": "../../native_preparation/validation/receipt.json",
+      "receipt_sha256": "46843c028008698dc4eaa47370191904cf274791402d8953e23868e725d62ea3",
+      "source_files": {
+        "Cargo.toml": "0d5fafc970dbb9b9d9fea33fcd0344c130c7184f732858b26fa1b2290c0a200e",
+        "Cargo.lock": "22228eb5115c49911bc588d440baf7528eba4a6dd69eda763598b52308225726",
+        "README.md": "028fa02346a36a8f9a1fd7f2ae1f43b1802e263d41f736dcda82228404641642",
+        "src/lib.rs": "2f7d71644f0e8f1ea48a3c10cb840dc3ece761ae29721920550b83156d8bb45a",
+        "src/main.rs": "42b328416d52f0416ed700446fd0f948a5a6d2da75aba9ba30985b9861bb0eed"
+      },
+      "binary_sha256": "11fb2aa25fe7cd737271c4a13236c0ae9be0346a437b776d3acaa8e4a1890360",
+      "software_tests": 3,
+      "current_instrument": {
+        "path_at_validation": "/home/ec2-user/pencil-build-40938439022/ecbench",
+        "sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+        "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+        "build_info_sha256": "17b5602dd978e0484677b4b9e27b8323ceb60b01ae5bbdcf9728e578d0d352c5"
+      },
+      "execution_boundary": {
+        "ecbench_subcommand": "plan --doc",
+        "solver_executions_performed": 0,
+        "cohorts_launched": 0,
+        "cloud_jobs_launched": 0
+      }
+    },
+    "review_report": {
+      "receipt": "../../native_review_report/validation-layout.json",
+      "receipt_sha256": "37da6488934ed19fb48102e16de777a0c7935519f36245bd31399e4708864023",
+      "source_files": {
+        "src/lib.rs": "80762786c36dcb56a3148b38e70974375432425f240087af786d65f10cceeeba",
+        "src/main.rs": "08a18c3648ae4581949e811d8f5d185052ef17c8a96e443173131d9864dfd895",
+        "Cargo.lock": "48a5ed9c7e282b9cd62f1ef17a0cf970a635028fb624c2b89d4897d17be2326e"
+      },
+      "software_tests": 8
+    },
+    "boundary": "Native tooling validation and preparation only; no solver runs, empirical price qualification, freeze or launch authorization"
+  },
+  "four_hour_authorization_preservation_checks": {
+    "sample_size": true,
+    "randomization": true,
+    "controls": true,
+    "execution": true,
+    "stopping_rules": true,
+    "invalidation_rules": true,
+    "arms": true,
+    "freeze": true,
+    "prepared_manifest": true,
+    "instrument_build": true,
+    "analysis_build": true,
+    "historical_first_gate_authorization": true,
+    "launch_still_pending": true,
+    "infra_still_pending": true,
+    "legacy_Diem_unchanged": true
+  },
+  "four_hour_authorization": {
+    "path": "first_gate_four_hour_authorization.json",
+    "sha256": "7b065bb626c1b3025a943ce72316b6d6c49efee72291c6ff7c25ac97761c185e",
+    "scope": "first p739 gate only: cumulative14400 worker-execution seconds across all attempts/control/recovery/fresh validation; fixed UTCdeadline2026-10-30T03:32:22Z",
+    "authority": "explicit_user_reply_with_recorded_coordinator_interpretation"
+  },
+  "infrastructure_authorization_preservation_checks": {
+    "sample_size": true,
+    "randomization": true,
+    "controls": true,
+    "execution": true,
+    "arms": true,
+    "stopping_rules": true,
+    "freeze": true,
+    "resource_authorizations": true,
+    "first_gate_execution_envelope": true,
+    "prepared_manifest": true,
+    "instrument_build": true,
+    "analysis_build": true,
+    "image_still_pending": true,
+    "no_iam_permissions_or_rbac_expansion": true
+  },
+  "infrastructure_authorization": {
+    "path": "infrastructure_authorization.json",
+    "sha256": "d3c22c9c8060af187ebf2aaedbb235487b1f7c2f38a6a105d3f766fd9a6cd32e",
+    "authority": "explicit_user_approval",
+    "scope": "Reviewed artifact publication, package-key/version-only controller update after change-set review, and pinned runtime image publication; no IAM permissions or RBAC expansion"
+  }
+}

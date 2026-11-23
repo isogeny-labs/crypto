@@ -1,0 +1,35 @@
+{
+  "recorded_at": "2026-11-05T19:29:03.470176+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-normalized-transport/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-normalized-transport-20261105/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-normalized-transport-20261105/tests",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 8,
+  "binary_sha256": "4cc0c3c5816cded1de93ef893b1935d9e1238cd50b5faf2fc80a52b304ca1603",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

@@ -1,0 +1,7 @@
+# Next: guarded field-specific block compression
+
+Changed hypothesis: low graph width is insufficient; exact block-image degree and Frobenius structure may control cost. On actual independent-source GF(2^83) three- and five-source chains, construct monomial-dependency graphs and a matched block-triangular ordering. Do not infer dependencies from first derivatives alone: binary squares have zero derivative but are not constant.
+
+Record every unmatched/free separator variable and its full remaining field/domain cardinality. For each block linearized in internal variables, retain exterior parameters explicitly; only constant-coefficient F2-linear blocks may reuse one exact elimination. Otherwise prove rank/consistency per guarded fiber, retaining singular fibers. Report block rank, image/quotient degree, reconstruction cost and every original root, not graph width as a complexity claim.
+
+First bounded test: exhaustive F4/F8/F9/F17 systems with singular, repeated, empty and free fibers, plus mixed Frobenius/nonlinear counterexamples. Compare complete original tuples before substituting into the GF83 circuit. Preflight actual block dimensions before search. Zero structural gain must produce a new design rather than a larger unchanged run. Preserve the five-field crossover as training; freeze new holdouts for dispatch promotion. Genuine F4/F5/F6, cold memory and the full release gate remain required.

@@ -143,3 +143,17 @@ Engineering: a configuration choice conditional on the weight.
   - `analysis/derivation.json` (`scripts/derive.jq`);
   - `analysis/summary.json` (`scripts/summary.sh`);
   - figures from `scripts/plots.py`, which only lays out the plot.
+
+## Note, 2026-11-01: byte counters are no longer priced as operations
+
+This README and its `analysis/band-*` files are frozen as measured. The band
+priced `factor_base_vec_bytes_floor_uncharged`, a byte count, at `w` GAE per
+byte. The owner decided (option B, 2026-11-01) that the band prices operations
+only (`band.rs` `NON_OPERATION_COUNTERS`); the counter stays listed.
+[`analysis/exbytes/`](analysis/exbytes/) holds the bands and the 6 weighted
+comparisons re-run under that rule (`sessions/` untouched). Rows of arms that
+name the counter change; the others are identical. Two of the six comparisons go
+from "unresolved inside the band" to resolved, four stay unresolved
+([`CHANGES.md`](analysis/exbytes/CHANGES.md)); three band-rank verdicts
+(`plan` against `c1`, `c2`, `c5`) go from unresolved to `plan` cheaper.
+Audit and rationale: [`research/ic_byte_counter_pricing_20261101`](../ic_byte_counter_pricing_20261101/README.md).

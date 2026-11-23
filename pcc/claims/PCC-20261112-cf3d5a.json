@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T12:33:04Z",
+ "id": "PCC-20261112-cf3d5a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4e94d77251455793687ff954931f06620e8929cd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "0d8414641661c2c012912d370aa133c70b1d1c108111ffbb8a1003c5c070b1d5",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+   "theorem": "TwoPrimaryQuotient.integer_cleared_maps_vanish_on_four"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful halving polynomial/quotientlift independence/16torsion lifts/Frobenius12mod16/crossdegree4divisibility/integerclearedmapzero consequences. Actual geometricquotient/Picard/Homcancellation/degree/kernelrestrictiondivisibility/classification remain written. Nativewrongdoubling control isnot theliteralclearednormpull map;V2explicit.",
+ "statement": "theorem integer_cleared_maps_vanish_on_four {A C : Type} [IntModule A] [IntModule C] (f l : A \u2192 C) (fz : f 0=0) (linear : \u2200 n : Int, \u2200 a, f (n \u2022 a)=n \u2022 f a) (cleared : \u2200 a, l a=(4 : Int) \u2022 f a) (a : A) (ha : (4 : Int) \u2022 a=0) : \u2200 n : Int, n \u2022 l a=0"
+}

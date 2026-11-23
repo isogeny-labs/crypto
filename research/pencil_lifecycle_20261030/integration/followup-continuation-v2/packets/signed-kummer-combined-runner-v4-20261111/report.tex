@@ -1,0 +1,47 @@
+\documentclass[10pt]{article}
+\usepackage[margin=18mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\begin{document}
+\section*{Combined qualification v4 lifecycle successor}
+\textcolor{gray}{Source-only correction, T-2147. No compiler, test, lock
+resolution, or scientific payload was run for this packet.}
+
+\subsection*{Observed v3 terminal boundary}
+The published v3 invocation reached the worker, then failed before
+materialization, compilation, or tests. Its monitor traversed
+\texttt{cache/target} before the materializer created that directory. The
+resulting \texttt{FileNotFoundError} killed and reaped the materializer after
+0.11502473399741575 seconds. The supervisor sealed the terminal receipts after
+the owned cgroup became empty. The full 2,400-second campaign reservation is
+charged to that attempt.
+
+\subsection*{V4 source correction}
+V4 permits \texttt{cache/target} to be absent only while the active command is
+\texttt{materialize}. Once present, target must be a real directory before
+traversal. Every other command fails closed if target is absent. The existing
+target-size, private-workspace, log-size, disk-free, permit, phase-deadline,
+absolute-deadline, cgroup, and resource-limit checks are unchanged.
+
+\subsection*{Preserved scope and caps}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+Signed panel & 28 cases, unchanged and unexecuted in v4 \\
+Labels panel & 7 cases, unchanged and unexecuted in v4 \\
+Native driver calls & At most 11 full-739 calls, plus 2 forced probes \\
+Adapter controls & 4 negative controls \\
+Build / execution caps & 1,800 seconds / 600 seconds; 2,400 total \\
+Resources & 2 CPU, 16 GiB memory, zero swap; one attempt, no retry \\
+Locks & Published driver and adapter lock bytes unchanged \\
+\end{tabularx}
+
+\subsection*{Admission state}
+The v4 admission draft remains false and its current ledger, lease, and release
+receipts remain null. Independent review, publication, a post-pivot current
+ledger, live owner, serial reconciliation, and a separately reviewed release
+are required before any invocation. No runtime result or cost ratio is claimed
+for v4.
+\end{document}

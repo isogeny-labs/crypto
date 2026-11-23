@@ -1,0 +1,459 @@
+{
+  "schema": "research.retained-lean-closure/v1",
+  "root_modules": [
+    "WeightedProjNonbranchDVR",
+    "WeightedProjNonbranchZeroOrder",
+    "WeightedProjQuinticHead",
+    "Common22SourceHead"
+  ],
+  "local_closure": {
+    "Common22SourceHead": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22SourceHead.lean",
+      "source_sha256": "6b012228f3c66c44cbf75538fe2715d6cd0b67934878c6d39df77185aea73be8",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22SourceHead.olean",
+      "olean_exists": true,
+      "olean_sha256": "f1f510f89ae1898f2637a0f04413c6b62f93e29435d0831c764deb14635cdc2d",
+      "imports": [
+        "Common22PolynomialHead",
+        "Common22SupportHead",
+        "Common22Coprime",
+        "Common22Degree",
+        "Common22Residues"
+      ]
+    },
+    "Common22Residues": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22Residues.lean",
+      "source_sha256": "8647d08f0e8ec1eaae0c1e75a4b4359cfd8f2dd3f1c6fbf13eb87c626df2c421",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22Residues.olean",
+      "olean_exists": true,
+      "olean_sha256": "19e8c4acede4bbd41a2e66e6e926090babab2c964e8b0d9d8eaf22cbd2112216",
+      "imports": [
+        "Mathlib.Algebra.Polynomial.Basic",
+        "Mathlib.Algebra.Polynomial.Degree.Domain",
+        "Mathlib.RingTheory.Coprime.Basic",
+        "Mathlib.Tactic.Ring"
+      ]
+    },
+    "Common22Degree": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22Degree.lean",
+      "source_sha256": "b8a40d7cff7aeeba1f7de789bf81864c411d1ca06419d9631322b3245eb8e7aa",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22Degree.olean",
+      "olean_exists": true,
+      "olean_sha256": "4cd0fe06e1cc9b243c0ba8d8e118c227f43cd13a5ba8f14ef56d81a8bf80952c",
+      "imports": [
+        "Mathlib.Algebra.Polynomial.Degree.Domain"
+      ]
+    },
+    "Common22Coprime": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22Coprime.lean",
+      "source_sha256": "e353511d1bc1e9dad2f946d971513ed95df5e8618c0d613a075f1471bf9863ab",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22Coprime.olean",
+      "olean_exists": true,
+      "olean_sha256": "312ec6b7d02a38fa11eeda9061f8fb52516a4ca9cb2a1e0c09e360556ad96c52",
+      "imports": [
+        "Mathlib.Algebra.Polynomial.Degree.Domain",
+        "Mathlib.RingTheory.Coprime.Basic",
+        "Mathlib.Tactic.Ring"
+      ]
+    },
+    "Common22SupportHead": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22SupportHead.lean",
+      "source_sha256": "5b587c98316df34b529a0cf6325f743ee20371d66971367ebca24a2d567d325f",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22SupportHead.olean",
+      "olean_exists": true,
+      "olean_sha256": "fb0b9463265b8891132d0d63e2e7568722f7c6e6ccf835772d148123db730043",
+      "imports": [
+        "Mathlib.Algebra.Field.Basic",
+        "Mathlib.Tactic.Ring"
+      ]
+    },
+    "Common22PolynomialHead": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22PolynomialHead.lean",
+      "source_sha256": "d8abf777af42a73d70c06a61a33af48fb65068c651dcf1c8af9cadeb4e260fb1",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22PolynomialHead.olean",
+      "olean_exists": true,
+      "olean_sha256": "9440355a2c8072783c667e368ed48bc860b67268600cb501f835177fcfd64e61",
+      "imports": [
+        "Mathlib.Algebra.Polynomial.Degree.Domain",
+        "Mathlib.Tactic.Ring"
+      ]
+    },
+    "WeightedProjQuinticHead": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjQuinticHead.lean",
+      "source_sha256": "668bd42e2f25d22dfa128cf910572f76190ec630a56665e8808b42bcf4d643f3",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedProjQuinticHead.olean",
+      "olean_exists": true,
+      "olean_sha256": "c6cfbdba07b7505b75d03e9d8c4633facb87500a2e7aac2dad862e730f0257c0",
+      "imports": [
+        "WeightedProjSmoothPoints",
+        "Common22BranchStalk",
+        "Common22BranchParameter",
+        "Mathlib.Tactic.ComputeDegree"
+      ]
+    },
+    "Common22BranchParameter": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22BranchParameter.lean",
+      "source_sha256": "8bf0d8f9360eb2d5325cb309f73381182d74f0bf13facead785e568616db6ce6",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22BranchParameter.olean",
+      "olean_exists": true,
+      "olean_sha256": "9eb8f29901827c2c5f3d8a1ebbb639df05ac7e0458354a50369a07485d0e8ecd",
+      "imports": [
+        "Common22BranchStalk"
+      ]
+    },
+    "Common22BranchStalk": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22BranchStalk.lean",
+      "source_sha256": "cc32399449c95235659c251c3a1133daf12bc2668890a56e107a104060a7925a",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22BranchStalk.olean",
+      "olean_exists": true,
+      "olean_sha256": "ef67c585e425254185abf9d166fa69f3621f6b54e4034803a6a31d2b9932e5a7",
+      "imports": [
+        "Common22SeparateChartMap",
+        "Mathlib.AlgebraicGeometry.AffineScheme",
+        "Mathlib.RingTheory.Ideal.Quotient.Basic"
+      ]
+    },
+    "Common22SeparateChartMap": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22SeparateChartMap.lean",
+      "source_sha256": "8e6bd2c06038b80b6497c5d130dc60e1d5a8b001b1bf4bd609d836a42ea63404",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22SeparateChartMap.olean",
+      "olean_exists": true,
+      "olean_sha256": "28308a0b50f8b2a3aec31b74ec175633c96c20c3dbbcfe0dd18d54eebd691212",
+      "imports": [
+        "Common22ExplicitChart",
+        "Common22PrincipalOpenEquation",
+        "Mathlib.RingTheory.Localization.Away.Basic"
+      ]
+    },
+    "Common22PrincipalOpenEquation": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22PrincipalOpenEquation.lean",
+      "source_sha256": "4b6bb321a713ce21a6d32e43387ecd4f71363dea83de738bbe3d4cea95afa361",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22PrincipalOpenEquation.olean",
+      "olean_exists": true,
+      "olean_sha256": "936bc74f610a7c126df51155754c354f10c0291eb8a2b6a95d62a8cf5c1d1b3d",
+      "imports": [
+        "Mathlib.Tactic.Ring",
+        "Mathlib.RingTheory.Ideal.Quotient.Operations",
+        "Mathlib.RingTheory.Localization.Away.Basic",
+        "Common22ExplicitChart"
+      ]
+    },
+    "Common22ExplicitChart": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22ExplicitChart.lean",
+      "source_sha256": "f5e2557b4cb4973fa006c09181198c9e87e29c4564eff7f3c8ff61fc7e992280",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22ExplicitChart.olean",
+      "olean_exists": true,
+      "olean_sha256": "fa78472886708970006c7ef5201272393be1bfaa06c390d14358315b8d6ac63a",
+      "imports": [
+        "Mathlib.RingTheory.MvPolynomial.Ideal",
+        "Mathlib.RingTheory.Ideal.Quotient.Basic",
+        "Mathlib.RingTheory.Ideal.Maps",
+        "Mathlib.RingTheory.Localization.AtPrime.Basic",
+        "Mathlib.RingTheory.Localization.Submodule",
+        "Mathlib.RingTheory.Ideal.Quotient.Noetherian",
+        "Mathlib.RingTheory.Polynomial.Basic",
+        "Mathlib.Tactic.FinCases",
+        "Common22LocalParameter"
+      ]
+    },
+    "Common22LocalParameter": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22LocalParameter.lean",
+      "source_sha256": "167e9e0bc7385c248f9c7fcfe42a29e97a167618a8c40c149e371c4f5e3249ab",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22LocalParameter.olean",
+      "olean_exists": true,
+      "olean_sha256": "382657c623fc30fe3f9f23ce1367adcf4bb0f7ebf64b77e801c7c32ff1f503ab",
+      "imports": [
+        "Mathlib.RingTheory.DiscreteValuationRing.Basic"
+      ]
+    },
+    "WeightedProjSmoothPoints": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjSmoothPoints.lean",
+      "source_sha256": "e0618f97117ca6ba52010da028958cdba26dcf2e5909a1d358e8717d9a709ff9",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedProjSmoothPoints.olean",
+      "olean_exists": true,
+      "olean_sha256": "fc0e39390b3d1306d78c738d155f47a43f800843922c76c4344887baf5369174",
+      "imports": [
+        "Common22InfinityChart",
+        "Mathlib.Algebra.Polynomial.Derivative",
+        "Mathlib.FieldTheory.Separable",
+        "Mathlib.FieldTheory.Perfect"
+      ]
+    },
+    "Common22InfinityChart": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22InfinityChart.lean",
+      "source_sha256": "5a8a8516b044f89afcb67a89530fce0bc18701dbf0bbed1423d70d069ff2aaf7",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22InfinityChart.olean",
+      "olean_exists": true,
+      "olean_sha256": "7369bfe43f58bd59a05f978a69673ab0f61710fecbacd245cc939bd5157e2b15",
+      "imports": [
+        "Common22SourceHead",
+        "Mathlib.Algebra.Polynomial.Eval.Defs",
+        "Mathlib.Algebra.Polynomial.Derivative",
+        "Mathlib.Algebra.Polynomial.FieldDivision",
+        "Mathlib.Tactic.FieldSimp"
+      ]
+    },
+    "WeightedProjNonbranchZeroOrder": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjNonbranchZeroOrder.lean",
+      "source_sha256": "3aca729afb11cdbf3992dc3db727b8d531922ecf381c423bc6bb6b2d6c3d3910",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedProjNonbranchZeroOrder.olean",
+      "olean_exists": true,
+      "olean_sha256": "af5ec64955e935bec66021340ebb308657854e46d6213a79a6e497655bb5ba5c",
+      "imports": [
+        "WeightedProjSchemeChart",
+        "Common22BranchStalk",
+        "Common22FiniteZeroOrder",
+        "WeightedProjQuinticHead",
+        "Mathlib.AlgebraicGeometry.AffineScheme",
+        "Mathlib.AlgebraicGeometry.OpenImmersion"
+      ]
+    },
+    "Common22FiniteZeroOrder": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22FiniteZeroOrder.lean",
+      "source_sha256": "af063fb50aff932dfce748dd5f8ab43491423b8f9eb654a692f45081f77b0549",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22FiniteZeroOrder.olean",
+      "olean_exists": true,
+      "olean_sha256": "48d305b37a5dae9a93bcb34d8c9dbb52beaad5a99e3220a0f092387b35712dc3",
+      "imports": [
+        "Mathlib.RingTheory.DiscreteValuationRing.Basic",
+        "Mathlib.RingTheory.LocalRing.Basic"
+      ]
+    },
+    "WeightedProjSchemeChart": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjSchemeChart.lean",
+      "source_sha256": "ffa7dd90d349648f22ab4d86cb18d557f6fb1b93bf5bd78febd116d4e95afd29",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedProjSchemeChart.olean",
+      "olean_exists": true,
+      "olean_sha256": "646a0e8680239a1155966607dbacb934c3680423b5064bd7e7ee16f637e16e04",
+      "imports": [
+        "WeightedChartIso",
+        "Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Basic"
+      ]
+    },
+    "WeightedChartIso": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedChartIso.lean",
+      "source_sha256": "fbcb3cae7cc4c9d7f0722da5f546892bb4cde848eb072580486be3c7a9ecd433",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedChartIso.olean",
+      "olean_exists": true,
+      "olean_sha256": "1e60f6b707b4abadb31c95b6c919caa34cb43c86478b2e23a493cf2b1bdb46ae",
+      "imports": [
+        "WeightedRingGraded",
+        "WeightedChartKernelRec",
+        "WeightedChartRoute"
+      ]
+    },
+    "WeightedChartRoute": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedChartRoute.lean",
+      "source_sha256": "ed6c4bc5b88acefa45fa00ed6ee83655b580e41e8f1d4fa0186777b821abab89",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedChartRoute.olean",
+      "olean_exists": true,
+      "olean_sha256": "28bb5ca9b53c64653e960c4f954b55f6ee947457b10146282ffdef76a3b639ed",
+      "imports": [
+        "Mathlib.RingTheory.GradedAlgebra.HomogeneousLocalization"
+      ]
+    },
+    "WeightedChartKernelRec": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedChartKernelRec.lean",
+      "source_sha256": "f02b2f827ca8123f3daabbf19b15d25f9f7793ab7693e8a795bec5572a9d4010",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedChartKernelRec.olean",
+      "olean_exists": true,
+      "olean_sha256": "148bd52e048d39fb017c23e2bf002b0087dcb006181463d04617fac69f3639ac",
+      "imports": [
+        "Mathlib.RingTheory.GradedAlgebra.HomogeneousLocalization"
+      ]
+    },
+    "WeightedRingGraded": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedRingGraded.lean",
+      "source_sha256": "b810dd4a6024bc77a7b8de1916c217caf8e1a0de2d555448c73a5d2515ff865c",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedRingGraded.olean",
+      "olean_exists": true,
+      "olean_sha256": "d94ab4347c3a8ef2b291abca875513c794bfaba6777fbdf416d6a76a0bb44941",
+      "imports": [
+        "WeightedRingComponent"
+      ]
+    },
+    "WeightedRingComponent": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedRingComponent.lean",
+      "source_sha256": "4f775fb6ac97fb2d478c2e550a955351df0ab730a5e344712ca5f4930cfb61b5",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedRingComponent.olean",
+      "olean_exists": true,
+      "olean_sha256": "7639f118f22f553f7c8192dbdd3bd1b5e4d8cca362c3824fa7a1742719818f0d",
+      "imports": [
+        "WeightedProjDegreeZeroScratch"
+      ]
+    },
+    "WeightedProjDegreeZeroScratch": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjDegreeZeroScratch.lean",
+      "source_sha256": "2026d342f368bd89bc60f16267edbdd8d6299c5401d6c625c539202aa3384377",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedProjDegreeZeroScratch.olean",
+      "olean_exists": true,
+      "olean_sha256": "d1888691d90c82513e5bfabfdcff403f3f48f461a67b011e20418abefcf59d8d",
+      "imports": [
+        "Common22WeightedProjKernel"
+      ]
+    },
+    "Common22WeightedProjKernel": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22WeightedProjKernel.lean",
+      "source_sha256": "264de1ec42c341dab220ccddffe116a5c66fbc680b86f93ad5bd2f77b641a53c",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22WeightedProjKernel.olean",
+      "olean_exists": true,
+      "olean_sha256": "ce5d79e870d0bb380b444d5fbca6418dd8a9ab5ddfd5525f5c0268aafd2c55c5",
+      "imports": [
+        "Common22WeightedProjQuotient",
+        "Mathlib.Tactic.Ring"
+      ]
+    },
+    "Common22WeightedProjQuotient": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22WeightedProjQuotient.lean",
+      "source_sha256": "877794f97a96f62c52b6ec9d1f68d6e2daaceb9e583cc8793fe5c2fe3b13696d",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22WeightedProjQuotient.olean",
+      "olean_exists": true,
+      "olean_sha256": "b78e5faf4c9659c173e04850b9bc309aa227fc4771724aa97bfee82fe2a20fd3",
+      "imports": [
+        "Common22WeightedProjHead",
+        "Mathlib.RingTheory.Ideal.Quotient.Operations"
+      ]
+    },
+    "Common22WeightedProjHead": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22WeightedProjHead.lean",
+      "source_sha256": "81e62fdb82407288a4e737719a8e86bdd7e2d85ba729a6fd5a495bbecd31c98f",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22WeightedProjHead.olean",
+      "olean_exists": true,
+      "olean_sha256": "a28fc7557c634ce08488538f97b34546050e08f7492491eaca0b62d949b00d7c",
+      "imports": [
+        "Mathlib.RingTheory.MvPolynomial.WeightedHomogeneous"
+      ]
+    },
+    "WeightedProjNonbranchDVR": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/WeightedProjNonbranchDVR.lean",
+      "source_sha256": "0eb48894992f0c1e412c20cdec44acc71692ea2b165b2d7afc3d72b6b204ce3f",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/WeightedProjNonbranchDVR.olean",
+      "olean_exists": true,
+      "olean_sha256": "9d34ec5f3822bc8847cbdc101d0c9822d280c5523fe5730813acca20093bc4f8",
+      "imports": [
+        "Common22SeparableAffineDomain",
+        "Common22BranchParameter",
+        "Mathlib.RingTheory.DiscreteValuationRing.TFAE"
+      ]
+    },
+    "Common22SeparableAffineDomain": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22SeparableAffineDomain.lean",
+      "source_sha256": "897099465cefd0afcf7a55668267fb56a46b91b7356a5594f17de6a6a680b602",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22SeparableAffineDomain.olean",
+      "olean_exists": true,
+      "olean_sha256": "67ace1e5ec698e88a42bce3049e299fbd0cafafb22193202c9354c8205d228d0",
+      "imports": [
+        "Common22AffineOddDomain",
+        "WeightedProjQuinticHead",
+        "Mathlib.RingTheory.Polynomial.UniqueFactorization"
+      ]
+    },
+    "Common22AffineOddDomain": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22AffineOddDomain.lean",
+      "source_sha256": "4ead48655a0379aaac0107324236231aa122b32ed1efb1911409865a455d05da",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22AffineOddDomain.olean",
+      "olean_exists": true,
+      "olean_sha256": "17f86da42b5dc3eec4af7ce1277c83d6345964bf99a8b86f2b945de1ba6973b1",
+      "imports": [
+        "Common22BranchDomain",
+        "WeightedProjNonbranchZeroOrder",
+        "Mathlib.RingTheory.DiscreteValuationRing.TFAE"
+      ]
+    },
+    "Common22BranchDomain": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22BranchDomain.lean",
+      "source_sha256": "29dec7059cf73856f216ba64f0599f54649d7ff1930df3f4ec1f2dc99701b462",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22BranchDomain.olean",
+      "olean_exists": true,
+      "olean_sha256": "3009a9888facb3cb3be482839046584bca5f4bf576453246125e535d2bd9c890",
+      "imports": [
+        "Common22BranchLocalParameter",
+        "Common22BranchValuation",
+        "Common22Domain",
+        "Common22Eisenstein",
+        "Mathlib.Algebra.MvPolynomial.Equiv",
+        "Mathlib.RingTheory.DiscreteValuationRing.TFAE"
+      ]
+    },
+    "Common22Eisenstein": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22Eisenstein.lean",
+      "source_sha256": "91e80e8fcfe59338162d0b32c13584ec486dd987289999fc1d7dabdf455fc92c",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22Eisenstein.olean",
+      "olean_exists": true,
+      "olean_sha256": "2b5b10b9dc25eb200c799bd0cfe5c4b50582e9003ccb28e7b4c2e9eb5abbbcd1",
+      "imports": [
+        "Mathlib.RingTheory.Polynomial.Eisenstein.Basic",
+        "Mathlib.RingTheory.Ideal.Maximal",
+        "Mathlib.Tactic.IntervalCases",
+        "Mathlib.Algebra.MvPolynomial.Division"
+      ]
+    },
+    "Common22Domain": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22Domain.lean",
+      "source_sha256": "9e478329ccf2a1a06badb365d5aa10fc3dbe93c7df9dbdda90ec02cce8071708",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22Domain.olean",
+      "olean_exists": true,
+      "olean_sha256": "704b138c7c88c84964893a40b9a6b0afe2a052afcd0784660ba62e3287589e2c",
+      "imports": [
+        "Common22Eisenstein",
+        "Common22ExplicitChart",
+        "Mathlib.RingTheory.Polynomial.UniqueFactorization",
+        "Mathlib.Algebra.MvPolynomial.Equiv",
+        "Mathlib.RingTheory.DiscreteValuationRing.TFAE"
+      ]
+    },
+    "Common22BranchValuation": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22BranchValuation.lean",
+      "source_sha256": "59514f0236a0d43c015f034732ce4d40b7281b55b01f62ae83175f66d68e1b93",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22BranchValuation.olean",
+      "olean_exists": true,
+      "olean_sha256": "3a0198c9fb0d30f0e246c4e82a0b0d1aa85ec13a2295984b625335d983fce19d",
+      "imports": [
+        "Common22BranchParameter",
+        "Mathlib.RingTheory.DiscreteValuationRing.Basic"
+      ]
+    },
+    "Common22BranchLocalParameter": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22BranchLocalParameter.lean",
+      "source_sha256": "717ad6c04c2611b7d05a3106d1fc6f855ecc552fe8466734c40d690ae77c447d",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22BranchLocalParameter.olean",
+      "olean_exists": true,
+      "olean_sha256": "be603c5d82609bc388aeec399e0487d36a638d320699f0f9464a696aad152a3a",
+      "imports": [
+        "Common22BranchMaximalIdeal",
+        "Common22BranchParameter",
+        "Common22LocalParameter"
+      ]
+    },
+    "Common22BranchMaximalIdeal": {
+      "source": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/Common22BranchMaximalIdeal.lean",
+      "source_sha256": "07253dabc66108c17c89544dd2e7eae8a6c5a17810832becafa13c9795650cf6",
+      "olean": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean/Common22BranchMaximalIdeal.olean",
+      "olean_exists": true,
+      "olean_sha256": "5ebefb95f67435caadbec52083596b36892183dd01675121d98610aa9944eee2",
+      "imports": [
+        "Common22BranchStalk"
+      ]
+    }
+  },
+  "missing_external_imports": [],
+  "local_missing_oleans": [],
+  "cache_roots": [
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/LeanSearchClient/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/Qq/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/aesop/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/batteries/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/importGraph/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/plausible/.lake/build/lib/lean",
+    "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/proofwidgets/.lake/build/lib/lean"
+  ],
+  "toolchain": "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+  "toolchain_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "lean_version_file": "leanprover/lean4:v4.34.1\n",
+  "lake_manifest_sha256": "ebc6643e694eaa4a60ab2b727c96253f3d88694e7ecb404f2176a548eedbe98d",
+  "source_custody_only": true,
+  "compiler_execution": false,
+  "limitation": "Source import closure/file hashes do not independently certify existing olean source correspondence."
+}

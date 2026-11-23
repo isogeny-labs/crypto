@@ -1,0 +1,16 @@
+digraph mechanisms {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.25", ranksep="0.35", fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fillcolor="#f0f4fa", color="#52718d", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.10"];
+  edge [color="#52718d", arrowsize=0.7];
+  request [label="Proposed objective: change the cold total exponent\nCurve25519 prime subgroup; common base and public targets", fillcolor="#dce9f6"];
+  a [label="A: compressed six-sum join\nImplicit triple images + original-root extraction\nMissing: affordable operator and update recurrence"];
+  b [label="B: norm-compatible base design\nTarget-bearing divisor 5[O]+[R]\nMissing: selective implicit factorization"];
+  c [label="C: controlled module saturation\nDegree, fill and complete extraction bounds\nMissing: growing-family invariant"];
+  gate [label="Conditional six-sum contract at B ~ N^(1/6)\nReturn more than B tagged checked rows in B^(3-epsilon) total work\nInclude setup, failed queries, decoding, replay and memory", fillcolor="#fff0cc"];
+  result [label="Would give collection exponent 1/2 - epsilon/6\nOnly if family, useful yield, hidden-tag selection, kernel\nand final recovery satisfy the full contract", fillcolor="#e3efdf"];
+  scope [label="All three mechanisms are proposals\nNo new solver run, algorithm theorem or scaling dataset", fillcolor="#f5eeee"];
+  request -> a; request -> b; request -> c;
+  {rank=same; a; b; c;}
+  a -> gate; b -> gate; c -> gate;
+  gate -> result -> scope;
+}

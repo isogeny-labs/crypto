@@ -1,0 +1,73 @@
+LIB "linalg.lib";
+proc require71(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc gcd71(int a,int b){int t;while(b!=0){t=a-(a/b)*b;a=b;b=t;}return(a);}
+proc phi71(int n){int a;int count=0;for(a=1;a<=n;a++){if(gcd71(a,n)==1){count++;}}return(count);}
+proc dump71(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../../../61/runs/trace61-01/trace-polynomial61.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));
+map unitToTable71=tracePolynomial61,u;
+matrix sourceUnit71=unitToTable71(unit61);
+require71(nrows(sourceUnit71)==32 && ncols(sourceUnit71)==1,"FIBER71_UNIT_SHAPE");
+intmat slots71[32][1];int p71;int i71;int j71;int f71;int k71;int d71;int e71;int pred71;int g71;int numerator71;int reduced71;int branches71;
+for(p71=1;p71<=528;p71++){
+ if(parents50[p71,1]==parents50[p71,2]){
+  j71=parents50[p71,1];require71(j71>=1 && j71<=32 && slots71[j71,1]==0,"FIBER71_UNIQUE_SQUARE_SLOTS");slots71[j71,1]=p71;
+ }
+}
+for(j71=1;j71<=32;j71++){require71(slots71[j71,1]>0,"FIBER71_ALL_SQUARE_SLOTS");}
+matrix squareFiber71[32][32];matrix unitFiber71[32][1];matrix image71[32][32];matrix nextImage71[32][32];matrix power71[32][32];
+intmat fixed71[32][1];intmat divisibilityCount71[32][1];intmat degrees71[32][1];
+int oldRank71;int newRank71;int stable71;int step71;int phiD71;int count71;int dimensions71;
+link out71="ASCII:w rational-fibers71.sing";open(out71);
+write(out71,"ring rationalFibers71=2,(u),dp;short=0;");
+for(f71=0;f71<=1;f71++){
+ for(i71=1;i71<=32;i71++){
+  unitFiber71[i71,1]=subst(sourceUnit71[i71,1],u,f71);
+  for(j71=1;j71<=32;j71++){squareFiber71[i71,j71]=subst(table50[i71,slots71[j71,1]],u,f71);}
+ }
+ require71(squareFiber71*unitFiber71==unitFiber71 && unitFiber71!=matrix(0,32,1),"FIBER71_UNIT_SQUARE");
+ image71=unitmat(32);oldRank71=32;stable71=0;step71=0;
+ while(stable71==0 && step71<32){
+  nextImage71=squareFiber71*image71;newRank71=mat_rk(nextImage71);step71++;
+  require71(newRank71<=oldRank71,"FIBER71_NESTED_IMAGE_RANK");
+  image71=nextImage71;if(newRank71==oldRank71){stable71=1;}oldRank71=newRank71;
+ }
+ require71(stable71==1 && newRank71>=1,"FIBER71_FROBENIUS_STABILIZATION");
+ require71(mat_rk(squareFiber71*image71)==newRank71,"FIBER71_STABLE_IMAGE_INVARIANT");
+ power71=unitmat(32);
+ for(d71=1;d71<=32;d71++){
+  power71=squareFiber71*power71;
+  fixed71[d71,1]=newRank71-mat_rk((power71+unitmat(32))*image71);
+  require71(fixed71[d71,1]>=1 && fixed71[d71,1]<=newRank71,"FIBER71_FIXED_DIMENSION_RANGE");
+ }
+ for(d71=1;d71<=32;d71++){
+  numerator71=fixed71[d71,1];
+  for(e71=1;e71<d71;e71++){if(d71==(d71/e71)*e71){numerator71=numerator71-phi71(e71)*divisibilityCount71[e71,1];}}
+  phiD71=phi71(d71);require71(phiD71>0 && numerator71==(numerator71/phiD71)*phiD71,"FIBER71_TOTIENT_DIVISIBILITY");
+  divisibilityCount71[d71,1]=numerator71/phiD71;
+  require71(divisibilityCount71[d71,1]>=0,"FIBER71_DIVISIBILITY_COUNT_NONNEGATIVE");
+ }
+ for(d71=32;d71>=1;d71--){
+  count71=divisibilityCount71[d71,1];
+  for(e71=d71+1;e71<=32;e71++){if(e71==(e71/d71)*d71){count71=count71-degrees71[e71,1];}}
+  require71(count71>=0,"FIBER71_DEGREE_COUNT_NONNEGATIVE");degrees71[d71,1]=count71;
+ }
+ dimensions71=0;branches71=0;
+ for(e71=1;e71<=32;e71++){dimensions71=dimensions71+e71*degrees71[e71,1];branches71=branches71+degrees71[e71,1];}
+ require71(dimensions71==newRank71 && branches71==fixed71[1,1],"FIBER71_RESIDUE_DIMENSION_AND_BRANCHES");
+ for(d71=1;d71<=32;d71++){
+  pred71=0;for(e71=1;e71<=32;e71++){pred71=pred71+gcd71(d71,e71)*degrees71[e71,1];}
+  require71(pred71==fixed71[d71,1],"FIBER71_ALL_FIXED_DIMENSIONS_RECONSTRUCTED");
+ }
+ dump71(out71,"squareFiber"+string(f71)+"_71",squareFiber71);
+ dump71(out71,"stableImage"+string(f71)+"_71",image71);
+ write(out71,"int stableSteps"+string(f71)+"_71="+string(step71)+";int reducedDimension"+string(f71)+"_71="+string(newRank71)+";int branches"+string(f71)+"_71="+string(branches71)+";");
+ for(d71=1;d71<=32;d71++){write(out71,"int fixed"+string(f71)+"_"+string(d71)+"_71="+string(fixed71[d71,1])+";int degreeCount"+string(f71)+"_"+string(d71)+"_71="+string(degrees71[d71,1])+";");}
+ print("FIBER71_RESULT fiber="+string(f71)+" algebra_dimension=32 stable_steps="+string(step71)+" reduced_dimension="+string(newRank71)+" branches="+string(branches71));
+ for(e71=1;e71<=32;e71++){if(degrees71[e71,1]>0){print("FIBER71_DEGREE fiber="+string(f71)+" degree="+string(e71)+" multiplicity="+string(degrees71[e71,1]));}}
+}
+close(out71);
+print("RATIONAL_FIBERS71_ALL_CHECKS_PASS");quit;

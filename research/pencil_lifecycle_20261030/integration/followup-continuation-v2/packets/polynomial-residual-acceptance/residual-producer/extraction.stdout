@@ -1,0 +1,107 @@
+{
+  "canonical_matches_original": true,
+  "comparisons": [
+    {
+      "source": "related-gate",
+      "function": "choose",
+      "present": true,
+      "byte_identical": false,
+      "identifier_replacements": {
+        "out": "x"
+      },
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    },
+    {
+      "source": "related-gate",
+      "function": "transform",
+      "present": true,
+      "byte_identical": false,
+      "identifier_replacements": {
+        "scale_inv": "inv"
+      },
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    },
+    {
+      "source": "related-gate",
+      "function": "map_divisor",
+      "present": false
+    },
+    {
+      "source": "state-collector",
+      "function": "choose",
+      "present": true,
+      "byte_identical": true,
+      "identifier_replacements": {},
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    },
+    {
+      "source": "state-collector",
+      "function": "transform",
+      "present": true,
+      "byte_identical": true,
+      "identifier_replacements": {},
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    },
+    {
+      "source": "state-collector",
+      "function": "map_divisor",
+      "present": true,
+      "byte_identical": false,
+      "identifier_replacements": {
+        "out": "result"
+      },
+      "equal_after_recorded_replacements": true,
+      "interpretation": "text comparison only; not compiler or independent semantic verification"
+    }
+  ],
+  "affected_packets": [
+    {
+      "packet": "coefficient-array-storage",
+      "excerpt_sha256": "396fc8c38664cc860d967aae7950cf489d1fd850389e8f44c6eb146ff3486715",
+      "excerpt_matches_related_gate_first61": true,
+      "named_functions_present": {
+        "choose": false,
+        "transform": false,
+        "map_divisor": false
+      },
+      "correction": "Use named canonical function excerpts and source map in this correction; preserve prior packet unchanged."
+    },
+    {
+      "packet": "coefficient-traversal",
+      "excerpt_sha256": "396fc8c38664cc860d967aae7950cf489d1fd850389e8f44c6eb146ff3486715",
+      "excerpt_matches_related_gate_first61": true,
+      "named_functions_present": {
+        "choose": false,
+        "transform": false,
+        "map_divisor": false
+      },
+      "correction": "Use named canonical function excerpts and source map in this correction; preserve prior packet unchanged."
+    },
+    {
+      "packet": "traversal-polynomial-composition",
+      "excerpt_sha256": "396fc8c38664cc860d967aae7950cf489d1fd850389e8f44c6eb146ff3486715",
+      "excerpt_matches_related_gate_first61": true,
+      "named_functions_present": {
+        "choose": false,
+        "transform": false,
+        "map_divisor": false
+      },
+      "correction": "Use named canonical function excerpts and source map in this correction; preserve prior packet unchanged."
+    },
+    {
+      "packet": "scale-trim-storage",
+      "excerpt_sha256": "396fc8c38664cc860d967aae7950cf489d1fd850389e8f44c6eb146ff3486715",
+      "excerpt_matches_related_gate_first61": true,
+      "named_functions_present": {
+        "choose": false,
+        "transform": false,
+        "map_divisor": false
+      },
+      "correction": "Use named canonical function excerpts and source map in this correction; preserve prior packet unchanged."
+    }
+  ]
+}

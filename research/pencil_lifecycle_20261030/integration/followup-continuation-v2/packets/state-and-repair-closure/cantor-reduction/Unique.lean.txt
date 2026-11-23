@@ -1,0 +1,24 @@
+import Cantor
+set_option autoImplicit false
+namespace CZeroCantor
+open Polynomial CZeroInterpolation CZeroOutput
+variable {K : Type*} [Field K]
+theorem support_monic (q r : K) : (CZeroInterpolation.support q r).Monic := by
+ show (CZeroInterpolation.support q r).leadingCoeff=1
+ rw [leadingCoeff,support_degree]
+ simp [CZeroInterpolation.support]
+theorem product_monic (q1 r1 q2 r2 : K) :
+ (CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2).Monic := by
+ show (CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2).leadingCoeff=1
+ rw [leadingCoeff_mul]
+ have h1:=support_monic q1 r1
+ have h2:=support_monic q2 r2
+ change (CZeroInterpolation.support q1 r1).leadingCoeff=1 at h1
+ change (CZeroInterpolation.support q2 r2).leadingCoeff=1 at h2
+ rw [h1,h2]; simp
+
+theorem exact_quotient_unique (q1 r1 q2 r2 : K) (n t wanted : K[X])
+ (h:n=CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2*t)
+ (hw:n=CZeroInterpolation.support q1 r1*CZeroInterpolation.support q2 r2*wanted) : t=wanted := by
+ exact mul_left_cancel₀ (mul_ne_zero (support_nonzero q1 r1) (support_nonzero q2 r2)) (h.symm.trans hw)
+end CZeroCantor

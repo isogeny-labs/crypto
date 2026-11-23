@@ -1,0 +1,76 @@
+[
+  {
+    "module": "DirectBranchCoefficientMultiplicity",
+    "import": "Nonbranch",
+    "kind": "retained artifact",
+    "paths": [
+      "/home/ec2-user/pencil-native-branch-coefficient-v2-20261109/Nonbranch.olean"
+    ]
+  },
+  {
+    "module": "DirectBranchCoefficientMultiplicity",
+    "import": "Mathlib.Algebra.Polynomial.FieldDivision",
+    "kind": "baseline-bound",
+    "paths": [
+      "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Algebra/Polynomial/FieldDivision.olean"
+    ]
+  },
+  {
+    "module": "DirectBranchCoefficientMultiplicity",
+    "import": "Mathlib.Algebra.Polynomial.RingDivision",
+    "kind": "baseline-bound",
+    "paths": [
+      "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Algebra/Polynomial/RingDivision.olean"
+    ]
+  },
+  {
+    "module": "DirectBranchCoefficientMultiplicity",
+    "import": "Mathlib.Tactic.Ring",
+    "kind": "baseline-bound",
+    "paths": [
+      "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Tactic/Ring.olean"
+    ]
+  },
+  {
+    "module": "DirectBranchCoefficientMultiplicity",
+    "import": "Lean.Elab.Tactic.Omega",
+    "kind": "baseline-bound",
+    "paths": [
+      "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean/Lean/Elab/Tactic/Omega.olean"
+    ]
+  },
+  {
+    "module": "DirectBranchControls",
+    "import": "DirectBranchCoefficientMultiplicity",
+    "kind": "fresh prior call",
+    "paths": []
+  },
+  {
+    "module": "DirectBranchControls",
+    "import": "Mathlib.Tactic.Ring",
+    "kind": "baseline-bound",
+    "paths": [
+      "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Tactic/Ring.olean"
+    ]
+  },
+  {
+    "module": "DirectBranchControls",
+    "import": "Mathlib.Tactic.NormNum",
+    "kind": "baseline-bound",
+    "paths": [
+      "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Tactic/NormNum.olean"
+    ]
+  },
+  {
+    "module": "Readback",
+    "import": "DirectBranchControls",
+    "kind": "fresh prior call",
+    "paths": []
+  },
+  {
+    "module": "ExpectedFailure",
+    "import": "DirectBranchControls",
+    "kind": "fresh prior call",
+    "paths": []
+  }
+]

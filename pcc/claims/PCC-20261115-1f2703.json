@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T20:19:25Z",
+ "id": "PCC-20261115-1f2703",
+ "kind": "statement",
+ "producer": {
+  "commit": "84fd610de0727b15cb009951392f7b21fea585df",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/backend-tests.log",
+    "sha256": "8b82c30e2629e2babe4dd8c6f0cc8f87e08a3409d412736b104c9607d8e4e862"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/backend-control-v1/backend-pre-call.json",
+    "sha256": "e8ce0c4f3588c02c9882e07f1e1af8de476c12798fe85c0deb50ab67c3849f05"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "tools/torus-s4/tests/backend.rs",
+    "sha256": "8684e6da9dd01560ac657254e4b49472e84d16b92d7e0d7302b2cbbddb3a7e97"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Producer optional native backend test reports that Singular standard bases classify both actual-field M1 controls as expected. This is a functional check, not a checked absence certificate, solver measurement or independent signed verification."
+}

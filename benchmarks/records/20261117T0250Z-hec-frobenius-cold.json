@@ -1,0 +1,357 @@
+{
+  "schema": "bench.record/v1",
+  "id": "20261117T0250Z-hec-frobenius-cold",
+  "slug": "hec-frobenius-cold",
+  "problem": "ic:hec-frobenius-proof-contract-g4f19",
+  "curve_uid": null,
+  "repo": "crypto",
+  "created_utc": "2026-11-17T02:46:16Z",
+  "closed_utc": "2026-11-17T02:48:13Z",
+  "status": "measured",
+  "commit": "165ed3d05866e4e1a72d1e32ee4881ada086e045",
+  "commit_dirty": true,
+  "branch": "research/hec-git-custody-20261116",
+  "host": {
+    "cpu": "Apple M4 Pro",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "platform": "macOS 27.2 arm64",
+    "isolation": "L0 shared, no exclusive core or frequency guarantee"
+  },
+  "entries": [
+
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/usr/bin/perl",
+        "-e",
+        "alarm 180; exec @ARGV",
+        "/Volumes/SSD990-2/hec-frobenius-cold-target/release/frobenius-cold-cost"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T02:46:31Z",
+      "wall_s": 1.0
+    }
+  ],
+  "raw": [
+    {
+      "path": "research/hec_residual_span_20261116/frobenius-cost/CONTROL.tsv",
+      "sha256": "8c06221dc071a2a3e1188b36e77b89a75d8389a5b131b7b0c0dc55fdfbfe58a3",
+      "bytes": 37362,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/frobenius-cost/CONTROL.stderr",
+      "sha256": "e217fc7d40d2b77a0dffdb5bc247d5194ecfc59fc55b6598d35bf2dd91d6c0f1",
+      "bytes": 185,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/frobenius-cost/SUMMARY.tsv",
+      "sha256": "bd42c2c3bc401a0de75226491496747d51bfbe136c6628be3d7d2dc85daf08ed",
+      "bytes": 838,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/frobenius-cost/SUMMARY.stderr",
+      "sha256": "0d7c73f0947ca89a83e8387d41376b9a8043c3b0370e90bb5ab654ddb865b01f",
+      "bytes": 391,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/frobenius-cost/RUN.txt",
+      "sha256": "bfc6b07588ad1cdfecda58bbd209c1bd2f7262455967ad11b2ec8c4363d2587a",
+      "bytes": 182,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    },
+    {
+      "path": "research/hec_residual_span_20261116/frobenius-cost/OUTPUT.sha256",
+      "sha256": "fc2e2789364529da0a0023c5768e630cb1eda62551f78d045e2166df42c8d1a7",
+      "bytes": 512,
+      "s3_uri": null,
+      "uploaded": false,
+      "custody": "git"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "target0_character_cold_wall",
+      "value": 3.3763062e-05,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        3.3625062e-05,
+        3.4276062e-05
+      ],
+      "baseline": 0.00070898175,
+      "reference": 0.00070898175,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target0_qualified_cold_wall",
+      "value": 0.00034542443800000003,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.00033838025,
+        0.00035124475
+      ],
+      "baseline": 0.00070898175,
+      "reference": 0.00070898175,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target0_orbit_cold_wall",
+      "value": 0.000414382812,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000410364625,
+        0.000427783875
+      ],
+      "baseline": 0.00070898175,
+      "reference": 0.00070898175,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target0_native_cold_wall",
+      "value": 0.00070898175,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000706033812,
+        0.00072326825
+      ],
+      "baseline": 0.00070898175,
+      "reference": 0.00070898175,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target0_native_aa_cold_wall",
+      "value": 0.000708677125,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000698338562,
+        0.000717442562
+      ],
+      "baseline": 0.00070898175,
+      "reference": 0.00070898175,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target1_character_cold_wall",
+      "value": 4.1697938e-05,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        4.105475e-05,
+        4.2453125e-05
+      ],
+      "baseline": 0.00057068475,
+      "reference": 0.00057068475,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target1_qualified_cold_wall",
+      "value": 0.000350455875,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000342151188,
+        0.00035406
+      ],
+      "baseline": 0.00057068475,
+      "reference": 0.00057068475,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target1_orbit_cold_wall",
+      "value": 0.00042236725,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000412166562,
+        0.00042705725
+      ],
+      "baseline": 0.00057068475,
+      "reference": 0.00057068475,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target1_native_cold_wall",
+      "value": 0.00057068475,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000562549562,
+        0.00058053125
+      ],
+      "baseline": 0.00057068475,
+      "reference": 0.00057068475,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target1_native_aa_cold_wall",
+      "value": 0.00056519525,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000564421938,
+        0.0005775105
+      ],
+      "baseline": 0.00057068475,
+      "reference": 0.00057068475,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target2_character_cold_wall",
+      "value": 3.2179688e-05,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        3.0963562e-05,
+        3.2419375e-05
+      ],
+      "baseline": 0.000792265562,
+      "reference": 0.000792265562,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target2_qualified_cold_wall",
+      "value": 0.000340349125,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.00033943493800000005,
+        0.0003442785
+      ],
+      "baseline": 0.000792265562,
+      "reference": 0.000792265562,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target2_orbit_cold_wall",
+      "value": 0.000414078125,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000412215938,
+        0.000416051938
+      ],
+      "baseline": 0.000792265562,
+      "reference": 0.000792265562,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target2_native_cold_wall",
+      "value": 0.000792265562,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.0007842215,
+        0.000800966188
+      ],
+      "baseline": 0.000792265562,
+      "reference": 0.000792265562,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "target2_native_aa_cold_wall",
+      "value": 0.00079044525,
+      "unit": "wall_s",
+      "better": "lower",
+      "n": 5,
+      "spread": [
+        0.000787518375,
+        0.00079235925
+      ],
+      "baseline": 0.000792265562,
+      "reference": 0.000792265562,
+      "reference_kind": "baseline",
+      "note": "5batchmeans*16freshcoldsetups. Explicit proof-based runtime versus fullqualification. L0fixedcurvewall only; no external/countprimary/independentadmission."
+    },
+    {
+      "name": "verified_complete_calls",
+      "value": 1200,
+      "unit": "count",
+      "better": "neutral",
+      "n": null,
+      "spread": null,
+      "baseline": null,
+      "reference": null,
+      "reference_kind": null,
+      "note": "Allcallsverify; proof-contract and qualification arms kept separate."
+    }
+  ],
+  "reports": {
+    "pdf": "research/hec_residual_span_20261116/reports/git-custody/REPORT.pdf",
+    "svg": [
+
+    ],
+    "png": [
+
+    ]
+  },
+  "validation": null,
+  "summary": "1200/1200correct, localspread/AApass. Native/character-fast20.998739/13.686163/24.620051passes numericaltenfold on fixedg4/F19under explicit proof-based runtimecontract. Fullqualificationarmnottenfold. Classicalspecialcurve, L0wall/noexternal/countprimary/independentreplay; broadergenus2+objectiveunachieved. Gitcustodyauthorized/noS3claim.",
+  "session": null,
+  "custody": {
+    "kind": "git",
+    "authorization": "research/hec_degree2_lp_20261116/GIT-CUSTODY-AMENDMENT.md",
+    "s3_available": false
+  },
+  "protocol": "research/hec_residual_span_20261116/frobenius-cost/PROTOCOL.md",
+  "scientific_paths_clean_at_execution": true,
+  "qualification": {
+    "local_spread_pass": true,
+    "native_aa_pass": true,
+    "numerical_tenfold": true,
+    "admitted": false,
+    "primary_counted_operation_result": false,
+    "external_comparison": "not run",
+    "proof_runtime_contract": "frobenius/THEORY.md plus percall Bezout and final source verification",
+    "full_qualification_arm_retained": true,
+    "objective_complete": false
+  }
+}

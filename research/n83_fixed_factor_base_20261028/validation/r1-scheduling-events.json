@@ -1,0 +1,133 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-28T01:55:27Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "n83-fixed-factor-base-e27-20261028-r1-zqzw5",
+                "namespace": "isolab",
+                "resourceVersion": "5276937",
+                "uid": "1db0dcf2-0fc7-4e92-9924-bf0a80fb8277"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-28T01:55:27Z",
+            "message": "0/5 nodes are available: 2 node(s) didn't match Pod's node affinity/selector, 3 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/5 nodes are available: 5 Preemption is not helpful for scheduling.",
+            "metadata": {
+                "creationTimestamp": "2026-10-28T01:55:27Z",
+                "name": "n83-fixed-factor-base-e27-20261028-r1-zqzw5.18e28eb91a099012",
+                "namespace": "isolab",
+                "resourceVersion": "5276940",
+                "uid": "1a2ba53b-da22-4c57-aef2-4970c4d8a894"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "default-scheduler",
+            "reportingInstance": "",
+            "source": {
+                "component": "default-scheduler"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-28T01:55:28Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "n83-fixed-factor-base-e27-20261028-r1-zqzw5",
+                "namespace": "isolab",
+                "resourceVersion": "5276941",
+                "uid": "1db0dcf2-0fc7-4e92-9924-bf0a80fb8277"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-28T01:55:28Z",
+            "message": "Pod should schedule on: nodeclaim/cpu-spot-h54qh",
+            "metadata": {
+                "creationTimestamp": "2026-10-28T01:55:28Z",
+                "name": "n83-fixed-factor-base-e27-20261028-r1-zqzw5.18e28eb970444051",
+                "namespace": "isolab",
+                "resourceVersion": "5276958",
+                "uid": "cbfa0135-793f-4031-b6f3-b2b701e0d93a"
+            },
+            "reason": "Nominated",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-28T01:56:02Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "n83-fixed-factor-base-e27-20261028-r1-zqzw5",
+                "namespace": "isolab",
+                "resourceVersion": "5276941",
+                "uid": "1db0dcf2-0fc7-4e92-9924-bf0a80fb8277"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-28T01:56:02Z",
+            "message": "NodeClaim cpu-spot-h54qh nominated for this pod failed to launch: creating instance, insufficient capacity, with fleet error(s), MaxSpotInstanceCountExceeded: Max spot instance count exceeded; UnfulfillableCapacity: Unable to fulfill capacity due to your request configuration. Please adjust your request and try again. (aws-error-code=UnfulfillableCapacity, aws-operation-name=CreateFleet, aws-request-id=1a31fd02-6d5c-4456-82e5-57816e2ba45b, aws-service-name=EC2, aws-status-code=200)",
+            "metadata": {
+                "creationTimestamp": "2026-10-28T01:56:02Z",
+                "name": "n83-fixed-factor-base-e27-20261028-r1-zqzw5.18e28ec15a288b56",
+                "namespace": "isolab",
+                "resourceVersion": "5277383",
+                "uid": "c25496e0-d803-44a9-9638-2f60b2beb2e9"
+            },
+            "reason": "InsufficientCapacityError",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Warning"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-10-28T01:56:08Z",
+            "involvedObject": {
+                "apiVersion": "v1",
+                "kind": "Pod",
+                "name": "n83-fixed-factor-base-e27-20261028-r1-zqzw5",
+                "namespace": "isolab",
+                "resourceVersion": "5276941",
+                "uid": "1db0dcf2-0fc7-4e92-9924-bf0a80fb8277"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-10-28T01:56:08Z",
+            "message": "Failed to schedule pod, all available instance types exceed limits for nodepool (NodePool=gha-on-demand-extra); all available instance types exceed limits for nodepool (NodePool=gha-on-demand); did not tolerate taint (taint=gha.dev/workload=runner:NoSchedule); no instance type has enough resources, requirements=isolab.dev/cpu-isolation In [v4], isolab.dev/pool In [cpu-spot], isolab.dev/role In [worker], karpenter.k8s.aws/ec2nodeclass In [cpu], karpenter.k8s.aws/instance-category In [c m r], karpenter.k8s.aws/instance-cpu In [16 32 8], karpenter.k8s.aws/instance-family NotIn [c7i-flex c8i-flex m7i-flex m8i-flex], karpenter.k8s.aws/instance-generation Exists \u003e=6, karpenter.sh/capacity-type In [spot], karpenter.sh/initialized In [true], karpenter.sh/nodepool In [cpu-spot], karpenter.sh/registered In [true], kubernetes.io/arch In [amd64], kubernetes.io/os In [linux], resources={\"cpu\":\"16180m\",\"ephemeral-storage\":\"10Gi\",\"memory\":\"8296Mi\",\"pods\":\"4\"}; did not tolerate taint (taint=isolab.dev/measurement=l2:NoSchedule)",
+            "metadata": {
+                "creationTimestamp": "2026-10-28T01:56:08Z",
+                "name": "n83-fixed-factor-base-e27-20261028-r1-zqzw5.18e28ec2c47e7f46",
+                "namespace": "isolab",
+                "resourceVersion": "5277472",
+                "uid": "c5ee763e-89e6-4add-92a3-b3a67ea39ab2"
+            },
+            "reason": "FailedScheduling",
+            "reportingComponent": "karpenter",
+            "reportingInstance": "",
+            "source": {
+                "component": "karpenter"
+            },
+            "type": "Warning"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

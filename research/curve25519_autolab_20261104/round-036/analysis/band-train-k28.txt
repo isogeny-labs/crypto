@@ -1,0 +1,52 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | inc | 16/16 | 1.997 | 2.187 | 3.896 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | rho-neg | 16/16 | 0.929 | 1.016 | 1.794 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | tw2l-x10-j16-n2 | 16/16 | 2.001 | 2.195 | 3.942 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | tw2l-x10-j8-n2 | 16/16 | 1.965 | 2.157 | 3.881 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | tw2l-x15-j16-n2 | 16/16 | 1.726 | 1.893 | 3.391 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | tw2l-x20-j16-n2 | 16/16 | 1.678 | 1.840 | 3.293 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | tw2l-x20-j32-n2 | 16/16 | 1.928 | 2.113 | 3.772 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | tw2l-x20-j8-n2 | 16/16 | 1.688 | 1.852 | 3.325 | — |
+| icv1-fp28-tm27314-a41e3b62 | 25.00 | tw2l-x30-j16-n2 | 16/16 | 1.614 | 1.770 | 3.166 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm27314-a41e3b62 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs tw2l-x10-j16-n2 | inc < tw2l-x10-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | inc vs tw2l-x10-j8-n2 | tw2l-x10-j8-n2 < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs tw2l-x15-j16-n2 | tw2l-x15-j16-n2 < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs tw2l-x20-j32-n2 | tw2l-x20-j32-n2 < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs tw2l-x20-j8-n2 | tw2l-x20-j8-n2 < inc |
+| icv1-fp28-tm27314-a41e3b62 | inc vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < inc |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs tw2l-x10-j16-n2 | rho-neg < tw2l-x10-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs tw2l-x10-j8-n2 | rho-neg < tw2l-x10-j8-n2 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs tw2l-x15-j16-n2 | rho-neg < tw2l-x15-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs tw2l-x20-j16-n2 | rho-neg < tw2l-x20-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs tw2l-x20-j32-n2 | rho-neg < tw2l-x20-j32-n2 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs tw2l-x20-j8-n2 | rho-neg < tw2l-x20-j8-n2 |
+| icv1-fp28-tm27314-a41e3b62 | rho-neg vs tw2l-x30-j16-n2 | rho-neg < tw2l-x30-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j16-n2 vs tw2l-x10-j8-n2 | tw2l-x10-j8-n2 < tw2l-x10-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j16-n2 vs tw2l-x15-j16-n2 | tw2l-x15-j16-n2 < tw2l-x10-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j16-n2 vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < tw2l-x10-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j16-n2 vs tw2l-x20-j32-n2 | tw2l-x20-j32-n2 < tw2l-x10-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j16-n2 vs tw2l-x20-j8-n2 | tw2l-x20-j8-n2 < tw2l-x10-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j16-n2 vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < tw2l-x10-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j8-n2 vs tw2l-x15-j16-n2 | tw2l-x15-j16-n2 < tw2l-x10-j8-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j8-n2 vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < tw2l-x10-j8-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j8-n2 vs tw2l-x20-j32-n2 | tw2l-x20-j32-n2 < tw2l-x10-j8-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j8-n2 vs tw2l-x20-j8-n2 | tw2l-x20-j8-n2 < tw2l-x10-j8-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x10-j8-n2 vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < tw2l-x10-j8-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x15-j16-n2 vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < tw2l-x15-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x15-j16-n2 vs tw2l-x20-j32-n2 | tw2l-x15-j16-n2 < tw2l-x20-j32-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x15-j16-n2 vs tw2l-x20-j8-n2 | tw2l-x20-j8-n2 < tw2l-x15-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x15-j16-n2 vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < tw2l-x15-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x20-j16-n2 vs tw2l-x20-j32-n2 | tw2l-x20-j16-n2 < tw2l-x20-j32-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x20-j16-n2 vs tw2l-x20-j8-n2 | tw2l-x20-j16-n2 < tw2l-x20-j8-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x20-j16-n2 vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < tw2l-x20-j16-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x20-j32-n2 vs tw2l-x20-j8-n2 | tw2l-x20-j8-n2 < tw2l-x20-j32-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x20-j32-n2 vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < tw2l-x20-j32-n2 |
+| icv1-fp28-tm27314-a41e3b62 | tw2l-x20-j8-n2 vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < tw2l-x20-j8-n2 |

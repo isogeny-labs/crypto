@@ -1,0 +1,52 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "synthetic-aps-package-contract",
+  "version": 1,
+  "created": "2026-11-04",
+  "repository": "other",
+  "question": "Can a synthetic package be reconstructed from its literal fixture files?",
+  "claims": [{"id":"fixture-only","text":"Synthetic parser contract; no experimental result or admitted design.","class":"out_of_scope","decided_by":["synthetic-all"]}],
+  "arms": [
+    {"id":"fixture-reference","role":"reference","description":"Synthetic reference label; all arms use the same fixture.","instrument":{"repo":"synthetic-fixture","commit":null,"build":null,"binary_sha256":null,"threads":1}},
+    {"id":"fixture-candidate","role":"candidate","description":"Synthetic candidate label; no measured comparison.","instrument":{"repo":"synthetic-fixture","commit":null,"build":null,"binary_sha256":null,"threads":1}},
+    {"id":"fixture-aa","role":"control_aa","description":"Synthetic duplicate label for role mapping.","instrument":{"repo":"synthetic-fixture","commit":null,"build":null,"binary_sha256":null,"threads":1}}
+  ],
+  "controls": {
+    "aa":{"present":true,"comparison":"synthetic-all","not_applicable_reason":null},
+    "positive":{"present":false,"arm":null,"expected_detection":null,"not_applicable_reason":"Parser fixture only."},
+    "negative":{"present":false,"arm":null,"null_population":null,"not_applicable_reason":"Parser fixture only."}
+  },
+  "variable_ledger": {
+    "independent":[],
+    "factors":[{"name":"fixture","treatment":"fixed","how":"All rows contain synthetic literals."}],
+    "comparisons":[{"id":"synthetic-all","arms":["fixture-reference","fixture-candidate","fixture-aa"],"differs_in":[],"design":"aa","reason":"Role and file-binding contracts only."}],
+    "crosses_map":false
+  },
+  "randomization": {
+    "arm_order":"fixed",
+    "seed_derivation":{"method":"explicit_list"},
+    "instance_sampling":{"rule":"One hard-coded public toy instance.","independent_of_arm":true},
+    "blinding":{"analysis_labels_masked":false,"how":"No experimental analysis is conducted."}
+  },
+  "sample_size": {
+    "instances":1,"replicates":1,
+    "power":{"method":"exact","alpha":0.05,"tests_in_family":1,"correction":"none","passes":false,"note":"No power or measurement admission is claimed for this parser fixture."},
+    "preflight_runtime":{"fixed_seconds":null,"per_sample_seconds":null,"threads":1,"estimated_total_seconds":null,"measured_on":null}
+  },
+  "metrics": {
+    "primary":[{"id":"fixture-equality","name":"Literal reconstruction","unit":"boolean","kind":"exact","definition":"Compare the reconstructed synthetic document.","source":"unit-test assertion","aggregation":"per_row","uncertainty":"none_exact"}],
+    "secondary":[]
+  },
+  "measurement":{"isolation_required":"none","warmups":0,"order":"sequential","record":["synthetic literals"],"timed_primary_justification":null},
+  "execution": {
+    "backend":"manual","timeout_seconds":1,
+    "checkpoint":{"policy":"none","interval_seconds":null,"grace_seconds":null,"restore_validation":"none","after_restore":{"wall_time":"invalid","counted_units":"valid"}},
+    "retries":{"infrastructure_only":true,"max_attempts":1}
+  },
+  "stopping_rules":[{"rule":"Stop after the finite fixture assertions.","kind":"fixed_n","preregistered":true}],
+  "decision_rule":{"text":"No scientific decision; parser fixture only.","comparison_ids":["synthetic-all"],"statistic":"literal equality","interval":"not applicable","multiple_comparison_correction":"none","effect_size_measure":"not applicable","verdict_vocabulary":["fixture-only"]},
+  "analysis_plan":{"script":null,"blinded":false,"frozen_before_data":false},
+  "inadmissible":["All performance, host-execution and experimental-design conclusions."],
+  "amendments":[],
+  "freeze":{"status":"draft","protocol_sha256":null,"commit":null,"frozen_at":null,"filed_before_affected_data":null}
+}

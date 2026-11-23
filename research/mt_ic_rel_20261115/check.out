@@ -1,0 +1,21 @@
+# Pre-run checks, 2026-11-15T23:49:06Z
+previous binary sha256 5151b2b05311ad8b  new cb370e2b5e8c5fa4  (new built from e33d54e9c0)
+## 1. previous vs new binary, all fields but times, pf and opts
+ic5b mt_fieldops_v5_20261112/instances/W28-0.json 1024 43 0.85 4 1.2 flatf 128 bi pf : identical PASS
+ic5b mt_ic_scale_20261115/instances/W36-0.json 1024 43 0.85 4 1.2 flatf 128 bi pf : identical PASS
+rhodpb mt_fieldops_v5_20261112/instances/W32-4.json 1024 43 0.25 0 64 : identical PASS
+## 2. every IC key keeps ic:pf's table, trials, relations, p1_trials (T = 1024)
+  W32-4.json flatf  pf         {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732} I 192357 M 7621129 ok 1024 / 1024
+  W32-4.json flatf  pf,rel     {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732} I 145732 M 7761294 ok 1024 / 1024
+  W32-4.json flatf  pf,cb      {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732} I 166772 M 7697884 ok 1024 / 1024
+  W32-4.json flatf  pf,rel,cb  {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732} I 120147 M 7838049 ok 1024 / 1024
+  W32-4.json flatf  pf,rad     {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732} I 192357 M 7621129 ok 1024 / 1024
+  W32-4.json flatfd pf         {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732} I 192357 M 7621129 ok 1024 / 1024
+  PASS
+  W36-0.json flatf  pf         {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182} I 710938 M 32035245 ok 1024 / 1024
+  W36-0.json flatf  pf,rel     {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182} I 360904 M 33085632 ok 1024 / 1024
+  W36-0.json flatf  pf,cb      {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182} I 637128 M 32256675 ok 1024 / 1024
+  W36-0.json flatf  pf,rel,cb  {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182} I 287094 M 33307062 ok 1024 / 1024
+  W36-0.json flatf  pf,rad     {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182} I 710938 M 32035245 ok 1024 / 1024
+  W36-0.json flatfd pf         {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182} I 710938 M 32035245 ok 1024 / 1024
+  PASS

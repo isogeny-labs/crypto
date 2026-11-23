@@ -1,0 +1,171 @@
+{
+  "at": "2026-10-30T20:27:59.890145+00:00",
+  "source_commit": "1e0ef6598043cf873e5756269acb651f3702e01a",
+  "full_library_source": "1e0ef6598043cf873e5756269acb651f3702e01a",
+  "library_source_manifest_equal": true,
+  "results": [
+    {
+      "stage": "selected-bins-example",
+      "command": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--bin",
+        "crypto",
+        "--bin",
+        "ecdlp-nist",
+        "--bin",
+        "volcano-ic-driver",
+        "--example",
+        "ic_next10_03_pkm_degree"
+      ],
+      "exit_code": 0,
+      "seconds": 354.17628941099974,
+      "log": "/workspace/ml2958-post-full11-selected-bins-example-20261030.log",
+      "bytes": 4023,
+      "sha256": "9a30cd5c6e6a7ff94c97f7e1b2f8835ae6e179282d0d05666356caf62a485253"
+    },
+    {
+      "stage": "real-cli-build",
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--bin",
+        "crypto",
+        "--message-format=json-render-diagnostics"
+      ],
+      "exit_code": 0,
+      "seconds": 11.480120413994882,
+      "log": "/workspace/ml2958-post-full11-real-cli-build-20261030.log",
+      "bytes": 213136,
+      "sha256": "bebc11e0620053f29dc7c590a5bf004b1a482ef6b909c45f62dedb58d74fdbf4"
+    },
+    {
+      "stage": "pin-real-cli",
+      "source_commit": "1e0ef6598043cf873e5756269acb651f3702e01a",
+      "path": "/workspace/ml2958-cli-test-artifacts-20261030/crypto-1e0ef6598043",
+      "bytes": 48926328,
+      "sha256": "1534e5934224c2961b9cf7598e1a750c2ca7ed7f2aa50f34909738028406ec52",
+      "actual_cargo_runtime_libraries": {
+        "crypto_lib": "/workspace/crypto/target/release/deps/libcrypto_lib-89ef1d48843faef6.rlib",
+        "serde": "/workspace/crypto/target/release/deps/libserde-90d17f1323a5c338.rlib",
+        "serde_json": "/workspace/crypto/target/release/deps/libserde_json-b62070e59ca92248.rlib",
+        "hex": "/workspace/crypto/target/release/deps/libhex-4ed7147d3e203501.rlib",
+        "libc": "/workspace/crypto/target/release/deps/liblibc-1ea52c1397d8163e.rlib"
+      }
+    },
+    {
+      "stage": "ml_dataset_live_capture-compile",
+      "command": [
+        "rustup",
+        "run",
+        "1.98.0",
+        "rustc",
+        "--edition=2021",
+        "--test",
+        "--crate-name",
+        "ml_dataset_live_capture",
+        "/workspace/crypto-ml-large-prime-trace-integration-repair/tests/ml_dataset_live_capture.rs",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "debug-assertions=no",
+        "-L",
+        "dependency=/workspace/crypto/target/release/deps",
+        "-o",
+        "/workspace/ml2958-cli-test-artifacts-20261030/ml_dataset_live_capture-1e0ef6598043",
+        "--extern",
+        "crypto_lib=/workspace/crypto/target/release/deps/libcrypto_lib-89ef1d48843faef6.rlib",
+        "--extern",
+        "serde=/workspace/crypto/target/release/deps/libserde-90d17f1323a5c338.rlib",
+        "--extern",
+        "serde_json=/workspace/crypto/target/release/deps/libserde_json-b62070e59ca92248.rlib",
+        "--extern",
+        "hex=/workspace/crypto/target/release/deps/libhex-4ed7147d3e203501.rlib",
+        "--extern",
+        "libc=/workspace/crypto/target/release/deps/liblibc-1ea52c1397d8163e.rlib"
+      ],
+      "exit_code": 0,
+      "seconds": 1.9549906959873624,
+      "log": "/workspace/ml2958-post-full11-ml_dataset_live_capture-compile-20261030.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "ml_dataset_live_capture-run",
+      "command": [
+        "/workspace/ml2958-cli-test-artifacts-20261030/ml_dataset_live_capture-1e0ef6598043",
+        "--test-threads",
+        "2"
+      ],
+      "exit_code": 0,
+      "seconds": 0.22644757898524404,
+      "log": "/workspace/ml2958-post-full11-ml_dataset_live_capture-run-20261030.log",
+      "bytes": 754,
+      "sha256": "682cd24900c5393c29cc75be77d10baa2b855c366cdc5185987d4ad17a1e9b74"
+    },
+    {
+      "stage": "store_scoped_head-compile",
+      "command": [
+        "rustup",
+        "run",
+        "1.98.0",
+        "rustc",
+        "--edition=2021",
+        "--test",
+        "--crate-name",
+        "store_scoped_head",
+        "/workspace/crypto-ml-large-prime-trace-integration-repair/tests/store_scoped_head.rs",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "debug-assertions=no",
+        "-L",
+        "dependency=/workspace/crypto/target/release/deps",
+        "-o",
+        "/workspace/ml2958-cli-test-artifacts-20261030/store_scoped_head-1e0ef6598043",
+        "--extern",
+        "crypto_lib=/workspace/crypto/target/release/deps/libcrypto_lib-89ef1d48843faef6.rlib",
+        "--extern",
+        "serde_json=/workspace/crypto/target/release/deps/libserde_json-b62070e59ca92248.rlib"
+      ],
+      "exit_code": 0,
+      "seconds": 0.7698605699988548,
+      "log": "/workspace/ml2958-post-full11-store_scoped_head-compile-20261030.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "store_scoped_head-run",
+      "command": [
+        "/workspace/ml2958-cli-test-artifacts-20261030/store_scoped_head-1e0ef6598043",
+        "--test-threads",
+        "2"
+      ],
+      "exit_code": 0,
+      "seconds": 0.157000381994294,
+      "log": "/workspace/ml2958-post-full11-store_scoped_head-run-20261030.log",
+      "bytes": 941,
+      "sha256": "34dd82dbbedc99796a3599e3c9ff0af9a5a37c555e4844196f9ed2422bcb8072"
+    },
+    {
+      "stage": "maintained-clippy",
+      "command": [
+        "bash",
+        "scripts/clippy-maintained.sh"
+      ],
+      "exit_code": 0,
+      "seconds": 168.59701811301056,
+      "log": "/workspace/ml2958-post-full11-maintained-clippy-20261030.log",
+      "bytes": 7888,
+      "sha256": "f874c983b7ccc2da9c7fd27e9b1685da96e5f18da86746fd37441a4ab6335b6b"
+    },
+    {
+      "stage": "complete",
+      "all_actual_selected_checks_passed": true
+    }
+  ]
+}

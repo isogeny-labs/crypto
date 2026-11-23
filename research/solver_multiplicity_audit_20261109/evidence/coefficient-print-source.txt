@@ -1,0 +1,10 @@
+  }
+  else{
+    if (gens->linear_form_base_coef > 0) {
+      const int32_t bcf = gens->linear_form_base_coef;
+      for (int i = 0; i < param->nvars-1; ++i) {
+        fprintf(file, "%d,", (int32_t)(pow(i+1, bcf - 1)));
+      }
+      fprintf(file, "%d", (int32_t)(1));
+    }
+    else{

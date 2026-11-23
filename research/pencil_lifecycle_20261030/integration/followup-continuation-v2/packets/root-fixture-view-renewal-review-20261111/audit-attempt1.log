@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "audit.py", line 68, in <module>
+    assert len(rows) == 18
+AssertionError
+
+The retained rows file is an object whose `rows` member contains the 18 historical failure rows; it is not itself the row array. The audit was corrected to inspect the schema and nested member.

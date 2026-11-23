@@ -1,0 +1,101 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-prime-medium-rho-cpc-20261109-M3-a2
+experiment_id: prime_medium_rho_cpc_20261109
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 7c9ff0aef94534cd3eb96201b396bb5564985b01
+receipt: research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3-a2.receipt.json
+binds:
+- path: research/prime_medium_rho_cpc_20261109/PROTOCOL.md
+  sha256: 089cecca51beb0de1888f90b4fa66cf1d07a4afdeea67992acd17375e009cb06
+- path: research/prime_medium_rho_cpc_20261109/seeds.json
+  sha256: 3304f0e6b9160015e80cda43be1b70210bfeb4275597277ccacdc0d0726653a1
+- path: research/prime_medium_rho_cpc_20261109/build.sh
+  sha256: 88d911db9bcc1777b3cda876999ed4f788b09886b6d122d347ab90fb25537d46
+- path: research/prime_medium_rho_cpc_20261109/specs/M3.json
+  sha256: 9e3ce3e87d1c5a43d0d7d87319971865adfc9b7478fad11599025c446b97720f
+- path: research/prime_medium_rho_cpc_20261109/requests/M3.request.json
+  sha256: 4f16b45899cde0f654df7e3921c17400e8ec410cca31a923d537842398e23f74
+- path: research/prime_medium_rho_cpc_20261109/check_session_complete.sh
+  sha256: 50d170d0fc16c773b1d6203d2b7200ed411d3add33022f2bceeea5c1b0db46e6
+- path: research/prime_medium_rho_cpc_20261109/wait_launcher_result.sh
+  sha256: 8f285937790f0f5f87e4bb2d66ab1481cb65d76e1de7b742abf8e9e5b88a05f2
+- path: scripts/checkpoint.sh
+  sha256: 6fc6b9311461111ecf55cdb70ae4dd52a408d0b0bf6b44fbe1177788756c12e8
+- path: taskq/deploy/eks-karpenter/remote/validate-request
+  sha256: dc6b59d32e937db5c049704102fe0d5ca0db7af9ac2bd8de67270bcafc230426
+- path: taskq/deploy/eks-karpenter/remote/launch-remote
+  sha256: de27df3830fb54589e5d030e416d2e6887f7d590bc03db2e50d7456449fc7362
+- path: taskq/deploy/eks-karpenter/remote/run-request
+  sha256: c4f75c585ca6c689bdbe3fa4840459df5347696db8901a3e23296239d21e6819
+- path: taskq/deploy/eks-karpenter/remote/current-run-request-buildspec.yml
+  sha256: 35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e
+- path: taskq/deploy/eks-karpenter/remote/verify-build
+  sha256: 6a020d533df4f18645726377b53d17fddb9efbe693c4b8a42a1d2e24169f7556
+- path: taskq/deploy/eks-karpenter/remote/check-ready
+  sha256: 746440f29360983290eb9c22d435ccf8ca1d49ba66f84af8db2b7326a04f44ea
+must_not_exist:
+- research/prime_medium_rho_cpc_20261109/receipts/M3
+commands:
+- id: checkpoint-gate
+  argv:
+  - scripts/checkpoint.sh
+  - gate
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3-a2.checkpoint-gate.stdout
+  stderr: research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3-a2.checkpoint-gate.stderr
+- id: validate
+  argv:
+  - taskq/deploy/eks-karpenter/remote/validate-request
+  - research/prime_medium_rho_cpc_20261109/requests/M3.request.json
+  timeout_seconds: 300
+  success_exit_codes:
+  - 0
+  stdout: research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3-a2.validate.stdout
+  stderr: research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3-a2.validate.stderr
+- id: launch
+  argv:
+  - taskq/deploy/eks-karpenter/remote/launch-remote
+  - research/prime_medium_rho_cpc_20261109/requests/M3.request.json
+  timeout_seconds: 6600
+  success_exit_codes:
+  - 0
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+    ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+    ISOLAB_CLIENT_OUTPUT: research/prime_medium_rho_cpc_20261109/receipts/M3
+  stdout: research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3-a2.launch.stdout
+  stderr: research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3-a2.launch.stderr
+  outputs:
+  - research/prime_medium_rho_cpc_20261109/receipts/M3/result.json
+- id: check-session-complete
+  argv:
+  - research/prime_medium_rho_cpc_20261109/check_session_complete.sh
+  - prime-medium-rho-cpc-20261109-m3
+  - research/prime_medium_rho_cpc_20261109/receipts/M3
+  - '112'
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+  stdout: research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3-a2.check-session-complete.stdout
+  stderr: research/prime_medium_rho_cpc_20261109/cards/CARD-prime-medium-rho-cpc-20261109-M3-a2.check-session-complete.stderr
+  outputs:
+  - research/prime_medium_rho_cpc_20261109/receipts/M3/admission.json
+bus_address: executor-mechanical-prime-medium-rho-cpc
+background: true
+write_scope:
+- research/prime_medium_rho_cpc_20261109/
+- .resume/
+stop_when:
+- Any command exits with a code outside its success_exit_codes or reaches its timeout; return the tool output verbatim, start no later command and resubmit nothing.
+- The tool exits 2 before running any command; return `refused` with the IMPEDIMENT line.
+notes: One job, one submission. PROTOCOL.md section 8 forbids resubmission without a written amendment. A stop after launch-remote has started a build is reconciled by the director against the saved receipts in research/prime_medium_rho_cpc_20261109/receipts/M3 (wait_launcher_result.sh, bound here, finishes an interrupted launch without starting a build), never by a new submission.

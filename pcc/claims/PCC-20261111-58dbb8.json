@@ -1,0 +1,40 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T14:05:17Z",
+ "id": "PCC-20261111-58dbb8",
+ "kind": "theorem",
+ "producer": {
+  "commit": "ad10b21a3578dadf2366dbd793ebed2f7aea319a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "4fee05510f2fb251e4a65d4ccff5aaee6bf91849873b9725bffdb0f318d246e5",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/EllipticSeven.lean",
+   "theorem": "EllipticSeven.short_translation_cleared"
+  },
+  {
+   "decl_sha256": "1010d2ff49bb1aeca010c7eabd8714d2e5107761c6f217b123cd04007d2acf1d",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/EllipticSeven.lean",
+   "theorem": "EllipticSeven.isomorphism_scaling"
+  },
+  {
+   "decl_sha256": "da9490bd273ace8520fb092cd0811d61252d57971b4a071004837ea73d220e97",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/EllipticSeven.lean",
+   "theorem": "EllipticSeven.recover_order109"
+  },
+  {
+   "decl_sha256": "1cee587de39efc65553462491428e163dc7f1a9822aa29cabc09887b008f545a",
+   "kind": "lean",
+   "project": "research/chained_jacobian_transfers_20261110/lean/EllipticSeven.lean",
+   "theorem": "EllipticSeven.recover_order113"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Four core Lean degree7 helper certificates pass gate4: general denominator-cleared long-to-short translation,coordinate isomorphism scaling,inverse78 under109-torsion and inverse97 under113-torsion for[7] recovery. These certify coordinate/scalar algebra only;no actual finite-field kernel,map,division polynomial,elliptic geometry or Jacobian7-hop formalized. Local proof pass is not signed scientific standing."
+}

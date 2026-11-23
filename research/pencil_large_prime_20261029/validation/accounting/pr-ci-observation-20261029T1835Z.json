@@ -1,0 +1,22 @@
+{
+  "schema": "pr-ci-observation/v1",
+  "repository": "isogeny-labs/crypto",
+  "pr": 2869,
+  "head": "ad958cf57ba011acb85c6d2a01efe12226723644",
+  "state": "OPEN",
+  "merge_state": "BLOCKED",
+  "auto_merge": true,
+  "failure": {
+    "run_id": 40925277205,
+    "job": "artifacts",
+    "command": "python3 tools/artifacts/wire_workflows.py --check",
+    "message": "isolab-experiment.yml needs Pull store data this workflow reads (tools/artifacts)",
+    "paths": [
+      "research/five_leads_e2e_20261019",
+      "research/pencil_large_prime_20261029",
+      "taskq/deploy/eks-karpenter"
+    ]
+  },
+  "other_checks": "success or in progress; not all passed",
+  "action": "Minimal workflow fix under investigation; uncommitted accounting source not covered by current-head CI"
+}

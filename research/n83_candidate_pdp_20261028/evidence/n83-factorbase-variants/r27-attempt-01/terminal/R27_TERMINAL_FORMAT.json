@@ -1,0 +1,30 @@
+{
+  "schema": "n83.factor-base-terminal-format/v1",
+  "files": {
+    "job-api.json": {
+      "role": "raw_kubernetes_api",
+      "structure": "Exact Kubernetes Job JSON; terminal conditions and backoff-limit reason."
+    },
+    "pod-api.json": {
+      "role": "raw_kubernetes_api",
+      "structure": "Exact Kubernetes Pod JSON; node assignment, image digest, container state, exit code and UIDs."
+    },
+    "events-api.json": {
+      "role": "raw_kubernetes_api",
+      "structure": "Exact Kubernetes Events response filtered to the attempt Pod; includes scheduling-limit and placement messages."
+    },
+    "container.log": {
+      "role": "raw_container_stderr",
+      "structure": "Exact bounded log text returned by the EKS log tool. The AccessDenied occurred on source-bucket ListObjectsV2 before the producer started."
+    },
+    "terminal-receipt.json": {
+      "role": "normalized_failure_record",
+      "structure": "Job/Pod identity, terminal status, failure class, producer-start flag, output count, and next-attempt requirement."
+    },
+    "DATA_INDEX.json": {
+      "role": "file_map",
+      "structure": "Byte count, SHA-256, role and media type for each evidence file."
+    }
+  },
+  "hash_rule": "manifest.sha256 hashes every listed file and the two descriptors; DATA_INDEX does not hash itself."
+}

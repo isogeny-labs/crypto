@@ -1,0 +1,145 @@
+{
+ "schema": "experiment.protocol/v1",
+ "protocol_id": "EXP-PKM-ODD-001",
+ "version": 1,
+ "created": "2026-11-14",
+ "repository": "isogeny-labs/crypto",
+ "study_dir": "research/pkm_odd_tower_f4_20261114",
+ "question": "Does an odd or mixed degree mix (3, 5, 2/3) or the isogeny form change F4's counted refutation work against the degree-2 Kummer tower at equal log2 S; and does the algebraic relation oracle (F4 + linear stage) cost less than enumeration over the factor base?",
+ "claims": [
+  {
+   "id": "C1",
+   "class": "exact_computation",
+   "text": "F4 verdict equals exhaustive verdict on every non-censored system"
+  },
+  {
+   "id": "C2",
+   "class": "exact_computation",
+   "text": "planted systems consistent; planted point satisfies every equation"
+  },
+  {
+   "id": "C3",
+   "class": "exact_computation",
+   "text": "ratio r_X(S) of refutation field_ops vs interpolated A2"
+  },
+  {
+   "id": "C4",
+   "class": "comparative",
+   "text": "ratio grows, fades or holds with S (descriptive over the ladder)"
+  },
+  {
+   "id": "C5",
+   "class": "exact_computation",
+   "text": "order effect A32/A23 at equal S"
+  },
+  {
+   "id": "C6",
+   "class": "exact_computation",
+   "text": "isogeny over Kummer for the same degree sequence"
+  },
+  {
+   "id": "C7",
+   "class": "exact_computation",
+   "text": "algebraic oracle relation set equals enumeration's on every decided target"
+  },
+  {
+   "id": "C8",
+   "class": "comparative",
+   "text": "alg/enum F_p multiplications per target and trend with S"
+  },
+  {
+   "id": "-",
+   "class": "out_of_scope",
+   "text": "larger S, m>=4, cryptographic sizes, rho"
+  }
+ ],
+ "arms": [
+  "A2",
+  "A3",
+  "A5",
+  "A23",
+  "A32",
+  "I2",
+  "I3",
+  "I23",
+  "partB:algebraic",
+  "partB:enumeration"
+ ],
+ "controls": {
+  "negative": {
+   "present": true,
+   "arm": "--control null (S3 support, random coefficients)"
+  },
+  "positive": {
+   "present": true,
+   "arm": "A2 one-bit shift W(t+1)/W(t) must be >= 2; planted cells for correctness"
+  },
+  "aa": {
+   "present": true,
+   "comparison": "AA-M2-A3-k5-tower vs M2-A3-k5-tower",
+   "kind": "determinism",
+   "expected": "bit-identical field_ops"
+  }
+ },
+ "variable_ledger": {
+  "factors": [
+   {
+    "name": "p, curve, g, seed",
+    "treatment": "fixed"
+   },
+   {
+    "name": "instrument",
+    "treatment": "fixed",
+    "how": "binary.sha256, commit.txt, rustc.txt"
+   },
+   {
+    "name": "threads",
+    "treatment": "fixed",
+    "value": 4
+   },
+   {
+    "name": "host",
+    "treatment": "measured",
+    "value": "local-ccr-4vcpu 15 GiB; counted metrics only"
+   },
+   {
+    "name": "order",
+    "treatment": "fixed",
+    "value": "run_cells.sh"
+   },
+   {
+    "name": "aux curve search",
+    "treatment": "excluded",
+    "value": "not charged (owner 2026-11-14); count recorded"
+   }
+  ]
+ },
+ "metrics": {
+  "primary": "field_ops (F_p multiplications, counted)",
+  "part_b": "alg_field_ops, enum_field_ops",
+  "clock": "recorded, not used"
+ },
+ "decision_rule": "PROTOCOL.md section 5 (bands 0.5 / 2; growing/closing qualifiers; attribution by null; replication at P2)",
+ "execution": {
+  "backend": "local",
+  "backend_reason": "no aws CLI or AWS identity in this container; counted metrics are host-independent",
+  "checkpoint": {
+   "policy": "per-cell skip/rerun",
+   "s3": "unavailable; CHECKPOINT_SKIP=no-s3-credentials recorded in pcc ledger"
+  },
+  "timeout_seconds": 1800,
+  "dmax": 64
+ },
+ "analysis_plan": {
+  "script": "analyze.py",
+  "sha256": "29c9ac27339bd24b6c73080aabb095084fd7153a61546aaeb98682eb20db503b"
+ },
+ "amendments": [],
+ "freeze": {
+  "status": "frozen",
+  "frozen_at": "2026-11-14",
+  "filed_before_affected_data": true,
+  "protocol_sha256": "be89ef4c37eea84aa7d1c10ab6a1257ccf8954bfdb963ef8411d68516ed6e316",
+  "note": "protocol_sha256 = SHA-256 of canonical JSON (sort_keys, compact) with this field null; commit = the commit adding this file, before any study row"
+ }
+}

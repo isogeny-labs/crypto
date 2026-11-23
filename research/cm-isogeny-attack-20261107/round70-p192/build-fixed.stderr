@@ -1,0 +1,11 @@
+   Compiling shifted-fiber v0.1.0 (/home/ec2-user/research/cm-isogeny-attack-20261107/round70-p192/native)
+warning: unused variable: `b`
+  --> src/main.rs:36:71
+   |
+36 | fn field_fibers<const P: i64, const D: i64>(t: &Tables<P, D>, a: i64, b: i64) -> Vec<Value> {
+   |                                                                       ^ help: if this is intentional, prefix it with an underscore: `_b`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `shifted-fiber` (bin "shifted-fiber") generated 1 warning (run `cargo fix --bin "shifted-fiber" -p shifted-fiber` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 7.63s

@@ -1,0 +1,204 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "log2_r": 27.51272829565651,
+      "arm": "candidate",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        20.969858682112097,
+        22.75071174077652,
+        38.778389268756435
+      ],
+      "charged_sum": 18571788.0,
+      "native_sum": 15771983,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "log2_r": 27.51272829565651,
+      "arm": "incumbent",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        20.969858682112097,
+        22.75071174077652,
+        38.778389268756435
+      ],
+      "charged_sum": 18571788.0,
+      "native_sum": 15771983,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "log2_r": 27.51272829565651,
+      "arm": "rho-neg",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        0.9601351120480416,
+        1.0533757195910374,
+        1.8925411874779983
+      ],
+      "charged_sum": 850336.0,
+      "native_sum": 825778,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "log2_r": 27.51272829565651,
+      "arm": "rho-neg-aa",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        0.9601351120480416,
+        1.0533757195910374,
+        1.8925411874779983
+      ],
+      "charged_sum": 850336.0,
+      "native_sum": 825778,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "log2_r": 27.892782557008744,
+      "arm": "candidate",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        20.572175361782133,
+        22.570672123901655,
+        40.55714298297734
+      ],
+      "charged_sum": 20784630.0,
+      "native_sum": 20191358,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "log2_r": 27.892782557008744,
+      "arm": "incumbent",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        20.572175361782133,
+        22.570672123901655,
+        40.55714298297734
+      ],
+      "charged_sum": 20784630.0,
+      "native_sum": 20191358,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "log2_r": 27.892782557008744,
+      "arm": "rho-neg",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        0.8461822381476191,
+        0.9283733276606317,
+        1.6680931332777473
+      ],
+      "charged_sum": 854921.0,
+      "native_sum": 830399,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "log2_r": 27.892782557008744,
+      "arm": "rho-neg-aa",
+      "runs": 64,
+      "verified": 64,
+      "mean_s": [
+        0.8461822381476191,
+        0.9283733276606317,
+        1.6680931332777473
+      ],
+      "charged_sum": 854921.0,
+      "native_sum": 830399,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "a": "candidate",
+      "b": "incumbent",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "a": "candidate",
+      "b": "rho-neg",
+      "verdict": "rho-neg < candidate"
+    },
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "a": "candidate",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < candidate"
+    },
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "a": "incumbent",
+      "b": "rho-neg",
+      "verdict": "rho-neg < incumbent"
+    },
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "a": "incumbent",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < incumbent"
+    },
+    {
+      "curve": "icv1-fp28-tm10425-13a2119a",
+      "a": "rho-neg",
+      "b": "rho-neg-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "a": "candidate",
+      "b": "incumbent",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "a": "candidate",
+      "b": "rho-neg",
+      "verdict": "rho-neg < candidate"
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "a": "candidate",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < candidate"
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "a": "incumbent",
+      "b": "rho-neg",
+      "verdict": "rho-neg < incumbent"
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "a": "incumbent",
+      "b": "rho-neg-aa",
+      "verdict": "rho-neg-aa < incumbent"
+    },
+    {
+      "curve": "icv1-fp28-t15757-68bdca4a",
+      "a": "rho-neg",
+      "b": "rho-neg-aa",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+--- a/src/ml_dataset/owned_search_central.rs
++++ b/src/ml_dataset/owned_search_central.rs
+@@ -211,6 +211,9 @@
+   s.audit=Some(semantic::verify(root,n,semantic::Limits::conservative(work,bytes),f.budget.policy.deadline,&mut f.budget));
+   if let Err(e)=s.audit.as_ref().unwrap().result{
+    self.incomplete=matches!(e,semantic::Failure::Cap|semantic::Failure::Owner|semantic::Failure::Deadline|semantic::Failure::Overflow|semantic::Failure::Allocation|semantic::Failure::Unavailable|semantic::Failure::Certificate(bridge::Failure::Cap|bridge::Failure::Owner|bridge::Failure::Deadline|bridge::Failure::Overflow|bridge::Failure::Allocation));
++   if e==semantic::Failure::Certificate(bridge::Failure::Checker){
++    self.incomplete=s.audit.as_ref().and_then(|a|a.rows.last()).is_some_and(|r|checker_exhausted(&r.certificate));
++   }
+    return Err("owned semantic replay did not complete".into())
+   }
+   Ok(())
+@@ -322,3 +325,7 @@
+  let mut matches=artifacts.iter().filter(|a|a.path==path);let a=matches.next().ok_or("manifest omits owned capture evidence")?;
+  if matches.next().is_some()||a.bytes!=bytes||a.sha256!=sha{return Err("owned capture manifest descriptor mismatch".into())}Ok(())
+ }
++
++fn checker_exhausted(c:&bridge::Certificate)->bool{
++ matches!(c.result,Err(bridge::Failure::Checker))&&c.audit.as_ref().is_some_and(|a|matches!(a.result,Err(bqi::Failure::Unknown(_))))
++}

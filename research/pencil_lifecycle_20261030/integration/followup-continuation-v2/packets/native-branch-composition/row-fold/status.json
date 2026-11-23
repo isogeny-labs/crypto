@@ -1,0 +1,38 @@
+{
+  "schema": "formal-component-result/v1",
+  "task": "T-1242",
+  "component": "literal Kummer row fold",
+  "status": "producer proof gates passed; independent review pending",
+  "main_theorems": 12,
+  "fixed_controls": 10,
+  "axiom_readbacks": 22,
+  "allowed_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "input_bound": "canonical residues; prime p <= 2^32",
+  "dot_bound": "< 2^66 < 2^128",
+  "square_premise": "16 widened dot remainders equal canonical nonzero cI",
+  "native_source": "snapshot/walk-source.rs.txt:14-21,48-50",
+  "fixed_binding_sha256": "8f6c33e483a6ceffe8009004470afd7699c4ccd330327804d496e7ea95966772",
+  "historical_matrix_actions": 105,
+  "new_matrix_actions": 0,
+  "new_scientific_runs": 0,
+  "full_target_scope": 1260,
+  "cost_ratio": null,
+  "remaining": [
+    "counter headroom and execution effects",
+    "compiler/binary fidelity",
+    "runtime input custody",
+    "chart action and xadd geometry"
+  ],
+  "failures_retained": [
+    "attempt1",
+    "attempt2",
+    "attempt3",
+    "initial shell permission denied, resolved by bash invocation"
+  ],
+  "pdf_inspected": true,
+  "independent_review": false
+}

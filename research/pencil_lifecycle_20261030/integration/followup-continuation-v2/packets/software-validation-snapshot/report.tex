@@ -1,0 +1,11 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.65in]{geometry}\usepackage{graphicx}\usepackage{hyperref}
+\begin{document}
+\section*{Software validation snapshot}
+\includegraphics[width=\linewidth]{snapshot-figure.pdf}
+\noindent The full-library run retains one failure at GPU capsule lock reacquisition. The isolated replay does not replace that outcome. The deterministic pipe-barrier check observes errno 11 while an inherited descriptor remains open, followed by successful acquisition after child closure and reap. It does not identify the original failing interleaving.
+
+\paragraph{Review boundary} Producer self-audit only. Source/receipt hashes and barrier ordering were checked without another execution. No scientific observations or ratios are reported here. Root-owned reduced-concurrency and additional checks remain pending at this snapshot.
+
+\paragraph{Evidence} Exact absolute paths and full SHA256 hashes are retained in \texttt{snapshot.json}; raw evidence remains in the referenced directories. The diagnostic and its original diagnosis packet remain unchanged. This document is an additive point-in-time record.
+\end{document}

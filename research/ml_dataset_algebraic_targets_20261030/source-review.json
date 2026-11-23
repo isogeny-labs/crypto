@@ -1,0 +1,17 @@
+{
+  "schema": "software-source-review/v1",
+  "reviewer": "Codex delegated consequence_review",
+  "scope": "Read-only review of identity verifier, consequence channel, replay/export integration",
+  "execution_validation": false,
+  "independent_scientific_validation": false,
+  "blocking_source_findings": [],
+  "delivery_gaps": ["New v6 actual CLI fixture required; historical v5 fixture preserved", "All new-source runtime tests/lint/build/CLI/full-library gates pending"],
+  "claim_boundary": "Native re-export executes direct identity replay; it is not an independent implementation or a standalone external-record verifier",
+  "files": {
+    "src/ml_dataset/algebraic_targets.rs": "7b0307098a7e92ec1256d0153a1600964874790b8a4c8d31034d1d02701a5d83",
+    "src/ml_dataset/prefix_algebra.rs": "5ccdc726bab042c60eca868eda8db638ffdf4c3c2d0cf2179c170be60e73f9d7",
+    "src/ml_dataset/prime_chain_prefix.rs": "a621dc3204aad6cb88db05ef597f5fa234d52aea209401439929d2b21f68c58f",
+    "src/ml_dataset/export.rs": "be972cf175ddff96041f788fb064aaf2f503760fdbaed5098d22162b973bbd8d"
+  },
+  "verified_cloud_dataset_cells": 0
+}

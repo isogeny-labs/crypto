@@ -1,0 +1,586 @@
+{
+  "false_identity": {
+    "counterexample": {
+      "assignment": [
+        1085497723234670894,
+        593759247838013400,
+        1316031029326303388,
+        680992374514802529,
+        221470734920623302
+      ],
+      "index": 0,
+      "lhs": 724365470456019772,
+      "rhs": 724365470456019773
+    },
+    "statement": {
+      "degree_bound": 6,
+      "lhs": {
+        "args": [
+          {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": "x",
+                        "op": "var"
+                      },
+                      {
+                        "args": "s",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": "d",
+                        "op": "var"
+                      },
+                      {
+                        "args": [
+                          {
+                            "args": "y",
+                            "op": "var"
+                          },
+                          {
+                            "args": "t",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      }
+                    ],
+                    "op": "mul"
+                  }
+                ],
+                "op": "add"
+              },
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": "x",
+                        "op": "var"
+                      },
+                      {
+                        "args": "s",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": "d",
+                        "op": "var"
+                      },
+                      {
+                        "args": [
+                          {
+                            "args": "y",
+                            "op": "var"
+                          },
+                          {
+                            "args": "t",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      }
+                    ],
+                    "op": "mul"
+                  }
+                ],
+                "op": "add"
+              }
+            ],
+            "op": "mul"
+          },
+          {
+            "args": {
+              "args": [
+                {
+                  "args": "d",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "t",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "y",
+                              "op": "var"
+                            },
+                            {
+                              "args": "s",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "x",
+                              "op": "var"
+                            },
+                            {
+                              "args": "t",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "y",
+                              "op": "var"
+                            },
+                            {
+                              "args": "s",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "add"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            },
+            "op": "neg"
+          }
+        ],
+        "op": "add"
+      },
+      "name": "twist-pairing-norm-product",
+      "rhs": {
+        "args": [
+          {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": "x",
+                        "op": "var"
+                      },
+                      {
+                        "args": "x",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  {
+                    "args": {
+                      "args": [
+                        {
+                          "args": "d",
+                          "op": "var"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "y",
+                              "op": "var"
+                            },
+                            {
+                              "args": "y",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    "op": "neg"
+                  }
+                ],
+                "op": "add"
+              },
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": "s",
+                        "op": "var"
+                      },
+                      {
+                        "args": "s",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  {
+                    "args": {
+                      "args": [
+                        {
+                          "args": "d",
+                          "op": "var"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "t",
+                              "op": "var"
+                            },
+                            {
+                              "args": "t",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    "op": "neg"
+                  }
+                ],
+                "op": "add"
+              }
+            ],
+            "op": "mul"
+          },
+          {
+            "args": 1,
+            "op": "const"
+          }
+        ],
+        "op": "add"
+      },
+      "source": "research/quadratic_twist_evidence_20261021/lean/PairingTransfer.lean:PairingTransfer.norm_product_identity; polynomial part only; no general pairing theorem",
+      "variables": [
+        "d",
+        "x",
+        "y",
+        "s",
+        "t"
+      ]
+    }
+  },
+  "false_source": {
+    "certificate": {
+      "id": "IDC1h23c0696a12358b08",
+      "independence": "Norm polynomial only; 16 independent-seed extra points; no performance claim",
+      "modulus": 2305843009213693951,
+      "points": 32,
+      "proof": {
+        "kind": "lean4",
+        "path": "research/quadratic_twist_evidence_20261021/lean/PairingTransfer.lean",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "schema": "identity.certificate/v1",
+      "seed": 20261024,
+      "statement": {
+        "degree_bound": 6,
+        "lhs": {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "s",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "d",
+                          "op": "var"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "y",
+                              "op": "var"
+                            },
+                            {
+                              "args": "t",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "s",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "d",
+                          "op": "var"
+                        },
+                        {
+                          "args": [
+                            {
+                              "args": "y",
+                              "op": "var"
+                            },
+                            {
+                              "args": "t",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": {
+                "args": [
+                  {
+                    "args": "d",
+                    "op": "var"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": "x",
+                                "op": "var"
+                              },
+                              {
+                                "args": "t",
+                                "op": "var"
+                              }
+                            ],
+                            "op": "mul"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": "y",
+                                "op": "var"
+                              },
+                              {
+                                "args": "s",
+                                "op": "var"
+                              }
+                            ],
+                            "op": "mul"
+                          }
+                        ],
+                        "op": "add"
+                      },
+                      {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": "x",
+                                "op": "var"
+                              },
+                              {
+                                "args": "t",
+                                "op": "var"
+                              }
+                            ],
+                            "op": "mul"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": "y",
+                                "op": "var"
+                              },
+                              {
+                                "args": "s",
+                                "op": "var"
+                              }
+                            ],
+                            "op": "mul"
+                          }
+                        ],
+                        "op": "add"
+                      }
+                    ],
+                    "op": "mul"
+                  }
+                ],
+                "op": "mul"
+              },
+              "op": "neg"
+            }
+          ],
+          "op": "add"
+        },
+        "name": "twist-pairing-norm-product",
+        "rhs": {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": {
+                    "args": [
+                      {
+                        "args": "d",
+                        "op": "var"
+                      },
+                      {
+                        "args": [
+                          {
+                            "args": "y",
+                            "op": "var"
+                          },
+                          {
+                            "args": "y",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "s",
+                      "op": "var"
+                    },
+                    {
+                      "args": "s",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": {
+                    "args": [
+                      {
+                        "args": "d",
+                        "op": "var"
+                      },
+                      {
+                        "args": [
+                          {
+                            "args": "t",
+                            "op": "var"
+                          },
+                          {
+                            "args": "t",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      }
+                    ],
+                    "op": "mul"
+                  },
+                  "op": "neg"
+                }
+              ],
+              "op": "add"
+            }
+          ],
+          "op": "mul"
+        },
+        "source": "research/quadratic_twist_evidence_20261021/lean/PairingTransfer.lean:PairingTransfer.norm_product_identity; polynomial part only; no general pairing theorem",
+        "variables": [
+          "d",
+          "x",
+          "y",
+          "s",
+          "t"
+        ]
+      },
+      "value_digest": "31c74551b0b8746b945032fda249d34108f659169fe3f93555daf6cb24d2c3a5"
+    },
+    "rejection": "Lean source SHA-256 mismatch"
+  }
+}

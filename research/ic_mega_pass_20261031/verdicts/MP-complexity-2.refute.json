@@ -1,0 +1,38 @@
+{
+ "idea_id": "MP-complexity-2",
+ "skeptic_lens": "mathematical refutation (+toy measurement)",
+ "verdict": "refuted",
+ "confidence": 0.8,
+ "measurement": {
+  "solver": "cryptominisat5",
+  "encoding": "explicit Tseitin multipliers/adders, integer f(x1,x2)=q*p, coefficients of S3(.,.,xR) reduced mod p",
+  "p_bits": 20,
+  "n_per_cell": 6,
+  "cap_s": 60,
+  "unsat_median_conflicts": {
+   "4": 562,
+   "5": 2092,
+   "6": 8940,
+   "7": 31700
+  },
+  "sat_median_conflicts": {
+   "4": 399,
+   "5": 918,
+   "6": 3406,
+   "7": 10792,
+   "8": ">=29475 (2/6 timeouts)"
+  },
+  "fitted_c_unsat": 1.94,
+  "fitted_c_sat": 1.59,
+  "note": "p=2^24 cells and k>=9 not reached within budget; planted SAT already times out at k=8"
+ },
+ "reason": "Measured c~1.9 (UNSAT) and ~1.6 (SAT) on k=4..7, p~2^20: conflicts grow ~3.5-4.3x per extra bit of k, worse than the 2^k enumerate-x1-and-solve-quadratic baseline, matching the factoring-by-SAT literature (no subexponential carry propagation through multiplier circuits). Structural reason: at k=log p/3 expected solutions are 2^{2k}/p=2^{-k}, so the oracle is overwhelmingly an UNSAT certifier; resolution must refute a degree-4 modular constraint whose reduction mod p destroys carry locality (q has ~3k+ bits of slack), and known resolution/CDCL behaviour on such multiplier-equality instances is exponential with exponent >=1 in the free-bit count. The nongenericity argument is formally valid (it does use the bit representation, so CGK does not apply), but non-genericity alone buys nothing: the measured c is far above the c<1 (and c<1/2 for rho-beating) gate. Scope: kills plain CDCL/XOR resolution solvers on this encoding; does not cover algebraic proof systems (Groebner/polynomial calculus, cutting planes) or lattice-assisted encodings.",
+ "fix": "none at this scale; a surviving variant would need a non-resolution proof system and must show c<1 itself",
+ "file": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-complexity-2.refute.json",
+ "collisions": [
+  "SAT-for-factoring literature (exponential, c>=1)",
+  "lever 9 digit presentation",
+  "generic oracle bound (not applicable, but dominated)"
+ ],
+ "data": "/Users/adamburan/ic-work/crypto/research/ic_mega_pass_20261031/verdicts/MP-complexity-2_data/"
+}

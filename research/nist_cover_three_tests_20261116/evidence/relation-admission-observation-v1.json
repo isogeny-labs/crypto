@@ -1,0 +1,41 @@
+{
+  "standing": "producer-unverified administrative observation",
+  "observed_at": "2026-11-17T07:08:37.572873+00:00",
+  "run": {
+    "id": 44035933968,
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/44035933968",
+    "headSha": "c5cbb67b19fe39864da7f8c9b29726696ba01580",
+    "createdAt": "2026-11-17T07:04:49Z",
+    "status": "completed",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "name": "controls",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "observe",
+        "status": "completed",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  "failure": "Could not assume role with OIDC: Not authorized to perform sts:AssumeRoleWithWebIdentity",
+  "failed_log_sha256": "d15f667ade4ef6bbef2e876db1d5a445b9b9b841baf2e89224c9e5a7b05b9e2c",
+  "failed_log_bytes": 2350,
+  "account_or_budget_read_executed": false,
+  "admission_report_artifact_present": false,
+  "scientific_experiment_dispatched": false,
+  "duplicate_dispatches": 0,
+  "trust_or_cloud_permissions_changed": false,
+  "existing_pr_ci_at_head_89b108d137": {
+    "gate": "Committed-tree validation test fails on existing benchmark/leaderboard diagnostics",
+    "names": "Artifact recovery cannot find ten existing docs/curves payload hashes in Git/cache; S3 was not contacted"
+  },
+  "remaining_requirements": [
+    "external authorized independently signed replay/recompute route",
+    "authorized live charged/reserved daily/monthly budget and capacity readback",
+    "admitted complete accounting with original report exclusions closed"
+  ]
+}

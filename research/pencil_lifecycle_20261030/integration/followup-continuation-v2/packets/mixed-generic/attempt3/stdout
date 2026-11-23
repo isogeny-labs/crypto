@@ -1,0 +1,29 @@
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:39:61: warning: This simp argument is unused:
+  C_sub
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [interp, MixedCancellation.support, ordinate, C_add, C_mul, C_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:50:34: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:51:34: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:64:92: warning: This simp argument is unused:
+  C_neg
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [curve, interp, MixedCancellation.support, ordinate, oq, orr, C_add, C_sub, C_mul, C_pow, map_ofNat]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-mixed-generic-20261031-v1/MixedGeneric.lean:86:62: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 3
+  0 ≤ a ≤ 2
+where
+ a := ↑(curve a0 a1 a2 a3 - interp q r s t m ^ 2 -
+      (X - C x) * MixedCancellation.support q r * MixedCancellation.support (oq x q m) (orr a3 x q r s m)).natDegree
+ b := ↑(curve a0 a1 a2 a3 - interp q r s t ((y - (s * x + t)) / (x ^ 2 + q * x + r)) ^ 2 -
+      (X - C x) * MixedCancellation.support q r * MixedCancellation.support (oq x q m) (orr a3 x q r s m)).natDegree

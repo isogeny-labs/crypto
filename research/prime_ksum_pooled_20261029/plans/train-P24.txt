@@ -1,0 +1,43 @@
+spec ECS1hdef960145038 (prime_ksum_pooled_20261029 train, 24-bit prime-order curves): 1224 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm bsgs-neg         reference  ECM1h87f6341629c3 bsgs.negation {}
+  arm inc-n81          candidate  ECM1hab75b05c1d0f ic.pipeline {"factor_base": "prime-abscissa:size=81", "linalg": "incremental-gauss", "max_trials": "4243777", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n115         candidate  ECM1h3651365added ic.pipeline {"factor_base": "prime-abscissa:size=115", "linalg": "incremental-gauss", "max_trials": "4243777", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n162         candidate  ECM1h7291b44e96ad ic.pipeline {"factor_base": "prime-abscissa:size=162", "linalg": "incremental-gauss", "max_trials": "4243777", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n228         candidate  ECM1hd1f67e5f0dfe ic.pipeline {"factor_base": "prime-abscissa:size=228", "linalg": "incremental-gauss", "max_trials": "4243777", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n324         candidate  ECM1h718a587c844e ic.pipeline {"factor_base": "prime-abscissa:size=324", "linalg": "incremental-gauss", "max_trials": "4243777", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a7         candidate  ECM1h3105f844b3d9 ic.pipeline {"factor_base": "prime-abscissa:size=7", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a10        candidate  ECM1h1639ea62a5a9 ic.pipeline {"factor_base": "prime-abscissa:size=10", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a14        candidate  ECM1h0c03ec62628e ic.pipeline {"factor_base": "prime-abscissa:size=14", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a20        candidate  ECM1ha52c8fb50db8 ic.pipeline {"factor_base": "prime-abscissa:size=20", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a28        candidate  ECM1ha70ab5ee3100 ic.pipeline {"factor_base": "prime-abscissa:size=28", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a6         candidate  ECM1h81ec185cbaf9 ic.pipeline {"factor_base": "prime-abscissa:size=6", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a8         candidate  ECM1h13224a8c412f ic.pipeline {"factor_base": "prime-abscissa:size=8", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a11        candidate  ECM1hb3865a0203d0 ic.pipeline {"factor_base": "prime-abscissa:size=11", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a16        candidate  ECM1h760e3dfc8821 ic.pipeline {"factor_base": "prime-abscissa:size=16", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a22        candidate  ECM1h88d175bb6fe9 ic.pipeline {"factor_base": "prime-abscissa:size=22", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  workload W51ebcbde8be2 icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload We9793b5db439 icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload W2d4f67812427 icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload W891ec7cb85a5 icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload Wbdd909955ea0 icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload W0d53cebf4d46 icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload We5eedd177cac icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload W47a3953102be icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload W7c527132cfb4 icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload W5f88e0a5426a icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload W6c0330e7c666 icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload W8cfa582ae5de icv1-fp24-tm3353-1a46dbd1 r=2^23.58 A=2 registered=false ec1=-
+  workload Wa91557a0c15d icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload W01e2c3aeda97 icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload Wa639a0698149 icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload W63eda187fe52 icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload W59b7c49d00f0 icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload W0d2cf17906a5 icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload W12ce8f0fc450 icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload W55b1663d2da8 icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload W88c9548dca9d icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload W590831c9e412 icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload Wfebfc01e7e8e icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+  workload W2f37682ca7f3 icv1-fp24-t3415-63d6e400 r=2^23.74 A=2 registered=false ec1=-
+note: 24 slug(s) are not in docs/curves/registry.json; register before citing them in prose (AGENTS.md §11)

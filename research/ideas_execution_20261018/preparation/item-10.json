@@ -1,0 +1,41 @@
+{
+  "item": 10,
+  "title": "Program search over kernel and base predicate",
+  "original_requirement": "Run AlphaEvolve-style restricted program search over decomposition kernel and factor-base predicate, optimizing oracle cost under frozen replay/counting fitness.",
+  "acceptance_criteria": [
+    "Restricted candidate language, compiler/cache/setup charges, immutable independent holdouts.",
+    "Kernel semantics certified; predicate size, yield and subgroup constraints matched.",
+    "Complete pipeline cost and failed candidate records; yield conservation remains in accounting."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/ic_framework/stages.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/koblitz_factor_base_search.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "src/cryptanalysis/koblitz_relation_solver.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/sat_factor_base_review_20260908/autolab/boundary_autolab.py"
+    }
+  ],
+  "source_supported_commands": [],
+  "remaining_gaps": [
+    "Existing autolab infrastructure is a reusable evaluator, not a bound AlphaEvolve kernel/predicate search implementation.",
+    "Need candidate grammar, fitness process, replay equivalence, heldout corpus, cold/online costs and independent acceptance gate."
+  ],
+  "dependencies": [
+    16
+  ],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Program search over the decomposition kernel and factor-base predicate. Frozen specs, replay certificates and a counted unit are exactly what an AlphaEvolve-style loop needs as a fitness function. The factor-base lab note mentions it and nothing ran. Aim it at oracle cost, not yield, since mean yield is conserved."
+}

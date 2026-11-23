@@ -1,0 +1,14 @@
+digraph proof {
+ graph [rankdir=LR, bgcolor="white", nodesep=0.28, ranksep=0.45, pad=0.18];
+ node [shape=box, style="rounded,filled", fillcolor="#edf3fa", fontname="sans-serif", fontsize=12];
+ edge [color="#53677b", arrowsize=0.75];
+ original [label="Original summation\npolynomials"];
+ r1 [label="Checked edge\nresultant 1"];
+ r2 [label="Checked edge\nresultant 2"];
+ gcd [label="Root GCD\nlocal references"];
+ coordinates [label="Checked coordinate\nidentities"];
+ basis [label="Complete reduced\ngrevlex basis"];
+ wire [label="Explicit v2 wire\nall reduction proofs"];
+ verify [label="Independent replay\noriginal membership\nideal containment\nreduced monicity\nall S-pairs", fillcolor="#e5f3e9"];
+ original -> {r1 r2}; {r1 r2} -> gcd; gcd -> coordinates; coordinates -> basis; {gcd coordinates basis} -> wire; wire -> verify;
+}

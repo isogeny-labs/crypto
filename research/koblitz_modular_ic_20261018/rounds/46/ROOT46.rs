@@ -1,0 +1,17 @@
+type UP=Vec<u16>;
+fn trim46(mut a:UP)->UP{while a.last()==Some(&0){a.pop();}a}
+fn plus46(a:&UP,b:&UP)->UP{let mut c=vec![0;a.len().max(b.len())];for(i,&x)in a.iter().enumerate(){c[i]^=x;}for(i,&x)in b.iter().enumerate(){c[i]^=x;}trim46(c)}
+fn times46(f:&Field,a:&UP,b:&UP)->UP{if a.is_empty()||b.is_empty(){return vec![];}let mut c=vec![0;a.len()+b.len()-1];for(i,&x)in a.iter().enumerate(){for(j,&y)in b.iter().enumerate(){c[i+j]^=f.mul(x,y);}}trim46(c)}
+fn scale46(f:&Field,a:&UP,b:u16)->UP{trim46(a.iter().map(|&x|f.mul(x,b)).collect())}
+fn div46(f:&Field,a:&UP,b:&UP)->(UP,UP){assert!(!b.is_empty());let mut r=a.clone();let mut q=vec![0;a.len().saturating_sub(b.len())+1];while !r.is_empty()&&r.len()>=b.len(){let d=r.len()-b.len();let c=f.div(*r.last().unwrap(),*b.last().unwrap());q[d]^=c;for i in 0..b.len(){r[d+i]^=f.mul(c,b[i]);}r=trim46(r);}let q=trim46(q);assert_eq!(plus46(&times46(f,&q,b),&r),*a);(q,r)}
+fn gcd46(f:&Field,a:&UP,b:&UP)->UP{let(mut x,mut y)=(a.clone(),b.clone());while !y.is_empty(){let z=div46(f,&x,&y).1;x=y;y=z;}if x.is_empty(){x}else{scale46(f,&x,f.inverse[*x.last().unwrap()as usize])}}
+fn value46(f:&Field,a:&UP,x:u16)->u16{a.iter().rev().fold(0,|s,&c|f.mul(s,x)^c)}
+fn qpoly46(f:&Field,a:&[UP;2],b:&[UP;2])->[UP;2]{let t=times46(f,&a[1],&b[1]);[plus46(&times46(f,&a[0],&b[0]),&t),plus46(&plus46(&times46(f,&a[0],&b[1]),&times46(f,&a[1],&b[0])),&t)]}
+fn symbolic46(f:&Field,p:&Poly,images:&[[UP;2];4])->[UP;2]{let mut pw:Vec<Vec<[UP;2]>>=vec![];for i in 0..4{let bound=p.iter().map(|e|e[i]).max().unwrap_or(0);let mut v=vec![[vec![1],vec![]]];for j in 0..bound{v.push(qpoly46(f,&v[j],&images[i]));}pw.push(v);}let mut ans=[vec![],vec![]];for ex in p{let mut term=[vec![1],vec![]];for i in 0..4{term=qpoly46(f,&term,&pw[i][ex[i]]);}ans[0]=plus46(&ans[0],&term[0]);ans[1]=plus46(&ans[1],&term[1]);}ans}
+fn roots46(f:&Field,g:&UP)->Vec<u16>{assert!(!g.is_empty());if g.len()==1{return vec![];}let x=vec![0,1];let mut xp=x.clone();for _ in 0..f.m{xp=div46(f,&times46(f,&xp,&xp),g).1;}let h=gcd46(f,g,&plus46(&xp,&x));if h.len()<=1{return vec![];}let mut factors=vec![h.clone()];for bit in 0..f.m{let mut term=vec![0,1u16<<bit];let mut tr=vec![];for _ in 0..f.m{tr=plus46(&tr,&term);term=div46(f,&times46(f,&term,&term),&h).1;}let mut next=vec![];for factor in factors{let a=gcd46(f,&factor,&tr);if a.len()>1&&a.len()<factor.len(){let(b,r)=div46(f,&factor,&a);assert!(r.is_empty());next.push(a);next.push(b);}else{next.push(factor);}}factors=next;}let mut product=vec![1];let mut roots=BTreeSet::new();for a in factors{assert_eq!(a.len(),2,"trace basis did not split linear-root polynomial");let r=f.div(a[0],a[1]);assert_eq!(value46(f,g,r),0);assert!(roots.insert(r));product=times46(f,&product,&a);}assert_eq!(product,h);roots.into_iter().collect()}
+fn lambda_roots46(f:&Field,polys:&BTreeMap<String,Vec<Poly>>,b:u16,c:u16,coeff:u16)->Vec<u16>{
+ let mut images:[[UP;2];4]=[[vec![],vec![]],[vec![0,1],trim46(vec![1^c])],[trim46(vec![b]),vec![]],[trim46(vec![c]),vec![]]];
+ let tail=symbolic46(f,&polys["N"][0],&images);let inv=f.inverse[coeff as usize];let nphys=[scale46(f,&tail[0],inv),scale46(f,&tail[1],inv)];assert_eq!(nphys[1],trim46(vec![b]),"nonconstant physical nu descent");images[0]=nphys;
+ let mut common=vec![];for p in &polys["S"]{let pair=symbolic46(f,p,&images);for row in pair{common=gcd46(f,&common,&row);}}
+ if common.is_empty(){return(0..f.size as u16).collect();}roots46(f,&common)
+}

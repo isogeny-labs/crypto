@@ -1,0 +1,17 @@
+{
+  "nodepools": {
+    "cpu-spot": {"cpu": "16", "memory": "128Gi"},
+    "cpu-l2-spot": {"cpu": "8", "memory": "32Gi"},
+    "gha-on-demand": {"cpu": "0", "memory": "0Gi"},
+    "gha-on-demand-extra": {"cpu": "0", "memory": "0Gi"},
+    "gha-xmem": {"cpu": "0", "memory": "0Gi"},
+    "gha-gates": {"cpu": "0", "memory": "0Gi"}
+  },
+  "required_nodepools": ["cpu-spot", "cpu-l2-spot"],
+  "quota": {
+    "requests.cpu": "16", "limits.cpu": "16",
+    "requests.memory": "128Gi", "limits.memory": "128Gi",
+    "requests.ephemeral-storage": "80Gi", "limits.ephemeral-storage": "80Gi",
+    "pods": "8", "count/jobs.batch": "200"
+  }
+}

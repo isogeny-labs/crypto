@@ -1,0 +1,199 @@
+# sgsecant panel summary (name=dev-seed-424243-cells domain=sgsecant/v1 seed=424243 cells=[(151, 3), (227, 4), (337, 5), (491, 6), (673, 7), (991, 8)] instances=4 runs=30 tmax=400 budget=2000000000 curve_cap=1024 graph_cap=40000 boot=4000)
+
+## cell p=151 d=3  (K=6 abscissae, rank target 7)
+arm cs2   runs=120 completed=120 median field_ops/relation incl.construct=29120 excl.construct=27031 native/relation=7523 median targets=18 handled_degree_max(median)=4 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cs1   runs=120 completed=120 median field_ops/relation incl.construct=10734 excl.construct=8588 native/relation=18166 median targets=18 handled_degree_max(median)=4 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cd    runs=120 completed=120 median field_ops/relation incl.construct=9507 excl.construct=7327 native/relation=22200 median targets=18 handled_degree_max(median)=8 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls2   runs=120 completed=120 median field_ops/relation incl.construct=13479 excl.construct=12118 native/relation=33840 median targets=17 handled_degree_max(median)=6 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls1   runs=120 completed=120 median field_ops/relation incl.construct=13024 excl.construct=11564 native/relation=40112 median targets=17 handled_degree_max(median)=5 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ld    runs=120 completed=120 median field_ops/relation incl.construct=8628 excl.construct=7113 native/relation=22247 median targets=17 handled_degree_max(median)=8 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2   runs=120 completed=120 median field_ops/relation incl.construct=14364 excl.construct=12799 native/relation=34365 median targets=18 handled_degree_max(median)=6 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs1   runs=120 completed=120 median field_ops/relation incl.construct=14279 excl.construct=12551 native/relation=43939 median targets=18 handled_degree_max(median)=5 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hd    runs=120 completed=120 median field_ops/relation incl.construct=9054 excl.construct=7403 native/relation=21894 median targets=18 handled_degree_max(median)=8 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2b  runs=120 completed=120 median field_ops/relation incl.construct=14262 excl.construct=12996 native/relation=35160 median targets=18 handled_degree_max(median)=6 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm pc2x  runs=30 completed=30 median field_ops/relation incl.construct=55555 excl.construct=54680 native/relation=15408 median targets=18 handled_degree_max(median)=4 exact_mismatch=0 replay_fail=0 censored_systems=0
+  PRIMARY cs2/cd               field                  construct=true n=120 GM=3.1003 CI95=[3.0300,3.1680] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=true n=120 GM=3.0693 CI95=[2.9938,3.1427] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=true n=120 GM=3.0668 CI95=[3.0015,3.1298] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=true n=120 GM=2.5683 CI95=[2.5143,2.6220] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=true n=120 GM=1.1607 CI95=[1.1319,1.1900] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field                  construct=false n=120 GM=3.6832 CI95=[3.6268,3.7387] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=false n=120 GM=3.7787 CI95=[3.7188,3.8377] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=false n=120 GM=3.5834 CI95=[3.5313,3.6346] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=false n=120 GM=2.9039 CI95=[2.8506,2.9554] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=false n=120 GM=1.1714 CI95=[1.1402,1.2030] unmeasured=0 -> higher
+  sec cs1/cd                   field                  construct=true n=120 GM=1.1292 CI95=[1.1208,1.1375] unmeasured=0 -> higher
+  ctl cs2/ls2                  field                  construct=true n=120 GM=2.0891 CI95=[1.9086,2.2870] unmeasured=0 -> higher
+  ctl cs2/hs2                  field                  construct=true n=120 GM=2.1010 CI95=[1.9371,2.2822] unmeasured=0 -> higher
+  ctl cs1/ls1                  field                  construct=true n=120 GM=0.7852 CI95=[0.7226,0.8538] unmeasured=0 -> lower
+  ctl cs1/hs1                  field                  construct=true n=120 GM=0.7834 CI95=[0.7277,0.8448] unmeasured=0 -> lower
+  same-base dense ctl ld/hd    field                  construct=true n=120 GM=1.0087 CI95=[0.9344,1.0964] unmeasured=0 -> indistinct
+  A/A hs2/hs2b                 field                  construct=true n=120 GM=0.9574 CI95=[0.8793,1.0406] unmeasured=0 -> indistinct
+  pos-ctl pc2x/cs2             field                  construct=true n=30 GM=1.9497 CI95=[1.9461,1.9530] unmeasured=0 -> higher
+  self cs2/cs2                 field                  construct=true n=120 GM=1.0000 CI95=[1.0000,1.0000] unmeasured=0 -> indistinct
+  distance to internal rho reference (field ops, complete cost / rho cost, median): cs2 = 51.7x, cd = 16.3x (distance remaining, not a gate; the matched ecbench rho with the section 5a band is a separate required row)
+
+## cell p=227 d=4  (K=8 abscissae, rank target 9)
+arm cs2   runs=120 completed=120 median field_ops/relation incl.construct=54736 excl.construct=42946 native/relation=15245 median targets=20 handled_degree_max(median)=5 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cs1   runs=120 completed=120 median field_ops/relation incl.construct=28614 excl.construct=16028 native/relation=41855 median targets=20 handled_degree_max(median)=5 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cd    runs=120 completed=120 median field_ops/relation incl.construct=23736 excl.construct=11955 native/relation=54337 median targets=20 handled_degree_max(median)=10 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls2   runs=120 completed=120 median field_ops/relation incl.construct=31699 excl.construct=25422 native/relation=87036 median targets=21 handled_degree_max(median)=8 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls1   runs=120 completed=120 median field_ops/relation incl.construct=28664 excl.construct=22041 native/relation=100162 median targets=21 handled_degree_max(median)=7 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ld    runs=120 completed=120 median field_ops/relation incl.construct=17825 excl.construct=11932 native/relation=54680 median targets=21 handled_degree_max(median)=10 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2   runs=120 completed=120 median field_ops/relation incl.construct=30302 excl.construct=24215 native/relation=84722 median targets=20 handled_degree_max(median)=8 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs1   runs=120 completed=120 median field_ops/relation incl.construct=26403 excl.construct=21004 native/relation=95854 median targets=20 handled_degree_max(median)=7 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hd    runs=120 completed=120 median field_ops/relation incl.construct=16589 excl.construct=11663 native/relation=54213 median targets=20 handled_degree_max(median)=10 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2b  runs=120 completed=120 median field_ops/relation incl.construct=30530 excl.construct=23463 native/relation=83808 median targets=19 handled_degree_max(median)=8 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm pc2x  runs=30 completed=30 median field_ops/relation incl.construct=106645 excl.construct=90380 native/relation=32079 median targets=22 handled_degree_max(median)=5 exact_mismatch=0 replay_fail=0 censored_systems=0
+  PRIMARY cs2/cd               field                  construct=true n=120 GM=2.5614 CI95=[2.4495,2.6837] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=true n=120 GM=2.5060 CI95=[2.3848,2.6387] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=true n=120 GM=2.5704 CI95=[2.4617,2.6885] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=true n=120 GM=2.0661 CI95=[1.9977,2.1378] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=true n=120 GM=0.9111 CI95=[0.8903,0.9313] unmeasured=0 -> lower
+  PRIMARY cs2/cd               field                  construct=false n=120 GM=3.6218 CI95=[3.5658,3.6757] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=false n=120 GM=3.7051 CI95=[3.6465,3.7614] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=false n=120 GM=3.5713 CI95=[3.5174,3.6230] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=false n=120 GM=2.5880 CI95=[2.5392,2.6355] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=false n=120 GM=0.8960 CI95=[0.8720,0.9193] unmeasured=0 -> lower
+  sec cs1/cd                   field                  construct=true n=120 GM=1.2265 CI95=[1.2102,1.2437] unmeasured=0 -> higher
+  ctl cs2/ls2                  field                  construct=true n=120 GM=1.6959 CI95=[1.5642,1.8382] unmeasured=0 -> higher
+  ctl cs2/hs2                  field                  construct=true n=120 GM=1.7868 CI95=[1.6468,1.9505] unmeasured=0 -> higher
+  ctl cs1/ls1                  field                  construct=true n=120 GM=0.9021 CI95=[0.8386,0.9674] unmeasured=0 -> lower
+  ctl cs1/hs1                  field                  construct=true n=120 GM=0.9578 CI95=[0.8947,1.0292] unmeasured=0 -> indistinct
+  same-base dense ctl ld/hd    field                  construct=true n=120 GM=1.0490 CI95=[0.9865,1.1191] unmeasured=0 -> indistinct
+  A/A hs2/hs2b                 field                  construct=true n=120 GM=0.9942 CI95=[0.9224,1.0702] unmeasured=0 -> indistinct
+  pos-ctl pc2x/cs2             field                  construct=true n=30 GM=1.7194 CI95=[1.6921,1.7451] unmeasured=0 -> higher
+  self cs2/cs2                 field                  construct=true n=120 GM=1.0000 CI95=[1.0000,1.0000] unmeasured=0 -> indistinct
+  distance to internal rho reference (field ops, complete cost / rho cost, median): cs2 = 114.0x, cd = 41.1x (distance remaining, not a gate; the matched ecbench rho with the section 5a band is a separate required row)
+
+## cell p=337 d=5  (K=10 abscissae, rank target 11)
+arm cs2   runs=120 completed=120 median field_ops/relation incl.construct=82068 excl.construct=62854 native/relation=16267 median targets=23 handled_degree_max(median)=6 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cs1   runs=120 completed=120 median field_ops/relation incl.construct=34056 excl.construct=18177 native/relation=55526 median targets=23 handled_degree_max(median)=6 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cd    runs=120 completed=120 median field_ops/relation incl.construct=34228 excl.construct=17662 native/relation=117677 median targets=23 handled_degree_max(median)=12 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls2   runs=120 completed=120 median field_ops/relation incl.construct=35721 excl.construct=34069 native/relation=165337 median targets=21 handled_degree_max(median)=10 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls1   runs=120 completed=120 median field_ops/relation incl.construct=26940 excl.construct=25468 native/relation=141333 median targets=21 handled_degree_max(median)=9 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ld    runs=120 completed=120 median field_ops/relation incl.construct=18049 excl.construct=16845 native/relation=109162 median targets=21 handled_degree_max(median)=12 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2   runs=120 completed=120 median field_ops/relation incl.construct=38727 excl.construct=37145 native/relation=178530 median targets=24 handled_degree_max(median)=10 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs1   runs=120 completed=120 median field_ops/relation incl.construct=28379 excl.construct=26584 native/relation=144656 median targets=24 handled_degree_max(median)=9 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hd    runs=120 completed=120 median field_ops/relation incl.construct=19345 excl.construct=17930 native/relation=115649 median targets=24 handled_degree_max(median)=12 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2b  runs=120 completed=120 median field_ops/relation incl.construct=37954 excl.construct=36057 native/relation=176133 median targets=22 handled_degree_max(median)=10 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm pc2x  runs=30 completed=30 median field_ops/relation incl.construct=130481 excl.construct=121395 native/relation=31097 median targets=22 handled_degree_max(median)=6 exact_mismatch=0 replay_fail=0 censored_systems=0
+  PRIMARY cs2/cd               field                  construct=true n=120 GM=2.4243 CI95=[2.3317,2.5224] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=true n=120 GM=2.4173 CI95=[2.3211,2.5190] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=true n=120 GM=2.4403 CI95=[2.3490,2.5367] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=true n=120 GM=1.7902 CI95=[1.7462,1.8361] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=true n=120 GM=0.6269 CI95=[0.6130,0.6404] unmeasured=0 -> lower
+  PRIMARY cs2/cd               field                  construct=false n=120 GM=3.5235 CI95=[3.4904,3.5559] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=false n=120 GM=3.6083 CI95=[3.5737,3.6419] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=false n=120 GM=3.5038 CI95=[3.4717,3.5352] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=false n=120 GM=2.1723 CI95=[2.1385,2.2052] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=false n=120 GM=0.5811 CI95=[0.5673,0.5946] unmeasured=0 -> lower
+  sec cs1/cd                   field                  construct=true n=120 GM=1.0154 CI95=[1.0127,1.0180] unmeasured=0 -> higher
+  ctl cs2/ls2                  field                  construct=true n=120 GM=2.1204 CI95=[1.9462,2.3132] unmeasured=0 -> higher
+  ctl cs2/hs2                  field                  construct=true n=120 GM=2.0812 CI95=[1.9117,2.2676] unmeasured=0 -> higher
+  ctl cs1/ls1                  field                  construct=true n=120 GM=1.1826 CI95=[1.0704,1.3082] unmeasured=0 -> higher
+  ctl cs1/hs1                  field                  construct=true n=120 GM=1.1877 CI95=[1.0821,1.3032] unmeasured=0 -> higher
+  same-base dense ctl ld/hd    field                  construct=true n=120 GM=0.9937 CI95=[0.9157,1.0792] unmeasured=0 -> indistinct
+  A/A hs2/hs2b                 field                  construct=true n=120 GM=1.0255 CI95=[0.9386,1.1256] unmeasured=0 -> indistinct
+  pos-ctl pc2x/cs2             field                  construct=true n=30 GM=1.8616 CI95=[1.8489,1.8743] unmeasured=0 -> higher
+  self cs2/cs2                 field                  construct=true n=120 GM=1.0000 CI95=[1.0000,1.0000] unmeasured=0 -> indistinct
+  distance to internal rho reference (field ops, complete cost / rho cost, median): cs2 = 186.3x, cd = 81.4x (distance remaining, not a gate; the matched ecbench rho with the section 5a band is a separate required row)
+
+## cell p=491 d=6  (K=12 abscissae, rank target 13)
+arm cs2   runs=120 completed=120 median field_ops/relation incl.construct=207136 excl.construct=123098 native/relation=33002 median targets=32 handled_degree_max(median)=7 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cs1   runs=120 completed=120 median field_ops/relation incl.construct=123433 excl.construct=35858 native/relation=118323 median targets=32 handled_degree_max(median)=7 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cd    runs=120 completed=120 median field_ops/relation incl.construct=118755 excl.construct=30685 native/relation=243221 median targets=32 handled_degree_max(median)=14 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls2   runs=120 completed=120 median field_ops/relation incl.construct=75068 excl.construct=72174 native/relation=397286 median targets=32 handled_degree_max(median)=12 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls1   runs=120 completed=120 median field_ops/relation incl.construct=52484 excl.construct=49246 native/relation=320826 median targets=32 handled_degree_max(median)=11 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ld    runs=120 completed=120 median field_ops/relation incl.construct=34836 excl.construct=30995 native/relation=259991 median targets=32 handled_degree_max(median)=14 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2   runs=120 completed=120 median field_ops/relation incl.construct=74709 excl.construct=69912 native/relation=388472 median targets=31 handled_degree_max(median)=12 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs1   runs=120 completed=120 median field_ops/relation incl.construct=52255 excl.construct=49244 native/relation=320165 median targets=31 handled_degree_max(median)=11 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hd    runs=120 completed=120 median field_ops/relation incl.construct=34815 excl.construct=31068 native/relation=250173 median targets=31 handled_degree_max(median)=14 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2b  runs=120 completed=120 median field_ops/relation incl.construct=72282 excl.construct=69392 native/relation=386867 median targets=31 handled_degree_max(median)=12 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm pc2x  runs=30 completed=30 median field_ops/relation incl.construct=354898 excl.construct=270028 native/relation=72235 median targets=34 handled_degree_max(median)=7 exact_mismatch=0 replay_fail=0 censored_systems=0
+  PRIMARY cs2/cd               field                  construct=true n=120 GM=2.0186 CI95=[1.9043,2.1444] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=true n=120 GM=2.0004 CI95=[1.8850,2.1281] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=true n=120 GM=2.0307 CI95=[1.9170,2.1557] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=true n=120 GM=1.5747 CI95=[1.5232,1.6315] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=true n=120 GM=0.6363 CI95=[0.6220,0.6500] unmeasured=0 -> lower
+  PRIMARY cs2/cd               field                  construct=false n=120 GM=3.9671 CI95=[3.9354,3.9989] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=false n=120 GM=4.0498 CI95=[4.0169,4.0826] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=false n=120 GM=3.9426 CI95=[3.9118,3.9735] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=false n=120 GM=2.2142 CI95=[2.1814,2.2471] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=false n=120 GM=0.5361 CI95=[0.5244,0.5480] unmeasured=0 -> lower
+  sec cs1/cd                   field                  construct=true n=120 GM=1.0589 CI95=[1.0516,1.0665] unmeasured=0 -> higher
+  ctl cs2/ls2                  field                  construct=true n=120 GM=2.5972 CI95=[2.3911,2.8266] unmeasured=0 -> higher
+  ctl cs2/hs2                  field                  construct=true n=120 GM=2.5485 CI95=[2.3223,2.7890] unmeasured=0 -> higher
+  ctl cs1/ls1                  field                  construct=true n=120 GM=1.9419 CI95=[1.7407,2.1662] unmeasured=0 -> higher
+  ctl cs1/hs1                  field                  construct=true n=120 GM=1.8985 CI95=[1.6782,2.1471] unmeasured=0 -> higher
+  same-base dense ctl ld/hd    field                  construct=true n=120 GM=0.9771 CI95=[0.9049,1.0552] unmeasured=0 -> indistinct
+  A/A hs2/hs2b                 field                  construct=true n=120 GM=1.0330 CI95=[0.9499,1.1253] unmeasured=0 -> indistinct
+  pos-ctl pc2x/cs2             field                  construct=true n=30 GM=1.5959 CI95=[1.5638,1.6280] unmeasured=0 -> higher
+  self cs2/cs2                 field                  construct=true n=120 GM=1.0000 CI95=[1.0000,1.0000] unmeasured=0 -> indistinct
+  distance to internal rho reference (field ops, complete cost / rho cost, median): cs2 = 501.0x, cd = 291.1x (distance remaining, not a gate; the matched ecbench rho with the section 5a band is a separate required row)
+
+## cell p=673 d=7  (K=14 abscissae, rank target 15)
+arm cs2   runs=120 completed=120 median field_ops/relation incl.construct=1182309 excl.construct=160531 native/relation=35867 median targets=38 handled_degree_max(median)=8 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cs1   runs=120 completed=120 median field_ops/relation incl.construct=1017590 excl.construct=42424 native/relation=168492 median targets=38 handled_degree_max(median)=8 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cd    runs=120 completed=120 median field_ops/relation incl.construct=1019892 excl.construct=44410 native/relation=454629 median targets=38 handled_degree_max(median)=16 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls2   runs=120 completed=120 median field_ops/relation incl.construct=97120 excl.construct=92139 native/relation=660106 median targets=36 handled_degree_max(median)=14 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls1   runs=120 completed=120 median field_ops/relation incl.construct=63398 excl.construct=59248 native/relation=423969 median targets=36 handled_degree_max(median)=13 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ld    runs=120 completed=120 median field_ops/relation incl.construct=46819 excl.construct=42207 native/relation=418212 median targets=36 handled_degree_max(median)=16 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2   runs=120 completed=120 median field_ops/relation incl.construct=95907 excl.construct=90999 native/relation=659842 median targets=36 handled_degree_max(median)=14 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs1   runs=120 completed=120 median field_ops/relation incl.construct=63803 excl.construct=57885 native/relation=437818 median targets=36 handled_degree_max(median)=13 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hd    runs=120 completed=120 median field_ops/relation incl.construct=46515 excl.construct=40678 native/relation=413179 median targets=36 handled_degree_max(median)=16 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2b  runs=120 completed=120 median field_ops/relation incl.construct=97739 excl.construct=92060 native/relation=675075 median targets=36 handled_degree_max(median)=14 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm pc2x  runs=30 completed=30 median field_ops/relation incl.construct=940830 excl.construct=339917 native/relation=76323 median targets=40 handled_degree_max(median)=8 exact_mismatch=0 replay_fail=0 censored_systems=0
+  PRIMARY cs2/cd               field                  construct=true n=120 GM=1.1307 CI95=[1.1170,1.1452] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=true n=120 GM=1.1272 CI95=[1.1138,1.1412] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=true n=120 GM=1.1345 CI95=[1.1205,1.1494] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=true n=120 GM=1.0783 CI95=[1.0697,1.0873] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=true n=120 GM=0.7869 CI95=[0.7721,0.8012] unmeasured=0 -> lower
+  PRIMARY cs2/cd               field                  construct=false n=120 GM=3.6087 CI95=[3.5811,3.6349] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=false n=120 GM=3.6963 CI95=[3.6677,3.7235] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=false n=120 GM=3.6068 CI95=[3.5797,3.6324] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=false n=120 GM=1.8008 CI95=[1.7706,1.8292] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=false n=120 GM=0.3852 CI95=[0.3761,0.3940] unmeasured=0 -> lower
+  sec cs1/cd                   field                  construct=true n=120 GM=0.9979 CI95=[0.9977,0.9982] unmeasured=0 -> lower
+  ctl cs2/ls2                  field                  construct=true n=120 GM=11.7926 CI95=[10.6959,13.0205] unmeasured=0 -> higher
+  ctl cs2/hs2                  field                  construct=true n=120 GM=11.8055 CI95=[10.6366,13.1772] unmeasured=0 -> higher
+  ctl cs1/ls1                  field                  construct=true n=120 GM=15.8260 CI95=[14.2409,17.6111] unmeasured=0 -> higher
+  ctl cs1/hs1                  field                  construct=true n=120 GM=15.6846 CI95=[14.0730,17.5426] unmeasured=0 -> higher
+  same-base dense ctl ld/hd    field                  construct=true n=120 GM=1.0048 CI95=[0.9269,1.0939] unmeasured=0 -> indistinct
+  A/A hs2/hs2b                 field                  construct=true n=120 GM=0.9898 CI95=[0.9109,1.0745] unmeasured=0 -> indistinct
+  pos-ctl pc2x/cs2             field                  construct=true n=30 GM=1.2191 CI95=[1.1992,1.2404] unmeasured=0 -> higher
+  self cs2/cs2                 field                  construct=true n=120 GM=1.0000 CI95=[1.0000,1.0000] unmeasured=0 -> indistinct
+  distance to internal rho reference (field ops, complete cost / rho cost, median): cs2 = 2956.7x, cd = 2475.7x (distance remaining, not a gate; the matched ecbench rho with the section 5a band is a separate required row)
+
+## cell p=991 d=8  (K=16 abscissae, rank target 17)
+arm cs2   runs=120 completed=120 median field_ops/relation incl.construct=8066805 excl.construct=299670 native/relation=67267 median targets=50 handled_degree_max(median)=9 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cs1   runs=120 completed=120 median field_ops/relation incl.construct=7654565 excl.construct=71950 native/relation=306789 median targets=50 handled_degree_max(median)=9 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm cd    runs=120 completed=120 median field_ops/relation incl.construct=7645211 excl.construct=68146 native/relation=797401 median targets=50 handled_degree_max(median)=18 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls2   runs=120 completed=120 median field_ops/relation incl.construct=158198 excl.construct=154433 native/relation=1197197 median targets=46 handled_degree_max(median)=16 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ls1   runs=120 completed=120 median field_ops/relation incl.construct=103659 excl.construct=100256 native/relation=812486 median targets=46 handled_degree_max(median)=15 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm ld    runs=120 completed=120 median field_ops/relation incl.construct=67166 excl.construct=62726 native/relation=748757 median targets=46 handled_degree_max(median)=18 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2   runs=120 completed=120 median field_ops/relation incl.construct=171869 excl.construct=166800 native/relation=1286576 median targets=50 handled_degree_max(median)=16 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs1   runs=120 completed=120 median field_ops/relation incl.construct=105395 excl.construct=99929 native/relation=836254 median targets=50 handled_degree_max(median)=15 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hd    runs=120 completed=120 median field_ops/relation incl.construct=72678 excl.construct=68322 native/relation=829876 median targets=50 handled_degree_max(median)=18 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm hs2b  runs=120 completed=120 median field_ops/relation incl.construct=179914 excl.construct=175589 native/relation=1355885 median targets=53 handled_degree_max(median)=16 exact_mismatch=0 replay_fail=0 censored_systems=0
+arm pc2x  runs=30 completed=30 median field_ops/relation incl.construct=11800551 excl.construct=561722 native/relation=125206 median targets=46 handled_degree_max(median)=9 exact_mismatch=0 replay_fail=0 censored_systems=0
+  PRIMARY cs2/cd               field                  construct=true n=120 GM=1.0622 CI95=[1.0521,1.0731] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=true n=120 GM=1.0602 CI95=[1.0504,1.0708] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=true n=120 GM=1.0634 CI95=[1.0531,1.0746] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=true n=120 GM=1.0406 CI95=[1.0343,1.0474] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=true n=120 GM=0.8977 CI95=[0.8816,0.9124] unmeasured=0 -> lower
+  PRIMARY cs2/cd               field                  construct=false n=120 GM=4.4588 CI95=[4.4270,4.4897] unmeasured=0 -> higher
+  PRIMARY cs2/cd               mul_only               construct=false n=120 GM=4.5413 CI95=[4.5088,4.5730] unmeasured=0 -> higher
+  PRIMARY cs2/cd               inv_x10                construct=false n=120 GM=4.4371 CI95=[4.4060,4.4672] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+0.1native        construct=false n=120 GM=2.0815 CI95=[2.0460,2.1169] unmeasured=0 -> higher
+  PRIMARY cs2/cd               field+1native          construct=false n=120 GM=0.4240 CI95=[0.4138,0.4343] unmeasured=0 -> lower
+  sec cs1/cd                   field                  construct=true n=120 GM=1.0011 CI95=[1.0009,1.0013] unmeasured=0 -> higher
+  ctl cs2/ls2                  field                  construct=true n=120 GM=36.1648 CI95=[31.4272,41.3369] unmeasured=0 -> higher
+  ctl cs2/hs2                  field                  construct=true n=120 GM=32.6819 CI95=[28.1280,37.9126] unmeasured=0 -> higher
+  ctl cs1/ls1                  field                  construct=true n=120 GM=49.9286 CI95=[43.4392,57.3199] unmeasured=0 -> higher
+  ctl cs1/hs1                  field                  construct=true n=120 GM=51.0462 CI95=[43.6276,59.5551] unmeasured=0 -> higher
+  same-base dense ctl ld/hd    field                  construct=true n=120 GM=0.9053 CI95=[0.8399,0.9772] unmeasured=0 -> lower
+  A/A hs2/hs2b                 field                  construct=true n=120 GM=1.0243 CI95=[0.9389,1.1156] unmeasured=0 -> indistinct
+  pos-ctl pc2x/cs2             field                  construct=true n=30 GM=1.0250 CI95=[1.0221,1.0281] unmeasured=0 -> higher
+  self cs2/cs2                 field                  construct=true n=120 GM=1.0000 CI95=[1.0000,1.0000] unmeasured=0 -> indistinct
+  distance to internal rho reference (field ops, complete cost / rho cost, median): cs2 = 19301.6x, cd = 17924.4x (distance remaining, not a gate; the matched ecbench rho with the section 5a band is a separate required row)

@@ -1,0 +1,31 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R74-DEGREE-FIVE-LOCAL-FACTORS",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "degree-five-local74-01",
+      "path": "runs/degree-five-local74-01/protocol.json",
+      "sha256": "ce90f49ea00286f997eda6b0c1ab77069b1ea1c48df128ef4bcdca1c3eb2cf81",
+      "frozen_revision": "02825749311a46bc46f44c716ceb3cae5170fdfb"
+    },
+    {
+      "attempt": "degree-five-local74-02",
+      "path": "runs/degree-five-local74-02/protocol.json",
+      "sha256": "d016250ff0253268b1bf12b218dd7ec787e014c3d48e26391b4f19a3267530fa",
+      "frozen_revision": "5132b5b5f8ca3ece4db0d7437ce059760d524d2c"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "2d4240fa4c051c99fe09ed90c01e5ca1eae69c2aa13537fde844736d2c581555"
+  },
+  "flow": {
+    "accepted": 1,
+    "rejected": 1,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual contract/source-byte checks only",
+  "notes": "All six degree-five local factors: lengths 2,14,1,7,7,1 and ramification 1,1,1,7,7,1 with relative degrees 2,14,1,1,1,1. Valuations and infinity separate."
+}

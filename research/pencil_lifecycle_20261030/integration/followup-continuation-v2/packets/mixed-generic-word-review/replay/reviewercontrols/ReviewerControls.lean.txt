@@ -1,0 +1,10 @@
+import WordGeneric
+open PencilWordRefinement
+set_option maxRecDepth 6000
+set_option maxHeartbeats 1200000
+example : (genericWords 7 ⟨0,1,2,2⟩ ⟨0,4,0,0,3,2⟩ 0).k = (mixedWords 7 ⟨0,1,2,2⟩ ⟨0,4,0,0,3,2⟩).k := by decide
+example : (genericWords 7 ⟨0,1,2,2⟩ ⟨0,4,0,0,3,2⟩ 0).payload.w = 1 := by rfl
+example : genericWordDispatch 5 ⟨0,0,1,1⟩ ⟨0,0,0,0,1,1⟩ 4 = none := by decide
+example : (genericWords 5 ⟨0,0,1,1⟩ ⟨0,0,0,0,1,1⟩ 4).payload.canonical 5 := by unfold WeightedWord.canonical; decide
+example : ¬ (5:UInt64).toNat < (5:UInt64).toNat := by decide
+#print PencilWordRefinement.generic_word_preserves

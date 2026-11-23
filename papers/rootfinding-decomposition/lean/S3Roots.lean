@@ -1,4 +1,5 @@
 import Mathlib.Tactic
+import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 
 /-!
 # The roots of Semaev's `S₃(x_R, x_F, X)` are `x(R + F)` and `x(R − F)`
@@ -12,8 +13,14 @@ For affine points `R = (xR, yR)` and `F = (xF, yF)` on the curve with
 `λ₊ = (yF − yR)/(xF − xR)` and the chord through `R` and `−F = (xF, −yF)`
 has slope `λ₋ = (−yF − yR)/(xF − xR)`; the affine addition law gives
 `x(R + F) = λ₊² − xR − xF` and `x(R − F) = λ₋² − xR − xF`.
-(These are the chord formulas of the affine group law; in Mathlib's
-`WeierstrassCurve.Affine` they are `slope` and `addX` with `a₁ = a₂ = 0`.)
+(These are the chord formulas of the affine group law. The section
+"Bridge to Mathlib's group law" at the end of this file proves it:
+`addX_eq_mathlib_addX` identifies `addX` with Mathlib's
+`WeierstrassCurve.Affine.addX` applied to `WeierstrassCurve.Affine.slope`
+when `a₁ = a₂ = 0` and `xR ≠ xF`, and `pointX_add_eq_xPlus` and
+`pointX_add_neg_eq_xMinus` identify `xPlus` and `xMinus` with the
+`x`-coordinates of Mathlib's `Point` sums `R + F` and `R + (−F)`, which in
+addition need `a₃ = 0`.)
 
 Semaev's third summation polynomial for this curve is
 `S₃(x₁, x₂, x₃) = (x₁ − x₂)² x₃² − 2[(x₁ + x₂)(x₁x₂ + a) + 2b] x₃
@@ -102,5 +109,77 @@ theorem S3_root_iff (a b xR yR xF yF X : K) (hx : xR ≠ xF)
   · rintro (h | h)
     · rw [h]; ring
     · rw [h]; ring
+
+/-! ## Bridge to Mathlib's group law
+
+The definitions above are stated with bare field elements. The lemmas below
+show that, for a Mathlib Weierstrass curve `W` with `a₁ = a₂ = 0` (and
+`a₃ = 0` where negation enters), they are the `x`-coordinates computed by
+Mathlib's affine group law `WeierstrassCurve.Affine.Point.add`. They do not
+assume `a₄ = a` or `a₆ = b`; `S3_factor` above is where the curve equation
+enters, and `S3_factor_mathlib` restates it for Mathlib points. -/
+
+/-- The affine `x`-coordinate of a Mathlib point, `none` at infinity. -/
+def pointX {W : WeierstrassCurve.Affine K} : W.Point → Option K
+  | .zero => none
+  | .some x _ _ => some x
+
+/-- `addX` is Mathlib's `x`-coordinate formula `W.addX` at Mathlib's chord
+slope `W.slope`, for any Weierstrass curve with `a₁ = a₂ = 0`, when
+`xR ≠ xF`. No curve equation is needed. -/
+theorem addX_eq_mathlib_addX [DecidableEq K] (W : WeierstrassCurve.Affine K)
+    (ha₁ : W.a₁ = 0) (ha₂ : W.a₂ = 0) (xR yR xF yF : K) (hx : xR ≠ xF) :
+    addX xR yR xF yF = W.addX xR xF (W.slope xR xF yR yF) := by
+  have hs : slope xR yR xF yF = (yR - yF) / (xR - xF) := by
+    unfold slope
+    rw [← neg_sub yR yF, ← neg_sub xR xF, neg_div_neg_eq]
+  rw [WeierstrassCurve.Affine.slope_of_X_ne hx]
+  simp only [addX, WeierstrassCurve.Affine.addX, hs, ha₁, ha₂] <;> ring
+
+/-- `xPlus` is the `x`-coordinate of the Mathlib sum `R + F` of two nonsingular
+affine points with `xR ≠ xF` on a curve with `a₁ = a₂ = 0`. -/
+theorem pointX_add_eq_xPlus [DecidableEq K] (W : WeierstrassCurve.Affine K)
+    (ha₁ : W.a₁ = 0) (ha₂ : W.a₂ = 0) {xR yR xF yF : K}
+    (hR : W.Nonsingular xR yR) (hF : W.Nonsingular xF yF) (hx : xR ≠ xF) :
+    pointX (WeierstrassCurve.Affine.Point.some xR yR hR
+        + WeierstrassCurve.Affine.Point.some xF yF hF) = some (xPlus xR yR xF yF) := by
+  rw [WeierstrassCurve.Affine.Point.add_of_X_ne hx]
+  show some (W.addX xR xF (W.slope xR xF yR yF)) = some (addX xR yR xF yF)
+  rw [addX_eq_mathlib_addX W ha₁ ha₂ xR yR xF yF hx]
+
+/-- `xMinus` is the `x`-coordinate of the Mathlib sum `R + (−F)` of two
+nonsingular affine points with `xR ≠ xF` on a curve with `a₁ = a₂ = a₃ = 0`
+(`a₃ = 0` makes Mathlib's `−(xF, yF)` equal to `(xF, −yF)`). -/
+theorem pointX_add_neg_eq_xMinus [DecidableEq K] (W : WeierstrassCurve.Affine K)
+    (ha₁ : W.a₁ = 0) (ha₂ : W.a₂ = 0) (ha₃ : W.a₃ = 0) {xR yR xF yF : K}
+    (hR : W.Nonsingular xR yR) (hF : W.Nonsingular xF yF) (hx : xR ≠ xF) :
+    pointX (WeierstrassCurve.Affine.Point.some xR yR hR
+        + -WeierstrassCurve.Affine.Point.some xF yF hF) = some (xMinus xR yR xF yF) := by
+  rw [WeierstrassCurve.Affine.Point.neg_some, WeierstrassCurve.Affine.Point.add_of_X_ne hx]
+  show some (W.addX xR xF (W.slope xR xF yR (W.negY xF yF))) = some (addX xR yR xF (-yF))
+  have hneg : W.negY xF yF = -yF := by
+    simp only [WeierstrassCurve.Affine.negY, ha₁, ha₃] <;> ring
+  rw [hneg, addX_eq_mathlib_addX W ha₁ ha₂ xR yR xF (-yF) hx]
+
+/-- **Proposition 1 for Mathlib points.** For nonsingular affine points `R`, `F`
+with `xR ≠ xF` on the Mathlib curve `y² = x³ + a₄ x + a₆` (`a₁ = a₂ = a₃ = 0`),
+`S₃(xR, xF, X)` factors with roots the `x`-coordinates of Mathlib's `R + F`
+and `R + (−F)`. -/
+theorem S3_factor_mathlib [DecidableEq K] (W : WeierstrassCurve.Affine K)
+    (ha₁ : W.a₁ = 0) (ha₂ : W.a₂ = 0) (ha₃ : W.a₃ = 0) {xR yR xF yF : K}
+    (hR : W.Nonsingular xR yR) (hF : W.Nonsingular xF yF) (hx : xR ≠ xF) (X : K) :
+    S3 W.a₄ W.a₆ xR xF X
+        = (xR - xF) ^ 2 * (X - xPlus xR yR xF yF) * (X - xMinus xR yR xF yF)
+      ∧ pointX (WeierstrassCurve.Affine.Point.some xR yR hR
+          + WeierstrassCurve.Affine.Point.some xF yF hF) = some (xPlus xR yR xF yF)
+      ∧ pointX (WeierstrassCurve.Affine.Point.some xR yR hR
+          + -WeierstrassCurve.Affine.Point.some xF yF hF) = some (xMinus xR yR xF yF) := by
+  have hEq : ∀ {x y : K}, W.Equation x y → y ^ 2 = x ^ 3 + W.a₄ * x + W.a₆ := by
+    intro x y h
+    rw [WeierstrassCurve.Affine.equation_iff, ha₁, ha₂, ha₃] at h
+    linear_combination h
+  refine ⟨S3_factor W.a₄ W.a₆ xR yR xF yF X hx (hEq hR.1) (hEq hF.1),
+    pointX_add_eq_xPlus W ha₁ ha₂ hR hF hx,
+    pointX_add_neg_eq_xMinus W ha₁ ha₂ ha₃ hR hF hx⟩
 
 end SemaevS3

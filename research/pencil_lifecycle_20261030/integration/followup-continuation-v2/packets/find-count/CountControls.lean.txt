@@ -1,0 +1,22 @@
+import TwoFindCount
+set_option autoImplicit false
+namespace CountControls
+open SignedWord FindCount
+def chain : State 3 := ⟨fun i=>if i.val=2 then 1 else 0,fun _=>ident⟩
+def q1 : Pot := compose 7 (chain.pot 1) ident
+def t1 : State 3 := compress chain 1 0 q1
+def q2 : Pot := compose 7 (t1.pot 2) q1
+def t2 : State 3 := compress t1 2 0 q2
+theorem root_visit : Counted 7 chain 0 chain 0 ident 1 := Counted.root _ _ (by decide)
+theorem first_three_visits : Counted 7 chain 2 t2 0 q2 3 := by
+ apply Counted.step chain t1 2 0 q1 2 (by decide)
+ apply Counted.step chain chain 1 0 ident 1 (by decide)
+ exact root_visit
+theorem repeated_two_visits : ∃ t p,Counted 7 t2 2 t 0 p 2 := by
+ refine ⟨_,_,Counted.step t2 t2 2 0 ident 1 (by decide) ?_⟩
+ exact Counted.root t2 0 (by decide)
+theorem root_increment : ticks 19 1=20 := by decide
+theorem paired_increment : ticks (ticks 19 3) 2=24 := by decide
+theorem boundary_wrap : ticks (UInt64.ofNat (2^64-1)) 1=0 := by decide
+theorem before_wrap : ticks (UInt64.ofNat (2^64-2)) 1=UInt64.ofNat (2^64-1) := by decide
+end CountControls

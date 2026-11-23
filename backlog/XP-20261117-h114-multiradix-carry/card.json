@@ -1,0 +1,116 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261117-h114-multiradix-carry",
+  "title": "Run the frozen H114 multiradix carry/cohomology falsification panel",
+  "created": "2026-11-17",
+  "authors": [
+    "ECDLP experimental research lane"
+  ],
+  "status": "blocked",
+  "status_note": "Producer, proof layer and independent verifier are published before data; the managed runtime has no checkpoint upload transport or digest-pinned EKS task image.",
+  "blocked_on": [
+    "problem:problems/arity-completion-launch-gates.md shared checkpoint and EKS command-image access",
+    "pr:4622 producer draft must retain exact source revision",
+    "url:https://github.com/isogeny-labs/cryptanalysis/pull/1736 independent verifier draft must retain exact source revision"
+  ],
+  "links": {
+    "lead": "research/h114_multiradix_carry_cohomology_20261117/README.md",
+    "notes": [
+      "research/h114_multiradix_carry_cohomology_20261117/PROTOCOL.md",
+      "research/h114_multiradix_carry_cohomology_20261117/PROTOCOL.json",
+      "research/h114_multiradix_carry_cohomology_20261117/RUN_BLOCKED.md",
+      "research/h114_multiradix_carry_cohomology_20261117/PROOF_MAP.md"
+    ],
+    "prs": [
+      4622
+    ]
+  },
+  "question": "Does one unchanged predicate in the frozen 11,520-member H114 family give an exact scalar digit modulo 30 on all 28 rows and decode all 9,096 toy-curve targets?",
+  "decision_value": "A nonempty independently verified 28-row exact-ID intersection advances the candidate to larger out-of-sample cohorts and a uniformity proof obligation; an empty intersection rejects this entire frozen shared-channel CRT family and redirects the next lead away from these first-layer windings.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "research/h114-multiradix-carry-cohomology-freeze",
+    "build": [
+      [
+        "rustc",
+        "--edition=2021",
+        "-D",
+        "warnings",
+        "research/h114_multiradix_carry_cohomology_20261117/h114_multiradix_lab.rs",
+        "-o",
+        "/tmp/h114_multiradix_lab"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": 1,
+    "est_wall_hours": 1,
+    "notes": "The frozen execution deadline is 1,800 seconds and budget is USD 1.00. Integer-hour estimates round that ceiling upward; they are planning limits, not observed runtime. Zero scientific retries are allowed."
+  },
+  "run": {
+    "argv": [
+      "/tmp/h114_multiradix_lab",
+      "--raw",
+      "{out}/h114-winding-raw.tsv",
+      "--summary",
+      "{out}/h114-winding-summary.json"
+    ],
+    "env": {
+      "RUST_BACKTRACE": "1"
+    },
+    "timeout_per_shard_s": 1800
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "h114.multiradix-carry-cohomology.result/v1",
+    "verify": [
+      "h114_multiradix_verify",
+      "{out}/h114-winding-raw.tsv",
+      "{out}/h114-winding-summary.json"
+    ],
+    "land": "research/h114_multiradix_carry_cohomology_20261117/results"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261117-h114-multiradix-carry"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "crypto-h114-multiradix",
+      "recipe": "Build a UID-1000-compatible digest-pinned Isolab image from crypto producer revision 4ceb5c032917a5f72a15046eee5aa4aad327a93c and retain cryptanalysis verifier revision f18430232e2814922d95f67e97abdda5d6ff44f6 for independent output verification."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 4096,
+      "timeout_s": 1800,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261117-h114-multiradix-carry"
+    },
+    "notes": "Single exhaustive frozen run; not preemptible because the producer has no mid-run checkpoint. Do not replace it with quick mode or a local scoring run. Promotion to ready must copy/freeze the existing protocol in this card, pin merged source commits and bind a runnable independent verifier.",
+    "funding": {
+      "units": 131072,
+      "rationale": "Lower seed-card level: one bounded toy-cohort falsification with complete producer and verifier source, but no generic-speedup claim."
+    }
+  },
+  "owner_hint": "authorized Isolab EKS experimental runner"
+}

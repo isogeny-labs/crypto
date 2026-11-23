@@ -1,0 +1,22 @@
+from pathlib import Path
+p=Path(__file__).parent
+body='''Normalization preserves polynomial support multiplicities
+
+T-1186; 2026-10-31. Producer proof packet; independent source-fidelity review pending.
+
+For any field, a nonzero scale a, arbitrary nonnegative exponents n,m,k and polynomials u,f, normalization preserves all power-divisibility predicates: T_n(u)^k divides T_m(f) if and only if u^k divides f. The proof supplies an explicit quotient in the forward direction and applies the previously checked inverse normalization for the converse. Power compatibility is T_n(u)^k=T_(nk)(u^k).
+
+The normalized linear factor is T_1(X-r)=X-(r-b)/a. Consequently, exact finite polynomial root multiplicity is preserved at the transformed root. The predicate used is explicit: (X-r)^k divides f and (X-r)^(k+1) does not divide f. It does not silently assign a finite multiplicity to the zero polynomial. An additional theorem preserves all powers dividing the Mumford residual f-v^2, using the previously proved square compatibility of T_3(v) with T_6(v^2).
+
+Eight main declarations and eight controls are exposed for separate axiom readback. Rational controls distinguish a double root from a simple root and an incorrect root. The fixture (X-5)^2 at a=2,b=3 has exact multiplicity two at the transformed root 1. The zero polynomial is divisible by every power but has no exact finite multiplicity under this predicate. Exponent zero is included; a=0 collapses the positive-weight transformation and is excluded from the equivalence theorems.
+
+This is polynomial support and residual multiplicity, not yet the local valuation of a function on a curve. Connecting it to divisor multiplicities requires the local curve model, including ramified support. Extension at infinity and principal-divisor transport also remain in the geometric class construction. The affine signed-support correspondence is in the preceding normalization-inverse-support packet; word/storage validity is in stored-divisor-validity. Existing compiled upstream dependencies remain within the trust boundary.
+
+Sources checked: prior inverse/support modules, canonical genus2_model_gate.rs with named extraction, and pinned Mathlib Algebra/Polynomial/AlgebraMap.lean (algEquivCMulXAddC and dvd_comp_C_mul_X_add_C_iff). Official documentation: https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Polynomial/AlgebraMap.html. The implementation uses explicit quotient witnesses and the existing inverse, without new compiled dependencies or a novelty assertion.
+
+All four final native checks passed with unchanged input hashes. Separate readback of all 16 declarations uses only propext, Classical.choice and Quot.sound. Outcomes are recorded in status.json. The first proof attempt failed to reassociate multiplication in the linear-factor identity; the corrected attempt uses an explicit reassociation. Failed attempts remain available. No scientific campaign, timing observation or cost ratio.
+'''
+(p/'REPORT.md').write_text('# '+body)
+s=body.replace('https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Polynomial/AlgebraMap.html','linked in REPORT.md').replace('_',r'\_').replace('^',r'\textasciicircum{}')
+(p/'report.tex').write_text(r'\documentclass[10pt]{article}\usepackage[margin=.7in]{geometry}\usepackage[T1]{fontenc}\setlength{\parindent}{0pt}\setlength{\parskip}{8pt}\begin{document}'+s+r'\end{document}')
+(p/'flow.svg').write_text('''<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="340"><rect width="1100" height="340" fill="white"/><g font-family="sans-serif" fill="#17364a" text-anchor="middle"><text x="550" y="30" font-size="22">Normalization and support multiplicity · T-1186</text><g stroke="#17364a" fill="#edf5f7"><rect x="30" y="70" width="390" height="90"/><rect x="680" y="70" width="390" height="90"/></g><text x="225" y="102">uᵏ divides f</text><text x="225" y="135">(X−r)ᵏ divides f</text><text x="875" y="102">T_n(u)ᵏ divides T_m(f)</text><text x="875" y="135">(X−(r−b)/a)ᵏ divides T_m(f)</text><path d="M420 115H680" stroke="#17364a"/><text x="550" y="99">if and only if</text><text x="550" y="210">All k ≥ 0 · any field · a ≠ 0 · exact finite multiplicity preserved</text><text x="550" y="255">Also preserves all powers dividing the Mumford residual f−v²</text><text x="550" y="305">Next: relate polynomial multiplicity to local curve valuations</text></g></svg>''')

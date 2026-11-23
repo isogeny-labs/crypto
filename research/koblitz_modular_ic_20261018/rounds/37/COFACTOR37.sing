@@ -1,0 +1,23 @@
+// Literal Hecke-ring basis, inverse basis, a1/a2/a4 and character values loaded.
+ideal fieldIdeal37=std(ideal(fieldPolynomial37));int iC37;int jC37;poly rebuiltC37;
+if(deg(fieldPolynomial37)!=16 || leadcoef(fieldPolynomial37)!=1 || gcd(fieldPolynomial37,diff(fieldPolynomial37,y))!=1){ERROR("COFACTOR37_FIELD");}
+for(iC37=1;iC37<=16;iC37++){rebuiltC37=0;for(jC37=1;jC37<=16;jC37++){rebuiltC37=rebuiltC37+inverseBasis37[iC37,jC37]*heckeBasis37[jC37];}if(reduce(rebuiltC37-y^(iC37-1),fieldIdeal37)!=0){ERROR("COFACTOR37_BASIS_INVERSE");}}
+poly aOneC37=0;poly aTwoC37=0;poly aFourC37=0;poly apTwoC37=0;poly chi45C37=0;poly chi57C37=0;
+for(iC37=1;iC37<=16;iC37++){aOneC37=aOneC37+aOneCoordinates37[1,iC37]*heckeBasis37[iC37];aTwoC37=aTwoC37+aTwoCoordinates37[1,iC37]*heckeBasis37[iC37];aFourC37=aFourC37+aFourCoordinates37[1,iC37]*heckeBasis37[iC37];apTwoC37=apTwoC37+apTwoCoordinates37[1,iC37]*heckeBasis37[iC37];chi45C37=chi45C37+chi45Coordinates37[1,iC37]*heckeBasis37[iC37];chi57C37=chi57C37+chi57Coordinates37[1,iC37]*heckeBasis37[iC37];}
+if(reduce(aOneC37-1,fieldIdeal37)!=0 || reduce(aTwoC37-apTwoC37,fieldIdeal37)!=0 || reduce(chi45C37+1,fieldIdeal37)!=0){ERROR("COFACTOR37_COORDINATES");}
+if((45*45*57)%77!=2){ERROR("COFACTOR37_CHARACTER_GENERATORS");}
+poly chiTwoC37=reduce(chi45C37^2*chi57C37,fieldIdeal37);
+if(reduce(chiTwoC37^4-chiTwoC37^3+chiTwoC37^2-chiTwoC37+1,fieldIdeal37)!=0 || reduce(chiTwoC37^5+1,fieldIdeal37)!=0){ERROR("COFACTOR37_CHARACTER_ORDER");}
+if(reduce(aTwoC37^2-2*chiTwoC37-aFourC37,fieldIdeal37)!=0){ERROR("COFACTOR37_HECKE_RECURRENCE");}
+if(reduce(aTwoC37^2-2*(chiTwoC37+1)-aFourC37,fieldIdeal37)==0){ERROR("COFACTOR37_CORRUPT_CHARACTER_ACCEPTED");}
+poly quadraticC37=1-aTwoC37*T+2*chiTwoC37*T^2;
+poly eulerC37=resultant(fieldPolynomial37,quadraticC37,y);
+if(deg(eulerC37)!=32 || subst(eulerC37,T,0)!=1 || reduce(eulerC37,ideal(y))!=eulerC37){ERROR("COFACTOR37_EULER_DEGREE");}
+for(iC37=1;iC37<=size(eulerC37);iC37++){if(denominator(leadcoef(eulerC37[iC37]))!=1){ERROR("COFACTOR37_NONINTEGRAL_EULER");}}
+number nPlusC37=number(subst(eulerC37,T,1));number nMinusC37=number(subst(eulerC37,T,-1));
+proc normMatrixC37(poly value){matrix m[16][16];int i;int j;poly rem;poly co;for(j=0;j<16;j++){rem=reduce(value*y^j,fieldIdeal37);for(i=0;i<16;i++){co=jet(rem,i);if(i>0){co=co-jet(rem,i-1);}m[i+1,j+1]=number(co/y^i);}}return(number(det(m)));}
+if(normMatrixC37(1-aTwoC37+2*chiTwoC37)!=nPlusC37 || normMatrixC37(1+aTwoC37+2*chiTwoC37)!=nMinusC37){ERROR("COFACTOR37_INDEPENDENT_NORM");}
+short=0;link outC37="ASCII:w complementary-euler.sing";open(outC37);write(outC37,"poly complementaryEuler37="+string(eulerC37)+";number normPlus37="+string(nPlusC37)+";number normMinus37="+string(nMinusC37)+";");close(outC37);
+print("COFACTOR37_NORMS plus="+string(nPlusC37)+" minus="+string(nMinusC37));
+string eulerTextC37=string(eulerC37);ring residueC37=11,(T),dp;execute("poly eulerModC37="+eulerTextC37+";");number plusResidueC37=number(subst(eulerModC37,T,1));number minusResidueC37=number(subst(eulerModC37,T,-1));
+print("COFACTOR37_RESULT basis_inverse_checks=16 euler_degree=32 recurrence=pass independent_norms=2 plus_mod11="+string(plusResidueC37)+" minus_mod11="+string(minusResidueC37)+" corrupt_character=rejected");print("COFACTOR37_ALL_CHECKS_PASS");quit;

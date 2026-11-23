@@ -1,0 +1,27 @@
+{
+  "schema": "rootfinding_cycle_decision_v1",
+  "cycle": "C94",
+  "program_state": "active",
+  "executed": [
+    "degree-block-oracles-20261116-v94",
+    "degree-block-cold-20261116-v94",
+    "odd-cached-quadratic-20261116-v94b"
+  ],
+  "statuses": {
+    "degree-block-oracles-20261116-v94": "passed",
+    "degree-block-cold-20261116-v94": "passed",
+    "odd-cached-quadratic-20261116-v94b": "passed"
+  },
+  "qualified_speedup": null,
+  "release_gate_passed": false,
+  "stretch_target": 50,
+  "changed_assumptions": [
+    "General linear preprocessing dissolves generic conditional pair hardness",
+    "Oddcharacteristic backend caches square roots and batches denominator inversions"
+  ],
+  "next": [
+    "certified sparse-block propagation on original chain",
+    "cold odd profiles against direct+batched strong comparator",
+    "whole-cell symmetric support"
+  ]
+}

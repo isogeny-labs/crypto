@@ -1,0 +1,29 @@
+{
+  "schema": "prime31.launcher-output-guard-regression/v1",
+  "scope": "Rejected-launch and shell-syntax checks only; no native arithmetic, workload, or experiment execution",
+  "script_sha256": "0cf3df59afaa3fe8bb12059b511e6de04e5bdb8f902fb8c59c7731d414424b31",
+  "existing_output_before": {
+    "events.jsonl": "5248953f27c39f6cc44fd2a4a033ae2959aacd1ff4fc312dbbcbd05afde1d5be",
+    "SHA256SUMS": "ec067ee6eed224b287c8e26ea222811849733c837ac4b9796989e0fd779305c0"
+  },
+  "existing_output_after": {
+    "events.jsonl": "5248953f27c39f6cc44fd2a4a033ae2959aacd1ff4fc312dbbcbd05afde1d5be",
+    "SHA256SUMS": "ec067ee6eed224b287c8e26ea222811849733c837ac4b9796989e0fd779305c0"
+  },
+  "existing_output_byte_identical": true,
+  "stage_selection_not_written": true,
+  "relative_output_not_created": true,
+  "checks": [
+    {
+      "case": "existing_directory",
+      "exit_code": 64,
+      "stderr": "Output must be a new absolute path; existing receipts cannot be reused."
+    },
+    {
+      "case": "relative_path",
+      "exit_code": 64,
+      "stderr": "Output must be a new absolute path; existing receipts cannot be reused."
+    }
+  ],
+  "bash_n_exit_code": 0
+}

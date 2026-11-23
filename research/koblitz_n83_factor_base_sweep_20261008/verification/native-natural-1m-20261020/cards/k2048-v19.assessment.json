@@ -1,0 +1,24 @@
+{
+  "card_id": "CARD-native-natural-1m-k2048-v19",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "stopped",
+  "classification": "resource_envelope_failure_not_admitted",
+  "stopped_at_step": "k2048-v19",
+  "recommendation": "rerun_after_infrastructure_fix",
+  "reasons": [
+    "Native runner-v19 card-check exited 0: record_digests_verified=true, relay_verbatim=true, status=stopped at command 1. Exact stdout/stderr/status preserved beside this assessment.",
+    "Actual relay and original receipt SHA256 both 4df97bd88b9bafefadb52013048f645fdb3a931db09d664d3a23d1b9be8d4066. Card unchanged; one exact specified argv attempt, exit 1, timed_out=false, seconds=1643.653593095.",
+    "Launcher error and original stderr report sampled live memory/swap limit changed or unavailable; data retained. Memory profile has 28 samples: first 27 memory.max=8589934592 and memory.swap.max=0; last compliant elapsed_ms=1562123.518912; final elapsed_ms=1622199.424337 records memory.max=8589934592 and memory.swap.max=max. Mutation time between samples and cause are unestablished.",
+    "failure-cleanup.json records cleanup_verified=true and admitted_as_search_result=false. failure-inspect.json shows Running=false, ExitCode=137, OOMKilled=false; configured Docker Memory and MemorySwap remain 8589934592. Container exit 137 follows guard kill and does not establish an OOM.",
+    "failure-stderr.log ends with a nonterminal conflict_snapshot at 420000 conflicts, elapsed_ms=1616553.564997, outcome=null. It is a retained progress observation, not a terminal count or completed 1M run. Terminal models/relations/rank remain missing, not zero.",
+    "audit.json, outer.json, inspect-final.json, isolation-after.json, stdout.log and stderr.log are absent as recorded by the receipt; no completed search or memory-profile replay admission is granted. Container cleanup verification does not substitute for missing final isolation evidence.",
+    "Frozen HEAD f31532017bbf2d5b9685f2ca03a3a912b2612325 verified; receipt dirty_before/dirty_after empty; independent git status output zero bytes. Root supplementary read-only Docker log capture outside the card is disclosed and does not change card argv or constitute executor deviation.",
+    "No retry, K4096 compilation, tracked edit or HEAD move was performed. Recommendation describes the infrastructure classification and supplies no new execution authorization."
+  ],
+  "interpretation": "not_assessed",
+  "commit": "f31532017bbf2d5b9685f2ca03a3a912b2612325",
+  "relay_sha256": "4df97bd88b9bafefadb52013048f645fdb3a931db09d664d3a23d1b9be8d4066",
+  "receipt_sha256": "4df97bd88b9bafefadb52013048f645fdb3a931db09d664d3a23d1b9be8d4066",
+  "card_check_exit_code": 0
+}

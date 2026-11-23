@@ -108,9 +108,10 @@ Restart the client and ask it to call `isolab_k8s_overview` before creating a jo
 
 ### Load the shared instructions and submit
 
-From a checkout containing this change, read
-[`.agents/skills/isolab-eks/SKILL.md`](../../../.agents/skills/isolab-eks/SKILL.md).
-Claude sees the same file through `.claude/skills/isolab-eks`.
+Read the `isolab-eks` skill in the workspace trunk,
+[`isogeny-labs/workspace:.agents/skills/isolab-eks/SKILL.md`](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md)
+(`.agents/skills/README.md`). Claude sees the same file through the trunk's
+`.claude/skills/isolab-eks` link; start the session from a workspace checkout so it loads.
 [OpenCode discovers these shared locations too](https://opencode.ai/docs/skills/).
 If discovery fails, explicitly ask the client to read that file.
 
@@ -212,6 +213,20 @@ Keep the receipt and native audit/replay results. A successful Pod or existing
 S3 prefix alone is insufficient; [HARNESS.md](HARNESS.md) defines failure states
 and exact source/build checks.
 
+### Command Jobs through the bridge
+
+`remote/launch-remote-command REQUEST.json` submits one arbitrary-command Job
+(`isolab.eks.command-request/v1`: digest-pinned image in `isolab/tasks`, argv,
+cpu, memory, seconds, isolation profile, optional instance type, a bounded
+`wait_seconds` ≤ 3000) or reads one Job's state
+(`isolab.eks.command-status/v1`). The same CodeBuild launcher runs
+`remote/run-command` or `remote/status-command`, fetched by sha256 like
+`run-request`; a long Job is observed later through status requests and its
+S3 results under `runs/<job>/<pod-uid>/`, which the command must upload itself.
+Command Jobs have no L2 gate, replay or A/A admission: their seconds are
+diagnostic only. Images without a daemon: `oci-layer-publish.py` appends one
+layer to a base image and pushes by digest.
+
 ## 3. Trigger the commit-building GitHub Action
 
 Authenticate `gh` with repository Actions write access. No AWS credentials are
@@ -233,7 +248,7 @@ gh workflow run isolab-experiment.yml --repo aburan28/crypto --ref main \
 
 The exact commit must be available in `aburan28/crypto`, with the spec at that
 commit. Capture the matching run ID and follow the checks in
-[the submission reference](../../../.agents/skills/isolab-eks/references/submission.md).
+[the submission reference](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/references/submission.md).
 A feature-branch dispatch skips publication and the experiment. Premerge L2
 evidence does not replace this separate Action verification.
 
@@ -276,6 +291,6 @@ Use the portable bridge instead if you only need remote submission.
 
 The lab remains capped at 64 vCPUs across ordinary and L2 pools, within a shared
 96-vCPU regional Standard Spot quota. Node labels do not establish L2. For
-resumable experiments, follow [the CRIU/EBS recovery instructions](../../../.agents/skills/isolab-eks/references/recovery.md):
+resumable experiments, follow [the CRIU/EBS recovery instructions](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/references/recovery.md):
 preserve computation, invalidate interrupted timings and start one separate
 fresh benchmark epoch. Ordinary request-v1 jobs are non-resumable.

@@ -1,0 +1,33 @@
+{
+ "created_at": "2026-11-08T20:51:51Z",
+ "id": "PCC-20261108-ffec83",
+ "kind": "theorem",
+ "producer": {
+  "commit": "92c5b02820c0e748c5fffd10632628f9654f5cda",
+  "model": "",
+  "session": "finite-buffers-20261108"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1476aec06527c7272733f42a9fae1a1dcaa05e31835b6e3eefd8410ce63fbaab",
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "ResidueEncoding.coefficient_equiv_exists"
+  },
+  {
+   "decl_sha256": "10573c895b979eef1decce358ed43c5f152fe31498bd072c5f1e91f67c9d9988",
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "ResidueEncoding.residue_formula"
+  },
+  {
+   "decl_sha256": "f717901a0b7f76d454df0d66c105bdd08b437ee61ebf6ffaf4de74ebc9b6904d",
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "ResidueEncoding.modular_buffer_card"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "ResidueEncoding.coefficient_equiv_exists, residue_formula and modular_buffer_card; no compiler, bit-operation cost, tensor or ECDLP asymptotic claim.",
+ "statement": "The concrete coefficient quotient A/(2^p) is ring-equivalent to ZMod2^p, its encoding is numerator times inverse denominator, and length-q modular buffers have exactly2^(p*q) states."
+}

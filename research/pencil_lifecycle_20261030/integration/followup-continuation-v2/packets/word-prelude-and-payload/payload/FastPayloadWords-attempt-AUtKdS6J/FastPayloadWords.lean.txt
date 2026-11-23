@@ -1,0 +1,51 @@
+import FastPreludeDecode
+import FastQuotientShape
+set_option autoImplicit false
+namespace FastPayload
+open FastPrelude PencilWordRefinement
+
+def slope0 (p : UInt64) (w : Inputs) : UInt64 :=
+ (s0Word p w*FastBatch.ni p (normWord p w) (s1Word p w))%p
+def slope1 (p : UInt64) (w : Inputs) : UInt64 :=
+ (s1Word p w*FastBatch.ni p (normWord p w) (s1Word p w))%p
+def leadRatio (p : UInt64) (w : Inputs) : UInt64 :=
+ (normWord p w*FastBatch.si p (normWord p w) (s1Word p w))%p
+def inverseLead (p : UInt64) (w : Inputs) : UInt64 :=
+ wordNeg p ((leadRatio p w*leadRatio p w)%p)
+
+theorem slope_words_decode (p : UInt64) (w : Inputs) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) :
+ (slope0 p w).toNat<p.toNat ∧ (slope1 p w).toNat<p.toNat ∧
+ ((slope0 p w).toNat : ZMod p.toNat)=s0Field p w/normField p w ∧
+ ((slope1 p w).toNat : ZMod p.toNat)=s1Field p w/normField p w := by
+ obtain ⟨_,_,_,hnc,_,hni,_⟩ := guarded_batch_from_inputs p w hp hb hw hn hs
+ have h0 := s0_decode p w (by omega) hb hw
+ have h1 := s1_decode p w (by omega) hb hw
+ have h0m := uint64_mul_decode p _ _ hb h0.1 hnc
+ have h1m := uint64_mul_decode p _ _ hb h1.1 hnc
+ rw [h0.2,hni] at h0m
+ rw [h1.2,hni] at h1m
+ exact ⟨uint64_mul_canonical p _ _ (by omega),uint64_mul_canonical p _ _ (by omega),
+ by simpa only [slope0,div_eq_mul_inv] using h0m,
+ by simpa only [slope1,div_eq_mul_inv] using h1m⟩
+
+theorem inverse_lead_decode (p : UInt64) (w : Inputs) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) :
+ (inverseLead p w).toNat<p.toNat ∧
+ ((inverseLead p w).toNat : ZMod p.toNat)=-(normField p w/s1Field p w)^2 := by
+ obtain ⟨_,_,_,_,hsc,_,hsi⟩ := guarded_batch_from_inputs p w hp hb hw hn hs
+ have hN := norm_decode p w (by omega) hb hw
+ have hr := uint64_mul_decode p _ _ hb hN.1 hsc
+ rw [hN.2,hsi] at hr
+ have hrc : (leadRatio p w).toNat<p.toNat := uint64_mul_canonical p _ _ (by omega)
+ change ((leadRatio p w).toNat : ZMod p.toNat)=_ at hr
+ have hsq := uint64_mul_decode p _ _ hb hrc hrc
+ rw [hr] at hsq
+ have hsqc := uint64_mul_canonical p (leadRatio p w) (leadRatio p w) (by omega)
+ have hneg := wordNeg_composition p _ (by omega) hsqc
+ rw [hsq] at hneg
+ refine ⟨hneg.1,?_⟩
+ simpa only [inverseLead,div_eq_mul_inv,pow_two] using hneg.2
+end FastPayload

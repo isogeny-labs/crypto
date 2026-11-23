@@ -1,0 +1,1294 @@
+warning: function `work` is never used
+   --> crates/hashed-ecdl-tensor/src/metrics.rs:170:15
+    |
+170 | pub(crate) fn work(n: u64) -> Result<()> {
+    |               ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hashed-ecdl-tensor` (lib) generated 1 warning
+   Compiling crypto v0.1.0 (/home/user/wt-batched)
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:1817:16
+     |
+1817 |             if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |                ^                                                             ^
+     |
+     = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+     |
+1817 -             if (self.event_failure.is_some() || self.native_failure.is_some()) {
+1817 +             if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:1825:16
+     |
+1825 |             if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |                ^                                                             ^
+     |
+help: remove these parentheses
+     |
+1825 -             if (self.event_failure.is_some() || self.native_failure.is_some()) {
+1825 +             if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:2834:20
+     |
+2834 |                 if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |                    ^                                                             ^
+     |
+help: remove these parentheses
+     |
+2834 -                 if (self.event_failure.is_some() || self.native_failure.is_some()) {
+2834 +                 if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:3885:12
+     |
+3885 |         if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |            ^                                                             ^
+     |
+help: remove these parentheses
+     |
+3885 -         if (self.event_failure.is_some() || self.native_failure.is_some()) {
+3885 +         if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:3906:12
+     |
+3906 |         if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |            ^                                                             ^
+     |
+help: remove these parentheses
+     |
+3906 -         if (self.event_failure.is_some() || self.native_failure.is_some()) {
+3906 +         if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:4240:12
+     |
+4240 |         if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |            ^                                                             ^
+     |
+help: remove these parentheses
+     |
+4240 -         if (self.event_failure.is_some() || self.native_failure.is_some()) {
+4240 +         if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:4269:16
+     |
+4269 |             if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |                ^                                                             ^
+     |
+help: remove these parentheses
+     |
+4269 -             if (self.event_failure.is_some() || self.native_failure.is_some()) {
+4269 +             if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:4294:20
+     |
+4294 |                 if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |                    ^                                                             ^
+     |
+help: remove these parentheses
+     |
+4294 -                 if (self.event_failure.is_some() || self.native_failure.is_some()) {
+4294 +                 if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:4342:20
+     |
+4342 |                 if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |                    ^                                                             ^
+     |
+help: remove these parentheses
+     |
+4342 -                 if (self.event_failure.is_some() || self.native_failure.is_some()) {
+4342 +                 if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:4467:20
+     |
+4467 |                 if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |                    ^                                                             ^
+     |
+help: remove these parentheses
+     |
+4467 -                 if (self.event_failure.is_some() || self.native_failure.is_some()) {
+4467 +                 if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unnecessary parentheses around `if` condition
+    --> src/cryptanalysis/sat.rs:4571:28
+     |
+4571 |                         if (self.event_failure.is_some() || self.native_failure.is_some()) {
+     |                            ^                                                             ^
+     |
+help: remove these parentheses
+     |
+4571 -                         if (self.event_failure.is_some() || self.native_failure.is_some()) {
+4571 +                         if self.event_failure.is_some() || self.native_failure.is_some() {
+     |
+
+warning: unused import: `Stop`
+ --> src/ml_dataset/owned_search_identity_capsule.rs:2:51
+  |
+2 | use super::{VerifiedWorkerOriginal, DecodeBudget, Stop};
+  |                                                   ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `page as page_retained`
+ --> src/ml_dataset/capture_projection.rs:6:73
+  |
+6 | pub(in crate::ml_dataset::solvers) use paging::{Page,Error as PageError,page as page_retained};
+  |                                                                         ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `bqi`
+ --> src/ml_dataset/capture_encoding.rs:2:98
+  |
+2 | use super::{OwnedAttempt,Budget,capture,equations,continuation,exclusions,scheduler,check,bridge,bqi,checked_model,LiftRecord,Failure...
+  |                                                                                                  ^^^
+
+warning: unused import: `check::Limits as AuditLimits`
+  --> src/ml_dataset/original_boolean_search.rs:24:40
+   |
+24 | pub(in crate::ml_dataset::solvers) use check::Limits as AuditLimits;
+   |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `super::*`
+    --> src/ml_dataset/solvers.rs:5027:9
+     |
+5027 |     use super::*;
+     |         ^^^^^^^^
+
+warning: unused import: `Admission`
+ --> src/ml_dataset/sat_search_segment.rs:6:61
+  |
+6 |     checked_model::{self, Progress, VerificationAdmission}, Admission, CheckedMap, Quote,
+  |                                                             ^^^^^^^^^
+
+warning: type `input_owner::InputBytes` is more private than the item `persisted::PersistenceFailure::input_bytes`
+   --> src/ml_dataset/binary_m3_persisted.rs:104:5
+    |
+104 |     pub input_bytes: InputBytes,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `persisted::PersistenceFailure::input_bytes` is reachable at visibility `pub(in crate::ml_dataset::solvers::koblitz_m3::ordinary_construction)`
+    |
+note: but type `input_owner::InputBytes` is only usable at visibility `pub(in crate::ml_dataset::solvers::koblitz_m3::ordinary_construction::persisted)`
+   --> src/ml_dataset/binary_m3_input_owner.rs:5:1
+    |
+  5 | pub(super) struct InputBytes {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `sat_original_owner::initial_native::CaptureState` is more private than the item `sat_original_owner::initial_native::checkpoint::search::on_event`
+   --> src/ml_dataset/sat_search_owned.rs:67:1
+    |
+ 67 | / pub(in crate::ml_dataset::solvers) fn on_event(
+ 68 | |     state: &mut CaptureState,
+ 69 | |     event: &SolverEvent,
+ 70 | | ) -> Result<(), Stop> {
+    | |_____________________^ function `sat_original_owner::initial_native::checkpoint::search::on_event` is reachable at visibility `pub(in crate::ml_dataset::solvers::koblitz_m3::sat_original_owner)`
+    |
+note: but type `sat_original_owner::initial_native::CaptureState` is only usable at visibility `pub(self)`
+   --> src/ml_dataset/sat_initial_native.rs:124:1
+    |
+124 | struct CaptureState {
+    | ^^^^^^^^^^^^^^^^^^^
+
+warning: type `sat_original_owner::AdmissionFailure<'a>` is more private than the item `sat_original_owner::worker::Owned::Admission::failure`
+  --> src/ml_dataset/sat_initial_worker.rs:54:9
+   |
+54 |         failure: AdmissionFailure<'a>,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `sat_original_owner::worker::Owned::Admission::failure` is reachable at visibility `pub(in crate::ml_dataset::solvers)`
+   |
+note: but type `sat_original_owner::AdmissionFailure<'a>` is only usable at visibility `pub(in crate::ml_dataset::solvers::koblitz_m3)`
+  --> src/ml_dataset/sat_original_owner.rs:55:1
+   |
+55 | pub(super) enum AdmissionFailure<'a> {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `sat_original_owner::OriginalOwner<'a>` is more private than the item `sat_original_owner::worker::Owned::Map::owner`
+  --> src/ml_dataset/sat_initial_worker.rs:58:9
+   |
+58 |         owner: OriginalOwner<'a>,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^ field `sat_original_owner::worker::Owned::Map::owner` is reachable at visibility `pub(in crate::ml_dataset::solvers)`
+   |
+note: but type `sat_original_owner::OriginalOwner<'a>` is only usable at visibility `pub(in crate::ml_dataset::solvers::koblitz_m3)`
+  --> src/ml_dataset/sat_original_owner.rs:77:1
+   |
+77 | pub(super) struct OriginalOwner<'a> {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `sat_original_owner::initial_native::Failure<'a>` is more private than the item `sat_original_owner::worker::Owned::Native::0`
+   --> src/ml_dataset/sat_initial_worker.rs:61:12
+    |
+ 61 |     Native(initial_native::Failure<'a>),
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `sat_original_owner::worker::Owned::Native::0` is reachable at visibility `pub(in crate::ml_dataset::solvers)`
+    |
+note: but type `sat_original_owner::initial_native::Failure<'a>` is only usable at visibility `pub(in crate::ml_dataset::solvers::koblitz_m3::sat_original_owner)`
+   --> src/ml_dataset/sat_initial_native.rs:147:1
+    |
+147 | pub(super) enum Failure<'a> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `policy::CheckpointCadence` is more private than the item `sat_original_owner::boolean_search::Caps::checkpoint`
+  --> src/ml_dataset/original_boolean_search.rs:55:116
+   |
+55 | ... continuation:ContinuationLimits,pub checkpoint:Option<policy::CheckpointCadence>}
+   |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `sat_original_owner::boolean_search::Caps::checkpoint` is reachable at visibility `pub(in crate::ml_dataset::solvers)`
+   |
+note: but type `policy::CheckpointCadence` is only usable at visibility `pub(in crate::ml_dataset::solvers::koblitz_m3::sat_original_owner::boolean_search)`
+  --> src/ml_dataset/original_boolean_search_policy.rs:17:1
+   |
+17 | pub(super) struct CheckpointCadence {pub every_batches:u64,pub max_snapshots:u64}
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `charge` is never read
+  --> src/cryptanalysis/matrix_rows.rs:93:74
+   |
+93 | pub struct Encoded { pub result:Result<(),Failure>, pub raw:Vec<u8>, pub charge:Charge }
+   |            ------- field in this struct                                  ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `encode` is never used
+   --> src/cryptanalysis/matrix_rows.rs:109:8
+    |
+109 | pub fn encode(n:u32,g:&[Polynomial],window:&[Monomial],a:&Attempt,row:usize,limits:Limits,owner:&mut impl Owner)->Result<Vec<u8>,Fa...
+    |        ^^^^^^
+
+warning: function `independent_check` is never used
+   --> src/cryptanalysis/matrix_rows.rs:123:8
+    |
+123 | pub fn independent_check(raw:&[u8],limits:super::bqi::Limits,deadline:Instant,owner:&mut impl Owner)->Result<super::bqi::Audit,Fail...
+    |        ^^^^^^^^^^^^^^^^^
+
+warning: function `verify_untrusted_admitted` is never used
+   --> src/cryptanalysis/boolean_identity_bqi.rs:450:8
+    |
+450 | pub fn verify_untrusted_admitted(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `Checked` is never constructed
+   --> src/cryptanalysis/matrix_rows.rs:111:12
+    |
+111 | pub struct Checked { pub audit:Option<super::bqi::Audit>, pub failure:Option<Failure> }
+    |            ^^^^^^^
+
+warning: function `independent_check_retained` is never used
+   --> src/cryptanalysis/matrix_rows.rs:112:8
+    |
+112 | pub fn independent_check_retained(raw:&[u8],limits:super::bqi::Limits,deadline:Instant,owner:&mut impl Owner)->Checked{
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `FILTER_CERTIFICATE_ROLE` is never used
+  --> src/ml_dataset/relations.rs:30:18
+   |
+30 | pub(super) const FILTER_CERTIFICATE_ROLE: &str = generic::FILTER_ROLE;
+   |                  ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `verify_generic_v2_labels` is never used
+  --> src/ml_dataset/relations.rs:32:15
+   |
+32 | pub(super) fn verify_generic_v2_labels(
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `generic_v2_filter_payloads` is never used
+  --> src/ml_dataset/relations.rs:42:15
+   |
+42 | pub(super) fn generic_v2_filter_payloads(
+   |               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `boolean_search` and `search` are never read
+   --> src/ml_dataset/solvers.rs:411:5
+    |
+410 | pub(super) struct WorkerResidualCustody {
+    |                   --------------------- fields in this struct
+411 |     boolean_search: Option<koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt>,
+    |     ^^^^^^^^^^^^^^
+412 |     boolean_search_report_unavailable: bool,
+413 |     search: Option<koblitz_m3::sat_original_owner::search_worker::Custody>,
+    |     ^^^^^^
+
+warning: field `path` is never read
+   --> src/ml_dataset/solvers.rs:425:5
+    |
+424 | pub(super) struct WorkerResidualArtifact {
+    |                   ---------------------- field in this struct
+425 |     path: &'static str,
+    |     ^^^^
+
+warning: field `reason` is never read
+    --> src/ml_dataset/koblitz_m3.rs:7625:5
+     |
+7624 | struct SavedPersistenceResult {
+     |        ---------------------- field in this struct
+7625 |     reason: String,
+     |     ^^^^^^
+
+warning: field `snapshot` is never read
+  --> src/ml_dataset/binary_m3_causal.rs:39:9
+   |
+38 |     Matrix {
+   |     ------ field in this variant
+39 |         snapshot: crate::cryptanalysis::koblitz_groebner::bounded_matrix::Event,
+   |         ^^^^^^^^
+
+warning: field `input_sha256` is never read
+  --> src/ml_dataset/binary_m3_causal.rs:50:5
+   |
+47 | struct NativePayload {
+   |        ------------- field in this struct
+...
+50 |     input_sha256: [u8; 32],
+   |     ^^^^^^^^^^^^
+
+warning: method `finish` is never used
+   --> src/ml_dataset/binary_m3_native.rs:248:19
+    |
+ 85 | impl<'o> OrdinaryRootRegistry<'o> {
+    | --------------------------------- method in this implementation
+...
+248 |     pub(super) fn finish(self, data: solvers::SolverData) -> OrdinaryWorkerOutput {
+    |                   ^^^^^^
+
+warning: struct `OrdinaryWorkerOutput` is never constructed
+   --> src/ml_dataset/binary_m3_native.rs:257:19
+    |
+257 | pub(super) struct OrdinaryWorkerOutput {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+
+warning: field `0` is never read
+  --> src/ml_dataset/binary_m3_boolean_identity.rs:44:18
+   |
+44 |     SharedBudget(Stop),
+   |     ------------ ^^^^
+   |     |
+   |     field in this variant
+   |
+   = note: `Refusal` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+44 -     SharedBudget(Stop),
+44 +     SharedBudget(()),
+   |
+
+warning: field `0` is never read
+  --> src/ml_dataset/binary_m3_boolean_identity.rs:59:18
+   |
+59 |     SharedBudget(Stop),
+   |     ------------ ^^^^
+   |     |
+   |     field in this variant
+   |
+   = note: `PostCheckFailure` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+59 -     SharedBudget(Stop),
+59 +     SharedBudget(()),
+   |
+
+warning: struct `SourceView` is never constructed
+  --> src/ml_dataset/binary_m3_boolean_identity.rs:81:19
+   |
+81 | pub(super) struct SourceView<'a> {
+   |                   ^^^^^^^^^^
+
+warning: function `source_view` is never used
+   --> src/ml_dataset/binary_m3_boolean_identity.rs:103:15
+    |
+103 | pub(super) fn source_view<'a>(
+    |               ^^^^^^^^^^^
+
+warning: function `check` is never used
+   --> src/ml_dataset/binary_m3_boolean_identity.rs:201:15
+    |
+201 | pub(super) fn check(
+    |               ^^^^^
+
+warning: method `roots_complete` is never used
+   --> src/ml_dataset/binary_m3_signed.rs:314:19
+    |
+313 | impl OrdinarySignedOwned<'_> {
+    | ---------------------------- method in this implementation
+314 |     pub(super) fn roots_complete(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^
+
+warning: method `verify_snapshot` is never used
+   --> src/ml_dataset/sat_original_owner.rs:504:19
+    |
+276 | impl<'a> OriginalOwner<'a> {
+    | -------------------------- method in this implementation
+...
+504 |     pub(super) fn verify_snapshot<'s>(
+    |                   ^^^^^^^^^^^^^^^
+
+warning: field `original` is never read
+   --> src/ml_dataset/sat_initial_native.rs:105:5
+    |
+104 | struct Evidence<'a> {
+    |        -------- field in this struct
+105 |     original: Option<&'a VerifiedWorkerOriginal<'a>>,
+    |     ^^^^^^^^
+
+warning: associated function `new` is never used
+    --> src/ml_dataset/sat_initial_central.rs:1779:8
+     |
+1778 | impl RowReplay {
+     | -------------- associated function in this implementation
+1779 |     fn new(limits:RowLimits)->Self{Self{limits,raw:Vec::new(),stored:None,artifact:None,map_artifact:None,receipt:None,map_receipt...
+     |        ^^^
+
+warning: struct `VerifiedRow` is never constructed
+    --> src/ml_dataset/sat_initial_central.rs:1781:43
+     |
+1781 | pub(in crate::ml_dataset::solvers) struct VerifiedRow {frame:Frame}
+     |                                           ^^^^^^^^^^^
+
+warning: enum `RowOutcome` is never used
+    --> src/ml_dataset/sat_initial_central.rs:1782:41
+     |
+1782 | pub(in crate::ml_dataset::solvers) enum RowOutcome {Verified(VerifiedRow),UnknownOriginalMath(Frame),Incomplete(Frame)}
+     |                                         ^^^^^^^^^^
+
+warning: function `verify_boolean_row` is never used
+    --> src/ml_dataset/sat_initial_central.rs:1784:39
+     |
+1784 | pub(in crate::ml_dataset::solvers) fn verify_boolean_row(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact],policy:...
+     |                                       ^^^^^^^^^^^^^^^^^^
+
+warning: methods `usage` and `audit` are never used
+    --> src/ml_dataset/sat_initial_central.rs:1799:43
+     |
+1798 | impl VerifiedRow {
+     | ---------------- methods in this implementation
+1799 |     pub(in crate::ml_dataset::solvers) fn usage(&self)->(u64,u64){self.frame.usage()}
+     |                                           ^^^^^
+1800 |     pub(in crate::ml_dataset::solvers) fn audit(&self)->&row_matrix::Audit{self.frame.row_mode.as_ref().unwrap().arithmetic.as_ref...
+     |                                           ^^^^^
+
+warning: function `join_row_terminal` is never used
+    --> src/ml_dataset/sat_initial_central.rs:1845:4
+     |
+1845 | fn join_row_terminal(dir:&Path,outcome:&Value,artifacts:&[Artifact],f:&mut Frame)->Result<(),String>{
+     |    ^^^^^^^^^^^^^^^^^
+
+warning: methods `model_relation_checked` and `native_unsat_uncertified` are never used
+    --> src/ml_dataset/sat_initial_central.rs:1886:43
+     |
+1885 | impl VerifiedSearch {
+     | ------------------- methods in this implementation
+1886 |     pub(in crate::ml_dataset::solvers) fn model_relation_checked(&self) -> bool {
+     |                                           ^^^^^^^^^^^^^^^^^^^^^^
+...
+1890 |     pub(in crate::ml_dataset::solvers) fn native_unsat_uncertified(&self) -> bool {
+     |                                           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `scalar_steps` and `scalar_calls` are never read
+  --> src/ml_dataset/sat_original_math_preflight.rs:20:9
+   |
+17 | pub(super) struct Plan {
+   |                   ---- fields in this struct
+...
+20 |     pub scalar_steps: u64,
+   |         ^^^^^^^^^^^^
+21 |     pub scalar_calls: u64,
+   |         ^^^^^^^^^^^^
+
+warning: method `observed_decisions` is never used
+   --> src/ml_dataset/sat_search_segment.rs:125:19
+    |
+ 52 | impl Segment {
+    | ------------ method in this implementation
+...
+125 |     pub(super) fn observed_decisions(&self)->usize {self.decisions}
+    |                   ^^^^^^^^^^^^^^^^^^
+
+warning: methods `charged` and `retained_slot_bytes` are never used
+  --> src/ml_dataset/owned_search_central.rs:56:40
+   |
+52 | impl Custody{
+   | ------------ methods in this implementation
+...
+56 |  pub(in crate::ml_dataset::solvers) fn charged(&self)->(u64,u64){self.usage()}
+   |                                        ^^^^^^^
+57 |  pub(in crate::ml_dataset::solvers) fn retained_slot_bytes(&self)->u64{self.frame.budget.bytes}
+   |                                        ^^^^^^^^^^^^^^^^^^^
+
+warning: enum `Failure` is never used
+ --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:9:10
+  |
+9 | pub enum Failure { Cap, Owner, Deadline, Allocation, Overflow, Malformed }
+  |          ^^^^^^^
+
+warning: struct `Limits` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:11:12
+   |
+11 | pub struct Limits { pub batch_rows:usize, pub batch_ops:usize, pub batches:usize, pub variables:u32, pub generators:usize, pub basis...
+   |            ^^^^^^
+
+warning: enum `Kind` is never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:17:10
+   |
+17 | pub enum Kind { Original(usize), Pair(usize,usize), Field(usize,u32) }
+   |          ^^^^
+
+warning: struct `Task` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:19:12
+   |
+19 | pub struct Task { pub kind:Kind, pub degree:usize, pub serial:u64 }
+   |            ^^^^
+
+warning: struct `Attempt` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:21:12
+   |
+21 | pub struct Attempt { pub batches:Vec<Batch>, pub result:Result<(),Failure>, pub complete:bool, pub basis:Vec<Row>, pub pending:Vec<T...
+   |            ^^^^^^^
+
+warning: function `order` is never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:22:4
+   |
+22 | fn order(a:&[u32],b:&[u32])->Ordering { a.len().cmp(&b.len()).then_with(||a.cmp(b)) }
+   |    ^^^^^
+
+warning: struct `Meter` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:23:8
+   |
+23 | struct Meter<'a,T:Owner>{ owner:&'a mut T, limits:Limits, deadline:Instant, charge:Charge }
+   |        ^^^^^
+
+warning: multiple methods are never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:25:5
+   |
+24 | impl<T:Owner> Meter<'_,T>{
+   | ------------------------- methods in this implementation
+25 |  fn pay(&mut self,w:u64,b:u64)->Result<(),Failure>{
+   |     ^^^
+...
+33 |  fn scan(&mut self,n:usize)->Result<(),Failure>{self.pay(u64::try_from(n).map_err(|_|Failure::Overflow)?.checked_add(1).ok_or(Failur...
+   |     ^^^^
+34 |  fn alloc<V>(&mut self,n:usize)->Result<Vec<V>,Failure>{let b=n.checked_mul(size_of::<V>()).and_then(|x|x.checked_add(64)).ok_or(Fai...
+   |     ^^^^^
+35 |  fn mono(&mut self,a:&[u32])->Result<Monomial,Failure>{self.scan(a.len())?;let mut v=self.alloc(a.len())?;v.extend_from_slice(a);Ok(v)}
+   |     ^^^^
+36 |  fn union(&mut self,a:&[u32],b:&[u32])->Result<Monomial,Failure>{self.scan(a.len().checked_add(b.len()).ok_or(Failure::Overflow)?)?;...
+   |     ^^^^^
+37 |  fn difference(&mut self,a:&[u32],b:&[u32])->Result<Monomial,Failure>{self.scan(a.len().checked_mul(b.len().max(1)).ok_or(Failure::O...
+   |     ^^^^^^^^^^
+38 |  fn divides(&mut self,a:&[u32],b:&[u32])->Result<bool,Failure>{self.scan(a.len().checked_mul(b.len().max(1)).ok_or(Failure::Overflow...
+   |     ^^^^^^^
+39 |  fn cmp(&mut self,a:&[u32],b:&[u32])->Result<Ordering,Failure>{self.scan(a.len().checked_add(b.len()).ok_or(Failure::Overflow)?)?;Ok...
+   |     ^^^
+40 |  fn toggle(&mut self,p:&mut Polynomial,t:Monomial)->Result<(),Failure>{let mut at=0;while at<p.len(){match self.cmp(&p[at],&t)?{Orde...
+   |     ^^^^^^
+41 |  fn proof_toggle(&mut self,p:&mut Vec<ProofTerm>,t:ProofTerm)->Result<(),Failure>{let mut at=0;while at<p.len(){self.scan(p[at].mult...
+   |     ^^^^^^^^^^^^
+42 |  fn scaled(&mut self,r:&Row,t:&[u32])->Result<Row,Failure>{let mut out=Row{polynomial:self.alloc(r.polynomial.len())?,proof:self.all...
+   |     ^^^^^^
+43 |  fn xor(&mut self,a:&Row,b:&Row)->Result<Row,Failure>{let mut out=Row{polynomial:self.alloc(a.polynomial.len().checked_add(b.polynom...
+   |     ^^^
+44 |  fn validate(&mut self,p:&Polynomial,n:u32)->Result<(),Failure>{if p.len()>self.limits.terms{return Err(Failure::Cap)}for(i,t)in p.i...
+   |     ^^^^^^^^
+
+warning: enum `Stage` is never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:48:10
+   |
+48 | pub enum Stage { Build, Symbolic, Eliminate, PrepareCommit, Committed }
+   |          ^^^^^
+
+warning: struct `Reducer` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:50:12
+   |
+50 | pub struct Reducer { pub basis:usize, pub multiplier:Monomial, pub row:usize }
+   |            ^^^^^^^
+
+warning: struct `Pivot` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:52:12
+   |
+52 | pub struct Pivot { pub target:usize, pub source:usize }
+   |            ^^^^^
+
+warning: struct `Batch` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:54:12
+   |
+54 | pub struct Batch {
+   |            ^^^^^
+
+warning: function `build_task` is never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:61:4
+   |
+61 | fn build_task<T:Owner>(task:Task,g:&[Polynomial],basis:&[Row],m:&mut Meter<T>)->Result<Row,Failure>{
+   |    ^^^^^^^^^^
+
+warning: enum `CheckpointStop` is never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:71:10
+   |
+71 | pub enum CheckpointStop{InvalidPolicy,SnapshotCap,Callback,Precheck(Failure),Postcheck(Failure)}
+   |          ^^^^^^^^^^^^^^
+
+warning: struct `CheckpointControl` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:73:12
+   |
+73 | pub struct CheckpointControl{every_batches:u64,max_snapshots:u64,batches:u64,snapshots:u64,stop:Option<CheckpointStop>}
+   |            ^^^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `snapshots`, and `stop` are never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:75:9
+   |
+74 | impl CheckpointControl{
+   | ---------------------- associated items in this implementation
+75 |  pub fn new(every_batches:u64,max_snapshots:u64)->Result<Self,CheckpointStop>{if every_batches==0||max_snapshots==0{return Err(Check...
+   |         ^^^
+76 |  pub fn snapshots(&self)->u64{self.snapshots}
+   |         ^^^^^^^^^
+77 |  pub fn stop(&self)->Option<CheckpointStop>{self.stop}
+   |         ^^^^
+
+warning: function `run` is never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:79:8
+   |
+79 | pub fn run(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut impl Owner)->Attempt{
+   |        ^^^
+
+warning: function `run_with_checkpoint` is never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:82:8
+   |
+82 | pub fn run_with_checkpoint<T:Owner>(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut T,control:&mut CheckpointControl...
+   |        ^^^^^^^^^^^^^^^^^^^
+
+warning: function `run_inner` is never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:85:4
+   |
+85 | fn run_inner<T:Owner>(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut T,mut checkpoint:Option<(&mut CheckpointContro...
+   |    ^^^^^^^^^
+
+warning: enum `Origin` is never used
+ --> src/ml_dataset/dynamic_boolean_search.rs:3:50
+  |
+3 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum Origin{Original(usize),Branch{parent:usize,variable:u32,value:bool}}
+  |                                                  ^^^^^^
+
+warning: enum `NodeStatus` is never used
+ --> src/ml_dataset/dynamic_boolean_search.rs:4:50
+  |
+4 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum NodeStatus{Building,Ready,Running,Branching,Branched,Refuted,Witness}
+  |                                                  ^^^^^^^^^^
+
+warning: enum `Verdict` is never used
+ --> src/ml_dataset/dynamic_boolean_search.rs:5:50
+  |
+5 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum Verdict{Unknown,Witness,UnsatDerived}
+  |                                                  ^^^^^^^
+
+warning: enum `NativeDisposition` is never used
+ --> src/ml_dataset/dynamic_boolean_search.rs:6:50
+  |
+6 | #[derive(Debug,Clone,Copy,PartialEq,Eq)]pub enum NativeDisposition{Complete,LocalCap,Stopped}
+  |                                                  ^^^^^^^^^^^^^^^^^
+
+warning: struct `SearchLimits` is never constructed
+ --> src/ml_dataset/dynamic_boolean_search.rs:7:33
+  |
+7 | #[derive(Clone,Copy)]pub struct SearchLimits{pub native:Limits,pub nodes:usize}
+  |                                 ^^^^^^^^^^^^
+
+warning: struct `Node` is never constructed
+ --> src/ml_dataset/dynamic_boolean_search.rs:8:28
+  |
+8 | #[derive(Debug)]pub struct Node{
+  |                            ^^^^
+
+warning: struct `SearchAttempt` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search.rs:13:28
+   |
+13 | #[derive(Debug)]pub struct SearchAttempt{pub result:Result<(),Failure>,pub verdict:Verdict,pub nodes:Vec<Node>,pub queue:Vec<usize>,...
+   |                            ^^^^^^^^^^^^^
+
+warning: struct `NativeOwner` is never constructed
+  --> src/ml_dataset/dynamic_boolean_search.rs:14:8
+   |
+14 | struct NativeOwner<'a,'b,T:Owner>{meter:&'a mut Meter<'b,T>,failure:Option<Failure>}
+   |        ^^^^^^^^^^^
+
+warning: function `copied_poly` is never used
+  --> src/ml_dataset/dynamic_boolean_search.rs:16:4
+   |
+16 | fn copied_poly<T:Owner>(p:&Polynomial,m:&mut Meter<T>)->Result<Polynomial,Failure>{m.pay(1,0)?;let mut q=m.alloc(p.len())?;for t in ...
+   |    ^^^^^^^^^^^
+
+warning: function `empty_node` is never used
+  --> src/ml_dataset/dynamic_boolean_search.rs:17:4
+   |
+17 | fn empty_node<T:Owner>(parent:Option<usize>,eqs:usize,depth:usize,m:&mut Meter<T>)->Result<Node,Failure>{Ok(Node{parent,origins:m.al...
+   |    ^^^^^^^^^^
+
+warning: function `eval` is never used
+  --> src/ml_dataset/dynamic_boolean_search.rs:18:4
+   |
+18 | fn eval<T:Owner>(g:&[Polynomial],point:&[bool],m:&mut Meter<T>)->Result<bool,Failure>{let mut all=true;for p in g{m.pay(1,0)?;let mu...
+   |    ^^^^
+
+warning: function `solve` is never used
+  --> src/ml_dataset/dynamic_boolean_search.rs:22:8
+   |
+22 | pub fn solve(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut impl Owner)->SearchAttempt{solve_inner(n,g,limits...
+   |        ^^^^^
+
+warning: function `solve_with_checkpoint` is never used
+  --> src/ml_dataset/dynamic_boolean_search.rs:23:8
+   |
+23 | pub fn solve_with_checkpoint<T:Owner>(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut T,control:&mut super::Ch...
+   |        ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `solve_inner` is never used
+  --> src/ml_dataset/dynamic_boolean_search.rs:24:4
+   |
+24 | fn solve_inner<T:Owner>(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut T,mut checkpoint:Option<(&mut super::C...
+   |    ^^^^^^^^^^^
+
+warning: fields `consumed`, `nodes`, and `charge` are never read
+  --> src/ml_dataset/owned_search_wire_decode.rs:21:94
+   |
+21 | ...uct Attempt{pub raw:Vec<u8>,pub value:Option<Value>,pub result:Result<(),Failure>,pub consumed:usize,pub nodes:u64,pub charge:Cha...
+   |        ------- fields in this struct                                                     ^^^^^^^^           ^^^^^         ^^^^^^
+
+warning: methods `raw`, `consumed`, `nodes`, and `charge` are never used
+ --> src/ml_dataset/owned_search_wire_prefix.rs:6:19
+  |
+6 | impl Audit{pub fn raw(&self)->&[u8]{&self.raw}pub fn result(&self)->Result<State,Failure>{self.result}pub fn binding_prefix(&self)->Option<&Value>{if self.result.is_ok(){self.prefix.as_ref()}else{None}}pub fn consumed(&self)->usize{self.consumed}pub fn nodes(&self)->u64{self.nodes}pub fn charge(&s...
+  | ----------        ^^^                                                                                                                                                                                            ^^^^^^^^                                    ^^^^^                               ^^^^^^
+  | |
+  | methods in this implementation
+
+warning: fields `original_descent_verified` and `search_complete` are never read
+ --> src/ml_dataset/owned_search_semantic_check.rs:9:148
+  |
+9 | ...ct Audit{pub result:Result<(),Failure>,pub charge:Charge,pub partitions:usize,pub nodes:usize,pub partial:usize,pub rows:Vec<RowAudit>,pub original_descent_verified:bool,pub search_complete:bool}
+  |       ----- fields in this struct                                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^          ^^^^^^^^^^^^^^^
+
+warning: method `expansion` is never used
+  --> src/ml_dataset/owned_search_original_descent.rs:12:9
+   |
+10 | impl Audit {
+   | ---------- method in this implementation
+11 |  pub fn source(&self)->&CheckedMap{self.expansion.source()}
+12 |  pub fn expansion(&self)->&equations::OwnedExpansion{&self.expansion}
+   |         ^^^^^^^^^
+
+warning: field `charged_work` is never read
+  --> src/ml_dataset/owned_search_interrupted_outcome.rs:39:9
+   |
+37 | pub struct Audit {
+   |            ----- field in this struct
+38 |     pub result: Result<Envelope, Failure>,
+39 |     pub charged_work: u64,
+   |         ^^^^^^^^^^^^
+   |
+   = note: `Audit` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: multiple fields are never read
+   --> src/ml_dataset/sat_initial_worker.rs:242:5
+    |
+241 | struct MapParts {
+    |        -------- fields in this struct
+242 |     binding: [u8; 32],
+    |     ^^^^^^^
+243 |     launch_sha256: [u8; 32],
+    |     ^^^^^^^^^^^^^
+244 |     math: Math,
+    |     ^^^^
+245 |     checked: Option<provenance::CheckedMap>,
+    |     ^^^^^^^
+246 |     retained_unchecked: Option<provenance::Map>,
+    |     ^^^^^^^^^^^^^^^^^^
+247 |     pattern: Option<u32>,
+    |     ^^^^^^^
+248 |     retained_bytes: Vec<u8>,
+    |     ^^^^^^^^^^^^^^
+249 |     map_ack: Option<capture::CommittedEventPosition>,
+    |     ^^^^^^^
+250 |     publication_attempted: bool,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+251 |     map_published: bool,
+    |     ^^^^^^^^^^^^^
+252 |     capture_limits: capture::CaptureLimits,
+    |     ^^^^^^^^^^^^^^
+
+warning: field `0` is never read
+  --> src/ml_dataset/original_boolean_rows.rs:27:13
+   |
+27 |     Reduced(rows::BoundRows<'s, 'static>),
+   |     ------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |     |
+   |     field in this variant
+   |
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+27 -     Reduced(rows::BoundRows<'s, 'static>),
+27 +     Reduced(()),
+   |
+
+warning: fields `public_sha256`, `factor_sha256`, `math`, `unchecked`, `publication_attempted`, and `boolean_attempted` are never read
+   --> src/ml_dataset/original_boolean_rows.rs:305:5
+    |
+304 | struct OriginalParts {
+    |        ------------- fields in this struct
+305 |     public_sha256: [u8; 32],
+    |     ^^^^^^^^^^^^^
+306 |     factor_sha256: [u8; 32],
+    |     ^^^^^^^^^^^^^
+...
+310 |     math: Math,
+    |     ^^^^
+311 |     checked: Option<provenance::CheckedMap>,
+312 |     unchecked: Option<provenance::Map>,
+    |     ^^^^^^^^^
+...
+316 |     publication_attempted: bool,
+    |     ^^^^^^^^^^^^^^^^^^^^^
+...
+319 |     boolean_attempted: bool,
+    |     ^^^^^^^^^^^^^^^^^
+
+warning: field `0` is never read
+   --> src/ml_dataset/original_boolean_rows.rs:324:13
+    |
+324 |     Reduced(rows::OwnedRows),
+    |     ------- ^^^^^^^^^^^^^^^
+    |     |
+    |     field in this variant
+    |
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+    |
+324 -     Reduced(rows::OwnedRows),
+324 +     Reduced(()),
+    |
+
+warning: field `diagnostic` is never read
+   --> src/ml_dataset/original_boolean_rows.rs:333:5
+    |
+327 | pub(in crate::ml_dataset::solvers) struct OwnedAttempt {
+    |                                           ------------ field in this struct
+...
+333 |     diagnostic: Option<String>,
+    |     ^^^^^^^^^^
+
+warning: function `genuine_owned` is never used
+   --> src/ml_dataset/original_boolean_rows.rs:499:8
+    |
+499 |     fn genuine_owned(twist: bool, refuse_wire: bool) -> OwnedAttempt { genuine_owned_fixture(twist,refuse_wire).0 }
+    |        ^^^^^^^^^^^^^
+
+warning: field `0` is never read
+  --> src/ml_dataset/original_boolean_search.rs:57:75
+   |
+57 | pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check...
+   |                                                                 --------- ^^^^^^^^^^^^^^^^^^
+   |                                                                 |
+   |                                                                 field in this variant
+   |
+   = note: `Failure` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+57 - pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+57 + pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(()),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+   |
+
+warning: field `0` is never read
+  --> src/ml_dataset/original_boolean_search.rs:57:156
+   |
+57 | ...earch(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(conti...
+   |                                                    ----------- ^^^^^^^^^^^^^^^^^
+   |                                                    |
+   |                                                    field in this variant
+   |
+   = note: `Failure` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+57 - pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+57 + pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(()),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+   |
+
+warning: field `0` is never read
+  --> src/ml_dataset/original_boolean_search.rs:57:220
+   |
+57 | ...ance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+   |                                                     -------- ^^^^^^^^^^^^^^^^^^^^^
+   |                                                     |
+   |                                                     field in this variant
+   |
+   = note: `Failure` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+57 - pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+57 + pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(()),Exclusions(exclusions::Failure),Publication(Stop)}
+   |
+
+warning: field `0` is never read
+  --> src/ml_dataset/original_boolean_search.rs:57:254
+   |
+57 | ...ation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+   |                                                    ---------- ^^^^^^^^^^^^^^^^^^^
+   |                                                    |
+   |                                                    field in this variant
+   |
+   = note: `Failure` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+57 - pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(exclusions::Failure),Publication(Stop)}
+57 + pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure),Exclusions(()),Publication(Stop)}
+   |
+
+warning: variants `Search` and `Audit` are never constructed
+  --> src/ml_dataset/original_boolean_search.rs:57:95
+   |
+57 | pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check...
+   |                                         ------- variants in this enum                         ^^^^^^                     ^^^^^
+   |
+   = note: `Failure` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: fields `unchecked` and `boolean_attempted` are never read
+  --> src/ml_dataset/original_boolean_search.rs:77:44
+   |
+75 | struct OriginalParts{
+   |        ------------- fields in this struct
+76 |     public_sha256:[u8;32],factor_sha256:[u8;32],budget:Budget,binding:[u8;32],launch_sha256:[u8;32],math:Math,
+77 |     checked:Option<provenance::CheckedMap>,unchecked:Option<provenance::Map>,pattern:Option<u32>,
+   |                                            ^^^^^^^^^
+78 |     map_bytes:Vec<u8>,map_ack:Option<capture::CommittedEventPosition>,publication_attempted:bool,map_published:bool,
+79 |     capture_limits:capture::CaptureLimits,boolean_attempted:bool,
+   |                                           ^^^^^^^^^^^^^^^^^
+
+warning: methods `charged`, `lift_records`, and `exclusion_audit` are never used
+   --> src/ml_dataset/original_boolean_search.rs:98:43
+    |
+ 95 | impl OwnedAttempt{
+    | ----------------- methods in this implementation
+...
+ 98 |     pub(in crate::ml_dataset::solvers) fn charged(&self)->(u64,u64){(self.original.budget.native.work+self.original.budget.checking...
+    |                                           ^^^^^^^
+ 99 |     pub(in crate::ml_dataset::solvers) fn lift_records(&self)->&[LiftRecord]{&self.lift_records}
+    |                                           ^^^^^^^^^^^^
+...
+111 |     pub(in crate::ml_dataset::solvers) fn exclusion_audit(&self)->Option<&exclusions::Audit>{self.exclusion_audit.as_ref()}
+    |                                           ^^^^^^^^^^^^^^^
+
+warning: field `index` is never read
+  --> src/ml_dataset/owned_search_capture_publication.rs:19:9
+   |
+18 | pub(in crate::ml_dataset::solvers) struct Chunk{
+   |                                           ----- field in this struct
+19 |     pub index:u64,pub path:String,pub bytes:u64,pub before:Option<capture::CommittedEventPosition>,
+   |         ^^^^^
+
+warning: method `capture_publication` is never used
+   --> src/ml_dataset/owned_search_capture_publication.rs:131:40
+    |
+117 | impl OwnedAttempt{
+    | ----------------- method in this implementation
+...
+131 |  pub(in crate::ml_dataset::solvers) fn capture_publication(&self)->&Publication{&self.publication}
+    |                                        ^^^^^^^^^^^^^^^^^^^
+
+warning: fields `pattern`, `snapshot`, `chunk`, `bytes`, and `receipt` are never read
+  --> src/ml_dataset/owned_search_publication_observer.rs:13:9
+   |
+12 |     ChunkAcknowledged {
+   |     ----------------- fields in this variant
+13 |         pattern: u32,
+   |         ^^^^^^^
+14 |         snapshot: u64,
+   |         ^^^^^^^^
+15 |         chunk: u64,
+   |         ^^^^^
+16 |         bytes: u64,
+   |         ^^^^^
+17 |         receipt: &'a capture::CommittedEventPosition,
+   |         ^^^^^^^
+   |
+   = note: `Boundary` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `pattern`, `snapshot`, `chunks`, `bytes`, and `receipt` are never read
+  --> src/ml_dataset/owned_search_publication_observer.rs:22:9
+   |
+21 |     SnapshotComplete {
+   |     ---------------- fields in this variant
+22 |         pattern: u32,
+   |         ^^^^^^^
+23 |         snapshot: u64,
+   |         ^^^^^^^^
+24 |         chunks: u64,
+   |         ^^^^^^
+25 |         bytes: u64,
+   |         ^^^^^
+26 |         receipt: &'a capture::CommittedEventPosition,
+   |         ^^^^^^^
+   |
+   = note: `Boundary` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Guard` is never constructed
+  --> src/ml_dataset/owned_search_publication_observer.rs:34:43
+   |
+34 | pub(in crate::ml_dataset::solvers) struct Guard {
+   |                                           ^^^^^
+
+warning: function `install` is never used
+  --> src/ml_dataset/owned_search_publication_observer.rs:48:39
+   |
+48 | pub(in crate::ml_dataset::solvers) fn install(observer: Observer) -> Result<Guard, &'static str> {
+   |                                       ^^^^^^^
+
+warning: multiple methods are never used
+  --> src/ml_dataset/capture_projection.rs:29:9
+   |
+27 | impl<'a> View<'a>{
+   | ----------------- methods in this implementation
+28 |  pub fn of(owner:&'a OwnedAttempt)->Self{Self{owner}}
+29 |  pub fn identity(&self)->SourceIdentity<'a>{let o=&self.owner.original;SourceIdentity{
+   |         ^^^^^^^^
+...
+35 |  pub fn signed_domain(&self,start:usize,limit:usize)->Result<Page<'a,(u64,u64)>,PageError>{paging::page(&self.owner.original.math.si...
+   |         ^^^^^^^^^^^^^
+36 |  pub fn signed_target(&self)->Option<(u64,u64)>{self.owner.original.math.signed_target}
+   |         ^^^^^^^^^^^^^
+...
+48 |  pub fn expansion(&self)->Option<&'a equations::OwnedExpansion>{self.owner.expansion.as_ref()}
+   |         ^^^^^^^^^
+49 |  pub fn normalization_cursor(&self)->(usize,usize,usize){(self.owner.normalization_generator,self.owner.normalization_term,self.owne...
+   |         ^^^^^^^^^^^^^^^^^^^^
+50 |  pub fn normalized(&self,start:usize,limit:usize)->Result<Page<'a,equations::Polynomial>,PageError>{paging::page(&self.owner.normali...
+   |         ^^^^^^^^^^
+51 |  /// Retains nested search basis/proof objects in each borrowed partition.
+52 |  pub fn partitions(&self,start:usize,limit:usize)->Result<Page<'a,continuation::Partition>,PageError>{paging::page(self.owner.contin...
+   |         ^^^^^^^^^^
+53 |  /// None differs from Some(empty): search was not entered versus no partitions.
+54 |  pub fn continuation(&self)->Option<&'a continuation::Attempt>{self.owner.continuation.as_ref()}
+   |         ^^^^^^^^^^^^
+55 |  pub fn lifts(&self,start:usize,limit:usize)->Result<Page<'a,LiftRecord>,PageError>{paging::page(&self.owner.lift_records,start,limit)}
+   |         ^^^^^
+56 |  pub fn coverage(&self)->Option<&'a continuation::CoverageAudit>{self.owner.coverage.as_ref()}
+   |         ^^^^^^^^
+57 |  pub fn exclusion_audit(&self)->Option<&'a exclusions::Audit>{self.owner.exclusion_audit()}
+   |         ^^^^^^^^^^^^^^^
+58 |  pub fn replays(&self,start:usize,limit:usize)->Result<Page<'a,exclusions::Replay>,PageError>{paging::page(self.owner.exclusion_audi...
+   |         ^^^^^^^
+
+warning: method `binding_sha256` is never used
+  --> src/ml_dataset/capture_encoding.rs:28:9
+   |
+24 | impl EncodingSource<'_>{
+   | ----------------------- method in this implementation
+...
+28 |  pub fn binding_sha256(&self)->&[u8;32]{self.identity.binding_sha256}
+   |         ^^^^^^^^^^^^^^
+
+warning: method `snapshots` is never used
+  --> src/ml_dataset/dynamic_boolean_search_scheduler.rs:76:9
+   |
+74 | impl CheckpointControl{
+   | ---------------------- method in this implementation
+75 |  pub fn new(every_batches:u64,max_snapshot...
+76 |  pub fn snapshots(&self)->u64{self.snapshots}
+   |         ^^^^^^^^^
+
+warning: method `candidate` is never used
+  --> src/ml_dataset/dynamic_boolean_continuation.rs:33:9
+   |
+31 | impl<'a,T:Owner> Session<'a,T>{
+   | ------------------------------ method in this implementation
+32 |  pub fn new(n:u32,g:&'a [Polynomial],limits:Limits,deadline:Instant,owner:&'a mut T)->Self{Self{owner,original:g,n,limits,deadline,a...
+33 |  pub fn candidate(&self)->Option<&[bool]>{if self.attempt.failure.is_some()||self.attempt.outcome!=Outcome::CandidateRetained{return...
+   |         ^^^^^^^^^
+
+warning: method `has_checked_map` is never used
+   --> src/ml_dataset/affine_row_central.rs:121:43
+    |
+117 | impl Frame {
+    | ---------- method in this implementation
+...
+121 |     pub(in crate::ml_dataset::solvers) fn has_checked_map(&self) -> bool {
+    |                                           ^^^^^^^^^^^^^^^
+
+warning: struct `TerminalVerified` is never constructed
+   --> src/ml_dataset/affine_row_central.rs:144:43
+    |
+144 | pub(in crate::ml_dataset::solvers) struct TerminalVerified {
+    |                                           ^^^^^^^^^^^^^^^^
+
+warning: function `terminal_fields` is never used
+   --> src/ml_dataset/affine_row_central.rs:148:4
+    |
+148 | fn terminal_fields(
+    |    ^^^^^^^^^^^^^^^
+
+warning: function `check_terminal_fields_for_control` is never used
+   --> src/ml_dataset/affine_row_central.rs:201:39
+    |
+201 | pub(in crate::ml_dataset::solvers) fn check_terminal_fields_for_control(
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `join_terminal` is never used
+   --> src/ml_dataset/affine_row_central.rs:211:43
+    |
+208 | impl VerifiedInitialCapture {
+    | --------------------------- method in this implementation
+...
+211 |     pub(in crate::ml_dataset::solvers) fn join_terminal(
+    |                                           ^^^^^^^^^^^^^
+
+warning: methods `usage` and `revalidate` are never used
+    --> src/ml_dataset/affine_row_central.rs:1402:43
+     |
+1401 | impl TerminalVerified {
+     | --------------------- methods in this implementation
+1402 |     pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
+     |                                           ^^^^^
+...
+1407 |     pub(in crate::ml_dataset::solvers) fn revalidate(
+     |                                           ^^^^^^^^^^
+
+warning: fields `public_sha256`, `factor_sha256`, `math`, `unchecked`, `publication_attempted`, and `boolean_attempted` are never read
+  --> src/ml_dataset/original_affine_rows.rs:26:5
+   |
+25 | struct OriginalParts {
+   |        ------------- fields in this struct
+26 |     public_sha256: [u8; 32],
+   |     ^^^^^^^^^^^^^
+27 |     factor_sha256: [u8; 32],
+   |     ^^^^^^^^^^^^^
+...
+31 |     math: Math,
+   |     ^^^^
+32 |     checked: Option<provenance::CheckedMap>,
+33 |     unchecked: Option<provenance::Map>,
+   |     ^^^^^^^^^
+...
+37 |     publication_attempted: bool,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+...
+40 |     boolean_attempted: bool,
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: field `0` is never read
+  --> src/ml_dataset/original_affine_rows.rs:44:14
+   |
+44 |     Expanded(affine::Attempt),
+   |     -------- ^^^^^^^^^^^^^^^
+   |     |
+   |     field in this variant
+   |
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+44 -     Expanded(affine::Attempt),
+44 +     Expanded(()),
+   |
+
+warning: field `0` is never read
+  --> src/ml_dataset/original_affine_rows.rs:45:13
+   |
+45 |     Audited(affine::audit::Audited),
+   |     ------- ^^^^^^^^^^^^^^^^^^^^^^
+   |     |
+   |     field in this variant
+   |
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+45 -     Audited(affine::audit::Audited),
+45 +     Audited(()),
+   |
+
+warning: field `0` is never read
+  --> src/ml_dataset/original_affine_rows.rs:46:13
+   |
+46 |     Reduced(rows::OwnedRows),
+   |     ------- ^^^^^^^^^^^^^^^
+   |     |
+   |     field in this variant
+   |
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+46 -     Reduced(rows::OwnedRows),
+46 +     Reduced(()),
+   |
+
+warning: field `diagnostic` is never read
+  --> src/ml_dataset/original_affine_rows.rs:55:5
+   |
+49 | pub(in crate::ml_dataset::solvers) struct OwnedAttempt {
+   |                                           ------------ field in this struct
+...
+55 |     diagnostic: Option<String>,
+   |     ^^^^^^^^^^
+
+warning: field `0` is never read
+ --> src/ml_dataset/sat_search_worker.rs:7:96
+  |
+7 | pub(in crate::ml_dataset::solvers) enum Custody { Search(search::ReportedSearch), BeforeSearch(worker::Custody) }
+  |                                                                                   ------------ ^^^^^^^^^^^^^^^
+  |                                                                                   |
+  |                                                                                   field in this variant
+  |
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+  |
+7 - pub(in crate::ml_dataset::solvers) enum Custody { Search(search::ReportedSearch), BeforeSearch(worker::Custody) }
+7 + pub(in crate::ml_dataset::solvers) enum Custody { Search(search::ReportedSearch), BeforeSearch(()) }
+  |
+
+warning: method `historical` is never used
+   --> src/ml_dataset/owned_replay_caller.rs:128:19
+    |
+127 | impl Session {
+    | ------------ method in this implementation
+128 |     pub(super) fn historical(&self)->bool {ReplayMode::parse(&self.policy.mode)==Some(ReplayMode::Historical)}
+    |                   ^^^^^^^^^^
+
+warning: unused `std::result::Result` that must be used
+    --> src/ml_dataset/solvers.rs:9519:9
+     |
+9519 |         self.owner.revalidate(dir, config, outcome, artifacts);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: this `Result` may be an `Err` variant, which should be handled
+     = note: `#[warn(unused_must_use)]` (part of `#[warn(unused)]`) on by default
+help: use `let _ = ...` to ignore the resulting value
+     |
+9519 |         let _ = self.owner.revalidate(dir, config, outcome, artifacts);
+     |         +++++++
+
+warning: `crypto` (lib test) generated 132 warnings (run `cargo fix --lib -p crypto --tests` to apply 16 suggestions)
+    Finished `release` profile [optimized] target(s) in 24m 15s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-b4fa3a3eb9ba3f87)
+
+running 16 tests
+test cryptanalysis::prime_fast::mulmod_n_tests::mulmod_n_matches_the_128_bit_remainder ... ok
+test cryptanalysis::prime_fast::tests::fast_arithmetic_matches_textbook_points ... ok
+test cryptanalysis::prime_fast::tests::fast_relations_match_the_s3_sweep ... ok
+test cryptanalysis::prime_fast::tests::add_x_with_inv_matches_the_full_addition ... ok
+test cryptanalysis::prime_fast::tests::fp64_selects_match_branchy_formulas ... ok
+test cryptanalysis::prime_fast::tests::hasse_bsgs_reproduces_the_ladder_models_and_orders ... ok
+test cryptanalysis::prime_fast::tests::batched_additions_preserve_independent_lane_streams ... ok
+test cryptanalysis::prime_fast::tests::ic_two_and_three_decomposition_recover_known_logs ... ok
+test cryptanalysis::prime_fast::tests::generated_curves_have_prime_order_and_solve ... ok
+test cryptanalysis::prime_fast::tests::montgomery_matches_biguint ... ok
+test cryptanalysis::prime_fast::tests::profile_native_walk_lane_batch ... ignored
+test cryptanalysis::prime_fast::tests::rho_recovers_known_logs ... ok
+test cryptanalysis::prime_fast::tests::tuned_walk_exercises_look_ahead_and_cycles_and_solves ... ok
+test cryptanalysis::prime_fast::tests::ic_solve_fast_recovers_same_log_as_ic_solve ... ok
+test cryptanalysis::prime_fast::tests::ic_solve_table_agrees_with_sweep ... ok
+test cryptanalysis::prime_fast::tests::jacobian_mul_and_combine_match_the_affine_ladder ... ok
+
+test result: ok. 15 passed; 0 failed; 1 ignored; 0 measured; 7597 filtered out; finished in 6.31s
+
+done

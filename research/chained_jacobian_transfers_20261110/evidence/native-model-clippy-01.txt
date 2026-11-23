@@ -1,0 +1,12 @@
+    Checking chained-jacobian-transfer v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/native)
+error: manual implementation of `.is_multiple_of()`
+   --> src/richelot/model.rs:403:23
+    |
+403 |             .find(|v| order % v == 0 && (2..*v).all(|d| v % d != 0))
+    |                       ^^^^^^^^^^^^^^ help: replace with: `order.is_multiple_of(*v)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+    = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: could not compile `chained-jacobian-transfer` (lib test) due to 1 previous error

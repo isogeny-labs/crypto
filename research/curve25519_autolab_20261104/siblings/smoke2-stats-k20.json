@@ -1,0 +1,144 @@
+{
+ "r": 131111,
+ "sqrt_r": 362.0925296108717,
+ "field_bits": 20,
+ "prices": {
+  "group_add": 26540,
+  "group_double": 31920.0
+ },
+ "arms": {
+  "rho-neg": {
+   "n": 24,
+   "bitops_per_sqrt_r": 37710.226576636225,
+   "gae_per_sqrt_r": 1.337250270956143,
+   "steps_per_sqrt_r": 0.8568251886704621,
+   "S": {
+    "0.0": 1.3372502709561422,
+    "0.1": 1.4278003301778444,
+    "1.0": 2.2427508631731543
+   }
+  },
+  "tw2cj-lazy": {
+   "n": 24,
+   "bitops_per_sqrt_r": 71081.34264555645,
+   "gae_per_sqrt_r": 2.5336525656924835,
+   "stored_points_per_sqrt_r": 1.7446047119840016,
+   "stored_se": 0.0996837922376738,
+   "setup_adds": 127.875,
+   "setup_doubles": 66,
+   "walk_adds": 631.7083333333334,
+   "post_hoc_bitops_per_sqrt_r": {
+    "setup": 15190.93063287227,
+    "walk_additions": 46301.8090560554,
+    "second_points": 0.0,
+    "lift_products": 0.0,
+    "sign_resolutions": 0.0,
+    "table_inserts": 139.56837695872014,
+    "walk_total": 46441.37743301412,
+    "setup_share_of_oracle_setup": 0.24647674425291372
+   },
+   "S": {
+    "0.0": 2.5336525656924835,
+    "0.1": 2.718699649482568,
+    "1.0": 4.384123403593329
+   }
+  },
+  "tw2cj-lazy-sib8-p256": {
+   "n": 24,
+   "bitops_per_sqrt_r": 72174.12731883292,
+   "gae_per_sqrt_r": 2.361159823573625,
+   "stored_points_per_sqrt_r": 1.847018681620949,
+   "stored_se": 0.11872077595664546,
+   "setup_adds": 350.2083333333333,
+   "setup_doubles": 68,
+   "walk_adds": 339,
+   "post_hoc_bitops_per_sqrt_r": {
+    "setup": 31663.423653030903,
+    "walk_additions": 24847.405743688854,
+    "second_points": 5009.649518635646,
+    "lift_products": 629.6111666401943,
+    "sign_resolutions": 433.6690776307544,
+    "table_inserts": 147.76149452967593,
+    "walk_total": 31068.097001125127,
+    "setup_share_of_oracle_setup": 0.5047450360337019
+   },
+   "S": {
+    "0.0": 2.361159823573625,
+    "0.1": 2.661175218671882,
+    "1.0": 5.361313774556205
+   }
+  },
+  "tw2cj-lazy-sib8-p64": {
+   "n": 24,
+   "bitops_per_sqrt_r": 55112.81473121237,
+   "gae_per_sqrt_r": 1.7251575649405813,
+   "stored_points_per_sqrt_r": 1.7954664811744856,
+   "stored_se": 0.10562513332846121,
+   "setup_adds": 126.20833333333333,
+   "setup_doubles": 68,
+   "walk_adds": 331.3333333333333,
+   "post_hoc_bitops_per_sqrt_r": {
+    "setup": 15245.078854841217,
+    "walk_additions": 24285.468347322243,
+    "second_points": 4838.781591405858,
+    "lift_products": 615.3721727043786,
+    "sign_resolutions": 534.4513280660705,
+    "table_inserts": 143.63731849395884,
+    "walk_total": 30417.71075799251,
+    "setup_share_of_oracle_setup": 0.33386218809891804
+   },
+   "S": {
+    "0.0": 1.7251575649405808,
+    "0.1": 2.016692162777892,
+    "1.0": 4.640503543313687
+   }
+  }
+ },
+ "ratios": {
+  "bitops tw2cj-lazy-sib8-p256/tw2cj-lazy": [
+   1.0153737202000472,
+   0.9166682325079206,
+   1.1232331996341787
+  ],
+  "bitops tw2cj-lazy-sib8-p256/rho-neg": [
+   1.9139139133030076,
+   1.6673226613736416,
+   2.205981142627405
+  ],
+  "stored tw2cj-lazy-sib8-p256/tw2cj-lazy": [
+   1.0587032517643953,
+   0.8705437627217214,
+   1.281669359938172
+  ],
+  "walk-only bitops tw2cj-lazy-sib8-p256/tw2cj-lazy": [
+   0.6689744946935946,
+   0.5560203953306193,
+   0.8066963759788351
+  ],
+  "bitops tw2cj-lazy-sib8-p64/tw2cj-lazy": [
+   0.7753485328214699,
+   0.7129768507760988,
+   0.8462972738359437
+  ],
+  "bitops tw2cj-lazy-sib8-p64/rho-neg": [
+   1.461481930351437,
+   1.2797329761326706,
+   1.6820278432468598
+  ],
+  "stored tw2cj-lazy-sib8-p64/tw2cj-lazy": [
+   1.0291537497526548,
+   0.8945669387257887,
+   1.1834617664493183
+  ],
+  "walk-only bitops tw2cj-lazy-sib8-p64/tw2cj-lazy": [
+   0.6549700383427743,
+   0.5698531805846899,
+   0.7517665241419954
+  ],
+  "bitops tw2cj-lazy/rho-neg": [
+   1.8849354432040368,
+   1.5993079991985857,
+   2.2316588195384686
+  ]
+ }
+}

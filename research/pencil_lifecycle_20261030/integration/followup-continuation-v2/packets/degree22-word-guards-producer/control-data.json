@@ -1,0 +1,96 @@
+{
+  "schema": "research.fixed-guard-controls/v1",
+  "coordinate_order": [
+    "q",
+    "r",
+    "s",
+    "t",
+    "z",
+    "w"
+  ],
+  "cases": [
+    {
+      "id": "nonunit",
+      "p": 7,
+      "input": [
+        4,
+        0,
+        1,
+        4,
+        2,
+        3
+      ],
+      "compared_with": "same input",
+      "B": 0,
+      "branch": "sameUDouble",
+      "s_nonzero": true
+    },
+    {
+      "id": "lower-bound",
+      "p": 5,
+      "input": [
+        1,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "compared_with": "same input",
+      "B": 0,
+      "branch": "sameUDouble",
+      "s_nonzero": true
+    },
+    {
+      "id": "zero-ordinate",
+      "p": 7,
+      "input": [
+        4,
+        0,
+        0,
+        0,
+        2,
+        3
+      ],
+      "compared_with": "same input",
+      "B": 0,
+      "branch": "sameUInverse",
+      "s_nonzero": false
+    },
+    {
+      "id": "zero-weight-overlap",
+      "p": 7,
+      "input": [
+        1,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      "compared_with": "same input",
+      "B": 0,
+      "branch": "sameUInverse"
+    },
+    {
+      "id": "noncanonical",
+      "p": 7,
+      "input": [
+        8,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "canonical": false
+    },
+    {
+      "id": "excluded-characteristic",
+      "p": 2,
+      "lower_prime_bound": false
+    }
+  ],
+  "scientific_execution": false,
+  "fixed_lean_propositions": 7
+}

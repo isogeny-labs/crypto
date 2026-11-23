@@ -1,0 +1,35 @@
+{
+  "round": 46,
+  "claim_class": [
+    "theorem",
+    "exact_computation"
+  ],
+  "target": "P192 three-coordinate marked order5 orbit representative",
+  "eigenvalues": "mu powers1..4",
+  "lattice": "c0+lambda*c1+lambda^2*c2=lambda^3 mod r",
+  "global_minimax": "LLL basis then complete inverse-image box enumeration inside a feasible incumbent cube",
+  "schedule_box": 36893488147419103231,
+  "widths": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "selection": "complete representative D+A then D,A and coefficient/width tuple",
+  "fixtures": [
+    0,
+    1,
+    2,
+    17,
+    20261107
+  ],
+  "counts": "Group D,A and negated lookups; include three odd-multiple tables and deriving fifth point; exclude stored-triple initialization",
+  "controls": "independent lattice basis/index and corner enumeration, signed digits, actual point action, all rotations and signs",
+  "caps": {
+    "command_seconds": 120,
+    "processes": 1,
+    "cloud_submissions": 0
+  },
+  "claims": "global coefficient minimum and finite-box schedule optimum; no global arithmetic-circuit optimum or runtime claim"
+}

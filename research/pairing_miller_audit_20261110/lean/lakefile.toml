@@ -1,0 +1,11 @@
+name = "pairing_miller_audit"
+version = "0.1.0"
+defaultTargets = ["PairingMillerAudit"]
+
+[[require]]
+name = "bk_actual_case_audit"
+path = "../../bk_actual_case_audit_20261110/lean"
+
+[[lean_lib]]
+name = "PairingMillerAudit"
+roots = ["BaseDescent", "MillerCertificate", "MillerCurve", "MillerExpressions", "MillerProperties", "MillerTable", "TangentCertificate", "TateClassPairing", "TateQuotient", "TorsionIndex", "UnitsTarget", "WeilTarget"]

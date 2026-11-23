@@ -1,0 +1,21 @@
+# COMMANDS.log  (cwd = lead directory; times not recorded)
+CMD python3 -I -m unittest -v src/test_l07.py 2> raw/tests_spec_command_failed.txt | exit=1 (ModuleNotFoundError: No module named 'src'; see DEVIATIONS D1)
+CMD python3 -I src/test_l07.py -v 2> raw/tests.txt | exit=0
+CMD python3 -I src/genus_table.py > raw/genus_table.tsv | exit=0
+CMD python3 -I src/split_law.py > raw/split_law.jsonl | exit=0 (about 22 s CPU)
+CMD python3 -I src/gates.py > raw/gates.txt | exit=0 (extra helper, D2)
+CMD python3 -I src/plot.py > plot.svg | exit=0
+SHA256:
+37be3f4f46362f6e4e1d76acc5f8c02a225daa4991088e0ce8f6079ed315e043  raw/tests_spec_command_failed.txt
+6bab4b825e29f8152346b5da09e9c3771f4e678925dca399ebe8fd817799f369  raw/tests.txt
+c611a6b309fe638ac5b05c5f93596cc46434b919d431c9cb9f55c121088326e0  raw/genus_table.tsv
+19c1cdfb1dd04eae5e1e8093d85fdd5fb1e19def7b3fe582490cebec5561e1e4  raw/split_law.jsonl
+658e40d7f2bb993b090340ca879708d79d193550fbc4699dd9a8cc95acf567f1  raw/gates.txt
+be6961efece064f3fb9c52ea1ebae4c719e1321d9b550645fc5f152c65317aba  plot.svg
+0664983686d6212a34258419a2d3d0cc4dd7197f94bc6c16618ff31b7beb4521  src/gates.py
+0896dcb8c4f69cc66c671af266d7406ad90cf5655efd90ed512658b40eb1a847  src/genus_table.py
+7d96a96e10dd8ba34832fce3aede60d860c8f1a0aad28a06b65910a1143f4a82  src/plot.py
+53642027552f14b7f55663a1500176dcb1e6a0abdbf326f66b2f105e0749cffc  src/split_law.py
+85da00e8507957daa565199b446a6cbcc00dfa997ae7b5c68e9ca2db85f4de32  src/test_l07.py
+50e4b5a2770817e53d58bf4f879bc3844d80ddb19d1b5c582956768d7625257d  RESULTS.md
+3735381afa72fa7556d05aac235142cabece7c067381bc61a3b4acb8decb7094  DEVIATIONS.md

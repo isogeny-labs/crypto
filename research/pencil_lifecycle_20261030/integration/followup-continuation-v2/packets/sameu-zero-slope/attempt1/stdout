@@ -1,0 +1,30 @@
+/var/tmp/pencil-sameu-zero-slope-20261031-v1/ZeroSlope.lean:37:15: error: No goals to be solved
+/var/tmp/pencil-sameu-zero-slope-20261031-v1/ZeroSlope.lean:39:15: error: No goals to be solved
+/var/tmp/pencil-sameu-zero-slope-20261031-v1/ZeroSlope.lean:50:22: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  b.w * a.w
+in the target expression
+  crossQ b a = (a.z * b.z) ^ 2 * nq b
+
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+a b : D2 K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+ha : validTwo f a
+hb : validTwo f b
+hq : crossQ a b = crossQ b a
+hr : crossR a b = crossR b a
+hni : ¬(crossS a b = -crossS b a ∧ crossT a b = -crossT b a)
+hne : ¬(crossS a b = crossS b a ∧ crossT a b = crossT b a)
+qa : crossQ a b = (a.z * b.z) ^ 2 * nq a
+ra : crossR a b = (a.z * b.z) ^ 4 * nr a
+sa : crossS a b = (a.z * b.z) ^ 3 * (a.w * b.w) * ns a
+ta : crossT a b = (a.z * b.z) ^ 5 * (a.w * b.w) * nt a
+qb : crossQ b a = (a.z * b.z) ^ 2 * nq b
+rb : crossR b a = (a.z * b.z) ^ 4 * nr b
+sb : crossS b a = (a.z * b.z) ^ 3 * (b.w * a.w) * ns b
+tb : crossT b a = (a.z * b.z) ^ 5 * (b.w * a.w) * nt b
+⊢ sourceK a b ≠ 0

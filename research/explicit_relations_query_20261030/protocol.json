@@ -1,0 +1,478 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXPLICIT-RELATIONS-QUERY-20261030",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/explicit_relations_query_20261030",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "implementation_pr": "https://github.com/isogeny-labs/crypto/pull/2896"
+  },
+  "question": "Do radix-packed winners and device-side reset preserve deterministic queries while reducing host/device payloads, and what do matched query diagnostics show?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Packed and fallback query paths preserve deterministic witnesses, batch visited counts, repeated reset and prepare behavior, independent CPU replay and overflow boundaries.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "For encodable batches, the default query uses one 8-byte readback per batch, instead of an 8-byte upload plus 8-byte readback and a further 8-byte readback on each hit.",
+      "class": "comparative",
+      "decided_by": [
+        "C-native"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "Certified latency speedup, fastest-tool status, full ECDLP performance and asymptotic improvements are not established by this L0 diagnostic panel.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "u",
+      "role": "baseline",
+      "description": "Separate matches and synchronous host reset upload",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "nvcc",
+            "-O3",
+            "-std=c++17",
+            "-arch=sm_120",
+            "research/explicit_relations_query_20261030/benchmark.cu"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "query_mode": "ER_QUERY_REFERENCE"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "query_mode": "ER_QUERY_REFERENCE"
+      }
+    },
+    {
+      "id": "v",
+      "role": "candidate",
+      "description": "Radix-packed winner and device-side asynchronous reset",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "nvcc",
+            "-O3",
+            "-std=c++17",
+            "-arch=sm_120",
+            "research/explicit_relations_query_20261030/benchmark.cu"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "query_mode": "default"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "query_mode": "default"
+      }
+    },
+    {
+      "id": "w",
+      "role": "reference",
+      "description": "Radix-packed winner with old host reset upload (ablation)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "nvcc",
+            "-O3",
+            "-std=c++17",
+            "-arch=sm_120",
+            "research/explicit_relations_query_20261030/benchmark.cu"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "query_mode": "ER_QUERY_PACKED_ONLY"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "query_mode": "ER_QUERY_PACKED_ONLY"
+      }
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "description": "Second invocation of identical u binary",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "nvcc",
+            "-O3",
+            "-std=c++17",
+            "-arch=sm_120",
+            "research/explicit_relations_query_20261030/benchmark.cu"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "query_mode": "ER_QUERY_REFERENCE"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "query_mode": "ER_QUERY_REFERENCE"
+      },
+      "same_instrument_as": "u"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Two planted reachable targets per execution exercise the same GPU path and independent host witness verification; each must be detected."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Two fixed negative targets per execution are exhaustively checked by the independent host backend; no random-population claim is made."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "query_mode",
+        "levels": [
+          "separate",
+          "packed",
+          "packed_device_reset"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "one frozen commit, nvcc13.2.51 -O3 -std=c++17 -arch=sm_120",
+        "how": "Only query-mode compile definitions differ; product-tree normalization is identical. Record every binary hash."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "p=2^61-1,a=0,b=7; base sizes16,64,256; 4slots; normalization counts257,65537,262145; seeds111,222,333",
+        "how": "Native deterministic generator independent of arm; CPU reference checks every witness and negative target."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Same full RTX PRO6000 and pod for all rows. Record device identity, GPU state, CPU affinity and CPUinfo; shared host earns only L0."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "Fresh process each cell samples ASLR; fixed launch geometry and row/chunk caps. Packed variants remove the chunk-length matches buffer by design."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Four-arm Latin rotation with alternating reversal per round and instance."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen Rust analysis consumes neutral u/v/w/x labels and validates complete cells/digests; labels are decoded only in report."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-native",
+        "arms": [
+          "u",
+          "v"
+        ],
+        "differs_in": [
+          "query_mode"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-reset",
+        "arms": [
+          "w",
+          "v"
+        ],
+        "differs_in": [
+          "query_mode"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "u",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "seed=111*(instance_index+1), all arms/rounds share deterministic inputs; SplitMix64 constructs projective scales."
+    },
+    "instance_sampling": {
+      "rule": "Fixed public software fixtures, not random scientific population: three increasing base sizes and partial-block normalization sizes.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "Standalone frozen analyzer receives only rows.csv with neutral u/v/w/x arm labels, no protocol or identity key. Numerical signatures may reveal implementations.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 3,
+    "replicates": 9,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact source-level counts and deterministic equality need no sampling power. Nine repeats characterize descriptive ranges only; no timed significance test or equivalence claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1800,
+      "measured_on": "Conservative unmeasured allocation estimate, not timing evidence. Round0 is the declared per-arm/size preflight and warmup; preserve all costs. No preflight numbers existed at freeze."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "transfer_bytes",
+        "name": "Query host-device API payload",
+        "unit": "bytes",
+        "kind": "exact",
+        "definition": "Sum per observed query batch: u/x16 bytes plus8 per hit; w16 bytes; v8 bytes. Calculated from visited batch counts and hits; excludes prepare transfers, memory writes and physical PCIe framing. All fixtures fit packed representation.",
+        "source": "rows.csv transfer_bytes",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "normalize_ms",
+        "name": "Normalization kernel diagnostic",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "CUDA event interval over8 launches divided by8, after one untimed kernel launch; readback and verification excluded.",
+        "source": "rows.csv normalize_ms",
+        "aggregation": "median",
+        "resolution": "CUDA events approximately0.5us; host steady_clock reported milliseconds",
+        "uncertainty": "range"
+      },
+      {
+        "id": "prepare_ms",
+        "name": "Prepare diagnostic",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Host synchronized prepare including allocations, table build, sort and device sync.",
+        "source": "rows.csv prepare_ms",
+        "aggregation": "median",
+        "resolution": "CUDA events approximately0.5us; host steady_clock reported milliseconds",
+        "uncertainty": "range"
+      },
+      {
+        "id": "query_ms",
+        "name": "Four-query diagnostic",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Four device.find calls including transfers, synchronization and native witness verification; independent comparison checker outside interval.",
+        "source": "rows.csv query_ms",
+        "aggregation": "median",
+        "resolution": "CUDA events approximately0.5us; host steady_clock reported milliseconds",
+        "uncertainty": "range"
+      },
+      {
+        "id": "cold_ms",
+        "name": "Cold pipeline diagnostic",
+        "unit": "milliseconds",
+        "kind": "timed",
+        "definition": "Fresh-process fixture construction, plan validation, GPU context initialization, prepare and four queries. Independent host cross-check excluded; no context reuse.",
+        "source": "rows.csv cold_ms",
+        "aggregation": "median",
+        "resolution": "CUDA events approximately0.5us; host steady_clock reported milliseconds",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "transfer_bytes",
+      "digest",
+      "norm_digest"
+    ],
+    "record": [
+      "GPU UUID and driver",
+      "CUDA compiler and binary hashes",
+      "CPUinfo and process affinity",
+      "GPU state before and after",
+      "all row stages and digests"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "runpod",
+    "queue": "Secure Cloud full RTX PRO 6000",
+    "placement": {
+      "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "count": 1,
+      "container_disk_gb": 40
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 2400,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "4arms x3instances x(1warmup+9rounds)=120 rows; no extra repeats after viewing results.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any incorrect output, failed sanitizer or missing cell invalidates the run; retain failures. Worker2400s/controller2700s deadline; delete pod and retain partial data.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any output mismatch, nonzero sanitizer result, missing measured cell or source mismatch invalidates the panel."
+  ],
+  "decision_rule": {
+    "text": "C1 requires all equality checks, matching cross-arm witnesses and visited counts, radix bounds and zero sanitizer errors. C2 requires exact API payload accounting and all fixed fixtures fit the radix encoding. L0 timings cannot decide certified speedup or fastest-tool status.",
+    "comparison_ids": [
+      "C-native"
+    ],
+    "threshold": "all correctness checks pass; u=x=w+16 and w=2*v query payload bytes on every cell",
+    "statistic": "exact query API payload accounting; descriptive latency median/min/max",
+    "interval": "exact counts; diagnostic full observed range, no confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "query host/device payload byte difference and ratio, excluding prepare and physical bus framing",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.rs",
+      "sha256": "24918adcf534e3425c743c7802e209c2af54c6132c99e5bd7602d4ecdd9cd306"
+    },
+    "inputs": [
+      "rows.csv"
+    ],
+    "outputs": [
+      "summary.csv",
+      "latency.svg",
+      "analysis.log"
+    ],
+    "blinded": true,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-arm four-query diagnostic latency with full ranges"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Treating L0 clocks as certified speedups",
+    "Omitting prepare/context costs from a full-pipeline claim",
+    "Changing fixtures or repeat count after observing data",
+    "Calling query API payload bytes total memory traffic",
+    "Claiming fastest-tool status without an equivalent external query implementation comparison"
+  ],
+  "literature": [
+    {
+      "ref": "https://docs.nvidia.com/cuda/cuda-runtime-api/api-sync-behavior.html",
+      "provenance": "retrieved",
+      "claim": "Pageable host uploads can synchronize and stage; blocking device readbacks complete before return; device memsetAsync is asynchronous with respect to host.",
+      "verified_by": "Primary documentation read before implementation,2026-10-30 UTC"
+    },
+    {
+      "ref": "https://docs.nvidia.com/cuda/cuda-runtime-api/cuda_runtime_api/group__CUDART__MEMORY.html",
+      "provenance": "retrieved",
+      "claim": "cudaMemsetAsync fills bytes and uses default stream semantics, allowing ordered all-ones reset before the same-stream search.",
+      "verified_by": "Primary documentation read before implementation,2026-10-30 UTC"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "5b519ba744fbe7c14a1ab32296959d322bb467f64044536fcc2c5523253ce020",
+    "commit": "3825b0bfdf9297c55c4e783e4528bd54ba346487",
+    "frozen_at": "2026-10-30T02:14:24Z",
+    "filed_before_affected_data": true
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "schema": "ecbench.spec/v1",
+  "description": "Development control inputs only. Not a frozen performance protocol or launch authorization. No experiment has run.",
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261030,
+    "isolation_required": "L2",
+    "timeout_seconds": 120
+  },
+  "label": "APS development controls: first three leads",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 101,
+        "a": 59,
+        "b": 6,
+        "group_order": 107,
+        "r": 107,
+        "gx": 78,
+        "gy": 4
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261030
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_v2"
+      }
+    },
+    {
+      "name": "legacy-partition",
+      "role": "baseline",
+      "method": {
+        "id": "ic.aps_v1",
+        "params": {
+          "encoding": "partitioned3",
+          "roots": "legacy",
+          "stop": "exhaustive",
+          "labels": "guaranteed",
+          "subset_size": "2",
+          "attempts": "8",
+          "degree": "24",
+          "budget_ms": "10000",
+          "sampling_draws": "1000",
+          "orbit": "none",
+          "beta": "0",
+          "lambda": "0",
+          "prune": "false"
+        }
+      }
+    },
+    {
+      "name": "exact-partition",
+      "role": "candidate",
+      "method": {
+        "id": "ic.aps_v1",
+        "params": {
+          "encoding": "partitioned3",
+          "roots": "exact",
+          "stop": "exhaustive",
+          "labels": "guaranteed",
+          "subset_size": "2",
+          "attempts": "8",
+          "degree": "24",
+          "budget_ms": "10000",
+          "sampling_draws": "1000",
+          "orbit": "none",
+          "beta": "0",
+          "lambda": "0",
+          "prune": "false"
+        }
+      }
+    },
+    {
+      "name": "exact-partition-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.aps_v1",
+        "params": {
+          "encoding": "partitioned3",
+          "roots": "exact",
+          "stop": "exhaustive",
+          "labels": "guaranteed",
+          "subset_size": "2",
+          "attempts": "8",
+          "degree": "24",
+          "budget_ms": "10000",
+          "sampling_draws": "1000",
+          "orbit": "none",
+          "beta": "0",
+          "lambda": "0",
+          "prune": "false"
+        }
+      }
+    },
+    {
+      "name": "first-partition",
+      "role": "candidate",
+      "method": {
+        "id": "ic.aps_v1",
+        "params": {
+          "encoding": "partitioned3",
+          "roots": "exact",
+          "stop": "first_informative",
+          "labels": "guaranteed",
+          "subset_size": "2",
+          "attempts": "8",
+          "degree": "24",
+          "budget_ms": "10000",
+          "sampling_draws": "1000",
+          "orbit": "none",
+          "beta": "0",
+          "lambda": "0",
+          "prune": "false"
+        }
+      }
+    },
+    {
+      "name": "unordered",
+      "role": "baseline",
+      "method": {
+        "id": "ic.aps_v1",
+        "params": {
+          "encoding": "unordered3",
+          "roots": "exact",
+          "stop": "exhaustive",
+          "labels": "guaranteed",
+          "subset_size": "2",
+          "attempts": "8",
+          "degree": "24",
+          "budget_ms": "10000",
+          "sampling_draws": "1000",
+          "orbit": "none",
+          "beta": "0",
+          "lambda": "0",
+          "prune": "false"
+        }
+      }
+    },
+    {
+      "name": "line",
+      "role": "candidate",
+      "method": {
+        "id": "ic.aps_v1",
+        "params": {
+          "encoding": "line3",
+          "roots": "exact",
+          "stop": "exhaustive",
+          "labels": "guaranteed",
+          "subset_size": "2",
+          "attempts": "8",
+          "degree": "24",
+          "budget_ms": "10000",
+          "sampling_draws": "1000",
+          "orbit": "none",
+          "beta": "0",
+          "lambda": "0",
+          "prune": "false"
+        }
+      }
+    }
+  ]
+}

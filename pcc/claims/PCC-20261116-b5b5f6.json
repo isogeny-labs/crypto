@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T23:48:35Z",
+ "id": "PCC-20261116-b5b5f6",
+ "kind": "statement",
+ "producer": {
+  "commit": "99f183dfedae515b24b7173670522996a2dd8bff",
+  "model": "",
+  "session": "codex-20261116-nist-quotient-degree"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/degree_identity.cpp",
+    "sha256": "094051f7a093774e28c2eac348e79339493698b19241f265b3e3a915d8b7f0e7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-degree-identity.sh",
+    "sha256": "fb165cfd02774cec113afb74ab03973cfa0272364eb12611f2ba0dfb6561b0cf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/degree-identity-v1/quadratic-norm.identity.json",
+    "sha256": "cf47d0a80bd71c479f7517db30ee3e4aa15f12f5d9f7cade10dbac8af3121441"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/degree-identity-v1/cubic-equality.identity.json",
+    "sha256": "26f1e30fc45a5721cb587240d267248bedce4f0c3ae4627b8bb0efbad2957d1b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Generic quadratic-norm multiplicativity and cubic equality formulas pass32 derived-point checks and added-one controls in identity.certificate/v1 field2^61-1. These limited-field structural checks do not assert an inequality over a finite field or verify the geometric degree/polarization proof. Producer-unverified."
+}

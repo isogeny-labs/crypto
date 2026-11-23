@@ -1,0 +1,60 @@
+{
+  "at": "2026-11-13T23:22:36.062819+00:00",
+  "results": [
+    {
+      "test": "ok_without_observed_reap_cannot_mark_or_read_sidecars",
+      "original_exit": 101,
+      "panic": "DiagnosticSessionClock::begin().unwrap():No such file or directory(os error2)",
+      "scope": "one failed/6329filtered each;publication invariants not reached"
+    },
+    {
+      "test": "publication_collision_preserves_previous_bytes_and_pending_failure",
+      "original_exit": 101,
+      "panic": "DiagnosticSessionClock::begin().unwrap():No such file or directory(os error2)",
+      "scope": "one failed/6329filtered each;publication invariants not reached"
+    }
+  ],
+  "all2137guards_unchanged": true,
+  "source_path": "src/cryptanalysis/ecbench/runner.rs",
+  "source_sha256": "a27e70be76ce43ba60f7c2090d7b19a8150af5a7f97bba69faf151c4d66666ab",
+  "source_original": true,
+  "clock_required_reads": [
+    {
+      "name": "boot-id",
+      "command": [
+        "cat",
+        "/proc/sys/kernel/random/boot_id"
+      ],
+      "original_exit": 0,
+      "stdout_bytes": 37,
+      "stdout_sha256": "e80260cc36b7399df720cc101af0dce62b7c702b83e6c91cd3b4830b432fb046",
+      "stderr": ""
+    },
+    {
+      "name": "time-namespace",
+      "command": [
+        "readlink",
+        "/proc/self/ns/time"
+      ],
+      "original_exit": 1,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "name": "time-offsets",
+      "command": [
+        "cat",
+        "/proc/self/timens_offsets"
+      ],
+      "original_exit": 1,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "cat: /proc/self/timens_offsets: No such file or directory\n"
+    }
+  ],
+  "observed_blocker": "container lacks original mandatory /proc/self/ns/time and /proc/self/timens_offsets;both tests panic at clock initialization before publication assertions",
+  "not_established": "publication assertions on a capable host/global unfiltered root pass/full suite totals",
+  "next": "retain original tests/clock/security checks;use a Linux host exposing required time namespace metadata for future original regression;no unchanged whole retry on this container",
+  "scope": "ordinary exact unit diagnostics;not mathematical/performance/merge evidence"
+}

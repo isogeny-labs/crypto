@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 560" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <style>
+    .box{fill:#f6f7f9;stroke:#59636e;stroke-width:1.2}
+    .q{fill:#e8f0fb;stroke:#2f6db5;stroke-width:1.4}
+    .dead{fill:#fbeaea;stroke:#b33a3a;stroke-width:1.2}
+    .live{fill:#eaf6ec;stroke:#2e8b47;stroke-width:1.4}
+    .t{fill:#1f2328}
+    .s{fill:#59636e;font-size:11px}
+    line,path{stroke:#59636e;stroke-width:1.2;fill:none}
+  </style>
+  <text x="490" y="26" text-anchor="middle" font-size="16" font-weight="bold" class="t">Where non-Semaev structures for E/F_p are stopped</text>
+  <text x="490" y="44" text-anchor="middle" class="s">[pcc:unverified] synthesis; verdicts as recorded in the cited files; T = Lemma T (this note)</text>
+
+  <rect class="q" x="330" y="60" width="320" height="46" rx="6"/>
+  <text x="490" y="80" text-anchor="middle" class="t">Candidate structure replacing the subfield</text>
+  <text x="490" y="97" text-anchor="middle" class="s">what job does it do?</text>
+
+  <path d="M410 106 L190 150"/><path d="M490 106 L490 150"/><path d="M570 106 L790 150"/>
+
+  <rect class="q" x="60" y="150" width="260" height="50" rx="6"/>
+  <text x="190" y="170" text-anchor="middle" class="t">Addition encoding</text>
+  <text x="190" y="187" text-anchor="middle" class="s">elliptic-net Ψ, RR / Frobenius-Stickelberger</text>
+
+  <rect class="q" x="360" y="150" width="260" height="50" rx="6"/>
+  <text x="490" y="170" text-anchor="middle" class="t">Membership / presentation</text>
+  <text x="490" y="187" text-anchor="middle" class="s">division-poly, Lattès, isogeny towers</text>
+
+  <rect class="q" x="660" y="150" width="260" height="50" rx="6"/>
+  <text x="790" y="170" text-anchor="middle" class="t">Relation source w/o membership</text>
+  <text x="790" y="187" text-anchor="middle" class="s">Hecke, Heegner/Kolyvagin, isogeny graphs</text>
+
+  <path d="M190 200 L190 240"/><path d="M490 200 L490 240"/><path d="M790 200 L790 240"/>
+
+  <rect class="dead" x="60" y="240" width="260" height="64" rx="6"/>
+  <text x="190" y="261" text-anchor="middle" class="t">Encoding is not the cost</text>
+  <text x="190" y="278" text-anchor="middle" class="s">group-law d_reg = 2 everywhere; Edwards and</text>
+  <text x="190" y="293" text-anchor="middle" class="s">shape-matched nulls equal (barrier map §1)</text>
+
+  <rect class="dead" x="360" y="240" width="260" height="64" rx="6"/>
+  <text x="490" y="261" text-anchor="middle" class="t">L1-L3: membership degree ≥ B</text>
+  <text x="490" y="278" text-anchor="middle" class="s">or a degree-d tower (PKM); ψ_m on E: exact</text>
+  <text x="490" y="293" text-anchor="middle" class="s">obstruction; isogeny tower = Kummer D</text>
+
+  <rect class="dead" x="660" y="240" width="260" height="64" rx="6"/>
+  <text x="790" y="261" text-anchor="middle" class="t">T: target connection ≥ n/(2B)</text>
+  <text x="790" y="278" text-anchor="middle" class="s">total ≥ √(2cn); beats rho-neg only if</text>
+  <text x="790" y="293" text-anchor="middle" class="s">c &lt; 0.39 ops per known-log point</text>
+
+  <path d="M190 304 L380 380"/><path d="M490 304 L490 380"/>
+  <path d="M790 304 L790 380"/>
+
+  <rect class="live" x="300" y="380" width="380" height="74" rx="6"/>
+  <text x="490" y="401" text-anchor="middle" class="t" font-weight="bold">Only unfiltered class: bounded tower degree D</text>
+  <text x="490" y="419" text-anchor="middle" class="s">measured slope 0.125-0.15/level; need D ≲ 10 at N ≈ 256</text>
+  <text x="490" y="436" text-anchor="middle" class="s">next: radix-vs-levels + RR-encoding arm at m = 4 (§6)</text>
+
+  <rect class="box" x="700" y="380" width="220" height="74" rx="6"/>
+  <text x="810" y="401" text-anchor="middle" class="t">Escape from T</text>
+  <text x="810" y="419" text-anchor="middle" class="s">non-generic use of R's coordinates</text>
+  <text x="810" y="436" text-anchor="middle" class="s">= membership again (L1-L3)</text>
+
+  <rect class="box" x="60" y="380" width="220" height="74" rx="6"/>
+  <text x="170" y="401" text-anchor="middle" class="t">Also closed</text>
+  <text x="170" y="419" text-anchor="middle" class="s">xedni / heights, p-adic split,</text>
+  <text x="170" y="436" text-anchor="middle" class="s">pairings, same-field covers, k-SUM</text>
+
+  <text x="490" y="500" text-anchor="middle" class="s">Open, not covered by T: coordinate-revealing (non-GGM) oracles; relations that already involve R (no construction known).</text>
+  <text x="490" y="520" text-anchor="middle" class="s">Sources: RESEARCH_PRIME_FIELD_BARRIER_MAP_20261104.md; semaev_alternatives_audit_20261104; RESEARCH_PKM_TOWER_ORACLE.md;</text>
+  <text x="490" y="536" text-anchor="middle" class="s">RESEARCH_EDS_RESIDUE.md; pair46 07-torsion-division; RESEARCH_ISOGENY_FIBERS_ECDLP.md; hecke-sparse-target-20261030.</text>
+</svg>

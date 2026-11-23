@@ -1,0 +1,108 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-n83-sat-boundary-20261019-free",
+  "experiment_id": "n83-sat-boundary-20261019",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "commit": "5e9ee5d4b1aa6ca22368213e5bc05b343e00bfb4",
+  "receipt": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free.receipt.json",
+  "binds": [
+    {
+      "path": "/home/ec2-user/scratch/n83-sat-boundary-20261019/runner-target/release/n83-sweep-runner",
+      "sha256": "51748c18f75a9e728c1709e27ae64603891246e8e0cbe19aa40f23c538e0f0cb"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-sat-boundary-20261019/PROTOCOL.md",
+      "sha256": "685f42fbb1412e4ea92a6cfb28763567f6f2d36db941ea0f978b1c003f5861a4"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/bin/docker",
+      "sha256": "be7b67b49e885cf85867da63de8fae7021178b89e056c97dce34707657fd3d54"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/src/cryptanalysis/sat.rs",
+      "sha256": "0c6a1230df392a9810b253595a9be2124e34ebeca485f347d240ec34d7703ede"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/examples/koblitz_n83_fixed_witness_control.rs",
+      "sha256": "38a12c2aa7d69219942a49d97337b830218152617e7cacce6203c680238ba314"
+    },
+    {
+      "path": "/home/ec2-user/crypto-n83-resume/examples/koblitz_n83_selector_witness_control.rs",
+      "sha256": "8e88ad07d21844d0fb1a8be2a0763a38e75152d06809cb606ad9a55780937e54"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-sat-boundary-20261019/specs/free.json",
+      "sha256": "af01dc384d0098c0e7e3d94aed3c45a356efcc336036a907bd5b7411255be5e6"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-sat-boundary-20261019/worker-target/release/examples/koblitz_n83_fixed_witness_control",
+      "sha256": "cef358ec89ddb654c4945caf623924dcfeaece8b95139c15ed9c938b9e5ac34b"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/inputs/witness/domains.json",
+      "sha256": "63accc5b9dc9de6327c5b07e93b3e62717f8376a96c3f91f7bb70b77095f23bb"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-native-phase-20261019/inputs/witness/fixture.json",
+      "sha256": "fc203db28eed0164e47b0c755c3d9a09f80df1acd5e4c7e09dfe172fa5f0a538"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures/probe-corpus.json",
+      "sha256": "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd"
+    },
+    {
+      "path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/inputs/fixtures/probe-validation.json",
+      "sha256": "1c6d3a45c8b4654ff208751258fa2e34f0cc60e1c30ba48e9214db62be60472f"
+    }
+  ],
+  "must_not_exist": [
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free.stdout",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free.stderr",
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free.receipt.json"
+  ],
+  "commands": [
+    {
+      "id": "free",
+      "argv": [
+        "/home/ec2-user/scratch/n83-sat-boundary-20261019/runner-target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-sat-boundary-20261019/specs/free.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free"
+      ],
+      "timeout_seconds": 240,
+      "success_exit_codes": [
+        0,
+        1
+      ],
+      "stdout": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free.stdout",
+      "stderr": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free.stderr",
+      "outputs": [
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/audit.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/config.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/custody.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/outer.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/inspect-live.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/inspect-final.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/stderr.log",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/stdout.log",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/spec.json"
+      ]
+    }
+  ],
+  "bus_address": "executor-mechanical-n83-sat-free",
+  "background": false,
+  "write_scope": [
+    "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/"
+  ],
+  "stop_when": [
+    "Native card validation refuses execution.",
+    "A bound digest differs or the pinned commit differs from HEAD.",
+    "A command exceeds its deadline or has an unaccepted exit code.",
+    "A declared output is missing."
+  ],
+  "notes": "Parent dispatch requires the pinned-selector positive gate to pass. Accepted runner exit1 requires all declared outputs, including native audit, trace validation and cleanup evidence. A censored free-selector positive control remains failed. No concurrent builds, tests or other task workloads during observation. Preserve all failures; no performance claim.",
+  "native_path": "/home/ec2-user/scratch/n83-docker-sweep-20261018/bin:/home/ec2-user/.cargo/bin:/home/ec2-user/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+}

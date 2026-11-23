@@ -1,0 +1,396 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-12T22:25:28+00:00",
+  "commands": [
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "./target/release/cover_pushforward_deg3 --seeds 15 --instances 3 --json research/cover_pushforward_deg3_20261112/deg3.json --svg research/cover_pushforward_deg3_20261112/deg3.svg > research/cover_pushforward_deg3_20261112/run.log 2>&1"
+      ],
+      "cwd": ".",
+      "exit": 1,
+      "started_utc": "2026-11-12T21:49:33+00:00",
+      "wall_s": 280.389
+    }
+  ],
+  "commit": "8826262bcc90d899dacb8efa838633fcf4ee8363",
+  "commit_dirty": true,
+  "created_utc": "2026-11-12T21:49:28+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-chained-prime-transfer"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261112T2149Z-cover-pushforward-deg3",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_full_stop_group_ops_p53",
+      "note": "IC on J(C) of the degree-3 genus-4 cover, full stop rule (nfb+8 rows); mean over 3 instances x 15 seeds, spread = min..max of instance means; reference = rho_reference mean on E same seeds; LA unpriced (w=0); gap to rho = distance remaining, identical counts in the native E fibre arm",
+      "reference": 198.8,
+      "reference_kind": "matched_rho",
+      "spread": [
+        518.9,
+        1905.0
+      ],
+      "unit": "gae",
+      "value": 1315.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_first_collision_group_ops_p53",
+      "note": "J(C) relation list read at the first repeated image +-Q; median over 3 instances x 15 seeds, spread = min..max of seeds; reference = median rho_reference on E; no genus-4 structure used beyond the acceptance filter",
+      "reference": 214.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        11.0,
+        398.0
+      ],
+      "unit": "gae",
+      "value": 71.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_full_stop_group_ops_p79",
+      "note": "IC on J(C) of the degree-3 genus-4 cover, full stop rule (nfb+8 rows); mean over 3 instances x 15 seeds, spread = min..max of instance means; reference = rho_reference mean on E same seeds; LA unpriced (w=0); gap to rho = distance remaining, identical counts in the native E fibre arm",
+      "reference": 196.1,
+      "reference_kind": "matched_rho",
+      "spread": [
+        344.6,
+        5881.5
+      ],
+      "unit": "gae",
+      "value": 2649.5
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_first_collision_group_ops_p79",
+      "note": "J(C) relation list read at the first repeated image +-Q; median over 3 instances x 15 seeds, spread = min..max of seeds; reference = median rho_reference on E; no genus-4 structure used beyond the acceptance filter",
+      "reference": 177.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        8.0,
+        792.0
+      ],
+      "unit": "gae",
+      "value": 102.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_full_stop_group_ops_p101",
+      "note": "IC on J(C) of the degree-3 genus-4 cover, full stop rule (nfb+8 rows); mean over 3 instances x 15 seeds, spread = min..max of instance means; reference = rho_reference mean on E same seeds; LA unpriced (w=0); gap to rho = distance remaining, identical counts in the native E fibre arm",
+      "reference": 195.6,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1789.5,
+        2788.1
+      ],
+      "unit": "gae",
+      "value": 2193.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_first_collision_group_ops_p101",
+      "note": "J(C) relation list read at the first repeated image +-Q; median over 3 instances x 15 seeds, spread = min..max of seeds; reference = median rho_reference on E; no genus-4 structure used beyond the acceptance filter",
+      "reference": 189.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        19.0,
+        416.0
+      ],
+      "unit": "gae",
+      "value": 80.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_full_stop_group_ops_p131",
+      "note": "IC on J(C) of the degree-3 genus-4 cover, full stop rule (nfb+8 rows); mean over 3 instances x 15 seeds, spread = min..max of instance means; reference = rho_reference mean on E same seeds; LA unpriced (w=0); gap to rho = distance remaining, identical counts in the native E fibre arm",
+      "reference": 303.3,
+      "reference_kind": "matched_rho",
+      "spread": [
+        3937.6,
+        6543.9
+      ],
+      "unit": "gae",
+      "value": 5134.4
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_first_collision_group_ops_p131",
+      "note": "J(C) relation list read at the first repeated image +-Q; median over 3 instances x 15 seeds, spread = min..max of seeds; reference = median rho_reference on E; no genus-4 structure used beyond the acceptance filter",
+      "reference": 285.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        23.0,
+        719.0
+      ],
+      "unit": "gae",
+      "value": 171.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_full_stop_group_ops_p151",
+      "note": "IC on J(C) of the degree-3 genus-4 cover, full stop rule (nfb+8 rows); mean over 3 instances x 15 seeds, spread = min..max of instance means; reference = rho_reference mean on E same seeds; LA unpriced (w=0); gap to rho = distance remaining, identical counts in the native E fibre arm",
+      "reference": 260.6,
+      "reference_kind": "matched_rho",
+      "spread": [
+        2210.9,
+        5985.3
+      ],
+      "unit": "gae",
+      "value": 4720.6
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_first_collision_group_ops_p151",
+      "note": "J(C) relation list read at the first repeated image +-Q; median over 3 instances x 15 seeds, spread = min..max of seeds; reference = median rho_reference on E; no genus-4 structure used beyond the acceptance filter",
+      "reference": 269.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        26.0,
+        557.0
+      ],
+      "unit": "gae",
+      "value": 183.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_full_stop_group_ops_p181",
+      "note": "IC on J(C) of the degree-3 genus-4 cover, full stop rule (nfb+8 rows); mean over 3 instances x 15 seeds, spread = min..max of instance means; reference = rho_reference mean on E same seeds; LA unpriced (w=0); gap to rho = distance remaining, identical counts in the native E fibre arm",
+      "reference": 310.1,
+      "reference_kind": "matched_rho",
+      "spread": [
+        5196.9,
+        7447.3
+      ],
+      "unit": "gae",
+      "value": 6535.6
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_first_collision_group_ops_p181",
+      "note": "J(C) relation list read at the first repeated image +-Q; median over 3 instances x 15 seeds, spread = min..max of seeds; reference = median rho_reference on E; no genus-4 structure used beyond the acceptance filter",
+      "reference": 293.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        36.0,
+        560.0
+      ],
+      "unit": "gae",
+      "value": 202.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_full_stop_group_ops_p211",
+      "note": "IC on J(C) of the degree-3 genus-4 cover, full stop rule (nfb+8 rows); mean over 3 instances x 15 seeds, spread = min..max of instance means; reference = rho_reference mean on E same seeds; LA unpriced (w=0); gap to rho = distance remaining, identical counts in the native E fibre arm",
+      "reference": 264.7,
+      "reference_kind": "matched_rho",
+      "spread": [
+        4746.0,
+        16496.6
+      ],
+      "unit": "gae",
+      "value": 9648.8
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_first_collision_group_ops_p211",
+      "note": "J(C) relation list read at the first repeated image +-Q; median over 3 instances x 15 seeds, spread = min..max of seeds; reference = median rho_reference on E; no genus-4 structure used beyond the acceptance filter",
+      "reference": 241.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        37.0,
+        779.0
+      ],
+      "unit": "gae",
+      "value": 180.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_full_stop_group_ops_p251",
+      "note": "IC on J(C) of the degree-3 genus-4 cover, full stop rule (nfb+8 rows); mean over 3 instances x 15 seeds, spread = min..max of instance means; reference = rho_reference mean on E same seeds; LA unpriced (w=0); gap to rho = distance remaining, identical counts in the native E fibre arm",
+      "reference": 244.4,
+      "reference_kind": "matched_rho",
+      "spread": [
+        5101.1,
+        6654.7
+      ],
+      "unit": "gae",
+      "value": 5717.2
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "ic_jc_first_collision_group_ops_p251",
+      "note": "J(C) relation list read at the first repeated image +-Q; median over 3 instances x 15 seeds, spread = min..max of seeds; reference = median rho_reference on E; no genus-4 structure used beyond the acceptance filter",
+      "reference": 233.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        14.0,
+        395.0
+      ],
+      "unit": "gae",
+      "value": 100.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 360,
+      "name": "relations_total",
+      "note": "accepted J(C) relations, all cells and seeds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 28815.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 360,
+      "name": "relations_single_full_fibre",
+      "note": "relations equal to exactly one full fibre c^*(Q)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 28815.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 360,
+      "name": "relations_union_or_other",
+      "note": "relations that are not a single full fibre",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 360,
+      "name": "trials_total",
+      "note": "all J(C) trials",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 159508.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 360,
+      "name": "trials_class_equal_pullback",
+      "note": "trials whose reduced class equals c^*(Q) by Mumford equality",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 159508.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 360,
+      "name": "pushed_relations_invalid",
+      "note": "relations whose c_* sum on E differs from [3alpha]G+[3beta]T",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 360,
+      "name": "seed_cells_arms_identical",
+      "note": "of 360 seed-cells: J(C) and E fibre arms identical in trials, ops, rows, log",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 360.0
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 1734767,
+      "path": "research/cover_pushforward_deg3_20261112/deg3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d1/d1f1c24bc1dfb1297ba0806d23c56620af032dccc188a82263698e155cf5e9b2",
+      "sha256": "d1f1c24bc1dfb1297ba0806d23c56620af032dccc188a82263698e155cf5e9b2",
+      "uploaded": false
+    },
+    {
+      "bytes": 13198,
+      "path": "research/cover_pushforward_deg3_20261112/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7f/7fa3bc8a23782d4933ef3d395d7660b018a0aa5ed50ec97cf9441aa236fc0853",
+      "sha256": "7fa3bc8a23782d4933ef3d395d7660b018a0aa5ed50ec97cf9441aa236fc0853",
+      "uploaded": false
+    },
+    {
+      "bytes": 6074,
+      "path": "research/cover_pushforward_deg3_20261112/deg3.svg",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d3/d3bae53539e43411f1fd0ea0979b097578db24fbbd8e7b7d50a02b6eaa46c612",
+      "sha256": "d3bae53539e43411f1fd0ea0979b097578db24fbbd8e7b7d50a02b6eaa46c612",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261111-chained-prime-transfer/REPORT_cover_deg3_20261112.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261111-chained-prime-transfer/deg3.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "cover-pushforward-deg3",
+  "status": "measured",
+  "summary": "Degree-3 cover: all 28,815 IC relations on the transferred subgroup are single full fibres c^*(Q); J(C) and E arms identical in 360/360 seed-cells; p<=251 [pcc:unverified]",
+  "validation": null
+}

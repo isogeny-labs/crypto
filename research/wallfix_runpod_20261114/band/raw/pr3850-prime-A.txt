@@ -1,0 +1,117 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-t727-cd198a38 | 19.10 | bsgs | 30/30 | 1.813 | 1.993 | 3.610 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | bsgs-neg | 30/30 | 1.315 | 1.445 | 2.612 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | ic-mitm-igauss | 30/30 | 11.033 | 12.682 | 27.525 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | ic-mitm-sgauss | 30/30 | 11.033 | 12.680 | 27.501 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | ic-rf-mitm-sgauss | 30/30 | 38.831 | 42.511 | 75.632 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | ic-rf-pairs | 30/30 | 1118.419 | 1225.789 | 2192.120 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | kangaroo | 30/30 | 2.103 | 2.127 | 2.349 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | rho-neg | 30/30 | 1.280 | 1.386 | 2.343 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | rho-neg-aa | 30/30 | 1.280 | 1.386 | 2.343 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | rho-plain | 30/30 | 1.739 | 1.739 | 1.739 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | bsgs | 30/30 | 1.812 | 1.993 | 3.620 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | bsgs-neg | 30/30 | 1.312 | 1.443 | 2.621 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | ic-mitm-igauss | 30/30 | 51.081 | 61.139 | 151.658 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | ic-mitm-sgauss | 30/30 | 51.081 | 61.138 | 151.647 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | ic-rf-mitm-sgauss | 30/30 | 187.492 | 206.193 | 374.496 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | ic-rf-pairs | 30/30 | 7151.519 | 7839.130 | 14027.624 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | kangaroo | 30/30 | 2.562 | 2.578 | 2.722 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | rho-neg | 30/30 | 1.052 | 1.148 | 2.013 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | rho-neg-aa | 30/30 | 1.052 | 1.148 | 2.013 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | rho-plain | 30/30 | 1.423 | 1.423 | 1.423 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-t727-cd198a38 | bsgs vs bsgs-neg | bsgs-neg < bsgs |
+| icv1-fp20-t727-cd198a38 | bsgs vs ic-mitm-igauss | bsgs < ic-mitm-igauss |
+| icv1-fp20-t727-cd198a38 | bsgs vs ic-mitm-sgauss | bsgs < ic-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | bsgs vs ic-rf-mitm-sgauss | bsgs < ic-rf-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | bsgs vs ic-rf-pairs | bsgs < ic-rf-pairs |
+| icv1-fp20-t727-cd198a38 | bsgs vs kangaroo | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | bsgs vs rho-neg | rho-neg < bsgs |
+| icv1-fp20-t727-cd198a38 | bsgs vs rho-neg-aa | rho-neg-aa < bsgs |
+| icv1-fp20-t727-cd198a38 | bsgs vs rho-plain | rho-plain < bsgs |
+| icv1-fp20-t727-cd198a38 | bsgs-neg vs ic-mitm-igauss | bsgs-neg < ic-mitm-igauss |
+| icv1-fp20-t727-cd198a38 | bsgs-neg vs ic-mitm-sgauss | bsgs-neg < ic-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | bsgs-neg vs ic-rf-mitm-sgauss | bsgs-neg < ic-rf-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | bsgs-neg vs ic-rf-pairs | bsgs-neg < ic-rf-pairs |
+| icv1-fp20-t727-cd198a38 | bsgs-neg vs kangaroo | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp20-t727-cd198a38 | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp20-t727-cd198a38 | bsgs-neg vs rho-plain | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | ic-mitm-igauss vs ic-mitm-sgauss | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | ic-mitm-igauss vs ic-rf-mitm-sgauss | ic-mitm-igauss < ic-rf-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-mitm-igauss vs ic-rf-pairs | ic-mitm-igauss < ic-rf-pairs |
+| icv1-fp20-t727-cd198a38 | ic-mitm-igauss vs kangaroo | kangaroo < ic-mitm-igauss |
+| icv1-fp20-t727-cd198a38 | ic-mitm-igauss vs rho-neg | rho-neg < ic-mitm-igauss |
+| icv1-fp20-t727-cd198a38 | ic-mitm-igauss vs rho-neg-aa | rho-neg-aa < ic-mitm-igauss |
+| icv1-fp20-t727-cd198a38 | ic-mitm-igauss vs rho-plain | rho-plain < ic-mitm-igauss |
+| icv1-fp20-t727-cd198a38 | ic-mitm-sgauss vs ic-rf-mitm-sgauss | ic-mitm-sgauss < ic-rf-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-mitm-sgauss vs ic-rf-pairs | ic-mitm-sgauss < ic-rf-pairs |
+| icv1-fp20-t727-cd198a38 | ic-mitm-sgauss vs kangaroo | kangaroo < ic-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-mitm-sgauss vs rho-neg | rho-neg < ic-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-mitm-sgauss vs rho-neg-aa | rho-neg-aa < ic-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-mitm-sgauss vs rho-plain | rho-plain < ic-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-rf-mitm-sgauss vs ic-rf-pairs | ic-rf-mitm-sgauss < ic-rf-pairs |
+| icv1-fp20-t727-cd198a38 | ic-rf-mitm-sgauss vs kangaroo | kangaroo < ic-rf-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-rf-mitm-sgauss vs rho-neg | rho-neg < ic-rf-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-rf-mitm-sgauss vs rho-neg-aa | rho-neg-aa < ic-rf-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-rf-mitm-sgauss vs rho-plain | rho-plain < ic-rf-mitm-sgauss |
+| icv1-fp20-t727-cd198a38 | ic-rf-pairs vs kangaroo | kangaroo < ic-rf-pairs |
+| icv1-fp20-t727-cd198a38 | ic-rf-pairs vs rho-neg | rho-neg < ic-rf-pairs |
+| icv1-fp20-t727-cd198a38 | ic-rf-pairs vs rho-neg-aa | rho-neg-aa < ic-rf-pairs |
+| icv1-fp20-t727-cd198a38 | ic-rf-pairs vs rho-plain | rho-plain < ic-rf-pairs |
+| icv1-fp20-t727-cd198a38 | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp20-t727-cd198a38 | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp20-t727-cd198a38 | kangaroo vs rho-plain | rho-plain < kangaroo |
+| icv1-fp20-t727-cd198a38 | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | rho-neg vs rho-plain | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | rho-neg-aa vs rho-plain | unresolved inside the band |
+| icv1-fp24-t1059-6df599df | bsgs vs bsgs-neg | bsgs-neg < bsgs |
+| icv1-fp24-t1059-6df599df | bsgs vs ic-mitm-igauss | bsgs < ic-mitm-igauss |
+| icv1-fp24-t1059-6df599df | bsgs vs ic-mitm-sgauss | bsgs < ic-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | bsgs vs ic-rf-mitm-sgauss | bsgs < ic-rf-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | bsgs vs ic-rf-pairs | bsgs < ic-rf-pairs |
+| icv1-fp24-t1059-6df599df | bsgs vs kangaroo | unresolved inside the band |
+| icv1-fp24-t1059-6df599df | bsgs vs rho-neg | rho-neg < bsgs |
+| icv1-fp24-t1059-6df599df | bsgs vs rho-neg-aa | rho-neg-aa < bsgs |
+| icv1-fp24-t1059-6df599df | bsgs vs rho-plain | rho-plain < bsgs |
+| icv1-fp24-t1059-6df599df | bsgs-neg vs ic-mitm-igauss | bsgs-neg < ic-mitm-igauss |
+| icv1-fp24-t1059-6df599df | bsgs-neg vs ic-mitm-sgauss | bsgs-neg < ic-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | bsgs-neg vs ic-rf-mitm-sgauss | bsgs-neg < ic-rf-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | bsgs-neg vs ic-rf-pairs | bsgs-neg < ic-rf-pairs |
+| icv1-fp24-t1059-6df599df | bsgs-neg vs kangaroo | bsgs-neg < kangaroo |
+| icv1-fp24-t1059-6df599df | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp24-t1059-6df599df | bsgs-neg vs rho-neg-aa | rho-neg-aa < bsgs-neg |
+| icv1-fp24-t1059-6df599df | bsgs-neg vs rho-plain | unresolved inside the band |
+| icv1-fp24-t1059-6df599df | ic-mitm-igauss vs ic-mitm-sgauss | unresolved inside the band |
+| icv1-fp24-t1059-6df599df | ic-mitm-igauss vs ic-rf-mitm-sgauss | ic-mitm-igauss < ic-rf-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-mitm-igauss vs ic-rf-pairs | ic-mitm-igauss < ic-rf-pairs |
+| icv1-fp24-t1059-6df599df | ic-mitm-igauss vs kangaroo | kangaroo < ic-mitm-igauss |
+| icv1-fp24-t1059-6df599df | ic-mitm-igauss vs rho-neg | rho-neg < ic-mitm-igauss |
+| icv1-fp24-t1059-6df599df | ic-mitm-igauss vs rho-neg-aa | rho-neg-aa < ic-mitm-igauss |
+| icv1-fp24-t1059-6df599df | ic-mitm-igauss vs rho-plain | rho-plain < ic-mitm-igauss |
+| icv1-fp24-t1059-6df599df | ic-mitm-sgauss vs ic-rf-mitm-sgauss | ic-mitm-sgauss < ic-rf-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-mitm-sgauss vs ic-rf-pairs | ic-mitm-sgauss < ic-rf-pairs |
+| icv1-fp24-t1059-6df599df | ic-mitm-sgauss vs kangaroo | kangaroo < ic-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-mitm-sgauss vs rho-neg | rho-neg < ic-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-mitm-sgauss vs rho-neg-aa | rho-neg-aa < ic-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-mitm-sgauss vs rho-plain | rho-plain < ic-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-rf-mitm-sgauss vs ic-rf-pairs | ic-rf-mitm-sgauss < ic-rf-pairs |
+| icv1-fp24-t1059-6df599df | ic-rf-mitm-sgauss vs kangaroo | kangaroo < ic-rf-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-rf-mitm-sgauss vs rho-neg | rho-neg < ic-rf-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-rf-mitm-sgauss vs rho-neg-aa | rho-neg-aa < ic-rf-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-rf-mitm-sgauss vs rho-plain | rho-plain < ic-rf-mitm-sgauss |
+| icv1-fp24-t1059-6df599df | ic-rf-pairs vs kangaroo | kangaroo < ic-rf-pairs |
+| icv1-fp24-t1059-6df599df | ic-rf-pairs vs rho-neg | rho-neg < ic-rf-pairs |
+| icv1-fp24-t1059-6df599df | ic-rf-pairs vs rho-neg-aa | rho-neg-aa < ic-rf-pairs |
+| icv1-fp24-t1059-6df599df | ic-rf-pairs vs rho-plain | rho-plain < ic-rf-pairs |
+| icv1-fp24-t1059-6df599df | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp24-t1059-6df599df | kangaroo vs rho-neg-aa | rho-neg-aa < kangaroo |
+| icv1-fp24-t1059-6df599df | kangaroo vs rho-plain | rho-plain < kangaroo |
+| icv1-fp24-t1059-6df599df | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp24-t1059-6df599df | rho-neg vs rho-plain | unresolved inside the band |
+| icv1-fp24-t1059-6df599df | rho-neg-aa vs rho-plain | unresolved inside the band |

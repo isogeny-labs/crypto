@@ -1,0 +1,58 @@
+{
+  "schema": "bench.record/v1",
+  "id": "20261116T1611Z-trace-runpod-preflight",
+  "slug": "trace-runpod-preflight",
+  "problem": "ecdlp:prime-random-labelled-pools-trace-incidence",
+  "repo": "crypto",
+  "created_utc": "2026-11-16T16:11:23.000Z",
+  "closed_utc": "2026-11-16T16:14:01Z",
+  "status": "invalid",
+  "commit": "c7b146a05b543beb66e42a2d5f1c869d90a672b1",
+  "commit_dirty": false,
+  "branch": "lane/trace-incidence",
+  "host": {
+    "cpu": "AMD EPYC 9575F 64-Core Processor",
+    "cpus_online": 128,
+    "hostname": "8yoqn5n838rcfp",
+    "platform": "Runpod digest-pinned Debian trixie amd64",
+    "isolation": "shared host; no L2; measured processes pinned to one CPU",
+    "requested_vcpus": 8,
+    "requested_memory_gb": 16,
+    "measurement_threads": 1
+  },
+  "entries": [
+    "benchmarks/20261116-trace-incidence-runpod"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_incidence_20261116/runpod/job.sh"
+      ],
+      "cwd": "/workspace/source",
+      "exit": 129,
+      "recording_scope": "Retrospective administrative transcription from sealed worker source/exit receipts; native job not launched through Python benchrec."
+    }
+  ],
+  "raw": [
+    {
+      "path": "research/trace_incidence_20261116/runpod/attempt-1/results.tar.gz",
+      "sha256": "db2d28bd5543fc42300a30a9e259363fb8f836caee5acb4281f27dd3d1817fd6",
+      "bytes": 244872,
+      "s3_uri": "s3://setec-astronomy-artifacts/store/runpod/trace-incidence/c7b146a05b543beb66e42a2d5f1c869d90a672b1/43904307401/results.tar.gz",
+      "uploaded": true
+    }
+  ],
+  "metrics": [],
+  "reports": {
+    "pdf": "benchmarks/20261116-trace-incidence-runpod/PREFLIGHT_REPORT.pdf",
+    "svg": [
+      "benchmarks/20261116-trace-incidence-runpod/preflight.svg"
+    ],
+    "png": [
+      "benchmarks/20261116-trace-incidence-runpod/preflight.png"
+    ]
+  },
+  "validation": null,
+  "summary": "[pcc:unverified] Preflight exit129 before timing; native checks passed; unsupported Git option corrected in explicit pre-data amendment. Pod deleted and archive/readback retained."
+}

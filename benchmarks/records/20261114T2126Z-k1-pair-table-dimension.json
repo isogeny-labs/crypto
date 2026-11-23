@@ -1,0 +1,179 @@
+{
+  "branch": "claude/relation-yield-index-calculus-97c347",
+  "closed_utc": "2026-11-14T21:27:17+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-I",
+        "research/ml_cryptanalysis_pt_lgrow_k1_20261114/summarize.py",
+        "--check"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T21:26:28+00:00",
+      "wall_s": 0.102
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validation_gate.py",
+        "evidence",
+        "benchmarks/20261114-k1-pair-table-dimension"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T21:26:28+00:00",
+      "wall_s": 0.065
+    },
+    {
+      "argv": [
+        "python3",
+        "-I",
+        "benchmarks/20261114-k1-pair-table-dimension/plot.py"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T21:26:28+00:00",
+      "wall_s": 1.134
+    }
+  ],
+  "commit": "e4578bec2272d2a973908142f26017caf1f6bda9",
+  "commit_dirty": true,
+  "created_utc": "2026-11-14T21:26:24+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261114-k1-pair-table-dimension"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T2126Z-k1-pair-table-dimension",
+  "metrics": [
+    {
+      "baseline": 109.3461,
+      "better": "lower",
+      "n": 40,
+      "name": "k1n23_pt_dim9_s_w0",
+      "note": "icv1-f2m23-tm5197-1f85e9e1 (r = 2^22.00); mean S per verified solve, native work at w = 0 GAE (AGENTS.md 5a); baseline pair-table dimension 7, reference rho.signed_frobenius_strong, same session and targets; gap to rho 5.59 bits [5.54, 5.65] (dimension 7: 6.91); copied from summary.json, not re-run; [pcc:unverified]",
+      "reference": 0.9082,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 43.8958
+    },
+    {
+      "baseline": 120.2198,
+      "better": "lower",
+      "n": 40,
+      "name": "k1n23_pt_dim9_s_w01",
+      "note": "icv1-f2m23-tm5197-1f85e9e1 (r = 2^22.00); mean S per verified solve, native work at w = 0.1 GAE (AGENTS.md 5a); baseline pair-table dimension 7, reference rho.signed_frobenius_strong, same session and targets; gap to rho 5.66 bits [5.60, 5.73] (dimension 7: 6.94); copied from summary.json, not re-run; [pcc:unverified]",
+      "reference": 0.9775,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 49.3937
+    },
+    {
+      "baseline": 218.084,
+      "better": "lower",
+      "n": 40,
+      "name": "k1n23_pt_dim9_s_w1",
+      "note": "icv1-f2m23-tm5197-1f85e9e1 (r = 2^22.00); mean S per verified solve, native work at w = 1 GAE (AGENTS.md 5a); baseline pair-table dimension 7, reference rho.signed_frobenius_strong, same session and targets; gap to rho 5.95 bits [5.85, 6.06] (dimension 7: 7.09); copied from summary.json, not re-run; [pcc:unverified]",
+      "reference": 1.601,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 98.8753
+    },
+    {
+      "baseline": 5891.5172,
+      "better": "lower",
+      "n": 40,
+      "name": "k1n29_pt_dim10_s_w0",
+      "note": "icv1-f2m29-tm40309-30c52b96 (r = 2^15.37); mean S per verified solve, native work at w = 0 GAE (AGENTS.md 5a); baseline pair-table dimension 7, reference rho.signed_frobenius_strong, same session and targets; gap to rho 9.47 bits [9.38, 9.54] (dimension 7: 10.36); copied from summary.json, not re-run; [pcc:unverified]",
+      "reference": 4.4904,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 3181.6462
+    },
+    {
+      "baseline": 6478.2622,
+      "better": "lower",
+      "n": 40,
+      "name": "k1n29_pt_dim10_s_w01",
+      "note": "icv1-f2m29-tm40309-30c52b96 (r = 2^15.37); mean S per verified solve, native work at w = 0.1 GAE (AGENTS.md 5a); baseline pair-table dimension 7, reference rho.signed_frobenius_strong, same session and targets; gap to rho 9.52 bits [9.43, 9.59] (dimension 7: 10.46); copied from summary.json, not re-run; [pcc:unverified]",
+      "reference": 4.5924,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 3375.461
+    },
+    {
+      "baseline": 11758.9673,
+      "better": "lower",
+      "n": 40,
+      "name": "k1n29_pt_dim10_s_w1",
+      "note": "icv1-f2m29-tm40309-30c52b96 (r = 2^15.37); mean S per verified solve, native work at w = 1 GAE (AGENTS.md 5a); baseline pair-table dimension 7, reference rho.signed_frobenius_strong, same session and targets; gap to rho 9.86 bits [9.74, 9.95] (dimension 7: 11.06); copied from summary.json, not re-run; [pcc:unverified]",
+      "reference": 5.5104,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 5119.7934
+    }
+  ],
+  "problem": "ecdlp:k1-koblitz-n23-n29-pair-table",
+  "raw": [
+    {
+      "bytes": 581436,
+      "path": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/sessions/n23-j0/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e1/e1e3c72ac6ca7ff9863d45845d00309bde3b2da58846721811cac8818759727c",
+      "sha256": "e1e3c72ac6ca7ff9863d45845d00309bde3b2da58846721811cac8818759727c",
+      "uploaded": false
+    },
+    {
+      "bytes": 581627,
+      "path": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/sessions/n23-j1/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d8/d84d4c5027e3aa296335881ccf778591bbdb91bb4ba4b0fd1631726b2a6998b0",
+      "sha256": "d84d4c5027e3aa296335881ccf778591bbdb91bb4ba4b0fd1631726b2a6998b0",
+      "uploaded": false
+    },
+    {
+      "bytes": 582117,
+      "path": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/sessions/n29-j0/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/de/dee69dfd7f4e4b41aae426ba41ef22005af6159f0d2abd3ccf7d1ef66b1b8529",
+      "sha256": "dee69dfd7f4e4b41aae426ba41ef22005af6159f0d2abd3ccf7d1ef66b1b8529",
+      "uploaded": false
+    },
+    {
+      "bytes": 581986,
+      "path": "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1/sessions/n29-j1/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/01/019184154bc132ee315f7492fbe9ac258eccf4e615c422ffb5b8b05ac23e93d4",
+      "sha256": "019184154bc132ee315f7492fbe9ac258eccf4e615c422ffb5b8b05ac23e93d4",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261114-k1-pair-table-dimension/REPORT.pdf",
+    "png": [
+      "benchmarks/20261114-k1-pair-table-dimension/gap.png",
+      "benchmarks/20261114-k1-pair-table-dimension/fig_lgrow_gap.png"
+    ],
+    "svg": [
+      "benchmarks/20261114-k1-pair-table-dimension/gap.svg",
+      "benchmarks/20261114-k1-pair-table-dimension/fig_lgrow_gap.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "k1-pair-table-dimension",
+  "status": "measured",
+  "summary": "Re-presentation, no new run: K1 one-target cold pair-table dimension 9 (n=23) / 10 (n=29) vs dimension 7 vs matched rho.signed_frobenius_strong, same ecbench session, 40 verified solves an arm, counted GAE, L0. Gap to rho w=0/0.1/1: n=23 5.59/5.66/5.95 bits (dim 7: 6.91/6.94/7.09); n=29 9.47/9.52/9.86 (dim 7: 10.36/10.46/11.06). Rho cheaper at every w. Validation VAL-20261114-d9190c; claim PCC-20261114-8ba038 [pcc:unverified].",
+  "validation": "benchmarks/20261114-k1-pair-table-dimension/VALIDATION.json"
+}

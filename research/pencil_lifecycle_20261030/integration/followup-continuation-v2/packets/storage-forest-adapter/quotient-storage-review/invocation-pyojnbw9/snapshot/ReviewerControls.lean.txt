@@ -1,0 +1,17 @@
+import StorageControls
+set_option autoImplicit false
+namespace StorageReview
+open QuotientStorage CoefficientTraversal MonicRemainder
+def noncanonical : State 1 := put (ProductPolynomial.zeros 1) ⟨0,by decide⟩ 17
+theorem raw_not_rejected : finish noncanonical=[17] := by decide
+theorem canonicality_required : ¬Good 17 noncanonical := by
+ intro h
+ have hh:=h ⟨0,by decide⟩
+ exact (show ¬((CoefficientTraversal.read noncanonical ⟨0,by decide⟩).toNat < (17:UInt64).toNat) by decide) hh
+theorem repeated_zero_trim : finish (put (put (ProductPolynomial.zeros 2) ⟨1,by decide⟩ 9) ⟨1,by decide⟩ 0)=[] := by decide
+theorem full_capacity_endpoint : wordDiv 17 [16,1] [16,0,1] 2=some ([1,1],[]) := by decide
+theorem insufficient_capacity : wloop 17 [16,1] 2 (ProductPolynomial.zeros 1) [16,0,1]=none := by decide
+theorem short_zero_capacity : wloop 17 [0,0,1] 0 (ProductPolynomial.zeros 0) [7]=some (ProductPolynomial.zeros 0,[7]) := by decide
+theorem nonmonic_rejected : wordDiv 17 [2] [2] 2=none := by decide
+theorem final_high_zero_trim : finish (put (ProductPolynomial.zeros 4) ⟨0,by decide⟩ 5)=[5] := by decide
+end StorageReview

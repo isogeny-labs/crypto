@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R104-MARKED23-X1-LEADING-NU-RESIDUE",
+  "version":1,
+  "goal":"compute the leading x=1 residue of the cleared N51 coordinate in the actual y/lambda source order and both maximal-ideal residues",
+  "claims":[{"id":"leading_residue104","class":"exact_computation","statement":"the 22 worst N51 coefficients yield a nonzero standard-basis leading residue with checked images at the two x=1 source-order points"}],
+  "arms":{"reference":"R102 exact coefficient orders and R101 exact fiber","candidate":"source-bound leading residue and Singular quotient evaluation","positive":["22 distinct in-range monomials","rank-112 quotient","nonzero reduced residue"],"negative":["one-term deletion rejection"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact computation"}},
+  "variables":{"fixed":["R102 and R101 SHA-256 pins","F2[l,y]","one Singular thread","120-second timeout","2 GiB cap"],"measured":["leading polynomial","source-order nonzero check","two quadratic-residue images","fresh replay"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation","seeds":[104]},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["leading term count","source-order dimension","two residue images","fresh replay"],
+  "execution":{"backend":"source-bound Python and pinned local Singular","backend_reason":"default EKS image lacks pinned CAS","timeout_seconds_per_program":120,"virtual_KiB_native":2097152,"threads":1,"seed":104,"queue":"one serial exact computation","source_gate":"committed source/protocol and R101/R102 hashes","checkpoint":"retain raw attempts"},
+  "stopping":{"accept":"hashes, 22 distinct standard terms, native exit zero and marker, no native errors, source-order nonzero, changed-term rejection, fresh replay","failure":"retain and amend under new attempt"},
+  "analysis":{"method":"leading coefficient after multiplying N51 relation by (x+1)^9, then source-order and maximal-ideal reductions","scope":"minimal pole bound in the monogenic order, not normalized function valuation"}
+}

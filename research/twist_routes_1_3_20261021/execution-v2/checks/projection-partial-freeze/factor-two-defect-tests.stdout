@@ -1,0 +1,38 @@
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.00s
+
+
+running 9 tests
+test followup::coupled::tests::auxiliary_trace_rows_match_mitm_with_nonzero_twist_parts ... ok
+test followup::coupled::tests::row_elimination_recovers_a_target_without_full_factor_rank ... ok
+test followup::cas_tests::gp_zero_exit_and_marker_cannot_hide_errors_or_input_mutation ... ok
+test followup::gluing::tests::module_rejects_wrong_trace_and_checks_nonsplit_counts ... ok
+test followup::geometry::tests::both_published_maps_replay_and_shifted_maps_fail ... ok
+test followup::projection::tests::twist_embedding_uses_the_standard_model_and_actual_power_frobenius ... ok
+test followup::bigfield::tests::quadratic_squares_and_polynomial_euclid ... ok
+test followup::partial::tests::real_extension_helper_rows_have_identical_source_graph_and_elimination ... FAILED
+test followup::bigfield::tests::tower_field_roundtrip_and_inverses ... ok
+
+failures:
+
+---- followup::partial::tests::real_extension_helper_rows_have_identical_source_graph_and_elimination stdout ----
+
+thread 'followup::partial::tests::real_extension_helper_rows_have_identical_source_graph_and_elimination' panicked at src/followup/partial.rs:123:21:
+assertion `left == right` failed: whole extension relation failed
+  left: Some((Q(45, 0), Q(21, 0)))
+ right: Some((Q(1, 0), Q(29, 0)))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    followup::partial::tests::real_extension_helper_rows_have_identical_source_graph_and_elimination
+
+test result: FAILED. 8 passed; 1 failed; 0 ignored; 0 measured; 99 filtered out; finished in 0.00s
+

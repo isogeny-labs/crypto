@@ -1,0 +1,137 @@
+{
+  "ReservationId": "r-0c3b324264febdec3",
+  "OwnerId": "104186811093",
+  "Groups": [],
+  "Instances": [
+    {
+      "Architecture": "x86_64",
+      "BlockDeviceMappings": [],
+      "ClientToken": "4698314a-ab01-4077-843c-6e06802a7bf8",
+      "EbsOptimized": false,
+      "EnaSupport": true,
+      "Hypervisor": "xen",
+      "InstanceLifecycle": "spot",
+      "NetworkInterfaces": [
+        {
+          "Attachment": {
+            "AttachTime": "2026-10-19T12:42:25+00:00",
+            "AttachmentId": "eni-attach-070fcec9912db8a93",
+            "DeleteOnTermination": true,
+            "DeviceIndex": 0,
+            "Status": "attaching",
+            "NetworkCardIndex": 0
+          },
+          "Description": "",
+          "Groups": [
+            {
+              "GroupId": "sg-0385a48ea263f2070",
+              "GroupName": "n83-cache-retry-20261019-8cde893"
+            }
+          ],
+          "Ipv6Addresses": [],
+          "MacAddress": "0e:ff:fb:5c:a1:b3",
+          "NetworkInterfaceId": "eni-0d3b1540fe530d531",
+          "OwnerId": "104186811093",
+          "PrivateDnsName": "ip-172-31-63-124.us-west-2.compute.internal",
+          "PrivateIpAddress": "172.31.63.124",
+          "PrivateIpAddresses": [
+            {
+              "Primary": true,
+              "PrivateDnsName": "ip-172-31-63-124.us-west-2.compute.internal",
+              "PrivateIpAddress": "172.31.63.124"
+            }
+          ],
+          "SourceDestCheck": true,
+          "Status": "in-use",
+          "SubnetId": "subnet-0ec88345806128652",
+          "VpcId": "vpc-0d4183a7579b59a6a",
+          "InterfaceType": "interface",
+          "Operator": {
+            "Managed": false
+          }
+        }
+      ],
+      "RootDeviceName": "/dev/xvda",
+      "RootDeviceType": "ebs",
+      "SecurityGroups": [
+        {
+          "GroupId": "sg-0385a48ea263f2070",
+          "GroupName": "n83-cache-retry-20261019-8cde893"
+        }
+      ],
+      "SourceDestCheck": true,
+      "SpotInstanceRequestId": "sir-hnbqq15g",
+      "StateReason": {
+        "Code": "pending",
+        "Message": "pending"
+      },
+      "Tags": [
+        {
+          "Key": "Study",
+          "Value": "n83-xor-cache-retry"
+        },
+        {
+          "Key": "Name",
+          "Value": "n83-cache-retry-20261019-8cde893"
+        }
+      ],
+      "VirtualizationType": "hvm",
+      "CpuOptions": {
+        "CoreCount": 4,
+        "ThreadsPerCore": 2
+      },
+      "CapacityReservationSpecification": {
+        "CapacityReservationPreference": "open"
+      },
+      "MetadataOptions": {
+        "State": "pending",
+        "HttpTokens": "required",
+        "HttpPutResponseHopLimit": 2,
+        "HttpEndpoint": "enabled",
+        "HttpProtocolIpv6": "disabled",
+        "InstanceMetadataTags": "disabled"
+      },
+      "EnclaveOptions": {
+        "Enabled": false
+      },
+      "BootMode": "uefi-preferred",
+      "PrivateDnsNameOptions": {
+        "HostnameType": "ip-name",
+        "EnableResourceNameDnsARecord": false,
+        "EnableResourceNameDnsAAAARecord": false
+      },
+      "MaintenanceOptions": {
+        "AutoRecovery": "default"
+      },
+      "CurrentInstanceBootMode": "uefi",
+      "Operator": {
+        "Managed": false
+      },
+      "InstanceId": "i-0b627b6b12ddea204",
+      "ImageId": "ami-0803a33fd43db1fbf",
+      "State": {
+        "Code": 0,
+        "Name": "pending"
+      },
+      "PrivateDnsName": "ip-172-31-63-124.us-west-2.compute.internal",
+      "PublicDnsName": "",
+      "StateTransitionReason": "",
+      "KeyName": "n83-cache-retry-20261019-8cde893",
+      "AmiLaunchIndex": 0,
+      "ProductCodes": [],
+      "InstanceType": "c7i.2xlarge",
+      "LaunchTime": "2026-10-19T12:42:25+00:00",
+      "Placement": {
+        "GroupName": "",
+        "Tenancy": "default",
+        "AvailabilityZone": "us-west-2d"
+      },
+      "Monitoring": {
+        "State": "disabled"
+      },
+      "SubnetId": "subnet-0ec88345806128652",
+      "VpcId": "vpc-0d4183a7579b59a6a",
+      "PrivateIpAddress": "172.31.63.124"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+digraph G {
+ graph [rankdir=LR, bgcolor="white", pad="0.12", nodesep="0.25", ranksep="0.35"];
+ node [shape=box, style="rounded,filled", fillcolor="#eef4fa", color="#54708d", fontname="Helvetica", fontsize=11, margin="0.13,0.12"];
+ edge [color="#54708d", arrowsize=0.65];
+ public [label="Sealed public System\n+ protected input roles"];
+ compile [label="Rust static affine basis\noriginal-linear-row lineage"];
+ cert [label="Quadratic rewrites\nf − f(E) = Σ Bᵥ Qᵥ"];
+ check [label="Separate coefficient checker\nlineage + exact identities", fillcolor="#eaf5ed"];
+ output [label="Original prefix retained\n+ certified appended rows", fillcolor="#eaf5ed"];
+ public -> compile -> cert -> check -> output;
+}

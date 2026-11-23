@@ -1,0 +1,32 @@
+Prime-field informative coverage follow-up
+Scope: local, synthetic prime-order curves and conditional toy labels.
+
+Decision
+The fixed Dickson D4 prefix did not replicate its pilot advantage across the expanded panel. Do not carry it forward as a default coverage optimization under this design. Preserve the observed curve-level heterogeneity for future hypotheses and keep the residual coefficient in any label-law experiment.
+
+Primary near-threshold contrast
+On 48 curves in eight field-prime strata with 16 random bases and four seeded label vectors per curve and B, at B0 and residual coefficient v=0, the mean informative coverage across curves was:
+  Interval 72.4912%, Dickson 72.2566%, random 73.1653%.
+  Dickson - random = -0.9087 percentage points.
+  Stratified paired percentile bootstrap 95% interval [-2.3844, +0.5180] pp.
+  25 positive curve contrasts, 0 ties, 23 negative.
+B0 is the smallest B with 16*choose(B,4) >= r. The within-curve SD across random-base seeds averaged 4.8002 pp. The interval is conditional on the fixed primes and base and label seed panel. The ±1 rows in summary.txt are descriptive.
+
+Label law
+For all-one labels and v=0, sign patterns with two positive and two negative signs have zero denominator, excluding precisely 6/16 signed tuples. Seeded nonzero labels increased coverage by 16.49 to 16.64 pp at B0 across the three base arms. For v=1, all-one signed sums are even integers in [-4,4] and thus never equal 1 modulo the odd subgroup orders used here. This arm already attains raw support. Seeded labels lowered coverage by 0.065 to 0.091 pp there. The gain depends on the residual coefficient and on the conditional toy label model.
+
+Collision comparison
+For N distinct informative sign vectors independent of i.i.d. uniform group elements, every two different sign vectors collide with probability 1/r, since their difference defines a nonzero prime-field linear form. Thus the expected energy of that null is N+N(N-1)/r. Mean measured-to-null informative energy ratios at B0,v=0 were 0.9846 interval, 0.9945 Dickson and 0.9717 random. This null differs from x-coordinate sampling with canonical signs and without replacement. It provides a descriptive diagnostic, including no indication that Dickson reduces collisions in this panel.
+
+Checks
+13,099,104 signed tuples in 2,592 base instances, 25,920 base/label/residual cells, 86,778 independently calculated affine group witness checks and one labelled scalar recovery for each of 25,920 informative cells. The exact support/subset and Cauchy inequalities held for every cell. A fresh process replayed the raw records, curve-draw diagnostics and analysis byte-for-byte. This scope supports no solver runtime or exponent claim.
+
+Replay
+  g++ -std=c++20 -O3 -Wall -Wextra -Werror coverage.cpp -o coverage-local
+  ./coverage-local > raw-local.csv 2> diagnostics-local.txt
+  test "$(sha256sum raw-local.csv | cut -d" " -f1)" = "$(awk '$2 == "raw.csv" {print $1}' expected.sha256)"
+  g++ -std=c++20 -O2 -Wall -Wextra -Werror analyze.cpp -o analyze-local
+  ./analyze-local raw-local.csv paired-local.csv > summary-local.txt
+  test "$(sha256sum paired-local.csv | cut -d" " -f1)" = "$(awk '$2 == "paired.csv" {print $1}' expected.sha256)"
+  cmp summary.txt summary-local.txt
+Field, curve, B offset and base/label/offset IDs are fixed by PROTOCOL.txt, source and the CSV headers. Arms 0/1/2 are interval/Dickson/random. Law 0 is all-one; laws 1 through 4 are fixed seeded vectors. The replay reuses the same binary and deterministic cohort. Affine arithmetic and the labelled-group checks verify the sampled tuples separately from the histogram path.

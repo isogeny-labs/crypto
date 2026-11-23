@@ -1,0 +1,10 @@
+digraph admission {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", label="N83 V5 Linux exporter build | attempt 1", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", color="#344054", fillcolor="#eef2f6"];
+  source [label="Frozen source + protocol\n5ae32d781cbd", fillcolor="#dbeafe"];
+  disk [label="Host boot floor\n>= 2 GiB", fillcolor="#fef3c7"];
+  stop [label="STOP: exit 93\nboot below 2 GiB", fillcolor="#fee2e2", color="#b42318"];
+  build [label="Source copy + Linux build\nnot reached", fillcolor="#f3f4f6", color="#98a2b3"];
+  source -> disk -> stop [color="#b42318"];
+  disk -> build [style=dashed, color="#98a2b3", label="only if admitted"];
+}

@@ -1,0 +1,15 @@
+AMENDMENT 1 to PRESET_G.txt, written 2026-11-12 after 18 of 24 preset instances had run and BEFORE any
+of their outputs were opened. [pcc:unverified]
+Reason: the strong success criterion (eliminant g_R in Mac_D) is degenerate when pi_1(V_R) covers the
+whole base (seen in the L4 check uni3, which ran before this amendment), and an XL-based procedure could
+act on partial univariate information.  The robust lower-bound quantity is
+  delta_weak(R) := least t such that some u(x_1) != 0 on pi_x(W), vanishing on pi_1(V_R), satisfies
+                   u(x_1)/S_R in L_t + F_{V_R}       (=> XL learns a univariate constraint at D = dS + t).
+Generic prediction (random-function model): least t with #{a : wt(a) > t} < w - |pi_1(V_R)| + |V_R|,
+w = |pi_x(W)|.
+Decision rule for delta_weak (fixed now): CONSISTENT if every target has delta_weak >= generic_weak - 1;
+REFUTED if any target has delta_weak <= generic_weak - 3, or >= 10% of an instance's targets have
+delta_weak <= generic_weak - 2; otherwise AMBIGUOUS.
+Execution: the 18 completed instances are kept as the preset's strong-delta data. A second pass (G2,
+same seeds, same instance list incl. the 6 not yet run) measures strong and weak delta; its strong delta
+must reproduce pass 1 exactly where both exist.

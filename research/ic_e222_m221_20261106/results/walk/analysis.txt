@@ -1,0 +1,15 @@
+frozen {'Eh': 256, 'D': 48, 'Dw': 16}
+verified 360 / 360 | timeouts/missing total_ms: 0
+pairs 120 instances 60
+Eh hoisted sweep extra2 fb 256 solver ms 26.9 process ms 50.5 max solver ms 91 trials 262.0
+D pair-sum table extra2 fb 48 solver ms 13.9 process ms 37.8 max solver ms 41 trials 377.5
+Dw table + restarted r-adding walk extra2 fb 16 solver ms 3.3 process ms 27.1 max solver ms 9 trials 1113.5
+ratio median [boot95]  solver | process
+Dw / D 0.249 [0.235,0.259] | 0.720 [0.689,0.752]
+Dw / Eh 0.124 [0.110,0.132] | 0.520 [0.492,0.564]
+D / Eh 0.494 [0.457,0.526] | 0.718 [0.691,0.774]
+Dw beats D in 120/120 (solver), 114/120 (process); Dw beats Eh in 120/120, 120/120
+r_bits 14 n 18 Dw/D solver 0.250 Dw/Eh solver 0.134
+r_bits 15 n 42 Dw/D solver 0.254 Dw/Eh solver 0.138
+r_bits 16 n 44 Dw/D solver 0.251 Dw/Eh solver 0.107
+r_bits 17 n 16 Dw/D solver 0.200 Dw/Eh solver 0.104

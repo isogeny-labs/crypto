@@ -1,0 +1,50 @@
+{
+  "candidate_id": "spike35",
+  "certificate_sha256": "10c57cb79edfc8d29a78d32c5c8ac32bd8e0ae771f895bdc79207d312678bfc8",
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike35/prime-m7-planted/input",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike35/prime-m7-planted/output"
+  ],
+  "elapsed_seconds": 0.828,
+  "family": "prime",
+  "first_fall_degree": null,
+  "first_fall_lower_bound": 5,
+  "id": "prime-m7-planted",
+  "input_row_sha256": "59e61e3b75f10745999c7ddd9075b430d98a228d90da74f393ec9b6d1a9281e4",
+  "m": 7,
+  "replay": {
+    "command": [
+      "timeout",
+      "--kill-after=5s",
+      "60s",
+      "prlimit",
+      "--as=8589934592",
+      "--",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+      "replay",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike35/prime-m7-planted/input",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/candidate-fall-20261102/attempt-02/cases/spike35/prime-m7-planted/output/prime-m7-planted.json"
+    ],
+    "elapsed_seconds": 0.007,
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"prime-m7-planted\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "s3_certificate_prefix": "s3://setec-astronomy-artifacts/runs/n83-ffd-lfd-factorbase-panel-20261102/v2/attempt-02/spike35/first-fall-attempt-01/certificates/prime-m7-planted.json",
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":null,\"first_fall_lower_bound\":5,\"id\":\"prime-m7-planted\",\"status\":\"certified_no_fall_through_degree_4\"}\n",
+  "system_bytes": 7992,
+  "system_sha256": "026a65420bbe29d76208bce19229bab5969844079254677d2fb8d0fd48bcdb8c",
+  "target_kind": "planted"
+}

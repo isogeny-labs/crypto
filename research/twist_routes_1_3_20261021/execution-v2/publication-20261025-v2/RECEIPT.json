@@ -1,0 +1,47 @@
+{
+  "schema": "twist.store-publication/v1",
+  "started_utc": "2026-10-25T00:59:25.890Z",
+  "remote": "s3://crypto-autoresearcher/store",
+  "name": "evidence/twist_routes_1_3_20261021/execution-v2-20261023/runs.tar.xz",
+  "sha256": "6fb0de2cf9ad5c2b9acd1703372560550433da7c095f5f42202100aba31ef167",
+  "bytes": 38156064,
+  "uploader_binary_sha256": "ba2e6347f619988ed68075d7bacb242044221f67557ee18977ee9c4458d67b44",
+  "aws_binary_sha256": "84958b12b8c1d794ba565acec08444cba19704e3e484d38eb45c60c51772460d",
+  "inherited_uploader_binary": true,
+  "original_source_revision": "07fbf5a8fe586302908abcfbb395786de2f11b1f",
+  "credentials_persisted": false,
+  "credential_values_in_receipts": false,
+  "scientific_results_changed": false,
+  "performance_claim": false,
+  "steps": [
+    {
+      "label": "push",
+      "argv": [
+        "/workspace/crypto-twist-runs/target/release/ecbench",
+        "store",
+        "push",
+        "/workspace/shared/twist-artifacts-20261023/runs.tar.xz",
+        "--name",
+        "evidence/twist_routes_1_3_20261021/execution-v2-20261023/runs.tar.xz",
+        "--description",
+        "Frozen twist follow-up raw evidence, including failed and incomplete attempts",
+        "--provenance",
+        "Exact 2026-10-23 native twist E18-E30 raw remainder; source/packing recipe in research/twist_routes_1_3_20261021/execution-v2/RAW_ARTIFACTS.json; no historical committed evidence repacked.",
+        "--tag",
+        "twist-followup-20261023",
+        "--no-cache",
+        "--json"
+      ],
+      "started_utc": "2026-10-25T00:59:36.855Z",
+      "finished_utc": "2026-10-25T00:59:38.264Z",
+      "exit_code": 2,
+      "signal": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ba9031b077dd77e72e4bc6ba4a711649beeec5a3f9487307456677e816bca5fd",
+      "outputs_redacted_before_persistence": true
+    }
+  ],
+  "status": "publication-incomplete",
+  "error": "Error: push failed: ecbench: aws head-object failed (exit status: 254): aws: [ERROR]: An error occurred (403) when calling the HeadObject operation (reached max retries: 1): Forbidden (S3 also answers 403 for an absent key when the caller lacks s3:ListBucket; check the credentials and the bucket policy)",
+  "finished_utc": "2026-10-25T00:59:38.265Z"
+}

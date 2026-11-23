@@ -1,0 +1,30 @@
+{
+  "schema": "research.derivation/v1",
+  "id": "scalar-projection-source-audit-20261031",
+  "task": "T-1120",
+  "status": "producer-derived-review-pending",
+  "scientific_execution": false,
+  "cohort_targets_executed": 0,
+  "cost_ratio": null,
+  "independent_review": "pending-reviewer-usage-limit",
+  "claims": [
+    {
+      "id": "coordinate-criterion",
+      "statement": "Exists ell:J->F_r with ell(G)=1 iff G not in rJ",
+      "evidence": "REPORT.md Exact criterion",
+      "status": "derived-not-kernel-checked"
+    },
+    {
+      "id": "coprime-retraction",
+      "statement": "Certified cardinality c*r, gcd(c,r)=1 and exact order r suffice",
+      "evidence": "REPORT.md Explicit sufficient construction",
+      "status": "derived-not-kernel-checked"
+    },
+    {
+      "id": "diagnostic-counterexample",
+      "statement": "Z/49Z with G=7 passes universal cofactor torsion but has no normalized scalar map",
+      "evidence": "REPORT.md Why the current diagnostic is insufficient by itself",
+      "status": "derived-abstract-counterexample"
+    }
+  ]
+}

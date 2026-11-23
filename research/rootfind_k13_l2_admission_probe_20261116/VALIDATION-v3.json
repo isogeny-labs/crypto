@@ -1,0 +1,31 @@
+{
+  "schema": "rootfind-k13-admission-static-validation/v3",
+  "status": "pass_static_predicates_and_coverage_only",
+  "v3_sha256": "ef890a6193c6b7c45d09775a27dede3c3eb16d7ab2ffaac8b359d18e976ef308",
+  "eks_source_sha256": "7353a57a151810173d36eaff6b8486a74d840c94dfe9954c543bad76972c8f4c",
+  "full_panel_spec_sha256": "d4339eceb596980b15fdc8aaa99f5ae6cd29aa247549c8ff39e5fb6ecad37ac3",
+  "exact_full_panel_workload": true,
+  "exact_full_panel_arm_objects": [
+    "rho-strong",
+    "rootfind-m3",
+    "rootfind-m2",
+    "batch-m3",
+    "batch-m2",
+    "batch-m3-aa"
+  ],
+  "v2_omitted_non_groebner_arms": [
+    "batch-m2",
+    "rho-strong",
+    "rootfind-m2",
+    "rootfind-m3"
+  ],
+  "native_eks_static_predicates": "pass",
+  "planned_executions_derived": 288,
+  "measured_executions_derived": 240,
+  "not_run": [
+    "native benchmark validator",
+    "source-bound ecbench plan",
+    "image build",
+    "experiment job"
+  ]
+}

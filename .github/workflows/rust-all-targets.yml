@@ -16,13 +16,27 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      full_library:
+        description: Run the complete native release library suite on a supported Linux host
+        type: boolean
+        default: false
+      source_revision:
+        description: Exact 40-character source SHA for the optional full library job
+        type: string
+        default: ''
 concurrency:
   group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+env:
+  ARTIFACTS_PULL_SOURCE: git
+
 jobs:
   scope:
-    if: ${{ !github.event.pull_request.draft }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (!github.event.pull_request.draft)
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -48,6 +62,12 @@ jobs:
           sparse-checkout: |
             /tools/factor-base/
             /.github/scripts/
+            /tools/artifacts/
+            /.artifacts/config.json
+            /.artifacts/recovery/index.json
+            /.artifacts/recovery/534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4-selected-representatives.csv.gz
+            /.artifacts/recovery/8970667e2f18587eeb08d033123dab029b94042ac5c07c870b08988f1ee5b738-targetwalk-records.jsonl.gz
+            /research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/.artifacts.json
             /build.rs
             /rustfmt.toml
             /clippy.toml
@@ -58,6 +78,26 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019/sessions/holdout-P24/records.jsonl research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl research/ecbench_all_candidates_20261003/sessions/koblitz/records.jsonl research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/records.jsonl research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl research/ecbench_numa_vm_20261002/sessions/v2-auto/records.jsonl research/ecbench_yield_sweep_20261004/sessions/koblitz/records.jsonl research/ext_endo_rho_20261023/sessions-a1/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/subfield-fp3/records.jsonl research/ic_planner_validation_20261020/sessions/c24/records.jsonl research/ic_planner_validation_20261020/sessions/r24/records.jsonl research/ic_planner_validation_20261020/sessions/r26/records.jsonl research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -66,7 +106,9 @@ jobs:
 
   check:
     needs: scope
-    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false'))
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
@@ -91,6 +133,12 @@ jobs:
             /.cargo/
             /rust-toolchain*
             /.github/scripts/
+            /tools/artifacts/
+            /.artifacts/config.json
+            /.artifacts/recovery/index.json
+            /.artifacts/recovery/534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4-selected-representatives.csv.gz
+            /.artifacts/recovery/8970667e2f18587eeb08d033123dab029b94042ac5c07c870b08988f1ee5b738-targetwalk-records.jsonl.gz
+            /research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/.artifacts.json
             /build.rs
             /rustfmt.toml
             /clippy.toml
@@ -101,8 +149,30 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019/sessions/holdout-P24/records.jsonl research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl research/ecbench_all_candidates_20261003/sessions/koblitz/records.jsonl research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/records.jsonl research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl research/ecbench_numa_vm_20261002/sessions/v2-auto/records.jsonl research/ecbench_yield_sweep_20261004/sessions/koblitz/records.jsonl research/ext_endo_rho_20261023/sessions-a1/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/subfield-fp3/records.jsonl research/ic_planner_validation_20261020/sessions/c24/records.jsonl research/ic_planner_validation_20261020/sessions/r24/records.jsonl research/ic_planner_validation_20261020/sessions/r26/records.jsonl research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv
       - name: Materialize compile-time inputs without research archives
-        run: node .github/scripts/ci-scope.mjs --materialize
+        run: |
+          node .github/scripts/ci-scope.mjs --materialize
+          python3 tools/artifacts/artifacts.py pull --source git research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       # Warnings stay out of the gate: this job answers "does it compile",
@@ -114,3 +184,173 @@ jobs:
       # and its tests with it on.
       - run: RUSTFLAGS=-Awarnings cargo check --lib --tests --features wide-vars
       - run: cargo test --manifest-path crates/crypto-analysis-core/Cargo.toml --lib
+
+  full-library:
+    name: Native full library (manual)
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch' && inputs.full_library)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 130
+    permissions:
+      contents: read
+    env:
+      SOURCE_REVISION: ${{ inputs.source_revision }}
+      WORKFLOW_REVISION: ${{ github.workflow_sha }}
+      CARGO_BUILD_JOBS: '2'
+      RUST_TEST_THREADS: '4'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - name: Admit the source and required Linux interfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          VALIDATION_DIR="$RUNNER_TEMP/native-library-validation"
+          printf 'VALIDATION_DIR=%s\n' "$VALIDATION_DIR" >> "$GITHUB_ENV"
+          mkdir -p "$VALIDATION_DIR"
+          jq -n --arg source "$SOURCE_REVISION" --arg workflow "$WORKFLOW_REVISION" \
+            --arg run "$GITHUB_RUN_ID" --arg attempt "$GITHUB_RUN_ATTEMPT" \
+            '{source_revision:$source,workflow_revision:$workflow,run_id:$run,
+              run_attempt:$attempt,kind:"native-development-validation",
+              job_deadline_minutes:130,automatic_retries:0,scientific_measurement:false}' \
+            > "$VALIDATION_DIR/request.json"
+          [[ "$SOURCE_REVISION" =~ ^[0-9a-f]{40}$ ]]
+          test -r /proc/sys/kernel/random/boot_id
+          readlink /proc/self/ns/time > "$VALIDATION_DIR/time-namespace.txt"
+          cat /proc/self/timens_offsets > "$VALIDATION_DIR/time-offsets.txt"
+          jq -n --arg kernel "$(uname -sr)" --arg runner "$RUNNER_NAME" \
+            --argjson cpus "$(nproc)" \
+            '{kernel:$kernel,runner:$runner,logical_cpus:$cpus,
+              required_time_interfaces_readable:true}' > "$VALIDATION_DIR/host.json"
+      - name: Check out the immutable source and tracked test fixtures
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        timeout-minutes: 15
+        with:
+          ref: ${{ inputs.source_revision }}
+          filter: blob:none
+          persist-credentials: false
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019/sessions/holdout-P24/records.jsonl research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl research/ecbench_all_candidates_20261003/sessions/koblitz/records.jsonl research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/records.jsonl research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl research/ecbench_numa_vm_20261002/sessions/v2-auto/records.jsonl research/ecbench_yield_sweep_20261004/sessions/koblitz/records.jsonl research/ext_endo_rho_20261023/sessions-a1/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/subfield-fp3/records.jsonl research/ic_planner_validation_20261020/sessions/c24/records.jsonl research/ic_planner_validation_20261020/sessions/r24/records.jsonl research/ic_planner_validation_20261020/sessions/r26/records.jsonl research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv
+      - name: Bind the checkout and toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_REVISION"
+          test -z "$(git status --porcelain --untracked-files=no)"
+          rustup toolchain install 1.99.1 --profile minimal
+          rustup run 1.99.1 rustc --version > "$VALIDATION_DIR/rustc.txt"
+          sha256sum Cargo.toml Cargo.lock src/cryptanalysis/koblitz_fast.rs \
+            src/cryptanalysis/koblitz_index_calculus.rs \
+            src/cryptanalysis/ic_framework/plugins.rs examples/koblitz_halftrace.rs \
+            > "$VALIDATION_DIR/source.sha256"
+      - name: Hydrate exact ecbench replay records without S3
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t records < .artifacts/recovery/ecbench-full-library-paths.txt
+          test "${#records[@]}" -eq 12
+          python3 tools/artifacts/artifacts.py pull --source git "${records[@]}"
+          sha256sum "${records[@]}" > "$VALIDATION_DIR/ecbench-records.sha256"
+      - name: Build the complete release library test executable
+        timeout-minutes: 40
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          cargo +1.99.1 test --release --lib --locked --no-run --message-format=json \
+            > "$VALIDATION_DIR/build.jsonl" 2> "$VALIDATION_DIR/build.stderr"
+          build_status=$?
+          set -e
+          printf '%s\n' "$build_status" > "$VALIDATION_DIR/build.exit"
+          if [ "$build_status" -ne 0 ]; then
+            tail -n 60 "$VALIDATION_DIR/build.stderr"
+            exit "$build_status"
+          fi
+          mapfile -t test_binaries < <(jq -r \
+            'select(.reason=="compiler-artifact" and .target.name=="crypto_lib" and .profile.test==true) | .executable // empty' \
+            "$VALIDATION_DIR/build.jsonl")
+          test "${#test_binaries[@]}" -eq 1
+          test -x "${test_binaries[0]}"
+          sha256sum "${test_binaries[0]}" > "$VALIDATION_DIR/test-binary.sha256"
+      - name: Run every non-ignored library test and retain the parent status
+        id: library
+        timeout-minutes: 70
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          cargo +1.99.1 test --release --lib --locked -- --nocapture 2>&1 | tee "$VALIDATION_DIR/library.log"
+          pipeline_status=("${PIPESTATUS[@]}")
+          test_status=${pipeline_status[0]}
+          log_status=${pipeline_status[1]}
+          set -e
+          jq -n --arg source "$SOURCE_REVISION" --argjson status "$test_status" --argjson log_status "$log_status" \
+            '{source_revision:$source,cargo_parent_exit_code:$status,
+              log_writer_exit_code:$log_status,
+              command:["cargo","+1.99.1","test","--release","--lib","--locked","--","--nocapture"],
+              filters:[],ignored_test_policy:"unchanged_default",
+              scientific_measurement:false}' > "$VALIDATION_DIR/parent-exit.json"
+          if [ "$log_status" -ne 0 ]; then exit "$log_status"; fi
+          exit "$test_status"
+      - name: Retain checksums and post-run source state
+        if: always()
+        env:
+          LIBRARY_STEP_OUTCOME: ${{ steps.library.outcome }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          VALIDATION_DIR="${VALIDATION_DIR:-$RUNNER_TEMP/native-library-validation}"
+          mkdir -p "$VALIDATION_DIR"
+          parent_payload=null
+          parent_receipt_present=false
+          if test -f "$VALIDATION_DIR/parent-exit.json"; then
+            parent_payload=$(cat "$VALIDATION_DIR/parent-exit.json")
+            parent_receipt_present=true
+          fi
+          jq -n --arg source "$SOURCE_REVISION" --arg outcome "$LIBRARY_STEP_OUTCOME" \
+            --argjson parent "$parent_payload" --argjson present "$parent_receipt_present" \
+            'if $present and $parent.source_revision != $source then
+               error("parent receipt source does not match the requested source")
+             else
+               {schema:"crypto.native-library-completion/v1",source_revision:$source,
+                test_step_outcome:$outcome,parent_exit_receipt_present:$present,
+                cargo_parent_exit_code:($parent.cargo_parent_exit_code // null),
+                log_writer_exit_code:($parent.log_writer_exit_code // null),
+                parent_summary_requires_separate_verification:true,
+                scientific_measurement:false}
+             end' > "$VALIDATION_DIR/completion.json"
+          if test -d .git; then
+            git status --porcelain --untracked-files=no > "$VALIDATION_DIR/post-run-status.txt"
+          fi
+          if test -f "$VALIDATION_DIR/source.sha256"; then
+            sha256sum -c "$VALIDATION_DIR/source.sha256" > "$VALIDATION_DIR/post-run-source-check.txt"
+          fi
+          if test -f "$VALIDATION_DIR/library.log"; then
+            sha256sum "$VALIDATION_DIR/library.log" > "$VALIDATION_DIR/library-log.sha256"
+          fi
+      - name: Upload development receipts and complete logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-library-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/native-library-validation
+          retention-days: 14
+          if-no-files-found: warn

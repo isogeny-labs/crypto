@@ -1,0 +1,91 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "comprehensive generic sweep, Koblitz K_1 over F_2^n, n in {17,19,23,29,43,47}",
+  "description": "Method × size scaling study (koblitz curves, degrees n of K_a/F_2^n 17,19,23,29,43,47; 2 independent single-target workload(s) per curve, 3 interleaved round(s)). One curve per size so `ecbench bound fit` and `ecbench report` can fit cost against r. Counted group operations; a measurement, not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 17
+      },
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 19
+      },
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 23
+      },
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 29
+      },
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 43
+      },
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 47
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261002
+  },
+  "arms": [
+    {
+      "name": "rho-signed_frobenius_strong",
+      "role": "baseline",
+      "method": {
+        "id": "rho.signed_frobenius_strong",
+        "params": {}
+      }
+    },
+    {
+      "name": "rho-negation",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      }
+    },
+    {
+      "name": "bsgs-negation",
+      "role": "candidate",
+      "method": {
+        "id": "bsgs.negation",
+        "params": {}
+      }
+    },
+    {
+      "name": "kangaroo-vow",
+      "role": "candidate",
+      "method": {
+        "id": "kangaroo.vow",
+        "params": {}
+      }
+    },
+    {
+      "name": "rho-negation-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

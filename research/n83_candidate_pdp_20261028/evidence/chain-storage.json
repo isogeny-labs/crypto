@@ -1,0 +1,16 @@
+{
+  "schema": "n83.chain-storage/v1",
+  "run_prefix": "s3://setec-astronomy-artifacts/runs/n83-binary-chain-20261028-r1/local/",
+  "archive": {
+    "path": "chain-archives/runs.tar.xz",
+    "kind": "raw",
+    "bytes": 358357680,
+    "sha256": "5da13e39bbc9db23f61a2fbd709da896bda04b1bb8eacbe78c218011758d579d"
+  },
+  "object": "s3://setec-astronomy-artifacts/store/sha256/5d/5da13e39bbc9db23f61a2fbd709da896bda04b1bb8eacbe78c218011758d579d",
+  "source_archive_sha256": "d694ef0aac885337be9192bdefe5127b28e495da3735d45079f1598118a23f06",
+  "source_commit": "8ccd4eb9729cb01767064e41c5507dcb0476b2ac",
+  "raw_file_count": 360,
+  "immutable_partial_summaries": 84,
+  "restoration": "Download archive, extract fresh root, sha256sum -c manifest.sha256, instrument replay ROOT, check manifest again"
+}

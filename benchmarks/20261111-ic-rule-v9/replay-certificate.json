@@ -1,0 +1,122 @@
+{
+  "independent": true,
+  "native_replay": {
+    "host": "Linux 6.18.44-fc-v140 x86_64",
+    "output": "../../research/ic_tool_program/validation/raw/native-replay.json",
+    "seed": "77767620d255d08ba58c8cadde0823c4",
+    "seed_file": "../../research/ic_tool_program/validation/REPLAY_SEED.md",
+    "tool": "src/bin/ic_validate.rs (ic_validate replay)"
+  },
+  "runs": [
+    {
+      "binary": "ic-v9",
+      "binary_sha256": "fa00b9785543705eb18c3dd23df5c91876f8f31de4bd562b72bdc11cfa6bf7a4",
+      "evidence": "research/ic_tool_program/rule/v9",
+      "identical": true,
+      "record": "runs/k0n41/T30-R1.price.json",
+      "scalars": {
+        "ic": "198319789443",
+        "rho": "198319789443"
+      }
+    },
+    {
+      "binary": "ic-v9",
+      "binary_sha256": "fa00b9785543705eb18c3dd23df5c91876f8f31de4bd562b72bdc11cfa6bf7a4",
+      "evidence": "research/ic_tool_program/rule/v9",
+      "identical": true,
+      "record": "runs/k1n59/T03-R1.price.json",
+      "scalars": {
+        "ic": "18504373680283",
+        "rho": "18504373680283"
+      }
+    },
+    {
+      "binary": "ic-v9",
+      "binary_sha256": "fa00b9785543705eb18c3dd23df5c91876f8f31de4bd562b72bdc11cfa6bf7a4",
+      "evidence": "research/ic_tool_program/rule/v9",
+      "identical": true,
+      "record": "runs/k0n61/T63-R1.price.json",
+      "scalars": {
+        "ic": "108914293440533",
+        "rho": "108914293440533"
+      }
+    },
+    {
+      "binary": "ic-v9",
+      "binary_sha256": "fa00b9785543705eb18c3dd23df5c91876f8f31de4bd562b72bdc11cfa6bf7a4",
+      "evidence": "research/ic_tool_program/rule/v9",
+      "identical": true,
+      "record": "runs/k0n41/T27-R1.price.json",
+      "scalars": {
+        "ic": "245960075774",
+        "rho": "245960075774"
+      }
+    },
+    {
+      "binary": "ic-v9c",
+      "binary_sha256": "38819b1ade2dacbe23544eb053120eef225f156822b5887692c2ca1f0061b2f4",
+      "evidence": "research/ic_tool_program/rule/v9c",
+      "identical": true,
+      "record": "runs/k0n53/T29-R1.price.json",
+      "scalars": {
+        "ic": "13819444172434",
+        "rho": "13819444172434"
+      }
+    },
+    {
+      "binary": "ic-v9c",
+      "binary_sha256": "38819b1ade2dacbe23544eb053120eef225f156822b5887692c2ca1f0061b2f4",
+      "evidence": "research/ic_tool_program/rule/v9c",
+      "identical": true,
+      "record": "runs/k0n41/T21-R1.price.json",
+      "scalars": {
+        "ic": "48686953755",
+        "rho": "48686953755"
+      }
+    },
+    {
+      "binary": "ic-v9c",
+      "binary_sha256": "38819b1ade2dacbe23544eb053120eef225f156822b5887692c2ca1f0061b2f4",
+      "evidence": "research/ic_tool_program/rule/v9c",
+      "identical": true,
+      "record": "runs/k0n57/T61-R1.price.json",
+      "scalars": {
+        "ic": "26883611453",
+        "rho": "26883611453"
+      }
+    },
+    {
+      "binary": "ic-v9c",
+      "binary_sha256": "38819b1ade2dacbe23544eb053120eef225f156822b5887692c2ca1f0061b2f4",
+      "evidence": "research/ic_tool_program/rule/v9c",
+      "identical": true,
+      "record": "runs/k0n41/T41-R1.price.json",
+      "scalars": {
+        "ic": "195186348698",
+        "rho": "195186348698"
+      }
+    }
+  ],
+  "scalar_verification": {
+    "certificates": 1678,
+    "failures": 0,
+    "field_degrees": [
+      41,
+      47,
+      53,
+      57,
+      59,
+      61
+    ],
+    "output": [
+      "../../research/ic_tool_program/validation/raw/certverify-v9.json",
+      "../../research/ic_tool_program/validation/raw/certverify-v9c.json"
+    ],
+    "records": 839,
+    "tool": "src/bin/ic_validate.rs (ic_validate certverify)"
+  },
+  "scalars_verified": true,
+  "schema": "ic-tool-programme-replay-certificate/v2",
+  "status": "verified",
+  "what": "research/ic_tool_program/rule/v9 + research/ic_tool_program/rule/v9c: every recorded scalar checked by an independent GF(2^m) verifier ([s]G = T, [n]G = O, [s+1]G != T), and 8 records drawn by REPLAY_SEED.md rerun natively with their own binaries, certificates and counts compared"
+}

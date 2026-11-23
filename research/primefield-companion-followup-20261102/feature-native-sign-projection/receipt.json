@@ -1,0 +1,33 @@
+{
+  "recorded_at": "2026-11-07T01:15:04.524830+00:00",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "source_sha256": "cecd35f4afe36c9bf7442e535f3f35576c494f4b884514289bb1f377bd8bb6c8",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-sign-projection/lib.rs",
+        "-o",
+        "/tmp/primefield-sign-projection-tests"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/tmp/primefield-sign-projection-tests",
+        "--test-threads=1"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0
+    }
+  ],
+  "binary_sha256": "9fb5861c906018755514da721117aff82fa1e91a642a824d31c5edf928423693"
+}

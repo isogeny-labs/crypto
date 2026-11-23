@@ -1,0 +1,19 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "held-out random-binary multiplier-base end-to-end panel",
+  "description": "Prospective held-out comparison of integer-multiple signed-graph batching against coordinate-subspace, plain-seed and rho controls.",
+  "workloads": {
+    "curves": [{"kind": "binary_random", "n": 27, "seed": 59297, "max_cofactor": 8}],
+    "targets_per_curve": 12,
+    "target_seed": 2026110202
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "coordinate-subspace", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-subspace:dimension=9", "oracle": "mitm:negation_folded=1,m=3"}}},
+    {"name": "plain-best", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-multiplier:size=320,mult=1", "oracle": "mitm:negation_folded=1,m=3"}}},
+    {"name": "plain-same-seeds", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-multiplier:size=8,mult=1", "oracle": "mitm:negation_folded=1,m=3"}}},
+    {"name": "multiplier", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-multiplier:size=8,mult=32", "oracle": "mitm:negation_folded=1,m=3"}}},
+    {"name": "multiplier-aa", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "binary-multiplier:size=8,mult=32", "oracle": "mitm:negation_folded=1,m=3"}}}
+  ],
+  "measurement": {"rounds": 6, "warmup": 1, "order": "alternate_measured", "seed": 2026110202, "isolation_required": "L2", "timeout_seconds": 180}
+}

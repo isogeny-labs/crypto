@@ -1,0 +1,64 @@
+{
+  "schema": "pkm.integration-resolution-review/v1",
+  "recorded_utc": "2026-10-30T07:34:54.371420+00:00",
+  "tested_merge_commit": "4e063aa5bb048bd474c967d7c000aee741d51967",
+  "parents": [
+    "507316c7fc9a00afdc63f857e65b02fa3a109595",
+    "af6ed463f556d26550d21a8c6c0191c172fd79ed"
+  ],
+  "copilot_request": 6516309991,
+  "fallback_comment": 6517345192,
+  "fallback_reason": "No response or visible resolver activity after more than an hour.",
+  "conflicts": [
+    "docs/session-logs/2026-10-30.md",
+    "problems/README.md"
+  ],
+  "all_58_non_log_index_pr_blobs_unchanged": true,
+  "prepared_handoff_appended": true,
+  "proof_gate": {
+    "exit": 0,
+    "declarations": 13,
+    "trusted_exceptions": 0
+  },
+  "module_build_exit": 0,
+  "module_kernel_replay": {
+    "exit": 0,
+    "mode": "official module replay against imports; not --fresh"
+  },
+  "local_size_exit": 0,
+  "local_artifacts_exit": 0,
+  "native_checks": "RUNNING; no fresh native/library pass claimed",
+  "native_supervisor": {
+    "exec_session": 49270,
+    "shell_pid": 14000,
+    "directory": "/workspace/pr2949-integration-20261030",
+    "script": "native-validation.sh",
+    "command_source": "/workspace/pr2949-integration-20261030/native-validation.sh",
+    "script_sha256": "d09d23ba8abd0ca5a0614817906ece47abf61446d55cd052aa19d0108ecd643b"
+  },
+  "git_object_bindings": {
+    "src": "4eb4c329aefc59778e20f4d48493f6e2306d1cf5",
+    "crates": "58421f9db55a9d525480e8be7189cb604970013d",
+    "tools/factor-base": "f9174d17fb0dd4d628e7873af65024eb6590f544",
+    "tools/volcano-cli": "f7b0683e86a320729dc28eb287158826786dd1ff",
+    "Cargo.toml": "43c519b5f15bf7e83bdbc2875807d939a0d27e15",
+    "Cargo.lock": "1c792ecacbbd8c46e82443a95b35ee9400888080",
+    "examples/pkm_oracle_program.rs": "401b724fd002139db3c184a1abe15c9276e94c43",
+    "examples/pkm_oracle_program": "c8a7700ee497c2a4228ab5d1bd2cbbb1e07c29d2",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/lean": "7717e915c52bc3e7d05636f8607e468cf64da5fd",
+    "scripts/checkpoint.sh": "6a2a37967047b1a46ed62a4123f4c69f08a55d04",
+    "research/prime_ecdlp_three_leads_20261029/lean": "4be707064b1430fc0e16b00fc1f3b0c3b6a82ade"
+  },
+  "scientific_panels_run": 0,
+  "comparison_admissible": false,
+  "research_goal_complete": false,
+  "auto_merge_enabled": false,
+  "remote_merge_checks": "gate,size,artifacts absent at initial 507316c7 snapshot; not a pass",
+  "initial_metadata_errors": [
+    "First paragraph preservation check wrote the validated log then stopped on whole-table comparison; corrected to index-link and added/updated row checks.",
+    "An initial historical hash check compared an old Cargo snapshot with current Cargo; correctly failed. Revised check validates each map at its own recorded revision; current Cargo is not historically validated.",
+    "The appended 07:34Z entry was committed at07:28:41Z; its manually entered heading was ahead of the actual clock. Correction is appended to the log."
+  ]
+}

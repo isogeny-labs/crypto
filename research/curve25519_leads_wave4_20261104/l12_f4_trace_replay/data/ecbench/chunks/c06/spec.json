@@ -1,0 +1,72 @@
+{
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "proj-a",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=32,scan_cap=512",
+     "oracle": "mitm:negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t5-g4-s1307",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=5,seed=1307",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4"
+    }
+   }
+  },
+  {
+   "name": "pkm-iso-t5-g4-s1307-trace",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-isogeny:t=5,seed=1307",
+     "oracle": "pkm-semaev:m=2,mode=full,guess=4,trace=1"
+    }
+   }
+  }
+ ],
+ "description": "research/curve25519_leads_wave4_20261104/l12_f4_trace_replay/PROTOCOL.md (frozen before data). L12: F4 trace replay (pkm-semaev trace=1) on the T10/T12 winner (prime-isogeny t=5 seed 1307, guess=4) against the same arm without trace, rho-neg and proj-a, k=20 Curve25519 miniature. Public synthetic curve; no security claim. Run in 8 one-target chunks by scripts/chunked_run.py (chunk c: target_seed 2026110421+c, measurement seed 2026110422+c). [chunk 6 of 8, Addendum C]",
+ "label": "Curve25519 k=20: PKM isogeny t5/G4/seed1307 with and without F4 trace replay, ecbench counted unit",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate_measured",
+  "rounds": 2,
+  "seed": 2026110428,
+  "timeout_seconds": 1800,
+  "warmup": 0
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 63700,
+    "b": 872826,
+    "group_order": 1049624,
+    "gx": 349837,
+    "gy": 122,
+    "kind": "prime_explicit",
+    "p": 1048573,
+    "r": 131203
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 2026110427,
+  "targets_per_curve": 1
+ }
+}

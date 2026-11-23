@@ -1,0 +1,98 @@
+card: CARD-p3-cross-trace-20261108-r2 (sha256 2d25bb725f660e7557c8ae75059ce4110d37d938cdd4ff7590d7a801a7cf9be8)
+commit: 3c11bc13b9cbb491454f49487453e8fc2321cfca
+receipt: research/split_prime_ecdlp_20261107/followups/p3_cross_trace/cards/p3-run-r2.receipt.json sha256 0b21d66ffc8512a6734613c7fdfaea2d863dcf43ae8e4158b3206f6921ef79ec
+status: completed
+command 1 (build): ["nice", "-n", "10", "cargo", "build", "--release"] in research/split_prime_ecdlp_20261107/followups/p3_cross_trace/p3census exit 0 (2.485 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 20 lines:
+    ...
+    40 |     pub fn on_curve(&self, pt: Pt) -> bool {
+       |            ^^^^^^^^
+    
+    warning: function `padd` is never used
+      --> src/poly.rs:13:8
+       |
+    13 | pub fn padd(a: &Poly, b: &Poly, p: u64) -> Poly {
+       |        ^^^^
+    
+    warning: field `l` is never read
+      --> src/selftest.rs:21:13
+       |
+    20 |     pub struct Ref {
+       |                --- field in this struct
+    21 |         pub l: u64,
+       |             ^
+    
+    warning: `p3census` (bin "p3census") generated 4 warnings
+        Finished `release` profile [optimized] target(s) in 2.42s
+command 2 (binary-sha256): ["sha256sum", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3r2run/release/p3census"] exit 0 (0.004 s) succeeded
+  stdout sha256 279b27f2d2b8172fe12423f2c5a57d67bf436f4d8f27d165cae071c55f3e7266; last 1 lines:
+    b4dcf0adb8caed9b7e09a50bfeeefc20688fbc506b47ba3fd1472b47e83555f9  /tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3r2run/release/p3census
+command 3 (selftest): ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3r2run/release/p3census", "selftest"] exit 0 (0.648 s) succeeded
+  stdout sha256 9ae74183c62ca38af9d000f1ff4ea1f1be4e520801a0b406dc1353f66b475e96; last 12 lines:
+    PASS sqrt_mod: 0 failures in 200 (p in 1009..2^32)
+    PASS is_prime: ok
+    PASS bsgs vs brute count: 160/160 curves
+    PASS psi3/psi5 (deg, lead 5, torsion<=>root, gcd vs evaluation, squarefree): last p=10007 psi3 roots 0 psi5 roots 2
+    PASS z_c equals splitcount.rs recount at all 12 cutoffs: 3 curves, max |dz| = 0.00e0; odd primes used at 691: 124 (124 expected)
+    PASS rho recovers planted k: 10/10; mean ops 279
+    PASS rho v2: no short jump relations, one DP rule per prime, no capped-walk regime: relations 0; capped 9/11592 walks; mean ops/sqrt(n) n<2^20 1.062, n>=2^20 1.018 (4 curves x 48 targets each)
+    PASS m=2 coverage equals brute-force set size: p=1009, N=20, 3 curves
+    PASS t quantile: t_0.975,10 = 2.228139
+    PASS normal: ok
+    PASS ols slope: b = 0.3000 [0.2997,0.3003]
+    ALL SELFTESTS PASSED
+command 4 (mkdir-prime-dirs): ["mkdir", "-p", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 5 (p24-rho-a): ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3r2run/release/p3census", "rho", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/curves.jsonl", "--targets", "256", "--seed", "11424068243091161927", "--run", "A", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/rhoA.jsonl"] exit 0 (325.208 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    rho run A: 2000 curves x 256 targets, 2043601801 group ops in 325.19s = 6.284e6 ops/s (one core)
+  output research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/rhoA.jsonl: 283b5199c7080f9a815e5ea1946f8b00094bfab5fd45137f5b4b9eab1f7b015d
+command 6 (p24-rho-b): ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3r2run/release/p3census", "rho", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/curves.jsonl", "--targets", "256", "--seed", "16739699506839864087", "--run", "B", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/rhoB.jsonl"] exit 0 (325.106 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    rho run B: 2000 curves x 256 targets, 2046777124 group ops in 325.10s = 6.296e6 ops/s (one core)
+  output research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/rhoB.jsonl: cf07b89421149850fdb53da3fbecd36f1f569958a8d06e136e0cf5ed6c2c641b
+command 7 (p24-analyze): ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3r2run/release/p3census", "analyze", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/curves.jsonl", "--cov", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/cov.jsonl", "--rho-a", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/rhoA.jsonl", "--rho-b", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/rhoB.jsonl", "--yield", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p24/yield.jsonl", "--seed", "9456636048090206450", "--perms", "1000", "--alpha", "0.05", "--planted", "0.02", "--covariates", "z_691,logL1_200000,psi3_roots,psi5_roots", "--family-size", "16", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/analysis.json"] exit 0 (2.34 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 13 lines:
+    curves joined: 2000; family 16; Bonferroni alpha 3.13e-3
+    outcome                        covariate      slope/mean      ci_lo      ci_hi         p  decision
+    rho_ops_over_sqrt_n            z_691            -0.00087   -0.00186   +0.00011  8.258e-2      null
+    rho_ops_over_sqrt_n            logL1_200000     +0.00013   -0.00086   +0.00113  7.924e-1      null
+    rho_ops_over_sqrt_n            psi3_roots       -0.00022   -0.00122   +0.00077  6.594e-1      null
+    rho_ops_over_sqrt_n            psi5_roots       -0.00024   -0.00124   +0.00075  6.336e-1      null
+    m2_coverage_over_2N2_over_n    z_691            -0.00002   -0.00003   +0.00000  7.011e-2      null
+    m2_coverage_over_2N2_over_n    logL1_200000     -0.00000   -0.00002   +0.00002  8.250e-1      null
+    m2_coverage_over_2N2_over_n    psi3_roots       -0.00001   -0.00003   +0.00001  4.324e-1      null
+    m2_coverage_over_2N2_over_n    psi5_roots       -0.00000   -0.00002   +0.00002  9.018e-1      null
+    planted +2.0% on rho_ops_over_sqrt_n: recovered +0.0191 [+0.0181,+0.0201] p=1.49e-238 detected=true analytic power 1.000; MDE(80%) = 0.0019
+    planted +2.0% on m2_coverage_over_2N2_over_n: recovered +0.0200 [+0.0200,+0.0200] p=0.00e0 detected=true analytic power 1.000; MDE(80%) = 0.0000
+    A/A: r(A,B)=+0.0274 [-0.0165,+0.0711]; slope B on A +0.0009 (per SD of A, frac of mean) p=0.213; mean B-A +1.514e-3 (t=+1.58); var ratios A 1.016 B 0.992
+  output research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p24/analysis.json: 78bb2f027e5dc36d9349c1e33cdc19db0fdf962dc9a59250f9bbd7e36ee1f6ff
+command 8 (p28-rho-a): ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3r2run/release/p3census", "rho", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/curves.jsonl", "--targets", "256", "--seed", "6471924370547007479", "--run", "A", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/rhoA.jsonl"] exit 0 (1349.567 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    rho run A: 2000 curves x 256 targets, 7989956827 group ops in 1349.56s = 5.920e6 ops/s (one core)
+  output research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/rhoA.jsonl: 80d23d0cb0a36b23a5491cdc51850241fedad326cc4c41989b51a76edcdc51d3
+command 9 (p28-rho-b): ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3r2run/release/p3census", "rho", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/curves.jsonl", "--targets", "256", "--seed", "13467469337155996127", "--run", "B", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/rhoB.jsonl"] exit 0 (1373.03 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+    rho run B: 2000 curves x 256 targets, 7987735621 group ops in 1373.02s = 5.818e6 ops/s (one core)
+  output research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/rhoB.jsonl: 37217da9fdfb499e6b1278d39f9164505baf1bfecd3880fc5c9b58d708f2ce83
+command 10 (p28-analyze): ["nice", "-n", "10", "/tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p3r2run/release/p3census", "analyze", "--curves", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/curves.jsonl", "--cov", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/cov.jsonl", "--rho-a", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/rhoA.jsonl", "--rho-b", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/rhoB.jsonl", "--yield", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-20261107T2220Z/p28/yield.jsonl", "--seed", "14287345612908892213", "--perms", "1000", "--alpha", "0.05", "--planted", "0.02", "--covariates", "z_691,logL1_200000,psi3_roots", "--family-size", "16", "--out", "research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/analysis.json"] exit 0 (2.007 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 11 lines:
+    curves joined: 2000; family 16; Bonferroni alpha 3.13e-3
+    outcome                        covariate      slope/mean      ci_lo      ci_hi         p  decision
+    rho_ops_over_sqrt_n            z_691            -0.00036   -0.00133   +0.00061  4.638e-1      null
+    rho_ops_over_sqrt_n            logL1_200000     +0.00025   -0.00073   +0.00123  6.180e-1      null
+    rho_ops_over_sqrt_n            psi3_roots       -0.00036   -0.00134   +0.00062  4.711e-1      null
+    m2_coverage_over_2N2_over_n    z_691            -0.00000   -0.00000   +0.00000  9.607e-1      null
+    m2_coverage_over_2N2_over_n    logL1_200000     -0.00000   -0.00000   +0.00000  9.277e-1      null
+    m2_coverage_over_2N2_over_n    psi3_roots       -0.00001   -0.00001   -0.00000  1.981e-2      null
+    planted +2.0% on rho_ops_over_sqrt_n: recovered +0.0196 [+0.0187,+0.0206] p=1.40e-255 detected=true analytic power 1.000; MDE(80%) = 0.0019
+    planted +2.0% on m2_coverage_over_2N2_over_n: recovered +0.0200 [+0.0200,+0.0200] p=0.00e0 detected=true analytic power 1.000; MDE(80%) = 0.0000
+    A/A: r(A,B)=+0.0090 [-0.0349,+0.0528]; slope B on A +0.0003 (per SD of A, frac of mean) p=0.687; mean B-A -2.648e-4 (t=-0.28); var ratios A 0.965 B 0.948
+  output research/split_prime_ecdlp_20261107/followups/p3_cross_trace/runs/run-r2-20261108T0544Z/p28/analysis.json: 4aab0917b0835362b1d229ef1657218203c24860262b2174f4e50aac99d1d283

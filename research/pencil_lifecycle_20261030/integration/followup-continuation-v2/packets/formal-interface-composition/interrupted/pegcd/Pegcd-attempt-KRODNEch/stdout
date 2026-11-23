@@ -1,0 +1,47 @@
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:13:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instOne', which is 'noncomputable'
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:15:10: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HDiv K[X] K[X] ?m.10
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:16:7: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HMod K[X] K[X] ?m.22
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:14:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instSub', which is 'noncomputable'
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:22:50: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HDiv K[X] K[X] ?m.16
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:23:25: error(lean.unknownIdentifier): Unknown identifier `EuclideanDomain.div_add_mod`
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:29:4: error: unknown tactic
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:28:10: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HMod K[X] K[X] ?m.59
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:24:89: error: unsolved goals
+case refine_2
+K : Type u_1
+inst✝ : Field K
+a b : K[X]
+z : State K
+h0 : z.r0 = z.s0 * a + z.t0 * b
+h1 : z.r1 = z.s1 * a + z.t1 * b
+hd : ∀ (h : K[X]), h ∣ z.r0 ∧ h ∣ z.r1 ↔ h ∣ a ∧ h ∣ b
+he : sorry
+⊢ ∀ (h : K[X]), h ∣ (step z).r0 ∧ h ∣ (step z).r1 ↔ h ∣ a ∧ h ∣ b
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:42:12: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Decidable (z.r1 = 0)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:49:3: error: Tactic `split_ifs` failed: no if-then-else conditions to split
+
+case succ
+K : Type u_1
+inst✝ : Field K
+a b : K[X]
+n : ℕ
+ih : ∀ (z : State K), Valid a b z → Valid a b (run n z)
+z : State K
+hv : Valid a b z
+⊢ Valid a b sorry
+/var/tmp/pencil-pegcd-formal-20261101-v1/Pegcd.lean:48:14: warning: declaration uses `sorry`

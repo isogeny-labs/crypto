@@ -1,0 +1,46 @@
+{
+  "schema": "n83.integration-validation/v1",
+  "validated_code_commit": "0dbd1fdf937ed5d06c3687ad4b719979340a196f",
+  "code_unchanged_through": "d9787dd9e",
+  "rust_and_cargo_diff_check": "PASS",
+  "command": "RAYON_NUM_THREADS=1 cargo test --offline --locked --release --lib --example koblitz_n83_factor_base_export --example koblitz_n83_fixed_witness_control --example koblitz_n83_selector_witness_control -j2 -- --test-threads=1",
+  "execution_permissions": "localhost fixture servers permitted",
+  "explicit_exit_code": 0,
+  "library": {
+    "passed": 4397,
+    "failed": 0,
+    "ignored": 118,
+    "recorded_seconds": 1221.76
+  },
+  "exporter": {
+    "passed": 19,
+    "failed": 0
+  },
+  "fixed_witness_example": {
+    "tests": 0
+  },
+  "selector_example": {
+    "passed": 1,
+    "failed": 0
+  },
+  "standalone_native_runner": {
+    "passed": 13,
+    "failed": 0,
+    "source": "unchanged since27d17bd"
+  },
+  "preserved_parallel_attempt": {
+    "passed": 4387,
+    "failed": 10,
+    "ignored": 118,
+    "exit": 101,
+    "reasons": "9 localhost fixture permission denials;1 existing F4 time cap under concurrent tests"
+  },
+  "isolated_previously_failed_test": {
+    "passed": 1,
+    "exit": 0,
+    "recorded_seconds": 2.70
+  },
+  "restricted_serial_attempt": "interrupted by parent; retained partial log and exit101",
+  "measured_source_validation": "separate prior full pass; see VALIDATION.md",
+  "raw_archive_includes_this_postmerge_validation": false
+}

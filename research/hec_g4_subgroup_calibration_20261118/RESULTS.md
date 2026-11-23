@@ -1,0 +1,3 @@
+The second-extension hyperelliptic point count is 1026. The reciprocal polynomial has central coefficient 866 and #J=959012=4·239753. The 32 distinct Abel images cannot fit into the order-four kernel of multiplication by four, so the true subgroup logs on these points are nonconstant. The plane relation kernel has dimension two; fixing the constant and the scale determines the true logs uniquely.
+
+With P0=(3,11), P1=(4,∞), H=4[P1-P0] has exact order 239753. All 32 values for 4[Pi-P0] are distinct and tabulated in CONTROL.txt. They satisfy all 80 plane differences. The class 4[K-6P0] has log 21967 relative to H. This provides a generator and scalar convention for target descent.

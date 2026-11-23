@@ -1,0 +1,43 @@
+import StoredRemainder
+set_option autoImplicit false
+namespace StoredValidity
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput ResidualWord
+
+def test (p : UInt64) (f : List UInt64) (d : Stored) : Bool :=
+ if d.degree≤2 then
+  if d.u.toList[d.degree]?=some 1 then
+   decide (FallbackGeometry.remainder p (residual p f (vp d)) (up d)=some [])
+  else false
+ else false
+
+theorem safe_leading_index (d : Stored) (hu : d.u.size=3) (hd : d.degree≤2) :
+ d.degree<d.u.size := by omega
+
+theorem guarded_accessors (p : UInt64) (d : Stored)
+ (hd : d.degree≤2) (hu : d.u.size=3) (hv : d.v.size=2)
+ (hc : d.canonical p) (hl : d.u.toList[d.degree]?=some 1) :
+ (up d).getLast?=some 1 ∧ Canon p (up d) ∧ Canon p (vp d) := by
+ have h : WellFormed p ((wordsPoly p (vp d))^2) d := ⟨hd,hu,hv,hc,hl,by simp⟩
+ obtain ⟨_,hm,_,_,_,huc,hvc⟩:=accessor_shape p _ d h
+ exact ⟨hm,huc,hvc⟩
+
+theorem test_iff_wellformed (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (d : Stored)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hf : Canon p f)
+ (hu : d.u.size=3) (hv : d.v.size=2) (hc : d.canonical p) :
+ test p f d=true ↔ WellFormed p (wordsPoly p f) d := by
+ by_cases hd : d.degree≤2
+ · by_cases hl : d.u.toList[d.degree]?=some 1
+   · obtain ⟨hm,huc,hvc⟩:=guarded_accessors p d hd hu hv hc hl
+     have hs:=residual_correct p f (vp d) (by omega) hb hf hvc
+     have hr:=remainder_empty_iff p (residual p f (vp d)) (up d) hp hb hs.1 huc hm
+     simp only [test,if_pos hd,if_pos hl,decide_eq_true_eq]
+     rw [hr,hs.2]
+     simp only [WellFormed,hd,hu,hv,hc,hl,true_and]
+   · simp [test,hd,hl,WellFormed]
+ · simp [test,hd,WellFormed]
+
+theorem test_accepts_wellformed (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (d : Stored)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (hf : Canon p f)
+ (hw : WellFormed p (wordsPoly p f) d) : test p f d=true :=
+ (test_iff_wellformed p f d hp hb hf hw.2.1 hw.2.2.1 hw.2.2.2.1).mpr hw
+end StoredValidity

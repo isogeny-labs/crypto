@@ -1,0 +1,46 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    }
+  ],
+  "description": "Matched negation-map rho on the pkm_symmetric_lead1 curve (PROTOCOL.md). Public synthetic curve and targets; no security claim.",
+  "label": "pkm_priced_20261115 matched rho-neg, p=786433 t=4",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 3,
+    "seed": 2026111545,
+    "timeout_seconds": 1800,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 674715,
+        "b": 777649,
+        "group_order": 787472,
+        "gx": 190048,
+        "gy": 5969,
+        "kind": "prime_explicit",
+        "p": 786433,
+        "r": 89
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026111535,
+    "targets_per_curve": 200
+  }
+}

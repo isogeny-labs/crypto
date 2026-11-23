@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-14T01:28:44Z",
+ "id": "PCC-20261114-3b0238",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d265c35a0efc1efb609a396e451fd543ab838c21",
+  "model": "",
+  "session": "norm-target-fiber-20261114"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ebfc38d47fcbdc46a54d6782e922af80e3d7c68e892d85170561b40b2fbfce75",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "NormTargetFiber.mapMaster"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual declaration/context hypotheses: CommRing, Nontrivial ring where needed, and Field for field specializations/factor removal. Curve equation, d>=3, bounded remainder and e!=0 premises are explicit. Actual computed norm/division/remainder and base change only; no weighted-degree29, low closure, finder or sub-exponential claim. Unsigned source-bound evidence.",
+ "statement": "Exact source-bound theorem NormTargetFiber.mapMaster: theorem mapMaster (\u03c6 : R \u2192+* S) (e : R) (n : \u2115) : (master e n).map \u03c6=master (\u03c6 e) n"
+}

@@ -1,0 +1,16 @@
+{
+  "action": "never run rebase --autostash, stash, worktree checkout, or a sync that restores files while lanes write; only commit, and restore solely the files the pulled merge itself deleted; give each lane raw-file outputs versioned names",
+  "created": "2026-11-16T02:19:35Z",
+  "evidence": [
+    "research/ecc2k130_followups_20261116/README.md",
+    "research/ecc2k130_open7_20261114/README.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "parallel-lanes",
+    "main-session"
+  ],
+  "trigger": "a main session commits/rebases/merges in a working tree where background lanes are still writing raw data files",
+  "why": "2026-11-14 a restore re-inserted 7 discarded L5 v1 files into raw/; 2026-11-16 an autostash rebase at 01:34Z rewrote F1 live files and stopped process p3 (rerun matched in counted fields)"
+}

@@ -1,0 +1,64 @@
+{
+ "created_at": "2026-11-09T19:50:30Z",
+ "id": "PCC-20261109-fb685e",
+ "kind": "execution",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round70-p192/execution-record.json",
+    "sha256": "035620c3f1128eaa0389da7e7470ba2a32844bbf959d8ca21276e7d20ce64e17"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round70-p192/P192-fibers.json",
+    "sha256": "ec8193de2e9c5eba6830065d0dfc4eff2de59cb5d9c76207d9a52b66612b4d26"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round70-p192/P192-fresh.json",
+    "sha256": "ec8193de2e9c5eba6830065d0dfc4eff2de59cb5d9c76207d9a52b66612b4d26"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round70-p192/small-fibers.stderr",
+    "sha256": "7582ef3057d46d8f7df1da8d2cc63436aa3020f9b0d83c1647e005c92e9352e5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round70-p192/report.md",
+    "sha256": "d0996262df006e195b817d4e4c5660fc274a0b51e5f8d3736ee5f754a88cf06b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round70-p192/native/src/p192.rs",
+    "sha256": "6300169683f7dbc83c9a4fc756dc01466133a6e734a1d30004fd4cc7ab73a4f2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cm-isogeny-attack-20261107/round70-p192/native/src/main.rs",
+    "sha256": "63d21d8d828307b856d9a8e4a741b82921ff9e36ca5312264fd382f8b994a637"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "P192 frozen Round70 exact inputs and maps; no complete small panel, no target group cardinalities, no general transfer claim",
+ "statement": "Round70 local P192 polynomial/point controls pass and replay byte-identically; 24 branch-lift based order tests fail, scalar prefixes fail at 2G, and the small panel stops at an overly strict wrong-Z assertion. No independent scientific verdict."
+}

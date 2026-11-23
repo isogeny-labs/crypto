@@ -1,0 +1,121 @@
+{
+ "schema": "validation-gate/v1",
+ "scope": "Gate evidence for session ECBS1h695ef8e76c34 (FES-K13-VALIDATED-20261112, Runpod attempt a1): the degree-13 Koblitz descent rows (binary-subspace d=7 + descent-algebraic m=2 + fes-f2 / inherited-f4 + walk), the pair-table row, and the matched rho. H1 (fes-f2 below inherited-f4 across the band) is NOT supported: unresolved inside the band (validator-report F2). No wall figure is admissible (F3, F4). Binary-to-source binding open (F5).",
+ "rows": [
+  "icv1-f2m13-t181-515ee569"
+ ],
+ "replay_certificate": {
+  "path": "validation/replay-certificate.json",
+  "sha256": "eef29c7b9c2a5956b58a77dbebc16c36203ad891ed1e906c95d7a2112cd7d3f8"
+ },
+ "validator_report": {
+  "path": "validation/validator-report.json",
+  "sha256": "c615bfbe75d7886e14484bc9ddbeb60d3e50931536238937a36da1aa204fbc40"
+ },
+ "rho_reference": {
+  "kind": "frobenius",
+  "arm": "rho-sfstrong-v2",
+  "protocol": "protocol.json arms: rho-sfstrong-v2 = rho.signed_frobenius_strong_v2 (signed-Frobenius orbits, A = 2n = 26), the reference arm and the strongest available Koblitz rho; same session ECBS1h695ef8e76c34, 8 public targets x 6 measured rounds, seeds shared per (workload, round) with every IC arm",
+  "unit": "ecbench.gae; S = GAE / sqrt(r), r = 2003",
+  "binary_or_process": "one ecbench binary (sha256 8f9576b5bf81819274cc6049eb671c6d97f0bc6660f99d0445448edb4e5130f4), one session ECBS1h695ef8e76c34, for every arm",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_note": "the protocol names it the strongest Koblitz rho; in this session it is below rho.negation at every band weight (2.584 / 2.677 / 3.513 vs 2.788 / 2.927 / 4.183). No other Koblitz rho variant was measured.",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "ic_arm": "ic-descent-fes-f2",
+  "gae_band": {
+   "0": {
+    "ic": 15.17711316765623,
+    "rho": 2.5844832898041115
+   },
+   "0.1": {
+    "ic": 3081.7630559809927,
+    "rho": 2.677303691154579
+   },
+   "1": {
+    "ic": 30681.036541301015,
+    "rho": 3.5126873033087898
+   }
+  },
+  "gae_band_ratio_ic_over_rho": {
+   "0": 5.872397483679055,
+   "0.1": 1151.0696624229402,
+   "1": 8734.348916398249
+  },
+  "order_holds_across_band": true,
+  "order_holds_across_band_means": "rho-sfstrong-v2 is below ic-descent-fes-f2 (and below inherited-f4 and the pair table) at w = 0, 0.1 and 1: the gap is the distance remaining. It does not rank fes-f2 against inherited-f4.",
+  "component_orders": {
+   "fes_f2_vs_inherited_f4": {
+    "order": {
+     "0": ">",
+     "0.1": "<",
+     "1": "<"
+    },
+    "ratio": {
+     "0": 1.000184060371802,
+     "0.1": 0.6668030451868829,
+     "1": 0.6658150014588617
+    },
+    "verdict": "unresolved inside the band"
+   }
+  },
+  "band_formula": "S(w) = mean over measured runs of [G - C + w (U + n_C)] / sqrt(r), band.rs at e9d5dbdccd, table work priced (2026-11-08 default reading)",
+  "unpriced_counters": {
+   "rho-sfstrong-v2": {
+    "listed": [
+     "canonicalisations_uncharged",
+     "partition_hashes_uncharged",
+     "table_inserts_uncharged",
+     "table_queries_uncharged"
+    ],
+    "mean_counts_priced": {
+     "canonicalisations_uncharged": 18.9375,
+     "partition_hashes_uncharged": 12.875,
+     "table_inserts_uncharged": 4.333333333333333,
+     "table_queries_uncharged": 5.395833333333333
+    }
+   },
+   "rho-negation": {
+    "listed": [
+     "canonicalisations_uncharged"
+    ],
+    "mean_counts_priced": {
+     "canonicalisations_uncharged": 62.458333333333336
+    }
+   },
+   "ic-pairtable-mitm2": {
+    "listed": [],
+    "mean_counts_priced": {
+     "table_insert_attempts": 8192.0
+    }
+   },
+   "ic-descent-inherited-f4": {
+    "listed": [],
+    "mean_counts_priced": {
+     "table_insert_attempts": 0.0
+    }
+   },
+   "ic-descent-fes-f2": {
+    "listed": [],
+    "mean_counts_priced": {
+     "table_insert_attempts": 0.0
+    }
+   },
+   "rho-sfstrong-v2-aa": {
+    "listed": [
+     "canonicalisations_uncharged",
+     "partition_hashes_uncharged",
+     "table_inserts_uncharged",
+     "table_queries_uncharged"
+    ],
+    "mean_counts_priced": {
+     "canonicalisations_uncharged": 18.9375,
+     "partition_hashes_uncharged": 12.875,
+     "table_inserts_uncharged": 4.333333333333333,
+     "table_queries_uncharged": 5.395833333333333
+    }
+   }
+  }
+ }
+}

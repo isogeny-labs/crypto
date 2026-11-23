@@ -1,0 +1,5 @@
+# A single witness shortened one target search and lengthened the other
+
+Both returned scalars verified on the original curve. Case 0 used source m=2 and target offset 37, visited 38 points in each stream, and tried 42 distinct scalar candidates. Its online time was 365.200 ms against 0.710 ms for the reference. Case 1 used source m=15 and target offset 31, visited 32 points in each stream, and tried 12 candidates. Its online time was 264.592 ms against 1.032 ms for the reference. Its slope 27034 is the negative modulo 239753 of the previously reported 212719, consistent with choosing residual triples.
+
+Compared with the two-witness experiment, visited points changed from 49 to 76 and from 201 to 64. The registered round-robin rule continues searching the source after a correct slope may already be present. Removing the repeat requirement alone offers no uniform reduction in anchor work. These single timings include precomputed geometry and log tables as inputs and cannot support an end-to-end speedup.

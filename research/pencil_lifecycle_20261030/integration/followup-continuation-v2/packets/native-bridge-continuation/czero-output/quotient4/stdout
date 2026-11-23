@@ -1,0 +1,20 @@
+/var/tmp/pencil-czero-output-20261101-v1/Quotient.lean:42:17: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (q1 + q2) * 1 + t.coeff 0
+in the target expression
+  q1 + q2 + t.coeff 0 + a * a = 0
+
+K : Type u_1
+inst✝ : Field K
+f : K[X]
+q1 r1 s1 t1 q2 r2 a : K
+t : K[X]
+hf : f.natDegree = 5
+h5 : f.coeff 5 = 1
+h4 : f.coeff 4 = 0
+he :
+  f - (ordinate s1 t1 - C a * CZeroInterpolation.support q1 r1) ^ 2 =
+    CZeroInterpolation.support q1 r1 * CZeroInterpolation.support q2 r2 * t
+ht : t = C (t.coeff 0) + C (t.coeff 1) * X
+he5 : 1 = t.coeff 1
+he4 : -(a * a) = (q1 + q2) * 1 + t.coeff 0
+⊢ q1 + q2 + t.coeff 0 + a * a = 0

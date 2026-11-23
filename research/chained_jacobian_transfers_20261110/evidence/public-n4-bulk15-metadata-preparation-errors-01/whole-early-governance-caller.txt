@@ -1,0 +1,17 @@
+ledger 0
+prose 0
+whitespace 0
+wiring 0
+cached-whitespace 0
+artifact 1
+Traceback (most recent call last):
+  File "/workspace/scratch/ct74_commit_bulk15.py", line 55, in <module>
+    expected=set(json.loads(Path('/workspace/scratch/ct74-bulk15-handoff-01/expected-migration-paths.json').read_text()))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/scratch/ct74-bulk15-handoff-01/expected-migration-paths.json'

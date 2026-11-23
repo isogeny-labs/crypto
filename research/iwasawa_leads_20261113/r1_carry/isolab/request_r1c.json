@@ -1,0 +1,25 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "r1c-iwasawa-psi-20261115",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:d6b31c889d6dae0f6ccba95972922caf1f6e026133b3b450165d9545b7c293cc",
+    "command": [
+      "/bin/sh",
+      "/opt/r1c/run_r1c.sh"
+    ],
+    "cpu": 6,
+    "memory": "8Gi",
+    "seconds": 3600,
+    "isolation_profile": "standard",
+    "instance_type": "c8a.2xlarge",
+    "retries": 0,
+    "wait_seconds": 1800
+  },
+  "provenance": {
+    "harness": "claude-code main session",
+    "source_revision": "ac299c6c8f1382fcfa7545500f0a1a95f9306f7a",
+    "study": "research/iwasawa_leads_20261113 R1c",
+    "protocol_sha256": "695a9e0d609ed929f543bed55d1d5767f25b98d80348717a639a7124d1b87ccd",
+    "note": "exact computation, no timing; owner budget ceiling USD 20; binaries r1c sha256 1b3837bd2f04211ee029399fdf0d37d6bc4cbd7f5fb847b11f1114f038da22c2"
+  }
+}

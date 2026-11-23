@@ -1,0 +1,39 @@
+{
+  "schema": "n83.native-short-control-protocol/v1",
+  "purpose": "separate terminal-receipt observability controls after a 600-second outer-censored K2048 attempt; no replacement of retained long-cap cells",
+  "parent_protocol_source_commit": "f08f9f887ba9f87d0b8976ec1c7a6cd65eb63127",
+  "columns_in_order": [
+    2048,
+    4096
+  ],
+  "curve_a": 0,
+  "summands": 5,
+  "policy": "public_x_hash",
+  "base_seed": 2026100801,
+  "sampler_seed": 2026100901,
+  "max_trials": 1,
+  "max_variables": 150000,
+  "max_domain_clauses": 2000000,
+  "max_models": 32,
+  "conflict_budget": 1000,
+  "wall_seconds_per_arm": 180,
+  "memory_bytes": 4294967296,
+  "swap_bytes": 0,
+  "cpu_limit": 1.0,
+  "network_mode": "none",
+  "additional_declared_worker_envelope_seconds": 360,
+  "image_id": "sha256:541096ae9b05d3b850341b78790e2ed31e94d5aa0ea086933c6ff0c09ffa2e63",
+  "binary_sha256": "9aa6f722d79f460d9388f63954c6ddbed1c2672e08c35c0bd34e697f5d7ddfc0",
+  "storage_bucket": "setec-astronomy-artifacts",
+  "expected_attempt_query_from_historical_reference": {
+    "a": "555041861612817674392871",
+    "b": "1880544021900751415145556",
+    "target": [
+      "6261116474805304534310590",
+      "4505575220639647215230954"
+    ]
+  },
+  "stop_rule": "do not extend either wall/conflict cap; retain all terminal or censored outcomes; verify actual query identity before calling the controls matched query results",
+  "interpretation": "bounded pipeline receipt controls; no yield estimate, fastest claim or cold-runtime base selection",
+  "selected_best_total_runtime": null
+}

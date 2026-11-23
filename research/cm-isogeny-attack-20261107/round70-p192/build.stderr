@@ -1,0 +1,123 @@
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling zmij v1.0.23
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling num-integer v0.1.47
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling num-bigint v0.4.8
+   Compiling shifted-fiber v0.1.0 (/home/ec2-user/research/cm-isogeny-attack-20261107/round70-p192/native)
+error[E0284]: type annotations needed
+   --> src/main.rs:165:35
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::c(-1))][0]];
+    |                                   ^^^^ cannot infer the value of the const parameter `P` declared on the struct `F`
+    |
+note: required by a const generic parameter in `fid`
+   --> src/main.rs:3:8
+    |
+  3 | fn fid<const P: i64, const D: i64>(x: F<P, D>) -> usize {
+    |        ^^^^^^^^^^^^ required by this const generic parameter in `fid`
+help: consider specifying the generic arguments
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::<P, D>::c(-1))][0]];
+    |                                    ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:165:35
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::c(-1))][0]];
+    |                                   ^^^^ cannot infer the value of the const parameter `D` declared on the struct `F`
+    |
+note: required by a const generic parameter in `fid`
+   --> src/main.rs:3:22
+    |
+  3 | fn fid<const P: i64, const D: i64>(x: F<P, D>) -> usize {
+    |                      ^^^^^^^^^^^^ required by this const generic parameter in `fid`
+help: consider specifying the generic arguments
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::<P, D>::c(-1))][0]];
+    |                                    ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:165:35
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::c(-1))][0]];
+    |                                   ^^^^ cannot infer the value of the const parameter `P` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F`
+   --> src/helpers.rs:13:10
+    |
+ 13 | struct F<const P: i64, const D: i64>(i64, i64);
+    |          ^^^^^^^^^^^^ required by this const generic parameter in `F`
+help: consider specifying the generic arguments
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::<P, D>::c(-1))][0]];
+    |                                    ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:165:35
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::c(-1))][0]];
+    |                                   ^^^^ cannot infer the value of the const parameter `D` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F`
+   --> src/helpers.rs:13:24
+    |
+ 13 | struct F<const P: i64, const D: i64>(i64, i64);
+    |                        ^^^^^^^^^^^^ required by this const generic parameter in `F`
+help: consider specifying the generic arguments
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::<P, D>::c(-1))][0]];
+    |                                    ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:165:35
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::c(-1))][0]];
+    |                                   ^^^^ cannot infer the value of the const parameter `P` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F::<P, D>::c`
+   --> src/helpers.rs:14:6
+    |
+ 14 | impl<const P: i64, const D: i64> F<P, D> {
+    |      ^^^^^^^^^^^^ required by this const generic parameter in `F::<P, D>::c`
+...
+ 18 |     fn c(a: i64) -> Self {
+    |        - required by a bound in this associated function
+help: consider specifying the generic arguments
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::<P, D>::c(-1))][0]];
+    |                                    ++++++++
+
+error[E0284]: type annotations needed
+   --> src/main.rs:165:35
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::c(-1))][0]];
+    |                                   ^^^^ cannot infer the value of the const parameter `D` declared on the struct `F`
+    |
+note: required by a const generic parameter in `F::<P, D>::c`
+   --> src/helpers.rs:14:20
+    |
+ 14 | impl<const P: i64, const D: i64> F<P, D> {
+    |                    ^^^^^^^^^^^^ required by this const generic parameter in `F::<P, D>::c`
+...
+ 18 |     fn c(a: i64) -> Self {
+    |        - required by a bound in this associated function
+help: consider specifying the generic arguments
+    |
+165 |     let i = t2.elems[t2.roots[fid(F::<P, D>::c(-1))][0]];
+    |                                    ++++++++
+
+warning: unused variable: `b`
+  --> src/main.rs:36:71
+   |
+36 | fn field_fibers<const P: i64, const D: i64>(t: &Tables<P, D>, a: i64, b: i64) -> Vec<Value> {
+   |                                                                       ^ help: if this is intentional, prefix it with an underscore: `_b`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+For more information about this error, try `rustc --explain E0284`.
+warning: `shifted-fiber` (bin "shifted-fiber") generated 1 warning
+error: could not compile `shifted-fiber` (bin "shifted-fiber") due to 6 previous errors; 1 warning emitted

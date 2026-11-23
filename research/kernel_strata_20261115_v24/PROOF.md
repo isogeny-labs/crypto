@@ -1,0 +1,7 @@
+# Exact degree-conditioned dual guards
+
+Fixdegree d: u_d=1,higherbits0. Arowmultiplier annihilating M(e0)..M(ed) gives anaffine necessarycondition onlowerdcoefficients fromitsrhs evaluations. Solvingalltheseconditions preserves everyfeasibledirection. Completeness onthedeclaredfinite degreeclass ischecked againstthefrozencomplete511direction pencil classification; it doesnotfollowmerelyfromtheexistenceofduals.
+
+Thelow6prefix includingu0isalsochecked byahomogeneous sharedsyndrome. Ifitscandidatekernel exactlymatchesallpositivepencil directionsandmatchesdivisibilitybytheexposedminimumcompatiblepolynomial,that is anexact finite-prefixdescription only. Noextrapolation tohighdegrees,otherh/k,fields,rootsets ornovelty.
+
+Complete4096tiny pencils andbothmonicdegree strata arechecked againstallinnertruthassignments. Thefirstexecutionof thepreviouslypreparedsource occursunder thisfreshplan; previousbudgetguard stoppedbefore anyregistration/run.90s4GiBonecore,raw256KiB/stdout8KiB,final84s. Sole-modelpreparation review;externalpromotionpending.

@@ -1,0 +1,14 @@
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
+#check AddSubgroup.addOrderOf_mk
+#check AddSubgroup.forall_zmultiples
+#check addEquivOfAddOrderOfEq
+#check addEquivOfAddOrderOfEq_apply_gen
+example {G H : Type*} [AddCommGroup G] [AddCommGroup H] (P : G) (R : H)
+    (h : addOrderOf P = addOrderOf R) :
+    Nonempty (AddSubgroup.zmultiples P ≃+ AddSubgroup.zmultiples R) := by
+  let p : AddSubgroup.zmultiples P := ⟨P, by simp⟩
+  let r : AddSubgroup.zmultiples R := ⟨R, by simp⟩
+  refine ⟨addEquivOfAddOrderOfEq (g := p) (g' := r) ?_ ?_ ?_⟩
+  · exact AddSubgroup.forall_zmultiples.mpr (fun n => ⟨n, rfl⟩)
+  · exact AddSubgroup.forall_zmultiples.mpr (fun n => ⟨n, rfl⟩)
+  · simpa only [p, r, AddSubgroup.addOrderOf_mk] using h

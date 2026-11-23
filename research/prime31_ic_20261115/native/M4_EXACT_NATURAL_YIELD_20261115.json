@@ -1,0 +1,208 @@
+{
+  "standing": "[pcc:unverified]",
+  "date": "2026-11-15",
+  "classification": "Producer-local Python exact group enumeration; generic support NEGATIVE CONTROL, not an IC discovery algorithm or ECDLP cost timing",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1
+  },
+  "base": "native Base::build depth6 seed3, canonical ordinate normalization; injective-y depth7 first31",
+  "coefficient_vector_bound": "1+4B+16*C(B,2)+24*C(B,3)+16*C(B,4)",
+  "rows": [
+    {
+      "selection": "canonical-depth6",
+      "B": 4,
+      "two_including_identity": 33,
+      "four_including_identity": 225,
+      "four_additions": 528,
+      "sha256_nonidentity": "3194dc2f56a420ae37052d7d69c020a6e9d5920439f45e1499cb3ab3fc45d9d3"
+    },
+    {
+      "selection": "canonical-depth6",
+      "B": 8,
+      "two_including_identity": 129,
+      "four_including_identity": 2945,
+      "four_additions": 8256,
+      "sha256_nonidentity": "5ed3b3754ff1cec8a63e803b509b55888fa6fa87b5beeb9cb139c1eedb43bafa"
+    },
+    {
+      "selection": "canonical-depth6",
+      "B": 16,
+      "two_including_identity": 513,
+      "four_including_identity": 44545,
+      "four_additions": 131328,
+      "sha256_nonidentity": "9a09d07322773e30c365d13cccf4fe343ae2cbb150fad5294c5fc36ef72bc0d0"
+    },
+    {
+      "selection": "canonical-depth6",
+      "B": 31,
+      "two_including_identity": 1923,
+      "four_including_identity": 618885,
+      "four_additions": 1848003,
+      "sha256_nonidentity": "8cb1a70c7b96983b7cfc17e809959a93248db98298e38748719537d26468df89",
+      "uniform_hit_fraction": 0.00028819572669550297,
+      "queries_per_hit": 3469.864079756336
+    },
+    {
+      "selection": "unique-y-depth7-first31",
+      "B": 31,
+      "two_including_identity": 1923,
+      "four_including_identity": 618625,
+      "four_additions": 1848003,
+      "sha256_nonidentity": "6a962ddc5a03c26086a0eeaf1012e49a2b15a56edf3b64ae31a06ba6284aef4c",
+      "uniform_hit_fraction": 0.0002880746526850797,
+      "queries_per_hit": 3471.3224182663166,
+      "collision_deficit": 260,
+      "verified_weight_eight_zero_rows": 4,
+      "rank_mod_n": 4
+    }
+  ],
+  "witness_rows": [
+    [
+      [
+        5,
+        -1
+      ],
+      [
+        9,
+        1
+      ],
+      [
+        16,
+        -1
+      ],
+      [
+        17,
+        -1
+      ],
+      [
+        18,
+        -1
+      ],
+      [
+        19,
+        -1
+      ],
+      [
+        29,
+        -1
+      ],
+      [
+        31,
+        1
+      ]
+    ],
+    [
+      [
+        1,
+        -1
+      ],
+      [
+        5,
+        1
+      ],
+      [
+        16,
+        -1
+      ],
+      [
+        20,
+        1
+      ],
+      [
+        22,
+        1
+      ],
+      [
+        25,
+        -1
+      ],
+      [
+        26,
+        1
+      ],
+      [
+        30,
+        1
+      ]
+    ],
+    [
+      [
+        5,
+        -1
+      ],
+      [
+        11,
+        -1
+      ],
+      [
+        15,
+        1
+      ],
+      [
+        16,
+        -1
+      ],
+      [
+        22,
+        -1
+      ],
+      [
+        23,
+        -1
+      ],
+      [
+        25,
+        1
+      ],
+      [
+        28,
+        -1
+      ]
+    ],
+    [
+      [
+        4,
+        -2
+      ],
+      [
+        9,
+        -1
+      ],
+      [
+        11,
+        -1
+      ],
+      [
+        12,
+        -1
+      ],
+      [
+        16,
+        -1
+      ],
+      [
+        29,
+        1
+      ],
+      [
+        30,
+        1
+      ]
+    ]
+  ],
+  "replay": [
+    "python3 research/prime31_ic_20261115/native/prime31_m4_natural_yield_gate.py",
+    "cargo test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m4_natural_yield_gate",
+    "cargo run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m4_natural_yield_gate"
+  ],
+  "validation": {
+    "python": "producer-local independent integer arithmetic completed on exact p and subgroup; JSON values reproduced",
+    "rust": "new gate committed but not compiled in this connector environment",
+    "pcc": "unverified",
+    "rho_cold": "not measured"
+  }
+}

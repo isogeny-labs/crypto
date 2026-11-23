@@ -1,0 +1,9 @@
+# Native rendering and publication checks
+
+The Rust renderer reads original qualified/custody records and verifies the exact47schema/source, two actual worker exits, original qualifier0, paired/default regression gates and deletion204/404. It invokes no worker. The original21411byte summary is copied verbatim, with full LOCAL stage/archive hashes. Percentages derive only from recorded subtotal differences divided by the relevant baseline. [pcc:unverified]
+
+Typst0.15.1renders a single landscapeA4page; opened as1754×1241pixels at150dpi. Full table, quantitative relation bars, units/scales, n=1label, exact observations, source/custody/scope notes are legible and unclipped. The publication raster converts that final render to16colors without dithering,56071bytes; it was opened and inspected again. Source SVG/PDF and all values remain identical; palette pixels need not be identical to the full-color raster. Exact benchmark copies/hash metadata are retained. [pcc:unverified]
+
+Rendering commands: pdftoppm -png -r150 -singlefile report.pdf OUTPUT; convert OUTPUT.png -dither None -colors16 -define png:compression-level=9 PNG8:NEW.png (each flag/value is a separate argv item). No Python scientific code, new timing measurement or scientific retry.47summary/deletion are pinned byPCC-20261117-5bb829UNVERIFIED. [pcc:unverified]
+
+During46raster publication, a sparse branch switch had omitted benchmark copies. The first copy/untracking/hash check therefore failed and shell sequencing continued. Restored exact tracked originals with git restore --ignore-skip-worktree-bits, used git rm --sparse --cached, and ran the unchanged original sealed manifest successfully before writing the corrected new publication manifest. All original file bytes/proof subjects remain unchanged. The final path now enforces early exit on each verification failure. This was publication repair, not a scientific data or threshold change. [pcc:unverified]

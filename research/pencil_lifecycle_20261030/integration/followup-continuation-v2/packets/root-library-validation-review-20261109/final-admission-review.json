@@ -1,0 +1,51 @@
+{
+  "schema": "source.review.binding-addendum/v1",
+  "task": "T-1960",
+  "reviewer": "/root/renew_norm",
+  "recorded_utc": "2026-11-09T17:39:24.381023+00:00",
+  "verdict": "final_admission_bindings_supported_pending_root_publication_readback",
+  "admission_sha256": "f870fd0dbb81e7a8ef85bd35f1ef71b2e35713ca8454c8329ec2ed175b74d1ac",
+  "manifest_sha256": "c97e0fc82daa36502d80478239eef0f3cefe3c0acebf7c4d45b9a327543f770b",
+  "materialized_inputs_sha256": "c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2",
+  "input_manifest_bytes": 5016236,
+  "immutable_rows": 18714,
+  "initial_cache_rows": 2133,
+  "materializer_receipts_match_native": true,
+  "wrapper_qualification_cases": 26,
+  "wrapper_qualification_passed": true,
+  "wrapper_source_unchanged": {
+    "durable_io.py": "2034c58e36bb3e3d6727dbd6c640ff437c695f472810e6ae596e6ac339dc854c",
+    "durable-launcher.py": "57def5896c88cc512da5edd99bdea423ca87d44935bc064e0995c516db5a9f9c",
+    "durable-worker.py": "d8e32926c2d254238e39928105d6d2c6c2c5d318fbdb7cda07382493ada7a77e"
+  },
+  "source_publication_commit_checked": "079484df3a1bb5afdce3c3e017ab3ba70a702b1d",
+  "checks": [
+    "All16recipe_file hash bindings match reviewed snapshot.",
+    "Full materialized-input bytes match native producer; terminal same invocation44fced24... and absent captured cgroup; worker passed with matchingreceipt hash.",
+    "Actual Cargo.toml,Cargo.lock and private candidate pencil source match source bindings and immutablemanifest. Cargo/rustc paths anddigests present; worker performs full native pre/post hashes.",
+    "Source/cache/vendor/target/cargo-home/tmp directories present; full runtime qualification is subsequentworker obligation.",
+    "Four exact controls and compile/fullsuite ordering preserved; recipecriticalfields equaladmission.",
+    "26casequalification result exactcopy ofnativeoutput,exit0 bound; no morefixtures required.",
+    "T1958 live observed leasecc4e412e-c0a7-44ac-bda2-2c8f1ed4729d epoch3 matchesconfig; refreshed heartbeat remainsroot obligation."
+  ],
+  "campaign": {
+    "ceiling": 43200,
+    "charged": 1080,
+    "remaining_before_reservation": 42120,
+    "reserved": 1800,
+    "unreserved": 40320
+  },
+  "launch": {
+    "seconds": 1800,
+    "cpu": 2,
+    "memory_bytes": 17179869184,
+    "swap": 0,
+    "tasks": 512,
+    "attempts": 1,
+    "automatic_retry": false
+  },
+  "note": "launch-draft metadata still says disabled/missingadmission at snapshot; producer asked to correct metadata only. Its exact argv already resolves to frozenlauncher from correctcwd; root final publication and current admission condition retained.",
+  "reviewer_execution": false,
+  "new_gate_added": false,
+  "artifact_policy": "5MB review snapshot moved outsideGit with exactSHA/size reference; producerartifactstorepointer supplies durablepublication."
+}

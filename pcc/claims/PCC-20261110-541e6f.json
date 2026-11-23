@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-10T10:38:19Z",
+ "id": "PCC-20261110-541e6f",
+ "kind": "theorem",
+ "producer": {
+  "commit": "7783f69298705dbe9cf27a25f09faf9a5273a5f6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "e0d396b42c9c01bdba78f9fa0c46412314a1076a9d3259633029907507c54a87",
+   "kind": "lean",
+   "project": "research/anomalous_cardinality_audit_20261110/lean",
+   "theorem": "AnomalousCardinalityAudit.anomalous_curve_cardinality_certificate"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual corrected160-bit curve has exactlyp rational points, with primality/bitbounds/nonsingularity/certified orderp/knownanswer relation. Generic emptyfiber cardinal bound, closedEuler nonresidue certificate and finite-group Lagrange composition. Actual F5curve has10points/order5point and directly refutes orderp-alone cardinality inference. No genericSmarttransfer,complexity,nativeexecutionrefinement or screenedNISTrefutation.",
+ "statement": "Lean proves that the actual corrected 160-bit nonsingular curve has exactly p rational points, using the certified order-p point, a closed quadratic-nonresidue certificate, an elementary missing-fiber cardinality bound and Lagrange, without a Hasse assumption. It retains primality, bit bounds and the actual known-answer relation, and directly disproves the inference from an order-characteristic point alone using an actual F5 curve with ten points and an order-five point."
+}

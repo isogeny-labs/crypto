@@ -1,0 +1,222 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T16:38:10+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/ablation-development-monitor-47.jsonl",
+        "--label",
+        "fixed-eighteen-relation-degree-ablation",
+        "--",
+        "/workspace/relation-native-qualifiers/ablation-driver-bf563ba26-47",
+        "relation-ablations",
+        "/workspace/ablation-development-results-47",
+        "research/relation_degree_trace_20261115/ablation-development/config-47.json",
+        "development"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T16:31:31+00:00",
+      "wall_s": 28.151
+    }
+  ],
+  "commit": "4066bba35b8ff5bb5adece4d5967510ce72b794e",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T16:31:31+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T1631Z-fixed-relation-degree-ablations-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 18,
+      "name": "checked_complete_development_cells",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 18.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 18,
+      "name": "cells_with_observed_f4_degree_reduction",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "kernel:certified-relations-degree-ablation",
+  "raw": [
+    {
+      "bytes": 13924,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n3-all-projections.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/86/86b893eb3d9d8e9044a3cb70c08143961ff89c72a9d95d0ec3c0e87479b125d2",
+      "sha256": "86b893eb3d9d8e9044a3cb70c08143961ff89c72a9d95d0ec3c0e87479b125d2",
+      "uploaded": false
+    },
+    {
+      "bytes": 13444,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n3-clique.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c2/c255e75b7d9e6e1432b35f723f8d3f0ad45976e520c531e08c5b53077312fba7",
+      "sha256": "c255e75b7d9e6e1432b35f723f8d3f0ad45976e520c531e08c5b53077312fba7",
+      "uploaded": false
+    },
+    {
+      "bytes": 13444,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n3-leaf-closure.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ce/ceacdafa0e6cf6a92535c669e03d9b826d21d9e0e8e27801644bd7eab0848516",
+      "sha256": "ceacdafa0e6cf6a92535c669e03d9b826d21d9e0e8e27801644bd7eab0848516",
+      "uploaded": false
+    },
+    {
+      "bytes": 16848,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n3-nonroot-projections.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c0/c087c521b1f5135f6d39ea44ce4e2966c5b4d427966269085b901e0980e69ec6",
+      "sha256": "c087c521b1f5135f6d39ea44ce4e2966c5b4d427966269085b901e0980e69ec6",
+      "uploaded": false
+    },
+    {
+      "bytes": 13912,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n3-root-projection.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/38a52da13224f45f41b29afbc7b1c90ea24b7eea6a852250368fba60590f4ce9",
+      "sha256": "38a52da13224f45f41b29afbc7b1c90ea24b7eea6a852250368fba60590f4ce9",
+      "uploaded": false
+    },
+    {
+      "bytes": 16800,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n3-star.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/53/5302f346e90e63a0d2f93e42ff3a7580f6ae3751b1017beacb77cc7fab903434",
+      "sha256": "5302f346e90e63a0d2f93e42ff3a7580f6ae3751b1017beacb77cc7fab903434",
+      "uploaded": false
+    },
+    {
+      "bytes": 28688,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n4-all-projections.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f6/f64124673e9e55de3ac11d448b94a777012f0f3161eb48ea04571e1f59824d64",
+      "sha256": "f64124673e9e55de3ac11d448b94a777012f0f3161eb48ea04571e1f59824d64",
+      "uploaded": false
+    },
+    {
+      "bytes": 29344,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n4-clique.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/24/24564875d71c9b3715747ac467536d6b87d2beac361e5719ed7c93f068f06f2c",
+      "sha256": "24564875d71c9b3715747ac467536d6b87d2beac361e5719ed7c93f068f06f2c",
+      "uploaded": false
+    },
+    {
+      "bytes": 36880,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n4-leaf-closure.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b6/b62259de36c2fd5f3ba11ef8045fe114287125d5d49db8af4c19f304fcb258f3",
+      "sha256": "b62259de36c2fd5f3ba11ef8045fe114287125d5d49db8af4c19f304fcb258f3",
+      "uploaded": false
+    },
+    {
+      "bytes": 40984,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n4-nonroot-projections.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/25/2539b3ef78648ea092c142d367ef2f45aa46f9c875d1ac780f5c5ac2ce4b650a",
+      "sha256": "2539b3ef78648ea092c142d367ef2f45aa46f9c875d1ac780f5c5ac2ce4b650a",
+      "uploaded": false
+    },
+    {
+      "bytes": 28676,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n4-root-projection.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/49/49752ae0372ffeffb948398f116375da833e476f680f665554e0e9f849db783f",
+      "sha256": "49752ae0372ffeffb948398f116375da833e476f680f665554e0e9f849db783f",
+      "uploaded": false
+    },
+    {
+      "bytes": 40892,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n4-star.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/71df83741f157fdd5ed585ed316bde246de9cbe7aba29685fa4186a8bbd588a0",
+      "sha256": "71df83741f157fdd5ed585ed316bde246de9cbe7aba29685fa4186a8bbd588a0",
+      "uploaded": false
+    },
+    {
+      "bytes": 110152,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n6-all-projections.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/30/30ee54a7273952702557bdac7d9b62a8af825bdae7d2e8f9594570154220d727",
+      "sha256": "30ee54a7273952702557bdac7d9b62a8af825bdae7d2e8f9594570154220d727",
+      "uploaded": false
+    },
+    {
+      "bytes": 120376,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n6-clique.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/68/68ddb78bdaab0e6a8404d2c352c4458e538be3586a101ae75418a8b5c50c657d",
+      "sha256": "68ddb78bdaab0e6a8404d2c352c4458e538be3586a101ae75418a8b5c50c657d",
+      "uploaded": false
+    },
+    {
+      "bytes": 190088,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n6-leaf-closure.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/39/3953745e8a4191ac0bb5f51b171f3610d19b80de3d23e9194c40f23b65475b1b",
+      "sha256": "3953745e8a4191ac0bb5f51b171f3610d19b80de3d23e9194c40f23b65475b1b",
+      "uploaded": false
+    },
+    {
+      "bytes": 193236,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n6-nonroot-projections.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d5/d5c16bacb79da6df5854a95c9e783f65c14b7fa5912cb650f7528f167c2f2880",
+      "sha256": "d5c16bacb79da6df5854a95c9e783f65c14b7fa5912cb650f7528f167c2f2880",
+      "uploaded": false
+    },
+    {
+      "bytes": 110168,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n6-root-projection.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/83/8318f89ee50817794049d8b20da02d7b204580cb6b249de5c9629ad3461e4f1b",
+      "sha256": "8318f89ee50817794049d8b20da02d7b204580cb6b249de5c9629ad3461e4f1b",
+      "uploaded": false
+    },
+    {
+      "bytes": 193172,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-n6-star.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/74/747d0439c9fcb54561bf461f1129dce95c48360ece5d1b22f42d701af820f68a",
+      "sha256": "747d0439c9fcb54561bf461f1129dce95c48360ece5d1b22f42d701af820f68a",
+      "uploaded": false
+    },
+    {
+      "bytes": 2424,
+      "path": "research/relation_degree_trace_20261115/relation-ablation-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/59/59f48a510d89a6b145a7e841eb2cd822e902f6f8c84d4ff069f7f90dd5cf0d13",
+      "sha256": "59f48a510d89a6b145a7e841eb2cd822e902f6f8c84d4ff069f7f90dd5cf0d13",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/relation-ablation-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/relation-ablation-01/report-01/degrees.png",
+      "research/relation_degree_trace_20261115/relation-ablation-01/details-01/matrices.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/relation-ablation-01/report-01/degrees.svg",
+      "research/relation_degree_trace_20261115/relation-ablation-01/details-01/matrices.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "fixed-relation-degree-ablations-20261116",
+  "status": "measured",
+  "summary": "All18 fixed development cells match complete Rust F4 and3 fresh mature bases, all ideals equal respective stars. All observed F4 and affine closure thresholds5; top-form vanishing null within caps. Root rows shrink, clique can enlarge matrix. Single-call costs descriptive; no further15x or degree reduction. PCC13cd4f/22d2c0 unsigned localL0, checkpoint waiver.",
+  "validation": null
+}

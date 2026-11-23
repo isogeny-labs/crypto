@@ -1,0 +1,54 @@
+{
+  "schema": "software.source-review/v1",
+  "reviewer": "/root/strict_storage_reviewer",
+  "input_commit": "0de65e421be557d4913a19f4f421d03cb4b18491",
+  "source_fidelity": "faithful_scoped",
+  "runtime_status": "untested",
+  "outcome": "source_review_complete_pending_bindings_and_runtime_qualification",
+  "recipe_delta": "two COPY directives and comment only",
+  "empty_files": 2,
+  "checkout_modes": "0644",
+  "numeric_owner": "0:0",
+  "qualifier_unchanged": true,
+  "empty_diff_requirement_unchanged": true,
+  "retained_qualification": "failed",
+  "new_image_id": null,
+  "runtime_executed": false,
+  "scientific_execution": false,
+  "budget_renewed": false,
+  "execution_admitted": false,
+  "findings": [
+    {
+      "id": "F1",
+      "status": "verified_source",
+      "finding": "Strict qualifier still requires no reported writable-layer diff"
+    },
+    {
+      "id": "F2",
+      "status": "verified_source",
+      "finding": "Missing or incorrect active bind mounts fail source inspection before start"
+    },
+    {
+      "id": "F3",
+      "status": "unresolved_binding",
+      "finding": "Exact base/config/context/image bindings remain required; inherited OnBuild must be checked before assembly, not only after"
+    },
+    {
+      "id": "F4",
+      "status": "untested_runtime",
+      "finding": "Placeholder effect on daemon diff and actual layer metadata requires fresh admitted qualification"
+    }
+  ],
+  "review_attestation": {
+    "author": false,
+    "sibling_reports_read": [],
+    "blind_rederivation": false,
+    "sources_read": "REVIEW.md attestation and input-sha256.txt",
+    "scope": "private read-only source review"
+  },
+  "documentation": [
+    "https://docs.docker.com/reference/dockerfile/#copy",
+    "https://docs.docker.com/reference/dockerfile/#onbuild",
+    "https://docs.docker.com/engine/storage/bind-mounts/"
+  ]
+}

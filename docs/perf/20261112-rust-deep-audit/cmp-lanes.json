@@ -1,0 +1,9 @@
+{"schema":"ecbench.spec/v1","label":"r2 phase C: rho.negation_lanes_v1 against rho.negation",
+"description":"Paired comparison of the new lock-step lane walk (lanes 8 and 32) against its parent rho.negation on the same prime curves, targets and seeds. Local, unisolated (--cpus none): counted units are the result, wall is indicative only.",
+"workloads":{"curves":[{"kind":"prime_search","bits":26,"seed":59297},{"kind":"prime_search","bits":28,"seed":59297},{"kind":"prime_search","bits":30,"seed":59297},{"kind":"prime_search","bits":32,"seed":59297}],"targets_per_curve":8,"target_seed":20261112},
+"arms":[
+ {"name":"rho-neg","role":"reference","method":{"id":"rho.negation"}},
+ {"name":"lanes8","role":"candidate","method":{"id":"rho.negation_lanes_v1","params":{"lanes":"8"}}},
+ {"name":"lanes32","role":"candidate","method":{"id":"rho.negation_lanes_v1","params":{"lanes":"32"}}}
+],
+"measurement":{"rounds":3,"warmup":1,"order":"alternate_measured","seed":20261112,"isolation_required":"L0","timeout_seconds":300}}

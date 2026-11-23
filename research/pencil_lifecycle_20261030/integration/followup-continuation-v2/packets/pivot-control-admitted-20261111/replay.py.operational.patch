@@ -1,0 +1,11 @@
+--- parent/replay.py
++++ operational/replay.py
+@@ -1,7 +1,7 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-pivot-control-successor-20261111')
++W=Path('/home/ec2-user/pencil-native-pivot-control-operational-v1-20261111')
+ ABSOLUTE_DEADLINE=1794398400  # 2026-11-11T12:00:00Z
+ OWNED=False
+ progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}

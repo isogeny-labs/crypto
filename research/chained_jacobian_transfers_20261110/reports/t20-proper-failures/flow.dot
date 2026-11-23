@@ -1,0 +1,13 @@
+digraph {
+  graph [rankdir=TB,bgcolor="white",ranksep="0.35",pad="0.1"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#456273",fillcolor="#fff0e5"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#456273",arrowsize=0.7];
+  F1 [label="Formal01 /45889b:FAIL_build,0audited\nImplicit module cancellation not solved\nCompiler recovery sorryAx rejected"];
+  F2 [label="Formal02 /7fc8a6:FAIL_build,0audited\nExplicit identities leave numeral reflexivity\nOriginal source/statement/log preserved"];
+  F3 [label="Formal03:six exact local bound passes\nExplicit rfl;statements/hypotheses unchanged\n198written39modules;0trusted",fillcolor="#e4f2e8"];
+  N1 [label="Whole-selected03 /f776e2:INCOMPLETE\nstdout1pass/40filtered;original outer receipts missing\nCause undetermined;no exit reconstructed"];
+  N2 [label="Full04 /6cecba:COMPLETE41passes\nOriginal exit/finish/627afterhashes/bothJSONcmp\nAll original criteria;complete custody",fillcolor="#e4f2e8"];
+  F1 -> F2 -> F3;
+  F3 -> N1 [style=invis];
+  N1 -> N2 [label="archive rejection did not stop caller\nworkflow error retained;no03 promotion"];
+}

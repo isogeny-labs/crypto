@@ -1,0 +1,57 @@
+name: Prime31 oriented S3 algebraic ablation (Rust-only)
+
+on:
+  push:
+    branches:
+      - research/prime31-oriented-pair-f4-20261115
+    paths:
+      - .github/workflows/prime31-oriented-pair-f4.yml
+      - research/prime31_ic_20261115/native/**
+      - src/cryptanalysis/f4_fp_tower.rs
+      - src/cryptanalysis/sig_fp_tower.rs
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - .github/workflows/prime31-oriented-pair-f4.yml
+      - research/prime31_ic_20261115/native/**
+      - src/cryptanalysis/f4_fp_tower.rs
+      - src/cryptanalysis/sig_fp_tower.rs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  oriented-pair-development:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      RAYON_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install recorded Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Verify 961 finite S3 roots and oriented signed point lifts
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_oriented_pair
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_oriented_pair -- --verify
+      - name: Same-host capped Rust F4 four-arm comparison
+        timeout-minutes: 3
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_oriented_pair -- --f4
+      - name: Paired exact-B31 oriented versus S3 30k/60k F4 cap ladder
+        timeout-minutes: 3
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_oriented_pair -- --ladder
+      - name: Verify target-conditioned oriented m8 planted signed polynomial fixture
+        timeout-minutes: 2
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_oriented_f4
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_oriented_f4 -- --verify
+      - name: Same-host 16-natural-target original versus oriented m8 Rust F4
+        timeout-minutes: 3
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_m8_oriented_f4 -- --panel

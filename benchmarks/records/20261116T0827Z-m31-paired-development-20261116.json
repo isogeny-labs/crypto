@@ -1,0 +1,140 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T08:33:21+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/m31-paired-isolation-7cb431bf0-01.jsonl",
+        "--label",
+        "m31-paired-development",
+        "--",
+        "/workspace/relation-native-qualifiers/paired-driver-7cb431bf0-09",
+        "root-paired",
+        "/workspace/root-paid-inputs-723f4c2dd-01",
+        "/workspace/m31-paired-results-7cb431bf0-01",
+        "research/relation_degree_trace_20261115/m31-development/paired-config-12.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T08:27:19+00:00",
+      "wall_s": 24.706
+    }
+  ],
+  "commit": "b2e61b478ef171d1528ff2ffb0c972f9a533c7d2",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T08:27:00+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T0827Z-m31-paired-development-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "complete_matching_answers",
+      "note": "Warmup3+A/A42+main63, all complete/match; local L0 unsigned",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 108.0
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 21,
+      "name": "f4_regeneration_over_candidate_full_paid",
+      "note": "Named original paid F4 workflow, ordinary95%; adjusted lower19.860475872591174. No fastest-control/fresh-family claim, PCCcd096e/6f927f unsigned.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        20.078212467145843,
+        21.899465469080937
+      ],
+      "unit": "ratio",
+      "value": 21.43971514730975
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 21,
+      "name": "expanded_regeneration_over_candidate_full_paid",
+      "note": "Named original paid expanded workflow, ordinary95%; adjusted lower12.873624435131221.10x partial passes,15x fails. No fastest-control/fresh-family claim, PCCcd096e/6f927f unsigned.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        13.258557791244904,
+        14.395680533166685
+      ],
+      "unit": "ratio",
+      "value": 13.723612836801772
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 47316,
+      "path": "research/relation_degree_trace_20261115/m31-paired-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8c/8c3c594cbe22613cc926220ad5e6098aaa6f0ce6945c568923b6c2fa58d0a86d",
+      "sha256": "8c3c594cbe22613cc926220ad5e6098aaa6f0ce6945c568923b6c2fa58d0a86d",
+      "uploaded": false
+    },
+    {
+      "bytes": 273424,
+      "path": "research/relation_degree_trace_20261115/m31-paired-01/reporter-executable.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e0/e0de7a7ebaa5b76bce6f73aa442d7c85eafdf6fb30eb0b06055706f7c145d59d",
+      "sha256": "e0de7a7ebaa5b76bce6f73aa442d7c85eafdf6fb30eb0b06055706f7c145d59d",
+      "uploaded": false
+    },
+    {
+      "bytes": 582,
+      "path": "research/relation_degree_trace_20261115/m31-paired-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3fc4f5c05327df54551b4a79e4be76e4a49f87a3f3a4bfa361671c8a737f7c5b",
+      "sha256": "3fc4f5c05327df54551b4a79e4be76e4a49f87a3f3a4bfa361671c8a737f7c5b",
+      "uploaded": false
+    },
+    {
+      "bytes": 2362,
+      "path": "research/relation_degree_trace_20261115/m31-paired-01/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e5/e58d52839846b47e37815d495cd2ebe0eef6fd51c9a86344e9c1aa7f75426334",
+      "sha256": "e58d52839846b47e37815d495cd2ebe0eef6fd51c9a86344e9c1aa7f75426334",
+      "uploaded": false
+    },
+    {
+      "bytes": 1866683,
+      "path": "research/relation_degree_trace_20261115/m31-paired-01/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a2/a20ca93210a2110fd022088f8bb35258d692260c694f4a232aaeb308c81d6c0d",
+      "sha256": "a20ca93210a2110fd022088f8bb35258d692260c694f4a232aaeb308c81d6c0d",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/m31-paired-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/m31-paired-01/report-01/ratios.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/m31-paired-01/report-01/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "m31-paired-development-20261116",
+  "status": "measured",
+  "summary": "All A/A gates pass;21 blocks/108 matching answers,0 monitor contention. Named paid adjusted lower F419.860/E12.874:10x partial passes,15x fails. Prior candidate only1.027 in separate screen; no fastest/fresh/signed claim. PCCcd096e/6f927f.",
+  "validation": null
+}

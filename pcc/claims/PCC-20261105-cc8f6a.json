@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-05T18:07:13Z",
+ "id": "PCC-20261105-cc8f6a",
+ "kind": "execution",
+ "producer": {
+  "commit": "87eb67540afa4e4f4174566cbf09d5f189b823eb",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/primefield-companion-followup-20261102/feature-native-adaptive-extension/receipt.json",
+    "sha256": "c66d17d5f5f2e4e8e8462e9f1baa042aee15f6230a6471d0827701b29fe468d7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/primefield-companion-followup-20261102/feature-native-adaptive-extension/test.log",
+    "sha256": "08e8da1533c716b66fd162eea883c4aaca2d886fa2471b76bf809748591962e5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/primefield-companion-followup-20261102/feature-native-adaptive-extension/checker-receipt.json",
+    "sha256": "cfaf16ae51db3736b70a6abc3e7f94997afaf639dc3ceb680c8bafc588fb782f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Local correctness and branch diagnostics; no trusted execution verdict or timing comparison",
+ "statement": "Saved incremental-source receipts report89 passing tests,320 split-window extensions,44 small-curve extensions and eight adaptive recoveries; four exceptional extensions use recurrence, and frozen baseline replay accepts the trace and rejects a corrupted value."
+}

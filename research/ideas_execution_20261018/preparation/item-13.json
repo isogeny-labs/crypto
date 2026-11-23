@@ -1,0 +1,62 @@
+{
+  "item": 13,
+  "title": "Distributed ECC2K-130 rho and negation shortfall",
+  "original_requirement": "Complete ECC2K130 distributed rho campaign; simultaneously run specified negation-map shortfall hypothesis.",
+  "acceptance_criteria": [
+    "Reproduce device throughput, DP ingestion, restart,duplicate suppression, collision recovery and independent challenge verification.",
+    "Freeze explicit negation shortfall paired test and include orbit/canonicalization costs.",
+    "Expected GPU-years are resource forecast; challenge complete only with verified solution."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "ecc2k130/README.md"
+    },
+    {
+      "repository": "crypto",
+      "path": ".github/workflows/launch-ecc2k130-fleet.yml"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": ".github/workflows/cloud-ecc2k130.yml"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "scripts/cloud_launch.sh"
+    },
+    {
+      "repository": "cryptanalysis",
+      "path": "cloud/fleet.py"
+    }
+  ],
+  "source_supported_commands": [
+    {
+      "repo": "cryptanalysis",
+      "argv": [
+        "gh",
+        "workflow",
+        "run",
+        "cloud-ecc2k130.yml",
+        "--repo",
+        "aburan28/cryptanalysis",
+        "--ref",
+        "claude/cryptanalysis-repo-setup-p59kek",
+        "-f",
+        "action=doctor"
+      ],
+      "purpose": "Existing status-only remote environment diagnostic; provider credentials stay in GitHub secrets.",
+      "kind": "infrastructure_status"
+    }
+  ],
+  "remaining_gaps": [
+    "No GPU on host; local provider token absent. Remote actions access/readiness needs actual response.",
+    "Exact shortfall hypothesisID not supplied by user and not identified by indexed-title search; bind before claiming its experiment.",
+    "EC2 launch workflow scales billable fleet without automatic termination; lifecycle/checkpoint/stop accounting must be explicit."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Finish ECC2K-130 with distributed rho. Your own figure is about ten GPU-years at the measured per-card rate. It is the reference every leaderboard row is priced against and nobody has completed it. Run the negation-map shortfall hypothesis at the same time. It is specified and has never run."
+}

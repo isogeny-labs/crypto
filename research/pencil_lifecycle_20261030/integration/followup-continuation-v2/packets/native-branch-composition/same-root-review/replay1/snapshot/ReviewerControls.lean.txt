@@ -1,0 +1,24 @@
+import WordErrorExclusion
+open Polynomial PencilWordRefinement
+instance : Fact (Nat.Prime (5 : UInt64).toNat) := ⟨by decide⟩
+def good : WeightedWord := ⟨0,0,0,1,1,1⟩
+def badA : WeightedWord := ⟨0,0,1,0,1,1⟩
+def badB : WeightedWord := ⟨0,0,1,1,1,1⟩
+lemma good_valid : good.normalizedValid 5 ((X : Polynomial (ZMod (5 : UInt64).toNat))^5+X^2+1) := by
+  norm_num [WeightedWord.normalizedValid,good]
+  exact ⟨X^3, by ring⟩
+example : crossPreludeWord 5 good good ≠ some .sameUMixedZeroSlope := by
+  apply bounded_word_prelude_excludes_zero_slope 5 (X^5+X^2+1) good good
+  · decide
+  · decide
+  · decide
+  · decide
+  · decide
+  · decide
+  · decide
+  · decide
+  · exact good_valid
+  · exact good_valid
+example : crossPreludeWord 5 badA badB = some .sameUMixedZeroSlope := by decide
+example : badA.canonical 5 ∧ badB.canonical 5 := by decide
+#print axioms good_valid

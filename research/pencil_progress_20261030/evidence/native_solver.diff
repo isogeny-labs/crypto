@@ -1,0 +1,128 @@
+--- frozen/native_solver.rs
++++ isolated/native_solver.rs
+@@ -1196,6 +1196,24 @@
+     config: Config,
+     observer: Option<&ObservedSystem>,
+ ) -> Result<PencilResult, Box<ValidationError>> {
++    solve_one_with_progress(
++        inst,
++        target,
++        seed,
++        config,
++        observer,
++        &mut crate::progress::Noop,
++    )
++}
++
++pub fn solve_one_with_progress(
++    inst: &StudyInstance,
++    target: Point,
++    seed: u64,
++    config: Config,
++    observer: Option<&ObservedSystem>,
++    progress: &mut dyn crate::progress::Sink,
++) -> Result<PencilResult, Box<ValidationError>> {
+     let mut outer_primality = kernel::outer_primality::OuterValidation::default();
+     config
+         .validate()
+@@ -1253,6 +1271,10 @@
+     assert_eq!(s.j.mul(transferred, r), Divisor::O);
+     let h = &s.j.polynomial;
+     let rational_y = rational_y_by_x(h, p);
++    if progress.enabled() {
++        progress.emit("rational_table_complete", "cold_setup", None, 0,
++        json!({"field":group_counts(&s),"arithmetic":arithmetic_counts(),"symbolic":meter::snapshot()}));
++    }
+     let rational_curve_points: usize = rational_y
+         .iter()
+         .map(|ys| {
+@@ -1285,6 +1307,10 @@
+     let setup_allocation = observer
+         .zip(setup_allocation_start)
+         .map(|(o, b)| o.finish(b));
++    if progress.enabled() {
++        progress.emit("cold_setup_complete", "cold_setup", None, 0,
++        json!({"field":setup_field,"arithmetic":setup_arithmetic,"symbolic":setup_semantic_counts}));
++    }
+     s.e.f.reset();
+     s.j.f.reset();
+     reset_arithmetic_counts();
+@@ -1301,6 +1327,10 @@
+     measured(observer, &s, &mut phases, "target_validation", || {
+         assert!(source.valid(target), "invalid target");
+     });
++    if progress.enabled() {
++        progress.emit("candidate_setup_complete", "candidate", None, 0,
++        json!({"field":group_counts(&s),"arithmetic":arithmetic_counts(),"symbolic":meter::snapshot(),"phases":phases}));
++    }
+     let mut recovered = None;
+     let mut failure = None;
+     let mut walks = 0;
+@@ -1319,6 +1349,10 @@
+             (a, b, s.tau(s.from_short(point)))
+         });
+         walks += 1;
++        if progress.enabled() {
++            progress.emit("walk_generation_complete", "candidate", Some(walk_index), 0,
++            json!({"field":group_counts(&s),"arithmetic":arithmetic_counts(),"symbolic":meter::snapshot(),"phases":phases}));
++        }
+         if d.degree != 2 {
+             continue;
+         }
+@@ -1327,6 +1361,11 @@
+                 point_sieve_candidates(d, h, p, &rational_y)
+             });
+         candidate_lambdas += candidates.len();
++        if progress.enabled() {
++            progress.emit("sieve_complete", "candidate", Some(walk_index), 0,
++            json!({"field":group_counts(&s),"arithmetic":arithmetic_counts(),"symbolic":meter::snapshot(),"phases":phases}));
++        }
++        let mut completed_candidates = 0u64;
+         for lambda in candidates {
+             let points = measured(observer, &s, &mut phases, "candidate_verification", || {
+                 let (quotient, w) = complement(d, lambda, h, p);
+@@ -1351,12 +1390,16 @@
+             });
+             let Some(points) = points else {
+                 rejected_candidates += 1;
++                completed_candidates += 1;
++                emit_candidate_progress(progress, &s, &phases, walk_index, completed_candidates);
+                 continue;
+             };
+             verified_relations += 1;
+             recovered = measured(observer, &s, &mut phases, "elimination", || {
+                 graph.relation(&points, a, b)
+             });
++            completed_candidates += 1;
++            emit_candidate_progress(progress, &s, &phases, walk_index, completed_candidates);
+             if recovered.is_some() {
+                 solution_key = Some([walk_index, lambda]);
+                 break 'walks;
+@@ -1413,6 +1456,10 @@
+         "solver_stored_nonzero_coefficients":graph.collector.basis().retained_coefficients(),
+         "counts":pencil_field,"arithmetic":pencil_arithmetic,"phases":phases,
+         "allocation_observer_available":observer.is_some()});
++    if progress.enabled() {
++        progress.emit("solver_returning", "candidate", None, 0,
++        json!({"field":group_counts(&s),"arithmetic":arithmetic_counts(),"symbolic":meter::snapshot(),"phases":phases}));
++    }
+     Ok(PencilResult {
+         recovered,
+         source_verified: verified,
+@@ -1431,3 +1478,16 @@
+     x = (x ^ (x >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+     (x ^ (x >> 31)) % modulus
+ }
++
++fn emit_candidate_progress(
++    progress: &mut dyn crate::progress::Sink,
++    s: &Scholten,
++    phases: &BTreeMap<&'static str, PhaseTotals>,
++    walk: u64,
++    completed: u64,
++) {
++    if progress.enabled() && crate::progress::milestone(completed) {
++        progress.emit("candidate_processing_complete", "candidate", Some(walk), completed,
++            json!({"field":group_counts(s),"arithmetic":arithmetic_counts(),"symbolic":meter::snapshot(),"phases":phases}));
++    }
++}

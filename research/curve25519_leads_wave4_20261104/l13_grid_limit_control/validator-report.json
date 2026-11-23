@@ -1,0 +1,237 @@
+{
+ "schema": "validator-report/v1",
+ "lead": "/home/user/crypto/research/curve25519_leads_wave4_20261104/l13_grid_limit_control",
+ "validated_at_utc": "2026-11-04T16:31:00Z",
+ "validator": "independent validator (Claude Sonnet 5.5); produced none of the lead's artifacts; no edit to README, data, protocol or analysis; no git mutation; scratch work only under the session scratchpad",
+ "supersedes": "the design-stage report (disposition insufficient_evidence, 2026-11-04T06:55:39Z, no data existed); that file is preserved in git at fd6a650cb2",
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "disposition_meaning": "All counts, ratios, intervals, band ranks and P1-P8 verdicts in README.md and analysis/verdicts.json recompute from the committed records with independent code. 160/160 certificates verify. Replays reproduce. The errata are wording, scope, disclosure and manifest-integrity items; none changes a number or a verdict.",
+ "commit_binding": {
+  "validated_from_commit": "fd6a650cb20ba4ef6825a9234140e193aa8e2356",
+  "commit_time_utc": "2026-11-04T16:18:10Z",
+  "head_moved_during_session": "HEAD was 909f1cd1dc when the session opened and became fd6a650cb2 within the first minutes (the producer committed README, verdicts.json, data/ and the old validator-report.json). Everything below was read or recomputed after that, and `git diff HEAD` / `git status` on the lead directory were empty before and after the work.",
+  "worktree_clean_for_lead_dir": true,
+  "protocol_freeze_commit": "5a800bb3d06c69b32f32195c3aebccdfb3fee31e",
+  "protocol_freeze_time_utc": "2026-11-04T06:32:32Z",
+  "frozen_files_identical_to_freeze_commit_and_HEAD": {
+   "PROTOCOL.md": "2ca422e8439f878671d7a03c57c7d7135f9c249c644e630283c37d20ddc9ab06",
+   "scripts/run.sh": "bb13be3c62bc1863f2328b1dcf6b46ea992ae4f99190e2b1962b7570f0fef655",
+   "scripts/chunked_run.py": "e8edaa81515b400bcb29e402f6ff0d8548001498aef662c23f47daf3d19aabde",
+   "scripts/cells_from_t12.py": "f91ed77099bf9973fc8cf85a293b1e469860cf26f91aa15271bd1e535375b7d4",
+   "scripts/identity_check.py": "9b6ffb54fe101be1fca0eb02014915bf7e5adf119189e0de3ec04867b633a2b1",
+   "scripts/pooled_compare.py": "2a7e25b48d15a6a957874d6dcac6624662ffe9dc3812d65aac3361756289591a"
+  },
+  "files_after_freeze": {
+   "ecbench/spec.json": "sha256 b83a07cc625d75554e54540b3922d6e367e68aa4d7abeb14e66a2cc7dc9b8faf, mtime 06:15:43Z (before the freeze) but first committed at 8d1257cead (07:13:56Z), after the 06:37:02Z launch and not in 5a800bb3; it is bound by the hash pinned in the frozen PROTOCOL.md section 2, env.txt spec_sha256, and data/ecbench/spec.frozen.json, all equal",
+   "analysis/decide.py": "mtime 06:38:13Z, first committed 8d1257cead (07:13:56Z), both before the first session (08:26:56Z); README discloses it is post-freeze",
+   "README.md, analysis/verdicts.json, data/**": "first committed fd6a650cb2"
+  },
+  "instrument_sha256": "54737834d048b22e77399160fa9e159782b1124ea8190d84dba185309229641b",
+  "instrument_source_revision": "not recorded: session.json and host.json carry git_commit null and git_dirty null for the binary; it is bound by sha256 only (rustc 1.97.0 recorded in host.json)"
+ },
+ "requirements": [
+  {
+   "id": "V1",
+   "requirement": "freeze order: protocol commit precedes every chunk session",
+   "status": "pass",
+   "evidence": "5a800bb3 committed 06:32:32Z; first launch 06:37:02Z (data/env.txt, chunks/driver.log); first session start 08:26:56Z (c00 session.json started_unix_ms 1793780816372); last session end 16:12:55Z (c15). Sessions c00-c07 ran 08:26:56Z-09:17:53Z, c08-c15 ran 15:33:38Z-16:12:55Z."
+  },
+  {
+   "id": "V2",
+   "requirement": "chunk specs differ from the frozen spec only in per-chunk keys; spec.frozen.json = ecbench/spec.json",
+   "status": "pass",
+   "evidence": "cmp data/ecbench/spec.frozen.json ecbench/spec.json identical (b83a07cc...). For c00..c15, chunks/cNN/spec.json equals chunks/specs/cNN.json and equals the frozen spec with exactly {workloads.targets_per_curve = 1, workloads.target_seed + c, measurement.seed + c, description suffix} (programmatic equality, 16/16), as scripts/chunked_run.py does. target_seed 2026110431..2026110446, measurement seed 2026110432..2026110447, 16 distinct targets."
+  },
+  {
+   "id": "V3",
+   "requirement": "binary identity in every session and record",
+   "status": "pass",
+   "evidence": "binary_sha256 = 54737834...641b in 160/160 records, 16/16 session.json, 16/16 verify receipts (auditor_binary_sha256), data/ecbench.sha256, env.txt (both launches), and the file on disk now."
+  },
+  {
+   "id": "V4",
+   "requirement": "data/SHA256SUMS re-verifies",
+   "status": "pass_with_erratum",
+   "evidence": "sha256sum -c: 158 of 161 listed files OK. FAILED: data/env.txt, data/run.log, data/run.out. In each case the recorded hash equals the hash of the file minus its final line (env.txt: `end_utc 2026-11-04T16:14:50Z`; run.log and run.out: the `L13: ALL_DONE` line), which scripts/run.sh finish() appends after computing the manifest. data/ALL_DONE (0 bytes) is not listed. Every evidence file (chunks, verify, band, pooled_compare, identity_check, spec.frozen, plan, ecbench.sha256) verifies. See E1."
+  },
+  {
+   "id": "V5",
+   "requirement": "recompute band means S = (GAE + w*native)/sqrt(r) per arm at w = 0, 0.1, 1",
+   "status": "pass",
+   "evidence": "Own code (scratchpad v2.py) implements band.rs unpriced_counts exactly (counter map first; then each phase's native map as `name` or the `_uncharged`-stripped base, summed over phases; a `solver_*` name falls back to solver.ops; NON_OPERATION_COUNTERS: none present; calibration_pinned_units empty so C = n_C = 0; no unpriced counter without a count). native U = priced_counts total; sqrt(r) = 362.2195466840518. Agreement with band_pooled.json: max relative difference 2.2e-16 for all 5 arms, charged_sum and native_sum equal as integers. Table: see recomputed.band.",
+   "native_definition": "src/cryptanalysis/ecbench/band.rs `unpriced_counts` / `priced_gae(w) = G - C + w*(U + n_C)`; U counts operations in the record's cost.unpriced counters. F4 arm U = solver.ops (F_p multiply-adds, elimination) + pkm_system_fp_mults_uncharged + pkm_grid_fp_mults_uncharged + sqrt/legendre/probe/row-op/velu counters; grid arm U = pkm_grid_fp_mults_uncharged (1248 per oracle call) + the same small counters, with its `solver_F_p_multiplications_(grid)` term = solver.ops = 0; mitm arm U = lookups + the small counters."
+  },
+  {
+   "id": "V6",
+   "requirement": "pooled paired ratios with 95% intervals as PROTOCOL / pooled_compare define them, for every quoted ratio",
+   "status": "pass",
+   "evidence": "Own implementation: per workload sum S over the 2 rounds per arm, R = sum(B)/sum(A), linearised t on z_k = (B_k - R A_k)/mean(A), df = K - 1 = 15, interval R*exp(-/+ t*se/R). t_{0.975,15} computed by own Simpson integration of the t density = 2.13144954556 (producer uses an incomplete-beta bisection). All 27 rows (9 pairs x 3 weights) match pooled_compare.jsonl on ratio and both interval ends, max relative difference 6.7e-15. Every ratio quoted in README (P2, P4, P5, P6 rows, the distance table, the 8.1e3, 2.28, 42, 76, 356, 4.7% figures) recomputes; the unrounded values are under recomputed.pooled_ratios."
+  },
+  {
+   "id": "V7",
+   "requirement": "band ranks",
+   "status": "pass",
+   "evidence": "Recomputed from own band means, 10/10 rank strings equal band_pooled.json `ranks`. grid vs F4 is `unresolved inside the band` because the two tie exactly at w = 0 (identical GAE, ratio 1.000); at w >= 0.1 grid is lower."
+  },
+  {
+   "id": "V8",
+   "requirement": "decide P1-P8 from the frozen rule text",
+   "status": "pass",
+   "evidence": "Own decision code (scratchpad v7.py) reading the records, not verdicts.json: P1 held, P2 held, P3 held, P4 FAILED, P5 held, P6 held, P7 held, P8 FAILED. Identical to analysis/verdicts.json and README (6 of 8 held). analysis/decide.py was also read against PROTOCOL section 4 and encodes it verbatim.",
+   "p4": "FAILED on the per-pair clause only: |GAE(mitm) - GAE(grid) - 506| <= 2*relations holds in 0/32 pairs (differences 437..489, mean 461.56). Ratio clauses held (mitm/grid 0.013128 [0.012750, 0.013517] at w = 0.1, 0.0028094 [0.0027706, 0.0028489] at w = 1, 1.04713 [1.04255, 1.05173] at w = 0) and the band verdict was `unresolved inside the band`. Verdict confirmed.",
+   "p8": "FAILED: grid solver.ops = 0 in 32/32, but pkm_grid_fp_mults_uncharged = 1248 * trials in 0/32. Confirmed that pkm_grid_fp_mults_uncharged = 1248 * solver_calls in 32/32 and solver_calls = trials - repeated_targets_skipped in 32/32 (c00 round 0: 10,147,488 = 1248 * 8,131; trials 8,415; skipped 284). Also in 32/32: mitm lookups = trials - skipped; F4 pkm_grid_fp_mults_uncharged = 1248 * pkm_consistent_systems and pkm_consistent_systems = relations. Verdict confirmed; the README explanation is right except as noted in E2.",
+   "other_identities_32_of_32": "algorithm_seed equal across all five arms in each (workload, round); trials, relations and repeated_targets_skipped equal across F4, grid, mitm; total_gae(grid) = total_gae(F4); mitm oracle_setup = 506 GAE; F4/grid oracle_setup = 0."
+  },
+  {
+   "id": "V9",
+   "requirement": "mechanism of the relations-phase difference (grid exceeds mitm by 17-69 GAE)",
+   "status": "established by the validator (README says it is not established)",
+   "evidence": "In every pair the whole difference is in the `adds` of the relations phase (doubles and scalar_mults differ by 0; all other phases equal except mitm oracle_setup +506). Source: src/cryptanalysis/ic_framework/pkm_semaev.rs lines 2237-2255 call ic_boundary.rs `lift_abscissae` (line 7792) after the grid/F4 step has returned abscissae for a consistent system. lift_abscissae tries the sign choices in order; every try is `acc = identity; acc = g.add(ops, acc, P_a); acc = g.add(ops, acc, P_b)` and PrimeCurve::add increments ops.adds unconditionally (ic_boundary.rs line 4721), so a try costs 2 charged additions; with 2 signs on each of 2 abscissae there are 4 tries, expected 2.5, so about 5 charged additions per relation. The pair table's `probe` (ic_boundary.rs line 7128) stores the signed witness pair and charges exactly 1 confirming addition per hit. Net grid-minus-mitm = (2*tries - 1) per relation, expected 4.0. Test on the data: sum over the 32 runs = 1422 extra additions over 358 relations = 3.972 per relation (expected 4.0, sd of mean 0.118); in 32/32 runs the difference has the parity of the relation count and lies in [relations, 7*relations], as sum(2*t_i - 1) with t_i in 1..4 requires. Hence mitm - grid = 506 - (lift additions - relations) = 506 - 44.4 on average = 461.6, and the frozen band 506 +/- 2*relations (about +/-22) could not contain it. The F4 arm pays the same lift, which is why GAE(grid) = GAE(F4) exactly."
+  },
+  {
+   "id": "V10",
+   "requirement": "certificates: recovered scalar * G == target with independent EC arithmetic",
+   "status": "pass",
+   "evidence": "Own affine short-Weierstrass arithmetic in Python (scratchpad v3.py) with the curve parameters from workload.curve_spec (p = 1048573, a = 63700, b = 872826, G = (349837, 122), r = 131203, n = 1049624 = 8r). Checks: G on curve; r*G = O; n*G = O; p and r prime; Hasse bound; naive point count #E(F_p) = 1049624 = n. For 160/160 records: target on curve, r*target = O, and recovered*G == target. 16 workloads, 16 distinct targets, one recovered scalar per workload shared by all five arms, all in [0, r). Not covered: the factor-base relations and the Gauss rows are not exported in the records, so relation-level certificates were not re-verified (only counters: relations, rank); the end-to-end scalar check above is the certificate the records permit."
+  },
+  {
+   "id": "V11",
+   "requirement": "replay: producer's receipts and at least 2 independent extra runs (one grid, one mitm) on scratch copies",
+   "status": "pass",
+   "evidence": "Producer: verify/c00..c15.json all ok = true, problems = [], all checks true, rc.txt 16 x rc=0; one replayed run per chunk (arms replayed: F4 1, rho-neg 2, grid 6, mitm 4, proj-a 3), all `identical`. Validator, on scratch copies under the scratchpad (original records cmp-identical afterwards, git status empty): (a) c01 `ecbench verify --replay 0 --replay-seq 3 --replay-seq 4 --replay-seq 5 --replay-seq 6` = grid round 0, mitm round 0, mitm round 1, grid round 1, 4/4 reproduced identical, rc 0, 1.1 s, receipt sha256 c71a5efc...1aedd24; (b) c15 `--replay-all`: all 10 runs (rho-neg x2, proj-a x2, F4 x2, grid x2, mitm x2) reproduced identical, rc 0, 5 min 1 s under load average about 8, audit OK 0 problems. No new session was generated and no record was altered."
+  },
+  {
+   "id": "V12",
+   "requirement": "controls and reporting contract (AGENTS.md sections 2, 5a, 12)",
+   "status": "pass_with_minor_notes",
+   "evidence": "Reference rho-neg and baseline proj-a are measured in the same 160-execution plan and priced at w = 0, 0.1, 1 like every other arm (unpriced canonicalisations_uncharged 497 in the c00 rho record). The cheaper baselines the lead is about (exhaustive grid, pair table) are arms, not omissions. One table, one unit (S = priced GAE / sqrt(r)), ratio columns against rho-neg given, verified/runs column given, ranks only where the band order holds. Not a vs_rho claim, not a leaderboard row, no wall time, no external fastest implementation compared or claimed. m = 83 and ECC2K-130 disclosure rules: not applicable (prime k = 20 miniature, no binary-field claim). Notes: the measured interval (cold per-target session: factor base, oracle set-up, walk, linear algebra, verify) is not named in the README, and phases are not tabulated (E10). Run was local, without the isolab-eks route or S3 resume checkpoint; README discloses this (acceptable for counted units, which replay deterministically)."
+  },
+  {
+   "id": "V13",
+   "requirement": "README Reading contains no overclaim",
+   "status": "fail_with_errata",
+   "evidence": "See E3 to E8. Arithmetic is right; scope is wider than the evidence in two sentences."
+  }
+ ],
+ "recomputed": {
+  "sqrt_r": 362.2195466840518,
+  "t975_df15_own_integration": 2.13144954556,
+  "band": {
+   "pkm-iso-t5-g4-s1307": {"runs": 32, "verified": 32, "charged_sum": 313374, "native_sum": 11976583533, "S": [27.0359167, 103353.3856, 1033290.5327]},
+   "grid-iso-t5-s1307": {"runs": 32, "verified": 32, "charged_sum": 313374, "native_sum": 282317820, "S": [27.0359167, 2462.6946, 24383.6228]},
+   "mitm-iso-t5-s1307": {"runs": 32, "verified": 32, "charged_sum": 328144, "native_sum": 465892, "S": [28.3101784, 32.3296, 68.5044]},
+   "proj-a": {"runs": 32, "verified": 32, "charged_sum": 137198, "native_sum": 102094, "S": [11.8365713, 12.7174, 20.6446]},
+   "rho-neg": {"runs": 32, "verified": 32, "charged_sum": 18312, "native_sum": 13267, "S": [1.5798430, 1.6943, 2.7244]}
+  },
+  "pooled_ratios": {
+   "note": "ratio = S(b)/S(a); K = 16 workloads, 32 pairs; values to 6 significant digits, identical to the producer's to 6.7e-15",
+   "grid/F4": {"w0": [1.0, 1.0, 1.0], "w0.1": [0.0238279, 0.0238178, 0.0238380], "w1": [0.0235980, 0.0235942, 0.0236019]},
+   "mitm/grid": {"w0": [1.04713, 1.04255, 1.05173], "w0.1": [0.0131277, 0.0127500, 0.0135167], "w1": [0.00280944, 0.00277056, 0.00284887]},
+   "grid/proj-a": {"w0": [2.28410, 2.03394, 2.56502], "w0.1": [193.648, 167.563, 223.794], "w1": [1181.11, 1010.74, 1380.21]},
+   "mitm/proj-a": {"w0": [2.39175, 2.13809, 2.67551], "w0.1": [2.54216, 2.25916, 2.86062], "w1": [3.31827, 2.87394, 3.83131]},
+   "grid/rho-neg": {"w0": [17.1130, 13.9362, 21.0141], "w0.1": [1453.52, 1158.14, 1824.22], "w1": [8949.97, 6991.96, 11456.3]},
+   "mitm/rho-neg": {"w0": [17.9196, 14.6284, 21.9514], "w0.1": [19.0814, 15.4787, 23.5225], "w1": [25.1444, 19.8061, 31.9216]},
+   "F4/rho-neg": {"w0": [17.1130, 13.9362, 21.0141], "w0.1": [61000.6, 48590.1, 76580.8], "w1": [379268, 296263, 485528]},
+   "F4/proj-a": {"w0": [2.28410, 2.03394, 2.56502], "w0.1": [8126.94, 7029.53, 9395.68], "w1": [50051.4, 42826.9, 58494.6]},
+   "mitm/F4": {"w0": [1.04713, 1.04255, 1.05173], "w0.1": [0.000312806, 0.000303681, 0.000322206], "w1": [6.62973e-05, 6.53714e-05, 6.72364e-05]}
+  },
+  "derived_for_errata": {
+   "F4_over_grid": [1.0, 41.97, 42.38],
+   "grid_over_mitm_w0.1_w1": [76.17, 355.95],
+   "F4_over_mitm": {"w0.1": 3196.9, "w1": 15083.6},
+   "F4_over_mitm_S_direct": {"w0.1": "103353.39 / 32.33 = 3197", "w1": "1033290.5 / 68.50 = 15084"},
+   "mean_GAE_per_run": {"F4": 9792.9, "grid": 9792.9, "mitm": 10254.5, "proj-a": 4287.4},
+   "mean_phase_gae": {
+    "F4_and_grid": {"factor_base": 932.0, "oracle_setup": 0.0, "relations": 8839.2, "verify": 21.7},
+    "mitm": {"factor_base": 932.0, "oracle_setup": 506.0, "relations": 8794.8, "verify": 21.7},
+    "proj-a": {"factor_base": 736.0, "oracle_setup": 1056.0, "relations": 2473.8, "verify": 21.7}
+   },
+   "trials_per_relation": {"iso_base_all_three_arms": 650.4, "proj-a": 64.4, "ratio": 10.09, "protocol_section_2_model_said": 9.3},
+   "mitm_over_grid_w0_decomposition": "+506 table additions - 44.4 mean lift additions it does not pay = +461.6 GAE = 4.71% of 9792.9",
+   "log10_decades_check": "log10(1/0.474)/log10(42) = 0.3242/1.6232 = 0.1997 (about one fifth), arithmetic correct; 0.474 is L12's separate session"
+  }
+ },
+ "readme_claims_checked": {
+  "agree_exactly": [
+   "band table (all 15 S values and 5 verified/runs)",
+   "P1-P8 outcome column including 0/32 and the 437-489 range, 17-69 GAE, 10,147,488 = 1248 x 8,131, 8,415 trials, 284 skipped",
+   "distance table (9 cells and intervals) and the 8.1e3 and 2.28 proj-a figures",
+   "76x and 356x (mitm below grid), 42x (F4 above grid), 4.7% (mitm over grid at w = 0), 2.39 to 3.32",
+   "6 of 8 held",
+   "reproduces T12's 6.06e4 (6.10e4 here, inside both intervals) and matches the frozen 1.49e3 grid point (1453.5 [1158, 1824])",
+   "launch 06:37:02Z, all 16 chunks complete 16:12:55Z, ALL_DONE 16:14:50Z, two launches in env.txt, c00-c07 complete before the restart whose uptime reads 2 min at 15:29:54Z",
+   "decide.py post-freeze and pre-data"
+  ],
+  "disagree": "none numerically. Wording and scope items are E2 to E9."
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "location": "data/SHA256SUMS; README.md Run record and Files",
+   "issue": "The manifest does not verify for data/env.txt, data/run.log and data/run.out (3 of 161). Each file had exactly one line appended after the manifest was written (scripts/run.sh finish() computes SHA256SUMS before `echo end_utc >> env.txt`, touch ALL_DONE and the final log line). ALL_DONE is not listed. The design-stage report forecast this (its E6). README does not mention it.",
+   "fix": "State in the README Run record that 158 of 161 entries verify and that the three mismatches are the last appended line, with the hashes of the files with their last line removed (env.txt 7cd72f5c...2703e, run.log and run.out 0077cf3a...f55). Do not rewrite the frozen run.sh; if the manifest is regenerated, record that as a change to the finished tree."
+  },
+  {
+   "id": "E2",
+   "location": "README.md, section `Why P4 and P8 failed`, P8 bullet",
+   "issue": "Two statements are inexact. (a) `found only after data`: the denominator defect (1,248 x trials where the oracle is called trials - repeated_targets_skipped times) was reported before any data, as E2 of the design-stage validator report (2026-11-04T06:55:39Z, git fd6a650cb2), about 1.5 h before the first session started (08:26:56Z). The frozen rule was rightly kept and reported as failed, but the defect was not first found after data. (b) `PROTOCOL.md section 1 states the quantity correctly as 1,248 per consistent system`: section 1 says `1,248 F_p multiplications per target` for the grid and uses `per consistent system` for the F4 arm, where the grid only reads out consistent systems. For the grid arm the exact invariant, confirmed in 32/32, is 1,248 per oracle call = trials - repeated_targets_skipped; the grid arm's consistent systems equal its relations, not its mults / 1,248.",
+   "fix": "Say the defect was flagged pre-data by the design-stage validator and the frozen rule was kept as preregistered. Replace the quotation by `1,248 per oracle call (solver_calls = trials - repeated_targets_skipped); the F4 arm reads out the grid only on consistent systems (1,248 x relations)`."
+  },
+  {
+   "id": "E3",
+   "location": "README.md, `Why P4 and P8 failed`, P4 bullet (`The mechanism ... is not established here`)",
+   "issue": "The mechanism is established in the source and quantitatively on the data (V9): the grid and F4 oracles return abscissae only, so the relation lift re-adds sign combinations on the counted ledger (about 2 charged additions per try, 2.5 tries, about 5 per relation), while the pair table's probe returns the signed pair and charges 1 confirming addition. Net 3.972 extra additions per relation measured against 4.0 expected; that is the 17-69 GAE. The same cost sits in the F4 and grid arms, which is why their GAE is identical.",
+   "fix": "Replace the sentence by the mechanism, citing ic_boundary.rs lift_abscissae (line 7792) and PairTable::probe (line 7128), and note that the frozen 506 +/- 2*relations band omitted the lift saving (-4 per relation), so P4's per-pair clause was bound to fail."
+  },
+  {
+   "id": "E4",
+   "location": "README.md, Reading, second bullet (`So no algebraic engine on this base can beat proj-a`)",
+   "issue": "A universal statement from a bounded measurement. The evidence is three oracles (F4 G = 4, exhaustive grid, generic pair table) that return the same m = 2 verdicts on the same walk, one base (t = 5, seed 1307), one curve (k = 20, r = 131203), counted-unit S. It does not cover an engine with different verdicts (m = 3, other yields), another base or seed, or larger k. The attribution to `coverage 210/r` is the preregistered model reason from the census (PROTOCOL section 2); this session does not vary coverage independently of column count, so it measures the consequence (trials per relation 650.4 against 64.4, 10.1x; the PROTOCOL model said 9.3x) and not the cause. The w = 0 `floor` also includes the table's own 506 additions only for the pair table.",
+   "fix": "Write: on this base, with the three m = 2 oracles measured, the w = 0 row is 2.28 (F4, grid) to 2.39 (table) times proj-a, so no oracle that returns these verdicts on this walk can reach proj-a here; the cause (coverage per column) is the preregistered model, supported by 10.1x more trials per relation and not isolated. Label the last sentence as interpretation."
+  },
+  {
+   "id": "E5",
+   "location": "README.md, Reading, `L12's trace replay (0.474x) closes about one fifth of the decades between F4 and its grid limit`",
+   "issue": "Arithmetic correct (log10(1/0.474)/log10(42) = 0.1997), but it composes two sessions (L12's 0.474 on its own targets and this lead's 42x) and is a log-scale reading, not a measurement of L13. L12's validated figure is 0.4742 at w = 0.1 and 0.4741 at w = 1.",
+   "fix": "Label it cross-lead arithmetic, cite L12's README row, and give the product (about 20x remaining above the grid limit if the two ratios compose)."
+  },
+  {
+   "id": "E6",
+   "location": "README.md, Reading, first bullet (`At w >= 0.1, F4 costs 42x its own grid and about 3,200x the table`)",
+   "issue": "3,200x holds only at w = 0.1 (3,197). At w = 1 the F4 winner costs 15,084x the table (1/6.62973e-05).",
+   "fix": "Write `about 3.2e3x the table at w = 0.1 and 1.5e4x at w = 1`."
+  },
+  {
+   "id": "E7",
+   "location": "README.md, Headline bullet 2 (`At w = 0 it costs 4.7 % more (its 506 table additions)`) and Reading bullet 1 (`At w = 0 the F4, grid and table arms cost the same group operations`)",
+   "issue": "The 4.7% is net: +506 table additions minus 44.4 lift additions the table does not pay (V9) = +461.6 GAE of 9,792.9. The table arm does not cost the same group operations as F4 and grid at w = 0 (28.31 against 27.04).",
+   "fix": "Write `4.7 % more (506 table additions, less about 44 lift additions it avoids)` and `F4 and grid cost the same, the table 4.7 % more`."
+  },
+  {
+   "id": "E8",
+   "location": "README.md, Headline bullet 1 (`The F4 winner sits 42x above its own grid limit`)",
+   "issue": "Unscoped. The factor is 41.97 at w = 0.1 and 42.38 at w = 1; at w = 0 the two arms are identical (ratio 1.000 [1.000, 1.000]) and the band rank for F4 vs grid is `unresolved inside the band`.",
+   "fix": "Add `at w = 0.1 and w = 1 (1.00 at w = 0)`."
+  },
+  {
+   "id": "E9",
+   "location": "README.md, Run record, `The chunk running then was rerun from scratch ...; its partial directory was not kept`",
+   "issue": "chunks/driver.log has `c08 start` at 09:17:53Z and the next entry is `c08 start` at 15:29:54Z with no `c08 incomplete -> interrupted/...` line. The driver logs and moves any existing chunk directory, so none existed at the relaunch: the first c08 attempt had not opened a session (the first c08 session started 15:33:38Z). `Partial directory was not kept` implies a partial directory existed. The 6 h gap (09:17:53Z to 15:29:54Z) is not explained in the artifacts. A hand deletion before relaunch, if any, is unlogged. No first-attempt data is in the cited set either way, and all 16 sessions are complete and replay-audited.",
+   "fix": "State: no c08 directory existed at the 15:29:54Z relaunch (driver.log), so nothing was moved to interrupted/; the first c08 attempt had not started a session; the 6 h gap cause is unrecorded."
+  },
+  {
+   "id": "E10",
+   "location": "README.md (reporting contract), data/ (artifact policy), session.json",
+   "issue": "(a) The measured interval is not named (cold per-target session: factor base 932 GAE, oracle set-up, walk, linear algebra, verify) and phases are not tabulated, although the P4 explanation depends on the phase split. (b) The 16 data/ecbench/chunks/cNN/records.jsonl files (about 96 KB each) exceed the 64 KiB data-suffix threshold of AGENTS.md section 13 and are committed to git without a .artifacts.json; the T12 sessions in the same wave did the same. (c) The ecbench binary's source revision is not recorded in the sessions (git_commit null, git_dirty null); identity rests on the sha256.",
+   "fix": "(a) Add one sentence naming the interval and a three-line phase table (factor_base, oracle_setup, relations means from derived_for_errata). (b) Push through tools/artifacts or record the exception as T12 did. (c) Record the source commit of the binary next time; no change to this lead's numbers."
+  }
+ ],
+ "not_done": [
+  "No relation-level or factor-base certificate was re-verified: the records export counters and the final scalar only.",
+  "T13, T11 and L12 were not examined; the README statement that L13 and T13 chunks ran concurrently from 15:29Z is not checkable from this lead's artifacts (the chunk sessions' preflight does show a busy host, load average about 9 at c00).",
+  "The source of the prebuilt ecbench binary was not rebuilt or diffed; ecbench source in the working tree (band.rs, pkm_semaev.rs, ic_boundary.rs at HEAD) was read, and its band semantics agree with the binary's output to 2.2e-16.",
+  "The producer's F4 arm was replayed once (c00 seq 7) plus the validator's two F4 replays in the c15 replay-all; the other 15 chunks' F4 runs were not replayed."
+ ],
+ "verdict_summary": "validated with errata: all numbers and verdicts reproduce (P1, P2, P3, P5, P6, P7 held; P4 and P8 failed as reported), certificates 160/160, replays identical, binary identity everywhere, freeze order correct. Fix E1 to E10 in the README wording; no number changes."
+}

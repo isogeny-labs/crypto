@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T02:04:35Z",
+ "id": "PCC-20261115-7b1b1f",
+ "kind": "execution",
+ "producer": {
+  "commit": "b86d983d0de8ffe2abc6568c1ce2cd4b55a5f4d4",
+  "model": "GPT-6",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/VALIDATION.md",
+    "sha256": "6802795f0e2a16089c8bdcc1572efef7bd2ff1f227e2535147ce52311312675f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_genus_dlp_20261115/results/local-checks.txt",
+    "sha256": "e5fda6be13c3e6fe95ebd08688dc8c78310075628e40a6e9c347f7ca9c86a582"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_genus_dlp_20261115",
+ "statement": "The native import check transcript records 14 passing release tests, strict Clippy, formatting, and deterministic output comparisons; it is a producer transcript, not independently signed execution verification."
+}

@@ -1,0 +1,36 @@
+WeightedAdd11.cross_difference.{u_1} {K : Type u_1} [Field K] (a b : WeightedAdd11.Input K) (haz : a.z ≠ 0)
+  (hbz : b.z ≠ 0) :
+  WeightedAdd11.crossA a b - WeightedAdd11.crossB a b = (WeightedAdd11.nx a - WeightedAdd11.nx b) * (a.z ^ 2 * b.z ^ 2)
+WeightedAdd11.normalized_distinct_cross.{u_1} {K : Type u_1} [Field K] (a b : WeightedAdd11.Input K) (haz : a.z ≠ 0)
+  (hbz : b.z ≠ 0) (hx : WeightedAdd11.nx a ≠ WeightedAdd11.nx b) : WeightedAdd11.crossA a b ≠ WeightedAdd11.crossB a b
+WeightedAdd11.normalized_coefficients.{u_1} {K : Type u_1} [Field K] (a b : WeightedAdd11.Input K) (haz : a.z ≠ 0)
+  (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0) (hx : WeightedAdd11.nx a ≠ WeightedAdd11.nx b) :
+  have c := WeightedAdd11.output a b;
+  c.z ≠ 0 ∧
+    c.w ≠ 0 ∧
+      c.q / c.z ^ 2 = -(WeightedAdd11.nx a + WeightedAdd11.nx b) ∧
+        c.r / c.z ^ 4 = WeightedAdd11.nx a * WeightedAdd11.nx b ∧
+          c.s / (c.z ^ 3 * c.w) =
+              (WeightedAdd11.ny a - WeightedAdd11.ny b) / (WeightedAdd11.nx a - WeightedAdd11.nx b) ∧
+            c.t / (c.z ^ 5 * c.w) =
+              (WeightedAdd11.nx a * WeightedAdd11.ny b - WeightedAdd11.nx b * WeightedAdd11.ny a) /
+                (WeightedAdd11.nx a - WeightedAdd11.nx b)
+WeightedAdd11.preserves_mumford.{u_1} {K : Type u_1} [Field K] (a b : WeightedAdd11.Input K) (f : Polynomial K)
+  (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0) (hx : WeightedAdd11.nx a ≠ WeightedAdd11.nx b)
+  (ha : Polynomial.X - Polynomial.C (WeightedAdd11.nx a) ∣ f - Polynomial.C (WeightedAdd11.ny a) ^ 2)
+  (hb : Polynomial.X - Polynomial.C (WeightedAdd11.nx b) ∣ f - Polynomial.C (WeightedAdd11.ny b) ^ 2) :
+  have c := WeightedAdd11.output a b;
+  c.z ≠ 0 ∧
+    c.w ≠ 0 ∧
+      Polynomial.X ^ 2 + Polynomial.C (c.q / c.z ^ 2) * Polynomial.X + Polynomial.C (c.r / c.z ^ 4) ∣
+        f - (Polynomial.C (c.s / (c.z ^ 3 * c.w)) * Polynomial.X + Polynomial.C (c.t / (c.z ^ 5 * c.w))) ^ 2
+WeightedAdd11.distinct_guard.{u_1} {K : Type u_1} [Field K] [DecidableEq K] (a b : WeightedAdd11.Input K)
+  (haz : a.z ≠ 0) (hbz : b.z ≠ 0) (hx : WeightedAdd11.nx a ≠ WeightedAdd11.nx b) :
+  Add11Distinct.classify (WeightedAdd11.crossA a b) (WeightedAdd11.crossY a b) (WeightedAdd11.crossB a b)
+      (WeightedAdd11.crossY b a) =
+    Add11Distinct.Prelude.distinct
+'WeightedAdd11.cross_difference' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedAdd11.normalized_distinct_cross' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedAdd11.normalized_coefficients' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedAdd11.preserves_mumford' depends on axioms: [propext, Classical.choice, Quot.sound]
+'WeightedAdd11.distinct_guard' depends on axioms: [propext, Classical.choice, Quot.sound]

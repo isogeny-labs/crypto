@@ -1,0 +1,190 @@
+{
+  "oracle": {
+    "out": {
+      "toy_cases": 40,
+      "toy_assignments": 3968,
+      "actual_inverse_controls": 256,
+      "original_complete": false,
+      "rank": 72,
+      "kernel_bits": 4,
+      "bijection_dimension": 76
+    },
+    "error": null
+  },
+  "compile": {
+    "out": {
+      "actual_controls": 64,
+      "original_complete": false,
+      "variables": 52008,
+      "clauses": 192562,
+      "gate_kinds": {
+        "false": 1,
+        "true": 1,
+        "input": 76,
+        "and": 15343,
+        "xor": 36551,
+        "not": 38
+      },
+      "blocks": [
+        {
+          "s": 1,
+          "m": 2,
+          "offset": 0,
+          "width": 4,
+          "observed_primary_bits": 4
+        },
+        {
+          "s": 1,
+          "m": 3,
+          "offset": 4,
+          "width": 4,
+          "observed_primary_bits": 4
+        },
+        {
+          "s": 2,
+          "m": 7,
+          "offset": 8,
+          "width": 8,
+          "observed_primary_bits": 8
+        },
+        {
+          "s": 3,
+          "m": 11,
+          "offset": 16,
+          "width": 12,
+          "observed_primary_bits": 12
+        },
+        {
+          "s": 3,
+          "m": 13,
+          "offset": 28,
+          "width": 12,
+          "observed_primary_bits": 12
+        },
+        {
+          "s": 4,
+          "m": 19,
+          "offset": 40,
+          "width": 16,
+          "observed_primary_bits": 16
+        },
+        {
+          "s": 4,
+          "m": 25,
+          "offset": 56,
+          "width": 16,
+          "observed_primary_bits": 16
+        }
+      ],
+      "graph_sha256": "e28c822a529e59b062cf0b887f01e1173b41a1744c6ce4b49b10ad532b135d7c",
+      "compile_and_validation_seconds": 0.8236308250052389
+    },
+    "error": null
+  },
+  "search": {
+    "out": {
+      "models": [],
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "cold_compile_seconds": 0.1359519090037793,
+      "variables": 52008,
+      "blocks": [
+        {
+          "s": 1,
+          "m": 2,
+          "offset": 0,
+          "width": 4,
+          "observed_primary_bits": 4
+        },
+        {
+          "s": 1,
+          "m": 3,
+          "offset": 4,
+          "width": 4,
+          "observed_primary_bits": 4
+        },
+        {
+          "s": 2,
+          "m": 7,
+          "offset": 8,
+          "width": 8,
+          "observed_primary_bits": 8
+        },
+        {
+          "s": 3,
+          "m": 11,
+          "offset": 16,
+          "width": 12,
+          "observed_primary_bits": 12
+        },
+        {
+          "s": 3,
+          "m": 13,
+          "offset": 28,
+          "width": 12,
+          "observed_primary_bits": 12
+        },
+        {
+          "s": 4,
+          "m": 19,
+          "offset": 40,
+          "width": 16,
+          "observed_primary_bits": 16
+        },
+        {
+          "s": 4,
+          "m": 25,
+          "offset": 56,
+          "width": 16,
+          "observed_primary_bits": 16
+        }
+      ],
+      "formulation_seconds": 3.2960849230003078,
+      "version": "4.15.4",
+      "cpu_affinity": [
+        0
+      ],
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "167345",
+        "sat mk clause 3ary": "54350",
+        "sat mk clause nary": "414885",
+        "sat mk var": "103904",
+        "sat gc clause": "82005",
+        "sat del clause": "258262",
+        "sat conflicts": "122690",
+        "sat decisions": "136519",
+        "sat propagations 2ary": "27755356",
+        "sat propagations nary": "217851788",
+        "sat restarts": "7491",
+        "sat minimized lits": "2052482",
+        "sat subs resolution dyn": "31602",
+        "sat units": "544",
+        "sat elim bool vars res": "25180",
+        "sat backjumps": "122688",
+        "sat backtracks": "2",
+        "sat elim clauses": "1178",
+        "sat elim literals": "1117",
+        "sat subsumed": "2128",
+        "sat subs resolution": "7080",
+        "sat scc elim vars": "52218",
+        "sat tr": "9",
+        "sat probing assigned": "1",
+        "rlimit count": "229279198",
+        "max memory": "225.07",
+        "memory": "99.69",
+        "num allocs": "4460080913.0",
+        "time": "41.767"
+      },
+      "engine_seconds": 45.070042678009486,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "qualified_speedup": null,
+  "original_complete": false
+}

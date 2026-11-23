@@ -1,5 +1,5 @@
 //! PKM tower systems over any prime-field backend, for `pkm_tower_pilot`
-//! at primes its `u64` builder cannot hold (NIST P-192, P-224, P-256), and
+//! at primes its `u64` builder cannot hold (NIST P-192 through P-521), and
 //! at small primes as the builder's own cross-check.
 //!
 //! Everything here is generic over [`PrimeField`]: the factor-base set `V`,
@@ -14,13 +14,7 @@
 //!   (P-224: `v₂(p − 1) = 96`);
 //! - `dickson-torus`: `y_{j+1} = y_j² − 2`, `V = {w + w⁻¹ : w ∈ u·μ_{2^t}}`
 //!   with `u`, `μ_{2^t}` in the norm-1 torus of `F_{p²}`, needs
-//!   `2^t | p + 1` and `p ≡ 3 mod 4` (P-192: `v₂(p + 1) = 64`; P-256: 96);
-//! - `isogeny` (since 2026-11-01): `V = x(R' + ⟨Q⟩)` for `Q` of order `2^t`
-//!   on an auxiliary curve `E'/F_p`, built by
-//!   `prime_tower_wide` over this backend — the supersingular `E'`
-//!   when `v₂(p + 1) ≥ t` (one draw, no search), else the charged
-//!   ordinary search.  Closes the u64 gap: an F4 system on the
-//!   isogeny tower now runs at P-192 and above.
+//!   `2^t | p + 1` (P-192: `v₂(p + 1) = 64`; P-256: 96).
 //!
 //! **Verification.** After each solve, every decomposition of the target
 //! over `V^m` is enumerated independently of the engine: the `S₃` links are
@@ -432,34 +426,34 @@ fn kummer<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::Elem> {
     }
 }
 
-// `F_{p²} = F_p(i)`, `i² = −1` (`p ≡ 3 mod 4`).
+// `F_{p²} = F_p(i)`, `i² = d` for a quadratic nonresidue d.
 type Fp2<E> = (E, E);
 
-fn fp2_mul<F: PrimeField>(f: &F, x: Fp2<F::Elem>, y: Fp2<F::Elem>) -> Fp2<F::Elem> {
+fn fp2_mul<F: PrimeField>(f: &F, d: F::Elem, x: Fp2<F::Elem>, y: Fp2<F::Elem>) -> Fp2<F::Elem> {
     (
-        f.sub(f.mul(x.0, y.0), f.mul(x.1, y.1)),
+        f.add(f.mul(x.0, y.0), f.mul(d, f.mul(x.1, y.1))),
         f.add(f.mul(x.0, y.1), f.mul(x.1, y.0)),
     )
 }
 
-fn fp2_pow<F: PrimeField>(f: &F, x: Fp2<F::Elem>, e: &BigUint) -> Fp2<F::Elem> {
+fn fp2_pow<F: PrimeField>(f: &F, d: F::Elem, x: Fp2<F::Elem>, e: &BigUint) -> Fp2<F::Elem> {
     let mut r = (f.one(), f.zero());
     for i in (0..e.bits()).rev() {
-        r = fp2_mul(f, r, r);
+        r = fp2_mul(f, d, r, r);
         if e.bit(i) {
-            r = fp2_mul(f, r, x);
+            r = fp2_mul(f, d, r, x);
         }
     }
     r
 }
 
-fn fp2_inv<F: PrimeField>(f: &F, x: Fp2<F::Elem>) -> Fp2<F::Elem> {
-    let n = f.add(f.sqr(x.0), f.sqr(x.1));
+fn fp2_inv<F: PrimeField>(f: &F, d: F::Elem, x: Fp2<F::Elem>) -> Fp2<F::Elem> {
+    let n = f.sub(f.sqr(x.0), f.mul(d, f.sqr(x.1)));
     let ni = f.inv(n).unwrap();
     (f.mul(x.0, ni), f.mul(f.neg(x.1), ni))
 }
 
-fn torus_element<F: PrimeField>(f: &F, rng: &mut StdRng) -> Fp2<F::Elem> {
+fn torus_element<F: PrimeField>(f: &F, d: F::Elem, rng: &mut StdRng) -> Fp2<F::Elem> {
     let p = f.modulus();
     loop {
         let z = (
@@ -469,7 +463,7 @@ fn torus_element<F: PrimeField>(f: &F, rng: &mut StdRng) -> Fp2<F::Elem> {
         if f.is_zero(z.0) && f.is_zero(z.1) {
             continue;
         }
-        return fp2_pow(f, z, &(p - 1u32));
+        return fp2_pow(f, d, z, &(p - 1u32));
     }
 }
 
@@ -477,34 +471,43 @@ fn dickson_torus<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::
     let p = f.modulus().clone();
     let pp1 = &p + 1u32;
     assert!(
-        (&p % 4u32) == BigUint::from(3u32) && pp1.trailing_zeros().unwrap_or(0) >= t as u64,
-        "the torus case needs 2^{t} | p + 1 and p ≡ 3 mod 4"
+        pp1.trailing_zeros().unwrap_or(0) >= t as u64,
+        "the torus case needs 2^{t} | p + 1"
     );
+    let minus_one = f.neg(f.one());
+    let d = if f.legendre(minus_one) == -1 {
+        minus_one
+    } else {
+        (2u64..)
+            .map(|n| f.from_u64(n))
+            .find(|&n| f.legendre(n) == -1)
+            .unwrap()
+    };
     let one = (f.one(), f.zero());
-    let minus_one = (f.neg(f.one()), f.zero());
+    let minus_one = (minus_one, f.zero());
     let zeta = loop {
-        let h = torus_element(f, rng);
-        if fp2_pow(f, h, &(&pp1 >> 1)) == minus_one {
-            break fp2_pow(f, h, &(&pp1 >> t));
+        let h = torus_element(f, d, rng);
+        if fp2_pow(f, d, h, &(&pp1 >> 1)) == minus_one {
+            break fp2_pow(f, d, h, &(&pp1 >> t));
         }
     };
     let two_t = BigUint::one() << t;
     loop {
-        let u = torus_element(f, rng);
-        if f.is_zero(u.1) || fp2_pow(f, u, &(&two_t << 1)) == one {
+        let u = torus_element(f, d, rng);
+        if f.is_zero(u.1) || fp2_pow(f, d, u, &(&two_t << 1)) == one {
             continue;
         }
         let mut v = Vec::with_capacity(1 << t);
         let mut w = u;
         for _ in 0..1u64 << t {
             v.push(f.double(w.0));
-            w = fp2_mul(f, w, zeta);
+            w = fp2_mul(f, d, w, zeta);
         }
         let set: HashSet<F::Elem> = v.iter().copied().collect();
         if set.len() != 1 << t {
             continue;
         }
-        let ut = fp2_pow(f, u, &two_t);
+        let ut = fp2_pow(f, d, u, &two_t);
         let c = f.double(ut.0);
         let tower = WTower {
             kind: WKind::DicksonTorus,
@@ -512,11 +515,10 @@ fn dickson_torus<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::
             v,
             scale: f.one(),
             c,
-            velu: None,
-            info: json!({"case": "torus", "u": [s(f, u.0), s(f, u.1)],
+            info: json!({"case": "torus", "d": s(f, d), "u": [s(f, u.0), s(f, u.1)],
                          "zeta": [s(f, zeta.0), s(f, zeta.1)], "c": s(f, c)}),
         };
-        check_torus(f, &tower, u, zeta, &p);
+        check_torus(f, d, &tower, u, zeta, &p);
         return tower;
     }
 }
@@ -527,6 +529,7 @@ fn dickson_torus<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::
 /// level is ramified, and `c ≠ ±2`.
 fn check_torus<F: PrimeField>(
     f: &F,
+    d: F::Elem,
     tower: &WTower<F::Elem>,
     u: Fp2<F::Elem>,
     zeta: Fp2<F::Elem>,
@@ -535,17 +538,21 @@ fn check_torus<F: PrimeField>(
     let t = tower.t;
     let one = (f.one(), f.zero());
     let minus_one = (f.neg(f.one()), f.zero());
-    assert_eq!(fp2_pow(f, zeta, &(BigUint::one() << t)), one, "ζ^(2^t) ≠ 1");
     assert_eq!(
-        fp2_pow(f, zeta, &(BigUint::one() << (t - 1))),
+        fp2_pow(f, d, zeta, &(BigUint::one() << t)),
+        one,
+        "ζ^(2^t) ≠ 1"
+    );
+    assert_eq!(
+        fp2_pow(f, d, zeta, &(BigUint::one() << (t - 1))),
         minus_one,
         "ζ does not have exact order 2^t"
     );
-    assert_eq!(fp2_pow(f, u, &(p + 1u32)), one, "u is not in the torus");
+    assert_eq!(fp2_pow(f, d, u, &(p + 1u32)), one, "u is not in the torus");
     assert!(!f.is_zero(u.1), "u lies in F_p");
     let mut w = u;
     for (k, &x) in tower.v.iter().enumerate() {
-        let wi = fp2_inv(f, w);
+        let wi = fp2_inv(f, d, w);
         let sum = (f.add(w.0, wi.0), f.add(w.1, wi.1));
         assert!(f.is_zero(sum.1), "w + 1/w ∉ F_p at k = {k}");
         assert!(sum.0 == x, "V[{k}] is not w + 1/w");
@@ -553,7 +560,7 @@ fn check_torus<F: PrimeField>(
         assert_eq!(f.legendre(disc), -1, "not the torus case at V[{k}]");
         let y = tower.values(f, x);
         assert!(y.iter().all(|&yj| !f.is_zero(yj)), "ramified at V[{k}]");
-        w = fp2_mul(f, w, zeta);
+        w = fp2_mul(f, d, w, zeta);
     }
     let two = f.from_u64(2);
     assert!(tower.c != two && tower.c != f.neg(two), "c = ±2");
@@ -662,11 +669,14 @@ fn target_curve<F: PrimeField>(
     f: &F,
     tower: &WTower<F::Elem>,
     need: usize,
+    fixed: Option<&(BigUint, BigUint)>,
     rng: &mut StdRng,
-) -> (WCurve<F::Elem>, Vec<F::Elem>) {
+) -> Option<(WCurve<F::Elem>, Vec<F::Elem>)> {
     loop {
-        let a = elem(f, 0, rng);
-        let b = elem(f, 1, rng);
+        let (a, b) = match fixed {
+            Some((a, b)) => (f.from_biguint(a), f.from_biguint(b)),
+            None => (elem(f, 0, rng), elem(f, 1, rng)),
+        };
         let disc = f.add(
             f.mul(f.from_u64(4), f.mul(f.sqr(a), a)),
             f.mul(f.from_u64(27), f.sqr(b)),
@@ -682,7 +692,10 @@ fn target_curve<F: PrimeField>(
             .filter(|&x| f.legendre(curve.rhs(f, x)) == 1)
             .collect();
         if on.len() >= need {
-            return (curve, on);
+            return Some((curve, on));
+        }
+        if fixed.is_some() {
+            return None;
         }
     }
 }
@@ -948,6 +961,7 @@ pub struct WArgs {
     pub verify: bool,
     /// The prime's label (`P-224`, …) for the rows.
     pub label: String,
+    pub curve_ab: Option<(BigUint, BigUint)>,
 }
 
 /// Build and solve one cell's systems over `f`; one JSON row per system.
@@ -959,8 +973,18 @@ pub fn run_cell<F: PrimeField>(f: &F, cell: &WCell, a: &WArgs) -> (Vec<Value>, b
         ^ ((cell.t as u64) << 16)
         ^ 1u64;
     let mut rng = <StdRng as rand::SeedableRng>::seed_from_u64(cell_seed);
-    let tower = build_tower(f, cell.kind, cell.t, &mut rng);
-    let (curve, on) = target_curve(f, &tower, cell.m.max(2), &mut rng);
+    let (tower, curve, on) = (0..10_000)
+        .find_map(|_| {
+            let tower = build_tower(f, cell.kind, cell.t, &mut rng);
+            if let Some((curve, on)) =
+                target_curve(f, &tower, cell.m.max(2), a.curve_ab.as_ref(), &mut rng)
+            {
+                Some((tower, curve, on))
+            } else {
+                None
+            }
+        })
+        .expect("no tower coset has enough abscissae on the selected curve");
     let mut targets = Vec::new();
     while targets.len() < a.planted {
         if let Some(tg) = plant(f, &curve, &tower, cell.m, &on, &mut rng) {
@@ -1102,6 +1126,7 @@ pub fn run_cell<F: PrimeField>(f: &F, cell: &WCell, a: &WArgs) -> (Vec<Value>, b
             "target_index": k,
             "x_r": s(f, target.x_r),
             "p": f.modulus().to_string(),
+            "curve_selection": if a.curve_ab.is_some() { "named-nist" } else { "random" },
             "prime": a.label,
             "p_bits": f.modulus().bits(),
             "v2_p_minus_1": (f.modulus() - 1u32).trailing_zeros(),
@@ -1180,13 +1205,71 @@ mod tests {
     fn p192() -> BigUint {
         (BigUint::one() << 192u32) - (BigUint::one() << 64u32) - 1u32
     }
+    fn p256() -> BigUint {
+        (BigUint::one() << 256u32) - (BigUint::one() << 224u32)
+            + (BigUint::one() << 192u32)
+            + (BigUint::one() << 96u32)
+            - 1u32
+    }
+    fn p384() -> BigUint {
+        (BigUint::one() << 384u32) - (BigUint::one() << 128u32) - (BigUint::one() << 96u32)
+            + (BigUint::one() << 32u32)
+            - 1u32
+    }
+    fn p521() -> BigUint {
+        (BigUint::one() << 521u32) - 1u32
+    }
+
+    fn check_both_sides<F: PrimeField>(f: &F, minus: u64, plus: u64, rng: &mut StdRng) {
+        let p = f.modulus();
+        assert_eq!((p - 1u32).trailing_zeros(), Some(minus));
+        assert_eq!((p + 1u32).trailing_zeros(), Some(plus));
+        for t in 1..=4 {
+            if t as u64 <= minus {
+                build_tower(f, WKind::Kummer, t, rng);
+            }
+            if t as u64 <= plus {
+                build_tower(f, WKind::DicksonTorus, t, rng);
+            }
+        }
+    }
 
     #[test]
     fn towers_check_at_nist_primes() {
         let mut rng = StdRng::seed_from_u64(1);
-        for t in 1..=8 {
-            let _ = build_tower(&Fp224::new(&p224()), WKind::Kummer, t, &mut rng);
-            let _ = build_tower(&FpWide::<3>::new(&p192()), WKind::DicksonTorus, t, &mut rng);
+        check_both_sides(&FpWide::<3>::new(&p192()), 1, 64, &mut rng);
+        check_both_sides(&Fp224::new(&p224()), 96, 1, &mut rng);
+        check_both_sides(&FpWide::<4>::new(&p256()), 1, 96, &mut rng);
+        check_both_sides(&FpWide::<6>::new(&p384()), 1, 32, &mut rng);
+        check_both_sides(&FpWide::<9>::new(&p521()), 1, 521, &mut rng);
+        build_tower(&FpWide::<3>::new(&p192()), WKind::DicksonTorus, 8, &mut rng);
+        build_tower(&Fp224::new(&p224()), WKind::Kummer, 8, &mut rng);
+        build_tower(&FpWide::<4>::new(&p256()), WKind::DicksonTorus, 8, &mut rng);
+    }
+
+    #[test]
+    fn towers_check_at_59_bit_primes() {
+        let mut rng = StdRng::seed_from_u64(59);
+        check_both_sides(&Fp64::new(288_230_376_154_267_649), 16, 1, &mut rng);
+        check_both_sides(&Fp64::new(288_230_376_151_973_887), 1, 18, &mut rng);
+        check_both_sides(&Fp64::new(288_230_445_959_117_953), 7, 1, &mut rng);
+    }
+
+    #[test]
+    fn nine_limb_field_matches_biguint() {
+        let p = p521();
+        let f = FpWide::<9>::new(&p);
+        let mut rng = StdRng::seed_from_u64(521);
+        for _ in 0..8 {
+            let x = rand_below(&p, &mut rng);
+            let y = rand_below(&p, &mut rng);
+            let fx = f.from_biguint(&x);
+            let fy = f.from_biguint(&y);
+            assert_eq!(f.to_biguint(f.mul(fx, fy)), (&x * &y) % &p);
+            assert_eq!(f.to_biguint(f.add(fx, fy)), (&x + &y) % &p);
+            if !x.is_zero() {
+                assert_eq!(f.to_biguint(f.inv(fx).unwrap()), x.modpow(&(&p - 2u32), &p));
+            }
         }
     }
 
@@ -1207,6 +1290,7 @@ mod tests {
             targets: None,
             verify: true,
             label: "p2".into(),
+            curve_ab: None,
         };
         let cell = WCell {
             kind: WKind::Kummer,

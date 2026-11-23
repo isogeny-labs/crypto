@@ -1,0 +1,28 @@
+import Residual
+set_option autoImplicit false
+namespace ResidualWord
+theorem square_value : ProductPolynomial.product 17 [1,1] [1,1]=[1,2,1] := by decide
+theorem empty_square : ProductPolynomial.product 17 [] []=[] := by decide
+
+theorem neg_keeps_trailing : pneg 17 [1,0,0]=[16,0,0] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem padded_left : padd 17 [16] [1,2,3]=[0,2,3] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem padded_right : padd 17 [1,2,3] [16]=[0,2,3] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem complete_cancellation : psub 17 [1,2,0] [1,2]=[] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem empty_add : padd 17 [] [0,3,0]=[0,3] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem empty_neg : pneg 17 []=[] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+
+theorem residual_square : residual 17 [1,0,1] [1,1]=[0,15] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem residual_exact_square : residual 17 [1,2,1] [1,1]=[] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem residual_zero_v : residual 17 [1,0,0] []=[1] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+theorem residual_empty_f : residual 17 [] [1,1]=[16,15,16] := by
+  simp only [residual,square_value,empty_square,psub,padd,pneg,slots,List.map_cons,List.map_nil] <;> decide
+end ResidualWord

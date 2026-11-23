@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T04:20:51Z",
+ "id": "PCC-20261123-a3193a",
+ "kind": "statement",
+ "producer": {
+  "commit": "ab905abd2a7b234c1c94946e8bae85493d120457",
+  "model": "gpt-6-astra",
+  "session": "fass-target-quotient-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/producer/attempt1/qualifier.stdout.jsonl",
+    "sha256": "a1c1fffe57f3f3b65408171b9244cceff4ba57a52276d041a6ba8d52f02339d9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/producer/attempt1/manifest.pre-call.txt",
+    "sha256": "d3cd2b84d668ec596d1f14a7c524c97be867260edd5e261a23c392191da76d1e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/target_quotient/evidence/producer/attempt1/manifest.post-call.sha256",
+    "sha256": "07d2501c47035a31a9df5f1d138c60a78910893ee5c724a3e83cd2fe30b101f6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact fixed fixture and public target workload in protocol SHA256 3eafeab5c2dc73c0add918bb23c9e8cdac1cf82d567d18a49792fd84aee0b20f; standalone source-pinned Rust module correctness",
+ "statement": "The frozen target-quotient native development qualifier reports exit 0 for 91 finite target cases, 52 cusp-minor checks, 20 empty controls, and 35391 quotient-grid comparisons; the retained Prime31 d63 cells distinguish coefficient rank from Boolean zero-support rank. These are unsigned producer observations, with no performance, random-yield, signed relation, formal theorem, or execution-verification claim."
+}

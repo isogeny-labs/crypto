@@ -1,0 +1,24 @@
+/tmp/round04-residue-probe.lean:8:12: error: Tactic `decide` failed for proposition
+  X.coeff 2 * 77 + 66 = X.coeff 2 * 9636 - 171
+because its `Decidable` instance
+  ZMod.decidableEq 79 (X.coeff 2 * 77 + 66) (X.coeff 2 * 9636 - 171)
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `Bool.decEq`, `Classical.decEq`, `Classical.propDecidable`, `Nat.decEq`, `Nat.decLe`, and `ZMod.decidableEq`, reduction got stuck at the `Decidable` instance
+  match h : (↑(X.coeff 2 * 77 + 66)).beq ↑(X.coeff 2 * 9636 - 171) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/tmp/round04-residue-probe.lean:8:12: error: Tactic `decide` failed for proposition
+  X.coeff 3 * 77 = X.coeff 3 * 9636
+because its `Decidable` instance
+  ZMod.decidableEq 79 (X.coeff 3 * 77) (X.coeff 3 * 9636)
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqFin`, `instDecidableEqNat`, `Classical.decEq`, `Classical.propDecidable`, `Nat.decEq`, and `ZMod.decidableEq`, reduction got stuck at the `Decidable` instance
+  match h : (↑(X.coeff 3 * 77)).beq ↑(X.coeff 3 * 9636) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/tmp/round04-residue-probe.lean:8:12: error: Expected type must not contain free variables
+  X.coeff (n + 1 + 1 + 1 + 1) * 77 = X.coeff (n + 1 + 1 + 1 + 1) * 9636
+
+Hint: Use the `+revert` option to automatically clean up and revert free variables

@@ -1,0 +1,27 @@
+{
+  "schema": "n83.dataset-file-layout/v1",
+  "dataset": "spike29-pdp-source-binding-audit-20261103",
+  "scope": "Read-only source binding and custody verification; no degree labels or new measurements.",
+  "files": [
+    {
+      "path": "audit.py",
+      "role": "reproducible verifier",
+      "contents": "Checks the frozen protocol arms, factor-base family manifests, 48-case cross, PDP membership references, input-index binding, source hashes against saved replay rows, and SHA-256 manifests. Default mode writes audit.json; --check verifies it without changing it."
+    },
+    {
+      "path": "audit.json",
+      "role": "machine-readable audit result",
+      "contents": "Frozen protocol identity, factor-base manifest bindings, 48 PDP source-to-replay rows, hashes, and manifest verification counts."
+    },
+    {
+      "path": "README.md",
+      "role": "human-readable guide",
+      "contents": "Reproduction command, source layout, result interpretation, and claim boundaries."
+    },
+    {
+      "path": "FILE_LAYOUT.json",
+      "role": "format description",
+      "contents": "Machine-readable description of this directory's files and scope."
+    }
+  ]
+}

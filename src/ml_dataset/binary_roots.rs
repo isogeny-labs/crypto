@@ -603,6 +603,8 @@ mod tests {
 
     fn fixture(family: &str, n: u32, twist: bool) -> (CaseConfig, CaseData) {
         let config = CaseConfig {
+            channels: None,
+            factor_base_policy: None,
             family: family.into(),
             n,
             m: 2,
@@ -612,6 +614,7 @@ mod tests {
             key_index: 1,
             seed: 42,
             factor_base_size: 8,
+
             degree_bound: 4,
             work_limit: TRACE_EVENT_CAP,
             solver: "root".into(),

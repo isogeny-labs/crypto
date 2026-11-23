@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T11:07:13Z",
+ "id": "PCC-20261117-0ecee3",
+ "kind": "execution",
+ "producer": {
+  "commit": "11c9a0312f0b0a8ae85be325e72cbf9602d9d777",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/validation/deferred50-format-successor-source.sha256",
+    "sha256": "435559b03a4051fe118c7dd5ad521d2c3c81df2d04bd983791e629ee18bc9fc8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/CI_FORMAT_ORIGINAL.log",
+    "sha256": "d9d7a324cc60789b13be1ae4b72282ff06ec2dd4a6cbdbcf7fb8d2b386cdc07a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/build/format-check.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "After Runpod50original collection/qualification and owned deletion, correct public export formatting only (layout and optional import trailing comma); original measured refs/archive/native binaries unchanged. Exact source210successor manifest distinguishes formatting from measured11c9source; rustfmt check passes. Unverified producer assertions."
+}

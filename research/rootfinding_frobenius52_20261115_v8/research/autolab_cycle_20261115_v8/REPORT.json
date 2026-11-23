@@ -1,0 +1,561 @@
+{
+  "result": {
+    "evidence": {
+      "complete_conditional_comparison": true,
+      "complete_global_root_search": false,
+      "details": {
+        "controls": {
+          "fields": [
+            {
+              "n": 2,
+              "positive": 1,
+              "regular_cells": 4
+            },
+            {
+              "n": 3,
+              "positive": 3,
+              "regular_cells": 4
+            },
+            {
+              "n": 4,
+              "positive": 2,
+              "regular_cells": 4
+            }
+          ],
+          "positive_norm_cases": 6,
+          "synthetic_alpha_zero_cases": 28
+        },
+        "profile": {
+          "complete_comparison": true,
+          "internal_total_ratio": 0.9997368179195791,
+          "median_total_seconds": {
+            "U52": 0.43292081099934876,
+            "k83": 0.43280687399965245
+          },
+          "original_global_complete": false,
+          "records": [
+            {
+              "cache_seconds": 0.003746383999896352,
+              "candidate_count": 64,
+              "cells": [
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 1,
+                    "ya": 0
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "10c1f56beb8ccef29f118aae9effb77ff132c1052fe506a91463efca96520fa1",
+                  "rows": 166
+                },
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 1,
+                    "ya": 1
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "a6fbab6c8240e00d41541c2d0f94018ad82c4e5e1adbdaa2f3cf37b6bf4cb9ca",
+                  "rows": 166
+                },
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341067
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "d49256aa95370ab1cc235901dfc4d4e608906af9eeb068b6bd23459a81b403e2",
+                  "rows": 166
+                },
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341064
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "8e08ebce3b3df0b01dcafeed9830278a791ff2069f28bfad4fffe3c7a2daca38",
+                  "rows": 166
+                }
+              ],
+              "complete_batch": true,
+              "extract_verify_seconds": 0.1058676499997091,
+              "formulation_solve_seconds": 0.022295265000138897,
+              "method": "k83",
+              "rep": 0,
+              "selection": [
+                [
+                  2,
+                  "no_rational_lift"
+                ],
+                [
+                  3,
+                  "outside_order4",
+                  8681770682262738787341067,
+                  [
+                    6447604371254566017040390,
+                    3961421876022238112816345
+                  ]
+                ]
+              ],
+              "serialization_seconds": 0.00046929900054237805,
+              "setup_seconds": 0.6726905400009855,
+              "source_tuple_count": 0,
+              "total_seconds": 0.8050780510002369
+            },
+            {
+              "cache_seconds": 0.016700142001354834,
+              "candidate_count": 64,
+              "cells": [
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 1,
+                    "ya": 0
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "10c1f56beb8ccef29f118aae9effb77ff132c1052fe506a91463efca96520fa1",
+                  "rows": 48
+                },
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 1,
+                    "ya": 1
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "a6fbab6c8240e00d41541c2d0f94018ad82c4e5e1adbdaa2f3cf37b6bf4cb9ca",
+                  "rows": 48
+                },
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341067
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "d49256aa95370ab1cc235901dfc4d4e608906af9eeb068b6bd23459a81b403e2",
+                  "rows": 48
+                },
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341064
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "8e08ebce3b3df0b01dcafeed9830278a791ff2069f28bfad4fffe3c7a2daca38",
+                  "rows": 48
+                }
+              ],
+              "complete_batch": true,
+              "extract_verify_seconds": 0.1007028160001937,
+              "formulation_solve_seconds": 0.017281357999308966,
+              "method": "U52",
+              "rep": 0,
+              "selection": [
+                [
+                  2,
+                  "no_rational_lift"
+                ],
+                [
+                  3,
+                  "outside_order4",
+                  8681770682262738787341067,
+                  [
+                    6447604371254566017040390,
+                    3961421876022238112816345
+                  ]
+                ]
+              ],
+              "serialization_seconds": 0.0002966270003526006,
+              "setup_seconds": 0.29327450999880966,
+              "source_tuple_count": 0,
+              "total_seconds": 0.4282608319990686
+            },
+            {
+              "cache_seconds": 0.017683415000647074,
+              "candidate_count": 64,
+              "cells": [
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 1,
+                    "ya": 0
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "10c1f56beb8ccef29f118aae9effb77ff132c1052fe506a91463efca96520fa1",
+                  "rows": 48
+                },
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 1,
+                    "ya": 1
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "a6fbab6c8240e00d41541c2d0f94018ad82c4e5e1adbdaa2f3cf37b6bf4cb9ca",
+                  "rows": 48
+                },
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341067
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "d49256aa95370ab1cc235901dfc4d4e608906af9eeb068b6bd23459a81b403e2",
+                  "rows": 48
+                },
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341064
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "8e08ebce3b3df0b01dcafeed9830278a791ff2069f28bfad4fffe3c7a2daca38",
+                  "rows": 48
+                }
+              ],
+              "complete_batch": true,
+              "extract_verify_seconds": 0.10568364299979294,
+              "formulation_solve_seconds": 0.017681211000308394,
+              "method": "U52",
+              "rep": 1,
+              "selection": [
+                [
+                  2,
+                  "no_rational_lift"
+                ],
+                [
+                  3,
+                  "outside_order4",
+                  8681770682262738787341067,
+                  [
+                    6447604371254566017040390,
+                    3961421876022238112816345
+                  ]
+                ]
+              ],
+              "serialization_seconds": 0.0002904880002461141,
+              "setup_seconds": 0.2980903269999544,
+              "source_tuple_count": 0,
+              "total_seconds": 0.439433542000188
+            },
+            {
+              "cache_seconds": 0.004093718000149238,
+              "candidate_count": 64,
+              "cells": [
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 1,
+                    "ya": 0
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "10c1f56beb8ccef29f118aae9effb77ff132c1052fe506a91463efca96520fa1",
+                  "rows": 166
+                },
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 1,
+                    "ya": 1
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "a6fbab6c8240e00d41541c2d0f94018ad82c4e5e1adbdaa2f3cf37b6bf4cb9ca",
+                  "rows": 166
+                },
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341067
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "d49256aa95370ab1cc235901dfc4d4e608906af9eeb068b6bd23459a81b403e2",
+                  "rows": 166
+                },
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341064
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "8e08ebce3b3df0b01dcafeed9830278a791ff2069f28bfad4fffe3c7a2daca38",
+                  "rows": 166
+                }
+              ],
+              "complete_batch": true,
+              "extract_verify_seconds": 0.10134017099881021,
+              "formulation_solve_seconds": 0.022150908000185154,
+              "method": "k83",
+              "rep": 1,
+              "selection": [
+                [
+                  2,
+                  "no_rational_lift"
+                ],
+                [
+                  3,
+                  "outside_order4",
+                  8681770682262738787341067,
+                  [
+                    6447604371254566017040390,
+                    3961421876022238112816345
+                  ]
+                ]
+              ],
+              "serialization_seconds": 0.000644563000605558,
+              "setup_seconds": 0.3045731080001133,
+              "source_tuple_count": 0,
+              "total_seconds": 0.43280687399965245
+            },
+            {
+              "cache_seconds": 0.0038068140001996653,
+              "candidate_count": 64,
+              "cells": [
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 1,
+                    "ya": 0
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "10c1f56beb8ccef29f118aae9effb77ff132c1052fe506a91463efca96520fa1",
+                  "rows": 166
+                },
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 1,
+                    "ya": 1
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "a6fbab6c8240e00d41541c2d0f94018ad82c4e5e1adbdaa2f3cf37b6bf4cb9ca",
+                  "rows": 166
+                },
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341067
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "d49256aa95370ab1cc235901dfc4d4e608906af9eeb068b6bd23459a81b403e2",
+                  "rows": 166
+                },
+                {
+                  "branch": "k83",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341064
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 83,
+                  "nullity": 4,
+                  "rank": 79,
+                  "receipt_alias": "8e08ebce3b3df0b01dcafeed9830278a791ff2069f28bfad4fffe3c7a2daca38",
+                  "rows": 166
+                }
+              ],
+              "complete_batch": true,
+              "extract_verify_seconds": 0.1116557190016465,
+              "formulation_solve_seconds": 0.02390140900024562,
+              "method": "k83",
+              "rep": 2,
+              "selection": [
+                [
+                  2,
+                  "no_rational_lift"
+                ],
+                [
+                  3,
+                  "outside_order4",
+                  8681770682262738787341067,
+                  [
+                    6447604371254566017040390,
+                    3961421876022238112816345
+                  ]
+                ]
+              ],
+              "serialization_seconds": 0.0004782819996762555,
+              "setup_seconds": 0.2883445780007605,
+              "source_tuple_count": 0,
+              "total_seconds": 0.42819089899967366
+            },
+            {
+              "cache_seconds": 0.017222490001586266,
+              "candidate_count": 64,
+              "cells": [
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 1,
+                    "ya": 0
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "10c1f56beb8ccef29f118aae9effb77ff132c1052fe506a91463efca96520fa1",
+                  "rows": 48
+                },
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 1,
+                    "ya": 1
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "a6fbab6c8240e00d41541c2d0f94018ad82c4e5e1adbdaa2f3cf37b6bf4cb9ca",
+                  "rows": 48
+                },
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341067
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "d49256aa95370ab1cc235901dfc4d4e608906af9eeb068b6bd23459a81b403e2",
+                  "rows": 48
+                },
+                {
+                  "branch": "U_coordinates",
+                  "cell": {
+                    "a": 3,
+                    "ya": 8681770682262738787341064
+                  },
+                  "consistent": true,
+                  "coordinate_variables": 52,
+                  "nullity": 4,
+                  "rank": 48,
+                  "receipt_alias": "8e08ebce3b3df0b01dcafeed9830278a791ff2069f28bfad4fffe3c7a2daca38",
+                  "rows": 48
+                }
+              ],
+              "complete_batch": true,
+              "extract_verify_seconds": 0.10753089400168392,
+              "formulation_solve_seconds": 0.016477126000609132,
+              "method": "U52",
+              "rep": 2,
+              "selection": [
+                [
+                  2,
+                  "no_rational_lift"
+                ],
+                [
+                  3,
+                  "outside_order4",
+                  8681770682262738787341067,
+                  [
+                    6447604371254566017040390,
+                    3961421876022238112816345
+                  ]
+                ]
+              ],
+              "serialization_seconds": 0.0003530929989210563,
+              "setup_seconds": 0.29133300299872644,
+              "source_tuple_count": 0,
+              "total_seconds": 0.43292081099934876
+            }
+          ],
+          "timing": "3alternatingSAMEPROCESSrep, parsing/fullsetup/sourceanchorselection/cache/formulation/support/verification/outputpaid; notcold/genuineGB"
+        }
+      },
+      "error": null,
+      "novelty_claim": false,
+      "original_root_count_exact": null,
+      "peak_process_rss_kib": 160488,
+      "predicates": 3264,
+      "qualified_speedup": null,
+      "raw_bytes": 14626,
+      "raw_path": "research/frobenius52_20261115_v8/raw.json.gz",
+      "raw_sha256": "96d326908f74534096ae2d1397bb6e8814e9b967f8c9e573731f993f880388d4",
+      "raw_uncompressed_bytes": 48753,
+      "release_gate_claim": false
+    },
+    "experiment_id": "frobenius52-20261115-v8",
+    "next_actions": [
+      "Review both coordinate family maps and all retained receipts; if total gain is setup-limited use a fresh preregistered batch with independently fixed generic anchors, while pursuing actual all-distinct rank4/global-root closure separately."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "passed",
+    "summary": "Exact pure-Frobenius52-coordinate component versus strong cached83-k baseline on matched torsion and source-only non-order4 anchors."
+  },
+  "process": {
+    "wall_seconds": 3.0852533930010395,
+    "peak_process_rss_kib": 160488
+  },
+  "scientific_goal_complete": false,
+  "requested_speed_target": 8,
+  "qualified_speedup": null,
+  "decision": "Correct52-coordinatecompression givesNOtotalcostgain; donotpromote. Nextfullquintic104compilerincludesrank4candidatesbutretains73freebits."
+}

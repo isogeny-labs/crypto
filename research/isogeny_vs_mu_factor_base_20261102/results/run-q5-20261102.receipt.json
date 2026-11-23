@@ -1,0 +1,87 @@
+{
+  "card_id": "CARD-isogeny-vs-mu-factor-base-20261102-3",
+  "card_path": "research/isogeny_vs_mu_factor_base_20261102/cards/run-q5-20261102.yaml",
+  "card_sha256": "5e6895be3132f92ee76a8773a7c412e1a102057953c876b444040f3d21c462c8",
+  "commands": [
+    {
+      "argv": [
+        "research/isogeny_vs_mu_factor_base_20261102/run_q5.sh",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 690.448,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-q5-msolve",
+      "index": 1,
+      "outputs": {
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/SHA256SUMS": "5e258c4af38acd5d4165953d34ecc71c6b587e31211cdfa2e7697956caf78e47",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/cargo-test.log": "644942dfadcd086d1ef56392dd95a31c4dcf3069a49a41177d3c1b2ab112131f",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/host.txt": "e4caa074f2ee273a5bf862033d20f9d0ebc8ca2b1c17e936064c303773363015",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/progress.log": "f463bf1feccf163b85c6b8d7c9997d87523dde13178262773531643dfa8a99d2",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_candidates.csv": "173997744611bc9551b7655dc91fef4212168210be5b18eb07e7c4020ad84069",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_summary.json": "cf06436842b84058d54df0ff98e4bc0432bda6323270737e7889cd0c6e4c1fda",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_cells.csv": "2e28bd91a8f4054e5fac2a6d47fec14e71796eca54f1b97e1cfd782f0f9ca32f",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_q2_summary.json": "784330963698633286c1c200bc6c306db7d9552ceb03215b8be1cc8528f5921e",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_systems.csv": "491f85798b97d09895b134ba22fc55b44d7f07e70dffbd653b537b98237f76a9",
+        "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_verdicts.json": "9c3d7c15a9541ade9cc63d2d129959af49bcb47b485a6a2ecaa920f7692ced2f"
+      },
+      "seconds": 690.448,
+      "stderr_sha256": "51da923da27f95c07ca16f42e8abb0113fc92b57329d549f9aaa289c8517917f",
+      "stderr_tail": [
+        "   Compiling isomu_search v0.1.0 (/home/user/crypto/research/isogeny_vs_mu_factor_base_20261102/search)",
+        "warning: variable does not need to be mutable",
+        "    --> src/main.rs:1055:17",
+        "     |",
+        "1055 |             let mut eval = |r: &Repr, s4: &mut String| -> f64 {",
+        "     |                 ----^^^^",
+        "     |                 |",
+        "     |                 help: remove this `mut`",
+        "     |",
+        "     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: `isomu_search` (bin \"isomu_search\") generated 1 warning (run `cargo fix --bin \"isomu_search\" -p isomu_search` to apply 1 suggestion)",
+        "    Finished `release` profile [optimized] target(s) in 7.75s",
+        "research/isogeny_vs_mu_factor_base_20261102/run_q5.sh: line 21: Version: unbound variable"
+      ],
+      "stdout_sha256": "9c3d7c15a9541ade9cc63d2d129959af49bcb47b485a6a2ecaa920f7692ced2f",
+      "stdout_tail": [
+        "{\"schema\":\"isomu-q5-verdicts/v1\",\"systems\":6486,\"gate_failures\":0,\"non_ok_status\":0,\"q5a_comparisons\":16,\"q5a_in_band\":16,\"q5a_out_of_band\":0,\"q5a_verdict\":\"presentation_explains_cost\",\"b_over_a1_ge_1_5\":0,\"q5b_comparisons\":16,\"q5b_improvement_count\":0,\"q5b_verdict\":\"no_improvement\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "233b8fa8f253dc880e0fd808db43c68bffd9ad50",
+  "dirty_after": [
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102.stderr",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102.stdout",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/SHA256SUMS",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/cargo-test.log",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/host.txt",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/progress.log",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_candidates.csv",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_s1_search.csv",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_selection_systems.csv",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_summary.json",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_systems.csv",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q4_yield.csv",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_cells.csv",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_q2_summary.json",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_systems.csv",
+    "research/isogeny_vs_mu_factor_base_20261102/results/run-q5-20261102/q5_verdicts.json"
+  ],
+  "dirty_before": [
+    "research/isogeny_vs_mu_factor_base_20261102/cards/run-q5-20261102.yaml",
+    "resume/RESUME.md"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

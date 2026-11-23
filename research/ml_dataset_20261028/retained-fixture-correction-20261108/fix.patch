@@ -1,0 +1,13 @@
+diff --git a/src/ml_dataset/owned_replay_caller.rs b/src/ml_dataset/owned_replay_caller.rs
+index e57fe3ab8ea6..6b3928554b86 100644
+--- a/src/ml_dataset/owned_replay_caller.rs
++++ b/src/ml_dataset/owned_replay_caller.rs
+@@ -709,7 +709,7 @@ mod tests {
+         );
+     }
+     fn retained_fixture_manifest() -> CellManifest {
+-        CellManifest { cell_index:0, config:serde_json::from_value(json!({
++        CellManifest { schema:"crypto.ml-dataset.cell/v1".into(), plan_sha256:digest(b"{}\n"), cell_index:0, config:serde_json::from_value(json!({
+             "family":"koblitz","n":23,"m":3,"twist":false,"curve_seed":1,
+             "generator_index":0,"key_index":0,"seed":1,"factor_base_size":4,
+             "degree_bound":4,"work_limit":100,"solver":"f4"

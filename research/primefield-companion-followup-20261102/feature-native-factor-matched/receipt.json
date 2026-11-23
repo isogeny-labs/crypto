@@ -1,0 +1,74 @@
+{
+  "recorded_at": "2026-11-03T22:35:28.052073+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "research/primefield-companion-followup-20261102/feature-native-factor-matched/main.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-factor-matched-20261103/runner"
+      ],
+      "cwd": null,
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test-build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-factor-matched/main.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-factor-matched-20261103/tests"
+      ],
+      "cwd": null,
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-factor-matched-20261103/tests",
+        "instrument_tests::",
+        "--test-threads=1"
+      ],
+      "cwd": null,
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "analysis-test",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "-v",
+        "test_analyze.py"
+      ],
+      "cwd": "research/primefield-companion-followup-20261102/feature-native-factor-matched",
+      "timeout_seconds": 30,
+      "exit_code": 0
+    },
+    {
+      "step": "describe",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-factor-matched-20261103/runner",
+        "--describe"
+      ],
+      "cwd": null,
+      "timeout_seconds": 10,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 72,
+  "binaries": {
+    "runner": "d39a1c37099bc0c8d517f1ca5c8fd352c95382684fdaab5cf1376efc54c7e7a2",
+    "tests": "3bae754ec1c808d25260beccef68c388179a05fba52dbc36532b49a26de3efe1"
+  },
+  "comparative_rows": 0
+}

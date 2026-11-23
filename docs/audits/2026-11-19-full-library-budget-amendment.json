@@ -1,0 +1,24 @@
+{
+  "schema": "engineering.full-library-budget-amendment/v1",
+  "previous_source": "e0f1fbe039a420878e1b61982abec029d6ea89cc",
+  "previous_run": 44600638945,
+  "previous_outcome": "Censored after the 55-minute test-step limit; no root parent exit or summary.",
+  "new_budget": {
+    "test_step_minutes": 110,
+    "job_minutes": 150,
+    "build_step_minutes": 25,
+    "automatic_retries": 0
+  },
+  "previous_budget": {
+    "test_step_minutes": 55,
+    "job_minutes": 90
+  },
+  "rationale": "The retained log has 4,299 completed test status lines (4,298 distinct names, including a child test); all 22 warned long tests completed. The next unfiltered run receives an explicitly larger validation budget. The prior outcome remains censored.",
+  "command_unchanged": "cargo +1.99.1 test --release --lib --locked -- --nocapture",
+  "tests_omitted": 0,
+  "ignored_policy_unchanged": true,
+  "thread_settings_unchanged": true,
+  "assertions_unchanged": true,
+  "scientific_measurement": false,
+  "frozen_artifacts_changed": false
+}

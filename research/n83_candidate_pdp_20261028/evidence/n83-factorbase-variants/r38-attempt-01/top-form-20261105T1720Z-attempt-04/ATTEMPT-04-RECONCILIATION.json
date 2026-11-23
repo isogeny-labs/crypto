@@ -1,0 +1,26 @@
+{
+  "schema": "n83.attempt-reconciliation/v1",
+  "attempt": "spike38-attempt-04",
+  "classification": "pre-generation integrity-gate failure",
+  "observed_utc": "2026-11-05T17:40:26Z",
+  "runner_protocol_sha256_expected": "1b0a27b19e5f32b78e23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+  "runner_protocol_sha256_actual": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+  "cause": "The pinned SHA-256 in run-spike38-topform.sh contains b78e23; the protocol file hashes to b78a23. The runner exited at the protocol integrity check before downloading compressed factor-base shards or invoking PDP/top.",
+  "runner_exit_code": 1,
+  "candidate_input_systems_generated": 0,
+  "top_certificates_generated": 0,
+  "factor_base_shards_downloaded": 0,
+  "s3_results_indexed_files": 853,
+  "s3_index_sha256": "65d767f42e93c88a218b7adf58590bc62c23a2d448b07f661ca67e4b3d1cf105",
+  "s3_receipts": {
+    "runner_error": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-04/results/runner-error.json",
+    "terminal": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-04/results/terminal.json",
+    "controller_status": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-04/results/controller-status.json"
+  },
+  "readback_sha256": {
+    "runner_error": "852dc6dfcf81d35fb5bae27f5555aa26aaf9740495972ba8dcea3911c2ee9699",
+    "terminal": "dc9f19f252f4b2c1ab3711f1660f176067adf700885005def31cac2587aabdf4",
+    "controller_status": "06eabb7fb64070f86fb965018afcebdf574886f6655c82559ee891fc66ab9bdb"
+  },
+  "next_step": "Amend run pin to exact protocol hash, freeze a new attempt with a fresh results prefix and explicit single-attempt allowance; do not reuse attempt-04 results prefix."
+}

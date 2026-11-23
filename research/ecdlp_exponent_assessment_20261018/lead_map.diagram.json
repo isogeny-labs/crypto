@@ -1,0 +1,221 @@
+{
+ "schema": "lead_map/v1",
+ "leads": [
+  {
+   "id": "L1",
+   "label": "closure degree of the Koblitz chain (m = 4, \u2113 = 5, 6)",
+   "tier": 1,
+   "level": "exponent",
+   "effort_weeks": 2.5,
+   "blocked": false,
+   "note": "measured: degree 4 up to m\u00b7\u2113 = 24"
+  },
+  {
+   "id": "L2",
+   "label": "half-dimension invariant base, implicit past n \u2248 40",
+   "tier": 1,
+   "level": "exponent",
+   "effort_weeks": 2.0,
+   "blocked": false,
+   "note": "measured: 17\u00d7 rho at n = 23"
+  },
+  {
+   "id": "L3",
+   "label": "S\u2085 small roots at \u03b4 \u2248 1/5, uncovered lattice variants",
+   "tier": 1,
+   "level": "exponent",
+   "effort_weeks": 1.0,
+   "blocked": false,
+   "note": "closed (this PR)"
+  },
+  {
+   "id": "L4",
+   "label": "PKM tower m = 3, N = 21 solving degree",
+   "tier": 1,
+   "level": "exponent",
+   "effort_weeks": 0.5,
+   "blocked": true,
+   "note": "D \u2265 7 at 4.3 h (#2175); needs -t 8 or 192 GB"
+  },
+  {
+   "id": "L5",
+   "label": "genus-3 plane-quartic cover IC: scaling vs rho",
+   "tier": 1,
+   "level": "exponent",
+   "effort_weeks": 3.0,
+   "blocked": false,
+   "note": "measured \u2113^2.5: not an IC (\u2192 N4)"
+  },
+  {
+   "id": "L6",
+   "label": "register F_{p\u2074} / genus-3 domains; four-size challenge",
+   "tier": 2,
+   "level": "accounting",
+   "effort_weeks": 1.0,
+   "blocked": false,
+   "note": "prerequisite of \u00a74.2"
+  },
+  {
+   "id": "L7",
+   "label": "\u03c4-slots in production; family-optimum base sizing",
+   "tier": 2,
+   "level": "constant",
+   "effort_weeks": 1.5,
+   "blocked": false,
+   "note": "up to log\u2082 m! bits"
+  },
+  {
+   "id": "L8",
+   "label": "multi-target vs the S\u00b7T\u00b2 line (PR #2163, K2 charge)",
+   "tier": 2,
+   "level": "accounting",
+   "effort_weeks": 0.5,
+   "blocked": false,
+   "note": "in flight"
+  },
+  {
+   "id": "L9",
+   "label": "a better rho reference (trail truncation, co-Z steps)",
+   "tier": 2,
+   "level": "constant",
+   "effort_weeks": 1.0,
+   "blocked": false,
+   "note": "moves every \u00d7 reference"
+  },
+  {
+   "id": "L10",
+   "label": "gate-first F6-IC, RREF root defaults, wide-path switch",
+   "tier": 2,
+   "level": "machine",
+   "effort_weeks": 0.4,
+   "blocked": false,
+   "note": "exact on 4 cells"
+  },
+  {
+   "id": "L11",
+   "label": "block structure in Gr\u00f6bner; several invariant bases",
+   "tier": 2,
+   "level": "constant",
+   "effort_weeks": 0.4,
+   "blocked": false,
+   "note": "measurable now"
+  },
+  {
+   "id": "L12",
+   "label": "ECC2K-130 PDP by a different relation producer",
+   "tier": 3,
+   "level": "exponent",
+   "effort_weeks": 8.0,
+   "blocked": true,
+   "note": "search power"
+  },
+  {
+   "id": "L13",
+   "label": "a method that sees the conductor",
+   "tier": 3,
+   "level": "constant",
+   "effort_weeks": 4.0,
+   "blocked": true,
+   "note": "low prior; #1888 queued"
+  },
+  {
+   "id": "L14",
+   "label": "Galois-invariant base from another algebraic group",
+   "tier": 3,
+   "level": "exponent",
+   "effort_weeks": 4.0,
+   "blocked": true,
+   "note": "theory; no compute"
+  },
+  {
+   "id": "L15",
+   "label": "learned structure (M2b, M3, RELN NA-1)",
+   "tier": 3,
+   "level": "constant",
+   "effort_weeks": 6.0,
+   "blocked": false,
+   "note": "all cost labels null"
+  },
+  {
+   "id": "M1",
+   "label": "IC exponent with a base that scales",
+   "tier": 4,
+   "level": "accounting",
+   "effort_weeks": 0.2,
+   "blocked": false,
+   "note": "afternoon"
+  },
+  {
+   "id": "M2",
+   "label": "re-pin calibration; F4 word-XOR drift; n83 phase counts",
+   "tier": 4,
+   "level": "accounting",
+   "effort_weeks": 1.0,
+   "blocked": false,
+   "note": "evidence floor"
+  },
+  {
+   "id": "M3",
+   "label": "zero-compute ledger items (Assumption 1, S\u2086 top form)",
+   "tier": 4,
+   "level": "accounting",
+   "effort_weeks": 0.1,
+   "blocked": false,
+   "note": "zero compute"
+  },
+  {
+   "id": "M4",
+   "label": "external Gr\u00f6bner baselines; root-finder \u2265 2\u00d7 gate",
+   "tier": 4,
+   "level": "machine",
+   "effort_weeks": 1.0,
+   "blocked": false,
+   "note": "T17"
+  },
+  {
+   "id": "N1",
+   "label": "m = 2 relation graph: does a cycle suffice? (\u03b1 2/3 vs 4/7)",
+   "tier": 5,
+   "level": "exponent",
+   "effort_weeks": 0.5,
+   "blocked": false,
+   "note": "2\u20133 days; reading, not a win"
+  },
+  {
+   "id": "N2",
+   "label": "Frobenius-fold the m = 2 pair table; optimum dimension",
+   "tier": 5,
+   "level": "constant",
+   "effort_weeks": 0.3,
+   "blocked": false,
+   "note": "\u22482\u20133\u00d7 on L2's rows"
+  },
+  {
+   "id": "N3",
+   "label": "m = 2 on near-prime Koblitz curves (n = 17, 19, 23, 41)",
+   "tier": 5,
+   "level": "accounting",
+   "effort_weeks": 0.2,
+   "blocked": false,
+   "note": "removes the cofactor confound"
+  },
+  {
+   "id": "N4",
+   "label": "relation solve for the plane-quartic cover IC",
+   "tier": 5,
+   "level": "exponent",
+   "effort_weeks": 1.5,
+   "blocked": false,
+   "note": "tests q^{4/3} for real"
+  },
+  {
+   "id": "N5",
+   "label": "curve-names --diff and ecbench report agree on slugs",
+   "tier": 5,
+   "level": "machine",
+   "effort_weeks": 0.1,
+   "blocked": false,
+   "note": "hours"
+  }
+ ]
+}

@@ -1,0 +1,113 @@
+# Native cached halftrace integration
+
+[Requested status report — 6 November 2026 (PDF)](reports/status-20261106/REPORT.pdf)
+summarizes the Rust implementation, source-bound validation, frozen comparison
+and remaining requirements in three pages. Its [editable source](reports/status-20261106/REPORT.typ),
+[evidence snapshot](reports/status-20261106/SNAPSHOT.json) and diagram are retained
+beside the PDF. This is a report of existing work, with no new experiment.
+
+This change integrates the missing one-word cached lifting path into the
+existing Rust Koblitz factor-base builder. It does not import a new Python
+solver, replace the repository's mature index-calculus implementation, or
+claim that existing Frobenius folding and pair joins are new work.
+
+**Track:** generic decomposition (bounded by sqrt(r); cannot beat rho).
+**Measurement status:** pending, blocked by pre-experiment S3 checkpoint access.
+No native speed ratio or end-to-end improvement is established.
+The [Actions preparation](https://github.com/isogeny-labs/crypto/actions/runs/41082358257)
+also failed because the approved upload secret is not configured. All build and
+experiment jobs were skipped; there are no scientific measurements.
+
+## Implementation
+
+- `src/cryptanalysis/koblitz_fast.rs`: opt-in, curve-local, lazy odd-degree
+  halftrace byte tables; initialized immutable tables are shared by clones.
+  Scope guards restore the previous selection on nesting and unwinding;
+  different threads do not change each other's recipe.
+- `src/cryptanalysis/koblitz_index_calculus.rs`: reuse the cache in the existing
+  fast coordinate lift while keeping its halftrace-selected first root and
+  point order. The original squaring path remains the default.
+- `src/cryptanalysis/ic_framework/plugins.rs`: select the candidate through
+  `koblitz-orbit:divisor=1;2,halftrace_tables=1`. Invalid selector values fail.
+- `examples/koblitz_halftrace.rs`: native known-answer integration fixture,
+  comparing the ordered bases, orbit maps, relation trials and recovered scalars
+  for two- and three-summand collection. The target scalar is not an input to
+  the existing solver API. A second test exercises the public ecbench recipe,
+  comparing the recovered scalar, factor-base hash and collection/LA counters.
+  These fixtures report correctness, not time.
+
+The cache uses at most eight 256-word tables on this path, not a table over
+the field. It is built inside the charged factor-base construction interval.
+Small or one-shot callers can keep the prior path. The generic and 131-bit
+fields already had halftrace tables; they are not reimplemented here.
+
+## Reproduction
+
+```sh
+cargo test --release --lib --locked
+cargo test --release --example koblitz_halftrace --locked
+cargo build --release --bin ecbench --locked
+target/release/ecbench plan --spec research/koblitz_halftrace_20261030/spec.json
+```
+
+Use [the frozen protocol](PROTOCOL.md) and the repository's isolab-eks skill
+for scientific execution. Do not run the measurement locally as a substitute
+for its required L2 EKS Spot environment. Native plan validation and tests are
+development checks; their elapsed times are not performance evidence.
+
+## Evidence and remaining requirements
+
+| Requirement | Status / record |
+| --- | --- |
+| Existing Rust baseline and source identity | built before source edits; [BASELINE.txt](BASELINE.txt) |
+| Rust cache and factor-base integration | implemented; no Python execution path |
+| Native correctness and regression gates | original suite: 5,447 passed, zero failed, 123 existing ignored; source507829726f cache tests12/12, ordered-lift1/1 and E2E2/2 pass; later full-library attempt incomplete with two observed host-interface failures |
+| Prospective native comparison protocol | [protocol.json](protocol.json) frozen before data; canonical schema/hash and corrupted-hash negative check pass |
+| Source-resume checkpoint preparation | [failed Actions receipt](development/checkpoint-actions-receipt.json); no uploader secret; all experiment jobs skipped |
+| Matched native end-to-end measurement | not run; [access blocker](../../problems/native-koblitz-measurement-access.md) |
+| Source-pinned EKS image, L2, A/A, independent replay | pending; no scientific job was submitted |
+| m=83 confidence gate / transfer toward ECC2K-130 | not established by this one-word change |
+| External arithmetic comparison | not measured; no fastest-tool claim |
+
+The coarse existing `as_solves` count alone does not price the changed work.
+No S improvement is inferred from an unchanged solve count or a stage time.
+The leaderboard, progress timeline and scoreboard are unchanged because no new
+admitted measurement or curve finding exists. Earlier standalone Python timings
+are preserved outside this repository and do not enter its benchmark ledger.
+
+Initial sparse-checkout/build failures and the failed checkpoint-upload attempt
+are retained in `development/`. No missing fixture was replaced with invented
+data: tracked fixtures were materialized from the baseline revision.
+The P1 review requires the saved matched comparison before landing; auto-merge is
+paused. Current-main build validation and its merge conflicts remain separate
+requirements. Scientific preparation pins tested source
+`7c58661935b79153ff74c1208d0592aa56ed04a1` and the unchanged spec bytes. It does
+not validate later main merges. The 280 planned executions have zero attempted
+or completed scientific rows; no canonical data export is fabricated.
+The 16:41 UTC upstream integration repaired the previously observed methods.rs
+error, then a fresh check found another upstream parse error in
+binary_semaev_chain_sat.rs. Its source-bound failure is retained separately;
+older passing checks are not presented as a pass of that merged source.
+
+On 4 November, fast-forwarded to the already-published external merge
+`507829726fbc731543f4527348b55c5e479242c9`. It contains the upstream parser
+repair and preserves the cache implementation and example. Fresh locked cache
+tests12/12, ordered-lift1/1 and E2E2/2 pass.
+CI at native source507829726f reports size success, gate failure on an unrelated
+benchmark-row disposition and artifacts failure on the checkpoint checkout's
+wiring. The narrow workflow repair gives the metadata-only checkout its own
+path and explicit working directory, without adding artifact credentials.
+The full suite has reported two resource-publication failures, reproduced in
+isolation: this development host lacks `/proc/self/ns/time` and
+`/proc/self/timens_offsets`, required by the unchanged upstream diagnostic
+clock. At the 17:07 check, the parent process had ended without a parent summary
+or exit receipt; its interruption cause is unknown. The one-pass summary in the
+partial log belongs to a nested child. No full-suite pass is claimed and no
+unchanged suite was restarted. The additive [outcome](development/recheck-20261104T1548Z/closure-20261104T1707Z/)
+retains the complete E2E log and an exact deterministic archive of the partial
+parent output.
+The source-bound follow-up is in [development/recheck-20261104T1548Z/](development/recheck-20261104T1548Z/).
+
+[Implementation and execution-status diagram](pipeline.svg).
+[Printable report](report.pdf), built from [report.typ](report.typ); an
+[HTML reading copy](report.html) is also retained.

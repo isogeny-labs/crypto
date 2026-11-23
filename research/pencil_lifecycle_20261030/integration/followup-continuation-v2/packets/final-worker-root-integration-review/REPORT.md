@@ -1,0 +1,15 @@
+# Final worker build and root adapter test review
+
+Accepted T1558 as a concrete preparation plan, with execution still false. Its 1200-second worker/mapper/readback split is explicit, as are missing cache/source manifests, resource enforcement, wrapper and cost release. No compiler, worker or test binary was invoked by this review.
+
+The exact existing root adapter namespace is `cryptanalysis::ecbench::three_leads::pencil::tests::`: three_leads.rs includes pencil.rs. The three tests cover fake dispatch/shared real meter, panic ownership cleanup and audited ledger hashing. A focused real-root run should compile the full root library test harness, capture/hash its actual executable from Cargo compiler-artifact JSON, check the exact names, and execute each with --exact, requiring one pass each. This avoids another standalone sieve replay. These tests do not invoke solve_with_progress; a complete Some/None solver-trace claim needs its own bounded synthetic fixture test.
+
+The owner-required `cargo test --release --lib` remains separate and unfiltered. Preserve default features, inventory and ignored counts; do not replace it with --no-run, --list, three selected tests or a successful ecbench binary build. The musl worker plan intentionally uses --no-default-features, while root defaults include redis-native-tls; record both configurations. Reuse the root test artifact for the focused and full checks only with matching source/profile/features/toolchain. Concrete argv and selection rules are in proposed-check.json; no envelope is admitted here.
+
+Historical target-stream validation records show an8GiB compiler allocation failure and an unchanged-source16GiB/600-second compilation timeout, with zero tests executed. They do not show source rejection or failing assertions. They also do not prove that the new8GiB build plan will finish. Preserve those failures and bound any new attempt prospectively.
+
+T1558 planning observations retain the earlier progress-module SHA01468d..., whereas its explicit validated-source field correctly records87f358.... Refresh the final closure after publication instead of treating the planning snapshot as final input. Aggregate2CPU/8GiB enforcement is unresolved; one Cargo job and per-process address-space limits are not equivalent. Current manifest/lock changes also require actual offline resolver/cache compatibility checks; copied cache paths alone do not attest source or guarantee reuse.
+
+Primary Cargo documentation confirms cargo test builds a test harness and executes selected tests, while cargo rustc compiles selected targets; --no-run compiles only. Sources: https://doc.rust-lang.org/cargo/commands/cargo-test.html and https://doc.rust-lang.org/cargo/commands/cargo-rustc.html. Local owner rules, ecbench adapter sources, prior failed validation and T1558 documents are hash-bound in review.json.
+
+Authorship disclosure: this reviewer authored the recurrence/progress integration, but did not author T1558. This is a nonblind review of build/test boundaries, not independent derivation of that recurrence. Pricing coverage review remains with witness; no duplicate pricing verdict is issued.

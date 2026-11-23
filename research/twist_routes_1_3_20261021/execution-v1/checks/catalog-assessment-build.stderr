@@ -1,0 +1,20 @@
+node:internal/fs/promises:697
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open '/workspace/crypto-twist-runs/research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
+    at async open (node:internal/fs/promises:697:25)
+    at async readFile (node:internal/fs/promises:1348:14)
+    at async fileHash (file:///workspace/crypto-twist-runs/scripts/build_cover_transfer_assessments.mjs:42:22)
+    at async sourceArtifact (file:///workspace/crypto-twist-runs/scripts/build_cover_transfer_assessments.mjs:795:13)
+    at async Promise.all (index 32)
+    at async buildLedger (file:///workspace/crypto-twist-runs/scripts/build_cover_transfer_assessments.mjs:1315:23)
+    at async main (file:///workspace/crypto-twist-runs/scripts/build_cover_transfer_assessments.mjs:1675:38)
+    at async file:///workspace/crypto-twist-runs/scripts/build_cover_transfer_assessments.mjs:1693:1 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/workspace/crypto-twist-runs/research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
+}
+
+Node.js v24.19.0

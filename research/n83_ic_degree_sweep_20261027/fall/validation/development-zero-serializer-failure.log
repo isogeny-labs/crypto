@@ -1,0 +1,39 @@
+   Compiling version_check v0.9.5
+   Compiling typenum v1.20.1
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling itoa v1.0.18
+   Compiling cpufeatures v0.2.17
+   Compiling memchr v2.8.3
+   Compiling cfg-if v1.0.5
+   Compiling generic-array v0.14.7
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling n83-ic-degree-sweep v0.1.0 (/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_ic_degree_sweep_20261027)
+    Finished `release` profile [optimized] target(s) in 12.37s
+     Running unittests src/bin/fall.rs (/home/ec2-user/n83-sweep-recovery/fall-target/release/deps/fall-ea25f5cd0d142f01)
+
+running 5 tests
+test tests::product_reduces_boolean_squares ... ok
+test tests::raw_linear_equations_fail_closed ... ok
+test tests::malformed_field_equation_rejected ... ok
+test tests::parser_cancels_duplicate_monomials ... ok
+test tests::controls ... FAILED
+
+failures:
+
+---- tests::controls stdout ----
+
+thread 'tests::controls' (142509) panicked at src/bin/fall.rs:77:26:
+called `Option::unwrap()` on a `None` value
+
+
+failures:
+    tests::controls
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin fall`

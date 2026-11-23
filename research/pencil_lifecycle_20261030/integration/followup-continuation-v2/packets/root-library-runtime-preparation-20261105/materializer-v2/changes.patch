@@ -1,0 +1,65 @@
+--- materializer-v1/materialize.py
++++ materializer-v2/materialize.py
+@@ -2,10 +2,11 @@
+ """Prospective bounded preparation; no compiler or Cargo command. Config is root-published."""
+ import datetime,hashlib,json,os,re,resource,shutil,signal,stat,subprocess,sys,tarfile,time,urllib.request,traceback
+ from pathlib import Path,PurePosixPath
++from materialize_safety import copy_candidate,cleanup_owned_group
+ P=Path(__file__).resolve().parent
+ F=json.loads((P/'preparation.json').read_text());START=time.monotonic();END=START+880
+ REV='29861c9a55f9ae5a33e1e09b3866aa397fbde605';W=Path(F['workspace']);OUT=Path(F['output']);REPO=Path(F['repository']);OWN=False;ACTIVE=None;LAST_HEARTBEAT=0
+-R={'status':'failed','revision':REV,'compiler_invoked':False,'errors':[],'files':0,'phase':'admission'};IMM={};CACHE={};SOURCE=W/'source';STAGE=W/'cache-stage-v2'
++R={'status':'failed','revision':REV,'compiler_invoked':False,'errors':[],'files':0,'phase':'admission','outer_cgroup_confirmation_required':True};IMM={};CACHE={};SOURCE=W/'source';STAGE=W/'cache-stage-v2'
+ resource.setrlimit(resource.RLIMIT_AS,(4*1024**3,4*1024**3))
+ def stop(sig,frame):raise RuntimeError('signal '+str(sig))
+ for sig in [signal.SIGTERM,signal.SIGINT]:signal.signal(sig,stop)
+@@ -45,8 +46,9 @@
+    except subprocess.TimeoutExpired:continue
+   assert ACTIVE.returncode==0,err.decode(errors='replace')[:2000];return out
+  finally:
+-  if ACTIVE.poll() is None:os.killpg(ACTIVE.pid,signal.SIGKILL)
+-  ACTIVE.wait();ACTIVE=None
++  owned=ACTIVE;ACTIVE=None
++  cleanup=cleanup_owned_group(owned);R.setdefault('child_cleanup',[]).append(cleanup);checkpoint()
++  assert not cleanup['errors'],'owned subprocess cleanup incomplete'
+ try:
+  assert F['revision']==REV and F['absolute_deadline']=='2026-11-06T04:00:00+00:00'
+  assert F['published_github_commit'] and F['reviewed'] is True
+@@ -63,7 +65,7 @@
+  assert controls['memory.max']==str(4*1024**3) and controls['memory.swap.max']=='0' and controls['pids.max']=='512'
+  R['cgroup']={'path':str(cg),'controls':controls};checkpoint()
+  R['workspace_mount']=cmd(['findmnt','-T',str(W.parent),'-J','-o','TARGET,SOURCE,FSTYPE,OPTIONS']).decode();R['output_mount']=cmd(['findmnt','-T',str(OUT),'-J','-o','TARGET,SOURCE,FSTYPE,OPTIONS']).decode();checkpoint()
+- required={F[k] for k in ('historical_source_manifest','concat_addendum','candidate','registry_archives','tool_manifest')}|{str(Path(__file__).resolve())}
++ required={F[k] for k in ('historical_source_manifest','concat_addendum','candidate','registry_archives','tool_manifest')}|{str(Path(__file__).resolve()),str(P/'materialize_safety.py')}
+  assert required<=set(F['input_files'])
+  for file,h in F['input_files'].items():assert H(Path(file))==h,file
+  assert shutil.disk_usage(W.parent).free>=12*1024**3
+@@ -111,7 +113,8 @@
+     if not any(a<=m.start()<b for a,b in found):unresolved.append({'source':name,'offset':m.start(),'line':text.count('\n',0,m.start())+1})
+  R['unresolved_includes']=unresolved;checkpoint();assert not unresolved,'unresolved include expressions require source disposition'
+  pencil=SOURCE/'src/cryptanalysis/ecbench/pencil.rs';assert H(pencil)=='481f94cc389a1e79880fc168c3a98b5bb37e9411694d424632d4f8f389e5ed00'
+- candidate=Path(F['candidate']);assert H(candidate)=='555a5c62339a927579599d46c7e94265e52497dc56bacf0b13bb53c2dcd133c4';pencil.write_bytes(candidate.read_bytes());row(pencil,IMM)
++ candidate=Path(F['candidate']);copy_candidate(candidate,pencil,'555a5c62339a927579599d46c7e94265e52497dc56bacf0b13bb53c2dcd133c4');row(pencil,IMM)
++ assert IMM[str(pencil)]['sha256']=='555a5c62339a927579599d46c7e94265e52497dc56bacf0b13bb53c2dcd133c4'
+  assert H(SOURCE/'Cargo.lock')=='cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6'
+  assert H(SOURCE/'Cargo.toml')=='f81e15d7ca2cfbba419165b272a15cd736db548f1c90e3454d32fbd3ded373e3'
+  lock=(SOURCE/'Cargo.lock').read_text();assert not re.search(r'^source = "git\+',lock,re.M),'unbound git dependency'
+@@ -161,14 +164,16 @@
+  for path,old in json.loads(Path(F['tool_manifest']).read_text())['files'].items():
+   f=Path(path);assert H(f)==old['sha256'];IMM[path]={'sha256':old['sha256'],'bytes':f.stat().st_size,'resolved':str(f.resolve())}
+  for path,r in {**IMM,**CACHE}.items():assert H(path)==r['sha256'],path
++ for file,h in F['input_files'].items():assert H(Path(file))==h,'post-bound-input: '+file
++ R['bound_inputs_rechecked']=True
+  (OUT/'materialized-inputs.json').write_text(json.dumps({'immutable':IMM,'initial_cache':CACHE},indent=2)+'\n')
+  with (OUT/'materialized-inputs.json').open('rb') as stream:os.fsync(stream.fileno())
+  R.update(status='passed',source_bytes=total,vendor_bytes=expanded,cache_bytes=copied,input_manifest_sha256=H(OUT/'materialized-inputs.json'));guard()
+ except BaseException as e:R['status']='failed';R['errors'].append({'repr':repr(e),'traceback':traceback.format_exc()})
+ finally:
+  if ACTIVE is not None:
+-  if ACTIVE.poll() is None:os.killpg(ACTIVE.pid,signal.SIGKILL)
+-  ACTIVE.wait();R['status']='failed'
++  owned=ACTIVE;ACTIVE=None
++  R.setdefault('child_cleanup',[]).append(cleanup_owned_group(owned));R['status']='failed'
+  if time.monotonic()>=END:R['status']='failed'
+  checkpoint()
+ raise SystemExit(0 if R['status']=='passed' else 1)

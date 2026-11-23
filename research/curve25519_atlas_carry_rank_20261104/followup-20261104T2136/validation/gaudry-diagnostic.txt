@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'cryptanalysis::gaudry_cubic::tests::arity_four_with_four_large_primes_recovers_the_planted_logarithm' (37602) panicked at src/cryptanalysis/gaudry_cubic.rs:4820:9:
+GaudryReport { p: 31, n: 29641, bits: 14.855306500293887, base: 13, residuals: 41, decompositions: 20, relations_verified: 20, relations_independent: 8, rank: 8, solved: true, recovered_scalar: Some(2844), correct: Some(true), group_ops: 32179, oracle_fp_muls: 25959437, torsion_lift_fp_muls: 0, fp_muls_per_add: 63.0, total_ops: 444349.6984126984, s: 2580.943301771887, pair_tests: 27716, fp_muls_per_pair_test: 936.6227810650887, decomposition_rate: 0.4878048780487805, wall_ms: 490.824169, linear_algebra_ms: 0.194774, solver: MeetInTheMiddle, precompute_fp_muls: 0, solve_stats: SolveStats { solves: 0, fp_muls: 0, macaulay_muls: 0, quotient_dim_total: 0, e_solutions: 0, split_cubics: 0, degenerate_eigenspaces: 0, retried_at_degree_11: 0, retried_at_degree_12: 0, retried_at_degree_13: 0, border_unreachable: 0, unsolved: 0, fallback_fp_muls: 0, macaulay_rows: 0, echelon_muls: 0, charpoly_muls: 0, eigenvector_muls: 0, roots_muls: 0, lazy_solves: 0, lazy_fallbacks: 0, lazy_pivots_reduced: 0, lazy_pivots_planned: 0, lazy_verified: 0, lazy_verify_mismatches: 0, lazy_needless_fallbacks: 0 }, cross_checked: 0, cross_check_mismatches: 0, la_mode: "dense", la_ops: 813, lp_abandoned: 0, lp_mean_merge_depth: 4.416666666666667, lp_max_merge_level: 0, lp_merge_ops: 500, la_unknowns: 8, la_rows: 8, la_avg_weight: 0.0, la_attempts: 0, la_filtered_out: 0, la_fp_equiv: 9.0, small_base: 7, max_large_primes: 4, lp_histogram: [1, 6, 11, 2, 0], lp_full_relations: 12 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::gaudry_cubic::tests::arity_four_with_four_large_primes_recovers_the_planted_logarithm ... FAILED
+
+failures:
+
+failures:
+    cryptanalysis::gaudry_cubic::tests::arity_four_with_four_large_primes_recovers_the_planted_logarithm
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6147 filtered out; finished in 0.50s
+

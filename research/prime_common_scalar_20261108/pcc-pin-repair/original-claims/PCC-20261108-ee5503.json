@@ -1,0 +1,25 @@
+{
+ "created_at": "2026-11-08T20:18:33Z",
+ "id": "PCC-20261108-ee5503",
+ "kind": "theorem",
+ "producer": {
+  "commit": "be8c3cc432ba056e3b184fb3a1b542d7aedb777d",
+  "model": "",
+  "session": "common-scalar-local-series-20261108"
+ },
+ "proofs": [
+  {
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "GlobalPolynomials.eval_basePolynomial"
+  },
+  {
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "GlobalPolynomials.actual_squared_product_degree"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "GlobalPolynomials.eval_basePolynomial, basePolynomial_degree, actual_squared_product_degree; actual contraction-program equal-M homogeneity remains separate.",
+ "statement": "The explicit global polynomial evaluates to the actual imported baseKernel and has degree at most2^(a+1)-1; products of its squares over A have degree at most A.card*2*(2^(a+1)-1)."
+}

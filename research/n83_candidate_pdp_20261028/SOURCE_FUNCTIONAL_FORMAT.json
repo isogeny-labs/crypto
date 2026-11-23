@@ -1,0 +1,26 @@
+{
+  "schema": "n83.source-functional-format/v1",
+  "status": "Instrument development; actual42case production not yet run",
+  "layout": {
+    "source/": "Exact native sources listed in protocol extensions.source_files",
+    "inputs/KEY/input.json": "Exact retained case input; hash pinned in case record",
+    "inputs/KEY/system.sing": "Exact source; complete template and planted witness audited again",
+    "terminal/KEY/certificate.json": "Retained terminal certificate pinned by SHA256; embedded input and source must match the fresh audit",
+    "terminal/KEY/A0.poly,A1.poly,A2.poly": "Canonical N83PFF1 factors; all metadata and coefficients recomputed",
+    "top/KEY.json": "Hash-pinned prior conditional top certificate; exact input/source/base identity join",
+    "OUT/KEY.json": "Source-bound pairing, input/base/certificate/factor hashes, coefficient identity and explicit null LFD/regularity fields",
+    "OUT/KEY.poly": "Complete C=A2-2tA1+t²A0 in canonical N83PFF1 format",
+    "OUT/summary.json": "All42 arithmetic records, new_lfd_claim=false and independent_review=pending",
+    "OUT/primality.json": "Native exact-field primality certificate"
+  },
+  "encoding": "JSON UTF-8; field elements are canonical decimal strings. Polynomial mask bitj denotes normalized last-block z_j. N83PFF1 binary header and 24-byte term records are documented in PRIME_FIRST_FALL_FORMAT.json.",
+  "checks": "Exact42key set; executing-binary and staged-source hashes; full source reconstruction; terminal embedded input/source; prior top identity and conditional status; factor lengths/hashes/codec/degrees/terms and recomputation; saved affine circuit; direct pairing against closed formula",
+  "production_gate": "run|replay ROOT PROTOCOL OUT requires N83_SOURCE_FUNCTIONAL_FROZEN=1 and frozen protocol with complete case and source identities. A protocol has not yet been frozen for this new instrument.",
+  "development": {
+    "fixture/": "Synthetic natural-target template and exact input/source/certificates/factors/output; record.json explicitly labels it as a fixture, not a saved production case",
+    "test-instrument": "Exact native test executable; run with fresh N83_SOURCE_FUNCTIONAL_DEV_OUT and --test-threads=1",
+    "manifest.json": "Payload paths, byte lengths and SHA256 hashes, excluding itself",
+    "test_count": "22 invocations:6new tests plus8unique inherited donor tests through each of2module imports; not22independent scientific controls"
+  },
+  "claim_boundary": "Checks establish arithmetic and source binding only. V16 is not computed. Strict filtered fall, LFD and regularity remain unclaimed. The separate conditional filtered implication still needs independent mathematical verification. Zero pairing is inconclusive."
+}

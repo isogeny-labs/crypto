@@ -1,0 +1,24 @@
+{
+  "schema": "hashed-native-ecbench.lossless-log/v1",
+  "original_path": "/tmp/native-ecbench-combined-root-tests-retry.txt",
+  "original_bytes": 570189,
+  "original_sha256": "340c24eaa862deff2de515f7b451f3dee4012675148b223593cdd7c0fd6f247c",
+  "chunks_in_order": [
+    {
+      "path": "combined-root-release-fulla.log.gz",
+      "uncompressed_bytes": 285094,
+      "uncompressed_sha256": "2ab0789da0ce157885a0b9cb175d5dfc6df7367301c90faf4ddd3ee91699ad0d",
+      "gzip_bytes": 54540,
+      "gzip_sha256": "86ca841c602bacf5aa0650eb26bc05d8602b560b8c967a71bae934968a024457"
+    },
+    {
+      "path": "combined-root-release-fullb.log.gz",
+      "uncompressed_bytes": 285095,
+      "uncompressed_sha256": "3719ee40d8e4236d2c24589d1f81be58fcdefac7afe5f2db0d115c0db98cf697",
+      "gzip_bytes": 53728,
+      "gzip_sha256": "d5ee9b234010e63af5339369170e595a1fa900f07f8a340746ea77b595325b4d"
+    }
+  ],
+  "reconstruct": "Concatenate gzip-decompressed chunks in listed order, then check original byte count and SHA-256.",
+  "scope": "Broad release invocation before policy correction; source/command bound by broad-run-command.json and broad-run-source.sha256. The final parent summary is5987passed,27failed,130ignored; nested child summaries are not added."
+}

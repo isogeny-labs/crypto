@@ -1,0 +1,121 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R61-RUST-CERTIFICATE-CHECK",
+  "goal": "pursue full Koblitz cover/modular/divisor leads and scale sources",
+  "claims": [
+    {
+      "id": "complete818-rowdot-reconstruction",
+      "class": "exact_computation",
+      "statement": "Independent packed binary row-dot replay of all818 full ambient-row reconstructions, left inverses, complete source spaces/involutions/Jordan/contraction and controls"
+    }
+  ],
+  "arms": {
+    "reference": "accepted Singular cubic61-02/fix61-02/cohort61-01 exact binary source matrices",
+    "baseline": {
+      "not_applicable_reason": "exactidentityreconstruction,no timingcomparison"
+    },
+    "candidate": "standalone Rust packed row-dot-column parity; strict sparse binary parser",
+    "positive": [
+      "complete ambient/mixed/fixed/Jordan/contraction products",
+      "actual1 regular kernel rank37/dimension1",
+      "all272 source-profile bindings"
+    ],
+    "negative": [
+      "changed inverse product fails",
+      "changed source row fails",
+      "invalid sparse binary syntax/duplicate entries rejected"
+    ],
+    "A_A": {
+      "not_applicable_reason": "fixedexactidentities,no statisticalmetric"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "all818supportpatterns",
+      "all136ambient rows before projection",
+      "all324/76/38source matrices",
+      "original4GiB/1200s Rust compile and run",
+      "CPU0 singleworker"
+    ],
+    "measured": [
+      "binaryhash",
+      "nativeUTC",
+      "exit/errors"
+    ],
+    "statistical": "notapplicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "exhaustive prescribed polynomial identities",
+    "seeds": [
+      61
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exactpredeclaredproducts"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "notapplicable"
+  },
+  "metrics": [
+    "818 exact pre-projection source reconstructions/left inverse products",
+    "all complete ambient/mixed/fixed/Jordan/contraction/jet products",
+    "global regular rank37/kernel1 and actual1",
+    "changed inverse/source-row rejection"
+  ],
+  "execution": {
+    "launcher": "REPLAY_RUST.sh rustcheck61-01",
+    "backend": "original manually authorized local Rust exact certificate replay",
+    "compiler": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "compiler_timeout_seconds": 1200,
+    "run_timeout_seconds": 1200,
+    "virtual_KiB": 4194304,
+    "CPU_affinity": "0",
+    "compiler_flags": [
+      "--edition=2021",
+      "-Copt-level=2",
+      "-Ccodegen-units=1",
+      "-Cdebuginfo=0"
+    ],
+    "queue": "one mathematical job atonce",
+    "checkpoint": "source gate then immutable raw sources/build/exit/log/binary and tar",
+    "source_gate": "seven executed files match Git; all donor hashes",
+    "dependencies": "standalone std, no Cargo/network",
+    "seed_semantics": "Rust uses no randomness; source cohort seed61 retained"
+  },
+  "stopping": {
+    "accepted": "exit0,exactmarker,no nativeerrorlines,allprescribedchecks",
+    "failure": "retain errors/caps/partials;freeze repairbeforefreshattempt",
+    "no_duplicate": "reconcilelivehandlebeforeretry"
+  },
+  "decision": {
+    "accept": "exit0,exactmarker,no nativeerrorlines,allpredeclaredsourceproducts",
+    "failure": "preserveeverycap/error/partial;freezearepairbeforefreshattempt",
+    "scope": "finite source-bound binary matrices only; geometry/function-field/normalization remain accepted native premises; no timing comparison"
+  },
+  "analysis": {
+    "kind": "exact GF2 word-bit parity products and independent control rank elimination",
+    "comparative": false,
+    "precision": "all recorded binary entries and all818 complete supports; no sampling"
+  },
+  "literature": [
+    {
+      "source": "R52normalRR/PID/table,R27tamedifferent,R60NEW-LEADS/TRACE-DUAL-NEXT",
+      "use": "actualsourcebasis andglobaldifferentialobligations"
+    },
+    {
+      "url": "https://stacks.math.columbia.edu/tag/0BW0",
+      "use": "complementarymodule=relative dualizingmodule forfinitegenericallyetale extension"
+    }
+  ],
+  "validation_note": "manualrecord;canonicalcheckerabsentfromselectedindexes",
+  "version": 13,
+  "amendment": {
+    "before_affected_data": true,
+    "reason": "Singular03 resource-manually-stopped before100cases, partial results excluded; independent Rust row-dot replay preserves complete818 source matrices/certificates under original Rust resource caps"
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "schema": "pencil.formal-producer/v1",
+  "scope": "Four-coordinate field repair nonvanishing and comparator closure",
+  "machine_status": "passed",
+  "independent_review": "pending",
+  "publication_binding": "pending",
+  "main_declarations": 10,
+  "controls": 9,
+  "axiom_audit": {
+    "declarations": [
+      {
+        "name": "RepairClosure.linear_zero",
+        "axioms": [
+          "propext",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairClosure.linear_scale",
+        "axioms": [
+          "propext",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairClosure.linear_comp",
+        "axioms": [
+          "propext",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairClosure.twice",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairClosure.preserves_nonzero",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairClosure.nonzero_iff",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairClosure.twice_same",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairClosure.same_preserved",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairClosure.same_iff",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairClosure.chart_basis_change",
+        "axioms": [
+          "propext",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairControls.square_four",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairControls.nonzero_input",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairControls.repaired_nonzero",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairControls.literal_swapped",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairControls.two_repairs",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairControls.square_zero_without_closure",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairControls.zero_comparator_vacuity",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairControls.zero_stays_zero",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      {
+        "name": "RepairControls.wrong_degree_one_basis",
+        "axioms": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      }
+    ],
+    "count": 19,
+    "allowed_only": true
+  },
+  "scientific_execution": false,
+  "historical_validator_rerun": false,
+  "cost_ratio": null,
+  "source": "snapshot/walk-source.rs.txt",
+  "source_lines": {
+    "linear": "48-50",
+    "xadd_repaired": "77-95"
+  },
+  "assumptions": [
+    "Field K",
+    "Sixteen equations M squared equals c times identity",
+    "c nonzero",
+    "Intermediate z nonzero",
+    "Nonzero comparator inputs"
+  ],
+  "proved": [
+    "Literal row-fold composition",
+    "Nonzero preservation and reflection",
+    "Double action projective identity",
+    "Nonzero comparator preservation and reflection",
+    "Corrected C2 versus C1 coordinate basis identity"
+  ],
+  "remaining_bindings": [
+    "Concrete runtime action matrix, prime modulus and square scalar",
+    "Canonical word arithmetic for entire linear fold",
+    "Chart geometric interpretation",
+    "xadd correctness and nonzero theta denominators",
+    "Branch existence and recovery coverage"
+  ],
+  "historical_evidence": {
+    "path": "snapshot/CHART_NONVANISHING.md",
+    "reported_actions": 105,
+    "counts_status": "historical reference only; no raw validation in this task"
+  },
+  "failed_attempts": [
+    "attempt1: squareScalar unfolding",
+    "attempt2: vector syntax",
+    "attempt3: unreduced conditionals; control build used previous olean and is superseded"
+  ],
+  "final_replay_order": [
+    "Repair",
+    "RepairControls",
+    "RepairReadback"
+  ],
+  "input_bindings": "before.sha256",
+  "input_readback": "after.txt",
+  "visual_inspection": "One-page PDF and SVG rendered and visually inspected; legible without clipping",
+  "dependency_boundary": "Pinned Lean and retained compiled dependencies; no independent binary checker"
+}

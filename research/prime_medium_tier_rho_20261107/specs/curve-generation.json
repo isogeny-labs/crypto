@@ -1,0 +1,95 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime medium-tier rho bound: curve generation (plan only, never run)",
+  "description": "research/prime_medium_tier_rho_20261107/PROTOCOL.md section 2. The ten curves are prime_orbit_index_calculus::generate_instance(generic, bits, seed) for bits in {33,37,41,45,49} and the seeds the protocol derives; `ecbench plan` resolves them and the measured specs give them explicitly as prime_explicit.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 33,
+        "seed": 201624291843241
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 33,
+        "seed": 24642267360510
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 37,
+        "seed": 18561872162765
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 37,
+        "seed": 135799598603144
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 41,
+        "seed": 119518173357916
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 41,
+        "seed": 181458334271012
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 45,
+        "seed": 185150999512726
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 45,
+        "seed": 196853410870112
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 49,
+        "seed": 40016877808970
+      },
+      {
+        "kind": "prime_orbit_shape",
+        "shape": "generic",
+        "bits": 49,
+        "seed": 203571419754608
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 54849620745713
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 227095582935304,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

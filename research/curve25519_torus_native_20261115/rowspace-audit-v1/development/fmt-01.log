@@ -1,0 +1,970 @@
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/check.rs:1:
+ //! Reader reconstructs each weighted row directly; it never calls elimination.
+-use crate::{decimal,decode,Audit,Limits,Meter,Polynomial,RankCertificate,Result,System};
++use crate::{decimal, decode, Audit, Limits, Meter, Polynomial, RankCertificate, Result, System};
+ use num_bigint::BigUint;
+-use num_traits::{One,Zero};
++use num_traits::{One, Zero};
+ use serde::Serialize;
+ use std::collections::BTreeSet;
+ 
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/check.rs:8:
+-fn weighted(original:&[Polynomial],weights:&[(usize,String)],source:usize,p:&BigUint,m:&mut Meter,l:&Limits)->Result<Polynomial> {
+-    let mut out=Polynomial::new(); let mut previous=None; let mut diagonal=false;
+-    for (i,c) in weights {
+-        m.event(1,l)?;
+-        if *i>source || previous.is_some_and(|old|old>=*i) { return Err("Invalid: origin order/triangle".into()); }
+-        let c=decimal(c)?;
+-        if c.is_zero() || &c>=p { return Err("Invalid: origin coefficient".into()); }
+-        diagonal|=*i==source; previous=Some(*i);
+-        for (monomial,coefficient) in &original[*i] {
+-            m.event(2,l)?; m.write(1,l)?;
+-            let product=(&c*coefficient)%p;
+-            let sum=(out.get(monomial).cloned().unwrap_or_default()+product)%p;
+-            if sum==BigUint::zero() { out.remove(monomial); } else { out.insert(monomial.clone(),sum); }
++fn weighted(
++    original: &[Polynomial],
++    weights: &[(usize, String)],
++    source: usize,
++    p: &BigUint,
++    m: &mut Meter,
++    l: &Limits,
++) -> Result<Polynomial> {
++    let mut out = Polynomial::new();
++    let mut previous = None;
++    let mut diagonal = false;
++    for (i, c) in weights {
++        m.event(1, l)?;
++        if *i > source || previous.is_some_and(|old| old >= *i) {
++            return Err("Invalid: origin order/triangle".into());
+         }
++        let c = decimal(c)?;
++        if c.is_zero() || &c >= p {
++            return Err("Invalid: origin coefficient".into());
++        }
++        diagonal |= *i == source;
++        previous = Some(*i);
++        for (monomial, coefficient) in &original[*i] {
++            m.event(2, l)?;
++            m.write(1, l)?;
++            let product = (&c * coefficient) % p;
++            let sum = (out.get(monomial).cloned().unwrap_or_default() + product) % p;
++            if sum == BigUint::zero() {
++                out.remove(monomial);
++            } else {
++                out.insert(monomial.clone(), sum);
++            }
++        }
+     }
+-    if !diagonal { return Err("Invalid: zero origin diagonal".into()); }
++    if !diagonal {
++        return Err("Invalid: zero origin diagonal".into());
++    }
+     Ok(out)
+ }
+-fn certificate(original:&[Polynomial],c:&RankCertificate,n:usize,p:&BigUint,m:&mut Meter,l:&Limits)->Result<usize> {
+-    if c.steps.len()!=original.len() { return Err("Invalid: source coverage".into()); }
+-    let mut pivots=vec![]; let mut entries=0;
+-    for (i,step) in c.steps.iter().enumerate() {
+-        if step.source!=i { return Err("Invalid: source sequence".into()); }
+-        entries+=step.row.len()+step.weights.len();
+-        if entries>l.entries { return Err("Cap: reader entries".into()); }
+-        let recomposed=weighted(original,&step.weights,i,p,m,l)?;
+-        let claimed=decode(&step.row,n,p)?;
+-        if recomposed!=claimed { return Err("Invalid: row recomposition".into()); }
+-        for old in &pivots { m.event(1,l)?; if claimed.contains_key(old) { return Err("Invalid: earlier pivot not zero".into()); } }
++fn certificate(
++    original: &[Polynomial],
++    c: &RankCertificate,
++    n: usize,
++    p: &BigUint,
++    m: &mut Meter,
++    l: &Limits,
++) -> Result<usize> {
++    if c.steps.len() != original.len() {
++        return Err("Invalid: source coverage".into());
++    }
++    let mut pivots = vec![];
++    let mut entries = 0;
++    for (i, step) in c.steps.iter().enumerate() {
++        if step.source != i {
++            return Err("Invalid: source sequence".into());
++        }
++        entries += step.row.len() + step.weights.len();
++        if entries > l.entries {
++            return Err("Cap: reader entries".into());
++        }
++        let recomposed = weighted(original, &step.weights, i, p, m, l)?;
++        let claimed = decode(&step.row, n, p)?;
++        if recomposed != claimed {
++            return Err("Invalid: row recomposition".into());
++        }
++        for old in &pivots {
++            m.event(1, l)?;
++            if claimed.contains_key(old) {
++                return Err("Invalid: earlier pivot not zero".into());
++            }
++        }
+         match &step.pivot {
+-            Some(pivot)=>{ if claimed.get(pivot)!=Some(&BigUint::one()) { return Err("Invalid: unit pivot".into()); } pivots.push(pivot.clone()); },
+-            None=>if !claimed.is_empty() { return Err("Invalid: nonzero kernel row".into()); },
++            Some(pivot) => {
++                if claimed.get(pivot) != Some(&BigUint::one()) {
++                    return Err("Invalid: unit pivot".into());
++                }
++                pivots.push(pivot.clone());
++            }
++            None => {
++                if !claimed.is_empty() {
++                    return Err("Invalid: nonzero kernel row".into());
++                }
++            }
+         }
+     }
+     Ok(pivots.len())
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/check.rs:43:
+ }
+-#[derive(Debug,Serialize)]
+-pub struct Summary { pub variables:usize,pub equations:usize,pub input_terms:usize,pub kept_variables:usize,pub original_input_rows:usize,pub remaining_rows:usize,pub projected_rank:usize,pub kernel_dimension:usize,pub original_input_rank:usize,pub total_input_rank:usize,pub new_input_relation_dimension:usize,pub reader_meter:Meter }
+-pub fn verify(s:&System,a:&Audit,l:&Limits)->Result<Summary> {
+-    if a.schema!="torus.rowspace-audit/v1" || !a.keep.windows(2).all(|w|w[0]<w[1]) || a.keep.iter().any(|&i|i>=s.raw.variables.len()) { return Err("Invalid: audit schema/keep".into()); }
+-    let keep:BTreeSet<_>=a.keep.iter().copied().collect();
+-    let pure=|r:&Polynomial|r.keys().all(|monomial|monomial.iter().all(|i|keep.contains(i)));
+-    let input_indices:Vec<_>=s.equations.iter().enumerate().filter(|(_,r)|pure(r)).map(|(i,_)|i).collect();
+-    if input_indices!=a.original_input_rows { return Err("Invalid: original input rows".into()); }
+-    let mut input:Vec<_>=input_indices.iter().map(|&i|s.equations[i].clone()).collect();
+-    let remaining:Vec<_>=s.equations.iter().filter(|r|!pure(r)).cloned().collect();
+-    let projected:Vec<_>=remaining.iter().map(|r|r.iter().filter(|(m,_)|m.iter().any(|i|!keep.contains(i))).map(|(m,c)|(m.clone(),c.clone())).collect()).collect();
+-    let mut meter=Meter::default();
+-    let projected_rank=certificate(&projected,&a.projection,s.raw.variables.len(),&s.p,&mut meter,l)?;
+-    let original_input_rank=certificate(&input,&a.baseline,s.raw.variables.len(),&s.p,&mut meter,l)?;
+-    let mut expected=vec![];
+-    for (i,step) in a.projection.steps.iter().enumerate() { if step.pivot.is_none() { let full=weighted(&remaining,&step.weights,i,&s.p,&mut meter,l)?; if !pure(&full) { return Err("Invalid: noninput image".into()); } expected.push(crate::encode(&full)); } }
+-    if expected!=a.images { return Err("Invalid: image coverage/value".into()); }
+-    for row in &a.images { input.push(decode(row,s.raw.variables.len(),&s.p)?); }
+-    let total_input_rank=certificate(&input,&a.combined,s.raw.variables.len(),&s.p,&mut meter,l)?;
+-    if total_input_rank<original_input_rank { return Err("Invalid: rank decreased".into()); }
+-    Ok(Summary {variables:s.raw.variables.len(),equations:s.equations.len(),input_terms:s.equations.iter().map(|r|r.len()).sum(),kept_variables:a.keep.len(),original_input_rows:input_indices.len(),remaining_rows:remaining.len(),projected_rank,kernel_dimension:remaining.len()-projected_rank,original_input_rank,total_input_rank,new_input_relation_dimension:total_input_rank-original_input_rank,reader_meter:meter})
++#[derive(Debug, Serialize)]
++pub struct Summary {
++    pub variables: usize,
++    pub equations: usize,
++    pub input_terms: usize,
++    pub kept_variables: usize,
++    pub original_input_rows: usize,
++    pub remaining_rows: usize,
++    pub projected_rank: usize,
++    pub kernel_dimension: usize,
++    pub original_input_rank: usize,
++    pub total_input_rank: usize,
++    pub new_input_relation_dimension: usize,
++    pub reader_meter: Meter,
++}
++pub fn verify(s: &System, a: &Audit, l: &Limits) -> Result<Summary> {
++    if a.schema != "torus.rowspace-audit/v1"
++        || !a.keep.windows(2).all(|w| w[0] < w[1])
++        || a.keep.iter().any(|&i| i >= s.raw.variables.len())
++    {
++        return Err("Invalid: audit schema/keep".into());
++    }
++    let keep: BTreeSet<_> = a.keep.iter().copied().collect();
++    let pure = |r: &Polynomial| {
++        r.keys()
++            .all(|monomial| monomial.iter().all(|i| keep.contains(i)))
++    };
++    let input_indices: Vec<_> = s
++        .equations
++        .iter()
++        .enumerate()
++        .filter(|(_, r)| pure(r))
++        .map(|(i, _)| i)
++        .collect();
++    if input_indices != a.original_input_rows {
++        return Err("Invalid: original input rows".into());
++    }
++    let mut input: Vec<_> = input_indices
++        .iter()
++        .map(|&i| s.equations[i].clone())
++        .collect();
++    let remaining: Vec<_> = s.equations.iter().filter(|r| !pure(r)).cloned().collect();
++    let projected: Vec<_> = remaining
++        .iter()
++        .map(|r| {
++            r.iter()
++                .filter(|(m, _)| m.iter().any(|i| !keep.contains(i)))
++                .map(|(m, c)| (m.clone(), c.clone()))
++                .collect()
++        })
++        .collect();
++    let mut meter = Meter::default();
++    let projected_rank = certificate(
++        &projected,
++        &a.projection,
++        s.raw.variables.len(),
++        &s.p,
++        &mut meter,
++        l,
++    )?;
++    let original_input_rank = certificate(
++        &input,
++        &a.baseline,
++        s.raw.variables.len(),
++        &s.p,
++        &mut meter,
++        l,
++    )?;
++    let mut expected = vec![];
++    for (i, step) in a.projection.steps.iter().enumerate() {
++        if step.pivot.is_none() {
++            let full = weighted(&remaining, &step.weights, i, &s.p, &mut meter, l)?;
++            if !pure(&full) {
++                return Err("Invalid: noninput image".into());
++            }
++            expected.push(crate::encode(&full));
++        }
++    }
++    if expected != a.images {
++        return Err("Invalid: image coverage/value".into());
++    }
++    for row in &a.images {
++        input.push(decode(row, s.raw.variables.len(), &s.p)?);
++    }
++    let total_input_rank = certificate(
++        &input,
++        &a.combined,
++        s.raw.variables.len(),
++        &s.p,
++        &mut meter,
++        l,
++    )?;
++    if total_input_rank < original_input_rank {
++        return Err("Invalid: rank decreased".into());
++    }
++    Ok(Summary {
++        variables: s.raw.variables.len(),
++        equations: s.equations.len(),
++        input_terms: s.equations.iter().map(|r| r.len()).sum(),
++        kept_variables: a.keep.len(),
++        original_input_rows: input_indices.len(),
++        remaining_rows: remaining.len(),
++        projected_rank,
++        kernel_dimension: remaining.len() - projected_rank,
++        original_input_rank,
++        total_input_rank,
++        new_input_relation_dimension: total_input_rank - original_input_rank,
++        reader_meter: meter,
++    })
+ }
+ 
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/controls.rs:1:
+-use crate::{audit,check,Audit,Limits,RawSystem,Result,System,Term};
++use crate::{audit, check, Audit, Limits, RawSystem, Result, System, Term};
+ use flate2::read::GzDecoder;
+-use serde_json::{json,Value};
+-use sha2::{Digest,Sha256};
+-use std::{fs,io::Read,path::Path};
++use serde_json::{json, Value};
++use sha2::{Digest, Sha256};
++use std::{fs, io::Read, path::Path};
+ pub const ORIGINAL:&[u8]=include_bytes!("../../../research/curve25519_torus_native_20261115/target-circuit-v2/native-v2/six-member-system.json.gz");
+-pub fn sha(bytes:&[u8])->String { format!("{:x}",Sha256::digest(bytes)) }
+-pub fn sources()->Value { json!({"Cargo.toml":sha(include_bytes!("../Cargo.toml")),"Cargo.lock":sha(include_bytes!("../Cargo.lock")),"src/lib.rs":sha(include_bytes!("lib.rs")),"src/check.rs":sha(include_bytes!("check.rs")),"src/controls.rs":sha(include_bytes!("controls.rs")),"src/main.rs":sha(include_bytes!("main.rs")),"original_gzip":sha(ORIGINAL)}) }
+-fn system(rows:Vec<Vec<(Vec<usize>,u32)>>)->System {
+-    let equations=rows.into_iter().map(|row|row.into_iter().map(|(monomial,c)|Term{monomial,coefficient:c.to_string()}).collect()).collect();
+-    let raw=RawSystem {schema:"torus-s4.quadratic/v1".into(),p:"29".into(),variables:vec!["x".into(),"y".into(),"z".into()],equations};
++pub fn sha(bytes: &[u8]) -> String {
++    format!("{:x}", Sha256::digest(bytes))
++}
++pub fn sources() -> Value {
++    json!({"Cargo.toml":sha(include_bytes!("../Cargo.toml")),"Cargo.lock":sha(include_bytes!("../Cargo.lock")),"src/lib.rs":sha(include_bytes!("lib.rs")),"src/check.rs":sha(include_bytes!("check.rs")),"src/controls.rs":sha(include_bytes!("controls.rs")),"src/main.rs":sha(include_bytes!("main.rs")),"original_gzip":sha(ORIGINAL)})
++}
++fn system(rows: Vec<Vec<(Vec<usize>, u32)>>) -> System {
++    let equations = rows
++        .into_iter()
++        .map(|row| {
++            row.into_iter()
++                .map(|(monomial, c)| Term {
++                    monomial,
++                    coefficient: c.to_string(),
++                })
++                .collect()
++        })
++        .collect();
++    let raw = RawSystem {
++        schema: "torus-s4.quadratic/v1".into(),
++        p: "29".into(),
++        variables: vec!["x".into(), "y".into(), "z".into()],
++        equations,
++    };
+     System::parse(&serde_json::to_vec(&raw).unwrap()).unwrap()
+ }
+-pub fn small_cases()->Vec<(&'static str,System,usize)> {
++pub fn small_cases() -> Vec<(&'static str, System, usize)> {
+     vec![
+-        ("new-quadratic",system(vec![vec![(vec![0],1),(vec![1],1)],vec![(vec![0,0],1),(vec![1],1)]]),1),
+-        ("private-auxiliary",system(vec![vec![(vec![0,0],28),(vec![1],1)],vec![(vec![0,1],28),(vec![2],1)]]),0),
+-        ("existing-input",system(vec![vec![(vec![0],28),(vec![0,0],1)],vec![(vec![0,0],28),(vec![1],1)]]),0),
+-        ("zero-image",system(vec![vec![(vec![0],28),(vec![1],1)],vec![(vec![0],27),(vec![1],2)]]),0),
+-        ("constant-conflict",system(vec![vec![(vec![0],1),(vec![1],1)],vec![(vec![],28),(vec![0],1),(vec![1],1)]]),1),
++        (
++            "new-quadratic",
++            system(vec![
++                vec![(vec![0], 1), (vec![1], 1)],
++                vec![(vec![0, 0], 1), (vec![1], 1)],
++            ]),
++            1,
++        ),
++        (
++            "private-auxiliary",
++            system(vec![
++                vec![(vec![0, 0], 28), (vec![1], 1)],
++                vec![(vec![0, 1], 28), (vec![2], 1)],
++            ]),
++            0,
++        ),
++        (
++            "existing-input",
++            system(vec![
++                vec![(vec![0], 28), (vec![0, 0], 1)],
++                vec![(vec![0, 0], 28), (vec![1], 1)],
++            ]),
++            0,
++        ),
++        (
++            "zero-image",
++            system(vec![
++                vec![(vec![0], 28), (vec![1], 1)],
++                vec![(vec![0], 27), (vec![1], 2)],
++            ]),
++            0,
++        ),
++        (
++            "constant-conflict",
++            system(vec![
++                vec![(vec![0], 1), (vec![1], 1)],
++                vec![(vec![], 28), (vec![0], 1), (vec![1], 1)],
++            ]),
++            1,
++        ),
+     ]
+ }
+-pub fn small_contracts()->Result<Value> {
+-    let limits=Limits::default();
+-    for (id,s,expected) in small_cases() { let a=audit(&s,vec![0],&limits)?; let r=check::verify(&s,&a,&limits)?; if r.new_input_relation_dimension!=expected {return Err(format!("wrong exact control {id}"));} }
+-    let (_,s,_)=small_cases().remove(0); let a=audit(&s,vec![0],&limits)?;
+-    let mut mutations:Vec<(&str,Audit)>=vec![];
+-    let mut b=a.clone();b.projection.steps[1].weights[0].1="2".into();mutations.push(("origin coefficient",b));
+-    let mut b=a.clone();b.projection.steps[0].weights.clear();mutations.push(("origin diagonal",b));
+-    let mut b=a.clone();b.projection.steps.pop();mutations.push(("source coverage",b));
+-    let mut b=a.clone();b.projection.steps[0].source=1;mutations.push(("source order",b));
+-    let mut b=a.clone();b.projection.steps[0].pivot=Some(vec![0]);mutations.push(("invented pivot",b));
+-    let mut b=a.clone();b.images[0][0].coefficient="3".into();mutations.push(("wrong image",b));
+-    let mut b=a.clone();b.keep.push(0);mutations.push(("duplicate keep",b));
+-    let mut b=a.clone();b.projection.steps[0].row[0].coefficient="01".into();mutations.push(("noncanonical coefficient",b));
+-    for (id,b) in &mutations { if check::verify(&s,b,&limits).is_ok() {return Err(format!("accepted corruption {id}"));} }
+-    for l in [Limits {work:0,..limits.clone()},Limits {writes:0,..limits.clone()},Limits {entries:0,..limits.clone()}] {if audit(&s,vec![0],&l).is_ok() || check::verify(&s,&a,&l).is_ok() {return Err("forced cap admitted".into());}}
+-    let mut encoded=serde_json::to_value(&a).map_err(|e|e.to_string())?; encoded["extra"]=json!(1);
+-    if serde_json::from_value::<Audit>(encoded).is_ok() {return Err("extra serialization field accepted".into());}
+-    if System::parse(&vec![b' ';(2<<20)+1]).is_ok(){return Err("input cap admitted".into());}
+-    Ok(json!({"matrix_controls":5,"corruptions_refused":mutations.len(),"forced_generator_and_reader_caps":3,"extra_field_refused":true,"oversize_input_refused":true}))
++pub fn small_contracts() -> Result<Value> {
++    let limits = Limits::default();
++    for (id, s, expected) in small_cases() {
++        let a = audit(&s, vec![0], &limits)?;
++        let r = check::verify(&s, &a, &limits)?;
++        if r.new_input_relation_dimension != expected {
++            return Err(format!("wrong exact control {id}"));
++        }
++    }
++    let (_, s, _) = small_cases().remove(0);
++    let a = audit(&s, vec![0], &limits)?;
++    let mut mutations: Vec<(&str, Audit)> = vec![];
++    let mut b = a.clone();
++    b.projection.steps[1].weights[0].1 = "2".into();
++    mutations.push(("origin coefficient", b));
++    let mut b = a.clone();
++    b.projection.steps[0].weights.clear();
++    mutations.push(("origin diagonal", b));
++    let mut b = a.clone();
++    b.projection.steps.pop();
++    mutations.push(("source coverage", b));
++    let mut b = a.clone();
++    b.projection.steps[0].source = 1;
++    mutations.push(("source order", b));
++    let mut b = a.clone();
++    b.projection.steps[0].pivot = Some(vec![0]);
++    mutations.push(("invented pivot", b));
++    let mut b = a.clone();
++    b.images[0][0].coefficient = "3".into();
++    mutations.push(("wrong image", b));
++    let mut b = a.clone();
++    b.keep.push(0);
++    mutations.push(("duplicate keep", b));
++    let mut b = a.clone();
++    b.projection.steps[0].row[0].coefficient = "01".into();
++    mutations.push(("noncanonical coefficient", b));
++    for (id, b) in &mutations {
++        if check::verify(&s, b, &limits).is_ok() {
++            return Err(format!("accepted corruption {id}"));
++        }
++    }
++    for l in [
++        Limits {
++            work: 0,
++            ..limits.clone()
++        },
++        Limits {
++            writes: 0,
++            ..limits.clone()
++        },
++        Limits {
++            entries: 0,
++            ..limits.clone()
++        },
++    ] {
++        if audit(&s, vec![0], &l).is_ok() || check::verify(&s, &a, &l).is_ok() {
++            return Err("forced cap admitted".into());
++        }
++    }
++    let mut encoded = serde_json::to_value(&a).map_err(|e| e.to_string())?;
++    encoded["extra"] = json!(1);
++    if serde_json::from_value::<Audit>(encoded).is_ok() {
++        return Err("extra serialization field accepted".into());
++    }
++    if System::parse(&vec![b' '; (2 << 20) + 1]).is_ok() {
++        return Err("input cap admitted".into());
++    }
++    Ok(
++        json!({"matrix_controls":5,"corruptions_refused":mutations.len(),"forced_generator_and_reader_caps":3,"extra_field_refused":true,"oversize_input_refused":true}),
++    )
+ }
+-fn write(path:&Path,value:&impl serde::Serialize)->Result<()> {fs::write(path,serde_json::to_vec_pretty(value).map_err(|e|e.to_string())?).map_err(|e|e.to_string())}
+-fn one(out:&Path,id:&str,s:&System,keep:Vec<usize>)->Result<Value> {
+-    let dir=out.join(id);fs::create_dir(&dir).map_err(|e|e.to_string())?;
+-    write(&dir.join("input.json"),&json!({"system":s.raw,"keep":keep,"limits":Limits::default()}))?;
+-    let a=match audit(s,keep,&Limits::default()) {Ok(a)=>a,Err(reason)=>{let v=json!({"id":id,"outcome":"Unknown","reason":reason});write(&dir.join("summary.json"),&v)?;return Ok(v)}};
+-    let summary=check::verify(s,&a,&Limits::default())?;
+-    write(&dir.join("certificate.json"),&a)?;
+-    let v=json!({"id":id,"outcome":"CompleteStaticCertificate","summary":summary,"generator_meter":a.generator_meter,"standing":"producer unsigned/unverified","solver_calls":0});write(&dir.join("summary.json"),&v)?;Ok(v)
++fn write(path: &Path, value: &impl serde::Serialize) -> Result<()> {
++    fs::write(
++        path,
++        serde_json::to_vec_pretty(value).map_err(|e| e.to_string())?,
++    )
++    .map_err(|e| e.to_string())
+ }
+-pub fn run(out:&Path)->Result<()> {
+-    fs::create_dir(out).map_err(|e|e.to_string())?;
+-    write(&out.join("pre-call.json"),&json!({"schema":"rowspace.static-controls/v1","compiled_sources":sources(),"planned_cases":7,"solver_calls":0,"scope":"fixed static development certificates; no performance/family claim"}))?;
+-    let contracts=small_contracts()?; let mut results=vec![];
+-    for (id,s,_) in small_cases(){results.push(one(out,id,&s,vec![0])?);}
+-    if sha(ORIGINAL)!="5b92bf1e7ef2b468175262d0a77e762386f83e364271a34f830624f1f9e87522" {return Err("frozen original input hash".into());}
+-    let mut decoded=vec![];GzDecoder::new(ORIGINAL).take((2<<20)+1).read_to_end(&mut decoded).map_err(|e|e.to_string())?;
+-    let s=System::parse(&decoded)?;
+-    if s.raw.variables.len()!=1059 || s.equations.len()!=1089 {return Err("original shape".into());}
+-    let mut raw=vec![];let mut inputs=vec![];
+-    for (i,name) in s.raw.variables.iter().enumerate(){
+-        let Some(rest)=name.strip_prefix("member") else {continue};
+-        let Some((leaf,stem))=rest.split_once('_') else {continue};
+-        if !["0","1","2","3","4","5"].contains(&leaf){continue;}
+-        let coordinate=stem=="z_a_0" || stem=="z_b_1";
+-        if coordinate {raw.push(i);}
+-        if coordinate || ["selector_","slack_","branch_","raw_v_"].iter().any(|tag|stem.starts_with(tag)){inputs.push(i);}
++fn one(out: &Path, id: &str, s: &System, keep: Vec<usize>) -> Result<Value> {
++    let dir = out.join(id);
++    fs::create_dir(&dir).map_err(|e| e.to_string())?;
++    write(
++        &dir.join("input.json"),
++        &json!({"system":s.raw,"keep":keep,"limits":Limits::default()}),
++    )?;
++    let a = match audit(s, keep, &Limits::default()) {
++        Ok(a) => a,
++        Err(reason) => {
++            let v = json!({"id":id,"outcome":"Unknown","reason":reason});
++            write(&dir.join("summary.json"), &v)?;
++            return Ok(v);
++        }
++    };
++    let summary = check::verify(s, &a, &Limits::default())?;
++    write(&dir.join("certificate.json"), &a)?;
++    let v = json!({"id":id,"outcome":"CompleteStaticCertificate","summary":summary,"generator_meter":a.generator_meter,"standing":"producer unsigned/unverified","solver_calls":0});
++    write(&dir.join("summary.json"), &v)?;
++    Ok(v)
++}
++pub fn run(out: &Path) -> Result<()> {
++    fs::create_dir(out).map_err(|e| e.to_string())?;
++    write(
++        &out.join("pre-call.json"),
++        &json!({"schema":"rowspace.static-controls/v1","compiled_sources":sources(),"planned_cases":7,"solver_calls":0,"scope":"fixed static development certificates; no performance/family claim"}),
++    )?;
++    let contracts = small_contracts()?;
++    let mut results = vec![];
++    for (id, s, _) in small_cases() {
++        results.push(one(out, id, &s, vec![0])?);
+     }
+-    if raw.len()!=12 || inputs.len()!=204{return Err(format!("frozen role adapter: raw{} inputs{}",raw.len(),inputs.len()));}
+-    results.push(one(out,"original-raw12",&s,raw)?);results.push(one(out,"original-input204",&s,inputs)?);
+-    write(&out.join("controls.json"),&json!({"schema":"torus.rowspace-results/v1","contracts":contracts,"planned":7,"attempted":results.len(),"cases":results,"original_input_gzip_sha256":sha(ORIGINAL),"native_aggregation":"Rust","solver_calls":0,"accounting_complete":false,"standing":"producer unsigned/unverified"}))
++    if sha(ORIGINAL) != "5b92bf1e7ef2b468175262d0a77e762386f83e364271a34f830624f1f9e87522" {
++        return Err("frozen original input hash".into());
++    }
++    let mut decoded = vec![];
++    GzDecoder::new(ORIGINAL)
++        .take((2 << 20) + 1)
++        .read_to_end(&mut decoded)
++        .map_err(|e| e.to_string())?;
++    let s = System::parse(&decoded)?;
++    if s.raw.variables.len() != 1059 || s.equations.len() != 1089 {
++        return Err("original shape".into());
++    }
++    let mut raw = vec![];
++    let mut inputs = vec![];
++    for (i, name) in s.raw.variables.iter().enumerate() {
++        let Some(rest) = name.strip_prefix("member") else {
++            continue;
++        };
++        let Some((leaf, stem)) = rest.split_once('_') else {
++            continue;
++        };
++        if !["0", "1", "2", "3", "4", "5"].contains(&leaf) {
++            continue;
++        }
++        let coordinate = stem == "z_a_0" || stem == "z_b_1";
++        if coordinate {
++            raw.push(i);
++        }
++        if coordinate
++            || ["selector_", "slack_", "branch_", "raw_v_"]
++                .iter()
++                .any(|tag| stem.starts_with(tag))
++        {
++            inputs.push(i);
++        }
++    }
++    if raw.len() != 12 || inputs.len() != 204 {
++        return Err(format!(
++            "frozen role adapter: raw{} inputs{}",
++            raw.len(),
++            inputs.len()
++        ));
++    }
++    results.push(one(out, "original-raw12", &s, raw)?);
++    results.push(one(out, "original-input204", &s, inputs)?);
++    write(
++        &out.join("controls.json"),
++        &json!({"schema":"torus.rowspace-results/v1","contracts":contracts,"planned":7,"attempted":results.len(),"cases":results,"original_input_gzip_sha256":sha(ORIGINAL),"native_aggregation":"Rust","solver_calls":0,"accounting_complete":false,"standing":"producer unsigned/unverified"}),
++    )
+ }
+ 
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/lib.rs:29:
+     pub equations: Vec<Polynomial>,
+ }
+ pub fn decimal(s: &str) -> Result<BigUint> {
+-    if s.is_empty() || s.len() > 78 || (s.len() > 1 && s.starts_with('0')) || !s.bytes().all(|b| b.is_ascii_digit()) {
++    if s.is_empty()
++        || s.len() > 78
++        || (s.len() > 1 && s.starts_with('0'))
++        || !s.bytes().all(|b| b.is_ascii_digit())
++    {
+         return Err("Invalid: canonical decimal".into());
+     }
+     BigUint::parse_bytes(s.as_bytes(), 10).ok_or("Invalid: decimal".into())
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/lib.rs:38:
+     let mut out = BTreeMap::new();
+     let mut previous: Option<&Vec<usize>> = None;
+     for t in terms {
+-        if t.monomial.len() > 2 || t.monomial.iter().any(|&v| v >= n) || !t.monomial.windows(2).all(|w| w[0] <= w[1]) || previous.is_some_and(|v| v >= &t.monomial) {
++        if t.monomial.len() > 2
++            || t.monomial.iter().any(|&v| v >= n)
++            || !t.monomial.windows(2).all(|w| w[0] <= w[1])
++            || previous.is_some_and(|v| v >= &t.monomial)
++        {
+             return Err("Invalid: monomial shape/order".into());
+         }
+         let c = decimal(&t.coefficient)?;
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/lib.rs:45:
+-        if c.is_zero() || &c >= p { return Err("Invalid: coefficient".into()); }
++        if c.is_zero() || &c >= p {
++            return Err("Invalid: coefficient".into());
++        }
+         out.insert(t.monomial.clone(), c);
+         previous = Some(&t.monomial);
+     }
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/lib.rs:49:
+     Ok(out)
+ }
+ pub fn encode(p: &Polynomial) -> Vec<Term> {
+-    p.iter().map(|(m,c)| Term { monomial:m.clone(), coefficient:c.to_string() }).collect()
++    p.iter()
++        .map(|(m, c)| Term {
++            monomial: m.clone(),
++            coefficient: c.to_string(),
++        })
++        .collect()
+ }
+ impl System {
+     pub fn parse(bytes: &[u8]) -> Result<Self> {
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/lib.rs:56:
+-        if bytes.len() > 2 << 20 { return Err("Cap: input bytes".into()); }
++        if bytes.len() > 2 << 20 {
++            return Err("Cap: input bytes".into());
++        }
+         let raw: RawSystem = serde_json::from_slice(bytes).map_err(|e| format!("Invalid: {e}"))?;
+-        let p=decimal(&raw.p)?;
+-        let actual=(BigUint::one()<<255usize)-19u32;
+-        if p != BigUint::from(29u32) && p != actual { return Err("Invalid: unsupported field".into()); }
+-        if raw.schema!="torus-s4.quadratic/v1" || raw.variables.len()>4096 || raw.equations.len()>8192 || raw.equations.iter().map(Vec::len).sum::<usize>()>32768 {
++        let p = decimal(&raw.p)?;
++        let actual = (BigUint::one() << 255usize) - 19u32;
++        if p != BigUint::from(29u32) && p != actual {
++            return Err("Invalid: unsupported field".into());
++        }
++        if raw.schema != "torus-s4.quadratic/v1"
++            || raw.variables.len() > 4096
++            || raw.equations.len() > 8192
++            || raw.equations.iter().map(Vec::len).sum::<usize>() > 32768
++        {
+             return Err("Invalid: system schema or admission shape".into());
+         }
+-        if raw.variables.iter().any(|s| s.len()>128) || raw.variables.iter().collect::<BTreeSet<_>>().len()!=raw.variables.len() { return Err("Invalid: variable names".into()); }
+-        let equations=raw.equations.iter().map(|r|decode(r,raw.variables.len(),&p)).collect::<Result<_>>()?;
+-        Ok(Self { raw,p,equations })
++        if raw.variables.iter().any(|s| s.len() > 128)
++            || raw.variables.iter().collect::<BTreeSet<_>>().len() != raw.variables.len()
++        {
++            return Err("Invalid: variable names".into());
++        }
++        let equations = raw
++            .equations
++            .iter()
++            .map(|r| decode(r, raw.variables.len(), &p))
++            .collect::<Result<_>>()?;
++        Ok(Self { raw, p, equations })
+     }
+ }
+ #[derive(Clone, Debug, Serialize, Deserialize)]
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/lib.rs:70:
+ #[serde(deny_unknown_fields)]
+-pub struct Limits { pub work:u64, pub writes:u64, pub entries:usize }
+-impl Default for Limits { fn default()->Self { Self { work:50_000_000,writes:8_000_000,entries:1_000_000 } } }
++pub struct Limits {
++    pub work: u64,
++    pub writes: u64,
++    pub entries: usize,
++}
++impl Default for Limits {
++    fn default() -> Self {
++        Self {
++            work: 50_000_000,
++            writes: 8_000_000,
++            entries: 1_000_000,
++        }
++    }
++}
+ #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+-pub struct Meter { pub events:u64,pub coefficient_writes:u64 }
++pub struct Meter {
++    pub events: u64,
++    pub coefficient_writes: u64,
++}
+ impl Meter {
+-    pub fn event(&mut self,n:u64,l:&Limits)->Result<()> { self.events=self.events.checked_add(n).ok_or("Cap: event overflow")?; if self.events>l.work { return Err("Cap: work".into()); } Ok(()) }
+-    pub fn write(&mut self,n:u64,l:&Limits)->Result<()> { self.coefficient_writes=self.coefficient_writes.checked_add(n).ok_or("Cap: write overflow")?; if self.coefficient_writes>l.writes { return Err("Cap: writes".into()); } Ok(()) }
++    pub fn event(&mut self, n: u64, l: &Limits) -> Result<()> {
++        self.events = self.events.checked_add(n).ok_or("Cap: event overflow")?;
++        if self.events > l.work {
++            return Err("Cap: work".into());
++        }
++        Ok(())
++    }
++    pub fn write(&mut self, n: u64, l: &Limits) -> Result<()> {
++        self.coefficient_writes = self
++            .coefficient_writes
++            .checked_add(n)
++            .ok_or("Cap: write overflow")?;
++        if self.coefficient_writes > l.writes {
++            return Err("Cap: writes".into());
++        }
++        Ok(())
++    }
+ }
+-#[derive(Clone,Debug,Serialize,Deserialize)]
++#[derive(Clone, Debug, Serialize, Deserialize)]
+ #[serde(deny_unknown_fields)]
+-pub struct Step { pub source:usize,pub weights:Vec<(usize,String)>,pub row:Vec<Term>,pub pivot:Option<Vec<usize>> }
+-#[derive(Clone,Debug,Serialize,Deserialize)]
++pub struct Step {
++    pub source: usize,
++    pub weights: Vec<(usize, String)>,
++    pub row: Vec<Term>,
++    pub pivot: Option<Vec<usize>>,
++}
++#[derive(Clone, Debug, Serialize, Deserialize)]
+ #[serde(deny_unknown_fields)]
+-pub struct RankCertificate { pub steps:Vec<Step> }
+-#[derive(Clone,Debug,Serialize,Deserialize)]
++pub struct RankCertificate {
++    pub steps: Vec<Step>,
++}
++#[derive(Clone, Debug, Serialize, Deserialize)]
+ #[serde(deny_unknown_fields)]
+-pub struct Audit { pub schema:String,pub keep:Vec<usize>,pub original_input_rows:Vec<usize>,pub projection:RankCertificate,pub images:Vec<Vec<Term>>,pub baseline:RankCertificate,pub combined:RankCertificate,pub generator_meter:Meter }
++pub struct Audit {
++    pub schema: String,
++    pub keep: Vec<usize>,
++    pub original_input_rows: Vec<usize>,
++    pub projection: RankCertificate,
++    pub images: Vec<Vec<Term>>,
++    pub baseline: RankCertificate,
++    pub combined: RankCertificate,
++    pub generator_meter: Meter,
++}
+ 
+-fn subtract<K:Ord+Clone>(a:&mut BTreeMap<K,BigUint>,b:&BTreeMap<K,BigUint>,c:&BigUint,p:&BigUint,m:&mut Meter,l:&Limits)->Result<()> {
+-    for (key,value) in b {
+-        m.event(3,l)?; m.write(1,l)?;
+-        let product=(c*value)%p; let current=a.get(key).cloned().unwrap_or_default(); let next=(current+p-product)%p;
+-        if next.is_zero() { a.remove(key); } else { a.insert(key.clone(),next); }
++fn subtract<K: Ord + Clone>(
++    a: &mut BTreeMap<K, BigUint>,
++    b: &BTreeMap<K, BigUint>,
++    c: &BigUint,
++    p: &BigUint,
++    m: &mut Meter,
++    l: &Limits,
++) -> Result<()> {
++    for (key, value) in b {
++        m.event(3, l)?;
++        m.write(1, l)?;
++        let product = (c * value) % p;
++        let current = a.get(key).cloned().unwrap_or_default();
++        let next = (current + p - product) % p;
++        if next.is_zero() {
++            a.remove(key);
++        } else {
++            a.insert(key.clone(), next);
++        }
+     }
+     Ok(())
+ }
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/lib.rs:97:
+-pub(crate) fn rank(gens:&[Polynomial],p:&BigUint,m:&mut Meter,l:&Limits)->Result<RankCertificate> {
+-    let mut basis:Vec<(Vec<usize>,Polynomial,BTreeMap<usize,BigUint>)>=vec![];
+-    let mut steps=vec![]; let mut entries=0usize;
+-    for (source,original) in gens.iter().enumerate() {
+-        m.event(1+original.len() as u64,l)?; m.write(1+original.len() as u64,l)?;
+-        let mut row=original.clone(); let mut weights=BTreeMap::from([(source,BigUint::one())]);
+-        for (pivot,other,origins) in &basis {
+-            m.event(1,l)?;
+-            if let Some(c)=row.get(pivot).cloned() { subtract(&mut row,other,&c,p,m,l)?; subtract(&mut weights,origins,&c,p,m,l)?; }
++pub(crate) fn rank(
++    gens: &[Polynomial],
++    p: &BigUint,
++    m: &mut Meter,
++    l: &Limits,
++) -> Result<RankCertificate> {
++    let mut basis: Vec<(Vec<usize>, Polynomial, BTreeMap<usize, BigUint>)> = vec![];
++    let mut steps = vec![];
++    let mut entries = 0usize;
++    for (source, original) in gens.iter().enumerate() {
++        m.event(1 + original.len() as u64, l)?;
++        m.write(1 + original.len() as u64, l)?;
++        let mut row = original.clone();
++        let mut weights = BTreeMap::from([(source, BigUint::one())]);
++        for (pivot, other, origins) in &basis {
++            m.event(1, l)?;
++            if let Some(c) = row.get(pivot).cloned() {
++                subtract(&mut row, other, &c, p, m, l)?;
++                subtract(&mut weights, origins, &c, p, m, l)?;
++            }
+         }
+-        let pivot=row.keys().next().cloned();
+-        if let Some(key)=&pivot {
+-            m.event(2*p.bits(),l)?;
+-            let inverse=row[key].modpow(&(p-2u32),p);
+-            for value in row.values_mut().chain(weights.values_mut()) { m.event(1,l)?; m.write(1,l)?; *value=(&*value*&inverse)%p; }
++        let pivot = row.keys().next().cloned();
++        if let Some(key) = &pivot {
++            m.event(2 * p.bits(), l)?;
++            let inverse = row[key].modpow(&(p - 2u32), p);
++            for value in row.values_mut().chain(weights.values_mut()) {
++                m.event(1, l)?;
++                m.write(1, l)?;
++                *value = (&*value * &inverse) % p;
++            }
+         }
+-        entries=entries.checked_add(row.len()+weights.len()).ok_or("Cap: entries overflow")?;
+-        if entries>l.entries { return Err("Cap: certificate entries".into()); }
+-        steps.push(Step {source,weights:weights.iter().map(|(i,c)|(*i,c.to_string())).collect(),row:encode(&row),pivot:pivot.clone()});
+-        if let Some(pivot)=pivot { basis.push((pivot,row,weights)); }
++        entries = entries
++            .checked_add(row.len() + weights.len())
++            .ok_or("Cap: entries overflow")?;
++        if entries > l.entries {
++            return Err("Cap: certificate entries".into());
++        }
++        steps.push(Step {
++            source,
++            weights: weights.iter().map(|(i, c)| (*i, c.to_string())).collect(),
++            row: encode(&row),
++            pivot: pivot.clone(),
++        });
++        if let Some(pivot) = pivot {
++            basis.push((pivot, row, weights));
++        }
+     }
+-    Ok(RankCertificate {steps})
++    Ok(RankCertificate { steps })
+ }
+-pub(crate) fn combine(gens:&[Polynomial],weights:&[(usize,String)],p:&BigUint,m:&mut Meter,l:&Limits)->Result<Polynomial> {
+-    let mut out=Polynomial::new();
+-    for (i,c) in weights {
+-        let c=decimal(c)?;
+-        for (key,value) in &gens[*i] { m.event(2,l)?; m.write(1,l)?; let next=(out.get(key).cloned().unwrap_or_default()+&c*value)%p; if next.is_zero() { out.remove(key); } else { out.insert(key.clone(),next); } }
++pub(crate) fn combine(
++    gens: &[Polynomial],
++    weights: &[(usize, String)],
++    p: &BigUint,
++    m: &mut Meter,
++    l: &Limits,
++) -> Result<Polynomial> {
++    let mut out = Polynomial::new();
++    for (i, c) in weights {
++        let c = decimal(c)?;
++        for (key, value) in &gens[*i] {
++            m.event(2, l)?;
++            m.write(1, l)?;
++            let next = (out.get(key).cloned().unwrap_or_default() + &c * value) % p;
++            if next.is_zero() {
++                out.remove(key);
++            } else {
++                out.insert(key.clone(), next);
++            }
++        }
+     }
+     Ok(out)
+ }
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/lib.rs:128:
+-pub fn audit(s:&System,keep:Vec<usize>,l:&Limits)->Result<Audit> {
+-    if !keep.windows(2).all(|w|w[0]<w[1]) || keep.iter().any(|&i|i>=s.raw.variables.len()) { return Err("Invalid: keep set".into()); }
+-    let keep_set:BTreeSet<_>=keep.iter().copied().collect();
+-    let input_only=|r:&Polynomial|r.keys().all(|monomial|monomial.iter().all(|i|keep_set.contains(i)));
+-    let original_input_rows:Vec<_>=s.equations.iter().enumerate().filter(|(_,r)|input_only(r)).map(|(i,_)|i).collect();
+-    let original_input:Vec<_>=original_input_rows.iter().map(|&i|s.equations[i].clone()).collect();
+-    let remaining:Vec<_>=s.equations.iter().filter(|r|!input_only(r)).cloned().collect();
+-    let projected:Vec<_>=remaining.iter().map(|r|r.iter().filter(|(monomial,_)|monomial.iter().any(|i|!keep_set.contains(i))).map(|(m,c)|(m.clone(),c.clone())).collect()).collect();
+-    let mut meter=Meter::default(); meter.event(s.equations.iter().map(|r|r.len() as u64).sum(),l)?;
+-    let projection=rank(&projected,&s.p,&mut meter,l)?;
+-    let mut images=vec![];
+-    for step in &projection.steps { if step.pivot.is_none() { images.push(encode(&combine(&remaining,&step.weights,&s.p,&mut meter,l)?)); } }
+-    let baseline=rank(&original_input,&s.p,&mut meter,l)?;
+-    let mut combined_gens=original_input;
+-    for image in &images { combined_gens.push(decode(image,s.raw.variables.len(),&s.p)?); }
+-    let combined=rank(&combined_gens,&s.p,&mut meter,l)?;
+-    let out=Audit {schema:"torus.rowspace-audit/v1".into(),keep,original_input_rows,projection,images,baseline,combined,generator_meter:meter};
+-    if serde_json::to_vec(&out).map_err(|e|e.to_string())?.len()>32<<20 { return Err("Cap: serialized certificate".into()); }
++pub fn audit(s: &System, keep: Vec<usize>, l: &Limits) -> Result<Audit> {
++    if !keep.windows(2).all(|w| w[0] < w[1]) || keep.iter().any(|&i| i >= s.raw.variables.len()) {
++        return Err("Invalid: keep set".into());
++    }
++    let keep_set: BTreeSet<_> = keep.iter().copied().collect();
++    let input_only = |r: &Polynomial| {
++        r.keys()
++            .all(|monomial| monomial.iter().all(|i| keep_set.contains(i)))
++    };
++    let original_input_rows: Vec<_> = s
++        .equations
++        .iter()
++        .enumerate()
++        .filter(|(_, r)| input_only(r))
++        .map(|(i, _)| i)
++        .collect();
++    let original_input: Vec<_> = original_input_rows
++        .iter()
++        .map(|&i| s.equations[i].clone())
++        .collect();
++    let remaining: Vec<_> = s
++        .equations
++        .iter()
++        .filter(|r| !input_only(r))
++        .cloned()
++        .collect();
++    let projected: Vec<_> = remaining
++        .iter()
++        .map(|r| {
++            r.iter()
++                .filter(|(monomial, _)| monomial.iter().any(|i| !keep_set.contains(i)))
++                .map(|(m, c)| (m.clone(), c.clone()))
++                .collect()
++        })
++        .collect();
++    let mut meter = Meter::default();
++    meter.event(s.equations.iter().map(|r| r.len() as u64).sum(), l)?;
++    let projection = rank(&projected, &s.p, &mut meter, l)?;
++    let mut images = vec![];
++    for step in &projection.steps {
++        if step.pivot.is_none() {
++            images.push(encode(&combine(
++                &remaining,
++                &step.weights,
++                &s.p,
++                &mut meter,
++                l,
++            )?));
++        }
++    }
++    let baseline = rank(&original_input, &s.p, &mut meter, l)?;
++    let mut combined_gens = original_input;
++    for image in &images {
++        combined_gens.push(decode(image, s.raw.variables.len(), &s.p)?);
++    }
++    let combined = rank(&combined_gens, &s.p, &mut meter, l)?;
++    let out = Audit {
++        schema: "torus.rowspace-audit/v1".into(),
++        keep,
++        original_input_rows,
++        projection,
++        images,
++        baseline,
++        combined,
++        generator_meter: meter,
++    };
++    if serde_json::to_vec(&out).map_err(|e| e.to_string())?.len() > 32 << 20 {
++        return Err("Cap: serialized certificate".into());
++    }
+     Ok(out)
+ }
+ 
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/lib.rs:149:
+ #[cfg(test)]
+ mod tests {
+     #[test]
+-    fn exact_rank_and_adversarial_contracts() { super::controls::small_contracts().unwrap(); }
++    fn exact_rank_and_adversarial_contracts() {
++        super::controls::small_contracts().unwrap();
++    }
+ }
+ 
+Diff in /workspace/isogeny-labs/crypto-leased-affine-20261117/tools/torus-rowspace-audit/src/main.rs:1:
+ use std::path::Path;
+-fn main(){
+-    let args:Vec<_>=std::env::args().collect();
+-    let result=if args.get(1).is_some_and(|x|x=="--identity") {serde_json::to_string_pretty(&torus_rowspace_audit::controls::sources()).map(|s|println!("{s}")).map_err(|e|e.to_string())} else if let Some(out)=args.get(1){torus_rowspace_audit::controls::run(Path::new(out))} else {Err("expected NEW output directory or --identity".into())};
+-    if let Err(e)=result{eprintln!("{e}");std::process::exit(1);}
++fn main() {
++    let args: Vec<_> = std::env::args().collect();
++    let result = if args.get(1).is_some_and(|x| x == "--identity") {
++        serde_json::to_string_pretty(&torus_rowspace_audit::controls::sources())
++            .map(|s| println!("{s}"))
++            .map_err(|e| e.to_string())
++    } else if let Some(out) = args.get(1) {
++        torus_rowspace_audit::controls::run(Path::new(out))
++    } else {
++        Err("expected NEW output directory or --identity".into())
++    };
++    if let Err(e) = result {
++        eprintln!("{e}");
++        std::process::exit(1);
++    }
+ }
+ 

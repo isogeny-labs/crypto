@@ -1,0 +1,197 @@
+{
+ "schema": "crypto.wide_producer_engineering/v1",
+ "date": "2026-10-18",
+ "class": "engineering",
+ "claim": "no end-to-end S claim, no rho claim; wall time of two stages of the wide (64 < n <= 127) relation producer, same binary, interleaved A/B",
+ "binary_source": "examples/koblitz_orbit_dlp_fast.rs",
+ "n": 73,
+ "scan_ns_per_probe": [
+  {
+   "k": 40,
+   "states_cap": 40000,
+   "source": "benchmarks/20261018-wide-producer-engineering/scan_k40.json",
+   "arms": {
+    "control": {
+     "median": 416.974,
+     "min": 414.268,
+     "max": 424.665,
+     "repeats": 5,
+     "ratio_to_control": 1.0
+    },
+    "lazy_canon": {
+     "median": 209.88,
+     "min": 202.99,
+     "max": 223.131,
+     "repeats": 5,
+     "ratio_to_control": 0.503
+    },
+    "prefetch": {
+     "median": 401.731,
+     "min": 374.949,
+     "max": 456.492,
+     "repeats": 5,
+     "ratio_to_control": 0.963
+    },
+    "all_three": {
+     "median": 216.989,
+     "min": 204.471,
+     "max": 244.976,
+     "repeats": 5,
+     "ratio_to_control": 0.52
+    }
+   },
+   "hits": 0
+  },
+  {
+   "k": 300,
+   "states_cap": 20000,
+   "source": "benchmarks/20261018-wide-producer-engineering/scan_k300.json",
+   "arms": {
+    "control": {
+     "median": 614.454,
+     "min": 559.287,
+     "max": 684.566,
+     "repeats": 5,
+     "ratio_to_control": 1.0
+    },
+    "lazy_canon": {
+     "median": 366.982,
+     "min": 349.307,
+     "max": 416.867,
+     "repeats": 5,
+     "ratio_to_control": 0.597
+    },
+    "prefetch": {
+     "median": 434.748,
+     "min": 386.822,
+     "max": 485.768,
+     "repeats": 5,
+     "ratio_to_control": 0.708
+    },
+    "all_three": {
+     "median": 225.573,
+     "min": 216.695,
+     "max": 250.483,
+     "repeats": 5,
+     "ratio_to_control": 0.367
+    }
+   },
+   "hits": 0
+  },
+  {
+   "k": 600,
+   "states_cap": 20000,
+   "source": "benchmarks/20261018-wide-producer-engineering/scan_k600.json",
+   "arms": {
+    "control": {
+     "median": 621.597,
+     "min": 583.105,
+     "max": 653.488,
+     "repeats": 5,
+     "ratio_to_control": 1.0
+    },
+    "lazy_canon": {
+     "median": 382.683,
+     "min": 372.011,
+     "max": 433.082,
+     "repeats": 5,
+     "ratio_to_control": 0.616
+    },
+    "prefetch": {
+     "median": 441.592,
+     "min": 422.228,
+     "max": 459.511,
+     "repeats": 5,
+     "ratio_to_control": 0.71
+    },
+    "all_three": {
+     "median": 234.967,
+     "min": 223.425,
+     "max": 302.984,
+     "repeats": 5,
+     "ratio_to_control": 0.378
+    }
+   },
+   "hits": 0
+  }
+ ],
+ "scan_control": "KIC_LAZY_CANON=0 KIC_PREFETCH=0",
+ "scan_all_switches": "KIC_LAZY_CANON=1 KIC_PREFETCH=1 KIC_BLOCKED_BLOOM=1 (lazy + prefetch alone: 232.8 vs 226.7 at K=300, same set)",
+ "index_build_seconds": [
+  {
+   "k": 300,
+   "source": "benchmarks/20261018-wide-producer-engineering/index_k300.json",
+   "arms": {
+    "serial": {
+     "median": 14.596,
+     "min": 14.392,
+     "max": 15.815,
+     "repeats": 3,
+     "ratio_to_serial": 1.0
+    },
+    "batch_inv_1thread": {
+     "median": 8.506,
+     "min": 8.213,
+     "max": 12.451,
+     "repeats": 3,
+     "ratio_to_serial": 0.583
+    },
+    "threads_only": {
+     "median": 5.825,
+     "min": 5.789,
+     "max": 6.396,
+     "repeats": 3,
+     "ratio_to_serial": 0.399
+    },
+    "threads_batch_inv": {
+     "median": 5.557,
+     "min": 4.848,
+     "max": 5.855,
+     "repeats": 3,
+     "ratio_to_serial": 0.381
+    }
+   }
+  },
+  {
+   "k": 600,
+   "source": "benchmarks/20261018-wide-producer-engineering/index_k600.json",
+   "arms": {
+    "serial": {
+     "median": 66.377,
+     "min": 60.61,
+     "max": 72.144,
+     "repeats": 2,
+     "ratio_to_serial": 1.0
+    },
+    "threads_batch_inv": {
+     "median": 29.13,
+     "min": 28.594,
+     "max": 29.665,
+     "repeats": 2,
+     "ratio_to_serial": 0.439
+    }
+   }
+  }
+ ],
+ "index_equality": "KIC_VERIFY_INDEX identical at K=150 (1,642,500 states, 1,642,050 table entries) for 4 threads + batch, 3 threads, batch alone; unit test at n=73 and symmetric n=83",
+ "e2e_identity": {
+  "spec": "construct:69:0:60",
+  "source": "benchmarks/20261018-wide-producer-engineering/e2e_n69_k60.txt",
+  "arms": 6,
+  "all_identical_to_control": true,
+  "rank_relations": 60,
+  "targets_solved": 8
+ },
+ "host": "unisolated shared 4-vCPU Xeon 2.80 GHz KVM guest, no PMU, load 3 to 6",
+ "caveats": [
+  "hits are 0 in every timed scan; the hit path is covered by the n=69 end-to-end run and unit tests",
+  "index rows: 3 repeats (K=300), 2 repeats (K=600); no A/A control",
+  "scan covers 20,000 to 40,000 states from the start of the state order",
+  "the 18,398 s of the landed n=73 K=600 run is the rank-stage wall; the serial index build is about 66 s"
+ ],
+ "report": "docs/ic/perf/WIDE_PRODUCER_ENGINEERING_20261018.md",
+ "commits": [
+  "21dccf843",
+  "0f831d70b"
+ ]
+}

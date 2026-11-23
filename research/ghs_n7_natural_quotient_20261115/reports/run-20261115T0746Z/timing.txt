@@ -1,0 +1,48 @@
+   Compiling ghs-n7-natural-quotient v0.1.0 (/Volumes/SSD990-2/crypto-worktrees/ghs-n7-membership-run-20261114/research/ghs_n7_natural_quotient_20261115)
+warning: unused import: `BTreeMap`
+ --> src/main.rs:1:24
+  |
+1 | use std::collections::{BTreeMap, BTreeSet};
+  |                        ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `inv` and `absolute_trace` are never used
+  --> src/main.rs:59:8
+   |
+10 | impl Field {
+   | ---------- methods in this implementation
+...
+59 |     fn inv(self, a: u32) -> u32 {
+   |        ^^^
+...
+85 |     fn absolute_trace(self, mut x: u32) -> u32 {
+   |        ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `ghs-n7-natural-quotient` (bin "ghs-n7-natural-quotient") generated 2 warnings (run `cargo fix --bin "ghs-n7-natural-quotient" -p ghs-n7-natural-quotient` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 1.35s
+     Running `research/ghs_n7_natural_quotient_20261115/target/release/ghs-n7-natural-quotient`
+
+thread 'main' (2035246) panicked at src/main.rs:257:25:
+assertion failed: exact_second_order(field, q, p, gamma2)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+        1.55 real         0.01 user         0.02 sys
+             2113536  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                1664  page reclaims
+                 824  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   0  voluntary context switches
+                 732  involuntary context switches
+           371847339  instructions retired
+           174523421  cycles elapsed
+             1311104  peak memory footprint

@@ -1,0 +1,13 @@
+# Central dynamic replay admission
+
+Implemented after9493ddb passed587 focused tests (0 failures,7 ignored) and strict release Clippy. This increment has not yet compiled or run its tests.
+
+The central verify_cell path now selects dynamic replay after original frozen-plan/config provenance. Selection ORs original solver ID, strategy and reserved dynamic artifact identity. It requires original execution/capture bindings, uses strict six-slot identity validation, and distinguishes mathematical replay from custody-only raw prefixes. A registered witness or terminal cannot evade strict replay by removing prerequisites. Public and factor-base inputs are bounded and reconstructed independently of the private witness. Canonical signed domain, retained worker outcome and outer outcome are checked. Supervisor timeout/budget/failure shapes may omit the witness label but cannot promote it.
+
+Raw prefixes retain partial bytes without generic legacy equation parsing. Claimed known-answer or factor-base facts still trigger their own verification. Unregistered raw output does not acquire a mathematical label. Oversize trace-budget failure output is preserved as custody, not admitted to mathematical parsing as success. The independent replay resource policy is10b work,128MiB allocation,30s; it is separate from original producer limits and counters.
+
+The existing actual n47/m4 both-twist runtime fixture now exercises the inner file verifier using its synthetic attempt identity, including positive witness replay, supervisor-censored outcomes, missing manifest records, raw setup failure, and malformed registered terminal marked partial. It is explicitly NOT an end-to-end frozen-plan fixture. Original-run loading is performed by the outer function and still requires full frozen-run/CLI controls before profile registration. The six-slot identity mutation test is integrated from the previously passing isolated harness.
+
+Sources: mod.rs verify_cell/bound_run/admit_capture_context and worker finalization; execution.rs load/terminal_outcome; wide-prime artifact/censored/unproved claim helpers; dynamic original-input builder, independent verify_files, prior central draft/review and exact Rust identity controls. No mathematical algorithm change.
+
+Next: validate this source, add complete frozen-run controls with profile registration/dispatch and capability admission, connect dynamic begin-failure handling, retain wrapper return/finish failure controls, and run full release library before PR. Profile remains absent from DatasetPlan accepted solvers and CLI capabilities at this increment.

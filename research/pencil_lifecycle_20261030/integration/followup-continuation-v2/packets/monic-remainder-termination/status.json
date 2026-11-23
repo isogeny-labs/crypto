@@ -1,0 +1,181 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1196",
+  "kind": "monic_remainder_strict_descent_and_sufficient_fuel",
+  "main_declarations": 9,
+  "control_declarations": 8,
+  "checks": {
+    "descent2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "fuel1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "readback": [
+    {
+      "name": "MonicTermination.top_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTermination.last_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTermination.raw_length",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTermination.raw_top_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTermination.raw_last_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTermination.selected_shorter",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTermination.sufficient_fuel",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTermination.checked_total",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTermination.input_length_suffices",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTerminationControls.raw_cancellation",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTerminationControls.strict_first_step",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTerminationControls.strict_second_step",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTerminationControls.full_input_fuel",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTerminationControls.nonzero_terminal",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTerminationControls.constant_full_fuel",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTerminationControls.empty_input_zero_fuel",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "MonicTerminationControls.monicity_is_required",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "failed_attempts": [
+    "descent1"
+  ],
+  "failed_api_probe": [
+    "probe1"
+  ],
+  "assumptions": [
+    "prime 0<p<2^31",
+    "canonical divisor and input words",
+    "divisor last word is one"
+  ],
+  "derived_fuel_bound": "fuel >= input coefficient-list length",
+  "terminal_result": "empty remainder or remainder shorter than divisor",
+  "preserved": [
+    "canonical words",
+    "polynomial divisibility equivalence"
+  ],
+  "independent_source_fidelity_review": "pending",
+  "compiled_rust_equivalence": "not proved",
+  "quotient_and_instrumentation": "excluded",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "upstream_compiled_dependencies": "retained trust boundary"
+}

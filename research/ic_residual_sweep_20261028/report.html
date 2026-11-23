@@ -1,0 +1,85 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Residual sweep</title>
+<style>body{font-family:Helvetica,Arial,sans-serif;max-width:980px;margin:24px auto;color:#222;font-size:13px}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #ccc;padding:3px 6px;text-align:right}td:first-child,th:first-child{text-align:left}</style></head><body>
+<h1>Single-large-prime residual sweep (2026-10-28)</h1>
+<p>Lead <code>ICP-residual-partial-relations</code>. Every residual R - P_i of a target is stored by abscissa; a collision of two
+residuals is a base-only relation. Three sessions per size in one binary; all arms alternated within each session.</p>
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" viewBox="0 0 760 420" font-family="Helvetica,Arial,sans-serif" font-size="11">
+<rect width="760" height="420" fill="#fff"/>
+<text x="16" y="20" font-size="14" fill="#222">Counted S of the residual sweep against its base size B (log-log)</text>
+<text x="16" y="36" fill="#555">solid: sweep; dashed horizontal: pair-table incumbent at the same size; model S = c sqrt(2B)</text>
+<line x1="70" y1="370.0" x2="730" y2="370.0" stroke="#eee"/><text x="64" y="374.0" text-anchor="end" fill="#555">1</text>
+<line x1="70" y1="315.0" x2="730" y2="315.0" stroke="#eee"/><text x="64" y="319.0" text-anchor="end" fill="#555">2</text>
+<line x1="70" y1="260.0" x2="730" y2="260.0" stroke="#eee"/><text x="64" y="264.0" text-anchor="end" fill="#555">4</text>
+<line x1="70" y1="205.0" x2="730" y2="205.0" stroke="#eee"/><text x="64" y="209.0" text-anchor="end" fill="#555">8</text>
+<line x1="70" y1="150.0" x2="730" y2="150.0" stroke="#eee"/><text x="64" y="154.0" text-anchor="end" fill="#555">16</text>
+<line x1="70" y1="95.0" x2="730" y2="95.0" stroke="#eee"/><text x="64" y="99.0" text-anchor="end" fill="#555">32</text>
+<line x1="70" y1="40.0" x2="730" y2="40.0" stroke="#eee"/><text x="64" y="44.0" text-anchor="end" fill="#555">64</text>
+<text x="70.0" y="386" text-anchor="middle" fill="#555">2</text>
+<text x="180.0" y="386" text-anchor="middle" fill="#555">4</text>
+<text x="290.0" y="386" text-anchor="middle" fill="#555">8</text>
+<text x="400.0" y="386" text-anchor="middle" fill="#555">16</text>
+<text x="510.0" y="386" text-anchor="middle" fill="#555">32</text>
+<text x="620.0" y="386" text-anchor="middle" fill="#555">64</text>
+<text x="730.0" y="386" text-anchor="middle" fill="#555">128</text>
+<text x="400" y="410" text-anchor="middle" fill="#222">base abscissae B</text>
+<polyline fill="none" stroke="#2a6fdb" stroke-width="2" points="70.0,265.5 180.0,250.0 290.0,244.1 400.0,226.4 510.0,208.2 620.0,178.8 730.0,160.9"/>
+<line x1="70" y1="131.6" x2="730" y2="131.6" stroke="#2a6fdb" stroke-dasharray="5 4"/>
+<text x="732" y="164.9" fill="#2a6fdb">20-bit</text>
+<polyline fill="none" stroke="#1a9850" stroke-width="2" points="70.0,284.7 180.0,269.2 290.0,255.6 400.0,233.7 510.0,213.9 620.0,191.6 730.0,164.8"/>
+<line x1="70" y1="124.9" x2="730" y2="124.9" stroke="#1a9850" stroke-dasharray="5 4"/>
+<text x="732" y="168.8" fill="#1a9850">24-bit</text>
+<polyline fill="none" stroke="#d98c00" stroke-width="2" points="70.0,294.4 180.0,275.6 290.0,261.8 400.0,234.3 510.0,221.6 620.0,195.7 730.0,174.8"/>
+<line x1="70" y1="115.2" x2="730" y2="115.2" stroke="#d98c00" stroke-dasharray="5 4"/>
+<text x="732" y="178.8" fill="#d98c00">28-bit</text>
+<polyline fill="none" stroke="#c0392b" stroke-width="2" points="70.0,287.6 180.0,279.4 290.0,255.3 400.0,236.4 510.0,217.9 620.0,192.1 730.0,175.9"/>
+<line x1="70" y1="92.5" x2="730" y2="92.5" stroke="#c0392b" stroke-dasharray="5 4"/>
+<text x="732" y="179.9" fill="#c0392b">32-bit</text>
+</svg>
+
+<p>Slope of log2 S against log2 B per size (model: +0.5): 20-bit +0.32, 24-bit +0.36, 28-bit +0.36, 32-bit +0.36.<br>
+Slope of log2 S against curve bits at fixed base (model: 0 for the sweep): sweep-b2 -0.035, sweep-b4 -0.043, sweep-b8 -0.018, sweep-b16 -0.014, sweep-b32 -0.017, sweep-b64 -0.020, sweep-b128 -0.025, pair-table (base ~ r^(1/3)) +0.058.</p>
+<table><tr><th>bits</th><th>arm</th><th>verified</th><th>mean S</th><th>S / rho.negation</th><th>paired S vs pair-table</th>
+<th>residuals stored</th><th>table MB (est.)</th></tr><tr><td>20</td><td>rho-neg</td><td>36/36</td><td>1.14</td><td>1.0</td><td>nan</td><td>nan</td><td>nan</td></tr>
+<tr><td>20</td><td>rho-lanes16</td><td>36/36</td><td>1.40</td><td>1.2</td><td>nan</td><td>nan</td><td>nan</td></tr>
+<tr><td>20</td><td>pair-table-b128</td><td>36/36</td><td>20.17</td><td>17.7</td><td>1.000</td><td>nan</td><td>nan</td></tr>
+<tr><td>20</td><td>sweep-b2</td><td>36/36</td><td>3.73</td><td>3.3</td><td>0.180</td><td>2163</td><td>0.12</td></tr>
+<tr><td>20</td><td>sweep-b4</td><td>36/36</td><td>4.54</td><td>4.0</td><td>0.220</td><td>3111</td><td>0.17</td></tr>
+<tr><td>20</td><td>sweep-b8</td><td>36/36</td><td>4.89</td><td>4.3</td><td>0.238</td><td>3627</td><td>0.19</td></tr>
+<tr><td>20</td><td>sweep-b16</td><td>36/36</td><td>6.11</td><td>5.4</td><td>0.301</td><td>4904</td><td>0.26</td></tr>
+<tr><td>20</td><td>sweep-b32</td><td>36/36</td><td>7.69</td><td>6.8</td><td>0.379</td><td>6512</td><td>0.35</td></tr>
+<tr><td>20</td><td>sweep-b64</td><td>36/36</td><td>11.13</td><td>9.8</td><td>0.550</td><td>9931</td><td>0.53</td></tr>
+<tr><td>20</td><td>sweep-b128</td><td>36/36</td><td>13.95</td><td>12.3</td><td>0.688</td><td>12736</td><td>0.68</td></tr>
+<tr><td>24</td><td>rho-neg</td><td>36/36</td><td>1.03</td><td>1.0</td><td>nan</td><td>nan</td><td>nan</td></tr>
+<tr><td>24</td><td>rho-lanes16</td><td>36/36</td><td>1.47</td><td>1.4</td><td>nan</td><td>nan</td><td>nan</td></tr>
+<tr><td>24</td><td>pair-table-b256</td><td>36/36</td><td>21.96</td><td>21.4</td><td>1.000</td><td>nan</td><td>nan</td></tr>
+<tr><td>24</td><td>sweep-b2</td><td>36/36</td><td>2.93</td><td>2.9</td><td>0.130</td><td>8069</td><td>0.43</td></tr>
+<tr><td>24</td><td>sweep-b4</td><td>36/36</td><td>3.56</td><td>3.5</td><td>0.153</td><td>11120</td><td>0.59</td></tr>
+<tr><td>24</td><td>sweep-b8</td><td>36/36</td><td>4.23</td><td>4.1</td><td>0.186</td><td>14191</td><td>0.76</td></tr>
+<tr><td>24</td><td>sweep-b16</td><td>36/36</td><td>5.57</td><td>5.4</td><td>0.250</td><td>19613</td><td>1.05</td></tr>
+<tr><td>24</td><td>sweep-b32</td><td>36/36</td><td>7.15</td><td>7.0</td><td>0.317</td><td>25877</td><td>1.38</td></tr>
+<tr><td>24</td><td>sweep-b64</td><td>36/36</td><td>9.48</td><td>9.2</td><td>0.428</td><td>34955</td><td>1.87</td></tr>
+<tr><td>24</td><td>sweep-b128</td><td>36/36</td><td>13.28</td><td>12.9</td><td>0.598</td><td>49643</td><td>2.65</td></tr>
+<tr><td>28</td><td>rho-neg</td><td>36/36</td><td>1.03</td><td>1.0</td><td>nan</td><td>nan</td><td>nan</td></tr>
+<tr><td>28</td><td>rho-lanes16</td><td>36/36</td><td>1.16</td><td>1.1</td><td>nan</td><td>nan</td><td>nan</td></tr>
+<tr><td>28</td><td>pair-table-b512</td><td>36/36</td><td>24.80</td><td>24.1</td><td>1.000</td><td>nan</td><td>nan</td></tr>
+<tr><td>28</td><td>sweep-b2</td><td>36/36</td><td>2.59</td><td>2.5</td><td>0.098</td><td>32337</td><td>1.73</td></tr>
+<tr><td>28</td><td>sweep-b4</td><td>36/36</td><td>3.29</td><td>3.2</td><td>0.129</td><td>45871</td><td>2.45</td></tr>
+<tr><td>28</td><td>sweep-b8</td><td>36/36</td><td>3.91</td><td>3.8</td><td>0.155</td><td>58091</td><td>3.10</td></tr>
+<tr><td>28</td><td>sweep-b16</td><td>36/36</td><td>5.53</td><td>5.4</td><td>0.223</td><td>85152</td><td>4.55</td></tr>
+<tr><td>28</td><td>sweep-b32</td><td>36/36</td><td>6.49</td><td>6.3</td><td>0.257</td><td>101680</td><td>5.43</td></tr>
+<tr><td>28</td><td>sweep-b64</td><td>36/36</td><td>8.99</td><td>8.7</td><td>0.359</td><td>142517</td><td>7.61</td></tr>
+<tr><td>28</td><td>sweep-b128</td><td>36/36</td><td>11.70</td><td>11.4</td><td>0.469</td><td>186667</td><td>9.97</td></tr>
+<tr><td>32</td><td>rho-neg</td><td>36/36</td><td>1.02</td><td>1.0</td><td>nan</td><td>nan</td><td>nan</td></tr>
+<tr><td>32</td><td>rho-lanes16</td><td>36/36</td><td>1.06</td><td>1.0</td><td>nan</td><td>nan</td><td>nan</td></tr>
+<tr><td>32</td><td>pair-table-b1024</td><td>36/36</td><td>33.01</td><td>32.4</td><td>1.000</td><td>nan</td><td>nan</td></tr>
+<tr><td>32</td><td>sweep-b2</td><td>36/36</td><td>2.82</td><td>2.8</td><td>0.080</td><td>131737</td><td>7.04</td></tr>
+<tr><td>32</td><td>sweep-b4</td><td>36/36</td><td>3.13</td><td>3.1</td><td>0.092</td><td>162503</td><td>8.68</td></tr>
+<tr><td>32</td><td>sweep-b8</td><td>36/36</td><td>4.25</td><td>4.2</td><td>0.127</td><td>233776</td><td>12.48</td></tr>
+<tr><td>32</td><td>sweep-b16</td><td>36/36</td><td>5.38</td><td>5.3</td><td>0.162</td><td>305883</td><td>16.34</td></tr>
+<tr><td>32</td><td>sweep-b32</td><td>36/36</td><td>6.80</td><td>6.7</td><td>0.203</td><td>392427</td><td>20.96</td></tr>
+<tr><td>32</td><td>sweep-b64</td><td>36/36</td><td>9.41</td><td>9.2</td><td>0.282</td><td>548427</td><td>29.29</td></tr>
+<tr><td>32</td><td>sweep-b128</td><td>36/36</td><td>11.55</td><td>11.3</td><td>0.343</td><td>675776</td><td>36.09</td></tr></table>
+<h2>Findings</h2>
+<ul><li><b>The sweep beats the pair-table recipe in the counted unit, by a lot.</b> At 32 bits S is 2.82 at B = 2, 5.38 at B = 16 and 11.55 at B = 128, against 33.01 for the incumbent (B = 1024) and 1.02 for rho.negation: the distance to rho falls from 32.4x to 2.8x. Every one of the 1008 sweep runs verified.</li><li><b>Its cost is a square root, and it is cheapest where there is least index calculus.</b> At fixed B the S does not grow with the curve (slope of log2 S against bits: -0.035, -0.043, -0.018, -0.014, -0.017, -0.020, -0.025), i.e. the work is c*sqrt(r) additions; S grows with the base as B^0.35 (model 0.5), so the smallest base wins. At B = 2 the base is four points and the search is a birthday collision of aG + bQ values.</li><li><b>The memory is the price the unit does not see.</b> The residual table holds 131737 entries at 32 bits for B = 2 (7.0 MB) and 675776 for B = 128 (36 MB); it grows like sqrt(r B). rho.negation keeps O(1) memory. S counts group additions only.</li><li><b>What this is.</b> A real, verified reduction of the cost of an index-calculus-pipeline arm and of its distance to rho; also the cost profile of a baby-step/giant-step collision search with a small signed base. The owner's rule that relabelling is not an improvement applies: this PR therefore does not put the sweep on tables A-C of the leaderboard and leaves that decision to the owner.</li><li><b>Unpriced native work.</b> Each residual costs a hash insert or probe that S does not charge. Priced at 1 GAE per probe the band keeps every ordering (sweep below the pair table, rho below the sweep).</li></ul>
+</body></html>

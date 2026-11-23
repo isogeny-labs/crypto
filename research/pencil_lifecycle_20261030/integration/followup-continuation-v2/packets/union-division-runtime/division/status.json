@@ -1,0 +1,59 @@
+{
+  "schema": "formal-component-result/v1",
+  "component": "monic-pdiv-quotient-accumulation",
+  "machine_status": "passed",
+  "independent_review": "pending_publication",
+  "main_declarations": 17,
+  "controls": 9,
+  "readbacks": 26,
+  "acceptance": "acceptance.json",
+  "source": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs",
+    "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6"
+  },
+  "invariants": [
+    "coefficient overwrite law",
+    "fresh quotient slots",
+    "Q*B+R conservation",
+    "canonical word remainder",
+    "terminal empty or shorter remainder",
+    "strict remainder-length termination"
+  ],
+  "interfaces": [
+    "NativeDivision.checked_correct",
+    "NativeDivision.exact_iff_divisible",
+    "NativeDivision.quotient_unique",
+    "NativeDivision.returns_given_exact"
+  ],
+  "assumptions": [
+    "Fact p.toNat.Prime",
+    "0<p.toNat",
+    "p.toNat<2^31",
+    "Canon p a",
+    "Canon p b",
+    "b.getLast?=some 1",
+    "fuel >= a.length for total/exact completeness"
+  ],
+  "remaining_interfaces": [
+    "quotient-polynomial to native Vec allocation/writes/trim simulation",
+    "general nonmonic leading inverse",
+    "general pegcd invariants/termination",
+    "compiled equivalence and counters"
+  ],
+  "scientific_execution": false,
+  "repository_edits": false,
+  "failed_attempts": [
+    "write1 coefficient simplification",
+    "exact1 empty listPoly normalization",
+    "controls1 decidable ZMod inequality"
+  ],
+  "visual_inspection": {
+    "pages": [
+      1,
+      2
+    ],
+    "svg_embedded": true,
+    "result": "all pages and diagram inspected; legible without clipping"
+  },
+  "dependencies": "existing word remainder/termination/zero-test proof roots; transitive cache trusted"
+}

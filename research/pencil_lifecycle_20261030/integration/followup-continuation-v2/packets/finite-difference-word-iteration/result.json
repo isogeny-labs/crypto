@@ -1,0 +1,179 @@
+{
+  "schema": "research.word-iteration-construction/v1",
+  "status": "producer_checked_independent_review_pending",
+  "task": "T-1525",
+  "new_theorem_count": 9,
+  "named_control_count": 8,
+  "named_axiom_readbacks": 17,
+  "allowed_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "malformed_axiom_inventory_controls_rejected": 3,
+  "attempts": [
+    {
+      "status": "failed",
+      "error": "AssertionError({'module': 'WordIteration', 'argv': ['/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean', '-j1', '-M3500', '-s16384', '-o', '/var/tmp/word-iteration-lean-ba2c1rob/WordIteration.olean', '/var/tmp/word-iteration-lean-ba2c1rob/WordIteration.lean'], 'expected_exit': 0, 'exit': 1})",
+      "commands": [
+        {
+          "module": "Difference",
+          "argv": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M3500",
+            "-s16384",
+            "-o",
+            "/var/tmp/word-iteration-lean-ba2c1rob/Difference.olean",
+            "/var/tmp/word-iteration-lean-ba2c1rob/Difference.lean"
+          ],
+          "expected_exit": 0,
+          "exit": 0
+        },
+        {
+          "module": "WordIteration",
+          "argv": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M3500",
+            "-s16384",
+            "-o",
+            "/var/tmp/word-iteration-lean-ba2c1rob/WordIteration.olean",
+            "/var/tmp/word-iteration-lean-ba2c1rob/WordIteration.lean"
+          ],
+          "expected_exit": 0,
+          "exit": 1
+        }
+      ],
+      "elapsed_seconds": 17.04275629800395,
+      "dependency_count": 28797,
+      "source_revision": "T1525-attempt1",
+      "workspace": "/var/tmp/word-iteration-lean-ba2c1rob",
+      "runtime_execution": false,
+      "independent_binary_kernel_rechecker": false,
+      "trust": "Pinned precursor and shared mathlib/toolchain caches; pre/post inventories do not exclude transient concurrent changes."
+    },
+    {
+      "status": "passed",
+      "error": null,
+      "commands": [
+        {
+          "module": "Difference",
+          "argv": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M3500",
+            "-s16384",
+            "-o",
+            "/var/tmp/word-iteration-lean-wi8aniio/Difference.olean",
+            "/var/tmp/word-iteration-lean-wi8aniio/Difference.lean"
+          ],
+          "expected_exit": 0,
+          "exit": 0
+        },
+        {
+          "module": "WordIteration",
+          "argv": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M3500",
+            "-s16384",
+            "-o",
+            "/var/tmp/word-iteration-lean-wi8aniio/WordIteration.olean",
+            "/var/tmp/word-iteration-lean-wi8aniio/WordIteration.lean"
+          ],
+          "expected_exit": 0,
+          "exit": 0
+        },
+        {
+          "module": "Controls",
+          "argv": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M3500",
+            "-s16384",
+            "-o",
+            "/var/tmp/word-iteration-lean-wi8aniio/Controls.olean",
+            "/var/tmp/word-iteration-lean-wi8aniio/Controls.lean"
+          ],
+          "expected_exit": 0,
+          "exit": 0
+        },
+        {
+          "module": "Readback",
+          "argv": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M3500",
+            "-s16384",
+            "-o",
+            "/var/tmp/word-iteration-lean-wi8aniio/Readback.olean",
+            "/var/tmp/word-iteration-lean-wi8aniio/Readback.lean"
+          ],
+          "expected_exit": 0,
+          "exit": 0
+        },
+        {
+          "module": "ExpectedFailure",
+          "argv": [
+            "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+            "-j1",
+            "-M3500",
+            "-s16384",
+            "-o",
+            "/var/tmp/word-iteration-lean-wi8aniio/ExpectedFailure.olean",
+            "/var/tmp/word-iteration-lean-wi8aniio/ExpectedFailure.lean"
+          ],
+          "expected_exit": 1,
+          "exit": 1
+        }
+      ],
+      "elapsed_seconds": 14.25291314398055,
+      "dependency_count": 28797,
+      "source_revision": "T1525-attempt2",
+      "workspace": "/var/tmp/word-iteration-lean-wi8aniio",
+      "runtime_execution": false,
+      "independent_binary_kernel_rechecker": false,
+      "trust": "Pinned precursor and shared mathlib/toolchain caches; pre/post inventories do not exclude transient concurrent changes."
+    }
+  ],
+  "total_lean_invocations": 7,
+  "ordinary_validation_elapsed_seconds": 31.2956694419845,
+  "dependency_toolchain_count": 28797,
+  "dependency_inventory_matches_between_attempts_and_after_success": true,
+  "formal_model": "UInt64 state recurrence decoded to ZMod, arbitrary Nat iterations",
+  "premises": [
+    "0 < p.toNat",
+    "p.toNat <= 2^63",
+    "a,b,c,e,f canonical modulo p"
+  ],
+  "derived": [
+    "canonical state at every iteration",
+    "decoded state equals prior ring recurrence",
+    "closed quadratic/first-difference/linear values",
+    "ordered pre-update observations and common-fold equality",
+    "canonical word equality and zero correspondence",
+    "post-update state at p has initial decoded value"
+  ],
+  "limits": [
+    "No formal Rust array, iterator or compiler refinement",
+    "Canonical natural-value projection not separately named; equality/zero correspondence proved",
+    "No primality premise required for recurrence; original full-sieve preconditions remain separate",
+    "Inherited shared dependency caches and Lean kernel trust; inventory cannot exclude transient concurrent writes"
+  ],
+  "source_pins": {
+    "snapshot/Controls.lean.txt": "4bdf73de042635af6e115c48a0eca65e4cfc83c3fc56f2ed49bb2754517f7711",
+    "snapshot/Difference.lean.txt": "d475d7f1b724d6d27fff478b25433331ad76bf422e8b236ff7bfdec871f89b42",
+    "snapshot/ExpectedFailure.lean.txt": "20cce0f8b42941b154ea9774577460748384e791fbb266b3ac8c1e0c3d4bfb3f",
+    "snapshot/Readback.lean.txt": "de8df3286ef8684a3d3ef788961f17a5ef2cb4134ab9217d78a59e7d9ea95c9d",
+    "snapshot/WordIteration.lean.txt": "51cef3539b371165a910d8c3167d57f01d40ac1e5f9598bbc448c457006bbf6d",
+    "snapshot/lean-workspace.txt": "ec30d02856b48726541a9e17e1c0cf2406a71393d0afd06b2bb279ebaed41b6a"
+  },
+  "native_source_sha256": "061f4f9f45d261b61af3482509ca5f09e03964abc670765852922d20f946bbd1",
+  "archive": {
+    "sha256": "73f69a6752a8b1ef40ceee2d12763ad85f43e6c0bfadf55e83cbc1432d166a17",
+    "bytes": 4167983
+  },
+  "scientific_execution": false,
+  "independent_review": null
+}

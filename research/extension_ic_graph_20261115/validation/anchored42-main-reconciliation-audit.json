@@ -1,0 +1,650 @@
+{
+  "schema": "crypto.shared-merge-audit/v1",
+  "ours_commit": "5f23671d2c3123832adf6d6b7146cb9e24f521f5",
+  "main_commit": "80a76623de94a7e5d0213333e0715ca04fa8fbf4",
+  "original_sha256": {
+    "2026-11-16.md.base": "7ce29984c2091eb135eb3bce67696c425cf662f477d8bf8f77477bea7f05b4d0",
+    "2026-11-16.md.main": "33bafa505341c993b7fedcb9f3647dec4f84519d85ebac23ed84dfc4f7401b1e",
+    "2026-11-16.md.ours": "48464999ca384207099933e31c778a2b2a0c0c3ea168cd57060925ca79a1c38f",
+    "RESUME.md.base": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "RESUME.md.main": "75ab72c54ecc211f6bafe352fc1ce6644431d0844cb23c023d05c524428df44c",
+    "RESUME.md.ours": "16d434ad65504b928c4186e07638dfd4a2a2d8535f6d28756e0d897ec1354764",
+    "ledger.jsonl.base": "7a83c97a3abed3556436eb00dad26284e580766e271208069455cc24608156a8",
+    "ledger.jsonl.main": "4c3259ac7efe1e5f34c25f330e23fd414a7ae33be988ef198b20e823bdf9372b",
+    "ledger.jsonl.ours": "8f54a0fec048a34d19e4b5c6e1b09eaa3df64c0f10bab89cd9b344423f0038c0"
+  },
+  "journal": {
+    "input_blocks": {
+      "ours": 1162,
+      "main": 1121
+    },
+    "output_blocks": 1315,
+    "full_normalized_multiset_max": true,
+    "output_sha256": "17d1aa2990523392cfd3f2be879a47edd7bd930c37320c2ef384ab7adc3090e5",
+    "normalization": "rstrip each line; strip blank edges; retain all full block content; recognize fenced code; preserve maximal multiplicities"
+  },
+  "resume": {
+    "feature_unchanged_from_merge_base": true,
+    "automatic_git_merge_preserved_verbatim": true,
+    "automatic_merge_sha256": "75ab72c54ecc211f6bafe352fc1ce6644431d0844cb23c023d05c524428df44c",
+    "output_sha256": "08d5763dcb314b7204e8cd025b86636c49f4e88bbfb89c376949642b4430df30"
+  },
+  "integration": {
+    "full_main_merge_aborted": true,
+    "reason": "Incoming main removes mandatory PCC/keyring/accounting/AGENTS source files; preserve source-bound native component baseline and reconcile shared metadata only. No unrelated source restoration/change.",
+    "required_source_deletions": "D\t.artifacts/config.json\nD\t.gitattributes\nD\tAGENTS.md\nD\tpcc/keyring.json\nD\tsrc/cryptanalysis/bitops.rs\nD\ttools/pcc/pcc.py\n",
+    "original_forks_preserved_in_immutable_git_history": true
+  },
+  "ledger": {
+    "input_entries": {
+      "ours": 1249,
+      "main": 1222
+    },
+    "output_entries_before_note": 1255,
+    "main_exact_byte_prefix": true,
+    "all_event_payload_multiplicities_retained": true,
+    "chain_and_prefix_errors": [],
+    "divergent_original_entry_mapping": [
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:44Z",
+          "body": {
+            "claim_id": "PCC-20261116-07f0b2",
+            "claim_sha256": "f82d4fd64b039b8b809cbfe297a9dd3a71ea9ea8398f7bc9d6802f0cea6dd7e6",
+            "path": "pcc/claims/PCC-20261116-07f0b2.json"
+          },
+          "hash": "56b27c58cb80d6cd9d5d4628ade23f1ee54cdd350193a491c5c40e3721197995",
+          "prev": "242e98ad23570695bb37984d395974c61873babf1310147b6980bdc4b5ac2dee",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1216,
+          "type": "claim"
+        },
+        "canonical_seq": 1222,
+        "canonical_hash": "511718ae8e1db5ced0baf8123b3f89c5834e1a2c2d69db302f107e03f189677b"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:44Z",
+          "body": {
+            "claim_id": "PCC-20261116-6dce0f",
+            "claim_sha256": "12d1426088ca3f5610851304d408ba42034ded740f35f4d60a6134702c699174",
+            "path": "pcc/claims/PCC-20261116-6dce0f.json"
+          },
+          "hash": "e46e7dab61990a56b3db6571d868d7afaf6f4e4b99f06928b36c50933d561d01",
+          "prev": "56b27c58cb80d6cd9d5d4628ade23f1ee54cdd350193a491c5c40e3721197995",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1217,
+          "type": "claim"
+        },
+        "canonical_seq": 1223,
+        "canonical_hash": "d087f06643d3ae1993d0863ab1dc577ee6c28b7c77474d01e05bbbf4853013d6"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:44Z",
+          "body": {
+            "claim_id": "PCC-20261116-79db33",
+            "claim_sha256": "6e80429e0370bb2e40e7e7588c678733cdb3b2a7e217d10a2b8984f9903d60e5",
+            "path": "pcc/claims/PCC-20261116-79db33.json"
+          },
+          "hash": "620197c8ba5c20390476382758b39d62a49cd9fe08363476fb7857bfeb80f67a",
+          "prev": "e46e7dab61990a56b3db6571d868d7afaf6f4e4b99f06928b36c50933d561d01",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1218,
+          "type": "claim"
+        },
+        "canonical_seq": 1224,
+        "canonical_hash": "c54a0503aaf046b723ebce85a6c0b561374368c8375387c157db9e20c14279a9"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:44Z",
+          "body": {
+            "claim_id": "PCC-20261116-0e87ec",
+            "claim_sha256": "a962c66ecb4dffb297f49a44c491f26b02876b9cfb53e3108456d4d4815c93a2",
+            "path": "pcc/claims/PCC-20261116-0e87ec.json"
+          },
+          "hash": "44c265660de62432476980cca9dbbfad22ba833247492af317568e65b82860ca",
+          "prev": "620197c8ba5c20390476382758b39d62a49cd9fe08363476fb7857bfeb80f67a",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1219,
+          "type": "claim"
+        },
+        "canonical_seq": 1225,
+        "canonical_hash": "ca7f1e3ef015fb5aeeb62c87f08d97e408553f39aaaebb1da2fd6c6787ef8a44"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-007ffe",
+            "claim_sha256": "2f77dd47f1bdc16a05ad7a09fce522d0d9689bc087949c61e68ba31aea33a6f7",
+            "path": "pcc/claims/PCC-20261116-007ffe.json"
+          },
+          "hash": "f81035c7ffa3e7354038db66f1542e8f5be32cfb950b7e1fc289fa3ea18773bf",
+          "prev": "44c265660de62432476980cca9dbbfad22ba833247492af317568e65b82860ca",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1220,
+          "type": "claim"
+        },
+        "canonical_seq": 1226,
+        "canonical_hash": "c8998edc5289e58d914484d6185bb02b3c0f8c80baf717828dfa8294fbd43c74"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-f276fb",
+            "claim_sha256": "3a2fd0417ff0f6dd6f62084e6b43ef95acf51330877c1224e613e04f1f472834",
+            "path": "pcc/claims/PCC-20261116-f276fb.json"
+          },
+          "hash": "4ccf97a9dcad34eb9067c06ec05e33f80a666db59406190fec1bf9b034e32c28",
+          "prev": "f81035c7ffa3e7354038db66f1542e8f5be32cfb950b7e1fc289fa3ea18773bf",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1221,
+          "type": "claim"
+        },
+        "canonical_seq": 1227,
+        "canonical_hash": "b56872c0bdb521bc19c61934f3d690dfff7baaefc34563c456de78eeabad1adb"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-b60806",
+            "claim_sha256": "6e0a54229c8c445eee58594aaba70234af1b6819731e8df95f2b9272a5fe3eb4",
+            "path": "pcc/claims/PCC-20261116-b60806.json"
+          },
+          "hash": "fe94a76583e1347feb8cb96929124fd3dbfb7912123f156ec4c3e36d1ed56f2e",
+          "prev": "4ccf97a9dcad34eb9067c06ec05e33f80a666db59406190fec1bf9b034e32c28",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1222,
+          "type": "claim"
+        },
+        "canonical_seq": 1228,
+        "canonical_hash": "102ca463ae06da1f6436e50fc923ff11dfd8e490904c4d228d17106e1ece26f0"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-5199cc",
+            "claim_sha256": "bbd900c8b17d6a3d7d03f813ca4de792382e7ab4197962684e86acae304544e3",
+            "path": "pcc/claims/PCC-20261116-5199cc.json"
+          },
+          "hash": "bb97e170e0e25acd131cbc2e7dc75bb339fe5d38bb40ca4ea0c9ee83efd7539f",
+          "prev": "fe94a76583e1347feb8cb96929124fd3dbfb7912123f156ec4c3e36d1ed56f2e",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1223,
+          "type": "claim"
+        },
+        "canonical_seq": 1229,
+        "canonical_hash": "7ed35cf6bf36d9d18631f6907a8d0bec7a11edf63e752f83bc9d05ff8ebc71e5"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-fc956d",
+            "claim_sha256": "17f53217a2fbd3daa4dce22a583cb5cda2f7a840a48554be8fa06a2c8e76af01",
+            "path": "pcc/claims/PCC-20261116-fc956d.json"
+          },
+          "hash": "33093227c5a5009c34f7b15409b69eac3f14825aadf8bcc6ae70a2888f09478f",
+          "prev": "bb97e170e0e25acd131cbc2e7dc75bb339fe5d38bb40ca4ea0c9ee83efd7539f",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1224,
+          "type": "claim"
+        },
+        "canonical_seq": 1230,
+        "canonical_hash": "997a6afbe47a94637b36223faad464d1f1cd59e904b15a79520d32c5fc2d204a"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-c57d97",
+            "claim_sha256": "46566a8f80cfc3b551bf9625c0e898c3a32dc6c4d515fe0ad82dda62bf2ae486",
+            "path": "pcc/claims/PCC-20261116-c57d97.json"
+          },
+          "hash": "5d7dc539a584103c99a4b9e75afa6c7f00b85ac20a3faca05629d93901dcde40",
+          "prev": "33093227c5a5009c34f7b15409b69eac3f14825aadf8bcc6ae70a2888f09478f",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1225,
+          "type": "claim"
+        },
+        "canonical_seq": 1231,
+        "canonical_hash": "42062693555464a49b7a763cd353956cc9818391f621d2ae03e9ea7ab0d47fef"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-8b685e",
+            "claim_sha256": "666b2a7679f450b6027ab9bf2c0cb26277bf3b33b7289957968fd944a5388033",
+            "path": "pcc/claims/PCC-20261116-8b685e.json"
+          },
+          "hash": "bb1b87a69d33c977f1e6d020bd04df845192a0cfcf107f0d2f5b325c31c27369",
+          "prev": "5d7dc539a584103c99a4b9e75afa6c7f00b85ac20a3faca05629d93901dcde40",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1226,
+          "type": "claim"
+        },
+        "canonical_seq": 1232,
+        "canonical_hash": "9f4a7d03b7b65537c3dadb4c81a71f2dcdbb122098b831bc91f15e47a1b399fe"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-3c284f",
+            "claim_sha256": "1403e47863eac2a7ca965ad8c31bc2acc1f8f1f5eba7a456d9b49ae0780e4817",
+            "path": "pcc/claims/PCC-20261116-3c284f.json"
+          },
+          "hash": "c9df10b8ddc92e9ccd325728aef04543780de086a6dee8e357d01079cd09a71f",
+          "prev": "bb1b87a69d33c977f1e6d020bd04df845192a0cfcf107f0d2f5b325c31c27369",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1227,
+          "type": "claim"
+        },
+        "canonical_seq": 1233,
+        "canonical_hash": "900f5d9d7c6867ca8cf335ce06276660b5c632cea86be3d9d6dddc4d4577223c"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-6489ba",
+            "claim_sha256": "ad54d390fc9f6b7c9a6fac632f5f9511733ac0d16d38dd2a27e7253ee9fabd57",
+            "path": "pcc/claims/PCC-20261116-6489ba.json"
+          },
+          "hash": "a15e187be5fc997c8ced014c80f9f25e62816aae27c501c5219b51bcd2c3ab54",
+          "prev": "c9df10b8ddc92e9ccd325728aef04543780de086a6dee8e357d01079cd09a71f",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1228,
+          "type": "claim"
+        },
+        "canonical_seq": 1234,
+        "canonical_hash": "13d9418b680c316ab9ffade4794867e234ea3ab1cf40783518cbb81fcdbf1367"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-7e4f97",
+            "claim_sha256": "ba40b30565c5d79114b9858064176ab18e26786b3f0c5757b641e18855ce5ca2",
+            "path": "pcc/claims/PCC-20261116-7e4f97.json"
+          },
+          "hash": "0746098bdca14c498c771a6e7d55013bc3ffe622d6cd237b555a9e3524a19d55",
+          "prev": "a15e187be5fc997c8ced014c80f9f25e62816aae27c501c5219b51bcd2c3ab54",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1229,
+          "type": "claim"
+        },
+        "canonical_seq": 1235,
+        "canonical_hash": "1abcaba67654df34d3b9ddd4385d356963c431265dfa50dc22e08d97f7b4928f"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-421bad",
+            "claim_sha256": "62cc851460e44dbabc7a1e011d9a6642e8e6fa46274bd1ae57f5e00440498521",
+            "path": "pcc/claims/PCC-20261116-421bad.json"
+          },
+          "hash": "014646eef841a6eacca4db005d83cb00d26231d28f4c91b01604f3c22a0aa847",
+          "prev": "0746098bdca14c498c771a6e7d55013bc3ffe622d6cd237b555a9e3524a19d55",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1230,
+          "type": "claim"
+        },
+        "canonical_seq": 1236,
+        "canonical_hash": "dea5342a801de4fa476ecdc37286433f59dab500ab51285206ad9bf4c42233f8"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-3cbd79",
+            "claim_sha256": "e9e1713aebdf31e126cef7bac6a3496a993082ce3ef95e2be9b3a27d3c05c394",
+            "path": "pcc/claims/PCC-20261116-3cbd79.json"
+          },
+          "hash": "9d76c58aa83cb03cbd41c0eb76c888f9798ae7de503efa7a20201f06fd7547c9",
+          "prev": "014646eef841a6eacca4db005d83cb00d26231d28f4c91b01604f3c22a0aa847",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1231,
+          "type": "claim"
+        },
+        "canonical_seq": 1237,
+        "canonical_hash": "b563ae63b16e9447cf7e8b7f8bf652b53f991ece9f215709c134e1517f226480"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-77059a",
+            "claim_sha256": "813bc89961aaa7711af077fd5d1a80088c0da8b22fe6881a81b26d8027759bac",
+            "path": "pcc/claims/PCC-20261116-77059a.json"
+          },
+          "hash": "2f8d8d72fe7d55bfd0e3b938ea4e16ead313e99408423d4ae6478ab8aea617c1",
+          "prev": "9d76c58aa83cb03cbd41c0eb76c888f9798ae7de503efa7a20201f06fd7547c9",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1232,
+          "type": "claim"
+        },
+        "canonical_seq": 1238,
+        "canonical_hash": "fb59636b2cd6071fab0b7f58a0146281c5fb16db8eac1c155cd6c11bf8cfe858"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-cca062",
+            "claim_sha256": "8e1416975cb34e5f34335068a45e7c57f04dfeb083d01198b1123edf4fa3b58a",
+            "path": "pcc/claims/PCC-20261116-cca062.json"
+          },
+          "hash": "9c188fabbaa2432e60fe495528645e3e10ad5723a1640b0841d3df054ad76903",
+          "prev": "2f8d8d72fe7d55bfd0e3b938ea4e16ead313e99408423d4ae6478ab8aea617c1",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1233,
+          "type": "claim"
+        },
+        "canonical_seq": 1239,
+        "canonical_hash": "94bbe269bd9ffdf446f5e63e688e1b16481b60f09ab46a4a3ce1bce193954548"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-7fa174",
+            "claim_sha256": "8dd9902e043d1b1c613c252dd1b34132e132d3c91172e9f4311991f3c3bd6332",
+            "path": "pcc/claims/PCC-20261116-7fa174.json"
+          },
+          "hash": "202d141b6c0cd13ef97a72f2dca869f5bcc4fef30f33281439d26e15d9dffd2f",
+          "prev": "9c188fabbaa2432e60fe495528645e3e10ad5723a1640b0841d3df054ad76903",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1234,
+          "type": "claim"
+        },
+        "canonical_seq": 1240,
+        "canonical_hash": "835e58bfd38ba9eb707de97be9420ae8b8c3eb9a99fdeededa326396976b7666"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-1fe548",
+            "claim_sha256": "67ae5b65b6b46a6cf7d2a6e8a1ebd3dae2fea91688818d693353b2b5ab7034ef",
+            "path": "pcc/claims/PCC-20261116-1fe548.json"
+          },
+          "hash": "7fe929790c816a334beafca193638ef6de79978e95655f69945dbb35a6a40e5f",
+          "prev": "202d141b6c0cd13ef97a72f2dca869f5bcc4fef30f33281439d26e15d9dffd2f",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1235,
+          "type": "claim"
+        },
+        "canonical_seq": 1241,
+        "canonical_hash": "875fdba5e37085de84759e4b2b6bcd95c996ea67a4ef9114926c46117e91fdb2"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-2ed91b",
+            "claim_sha256": "4ac9c7a4c0d2f0949736dd65d302ed9921c15c2a6112353b50a269b494b81d0d",
+            "path": "pcc/claims/PCC-20261116-2ed91b.json"
+          },
+          "hash": "fe859bf43548b73ce68d87b7439314ed96f53f9e59b884353c46da02ebf37d52",
+          "prev": "7fe929790c816a334beafca193638ef6de79978e95655f69945dbb35a6a40e5f",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1236,
+          "type": "claim"
+        },
+        "canonical_seq": 1242,
+        "canonical_hash": "22751f33f4ce3bbcd9553079b21f4d6c275526152420c389c3046ad89caa52ec"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-8e1cab",
+            "claim_sha256": "7a15189597060ed9ea1e36130313dfa29f7b8c62136bb077c84929b1bf89c732",
+            "path": "pcc/claims/PCC-20261116-8e1cab.json"
+          },
+          "hash": "d8b089db61d40bdbceb6f5e98252d62b669f39bd85b9df3aa2c26d1241f621b2",
+          "prev": "fe859bf43548b73ce68d87b7439314ed96f53f9e59b884353c46da02ebf37d52",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1237,
+          "type": "claim"
+        },
+        "canonical_seq": 1243,
+        "canonical_hash": "becae72b17dafcf4cb979107e7dac6e2f7634c696a687dfcaf05cc67be14b534"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-7d680e",
+            "claim_sha256": "f9039931ce637f43ccf1986eb65072d3231e2c5efe3d1bc72e93ede717b7bfe4",
+            "path": "pcc/claims/PCC-20261116-7d680e.json"
+          },
+          "hash": "3eb75d187afa1a51d35eca8578132bf074c826fb92a52ec9559f68fddee9ce3e",
+          "prev": "d8b089db61d40bdbceb6f5e98252d62b669f39bd85b9df3aa2c26d1241f621b2",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1238,
+          "type": "claim"
+        },
+        "canonical_seq": 1244,
+        "canonical_hash": "db968d9d94721e657227ce344b8572e039127f649664ec6da3cec5502acdd3ad"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-c04e84",
+            "claim_sha256": "6a989a7bd9397508070ce1b9538202bfc3fd2f26f7ceb9fda4e81a3c6e72370e",
+            "path": "pcc/claims/PCC-20261116-c04e84.json"
+          },
+          "hash": "c7cce97f516226ce5f074fc2d0f2fd7c9c20eec1c3692c41bb50aec38b7f477f",
+          "prev": "3eb75d187afa1a51d35eca8578132bf074c826fb92a52ec9559f68fddee9ce3e",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1239,
+          "type": "claim"
+        },
+        "canonical_seq": 1245,
+        "canonical_hash": "4ceff1098879ec033ffc68e20e16b3f5b936eb6e2ce2b7a31be917d99d2086ac"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-fa3def",
+            "claim_sha256": "bb97d2a570d145c9f492a507899f0eb1ed00c65b8e4c6489cbc286c018bf2578",
+            "path": "pcc/claims/PCC-20261116-fa3def.json"
+          },
+          "hash": "cfd22f53ce83b127939a9e14612291cf65c9cf7f312c385e5944fc4110b2431e",
+          "prev": "c7cce97f516226ce5f074fc2d0f2fd7c9c20eec1c3692c41bb50aec38b7f477f",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1240,
+          "type": "claim"
+        },
+        "canonical_seq": 1246,
+        "canonical_hash": "f2718dabd68806c6d685f5b78b77719a539d7178d8fa3e60ba00a8358555f9d5"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-c26441",
+            "claim_sha256": "80404f194941fc96320921fb108dc77fa242533eeb4c72a1b72fd9278dd9c671",
+            "path": "pcc/claims/PCC-20261116-c26441.json"
+          },
+          "hash": "24df35a6b360c28bdec467579774d1e43eb9d85348fa85e6d750b8372eb552a7",
+          "prev": "cfd22f53ce83b127939a9e14612291cf65c9cf7f312c385e5944fc4110b2431e",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1241,
+          "type": "claim"
+        },
+        "canonical_seq": 1247,
+        "canonical_hash": "25ed97d568ee48a3204ba2c2e02b988210c999b5d15cf7a9353ceebc2a78d52a"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-0b939e",
+            "claim_sha256": "bf1b0e1b45fc525a82d46f0d30be2ae1b43bd9e286119f1ea84464334f349e0d",
+            "path": "pcc/claims/PCC-20261116-0b939e.json"
+          },
+          "hash": "3de4ff2bc21e57f1260532c055dedca24cbc4ecb495e89d15e6a63fc86efdc12",
+          "prev": "24df35a6b360c28bdec467579774d1e43eb9d85348fa85e6d750b8372eb552a7",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1242,
+          "type": "claim"
+        },
+        "canonical_seq": 1248,
+        "canonical_hash": "aaebfc80976af0d36aaab739db7238453553f46449bbfb6a6c036d10ca0eea2e"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-d04cee",
+            "claim_sha256": "2b87119d058da293ad635d9ed6de73d8b494413d86edcfda8151a9282dddd548",
+            "path": "pcc/claims/PCC-20261116-d04cee.json"
+          },
+          "hash": "1dc2d14f5a00d559d2a1b82496d3264a2651d859fb4fe8833a771ee680d90c6a",
+          "prev": "3de4ff2bc21e57f1260532c055dedca24cbc4ecb495e89d15e6a63fc86efdc12",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1243,
+          "type": "claim"
+        },
+        "canonical_seq": 1249,
+        "canonical_hash": "55035e84dac90f48a646f32eda7bb31648a25a6e60da4be59acf66ee7fbb21a2"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "claim_id": "PCC-20261116-7d4d7e",
+            "claim_sha256": "5b9d5bcb132626fba5e4040ca5b9c86531a029ce7539cd9ec9dc72bcf67d6e30",
+            "path": "pcc/claims/PCC-20261116-7d4d7e.json"
+          },
+          "hash": "340ad0221754bcdc5c2379f8fe7b96f96c3995b32de532534e9625699ee54138",
+          "prev": "1dc2d14f5a00d559d2a1b82496d3264a2651d859fb4fe8833a771ee680d90c6a",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1244,
+          "type": "claim"
+        },
+        "canonical_seq": 1250,
+        "canonical_hash": "00f447e661ca26d93b22403abdbfc24ee1ffaba09a244885dab537a919dffb80"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:57:45Z",
+          "body": {
+            "audit_path": "research/extension_ic_graph_20261115/validation/pipeline41-main-reconciliation-audit.json",
+            "audit_sha256": "ebf119cc6d57bf4ff7b314df54d3eb50cf992937bafc3ca2ae638bf4f8635d3b",
+            "event": "merge-fork-reconciliation",
+            "main_commit": "90ea6cb42434698be3fac9d2d012a579f298b961",
+            "ours_commit": "3e5404182ad9be901761ff53d0ea35ad706318f5",
+            "policy": "Exact incoming-main prefix; missing feature payload occurrences appended through official API with unchanged body/signature; original envelope provenance in audit and both merge parents. No new verdict or bypass."
+          },
+          "hash": "72dd242902c04056664291844303f3f8d9196759c85365f7fa59ce206170b4d7",
+          "prev": "340ad0221754bcdc5c2379f8fe7b96f96c3995b32de532534e9625699ee54138",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1245,
+          "type": "note"
+        },
+        "canonical_seq": 1251,
+        "canonical_hash": "667d9978898d40c7163ac5fc4b8f7fc57a2f047350ae2caa03f1d5aa17faaa2d"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:58:38Z",
+          "body": {
+            "audit_path": "research/extension_ic_graph_20261115/validation/pipeline41-main-reconciliation-finalization.json",
+            "audit_sha256": "e2b3dc656613f6c0740fee9e3e1665804defde900879dcb0599d6e85bae7914f",
+            "detail": "Quoted complete handoffs retain recoverable original bytes including pre-existing main markers; journal trailing whitespace normalized without content loss. Prior audit remains immutable.",
+            "event": "merge-handoff-format-finalization"
+          },
+          "hash": "43fe503efba1a0ace472f7504755dc4d36a0e746662bc1a1e21cfbfcfdd0c719",
+          "prev": "72dd242902c04056664291844303f3f8d9196759c85365f7fa59ce206170b4d7",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1246,
+          "type": "note"
+        },
+        "canonical_seq": 1252,
+        "canonical_hash": "0ed63b48042c79380f080559ebf29b4463bbb7226670773e07e098a08c634619"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T22:59:21Z",
+          "body": {
+            "audit_path": "research/extension_ic_graph_20261115/validation/pipeline41-main-reconciliation-quotation.json",
+            "audit_sha256": "dae51e97fca2a4ac918bfa12f68caa7a95f2b470ba046e126c3190e4c5b8fd86",
+            "detail": "Blank quoted lines use > without trailing space; both original handoffs recover byte-for-byte. Earlier audit snapshots retained.",
+            "event": "merge-quotation-whitespace-finalization"
+          },
+          "hash": "99b9eb20024ff13e799db54e8669a100ebd0b511cbf420ea93e06497efc5c2b7",
+          "prev": "43fe503efba1a0ace472f7504755dc4d36a0e746662bc1a1e21cfbfcfdd0c719",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1247,
+          "type": "note"
+        },
+        "canonical_seq": 1253,
+        "canonical_hash": "d7c9fa9a4177c63e923788f66621c62bcb9943b9100913b444929fb90ece91f6"
+      },
+      {
+        "action": "official-api-replay",
+        "original_entry": {
+          "at": "2026-11-16T23:32:14Z",
+          "body": {
+            "claim_id": "PCC-20261116-69b00b",
+            "claim_sha256": "94cad1cff551eeba64626eb2c23518c80625fb133d34ad4647ca00ab78b5f9b7",
+            "path": "pcc/claims/PCC-20261116-69b00b.json"
+          },
+          "hash": "9a2eb3da18c4013ae450ddfec48135e6dba61bee64c599f7644aa291e68174c2",
+          "prev": "99b9eb20024ff13e799db54e8669a100ebd0b511cbf420ea93e06497efc5c2b7",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1248,
+          "type": "claim"
+        },
+        "canonical_seq": 1254,
+        "canonical_hash": "35cca98f6b06bf49eaaa11cca9fc33fbdebfb295e2b415e231d468adbecc0527"
+      }
+    ],
+    "original_forks_preserved_in_immutable_git_history": true
+  }
+}

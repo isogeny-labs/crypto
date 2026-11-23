@@ -1,0 +1,235 @@
+{
+  "schema": "crypto.engineering-validation/v1",
+  "date": "2026-10-27",
+  "scope": "Experiment queue controller development; fake service observations, no live cryptographic or EKS experiment",
+  "base_commit": "5e4e6fb994d6a69d16f75adcbbf0989b8895d9ff",
+  "canonical_schema_commit": "6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad",
+  "go_version": "go1.23.10 linux/amd64",
+  "native_tests": {
+    "command": "EXPERIMENT_SCHEMAS=/workspace/crypto-autoresearcher/schemas EXPERIMENT_PROTOCOL_FIXTURE=/workspace/crypto-autoresearcher/examples/experiment-protocol/ecbench-l2-smoke-subset/protocol.json EXPSPEC_BIN=/tmp/nist-expspec GOCACHE=/workspace/.cache/nist-go GOMODCACHE=/workspace/.cache/nist-go-mod /workspace/.tools/go123/bin/go test -race -json ./...",
+    "working_directory": "tools/experiment-queue",
+    "status": "passed",
+    "top_level": 16,
+    "subtests": 13,
+    "finished_at": "2026-10-27T00:59:30.400135879Z",
+    "events": "native-test-events.jsonl",
+    "cases": [
+      "TestNativeBenchmarkExportMatchesCanonicalSchema",
+      "TestPublisherReturnsOneScopedCommitAndPR",
+      "TestCodeBuildCommandBridgeAndUIDFailure/complete",
+      "TestCodeBuildCommandBridgeAndUIDFailure/changed-job-uid",
+      "TestCodeBuildCommandBridgeAndUIDFailure",
+      "TestSelectionProgressAndUnclaimedPlanRefusal",
+      "TestIdentityStableForNotesButNotWorkload",
+      "TestManifestRejectsTraversalDuplicateAndMalformed",
+      "TestReadRejectsSymlinkOutsideCheckout",
+      "TestDiscoveryHonorsApprovalFreezeAndBounds/image",
+      "TestDiscoveryHonorsApprovalFreezeAndBounds/time",
+      "TestDiscoveryHonorsApprovalFreezeAndBounds/CPU",
+      "TestDiscoveryHonorsApprovalFreezeAndBounds/output_escape",
+      "TestDiscoveryHonorsApprovalFreezeAndBounds/unhashed_verifier",
+      "TestDiscoveryHonorsApprovalFreezeAndBounds/draft",
+      "TestDiscoveryHonorsApprovalFreezeAndBounds",
+      "TestUnapprovedRecordDoesNotRun",
+      "TestConcurrentClaimsOnlyOneLauncher",
+      "TestCollectVerifiesIdentityAndPayloads",
+      "TestCollectExistingClaimNeverStartsAgain",
+      "TestAmbiguousStartNeverRetries",
+      "TestCollectRejectsClaimedClockAndSource/clock",
+      "TestCollectRejectsClaimedClockAndSource/source",
+      "TestCollectRejectsClaimedClockAndSource",
+      "TestPendingAndAmbiguousDoNotCreateResultBranch",
+      "TestWorkerLiteralArgvVerifierFailureAndBadHash/success",
+      "TestWorkerLiteralArgvVerifierFailureAndBadHash/verifier-failed",
+      "TestWorkerLiteralArgvVerifierFailureAndBadHash/wrong-runtime",
+      "TestWorkerLiteralArgvVerifierFailureAndBadHash"
+    ],
+    "fixtures": "Fake GitHub HTTP and AWS/MCP services, canonical protocol fixture, native expspec validator. Local HTTP test listeners need sandbox network permission."
+  },
+  "other_checks": [
+    {
+      "command": "go vet ./...",
+      "directory": "tools/experiment-queue",
+      "status": "passed"
+    },
+    {
+      "command": "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath",
+      "directory": "tools/experiment-queue",
+      "status": "passed"
+    },
+    {
+      "command": "gofmt -l tools/experiment-queue",
+      "status": "passed"
+    },
+    {
+      "command": "bash -n tools/experiment-queue/worker.sh tools/experiment-queue/remote.sh",
+      "status": "passed"
+    },
+    {
+      "command": "/workspace/.tools/actionlint -shellcheck= .github/workflows/experiment-queue.yml",
+      "status": "passed"
+    },
+    {
+      "command": "python3 -B scripts/test_workflows_parse.py -v",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "command": "python3 -B .github/scripts/check-pr-budgets.py",
+      "status": "failed_unrelated_existing_workflow",
+      "violations": 3,
+      "workflow": ".github/workflows/phase-paired-native.yml",
+      "job": "replay",
+      "events": [
+        "pull_request/opened",
+        "pull_request/synchronize",
+        "pull_request/reopened"
+      ],
+      "new_workflow_violations": 0
+    },
+    {
+      "command": "python3 tools/artifacts/wire_workflows.py --check .github/workflows/experiment-queue.yml",
+      "status": "not_completed",
+      "reason": "Stopped a broad sparse manifest enumeration after several minutes of promisor fetches. Changed-file artifact policy is checked separately; no claim of a full wiring pass."
+    },
+    {
+      "command": "python3 tools/artifacts/artifacts.py check 5e4e6fb994d6a69d16f75adcbbf0989b8895d9ff HEAD",
+      "status": "passed",
+      "scope": "Queue implementation additions",
+      "diagnostics": "changed-artifact-policy.log"
+    },
+    {
+      "command": "python3 tools/artifacts/artifacts.py check \"$(git merge-base origin/main HEAD)\" HEAD",
+      "status": "failed_existing_pr_data",
+      "diagnostics": "full-pr-artifact-diagnostics.txt",
+      "files": [
+        {
+          "path": "benchmarks/20261026-r12-rho-ns-per-step/ns_per_step.png",
+          "bytes": 73654
+        },
+        {
+          "path": "research/r12_rho_ns_per_step_20261026/data/ecbench_records.jsonl.gz",
+          "bytes": 138855
+        }
+      ],
+      "unchanged_since": "5e4e6fb994d6a69d16f75adcbbf0989b8895d9ff",
+      "reason": "These predate the queue implementation; no private object-store publication was performed by this session."
+    },
+    {
+      "command": "Local Markdown link and recorded-source hash inspection",
+      "status": "passed",
+      "local_links": 10,
+      "source_hashes": 14
+    }
+  ],
+  "dry_run": {
+    "status": "passed",
+    "claimed": false,
+    "selected": 0,
+    "nist": {
+      "record": "experiments/queue/EXP-NIST-FILTER-001.json",
+      "reason": "registration blocked: The definition is in PR #2668. Publish the R06/R08 checkpoint inputs, build and hash an Isolab-compatible task image, and file an explicit prospective EKS/storage/budget amendment and committed approval before ready promotion. The existing local nonpreemptible protocol is not silently converted to Spot."
+    },
+    "inventory_blockers": 46
+  },
+  "live_qualification": {
+    "status": "not_performed",
+    "eks_jobs_submitted": 0,
+    "reason": "Current managed environment reports no outbound identity, capabilities, secrets or runtime variables.",
+    "repository_variable_inventory": "Not verified: Actions variables API returned HTTP 403 Resource not accessible by integration.",
+    "remaining": [
+      "Merge reviewed workflow to main",
+      "Verify repository variables, runner availability and OIDC trust for isogeny-labs/crypto main",
+      "Qualify CodeBuild buildspec override and both adapters with approved real task images/inputs",
+      "Preserve NIST blocked status until inputs, image, prospective protocol amendment and committed approval are ready",
+      "Configure EXPERIMENT_PROTOCOL_READ_TOKEN with contents-read access to the private canonical protocol repository"
+    ],
+    "resumable_protocol_adapter": "not_implemented; explicitly rejected, separate Isolab resumable contract required"
+  },
+  "source_files": [
+    {
+      "path": "tools/experiment-queue/coverage.go",
+      "sha256": "b44aa02be22089408a3e17c8d5ee9ccf7c3f16171f11eeb16eb7da8d82ffed25"
+    },
+    {
+      "path": "tools/experiment-queue/export.go",
+      "sha256": "5a0b5fae27682285aef53b0a0aeee07e5338bcdf69dfb36dd06dc6fb96188a3d"
+    },
+    {
+      "path": "tools/experiment-queue/github.go",
+      "sha256": "4d739c46f73c598cbe87767fd4ff855c480826abe5a3ed75f51f1fe9ee0dc6ab"
+    },
+    {
+      "path": "tools/experiment-queue/hydrate.go",
+      "sha256": "47e31ae202357b93e2ea81abfb62783cc61e6e82d8f303afbaf386ba1c12167d"
+    },
+    {
+      "path": "tools/experiment-queue/integration_test.go",
+      "sha256": "d65e0dc7374ae2a3c83b292362902541852ce60b0757b814b91d64bb3f4cdd73"
+    },
+    {
+      "path": "tools/experiment-queue/main.go",
+      "sha256": "7b82b0bc93f6fdadc9734c301298ff08edbf5efd826d7d68580deb1a742806b3"
+    },
+    {
+      "path": "tools/experiment-queue/plan.go",
+      "sha256": "93ab497ed2404b168256e449a318b604e59caf049c342dc8f1fe0dcbb7db9cc3"
+    },
+    {
+      "path": "tools/experiment-queue/queue_test.go",
+      "sha256": "efd4e506ace653a870c3b6a3848747796702bc228bd645d59aa99464155d3f90"
+    },
+    {
+      "path": "tools/experiment-queue/remote.sh",
+      "sha256": "bdc8e19b4c9e7ac0e5cd581e330e658805dd52bd2c7bf270962f1f2fe9f789cb"
+    },
+    {
+      "path": "tools/experiment-queue/run.go",
+      "sha256": "9921b5573b6d795080856a376f3acf7641e4935c9bc5b954bd8ebfbda5bfd036"
+    },
+    {
+      "path": "tools/experiment-queue/worker.sh",
+      "sha256": "6cd6b3d3d6e6e5c956e2382543be447f0da4ccaf8d89d3ea0babeb9bbe8dc00d"
+    },
+    {
+      "path": "tools/experiment-queue/go.mod",
+      "sha256": "62c98d7623c2b66faf81cff6551b244e92ade6e0c14eec4f6cc72b95aa5ea907"
+    },
+    {
+      "path": "tools/experiment-queue/go.sum",
+      "sha256": "b04027f10ac06055870ba27e08158f00bb45f5255a8f64de14ca4d4be82b209b"
+    },
+    {
+      "path": ".github/workflows/experiment-queue.yml",
+      "sha256": "90b7e33e693caeff16d4f439138978cd3d0ebb898abbfb0f359b37004499020f"
+    }
+  ],
+  "implementation_commit": "e17b4380c51b6cecc9351534c951ad23d5fd8651",
+  "root_library": {
+    "command": "cargo test --release --lib",
+    "status": "stopped_after_observed_unrelated_failures",
+    "planned_tests": 5015,
+    "full_suite_completed": false,
+    "compilation": "Succeeded after restoring four small tracked include fixtures from the sparse checkout",
+    "diagnostics": "root-validation-diagnostics.txt",
+    "reproduced": [
+      {
+        "test": "cryptanalysis::ecbench::bounds::tests::a_bound_on_one_size_is_stratified_by_workload",
+        "result": "failed",
+        "reason": "Tracked audit-prime.json runtime fixture not materialized"
+      },
+      {
+        "test": "cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity",
+        "result": "failed",
+        "reason": "Assertion zero.legacy_comparison_id.is_none()"
+      },
+      {
+        "test": "cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians",
+        "result": "failed",
+        "reason": "method ic.hyperelliptic has no parameter branches"
+      }
+    ],
+    "source_unchanged_from_queue_parent": true,
+    "scope": "No claim that full library checks pass; these diagnostics do not replace missing full-suite validation."
+  }
+}

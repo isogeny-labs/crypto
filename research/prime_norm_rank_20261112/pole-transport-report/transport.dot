@@ -1,0 +1,20 @@
+digraph G {
+ graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.35", fontname="Helvetica"];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4fc", color="#365a7c", fontname="Helvetica", fontsize=11];
+ edge [fontname="Helvetica", fontsize=10, color="#365a7c"];
+ source [label="Actual original norm / membership model\nSame public curve and target; weighted core coefficients"];
+ unit [label="Explicit inverse pair: e*l = 1\nCompose with l^2*X; no finite-field evaluation shortcut"];
+ norm [label="Actual norm scales by e^12\nTarget factor by e^2; support quotient by e^10"];
+ remainder [label="Every Dickson depth: d = 2^(n+1)\nActual full remainder scales by e^d"];
+ coefficient [label="Coefficient j: exact normalization e^(d-2j)\nPCC-20261114-9e7aa6 (unsigned)",fillcolor="#e7f2e7"];
+ graded [label="Graded-polynomial / initial-form interpretation\nStronger constant vanishing still separate",fillcolor="#fff2d6",color="#a87926"];
+ zero [label="e = 0 endpoint\nSeparate special-fiber theorem; no inverse pair",fillcolor="#f2f2f2"];
+ solver [label="Weighted closure / normal-form degree bound\nGrowing-family expected bit cost",fillcolor="#fff2d6",color="#a87926"];
+ source -> unit;
+ unit -> norm;
+ norm -> remainder [label="actual division uniqueness"];
+ remainder -> coefficient [label="actual polynomial coefficients"];
+ coefficient -> graded [style=dashed,color="#a87926"];
+ graded -> zero [style=dashed,color="#a87926",label="not transport of a solution"];
+ graded -> solver [style=dashed,color="#a87926"];
+}

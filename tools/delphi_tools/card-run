@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Delphi tool: run a linted frozen task card (tools/task_card.py run).
+# Argument: repo-relative card path (research/....yaml).
+# The resume-checkpoint gate must pass first (AGENTS.md "Resume checkpoints").
+set -euo pipefail
+
+[ $# -eq 1 ] || { echo "usage: card-run research/<card>.yaml" >&2; exit 2; }
+[[ $1 =~ ^research/[A-Za-z0-9_./-]+\.yaml$ ]] || { echo "card-run: bad card path" >&2; exit 2; }
+
+root=${DELPHI_TOOLS_ROOT:-$(git rev-parse --show-toplevel)}
+cd "$root"
+
+if [ "${DELPHI_TOOLS_SKIP_GATE:-}" = 1 ]; then
+  echo "card-run: DELPHI_TOOLS_SKIP_GATE=1, checkpoint gate skipped" >&2
+else
+  scripts/checkpoint.sh gate >&2
+fi
+exec python3 tools/task_card.py run "$1"

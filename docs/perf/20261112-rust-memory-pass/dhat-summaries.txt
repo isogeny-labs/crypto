@@ -1,0 +1,336 @@
+=== base rho-neg24
+Total:     773,492 bytes in 2,010 blocks
+At t-gmax: 348,349 bytes in 756 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=773492 total_blocks=2010 short<500instr: blocks=668 bytes=10891; short<100k instr: blocks=1146 bytes=297256
+-- by count
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+206	3296	avg_life=464997	<clap_builder::builder::arg::Arg>::value_names::<clap_builder::builder::str::Str, [clap_builder::builder::str:
+93	16936	avg_life=559031	<ecbench::Cmd as clap_builder::derive::Subcommand>::augment_subcommands
+90	2880	avg_life=1150	crypto_lib::cryptanalysis::ecbench::isolation::parse_interrupts
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+70	736	avg_life=927	<u8 as core::fmt::LowerHex>::fmt
+52	41088	avg_life=6698	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+-- by bytes
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+4	131264	avg_life=2511	__alloc_dir
+15	122464	avg_life=313754	<clap_builder::builder::command::Command>::subcommand_internal
+2	51323	avg_life=719286	crypto_lib::cryptanalysis::ic_boundary::rho_search_from::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve, 
+52	41088	avg_life=6698	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+93	16936	avg_life=559031	<ecbench::Cmd as clap_builder::derive::Subcommand>::augment_subcommands
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+
+=== base rho-neg32
+Total:     774,456 bytes in 2,013 blocks
+At t-gmax: 348,349 bytes in 756 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=774456 total_blocks=2013 short<500instr: blocks=667 bytes=10985; short<100k instr: blocks=1147 bytes=297060
+-- by count
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+206	3296	avg_life=464997	<clap_builder::builder::arg::Arg>::value_names::<clap_builder::builder::str::Str, [clap_builder::builder::str:
+93	16936	avg_life=559031	<ecbench::Cmd as clap_builder::derive::Subcommand>::augment_subcommands
+90	2880	avg_life=1150	crypto_lib::cryptanalysis::ecbench::isolation::parse_interrupts
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+70	736	avg_life=941	<u8 as core::fmt::LowerHex>::fmt
+52	41048	avg_life=6412	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+-- by bytes
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+4	131264	avg_life=2449	__alloc_dir
+15	122464	avg_life=313754	<clap_builder::builder::command::Command>::subcommand_internal
+2	51323	avg_life=27267127	crypto_lib::cryptanalysis::ic_boundary::rho_search_from::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve, 
+52	41048	avg_life=6412	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+93	16936	avg_life=559031	<ecbench::Cmd as clap_builder::derive::Subcommand>::augment_subcommands
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+
+=== base kangaroo32
+Total:     813,242 bytes in 1,969 blocks
+At t-gmax: 348,349 bytes in 756 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=813242 total_blocks=1969 short<500instr: blocks=665 bytes=10921; short<100k instr: blocks=1123 bytes=291001
+-- by count
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+206	3296	avg_life=464997	<clap_builder::builder::arg::Arg>::value_names::<clap_builder::builder::str::Str, [clap_builder::builder::str:
+93	16936	avg_life=559031	<ecbench::Cmd as clap_builder::derive::Subcommand>::augment_subcommands
+90	2880	avg_life=1150	crypto_lib::cryptanalysis::ecbench::isolation::parse_interrupts
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+70	736	avg_life=941	<u8 as core::fmt::LowerHex>::fmt
+52	41088	avg_life=6561	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+-- by bytes
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+4	131264	avg_life=2509	__alloc_dir
+15	122464	avg_life=313754	<clap_builder::builder::command::Command>::subcommand_internal
+14	100338	avg_life=37256474	crypto_lib::cryptanalysis::ecbench::generic::kangaroo_with::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurv
+52	41088	avg_life=6561	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+93	16936	avg_life=559031	<ecbench::Cmd as clap_builder::derive::Subcommand>::augment_subcommands
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+
+=== base bsgs32
+Total:     2,938,786 bytes in 1,950 blocks
+At t-gmax: 2,238,883 bytes in 65 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=2938786 total_blocks=1950 short<500instr: blocks=667 bytes=10985; short<100k instr: blocks=1119 bytes=290350
+-- by count
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+206	3296	avg_life=464997	<clap_builder::builder::arg::Arg>::value_names::<clap_builder::builder::str::Str, [clap_builder::builder::str:
+93	16936	avg_life=559031	<ecbench::Cmd as clap_builder::derive::Subcommand>::augment_subcommands
+90	2880	avg_life=1150	crypto_lib::cryptanalysis::ecbench::isolation::parse_interrupts
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+70	736	avg_life=941	<u8 as core::fmt::LowerHex>::fmt
+52	41044	avg_life=6411	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+-- by bytes
+1	2228240	avg_life=43578200	crypto_lib::cryptanalysis::ecbench::generic::bsgs_textbook::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurv
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+4	131264	avg_life=2439	__alloc_dir
+15	122464	avg_life=313754	<clap_builder::builder::command::Command>::subcommand_internal
+52	41044	avg_life=6411	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+93	16936	avg_life=559031	<ecbench::Cmd as clap_builder::derive::Subcommand>::augment_subcommands
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+
+=== base ic-igauss32
+Total:     154,488,145 bytes in 4,000 blocks
+At t-gmax: 115,867,255 bytes in 541 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=154488145 total_blocks=4000 short<500instr: blocks=846 bytes=13817; short<100k instr: blocks=1943 bytes=327485
+-- by count
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+370	5920	avg_life=176170	<serde_json::de::Deserializer<serde_json::read::StrRead>>::parse_any_number
+311	124234	avg_life=3658622137	crypto_lib::cryptanalysis::ic_boundary::prime_factor_base
+240	151222221	avg_life=1609685503	crypto_lib::cryptanalysis::ic_boundary::collect_and_solve_relations_scaled_touching::<crypto_lib::cryptanalysi
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+214	2965	avg_life=333517	<serde_json::de::MapAccess<serde_json::read::StrRead> as serde_core::de::MapAccess>::next_key_seed::<core::mar
+206	3296	avg_life=464997	<clap_builder::builder::arg::Arg>::value_names::<clap_builder::builder::str::Str, [clap_builder::builder::str:
+199	26016	avg_life=63577834	<crypto_lib::cryptanalysis::ic_boundary::IncrementalGauss>::add_row
+-- by bytes
+240	151222221	avg_life=1609685503	crypto_lib::cryptanalysis::ic_boundary::collect_and_solve_relations_scaled_touching::<crypto_lib::cryptanalysi
+2	2230288	avg_life=2131746313	<crypto_lib::cryptanalysis::ic_boundary::PairTable>::build_negation_folded::<crypto_lib::cryptanalysis::ic_bou
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+4	131264	avg_life=2506	__alloc_dir
+311	124234	avg_life=3658622137	crypto_lib::cryptanalysis::ic_boundary::prime_factor_base
+15	122464	avg_life=313754	<clap_builder::builder::command::Command>::subcommand_internal
+15	74669	avg_life=2547572052	crypto_lib::cryptanalysis::ic_framework::run_pipeline_with_base::<crypto_lib::cryptanalysis::ic_boundary::Prim
+52	41076	avg_life=6423	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+
+=== base rf-mitm-prime
+Total:     1,089,011 bytes in 3,201 blocks
+At t-gmax: 348,349 bytes in 756 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=1089011 total_blocks=3201 short<500instr: blocks=707 bytes=11779; short<100k instr: blocks=1492 bytes=324011
+-- by count
+558	8928	avg_life=141	num_bigint::biguint::monty::montgomery
+370	5920	avg_life=175699	<serde_json::de::Deserializer<serde_json::read::StrRead>>::parse_any_number
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+214	2965	avg_life=332898	<serde_json::de::MapAccess<serde_json::read::StrRead> as serde_core::de::MapAccess>::next_key_seed::<core::mar
+206	3296	avg_life=464997	<clap_builder::builder::arg::Arg>::value_names::<clap_builder::builder::str::Str, [clap_builder::builder::str:
+93	16936	avg_life=559031	<ecbench::Cmd as clap_builder::derive::Subcommand>::augment_subcommands
+90	2880	avg_life=1150	crypto_lib::cryptanalysis::ecbench::isolation::parse_interrupts
+85	11065	avg_life=70216636	<crypto_lib::cryptanalysis::ic_framework::linalg::StructuredGauss as crypto_lib::cryptanalysis::ic_boundary::R
+-- by bytes
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+81	160981	avg_life=14117613	crypto_lib::cryptanalysis::ic_boundary::collect_and_solve_relations_scaled_touching::<crypto_lib::cryptanalysi
+4	131264	avg_life=2465	__alloc_dir
+15	122464	avg_life=313754	<clap_builder::builder::command::Command>::subcommand_internal
+15	74676	avg_life=199737244	crypto_lib::cryptanalysis::ic_framework::run_pipeline_with_base::<crypto_lib::cryptanalysis::ic_boundary::Prim
+52	41056	avg_life=6277	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+2	35088	avg_life=155032424	<crypto_lib::cryptanalysis::ic_boundary::PairTable>::build_negation_folded::<crypto_lib::cryptanalysis::ic_bou
+38	24208	avg_life=324032	<<serde_json::value::Value as serde_core::de::Deserialize>::deserialize::ValueVisitor as serde_core::de::Visit
+
+=== base rf-mitm-k19
+Total:     1,040,729 bytes in 3,414 blocks
+At t-gmax: 348,349 bytes in 756 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=1040729 total_blocks=3414 short<500instr: blocks=536 bytes=8874; short<100k instr: blocks=1735 bytes=401551
+-- by count
+372	5952	avg_life=258085	<serde_json::de::Deserializer<serde_json::read::StrRead>>::parse_any_number
+218	16498	avg_life=538867	<clap_builder::builder::styled_str::StyledStr as core::convert::From<&str>>::from
+216	3000	avg_life=481287	<serde_json::de::MapAccess<serde_json::read::StrRead> as serde_core::de::MapAccess>::next_key_seed::<core::mar
+206	3296	avg_life=464997	<clap_builder::builder::arg::Arg>::value_names::<clap_builder::builder::str::Str, [clap_builder::builder::str:
+198	1584	avg_life=174	<crypto_lib::binary_ecc::f2m::F2mElement>::to_biguint
+166	3984	avg_life=7645	<crypto_lib::binary_ecc::f2m::F2mElement>::flt_inverse
+140	1472	avg_life=1443	<u8 as core::fmt::LowerHex>::fmt
+139	15736	avg_life=66775	crypto_lib::cryptanalysis::koblitz_index_calculus::finish_negation_only_factor_base
+-- by bytes
+78	300000	avg_life=408622	<clap_builder::builder::command::Command>::arg_internal
+4	131264	avg_life=2511	__alloc_dir
+15	122464	avg_life=313754	<clap_builder::builder::command::Command>::subcommand_internal
+1	73744	avg_life=12236991	crypto_lib::cryptanalysis::ic_boundary::collect_and_solve_relations_touching::<crypto_lib::cryptanalysis::ic_b
+40	56320	avg_life=21110	crypto_lib::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base
+52	41088	avg_life=6285	std::io::default_read_to_end::small_probe_read::<std::fs::File>
+2	35096	avg_life=6836815	<crypto_lib::cryptanalysis::ic_boundary::PairTable>::build_negation_folded::<crypto_lib::cryptanalysis::ic_bou
+38	24208	avg_life=467490	<<serde_json::value::Value as serde_core::de::Deserialize>::deserialize::ValueVisitor as serde_core::de::Visit
+
+=== base da-f4-k13
+Total:     38,736,742 bytes in 205,752 blocks
+At t-gmax: 459,482 bytes in 1,847 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=38736742 total_blocks=205752 short<500instr: blocks=35593 bytes=1617068; short<100k instr: blocks=109825 bytes=19149232
+-- by count
+65932	4347408	avg_life=361180	<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>::mul_mono
+34874	3051376	avg_life=537	crypto_lib::cryptanalysis::pq_groebner_f2::sort_masks_descending
+33830	1368128	avg_life=428336	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::pack
+21580	12126688	avg_life=76566	crypto_lib::cryptanalysis::pq_f4_f2::groebner_basis_f4
+10703	1516960	avg_life=584	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::unpack
+9816	5498472	avg_life=110339	<crypto_lib::cryptanalysis::pq_f4_f2::State>::insert_core
+7182	596550	avg_life=2034541	<crypto_lib::cryptanalysis::ic_framework::solvers::F4F2 as crypto_lib::cryptanalysis::ic_framework::stages::Sy
+4850	1021328	avg_life=871941	<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>::from_monos
+-- by bytes
+21580	12126688	avg_life=76566	crypto_lib::cryptanalysis::pq_f4_f2::groebner_basis_f4
+9816	5498472	avg_life=110339	<crypto_lib::cryptanalysis::pq_f4_f2::State>::insert_core
+65932	4347408	avg_life=361180	<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>::mul_mono
+261	4276224	avg_life=218205	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::from_monomials::<alloc::vec::Vec<u64>>
+34874	3051376	avg_life=537	crypto_lib::cryptanalysis::pq_groebner_f2::sort_masks_descending
+897	2107560	avg_life=243792	crypto_lib::cryptanalysis::pq_f4_f2::echelon_block_tables
+10703	1516960	avg_life=584	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::unpack
+33830	1368128	avg_life=428336	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::pack
+
+=== base tensor12
+Total:     2,129,766,847 bytes in 32,757,506 blocks
+At t-gmax: 1,556,423 bytes in 13,054 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=2129766847 total_blocks=32757506 short<500instr: blocks=6394432 bytes=154142638; short<100k instr: blocks=15522004 bytes=412552815
+-- by count
+20687875	1826101670	avg_life=10547823	<ecdl_tensor_ic::tensor::SparseContractor as ecdl_tensor_ic::tensor::Counter>::count
+6694543	151597208	avg_life=47801	ecdl_tensor_ic::opcount::bump
+3331808	83295200	avg_life=1884650	<ecdl_tensor_ic::curve::Curve>::encode_point
+1965414	49135350	avg_life=172	ecdl_tensor_ic::relation::relation_network::{closure#3}
+41330	14878800	avg_life=493	<ecdl_tensor_ic::tensor::Vertex>::edges
+29280	1899906	avg_life=216537187	<ecdl_tensor_ic::tensor::SupportVertex>::new
+2196	398391	avg_life=180447749	ecdl_tensor_ic::relation::relation_network
+1194	170645	avg_life=2714234831	<ecdl_tensor_ic::solver::Solver>::solve_with_stats
+-- by bytes
+20687875	1826101670	avg_life=10547823	<ecdl_tensor_ic::tensor::SparseContractor as ecdl_tensor_ic::tensor::Counter>::count
+6694543	151597208	avg_life=47801	ecdl_tensor_ic::opcount::bump
+3331808	83295200	avg_life=1884650	<ecdl_tensor_ic::curve::Curve>::encode_point
+1965414	49135350	avg_life=172	ecdl_tensor_ic::relation::relation_network::{closure#3}
+41330	14878800	avg_life=493	<ecdl_tensor_ic::tensor::Vertex>::edges
+29280	1899906	avg_life=216537187	<ecdl_tensor_ic::tensor::SupportVertex>::new
+732	767136	avg_life=216566769	ecdl_tensor_ic::relation::relation_network::{closure#1}
+2196	398391	avg_life=180447749	ecdl_tensor_ic::relation::relation_network
+
+=== f1 da-f4-k13
+Total:     31,535,140 bytes in 125,616 blocks
+At t-gmax: 459,482 bytes in 1,847 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=31535140 total_blocks=125616 short<500instr: blocks=8283 bytes=368148; short<100k instr: blocks=29689 bytes=11947632
+-- by count
+33830	1368128	avg_life=417000	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::pack
+32966	2173704	avg_life=691296	<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>::mul_mono
+21580	12126688	avg_life=72570	crypto_lib::cryptanalysis::pq_f4_f2::groebner_basis_f4
+9816	5498472	avg_life=104684	<crypto_lib::cryptanalysis::pq_f4_f2::State>::insert_core
+7182	596550	avg_life=1939945	<crypto_lib::cryptanalysis::ic_framework::solvers::F4F2 as crypto_lib::cryptanalysis::ic_framework::stages::Sy
+4550	125190	avg_life=2727984	<crypto_lib::cryptanalysis::ic_framework::stages::SolverTotals>::absorb
+3257	561776	avg_life=1230906	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::unpack
+2999	485992	avg_life=615706	<crypto_lib::cryptanalysis::pq_descent_symbolic::FieldBoolPoly>::split
+-- by bytes
+21580	12126688	avg_life=72570	crypto_lib::cryptanalysis::pq_f4_f2::groebner_basis_f4
+9816	5498472	avg_life=104684	<crypto_lib::cryptanalysis::pq_f4_f2::State>::insert_core
+261	4276224	avg_life=212621	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::from_monomials::<alloc::vec::Vec<u64>>
+32966	2173704	avg_life=691296	<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>::mul_mono
+897	2107560	avg_life=234941	crypto_lib::cryptanalysis::pq_f4_f2::echelon_block_tables
+33830	1368128	avg_life=417000	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::pack
+7182	596550	avg_life=1939945	<crypto_lib::cryptanalysis::ic_framework::solvers::F4F2 as crypto_lib::cryptanalysis::ic_framework::stages::Sy
+3257	561776	avg_life=1230906	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::unpack
+
+=== f2 da-f4-k13
+Total:     28,880,888 bytes in 115,774 blocks
+At t-gmax: 475,466 bytes in 1,851 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=28880888 total_blocks=115774 short<500instr: blocks=8283 bytes=368148; short<100k instr: blocks=21480 bytes=9200848
+-- by count
+33830	1368128	avg_life=412103	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::pack
+32966	2173704	avg_life=687248	<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>::mul_mono
+17988	10276080	avg_life=87359	crypto_lib::cryptanalysis::pq_f4_f2::groebner_basis_f4
+7182	596550	avg_life=1913916	<crypto_lib::cryptanalysis::ic_framework::solvers::F4F2 as crypto_lib::cryptanalysis::ic_framework::stages::Sy
+4550	125190	avg_life=2690926	<crypto_lib::cryptanalysis::ic_framework::stages::SolverTotals>::absorb
+3566	4694824	avg_life=341411	<crypto_lib::cryptanalysis::pq_f4_f2::State>::insert_core
+3257	561776	avg_life=1206053	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::unpack
+2999	485992	avg_life=607017	<crypto_lib::cryptanalysis::pq_descent_symbolic::FieldBoolPoly>::split
+-- by bytes
+17988	10276080	avg_life=87359	crypto_lib::cryptanalysis::pq_f4_f2::groebner_basis_f4
+3566	4694824	avg_life=341411	<crypto_lib::cryptanalysis::pq_f4_f2::State>::insert_core
+261	4276224	avg_life=210160	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::from_monomials::<alloc::vec::Vec<u64>>
+32966	2173704	avg_life=687248	<crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly>::mul_mono
+897	2107560	avg_life=232094	crypto_lib::cryptanalysis::pq_f4_f2::echelon_block_tables
+33830	1368128	avg_life=412103	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::pack
+7182	596550	avg_life=1913916	<crypto_lib::cryptanalysis::ic_framework::solvers::F4F2 as crypto_lib::cryptanalysis::ic_framework::stages::Sy
+3257	561776	avg_life=1206053	<crypto_lib::cryptanalysis::pq_f4_f2::Columns>::unpack
+
+=== t1 tensor12
+Total:     1,978,170,362 bytes in 26,062,977 blocks
+At t-gmax: 1,556,396 bytes in 13,056 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=1978170362 total_blocks=26062977 short<500instr: blocks=1991143 bytes=54114330; short<100k instr: blocks=8834456 bytes=261138122
+-- by count
+20687875	1826101670	avg_life=9778960	<ecdl_tensor_ic::tensor::SparseContractor as ecdl_tensor_ic::tensor::Counter>::count
+3331808	83295200	avg_life=1776607	<ecdl_tensor_ic::curve::Curve>::encode_point
+1965414	49135350	avg_life=173	ecdl_tensor_ic::relation::relation_network::{closure#3}
+41330	14878800	avg_life=494	<ecdl_tensor_ic::tensor::Vertex>::edges
+29280	1899906	avg_life=204086936	<ecdl_tensor_ic::tensor::SupportVertex>::new
+2196	398391	avg_life=170072499	ecdl_tensor_ic::relation::relation_network
+1194	170645	avg_life=2558226348	<ecdl_tensor_ic::solver::Solver>::solve_with_stats
+790	345704	avg_life=36109262	ecdl_tensor_ic::tensor::find_witness
+-- by bytes
+20687875	1826101670	avg_life=9778960	<ecdl_tensor_ic::tensor::SparseContractor as ecdl_tensor_ic::tensor::Counter>::count
+3331808	83295200	avg_life=1776607	<ecdl_tensor_ic::curve::Curve>::encode_point
+1965414	49135350	avg_life=173	ecdl_tensor_ic::relation::relation_network::{closure#3}
+41330	14878800	avg_life=494	<ecdl_tensor_ic::tensor::Vertex>::edges
+29280	1899906	avg_life=204086936	<ecdl_tensor_ic::tensor::SupportVertex>::new
+732	767136	avg_life=204116674	ecdl_tensor_ic::relation::relation_network::{closure#1}
+2196	398391	avg_life=170072499	ecdl_tensor_ic::relation::relation_network
+790	345704	avg_life=36109262	ecdl_tensor_ic::tensor::find_witness
+
+=== t2 tensor12
+Total:     1,548,155,047 bytes in 12,795,049 blocks
+At t-gmax: 1,247,454 bytes in 6,824 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=1548155047 total_blocks=12795049 short<500instr: blocks=1479 bytes=129148; short<100k instr: blocks=3552547 bytes=117984516
+-- by count
+9425776	1459771101	avg_life=14818478	<ecdl_tensor_ic::tensor::SparseContractor as ecdl_tensor_ic::tensor::Counter>::count
+3331808	83295200	avg_life=1696548	<ecdl_tensor_ic::curve::Curve>::encode_point
+29280	1899906	avg_life=194892403	<ecdl_tensor_ic::tensor::SupportVertex>::new
+2196	398391	avg_life=162410428	ecdl_tensor_ic::relation::relation_network
+1194	170645	avg_life=2443030064	<ecdl_tensor_ic::solver::Solver>::solve_with_stats
+915	329400	avg_life=466	<ecdl_tensor_ic::tensor::Vertex>::edges
+790	345704	avg_life=34738626	ecdl_tensor_ic::tensor::find_witness
+732	767136	avg_life=194922112	ecdl_tensor_ic::relation::relation_network::{closure#1}
+-- by bytes
+9425776	1459771101	avg_life=14818478	<ecdl_tensor_ic::tensor::SparseContractor as ecdl_tensor_ic::tensor::Counter>::count
+3331808	83295200	avg_life=1696548	<ecdl_tensor_ic::curve::Curve>::encode_point
+29280	1899906	avg_life=194892403	<ecdl_tensor_ic::tensor::SupportVertex>::new
+732	767136	avg_life=194922112	ecdl_tensor_ic::relation::relation_network::{closure#1}
+2196	398391	avg_life=162410428	ecdl_tensor_ic::relation::relation_network
+790	345704	avg_life=34738626	ecdl_tensor_ic::tensor::find_witness
+915	329400	avg_life=466	<ecdl_tensor_ic::tensor::Vertex>::edges
+78	300000	avg_life=408560	<clap_builder::builder::command::Command>::arg_internal
+
+=== t3 tensor12
+Total:     1,548,761,272 bytes in 12,803,132 blocks
+At t-gmax: 1,247,529 bytes in 6,825 blocks
+At t-end:  8,840 bytes in 25 blocks
+total_bytes=1548761272 total_blocks=12803132 short<500instr: blocks=1479 bytes=129148; short<100k instr: blocks=3589465 bytes=139386412
+-- by count
+9433859	1460377326	avg_life=9612383	<ecdl_tensor_ic::tensor::SparseContractor as ecdl_tensor_ic::tensor::Counter>::count
+3331808	83295200	avg_life=1015314	<ecdl_tensor_ic::curve::Curve>::encode_point
+29280	1899906	avg_life=116750398	<ecdl_tensor_ic::tensor::SupportVertex>::new
+2196	398391	avg_life=97292120	ecdl_tensor_ic::relation::relation_network
+1194	170645	avg_life=1464615372	<ecdl_tensor_ic::solver::Solver>::solve_with_stats
+915	329400	avg_life=466	<ecdl_tensor_ic::tensor::Vertex>::edges
+790	345704	avg_life=18142235	ecdl_tensor_ic::tensor::find_witness
+732	767136	avg_life=116780122	ecdl_tensor_ic::relation::relation_network::{closure#1}
+-- by bytes
+9433859	1460377326	avg_life=9612383	<ecdl_tensor_ic::tensor::SparseContractor as ecdl_tensor_ic::tensor::Counter>::count
+3331808	83295200	avg_life=1015314	<ecdl_tensor_ic::curve::Curve>::encode_point
+29280	1899906	avg_life=116750398	<ecdl_tensor_ic::tensor::SupportVertex>::new
+732	767136	avg_life=116780122	ecdl_tensor_ic::relation::relation_network::{closure#1}
+2196	398391	avg_life=97292120	ecdl_tensor_ic::relation::relation_network
+790	345704	avg_life=18142235	ecdl_tensor_ic::tensor::find_witness
+915	329400	avg_life=466	<ecdl_tensor_ic::tensor::Vertex>::edges
+78	300000	avg_life=408537	<clap_builder::builder::command::Command>::arg_internal
+

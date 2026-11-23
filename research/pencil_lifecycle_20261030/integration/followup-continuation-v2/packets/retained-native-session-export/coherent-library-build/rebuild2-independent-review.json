@@ -1,0 +1,53 @@
+{
+  "schema": "prospective-source-review/v1",
+  "task": "T-1521",
+  "reviewer": "assembler_independent_review_v2",
+  "author": "witness_independent_review_v2",
+  "independent": true,
+  "prior_advisory_familiarity": true,
+  "created_at": "2026-11-03T21:15:03.682128+00:00",
+  "decision": "accepted_scoped_prospective_recipe",
+  "execution_release": false,
+  "scope": "ONE direct crypto_lib compile only; root release and publication remain required. No exporter/test/scientific execution.",
+  "closure_sha256": "babd5796d223278c5b34ed40fe71a9608c89a5281c2dba0a692b9fa79293d607",
+  "closure": {
+    "freeze_sha256": "21aadc8e1ffc29209684b726a4961982d1a04dfdfdb82e8d16be816bdfc91260",
+    "files": {
+      "REBUILD2-PLAN.md": "adf84d90e0d74b5798a2a40983503de2e17635c1ef761f41b11ce058ce89ada7",
+      "rebuild2-command.json": "1c4ad5a2f2235c90a49de16d128091078af04731d08c25951cd63ad64181fa23",
+      "rebuild2-runner.py": "b521e4924df61ab379fc32a4e44b8db1a704437303abe89fe2e97648b55895aa",
+      "rebuild2-reused-inputs.json": "37aa48a82569c1fe52075fa73c5eef7d3ecbe7fcd60be96fbe1fcbf94ae1ed0a",
+      "rebuild-source-inputs.json": "57258b0b341a8894373b57284e81478c6bce0cabb2e88f9c2bb2ec5b3ef54311",
+      "rebuild2-toolchain-inputs.json": "f5f7706ee800233a8a030c69549bc20f7509a3d64aec52d588dd52fe46dc8f80",
+      "rebuild2-ldd.txt": "7f07eb05659e22829282a01b7af6fc699bcddfd7d46e9701fb44bdd9970412ea"
+    },
+    "counts": {
+      "rebuild-source-inputs.json": 1103,
+      "rebuild2-reused-inputs.json": 506,
+      "rebuild2-toolchain-inputs.json": 145
+    },
+    "changed": [],
+    "source_membership_match": true,
+    "source_symlinks": [],
+    "output_empty": true
+  },
+  "findings": [
+    "Final real pipe descriptors are passed through pass_fds, named by both MAKEFLAGS variables, contain zero additional tokens, and retained until confirmed child reap. This is one jobserver-managed implicit slot, not a hard CPU/thread quota.",
+    "Single compiler argv uses CGU16/embed-bitcode=no, fresh output, exact retained graph and cached dependencies. HOME removed. Source membership, symlinks and 1754 inventory entries independently checked without invoking compiler.",
+    "Failure and pending signal return nonzero; process group kill/reap is attempted; unresolved launch/reap is failed. Passed JSON alone insufficient: require outer runner exit0 and unchanged input checks.",
+    "Outer timeout295s plus5s kill grace is mandatory; internal275s work and290s success limits. Hard AS8GiB, perfile1GiB; 4GiB aggregate and16MiB logs are sampled thresholds with possible overshoot, explicitly accepted by root.",
+    "Owned output retained on failure for archival, as explicitly accepted by root; no deletion promise. Cached dependencies have byte custody, not new source attestation."
+  ],
+  "remaining_conditions": [
+    "Use exact frozen runner/argv and prescribed outer timeout once; no automatic retry.",
+    "Record outer exit, native stdout/stderr, cleanup and final receipts, actual jobserver descriptor custody, disk observations and posthashes.",
+    "Uninterruptible kernel work or receipt interruption may prevent complete cleanup/receipt; classify uncertainty honestly.",
+    "Success here establishes library build only; subsequent exporter build/test requires separate reviewed scope."
+  ],
+  "tests_executed": 0,
+  "compiler_invocations": 0,
+  "references": [
+    "https://doc.rust-lang.org/rustc/jobserver.html",
+    "https://doc.rust-lang.org/stable/nightly-rustc/cargo/compiler/job_queue/index.html"
+  ]
+}

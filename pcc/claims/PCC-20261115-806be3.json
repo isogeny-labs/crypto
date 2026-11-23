@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T21:27:40Z",
+ "id": "PCC-20261115-806be3",
+ "kind": "statement",
+ "producer": {
+  "commit": "7e75a593aea0675115ac5708d46f7bf33fcfe7c2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/root-library-compatibility/incomplete-run.log",
+    "sha256": "e11174c6596d1ef44ab345fe08cff96ce2d73b415301b35b6ecd84b663722f9e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/root-library-compatibility/pricing-failure.log",
+    "sha256": "48c6161889924e73e9f5ec5033f52c9808609bd4b78836f844adc534cb7328e1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/root-library-compatibility/STATUS.md",
+    "sha256": "8544a396073cfe52e0a1499458edce05927281d5df3f748a01cf4c621e85a4d1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The broad root library development check was stopped incomplete after 51 minutes including compilation. A focused reported failure is a missing embedded records fixture; source tree IDs match the initial base. Other partial-run failures remain undiagnosed. No root-library pass or clean baseline reproduction is claimed."
+}

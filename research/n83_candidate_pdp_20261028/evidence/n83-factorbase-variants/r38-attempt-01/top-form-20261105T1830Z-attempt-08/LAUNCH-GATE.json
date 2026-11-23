@@ -1,0 +1,77 @@
+{
+  "schema": "n83.topform-launch-gate/v1",
+  "candidate": "spike38",
+  "attempt": "08",
+  "gate_utc": "2026-11-05T18:38:00Z",
+  "protocol_id": "N83-FACTOR-BASE-TOP-DREG-20261031-V2",
+  "protocol_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+  "amendment_id": "N83-FACTOR-BASE-TOP-DREG-20261031-V2-OPERATIONAL-CONTINUATION-05",
+  "amendment_sha256": "a4560ed33e1493ebde7e7d9b3cf72a5e6c0166aabe8baf214c935a5921fef74e",
+  "execution_repository": "isogeny-labs/crypto",
+  "execution_branch": "codex/n83-spike38-attempt04-20261105",
+  "execution_git_revision": "5bb8a74bc4936dc219fb123467296a7e24f21bb6",
+  "required_source_and_protocol_files_equal_revision": true,
+  "attempt06_reused_data_path": "/tmp/n83-candidate-bases/r38-attempt-06/data",
+  "attempt06_verified_shards_report_sha256": "38e0f39bc2f3157eb6b2cb99ca5dc2a40ad48ff67ed2986071b950238af5f8b5",
+  "local_shard_files_present": 384,
+  "local_s3_file_index_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+  "generator_output_paths_fresh": true,
+  "active_matching_processes": 0,
+  "capsule_s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-08/capsule-v1/",
+  "capsule_readback_object_count": 418,
+  "capsule_readback_bytes": 4866829,
+  "capsule_byte_identical": true,
+  "fresh_results_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-08/results/",
+  "fresh_results_prefix_empty": true,
+  "empty_prefix_check": "aws s3api list-objects-v2 KeyCount 0 and no Contents, exit 0",
+  "strace_openat_smoke_test": true,
+  "aws_caller": "arn:aws:sts::104186811093:assumed-role/spot-experiments-WorkerRole-G1FZ84yk3gS6/i-0134957064d7a24c6",
+  "host": "ip-172-31-17-161.us-east-2.compute.internal",
+  "host_vcpus": 32,
+  "available_memory_gib_at_gate": 82,
+  "tmp_available_gib_at_gate": 56,
+  "limits": {
+    "cpu_cores": 1,
+    "memory_gib": 8,
+    "wall_seconds": 12850,
+    "termination_grace_seconds": 45,
+    "s3_fetch_concurrency": 4,
+    "aws_max_attempts": 1,
+    "protocol_attempts": 1,
+    "protocol_retries": 0,
+    "compute_ceiling_usd": 2.9,
+    "artifacts_ceiling_usd": 0.25,
+    "total_ceiling_usd": 3.15
+  },
+  "live_costs_usd": {
+    "day_to_date": 37.0452184422,
+    "month_to_date": 538.7198087168,
+    "daily_cap": 200,
+    "monthly_cap": 1000
+  },
+  "spot_price_usd_per_hour": 0.8015,
+  "estimated_compute_cap_usd": 2.860909722222222,
+  "expected_scope": {
+    "systems": 48,
+    "families": [
+      "koblitz",
+      "binary",
+      "prime"
+    ],
+    "m_values": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "targets": [
+      "natural",
+      "planted"
+    ],
+    "fresh_replay": true
+  }
+}

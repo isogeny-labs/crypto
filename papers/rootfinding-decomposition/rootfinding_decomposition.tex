@@ -256,7 +256,18 @@ $\lambda_\pm = (\pm y_F - y_R)/(x_F - x_R)$ are the affine chord formulas
 for $x(R \pm F)$, over an arbitrary field $K$ with the two curve equations
 as hypotheses (\code{SemaevS3.S3\_factor}); the root statement
 $\Sem{3}(x_R,x_F,X) = 0 \iff X \in \{x_+, x_-\}$ follows
-(\code{SemaevS3.S3\_root\_iff}). The proof clears the two chord
+(\code{SemaevS3.S3\_root\_iff}). That $x_\pm$ are the
+$x$-coordinates of the group law is itself checked against Mathlib:
+\code{SemaevS3.addX\_eq\_mathlib\_addX} identifies the chord formula with
+Mathlib's \code{WeierstrassCurve.Affine.addX} at
+\code{WeierstrassCurve.Affine.slope} for any Weierstrass curve with
+$a_1 = a_2 = 0$ and $x_R \ne x_F$, and \code{SemaevS3.pointX\_add\_eq\_xPlus},
+\code{SemaevS3.pointX\_add\_neg\_eq\_xMinus} and
+\code{SemaevS3.S3\_factor\_mathlib} state that $x_+$ and $x_-$ are the
+$x$-coordinates of Mathlib's sums $R + F$ and $R + (-F)$ of nonsingular
+points on $y^2 = x^3 + a_4x + a_6$ ($a_1 = a_2 = a_3 = 0$; the sum needs
+only $a_1 = a_2 = 0$). The summation polynomials $\Sem{m}$ for $m \ge 4$
+are not formalized. The proof clears the two chord
 denominators and closes a polynomial identity modulo the curve equations
 with explicit cofactors; it depends only on Lean's standard axioms. The
 source and a pinned Mathlib manifest are in

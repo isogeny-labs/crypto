@@ -1,0 +1,20 @@
+{
+  "schema": "vieta-pcc-base-reproduction/v1",
+  "base": "b02431b26e011f7b2df96a4ef01d2644c3d4401e",
+  "main_ledger_entries": 1215,
+  "head_ledger_entries": 1221,
+  "chain_and_exact_main_prefix_errors": [],
+  "exact_main_ledger_prefix_sha256": "5486ab98a2ee6a9f22f118153e73dbd652f042938e9b65e2c6fae79fffbaea83",
+  "main_claims_exact_git_blob_matches": 2135,
+  "inherited_claim_type_errors": 125,
+  "base_and_head_errors_identical": true,
+  "all_errored_claims_byte_equal_to_main": true,
+  "producer_new_claim_types_and_proof_pins_valid": [
+    "PCC-20261116-640dba",
+    "PCC-20261116-9dc34f",
+    "PCC-20261116-c8911d"
+  ],
+  "base_reproduction": "Snapshot all2135 main claim files after matching exact Git blob IDs; exact main ledger/keyring; unchanged official pcc.py --repo SNAPSHOT ledger verify returns1 with identical125 claim-type errors. Whole-pcc Git archives stalled in lazy fetching and were stopped; no archive pass claimed.",
+  "gate_status": "FAIL; no waiver or rewrite of historical claims",
+  "standing": "producer infrastructure diagnosis [pcc:unverified]"
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "pencil-prospective-instrument-provenance/v1",
+  "id": "pencil-early-rejection-20261030",
+  "baseline": {
+    "path": "provenance/frozen-native-solver.rs.txt",
+    "sha256": "e71e9cf9b356db1f16781f394994b0ca13abbb05b4a7db82bfd2a6925a0ef4df"
+  },
+  "fork": {
+    "path": "src/native_solver.rs",
+    "sha256": "6a8041b6ec015590d0f0ae105a483e4a4f0fb45357a2fd591ec9424542bf51d3"
+  },
+  "baseline_helper": {
+    "path": "src/frozen_helper.rs",
+    "sha256": "b0e8fcb9cc5e678594e2ec6ff6f093318ecc21eed66ce66206b490f9bf69cc47",
+    "binding": "unit test checks exact source closure modulo whitespace"
+  },
+  "runtime_change": "Extract candidate verification; evaluate final bucket-length rejection before complement",
+  "runtime_api": "native_solver::solve_one retained but not invoked",
+  "dependencies": "provenance/dependency-sources.sha256",
+  "ecbench_integration": false,
+  "frozen_source_modified": false,
+  "scientific_admission": false,
+  "performance_result": null
+}

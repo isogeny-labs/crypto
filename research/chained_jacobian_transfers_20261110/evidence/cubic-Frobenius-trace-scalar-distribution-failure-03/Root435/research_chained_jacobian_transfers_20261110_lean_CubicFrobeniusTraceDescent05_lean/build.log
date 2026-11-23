@@ -1,0 +1,56 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/CubicFrobeniusTraceDescent05.lean:39:2: error: `grind` failed
+case grind
+M : Type
+inst : IntModule M
+F : M → M
+hlin : ∀ (n : Int) (x : M), F (n • x) = n • F x
+n : Int
+x : M
+h : ¬n • x + n • F x + n • F (F x) = n • (x + F x + F (F x))
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] ∀ (n : Int) (x : M), F (n • x) = n • F x
+    [prop] ¬n • x + n • F x + n • F (F x) = n • (x + F x + F (F x))
+  [eqc] True propositions
+    [prop] ∀ (n : Int) (x : M), F (n • x) = n • F x
+  [eqc] False propositions
+    [prop] n • x + n • F x + n • F (F x) = n • (x + F x + F (F x))
+  [ematch] E-matching patterns
+    [thm] hlin: [F (@HSMul.hSMul `[Int] `[M] `[M] `[instHSMul] #1 #0)]
+  [linarith] Linarith assignment for `M`
+    [assign] x := 2
+    [assign] F x := 4
+    [assign] F (F x) := 5
+[grind] Issues
+  [issue] `grind linarith` term with unexpected instance
+        n • x
+  [issue] `grind linarith` term with unexpected instance
+        n • F x
+  [issue] `grind linarith` term with unexpected instance
+        n • F (F x)
+  [issue] `grind linarith` term with unexpected instance
+        n • (x + F x + F (F x))
+  [issue] `grind linarith` term with unexpected instance
+        n • (x + F x + F (F x))
+'CubicFrobeniusTraceDescent05.recover_annihilated_point' depends on axioms: [propext]
+'CubicFrobeniusTraceDescent05.trace3_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.trace3_smul' depends on axioms: [sorryAx]
+'CubicFrobeniusTraceDescent05.trace3_commutes' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.trace3_fixed_image' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.trace3_fixed_input' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.normalized_fixed_input' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.normalized_fixed_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.normalized_idempotent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.trace_zero_complement' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.faithful_stable_cyclic_forces_fixed' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CubicFrobeniusTraceDescent05.fixed_target_eigenline_zero' depends on axioms: [propext]
+'CubicFrobeniusTraceDescent05.trace_eigenline_zero' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CubicFrobeniusTraceDescent05.composition_covariance' does not depend on any axioms
+'CubicFrobeniusTraceDescent05.nonfixed_scalar_control' depends on axioms: [propext]
+'CubicFrobeniusTraceDescent05.fixed_scalar_control' depends on axioms: [propext]
+'CubicFrobeniusTraceDescent05.characteristic_three_exception_control' depends on axioms: [propext, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0

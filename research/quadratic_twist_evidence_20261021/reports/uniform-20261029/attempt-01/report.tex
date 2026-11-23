@@ -1,0 +1,32 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=17mm]{geometry}
+\usepackage[T1]{fontenc}\usepackage{lmodern,amsmath,amssymb,booktabs,graphicx,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\newcommand{\rec}{\texttt{uniform-20261029}}
+\sloppy\setlength{\emergencystretch}{3em}
+\begin{document}
+\begin{center}{\Large Attempt01: independent size-three audit rejection}\\2026-10-29; uniform-20261029\end{center}
+Producer completed all planned case files at input \texttt{7c463e834d21}; independent
+audit exited101, no positive receipt, no controls/backend completion. The preserved
+assertion was ``cubic membership changes no S3 monomial.'' The old Rust helper
+incorrectly divided by the polynomial of only the first two roots for size-three
+bases. The invariant correctly rejected this defect. No verified comparison was
+admitted at this attempt. The later full replay verifies the identical producer
+bytes; it does not rewrite this failed run. New versioned full-base monic division
+was compiled/committed at \texttt{42b72c3a2feb} before the fresh second execution.
+No polynomial/point/state criterion was relaxed. The original failed source and
+full raw records remain. A quantitative comparison is omitted here because the
+independent result was not available at failure.
+\par
+\noindent\includegraphics[width=\linewidth]{bridge.pdf}
+
+\textbf{Execution contract.} Same full preregistered96/896/210 workload, deterministic
+response census, existing local host/two workers,600s command caps, no clock or
+speed claim. Raw inputs/commands/exits and precise failed payload are restored by
+\path{validation/uniform-20261029/restore-runs.sh}. The official checkpoint gate
+passed before this scientific execution. No private key/token enters the record.
+
+\textbf{Source links.} \path{UNIFORM_YIELD_20261025_PROTOCOL.md}, dated
+audit/control correction contracts, and final \path{reports/uniform-20261029/README.md}.
+The broader useful-yield/degree/source-DLP objective remains open.
+\end{document}

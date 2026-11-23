@@ -1,0 +1,36 @@
+{
+  "schema": "native-general-function-divisor-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "function-divisor-finiteness-certificate",
+      "expected_decl_sha256": "f4c0c971036efced202ba6da453857cdaaaa70f6e116619f5839ce5d10ad1b1b",
+      "full_characters": 1029,
+      "full_decl_sha256": "f4c0c971036efced202ba6da453857cdaaaa70f6e116619f5839ce5d10ad1b1b",
+      "full_normalized_signature": "theorem function_divisor_finiteness_certificate : (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (hf : f ≠ 0), (Function.support (pointOrder W f)).Finite ∧ (∀ R : W.Point, functionDivisor W f hf R = pointOrder W f R) ∧ functionDivisor W f hf ∈ principalPointDivisors W) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0), functionDivisor W (f * g) (mul_ne_zero hf hg) = functionDivisor W f hf + functionDivisor W g hg ∧ functionDivisor W (f / g) (div_ne_zero hf hg) = functionDivisor W f hf - functionDivisor W g hg) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (n : ℕ), functionDivisor W (millerFunction W P n) (miller_function_nonzero W P n) = millerDivisor W P n) ∧ rationalCurve.Δ ≠ 0 ∧ rationalFunction ≠ 0 ∧ (∀ c : F3, rationalFunction ≠ constantHom rationalCurve c) ∧ functionDivisor rationalCurve rationalFunction rational_function_nonzero = 0 ∧ InfinityMonic rationalCurve rationalFunction",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "function_divisor_finiteness_certificate",
+        "end_byte": 1713,
+        "file": "/workspace/scratch/function-divisor-binding-input01/FunctionDivisorCertificate.lean",
+        "qualified_decl_id": "FunctionDivisorFinitenessAudit.function_divisor_finiteness_certificate",
+        "signature": "theorem function_divisor_finiteness_certificate :\n    (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (hf : f ≠ 0),\n      (Function.support (pointOrder W f)).Finite ∧\n      (∀ R : W.Point, functionDivisor W f hf R = pointOrder W f R) ∧\n      functionDivisor W f hf ∈ principalPointDivisors W) ∧\n    (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f g : W.FunctionField)\n      (hf : f ≠ 0) (hg : g ≠ 0),\n      functionDivisor W (f * g) (mul_ne_zero hf hg) =\n        functionDivisor W f hf + functionDivisor W g hg ∧\n      functionDivisor W (f / g) (div_ne_zero hf hg) =\n        functionDivisor W f hf - functionDivisor W g hg) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (n : ℕ),\n      functionDivisor W (millerFunction W P n) (miller_function_nonzero W P n) = millerDivisor W P n) ∧\n    rationalCurve.Δ ≠ 0 ∧ rationalFunction ≠ 0 ∧\n    (∀ c : F3, rationalFunction ≠ constantHom rationalCurve c) ∧\n    functionDivisor rationalCurve rationalFunction rational_function_nonzero = 0 ∧\n    InfinityMonic rationalCurve rationalFunction",
+        "start_byte": 551
+      },
+      "recorded_statement": "theorem function_divisor_finiteness_certificate : (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f : W.FunctionField) (hf : f ≠ 0), (Function.support (pointOrder W f)).Finite ∧ (∀ R : W.Point, functionDivisor W f hf R = pointOrder W f R) ∧ functionDivisor W f hf ∈ principalPointDivisors W) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (f g : W.FunctionField) (hf : f ≠ 0) (hg : g ≠ 0), functionDivisor W (f * g) (mul_ne_zero hf hg) = functionDivisor W f hf + functionDivisor W g hg ∧ functionDivisor W (f / g) (div_ne_zero hf hg) = functionDivisor W f hf - functionDivisor W g hg) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (P : W.Point) (n : ℕ), functionDivisor W (millerFunction W P n) (miller_function_nonzero W P n) = millerDivisor W P n) ∧ rationalCurve.Δ ≠ 0 ∧ rationalFunction ≠ 0 ∧ (∀ c : F3, rationalFunction ≠ constantHom rationalCurve c) ∧ functionDivisor rationalCurve rationalFunction rational_function_nonzero = 0 ∧ InfinityMonic rationalCurve rationalFunction",
+      "recorded_text_sha256": "f4c0c971036efced202ba6da453857cdaaaa70f6e116619f5839ce5d10ad1b1b",
+      "source_plan": "research/function_divisor_finiteness_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "FunctionDivisorFinitenessAudit.function_divisor_finiteness_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

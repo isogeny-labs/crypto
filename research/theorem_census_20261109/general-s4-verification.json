@@ -1,0 +1,68 @@
+{
+  "schema": "general-s4-verification/v1",
+  "created": "2026-11-09T16:29:47.300Z",
+  "formal_source_commit": "e6bcfc3aa9d87ba56e27f9589d8a3bcbcc56b4f6",
+  "formal_gate": {
+    "path": "evidence/general-s4-gate.log",
+    "sha256": "ae752718f5c87a19e08014a4045d061782fafdf40ff7ab6a840dbbd3b5757c8c",
+    "declarations": 197,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "pcc": [
+    {
+      "claim_id": "PCC-20261109-21757f",
+      "path": "evidence/pcc-general-s4-check.json",
+      "sha256": "e9f22c009de0012daf8cc95123aa3c5719452b6cb4f7442cf6e2796f3cba44ea",
+      "verdict": "pass",
+      "verified_at": "2026-11-09T16:26:06Z",
+      "standing": "Unsigned producer check; no signed or independent-host promotion"
+    },
+    {
+      "claim_id": "PCC-20261109-ce6722",
+      "path": "evidence/pcc-general-s4-control-check.json",
+      "sha256": "6d494dc6ef9991eb618314c14e1ac7d4ec1f6392d7d945ebae2ee0e0ff71e8e5",
+      "verdict": "pass",
+      "verified_at": "2026-11-09T16:28:49Z",
+      "standing": "Unsigned producer check; no signed or independent-host promotion"
+    }
+  ],
+  "identity": {
+    "id": "IDC1hbf1f44625ee306dc",
+    "path": "general-s4-identity-certificate.json",
+    "sha256": "2bf48b202f37dd256196a3b40fcaf88565de371ef8af059cb9f256864b473864",
+    "points": 32,
+    "extra_points": 11,
+    "modulus_decimal": "2305843009213693951",
+    "variables": 6,
+    "degree_bound": 4,
+    "source_sha256": "9ce7623ab15583da4a7c85a1a2782bf72b1f115398b0f73d46d1d22ba2aa1abf",
+    "proof_source": "research/theorem_census_20261109/lean/GeneralS4.lean",
+    "proof_sha256": "1d73c0555b406b7c54796796f11f4ca720708060b2d5dba4de95c9d455bc378b",
+    "proof_pointer_matches": true,
+    "issue_and_extra_check_exit": 0,
+    "independence": "Producer-issued on one host using unchanged repository checker; universal determinant and group conclusions independently checked by Lean; no signed or separate-host standing."
+  },
+  "source_publication": {
+    "branch": "research/theorem-census-native-20261109",
+    "commit": "5138061f8d1fe2a562b2134f3b9d94f2988c0e3b",
+    "tree": "bc87c746835142f5acc3eeb4cbdab635d7f7ba5f",
+    "local_commit": "e6bcfc3aa9d87ba56e27f9589d8a3bcbcc56b4f6",
+    "files": 13
+  },
+  "ledger_comparison": {
+    "checked_at": "2026-11-09T16:26:47.209Z",
+    "main_commit": "6724228934e004fbe2c74ee4d70c7e21afb11993",
+    "main_blob": "1f8804d3baa280cb2b6298a4e17eb92c1c16a9de",
+    "main_sha256": "66e038b39a73d6f1dc7dbd1e8da8dc929b3ae89feb77f61d6a636326186f6c7b",
+    "main_rows": 483,
+    "local_rows": 481,
+    "common_prefix": 457,
+    "main_is_prefix": false,
+    "local_is_prefix": false,
+    "action": "Read only; preserve both histories. No rechain, side selection or force push."
+  },
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}

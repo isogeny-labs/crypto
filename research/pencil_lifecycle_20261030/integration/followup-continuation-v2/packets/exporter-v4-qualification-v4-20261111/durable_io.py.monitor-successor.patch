@@ -1,0 +1,59 @@
+--- exporter-v4-qualification-v3-20261111/durable_io.py
++++ exporter-v4-qualification-v4-20261111/durable_io.py
+@@ -1,6 +1,7 @@
+ """Unexecuted prospective durable receipt/admission helpers."""
+ import hashlib,json,math,os,tempfile,re
+ from pathlib import Path
++from concurrent_tree import scan_regular_tree
+ 
+ def atomic_json(path,value):
+     path=Path(path);raw=(json.dumps(value,indent=2,allow_nan=False)+'\n').encode()
+@@ -59,7 +60,7 @@
+     for name,digest in a['packet_files'].items():
+         q=p/name;assert not Path(name).is_absolute() and '..' not in Path(name).parts
+         assert hashlib.sha256(q.read_bytes()).hexdigest()==digest,name
+-    required={'durable_io.py','durable-launcher.py','durable-worker.py','materialize.py','commands.json','overlays.json','expected-source-manifest.json','overlay-archive.json','source-overlay.tar.gz','cache-mode-inventory.json'}
++    required={'concurrent_tree.py','concurrent_traversal_control.py','durable_io.py','durable-launcher.py','durable-worker.py','materialize.py','commands.json','overlays.json','expected-source-manifest.json','overlay-archive.json','source-overlay.tar.gz','cache-mode-inventory.json'}
+     assert required<=set(a['packet_files'])
+     assert set(a['release_receipts'])=={'prior_v4_terminal','fresh_cache_snapshot','ledger','lease_readback','independent_review','publication','campaign_authorization'}
+     for name,row in a['release_receipts'].items():
+@@ -70,27 +71,24 @@
+     assert a['fresh_cache_manifest']['sha256'] and a['fresh_cache_manifest']['path']
+     assert a['source_manifest_sha256']==hashlib.sha256((p/'expected-source-manifest.json').read_bytes()).hexdigest()
+     assert a['immutable_manifest']['sha256']=='c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2'
+-    assert a['workspace']=='/var/tmp/pencil-exporter-v4-qualification-v3-20261111'
+-    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/exporter-v4-qualification-v3-20261111'
+-    assert a['unit']=='pencil-exporter-v4-qualification-v3-20261111.service'
++    assert a['workspace']=='/var/tmp/pencil-exporter-v4-qualification-v4-20261111'
++    assert a['durable_run']=='/home/ec2-user/pencil-validation-receipts/exporter-v4-qualification-v4-20261111'
++    assert a['unit']=='pencil-exporter-v4-qualification-v4-20261111.service'
+     assert a['limits']=={'target_stop_threshold_bytes':6*1024**3,'workspace_stop_threshold_bytes':8*1024**3,'logs_stop_threshold_bytes':256*1024**2,'minimum_free_bytes':6*1024**3,'durable_metadata_stop_bytes':64*1024**2,'durable_total_stop_bytes':384*1024**2,'supervisor_permit_seconds':10}
+     return a
+ 
+ def durable_limits(directory,limits):
+-    total=0;metadata=0
+-    for path in Path(directory).rglob('*'):
+-        if path.is_dir():continue
+-        if path.is_symlink():raise RuntimeError('symlink in output')
+-        try:n=path.stat().st_size
+-        except FileNotFoundError:
+-            # Only our atomic checkpoint temp names may disappear mid-enumeration.
+-            if re.fullmatch(r'\.(?:launch-receipt|worker-receipt|log-prefix-checkpoint|supervisor-permit|terminal-output-manifest)\.json\.[A-Za-z0-9_-]+',path.name):continue
+-            raise
+-        total+=n
+-        if not path.name.endswith(('.stdout','.stderr')):metadata+=n
++    def atomic_checkpoint_temp(path):
++        return re.fullmatch(r'\.(?:launch-receipt|worker-receipt|log-prefix-checkpoint|supervisor-permit|terminal-output-manifest)\.json\.[A-Za-z0-9_-]+',path.name) is not None
++    scan=scan_regular_tree(
++        directory,
++        missing_name_predicate=atomic_checkpoint_temp,
++        bucket=lambda path:'logs' if path.name.endswith(('.stdout','.stderr')) else 'metadata',
++    )
++    total=scan['total_bytes'];metadata=scan['buckets'].get('metadata',0)
+     if total>limits['durable_total_stop_bytes'] or metadata>limits['durable_metadata_stop_bytes']:
+         raise RuntimeError('durable output size stop threshold')
+-    return {'total_bytes':total,'metadata_bytes':metadata}
++    return {'total_bytes':total,'metadata_bytes':metadata,'transient_atomic_temps':len(scan['transient_missing'])}
+ 
+ def seal_outputs(directory):
+     directory=Path(directory);rows={}

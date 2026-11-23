@@ -1,0 +1,13 @@
+kind: bounded native format/library DEVELOPMENT checks, not solving experiment
+compiler: g++ (Debian14.2.0-19)14.2.0
+command: LD_LIBRARY_PATH=/workspace/audit/backend/prefix/usr/lib/x86_64-linux-gnu bash research/prime_one_shot_20261029/continuation/canonical/check.sh /tmp/norm-canonical-check /workspace/audit/backend/prefix/usr/bin/msolve
+exit: 0
+adapter_selftests:21
+canonical_exports:6
+separate_assignment_checks:6
+external_known_bound_imports:6
+external_backend:Debian msolve0.7.5-1; exact hashes in backend/packages.json
+raw_plus_zero_initial_import:failed (unit ideal), retained
+corrective_action:canonicalize appended constraints before import; all six expected assignment ideals match
+scientific_unknown_solves:0
+performance_comparisons:0

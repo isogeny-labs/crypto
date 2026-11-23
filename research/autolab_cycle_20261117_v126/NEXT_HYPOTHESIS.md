@@ -1,0 +1,7 @@
+# Prepared C127: exploit the quadratic generator's Frobenius pair
+
+UNEXECUTED. This prototype has static AST/global-name checks only. It has not passed semantic or size oracles, nor a search.
+
+The low pair is generated as r and r+a for every assignment, not just supported inputs. In characteristic2, (T+r)(T+r+a)=T^2+aT+r^2+ar. Squaring a polynomial over F2 is a wire permutation (odd coefficients zero), so replace multiplication of two correlated roots by one square and ar, using the already generated a instead of recomputing r+(r+a). Final exact raw product equality and all five recovery words remain. This preserves invalid-input observable values as well as valid multiplicities. The general identity over a characteristic-p field is product_{c in Fp}(T-r-ca)=(T-r)^p-a^(p-1)(T-r); using it requires a complete affine orbit, not an assumed root symmetry.
+
+The current prototype reuses the clipped lift's structural cache to obtain a. Cold setup cost must include that second traversal; a reviewed generator API that returns a directly can be a separate later variant. No speed claim follows from the algebraic identity. Test exhaustive d2 controls, all supported d3 multisets, random inputs and graph hashes before comparing actual counts. Then measure a changed hard diagnostic only if the circuit/setup tradeoff warrants it. Run under90s/4GiB/CPU0, all raw q lifts and original source/U/outer contracts unchanged. This is known Frobenius algebra; novelty of the complete research method remains unestablished.

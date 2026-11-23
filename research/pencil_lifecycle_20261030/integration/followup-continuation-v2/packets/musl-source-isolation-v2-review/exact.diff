@@ -1,0 +1,19 @@
+--- 
++++ 
+@@ -5,7 +5,7 @@
+ p=argparse.ArgumentParser();p.add_argument('--source-root',required=True);p.add_argument('--commit',required=True);p.add_argument('--seconds',required=True,type=int);p.add_argument('--receipt-dir',required=True);a=p.parse_args()
+ assert re.fullmatch('[0-9a-f]{40}',a.commit) and 1<=a.seconds<=3600
+ D=Path(a.receipt_dir);assert str(D).startswith('/var/tmp/');D.mkdir(exist_ok=False)
+-ORIGINAL=Path('/home/ec2-user/crypto-pencil-signed-graph-20261029');R=Path(a.source_root);assert R.is_absolute() and R==R.resolve() and R.parent==Path('/var/tmp') and R.name.startswith('pencil-musl-source-') and R!=ORIGINAL;T=Path('/tmp/pencil-musl-target');M=Path('/var/tmp/pencil-musl-private-20261031');B=T/'x86_64-unknown-linux-musl/release/ecbench'
++ORIGINAL=Path('/home/ec2-user/crypto-pencil-signed-graph-20261029');R=Path(a.source_root);T=Path('/tmp/pencil-musl-target');M=Path('/var/tmp/pencil-musl-private-20261031');B=T/'x86_64-unknown-linux-musl/release/ecbench'
+ sha=lambda q:hashlib.sha256(q.read_bytes()).hexdigest()
+ receipt={'schema':'software.bounded-musl-build/v1','source_commit_requested':a.commit,'seconds_cap':a.seconds,'start':time.time(),'binary_sha256':None,'image_qualified':False,'scientific_execution':False};proc=None
+ 
+@@ -28,6 +28,7 @@
+ def interrupted(signum,frame):raise InterruptedError('supervisor signal '+str(signum))
+ for sig in (signal.SIGINT,signal.SIGTERM):signal.signal(sig,interrupted)
+ try:
++ assert R.is_absolute() and R==R.resolve() and R.parent==Path('/var/tmp') and R.name.startswith('pencil-musl-source-') and R!=ORIGINAL
+  lock=(T/'.pencil-musl-owner.lock').open('a+');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+  receipt['conflicting_owners']=ownership();assert not receipt['conflicting_owners']
+  assert command('source-top-level',['git','rev-parse','--show-toplevel']).strip()==str(R)

@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:36:41Z",
+ "id": "PCC-20261116-bfeb59",
+ "kind": "statement",
+ "producer": {
+  "commit": "3dff0d3c46d8fda98016bf1afea71499c553a2ce",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/Git-index-storage-custody-01/whole-storage-custody.json",
+    "sha256": "7bc1aaad4a0d34ef9637c0b909c9e3db915a5949b34532c95b659ab772543110"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/Git-index-storage-custody-01/initial-runtime-directory-ENOSPC.txt",
+    "sha256": "f679ec95c2e0892aa87e05342b5b2fcda3e80f23a8311dbd1c21e36432c7846c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Filesystem full stopped new runtime source mkdir before write. Whole48,243,873-byte current Git index preserved in RAM, split-index storage enabled and whole47,072,504-byte shared index retained there; small current index1,171,469 bytes. Actual HEAD and staged tree before/after identical, no staged changes or worktree/raw/ledger/ref rewrite. Restored46MiB filesystem availability without removing research data or old closed holds. Full byte/hash/recovery metadata retained; Git cache storage only, not a scientific result."
+}

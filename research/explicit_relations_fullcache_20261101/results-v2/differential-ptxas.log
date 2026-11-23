@@ -1,0 +1,173 @@
+curve.cuh(273): warning #20012-D: __host__ annotation is ignored on a non-virtual function("DenseRow") that is explicitly defaulted on its first declaration
+    __attribute__((host)) __attribute__((device)) __inline__ __attribute__((always_inline)) DenseRow() = default;
+                   ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+curve.cuh(273): warning #20012-D: __device__ annotation is ignored on a non-virtual function("DenseRow") that is explicitly defaulted on its first declaration
+    __attribute__((host)) __attribute__((device)) __inline__ __attribute__((always_inline)) DenseRow() = default;
+                                         ^
+
+curve.cuh(273): warning #20012-D: __host__ annotation is ignored on a non-virtual function("DenseRow") that is explicitly defaulted on its first declaration
+    __attribute__((host)) __attribute__((device)) __inline__ __attribute__((always_inline)) DenseRow() = default;
+                   ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+curve.cuh(273): warning #20012-D: __device__ annotation is ignored on a non-virtual function("DenseRow") that is explicitly defaulted on its first declaration
+    __attribute__((host)) __attribute__((device)) __inline__ __attribute__((always_inline)) DenseRow() = default;
+                                         ^
+
+ptxas info    : 63 bytes gmem, 504 bytes cmem[4]
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail6select23DeviceSelectSweepKernelINS2_10policy_hubIN18explicit_relations5PointENS0_8NullTypeEiLb0ELNS0_10SelectImplE1EE10Policy1000EN6thrust16_V_300200_SM_8906detail15normal_iteratorINSC_10device_ptrIS6_EEEEPS7_SH_PlNS0_13ScanTileStateIiLb1EEEN4cuda3std3__410__not_fn_tINS5_10IsInfinityEEES7_iNS2_19streaming_context_tIlLb1EEELS8_1EEEvT0_T1_T2_T3_T4_T5_T6_T7_iT8_NS1_7vsmem_tE' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail6select23DeviceSelectSweepKernelINS2_10policy_hubIN18explicit_relations5PointENS0_8NullTypeEiLb0ELNS0_10SelectImplE1EE10Policy1000EN6thrust16_V_300200_SM_8906detail15normal_iteratorINSC_10device_ptrIS6_EEEEPS7_SH_PlNS0_13ScanTileStateIiLb1EEEN4cuda3std3__410__not_fn_tINS5_10IsInfinityEEES7_iNS2_19streaming_context_tIlLb1EEELS8_1EEEvT0_T1_T2_T3_T4_T5_T6_T7_iT8_NS1_7vsmem_tE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 6192 bytes smem, 456 bytes cmem[0]
+ptxas info    : Compile time = 58.728 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail4scan23DeviceCompactInitKernelINS0_13ScanTileStateIiLb1EEEPlEEvT_iT0_' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail4scan23DeviceCompactInitKernelINS0_13ScanTileStateIiLb1EEEPlEEvT_iT0_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.472 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmNS2_12op_wrapper_tImN6thrust16_V_300200_SM_8906detail24construct1_via_allocatorINS8_16device_allocatorIN18explicit_relations11CachedPointEEEEENS8_10device_ptrISD_EEEEEEvT0_T1_' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmNS2_12op_wrapper_tImN6thrust16_V_300200_SM_8906detail24construct1_via_allocatorINS8_16device_allocatorIN18explicit_relations11CachedPointEEEEENS8_10device_ptrISD_EEEEEEvT0_T1_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 14 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.694 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmN6thrust16_V_300200_SM_8908cuda_cub20__uninitialized_fill7functorINS7_10device_ptrIyEEyEEEEvT0_T1_' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmN6thrust16_V_300200_SM_8908cuda_cub20__uninitialized_fill7functorINS7_10device_ptrIyEEyEEEEvT0_T1_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 11 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.576 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmN6thrust16_V_300200_SM_8908cuda_cub20__uninitialized_fill7functorINS7_10device_ptrImEEmEEEEvT0_T1_' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmN6thrust16_V_300200_SM_8908cuda_cub20__uninitialized_fill7functorINS7_10device_ptrImEEmEEEEvT0_T1_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 11 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 1.554 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmNS2_12op_wrapper_tImN6thrust16_V_300200_SM_8906detail24construct1_via_allocatorINS8_16device_allocatorIN18explicit_relations8DenseRowEEEEENS8_10device_ptrISD_EEEEEEvT0_T1_' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmNS2_12op_wrapper_tImN6thrust16_V_300200_SM_8906detail24construct1_via_allocatorINS8_16device_allocatorIN18explicit_relations8DenseRowEEEEENS8_10device_ptrISD_EEEEEEvT0_T1_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 2.051 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmNS2_12op_wrapper_tImN6thrust16_V_300200_SM_8906detail24construct1_via_allocatorINS8_16device_allocatorIN18explicit_relations5PointEEEEENS8_10device_ptrISD_EEEEEEvT0_T1_' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail8for_each13static_kernelINS2_12policy_hub_t12policy_500_tEmNS2_12op_wrapper_tImN6thrust16_V_300200_SM_8906detail24construct1_via_allocatorINS8_16device_allocatorIN18explicit_relations5PointEEEEENS8_10device_ptrISD_EEEEEEvT0_T1_
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 12 registers, used 0 barriers, 376 bytes cmem[0]
+ptxas info    : Compile time = 2.009 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail10merge_sort26DeviceMergeSortMergeKernelINS2_10policy_hubIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS6_10device_ptrIN18explicit_relations5PointEEEEEE9Policy600ESD_PNS0_8NullTypeESD_SH_mNSA_9PointLessESB_SG_NS2_11VSMemHelperEEEvbT2_T3_T4_PT6_PT7_T5_PSM_SM_NS1_7vsmem_tE' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail10merge_sort26DeviceMergeSortMergeKernelINS2_10policy_hubIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS6_10device_ptrIN18explicit_relations5PointEEEEEE9Policy600ESD_PNS0_8NullTypeESD_SH_mNSA_9PointLessESB_SG_NS2_11VSMemHelperEEEvbT2_T3_T4_PT6_PT7_T5_PSM_SM_NS1_7vsmem_tE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 33 registers, used 1 barriers, 12320 bytes smem, 432 bytes cmem[0]
+ptxas info    : Compile time = 34.295 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortPartitionKernelIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS5_10device_ptrIN18explicit_relations5PointEEEEEmNS9_9PointLessESA_EEvbT_PT2_T0_SH_PSH_T1_SH_i' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortPartitionKernelIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS5_10device_ptrIN18explicit_relations5PointEEEEEmNS9_9PointLessESA_EEvbT_PT2_T0_SH_PSH_T1_SH_i
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 25 registers, used 0 barriers, 420 bytes cmem[0]
+ptxas info    : Compile time = 8.184 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortBlockSortKernelINS2_10policy_hubIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS6_10device_ptrIN18explicit_relations5PointEEEEEE9Policy600ESD_PNS0_8NullTypeESD_SH_mNSA_9PointLessESB_SG_NS2_11VSMemHelperEEEvbT0_T1_T2_T3_T4_PT6_PT7_T5_NS1_7vsmem_tE' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortBlockSortKernelINS2_10policy_hubIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS6_10device_ptrIN18explicit_relations5PointEEEEEE9Policy600ESD_PNS0_8NullTypeESD_SH_mNSA_9PointLessESB_SG_NS2_11VSMemHelperEEEvbT0_T1_T2_T3_T4_PT6_PT7_T5_NS1_7vsmem_tE
+    128 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 128 bytes cumulative stack size, 12320 bytes smem, 432 bytes cmem[0]
+ptxas info    : Compile time = 54.208 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail10merge_sort26DeviceMergeSortMergeKernelINS2_10policy_hubIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS6_10device_ptrIN18explicit_relations5PointEEEEEE9Policy600ESD_PNS0_8NullTypeESD_SH_jNSA_9PointLessESB_SG_NS2_11VSMemHelperEEEvbT2_T3_T4_PT6_PT7_T5_PSM_SM_NS1_7vsmem_tE' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail10merge_sort26DeviceMergeSortMergeKernelINS2_10policy_hubIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS6_10device_ptrIN18explicit_relations5PointEEEEEE9Policy600ESD_PNS0_8NullTypeESD_SH_jNSA_9PointLessESB_SG_NS2_11VSMemHelperEEEvbT2_T3_T4_PT6_PT7_T5_PSM_SM_NS1_7vsmem_tE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 36 registers, used 1 barriers, 12320 bytes smem, 432 bytes cmem[0]
+ptxas info    : Compile time = 34.736 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortPartitionKernelIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS5_10device_ptrIN18explicit_relations5PointEEEEEjNS9_9PointLessESA_EEvbT_PT2_T0_SH_PSH_T1_SH_i' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortPartitionKernelIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS5_10device_ptrIN18explicit_relations5PointEEEEEjNS9_9PointLessESA_EEvbT_PT2_T0_SH_PSH_T1_SH_i
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 22 registers, used 0 barriers, 404 bytes cmem[0]
+ptxas info    : Compile time = 5.812 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortBlockSortKernelINS2_10policy_hubIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS6_10device_ptrIN18explicit_relations5PointEEEEEE9Policy600ESD_PNS0_8NullTypeESD_SH_jNSA_9PointLessESB_SG_NS2_11VSMemHelperEEEvbT0_T1_T2_T3_T4_PT6_PT7_T5_NS1_7vsmem_tE' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortBlockSortKernelINS2_10policy_hubIN6thrust16_V_300200_SM_8906detail15normal_iteratorINS6_10device_ptrIN18explicit_relations5PointEEEEEE9Policy600ESD_PNS0_8NullTypeESD_SH_jNSA_9PointLessESB_SG_NS2_11VSMemHelperEEEvbT0_T1_T2_T3_T4_PT6_PT7_T5_NS1_7vsmem_tE
+    128 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 128 bytes cumulative stack size, 12320 bytes smem, 432 bytes cmem[0]
+ptxas info    : Compile time = 53.710 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail10merge_sort26DeviceMergeSortMergeKernelINS2_10policy_hubIPN18explicit_relations8DenseRowEE9Policy600ES7_PNS0_8NullTypeES7_SB_yNS5_12DenseRowLessES6_SA_NS2_11VSMemHelperEEEvbT2_T3_T4_PT6_PT7_T5_PSG_SG_NS1_7vsmem_tE' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail10merge_sort26DeviceMergeSortMergeKernelINS2_10policy_hubIPN18explicit_relations8DenseRowEE9Policy600ES7_PNS0_8NullTypeES7_SB_yNS5_12DenseRowLessES6_SA_NS2_11VSMemHelperEEEvbT2_T3_T4_PT6_PT7_T5_PSG_SG_NS1_7vsmem_tE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 15376 bytes smem, 432 bytes cmem[0]
+ptxas info    : Compile time = 61.524 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortPartitionKernelIPN18explicit_relations8DenseRowEyNS4_12DenseRowLessES5_EEvbT_PT2_T0_SB_PSB_T1_SB_i' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortPartitionKernelIPN18explicit_relations8DenseRowEyNS4_12DenseRowLessES5_EEvbT_PT2_T0_SB_PSB_T1_SB_i
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 24 registers, used 0 barriers, 420 bytes cmem[0]
+ptxas info    : Compile time = 8.024 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortBlockSortKernelINS2_10policy_hubIPN18explicit_relations8DenseRowEE9Policy600ES7_PNS0_8NullTypeES7_SB_yNS5_12DenseRowLessES6_SA_NS2_11VSMemHelperEEEvbT0_T1_T2_T3_T4_PT6_PT7_T5_NS1_7vsmem_tE' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail10merge_sort30DeviceMergeSortBlockSortKernelINS2_10policy_hubIPN18explicit_relations8DenseRowEE9Policy600ES7_PNS0_8NullTypeES7_SB_yNS5_12DenseRowLessES6_SA_NS2_11VSMemHelperEEEvbT0_T1_T2_T3_T4_PT6_PT7_T5_NS1_7vsmem_tE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 15376 bytes smem, 432 bytes cmem[0]
+ptxas info    : Compile time = 70.904 ms
+ptxas info    : Compiling entry function '_ZN3cub16_V_300200_SM_8906detail11EmptyKernelIvEEvv' for 'sm_89'
+ptxas info    : Function properties for _ZN3cub16_V_300200_SM_8906detail11EmptyKernelIvEEvv
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 4 registers, used 0 barriers, 352 bytes cmem[0]
+ptxas info    : Compile time = 0.593 ms
+ptxas info    : Compiling entry function '_ZN18explicit_relations21build_negative_filterINS_8DenseRowEEEvPKT_mPym' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations21build_negative_filterINS_8DenseRowEEEvPKT_mPym
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 16 registers, used 0 barriers, 384 bytes cmem[0]
+ptxas info    : Compile time = 2.475 ms
+ptxas info    : Compiling entry function '_ZN18explicit_relations12build_prefixINS_8DenseRowEEEvPKT_mmjPm' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations12build_prefixINS_8DenseRowEEEvPKT_mmjPm
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 20 registers, used 0 barriers, 392 bytes cmem[0]
+ptxas info    : Compile time = 2.970 ms
+ptxas info    : Compiling entry function '_ZN18explicit_relations14hash_base_wideENS_5CurveEmmmmPNS_5PointE' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations14hash_base_wideENS_5CurveEmmmmPNS_5PointE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 36 registers, used 0 barriers, 448 bytes cmem[0]
+ptxas info    : Compile time = 43.349 ms
+ptxas info    : Compiling entry function '_ZN18explicit_relations9hash_baseENS_5CurveE7Fp64CtxmmmPNS_5PointE' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations9hash_baseENS_5CurveE7Fp64CtxmmmPNS_5PointE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 36 registers, used 0 barriers, 480 bytes cmem[0]
+ptxas info    : Compile time = 42.818 ms
+ptxas info    : Compiling entry function '_ZN18explicit_relations6lift_xENS_5CurveEPKmmPNS_5PointE' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations6lift_xENS_5CurveEPKmmPNS_5PointE
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 36 registers, used 0 barriers, 432 bytes cmem[0]
+ptxas info    : Compile time = 41.847 ms
+ptxas info    : Compiling entry function '_ZN18explicit_relations25resolve_persistent_winnerENS_5CurveENS_5BasesEjNS_5PointEPKNS_8DenseRowEmPyPKmjNS_13RightPartialsE' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations25resolve_persistent_winnerENS_5CurveENS_5BasesEjNS_5PointEPKNS_8DenseRowEmPyPKmjNS_13RightPartialsE
+    176 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 176 bytes cumulative stack size, 4096 bytes smem, 648 bytes cmem[0]
+ptxas info    : Compile time = 253.535 ms
+ptxas info    : Function properties for _Z8fp64_invRK7Fp64Ctxm
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN18explicit_relations22search_right_fullcacheENS_5CurveENS_5PointEmPKNS_8DenseRowEmPyPKmjNS_13RightPartialsE' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations22search_right_fullcacheENS_5CurveENS_5PointEmPKNS_8DenseRowEmPyPKmjNS_13RightPartialsE
+    56 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 56 bytes cumulative stack size, 4104 bytes smem, 528 bytes cmem[0]
+ptxas info    : Compile time = 97.656 ms
+ptxas info    : Function properties for _Z8fp64_invRK7Fp64Ctxm
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN18explicit_relations23search_right_persistentENS_5CurveENS_5BasesEjNS_5PointEmPKNS_8DenseRowEmPyPKmjNS_13RightPartialsE' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations23search_right_persistentENS_5CurveENS_5BasesEjNS_5PointEmPKNS_8DenseRowEmPyPKmjNS_13RightPartialsE
+    120 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 48 registers, used 1 barriers, 120 bytes cumulative stack size, 4104 bytes smem, 656 bytes cmem[0]
+ptxas info    : Compile time = 244.271 ms
+ptxas info    : Function properties for _Z8fp64_invRK7Fp64Ctxm
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN18explicit_relations17build_right_cacheENS_5CurveENS_5BasesEjmPNS_11CachedPointE' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations17build_right_cacheENS_5CurveENS_5BasesEjmPNS_11CachedPointE
+    176 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 176 bytes cumulative stack size, 4096 bytes smem, 552 bytes cmem[0]
+ptxas info    : Compile time = 100.666 ms
+ptxas info    : Function properties for _Z8fp64_invRK7Fp64Ctxm
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN18explicit_relations13build_partialENS_5CurveENS_5BasesEjjmPNS_5PointE' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations13build_partialENS_5CurveENS_5BasesEjjmPNS_5PointE
+    176 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 176 bytes cumulative stack size, 4096 bytes smem, 552 bytes cmem[0]
+ptxas info    : Compile time = 99.745 ms
+ptxas info    : Function properties for _Z8fp64_invRK7Fp64Ctxm
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Compiling entry function '_ZN18explicit_relations10build_leftENS_5CurveENS_5BasesEjmPNS_8DenseRowE' for 'sm_89'
+ptxas info    : Function properties for _ZN18explicit_relations10build_leftENS_5CurveENS_5BasesEjmPNS_8DenseRowE
+    176 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads
+ptxas info    : Used 40 registers, used 1 barriers, 176 bytes cumulative stack size, 4096 bytes smem, 552 bytes cmem[0]
+ptxas info    : Compile time = 98.384 ms
+ptxas info    : Function properties for _Z8fp64_invRK7Fp64Ctxm
+    0 bytes stack frame, 0 bytes spill stores, 0 bytes spill loads

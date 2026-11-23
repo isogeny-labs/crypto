@@ -1,0 +1,75 @@
+name: Quadratic twist native parity and audit
+
+on:
+  pull_request:
+    paths:
+      - 'research/quadratic_twist_evidence_20261021/**'
+      - '.github/workflows/quadratic-twist-evidence.yml'
+      - 'docs/curves/sources/quadratic-twist-native-20261021.json'
+      - 'src/cryptanalysis/identity_certificate.rs'
+      - 'src/cryptanalysis/curve_id.rs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/quadratic_twist_evidence_20261021/
+            /docs/curves/registry.json
+            /docs/curves/sources/quadratic-twist-native-20261021.json
+            /docs/identity-certificates/schoenhage-10mult.json
+            /src/binary_ecc/f2m.rs
+            /src/hash/sha256.rs
+            /src/cryptanalysis/curve_id.rs
+            /src/cryptanalysis/curve_aliases.json
+            /src/cryptanalysis/identity_certificate.rs
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.99.1'
+      - name: Install native audit dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++ libssl-dev jq xz-utils ripgrep
+      - name: Audit historical certificates natively
+        run: bash research/quadratic_twist_evidence_20261021/run-audit.sh
+      - name: Check corrupted-source and false-relation controls
+        run: bash research/quadratic_twist_evidence_20261021/test-audit.sh
+      - name: Replay every historical finite workload natively
+        run: bash research/quadratic_twist_evidence_20261021/run-native.sh "$RUNNER_TEMP/twist-native"
+      - name: Reject false new relations and incomplete coverage
+        run: bash research/quadratic_twist_evidence_20261021/test-native.sh "$RUNNER_TEMP/twist-native" "$RUNNER_TEMP/twist-controls"
+      - name: Check native identity backend tests
+        run: cargo test --release --locked --manifest-path research/quadratic_twist_evidence_20261021/native/metadata/Cargo.toml
+      - name: Reproduce identity certificates and registered models
+        run: bash research/quadratic_twist_evidence_20261021/test-metadata.sh "$RUNNER_TEMP/twist-native" "$RUNNER_TEMP/twist-metadata"
+      - name: Replay mixed Frobenius words with independent native arithmetic
+        run: bash research/quadratic_twist_evidence_20261021/run-mixed.sh "$RUNNER_TEMP/twist-mixed"
+      - name: Check mixed-audit native identity backend tests
+        run: cargo test --release --locked --manifest-path research/quadratic_twist_evidence_20261021/native/mixed-audit/Cargo.toml
+      - name: Replay source-bound group-map polynomial identities and controls
+        run: bash research/quadratic_twist_evidence_20261021/run-group-map.sh "$RUNNER_TEMP/twist-group-map"
+      - name: Replay twist-assisted pairing transfers, independent arithmetic and controls
+        run: bash research/quadratic_twist_evidence_20261021/run-pairing.sh "$RUNNER_TEMP/twist-pairing"
+      - name: Replay conditional yield-cost polynomial and source controls
+        run: bash research/quadratic_twist_evidence_20261021/run-yield.sh "$RUNNER_TEMP/twist-yield"
+      - name: Upload native audit receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quadratic-twist-native-audit
+          path: |
+            research/quadratic_twist_evidence_20261021/audits/
+            ${{ runner.temp }}/twist-native/
+            ${{ runner.temp }}/twist-controls/
+            ${{ runner.temp }}/twist-metadata/
+            ${{ runner.temp }}/twist-mixed/
+            ${{ runner.temp }}/twist-group-map/
+            ${{ runner.temp }}/twist-pairing/
+            ${{ runner.temp }}/twist-yield/
+          if-no-files-found: error

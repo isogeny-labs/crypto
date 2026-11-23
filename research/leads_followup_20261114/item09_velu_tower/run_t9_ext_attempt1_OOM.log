@@ -1,0 +1,33 @@
+22:02:01 instance t=9 i=1: aux a0=3479 b0=41499 #E'=1048576 tried=1131; E a=935481 b=573096 target=505903 nonunit_rejected=0
+22:02:01 {"t": 9, "D": 3, "columns": 988, "gen_weight": 4, "one_in_V": false, "dim": 0, "profile": null, "secs": 0.0, "note": "generator weight > D: V_D = 0 (vacuous)", "kind": "velu", "instance": 1}
+22:02:01 {"t": 9, "D": 4, "columns": 4048, "gen_weight": 4, "one_in_V": false, "dim": 1, "profile": [0, 0, 0, 0, 1], "secs": 0.0, "verify_bad": 0, "kind": "velu", "instance": 1}
+22:02:01   D=5 rank=19 low=5 processed=1 t=0s
+22:02:01   D=5 rank=81 low=41 processed=5 t=0s
+22:02:03   D=5 rank=377 low=117 processed=41 t=3s
+22:02:08   D=5 rank=914 low=300 processed=117 t=8s
+22:02:24   D=5 rank=1916 low=448 processed=300 t=24s
+22:02:45   D=5 rank=2820 low=674 processed=448 t=45s
+22:03:18   D=5 rank=3978 low=878 processed=674 t=77s
+22:03:56   D=5 rank=5047 low=1064 processed=878 t=116s
+22:04:39   D=5 rank=6079 low=1294 processed=1064 t=159s
+22:05:34   D=5 rank=7139 low=1519 processed=1294 t=214s
+22:06:33   D=5 rank=8221 low=1713 processed=1519 t=273s
+22:07:38   D=5 rank=9120 low=1971 processed=1713 t=337s
+22:08:57   D=5 rank=10150 low=2231 processed=1971 t=417s
+22:10:34   D=5 rank=10923 low=2409 processed=2231 t=514s
+22:12:09   D=5 rank=11558 low=2990 processed=2409 t=608s
+Traceback (most recent call last):
+  File "/home/user/crypto/research/leads_followup_20261114/item09_velu_tower/run_cells.py", line 27, in <module>
+    r = run_cell(rules, p, inst['a'], inst['b'], inst['target'], D, early=True, verify=True, log=log if t >= 7 else None)
+  File "/home/user/crypto/research/leads_followup_20261114/item09_velu_tower/tower_engine.py", line 231, in run_cell
+    r = closure(L, g, ops, p, chunk=chunk, early=early, log=log)
+  File "/home/user/crypto/research/leads_followup_20261114/item09_velu_tower/tower_engine.py", line 202, in closure
+    B, piv, _ = merge(B, piv, Y, p)
+                ~~~~~^^^^^^^^^^^^^^
+  File "/home/user/crypto/research/leads_followup_20261114/item09_velu_tower/tower_engine.py", line 176, in merge
+    if len(piv): B = (B - modmm(B[:, newpc], newC, p)) % p
+                          ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/crypto/research/leads_followup_20261114/item09_velu_tower/tower_engine.py", line 138, in modmm
+    out += np.mod(P, p).astype(np.int64)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+numpy._core._exceptions._ArrayMemoryError: Unable to allocate 1.09 GiB for an array with shape (11558, 12616) and data type int64

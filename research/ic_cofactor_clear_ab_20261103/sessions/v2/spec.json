@@ -1,0 +1,209 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "cofactor clearing A/B, census V2 D-L0 curves (h=32)",
+  "description": "Clear the cofactor from the IC factor base (prime-projected-abscissa) against the census ic arm (prime-abscissa), same size, oracle and targets. Known-answer synthetic curves; counted metrics only (L1 host). Protocol: research/ic_cofactor_clear_ab_20261103/protocol-v2.json",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 38553991,
+        "b": 25071365,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 33926210,
+        "gy": 3740559
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 37468857,
+        "b": 12031159,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 41618021,
+        "gy": 13115602
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 3762262,
+        "b": 35355650,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 23083654,
+        "gy": 14787869
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 16695840,
+        "b": 40652731,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 3669294,
+        "gy": 5421090
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 19810944,
+        "b": 10904692,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 2167061,
+        "gy": 10460067
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 24285442,
+        "b": 726056,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 13624450,
+        "gy": 764999
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 2125803,
+        "b": 11372460,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 1274154,
+        "gy": 13580353
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 25016911,
+        "b": 24720893,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 11069560,
+        "gy": 31131882
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 36289814,
+        "b": 21139651,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 2926870,
+        "gy": 28478488
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 5233613,
+        "b": 31729187,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 3635287,
+        "gy": 16025588
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 2312262,
+        "b": 1805273,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 5460887,
+        "gy": 19176723
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 38834284,
+        "b": 31119521,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 25385042,
+        "gy": 42284997
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 36532649,
+        "b": 13710846,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 22114272,
+        "gy": 17349860
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 42310123,
+        "a": 23278692,
+        "b": 16620677,
+        "group_order": 42313696,
+        "r": 1322303,
+        "gx": 9959766,
+        "gy": 11902829
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261103,
+    "target_kind": "planted_shared"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-plain",
+      "role": "baseline",
+      "method": {
+        "id": "rho.plain"
+      }
+    },
+    {
+      "name": "ic-raw",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "ic-clear",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=64,scan_cap=4096",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "ic-raw-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261103,
+    "isolation_required": "L1",
+    "timeout_seconds": 600
+  }
+}

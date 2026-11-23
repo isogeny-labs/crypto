@@ -1,0 +1,295 @@
+[
+    {
+        "Id": "382546816b0d899a124a209a20974fee48758fdc0611f4ac0f154c06c0aa6eff",
+        "Created": "2026-11-16T06:27:54.279402429Z",
+        "Path": "sh",
+        "Args": [
+            "-ec",
+            "\n    repo=/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116\n    plan=$repo/research/koblitz_n83_factor_base_sweep_20261008/verification/k600-colima-charged-retry-20261116/CHARGED_BUILD_PLAN_LOCAL_SOLVER.json\n    producer=/build-output/bootstrap-20261116-attempt-2/build-producer\n    test \"$(uname -m)\" = aarch64\n    test \"$(cat /sys/fs/cgroup/memory.max)\" = 12884901888\n    test \"$(cat /sys/fs/cgroup/memory.swap.max)\" = 0\n    test \"$(cat /sys/fs/cgroup/cpu.max)\" = \"400000 100000\"\n    test \"$(cat /sys/fs/cgroup/pids.max)\" = 512\n    test \"$(git -C \"$repo\" rev-parse HEAD)\" = \"$EXPECT_SOURCE\"\n    test -z \"$(git -C \"$repo\" status --porcelain)\"\n    exec \"$producer\" run \"$plan\" /build-output/charged-20261116-attempt-4\n  "
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-16T06:27:54.320693522Z",
+            "FinishedAt": "2026-11-16T07:17:31.81655785Z"
+        },
+        "Image": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+        "ResolvConfPath": "/var/lib/docker/containers/382546816b0d899a124a209a20974fee48758fdc0611f4ac0f154c06c0aa6eff/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/382546816b0d899a124a209a20974fee48758fdc0611f4ac0f154c06c0aa6eff/hostname",
+        "HostsPath": "/var/lib/docker/containers/382546816b0d899a124a209a20974fee48758fdc0611f4ac0f154c06c0aa6eff/hosts",
+        "LogPath": "/var/lib/docker/containers/382546816b0d899a124a209a20974fee48758fdc0611f4ac0f154c06c0aa6eff/382546816b0d899a124a209a20974fee48758fdc0611f4ac0f154c06c0aa6eff-json.log",
+        "Name": "/n83-colima-charged-build-20261116-attempt-4",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "bridge",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 12884901888,
+            "NanoCpus": 4000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 12884901888,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 512,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                    "Target": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/crypto/.git",
+                    "Target": "/Volumes/SSD990/crypto/.git",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/.codex/git-objects/crypto-n83-20261019",
+                    "Target": "/Volumes/SSD990-2/.codex/git-objects/crypto-n83-20261019",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs",
+                    "Target": "/inputs",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-output",
+                    "Target": "/build-output"
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/var/run/docker.sock",
+                    "Target": "/var/run/docker.sock"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/.codex/git-objects/crypto-n83-20261019",
+                "Destination": "/Volumes/SSD990-2/.codex/git-objects/crypto-n83-20261019",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs",
+                "Destination": "/inputs",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-output",
+                "Destination": "/build-output",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/var/run/docker.sock",
+                "Destination": "/var/run/docker.sock",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                "Destination": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/crypto/.git",
+                "Destination": "/Volumes/SSD990/crypto/.git",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "382546816b0d",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "DOCKER_HOST=unix:///var/run/docker.sock",
+                "EXPECT_SOURCE=ba620214684e41def8bc6caddf2e782f43920218",
+                "GIT_OPTIONAL_LOCKS=0",
+                "GIT_CONFIG_COUNT=1",
+                "GIT_CONFIG_KEY_0=safe.directory",
+                "GIT_CONFIG_VALUE_0=/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116",
+                "PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "RUSTUP_HOME=/usr/local/rustup",
+                "CARGO_HOME=/usr/local/cargo",
+                "RUST_VERSION=1.99.1"
+            ],
+            "Cmd": [
+                "sh",
+                "-ec",
+                "\n    repo=/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-full-validation-20261116\n    plan=$repo/research/koblitz_n83_factor_base_sweep_20261008/verification/k600-colima-charged-retry-20261116/CHARGED_BUILD_PLAN_LOCAL_SOLVER.json\n    producer=/build-output/bootstrap-20261116-attempt-2/build-producer\n    test \"$(uname -m)\" = aarch64\n    test \"$(cat /sys/fs/cgroup/memory.max)\" = 12884901888\n    test \"$(cat /sys/fs/cgroup/memory.swap.max)\" = 0\n    test \"$(cat /sys/fs/cgroup/cpu.max)\" = \"400000 100000\"\n    test \"$(cat /sys/fs/cgroup/pids.max)\" = 512\n    test \"$(git -C \"$repo\" rev-parse HEAD)\" = \"$EXPECT_SOURCE\"\n    test -z \"$(git -C \"$repo\" status --porcelain)\"\n    exec \"$producer\" run \"$plan\" /build-output/charged-20261116-attempt-4\n  "
+            ],
+            "Image": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "Labels": {
+                "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust"
+            }
+        },
+        "NetworkSettings": {
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "2af0ee2f72822f766ad8066218d1b13fe280f60d885b04f3a5d97d0b63545399",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "MacAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:08323aa37a9a6bdf87c250655aae3a1cfa3cbd09f3b30caf3561f0bfc6ad942d",
+            "size": 1449,
+            "platform": {
+                "architecture": "arm64",
+                "os": "linux"
+            }
+        }
+    }
+]

@@ -1,0 +1,36 @@
+import ReductionRun
+set_option autoImplicit false
+namespace ReductionWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest
+
+theorem step_exists_strict (p : UInt64) [Fact p.toNat.Prime] (f u v : List UInt64)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hf : Canon p f) (hu : Canon p u) (hv : Canon p v) (hun : Normal u)
+ (hfd : (wordsPoly p f).natDegree=5)
+ (hud : 3≤(wordsPoly p u).natDegree) (hu4 : (wordsPoly p u).natDegree≤4)
+ (hvd : (wordsPoly p v).natDegree<(wordsPoly p u).natDegree)
+ (hvalid : wordsPoly p u ∣ wordsPoly p f-(wordsPoly p v)^2) :
+ ∃ q r, FallbackWord.exactDiv p (ResidualWord.residual p f v) u=some q ∧
+ FallbackGeometry.remainder p (ResidualWord.pneg p v) (monic p q)=some r ∧
+ Canon p (monic p q) ∧ Canon p r ∧ Normal (monic p q) ∧ Normal r ∧ r.length < (monic p q).length ∧
+ monic p q ≠ [] ∧ (monic p q).length≤3 ∧ r.length≤2 ∧
+ MumfordValidity.Valid (wordsPoly p f) (wordsPoly p (monic p q)) (wordsPoly p r) := by
+ have hres := ResidualWord.residual_correct p f v (by omega) hb hf hv
+ have hunz : wordsPoly p u ≠ 0 := by intro hz; simp [hz] at hud
+ have hdiv : wordsPoly p u ∣ wordsPoly p (ResidualWord.residual p f v) := by rw [hres.2]; exact hvalid
+ obtain ⟨q,hq,hqc,hqn,hdec⟩ := FallbackWord.exact_total_normal p _ u hp hb hres.1 hu hun hunz hdiv
+ have heq : wordsPoly p f-wordsPoly p v*wordsPoly p v=wordsPoly p q*wordsPoly p u := by
+   simpa [hres.2,pow_two] using hdec
+ have hbound := quintic_quotient_bound (wordsPoly p f) (wordsPoly p u) (wordsPoly p v) (wordsPoly p q) hfd hud hu4 hvd heq
+ have hqe : q ≠ [] := by intro hz; apply hbound.1; simp [hz,wordsPoly,listPoly]
+ have hqs := monic_shape p q hp hb hqc hqn hqe
+ have hqv : wordsPoly p q ∣ wordsPoly p f-wordsPoly p v*wordsPoly p v := ⟨wordsPoly p u,heq⟩
+ have hmv := normalization_valid p q (wordsPoly p f) (wordsPoly p v) hp hb hqc hqn hqe hqv
+ have hneg := ResidualWord.neg_correct p v (by omega) hv
+ obtain ⟨r,hr,hrc,hrn,hrs,hrdiv⟩ := FallbackGeometry.remainder_total p (ResidualWord.pneg p v) (monic p q) hp hb hneg.1 hqs.1 hqs.2.1 hmv.1.ne_zero
+ have hnegvalid : wordsPoly p (monic p q) ∣ wordsPoly p f-wordsPoly p (ResidualWord.pneg p v)*wordsPoly p (ResidualWord.pneg p v) := by
+   simpa [hneg.2] using hmv.2.1
+ have hrv := FallbackGeometry.remainder_valid _ _ _ _ hnegvalid hrdiv
+ have hout := final_storage p q r (wordsPoly p f) hp hb hqc hqn hqe hbound.2 hrs (by simpa [pow_two] using hrv)
+ exact ⟨q,r,hq,hr,hqs.1,hrc,hqs.2.1,hrn,hrs,hout⟩
+end ReductionWord

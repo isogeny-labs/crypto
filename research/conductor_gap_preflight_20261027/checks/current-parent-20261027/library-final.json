@@ -1,0 +1,51 @@
+{
+  "schema": "development-validation-result/v1",
+  "observed_at_utc": "2026-10-27T16:09:38Z",
+  "source_merge_revision": "adfb858227a5a31585a12afb2cd55114dbcd2c81",
+  "observed_on_published_head": "3a8acd764a1e73a1f4a3db7f50174aee5e30c4d4",
+  "command": "cargo test --release --lib --offline",
+  "status": "failed",
+  "exit_code": 101,
+  "declared_cases": 5037,
+  "passed": 4902,
+  "failed": 13,
+  "repository_ignored": 122,
+  "measured": 0,
+  "filtered_out": 0,
+  "terminal_case_names": 5037,
+  "previously_unconfirmed_case": "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies",
+  "previously_unconfirmed_case_result": "ok",
+  "unconfirmed_cases": [],
+  "test_harness_duration_seconds": "2572.04",
+  "duration_is_scientific_measurement": false,
+  "failure_names": [
+    "cryptanalysis::ecbench::compare::tests::weighted_comparison_prices_verified_pairs_and_records_weight_identity",
+    "cryptanalysis::ecbench::hyper_ic::tests::ecbench_recovers_planted_logs_on_thread_jacobians",
+    "cryptanalysis::ecbench::hyper_ic::tests::ecbench_runs_are_deterministic_in_the_seed",
+    "cryptanalysis::ecbench::hyper_ic::tests::ic_hyperelliptic_is_refused_off_jacobians_and_other_ic_on_them",
+    "cryptanalysis::pollard_collab::cairn::tests::a_key_submitter_signs_what_cairn_verifies",
+    "cryptanalysis::pollard_collab::cairn::tests::an_older_node_without_progress_turns_heartbeats_off_quietly",
+    "cryptanalysis::pollard_collab::cairn::tests::generic_artifacts_use_the_persisted_commit_reveal_outbox",
+    "cryptanalysis::pollard_collab::cairn::tests::heartbeats_carry_the_sessions_own_counters_at_the_cadence",
+    "cryptanalysis::pollard_collab::cairn::tests::pending_commitments_survive_a_restart",
+    "cryptanalysis::pollard_collab::cairn::tests::points_travel_through_cairn_as_commit_reveal_claims_and_solve",
+    "cryptanalysis::pollard_collab::cairn::tests::the_client_speaks_enough_http",
+    "cryptanalysis::pollard_collab::net::tests::foreign_job_is_refused",
+    "cryptanalysis::pollard_collab::net::tests::three_nodes_in_a_chain_converge"
+  ],
+  "full_log_bytes": 438245,
+  "full_log_sha256": "e891b5147f4fdb17ff730d97cd8fe8e26822eb2f9096752e6079676a18fc0bcd",
+  "full_log_local_path": "/workspace/conductor-2684-validation-20261027/release-lib.log",
+  "raw_log_durably_uploaded": false,
+  "historical_progress_snapshot_preserved": true,
+  "owned_processes_observed_absent": [
+    50730,
+    62261
+  ],
+  "termination_or_rerun_performed": false,
+  "focused_reruns": {
+    "local_network_passed": 9,
+    "parent_code_failed": 4,
+    "original_full_result_revised_to_pass": false
+  }
+}

@@ -1,0 +1,11 @@
+# Independent weighted constructor review
+
+All 50 producer manifest entries match. Constructor, literal equality, producer controls and separate axiom readback compiled privately with exit 0. Reviewer controls also compile with exit 0 after preserving a failed Decidable-synthesis attempt and replacing it with an explicit bound contradiction. Readback contains only standard propext, Classical.choice and Quot.sound dependencies.
+
+The Rust source uses z2=sq(z), z3=mul(z2,z), z4=sq(z2), z5=mul(z4,z), then q*z2, r*z4, s*(z3*w), t*(z5*w). Literal.lean retains that exact value-expression tree and modulus after each product, not the different cross-scaling association. The word model expands shared subtrees; it makes no operation-count equivalence claim. Gate lines569–580 confirm from_affine degree2 invokes weight_degree_two(d,1,1,f).
+
+The decoding theorem supplies canonical results from six canonical inputs and positive p<2^31. The invariant theorem uses prime-field cancellation with nonzero weights, reducing normalized coefficients to the original monic support and linear v, so its only validity premise is the original affine divisibility. The unit-weight specialization passes this invariant into existing word-prelude exclusion with an explicitly valid partner and 5<=p<2^31. No coefficient-identity premise bypasses validity.
+
+Producer nonvacuity is a full p5 polynomial-divisibility instance with nonunit z2,w3. Independent controls check all four nonzero coefficients at p7, unit-weight preservation, zero-weight preservation, and failure of output canonicality when the retained z equals p. The latter is an assumption-boundary control, not a counterexample under the theorem hypotheses.
+
+No blocking discrepancy found in the constructor/initialization claim. Native mapping still requires Field.n1, tablesNone, normal execution and counter headroom. Canonical transfer outputs and the bridge from Rust Jacobian::valid to formal divisibility remain external. No nonidentity addition closure, complete jump initialization, or loop invariant is established. Sources: producer PLAN/REPORT; retained exact projective_law_gate.rs and Field primitives; previously independently checked CrossScaling and WordErrorExclusion dependencies. No new literature or performance claim.

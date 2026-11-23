@@ -1,0 +1,282 @@
+{
+  "schema": "semaev-source-order-reassociation-plan/v1",
+  "created": "2026-11-13T17:41:03.607194+00:00",
+  "formal": {
+    "project": "research/semaev_reassociation_audit_20261113/lean",
+    "theorem": "SemaevReassociationAudit.actual_source_order_reassociation_with_control",
+    "statement": "theorem actual_source_order_reassociation_with_control : (∀ (R : Type) [CommRing R] [IsDomain R] (D : ℕ) (p : Polynomial R), p.natDegree ≤ D → ∀ W : WeierstrassCurve R, doubleStep D p W.b₂ W.b₄ W.b₆ W.b₈ = sourceBalanced D p W) ∧ (∀ (K : Type) [Field K] (W : WeierstrassCurve.Affine K) (n : ℕ), recursivePolynomial W (n+2) = sourceBalanced (2^(n+1)) (recursivePolynomial W n) (W.map (coefficientEmbedding n))) ∧ s4Ring (0 : ℚ) 0 0 1 0 1 2 3 ≠ s4Ring (0 : ℚ) 0 0 1 0 2 1 3",
+    "decl_sha256": "bf6fbf6ca38648e090bba826e2ba9a2e8054563448ff16b560d7d96489293e1b",
+    "scope": "Actual general-Weierstrass S3 two-step fixed-size resultant reassociation into the existing source-ordered S4 block over every commutative integral domain, for every declared old sizeD>=natDegreeP, including zero P, repeated coordinates and every characteristic. Actual bivariate source/symmetry/degree, specialization and generic leading-coefficient proof, generic evaluation homomorphism proved identity on the three-variable polynomial ring, literal doubleStep and actual recursivePolynomial W(n+2) equality to sourceBalanced at every canonical stage. Actual Weierstrass-curve S4 cross-pair symmetry and rotation give exact source argument order. Direct rational independent-b coefficient control refutes unrestricted S4 cross symmetry; no qualified source refutation. This normalizes the k=2 S4-block split at every arity>=5, not all arbitrary k>=3, full higher permutation invariance or absolute irreducibility. No new native experiment or execution assurance.",
+    "sources": [
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/Definitions.lean",
+        "bytes": 1405,
+        "sha256": "2ef9816af6fb11118589a3ac23abd10b6c10b0447d73f522a95631003c1606ba"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/DegreeDropControl.lean",
+        "bytes": 3439,
+        "sha256": "47145d96b6d2a7b2d2179c55c009c0e1d30f207763e2b32f97f8671ca5b71446"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/DomainInterchange.lean",
+        "bytes": 3780,
+        "sha256": "db508fb51bc97b00928f87f540fec0093be7a39ec52cf87e41d9c93d9175d8c5"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/FieldInterchange.lean",
+        "bytes": 4359,
+        "sha256": "61c3e2a5c19b4a4581c49eff4ddb0b776d8935337fa4ec81fa03801abc345b80"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/SplitInterchange.lean",
+        "bytes": 5171,
+        "sha256": "15fa7135ea55f0d554920970af5c37298c4c1fd2c3a338ae4ac5590957ddf777"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3561,
+        "sha256": "ae065ef42758e41ad3d966bb078b3cf34681205d1c9355b72f0ed3cd24387d40"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/lakefile.toml",
+        "bytes": 397,
+        "sha256": "5f03eb79f4c676010a52491c51a2680dcac5dac1ab059c76f81b754a9464ea4d"
+      },
+      {
+        "path": "research/resultant_interchange_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/ActualS3.lean",
+        "bytes": 2969,
+        "sha256": "6746fbd36771b16c1c0697a00efc0851f918c65dbe559274641aff73e5deb19d"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/CanonicalBridge.lean",
+        "bytes": 4061,
+        "sha256": "ff24730e10077b9d08eda82ebdfe5175b4bfa185fe053e2c6f3ec3ad9114958d"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/GenericSpecialization.lean",
+        "bytes": 1843,
+        "sha256": "0216f67f3d98f4b2a508d7399d8cf7f0ccd0f3a8557ebb1ad888fed0acfbe12a"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/LiteralPolynomial.lean",
+        "bytes": 4912,
+        "sha256": "c2adc19af049ca51f6591917244b795b74c24231e18718fb03f717ad2fad4fd4"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/PrescribedDegree.lean",
+        "bytes": 1923,
+        "sha256": "27def4d6bffe502408aa6aba96502322969924898948a4c1f18b0c8f10f8f535"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/Reassociation.lean",
+        "bytes": 3548,
+        "sha256": "32266f19df5870d47081e101be3816eab397bf62d43f7a718c0613ccb9f98765"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/S4Cross.lean",
+        "bytes": 577,
+        "sha256": "3f4470901a4286932292c073d6485a5c16fb7b59df20614042913d1fdb5f63ea"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/SourceOrder.lean",
+        "bytes": 3968,
+        "sha256": "0d20877be853155fc17ae4084d6575d14d2229b1a311523c468f0a6e468ec51b"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/lake-manifest.json",
+        "bytes": 4379,
+        "sha256": "de7f096b8b13b7cbaa02c89f9cb2c65b84f4a7bbe5bebbe11d691119169b21c3"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/lakefile.toml",
+        "bytes": 490,
+        "sha256": "a45e823f636714a6fa3f9a2088c515eea884ab8fbf2f7559dc258bd950e2929d"
+      },
+      {
+        "path": "research/semaev_reassociation_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/DeclaredResultantRoots.lean",
+        "bytes": 5614,
+        "sha256": "b0b9cf067feab2f8375d2e287f242192a604ef3188ea8ead25458a91bea335ba"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/GeneralS3.lean",
+        "bytes": 13770,
+        "sha256": "13ffefd385f4e20e60df00483802c80c00cc21c9f25caf41987d41845d375633"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/GeneralS4.lean",
+        "bytes": 11447,
+        "sha256": "1d73c0555b406b7c54796796f11f4ca720708060b2d5dba4de95c9d455bc378b"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevDegree.lean",
+        "bytes": 6783,
+        "sha256": "cea5acca394aa203c125416ce1d69247079749e48de38ce4d67faaf7a5ae9edf"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevEvaluation.lean",
+        "bytes": 7032,
+        "sha256": "525b56734270937c8b207978f085df454bdb86bf0dd0a51fd83129a3336b448e"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/ResultantDegreeStep.lean",
+        "bytes": 13874,
+        "sha256": "3a360ba0006ff7112f6c54cd389dcf8719d0c59c0cc816be4075e9a4970231f6"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/S4Degree.lean",
+        "bytes": 17208,
+        "sha256": "b26b20cddee5ec12369b5b3447c6d3b352f878a1f9201219090271ed201f2c20"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "research/semaev_reassociation_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 22140,
+      "sha256": "62fb02f47964d4d2195511c05eb334de43bda853dec6873ebe94e02feba2364f"
+    },
+    {
+      "path": "research/semaev_reassociation_audit_20261113/evidence/attempts.json",
+      "bytes": 15260,
+      "sha256": "b4e29d753fe008866c7f77761ffe73b86613f5955aede7eda93f2e1a0bd32dea"
+    },
+    {
+      "path": "research/semaev_reassociation_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 3871,
+      "sha256": "647a5b086710a8696bb815379b2ec41607d2440fccdd91857ff40b1782ac1e92"
+    },
+    {
+      "path": "research/semaev_reassociation_audit_20261113/evidence/gate.json",
+      "bytes": 2493,
+      "sha256": "51ed323a9b1b6724cfa6de9004ae37fd831e6708553fb3389df243c2e46875d1"
+    },
+    {
+      "path": "research/semaev_reassociation_audit_20261113/evidence/source-review.json",
+      "bytes": 2269,
+      "sha256": "0065e78e48232bd0cffb15981eb63513b7a2274f80a62f5280b7a40262fd531c"
+    },
+    {
+      "path": "research/semaev_reassociation_audit_20261113/proof-map.json",
+      "bytes": 2672,
+      "sha256": "1f2fde099445e31ba593dd82297846fa5d11d31a410f0aa3a6df71209be52d52"
+    },
+    {
+      "path": "research/semaev_reassociation_audit_20261113/render_report.py",
+      "bytes": 5925,
+      "sha256": "c19a2379da890c7ec4324f2e32a0b640e919402cd8147fd680c4386465868b1a"
+    },
+    {
+      "path": "research/semaev_reassociation_audit_20261113/reports/layout.json",
+      "bytes": 279,
+      "sha256": "4e44cc3bc8c265598c9c41df0789e374e233581758d4ba5f9dd4c711377df8c4"
+    },
+    {
+      "path": "research/semaev_reassociation_audit_20261113/reports/proof-flow.svg",
+      "bytes": 1771,
+      "sha256": "1e2bc00cfd48cd4b6a3368bd12a543c4b9bef5afadc644e5de85c44a0fba10f7"
+    },
+    {
+      "path": "research/semaev_reassociation_audit_20261113/reports/report.pdf",
+      "bytes": 46509,
+      "sha256": "2a1e6f2d5f285ca993292e47f9cfba37c28006efd33d8246f5c7e3cb551ffd4e"
+    }
+  ],
+  "custom_import_modules": [
+    "ActualS3",
+    "CanonicalBridge",
+    "DeclaredResultantRoots",
+    "Definitions",
+    "DegreeDropControl",
+    "DomainInterchange",
+    "FieldInterchange",
+    "GeneralS3",
+    "GeneralS4",
+    "GenericSpecialization",
+    "LiteralPolynomial",
+    "PrescribedDegree",
+    "Reassociation",
+    "RecursiveSemaevDegree",
+    "RecursiveSemaevEvaluation",
+    "ResultantDegreeStep",
+    "S3Completion",
+    "S3Roots",
+    "S4Cross",
+    "S4Degree",
+    "SourceOrder",
+    "SplitInterchange"
+  ],
+  "assurance": {
+    "gate_declarations": 60,
+    "initial_gate": 51,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "added_elaboration_options": false,
+    "waivers": false,
+    "actual_formal_polynomial_equality": true,
+    "source_order_k2_split": true,
+    "all_arbitrary_splits": false,
+    "higher_absolute_irreducibility": false,
+    "qualified_source_refuted": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

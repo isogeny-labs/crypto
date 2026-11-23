@@ -1,0 +1,126 @@
+{
+  "schema": "jv-local-source-review/v1",
+  "credited_dependency_modules": [
+    "research/coordinate_length_audit_20261114/lean/Bivariate.lean",
+    "research/coordinate_length_audit_20261114/lean/Solutions.lean",
+    "research/coordinate_length_audit_20261114/lean/Thickening.lean",
+    "research/jv_graded_hilbert_audit_20261114/lean/CanonicalPieces.lean",
+    "research/jv_graded_hilbert_audit_20261114/lean/GradedBasis.lean",
+    "research/jv_graded_hilbert_audit_20261114/lean/GradedCertificate.lean",
+    "research/jv_hilbert_audit_20261113/lean/CubicDual.lean",
+    "research/jv_hilbert_audit_20261113/lean/DualBasis.lean",
+    "research/jv_hilbert_audit_20261113/lean/QuotientBasis.lean",
+    "research/jv_hilbert_audit_20261113/lean/SharpCutoff.lean",
+    "research/jv_macaulay_certificate_20261113/lean/ActualIdeal.lean",
+    "research/jv_macaulay_certificate_20261113/lean/CubicNormalForms.lean",
+    "research/jv_macaulay_certificate_20261113/lean/LiteralQuadratics.lean",
+    "research/jv_macaulay_certificate_20261113/lean/MacaulayCertificate.lean",
+    "research/local_algebra_length_audit_20261114/lean/LocalLengthCertificate.lean",
+    "research/local_algebra_length_audit_20261114/lean/PowerBasisLength.lean",
+    "research/local_algebra_length_audit_20261114/lean/ResidueDegreeControl.lean",
+    "research/local_algebra_length_audit_20261114/lean/TruncatedLocal.lean"
+  ],
+  "new_modules": [
+    "JVCharts",
+    "JVConePoints",
+    "JVLocalCertificate",
+    "JVLocalization",
+    "JVOrigin",
+    "JVTailFlags"
+  ],
+  "primary_sources": [
+    {
+      "source": "Joux–Vitse author manuscript, DLFq5.pdf",
+      "url": "https://www-fourier.ujf-grenoble.fr/~viva/research/articles/DLFq5.pdf",
+      "pages_total": 21,
+      "bytes": 466920,
+      "sha256": "6f3268a0ef8c50b51a79f8b64deff0c60374228a827bea73d4e590284cb68377",
+      "fresh_fulltext_and_visual_pages": [
+        7
+      ],
+      "coverage": "Both literal toy systems and source-known empty first affine system/second root(69,75); no whole-paper read claim."
+    },
+    {
+      "source": "Diem 2011",
+      "doi": "10.1112/S0010437X10005075",
+      "pages_total": 31,
+      "bytes": 878749,
+      "sha256": "74902b5816cd550aa57e180c60fb5bc60b64d93c8ce9f2019a53ca30a934a58a",
+      "fresh_fulltext_and_visual_pdf_pages": [
+        6,
+        7,
+        8
+      ],
+      "printed_pages": [
+        79,
+        80,
+        81
+      ],
+      "coverage": "Proposition2.5 explicitly counts with multiplicities/zero-dimensional cycle degree in product(P1)^n; source intersection sketch read, general proof not formalized."
+    }
+  ],
+  "prior_claims": [
+    {
+      "claim": "PCC-20261114-aec576",
+      "credit": "Actual F101 source ideal/quotient/basis/multiplication/scalar dimension8/Hilbert1,3,3,1,0 and all-field cone zero characterization.",
+      "gate_declarations": 26
+    },
+    {
+      "claim": "PCC-20261114-81195a",
+      "credit": "Classical ordered ideal flag and scalar-restriction length upper bound. Prior F4/F2 residue-degree control credited; not rebranded.",
+      "gate_declarations": 28
+    },
+    {
+      "claim": "PCC-20261113-6296df",
+      "credit": "Actual first source field/curve/nondecomposability is documentary context only. No new curve/scalar/decomposition result or import."
+    },
+    {
+      "path": "research/groebner_system_audit_20261113",
+      "credit": "Historical native GB output6/1/2 and independent scalar-length/point/Hilbert analysis; no new solver run or fresh independent host."
+    }
+  ],
+  "official_api_reads": [
+    "Module.Basis.mk_apply; basis coefficient/degree identities",
+    "Submodule.span_induction; Ideal and strict LTSeries; Module.length lower bound and scalar restriction",
+    "Commute.isNilpotent_add/mul_right; IsNilpotent.smul; IsLocalRing.of_isUnit_or_isUnit_one_sub_self",
+    "RingHom.ker_isMaximal_of_surjective and quotientKerEquivOfSurjective",
+    "Ideal.IsPrime.mem_of_pow_mem; PrimeSpectrum.ext and singleton topology",
+    "IsLocalization.atUnits; canonical AtPrime.isLocalRing; Module.length_eq_of_surjective and LinearEquiv.length_eq",
+    "IsLocalRing.ker_eq_maximalIdeal; ResidueField; Ideal.quotEquivOfEq",
+    "Ideal.eq_top_of_isUnit_mem; Ideal.Quotient.subsingleton_iff; IsLocalization.subsingleton; Away.lift",
+    "Lean.Environment module restriction and Lake module import/requiresModuleSystem implementation"
+  ],
+  "prior_tools": {
+    "kb_correct_calls": 5,
+    "kb_exit": 127,
+    "kb_failure_before_query_processing": true,
+    "mcp_relevant_tools": 0,
+    "conductor_calls": 1,
+    "conductor_exit": 127,
+    "conductor_before_edits": true,
+    "fallback": "Bounded local exact Git objects, frozen credited formal artifacts, official API and primary source reads. No absence/novelty claim."
+  },
+  "local_dependency": {
+    "modules": 18,
+    "formal_configuration_pins": 33,
+    "total_predecessor_formal_artifact_pins": 61,
+    "copied_modules": 0,
+    "hydrated_dependency_files": 0,
+    "pattern": "Existing ordinary local Lake dependency pattern; frozen module sources/configuration unchanged."
+  },
+  "scope": {
+    "new": "Actual self-module length8/locality/origin residue/canonical origin localization and own length8/residue F101/unique isolated prime/nonreducedness/empty chart-open and actual second nonempty controls.",
+    "known_population": "One geometric cone point over every characteristic101 field is a cardinality corollary of the credited all-field zero characterization.",
+    "qualified_Diem_bound_refuted": false,
+    "ordinary_cone_is_Diem_product_projective_instance": false,
+    "Scheme_localRing_cycle_comparison": false,
+    "general_positive_dimensional_isolated_components": false,
+    "general_multihomogeneous_intersection_proof": false,
+    "solver_directly_reported_multiplicity8": false,
+    "source_second_root_unique_proved": false,
+    "whole_curve_order_scalar_or_decomposition": false,
+    "novelty_claim": false,
+    "original14_complete": false
+  },
+  "primary_copyright_files": "Read locally only, excluded from packet/repository/archive."
+}

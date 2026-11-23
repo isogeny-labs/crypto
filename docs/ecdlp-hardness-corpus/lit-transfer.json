@@ -1,0 +1,2944 @@
+{
+  "sources": [
+    {
+      "id": "S-XT-MILLER-1986",
+      "title": "Use of elliptic curves in cryptography",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Victor S. Miller, CRYPTO '85, LNCS 218, Springer, 1986, pp. 417-426.",
+      "url": "https://doi.org/10.1007/3-540-39799-X_31",
+      "notes": "Not read. The lifting/height argument is known here only through Galbraith 2018 Section 15.9.3 (primary-read book) and the Silverman-Suzuki and Huang-Kueh-Tan abstracts, which call it a brief heuristic argument."
+    },
+    {
+      "id": "S-XT-SILVERMAN-SUZUKI-1998",
+      "title": "Elliptic curve discrete logarithms and the index calculus",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Joseph H. Silverman and Joe Suzuki, ASIACRYPT 1998, LNCS 1514, Springer, 1998, pp. 110-125.",
+      "url": "https://doi.org/10.1007/3-540-49649-1_10",
+      "notes": "Paywalled; only the chapter landing text and the Huang-Kueh-Tan abstract were read (2026-11-02). Conclusion as summarized there: the natural generalization of index calculus to E is less efficient than brute force, supported by theoretical and numerical evidence. No theorem numbers are recorded."
+    },
+    {
+      "id": "S-XT-HKT-2000",
+      "title": "Lifting elliptic curves and solving the elliptic curve discrete logarithm problem",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Ming-Deh A. Huang, Ka Lam Kueh and Ki-Seng Tan, ANTS-IV, LNCS 1838, Springer, 2000, pp. 377-384.",
+      "url": "https://doi.org/10.1007/10722028_22",
+      "notes": "Abstract only (via search indexes, 2026-11-02): the fundamental obstruction is the need to lift an asymptotically increasing number of random points to bounded-height rational points; a method meeting this requirement yields a method to construct elliptic curves over Q of arbitrarily large rank. Theorem numbering not seen."
+    },
+    {
+      "id": "S-XT-CHENG-HUANG-2006",
+      "title": "Partial lifting and the elliptic curve discrete logarithm problem",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Qi Cheng and Ming-Deh Huang, Algorithmica 46 (2006); DOI 10.1007/s00453-006-0069-9.",
+      "url": "https://doi.org/10.1007/s00453-006-0069-9",
+      "notes": "Abstract-level only: ECDLP reduces to three partial lifting problems, under heuristic conjectures about elliptic-curve ranks."
+    },
+    {
+      "id": "S-XT-SILVERMAN-FOUR-FACES-2007",
+      "title": "The Four Faces of Lifting for the Elliptic Curve Discrete Logarithm Problem (talk slides)",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Joseph H. Silverman, 11th Workshop on Elliptic Curve Cryptography (ECC 2007), Dublin, 5-7 September 2007, slides.",
+      "url": "https://maths.ucd.ie/~gmg/ECC2007Talks/ECC4FacesOfLifts.pdf",
+      "sha256": "f94f9dd5fb6639fe6c18cc62947213cc9f36c2c7960724fd58a3f27a56f6cf01",
+      "notes": "Author's talk slides hosted by the workshop, read in full. Slide numbers are cited as locators. The expanded paper is S-XT-SILVERMAN-SAC-2008 (not read). Masser, Mazur and Serre results are quoted on the slides without proof."
+    },
+    {
+      "id": "S-XT-SILVERMAN-SAC-2008",
+      "title": "Lifting and elliptic curve discrete logarithms",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Joseph H. Silverman, Selected Areas in Cryptography 2008, LNCS 5381, Springer, 2009, pp. 82-102.",
+      "url": "https://doi.org/10.1007/978-3-642-04159-4_6",
+      "notes": "Paywalled; survey of local/global, torsion/nontorsion lifts. Content taken from the primary-read slides S-XT-SILVERMAN-FOUR-FACES-2007."
+    },
+    {
+      "id": "S-XT-PETSCHE-2006",
+      "title": "Small rational points on elliptic curves over number fields",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Clayton Petsche, New York J. Math. 12 (2006), 257-268; arXiv:math/0508160v2.",
+      "url": "https://arxiv.org/abs/math/0508160",
+      "sha256": "9bd506a6889195509a5886f27b9ff34af14c66562af600c2bf2272d5ca1fe880",
+      "notes": "Read abstract, introduction, Theorems 1 and 2 (explicit Szpiro-ratio torsion bound and canonical-height lower bound) and the statement of Lang's conjecture (3). Journal volume/pages taken from the NYJM listing returned by search; arXiv text is what was read."
+    },
+    {
+      "id": "S-XT-HINDRY-SILVERMAN-1988",
+      "title": "The canonical height and integral points on elliptic curves",
+      "kind": "primary_publication",
+      "verification": "secondary_only",
+      "citation": "Marc Hindry and Joseph H. Silverman, Inventiones Mathematicae 93 (1988), 419-450.",
+      "url": "https://doi.org/10.1007/BF01394340",
+      "notes": "Not read. Reported by Petsche 2006 (primary read): Hindry-Silverman proved that Szpiro's conjecture implies Lang's height conjecture, with c depending exponentially on d and sigma, and gave a torsion bound exponential in d and sigma."
+    },
+    {
+      "id": "S-XT-PPVW-2019",
+      "title": "A heuristic for boundedness of ranks of elliptic curves",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Jennifer Park, Bjorn Poonen, John Voight and Melanie Matchett Wood, J. Eur. Math. Soc. 21 (2019); arXiv:1602.01431v3.",
+      "url": "https://arxiv.org/abs/1602.01431",
+      "sha256": "869b3852dbd145984b1d92587f8a219857af0151e2fdb87aae770c252962afa6",
+      "notes": "Read abstract, Section 1.1 and Theorem 1.1.1 (unconditional theorem about the random model; the transfer to actual ranks is a heuristic). Journal reference from memory of the published version; the arXiv v3 text is what was read."
+    },
+    {
+      "id": "S-XT-SEMAEV-1998",
+      "title": "Evaluation of discrete logarithms in a group of p-torsion points of an elliptic curve in characteristic p",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Igor A. Semaev, Mathematics of Computation 67(221), 1998, pp. 353-356.",
+      "url": "https://doi.org/10.1090/S0025-5718-98-00887-4",
+      "notes": "Not read; the differential method is read in Galbraith 2018 Section 26.4.1 (Lemmas 26.4.3, 26.4.5), which attributes it to Semaev and Rueck."
+    },
+    {
+      "id": "S-XT-SATOH-ARAKI-1998",
+      "title": "Fermat quotients and the polynomial time discrete log algorithm for anomalous elliptic curves",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Takakazu Satoh and Kiyomichi Araki, Commentarii Math. Univ. Sancti Pauli 47(1), 1998, pp. 81-92.",
+      "notes": "Not read. Galbraith 2018 Section 26.4.1 records it, with Smart 1999, as the p-adic-lifting view of the anomalous attack."
+    },
+    {
+      "id": "S-XT-RUECK-1999",
+      "title": "On the discrete logarithm in the divisor class group of curves",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Hans-Georg Rueck, Mathematics of Computation 68(226), 1999, pp. 805-806.",
+      "url": "https://doi.org/10.1090/S0025-5718-99-01043-1",
+      "notes": "Not read. Galbraith 2018 Section 26.4.1: generalises Semaev's method to higher-genus curves; the 'additive version of the Tate-Lichtenbaum pairing' computes only the needed coefficient f_1."
+    },
+    {
+      "id": "S-XT-BK-1998",
+      "title": "The improbability that an elliptic curve has subexponential discrete log problem under the Menezes-Okamoto-Vanstone algorithm",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "R. Balasubramanian and Neal Koblitz, Journal of Cryptology 11(2), 1998, pp. 141-145.",
+      "url": "https://doi.org/10.1007/s001459900040",
+      "notes": "Not read (paywalled). Theorem 26.4.1 of Galbraith 2018 restates the E[r] criterion with 'Proof: See [26]'. The probability bound (Theorem 2) is known here only from search-index snippets: for p in [M/2, M] and a random curve over F_p with a prime number l of points, the probability that l | p^k - 1 for some k <= (log p)^2 is at most an effective constant times (log M)^9 (log log M)^2 / M; the exact printed form was not checked."
+    },
+    {
+      "id": "S-XT-LUCA-SHPARLINSKI-2006",
+      "title": "Elliptic curves with low embedding degree",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Florian Luca and Igor E. Shparlinski, Journal of Cryptology 19(4), 2006, pp. 553-562; IACR ePrint 2005/363.",
+      "url": "https://eprint.iacr.org/2005/363",
+      "notes": "Abstract only: heuristic count of about z^(1/2+o(1)) MNT curves with CM discriminant up to z; and (ePrint abstract) very few finite fields admit curves with small embedding degree and small CM discriminant. Luca-Mireles-Shparlinski (MOV in various subgroups) not separately recorded."
+    },
+    {
+      "id": "S-XT-VERHEUL-2004",
+      "title": "Evidence that XTR is more secure than supersingular elliptic curve cryptosystems",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Eric R. Verheul, Journal of Cryptology 17(4), 2004, pp. 277-296 (EUROCRYPT 2001, LNCS 2045).",
+      "url": "https://doi.org/10.1007/s00145-004-0313-x",
+      "notes": "Not read. Galbraith 2018 Section 26.6.1 cites 'Theorem 5 of [620]' for existence of distortion maps on supersingular curves."
+    },
+    {
+      "id": "S-XT-GPS-2008",
+      "title": "Pairings for cryptographers",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Steven D. Galbraith, Kenneth G. Paterson and Nigel P. Smart, Discrete Applied Mathematics 156(16), 2008, pp. 3113-3121; IACR ePrint 2006/165.",
+      "url": "https://eprint.iacr.org/2006/165",
+      "notes": "Not read. The Type 1/2/3 classification is recorded as widely cited; Galbraith 2018 Definition 22.2.14 and the remark after it (Section 22.2.3) use an efficiently computable psi: G2 -> G1, the property that distinguishes the types."
+    },
+    {
+      "id": "S-XT-POMERANCE-1987",
+      "title": "Fast, rigorous factorization and discrete logarithm algorithms",
+      "kind": "primary_publication",
+      "verification": "secondary_only",
+      "citation": "Carl Pomerance, in Discrete Algorithms and Complexity, Academic Press, 1987, pp. 119-143.",
+      "notes": "Not read. Kleinjung-Wesolowski 2019 (primary read) cites it as the previously best proved complexity L_{p^n}(1/2) for DLP in fixed characteristic."
+    },
+    {
+      "id": "S-XT-BGJT-2014",
+      "title": "A heuristic quasi-polynomial algorithm for discrete logarithm in finite fields of small characteristic",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Razvan Barbulescu, Pierrick Gaudry, Antoine Joux and Emmanuel Thome, EUROCRYPT 2014, LNCS 8441, pp. 1-16; arXiv:1306.4244v2.",
+      "url": "https://arxiv.org/abs/1306.4244",
+      "sha256": "cda7ac8d1a08fdf8f31fd933eb296f61d26b2abbac6b4b379f16b45a20246b6c",
+      "notes": "Read Sections 1-5: Proposition 2, Theorem 3, Corollaries 4-6, Heuristics 7 and 8, and the 'obstruction to the heuristics' paragraph with Proposition 10 (traps raised by Cheng-Wan-Zhuang)."
+    },
+    {
+      "id": "S-XT-CWZ-2014",
+      "title": "Traps to the BGJT-algorithm for discrete logarithms",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Qi Cheng, Daqing Wan and Jincheng Zhuang, LMS J. Comput. Math. 17A (2014); arXiv:1310.5124v1, IACR ePrint 2013/673.",
+      "url": "https://arxiv.org/abs/1310.5124",
+      "sha256": "bc13f6ced081dea668feb08c8e8ee31794ce0fa2b627b68bb3f5a29875c3f07f",
+      "notes": "Read abstract, Section 1, Theorem 3 (traps: if W(x) | x^q h1 - h0 then e1 = 0), Heuristics 1-3 and Proposition 1. Journal volume from memory; the arXiv text is what was read."
+    },
+    {
+      "id": "S-XT-GKZ-2018",
+      "title": "On the discrete logarithm problem in finite fields of fixed characteristic",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Robert Granger, Thorsten Kleinjung and Jens Zumbraegel, Transactions of the AMS 370(5), 2018, pp. 3129-3145; arXiv:1507.01495.",
+      "url": "https://arxiv.org/abs/1507.01495",
+      "sha256": "7d34f0e807f9bfab7079748e0f9ede780f25083a125d78c16fbb9f35d0194e0e",
+      "notes": "Read abstract, Section 1 (Theorems 1 and 2, the conditional all-n statement), statement of Theorem 3. Kleinjung-Wesolowski's bibliography prints the volume as 270; 370 is the correct Trans. AMS volume for 2018."
+    },
+    {
+      "id": "S-XT-GKZ-SS-BINARY-2014",
+      "title": "Breaking '128-bit secure' supersingular binary curves (or how to solve discrete logarithms in F_{2^{4*1223}} and F_{2^{12*367}})",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Robert Granger, Thorsten Kleinjung and Jens Zumbraegel, CRYPTO 2014, LNCS 8617; arXiv:1402.3668v3.",
+      "url": "https://arxiv.org/abs/1402.3668",
+      "sha256": "c9a441a9979cdcbde6372379ba0c7dd4916f912ba88f2d452f6d0f8df99e2611",
+      "notes": "Read abstract, Section 1 (history incl. the footnote correcting Joux's pinpointing constant), contribution list, Section 5.4 and Conclusion."
+    },
+    {
+      "id": "S-XT-KW-2019",
+      "title": "Discrete logarithms in quasi-polynomial time in finite fields of fixed characteristic",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Thorsten Kleinjung and Benjamin Wesolowski, arXiv:1906.10668v2 (2019); journal version J. Amer. Math. Soc. 35 (2022).",
+      "url": "https://arxiv.org/abs/1906.10668",
+      "sha256": "a7e8289e65bea1e5dbba6e671a98924f8051c81f4c07613662003a37887b6ff9",
+      "notes": "Read Sections 1-3 (Theorem 1.1, Definition 2.1, Proposition 2.3, Theorem 2.4, Theorem 3.1) and the statement that Theorem 1.1 follows from Theorem 3.1. Journal reference from memory; the arXiv text is what was read."
+    },
+    {
+      "id": "S-XT-KB-2016",
+      "title": "Extended Tower Number Field Sieve: a new complexity for the medium prime case",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Taechan Kim and Razvan Barbulescu, CRYPTO 2016, LNCS 9814, pp. 543-571; HAL hal-01281966v1, IACR ePrint 2015/1027.",
+      "url": "https://hal.science/hal-01281966",
+      "sha256": "88d9f51bd7863f644d91fec19c873f7a4b010e5c1cb2e1e870611c1f3b7bdf69",
+      "notes": "HAL open-archive copy read: abstract, the smoothness heuristic (Section 3), Theorem 1 with its table of constants, the exTNFS-Conj derivation (Conj = conjugation polynomial selection, not a conjecture) and the key-size discussion."
+    },
+    {
+      "id": "S-XT-MSS-2016",
+      "title": "Challenges with assessing the impact of NFS advances on the security of pairing-based cryptography",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Alfred Menezes, Palash Sarkar and Shashank Singh, Mycrypt 2016, LNCS 10311; IACR ePrint 2016/1102.",
+      "url": "https://eprint.iacr.org/2016/1102",
+      "notes": "ePrint abstract page read 2026-11-02. Methodological details (norm upper bounds, linear algebra ~B^2) are known here from Barbulescu-Duquesne 2019 Section 4.3 (primary read)."
+    },
+    {
+      "id": "S-XT-BD-2019",
+      "title": "Updating key size estimations for pairings",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Razvan Barbulescu and Sylvain Duquesne, Journal of Cryptology 32(4), 2019, pp. 1298-1336; HAL hal-01534101v2.",
+      "url": "https://hal.science/hal-01534101",
+      "sha256": "d818c158e36ea481b4829dd253360f0f15938414db773a031c331dec713df539",
+      "notes": "HAL open-archive copy read: abstract, introduction (o(1)-less estimation, c=32 floor remark), Section 4.3 (disagreement with MSS16), Section 5.2 (BN 3072-bit example: 2^99.69) and Tables 8-11."
+    },
+    {
+      "id": "S-XT-TRANSFER-AUDIT-2026",
+      "title": "Transfer audit: pairing, GHS and isogeny transfer certificates",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/transfer_audit_20261011: PROTOCOL.md section D (L[1/3] price with c=(32/9)^(1/3) called an attacker-favourable lower bound) and RESULTS.md (quasi-polynomial and tower NFS not modeled).",
+      "repository_path": "research/transfer_audit_20261011/PROTOCOL.md"
+    },
+    {
+      "id": "S-XT-ECC2K130-EXT",
+      "title": "ECC2K-130 extension-field and transfer boundary notes",
+      "kind": "repository_synthesis",
+      "verification": "repository_read",
+      "citation": "research/notes/ecc2k130/RESEARCH_ECC2K130_EXTENSION.md, Section 5 (Boundary E): exhaustion finds no embedding degree k <= 10^7 for ECC2K-130.",
+      "repository_path": "research/notes/ecc2k130/RESEARCH_ECC2K130_EXTENSION.md"
+    },
+    {
+      "id": "S-XT-COVER-GAP-LIT",
+      "title": "Cover/decomposition gap search: literature-adjacent routes",
+      "kind": "repository_synthesis",
+      "verification": "repository_read",
+      "citation": "research/cover_decomposition_gap_search_20261018/appendix/C_literature_adjacent_routes.md, Section 3 (Lifting).",
+      "repository_path": "research/cover_decomposition_gap_search_20261018/appendix/C_literature_adjacent_routes.md"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "DEF-XT-LIFTING-PROBLEM",
+      "label": "ECDLP lifting problem (Silverman)",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "Given E/F_p and S, T in E(F_p), find a ring R in a field K, an ideal p of R with R/p = F_p, a curve E^/K reducing to E mod p, and points S^, T^ in E^(K) reducing to S, T. Variants: K local (Q_p) or global (Q, number field); lifted points torsion or nontorsion.",
+      "scope": "Framework for the four lifting faces (local/global x torsion/nontorsion). Xedni is the global-nontorsion 'easy lifting' face; Smart's anomalous attack is a local-nontorsion lift that works only because l = p.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007",
+        "S-XT-SILVERMAN-SAC-2008"
+      ],
+      "tags": [
+        "lifting",
+        "definition",
+        "xedni"
+      ],
+      "source_locations": [
+        "Silverman 2007 slides 4-5 ('The Elliptic Curve Lifting Problem', 'The Four Faces')"
+      ],
+      "evidence_class": "definition"
+    },
+    {
+      "id": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "label": "Index calculus on a lift E~(Q)",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "Lift E/F_p to E~/Q, take the factor base to be the points of small canonical height in E~(Q), lift random [a]P+[b]Q to E~(Q) and decompose them over the factor base by descent; reduce the relations mod p.",
+      "scope": "The direct analogue of finite-field index calculus (lift to Z, factor over small primes). Distinct from summation-polynomial index calculus and from xedni, which lifts a fixed small number of points simultaneously.",
+      "assumptions": [],
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-MILLER-1986"
+      ],
+      "tags": [
+        "lifting",
+        "index-calculus",
+        "definition"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Section 15.9.3, p. 351"
+      ],
+      "evidence_class": "definition"
+    },
+    {
+      "id": "HEUR-XT-MILLER-HEIGHT",
+      "label": "Miller's height argument against lifted index calculus",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "E~(Q) has very few points of small height, so random points [a]P+[b]Q from the exponentially large E(F_p) would have to lift to points of exponentially large height; in addition the lifting itself is a nonlinear Diophantine problem over Z.",
+      "scope": "Brief heuristic in the paper that proposed elliptic-curve cryptography; Galbraith and later authors call it a heuristic argument, not a theorem.",
+      "assumptions": [
+        "Points of E~(Q) of height <= B are sparse (rank and height-counting behaviour of E~)",
+        "Random lifts behave like generic points of E~(Q)"
+      ],
+      "source_refs": [
+        "S-XT-MILLER-1986",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "lifting",
+        "height",
+        "heuristic",
+        "obstruction"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Section 15.9.3, p. 351 ('Miller argued ...')",
+        "Miller 1986, LNCS 218 pp. 417-426 (location not seen)"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "non_implications": [
+        "Does not rule out lifts that avoid small-height factor bases (e.g. xedni's simultaneous lifts)",
+        "Not a lower bound for any algorithm"
+      ]
+    },
+    {
+      "id": "HEUR-XT-SS-ANALYSIS",
+      "label": "Silverman-Suzuki: lifted index calculus slower than brute force",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "A detailed analysis of the natural generalization of index calculus to elliptic curves concludes that it is less efficient than brute-force search, supporting Miller's view with theoretical and numerical evidence.",
+      "scope": "Analysis of the lift-and-decompose approach of DEF-XT-LIFTED-INDEX-CALCULUS; the abstract-level summaries do not state an unconditional theorem.",
+      "assumptions": [
+        "Height/rank heuristics for the lifted curves",
+        "Numerical evidence on small examples"
+      ],
+      "source_refs": [
+        "S-XT-SILVERMAN-SUZUKI-1998",
+        "S-XT-HKT-2000"
+      ],
+      "tags": [
+        "lifting",
+        "heuristic",
+        "obstruction"
+      ],
+      "source_locations": [
+        "Silverman-Suzuki 1998, LNCS 1514 pp. 110-125 (whole paper; theorem numbers not seen)"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "cited_by": [
+        {
+          "path": "research_notes/Index calculus leads next steps/literature_frontier.md",
+          "use": "mention",
+          "note": "Listed as unverified recall."
+        }
+      ]
+    },
+    {
+      "id": "THM-XT-HKT-LIFT-RANK",
+      "label": "Huang-Kueh-Tan: bounded-height lifting implies arbitrarily large rank",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "algebraic_coordinate",
+      "statement": "Any method that lifts an asymptotically increasing number of random points of E(F_p) to rational points of bounded height on curves over Q (as lifted index calculus requires) yields a method for constructing elliptic curves over Q of arbitrarily large rank.",
+      "scope": "Applies to lifting schemes whose number of lifted points grows; a fixed-size simultaneous lift (classic xedni, at most 9 points) is not covered.",
+      "assumptions": [
+        "The lifting scheme lifts a growing number of random points with bounded height"
+      ],
+      "source_refs": [
+        "S-XT-HKT-2000"
+      ],
+      "tags": [
+        "lifting",
+        "rank",
+        "obstruction"
+      ],
+      "source_locations": [
+        "Huang-Kueh-Tan 2000, main theorem as stated in the abstract (LNCS 1838 pp. 377-384)"
+      ],
+      "evidence_class": "theorem",
+      "non_implications": [
+        "Does not by itself refute lifting: unbounded rank over Q is not disproved",
+        "Does not cover fixed-r simultaneous lifts"
+      ],
+      "cited_by": [
+        {
+          "path": "research/cover_decomposition_gap_search_20261018/appendix/C_literature_adjacent_routes.md",
+          "use": "mention"
+        },
+        {
+          "path": "research/p2_lift_defect_20261101/PROTOCOL.md",
+          "use": "mention"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-XT-PPVW-BOUNDED-RANK",
+      "label": "PPVW heuristic: ranks of E/Q are bounded (finitely many > 21)",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "mathematical",
+      "statement": "Modeling ranks and Shafarevich-Tate groups by random alternating matrices, the model proves (Theorem 1.1.1) that with probability 1 all but finitely many E have model rank <= 21 and #{E: ht E <= H, rank >= r} = H^((21-r)/24+o(1)) for 1 <= r <= 20; the heuristic is that actual ranks behave like the model.",
+      "scope": "The theorem is about the random model; the transfer to rk E(Q) is a heuristic, and special families may deviate (Remark 1.1.2).",
+      "assumptions": [
+        "Actual ranks and Sha follow the random alternating-matrix model"
+      ],
+      "source_refs": [
+        "S-XT-PPVW-2019"
+      ],
+      "tags": [
+        "rank",
+        "heuristic",
+        "Mordell-Weil"
+      ],
+      "source_locations": [
+        "PPVW arXiv:1602.01431v3, Theorem 1.1.1 and Section 1.1",
+        "Remark 1.1.2"
+      ],
+      "formula": "#{E : ht E <= H, rk >= r} = H^((21-r)/24+o(1)), 1<=r<=20 (model)",
+      "evidence_class": "asymptotic_heuristic",
+      "non_implications": [
+        "Not a theorem about rk E(Q)",
+        "Says nothing about curves over number fields of growing degree"
+      ]
+    },
+    {
+      "id": "OBS-XT-LIFT-BOUNDED-RANK",
+      "label": "Bounded rank would rule out growing-factor-base lifting",
+      "kind": "structural_theorem",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "If ranks of elliptic curves over Q are bounded (as the PPVW heuristic predicts), then by Huang-Kueh-Tan no method can lift an asymptotically increasing number of random points to bounded height on curves over Q, so lifted index calculus over Q with a growing factor base cannot work.",
+      "scope": "Composition of HKT's theorem with the boundedness heuristic, made in this corpus; neither paper states it in this form.",
+      "assumptions": [
+        "Huang-Kueh-Tan theorem as stated in their abstract",
+        "Ranks over Q are bounded (heuristic)"
+      ],
+      "source_refs": [
+        "S-XT-HKT-2000",
+        "S-XT-PPVW-2019"
+      ],
+      "tags": [
+        "lifting",
+        "rank",
+        "conditional-obstruction"
+      ],
+      "evidence_class": "conditional_theorem",
+      "non_implications": [
+        "Says nothing about fixed-r xedni",
+        "Says nothing about lifts to number fields of growing degree"
+      ]
+    },
+    {
+      "id": "RED-XT-CHENG-HUANG-PARTIAL-LIFT",
+      "label": "Cheng-Huang: ECDLP reduces to three partial lifting problems",
+      "kind": "reduction",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "ECDLP reduces to three partial lifting problems, under heuristic conjectures about the ranks of elliptic curves.",
+      "scope": "Refines the HKT lifting obstacle into partial lifting subproblems; no algorithm for the partial lifting problems is given.",
+      "assumptions": [
+        "Heuristic rank conjectures stated in the paper"
+      ],
+      "source_refs": [
+        "S-XT-CHENG-HUANG-2006"
+      ],
+      "tags": [
+        "lifting",
+        "reduction",
+        "rank"
+      ],
+      "source_locations": [
+        "Cheng-Huang 2006, Algorithmica, main result (abstract)"
+      ],
+      "evidence_class": "conditional_theorem"
+    },
+    {
+      "id": "OBS-XT-LOCAL-NONTORSION-LIFT",
+      "label": "Local nontorsion lifts lose the relation T = mS",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "Hensel lifting of S and T to E^(Q_p) has p choices at each step; once S_2 is chosen only one of p lifts of T preserves T_2 = m S_2, and no method is known to make consistent choices without knowing m. If a consistent lift were available, log_F(N T^)/log_F(N S^) with N = #E(F_p) would give m.",
+      "scope": "Counting fact proved; the absence of a consistent-choice method is an open negative, not a theorem.",
+      "assumptions": [
+        "l != p for the subgroup order (otherwise Smart's attack applies)"
+      ],
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ],
+      "tags": [
+        "lifting",
+        "p-adic",
+        "obstruction"
+      ],
+      "source_locations": [
+        "Silverman 2007 slides 6-9"
+      ],
+      "evidence_class": "theorem",
+      "non_implications": [
+        "Does not prove that consistent lifting is hard"
+      ]
+    },
+    {
+      "id": "OBS-XT-LOCAL-TORSION-LIFT",
+      "label": "Local torsion lifts preserve the relation but land in the formal-group kernel",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "A point of order n != p has a unique lift of order n in E(Q_p), so T^ = m S^ holds for torsion lifts; but multiplying by n to enter the formal group gives O = mO, and no efficient ECDLP method in E(Q_p) is known without the formal group.",
+      "scope": "Uniqueness of the torsion lift is proved; 'no method known' is an open negative.",
+      "assumptions": [
+        "n coprime to p"
+      ],
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ],
+      "tags": [
+        "lifting",
+        "p-adic",
+        "torsion",
+        "obstruction"
+      ],
+      "source_locations": [
+        "Silverman 2007 slides 10-12"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "FACT-XT-ANOMALOUS-ONLY-L-EQ-P",
+      "label": "Only l = p torsion leaks through E(Z/p^2)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "E(Z/p^2) is an extension of E(F_p) by the formal-group layer, isomorphic to F_p^+; l-torsion with l != p lifts isomorphically, so the only homomorphic leak to an additive group is for l = p (the anomalous case). Published generalisations of Smart (Belding; Abdullah-Mahalanobis-Mallick) all require l = p.",
+      "scope": "Repository synthesis of a standard structural argument; consistent with OBS-XT-LOCAL-TORSION-LIFT.",
+      "assumptions": [
+        "Good reduction at p"
+      ],
+      "source_refs": [
+        "S-XT-COVER-GAP-LIT",
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ],
+      "tags": [
+        "anomalous",
+        "p-adic",
+        "structural"
+      ],
+      "evidence_class": "theorem",
+      "cited_by": [
+        {
+          "path": "research/cover_decomposition_gap_search_20261018/appendix/C_literature_adjacent_routes.md",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "OBS-XT-GLOBAL-TORSION-LIFT",
+      "label": "Global torsion lifts: torsion too small over Q, fields too large otherwise",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "algebraic_coordinate",
+      "statement": "Lifting S, T to torsion points of E^(Q) would preserve T^ = mS^ and make m easy, but #E^(Q)_tors <= 16 (Mazur); over a number field K containing a point of order n, generally [K:Q] >= c #GL_2(Z/nZ) ~ c n^4 (Serre), so the field is too large to compute in.",
+      "scope": "Mazur and Serre are quoted on the slides without proof; the Serre bound is stated as holding 'generally' (non-CM, open-image situations).",
+      "assumptions": [
+        "Serre open-image hypotheses for the degree bound"
+      ],
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ],
+      "tags": [
+        "lifting",
+        "torsion",
+        "obstruction"
+      ],
+      "source_locations": [
+        "Silverman 2007 slides 13-14"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-XT-PETSCHE-TORSION",
+      "label": "Petsche: torsion bound polynomial in degree and Szpiro ratio",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "For E/k with [k:Q] = d and Szpiro ratio sigma, |E(k)_tors| <= c1 d sigma^2 log(c2 d sigma^2) with c1 = 134861, c2 = 104613.",
+      "scope": "Explicit refinement of Hindry-Silverman's exponential bound; uniform in k only if Szpiro's conjecture bounds sigma.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-PETSCHE-2006"
+      ],
+      "tags": [
+        "torsion",
+        "Szpiro",
+        "height"
+      ],
+      "source_locations": [
+        "Petsche 2006, Theorem 1"
+      ],
+      "formula": "|E(k)_tors| <= 134861 d sigma^2 log(104613 d sigma^2)",
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-XT-MASSER-DEPENDENCE",
+      "label": "Masser: dependent specializations have density zero",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "algebraic_coordinate",
+      "statement": "For a parameterized family E_U with parameterized points Q_{1,U},...,Q_{r,U} that are generically independent, the set of u in Q^n at which the specialized points are dependent in E_u(Q) is small (density 0).",
+      "scope": "Quoted on the Silverman slides without a precise reference or proof.",
+      "assumptions": [
+        "Generic independence over the function field"
+      ],
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ],
+      "tags": [
+        "Mordell-Weil",
+        "specialization",
+        "lifting"
+      ],
+      "source_locations": [
+        "Silverman 2007 slide 19 (Masser's theorem)"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "HEUR-XT-EASY-LIFT-DEPENDENCE",
+      "label": "Easy-lift (xedni) points are dependent with probability below 1/p",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "Viewing the curve coefficients as parameters, Masser's theorem suggests that the probability that simultaneously lifted points (up to 9 through a cubic) are linearly dependent is less than 1/p; choosing curves to 'encourage' small rank (BSD-guided, Mestre-Nagao-style) still leaves the lifted points independent in practice.",
+      "scope": "Silverman's own summary of why the easy lifting method (xedni) fails; independent of, and consistent with, JKSST's C0/p conditional bound.",
+      "assumptions": [
+        "Density-zero statement transfers to a per-instance probability bound",
+        "Rank-lowering curve selection does not correlate with dependence of the chosen points"
+      ],
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007",
+        "S-JKSST-XEDNI-2000"
+      ],
+      "tags": [
+        "xedni",
+        "heuristic",
+        "Mordell-Weil"
+      ],
+      "source_locations": [
+        "Silverman 2007 slides 16-19"
+      ],
+      "formula": "Pr[lifted points dependent] < 1/p (heuristic)",
+      "evidence_class": "asymptotic_heuristic"
+    },
+    {
+      "id": "OBS-XT-HARD-LIFT-HEIGHT",
+      "label": "Hard lifting: the lift of T has canonical height m^2 h(S)",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "If E^ and S^ are lifted and T^ = m S^ exists, then h(T^) = m^2 h(S^); with m = Theta(p) writing T^ takes Theta(p^2 h(S^)) bits, and no method is known to find T^ (or describe it implicitly) without m.",
+      "scope": "Quadraticity of the canonical height is a theorem; the 'no implicit description' part is open.",
+      "assumptions": [
+        "rank E^(Q) = 1 or T^ known to exist"
+      ],
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ],
+      "tags": [
+        "lifting",
+        "height",
+        "obstruction"
+      ],
+      "source_locations": [
+        "Silverman 2007 slides 20-22"
+      ],
+      "formula": "h(T^) = m^2 h(S^); size(T^) = O(p^2) bits for m ~ p",
+      "evidence_class": "theorem",
+      "non_implications": [
+        "Quadraticity alone gives no Lang-type lower bound constant (scaled-lattice countermodel in the JKSST Lean audit)"
+      ]
+    },
+    {
+      "id": "CONJ-XT-LANG-HEIGHT",
+      "label": "Lang's canonical-height conjecture",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "mathematical",
+      "statement": "For a number field k there is c(k) > 0 with h(P) >= c(k) log|N_{k/Q}(Delta_{E/k})| for every elliptic curve E/k and every non-torsion P in E(k).",
+      "scope": "Open in general; known conditionally on Szpiro's conjecture (Hindry-Silverman) and with explicit Szpiro-ratio-dependent constants (Petsche). It is one of the bridge hypotheses of the JKSST xedni obstruction.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-PETSCHE-2006",
+        "S-XT-HINDRY-SILVERMAN-1988"
+      ],
+      "tags": [
+        "height",
+        "Lang",
+        "conjecture"
+      ],
+      "source_locations": [
+        "Petsche 2006, equation (3)"
+      ],
+      "formula": "h(P) >= c(k) log|N(Delta_{E/k})|",
+      "evidence_class": "open",
+      "cited_by": [
+        {
+          "path": "research/notes/cm-isogeny/RESEARCH_NIST_CYCLOTOMIC_POINT_HEIGHTS.md",
+          "use": "reports",
+          "note": "Compares lifted-point Lang ratios (~1/6) with a Hindry-Silverman-type constant of order 1e-15."
+        }
+      ]
+    },
+    {
+      "id": "CONJ-XT-SZPIRO",
+      "label": "Szpiro's conjecture (Szpiro ratio bounded, 6 the largest limit point)",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "mathematical",
+      "statement": "The set of Szpiro ratios sigma = log|N(Delta_{E/k})| / log|N(f_{E/k})| of elliptic curves over k is bounded, with 6 its largest limit point.",
+      "scope": "Open over number fields (follows from ABC); the function-field analogue is known (sigma <= 6).",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-PETSCHE-2006"
+      ],
+      "tags": [
+        "Szpiro",
+        "ABC",
+        "conjecture"
+      ],
+      "source_locations": [
+        "Petsche 2006, Section 1 (definition (1) and the conjecture following Theorem 1)"
+      ],
+      "evidence_class": "open"
+    },
+    {
+      "id": "THM-XT-HS-SZPIRO-IMPLIES-LANG",
+      "label": "Hindry-Silverman: Szpiro implies Lang",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "mathematical",
+      "statement": "Lang's height conjecture holds with a constant depending (exponentially) on [k:Q] and the Szpiro ratio; in particular Szpiro's conjecture implies Lang's conjecture.",
+      "scope": "Reported by Petsche; the original constants were not read.",
+      "assumptions": [
+        "Bounded Szpiro ratio to get a uniform constant"
+      ],
+      "source_refs": [
+        "S-XT-HINDRY-SILVERMAN-1988",
+        "S-XT-PETSCHE-2006"
+      ],
+      "tags": [
+        "height",
+        "Lang",
+        "Szpiro"
+      ],
+      "source_locations": [
+        "Hindry-Silverman 1988 (as reported in Petsche 2006, Section 1, discussion after Theorem 2)"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-XT-PETSCHE-HEIGHT-BOUND",
+      "label": "Petsche: explicit Lang-type height lower bound in d and sigma",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "For E/k with [k:Q] = d, minimal discriminant Delta and Szpiro ratio sigma, every non-torsion P in E(k) has h(P) >= c(d,sigma) log|N_{k/Q}(Delta)| with c(d,sigma) = 1/(10^15 d^3 sigma^6 log^2(c2 d sigma^2)), c2 = 104613.",
+      "scope": "Unconditional but non-uniform: the constant degrades polynomially with sigma. A family of lifts with bounded Szpiro ratio inherits an explicit Lang constant without assuming Lang.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-PETSCHE-2006"
+      ],
+      "tags": [
+        "height",
+        "Lang",
+        "Szpiro",
+        "explicit-constant"
+      ],
+      "source_locations": [
+        "Petsche 2006, Theorem 2, equations (4)-(5)"
+      ],
+      "formula": "h(P) >= log|N(Delta)| / (1e15 d^3 sigma^6 log^2(104613 d sigma^2))",
+      "evidence_class": "theorem",
+      "non_implications": [
+        "Does not bound sigma for the curves an xedni-type lift produces"
+      ]
+    },
+    {
+      "id": "THM-XT-SEMAEV-RUECK-DIFFERENTIAL",
+      "label": "Semaev/Rueck anomalous attack via logarithmic differentials",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "curve_family_restricted",
+      "statement": "For P in E(F_p) of order p and f_P with div(f_P) = p(P) - p(O), P -> df_P/f_P is a well-defined homomorphism E(F_p)[p] -> Omega_{F_p}(E) (Lemma 26.4.3); writing f_P = t^-p + f_1 t^-(p-1) + ..., df_P/f_P = (f_1 + ...)dt (Lemma 26.4.5), so Q = [a]P gives coefficient a f_1 and the DLP in E(F_p)[p] is solved by a Miller-style power-series computation.",
+      "scope": "Anomalous (trace-one) prime-field curves, or more generally the p-torsion in characteristic p; the differential view of the attack that Smart and Satoh-Araki give p-adically.",
+      "assumptions": [
+        "#E(F_p) divisible by p (point of order p)",
+        "Power-series expansion at a uniformizer is computable"
+      ],
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-SEMAEV-1998",
+        "S-XT-RUECK-1999"
+      ],
+      "tags": [
+        "anomalous",
+        "attack",
+        "differential"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Lemma 26.4.3 and Lemma 26.4.5, Section 26.4.1, pp. 584-585"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-XT-SATOH-ARAKI-FERMAT",
+      "label": "Satoh-Araki Fermat-quotient anomalous attack",
+      "kind": "conditional_attack",
+      "status": "proved_external_unread",
+      "model": "curve_family_restricted",
+      "statement": "Polynomial-time discrete logarithm algorithm for anomalous elliptic curves over F_p via Fermat quotients / p-adic lifting, found independently of Smart's and Semaev's formulations.",
+      "scope": "Anomalous curves only.",
+      "assumptions": [
+        "#E(F_p) = p"
+      ],
+      "source_refs": [
+        "S-XT-SATOH-ARAKI-1998",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "anomalous",
+        "p-adic",
+        "attack"
+      ],
+      "source_locations": [
+        "Satoh-Araki 1998 (title result); Galbraith 2018 Section 26.4.1, p. 584"
+      ],
+      "evidence_class": "algorithm"
+    },
+    {
+      "id": "THM-XT-RUECK-JACOBIAN-PTORSION",
+      "label": "Rueck: p-torsion DLP in Jacobians of curves in characteristic p",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "curve_family_restricted",
+      "statement": "Generalises Semaev's anomalous method to the p-part of the divisor class group of curves of any genus over fields of characteristic p, via an 'additive version of the Tate-Lichtenbaum pairing' that computes the needed coefficient directly; the DLP there is efficiently solvable.",
+      "scope": "p-torsion in characteristic p only; complexity statement not transcribed here.",
+      "assumptions": [
+        "Subgroup order divisible by the characteristic"
+      ],
+      "source_refs": [
+        "S-XT-RUECK-1999",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "anomalous",
+        "Jacobian",
+        "higher-genus"
+      ],
+      "source_locations": [
+        "Rueck 1999, Math. Comp. 68, pp. 805-806 (main theorem); Galbraith 2018 Section 26.4.1, p. 585"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-XT-BK-WEIL-SUFFICES",
+      "label": "Balasubramanian-Koblitz: E[r] lies in E(F_{q^k}) iff r | q^k - 1",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "curve_family_restricted",
+      "statement": "Let r be a prime dividing #E(F_q) with r not dividing q - 1 and gcd(r,q) = 1. Then E[r] is contained in E(F_{q^k}) if and only if r divides q^k - 1.",
+      "scope": "So for r not dividing q-1 the Weil-pairing MOV attack can work in E(F_{q^k}) with k the embedding degree; the case r | q-1 is excluded.",
+      "assumptions": [
+        "r prime, r | #E(F_q)",
+        "r does not divide q-1",
+        "gcd(r,q) = 1"
+      ],
+      "source_refs": [
+        "S-XT-BK-1998",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "pairing",
+        "embedding-degree",
+        "MOV"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Theorem 26.4.1, p. 584 (proof deferred to BK 1998)"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-XT-BK-IMPROBABILITY",
+      "label": "Balasubramanian-Koblitz: small embedding degree is improbable",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "curve_family_restricted",
+      "statement": "For a random prime p in [M/2, M] and a random curve over F_p with a prime number l of points, the probability that l | p^k - 1 for some k <= (log p)^2 is bounded by an effectively computable constant times a factor of order (log M)^9 (log log M)^2 / M.",
+      "scope": "Counts curves of prime order; makes the MOV/Frey-Rueck threat negligible for randomly chosen curves. The exact printed form of the bound was not checked against the primary text.",
+      "assumptions": [
+        "Curve and prime chosen at random as in the theorem",
+        "Prime group order"
+      ],
+      "source_refs": [
+        "S-XT-BK-1998",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "embedding-degree",
+        "probability",
+        "MOV"
+      ],
+      "source_locations": [
+        "Balasubramanian-Koblitz 1998, Thm. 2",
+        "Galbraith 2018 Section 26.4, p. 584 (qualitative restatement)"
+      ],
+      "formula": "Pr[k <= (log p)^2] <= C (log M)^9 (log log M)^2 / M (transcription unverified)",
+      "evidence_class": "theorem",
+      "non_implications": [
+        "Says nothing about deliberately constructed or special-family curves",
+        "Does not price the target-field DLP"
+      ],
+      "cited_by": [
+        {
+          "path": "papers/ecdlp-index-calculus-treatise/sections/obstructions.tex",
+          "use": "mention"
+        },
+        {
+          "path": "research/lift_dense_factor_base_20261027/README.md",
+          "use": "mention"
+        }
+      ]
+    },
+    {
+      "id": "MEAS-XT-ECC2K130-EMBEDDING-DEGREE",
+      "label": "ECC2K-130 embedding degree exceeds 10^7",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Exhaustion finds no embedding degree k <= 10^7 for the ECC2K-130 subgroup order r over F_{2^131}, so the MOV/Frey-Rueck target field exceeds 1.31e9 bits.",
+      "scope": "Repository exhaustion bound on ord_r(2^131); consistent with BK's prediction that ordinary curves have k of size comparable to r.",
+      "assumptions": [
+        "Correct subgroup order r"
+      ],
+      "source_refs": [
+        "S-XT-ECC2K130-EXT"
+      ],
+      "tags": [
+        "embedding-degree",
+        "ECC2K-130",
+        "measurement"
+      ],
+      "formula": "ord_r(2^131) > 10^7",
+      "evidence_class": "measurement",
+      "cited_by": [
+        {
+          "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_EXTENSION.md",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-XT-LS-MNT-COUNT",
+      "label": "Luca-Shparlinski: about z^(1/2+o(1)) MNT curves with CM discriminant <= z",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "curve_family_restricted",
+      "statement": "Heuristic arguments suggest there are only about z^(1/2+o(1)) MNT (low embedding degree, prime order) elliptic curves with complex multiplication discriminant up to z.",
+      "scope": "Ordinary low-embedding-degree constructions; supports that low-k ordinary curves are rare and must be built deliberately.",
+      "assumptions": [
+        "Heuristic distribution of the relevant norm-equation solutions"
+      ],
+      "source_refs": [
+        "S-XT-LUCA-SHPARLINSKI-2006"
+      ],
+      "tags": [
+        "MNT",
+        "embedding-degree",
+        "heuristic"
+      ],
+      "source_locations": [
+        "Luca-Shparlinski 2006, abstract (J. Cryptology 19(4))"
+      ],
+      "evidence_class": "asymptotic_heuristic"
+    },
+    {
+      "id": "DEF-XT-DISTORTION-MAP",
+      "label": "Distortion map",
+      "kind": "definition",
+      "status": "definition",
+      "model": "curve_family_restricted",
+      "statement": "For E/F_q, a prime r | #E(F_q), a nondegenerate bilinear pairing e on E[r] and P in E(F_q)[r], a distortion map is an endomorphism psi with e(P, psi(P)) != 1.",
+      "scope": "Lets a pairing be nondegenerate on a single cyclic subgroup, which is what makes DDH easy on supersingular curves.",
+      "assumptions": [],
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-VERHEUL-2004"
+      ],
+      "tags": [
+        "pairing",
+        "distortion-map",
+        "definition"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Definition 26.6.4, p. 588"
+      ],
+      "evidence_class": "definition"
+    },
+    {
+      "id": "THM-XT-VERHEUL-DISTORTION-EXISTS",
+      "label": "Verheul: distortion maps exist on supersingular curves",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "curve_family_restricted",
+      "statement": "If E is supersingular then for any point P in E(F_{q^k}) - {O} a distortion map exists; in particular for P in E(F_q)[r] with k > 1 there is an endomorphism psi (not defined over F_q) with t_r(P, psi(P)) != 1.",
+      "scope": "Supersingular curves; the 'Type 1' symmetric-pairing setting.",
+      "assumptions": [
+        "E supersingular",
+        "k > 1"
+      ],
+      "source_refs": [
+        "S-XT-VERHEUL-2004",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "pairing",
+        "distortion-map",
+        "supersingular"
+      ],
+      "source_locations": [
+        "Verheul 2004, Thm. 5 (as cited in Galbraith 2018 Section 26.6.1, p. 588)"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-XT-TRACE-MAP-DISTORTION",
+      "label": "The trace map distorts some points but not the G1/G2 eigenspaces",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "curve_family_restricted",
+      "statement": "With k = k(q,r) > 1 and Tr(P) = sum over Gal(F_{q^k}/F_q) of sigma(P): Tr(P) is in E(F_q); if P in E[r], P not in E(F_q) and Tr(P) != O then {P, Tr(P)} generates E[r] and Tr is a distortion map for e_r and P; but Tr(Q) = [k]Q on ker(pi_q - 1) and Tr(Q) = O on ker(pi_q - q), so Tr is not a distortion map for the pairing groups G1, G2.",
+      "scope": "Exercise-level statements (no printed proof); they explain why ordinary-curve (Type 3) settings lack an efficient homomorphism between G2 and G1 via the trace.",
+      "assumptions": [
+        "k > 1",
+        "r prime"
+      ],
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "pairing",
+        "trace-map",
+        "distortion-map"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Exercises 26.6.6 and 26.6.7, p. 588"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "DEF-XT-GPS-PAIRING-TYPES",
+      "label": "Galbraith-Paterson-Smart pairing types",
+      "kind": "definition",
+      "status": "definition",
+      "model": "curve_family_restricted",
+      "statement": "Type 1: G1 = G2 (symmetric, supersingular with distortion map); Type 2: G1 != G2 with an efficiently computable homomorphism psi: G2 -> G1; Type 3: G1 != G2 with no efficiently computable homomorphism known in either direction.",
+      "scope": "Classification of how the source groups of a pairing relate; determines which DLP/CDH/DDH problems a pairing exposes on each side.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-GPS-2008",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "pairing",
+        "definition",
+        "pairing-types"
+      ],
+      "source_locations": [
+        "Galbraith-Paterson-Smart 2008, Section 2-3 (types); Galbraith 2018 Definition 22.2.14 (pairing groups) and the following remark on psi: G2 -> G1, Section 22.2.3"
+      ],
+      "evidence_class": "definition"
+    },
+    {
+      "id": "THM-XT-RIGOROUS-L-HALF",
+      "label": "Rigorous L(1/2) discrete logarithms (Pomerance; F_p index calculus)",
+      "kind": "algorithmic_upper_bound",
+      "status": "proved_external_unread",
+      "model": "classical_unrestricted",
+      "statement": "Index calculus in F_p^* with random multipliers from the complementary subgroup and Lanczos/Wiedemann linear algebra solves the DLP in O(L_p(1/2, 2+o(1))) bit operations without heuristics; Pomerance (1987) proved L_{p^n}(1/2) for fields of fixed characteristic.",
+      "scope": "The best proved bounds before the quasi-polynomial results for fixed characteristic; for large and medium characteristic no proved L(1/3) algorithm is recorded in the sources read.",
+      "assumptions": [
+        "r^2 does not divide p-1 for the simple version (Exercise 15.5.8 removes it)"
+      ],
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-POMERANCE-1987",
+        "S-XT-KW-2019"
+      ],
+      "tags": [
+        "finite-field-dlp",
+        "rigorous",
+        "index-calculus"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Section 15.5.1, Exercise 15.5.7, pp. 334-336",
+        "Kleinjung-Wesolowski 2019, Section 1 (citing Pom87)"
+      ],
+      "formula": "L_p(1/2, 2+o(1)) proved; L_{p^n}(1/2) proved (fixed p)",
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "HEUR-XT-NFS-SMOOTHNESS",
+      "label": "Classical NFS smoothness heuristic",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "classical_unrestricted",
+      "statement": "The norms N_f, N_g of the sieved polynomials are B-smooth with the same probability as arbitrary positive integers of the same size (Dickman rho), Prob(x^(1+o(1)), y) = Prob(x,y)^(1+o(1)); together with relation-matrix rank and descent heuristics this underlies every L(1/3) NFS/TNFS/exTNFS complexity.",
+      "scope": "All NFS-family L(1/3, c) complexities and all key-size estimations derived from them rest on it; no NFS DLP complexity is proved.",
+      "assumptions": [
+        "Norms behave like random integers of the same size",
+        "Relations are sufficiently independent",
+        "Individual-log descent succeeds"
+      ],
+      "source_refs": [
+        "S-XT-KB-2016",
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-BD-2019"
+      ],
+      "tags": [
+        "NFS",
+        "heuristic",
+        "smoothness",
+        "finite-field-dlp"
+      ],
+      "source_locations": [
+        "Kim-Barbulescu 2016, Section 3 ('We make the usual heuristic ...') and Thm. 1 ('under the classical NFS heuristics')",
+        "Galbraith 2018 Section 15.5.6, p. 342 ('heuristic arguments')"
+      ],
+      "evidence_class": "assumption"
+    },
+    {
+      "id": "ALG-XT-NFS-L13",
+      "label": "NFS/SNFS/FFS L(1/3) discrete logarithms",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "classical_unrestricted",
+      "statement": "Heuristically, NFS solves the DLP in F_p^* in L_p(1/3, (64/9)^(1/3)+o(1)); special NFS for special p in L_p(1/3, (32/9)^(1/3)+o(1)); the special function field sieve in F_{p^n} in L(1/3, (32/9)^(1/3)+o(1)) for p <= n^o(sqrt n); Joux-Lercier/JLSV give heuristic L_q(1/3, c) for all finite fields.",
+      "scope": "Heuristic complexities; the o(1) term and constant-factor terms decide concrete sizes.",
+      "assumptions": [
+        "Classical NFS heuristics"
+      ],
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "NFS",
+        "finite-field-dlp",
+        "L(1/3)"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Sections 15.5.6-15.5.7, pp. 342-343"
+      ],
+      "formula": "L_p(1/3,(64/9)^(1/3)) ~ L(1/3,1.923); SNFS/SFFS L(1/3,(32/9)^(1/3)) ~ L(1/3,1.526)",
+      "evidence_class": "asymptotic_heuristic",
+      "cited_by": [
+        {
+          "path": "research/transfer_audit_20261011/PROTOCOL.md",
+          "use": "depends",
+          "note": "Prices DLP in F_(q^k) by L[1/3, c] with c = (32/9)^(1/3), o(1) dropped, called an attacker-favourable lower bound."
+        }
+      ]
+    },
+    {
+      "id": "ALG-XT-COPPERSMITH-F2N",
+      "label": "Coppersmith's algorithm for F_{2^n}",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "classical_unrestricted",
+      "statement": "Coppersmith's algorithm solves the DLP in F_{2^n}^* in L_q(1/3, (32/9)^(1/3)+o(1)) bit operations as n -> infinity (stated as a conjecture).",
+      "scope": "Historic small-characteristic baseline used to size early supersingular pairing parameters; superseded by the 2013-2014 L(1/4) and quasi-polynomial algorithms.",
+      "assumptions": [
+        "Smoothness heuristics for polynomials of the sizes arising"
+      ],
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "finite-field-dlp",
+        "small-characteristic",
+        "FFS"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Conjecture 15.5.21, p. 338"
+      ],
+      "evidence_class": "asymptotic_heuristic"
+    },
+    {
+      "id": "ALG-XT-EXTNFS",
+      "label": "Kim-Barbulescu exTNFS: medium-prime L(1/3, (48/9)^(1/3))",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "classical_unrestricted",
+      "statement": "Under the classical NFS heuristics, for Q = p^n with n = eta*kappa, gcd(eta,kappa) = 1 and p = L_Q(l_p, c_p), 1/3 < l_p (< 2/3 or l_p = 2/3 with c_p < 12^(1/3)): exTNFS-JLSV2 and exTNFS-GJL reach L_Q(1/3,(64/9)^(1/3)); exTNFS-Conj (conjugation polynomial selection, kappa = 12^(-1/3)(log Q/log log Q)^(1/3)) reaches L_Q(1/3,(48/9)^(1/3)); SexTNFS for special p reaches L_Q(1/3,(32/9)^(1/3)); multiple-field variants reach about L_Q(1/3,1.71).",
+      "scope": "Medium-prime fields with composite small n, including the n = 6 and n = 12 target fields of BN/BLS12 pairings; 'Conj' names the conjugation method, not a conjecture.",
+      "assumptions": [
+        "Classical NFS heuristics",
+        "Polynomial-selection conditions of the table in Theorem 1"
+      ],
+      "source_refs": [
+        "S-XT-KB-2016"
+      ],
+      "tags": [
+        "NFS",
+        "TNFS",
+        "exTNFS",
+        "pairing",
+        "finite-field-dlp"
+      ],
+      "source_locations": [
+        "Kim-Barbulescu 2016, Theorem 1 and its table; Section 3 derivations; Section 6 key-size discussion"
+      ],
+      "formula": "L_Q(1/3,(48/9)^(1/3)) ~ L(1/3,1.747); special p: L_Q(1/3,(32/9)^(1/3))",
+      "evidence_class": "asymptotic_heuristic",
+      "cited_by": [
+        {
+          "path": "research/elliptic_snfs_survey_20261016/README.md",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-XT-NFS-C32-FLOOR",
+      "label": "Barbulescu-Duquesne: arguments that c cannot go below 32",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "classical_unrestricted",
+      "statement": "Writing NFS variants as L_Q[c] = L_Q(1/3, (c/9)^(1/3)), the constants have descended 64 -> 48 -> 32 (Joux-Pierrot, BGGM, BGK TNFS, Kim-Barbulescu exTNFS); BD give arguments (their Appendix B) that one cannot go below c = 32.",
+      "scope": "Arguments, not a lower-bound theorem; restricted to the NFS family as currently structured. Small-characteristic fields are outside it (quasi-polynomial algorithms).",
+      "assumptions": [
+        "NFS-family algorithm structure (two number-field sides, smoothness of norms)"
+      ],
+      "source_refs": [
+        "S-XT-BD-2019"
+      ],
+      "tags": [
+        "NFS",
+        "heuristic",
+        "lower-bound-argument"
+      ],
+      "source_locations": [
+        "Barbulescu-Duquesne 2019, Introduction ('o(1)-less estimation' paragraph) and Appendix B (not present in the HAL text read)"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "non_implications": [
+        "Is not a lower bound on finite-field DLP cost",
+        "Does not apply to small or fixed characteristic"
+      ]
+    },
+    {
+      "id": "COND-XT-BD-BN-100BIT",
+      "label": "BD: the 3072-bit BN curve offers about 100 bits, not 128",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "For the popular BN curve u = -(2^62 + 2^55 + 1) with 3072-bit F_{p^12}, SexTNFS with kappa = 2, eta = 6, h = t^6 - t^3 - t - 1, log2 A = 7.36, log2 B = 57 gives sieving 2^98.65 (c_sieve ~ 1) plus linear algebra 2^98.73 after a log2 B filtering reduction, total about 2^99.69 operations: the curve 'ensures no more than the 100-bits security level'.",
+      "scope": "o(1)-less concrete estimate under Dickman smoothness with Monte Carlo norm sizes; operations counted as additions mod p / clock cycles.",
+      "assumptions": [
+        "Classical NFS heuristics",
+        "c_sieve ~ 1 and linear algebra cost 2^5 N^2 calibrated on records",
+        "Filtering reduces the matrix by a factor ~ log2 B (heuristic)"
+      ],
+      "source_refs": [
+        "S-XT-BD-2019"
+      ],
+      "tags": [
+        "pairing",
+        "BN",
+        "key-size",
+        "SexTNFS"
+      ],
+      "source_locations": [
+        "Barbulescu-Duquesne 2019, Section 5.2"
+      ],
+      "formula": "2^98.65 + 2^98.73 = 2^99.69",
+      "evidence_class": "concrete_estimate"
+    },
+    {
+      "id": "CLAIM-XT-BN3072-128BIT",
+      "label": "Claim: BN curves with a 3072-bit F_{p^12} reach 128-bit security",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "curve_family_restricted",
+      "statement": "BN curves with a 256-bit p and 3072-bit target F_{p^12} match the 128-bit security level (per pre-2015 NIST-style key-size tables used for the target field).",
+      "scope": "Pre-TNFS sizing claim. Refuted within the shared heuristic NFS cost model, by an explicit SexTNFS parameterization costing ~2^99.7; not refuted by a completed computation.",
+      "assumptions": [
+        "Target-field DLP priced with classical NFS constants"
+      ],
+      "source_refs": [
+        "S-XT-BD-2019",
+        "S-XT-KB-2016"
+      ],
+      "tags": [
+        "pairing",
+        "BN",
+        "key-size",
+        "refuted"
+      ],
+      "source_locations": [
+        "Barbulescu-Duquesne 2019, Section 2.1 (BN curves 'supposed to match the 128-bit security level') and Section 5.2",
+        "Kim-Barbulescu 2016, Section 6 (current key sizes invalidated)"
+      ],
+      "evidence_class": "counterexample"
+    },
+    {
+      "id": "COND-XT-BD-KEYSIZES",
+      "label": "BD updated pairing key sizes",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "For 2^128 target-field DLP cost: BN log2(p^k) = 5534, BLS12 5530, KSS16 ~ 4400, KSS18 ~ 4300 (in the KSS cases the curve side is weaker); 192 bits: KSS18 12200, BLS24 13300; 256 bits: KSS18 26900, BLS24 24700; 128-bit parameter sizes log2 u = 114 (BN), 77 (BLS12), 34 (KSS16), 44 (KSS18).",
+      "scope": "Attacker-favourable choices of polynomials and automorphisms; o(1)-less model. Upper-bound style estimates for the attacker's cost, not lower bounds.",
+      "assumptions": [
+        "Classical NFS heuristics",
+        "Best polynomials available to the attacker",
+        "Calibration constants from records"
+      ],
+      "source_refs": [
+        "S-XT-BD-2019"
+      ],
+      "tags": [
+        "pairing",
+        "key-size",
+        "TNFS"
+      ],
+      "source_locations": [
+        "Barbulescu-Duquesne 2019, Tables 8, 9, 10, 11"
+      ],
+      "evidence_class": "concrete_estimate",
+      "cited_by": [
+        {
+          "path": "research/elliptic_snfs_survey_20261016/README.md",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "ALG-XT-MSS-NORM-UPPER-BOUND",
+      "label": "MSS 2016 key-size method (norm upper bounds, B^2 linear algebra)",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "Menezes-Sarkar-Singh survey the 2014-2016 NFS advances for F_{p^n} with small n > 1 and estimate their impact on pairing key lengths using mathematical upper bounds on norm sizes and a linear-algebra cost of about B^2.",
+      "scope": "Barbulescu-Duquesne argue the method gives an upper bound on attack complexity (useful to show feasibility) but not a security estimate, which would need a lower bound; it ignores filtering and uses B instead of the factor-base size 2B/log B.",
+      "assumptions": [
+        "Classical NFS heuristics",
+        "Norm upper bounds as proxy for typical norms"
+      ],
+      "source_refs": [
+        "S-XT-MSS-2016",
+        "S-XT-BD-2019"
+      ],
+      "tags": [
+        "pairing",
+        "key-size",
+        "NFS",
+        "methodology"
+      ],
+      "source_locations": [
+        "Menezes-Sarkar-Singh 2016, Sections 6.3 and Table 3 (as cited by Barbulescu-Duquesne 2019, Section 4.3)"
+      ],
+      "evidence_class": "concrete_estimate"
+    },
+    {
+      "id": "GAP-XT-NFS-SECURITY-LOWER-BOUND",
+      "label": "No lower bound for target-field DLP cost exists",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "statement": "Pairing key sizes are set from heuristic upper estimates of the best known attack (o(1) dropped, calibrated constants); neither MSS nor BD nor any read source gives a lower bound on finite-field DLP cost, and BD state that a security estimation would ideally require one.",
+      "scope": "Applies to every 'bits of security' figure for a pairing target field and to every transfer-audit price of F_(q^k).",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-BD-2019",
+        "S-XT-MSS-2016"
+      ],
+      "tags": [
+        "open-obligation",
+        "finite-field-dlp",
+        "key-size"
+      ],
+      "source_locations": [
+        "Barbulescu-Duquesne 2019, Section 4.3.1 (upper bound vs lower bound remark)"
+      ],
+      "evidence_class": "open"
+    },
+    {
+      "id": "DEF-XT-SPARSE-MEDIUM-SUBFIELD-REP",
+      "label": "Sparse medium subfield representation",
+      "kind": "definition",
+      "status": "definition",
+      "model": "mathematical",
+      "statement": "F_{q^2k} is represented as F_{q^2}[X]/(I) with I an irreducible degree-k factor of h1(X) X^q - h0(X), deg h0, deg h1 <= delta for a constant delta (2 in practice), so that X^q = h0/h1 modulo I.",
+      "scope": "The field model behind BGJT and the GKZ descent; KW replace it by an elliptic-curve model that provably exists.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-BGJT-2014",
+        "S-XT-KW-2019"
+      ],
+      "tags": [
+        "finite-field-dlp",
+        "small-characteristic",
+        "definition"
+      ],
+      "source_locations": [
+        "BGJT 2014, Section 2 (definition before Proposition 2)",
+        "Kleinjung-Wesolowski 2019, Section 2 (equation (1))"
+      ],
+      "evidence_class": "definition"
+    },
+    {
+      "id": "HEUR-XT-BGJT-REPRESENTATION",
+      "label": "BGJT heuristic: a sparse medium subfield representation exists",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "mathematical",
+      "statement": "Every field F_{q^2k} with k <= q + 2 admits a sparse medium subfield representation with deg h0, deg h1 <= 2 (and small-characteristic fields embed into such a field of slightly larger size).",
+      "scope": "Heuristically almost certain; attempts to prove existence have failed (Micheli 2019, cited by KW).",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-BGJT-2014",
+        "S-XT-GKZ-2018",
+        "S-XT-KW-2019"
+      ],
+      "tags": [
+        "heuristic",
+        "small-characteristic",
+        "field-representation"
+      ],
+      "source_locations": [
+        "BGJT 2014, Section 2 and Section 1 (first of 'three key heuristics')",
+        "GKZ 2018, Section 1",
+        "Kleinjung-Wesolowski 2019, Section 1"
+      ],
+      "evidence_class": "assumption"
+    },
+    {
+      "id": "HEUR-XT-BGJT-DESCENT",
+      "label": "BGJT descent heuristics (smoothness and PGL2 full rank)",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "mathematical",
+      "statement": "Heuristic 7: for any P(X), the rows v(m) for cosets m in PGL2(F_{q^2})/PGL2(F_q) that yield a relation have full rank q^2 + 1; Heuristic 8: the linear system for P = X has full rank; plus smoothness of the non-uniform polynomials arising matches that of random polynomials of the same degree.",
+      "scope": "Needed for Proposition 2 (each node of the descent costs poly(q,k)); fails as literally stated for problematic polynomials dividing h1 X^q - h0 (traps), which BGJT v2 Proposition 10 and CWZ patch with further heuristics.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-BGJT-2014",
+        "S-XT-CWZ-2014"
+      ],
+      "tags": [
+        "heuristic",
+        "small-characteristic",
+        "descent"
+      ],
+      "source_locations": [
+        "BGJT 2014, Heuristic 7, Heuristic 8, Section 5",
+        "Cheng-Wan-Zhuang 2014, Heuristics 1-3"
+      ],
+      "evidence_class": "assumption"
+    },
+    {
+      "id": "COND-XT-BGJT-QUASIPOLY",
+      "label": "BGJT heuristic quasi-polynomial DLP in small characteristic",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "classical_unrestricted",
+      "statement": "Assuming the representation and descent heuristics, any discrete logarithm in F_{q^2k} is computed in max(q,k)^O(log k) (Theorem 3); for q ~ k this is 2^O((log log Q)^2) (Corollary 4); for characteristic bounded by (log Q)^O(1) it is 2^O((log log Q)^2) (Corollary 5), e.g. F_{2^n} in 2^O((log n)^2); for q <= L_Q(alpha) it is L_Q(alpha)^O(log log Q) (Corollary 6).",
+      "scope": "Heuristic; constant in the exponent unspecified. The first quasi-polynomial claim, later made rigorous (GKZ for infinitely many n; KW for all n).",
+      "assumptions": [
+        "BGJT representation heuristic",
+        "BGJT descent heuristics, as patched for traps"
+      ],
+      "source_refs": [
+        "S-XT-BGJT-2014"
+      ],
+      "tags": [
+        "finite-field-dlp",
+        "quasi-polynomial",
+        "small-characteristic"
+      ],
+      "source_locations": [
+        "BGJT 2014, Proposition 2, Theorem 3, Corollaries 4-6"
+      ],
+      "formula": "max(q,k)^O(log k); 2^O((log log Q)^2)",
+      "evidence_class": "asymptotic_heuristic",
+      "cited_by": [
+        {
+          "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_EXTENSION.md",
+          "use": "depends",
+          "note": "Prices the ECC2K-130 MOV target with N^O(log N), past 2^900."
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-XT-BGJT-PROP2-ALL-P",
+      "label": "Claim: BGJT descent step applies to every polynomial P",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "mathematical",
+      "statement": "Proposition 2 part 1 (each P of degree 2..k-1 rewrites as O(kq^2) logarithms of polynomials of degree <= ceil(deg P / 2)) holds for every P under Heuristic 7, and part 2 yields the logarithms of all linear X + a.",
+      "scope": "Refuted as stated for 'problematic' polynomials: irreducible factors of h1 X^q - h0 other than the defining one (traps), and linear factors in the non-Kummer case. BGJT v2 itself concedes it and adds Proposition 10; CWZ give an alternative fix. The quasi-polynomial claim survives only through these patched, still heuristic, steps.",
+      "assumptions": [
+        "As printed in the original BGJT heuristic analysis"
+      ],
+      "source_refs": [
+        "S-XT-BGJT-2014",
+        "S-XT-CWZ-2014"
+      ],
+      "tags": [
+        "refuted",
+        "small-characteristic",
+        "descent",
+        "traps"
+      ],
+      "source_locations": [
+        "BGJT 2014 (arXiv v2), Section 5 'An obstruction to the heuristics'",
+        "Cheng-Wan-Zhuang 2014, Section 1 and Theorem 3"
+      ],
+      "evidence_class": "counterexample"
+    },
+    {
+      "id": "CEX-XT-CWZ-TRAPS",
+      "label": "Cheng-Wan-Zhuang traps in the BGJT descent",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "The computation really takes place in F_{q^2}[x]/(x^q h1 - h0), not modulo the minimal polynomial; if W(x) divides x^q h1(x) - h0(x) then the coefficient e1 in the descent relation is always 0 (Theorem 3), so such W cannot be descended by the original method; when x^q h1 - h0 has linear factors the factor-base step can fail too.",
+      "scope": "Exact statements about the BGJT relation construction; the proposed fix (Heuristics 1-3, Proposition 1) is itself heuristic.",
+      "assumptions": [
+        "deg h1 <= 2 for the structural theorems"
+      ],
+      "source_refs": [
+        "S-XT-CWZ-2014"
+      ],
+      "tags": [
+        "counterexample",
+        "small-characteristic",
+        "traps"
+      ],
+      "source_locations": [
+        "Cheng-Wan-Zhuang 2014, Theorems 1-3 and Section 1"
+      ],
+      "evidence_class": "counterexample"
+    },
+    {
+      "id": "THM-XT-GKZ-RIGOROUS-INFINITE",
+      "label": "GKZ: rigorous quasi-polynomial DLP for infinitely many F_{p^n}",
+      "kind": "algorithmic_upper_bound",
+      "status": "proved_external",
+      "model": "classical_unrestricted",
+      "statement": "Theorem 1: for every prime p there are infinitely many explicit extensions F_{p^n} with DLP solvable in expected time exp((1/log 2 + o(1))(log n)^2). Theorem 2: for a prime power q > 61 not a power of 4, k >= 18, coprime h0, h1 in F_{q^k}[X] of degree <= 2 and an irreducible degree-l factor I of h1 X^q - h0, the DLP in F_{q^{kl}} = F_{q^k}[X]/(I) is solved in expected time q^(log2 l + O(k)).",
+      "scope": "Rigorous (randomized) and free of smoothness heuristics, but only for fields with such a representation (e.g. Kummer case l = q - 1).",
+      "assumptions": [
+        "Existence of the representation (h0,h1,I) with the stated parameters"
+      ],
+      "source_refs": [
+        "S-XT-GKZ-2018"
+      ],
+      "tags": [
+        "finite-field-dlp",
+        "quasi-polynomial",
+        "rigorous"
+      ],
+      "source_locations": [
+        "GKZ 2018, Theorem 1 and Theorem 2 (Section 1); Theorem 3 proved in Section 4"
+      ],
+      "formula": "exp((1/log 2 + o(1))(log n)^2); q^(log2 l + O(k))",
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "CONJ-XT-GKZ-REPRESENTATION",
+      "label": "GKZ representation conjecture (all extensions)",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "mathematical",
+      "statement": "For p fixed and every n there exist q = p^i >= n - 2 (not too large) and 18 <= k = o(log q) with h0, h1 in F_{q^k}[X] of degree <= 2 such that h1 X^q - h0 has an irreducible factor of degree n.",
+      "scope": "GKZ call proving it 'a very hard problem, even if heuristically it would appear to be almost certain'; Kleinjung-Wesolowski bypass it with an elliptic-curve model.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-GKZ-2018",
+        "S-XT-KW-2019"
+      ],
+      "tags": [
+        "conjecture",
+        "small-characteristic",
+        "field-representation"
+      ],
+      "source_locations": [
+        "GKZ 2018, Section 1 (paragraph after Theorem 2) and abstract"
+      ],
+      "evidence_class": "open"
+    },
+    {
+      "id": "COND-XT-GKZ-ALL-EXTENSIONS",
+      "label": "GKZ conditional: quasi-polynomial DLP in every F_{p^n}",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "classical_unrestricted",
+      "statement": "Subject to the representation conjecture, the GKZ algorithm solves the DLP in every F_{p^n} (p fixed) in expected time exp((1/log 2 + o(1))(log n)^2).",
+      "scope": "Superseded as a route to an unconditional statement by Kleinjung-Wesolowski 2019.",
+      "assumptions": [
+        "GKZ representation conjecture"
+      ],
+      "source_refs": [
+        "S-XT-GKZ-2018"
+      ],
+      "tags": [
+        "finite-field-dlp",
+        "quasi-polynomial",
+        "conditional"
+      ],
+      "source_locations": [
+        "GKZ 2018, abstract and Section 1"
+      ],
+      "evidence_class": "conditional_theorem"
+    },
+    {
+      "id": "THM-XT-KW-ELLIPTIC-MODEL",
+      "label": "KW: elliptic-curve models of F_{p^{rn}} exist and are constructible",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "For any prime p and integer n one can find, in deterministic time polynomial in p and n, r = O(log n) and a (p^r, n)-elliptic curve model (E, Q, I) of F_{p^{rn}}: an ordinary E/F_q with a rational point Q of order n and a degree-n place I with f o phi_q = f o tau_Q mod I.",
+      "scope": "Replaces the unproved sparse-subfield representation (Frobenius acts as translation by Q on the place I).",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-KW-2019"
+      ],
+      "tags": [
+        "finite-field-dlp",
+        "field-representation",
+        "elliptic-model"
+      ],
+      "source_locations": [
+        "Kleinjung-Wesolowski 2019, Definition 2.1, Proposition 2.3, Theorem 2.4"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "THM-XT-KW-QUASIPOLY",
+      "label": "Kleinjung-Wesolowski: proved quasi-polynomial DLP in fixed characteristic",
+      "kind": "algorithmic_upper_bound",
+      "status": "proved_external",
+      "model": "classical_unrestricted",
+      "statement": "For any prime p and positive integer n, the DLP in F_{p^n}^* can be solved in expected time (pn)^(2 log2 n + O(1)); for fixed p this is n^(2 log2 n + O(1)), quasi-polynomial; for p = L_{p^n}(alpha), alpha in (0, 1/2), it gives L_{p^n}(alpha + o(1)).",
+      "scope": "Rigorous, randomized (expected time). Small and fixed characteristic; says nothing about large-characteristic or medium-prime fields where NFS variants are heuristic.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-KW-2019"
+      ],
+      "tags": [
+        "finite-field-dlp",
+        "quasi-polynomial",
+        "rigorous"
+      ],
+      "source_locations": [
+        "Kleinjung-Wesolowski 2019, Theorem 1.1 (proof completed in Section 7.1 from Theorem 3.1)"
+      ],
+      "formula": "(pn)^(2 log2 n + O(1))",
+      "evidence_class": "theorem",
+      "non_implications": [
+        "Quasi-polynomial in n is not practical at astronomically large n: targets of size ~r bits (ordinary curves) stay infeasible"
+      ],
+      "cited_by": [
+        {
+          "path": "research/transfer_audit_20261011/RESULTS.md",
+          "use": "mention",
+          "note": "States quasi-polynomial small-characteristic algorithms are not modeled in the pairing prices."
+        }
+      ]
+    },
+    {
+      "id": "GAP-XT-RIGOROUS-L13",
+      "label": "No proved L(1/3) DLP in large or medium characteristic",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "statement": "In the sources read, every L(1/3) complexity for F_p or medium-prime F_{p^n} (NFS, TNFS, exTNFS, SNFS) is heuristic, while the proved bounds there remain L(1/2); only fixed (and L(alpha < 1/2)) characteristic has proved sub-L(1/2) results (KW).",
+      "scope": "Every pairing transfer to a large- or medium-characteristic target field (BN, BLS, KSS, MNT; supersingular over F_p with k = 2) therefore inherits heuristic, not proved, target costs.",
+      "assumptions": [],
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-KW-2019",
+        "S-XT-KB-2016"
+      ],
+      "tags": [
+        "open-obligation",
+        "finite-field-dlp",
+        "rigorous-vs-heuristic"
+      ],
+      "source_locations": [
+        "Galbraith 2018 Sections 15.5.1-15.5.7",
+        "Kleinjung-Wesolowski 2019, Section 1",
+        "Kim-Barbulescu 2016, Thm. 1 ('under the classical NFS heuristics')"
+      ],
+      "evidence_class": "open"
+    },
+    {
+      "id": "COND-XT-MOV-SS-SMALLCHAR",
+      "label": "Rigorous quasi-polynomial ECDLP on supersingular curves of fixed characteristic",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "For supersingular E over F_{p^m} with p fixed (e.g. 2 or 3) and prime r | #E with embedding degree k <= 6, the MOV/Frey-Rueck pairing maps the ECDLP in polynomial time into F_{p^{mk}}^*, where Kleinjung-Wesolowski solve it in expected time (p mk)^(2 log2(mk) + O(1)); hence the ECDLP on such curves is quasi-polynomial in m without heuristics.",
+      "scope": "Composition assembled in this corpus from proved pieces; no read source states it in this form, so it is kept conditional until the composition (pairing evaluation, nondegeneracy sampling, subgroup bookkeeping) is written out and reviewed.",
+      "assumptions": [
+        "E supersingular, k <= 6 (THEOREM-SUPERSINGULAR-SMALL-K)",
+        "Pairing nondegenerate on the target subgroup and computable by Miller's algorithm in poly(m) time",
+        "Reduction from F_{q^k} subgroup DLP to full F_{q^k}^* DLP via KW"
+      ],
+      "source_refs": [
+        "S-XT-KW-2019",
+        "S-GALBRAITH-MPKC-2018",
+        "S-FST-2010"
+      ],
+      "tags": [
+        "pairing",
+        "supersingular",
+        "quasi-polynomial",
+        "composition"
+      ],
+      "source_locations": [
+        "Kleinjung-Wesolowski 2019, Thm. 1.1",
+        "Galbraith 2018 Theorem 26.4.2 and Section 26.4, p. 584"
+      ],
+      "evidence_class": "conditional_theorem"
+    },
+    {
+      "id": "CLAIM-XT-JOUX-PINPOINT-ORIGINAL",
+      "label": "Claim: Joux pinpointing reaches L(1/3, (8/9)^(1/3))",
+      "kind": "heuristic",
+      "status": "refuted",
+      "model": "classical_unrestricted",
+      "statement": "Joux's December 2012 'pinpointing' relation method for medium base fields has heuristic complexity L(1/3, (8/9)^(1/3)) ~ L(1/3, 0.961).",
+      "scope": "The constant as originally printed; corrected after later communications.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ],
+      "tags": [
+        "refuted",
+        "finite-field-dlp",
+        "constant-error"
+      ],
+      "source_locations": [
+        "GKZ 2014 (arXiv:1402.3668v3), Section 1, footnote to 'L(1/3, 2^(1/3))'"
+      ],
+      "evidence_class": "counterexample",
+      "notes": "Known only through the GKZ footnote ('The original paper states a complexity of L(1/3,(8/9)^(1/3)) ... on foot of recent communications the constant should be as stated'). The Joux paper itself was not read."
+    },
+    {
+      "id": "HEUR-XT-JOUX-PINPOINT-CORRECTED",
+      "label": "Joux pinpointing: corrected constant L(1/3, 2^(1/3))",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "classical_unrestricted",
+      "statement": "For medium-sized base fields the pinpointing technique has heuristic complexity as low as L(1/3, 2^(1/3)) ~ L(1/3, 1.260), improving on Joux-Lercier's L(1/3, 3^(1/3)).",
+      "scope": "Heuristic; a corrected constant reported by GKZ.",
+      "assumptions": [
+        "FFS-type smoothness heuristics"
+      ],
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ],
+      "tags": [
+        "finite-field-dlp",
+        "heuristic",
+        "constant"
+      ],
+      "source_locations": [
+        "GKZ 2014, Section 1 and footnote"
+      ],
+      "evidence_class": "asymptotic_heuristic"
+    },
+    {
+      "id": "ALG-XT-GKZ-F2-367-BREAK",
+      "label": "Total break of the DLP in F_{2^{12*367}} (genus-2 supersingular pairing target)",
+      "kind": "algorithmic_upper_bound",
+      "status": "proved_external",
+      "model": "curve_family_restricted",
+      "statement": "The DLP in F_{2^{12*367}}, the embedding field (k = 12) of a supersingular genus-two curve over F_{2^367} proposed at the '128-bit' level, was solved in about 52240 core-hours (2^48 M_r2); the paper prints the resulting logarithm.",
+      "scope": "A completed record computation (its output logarithm can be checked), using only L(1/4)-type techniques; no BGJT quasi-polynomial elimination was needed.",
+      "assumptions": [
+        "Correct implementation; the printed logarithm verifies"
+      ],
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ],
+      "tags": [
+        "pairing",
+        "supersingular",
+        "small-characteristic",
+        "record"
+      ],
+      "source_locations": [
+        "GKZ 2014, Section 5.4 'Summary' and Section 1 contribution list"
+      ],
+      "formula": "~52240 core-hours (~2^48 M_r2)",
+      "evidence_class": "measurement"
+    },
+    {
+      "id": "CLAIM-XT-SS-GENUS2-F2-367-128BIT",
+      "label": "Claim: the genus-2 supersingular curve over F_{2^367} gives 128-bit security",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "curve_family_restricted",
+      "statement": "The pairing on the Jacobian of a supersingular genus-two curve over F_{2^367} with embedding degree 12 offers 128-bit security (target field F_{2^{12*367}} sized with Coppersmith-era estimates).",
+      "scope": "Refuted by a completed computation of a discrete logarithm in the target field.",
+      "assumptions": [
+        "Target field priced with pre-2013 small-characteristic algorithms"
+      ],
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ],
+      "tags": [
+        "refuted",
+        "pairing",
+        "supersingular"
+      ],
+      "source_locations": [
+        "GKZ 2014, Section 1 (Adj et al. upper bound 2^94.6; originally '128-bit secure')"
+      ],
+      "evidence_class": "counterexample"
+    },
+    {
+      "id": "COND-XT-GKZ-F2-1223-59BIT",
+      "label": "GKZ: the genus-1 supersingular F_{2^1223} target has about 59-bit security",
+      "kind": "algorithmic_upper_bound",
+      "status": "conditional",
+      "model": "curve_family_restricted",
+      "statement": "The DLP in F_{2^{4*1223}} (embedding field of the commonly implemented supersingular genus-one curve over F_{2^1223}, k = 4, r a 1221-bit prime) can be solved in approximately 2^40 s, or 2^59 M_r.",
+      "scope": "A step-by-step costed estimate, not a completed computation; relies on descent success heuristics at each stage.",
+      "assumptions": [
+        "Descent and elimination steps succeed as in the cost analysis (heuristic)"
+      ],
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ],
+      "tags": [
+        "pairing",
+        "supersingular",
+        "small-characteristic",
+        "estimate"
+      ],
+      "source_locations": [
+        "GKZ 2014, Section 1 contribution list and Section 4"
+      ],
+      "formula": "~2^59 M_r",
+      "evidence_class": "concrete_estimate"
+    },
+    {
+      "id": "CLAIM-XT-AMOR-F2-1223-128BIT",
+      "label": "Claim: new small-characteristic algorithms leave the F_{2^1223} genus-1 curve at ~128 bits",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "curve_family_restricted",
+      "statement": "Adj, Menezes, Oliveira and Rodriguez-Henriquez suggested that the 2013 algorithms have no impact on the security of the supersingular genus-one curve over F_{2^1223} (k = 4), which stays very close to 128 bits.",
+      "scope": "Refuted within the concrete-estimate model by GKZ's costed descent (~2^59 M_r); not by a completed computation.",
+      "assumptions": [],
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ],
+      "tags": [
+        "refuted",
+        "pairing",
+        "supersingular"
+      ],
+      "source_locations": [
+        "GKZ 2014, Section 1 (summary of Adj et al.) and Section 6 Conclusion"
+      ],
+      "evidence_class": "counterexample",
+      "notes": "The Adj et al. paper itself was not read; its claim is as summarized by GKZ."
+    }
+  ],
+  "edges": [
+    {
+      "id": "E-XT-001",
+      "from": "DEF-XT-LIFTING-PROBLEM",
+      "to": "DEF-XEDNI-CALCULUS",
+      "relation": "defines",
+      "statement": "Xedni is the global-nontorsion 'easy lifting' instance of the lifting problem: curve and up to 9 points lifted simultaneously by linear algebra.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ]
+    },
+    {
+      "id": "E-XT-002",
+      "from": "DEF-XT-LIFTING-PROBLEM",
+      "to": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "relation": "defines",
+      "statement": "Lifted index calculus is the global-nontorsion 'hard lifting' face with a factor base of small-height points.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007",
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-003",
+      "from": "HEUR-XT-MILLER-HEIGHT",
+      "to": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "relation": "obstructs",
+      "statement": "Few small-height points in E~(Q) force exponentially large lifts of random points (heuristic).",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-MILLER-1986"
+      ]
+    },
+    {
+      "id": "E-XT-004",
+      "from": "HEUR-XT-MILLER-HEIGHT",
+      "to": "HEUR-XT-SS-ANALYSIS",
+      "relation": "enables",
+      "statement": "Silverman-Suzuki develop Miller's brief heuristic into a detailed analysis.",
+      "source_refs": [
+        "S-XT-SILVERMAN-SUZUKI-1998",
+        "S-XT-HKT-2000"
+      ]
+    },
+    {
+      "id": "E-XT-005",
+      "from": "HEUR-XT-SS-ANALYSIS",
+      "to": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "relation": "obstructs",
+      "statement": "The natural lifted index calculus is estimated to be slower than brute force.",
+      "source_refs": [
+        "S-XT-SILVERMAN-SUZUKI-1998"
+      ]
+    },
+    {
+      "id": "E-XT-006",
+      "from": "THM-XT-HKT-LIFT-RANK",
+      "to": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "relation": "obstructs",
+      "statement": "A working growing-factor-base lift would construct curves over Q of arbitrarily large rank.",
+      "source_refs": [
+        "S-XT-HKT-2000"
+      ]
+    },
+    {
+      "id": "E-XT-007",
+      "from": "THM-XT-HKT-LIFT-RANK",
+      "to": "OBS-XT-LIFT-BOUNDED-RANK",
+      "relation": "conditions",
+      "statement": "The bounded-rank obstruction is HKT's implication read contrapositively.",
+      "source_refs": [
+        "S-XT-HKT-2000"
+      ]
+    },
+    {
+      "id": "E-XT-008",
+      "from": "HEUR-XT-PPVW-BOUNDED-RANK",
+      "to": "OBS-XT-LIFT-BOUNDED-RANK",
+      "relation": "conditions",
+      "statement": "The obstruction needs ranks over Q to be bounded, which is only heuristic.",
+      "source_refs": [
+        "S-XT-PPVW-2019"
+      ]
+    },
+    {
+      "id": "E-XT-009",
+      "from": "OBS-XT-LIFT-BOUNDED-RANK",
+      "to": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "relation": "obstructs",
+      "statement": "Under bounded rank, no lift of a growing number of random points to bounded height exists.",
+      "source_refs": [
+        "S-XT-HKT-2000",
+        "S-XT-PPVW-2019"
+      ]
+    },
+    {
+      "id": "E-XT-010",
+      "from": "OBS-XT-LIFT-BOUNDED-RANK",
+      "to": "DEF-XEDNI-CALCULUS",
+      "relation": "does_not_cover",
+      "statement": "Classic xedni lifts a fixed number (<= 9) of points; HKT's hypothesis is an asymptotically increasing number.",
+      "source_refs": [
+        "S-XT-HKT-2000",
+        "S-JKSST-XEDNI-2000"
+      ]
+    },
+    {
+      "id": "E-XT-011",
+      "from": "RED-XT-CHENG-HUANG-PARTIAL-LIFT",
+      "to": "THM-XT-HKT-LIFT-RANK",
+      "relation": "qualifies",
+      "statement": "Cheng-Huang split the HKT lifting obstacle into three partial lifting problems under rank heuristics.",
+      "source_refs": [
+        "S-XT-CHENG-HUANG-2006"
+      ]
+    },
+    {
+      "id": "E-XT-012",
+      "from": "PROB-ECDLP",
+      "to": "RED-XT-CHENG-HUANG-PARTIAL-LIFT",
+      "relation": "reduces_to",
+      "statement": "An algorithm for the three partial lifting problems solves ECDLP, assuming the rank heuristics.",
+      "source_refs": [
+        "S-XT-CHENG-HUANG-2006"
+      ]
+    },
+    {
+      "id": "E-XT-013",
+      "from": "OBS-XT-LOCAL-NONTORSION-LIFT",
+      "to": "DEF-XT-LIFTING-PROBLEM",
+      "relation": "obstructs",
+      "statement": "Local nontorsion lifts lose T = mS unless each Hensel step is chosen consistently, which needs m.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ]
+    },
+    {
+      "id": "E-XT-014",
+      "from": "OBS-XT-LOCAL-TORSION-LIFT",
+      "to": "DEF-XT-LIFTING-PROBLEM",
+      "relation": "obstructs",
+      "statement": "Torsion lifts keep the relation but give O = mO in the formal group.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ]
+    },
+    {
+      "id": "E-XT-015",
+      "from": "OBS-XT-GLOBAL-TORSION-LIFT",
+      "to": "DEF-XT-LIFTING-PROBLEM",
+      "relation": "obstructs",
+      "statement": "Torsion over Q is at most 16; number fields carrying order-n torsion have degree ~n^4.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ]
+    },
+    {
+      "id": "E-XT-016",
+      "from": "OBS-XT-HARD-LIFT-HEIGHT",
+      "to": "DEF-XT-LIFTED-INDEX-CALCULUS",
+      "relation": "obstructs",
+      "statement": "The lift of T has height m^2 h(S): O(p^2) bits and no known way to find it.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ]
+    },
+    {
+      "id": "E-XT-017",
+      "from": "FACT-XT-ANOMALOUS-ONLY-L-EQ-P",
+      "to": "ATTACK-SMART-TRACE-ONE",
+      "relation": "qualifies",
+      "statement": "Explains why the p-adic/formal-group attack works only for l = p and gives no leak for l != p.",
+      "source_refs": [
+        "S-XT-COVER-GAP-LIT"
+      ]
+    },
+    {
+      "id": "E-XT-018",
+      "from": "FACT-XT-ANOMALOUS-ONLY-L-EQ-P",
+      "to": "OBS-XT-LOCAL-TORSION-LIFT",
+      "relation": "qualifies",
+      "statement": "Same structure: l-torsion (l != p) lifts isomorphically through E(Z/p^2).",
+      "source_refs": [
+        "S-XT-COVER-GAP-LIT",
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ]
+    },
+    {
+      "id": "E-XT-019",
+      "from": "THM-XT-PETSCHE-TORSION",
+      "to": "OBS-XT-GLOBAL-TORSION-LIFT",
+      "relation": "qualifies",
+      "statement": "Torsion over number fields is polynomially bounded in degree and Szpiro ratio, quantifying how large K must be.",
+      "source_refs": [
+        "S-XT-PETSCHE-2006"
+      ]
+    },
+    {
+      "id": "E-XT-020",
+      "from": "THM-XT-MASSER-DEPENDENCE",
+      "to": "HEUR-XT-EASY-LIFT-DEPENDENCE",
+      "relation": "enables",
+      "statement": "The < 1/p dependence heuristic is extrapolated from Masser's density-zero theorem.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ]
+    },
+    {
+      "id": "E-XT-021",
+      "from": "HEUR-XT-EASY-LIFT-DEPENDENCE",
+      "to": "DEF-XEDNI-CALCULUS",
+      "relation": "obstructs",
+      "statement": "Simultaneously lifted points are almost never dependent, so xedni rarely yields a relation.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007"
+      ]
+    },
+    {
+      "id": "E-XT-022",
+      "from": "HEUR-XT-EASY-LIFT-DEPENDENCE",
+      "to": "OBSTRUCTION-XEDNI-HEIGHT",
+      "relation": "qualifies",
+      "statement": "Independent route (Masser specialization) to the same order-1/p per-trial success as JKSST's height-based C0/p bound.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007",
+        "S-JKSST-XEDNI-2000"
+      ]
+    },
+    {
+      "id": "E-XT-023",
+      "from": "OBS-XT-HARD-LIFT-HEIGHT",
+      "to": "CONJ-XT-LANG-HEIGHT",
+      "relation": "does_not_cover",
+      "statement": "Quadratic growth of h gives no uniform lower-bound constant; the JKSST Lean audit has an explicit scaled-lattice countermodel.",
+      "source_refs": [
+        "S-XT-SILVERMAN-FOUR-FACES-2007",
+        "S-JKSST-LEAN-AUDIT-2026"
+      ]
+    },
+    {
+      "id": "E-XT-024",
+      "from": "CONJ-XT-LANG-HEIGHT",
+      "to": "OBSTRUCTION-XEDNI-HEIGHT",
+      "relation": "conditions",
+      "statement": "JKSST's C0/p bound assumes Lang's conjecture (or a direct uniform height gap) for the selected lifts.",
+      "source_refs": [
+        "S-JKSST-XEDNI-2000"
+      ]
+    },
+    {
+      "id": "E-XT-025",
+      "from": "THM-XT-HS-SZPIRO-IMPLIES-LANG",
+      "to": "CONJ-XT-LANG-HEIGHT",
+      "relation": "qualifies",
+      "statement": "Lang follows from Szpiro's conjecture.",
+      "source_refs": [
+        "S-XT-HINDRY-SILVERMAN-1988",
+        "S-XT-PETSCHE-2006"
+      ]
+    },
+    {
+      "id": "E-XT-026",
+      "from": "CONJ-XT-SZPIRO",
+      "to": "CONJ-XT-LANG-HEIGHT",
+      "relation": "qualifies",
+      "statement": "Szpiro (bounded sigma) is a sufficient condition for Lang via Hindry-Silverman/Petsche.",
+      "source_refs": [
+        "S-XT-PETSCHE-2006"
+      ]
+    },
+    {
+      "id": "E-XT-027",
+      "from": "THM-XT-PETSCHE-HEIGHT-BOUND",
+      "to": "OBSTRUCTION-XEDNI-HEIGHT",
+      "relation": "model_bridge",
+      "statement": "Replaces the Lang hypothesis by an unconditional explicit constant c(d, sigma), provided the Szpiro ratio of the selected lifts is bounded.",
+      "source_refs": [
+        "S-XT-PETSCHE-2006",
+        "S-JKSST-XEDNI-2000"
+      ]
+    },
+    {
+      "id": "E-XT-028",
+      "from": "THM-XT-PETSCHE-HEIGHT-BOUND",
+      "to": "GAP-XEDNI-END-TO-END",
+      "relation": "qualifies",
+      "statement": "Turns the 'Lang or direct height gap' bridge into the measurable question of the Szpiro ratio of selected lifts.",
+      "source_refs": [
+        "S-XT-PETSCHE-2006",
+        "S-JKSST-LEAN-AUDIT-2026"
+      ]
+    },
+    {
+      "id": "E-XT-029",
+      "from": "THM-XT-SEMAEV-RUECK-DIFFERENTIAL",
+      "to": "PROB-ECDLP",
+      "relation": "attacks_when",
+      "statement": "Polynomial-time when the subgroup order is the characteristic (anomalous case).",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-SEMAEV-1998"
+      ]
+    },
+    {
+      "id": "E-XT-030",
+      "from": "THM-XT-SEMAEV-RUECK-DIFFERENTIAL",
+      "to": "ATTACK-SMART-TRACE-ONE",
+      "relation": "qualifies",
+      "statement": "Semaev's differential method and Smart's p-adic lift solve the same anomalous case.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-SMART-1999"
+      ]
+    },
+    {
+      "id": "E-XT-031",
+      "from": "THM-XT-SATOH-ARAKI-FERMAT",
+      "to": "ATTACK-SMART-TRACE-ONE",
+      "relation": "qualifies",
+      "statement": "Independent p-adic (Fermat-quotient) formulation of the anomalous attack.",
+      "source_refs": [
+        "S-XT-SATOH-ARAKI-1998",
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-032",
+      "from": "THM-XT-SEMAEV-RUECK-DIFFERENTIAL",
+      "to": "THM-XT-RUECK-JACOBIAN-PTORSION",
+      "relation": "instantiates",
+      "statement": "The elliptic anomalous attack is the genus-one case of Rueck's p-torsion method.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-RUECK-1999"
+      ]
+    },
+    {
+      "id": "E-XT-033",
+      "from": "THM-XT-SEMAEV-RUECK-DIFFERENTIAL",
+      "to": "STANDARD-CURVE-EXCLUSIONS",
+      "relation": "conditions",
+      "statement": "The anomalous exclusion in curve screens is justified by this polynomial-time attack.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-NIST-800-186"
+      ]
+    },
+    {
+      "id": "E-XT-034",
+      "from": "THM-XT-BK-WEIL-SUFFICES",
+      "to": "ATTACK-MOV-PAIRING",
+      "relation": "enables",
+      "statement": "The Weil-pairing MOV attack can be run in E(F_{q^k}) with k the embedding degree when r does not divide q-1.",
+      "source_refs": [
+        "S-XT-BK-1998",
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-035",
+      "from": "DEF-EMBEDDING-DEGREE",
+      "to": "THM-XT-BK-IMPROBABILITY",
+      "relation": "defines",
+      "statement": "The bound is on the probability of small embedding degree.",
+      "source_refs": [
+        "S-XT-BK-1998"
+      ]
+    },
+    {
+      "id": "E-XT-036",
+      "from": "THM-XT-BK-IMPROBABILITY",
+      "to": "ATTACK-MOV-PAIRING",
+      "relation": "qualifies",
+      "statement": "For random prime-order curves the MOV/FR transfer is subexponential only with negligible probability.",
+      "source_refs": [
+        "S-XT-BK-1998",
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-037",
+      "from": "THM-XT-BK-IMPROBABILITY",
+      "to": "STANDARD-CURVE-EXCLUSIONS",
+      "relation": "qualifies",
+      "statement": "The embedding-degree screen rejects a rare event for random curves; it matters for constructed/special curves.",
+      "source_refs": [
+        "S-XT-BK-1998"
+      ]
+    },
+    {
+      "id": "E-XT-038",
+      "from": "MEAS-XT-ECC2K130-EMBEDDING-DEGREE",
+      "to": "ATTACK-MOV-PAIRING",
+      "relation": "qualifies",
+      "statement": "On ECC2K-130 the transfer target exceeds 1.3e9 bits, so MOV/FR is not a route there.",
+      "source_refs": [
+        "S-XT-ECC2K130-EXT"
+      ]
+    },
+    {
+      "id": "E-XT-039",
+      "from": "HEUR-XT-LS-MNT-COUNT",
+      "to": "FACT-PAIRING-FRIENDLY-TWO-DLPS",
+      "relation": "qualifies",
+      "statement": "Low-embedding-degree ordinary curves are scarce and must be constructed; they are not found by random search.",
+      "source_refs": [
+        "S-XT-LUCA-SHPARLINSKI-2006"
+      ]
+    },
+    {
+      "id": "E-XT-040",
+      "from": "DEF-XT-DISTORTION-MAP",
+      "to": "THM-XT-VERHEUL-DISTORTION-EXISTS",
+      "relation": "defines",
+      "statement": "The theorem asserts existence of distortion maps.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-041",
+      "from": "THM-XT-VERHEUL-DISTORTION-EXISTS",
+      "to": "RED-PAIRING-CO-DDH",
+      "relation": "enables",
+      "statement": "With a distortion map the pairing is nondegenerate on <P> x <P>, so DDH in <P> becomes easy on supersingular curves.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-VERHEUL-2004"
+      ]
+    },
+    {
+      "id": "E-XT-042",
+      "from": "THM-XT-VERHEUL-DISTORTION-EXISTS",
+      "to": "DEF-XT-GPS-PAIRING-TYPES",
+      "relation": "instantiates",
+      "statement": "Supersingular curves with a distortion map realize Type 1 pairings.",
+      "source_refs": [
+        "S-XT-GPS-2008",
+        "S-XT-VERHEUL-2004"
+      ]
+    },
+    {
+      "id": "E-XT-043",
+      "from": "THM-XT-TRACE-MAP-DISTORTION",
+      "to": "DEF-XT-GPS-PAIRING-TYPES",
+      "relation": "qualifies",
+      "statement": "The trace is not a distortion map for the Frobenius eigenspaces G1, G2, consistent with Type 3 settings lacking an efficient homomorphism.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-044",
+      "from": "DEF-XT-GPS-PAIRING-TYPES",
+      "to": "FACT-PAIRING-FRIENDLY-TWO-DLPS",
+      "relation": "qualifies",
+      "statement": "Which source-group problems a pairing exposes depends on its type.",
+      "source_refs": [
+        "S-XT-GPS-2008"
+      ]
+    },
+    {
+      "id": "E-XT-045",
+      "from": "DEF-SUBEXPONENTIAL-L",
+      "to": "ALG-XT-NFS-L13",
+      "relation": "defines",
+      "statement": "Complexities are stated in L notation.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-046",
+      "from": "HEUR-XT-NFS-SMOOTHNESS",
+      "to": "ALG-XT-NFS-L13",
+      "relation": "conditions",
+      "statement": "NFS L(1/3) complexities are derived from the smoothness heuristic.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-047",
+      "from": "HEUR-XT-NFS-SMOOTHNESS",
+      "to": "ALG-XT-EXTNFS",
+      "relation": "conditions",
+      "statement": "Kim-Barbulescu Theorem 1 holds 'under the classical NFS heuristics'.",
+      "source_refs": [
+        "S-XT-KB-2016"
+      ]
+    },
+    {
+      "id": "E-XT-048",
+      "from": "HEUR-XT-NFS-SMOOTHNESS",
+      "to": "COND-XT-BD-BN-100BIT",
+      "relation": "conditions",
+      "statement": "The 2^99.69 estimate uses Dickman smoothness of Monte Carlo norm sizes.",
+      "source_refs": [
+        "S-XT-BD-2019"
+      ]
+    },
+    {
+      "id": "E-XT-049",
+      "from": "HEUR-XT-NFS-SMOOTHNESS",
+      "to": "COND-XT-BD-KEYSIZES",
+      "relation": "conditions",
+      "statement": "All recommended sizes come from the same heuristic cost model.",
+      "source_refs": [
+        "S-XT-BD-2019"
+      ]
+    },
+    {
+      "id": "E-XT-050",
+      "from": "HEUR-XT-NFS-SMOOTHNESS",
+      "to": "ALG-XT-MSS-NORM-UPPER-BOUND",
+      "relation": "conditions",
+      "statement": "MSS estimates also rest on the NFS smoothness heuristics.",
+      "source_refs": [
+        "S-XT-MSS-2016",
+        "S-XT-BD-2019"
+      ]
+    },
+    {
+      "id": "E-XT-051",
+      "from": "HEUR-XT-NFS-SMOOTHNESS",
+      "to": "ALG-XT-COPPERSMITH-F2N",
+      "relation": "conditions",
+      "statement": "Coppersmith's L(1/3) bound rests on polynomial smoothness heuristics for the non-uniform values sieved.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-052",
+      "from": "ALG-XT-EXTNFS",
+      "to": "COND-XT-BD-BN-100BIT",
+      "relation": "enables",
+      "statement": "The BN estimate uses SexTNFS, the special-p variant of exTNFS.",
+      "source_refs": [
+        "S-XT-BD-2019",
+        "S-XT-KB-2016"
+      ]
+    },
+    {
+      "id": "E-XT-053",
+      "from": "ALG-XT-EXTNFS",
+      "to": "COND-XT-BD-KEYSIZES",
+      "relation": "enables",
+      "statement": "Key sizes assume the attacker uses (S)exTNFS where it applies.",
+      "source_refs": [
+        "S-XT-BD-2019"
+      ]
+    },
+    {
+      "id": "E-XT-054",
+      "from": "COND-XT-BD-BN-100BIT",
+      "to": "CLAIM-XT-BN3072-128BIT",
+      "relation": "refutes",
+      "statement": "An explicit SexTNFS parameterization costs about 2^99.7 < 2^128 in the same heuristic cost model the claim used.",
+      "source_refs": [
+        "S-XT-BD-2019"
+      ]
+    },
+    {
+      "id": "E-XT-055",
+      "from": "COND-XT-BD-BN-100BIT",
+      "to": "ALG-XT-MSS-NORM-UPPER-BOUND",
+      "relation": "qualifies",
+      "statement": "BD show the MSS norm upper bounds sit far above 99.9% of sampled norms and that MSS omit filtering; both give attack upper estimates, not security lower bounds.",
+      "source_refs": [
+        "S-XT-BD-2019"
+      ]
+    },
+    {
+      "id": "E-XT-056",
+      "from": "GAP-XT-NFS-SECURITY-LOWER-BOUND",
+      "to": "COND-XT-BD-KEYSIZES",
+      "relation": "qualifies",
+      "statement": "Key sizes are upper estimates of the best known attack, not lower bounds on cost.",
+      "source_refs": [
+        "S-XT-BD-2019",
+        "S-XT-MSS-2016"
+      ]
+    },
+    {
+      "id": "E-XT-057",
+      "from": "GAP-XT-NFS-SECURITY-LOWER-BOUND",
+      "to": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "relation": "qualifies",
+      "statement": "The target-field cost that governs a pairing attack has no proved lower bound; only best-known-attack estimates.",
+      "source_refs": [
+        "S-XT-BD-2019"
+      ]
+    },
+    {
+      "id": "E-XT-058",
+      "from": "HEUR-XT-NFS-C32-FLOOR",
+      "to": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "relation": "qualifies",
+      "statement": "c = 32 is argued (not proved) to be the floor of the NFS family in large/medium characteristic.",
+      "source_refs": [
+        "S-XT-BD-2019"
+      ]
+    },
+    {
+      "id": "E-XT-059",
+      "from": "ALG-XT-NFS-L13",
+      "to": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "relation": "upper_bounds",
+      "statement": "Heuristic L(1/3) upper bound on the target-field DLP for prime and general fields.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-060",
+      "from": "ALG-XT-EXTNFS",
+      "to": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "relation": "upper_bounds",
+      "statement": "Heuristic L(1/3,(48/9)^(1/3)) / (32/9)^(1/3) for the composite-n medium-prime targets of BN/BLS pairings.",
+      "source_refs": [
+        "S-XT-KB-2016"
+      ]
+    },
+    {
+      "id": "E-XT-061",
+      "from": "ALG-XT-COPPERSMITH-F2N",
+      "to": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "relation": "upper_bounds",
+      "statement": "Historic heuristic bound for binary targets.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-062",
+      "from": "THM-XT-RIGOROUS-L-HALF",
+      "to": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "relation": "upper_bounds",
+      "statement": "Proved L(1/2) bound in any characteristic covered (prime fields; fixed characteristic per Pomerance).",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-KW-2019"
+      ]
+    },
+    {
+      "id": "E-XT-063",
+      "from": "COND-XT-BGJT-QUASIPOLY",
+      "to": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "relation": "upper_bounds",
+      "statement": "Heuristic quasi-polynomial bound for small-characteristic targets.",
+      "source_refs": [
+        "S-XT-BGJT-2014"
+      ]
+    },
+    {
+      "id": "E-XT-064",
+      "from": "THM-XT-KW-QUASIPOLY",
+      "to": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "relation": "upper_bounds",
+      "statement": "Proved expected quasi-polynomial bound for fixed-characteristic targets.",
+      "source_refs": [
+        "S-XT-KW-2019"
+      ]
+    },
+    {
+      "id": "E-XT-065",
+      "from": "GAP-XT-RIGOROUS-L13",
+      "to": "ALG-XT-NFS-L13",
+      "relation": "leaves_open",
+      "statement": "The L(1/3) complexities remain unproved.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-KW-2019"
+      ]
+    },
+    {
+      "id": "E-XT-066",
+      "from": "GAP-XT-RIGOROUS-L13",
+      "to": "ALG-XT-EXTNFS",
+      "relation": "leaves_open",
+      "statement": "exTNFS complexities remain unproved.",
+      "source_refs": [
+        "S-XT-KB-2016"
+      ]
+    },
+    {
+      "id": "E-XT-067",
+      "from": "DEF-XT-SPARSE-MEDIUM-SUBFIELD-REP",
+      "to": "HEUR-XT-BGJT-REPRESENTATION",
+      "relation": "defines",
+      "statement": "The heuristic asserts that such a representation exists.",
+      "source_refs": [
+        "S-XT-BGJT-2014"
+      ]
+    },
+    {
+      "id": "E-XT-068",
+      "from": "HEUR-XT-BGJT-REPRESENTATION",
+      "to": "COND-XT-BGJT-QUASIPOLY",
+      "relation": "conditions",
+      "statement": "First of BGJT's three key heuristics.",
+      "source_refs": [
+        "S-XT-BGJT-2014"
+      ]
+    },
+    {
+      "id": "E-XT-069",
+      "from": "HEUR-XT-BGJT-DESCENT",
+      "to": "COND-XT-BGJT-QUASIPOLY",
+      "relation": "conditions",
+      "statement": "Proposition 2, hence Theorem 3, rests on Heuristics 7 and 8 and smoothness of non-uniform polynomials.",
+      "source_refs": [
+        "S-XT-BGJT-2014"
+      ]
+    },
+    {
+      "id": "E-XT-070",
+      "from": "CEX-XT-CWZ-TRAPS",
+      "to": "CLAIM-XT-BGJT-PROP2-ALL-P",
+      "relation": "refutes",
+      "statement": "Factors of x^q h1 - h0 (traps) get e1 = 0 and cannot be descended; BGJT v2 concedes Proposition 2 cannot hold for them.",
+      "source_refs": [
+        "S-XT-CWZ-2014",
+        "S-XT-BGJT-2014"
+      ]
+    },
+    {
+      "id": "E-XT-071",
+      "from": "CEX-XT-CWZ-TRAPS",
+      "to": "HEUR-XT-BGJT-DESCENT",
+      "relation": "qualifies",
+      "statement": "The descent heuristics as originally stated are problematic in the non-Kummer case; patched versions are still heuristic.",
+      "source_refs": [
+        "S-XT-CWZ-2014"
+      ]
+    },
+    {
+      "id": "E-XT-072",
+      "from": "CLAIM-XT-BGJT-PROP2-ALL-P",
+      "to": "COND-XT-BGJT-QUASIPOLY",
+      "relation": "qualifies",
+      "statement": "The quasi-polynomial claim must route around the refuted universal step (Proposition 10 or the CWZ fix).",
+      "source_refs": [
+        "S-XT-BGJT-2014",
+        "S-XT-CWZ-2014"
+      ]
+    },
+    {
+      "id": "E-XT-073",
+      "from": "DEF-XT-SPARSE-MEDIUM-SUBFIELD-REP",
+      "to": "THM-XT-GKZ-RIGOROUS-INFINITE",
+      "relation": "defines",
+      "statement": "GKZ Theorem 2 is stated for fields given in this representation (degree <= 2 h0, h1).",
+      "source_refs": [
+        "S-XT-GKZ-2018"
+      ]
+    },
+    {
+      "id": "E-XT-074",
+      "from": "THM-XT-GKZ-RIGOROUS-INFINITE",
+      "to": "HEUR-XT-BGJT-DESCENT",
+      "relation": "qualifies",
+      "statement": "GKZ's descent removes the smoothness heuristics, proving quasi-polynomial time where the representation exists.",
+      "source_refs": [
+        "S-XT-GKZ-2018"
+      ]
+    },
+    {
+      "id": "E-XT-075",
+      "from": "CONJ-XT-GKZ-REPRESENTATION",
+      "to": "COND-XT-GKZ-ALL-EXTENSIONS",
+      "relation": "conditions",
+      "statement": "The all-n statement needs the representation conjecture.",
+      "source_refs": [
+        "S-XT-GKZ-2018"
+      ]
+    },
+    {
+      "id": "E-XT-076",
+      "from": "THM-XT-GKZ-RIGOROUS-INFINITE",
+      "to": "COND-XT-GKZ-ALL-EXTENSIONS",
+      "relation": "enables",
+      "statement": "Theorem 2 is applied after embedding F_{p^n} into a suitable F_{q^{kn}}.",
+      "source_refs": [
+        "S-XT-GKZ-2018"
+      ]
+    },
+    {
+      "id": "E-XT-077",
+      "from": "THM-XT-KW-ELLIPTIC-MODEL",
+      "to": "THM-XT-KW-QUASIPOLY",
+      "relation": "enables",
+      "statement": "The provably existing elliptic-curve model replaces the conjectural representation.",
+      "source_refs": [
+        "S-XT-KW-2019"
+      ]
+    },
+    {
+      "id": "E-XT-078",
+      "from": "THM-XT-KW-QUASIPOLY",
+      "to": "CONJ-XT-GKZ-REPRESENTATION",
+      "relation": "qualifies",
+      "statement": "The quasi-polynomial conclusion no longer depends on the conjecture (the conjecture itself stays open).",
+      "source_refs": [
+        "S-XT-KW-2019"
+      ]
+    },
+    {
+      "id": "E-XT-079",
+      "from": "THM-XT-KW-QUASIPOLY",
+      "to": "COND-XT-BGJT-QUASIPOLY",
+      "relation": "qualifies",
+      "statement": "The heuristic quasi-polynomial claim is now a theorem in fixed characteristic (with a different algorithm).",
+      "source_refs": [
+        "S-XT-KW-2019"
+      ]
+    },
+    {
+      "id": "E-XT-080",
+      "from": "THM-XT-KW-QUASIPOLY",
+      "to": "COND-XT-MOV-SS-SMALLCHAR",
+      "relation": "enables",
+      "statement": "Supplies a proved quasi-polynomial target-field DLP.",
+      "source_refs": [
+        "S-XT-KW-2019"
+      ]
+    },
+    {
+      "id": "E-XT-081",
+      "from": "ATTACK-MOV-PAIRING",
+      "to": "COND-XT-MOV-SS-SMALLCHAR",
+      "relation": "enables",
+      "statement": "The pairing transfer carries the ECDLP into F_{q^k}^*.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-082",
+      "from": "ATTACK-FREY-RUECK",
+      "to": "COND-XT-MOV-SS-SMALLCHAR",
+      "relation": "enables",
+      "statement": "Tate-pairing variant of the same transfer.",
+      "source_refs": [
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-083",
+      "from": "THEOREM-SUPERSINGULAR-SMALL-K",
+      "to": "COND-XT-MOV-SS-SMALLCHAR",
+      "relation": "conditions",
+      "statement": "k <= 6 keeps the target field size polynomial in the curve's field size.",
+      "source_refs": [
+        "S-FST-2010",
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-084",
+      "from": "COND-XT-MOV-SS-SMALLCHAR",
+      "to": "PROB-ECDLP",
+      "relation": "attacks_when",
+      "statement": "Quasi-polynomial ECDLP for supersingular curves over fields of fixed small characteristic.",
+      "source_refs": [
+        "S-XT-KW-2019",
+        "S-GALBRAITH-MPKC-2018"
+      ]
+    },
+    {
+      "id": "E-XT-085",
+      "from": "HEUR-XT-JOUX-PINPOINT-CORRECTED",
+      "to": "CLAIM-XT-JOUX-PINPOINT-ORIGINAL",
+      "relation": "refutes",
+      "statement": "The printed constant (8/9)^(1/3) was corrected to 2^(1/3) after later communications.",
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ]
+    },
+    {
+      "id": "E-XT-086",
+      "from": "ALG-XT-GKZ-F2-367-BREAK",
+      "to": "CLAIM-XT-SS-GENUS2-F2-367-128BIT",
+      "relation": "refutes",
+      "statement": "A discrete logarithm in the target field was computed in ~52240 core-hours.",
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ]
+    },
+    {
+      "id": "E-XT-087",
+      "from": "COND-XT-GKZ-F2-1223-59BIT",
+      "to": "CLAIM-XT-AMOR-F2-1223-128BIT",
+      "relation": "refutes",
+      "statement": "A costed descent gives ~2^59 M_r, far below the claimed ~128 bits (estimate, not computation).",
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ]
+    },
+    {
+      "id": "E-XT-088",
+      "from": "ALG-XT-GKZ-F2-367-BREAK",
+      "to": "FACT-FIELD-DLP-AFTER-PAIRING",
+      "relation": "measures",
+      "statement": "A completed target-field DLP for a proposed pairing curve.",
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ]
+    },
+    {
+      "id": "E-XT-089",
+      "from": "COND-XT-BGJT-QUASIPOLY",
+      "to": "ALG-XT-GKZ-F2-367-BREAK",
+      "relation": "does_not_cover",
+      "statement": "The break used only L(1/4)-type techniques; its validity does not rest on BGJT's heuristics.",
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ]
+    },
+    {
+      "id": "E-XT-090",
+      "from": "HEUR-XT-BGJT-DESCENT",
+      "to": "COND-XT-GKZ-F2-1223-59BIT",
+      "relation": "conditions",
+      "statement": "The 2^59 estimate assumes the elimination steps succeed as in the analysis (the same descent-type heuristics).",
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ]
+    },
+    {
+      "id": "E-XT-091",
+      "from": "ALG-XT-GKZ-F2-367-BREAK",
+      "to": "PROB-ECDLP",
+      "relation": "attacks_when",
+      "statement": "Via the pairing, the break transfers to the genus-2 supersingular Jacobian DLP (and illustrates the risk for small-characteristic supersingular elliptic curves).",
+      "source_refs": [
+        "S-XT-GKZ-SS-BINARY-2014"
+      ]
+    }
+  ],
+  "research_targets": [
+    {
+      "id": "RT-XT-SZPIRO-XEDNI-LIFTS",
+      "label": "Replace Lang by a measured Szpiro-ratio bound for xedni lifts",
+      "status": "ready",
+      "priority": 1,
+      "objective": "Decide whether the Lang hypothesis in the JKSST obstruction can be replaced by Petsche's unconditional c(d, sigma) bound: measure the Szpiro ratio of the curves the xedni/JKSST lift selection actually produces, and prove or refute a uniform bound for that family.",
+      "depends_on": [
+        "THM-XT-PETSCHE-HEIGHT-BOUND",
+        "CONJ-XT-LANG-HEIGHT",
+        "CONJ-XT-SZPIRO",
+        "OBSTRUCTION-XEDNI-HEIGHT",
+        "GAP-XEDNI-END-TO-END"
+      ],
+      "acceptance": "Either a proof that sigma is bounded on the selected-lift family (then the obstruction's Lang bridge becomes unconditional with an explicit constant), or a measured family where sigma grows, recorded with exact discriminants and conductors.",
+      "next_step": "Generate lifts with the repository's frozen xedni lift procedure for p up to 2^20, compute minimal discriminant and conductor (PARI/Sage), and tabulate sigma against p.",
+      "source_refs": [
+        "S-XT-PETSCHE-2006",
+        "S-JKSST-XEDNI-2000",
+        "S-JKSST-LEAN-AUDIT-2026"
+      ]
+    },
+    {
+      "id": "RT-XT-TRANSFER-PRICE-MODEL",
+      "label": "Correct the transfer audit's 'lower bound' for F_(q^k) prices",
+      "status": "ready",
+      "priority": 2,
+      "objective": "The transfer audit prices F_(q^k) DLP by L[1/3, (32/9)^(1/3)] with o(1) dropped and calls it an attacker-favourable lower bound. It is neither proved nor a lower bound: in fixed characteristic Kleinjung-Wesolowski give a proved quasi-polynomial cost far below it, and in large characteristic the c = 32 floor is only argued. Reclassify and reprice.",
+      "depends_on": [
+        "ALG-XT-NFS-L13",
+        "HEUR-XT-NFS-C32-FLOOR",
+        "THM-XT-KW-QUASIPOLY",
+        "GAP-XT-NFS-SECURITY-LOWER-BOUND",
+        "FACT-FIELD-DLP-AFTER-PAIRING"
+      ],
+      "acceptance": "Each pairing certificate states which characteristic regime applies, uses KW (proved) or BGJT/GKZ (heuristic) prices for char 2/3 targets, labels L[1/3] prices 'heuristic upper estimate', and no longer calls any target-field price a lower bound.",
+      "next_step": "List certificates with q = 2^m or 3^m targets (B-163, K-163, sect113r1, ECC2K-130) and recompute the band with (pn)^(2 log2 n) alongside the L[1/3] figure; the verdicts should not change for these huge k but the wording must.",
+      "source_refs": [
+        "S-XT-TRANSFER-AUDIT-2026",
+        "S-XT-KW-2019",
+        "S-XT-BD-2019"
+      ]
+    },
+    {
+      "id": "RT-XT-MOV-KW-COMPOSITION",
+      "label": "Prove the rigorous quasi-polynomial ECDLP on supersingular small-characteristic curves",
+      "status": "open",
+      "priority": 3,
+      "objective": "Write out (and ideally formalize the bookkeeping of) the composition MOV/Frey-Rueck + Kleinjung-Wesolowski, so COND-XT-MOV-SS-SMALLCHAR becomes a reviewed theorem: pairing evaluation cost, nondegenerate partner-point sampling, subgroup-to-field DLP reduction, and the final expected-time bound in terms of m.",
+      "depends_on": [
+        "COND-XT-MOV-SS-SMALLCHAR",
+        "THM-XT-KW-QUASIPOLY",
+        "ATTACK-MOV-PAIRING",
+        "THEOREM-SUPERSINGULAR-SMALL-K",
+        "THM-XT-BK-WEIL-SUFFICES"
+      ],
+      "acceptance": "A written proof with every step's cost and probability, reviewed, giving expected time (p m k)^(2 log2(mk)+O(1)) times poly(m) for k <= 6.",
+      "next_step": "Draft the proof in papers/, citing KW Theorem 1.1 and Galbraith Theorem 26.4.1/26.4.2, and check the r | q - 1 edge case separately.",
+      "source_refs": [
+        "S-XT-KW-2019",
+        "S-GALBRAITH-MPKC-2018",
+        "S-XT-BK-1998"
+      ]
+    },
+    {
+      "id": "RT-XT-HKT-SCOPE",
+      "label": "Read Huang-Kueh-Tan and Cheng-Huang: exact scope of the rank obstruction",
+      "status": "blocked",
+      "priority": 4,
+      "objective": "Determine exactly which lifting algorithms HKT's theorem covers (bounded height, growing point count, curves over Q only?) and what rank heuristics Cheng-Huang need, so the conditional obstruction OBS-XT-LIFT-BOUNDED-RANK can be stated precisely and its gap to fixed-r xedni closed or recorded.",
+      "depends_on": [
+        "THM-XT-HKT-LIFT-RANK",
+        "RED-XT-CHENG-HUANG-PARTIAL-LIFT",
+        "OBS-XT-LIFT-BOUNDED-RANK",
+        "HEUR-XT-PPVW-BOUNDED-RANK"
+      ],
+      "acceptance": "Primary-read statements with theorem numbers for HKT and Cheng-Huang, and a corrected OBS-XT-LIFT-BOUNDED-RANK node.",
+      "next_step": "Obtain the ANTS-IV and Algorithmica texts through a licensed channel (paywalled; not retrievable from this host).",
+      "source_refs": [
+        "S-XT-HKT-2000",
+        "S-XT-CHENG-HUANG-2006",
+        "S-XT-PPVW-2019"
+      ]
+    },
+    {
+      "id": "RT-XT-BN-NORM-REPLAY",
+      "label": "Replay the Barbulescu-Duquesne BN norm-size estimate",
+      "status": "ready",
+      "priority": 5,
+      "objective": "Measure, not assume, the smoothness inputs behind the 2^99.69 BN figure: reproduce the Monte Carlo norm sizes (log2 N_f ~ 414.7, log2 N_g ~ 460.8) for the published polynomials and check actual B-smoothness rates against Dickman rho on a sample.",
+      "depends_on": [
+        "COND-XT-BD-BN-100BIT",
+        "HEUR-XT-NFS-SMOOTHNESS",
+        "ALG-XT-EXTNFS"
+      ],
+      "acceptance": "Measured norm-size distribution and smoothness rate with confidence intervals, compared with BD's values and the MSS upper bounds.",
+      "next_step": "Implement the norm sampler for f = P(x^2 + t), g = x^2 + t - u over Q(t)/h(t) and sample 10^6 pairs (a, b).",
+      "source_refs": [
+        "S-XT-BD-2019",
+        "S-XT-KB-2016",
+        "S-XT-MSS-2016"
+      ]
+    }
+  ]
+}

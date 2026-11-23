@@ -1,0 +1,33 @@
+[
+ {
+  "label": "hilbert_p1301_s1",
+  "present": true,
+  "committed": "research/jv_nagao_hilbert_20261112/results/hilbert_p1301_s1.json",
+  "committed_sha256": "65103e32587a0578e5ab3a757d9ae8822843059b725593dfc74ff5d7ce9ca64d",
+  "replay_sha256": "639ec13072d73c3950f9966af9e2ec85ee1452d343a63bb3f8e5e95b6b158ba1",
+  "fields_compared": 73,
+  "timing_fields_excluded": [
+   "[0].f4_ms",
+   "[0].lin_ms",
+   "[0].wall_ms"
+  ],
+  "mismatches": [
+   {
+    "field": "[0].f4_muls_per_test_sum",
+    "committed": 289507254316,
+    "replay": 80010716496
+   },
+   {
+    "field": "[0].hilbert_check_muls",
+    "committed": 64373211967,
+    "replay": 8875006425
+   }
+  ],
+  "identical": false,
+  "solved": true,
+  "correct": true,
+  "total_muls": 140174712426,
+  "s": 0.38462701651404885,
+  "relation_digest": 4198168094706900228
+ }
+]

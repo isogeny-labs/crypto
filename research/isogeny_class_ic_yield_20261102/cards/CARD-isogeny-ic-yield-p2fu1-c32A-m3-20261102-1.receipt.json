@@ -1,0 +1,250 @@
+{
+  "card_id": "CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1",
+  "card_path": "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.yaml",
+  "card_sha256": "f847e4e2bb67995c73bf77c209e7ee45b86e01045c71783a6ef7f7849f1389bc",
+  "commands": [
+    {
+      "argv": [
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool-f1",
+        "spec",
+        "--classes",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/classes.json",
+        "--class",
+        "c32A",
+        "--m",
+        "3",
+        "--y",
+        "0.1",
+        "--isolation",
+        "L0",
+        "--focus",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/followup1_focus.json",
+        "--targets",
+        "12",
+        "--rounds",
+        "4",
+        "--aa",
+        "0",
+        "--seed",
+        "363589115",
+        "--out",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.017,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "spec",
+      "index": 1,
+      "outputs": {
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json": "44738c754d75a275359836ab07cc9847deeb40b640bfc465ca21ff18f588e06f"
+      },
+      "seconds": 0.017,
+      "stderr_sha256": "485bf4905929519ca7b662f9d7212cd69ebcd5b5a60272a05471fa15ad60cd60",
+      "stderr_tail": [
+        "wrote research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json: kind yield class c32A m=3 |F|=470 (pc 499) predicted_yield=3.354e-2 attempts=5964 curves=24"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "target/release/ecbench",
+        "run",
+        "--wait",
+        "--allow-busy",
+        "--spec",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json",
+        "--out",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2474.749,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run",
+      "index": 2,
+      "outputs": {
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session/records.jsonl": "82bade1bc42b4a4698021811bbd405e263d5709022c821406a3b8c71b3060905",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session/session.json": "e5b96ccdd282a1040b693edf4b9d689088253efd6a9d93fb807a112c24d6c225"
+      },
+      "seconds": 2474.749,
+      "stderr_sha256": "a98e54b170e962d2737fe9ae7fd7c35a6b3cd3c580782672307c376cb4f35214",
+      "stderr_tail": [
+        "2862/2880 m3-pc          icv1-fp32-t128491-9e2356c9 W1b0858fc4505 exhausted S=98.088 L2",
+        "2863/2880 m3-main        icv1-fp32-t128491-9e2356c9 W31cbc4ac984e exhausted S=91.903 L2",
+        "2864/2880 m3-pc          icv1-fp32-t128491-9e2356c9 W31cbc4ac984e exhausted S=97.561 L2",
+        "2865/2880 m3-main        icv1-fp32-t128491-9e2356c9 Wd62f79b3ca1c exhausted S=92.149 L2",
+        "2866/2880 m3-pc          icv1-fp32-t128491-9e2356c9 Wd62f79b3ca1c exhausted S=97.822 L2",
+        "2867/2880 m3-main        icv1-fp32-t128491-9e2356c9 W689bbad57075 exhausted S=92.218 L2",
+        "2868/2880 m3-pc          icv1-fp32-t128491-9e2356c9 W689bbad57075 exhausted S=97.949 L2",
+        "2869/2880 m3-main        icv1-fp32-t128491-9e2356c9 W639aeda29f11 exhausted S=92.171 L2",
+        "2870/2880 m3-pc          icv1-fp32-t128491-9e2356c9 W639aeda29f11 exhausted S=97.769 L2",
+        "2871/2880 m3-main        icv1-fp32-t128491-9e2356c9 Wdb0fe5c94f7c exhausted S=92.075 L2",
+        "2872/2880 m3-pc          icv1-fp32-t128491-9e2356c9 Wdb0fe5c94f7c exhausted S=97.716 L2",
+        "2873/2880 m3-main        icv1-fp32-t128491-9e2356c9 W57b9dbd1f6e2 exhausted S=92.111 L1",
+        "2874/2880 m3-pc          icv1-fp32-t128491-9e2356c9 W57b9dbd1f6e2 exhausted S=97.840 L1",
+        "2875/2880 m3-main        icv1-fp32-t128491-9e2356c9 W1a15ddbbecef exhausted S=91.972 L2",
+        "2876/2880 m3-pc          icv1-fp32-t128491-9e2356c9 W1a15ddbbecef exhausted S=97.680 L2",
+        "2877/2880 m3-main        icv1-fp32-t128491-9e2356c9 W21321e93d18b exhausted S=92.317 L2",
+        "2878/2880 m3-pc          icv1-fp32-t128491-9e2356c9 W21321e93d18b exhausted S=98.024 L2",
+        "2879/2880 m3-main        icv1-fp32-t128491-9e2356c9 Wd00334e0d855 exhausted S=91.983 L2",
+        "2880/2880 m3-pc          icv1-fp32-t128491-9e2356c9 Wd00334e0d855 exhausted S=97.689 L2",
+        "session ECBS1h240b663c0a80 complete -> research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session (2880 records: {\"exhausted\": 2880})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session",
+        "--replay",
+        "12",
+        "--out",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 12.078,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify",
+      "index": 3,
+      "outputs": {
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/audit.json": "6d1a32be3a70e4a08c8ab14a48621999e168f1e2ed563e0f17abdca07d033f0f"
+      },
+      "seconds": 12.078,
+      "stderr_sha256": "1fdb72a7017d3f738aadd2a1d82d3a6bbf5705be2d28373d312fae6d7ac54e7a",
+      "stderr_tail": [
+        "receipt sha256 6d1a32be3a70e4a08c8ab14a48621999e168f1e2ed563e0f17abdca07d033f0f",
+        "replay seed 9282349034590696806 (2304 eligible runs)",
+        "audit OK: 2880 records, 0 verified, 12 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "6d1a32be3a70e4a08c8ab14a48621999e168f1e2ed563e0f17abdca07d033f0f",
+      "stdout_tail": [
+        "      \"record_id\": \"ECR1hb00f0922c666\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"replay_selection\": \"sample\",",
+        "  \"replay_seed\": 9282349034590696806,",
+        "  \"replay_candidates\": 2304,",
+        "  \"files\": {",
+        "    \"host.json\": \"7b68bb1d19bb0966e975b3c279a5cc0d0214600742b014453acd6c6684f2e21b\",",
+        "    \"plan.json\": \"01a4ec801a3ac17609d40bf3b2bfd07cdc81253f8195d8e5506f06a05bb880de\",",
+        "    \"records.jsonl\": \"82bade1bc42b4a4698021811bbd405e263d5709022c821406a3b8c71b3060905\",",
+        "    \"session.json\": \"e5b96ccdd282a1040b693edf4b9d689088253efd6a9d93fb807a112c24d6c225\",",
+        "    \"spec.json\": \"44738c754d75a275359836ab07cc9847deeb40b640bfc465ca21ff18f588e06f\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"3447ba8a3e410bf816f0fbb13fc7aed235c63a834d31ab32b00f480a930fac1c\",",
+        "  \"auditor_env_class_id\": \"ECBENV3hc2f746c836b2\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1hc00b2367431c\",",
+        "  \"audited_unix_ms\": 1793658554664",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/p2tool/target/release/p2tool-f1",
+        "analyze-focus",
+        "--spec",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json",
+        "--focus",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/followup1_focus.json",
+        "--classes",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/classes.json",
+        "--session",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session",
+        "--out",
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/focus_analysis.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.296,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "analyze",
+      "index": 4,
+      "outputs": {
+        "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/focus_analysis.json": "0533b53ea64e2dc98c8ebd7301b33b3552db0bcd0072b913add7f591d270c7f5"
+      },
+      "seconds": 0.296,
+      "stderr_sha256": "0ae1f831df02f3a2d9e7c0c92a86dd77c690a9847ec27ece5c089279dfed2a0e",
+      "stderr_tail": [
+        "wrote research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/focus_analysis.json"
+      ],
+      "stdout_sha256": "c1bdb26ac61694c7b7c9db0c83dfc421f77e74fe41b1626e6d3de12a368aec28",
+      "stdout_tail": [
+        "verdict: not_replicated_chance_winners_curse",
+        "T1 curve 80 vs C: ratio 1.0021 (95% 0.9815..1.0232) z 0.20 p_z 8.416e-1 p_perm 8.370e-1 decision p 8.416e-1 replicated false",
+        "T2 iso vs C: ratio 1.0009 (95% 0.9921..1.0098) z 0.20 p_z 8.382e-1 present false",
+        "T3 curve 80 vs iso: ratio 1.0012 z 0.11 p_z 9.122e-1",
+        "positive control (pc vs C): ratio 1.1906 p_z 6.042e-71 met true",
+        "negative control: D 1.298 max|z| 2.55 n|z|>1.96 2 informative true",
+        "decision step 2 -> not_replicated_chance_winners_curse"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 4,
+  "commit": "ef9d986d756f8af489b6c64fa0d0351ccd22ee80",
+  "dirty_after": [
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.analyze.stderr",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.analyze.stdout",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.launch.log",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.run.stderr",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.run.stdout",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.spec.stderr",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.spec.stdout",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.verify.stderr",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.verify.stdout",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.yaml",
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/audit.json",
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/focus_analysis.json",
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session/host.json",
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session/plan.json",
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session/records.jsonl",
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session/session.json",
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/session/spec.json",
+    "research/isogeny_class_ic_yield_20261102/p2_prime_analogues/runs/followup1_c32A_m3/spec.json"
+  ],
+  "dirty_before": [
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.launch.log",
+    "research/isogeny_class_ic_yield_20261102/cards/CARD-isogeny-ic-yield-p2fu1-c32A-m3-20261102-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

@@ -1,0 +1,11 @@
+# Independent incremental BQI admission review
+
+No remaining concrete source blocker found in the hash-bound sources. This is a read-only source and saved-test-evidence review, not a full library compile or independent rerun.
+
+The checker admits each deadline-probe/resource request before committing its local counter or performing the corresponding charged operation. Vector allocation follows successful AllocationBytes admission. Local-cap refusals do not request the denied resource. Admission refusals retain the exact resource and amount and all previously accepted local counters. The native bridge forwards resource increments into the same original owner and absolute deadline; allocation increments also reserve parent bytes. It stores the BQI audit before translating the specific bridge refusal. If the parent accepted a reservation before a later postcheck refusal, the bridge charge and original parent ledger retain it even though the checker does not count the refused callback as accepted.
+
+The initial review identified a successful callback that could consume the remaining deadline between the checker's probe and operation. Resolution follows the explicit caller contract: every successful callback must postcheck the SAME original deadline. The actual bridge Meter::pay checks after parent reserve/check and satisfies that contract. No extra uncounted checker clock probe was retained. The generic admitted API's guarantee is conditional on this documented callback contract; it is not a timeout enforcement mechanism for arbitrary callbacks.
+
+Legacy verify_untrusted and verify_expected use admission:None, preserving their old arithmetic/counter path. The new admitted entry point is separate. Audits still deny source authentication/native-operation proof; these resource reservations are modeled counters, not retired instructions.
+
+Inspected controls include exact resource/counter compatibility, a refusal sweep over every callback request, vector refusal before allocation, local caps/deadline, and bridge checks for delayed allocation reservation and parent postcheck refusal after reservation. tests-reviewed.log records22passing tests. Tests use a structural parent Owner; no genuine full original owner/CLI execution is claimed by this review. Full-source integration remains separately required.

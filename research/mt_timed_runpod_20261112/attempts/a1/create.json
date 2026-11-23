@@ -1,0 +1,77 @@
+{
+ "payload_sha256": "d44404ff036b44dd2b2805b178755eb1136a6d36b7e48f5710d34fb8645bd335",
+ "podjob_sha256": "47ab44692f5f47d74362ba31981e058a34f1c6653609a860c815587115de1a73",
+ "request": {
+  "cloudType": "SECURE",
+  "computeType": "CPU",
+  "containerDiskInGb": 20,
+  "cpuFlavorIds": [
+   "cpu5c"
+  ],
+  "cpuFlavorPriority": "custom",
+  "dockerEntrypoint": [
+   "bash",
+   "-c"
+  ],
+  "dockerStartCmd": [
+   "echo $PODJOB_B64 | base64 -d > /podjob.py && python3 /podjob.py"
+  ],
+  "imageName": "runpod/base:1.0.2-ubuntu2404",
+  "interruptible": false,
+  "name": "mt-timed-runpod-20261112",
+  "ports": [
+   "8000/http"
+  ],
+  "vcpuCount": 4,
+  "volumeInGb": 0
+ },
+ "request_env_keys": [
+  "JOB_ARGV",
+  "PAYLOAD_SHA256",
+  "PIN",
+  "PODJOB_B64",
+  "REPEATS",
+  "TOKEN"
+ ],
+ "response": {
+  "consumerUserId": "user_3JahrCo3UmxttnVuYylFiPlXpxw",
+  "containerDiskInGb": 20,
+  "costPerHr": 0.14,
+  "cpuFlavorId": "cpu5c",
+  "createdAt": "2026-11-12 16:30:47.04 +0000 UTC",
+  "desiredStatus": "RUNNING",
+  "dockerEntrypoint": [
+   "bash",
+   "-c"
+  ],
+  "dockerStartCmd": [
+   "echo $PODJOB_B64 | base64 -d > /podjob.py && python3 /podjob.py"
+  ],
+  "id": "fukok3vh2qhsum",
+  "imageName": "runpod/base:1.0.2-ubuntu2404",
+  "lastStartedAt": "2026-11-12 16:30:47.034 +0000 UTC",
+  "lastStatusChange": "Rented by User: Thu Nov 12 2026 16:30:47 GMT+0000 (Coordinated Universal Time)",
+  "machine": {
+   "dataCenterId": "EUR-IS-1",
+   "diskThroughputMBps": 5832,
+   "gpuTypeId": "unknown",
+   "location": "IS",
+   "maxDownloadSpeedMbps": 22104,
+   "maxUploadSpeedMbps": 25665,
+   "reservedCountVersion": 240249,
+   "secureCloud": true,
+   "supportPublicIp": true
+  },
+  "machineId": "qo74v3i69dob",
+  "memoryInGb": 8,
+  "name": "mt-timed-runpod-20261112",
+  "ports": [
+   "8000/http"
+  ],
+  "publicIp": "",
+  "templateId": "",
+  "vcpuCount": 4,
+  "volumeInGb": 0,
+  "volumeMountPath": "/workspace"
+ }
+}

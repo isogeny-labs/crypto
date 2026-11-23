@@ -1,0 +1,113 @@
+{
+ "created": "2026-11-10T04:09:00Z",
+ "round": 37,
+ "track": "generic",
+ "schema": "ic_autolab.panel/v1",
+ "rules": {
+  "exploration_slots": 0,
+  "families_enabled": [
+   "tw2l-x20-j16"
+  ],
+  "max_candidates": 1,
+  "n_grid": [],
+  "note": "hand-written confirmation round: one challenger per size, holdout 64 targets x 4 rounds (256 pairs) instead of the default 32 x 2; owner ruling 2026-11-10 (ratchet tw2cj-lazy)"
+ },
+ "sizes": {
+  "20": {
+   "candidates": [
+    {
+     "arm": {
+      "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+      "family": "tw2l-x20-j16",
+      "n": 2,
+      "name": "tw2l-x20-j16-n2",
+      "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+      "params": {
+       "targets": "stride-generator"
+      }
+     },
+     "reason": "the SNC-panel arm (PCC-20261110-978c29: 0.936 / 0.909 / 0.922 of the incumbent at k = 20 / 28 / 32 over 480 multi-curve pairs); round 36's 64-pair holdout left these sizes null (0.998 / 0.958 / 0.942 with intervals touching 1), so this round re-tests it with a four times larger holdout"
+    }
+   ],
+   "incumbent": {
+    "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+    "family": "wsum2g-b15",
+    "n": 2,
+    "name": "wsum2g-b15-n2",
+    "oracle": "wsum:coef=15,free=1",
+    "params": {
+     "targets": "stride-generator"
+    }
+   },
+   "incumbent_s": [
+    2.5745780660849693,
+    2.691211404585748,
+    3.740911451092766
+   ],
+   "tried_before": 0
+  },
+  "28": {
+   "candidates": [
+    {
+     "arm": {
+      "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+      "family": "tw2l-x20-j16",
+      "n": 2,
+      "name": "tw2l-x20-j16-n2",
+      "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+      "params": {
+       "targets": "stride-generator"
+      }
+     },
+     "reason": "the SNC-panel arm (PCC-20261110-978c29: 0.936 / 0.909 / 0.922 of the incumbent at k = 20 / 28 / 32 over 480 multi-curve pairs); round 36's 64-pair holdout left these sizes null (0.998 / 0.958 / 0.942 with intervals touching 1), so this round re-tests it with a four times larger holdout"
+    }
+   ],
+   "incumbent": {
+    "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+    "family": "wwalkGg-x09-sr",
+    "n": 2,
+    "name": "wwalkGg-x09-sr-n2",
+    "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+    "params": {
+     "targets": "stride-generator"
+    }
+   },
+   "incumbent_s": [
+    1.8834768805111894,
+    1.9260790640345884,
+    2.3094987157451885
+   ],
+   "tried_before": 0
+  },
+  "32": {
+   "candidates": [
+    {
+     "arm": {
+      "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+      "family": "tw2l-x20-j16",
+      "n": 2,
+      "name": "tw2l-x20-j16-n2",
+      "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+      "params": {
+       "targets": "stride-generator"
+      }
+     },
+     "reason": "the SNC-panel arm (PCC-20261110-978c29: 0.936 / 0.909 / 0.922 of the incumbent at k = 20 / 28 / 32 over 480 multi-curve pairs); round 36's 64-pair holdout left these sizes null (0.998 / 0.958 / 0.942 with intervals touching 1), so this round re-tests it with a four times larger holdout"
+    }
+   ],
+   "incumbent": {
+    "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+    "family": "wwalkG-x06-sr",
+    "n": 2,
+    "name": "wwalkG-x06-sr-n2",
+    "oracle": "wwalk:x=0.6,g=1,grow=2,seed=run"
+   },
+   "incumbent_s": [
+    1.8423102792691786,
+    1.9320765242126474,
+    2.7399727287038655
+   ],
+   "tried_before": 0
+  }
+ }
+}

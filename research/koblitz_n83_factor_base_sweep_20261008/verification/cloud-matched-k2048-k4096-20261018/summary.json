@@ -1,0 +1,121 @@
+{
+  "schema": "n83.cloud-matched-summary/v1",
+  "docker_restored": true,
+  "storage_bucket": "setec-astronomy-artifacts",
+  "stage_audits": [
+    {
+      "schema": "n83.cloud-matched-stage-audit/v1",
+      "auditor_source_sha256": "8429658f295ce2c106a6caf139bb6f70ca38ab484db8ca78e3d7f4aeaa8b520c",
+      "stage": "capacity",
+      "columns": 2048,
+      "source_commit": "f08f9f887ba9f87d0b8976ec1c7a6cd65eb63127",
+      "status": "PASS",
+      "worker_status": "PASS_model_construction_only",
+      "outer_wall_ms": 23314.246807000018,
+      "selected_best_total_runtime": null,
+      "sat_variables": 111478,
+      "domain_clauses": 892470,
+      "sat_clauses": 1140557,
+      "peak_bytes": 317931520
+    },
+    {
+      "schema": "n83.cloud-matched-stage-audit/v1",
+      "auditor_source_sha256": "8429658f295ce2c106a6caf139bb6f70ca38ab484db8ca78e3d7f4aeaa8b520c",
+      "stage": "capacity",
+      "columns": 4096,
+      "source_commit": "f08f9f887ba9f87d0b8976ec1c7a6cd65eb63127",
+      "status": "PASS",
+      "worker_status": "PASS_model_construction_only",
+      "outer_wall_ms": 12539.25328600053,
+      "selected_best_total_runtime": null,
+      "sat_variables": 131958,
+      "domain_clauses": 1773110,
+      "sat_clauses": 2021197,
+      "peak_bytes": 635953152
+    },
+    {
+      "schema": "n83.cloud-matched-stage-audit/v1",
+      "auditor_source_sha256": "8429658f295ce2c106a6caf139bb6f70ca38ab484db8ca78e3d7f4aeaa8b520c",
+      "stage": "search",
+      "columns": 2048,
+      "source_commit": "f08f9f887ba9f87d0b8976ec1c7a6cd65eb63127",
+      "status": "PASS_CENSORED_OUTER_WALL",
+      "worker_status": "UNKNOWN_wall_cap",
+      "outer_wall_ms": 600612.2280159998,
+      "selected_best_total_runtime": null,
+      "relations": null,
+      "conflicts": null,
+      "peak_bytes": null
+    },
+    {
+      "schema": "n83.cloud-matched-stage-audit/v1",
+      "auditor_source_sha256": "8429658f295ce2c106a6caf139bb6f70ca38ab484db8ca78e3d7f4aeaa8b520c",
+      "stage": "search",
+      "columns": 4096,
+      "source_commit": "f08f9f887ba9f87d0b8976ec1c7a6cd65eb63127",
+      "status": "PASS_CENSORED_OUTER_WALL",
+      "worker_status": "UNKNOWN_wall_cap",
+      "outer_wall_ms": 601214.6951769992,
+      "selected_best_total_runtime": null,
+      "relations": null,
+      "conflicts": null,
+      "peak_bytes": null
+    },
+    {
+      "schema": "n83.cloud-matched-stage-audit/v1",
+      "auditor_source_sha256": "8429658f295ce2c106a6caf139bb6f70ca38ab484db8ca78e3d7f4aeaa8b520c",
+      "stage": "control",
+      "columns": 2048,
+      "source_commit": "19c2f73268be9c4fa16b18f55f234e077ffb5e53",
+      "status": "PASS",
+      "worker_status": "UNKNOWN_solver_cap",
+      "outer_wall_ms": 162630.4918810001,
+      "selected_best_total_runtime": null,
+      "group_replay": {
+        "status": "PASS",
+        "queries": 1,
+        "relations": 0
+      },
+      "relations": 0,
+      "models": 0,
+      "conflicts": 1000,
+      "rank": 0,
+      "peak_bytes": 484421632,
+      "solver_ms": 155639.52360299998,
+      "attempt_records": [
+        {
+          "a": "555041861612817674392871",
+          "b": "1880544021900751415145556",
+          "conflicts": 1000,
+          "decomposition_indices": null,
+          "disposition": "Unknown",
+          "implied_rows": 0,
+          "models": 0,
+          "solver_calls": 1,
+          "target": [
+            "6261116474805304534310590",
+            "4505575220639647215230954"
+          ],
+          "trial": 1
+        }
+      ]
+    },
+    {
+      "schema": "n83.cloud-matched-stage-audit/v1",
+      "auditor_source_sha256": "8429658f295ce2c106a6caf139bb6f70ca38ab484db8ca78e3d7f4aeaa8b520c",
+      "stage": "control",
+      "columns": 4096,
+      "source_commit": "19c2f73268be9c4fa16b18f55f234e077ffb5e53",
+      "status": "PASS_CENSORED_OUTER_WALL",
+      "worker_status": "UNKNOWN_wall_cap",
+      "outer_wall_ms": 181095.333452,
+      "selected_best_total_runtime": null,
+      "relations": null,
+      "conflicts": null,
+      "peak_bytes": null
+    }
+  ],
+  "runtime_source_equal_across_arms": true,
+  "all_original_research_requirements_complete": false,
+  "selected_best_total_runtime": null
+}

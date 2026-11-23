@@ -1,0 +1,474 @@
+{
+  "analysis": {
+    "script": {
+      "path": "src/bin/prime_radix_census.rs",
+      "sha256": "9d71568c09d13c4524400c8929c424a667bbda91322bd00e46d3bc2fbfef4cbe",
+      "bytes": 9229,
+      "kind": "analysis"
+    },
+    "outputs": [
+      {
+        "path": "evidence/radix-census-r2/summary.json",
+        "sha256": "9a257e60e7c03121a1ca35c3b6a374817625a94552a8e9e4e2e2a85d93f077ac",
+        "bytes": 1178122,
+        "kind": "raw"
+      },
+      {
+        "path": "evidence/radix-census-r2/observations.json",
+        "sha256": "12fb8e007dd3a653f55536f9dc06aee3bb4e3602026ffe48cb67075bfa133c3c",
+        "bytes": 652,
+        "kind": "raw"
+      }
+    ],
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "id": "producer",
+      "role": "candidate",
+      "commit": "1e5269c772dfff228fb07c391c03737466f63d8d",
+      "binary_sha256": "792a2a77755917de5c8e281cfcf1222451f15949628ccdb0a1674ef8709e73fd",
+      "image_digest": "sha256:25163e42d64075e44ddfa2e1a2d55cdc53d25357ff036c152a6ebff1d417e3e9"
+    },
+    {
+      "id": "replay",
+      "role": "reference",
+      "commit": "1e5269c772dfff228fb07c391c03737466f63d8d",
+      "binary_sha256": "792a2a77755917de5c8e281cfcf1222451f15949628ccdb0a1674ef8709e73fd",
+      "image_digest": "sha256:25163e42d64075e44ddfa2e1a2d55cdc53d25357ff036c152a6ebff1d417e3e9"
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-30T22:09:02.907668+00:00",
+  "export_id": "N83-RADIX-CENSUS-20261030-R2",
+  "files": [
+    {
+      "path": "evidence/radix-census-r2/README.md",
+      "sha256": "c834c85ddeebb1f71ef8733bd06e5be09b7b95b0de262fbe0ef44a64bd7639fd",
+      "bytes": 1017,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/binding.json",
+      "sha256": "3dfaa0d9cec77b6af38bd273571feeb86fead9037a2a32e08e77386bbdf8b03d",
+      "bytes": 8577,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/custody.json",
+      "sha256": "45186ad0db915833f400825bbf597e74f5f89ea9697f32ddf2dc228fefbedce9",
+      "bytes": 505,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/exact-cases.json",
+      "sha256": "502165345cc7b324070c5f08a13cdfcc358c3f886b98d9ae7b387c234e2b97b0",
+      "bytes": 145362,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/host.txt",
+      "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a",
+      "bytes": 3504,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/manifest.sha256",
+      "sha256": "6dfb197cd95ee385c72f8874c3acddd9661ab2000515503449c1d261f8019dad",
+      "bytes": 276148,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/observations.json",
+      "sha256": "12fb8e007dd3a653f55536f9dc06aee3bb4e3602026ffe48cb67075bfa133c3c",
+      "bytes": 652,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/producer-status.json",
+      "sha256": "b620d3f039a8748938b837aa5481ed0d9ca4c670bb228918cdecaedc572b0d95",
+      "bytes": 40,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/radix-census-r2-restored-hashes.log",
+      "sha256": "ec59354ee3e4f63e99d2855d92e8fc96564c8178673d7a00bd2c6a84ca9752c9",
+      "bytes": 87978,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/radix-census-r2-s3-replay.log",
+      "sha256": "83fc506c3ae6bf48e349202051f57c5f32f4923634e5f78f3587356581c5b957",
+      "bytes": 48,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/replay-status.json",
+      "sha256": "b620d3f039a8748938b837aa5481ed0d9ca4c670bb228918cdecaedc572b0d95",
+      "bytes": 40,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/replay.log",
+      "sha256": "83fc506c3ae6bf48e349202051f57c5f32f4923634e5f78f3587356581c5b957",
+      "bytes": 48,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/summary.json",
+      "sha256": "9a257e60e7c03121a1ca35c3b6a374817625a94552a8e9e4e2e2a85d93f077ac",
+      "bytes": 1178122,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/radix-census-r2/terminal.json",
+      "sha256": "32970c5e14a182aa6df3d655c6e7842f789e30185398374a2ee25af5f02f9942",
+      "bytes": 301,
+      "kind": "raw"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "host": {
+    "path": "evidence/radix-census-r2/host.txt",
+    "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a",
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0"
+    }
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "executor",
+      "text": "Two successful whole-census phases cover identical3010 partition records.35 exact values and2975 lower bounds retained. Minimum exact42,minimum certified bound43. No timing comparison; FFD/LFD unknown."
+    }
+  ],
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "T-1008",
+    "role": "executor"
+  },
+  "protocol": {
+    "path": "protocol-radix-census-local.json",
+    "sha256": "994b14318ad32876c7c4a9ebb79a9e3e6fcaed539cd1d518d138195f67dc354d",
+    "protocol_id": "N83-RADIX-CENSUS-20261030",
+    "version": 2
+  },
+  "reviews_dir": "reviews-radix-r2",
+  "runs": [
+    {
+      "run_id": "radix-census-producer",
+      "arm": "producer",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "partition_records": 3010
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "partition_records": 3010
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Native source-bound whole-census recomputation and exact byte replay; S3-restored executable replay passed"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/radix-census-r2/README.md",
+          "sha256": "c834c85ddeebb1f71ef8733bd06e5be09b7b95b0de262fbe0ef44a64bd7639fd",
+          "bytes": 1017,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/binding.json",
+          "sha256": "3dfaa0d9cec77b6af38bd273571feeb86fead9037a2a32e08e77386bbdf8b03d",
+          "bytes": 8577,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/custody.json",
+          "sha256": "45186ad0db915833f400825bbf597e74f5f89ea9697f32ddf2dc228fefbedce9",
+          "bytes": 505,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/exact-cases.json",
+          "sha256": "502165345cc7b324070c5f08a13cdfcc358c3f886b98d9ae7b387c234e2b97b0",
+          "bytes": 145362,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/host.txt",
+          "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a",
+          "bytes": 3504,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/manifest.sha256",
+          "sha256": "6dfb197cd95ee385c72f8874c3acddd9661ab2000515503449c1d261f8019dad",
+          "bytes": 276148,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/observations.json",
+          "sha256": "12fb8e007dd3a653f55536f9dc06aee3bb4e3602026ffe48cb67075bfa133c3c",
+          "bytes": 652,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/producer-status.json",
+          "sha256": "b620d3f039a8748938b837aa5481ed0d9ca4c670bb228918cdecaedc572b0d95",
+          "bytes": 40,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/radix-census-r2-restored-hashes.log",
+          "sha256": "ec59354ee3e4f63e99d2855d92e8fc96564c8178673d7a00bd2c6a84ca9752c9",
+          "bytes": 87978,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/radix-census-r2-s3-replay.log",
+          "sha256": "83fc506c3ae6bf48e349202051f57c5f32f4923634e5f78f3587356581c5b957",
+          "bytes": 48,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/replay-status.json",
+          "sha256": "b620d3f039a8748938b837aa5481ed0d9ca4c670bb228918cdecaedc572b0d95",
+          "bytes": 40,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/replay.log",
+          "sha256": "83fc506c3ae6bf48e349202051f57c5f32f4923634e5f78f3587356581c5b957",
+          "bytes": 48,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/summary.json",
+          "sha256": "9a257e60e7c03121a1ca35c3b6a374817625a94552a8e9e4e2e2a85d93f077ac",
+          "bytes": 1178122,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/terminal.json",
+          "sha256": "32970c5e14a182aa6df3d655c6e7842f789e30185398374a2ee25af5f02f9942",
+          "bytes": 301,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:03:44Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-radix-census-20261030-r2"
+    },
+    {
+      "run_id": "radix-census-replay",
+      "arm": "replay",
+      "instance_id": "0",
+      "seed": 20261027,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "partition_records": 3010
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "partition_records": 3010
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Shared existing host; no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Native source-bound whole-census recomputation and exact byte replay; S3-restored executable replay passed"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/radix-census-r2/README.md",
+          "sha256": "c834c85ddeebb1f71ef8733bd06e5be09b7b95b0de262fbe0ef44a64bd7639fd",
+          "bytes": 1017,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/binding.json",
+          "sha256": "3dfaa0d9cec77b6af38bd273571feeb86fead9037a2a32e08e77386bbdf8b03d",
+          "bytes": 8577,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/custody.json",
+          "sha256": "45186ad0db915833f400825bbf597e74f5f89ea9697f32ddf2dc228fefbedce9",
+          "bytes": 505,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/exact-cases.json",
+          "sha256": "502165345cc7b324070c5f08a13cdfcc358c3f886b98d9ae7b387c234e2b97b0",
+          "bytes": 145362,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/host.txt",
+          "sha256": "958527093e13ef3f4054aeb182138e67a0d058e5645e2d94bda3f1e1d9e3b77a",
+          "bytes": 3504,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/manifest.sha256",
+          "sha256": "6dfb197cd95ee385c72f8874c3acddd9661ab2000515503449c1d261f8019dad",
+          "bytes": 276148,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/observations.json",
+          "sha256": "12fb8e007dd3a653f55536f9dc06aee3bb4e3602026ffe48cb67075bfa133c3c",
+          "bytes": 652,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/producer-status.json",
+          "sha256": "b620d3f039a8748938b837aa5481ed0d9ca4c670bb228918cdecaedc572b0d95",
+          "bytes": 40,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/radix-census-r2-restored-hashes.log",
+          "sha256": "ec59354ee3e4f63e99d2855d92e8fc96564c8178673d7a00bd2c6a84ca9752c9",
+          "bytes": 87978,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/radix-census-r2-s3-replay.log",
+          "sha256": "83fc506c3ae6bf48e349202051f57c5f32f4923634e5f78f3587356581c5b957",
+          "bytes": 48,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/replay-status.json",
+          "sha256": "b620d3f039a8748938b837aa5481ed0d9ca4c670bb228918cdecaedc572b0d95",
+          "bytes": 40,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/replay.log",
+          "sha256": "83fc506c3ae6bf48e349202051f57c5f32f4923634e5f78f3587356581c5b957",
+          "bytes": 48,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/summary.json",
+          "sha256": "9a257e60e7c03121a1ca35c3b6a374817625a94552a8e9e4e2e2a85d93f077ac",
+          "bytes": 1178122,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/radix-census-r2/terminal.json",
+          "sha256": "32970c5e14a182aa6df3d655c6e7842f789e30185398374a2ee25af5f02f9942",
+          "bytes": 301,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": "2026-10-30T22:03:44Z",
+      "worker": "existing_host",
+      "backend_ref": "n83-radix-census-20261030-r2"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "repo": "crypto",
+    "commit": "1e5269c772dfff228fb07c391c03737466f63d8d",
+    "dirty": false
+  },
+  "backend_record": {
+    "terminal": {
+      "exit_code": 0,
+      "started_at": "2026-10-30T22:02:03Z",
+      "finished_at": "2026-10-30T22:03:44Z",
+      "backend": "local",
+      "wall_valid": false,
+      "phases": {
+        "producer": {
+          "started": true,
+          "exit_code": 0
+        },
+        "replay": {
+          "started": true,
+          "exit_code": 0
+        }
+      }
+    },
+    "custody": {
+      "raw_uri": "s3://setec-astronomy-artifacts/runs/n83-radix-census-20261030-r2/raw/",
+      "raw_manifest_sha256": "6dfb197cd95ee385c72f8874c3acddd9661ab2000515503449c1d261f8019dad",
+      "raw_payload_hashes_verified": 3035,
+      "restored_native_payloads_verified": 3015,
+      "restored_native_replay_exit_code": 0,
+      "producer_and_first_replay_exit_code": 0,
+      "source_commit": "1e5269c772dfff228fb07c391c03737466f63d8d",
+      "instrument_sha256": "792a2a77755917de5c8e281cfcf1222451f15949628ccdb0a1674ef8709e73fd"
+    },
+    "prior_attempt": "evidence/radix-census-r1/outcome.json"
+  }
+}

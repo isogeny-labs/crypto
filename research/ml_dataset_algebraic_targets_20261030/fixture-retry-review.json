@@ -1,0 +1,23 @@
+{
+  "schema": "software-fixture-review/v1",
+  "runtime_source_unchanged": "db9bd045e38f2e55039d02372b92b5bee3f29ba0",
+  "reviewer": "consequence_review",
+  "finding": "jq value argument $keys shadows builtin keys; exact_keys incorrectly compares expected array to sorted expected array",
+  "correction": "rename argument to $expected_keys; retain exact key equality and every original predicate",
+  "full_retained_curve_predicate_exit": 0,
+  "full_retained_curve_predicate_result": true,
+  "minimal_old_false_new_true_extra_key_rejected": true,
+  "bash_syntax_passed": true,
+  "diff_check_passed": true,
+  "run_sh_sha256": "ebc7419fc334204700e38e68fd40632d93545b98d413d15566a02e778c8b2b2c",
+  "whole_cli_rerun_pending": true,
+  "independent_crypto_implementation": false,
+  "continuation_review": {
+    "reviewer": "consequence_review",
+    "sha256": "cc233c1c47c83ef29156dd2878ddf31c818b4cbc693512909bbeb9a12fb61481",
+    "blocking_defects": 0,
+    "prior_receipts_checked": true,
+    "execution_performed": false,
+    "final_pipeline_receipt_archival": "parent responsibility"
+  }
+}

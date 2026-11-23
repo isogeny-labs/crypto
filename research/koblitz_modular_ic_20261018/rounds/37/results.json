@@ -1,0 +1,4509 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 37,
+  "runs": [
+    {
+      "attempt": "classorder37-01",
+      "kind": "native",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "Singular_errors": false,
+      "status": "accepted",
+      "observations": [
+        "SIGNED37_EQUALITY label=six-seventy-one-versus-zero witness_dimension=1 equivalent=true",
+        "CLASSORDER37_RESULT six_seventy_one_principal=true exact_source_order_under_retained_bridge=671 least_scalar_to_eleven_torsion=61 all_generator_memberships=checked independent_products=all intended_sign_factor_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "classorderlean37-01",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "status": "rejected",
+      "audit_exit": null,
+      "reason": "ClassOrder37.lean:14:75: error: maximum recursion depth has been reached"
+    },
+    {
+      "attempt": "classorderlean37-02",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 5
+    },
+    {
+      "attempt": "cofactor37-01",
+      "kind": "native",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "Singular_errors": false,
+      "status": "accepted",
+      "observations": [
+        "COFACTOR37_NORMS plus=125238481 minus=3721",
+        "COFACTOR37_RESULT basis_inverse_checks=16 euler_degree=32 recurrence=pass independent_norms=2 plus_mod11=5 minus_mod11=3 corrupt_character=rejected"
+      ]
+    },
+    {
+      "attempt": "isolate37-01",
+      "kind": "native",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "Singular_errors": false,
+      "status": "accepted",
+      "observations": [
+        "SIGNED37_EQUALITY label=cofactor-two-expressions witness_dimension=1 equivalent=true",
+        "SIGNED37_EQUALITY label=cofactor-versus-zero witness_dimension=0 equivalent=false",
+        "SIGNED37_EQUALITY label=sixty-one-versus-zero witness_dimension=0 equivalent=false",
+        "SIGNED37_EQUALITY label=eleven-cofactor-versus-zero witness_dimension=1 equivalent=true",
+        "SIGNED37_EQUALITY label=bridge-annihilator-versus-zero witness_dimension=1 equivalent=true",
+        "ISOLATE37_RESULT cofactor=3721 cofactor_mod11=3 cofactor_class_principal=false sixty_one_class_principal=false eleven_cofactor_principal=true bridge_annihilator_principal=true independent_cofactor_expressions_equal=true all_generator_memberships=checked independent_products=all intended_sign_factor_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "lean37-01",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 2
+    },
+    {
+      "attempt": "order37-01",
+      "kind": "native",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "Singular_errors": false,
+      "status": "accepted",
+      "observations": [
+        "ORDER37_MATCH step=0 label=r1-f2 phase=0 weight=4 old_sections=68 period=83",
+        "ORDER37_MATCH step=1 label=r3-f2 phase=0 weight=1 old_sections=68 period=83",
+        "ORDER37_MATCH step=2 label=r4-f3 phase=0 weight=-1 old_sections=68 period=83",
+        "ORDER37_MATCH step=3 label=r2-f3 phase=0 weight=1 old_sections=68 period=83",
+        "ORDER37_MATCH step=4 label=r5-f2 phase=0 weight=-1 old_sections=68 period=83",
+        "ORDER37_MATCH step=5 label=r1-f3 phase=0 weight=-4 old_sections=68 period=83",
+        "ORDER37_MATCH step=6 label=r3-f3 phase=0 weight=-1 old_sections=68 period=83",
+        "ORDER37_MATCH step=7 label=r4-f2 phase=0 weight=1 old_sections=68 period=83",
+        "ORDER37_MATCH step=8 label=r2-f2 phase=0 weight=-1 old_sections=68 period=83",
+        "ORDER37_MATCH step=9 label=r5-f3 phase=0 weight=1 old_sections=68 period=83",
+        "ORDER37_RESULT labels=10 full_coordinate_orbits=10 old_section_bindings=680 least_period=83 deck_period=10 augmentation=0 corrupt_label_controls=10",
+        "ORDER37_ALL_CHECKS_PASS"
+      ]
+    },
+    {
+      "attempt": "signed37-01",
+      "kind": "native",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "Singular_errors": false,
+      "status": "accepted",
+      "observations": [
+        "SIGNED37_INPUT step=0 label=r1-f2 weight=4 rank=196",
+        "SIGNED37_INPUT step=1 label=r3-f2 weight=1 rank=196",
+        "SIGNED37_INPUT step=2 label=r4-f3 weight=-1 rank=196",
+        "SIGNED37_INPUT step=3 label=r2-f3 weight=1 rank=196",
+        "SIGNED37_INPUT step=4 label=r5-f2 weight=-1 rank=196",
+        "SIGNED37_INPUT step=5 label=r1-f3 weight=-4 rank=196",
+        "SIGNED37_INPUT step=6 label=r3-f3 weight=-1 rank=196",
+        "SIGNED37_INPUT step=7 label=r4-f2 weight=1 rank=196",
+        "SIGNED37_INPUT step=8 label=r2-f2 weight=-1 rank=196",
+        "SIGNED37_INPUT step=9 label=r5-f3 weight=1 rank=196",
+        "SIGNED37_EQUALITY label=positive-versus-negative witness_dimension=0 equivalent=false",
+        "SIGNED37_EQUALITY label=signed-first-versus-zero witness_dimension=0 equivalent=false",
+        "SIGNED37_EQUALITY label=independent-expression-equality witness_dimension=1 equivalent=true",
+        "SIGNED37_EQUALITY label=signed-second-versus-zero witness_dimension=0 equivalent=false",
+        "SIGNED37_RESULT actual_deck_labels=10 signed_class_principal=false positive_negative_equal=false independent_expression_equal=true all_generator_memberships=checked independent_products=all target_factor_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "torsion37-01",
+      "kind": "native",
+      "native_exit": 0,
+      "terminal_marker": true,
+      "Singular_errors": false,
+      "status": "accepted",
+      "observations": [
+        "SIGNED37_EQUALITY label=first-11-versus-zero witness_dimension=0 equivalent=false",
+        "SIGNED37_EQUALITY label=first-5-versus-zero witness_dimension=0 equivalent=false",
+        "SIGNED37_EQUALITY label=two-eleven-expressions witness_dimension=1 equivalent=true",
+        "SIGNED37_EQUALITY label=second-11-versus-zero witness_dimension=0 equivalent=false",
+        "TORSION37_RESULT source_nonprincipal=true eleven_kills=false five_kills=false independent_eleven_expressions_equal=true all_generator_memberships=checked independent_products=all target_factor_evaluated=false"
+      ]
+    },
+    {
+      "attempt": "torsionlean37-01",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "status": "rejected",
+      "audit_exit": null,
+      "reason": "Torsion37.lean:19:13: error: unsolved goals"
+    },
+    {
+      "attempt": "torsionlean37-02",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_declarations": 2
+    }
+  ],
+  "construction_counts": {
+    "actual_deck_labels_bound": 10,
+    "literal_old_section_bindings": 680,
+    "nonprincipal_signed_source_classes": 1,
+    "ordinary_eleven_source_classes": 1,
+    "exact_subspace_divisions": 475,
+    "coefficient_field_dimension": 16,
+    "complementary_Euler_degree": 32
+  },
+  "signed_class": {
+    "weights": [
+      4,
+      1,
+      -1,
+      1,
+      -1,
+      -4,
+      -1,
+      1,
+      -1,
+      1
+    ],
+    "actual_deck_order": [
+      "r1-f2",
+      "r3-f2",
+      "r4-f3",
+      "r2-f3",
+      "r5-f2",
+      "r1-f3",
+      "r3-f3",
+      "r4-f2",
+      "r2-f2",
+      "r5-f3"
+    ],
+    "all_Frobenius_phases": 0,
+    "principal": false,
+    "independent_expressions_equal": true,
+    "eleven_annihilates": false,
+    "five_annihilates": false,
+    "exact_order_under_retained_bridge": 671,
+    "least_scalar_to_eleven_torsion": 61,
+    "finite_cyclic_projector_scalar": 122
+  },
+  "complementary_factor": {
+    "label": "77.2.l.b",
+    "norm_at_plus_one": 125238481,
+    "norm_at_minus_one": 3721,
+    "norm_minus_mod11": 3,
+    "full_basis_inverse_checks": 16,
+    "independent_norms": 2,
+    "modular_proper_twist_binding": "retained written bridge, model-annihilator check below"
+  },
+  "cofactor_class_tests": {
+    "cofactor": 3721,
+    "cofactor_mod11": 3,
+    "cofactor_class_principal": false,
+    "sixty_one_class_principal": false,
+    "eleven_cofactor_principal": true,
+    "bridge_annihilator_principal": true,
+    "independent_cofactor_expressions_equal": true,
+    "all_generator_memberships": "checked",
+    "independent_products": "all",
+    "intended_sign_factor_evaluated": false
+  },
+  "source_order_test": {
+    "six_seventy_one_principal": true,
+    "exact_order": 671,
+    "least_scalar_to_eleven_torsion": 61
+  },
+  "quotient_receipts": [
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24192",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6226",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23976",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6200",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14770",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23636",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6278",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14744",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24238",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6362",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23644",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6324",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23636",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6292",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23978",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6160",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13590",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6160",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-double-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23976",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6312",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13682",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "sixty-one-times-eleven-add-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "15024",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "classorder37-01",
+      "label": "six-seventy-one-versus-zero",
+      "generators": "196",
+      "dimension": "1",
+      "construction_products": "5075",
+      "final_memberships": "196",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-10-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23980",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-10-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6166",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-10-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13592",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-10-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-10-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14732",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-10-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23986",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-10-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6450",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-10-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-10-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-10-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-9-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-9-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6288",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-9-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-9-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-9-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14774",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-9-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23638",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-9-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6164",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-9-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13592",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-9-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-9-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14710",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-8-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23976",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-8-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6306",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-8-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-8-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-8-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14772",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-7-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23636",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-7-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6282",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-7-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-7-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-7-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-7-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24386",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-7-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6294",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-7-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-7-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-7-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-6-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23728",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-6-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6162",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-6-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-6-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-6-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14778",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-5-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24104",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-5-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6334",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-5-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-5-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-5-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6288",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23640",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6160",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6162",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13592",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14770",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23982",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6288",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14770",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23986",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6288",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14710",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23980",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6332",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-double-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23980",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6170",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-first-add-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24630",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6400",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6164",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6160",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6176",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14734",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23984",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6414",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14742",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6288",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13590",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14728",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24450",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6382",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14770",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23984",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6316",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-double-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6164",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61a-add-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14770",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23984",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6314",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13592",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24194",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6334",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13590",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6208",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6304",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14772",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23636",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6160",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6188",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24192",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6160",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13590",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14746",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23980",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6324",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13594",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-double-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14774",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24340",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6296",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-second-61b-add-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14746",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-two-expressions",
+      "generators": "196",
+      "dimension": "1",
+      "construction_products": "4529",
+      "final_memberships": "196",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-versus-zero",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "4436",
+      "final_memberships": "0",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "sixty-one-versus-zero",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "4442",
+      "final_memberships": "0",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23978",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6332",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24208",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6196",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14711",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23636",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6314",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23639",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6288",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-double-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14770",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23988",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6330",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13692",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-eleven-add-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "15024",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24240",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "4912",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13680",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13680",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13680",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13680",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-double-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13680",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "cofactor-one-twenty-one-add-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "eleven-cofactor-versus-zero",
+      "generators": "196",
+      "dimension": "1",
+      "construction_products": "5075",
+      "final_memberships": "196",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "isolate37-01",
+      "label": "bridge-annihilator-versus-zero",
+      "generators": "196",
+      "dimension": "1",
+      "construction_products": "6419",
+      "final_memberships": "196",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25500",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5008",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14742",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23724",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6168",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5078",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-double4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14700",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23986",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6116",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24328",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6280",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13592",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-7-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23984",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-7-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6134",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-7-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13594",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-7-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-7-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14736",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-9-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23980",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-9-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6132",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-9-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-9-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-add-9-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14710",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25502",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5008",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14748",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23726",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6170",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-double4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23638",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14772",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6108",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14706",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-6-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24116",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-6-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6100",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-6-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13590",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-6-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-6-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-8-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23976",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-8-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6102",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-8-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-8-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "negative-add-8-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "positive-versus-negative",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "4376",
+      "final_memberships": "0",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "minus-negative-total-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "minus-negative-total-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "signed-difference-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23636",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "signed-difference-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6036",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "signed-difference-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "signed-difference-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "signed-difference-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14712",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "signed-first-versus-zero",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "4434",
+      "final_memberships": "0",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-0-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-0-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-0-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25500",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-0-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5008",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-0-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-0-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-0-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14774",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-1-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-1-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14708",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25488",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "4882",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-2-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-2-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25498",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "4886",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14710",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-3-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-3-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25496",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5008",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-4-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-negate-4-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25488",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "4880",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-difference-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14708",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23732",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6298",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6160",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-double4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-1-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23978",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-1-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6164",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-1-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-1-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-1-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14734",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-term-negate-2-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-term-negate-2-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13624",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23982",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6176",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13591",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14732",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23990",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6334",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5074",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14772",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-term-negate-4-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5104",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-term-negate-4-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13626",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23636",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6122",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "paired-sum-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "independent-expression-equality",
+      "generators": "196",
+      "dimension": "1",
+      "construction_products": "4527",
+      "final_memberships": "196",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "signed37-01",
+      "label": "signed-second-versus-zero",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "4602",
+      "final_memberships": "0",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23980",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6166",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13592",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14732",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23986",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6434",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-8-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-8-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6316",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-8-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-8-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-8-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-10-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23636",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-10-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6152",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-10-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-10-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5076",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-10-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14734",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-11-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23982",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-11-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6376",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-11-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-11-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-11-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-5-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23632",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-5-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6316",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-5-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-5-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-5-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-11-versus-zero",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "4488",
+      "final_memberships": "0",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "first-5-versus-zero",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "4372",
+      "final_memberships": "0",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-2-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "24630",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-2-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6400",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-2-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-2-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-2-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-3-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-3-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6164",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-3-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-3-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-3-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-4-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-4-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6164",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-4-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13588",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-4-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-4-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-5-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23642",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-5-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6162",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-5-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-5-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-5-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-6-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-6-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6160",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-6-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13586",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-6-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-6-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-11-addflip-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23634",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-11-addflip-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "6168",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-11-addflip-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-11-negate-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-11-negate-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "two-eleven-expressions",
+      "generators": "196",
+      "dimension": "1",
+      "construction_products": "4579",
+      "final_memberships": "196",
+      "independent_products": "all"
+    },
+    {
+      "attempt": "torsion37-01",
+      "label": "second-11-versus-zero",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "4374",
+      "final_memberships": "0",
+      "independent_products": "all"
+    }
+  ],
+  "formal": {
+    "accepted_runs": 3,
+    "rejected_runs": 2,
+    "audited_declarations": 9,
+    "native_arrays_formalized": false,
+    "proper_geometry_formalized": false,
+    "exact_order_eleven_lemma_applied_to_original_E": false,
+    "exact_order_eleven_lemma_applied_to_cofactor_class": true
+  },
+  "intended_sign_factor_image": null,
+  "performance_measured": false,
+  "IC_relation_rank": null,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false,
+  "global_metrics_integration": "pending exclusive scope T-865; scoped patch retained"
+}

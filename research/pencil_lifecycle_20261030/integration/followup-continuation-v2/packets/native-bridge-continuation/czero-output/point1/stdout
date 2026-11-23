@@ -1,0 +1,7 @@
+/var/tmp/pencil-czero-output-20261101-v1/CurvePoint.lean:30:1: error: Type mismatch
+  Eq.symm (sub_eq_zero.mp he)
+has type
+  (eval (q1 + q2 + a ^ 2) (ordinate s1 t1) - a * eval (q1 + q2 + a ^ 2) (CZeroInterpolation.support q1 r1)) ^ 2 =
+    eval (q1 + q2 + a ^ 2) f
+but is expected to have type
+  eval (q1 + q2 + a ^ 2) (ordinate s1 t1 - C a * CZeroInterpolation.support q1 r1) ^ 2 = eval (q1 + q2 + a ^ 2) f

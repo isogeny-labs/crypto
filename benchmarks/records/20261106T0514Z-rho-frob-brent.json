@@ -1,0 +1,190 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-06T05:18:10+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/rho_frob_brent_20261106/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-06T05:15:15+00:00",
+      "wall_s": 64.535
+    }
+  ],
+  "commit": "77948b3c8c6e7c0d0ef2f0e18e1f44228b4a5bbb",
+  "commit_dirty": true,
+  "created_utc": "2026-11-06T05:14:54+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261106-rho-frob-brent"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v242-x86_64-with-glibc2.39"
+  },
+  "id": "20261106T0514Z-rho-frob-brent",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 96,
+      "name": "s_legacy_over_v2_n31",
+      "note": "legacy / Brent, a0 n31, paired by target, 95 % interval",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.203,
+        1.803
+      ],
+      "unit": "ratio",
+      "value": 1.4723
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 96,
+      "name": "s_legacy_over_v2_n37",
+      "note": "a0 n37",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.014,
+        1.119
+      ],
+      "unit": "ratio",
+      "value": 1.0653
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 96,
+      "name": "s_legacy_over_v2_n23",
+      "note": "a0 n23",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.029,
+        1.164
+      ],
+      "unit": "ratio",
+      "value": 1.0948
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 96,
+      "name": "s_legacy_over_v2_n13",
+      "note": "a0 n13: Brent dearer",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.58,
+        0.889
+      ],
+      "unit": "ratio",
+      "value": 0.718
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 96,
+      "name": "s_legacy_over_v2_n41",
+      "note": "a0 n41: no difference",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0,
+        1.002
+      ],
+      "unit": "ratio",
+      "value": 1.0008
+    }
+  ],
+  "problem": "rho:koblitz_signed_frobenius_panel",
+  "raw": [
+    {
+      "bytes": 2709214,
+      "path": "research/rho_frob_brent_20261106/sessions/a0-n13/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/82/82e7e117f3084caff068efd4784363e04ff51236129ee9cbb46e3edd9685edb9",
+      "sha256": "82e7e117f3084caff068efd4784363e04ff51236129ee9cbb46e3edd9685edb9",
+      "uploaded": false
+    },
+    {
+      "bytes": 2713089,
+      "path": "research/rho_frob_brent_20261106/sessions/a0-n19/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/81/812b4df62d5fdefd1ed21c4b46a16276bba0fea1173639eaf42c32cc5f24f157",
+      "sha256": "812b4df62d5fdefd1ed21c4b46a16276bba0fea1173639eaf42c32cc5f24f157",
+      "uploaded": false
+    },
+    {
+      "bytes": 2724827,
+      "path": "research/rho_frob_brent_20261106/sessions/a0-n23/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0a/0acf82deff2cba0f39bcf767abb76cf4a40a09bc48055d6db22d73f649f0be20",
+      "sha256": "0acf82deff2cba0f39bcf767abb76cf4a40a09bc48055d6db22d73f649f0be20",
+      "uploaded": false
+    },
+    {
+      "bytes": 2732539,
+      "path": "research/rho_frob_brent_20261106/sessions/a0-n31/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/01/012588a22125aad351c5a593b9bf47e89ec824055c2a543be4203cf0cf815928",
+      "sha256": "012588a22125aad351c5a593b9bf47e89ec824055c2a543be4203cf0cf815928",
+      "uploaded": false
+    },
+    {
+      "bytes": 2753151,
+      "path": "research/rho_frob_brent_20261106/sessions/a0-n37/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bc/bcf73c4ae889b73281dd74b8d840234ad48afca70275da2224eb4d33e4f2cfc6",
+      "sha256": "bcf73c4ae889b73281dd74b8d840234ad48afca70275da2224eb4d33e4f2cfc6",
+      "uploaded": false
+    },
+    {
+      "bytes": 2780556,
+      "path": "research/rho_frob_brent_20261106/sessions/a0-n41/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/36/36a1c1c628734babe7cf535416c6f856fdd694a571f7dbcfb2e2434c2a8542cd",
+      "sha256": "36a1c1c628734babe7cf535416c6f856fdd694a571f7dbcfb2e2434c2a8542cd",
+      "uploaded": false
+    },
+    {
+      "bytes": 2713911,
+      "path": "research/rho_frob_brent_20261106/sessions/a1-n17/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2a/2a9e722fc24fd7225cd342b15c127a819ab32c80d3b97b5815353115160d4f60",
+      "sha256": "2a9e722fc24fd7225cd342b15c127a819ab32c80d3b97b5815353115160d4f60",
+      "uploaded": false
+    },
+    {
+      "bytes": 2728212,
+      "path": "research/rho_frob_brent_20261106/sessions/a1-n29/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/21/21e63959eb0cbb21d9ea8cbb3527fed6bd2995b2d0a228cf07318e453fcc7484",
+      "sha256": "21e63959eb0cbb21d9ea8cbb3527fed6bd2995b2d0a228cf07318e453fcc7484",
+      "uploaded": false
+    },
+    {
+      "bytes": 5936,
+      "path": "research/rho_frob_brent_20261106/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/7924f99897befc9f162fed43924fdd711f43788a40f1b0a6f61f2d5ee0e9ac1e",
+      "sha256": "7924f99897befc9f162fed43924fdd711f43788a40f1b0a6f61f2d5ee0e9ac1e",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261106-rho-frob-brent/report.pdf",
+    "png": [
+      "benchmarks/20261106-rho-frob-brent/fig_brent.png"
+    ],
+    "svg": [
+      "benchmarks/20261106-rho-frob-brent/fig_brent.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "rho-frob-brent",
+  "status": "measured",
+  "summary": "Brent detection in rho-frob, fully priced: cheaper at n23 (1.09x), n31 (1.47x), n37 (1.07x), dearer at n13 (0.72x), no difference at n17, n19, n29, n41; 8 Koblitz curves, 32 targets x 3 rounds",
+  "validation": null
+}

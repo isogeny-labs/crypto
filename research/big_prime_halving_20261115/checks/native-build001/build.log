@@ -1,0 +1,128 @@
+In file included from /workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:4,
+                 from /workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/setup.cpp:1:
+/workspace/scratch/msolve-native/usr/include/flint/fmpz_mod_poly_factor.h: In function ‘void fmpz_mod_poly_factor_swap(fmpz_mod_poly_factor_struct*, fmpz_mod_poly_factor_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/scratch/msolve-native/usr/include/flint/fmpz_mod_poly_factor.h:60:76: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+   60 |                             fmpz_mod_poly_factor_t b, const fmpz_mod_ctx_t ctx)
+      |                                                       ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp: In constructor ‘big::Field::Field(big::Z)’:
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:31:18: error: ‘fmpz_init’ was not declared in this scope; did you mean ‘mpz_init’?
+   31 |         fmpz_t n;fmpz_init(n);fmpz_set_mpz(n,p.get_mpz_t());
+      |                  ^~~~~~~~~
+      |                  mpz_init
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:31:31: error: ‘fmpz_set_mpz’ was not declared in this scope; did you mean ‘mpz_set_si’?
+   31 |         fmpz_t n;fmpz_init(n);fmpz_set_mpz(n,p.get_mpz_t());
+      |                               ^~~~~~~~~~~~
+      |                               mpz_set_si
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:32:29: error: ‘fmpz_is_prime’ was not declared in this scope
+   32 |         const bool prime_ok=fmpz_is_prime(n)==1;fmpz_clear(n);
+      |                             ^~~~~~~~~~~~~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:32:49: error: ‘fmpz_clear’ was not declared in this scope; did you mean ‘mpz_clear’?
+   32 |         const bool prime_ok=fmpz_is_prime(n)==1;fmpz_clear(n);
+      |                                                 ^~~~~~~~~~
+      |                                                 mpz_clear
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp: In member function ‘std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> > big::Field::sqrt(const big::Z&) const’:
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:40:22: error: ‘fmpz_init’ was not declared in this scope; did you mean ‘mpz_init’?
+   40 |         fmpz_t a,m,r;fmpz_init(a);fmpz_init(m);fmpz_init(r);
+      |                      ^~~~~~~~~
+      |                      mpz_init
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:41:9: error: ‘fmpz_set_mpz’ was not declared in this scope; did you mean ‘mpz_set_si’?
+   41 |         fmpz_set_mpz(a,n.get_mpz_t());fmpz_set_mpz(m,p.get_mpz_t());
+      |         ^~~~~~~~~~~~
+      |         mpz_set_si
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:42:22: error: ‘fmpz_sqrtmod’ was not declared in this scope; did you mean ‘mpz_sqrt’?
+   42 |         const int ok=fmpz_sqrtmod(r,a,m);Z z;fmpz_get_mpz(z.get_mpz_t(),r);
+      |                      ^~~~~~~~~~~~
+      |                      mpz_sqrt
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:42:46: error: ‘fmpz_get_mpz’ was not declared in this scope; did you mean ‘mpz_get_d’?
+   42 |         const int ok=fmpz_sqrtmod(r,a,m);Z z;fmpz_get_mpz(z.get_mpz_t(),r);
+      |                                              ^~~~~~~~~~~~
+      |                                              mpz_get_d
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:43:9: error: ‘fmpz_clear’ was not declared in this scope; did you mean ‘mpz_clear’?
+   43 |         fmpz_clear(r);fmpz_clear(m);fmpz_clear(a);
+      |         ^~~~~~~~~~
+      |         mpz_clear
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp: In function ‘std::string big::zs(const std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> >&)’:
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:55:5: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   55 |     if(v.empty())return "-";std::string s;
+      |     ^~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:55:29: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   55 |     if(v.empty())return "-";std::string s;
+      |                             ^~~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp: In function ‘std::string big::pts(const std::vector<Point>&)’:
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:59:5: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   59 |     if(v.empty())return "-";std::string s;
+      |     ^~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:59:29: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   59 |     if(v.empty())return "-";std::string s;
+      |                             ^~~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp: In member function ‘big::Point big::Curve::add(const big::Point&, const big::Point&) const’:
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:69:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   69 |         if(q.infinity)return r;if(r.infinity)return q;
+      |         ^~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:69:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   69 |         if(q.infinity)return r;if(r.infinity)return q;
+      |                                ^~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp: In function ‘big::Poly big::times(const Field&, const Poly&, const Poly&)’:
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:87:5: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   87 |     if(a.empty()||b.empty())return {};Poly c(a.size()+b.size()-1);
+      |     ^~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:87:39: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   87 |     if(a.empty()||b.empty())return {};Poly c(a.size()+b.size()-1);
+      |                                       ^~~~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp: In function ‘std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> > big::roots(const Field&, const Poly&)’:
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:94:16: error: ‘fmpz_init’ was not declared in this scope; did you mean ‘mpz_init’?
+   94 |     fmpz_t p,c;fmpz_init(p);fmpz_init(c);fmpz_set_mpz(p,f.p.get_mpz_t());
+      |                ^~~~~~~~~
+      |                mpz_init
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:94:42: error: ‘fmpz_set_mpz’ was not declared in this scope; did you mean ‘mpz_set_si’?
+   94 |     fmpz_t p,c;fmpz_init(p);fmpz_init(c);fmpz_set_mpz(p,f.p.get_mpz_t());
+      |                                          ^~~~~~~~~~~~
+      |                                          mpz_set_si
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:95:24: error: ‘fmpz_mod_ctx_init’ was not declared in this scope; did you mean ‘fmpz_mod_ctx_t’?
+   95 |     fmpz_mod_ctx_t ctx;fmpz_mod_ctx_init(ctx,p);
+      |                        ^~~~~~~~~~~~~~~~~
+      |                        fmpz_mod_ctx_t
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:96:23: error: ‘fmpz_mod_poly_init’ was not declared in this scope; did you mean ‘fmpz_mod_poly_t’?
+   96 |     fmpz_mod_poly_t q;fmpz_mod_poly_init(q,ctx);
+      |                       ^~~~~~~~~~~~~~~~~~
+      |                       fmpz_mod_poly_t
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:97:74: error: ‘fmpz_mod_poly_set_coeff_fmpz’ was not declared in this scope
+   97 |     for(std::size_t i=0;i<v.size();++i){fmpz_set_mpz(c,v[i].get_mpz_t());fmpz_mod_poly_set_coeff_fmpz(q,static_cast<slong>(i),c,ctx);}
+      |                                                                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:101:14: error: ‘fmpz_mod_poly_degree’ was not declared in this scope; did you mean ‘fmpz_mod_poly_t’?
+  101 |         need(fmpz_mod_poly_degree(fac->poly+i,ctx)==1,"root factor degree");
+      |              ^~~~~~~~~~~~~~~~~~~~
+      |              fmpz_mod_poly_t
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:102:9: error: ‘fmpz_mod_poly_get_coeff_fmpz’ was not declared in this scope
+  102 |         fmpz_mod_poly_get_coeff_fmpz(c,fac->poly+i,0,ctx);Z c0;fmpz_get_mpz(c0.get_mpz_t(),c);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:102:64: error: ‘fmpz_get_mpz’ was not declared in this scope; did you mean ‘mpz_get_d’?
+  102 |         fmpz_mod_poly_get_coeff_fmpz(c,fac->poly+i,0,ctx);Z c0;fmpz_get_mpz(c0.get_mpz_t(),c);
+      |                                                                ^~~~~~~~~~~~
+      |                                                                mpz_get_d
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:106:41: error: ‘fmpz_mod_poly_clear’ was not declared in this scope; did you mean ‘fmpz_mod_poly_t’?
+  106 |     fmpz_mod_poly_factor_clear(fac,ctx);fmpz_mod_poly_clear(q,ctx);fmpz_mod_ctx_clear(ctx);fmpz_clear(c);fmpz_clear(p);
+      |                                         ^~~~~~~~~~~~~~~~~~~
+      |                                         fmpz_mod_poly_t
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:106:68: error: ‘fmpz_mod_ctx_clear’ was not declared in this scope; did you mean ‘fmpz_mod_ctx_t’?
+  106 |     fmpz_mod_poly_factor_clear(fac,ctx);fmpz_mod_poly_clear(q,ctx);fmpz_mod_ctx_clear(ctx);fmpz_clear(c);fmpz_clear(p);
+      |                                                                    ^~~~~~~~~~~~~~~~~~
+      |                                                                    fmpz_mod_ctx_t
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:106:92: error: ‘fmpz_clear’ was not declared in this scope; did you mean ‘mpz_clear’?
+  106 |     fmpz_mod_poly_factor_clear(fac,ctx);fmpz_mod_poly_clear(q,ctx);fmpz_mod_ctx_clear(ctx);fmpz_clear(c);fmpz_clear(p);
+      |                                                                                            ^~~~~~~~~~
+      |                                                                                            mpz_clear
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:108:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+  108 |     for(const Z&x:out)need(eval(f,v,x)==0,"root arithmetic check");return out;
+      |     ^~~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:108:68: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  108 |     for(const Z&x:out)need(eval(f,v,x)==0,"root arithmetic check");return out;
+      |                                                                    ^~~~~~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp: In function ‘big::Setup big::setup(const Field&, unsigned int, uint64_t, std::ostream&)’:
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:160:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  160 |         if(!e.good())continue;Point t{x,0,false};bool dead=false;
+      |         ^~
+/workspace/scratch/big-prime-halving/research/big_prime_halving_20261115/big.hpp:160:31: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  160 |         if(!e.good())continue;Point t{x,0,false};bool dead=false;
+      |                               ^~~~~
+cc1plus: all warnings being treated as errors

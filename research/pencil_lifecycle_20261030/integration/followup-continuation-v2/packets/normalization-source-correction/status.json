@@ -1,0 +1,265 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1177",
+  "kind": "source_attribution_correction_and_producer_replay",
+  "new_theorems": 0,
+  "replayed_main_declarations": 17,
+  "replayed_control_declarations": 15,
+  "proof_sources_unchanged": {
+    "Scale.lean": "dac505cdffc73038a6df61274c5a4e198d1afa936f1161e943f8402c0459f1c0",
+    "Trim.lean": "bb78dab59127798f267b201c48baa40e0cb50089c3ff5272683270b66d7e4cc3",
+    "Bridge.lean": "94ac28c3f62ba745759d01a76fad9745cfd5df4e66ee922aeb91ce4112d47d2e",
+    "Controls.lean": "76a39df1d4a774d72832851c05ca6542a6b021324751481083694d3300173fe4",
+    "Readback.lean": "aa3fc8b3f7267106ff532bc11acbe8198bf810c3826e7839686b2d1a0a358e9e"
+  },
+  "readback": [
+    {
+      "name": "ScaleTrim.scale_nonzero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.transform_computed_scale",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.listPoly_append",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.listPoly_zeros",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.words_append_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_preserves",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_length",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_finished",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.pad_length",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.pad_preserves",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_pad_preserves",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_pad_capacity",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.listPoly_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.wordsPoly_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.wordsPoly_array",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.postprocessed_transform",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.postprocessed_capacity",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.empty",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.all_zero",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.trailing",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.internal",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.partial_fuel",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.pad_u",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.pad_v",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.over_capacity_excluded",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.no_silent_truncation",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.scale_zero_exponent",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.scale_two",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.scale_three",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.u_output",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.v_output",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.zero_v",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "attempts": {
+    "scale1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "trim1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "bridge1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "affected_packets": [
+    "coefficient-array-storage",
+    "coefficient-traversal",
+    "traversal-polynomial-composition",
+    "scale-trim-storage"
+  ],
+  "canonical_source_matches_original_hash": true,
+  "old_excerpts_contain_target_functions": false,
+  "corrected_extraction": "source-map.json",
+  "independent_source_fidelity_review": "pending",
+  "compiled_rust_equivalence": "not established",
+  "scientific_execution": false,
+  "cost_ratio": null
+}

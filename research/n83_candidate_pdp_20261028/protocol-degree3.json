@@ -1,0 +1,686 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "N83-DEGREE3-PAIRED-20261028-R1",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/n83_candidate_pdp_20261028",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "design": "DEGREE3_DESIGN.md"
+  },
+  "question": "Does ordinary-degree-three closure supply a strict fall beyond complete V2 and a global LFD certificate for the eight preserved baseline/spike40 binary/Koblitz m2 PDP systems?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "A replayed polynomial of degree<=2 in V3 but outside complete V2 certifies LFD>=3. Exact LFD3 additionally requires a verified global upper certificate. Existing exactV2 certificates remain2.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Regularity reduction, elite-base status, universal FFD/LFD assertions, solving speed and ECDLP claims remain outside this batch.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "baseline-koblitz",
+      "role": "baseline",
+      "description": "baseline koblitz matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b4cca71a0f3df5ab0b5da202c10af1e741095b7",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3"
+          ]
+        ],
+        "binary_sha256": "fd0393eaacc36513d835abb362bf63729300088c339cd12e82cb26f41305b574",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "complete_v2_replay",
+          "degree_three_closure",
+          "strict_fall_nonmembership",
+          "global_upper_certificate",
+          "fresh_replay"
+        ],
+        "seconds": 600,
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "candidate_id": "baseline"
+      }
+    },
+    {
+      "id": "baseline-binary",
+      "role": "baseline",
+      "description": "baseline binary matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b4cca71a0f3df5ab0b5da202c10af1e741095b7",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3"
+          ]
+        ],
+        "binary_sha256": "fd0393eaacc36513d835abb362bf63729300088c339cd12e82cb26f41305b574",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "complete_v2_replay",
+          "degree_three_closure",
+          "strict_fall_nonmembership",
+          "global_upper_certificate",
+          "fresh_replay"
+        ],
+        "seconds": 600,
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "candidate_id": "baseline"
+      }
+    },
+    {
+      "id": "spike40-koblitz",
+      "role": "candidate",
+      "description": "spike40 koblitz matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b4cca71a0f3df5ab0b5da202c10af1e741095b7",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3"
+          ]
+        ],
+        "binary_sha256": "fd0393eaacc36513d835abb362bf63729300088c339cd12e82cb26f41305b574",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "complete_v2_replay",
+          "degree_three_closure",
+          "strict_fall_nonmembership",
+          "global_upper_certificate",
+          "fresh_replay"
+        ],
+        "seconds": 600,
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6",
+        "candidate_id": "spike40"
+      }
+    },
+    {
+      "id": "spike40-binary",
+      "role": "candidate",
+      "description": "spike40 binary matched public PDP systems",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b4cca71a0f3df5ab0b5da202c10af1e741095b7",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/n83_candidate_pdp_20261028/Cargo.toml",
+            "--bin",
+            "degree3"
+          ]
+        ],
+        "binary_sha256": "fd0393eaacc36513d835abb362bf63729300088c339cd12e82cb26f41305b574",
+        "threads": 1
+      },
+      "parameters": {
+        "n": 83,
+        "m": [
+          2
+        ],
+        "ell_rule": "fixed 27 for every m",
+        "target_kinds": [
+          "planted",
+          "natural"
+        ],
+        "modes": [
+          "complete_v2_replay",
+          "degree_three_closure",
+          "strict_fall_nonmembership",
+          "global_upper_certificate",
+          "fresh_replay"
+        ],
+        "seconds": 600,
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+        "candidate_id": "spike40"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact computations only; no clock or statistical comparison."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No separate extra arm: retained native xy+1,yz+1,xz Boolean control requires exactLFD3; xy,xy+1 requires exactLFD2. Four paired baseline cases must preserve their existing exactLFD2 certificates."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Native xy-only control must not certify a global upper bound; missing field equations, degree3-row multiplication and modified traces must be rejected."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "family",
+        "levels": [
+          "koblitz",
+          "binary"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          2
+        ]
+      },
+      {
+        "name": "factor_base",
+        "levels": [
+          "baseline",
+          "spike40"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "94762890c9634b86c7c3fe6e8937d968546a5a1bbb6da4ae5fa8f18306467adc",
+        "how": "Identical committed native V3 instrument for all cases; complete V2 traces replayed before use"
+      },
+      {
+        "name": "seed",
+        "treatment": "fixed",
+        "value": 20261027,
+        "how": "SplitMix64 family and m seed rule in PROTOCOL.md"
+      },
+      {
+        "name": "factor_base",
+        "treatment": "crossed",
+        "how": "Two saved complete ell27 per-curve manifests, unchanged from paired-r1"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Sequential native processes"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Existing host after recorded EKS S3 permission failure; no timing claim"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "how": "Baseline/spike40 interleaved for each family and target kind; no timing claim"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen parsing; no discretionary exclusion"
+      },
+      {
+        "name": "limits",
+        "treatment": "fixed",
+        "how": "8GiB virtual memory,600s per production/replay plus5s grace,10800s outer; no retries; partial data retained"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-completion",
+        "arms": [
+          "baseline-koblitz",
+          "baseline-binary",
+          "spike40-koblitz",
+          "spike40-binary"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Accept exact per-input certificate only after completion and successful replay; unsupported and failed values remain null."
+      }
+    ],
+    "aa_not_applicable": "Exact non-timing computations",
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Interleaved baseline/spike40 by family and target kind. Exact counted algebra; no clock comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261027
+      ],
+      "nonce": null,
+      "note": "SplitMix64: seed xor m<<32 xor family tag; source defines all draws."
+    },
+    "instance_sampling": {
+      "rule": "Exactly the eight saved m2 Koblitz/binary cases from paired-r1. Identical natural targets and common-low26 planted tuples; no resampling.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Deterministic exact computation with frozen parser",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Four arm/family combinations times two target kinds; eight complete production attempts and eight fresh replays. Exact computation, no statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0.01,
+      "per_sample_seconds": 600,
+      "threads": 1,
+      "estimated_total_seconds": 10800,
+      "measured_on": "Four native unit tests finish below timer resolution;10800s is a resource budget, not an n83 timing prediction"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "last_fall_degree",
+        "name": "Certified last fall degree",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "2 from a valid existing V2 lower/upper certificate,3 only from strict V3 nonmembership witness plus global upper certificate; otherwise null",
+        "source": "summary.json rows last_fall_degree",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "closure_rank",
+        "name": "closure rank",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Rank of completed Boolean V2 normal-form closure",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "linear_rank",
+        "name": "linear rank",
+        "unit": "integer",
+        "kind": "counted",
+        "definition": "Number of independent linear rows in V2",
+        "source": "summary.json rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "last_fall_lower_bound",
+        "name": "last fall lower bound",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "Verified per-case bound; null for unknown; never inferred from a plateau or timeout",
+        "source": "summary.json rows last_fall_lower_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "last_fall_upper_bound",
+        "name": "last fall upper bound",
+        "unit": "polynomial degree",
+        "kind": "counted",
+        "definition": "Verified per-case bound; null for unknown; never inferred from a plateau or timeout",
+        "source": "summary.json rows last_fall_upper_bound",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "last_fall_degree",
+      "last_fall_lower_bound",
+      "last_fall_upper_bound",
+      "closure_rank",
+      "linear_rank"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "image_digest",
+      "source_revision",
+      "exit_code",
+      "stdout_sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": "existing-spot-workspace",
+    "placement": {
+      "cpus": 1,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 10800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Attempt all eight preserved cases; replay complete productions in a fresh process. Every production/replay also replays its complete savedV2 trace. Three native algebra controls required.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "600s per production/replay plus5s grace;8GiB virtual memory;10800s outer;one native process at a time;no retries.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Hash mismatch, malformed input or failed replay invalidates a certificate",
+    "Closure plateau alone does not certify last fall degree",
+    "Resource limits imply no mathematical degree bound",
+    "Every elapsed time is diagnostic, wall_valid=false"
+  ],
+  "decision_rule": {
+    "text": "Report exactLFD or strict lower/global upper certificates only after fresh replay; no scientific hypothesis promotion; unknown stays null.",
+    "comparison_ids": [
+      "C-completion"
+    ],
+    "statistic": "Exact per-input value or missing",
+    "interval": "not applicable",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "not applicable",
+    "verdict_vocabulary": [
+      "certified",
+      "bounded",
+      "resource_limit",
+      "error",
+      "unresolved"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "src/bin/degree3.rs",
+      "sha256": "94762890c9634b86c7c3fe6e8937d968546a5a1bbb6da4ae5fa8f18306467adc"
+    },
+    "inputs": [
+      "protocol-degree3.json extensions.cases",
+      "cases/*/result.json",
+      "status/*.json"
+    ],
+    "outputs": [
+      "summary.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Eight-case V2/V3 linear-rank and certified LFD grid"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting first-fall degree as regularity",
+    "Reporting final basis degree as solving degree",
+    "Using timeout as a degree bound",
+    "Downscaling n or omitting m cells",
+    "Claiming an IC/rho speedup or subgroup attack from this stage",
+    "Equating closure plateau with global stabilization",
+    "Inferring lower regularity or elite factor-base quality from low FFD/LFD alone",
+    "Removing failed or partial outputs"
+  ],
+  "literature": [
+    {
+      "ref": "https://arxiv.org/html/2112.05579",
+      "provenance": "retrieved",
+      "claim": "Ordinary-degree V_i and LFD definitions; distinction of FFD, LFD, solving degree and homogeneous regularity",
+      "verified_by": "Read primary definitions and Macaulay closure construction before implementation"
+    },
+    {
+      "ref": "research/n83_fixed_fall_catalog_20261028/src/main.rs",
+      "provenance": "internal",
+      "claim": "Prior exactV2 construction and complete replay traces",
+      "verified_by": "Read source and retained paired data before extension"
+    }
+  ],
+  "amendments": [],
+  "extensions": {
+    "detailed_design": "DEGREE3_DESIGN.md",
+    "cases": [
+      {
+        "key": "baseline-koblitz-m2-planted",
+        "arm": "baseline",
+        "id": "koblitz-m2-planted",
+        "family": "koblitz",
+        "target_kind": "planted",
+        "input_json_sha256": "231b4b9a5e1543ea42ed1218eb4f750e1dd0d1c34ecba856be5d5090b3f4677b",
+        "system_sha256": "8f106faf3b1de580ccc4c55664d2723741bf5bd1aeacff97a578d76d8f87e0b4",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "v2": {
+          "rows_sha256": "952b8671e08c2b5f37060104827dbd850aa0f9e77856aceedfbe0609b6649e0d",
+          "operations_sha256": "0438e422a63015c10add0eae9269ec0c853d2767c7360c44050ff25fddb44272",
+          "result_sha256": "afddd45ad58473c02a1ce1c1eaec0d4557020f825ef6ef7486e71b0649442597"
+        }
+      },
+      {
+        "key": "spike40-koblitz-m2-planted",
+        "arm": "spike40",
+        "id": "koblitz-m2-planted",
+        "family": "koblitz",
+        "target_kind": "planted",
+        "input_json_sha256": "84120a02436f5c2695156e7389639e794966d6ab089fb66e389ff113da3ae434",
+        "system_sha256": "515c8e2a10e464e0b8d851800ea94d05b41f352a8ca7a10007c60f53e5070fdc",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6",
+        "v2": {
+          "rows_sha256": "a1cff3d379621e1302443de13a84c5c428030e03f989ebe0661f39649413584e",
+          "operations_sha256": "cab8c1f174fa3377b1315436ccdb1660c3c282af01f3fdf137c033ae7f5d9b5d",
+          "result_sha256": "871a06eca1ee89030e34d410beba9bcb54b2af74152497f84adcea7a8acfa054"
+        }
+      },
+      {
+        "key": "baseline-koblitz-m2-natural",
+        "arm": "baseline",
+        "id": "koblitz-m2-natural",
+        "family": "koblitz",
+        "target_kind": "natural",
+        "input_json_sha256": "1e05e959d5aebb7664b579c807ba4bf3bbc8d5eb6b2070883edf425c898ffd91",
+        "system_sha256": "610b2f18a0ece84e5ca1c004963a4079c0aa7b4e7db403402bc97db94c16109e",
+        "factor_base_manifest_sha256": "31343c5145d44695e2388020501eb009a34bf3d7ebdafe0f6566d637ce30f67b",
+        "v2": {
+          "rows_sha256": "b9721a18853f556658e17a7517344fecf8130ff5b55f407b5287bcc4595a91ae",
+          "operations_sha256": "95d94014fda36d02aad71f44bd96a4e874d6099ec9153b9a401a015a10042bbd",
+          "result_sha256": "ffc41fd310b0963df27f82dc83e5a3b2543b2afbc2abd21e422690caf6d4f9c2"
+        }
+      },
+      {
+        "key": "spike40-koblitz-m2-natural",
+        "arm": "spike40",
+        "id": "koblitz-m2-natural",
+        "family": "koblitz",
+        "target_kind": "natural",
+        "input_json_sha256": "f2f9ab72ea88a4e776f3308d55fdf2623809f0f359a4b0f657aecba70b9b85ab",
+        "system_sha256": "17f8ad981276e15857077ad561d4de93a878e1f4417a6528affd66327f558a14",
+        "factor_base_manifest_sha256": "95057db18ee3365b1927e84f43a62f5b7cba4dd4859654bc50e606caa62b4ca6",
+        "v2": {
+          "rows_sha256": "b0f61ff19227693f9b45696a547828a9288d2a178192387684e05c12050cac2a",
+          "operations_sha256": "05843d80234059ed3d6a69af969365413d65dcebb5f3f990d1345fa36589e2c8",
+          "result_sha256": "4e327a77563d81d16f4fc1c2f67d129c3cf2104a2df9ad57e1b41ac37e891050"
+        }
+      },
+      {
+        "key": "baseline-binary-m2-planted",
+        "arm": "baseline",
+        "id": "binary-m2-planted",
+        "family": "binary",
+        "target_kind": "planted",
+        "input_json_sha256": "8a5413b5b4306af01d7f3158f190fe0eeb9daac1668bf1024f053530f8fbbbac",
+        "system_sha256": "c4a4778e5aa677d4e33e3b44eda0838591be74b2304f1f3cc8b558df509b4c5c",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "v2": {
+          "rows_sha256": "eb82d0e29799956d67d77d3581a86e13ed47811487ed1843d17aa07b889a43af",
+          "operations_sha256": "15d191bd35a7f2d06aca7d0a48eeed0cf595586e31a47673c0f70ab28764b0cd",
+          "result_sha256": "4e322bf7fd68831783dba237556f84111cf21c52d380946d151e890cc70138cd"
+        }
+      },
+      {
+        "key": "spike40-binary-m2-planted",
+        "arm": "spike40",
+        "id": "binary-m2-planted",
+        "family": "binary",
+        "target_kind": "planted",
+        "input_json_sha256": "f6d1c164ce10aaf7152087c76d920b69aa1b1ef567314783a410bc7748f28bdd",
+        "system_sha256": "4b3d246ad308f0af7913c48d9f51b37d349b94af06ac6a0980a39e6893188a47",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+        "v2": {
+          "rows_sha256": "66cf335ef6c37b923d30ad49e2a2cc5211e2ab54555966dae432c43956cfa996",
+          "operations_sha256": "693fb1eb70ffdc54404796c390fbb4faee4779a084a4fd446b9c68f642b500ea",
+          "result_sha256": "de443fa4c9c09f25ed8b39c18b67bc7807c1b89c6f51753ff87999b40b82e1cd"
+        }
+      },
+      {
+        "key": "baseline-binary-m2-natural",
+        "arm": "baseline",
+        "id": "binary-m2-natural",
+        "family": "binary",
+        "target_kind": "natural",
+        "input_json_sha256": "ed95d632a056f35c4b9c07d0a99a24571e30312d80ed7858f8529f5443e3d1f0",
+        "system_sha256": "2907e70d84b10f9a0eabbc6fd9dff83197655fb95e856095820e4cb62c237fa3",
+        "factor_base_manifest_sha256": "1d974ee32f633c4b2c220e28f550cc93afecb56aa836a36cc8d8e5962d7f2c6d",
+        "v2": {
+          "rows_sha256": "73e62886c2bb8eedd4e67bd929a365f87bb9d8b4806c67c23f4f201b56d35b21",
+          "operations_sha256": "7134e8c6df925d0b2b08867673498446b45807f741848ed2b69bd50427e3d446",
+          "result_sha256": "aa221d83abac1ffe39a213dbf845ca32aff50dad0265c2fffa19613a960297a7"
+        }
+      },
+      {
+        "key": "spike40-binary-m2-natural",
+        "arm": "spike40",
+        "id": "binary-m2-natural",
+        "family": "binary",
+        "target_kind": "natural",
+        "input_json_sha256": "89b09154a64c73a25069948345330c4971ecd3177b77382b44f51ff7f51eeb92",
+        "system_sha256": "d08d4006bc920fa696304bb38d0665b7139a6825fdf7b439acd70f4405587129",
+        "factor_base_manifest_sha256": "a9b7d2b4de575095b3a512d53da60c8e4a3e3d6e46c0799346d53aa9158f5bbe",
+        "v2": {
+          "rows_sha256": "f2f1eedd6ab10425d10c2f9c342cfe7458536a977ee964e7497c57c69f3a04e4",
+          "operations_sha256": "5e9dc8b570999b266118776921a75aa797d58238e25ce489932054f39b357e93",
+          "result_sha256": "737ec67f45ded4a0ae0831a7c908a12297554769007d6caea47943e4ecbe7d7f"
+        }
+      }
+    ],
+    "prior_run": "n83-candidate-paired-falls-20261028-r1",
+    "prior_archive_sha256": "25f88306bde0643f435ffe3db3ab1de9c95952f9e3476242083d4ab551c23845",
+    "raw_prefix": "s3://setec-astronomy-artifacts/runs/n83-degree3-paired-20261028-r1/local/",
+    "file_layout": "DEGREE3_FORMAT.json",
+    "backend_reason": "Recorded EKS shared-bucket failure; refreshed inventory shows no duplicate V3 run; existing-host fallback without IAM/capacity change",
+    "retained_full_objective": "Alln83 families,m2..9; prime/larger-m LFD, regularity and elite-base reduction remain unresolved by this specific eight-case stage."
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "471f53d00cdab630bb3a1ab2f1ad1e637eeceb17549ed08fad0dab21dd13031f",
+    "commit": "3b4cca71a0f3df5ab0b5da202c10af1e741095b7",
+    "frozen_at": "2026-10-28T06:59:42Z",
+    "filed_before_affected_data": true
+  }
+}

@@ -1,0 +1,31 @@
+stage 0: curves and targets
+stage0 s=20 instances=90 arms=[1, 3, 4]
+stage0 s=24 instances=72 arms=[1, 3, 4]
+stage 1: unit tests, controls, stopping rule
+controls s=20 done
+controls s=24 done
+gates (pilot of 2 instances, 1 stream)
+sizes run:  20 24
+stage 2: cells (parallel, 3 jobs)
+cell_ic Dh s=24 instances=24 reps=10 total_ms=33085
+cell_ic D s=24 instances=24 reps=10 total_ms=22038
+cell_ic B s=24 instances=24 reps=10 total_ms=2258
+cell_ic Bp s=24 instances=24 reps=10 total_ms=2189
+cell_ic A s=24 instances=24 reps=10 total_ms=1406
+cell_ic Dq s=24 instances=24 reps=10 total_ms=61353
+cell_census s=24 total_ms=2806
+cell_rho s=24 total_ms=6135
+cell_ic Dq s=20 instances=30 reps=10 total_ms=19570
+cell_ic C s=20 instances=30 reps=10 total_ms=28952
+cell_ic Dh s=20 instances=30 reps=10 total_ms=10341
+cell_ic B s=20 instances=30 reps=10 total_ms=1221
+cell_ic Bp s=20 instances=30 reps=10 total_ms=1255
+cell_ic D s=20 instances=30 reps=10 total_ms=7039
+cell_ic A s=20 instances=30 reps=10 total_ms=708
+cell_census s=20 total_ms=1755
+cell_rho s=20 total_ms=1917
+cell_ic C s=24 instances=24 reps=10 total_ms=174607
+stage 3: analysis
+analysis done: 67 json items
+done: research/twist_ecdlp_followup_20261107/L1-descent-parity/replicate/reduced/results.json research/twist_ecdlp_followup_20261107/L1-descent-parity/replicate/reduced/RESULTS.md (full runs also copy them next to run.sh)
+exit=0

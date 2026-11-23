@@ -1,0 +1,114 @@
+   Compiling libc v0.2.191
+   Compiling proc-macro2 v1.0.107
+   Compiling zerocopy v0.8.63
+   Compiling quote v1.0.47
+   Compiling autocfg v1.5.1
+   Compiling unicode-ident v1.0.27
+   Compiling cfg-if v1.0.5
+   Compiling getrandom v0.2.17
+   Compiling num-traits v0.2.19
+   Compiling serde_core v1.0.229
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_core v0.6.4
+   Compiling zmij v1.0.23
+   Compiling rand_chacha v0.3.1
+   Compiling syn v3.0.10
+   Compiling serde_json v1.0.154
+   Compiling serde v1.0.229
+   Compiling serde_derive v1.0.229
+   Compiling num-integer v0.1.47
+   Compiling rand v0.8.8
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.19
+   Compiling num-bigint v0.4.8
+   Compiling hex v0.4.3
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend)
+   Compiling trace-zero-leads v0.1.0 (/workspace/crypto-trace/research/trace_zero_leads_20261109/native)
+   Compiling trace-zero-kernel v0.1.0 (/workspace/crypto-trace/research/trace_zero_kernel_20261116/native)
+   Compiling trace-zero-experiments v0.1.0 (/workspace/crypto-trace/research/trace_zero_experiments_20261109/native)
+error[E0603]: function `mul_words_into` is private
+   --> src/../../compact_word_snapshot.rs:6:11
+    |
+  6 |     f2m::{mul_words_into, reduce_words, spread32},
+    |           ^^^^^^^^^^^^^^ private function
+    |
+note: the function `mul_words_into` is defined here
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:981:1
+    |
+981 | pub(crate) fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `reduce_words` is private
+    --> src/../../compact_word_snapshot.rs:6:27
+     |
+   6 |     f2m::{mul_words_into, reduce_words, spread32},
+     |                           ^^^^^^^^^^^^ private function
+     |
+note: the function `reduce_words` is defined here
+    --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:1072:1
+     |
+1072 | pub(crate) fn reduce_words(value: &mut [u64], irreducible: &IrreduciblePoly) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `spread32` is private
+   --> src/../../compact_word_snapshot.rs:6:41
+    |
+  6 |     f2m::{mul_words_into, reduce_words, spread32},
+    |                                         ^^^^^^^^ private function
+    |
+note: the function `spread32` is defined here
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:898:1
+    |
+898 | pub(crate) fn spread32(x: u64) -> u64 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `tick` is private
+  --> src/../../compact_word_snapshot.rs:88:26
+   |
+88 |         operation_tally::tick(self.m, "add");
+   |                          ^^^^ private function
+   |
+note: the function `tick` is defined here
+  --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/operation_tally.rs:32:1
+   |
+32 | pub(crate) fn tick(m: u32, operation: &str) {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `tick` is private
+  --> src/../../compact_word_snapshot.rs:93:26
+   |
+93 |         operation_tally::tick(self.m, "mul");
+   |                          ^^^^ private function
+   |
+note: the function `tick` is defined here
+  --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/operation_tally.rs:32:1
+   |
+32 | pub(crate) fn tick(m: u32, operation: &str) {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `tick` is private
+   --> src/../../compact_word_snapshot.rs:101:26
+    |
+101 |         operation_tally::tick(self.m, "square");
+    |                          ^^^^ private function
+    |
+note: the function `tick` is defined here
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/operation_tally.rs:32:1
+    |
+ 32 | pub(crate) fn tick(m: u32, operation: &str) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `tick` is private
+   --> src/../../compact_word_snapshot.rs:111:26
+    |
+111 |         operation_tally::tick(self.m, "inverse_informational");
+    |                          ^^^^ private function
+    |
+note: the function `tick` is defined here
+   --> /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/operation_tally.rs:32:1
+    |
+ 32 | pub(crate) fn tick(m: u32, operation: &str) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0603`.
+error: could not compile `trace-zero-kernel` (lib) due to 7 previous errors

@@ -1,0 +1,74 @@
+{
+  "schema": "char-p-pairing-domain-verification/v1",
+  "source_commit": "64697ddc799d21b396472c8d28d25ae0cdaa3350",
+  "claim_id": "PCC-20261114-f7faf2",
+  "declaration_sha256": "9b89e4253f799bc770b1351b51af1029edd753328fa2c420f380430641581502",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 117,
+  "gate_declarations": 37,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 113,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-f7faf2",
+    "claim_sha256": "b844318fc902763f6670e1ad8546ae6e38b7e32e4b21cd67dcce53c2fe630cb1",
+    "commit": "64697ddc799d21b396472c8d28d25ae0cdaa3350",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/char_p_pairing_domain_audit_20261114/lean (CharPPairingCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T08:22:13Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-f7faf2",
+    "claim_sha256": "b844318fc902763f6670e1ad8546ae6e38b7e32e4b21cd67dcce53c2fe630cb1",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46932,
+    "sha256": "f752be2c01fd180fbaec32af163c7712ac3e237461baa4b8400721cc83b85270",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 37,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_power_targets_and_finite_curve_quotients_proved": true,
+    "unbounded_char2_and_paired_char3_actual_domain_obstructions_proved": true,
+    "prime_root_implies_coprime_source_guard_proved": true,
+    "explicit_imperfect_target_control_and_three_universal_negations_proved": true,
+    "qualified_source_refuted": false,
+    "group_scheme_pairing_refuted": false,
+    "canonical_divisor_pairing_identified": false,
+    "full_paper_read": false,
+    "full_book_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

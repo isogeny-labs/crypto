@@ -1,0 +1,36 @@
+{
+  "schema": "five-rank-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "five-torsion-rank-certificate",
+      "expected_decl_sha256": "7cf18bb12120869fac57c17df562ecbdb06329a691fd1ae4446fe7ce97cc10df",
+      "full_characters": 1281,
+      "full_decl_sha256": "7cf18bb12120869fac57c17df562ecbdb06329a691fd1ae4446fe7ce97cc10df",
+      "full_normalized_signature": "theorem actual_geometric_five_certificate : (∀ (R : Type) [CommRing R] (W : WeierstrassCurve R), psiFive W=W.Ψ₂Sq^2*W.preΨ₄-W.Ψ₃^3 ∧ (psiFive W).derivative=5*W.Ψ₂Sq*(central W*W.preΨ₄-W.Ψ₃^2)) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (x y : K) (hN : W.Nonsingular x y), (5:ℕ) • Point.some x y hN=0 ↔ (psiFive W).IsRoot x) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [IsAlgClosed K] [NeZero (5:K)] (W : WeierstrassCurve.Affine K), W.Δ≠0 → (psiFive W).Separable ∧ (psiFive W).natDegree=12 ∧ Nat.card (FiveRoot W)=12 ∧ Finite (FiveTorsion W) ∧ Nat.card (FiveTorsion W)=25 ∧ Nat.card {P : W.Point // addOrderOf P=5}=24 ∧ finrank (ZMod 5) (FiveTorsion W)=2 ∧ Nonempty (Basis (Fin 2) (ZMod 5) (FiveTorsion W))) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [CharP K 5], (charFiveCurve K).Δ≠0 ∧ (∀ x : K, (psiFive (charFiveCurve K)).eval x= -1) ∧ Nat.card (FiveTorsion (charFiveCurve K))=1 ∧ Nat.card (FiveTorsion (charFiveCurve K))≠25) ∧ (CharP BinaryClosure 2 ∧ binaryCurve.Δ≠0 ∧ Nat.card (FiveTorsion binaryCurve)=25 ∧ finrank (ZMod 5) (FiveTorsion binaryCurve)=2) ∧ (CharP CharThreeClosure 3 ∧ (short (-1:CharThreeClosure) 0).Δ≠0 ∧ Nat.card (FiveTorsion (short (-1:CharThreeClosure) 0))=25 ∧ finrank (ZMod 5) (FiveTorsion (short (-1:CharThreeClosure) 0))=2)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "actual_geometric_five_certificate",
+        "end_byte": 1714,
+        "file": "/workspace/scratch/five-rank-binding-input01/FiveCertificate.lean",
+        "qualified_decl_id": "FiveTorsionRankAudit.actual_geometric_five_certificate",
+        "signature": "theorem actual_geometric_five_certificate :\n    (∀ (R : Type) [CommRing R] (W : WeierstrassCurve R),\n      psiFive W=W.Ψ₂Sq^2*W.preΨ₄-W.Ψ₃^3 ∧\n      (psiFive W).derivative=5*W.Ψ₂Sq*(central W*W.preΨ₄-W.Ψ₃^2)) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K)\n      (x y : K) (hN : W.Nonsingular x y),\n      (5:ℕ) • Point.some x y hN=0 ↔ (psiFive W).IsRoot x) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] [IsAlgClosed K] [NeZero (5:K)]\n      (W : WeierstrassCurve.Affine K), W.Δ≠0 →\n      (psiFive W).Separable ∧ (psiFive W).natDegree=12 ∧ Nat.card (FiveRoot W)=12 ∧\n      Finite (FiveTorsion W) ∧ Nat.card (FiveTorsion W)=25 ∧\n      Nat.card {P : W.Point // addOrderOf P=5}=24 ∧ finrank (ZMod 5) (FiveTorsion W)=2 ∧\n      Nonempty (Basis (Fin 2) (ZMod 5) (FiveTorsion W))) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] [CharP K 5],\n      (charFiveCurve K).Δ≠0 ∧ (∀ x : K, (psiFive (charFiveCurve K)).eval x= -1) ∧\n      Nat.card (FiveTorsion (charFiveCurve K))=1 ∧ Nat.card (FiveTorsion (charFiveCurve K))≠25) ∧\n    (CharP BinaryClosure 2 ∧ binaryCurve.Δ≠0 ∧ Nat.card (FiveTorsion binaryCurve)=25 ∧\n      finrank (ZMod 5) (FiveTorsion binaryCurve)=2) ∧\n    (CharP CharThreeClosure 3 ∧ (short (-1:CharThreeClosure) 0).Δ≠0 ∧\n      Nat.card (FiveTorsion (short (-1:CharThreeClosure) 0))=25 ∧\n      finrank (ZMod 5) (FiveTorsion (short (-1:CharThreeClosure) 0))=2)",
+        "start_byte": 231
+      },
+      "recorded_statement": "theorem actual_geometric_five_certificate : (∀ (R : Type) [CommRing R] (W : WeierstrassCurve R), psiFive W=W.Ψ₂Sq^2*W.preΨ₄-W.Ψ₃^3 ∧ (psiFive W).derivative=5*W.Ψ₂Sq*(central W*W.preΨ₄-W.Ψ₃^2)) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (x y : K) (hN : W.Nonsingular x y), (5:ℕ) • Point.some x y hN=0 ↔ (psiFive W).IsRoot x) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [IsAlgClosed K] [NeZero (5:K)] (W : WeierstrassCurve.Affine K), W.Δ≠0 → (psiFive W).Separable ∧ (psiFive W).natDegree=12 ∧ Nat.card (FiveRoot W)=12 ∧ Finite (FiveTorsion W) ∧ Nat.card (FiveTorsion W)=25 ∧ Nat.card {P : W.Point // addOrderOf P=5}=24 ∧ finrank (ZMod 5) (FiveTorsion W)=2 ∧ Nonempty (Basis (Fin 2) (ZMod 5) (FiveTorsion W))) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [CharP K 5], (charFiveCurve K).Δ≠0 ∧ (∀ x : K, (psiFive (charFiveCurve K)).eval x= -1) ∧ Nat.card (FiveTorsion (charFiveCurve K))=1 ∧ Nat.card (FiveTorsion (charFiveCurve K))≠25) ∧ (CharP BinaryClosure 2 ∧ binaryCurve.Δ≠0 ∧ Nat.card (FiveTorsion binaryCurve)=25 ∧ finrank (ZMod 5) (FiveTorsion binaryCurve)=2) ∧ (CharP CharThreeClosure 3 ∧ (short (-1:CharThreeClosure) 0).Δ≠0 ∧ Nat.card (FiveTorsion (short (-1:CharThreeClosure) 0))=25 ∧ finrank (ZMod 5) (FiveTorsion (short (-1:CharThreeClosure) 0))=2)",
+      "recorded_text_sha256": "7cf18bb12120869fac57c17df562ecbdb06329a691fd1ae4446fe7ce97cc10df",
+      "source_plan": "research/five_torsion_rank_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "FiveTorsionRankAudit.actual_geometric_five_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Frozen procedural writtenheader check, not kernel parser/hash/compiler/physicalhost refinement. Fullheader/check aftercompletedgate; no prefix/verifierchange."
+}

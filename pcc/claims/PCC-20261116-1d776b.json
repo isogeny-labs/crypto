@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T12:07:21Z",
+ "id": "PCC-20261116-1d776b",
+ "kind": "statement",
+ "producer": {
+  "commit": "1c99a2350ec07305cf78600a43cf13f81311b5f5",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-06/ledger-baseline-diagnostic-01.json",
+    "sha256": "ebf94e6d159bb6199fd0c33785c27bba632351d44843728e5e6d42cf1b00d2cc"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "prime-field-transfer/round06/inherited-ledger-fork",
+ "statement": "Read-only ledger comparison: current main has1197 rows, published dfe88f759 has1233 and local round06 has1250. Base versus both lane versions share1195 rows then fork; the full published1233-row ledger remains a byte prefix of round06. No old row was rewritten by round06; current-base prefix verification is blocked. No fork repair or side selection is claimed."
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "crypto.integration-validation/1",
+  "status": "pass",
+  "feature_parent": "9ba11933fb44cb373e1c4ac96986096847ce4fce",
+  "main_parent": "f8501268305c0c84d0e077a4ab9054c07ff74540",
+  "source_state": "validated ordinary merge resolution; containing merge commit records the exact final tree",
+  "library_tests": {
+    "argv": [
+      "cargo",
+      "test",
+      "--release",
+      "--locked",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "passed": 4382,
+    "failed": 0,
+    "ignored": 117,
+    "execution_seconds_descriptive": 664.98,
+    "log": "logs/crypto-pr2148-lib-tests.log",
+    "exit_receipt": "logs/crypto-pr2148-lib-tests.exit",
+    "network": "explicitly enabled, including local TCP mocks"
+  },
+  "native_traits": {
+    "argv": [
+      "target/release/curve_traits",
+      "check",
+      "--traits",
+      "/tmp/crypto-pr2148-traits-candidate.json"
+    ],
+    "exit_code": 0,
+    "full_native_rebuild_compared_byte_for_byte": true,
+    "schema": "curve-traits/2",
+    "rows": 2748,
+    "registry_rows": 2572,
+    "input_count": 6,
+    "feature_parent_rows_retained": 2551,
+    "main_parent_rows_retained": 2748,
+    "traits_sha256": "b5bc649da40a5c143aa814414ade1736e802ffafffeeabe42567ffea2a018c26",
+    "coverage": "traits-coverage-final.json",
+    "crosswalk_equivalence": "crosswalk-equivalence.json",
+    "log": "logs/crypto-pr2148-traits-check.log"
+  },
+  "cli_builds": {
+    "curve_traits_ecbench_exit_code": 0,
+    "ic_exit_code": 0
+  },
+  "examples": {
+    "passed": 7,
+    "failed": 0,
+    "ignored": 0,
+    "additional_zero_test_examples_built": 2,
+    "log": "logs/crypto-pr2148-example-tests.log"
+  },
+  "integrity": {
+    "final_byte_checks": "final-integrity.txt",
+    "sources": "merged-inputs.sha256",
+    "generated_traits": "generated-traits.sha256",
+    "native_binaries": "native-binaries.sha256",
+    "protocol": "protocol-source.sha256",
+    "prior_conflict_stages": "prior-archive.sha256",
+    "unmerged_paths": 0
+  },
+  "conductor": {
+    "exit_code": 127,
+    "status": "unavailable; explicit parent merge authorization retained"
+  },
+  "boundaries": [
+    "117 standard ignored tests were not executed",
+    "No new cryptanalytic or performance claim",
+    "Historical frozen studies retain their captured older revisions",
+    "Root-owned EXECUTION.md and cloud_status.json edits excluded from merge staging",
+    "Root owns push and PR publication"
+  ]
+}

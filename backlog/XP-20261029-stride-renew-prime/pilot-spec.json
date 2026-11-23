@@ -1,0 +1,66 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "stride-renew feasibility pilot (not a claim; throwaway curve)",
+ "description": "Feasibility only: does ic.pipeline accept targets=stride/stride-renew on a prime curve with the mitm m=2 oracle. Throwaway curve seed, disclosed in the protocol.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 20,
+    "seed": 424242
+   }
+  ],
+  "targets_per_curve": 6,
+  "target_seed": 424243,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "walk",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=45",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1410236",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "stride-renew",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=45",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1410236",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "stride",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=45",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "1410236",
+     "targets": "stride"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 424244,
+  "isolation_required": "L0",
+  "timeout_seconds": 600
+ }
+}

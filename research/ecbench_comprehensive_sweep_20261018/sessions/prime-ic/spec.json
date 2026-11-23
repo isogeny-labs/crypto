@@ -1,0 +1,86 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "index calculus (prime-abscissa 32, MITM) against rho over 16..26-bit prime-order curves",
+  "description": "Method × size scaling study (prime curves, bits of p 16,18,20,22,24,26; 2 independent single-target workload(s) per curve, 3 interleaved round(s)). One curve per size so `ecbench bound fit` and `ecbench report` can fit cost against r. Counted group operations; a measurement, not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 16,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 18,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 22,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 24,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 26,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261002
+  },
+  "arms": [
+    {
+      "name": "rho-negation",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      }
+    },
+    {
+      "name": "rho-frozen_reference",
+      "role": "baseline",
+      "method": {
+        "id": "rho.frozen_reference",
+        "params": {}
+      }
+    },
+    {
+      "name": "ic-pipeline",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm-prime-batch:m=2"
+        }
+      }
+    },
+    {
+      "name": "rho-negation-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L2",
+    "timeout_seconds": 300
+  }
+}

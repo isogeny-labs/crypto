@@ -1,0 +1,43 @@
+{
+  "schema": "crypto.native-halftrace-ci-inspection/v1",
+  "observed_on": "2026-11-04",
+  "head_commit": "507829726fbc731543f4527348b55c5e479242c9",
+  "synthetic_merge_commit": "63b123edcbcfaa84d9c997723bc7c71617461017",
+  "review_p1": "unresolved_saved_matched_native_comparison",
+  "auto_merge_observation": "externally_reenabled_then_disabled_in_this_check",
+  "checks": [
+    {
+      "name": "size",
+      "conclusion": "success",
+      "job_id": 124634778097
+    },
+    {
+      "name": "gate",
+      "conclusion": "failure",
+      "job_id": 124634778278,
+      "detail": "removed benchmark 20261022-ic-generator-orbit lacks an exact archival disposition",
+      "attribution": "benchmarks/README.md is byte-identical to external merge's upstream parent; no benchmark-row edits made here"
+    },
+    {
+      "name": "artifacts",
+      "conclusion": "failure",
+      "job_id": 124634778325,
+      "detail": "isolab-experiment.yml lacks generator wiring for the metadata-only checkout",
+      "attribution": "new checkpoint checkout is attributable to this PR; narrow path/working-directory repair prepared"
+    },
+    {
+      "name": "clippy (crypto)",
+      "conclusion": "success",
+      "job_id": 124635260534
+    },
+    {
+      "name": "rustfmt (changed files)",
+      "conclusion": "success",
+      "job_id": 124635260523
+    }
+  ],
+  "scientific_jobs": 0,
+  "scientific_measurements": 0,
+  "checkpoint_retry": false,
+  "required_check_admission": false
+}

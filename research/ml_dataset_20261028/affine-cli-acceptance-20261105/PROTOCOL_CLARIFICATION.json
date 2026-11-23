@@ -1,0 +1,20 @@
+{
+  "status": "proposed clarification only; not a frozen protocol",
+  "metric_id": "cell_contract_pass",
+  "definition": "One if the actual sealed native outcome is a successful partial finite identity for the fixed request row0/pattern1, exact original configuration/plan/run/protocol bindings hold, and the pre-custody generate and verify commands plus their actual cumulative replay invocation receipts pass. A later export or custody failure does not erase this gate. Zero means this acceptance gate is not established. No degree or solver-completion inference.",
+  "source": "sealed manifest/config/attempt bindings; commands/generate and commands/verify receipts; replay/generate.json and replay/verify.json with exact pre-command policies; exported per-cell gate result and diagnostic in canonical observations; post-verify inventory plus original terminal digest",
+  "pipeline_metric_unchanged": true,
+  "adapter": {
+    "path": "export_actual.py",
+    "sha256": "4ef58315bd5aa7022716f937355cc2fef4e8eb93df7833e423234d8f0b8f2e15"
+  },
+  "output_placement": "separate output directory disjoint from sealed evidence root",
+  "requires_parent_protocol_composition": true,
+  "post_verify_inventory": {
+    "path": "post-verify-inventory.json",
+    "captured": "after successful native verify before later commands",
+    "terminal_anchor": "attempt-result.json post_verify_inventory_sha256",
+    "source": "driver source increment",
+    "native_generation": false
+  }
+}

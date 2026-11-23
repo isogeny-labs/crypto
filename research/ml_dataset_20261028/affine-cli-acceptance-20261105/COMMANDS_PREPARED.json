@@ -1,0 +1,30 @@
+{
+  "execution_allowed": false,
+  "status": "prepared commands only; no side effects executed",
+  "source_checkout": {
+    "path": "/home/ec2-user/affine-cli-acceptance-source-802444fa",
+    "commit": "802444fa9dc94194b2ae525d9cd3ad14fe1b9b52",
+    "clean_required": true
+  },
+  "acceptance": [
+    "/home/ec2-user/prime-sat-research-venv/bin/python",
+    "/var/tmp/affine-cli-custody-acceptance-20261105-v3/driver.py",
+    "--root",
+    "/var/tmp/affine-cli-custody-acceptance-20261105-v3",
+    "--ready",
+    "/var/tmp/affine-cli-custody-acceptance-20261105-v3/ready.json"
+  ],
+  "canonical_export": [
+    "/home/ec2-user/prime-sat-research-venv/bin/python",
+    "/var/tmp/affine-cli-custody-acceptance-20261105-v3/export_actual.py",
+    "--root",
+    "/var/tmp/affine-cli-custody-acceptance-20261105-v3",
+    "--output-dir",
+    "/var/tmp/affine-cli-custody-acceptance-20261105-v3-export-v1"
+  ],
+  "publication_repository": "isogeny-labs/crypto",
+  "publication_scope": "source_protocol_configuration_only",
+  "max_native_generate_invocations": 1,
+  "max_acceptance_attempts": 1,
+  "deadline_or_budget_reset": false
+}

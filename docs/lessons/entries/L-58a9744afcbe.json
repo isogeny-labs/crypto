@@ -1,0 +1,14 @@
+{
+  "action": "wrap the grep as { grep ... || true; } inside pipelines; a no-match exit 1 aborts the script silently",
+  "created": "2026-11-15T03:24:59Z",
+  "evidence": [
+    "tools/lean/lean-health.sh"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "lean-instance-gate"
+  ],
+  "trigger": "a shell script greps for an optional pattern under set -euo pipefail",
+  "why": ""
+}

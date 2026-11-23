@@ -24,7 +24,7 @@
 //! `cargo run --release --example dump_fold_vectors > gpu/ecc2k/vec_fold.h`.
 use crypto_lib::cryptanalysis::koblitz_fast::{FastCurve, FrobeniusCanon};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
-    build_subgroup_orbit_factor_base, FoldedRows, KoblitzCurve, PairSumTable,
+    build_subgroup_orbit_factor_base, FilterLayout, FoldedRows, KoblitzCurve, PairSumTable,
 };
 
 fn emit_u64(name: &str, values: &[u64]) {
@@ -107,7 +107,9 @@ fn main() {
     for (n, want) in cases {
         let kc = KoblitzCurve::new(0, n).expect("Koblitz curve");
         let fb = build_subgroup_orbit_factor_base(&kc, seed, want).expect("factor base");
-        let table = PairSumTable::build_folded_within(&kc, &fb, u128::MAX).expect("folded table");
+        let table =
+            PairSumTable::build_folded_within_layout(&kc, &fb, u128::MAX, FilterLayout::Low)
+                .expect("folded table");
         let storage = table.folded_storage().expect("a folded table");
         let curve = FastCurve::new(&kc.curve).expect("single-word curve");
         // The basis the table named its keys in.  The search for a

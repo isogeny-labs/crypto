@@ -1,0 +1,133 @@
+{
+  "main": "MillerRecursionAudit.miller_recursion_certificate",
+  "binding": "3be8f68d63b18ecd7bf18c28c045b53530c90948403c38146513bc3bcdb1d3bd",
+  "custom_imports": {
+    "FieldValuation": "research/miller_recursion_audit_20261115/lean/FieldValuation.lean",
+    "LineEvaluation": "research/miller_recursion_audit_20261115/lean/LineEvaluation.lean",
+    "FiniteFractionField": "research/miller_recursion_audit_20261115/lean/FiniteFractionField.lean",
+    "ChartAlgebra": "research/miller_recursion_audit_20261115/lean/ChartAlgebra.lean",
+    "LocalOrderAlgebra": "research/miller_recursion_audit_20261115/lean/LocalOrderAlgebra.lean",
+    "AllMiller": "research/miller_recursion_audit_20261115/lean/AllMiller.lean",
+    "FiniteValuation": "research/miller_recursion_audit_20261115/lean/FiniteValuation.lean",
+    "LocalComparison": "research/miller_recursion_audit_20261115/lean/LocalComparison.lean",
+    "MillerFunctions": "research/miller_recursion_audit_20261115/lean/MillerFunctions.lean",
+    "OriginEvaluation": "research/miller_recursion_audit_20261115/lean/OriginEvaluation.lean",
+    "InfinityMonic": "research/miller_recursion_audit_20261115/lean/InfinityMonic.lean",
+    "DVRIdentification": "research/miller_recursion_audit_20261115/lean/DVRIdentification.lean",
+    "PointLocalization": "research/miller_recursion_audit_20261115/lean/PointLocalization.lean",
+    "Normalization": "research/miller_recursion_audit_20261115/lean/Normalization.lean",
+    "RecursionCertificate": "research/miller_recursion_audit_20261115/lean/RecursionCertificate.lean",
+    "ValuationCertificate": "research/miller_recursion_audit_20261115/lean/ValuationCertificate.lean",
+    "MillerStep": "research/miller_recursion_audit_20261115/lean/MillerStep.lean",
+    "ChartCertificate": "research/miller_recursion_audit_20261115/lean/ChartCertificate.lean",
+    "ChartFractionField": "research/miller_recursion_audit_20261115/lean/ChartFractionField.lean",
+    "ChartAdicValuation": "research/miller_recursion_audit_20261115/lean/ChartAdicValuation.lean",
+    "ChartLocalization": "research/miller_recursion_audit_20261115/lean/ChartLocalization.lean",
+    "FinitePointCertificate": "research/miller_recursion_audit_20261115/lean/FinitePointCertificate.lean",
+    "LineIdeals": "research/miller_recursion_audit_20261115/lean/LineIdeals.lean",
+    "LocalOriginEvaluation": "research/miller_recursion_audit_20261115/lean/LocalOriginEvaluation.lean",
+    "FiniteDVR": "research/miller_recursion_audit_20261115/lean/FiniteDVR.lean",
+    "NormDegree": "research/miller_recursion_audit_20261115/lean/NormDegree.lean",
+    "PointDivisor": "research/miller_recursion_audit_20261115/lean/PointDivisor.lean",
+    "DiscreteValuation": "research/miller_recursion_audit_20261115/lean/DiscreteValuation.lean",
+    "GuardControls": "research/miller_recursion_audit_20261115/lean/GuardControls.lean",
+    "FiniteControls": "research/miller_recursion_audit_20261115/lean/FiniteControls.lean",
+    "RecursionControls": "research/miller_recursion_audit_20261115/lean/RecursionControls.lean",
+    "ResidueNormalization": "research/miller_recursion_audit_20261115/lean/ResidueNormalization.lean",
+    "LineMultiplicity": "research/miller_recursion_audit_20261115/lean/LineMultiplicity.lean"
+  },
+  "claims": [
+    {
+      "declaration": "MillerRecursionAudit.point_order_mul",
+      "conclusion": "Actual normalized local orders add on nonzero function products."
+    },
+    {
+      "declaration": "MillerRecursionAudit.HasPointDivisor.principal",
+      "conclusion": "Actual local orders give finite support and actual principal point divisor."
+    },
+    {
+      "declaration": "MillerRecursionAudit.step_has_point_divisor",
+      "conclusion": "Actual every-branch addition-step function has source point divisor and is nonzero."
+    },
+    {
+      "declaration": "MillerRecursionAudit.miller_has_point_divisor",
+      "conclusion": "Constructed actual all-n functions have exact source principal point divisor."
+    },
+    {
+      "declaration": "MillerRecursionAudit.miller_torsion_divisor",
+      "conclusion": "Actual n-torsion specializes to n(P)-n(O)."
+    },
+    {
+      "declaration": "MillerRecursionAudit.miller_infinity_monic",
+      "conclusion": "Every constructed actual function has source leading residue one at infinity."
+    },
+    {
+      "declaration": "MillerRecursionAudit.normalized_miller_addition",
+      "conclusion": "Any normalized valid i,j functions yield a normalized valid i+j function."
+    },
+    {
+      "declaration": "MillerRecursionAudit.miller_function_one",
+      "conclusion": "Actual constructed f1 equals1."
+    },
+    {
+      "declaration": "MillerRecursionAudit.two_point_double",
+      "conclusion": "Actual F5 nonzero control point doubles toO."
+    },
+    {
+      "declaration": "MillerRecursionAudit.unsafe_two_point_chord_divisor",
+      "conclusion": "Omitting the source vertical exception makes actual divisor assertion false."
+    }
+  ],
+  "prior_reused_claims": [
+    "PCC-20261115-bb5771",
+    "PCC-20261115-6a306d",
+    "PCC-20261115-c0e6db",
+    "PCC-20261115-357b60"
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 285,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 27,
+    "new_modules": 6,
+    "actual_all_n_nonzero_functions_and_point_divisors": true,
+    "actual_leading_residue_one_normalization": true,
+    "actual_normalized_addition_invariant": true,
+    "actual_vertical_exception_countercontrol": true,
+    "arbitrary_field_scope": "NonsingularKpoints; elliptic model overalgclosedK includesallgeometricpoints.",
+    "chosen_function_uniqueness_or_binary_algorithm_refinement": false,
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "general_all_function_finiteness_or_canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

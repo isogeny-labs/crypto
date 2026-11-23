@@ -1,0 +1,7 @@
+# Independent next-plan review
+
+The uniform k0 derivation is sound under its declared B!=0, target x z outside V, and supported4+1stratum premises. Write b=e1(H), p=h²+h=z+b!=0. Derivative equality gives N'=pX4+hsX²=p(X+a)^4, so a=s=0. The constant gives t=0. Substitution into e2 using the target curve equation gives h²B/z²!=0, contradicting the stratum. Equivalently, after a=s=t=0 the literal norm has nonzero X² coefficient h²B whereas its desired factorization has factorX4. This closes only the supported4+1stratum at k0 for all admitted h, not the other k/root patterns or original auxiliary branches. It is a proved but UNEXECUTED next branch; future tiny tests/admission remain required.
+
+The general fixed h,k two-candidate proposal follows from e2=0: r²+hr+K=0 with h!=0, and e3=0 gives s=(kr+k²)/h. The quadratic has zero or two field roots, and each must receive full literal norm and e5=b e4 plus e4 fourth-image support replay. Original recovery remains separate. Do not infer global h/k tractability.
+
+The degree-eight UNTRANSLATED proposal on curve A0B1 is also algebraically correct: k=r²+hr, h s=rk+k², t=k, c=k²/z and the X² residual yield Qh=zA²+zhAk+zh³k+zh4+h²k². Its degree is exactly8 with leading z!=0. Target-ordinate F(z)+G(z)y=0 and zero-G exceptions must be retained. Existing rank-one coverage overlaps this family, as the plan explicitly acknowledges; do not claim new coverage/novelty without that comparison. Both proposed branches remain unexecuted and source-identified all-root extraction needs separate admission.

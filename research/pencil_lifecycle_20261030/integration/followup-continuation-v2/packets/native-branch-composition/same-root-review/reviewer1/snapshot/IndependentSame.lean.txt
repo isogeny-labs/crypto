@@ -1,0 +1,73 @@
+import SameControls
+set_option autoImplicit false
+namespace IndependentSame
+open SignedGraphAlgebra GraphFind GraphUnion GraphForest GraphSameRoot
+def g : GraphFind.State ℚ 4 := ⟨fun i=>if i=2 ∨ i=3 then 1 else i,
+ fun i=>if i=2 then ⟨1,2,1⟩ else if i=3 then ⟨-1,5,-1⟩ else ident⟩
+def s : GraphUnion.State ℚ 4 := ⟨g,fun i=>if i=0 then some (0,0) else none⟩
+def val (i:Fin 4) : ℚ := if i=0 then 0 else if i=1 then 3 else if i=2 then 7 else 0
+def rank (i:Fin 4) : Nat := if i=2 ∨ i=3 then 1 else 0
+def pu : Potential ℚ := compose (g.pot 2) ident
+def t := compress g 2 1 pu
+def pv : Potential ℚ := compose (t.pot 3) ident
+def w := compress t 3 1 pv
+theorem valid_initial : Valid s val 2 := by
+ constructor
+ · intro i; fin_cases i <;> norm_num [s,g,val,ident,eval]
+ · intro i a b h
+   fin_cases i <;> simp [s] at h
+   rcases h with ⟨rfl,rfl⟩; norm_num [val]
+theorem forest_initial : Forest g rank := by intro i; fin_cases i <;> norm_num [g,rank]
+theorem first_find : Run g 2 t 1 pu := by
+ apply Run.step g g 2 1 ident
+ · decide
+ · exact Run.root g 1 (by decide)
+theorem second_find : Run t 3 w 1 pv := by
+ apply Run.step t t 3 1 ident
+ · decide
+ · exact Run.root t 1 (by decide)
+theorem negative_composition :
+ Forest (afterSame s w 1 pu pv (-1) 1 (-3) (-2)).1.graph rank ∧
+ Valid (afterSame s w 1 pu pv (-1) 1 (-3) (-2)).1 val 2 ∧
+ Safe (afterSame s w 1 pu pv (-1) 1 (-3) (-2)).2 2 := by
+ apply same_after_two_finds s t w 2 3 1 pu pv rank val (-1) 1 (-3) (-2) 2
+ · exact forest_initial
+ · exact valid_initial
+ · exact first_find
+ · exact second_find
+ · norm_num
+ · right; norm_num [pu,compose,g,ident]
+ · right; norm_num [pv,t,compress,g,compose,ident]
+ · norm_num [val]
+theorem opposite_composition :
+ Forest (afterSame s w 1 pu pv 1 1 3 2).1.graph rank ∧
+ Valid (afterSame s w 1 pu pv 1 1 3 2).1 val 2 ∧
+ Safe (afterSame s w 1 pu pv 1 1 3 2).2 2 := by
+ apply same_after_two_finds s t w 2 3 1 pu pv rank val 1 1 3 2 2
+ · exact forest_initial
+ · exact valid_initial
+ · exact first_find
+ · exact second_find
+ · norm_num
+ · left; norm_num [pu,compose,g,ident]
+ · right; norm_num [pv,t,compress,g,compose,ident]
+ · norm_num [val]
+theorem opposite_answer : (afterSame s w 1 pu pv 1 1 3 2).2=.answer 2 := by
+ norm_num [afterSame,sameRoot,GraphSameRoot.constraint,pu,pv,t,compress,g,compose,ident]
+theorem negative_new_anchor : (afterSame s w 1 pu pv (-1) 1 (-3) (-2)).1.fixed 1=some (3,0) := by
+ norm_num [afterSame,sameRoot,anchor,s,lifted,pu,pv,t,compress,g,compose,ident]
+theorem other_anchor_preserved : (afterSame s w 1 pu pv (-1) 1 (-3) (-2)).1.fixed 0=some (0,0) := by
+ norm_num [afterSame,sameRoot,anchor,s,lifted,pu,pv,t,compress,g,compose,ident]
+def fixed : GraphUnion.State ℚ 4 := ⟨g,fun i=>if i=1 then some (3,0) else s.fixed i⟩
+theorem repeated_consistent : (sameRoot fixed 1 (-1) (-1) (-6) 0).2=.none := by
+ norm_num [sameRoot,anchor,fixed,GraphSameRoot.constraint]
+theorem repeated_recovers : (sameRoot fixed 1 (-1) (-1) (-4) (-1)).2=.answer 2 := by
+ norm_num [sameRoot,anchor,fixed,GraphSameRoot.constraint]
+theorem contradictory_anchor : (sameRoot fixed 1 1 1 8 0).2=.inconsistent := by
+ norm_num [sameRoot,anchor,fixed,GraphSameRoot.constraint]
+theorem characteristic_two_excluded : ¬((2:ZMod 2)≠0) := by decide
+theorem nonsign_excluded : ¬((2:ℚ)=1 ∨ (2:ℚ)= -1) := by norm_num
+theorem no_assertion_from_actual_finds :
+ (afterSame s w 1 pu pv (-1) 1 (-3) (-2)).2≠.inconsistent :=
+ assertion_excluded _ 2 negative_composition.2.2
+end IndependentSame

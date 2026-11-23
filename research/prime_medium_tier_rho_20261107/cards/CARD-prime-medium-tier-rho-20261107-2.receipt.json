@@ -1,0 +1,537 @@
+{
+  "card_id": "CARD-prime-medium-tier-rho-20261107-2",
+  "card_path": "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.yaml",
+  "card_sha256": "2e60f41c0b2b212d451f9738242dfbba4b67b0da52860817faa0d968e1662eef",
+  "commands": [
+    {
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.57,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "checkpoint-gate",
+      "index": 1,
+      "outputs": {},
+      "seconds": 4.57,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2e05d8810447aa71c720ff79a05f9851176f03fdbc1d5ab38086db19a93aae1d",
+      "stdout_tail": [
+        "checkpoint: s3://setec-astronomy-artifacts/checkpoints/crypto/claude__serene-davinci-ujoi58/20261107T212116Z-a5051a58e222/ (0 unpushed commit(s), 0 spec file(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/prime_medium_tier_rho_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.144,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.144,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "704cca8f4253c98e5702b989bf8dceb05516a3bbe56c2374a173a4bf29e14c23",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/prime_medium_tier_rho_20261107/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "5643e3e78d4fe23a624a0834b266fba9d2da81adc091595d418ba35d6c664cd6",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/prime_medium_tier_rho_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.015,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j1",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.015,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "5751d7a1ce8c2315bcf041fcd4147fde0f364a6af39a205eedd54f6ee2030f02",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 107516164087790,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J2.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.013,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j2",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.013,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f634d0fb2f0a90b3584f99db9d828ec9e43dac609923c18df61e237a400630ee",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 26995759977218,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J3.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.013,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j3",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.013,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0cfa85dade0c9611e04546b7e34188e09ac6441cff61cb399a1ed4119c60c8eb",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 166668755239101,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J4.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.013,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j4",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.013,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0e4a2af29ef1776a9a5447981bb9840a6ba2229ca9b846263bb2643e747bb4f9",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 6472169882280,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J5.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.012,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j5",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.012,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "da89c151cf224094c6f515bf8964b6b3933e4d98a3993cd8e1ff7032eaccf1ef",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 54391810056847,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/validate-request",
+        "research/prime_medium_tier_rho_20261107/requests/final/J6.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.017,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "validate-j6",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.017,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "1bbf8f32f998ab9072ef09a581717df66afd93d0e912d58ecf5bdf7584c758bd",
+      "stdout_tail": [
+        "      \"measurement\": {",
+        "        \"rounds\": 6,",
+        "        \"warmup\": 1,",
+        "        \"order\": \"alternate\",",
+        "        \"seed\": 22552766203232,",
+        "        \"isolation_required\": \"L2\",",
+        "        \"timeout_seconds\": 300",
+        "      }",
+        "    },",
+        "    \"build\": {",
+        "      \"image_uri\": \"104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5\",",
+        "      \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\",",
+        "      \"ecbench_sha256\": \"a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9\"",
+        "    }",
+        "  },",
+        "  \"provenance\": {",
+        "    \"harness\": \"claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)\",",
+        "    \"source_revision\": \"dbd587a01aefba0634acc459ea30cfb9bbf49a09\"",
+        "  }",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5",
+        "--arg",
+        "s",
+        "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "--arg",
+        "b",
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        ".image == {image_uri:$i, source_revision:$s, ecbench_sha256:$b}",
+        "research/prime_medium_tier_rho_20261107/receipts/image-publication.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "receipt-identity",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "-n",
+        "--arg",
+        "i",
+        "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5",
+        "--arg",
+        "s",
+        "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+        "--arg",
+        "b",
+        "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9",
+        "[inputs | .job.build == {image_uri:$i, source_revision:$s, ecbench_sha256:$b} and .provenance.source_revision == $s] | length == 6 and all",
+        "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J2.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J3.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J4.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J5.request.json",
+        "research/prime_medium_tier_rho_20261107/requests/final/J6.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build-identity",
+      "index": 11,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "run",
+        "benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json",
+        "--",
+        "taskq/deploy/eks-karpenter/remote/launch-remote",
+        "research/prime_medium_tier_rho_20261107/requests/final/J1.request.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 255,
+          "seconds": 3.743,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 255,
+      "id": "launch-j1",
+      "index": 12,
+      "outputs": {
+        "research/prime_medium_tier_rho_20261107/receipts/J1/result.json": null
+      },
+      "seconds": 3.743,
+      "stderr_sha256": "963578b681b991f72d4fd0182800b37b8f73df367dfe6bb459752e6a03593935",
+      "stderr_tail": [
+        "You must specify a region. You can also configure your region by running \"aws configure\"."
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 23,
+  "commit": "a5051a58e222e4cfef323633d511544f1710e79b",
+  "dirty_after": [
+    "enchmarks/records/20261107T2115Z-prime-medium-rho-bound.json",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.build-identity.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.build-identity.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.checkpoint-gate.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.checkpoint-gate.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.launch-j1.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.launch-j1.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.protocol-check.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.protocol-check.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.protocol-frozen-hash.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.protocol-frozen-hash.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.receipt-identity.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.receipt-identity.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j1.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j1.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j2.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j2.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j3.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j3.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j4.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j4.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j5.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j5.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j6.stderr",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.validate-j6.stdout",
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.yaml",
+    "research/prime_medium_tier_rho_20261107/receipts/J1/build-start.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J1/request.json",
+    "research/prime_medium_tier_rho_20261107/receipts/J1/start-request.json"
+  ],
+  "dirty_before": [
+    "research/prime_medium_tier_rho_20261107/cards/CARD-prime-medium-tier-rho-20261107-2.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 12"
+}

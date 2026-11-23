@@ -1,0 +1,22 @@
+{
+ "created_at": "2026-11-05T22:56:19Z",
+ "id": "PCC-20261105-a3f112",
+ "kind": "statement",
+ "producer": {
+  "commit": "180d8ea25b00083894ba794f1c593c0850da4c9b",
+  "model": "",
+  "session": "codex-cubic-native-measurement-20261105"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/cubic_extension_transfer_20261025/native_end_to_end/measure/evidence/deadline-regression.log",
+    "sha256": "6ccc3714ec7e26c602e02afe5004a398de20d8cb2a284cc938cd3dd8042a3b30"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Native runner deadline handling; non-cryptographic lifecycle controls only, no benchmark performance admission.",
+ "statement": "The command watchdog now computes remaining time inside its own thread and rejects a reap beyond the original cold-process timeout even if the watchdog was delayed. The unsigned release lifecycle regression transcript reports success after this change."
+}

@@ -1,0 +1,131 @@
+module
+public import OrientationDegree
+public import OrientationRank
+public import OrientationFullChart
+import all OrientationDegree
+import all OrientationCompact
+import all OrientationHigher
+import all OrientationRank
+import all OrientationFullChart
+import all OrientationNode
+import all OrientationMoment
+import all OrientationContent
+public section
+noncomputable section
+namespace OrientationModeProfile
+open Polynomial Finset OrientationAnchor OrientationMoment OrientationNodePolynomial
+  OrientationNodeMoment OrientationGradedNode OrientationRefinement OrientationLeading
+  OrientationDiagonal OrientationJet OrientationResidue OrientationBivariate OrientationChartDegree
+
+def targetBit {u k : ℕ} (i : ℕ) (rb : MomentLabels u k) : Bool := rb.1.val.testBit i
+def sourceBit {u k : ℕ} (i : ℕ) (rb : MomentLabels u k) : Bool := !(rb.1.val.testBit i)
+def modeWeight {u k : ℕ} (w : ℤ) (rb : MomentLabels u k) : ℤ := w+rb.2.val
+
+theorem actual_left_support (a u i k : ℕ) (hiu : i<u) (x : Ports a) (rb : MomentLabels u k)
+    (hn : polyLeft a u k x rb ≠ 0) : x.val.testBit i=targetBit i rb := by
+  have he : rowResidue u x.val=rb.1.val := by
+    by_contra h
+    apply hn
+    simp only [polyLeft,momentLeft,h,ite_false,map_zero]
+  have hmod : x.val % 2^u=rb.1.val % 2^u := by
+    simpa only [rowResidue,Nat.mod_eq_of_lt rb.1.isLt] using he
+  exact matching_bits u x.val rb.1.val i hiu hmod
+
+theorem actual_weighted_left_support (a u i k : ℕ) (m : ℕ → ℕ) (hiu : i<u)
+    (x : Ports a) (rb : MomentLabels u k)
+    (hn : OrientationBivariate.weightedLeft a u i k m x rb ≠ 0) :
+    x.val.testBit i=targetBit i rb := by
+  have hL : polyLeft a u k x rb ≠ 0 := by
+    intro hz
+    apply hn
+    simp only [OrientationBivariate.weightedLeft,hz,mul_zero]
+  exact actual_left_support a u i k hiu x rb hL
+
+theorem actual_right_support (a u i k : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (rb : MomentLabels u k) (y : Ports a)
+    (hn : trimmedRight a u i k t m rb y ≠ 0) : (!(y.val.testBit i))=sourceBit i rb := by
+  have hc : rb.1.val.testBit i=y.val.testBit i := by
+    by_contra h
+    simp [trimmedRight,polyRight,h,trimZ] at hn
+  simp only [sourceBit,hc]
+
+theorem mode_sides_differ {u k : ℕ} (i : ℕ) (rb : MomentLabels u k) :
+    targetBit i rb ≠ sourceBit i rb := by
+  cases h : rb.1.val.testBit i <;> simp [targetBit,sourceBit,h]
+
+theorem mode_weight_nonnegative {u k : ℕ} (w : ℤ) (hw : 0≤w) (rb : MomentLabels u k) :
+    0 ≤ modeWeight w rb := by unfold modeWeight; omega
+
+theorem mode_weight_positive {u k : ℕ} (w : ℤ) (hw : 1≤w) (rb : MomentLabels u k) :
+    1 ≤ modeWeight w rb := by unfold modeWeight; omega
+
+theorem weight_fiber_count (u k : ℕ) (w z : ℤ) :
+    Fintype.card {rb : MomentLabels u k // modeWeight w rb=z}≤2^u := by
+  have hi : Function.Injective (fun rb : {rb : MomentLabels u k // modeWeight w rb=z} => rb.val.1) := by
+    intro r s he
+    apply Subtype.ext
+    apply Prod.ext he
+    apply Fin.ext
+    have hr := r.property
+    have hs := s.property
+    dsimp [modeWeight] at hr hs
+    omega
+  simpa only [Fintype.card_fin] using Fintype.card_le_of_injective _ hi
+
+theorem packet_weight_count {P : Type*} [Fintype P] (u k : ℕ) (w : P → ℤ) (z : ℤ) :
+    (∑ p : P,Fintype.card {rb : MomentLabels u k // modeWeight (w p) rb=z})≤
+      Fintype.card P*2^u := by
+  calc
+    _ ≤ ∑ _p : P,2^u := Finset.sum_le_sum (by intro p _; exact weight_fiber_count u k (w p) z)
+    _ = _ := by simp
+
+theorem packet_capacity_bound (P N L M u : ℕ) (hN : N≤P*2^u) (hP : P*L≤3*M) :
+    N*L≤(3*M)*2^u := by
+  calc
+    N*L≤(P*2^u)*L := Nat.mul_le_mul_right L hN
+    _ = (P*L)*2^u := by ring
+    _ ≤ (3*M)*2^u := Nat.mul_le_mul_right _ hP
+
+/-- Exact capacity comparison, not actual nonzero support or runtime. -/
+theorem declared_capacity_ratio (P u i : ℕ) (hi : i<u) :
+    P*2^u=(P*2^(i+1))*2^(u-i-1) := by
+  have he : (i+1)+(u-i-1)=u := by omega
+  rw [mul_assoc,← pow_add,he]
+
+theorem content_eval_one {k : ℤ} {P : ℚ[X]} (hP : Content k P) : VBound k (P.eval 1) := by
+  rw [eval_eq_sum,Polynomial.sum_def]
+  apply VBound.sum
+  intro n _
+  simpa only [one_pow,mul_one] using hP n
+
+/-- Negative-pole product family only; no integrality premises on proposed factors. -/
+theorem negative_pole_polynomial_width (a u i r : ℕ) (hu : u≤a) (m : ℕ → ℕ)
+    (hi : i<u) (hm : ∀ j<u,0 < m j)
+    (A : Matrix (Ports a) (Fin r) ℚ[X]) (B : Matrix (Fin r) (Ports a) ℚ[X])
+    (happrox : ∀ x y,Content 1
+      (OrientationFullChart.normalizedChartMatrix a u i m x y-(A*B) x y)) : 2^u≤r := by
+  let Ae : Matrix (Ports a) (Fin r) ℚ := fun x j => (A x j).eval 1
+  let Be : Matrix (Fin r) (Ports a) ℚ := fun j y => (B j y).eval 1
+  have he (x y : Ports a) : ((A*B) x y).eval 1=(Ae*Be) x y := by
+    simp only [Ae,Be]
+    rw [Matrix.mul_apply,Matrix.mul_apply,eval_finsetSum]
+    apply sum_congr rfl
+    intro j _
+    rw [eval_mul]
+  apply OrientationRank.actual_approximation_label_lower_bound a u i r hu m hi hm Ae Be
+  intro x y
+  have ha : VBound 1 ((OrientationFullChart.normalizedChartMatrix a u i m x y).eval 1-
+      (Ae*Be) x y) := by
+    simpa only [eval_sub,he] using content_eval_one (happrox x y)
+  have hb : VBound 1 ((OrientationFullChart.normalizedChartMatrix a u i m x y).eval 1-
+      normalizedCrossing a u i m x y) := by
+    simpa only [eval_sub,eval_mul,eval_C,eval_X,mul_one] using
+      content_eval_one (OrientationFullChart.actual_chart_to_first a u i m hi hu x y)
+  convert ha.add hb.neg using 1; ring
+
+end OrientationModeProfile
+
+#print axioms OrientationModeProfile.actual_weighted_left_support
+#print axioms OrientationModeProfile.actual_right_support
+#print axioms OrientationModeProfile.weight_fiber_count
+#print axioms OrientationModeProfile.negative_pole_polynomial_width

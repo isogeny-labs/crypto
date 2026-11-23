@@ -1,0 +1,81 @@
+{
+  "arms": {
+    "d18": {
+      "export_receipt": "/Volumes/SSD990-2/tmp/n83-a0-d18-public-fixture-20261114/fixture-01.json",
+      "export_receipt_sha256": "42cee346512a2ee539abd57dfb1f260327bb6f58d7b098ec0ff966d04bd22e76",
+      "export_source_commit": "cfa916b8d169962c9b906828afe0899136865d69",
+      "flags_tail": [
+        "--branchstr",
+        "vsids"
+      ],
+      "formula": "/Volumes/SSD990-2/tmp/n83-a0-d18-public-fixture-20261114/fixture-01.xcnf",
+      "formula_bytes": 50520592,
+      "formula_header": "p cnf 329808 2811402",
+      "formula_sha256": "e0e29d928ebedee1177eefb5aa1d88d247a5e28329bffa9b93da5aefac167fe9",
+      "positive_replay": "research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/ordered-cms-vsids-20261114/evidence/solver-positive/group-replay.json",
+      "positive_replay_sha256": "7078a61686932b78da88e7c7db9ed1e11d0ecb44871bd3756d3354bd8630d6a2",
+      "positive_replay_status": "PASS_ORIGINAL_GROUP_AND_ROW_REPLAY"
+    },
+    "k2048": {
+      "export_receipt": "/Volumes/SSD990-2/tmp/n83-a0-public-fixture-20261114/fixture-01.json",
+      "export_receipt_sha256": "12910c8ad562f73103a43b2f44d5828bdb4a4e3fea7d0a8f1096b1f1e48895b3",
+      "export_source_commit": "34cb2f0bfe30b0609a2f55a6d396ecfc60c53e55",
+      "flags_tail": [
+        "--maxmatrixcols",
+        "25000",
+        "--branchstr",
+        "vsids"
+      ],
+      "formula": "/Volumes/SSD990-2/tmp/n83-a0-public-fixture-20261114/fixture-01.xcnf",
+      "formula_bytes": 20511051,
+      "formula_header": "p cnf 111478 1145537",
+      "formula_sha256": "ecf8badc76aa4295b7d005f8c2f55359979e7d4f1210edf829ad6c68d1fb9bef",
+      "positive_replay": "research/koblitz_n83_factor_base_sweep_20261008/verification/k2048-m5-wide-xcnf-20261114/native-evidence/positive-02/replay.json",
+      "positive_replay_sha256": "4b18a7b7ebf5057189aee32bd26260c86ce58e089a2c7c5dbfc394b68406c388",
+      "positive_replay_status": "PASS_ORIGINAL_XCNF_GROUP_AND_ROW_REPLAY"
+    }
+  },
+  "conflict_cap": 1000000,
+  "corpus": "/Volumes/SSD990-2/tmp/n83-a0-k2048-m5-20261114/probe-corpus.json",
+  "corpus_sha256": "760ae5c2e88615152e2569653a0e0c0cf3b2f84691f2b0731247f9ee3759dcbd",
+  "date_utc": "2026-11-14",
+  "fixture": 1,
+  "outer_watchdog_seconds": 660,
+  "run_order": [
+    "d18",
+    "k2048"
+  ],
+  "run_root": "/Volumes/SSD990-2/tmp/n83-a0-matched-public-solver-20261114",
+  "runner_sha256": "4b2692d53e1da67943c3bedd1746ef78ecebac22a45b7f446e94d7994106a648",
+  "runner_source_commit": "7ab0f22043b0833c3b1a1bdcfac1b27bc6600d78",
+  "schema": "n83.a0-matched-public-solver-lock/v1",
+  "solver": "/opt/homebrew/bin/cryptominisat5",
+  "solver_flags_base": [
+    "--threads",
+    "1",
+    "--random",
+    "20261114",
+    "--maxtime",
+    "600",
+    "--maxconfl",
+    "1000000",
+    "--verb",
+    "1",
+    "--verbstat",
+    "1",
+    "--printsol",
+    "1",
+    "--maxnummatrices",
+    "32",
+    "--autodisablegauss",
+    "0",
+    "--gaussusefulcutoff",
+    "0"
+  ],
+  "solver_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "solver_time_cap_seconds": 600,
+  "target": [
+    "5809312440517013698248638",
+    "3568442427236746854022671"
+  ]
+}

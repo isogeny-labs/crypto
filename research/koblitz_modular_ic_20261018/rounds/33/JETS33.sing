@@ -1,0 +1,119 @@
+// Original r, its lambda/nu derivative ideals, both RR bases, pairs and Q loaded.
+ideal jetResidue33=std(ideal(z^9,T^2+T+1));
+proc inverseJet33(poly value){
+ ideal gens=jetResidue33,value;if(std(gens)[1]!=1){ERROR("JETS33_NONUNIT");}
+ matrix wit=lift(gens,ideal(1));poly answer=reduce(wit[nrows(wit),1],jetResidue33);
+ if(reduce(value*answer+1,jetResidue33)!=0){ERROR("JETS33_INVERSE_IDENTITY");}return(answer);
+}
+proc coeffJet33(poly value,int k){return(number((jet(value,k)+jet(value,k-1))/z^k));}
+proc componentJet33(ideal values,int index,int k){
+ int row=(index+1) div 2;poly value=values[row];
+ if(index%2==1){value=subst(value,T,0);}else{value=diff(value,T);}
+ return(coeffJet33(value,k));
+}
+proc tr5Jet33(number value){number ans=0;int i;for(i=0;i<5;i++){ans=ans+value;value=value^2;}if(ans!=0 && ans!=1){ERROR("JETS33_TRACE_NOT_F2");}return(ans);}
+proc conjugateJet33(poly value){poly ans=0;int i;for(i=1;i<=size(value);i++){ans=ans+leadcoef(value[i])^2*leadmonom(value[i]);}return(ans);}
+list Q33=paddingRepresentatives33[1];number b033=Q33[1];number c033=Q33[2];number l033=Q33[3];number n033=Q33[4];
+number A033=1+c033;number u033=(b033+c033)/c033^2;number v033=((b033/c033)*u033^3+1)/(u033+1);
+if(u033==0 || u033==1 || v033^2+v033!=u033^3+u033){ERROR("JETS33_BASE_POINT");}
+poly uJet33=u033+z;poly rhsJet33=reduce(uJet33^3+uJet33+u033^3+u033,jetResidue33);
+poly vJet33=v033+rhsJet33+rhsJet33^2+rhsJet33^4+rhsJet33^8;vJet33=reduce(vJet33,jetResidue33);
+if(reduce(vJet33^2+vJet33+uJet33^3+uJet33,jetResidue33)!=0){ERROR("JETS33_BASE_HENSEL");}
+poly rnJet33=reduce((uJet33+1)*vJet33+1,jetResidue33);poly cnJet33=reduce(rnJet33+uJet33^3,jetResidue33);
+poly bJet33=reduce(rnJet33*cnJet33*inverseJet33(uJet33^7),jetResidue33);
+poly cJet33=reduce(cnJet33*inverseJet33(uJet33^4),jetResidue33);poly AJet33=1+cJet33;
+map atQJet33=r,n033+b033*T,l033+A033*T,b033,c033;
+ideal lambdaDerValues33=reduce(atQJet33(originalLambdaDerivatives33),jetResidue33);
+ideal nuDerValues33=reduce(atQJet33(originalNuDerivatives33),jetResidue33);
+list jacL33;list jacN33;int iJ33;int jJ33;int kJ33;
+for(iJ33=1;iJ33<=5;iJ33++){
+ jacL33[2*iJ33-1]=number(subst(lambdaDerValues33[iJ33],T,0));jacL33[2*iJ33]=number(diff(lambdaDerValues33[iJ33],T));
+ jacN33[2*iJ33-1]=number(subst(nuDerValues33[iJ33],T,0));jacN33[2*iJ33]=number(diff(nuDerValues33[iJ33],T));
+}
+int pivotAJet33;int pivotBJet33;number detJet33;number trialDetJet33;
+for(iJ33=1;iJ33<=9;iJ33++){for(jJ33=iJ33+1;jJ33<=10;jJ33++){
+ trialDetJet33=number(jacL33[iJ33])*number(jacN33[jJ33])+number(jacL33[jJ33])*number(jacN33[iJ33]);
+ if(pivotAJet33==0 && trialDetJet33!=0){pivotAJet33=iJ33;pivotBJet33=jJ33;detJet33=trialDetJet33;}
+}}
+if(pivotAJet33==0){ERROR("JETS33_NO_ETALE_COORDINATE_PAIR");}
+poly lJet33=l033;poly nJet33=n033;ideal errorsJet33;number errAJet33;number errBJet33;number dlJet33;number dnJet33;
+for(kJ33=1;kJ33<=8;kJ33++){
+ map atStepJet33=r,nJet33+bJet33*T,lJet33+AJet33*T,bJet33,cJet33;
+ errorsJet33=reduce(atStepJet33(original),jetResidue33);
+ errAJet33=componentJet33(errorsJet33,pivotAJet33,kJ33);errBJet33=componentJet33(errorsJet33,pivotBJet33,kJ33);
+ dlJet33=(errAJet33*number(jacN33[pivotBJet33])+errBJet33*number(jacN33[pivotAJet33]))/detJet33;
+ dnJet33=(number(jacL33[pivotAJet33])*errBJet33+number(jacL33[pivotBJet33])*errAJet33)/detJet33;
+ lJet33=lJet33+dlJet33*z^kJ33;nJet33=nJet33+dnJet33*z^kJ33;
+}
+map atFullJet33=r,nJet33+bJet33*T,lJet33+AJet33*T,bJet33,cJet33;
+if(size(reduce(atFullJet33(original),jetResidue33))!=0){ERROR("JETS33_COMPLETE_SOURCE_RESIDUAL");}
+ideal sourceUnitsJet33=reduce(atFullJet33(registered),jetResidue33);ideal sourceInversesJet33;
+for(iJ33=1;iJ33<=8;iJ33++){sourceInversesJet33[iJ33]=inverseJet33(sourceUnitsJet33[iJ33]);}
+map corruptJet33=r,nJet33+z^8+bJet33*T,lJet33+AJet33*T,bJet33,cJet33;
+if(size(reduce(corruptJet33(original),jetResidue33))==0){ERROR("JETS33_CORRUPTED_JET_ACCEPTED");}
+poly bcj33=bJet33;poly ccj33=cJet33;poly lcj33=lJet33;poly ncj33=nJet33;
+ideal inverseConjugatesJet33=sourceInversesJet33;ideal unitsConjugatesJet33;
+for(kJ33=1;kJ33<=5;kJ33++){
+ bcj33=conjugateJet33(bcj33);ccj33=conjugateJet33(ccj33);lcj33=conjugateJet33(lcj33);ncj33=conjugateJet33(ncj33);
+ map atConjJet33=r,ncj33+bcj33*T,lcj33+(1+ccj33)*T,bcj33,ccj33;
+ if(size(reduce(atConjJet33(original),jetResidue33))!=0){ERROR("JETS33_CONJUGATE_SOURCE_RESIDUAL");}
+ unitsConjugatesJet33=reduce(atConjJet33(registered),jetResidue33);
+ for(iJ33=1;iJ33<=8;iJ33++){
+  inverseConjugatesJet33[iJ33]=conjugateJet33(inverseConjugatesJet33[iJ33]);
+  if(reduce(unitsConjugatesJet33[iJ33]*inverseConjugatesJet33[iJ33]+1,jetResidue33)!=0){ERROR("JETS33_CONJUGATE_SOURCE_UNIT");}
+ }
+}
+if(bcj33!=bJet33 || ccj33!=cJet33 || lcj33!=lJet33 || ncj33!=nJet33){ERROR("JETS33_CONJUGATE_CLOSURE");}
+map oldZeroJet33=rrBasis27,nJet33+bJet33*T,lJet33+AJet33*T,vJet33,uJet33;
+map oldOneJet33=rrBasis27,nJet33+bJet33*(T+1),lJet33+AJet33*(T+1),vJet33,uJet33;
+map descendedJet33=twistBasis33,nJet33,lJet33,vJet33,uJet33;
+ideal oldZeroValuesJet33=reduce(oldZeroJet33(basisNumerators),jetResidue33);ideal oldOneValuesJet33=reduce(oldOneJet33(basisNumerators),jetResidue33);
+ideal newValuesJet33=reduce(descendedJet33(twistNumerators33),jetResidue33);
+poly oldInverseJet33=inverseJet33(uJet33^16*(uJet33+1)^16);poly newInverseJet33=inverseJet33(uJet33^49*(uJet33+1)^16);
+ideal sectionJets33;poly comparisonJet33;
+for(iJ33=1;iJ33<=68;iJ33++){
+ sectionJets33[iJ33]=reduce(newValuesJet33[iJ33]*newInverseJet33,jetResidue33);
+ comparisonJet33=reduce(((T+1)*oldZeroValuesJet33[iJ33]+T*oldOneValuesJet33[iJ33])*oldInverseJet33,jetResidue33);
+ if(sectionJets33[iJ33]!=comparisonJet33 || sectionJets33[iJ33]!=subst(sectionJets33[iJ33],T,0)){ERROR("JETS33_DESCENT_COMPARISON");}
+}
+// Full rank trace detector for the coefficient field.
+list pivDetJet33;int rankDetJet33;poly detBitsJet33;int ppJet33;
+for(iJ33=1;iJ33<=5;iJ33++){pivDetJet33[iJ33]=poly(0);}
+for(iJ33=0;iJ33<5;iJ33++){
+ detBitsJet33=0;for(jJ33=0;jJ33<5;jJ33++){if(tr5Jet33(a^(iJ33+jJ33))==1){detBitsJet33=detBitsJet33+w^jJ33;}}
+ while(detBitsJet33!=0){ppJet33=deg(detBitsJet33)+1;if(pivDetJet33[ppJet33]==0){pivDetJet33[ppJet33]=detBitsJet33;rankDetJet33++;break;}detBitsJet33=detBitsJet33+pivDetJet33[ppJet33];}
+}
+if(rankDetJet33!=5){ERROR("JETS33_TRACE_DETECTOR_DEGENERATE");}
+ideal quadraticJets33;ideal paddingJetBits33;list pivJet33;list coordJet33;list kernelJet33;int rankJet33;
+poly valJet33;poly bitsJet33;poly coJet33;poly rebuiltJet33;poly seriesRebuiltJet33;number coeffValueJet33;
+for(iJ33=1;iJ33<=45;iJ33++){pivJet33[iJ33]=poly(0);coordJet33[iJ33]=poly(0);}
+for(iJ33=1;iJ33<=196;iJ33++){
+ valJet33=reduce(sectionJets33[sectionPairs2[iJ33,1]]*sectionJets33[sectionPairs2[iJ33,2]],jetResidue33);quadraticJets33[iJ33]=valJet33;
+ bitsJet33=0;
+ for(kJ33=0;kJ33<9;kJ33++){
+  if(kJ33==0){coeffValueJet33=number(subst(valJet33,z,0));}else{coeffValueJet33=coeffJet33(valJet33,kJ33);}
+  for(jJ33=0;jJ33<5;jJ33++){if(tr5Jet33(coeffValueJet33*a^jJ33)==1){bitsJet33=bitsJet33+w^(5*kJ33+jJ33);}}
+ }
+ paddingJetBits33[iJ33]=bitsJet33;coJet33=w^(iJ33-1);
+ while(bitsJet33!=0){ppJet33=deg(bitsJet33)+1;if(pivJet33[ppJet33]==0){pivJet33[ppJet33]=bitsJet33;coordJet33[ppJet33]=coJet33;rankJet33++;break;}bitsJet33=bitsJet33+pivJet33[ppJet33];coJet33=coJet33+coordJet33[ppJet33];}
+ if(bitsJet33==0){if(deg(coJet33)!=iJ33-1){ERROR("JETS33_KERNEL_LEADING_LABEL");}kernelJet33[size(kernelJet33)+1]=coJet33;}
+}
+if(rankJet33!=45 || size(kernelJet33)!=151){ERROR("JETS33_EVALUATION_RANK");}
+for(iJ33=1;iJ33<=151;iJ33++){
+ rebuiltJet33=0;seriesRebuiltJet33=0;coJet33=kernelJet33[iJ33];
+ for(jJ33=1;jJ33<=size(coJet33);jJ33++){if(leadcoef(coJet33[jJ33])!=1){ERROR("JETS33_NONBINARY_KERNEL");}ppJet33=deg(coJet33[jJ33])+1;rebuiltJet33=rebuiltJet33+paddingJetBits33[ppJet33];seriesRebuiltJet33=seriesRebuiltJet33+quadraticJets33[ppJet33];}
+ if(rebuiltJet33!=0 || reduce(seriesRebuiltJet33,jetResidue33)!=0){ERROR("JETS33_KERNEL_RECOMBINATION");}
+}
+for(ppJet33=1;ppJet33<=45;ppJet33++){
+ if(pivJet33[ppJet33]!=0){rebuiltJet33=0;coJet33=coordJet33[ppJet33];for(jJ33=1;jJ33<=size(coJet33);jJ33++){rebuiltJet33=rebuiltJet33+paddingJetBits33[deg(coJet33[jJ33])+1];}if(rebuiltJet33!=pivJet33[ppJet33]){ERROR("JETS33_PIVOT_RECOMBINATION");}}
+}
+link jetOut33="ASCII:w padding-jets.sing";open(jetOut33);
+write(jetOut33,"poly paddingUJet33="+string(uJet33)+";poly paddingVJet33="+string(vJet33)+";poly paddingBJet33="+string(bJet33)+";poly paddingCJet33="+string(cJet33)+";poly paddingLambdaJet33="+string(lJet33)+";poly paddingNuJet33="+string(nJet33)+";");
+write(jetOut33,"ideal sourceUnitJetValues33;ideal sourceUnitJetInverses33;ideal completeSectionJets33;ideal completeQuadraticJets33;ideal paddingJetBits33;ideal paddingJetKernel33;");
+for(iJ33=1;iJ33<=8;iJ33++){write(jetOut33,"sourceUnitJetValues33["+string(iJ33)+"]="+string(sourceUnitsJet33[iJ33])+";sourceUnitJetInverses33["+string(iJ33)+"]="+string(sourceInversesJet33[iJ33])+";");}
+for(iJ33=1;iJ33<=68;iJ33++){write(jetOut33,"completeSectionJets33["+string(iJ33)+"]="+string(sectionJets33[iJ33])+";");}
+for(iJ33=1;iJ33<=196;iJ33++){write(jetOut33,"completeQuadraticJets33["+string(iJ33)+"]="+string(quadraticJets33[iJ33])+";");write(jetOut33,"paddingJetBits33["+string(iJ33)+"]="+string(paddingJetBits33[iJ33])+";");}
+for(iJ33=1;iJ33<=151;iJ33++){write(jetOut33,"paddingJetKernel33["+string(iJ33)+"]="+string(kernelJet33[iJ33])+";");}
+close(jetOut33);
+print("JETS33_RESULT precision=9 residue_degree=5 jet_constraints=45 rank=45 kernel=151 source_residuals=all units=8 conjugates=5 descent_functions=68");
+print("JETS33_ALL_CHECKS_PASS");quit;

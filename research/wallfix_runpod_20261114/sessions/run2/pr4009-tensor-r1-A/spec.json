@@ -1,0 +1,55 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "wallfix runpod 2026-11-14: tensor gate (identity + wall), draft derived from gate-tensor.json",
+  "description": "Same workloads, ic-tensor arm and target_seed as docs/perf/20261110-wall-only-rust-fixes/gate-tensor.json; measurement block from taskq/deploy/eks-karpenter/l2-validation.json with isolation_required lowered to L0 (RunPod shared CPU pod, no isolation) (timeout_seconds 120 from the gate); rho.negation reference arm and rho-neg-aa control arm added because the EKS launcher requires both. Not a performance claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 12,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 14,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 20261110
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-tensor",
+      "role": "candidate",
+      "method": {
+        "id": "ic.tensor_contraction_v1",
+        "params": {
+          "m": "2"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}

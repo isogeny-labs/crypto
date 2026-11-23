@@ -1,0 +1,72 @@
+{
+  "schema": "formal.source-fidelity-review/v1",
+  "task": "T-1431",
+  "reviewer": "/root/witness_independent_review_v2",
+  "independent_of_producer": true,
+  "blind_rederivation": false,
+  "machine_status": "passed",
+  "outcome": "validated_scoped",
+  "claims": [
+    {
+      "id": "coefficient-fiber",
+      "declarations": [
+        "square_cases",
+        "same_slope",
+        "neg_valid",
+        "shared_square_fiber",
+        "two_candidate_containment"
+      ],
+      "proved": "Shared remainder equations and b1 square give at most two opposite coefficient pairs, including b1=0.",
+      "assumptions": "Field K; theorem uses2!=0; both valid coefficient equations; same squared slope. Valid is remainder-equation predicate, not full native divisor parser.",
+      "fidelity": "faithful_scoped"
+    },
+    {
+      "id": "quintic-extraction",
+      "declarations": [
+        "extraction_residual",
+        "quintic_extraction"
+      ],
+      "proved": "Literal projector/extractor composition gives b1^2+f6*(a1^2-a0)^2; f6=0 removes residual.",
+      "assumptions": "Field arithmetic. Native quintic curve construction source inspected; no machine refinement of all native arithmetic/inputs.",
+      "fidelity": "faithful_scoped"
+    },
+    {
+      "id": "ordinary-chart",
+      "declarations": [
+        "project_eq_linear",
+        "solve_normalize",
+        "ordinary_source_extract"
+      ],
+      "proved": "C1 row layout equals explicit linear action; given injectivity, correct scaled solve equation, nonzero scale and q0=1, normalization recovers x and squared slope.",
+      "assumptions": "Injectivity, solve equation and nonzero scale are premises. Native solve4 and caller/chart admissibility not proved.",
+      "fidelity": "faithful_scoped"
+    },
+    {
+      "id": "neighbour-orientation",
+      "declarations": [
+        "neighbour_orients",
+        "coefficient_neighbour_orientation"
+      ],
+      "proved": "An abstract additive-group sign pair is uniquely oriented by neighbour equality when anchor doubles nonzero and neighbour fiber is plus/minus.",
+      "assumptions": "AddCommGroup carrier, representation respects negation, actual neighbour fiber disjunction, g+g!=0. Does not identify concrete Jacobian/projector or scalar labels.",
+      "fidelity": "faithful_scoped"
+    }
+  ],
+  "fresh_named_readbacks": 12,
+  "reviewer_controls": 5,
+  "expected_false_theorem_exit": 1,
+  "checker_rejection_controls": 3,
+  "allowed_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "first_attempt": "infrastructure_error: thread creation under4GiB address-space limit; source untouched",
+  "accepted_attempt": "replay2;8GiB address-space,3.5GiB Lean heap,16MiB thread stack,oneworker,300s outer",
+  "input_hashes_unchanged": true,
+  "upstream_trust": "Existing pinned Lean4.34.1/shared Mathlib compiled caches; copied local source/olean imports hashed. No independent binary/kernel rechecker.",
+  "native_solve4_verified": false,
+  "geometric_transition_verified": false,
+  "scientific_execution": false,
+  "knowledge_promotion": "not requested; technical review only, no official hypothesis transition"
+}

@@ -1,0 +1,549 @@
+warning: associated function `read` is never used
+  --> src/bin/../prime_cubic_bounded.rs:17:12
+   |
+12 | impl Limits {
+   | ----------- associated function in this implementation
+...
+17 |     pub fn read(v: &Value) -> Self {
+   |            ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `n83-candidate-pdp` (bin "prime_cubic" test) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 1.23s
+     Running unittests src/bin/binary_pair.rs (research/n83_candidate_pdp_20261028/target/release/deps/binary_pair-d73a1e179c8f6807)
+
+running 5 tests
+test tests::expected_source_constants_and_fields ... ok
+test tests::natural_and_planted_suffix ... ok
+test tests::xor_witness_and_mutation ... ok
+test tests::pair_slot_hilbert_upper ... ok
+test tests::all_explicit_controls ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/chain_exact.rs (research/n83_candidate_pdp_20261028/target/release/deps/chain_exact-33c408668bb08a8d)
+
+running 5 tests
+test tests::hypothesis_boundaries ... ok
+test tests::all_small_embedding_coefficients ... ok
+test tests::parser_mutations ... ok
+test tests::reject_bad_windows_and_inverse ... ok
+test tests::mixed_hilbert_controls ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+     Running unittests src/bin/chain_upper.rs (research/n83_candidate_pdp_20261028/target/release/deps/chain_upper-ae182b14b668770f)
+
+running 5 tests
+test tests::parser_rejects_bad_coefficient_and_duplicate ... ok
+test tests::suffix_rejection ... ok
+test tests::transforms_and_mutation ... ok
+test tests::disjoint_chain_selection ... ok
+test tests::explicit_controls ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/compare.rs (research/n83_candidate_pdp_20261028/target/release/deps/compare-1dbef4c72cb211a4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/degree3.rs (research/n83_candidate_pdp_20261028/target/release/deps/degree3-e3c8a28a8206af75)
+
+running 4 tests
+test tests::field_equations_required ... ok
+test tests::product_degree_guard ... ok
+test tests::positive_negative_and_tamper ... ok
+test tests::columns ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/degree3_continue.rs (research/n83_candidate_pdp_20261028/target/release/deps/degree3_continue-1e8eecb099ee0ae3)
+
+running 10 tests
+test tests::duplicate_equation_ids_rejected ... ok
+test tests::field_equations_required ... ok
+test tests::product_degree_guard ... ok
+test tests::capped_trace_and_false_completion_rejected ... ok
+test tests::positive_negative_and_tamper ... ok
+test continuation_tests::suffix_caps_replay_exact_first_boundary ... ok
+test continuation_tests::resumed_traces_equal_uninterrupted_and_keep_parent ... ok
+test continuation_tests::wrong_parent_offset_operations_and_extra_bytes_rejected ... ok
+test tests::products_cross_word_boundary ... ok
+test tests::columns ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running unittests src/bin/degree3_m3.rs (research/n83_candidate_pdp_20261028/target/release/deps/degree3_m3-499c2a063e46e1f8)
+
+running 7 tests
+test tests::duplicate_equation_ids_rejected ... ok
+test tests::field_equations_required ... ok
+test tests::product_degree_guard ... ok
+test tests::capped_trace_and_false_completion_rejected ... ok
+test tests::positive_negative_and_tamper ... ok
+test tests::products_cross_word_boundary ... ok
+test tests::columns ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running unittests src/bin/degree4_propagation.rs (research/n83_candidate_pdp_20261028/target/release/deps/degree4_propagation-5d6b6e1410b8f60e)
+
+running 19 tests
+test degree4_tests::field_multiplication_independent_long_division ... ok
+test degree4_tests::degree_and_trace_guards ... ok
+test degree4_tests::serialized_witness_tampering_rejected ... ok
+test tests::duplicate_equation_ids_rejected ... ok
+test tests::field_equations_required ... ok
+test tests::product_degree_guard ... ok
+test propagation_tests::witness_header_tail_and_field_guards ... ok
+test propagation_tests::dependent_seeds_and_unit_certificate ... ok
+test degree4_tests::strict_and_null_against_independent_spaces ... ok
+test tests::capped_trace_and_false_completion_rejected ... ok
+test propagation_tests::global_upper_positive_and_restricted_negative ... ok
+test tests::positive_negative_and_tamper ... ok
+test propagation_tests::caps_replay_and_affine_certificate_with_pending_queue ... ok
+test propagation_tests::altered_row_operation_pending_and_upper_rejected ... ok
+test continuation_tests::suffix_caps_replay_exact_first_boundary ... ok
+test continuation_tests::wrong_parent_offset_operations_and_extra_bytes_rejected ... ok
+test continuation_tests::resumed_traces_equal_uninterrupted_and_keep_parent ... ok
+test tests::products_cross_word_boundary ... ok
+test tests::columns ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running unittests src/bin/degree4_quartic.rs (research/n83_candidate_pdp_20261028/target/release/deps/degree4_quartic-6aa9d841cc495814)
+
+running 28 tests
+test degree4_tests::degree_and_trace_guards ... ok
+test degree4_tests::field_multiplication_independent_long_division ... ok
+test degree4_tests::serialized_witness_tampering_rejected ... ok
+test quartic_tests::queue_coverage_and_urgent_priority ... ok
+test propagation_tests::witness_header_tail_and_field_guards ... ok
+test propagation_tests::dependent_seeds_and_unit_certificate ... ok
+test quartic_tests::unit_and_affine_upper_do_not_require_queue_exhaustion ... ok
+test degree4_tests::strict_and_null_against_independent_spaces ... ok
+test quartic_tests::fill_in_weight_cap_retains_exact_reducer_prefix ... ok
+test quartic_tests::all_caps_preserve_pending_and_blocked_rows ... ok
+test tests::duplicate_equation_ids_rejected ... ok
+test tests::field_equations_required ... ok
+test quartic_tests::independent_controls ... ok
+test tests::product_degree_guard ... ok
+test propagation_tests::global_upper_positive_and_restricted_negative ... ok
+test tests::capped_trace_and_false_completion_rejected ... ok
+test propagation_tests::caps_replay_and_affine_certificate_with_pending_queue ... ok
+test propagation_tests::altered_row_operation_pending_and_upper_rejected ... ok
+test tests::positive_negative_and_tamper ... ok
+test continuation_tests::suffix_caps_replay_exact_first_boundary ... ok
+test continuation_tests::wrong_parent_offset_operations_and_extra_bytes_rejected ... ok
+test continuation_tests::resumed_traces_equal_uninterrupted_and_keep_parent ... ok
+test quartic_tests::replay_rejects_mutations_truncation_and_tails ... ok
+test quartic_tests::sparse_xor_matches_dense ... ok
+test quartic_tests::deterministic_small_systems_match_independent_dense_closure ... ok
+test tests::products_cross_word_boundary ... ok
+test quartic_tests::indices_and_boolean_products_match_explicit_subsets ... ok
+test tests::columns ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running unittests src/bin/degree4_witness.rs (research/n83_candidate_pdp_20261028/target/release/deps/degree4_witness-033f408c829fddc1)
+
+running 14 tests
+test degree4_tests::degree_and_trace_guards ... ok
+test degree4_tests::field_multiplication_independent_long_division ... ok
+test tests::duplicate_equation_ids_rejected ... ok
+test degree4_tests::serialized_witness_tampering_rejected ... ok
+test tests::field_equations_required ... ok
+test tests::product_degree_guard ... ok
+test tests::capped_trace_and_false_completion_rejected ... ok
+test degree4_tests::strict_and_null_against_independent_spaces ... ok
+test tests::positive_negative_and_tamper ... ok
+test continuation_tests::suffix_caps_replay_exact_first_boundary ... ok
+test continuation_tests::wrong_parent_offset_operations_and_extra_bytes_rejected ... ok
+test continuation_tests::resumed_traces_equal_uninterrupted_and_keep_parent ... ok
+test tests::products_cross_word_boundary ... ok
+test tests::columns ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running unittests src/bin/factor_base.rs (research/n83_candidate_pdp_20261028/target/release/deps/factor_base-31bbc5fb982177f5)
+
+running 5 tests
+test tests::candidate_map_and_prime_rhs ... ok
+test tests::positive_and_negative_controls ... ok
+test field::tests::arithmetic_reference_and_boundaries ... ok
+test tests::shard_boundaries_and_encoding ... ok
+test field::tests::all_sqrt_classes_and_binary_linear_map ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/bin/fall.rs (research/n83_candidate_pdp_20261028/target/release/deps/fall-55333d58de564a77)
+
+running 8 tests
+test tests::malformed_field_equation_rejected ... ok
+test tests::altered_witness_rejected ... ok
+test tests::controls ... ok
+test tests::parser_cancels_duplicate_monomials ... ok
+test tests::product_reduces_boolean_squares ... ok
+test tests::raw_linear_equations_fail_closed ... ok
+test tests::prime_minors_toy_all_arities ... ok
+test tests::prime_spike40_encoding_and_tamper ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/hilbert.rs (research/n83_candidate_pdp_20261028/target/release/deps/hilbert-4d00baeb0d973b13)
+
+running 6 tests
+test tests::characteristic_two_product_zero ... ok
+test tests::modular_overflow_control ... ok
+test tests::combinatorial_controls ... ok
+test tests::primality_certificate_valid ... ok
+test tests::explicit_matrix_controls ... ok
+test tests::rejects_incomplete_presentation ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/hilbert_v2.rs (research/n83_candidate_pdp_20261028/target/release/deps/hilbert_v2-0299d15a6b4bb004)
+
+running 8 tests
+test suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test tests::characteristic_two_product_zero ... ok
+test tests::combinatorial_controls ... ok
+test tests::modular_overflow_control ... ok
+test tests::primality_certificate_valid ... ok
+test tests::explicit_matrix_controls ... ok
+test tests::rejects_incomplete_presentation ... ok
+test suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/pdp.rs (research/n83_candidate_pdp_20261028/target/release/deps/pdp-fed3888b47590eb1)
+
+running 7 tests
+test candidate_tests::remote_shard_index_binds_immutable_object_and_digest ... ok
+test candidate_tests::coordinate_map_and_lift_lookup ... ok
+test tests::saved_base_lookup_checks_both_coordinates ... ok
+test tests::binary_arithmetic ... ok
+test tests::symbolic_evaluation ... ok
+test tests::proth_and_prime_arithmetic ... ok
+test tests::curves_and_semaev ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/bin/prime_centered_witness.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_centered_witness-e21e948448227bd4)
+
+running 19 tests
+test binding::source_donor::donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test binding::source_donor::donor::tests::combinatorial_controls ... ok
+test binding::source_donor::donor::tests::modular_overflow_control ... ok
+test binding::source_donor::donor::tests::characteristic_two_product_zero ... ok
+test tests::codec_rejects_noncanonical_bytes ... ok
+test tests::multiplication_matches_general_quotient ... ok
+test tests::invalid_parameters_rejected ... ok
+test tests::projection_matches_literal_on_complete_small_basis ... ok
+test binding::source_donor::donor::tests::primality_certificate_valid ... ok
+test tests::all_low_degree_rows_annihilated ... ok
+test tests::n83_modulus_has_exact_lucas_certificate ... ok
+test binding::source_donor::donor::tests::explicit_matrix_controls ... ok
+test binding::source_donor::donor::tests::rejects_incomplete_presentation ... ok
+test binding::source_donor::donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test binding::tests::changed_parent_or_case_rejected ... ok
+test binding::tests::wrapper_mutations_rejected ... ok
+test binding::tests::retained_and_synthetic_binding ... ok
+test tests::fixture_replay_rejects_coefficient_mutation ... ok
+test tests::exhaustive_pointwise_terminal_identity_and_degrees ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.79s
+
+     Running unittests src/bin/prime_cubic.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_cubic-28ed82a160b2996c)
+
+running 28 tests
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::combinatorial_controls ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::modular_overflow_control ... ok
+test source_donor::donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test bounded::tests::interrupted_and_extra_journals_rejected ... ok
+test source_donor::donor::tests::combinatorial_controls ... ok
+test source_donor::donor::tests::modular_overflow_control ... ok
+test source_donor::donor::tests::characteristic_two_product_zero ... ok
+test tests::multiplication_rules ... ok
+test tests::five_selector_quadratic_annihilator ... ok
+test donor::tests::primality_certificate_valid ... ok
+test source_donor::donor::tests::primality_certificate_valid ... ok
+test tests::three_selector_annihilator ... ok
+test tests::seven_selector_cubic_annihilator ... ok
+test tests::independent_terminal_positive_control ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test source_donor::donor::tests::explicit_matrix_controls ... ok
+test source_donor::donor::tests::rejects_incomplete_presentation ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test tests::covering_all_selectors ... ok
+test source_donor::donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test bounded::tests::every_cap_is_retained_and_replayed ... ok
+test tests::small_dense_rank_agrees ... ok
+test bounded::tests::complete_matches_unbounded_and_replays ... ok
+test tests::cubic_domain_and_triple_coverage ... ok
+test tests::independent_six_term_expansion ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/bin/prime_filtered_small.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_filtered_small-fe9fffb575982372)
+
+running 3 tests
+test tests::selector_normalization_and_unrestricted_intermediate ... ok
+test tests::closure_requires_multiplying_a_new_degree_fall ... ok
+test tests::chain_witness_full_filtered_closure ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running unittests src/bin/prime_first_fall.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_first_fall-2e9049185143aff9)
+
+running 12 tests
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::combinatorial_controls ... ok
+test donor::tests::modular_overflow_control ... ok
+test tests::encoding_roundtrip_and_corruption ... ok
+test tests::explicit_h_annihilator ... ok
+test tests::reject_zero_weight_and_small_characteristic ... ok
+test donor::tests::primality_certificate_valid ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test tests::expanded_and_dense_controls ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running unittests src/bin/prime_lefschetz_native.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_lefschetz_native-610e69be5216464f)
+
+running 14 tests
+test donor::tests::combinatorial_controls ... ok
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::modular_overflow_control ... ok
+test tests::block_and_boundary ... ok
+test tests::binding_mutations ... ok
+test tests::retain_arithmetic_controls ... ok
+test tests::scope_duplicates_and_missing ... ok
+test tests::leading_positive_and_ties ... ok
+test donor::tests::primality_certificate_valid ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test tests::explicit_witness_and_mutation ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/bin/prime_linear.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_linear-86434e35fa4ed4e4)
+
+running 21 tests
+test donor::tests::combinatorial_controls ... ok
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::modular_overflow_control ... ok
+test source_donor::donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test source_donor::donor::tests::characteristic_two_product_zero ... ok
+test source_donor::donor::tests::combinatorial_controls ... ok
+test source_donor::donor::tests::modular_overflow_control ... ok
+test tests::covering_all_selectors ... ok
+test tests::multiplication_rules ... ok
+test tests::three_selector_annihilator ... ok
+test donor::tests::primality_certificate_valid ... ok
+test source_donor::donor::tests::primality_certificate_valid ... ok
+test tests::independent_six_term_expansion ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test source_donor::donor::tests::explicit_matrix_controls ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test source_donor::donor::tests::rejects_incomplete_presentation ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test source_donor::donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test tests::small_dense_rank_agrees ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/bin/prime_quadratic.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_quadratic-b99058b9b5a273b2)
+
+running 26 tests
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::combinatorial_controls ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::modular_overflow_control ... ok
+test source_donor::donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test source_donor::donor::tests::characteristic_two_product_zero ... ok
+test source_donor::donor::tests::combinatorial_controls ... ok
+test bounded::tests::interrupted_and_extra_journals_rejected ... ok
+test source_donor::donor::tests::modular_overflow_control ... ok
+test tests::multiplication_rules ... ok
+test tests::covering_all_selectors ... ok
+test donor::tests::primality_certificate_valid ... ok
+test tests::five_selector_quadratic_annihilator ... ok
+test source_donor::donor::tests::primality_certificate_valid ... ok
+test tests::quadratic_domain_and_pair_coverage ... ok
+test tests::three_selector_annihilator ... ok
+test source_donor::donor::tests::explicit_matrix_controls ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test bounded::tests::every_cap_is_retained_and_replayed ... ok
+test source_donor::donor::tests::rejects_incomplete_presentation ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test tests::independent_six_term_expansion ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test source_donor::donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test bounded::tests::complete_matches_unbounded_and_replays ... ok
+test tests::small_dense_rank_agrees ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.14s
+
+     Running unittests src/bin/prime_radix_census.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_radix_census-ffba91496429379f)
+
+running 15 tests
+test controls::tests::rejects_oversized_total - should panic ... ok
+test controls::tests::rejects_oversized_part - should panic ... ok
+test controls::tests::rejects_zero_part - should panic ... ok
+test controls::tests::rejects_empty_parts - should panic ... ok
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::combinatorial_controls ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::modular_overflow_control ... ok
+test tests::bounded_path_has_no_exact_claim ... ok
+test tests::small_one_digit_quotient ... ok
+test tests::small_two_boolean_digits ... ok
+test donor::tests::primality_certificate_valid ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/prime_radix_controls.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_radix_controls-2371c32a2ea720d6)
+
+running 4 tests
+test tests::rejects_oversized_part - should panic ... ok
+test tests::rejects_empty_parts - should panic ... ok
+test tests::rejects_oversized_total - should panic ... ok
+test tests::rejects_zero_part - should panic ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/prime_source_audit.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_source_audit-93d07a5d3e312215)
+
+running 18 tests
+test donor::tests::combinatorial_controls ... ok
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::modular_overflow_control ... ok
+test source_donor::donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test source_donor::donor::tests::combinatorial_controls ... ok
+test source_donor::donor::tests::characteristic_two_product_zero ... ok
+test source_donor::donor::tests::modular_overflow_control ... ok
+test tests::full_scope_keys ... ok
+test tests::missing_and_duplicate_keys_rejected ... ok
+test donor::tests::primality_certificate_valid ... ok
+test source_donor::donor::tests::primality_certificate_valid ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test source_donor::donor::tests::explicit_matrix_controls ... ok
+test source_donor::donor::tests::rejects_incomplete_presentation ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test source_donor::donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/prime_source_functional.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_source_functional-a657d0edd633d109)
+
+running 22 tests
+test donor::tests::combinatorial_controls ... ok
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::modular_overflow_control ... ok
+test source_donor::donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test source_donor::donor::tests::combinatorial_controls ... ok
+test source_donor::donor::tests::characteristic_two_product_zero ... ok
+test source_donor::donor::tests::modular_overflow_control ... ok
+test tests::input_hash_mismatch_rejected_before_parsing ... ok
+test tests::complete_scope_and_duplicate_rejection ... ok
+test donor::tests::primality_certificate_valid ... ok
+test source_donor::donor::tests::primality_certificate_valid ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test source_donor::donor::tests::explicit_matrix_controls ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test source_donor::donor::tests::rejects_incomplete_presentation ... ok
+test source_donor::donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test tests::changed_source_base_and_certificate_hash_rejected ... ok
+test tests::synthetic_source_roundtrip_and_retained_fixture ... ok
+test tests::forged_factor_metadata_still_fails_recomputation ... ok
+test tests::top_binding_and_circuit_semantic_mutations_rejected ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+     Running unittests src/bin/prime_terminal.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_terminal-df15eb2b71737ef2)
+
+running 18 tests
+test donor::tests::combinatorial_controls ... ok
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::modular_overflow_control ... ok
+test source_tests::projection_negative_control ... ok
+test source_tests::altered_source_rejected ... ok
+test source_tests::invalid_planted_witness_rejected ... ok
+test tests::invalid_weights ... ok
+test source_tests::wrong_base_rejected ... ok
+test donor::tests::primality_certificate_valid ... ok
+test tests::codec ... ok
+test tests::panel_missing_rejected ... ok
+test tests::small_primes ... ok
+test source_tests::full_chain_sources ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test tests::independent_expansion ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/prime_terminal_functional.rs (research/n83_candidate_pdp_20261028/target/release/deps/prime_terminal_functional-a1cf94ff768b3e96)
+
+running 14 tests
+test donor::suffix_tests::witness_suffix_exact_and_bad_bit_rejected ... ok
+test donor::tests::combinatorial_controls ... ok
+test donor::tests::characteristic_two_product_zero ... ok
+test donor::tests::modular_overflow_control ... ok
+test tests::complementary_coefficient_mutation_is_detected ... ok
+test tests::reject_even_width - should panic ... ok
+test tests::reject_zero_normalization_weight - should panic ... ok
+test tests::terminal_top_image_annihilation_all_small_multipliers ... ok
+test tests::small_pairings_independent_product_and_exception ... ok
+test donor::tests::primality_certificate_valid ... ok
+test donor::tests::explicit_matrix_controls ... ok
+test donor::tests::rejects_incomplete_presentation ... ok
+test donor::suffix_tests::complete_planted_template_accepts_and_rejects_added_code ... ok
+test tests::n83_synthetic_fixture_not_source_bound ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s
+
+     Running unittests src/bin/radix_neural_probe.rs (research/n83_candidate_pdp_20261028/target/release/deps/radix_neural_probe-248e49674bee3e50)
+
+running 1 test
+test tests::censored_constant_bracket_covers_large_certified_bounds ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/top.rs (research/n83_candidate_pdp_20261028/target/release/deps/top-3d66c5ba19043808)
+
+running 10 tests
+test tests::cancellation_precedes_top_extraction ... ok
+test tests::linear_top_must_not_be_dropped ... ok
+test tests::duplicate_equation_rejected - should panic ... ok
+test tests::greedy_maps_recheck_every_generator ... ok
+test tests::linear_upper_has_original_equation_witness ... ok
+test tests::missing_field_rejected - should panic ... ok
+test tests::projection_positive_and_negative ... ok
+test tests::prime_structural_certificates ... ok
+test tests::spike_prime_weights_checked ... ok
+test tests::prime_diagonal_map_invertible_and_weight_matched ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

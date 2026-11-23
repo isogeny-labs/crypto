@@ -1,0 +1,41 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-t74357-b7396dac | 31.69 | batch-1024 | 36/36 | 34.222 | 37.194 | 63.945 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | batch-16 | 36/36 | 31.083 | 33.732 | 57.574 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | batch-256 | 36/36 | 33.690 | 36.790 | 64.689 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | batch-64 | 36/36 | 31.948 | 34.756 | 60.030 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | fast | 36/36 | 33.010 | 36.051 | 63.417 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | rho-neg | 36/36 | 1.019 | 1.120 | 2.031 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | serial-1024 | 36/36 | 34.222 | 37.194 | 63.945 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | walk | 36/36 | 33.010 | 36.051 | 63.417 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-t74357-b7396dac | batch-1024 vs batch-16 | batch-16 < batch-1024 |
+| icv1-fp32-t74357-b7396dac | batch-1024 vs batch-256 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | batch-1024 vs batch-64 | batch-64 < batch-1024 |
+| icv1-fp32-t74357-b7396dac | batch-1024 vs fast | fast < batch-1024 |
+| icv1-fp32-t74357-b7396dac | batch-1024 vs rho-neg | rho-neg < batch-1024 |
+| icv1-fp32-t74357-b7396dac | batch-1024 vs serial-1024 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | batch-1024 vs walk | walk < batch-1024 |
+| icv1-fp32-t74357-b7396dac | batch-16 vs batch-256 | batch-16 < batch-256 |
+| icv1-fp32-t74357-b7396dac | batch-16 vs batch-64 | batch-16 < batch-64 |
+| icv1-fp32-t74357-b7396dac | batch-16 vs fast | batch-16 < fast |
+| icv1-fp32-t74357-b7396dac | batch-16 vs rho-neg | rho-neg < batch-16 |
+| icv1-fp32-t74357-b7396dac | batch-16 vs serial-1024 | batch-16 < serial-1024 |
+| icv1-fp32-t74357-b7396dac | batch-16 vs walk | batch-16 < walk |
+| icv1-fp32-t74357-b7396dac | batch-256 vs batch-64 | batch-64 < batch-256 |
+| icv1-fp32-t74357-b7396dac | batch-256 vs fast | fast < batch-256 |
+| icv1-fp32-t74357-b7396dac | batch-256 vs rho-neg | rho-neg < batch-256 |
+| icv1-fp32-t74357-b7396dac | batch-256 vs serial-1024 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | batch-256 vs walk | walk < batch-256 |
+| icv1-fp32-t74357-b7396dac | batch-64 vs fast | batch-64 < fast |
+| icv1-fp32-t74357-b7396dac | batch-64 vs rho-neg | rho-neg < batch-64 |
+| icv1-fp32-t74357-b7396dac | batch-64 vs serial-1024 | batch-64 < serial-1024 |
+| icv1-fp32-t74357-b7396dac | batch-64 vs walk | batch-64 < walk |
+| icv1-fp32-t74357-b7396dac | fast vs rho-neg | rho-neg < fast |
+| icv1-fp32-t74357-b7396dac | fast vs serial-1024 | fast < serial-1024 |
+| icv1-fp32-t74357-b7396dac | fast vs walk | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | rho-neg vs serial-1024 | rho-neg < serial-1024 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs walk | rho-neg < walk |
+| icv1-fp32-t74357-b7396dac | serial-1024 vs walk | walk < serial-1024 |

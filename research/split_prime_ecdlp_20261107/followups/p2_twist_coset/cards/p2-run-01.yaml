@@ -1,0 +1,164 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-p2-twist-coset-20261107-1
+experiment_id: split_prime_ecdlp_20261107-p2
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/cards/p2-run-01.receipt.json
+route: this host, isolation L0, counted metrics only (followups/README.md, Rules shared by the three protocols); no EKS request
+binds:
+- path: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/PROTOCOL.md
+  sha256: 4fad07b7f4ff7245a860157326dbf9795c4a4b463b67ecae190d824b0201369d
+- path: research/split_prime_ecdlp_20261107/followups/README.md
+  sha256: aa622e0b61297bd71a55a30626e0a561c28281ed73fd26093a0267770a580af2
+- path: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/p2coset/README.md
+  sha256: 260771f210c507c26a8fa8a05c8a8f1a82d19a9d57f62e9b39d40dc34cde526c
+- path: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/p2coset/src/main.rs
+  sha256: 963c2f08970dd3d0602e1ad3091210d3a36b7d4cdbcc6e56f1b277350c4d401c
+- path: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/p2coset/Cargo.toml
+  sha256: 07132d8dbaa983e75dcfd86fe8359fa138919018f6037e480072cedc56823e97
+- path: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/p2coset/Cargo.lock
+  sha256: 884b1b96cee2cc2c121e418a09e5119b1a289073829ea08eb3062d634293e4a6
+- path: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/cards/p2-run-01.driver.sh
+  sha256: 7dc89a680c07354bab590a4aa825a8a9b0203a9e011a33d42e1776cab5724019
+- path: /usr/bin/msolve
+  sha256: c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa
+must_not_exist:
+- research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z
+commands:
+- id: build
+  argv:
+  - cargo
+  - build
+  - --release
+  cwd: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/p2coset
+  env:
+    CARGO_TARGET_DIR: /tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p2run
+  timeout_seconds: 1800
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/build.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/build.stderr
+- id: sha256-p2coset
+  argv:
+  - sha256sum
+  - /tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p2run/release/p2coset
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/sha256-p2coset.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/sha256-p2coset.stderr
+- id: sha256-msolve
+  argv:
+  - sha256sum
+  - /usr/bin/msolve
+  timeout_seconds: 60
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/sha256-msolve.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/sha256-msolve.stderr
+- id: driver-m1
+  argv:
+  - bash
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/cards/p2-run-01.driver.sh
+  - m1
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z
+  - /tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p2run/release/p2coset
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/driver-m1.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/driver-m1.stderr
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/m1.jsonl
+- id: driver-m2
+  argv:
+  - bash
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/cards/p2-run-01.driver.sh
+  - m2
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z
+  - /tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p2run/release/p2coset
+  timeout_seconds: 7200
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/driver-m2.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/driver-m2.stderr
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/m2.jsonl
+- id: driver-m4
+  argv:
+  - bash
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/cards/p2-run-01.driver.sh
+  - m4
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z
+  - /tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p2run/release/p2coset
+  timeout_seconds: 21600
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/driver-m4.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/driver-m4.stderr
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/m4.jsonl
+- id: driver-m3
+  argv:
+  - bash
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/cards/p2-run-01.driver.sh
+  - m3
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z
+  - /tmp/claude-0/-home-user/0af71fd6-cb66-5cbf-9292-d617eb53cca4/scratchpad/targets/p2run/release/p2coset
+  timeout_seconds: 180000
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/driver-m3.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/driver-m3.stderr
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/m3.jsonl
+seeds:
+  rule: first 8 bytes little endian of SHA-256 of split_prime_ecdlp_20261107/P2/cosets/<p>/<i>/<t>; curve index i is passed as --cseed i
+  coset_seed:
+    kummer/1049089/c0/t4: 13609300572028886034
+    kummer/1049089/c0/t6: 16765669404794311197
+    kummer/1049089/c0/t8: 11933998564104009250
+    kummer/1049089/c1/t4: 17667823323466471606
+    kummer/1049089/c1/t6: 18248182231806792612
+    kummer/1049089/c1/t8: 3497424982144335580
+    kummer/1049089/c2/t4: 8718496296732446773
+    kummer/1049089/c2/t6: 1594821106893327385
+    kummer/1049089/c2/t8: 2176223858794416553
+    kummer/16777729/c0/t4: 11173020513567249145
+    kummer/16777729/c0/t6: 1320760113827526238
+    kummer/16777729/c0/t8: 15064022976432489644
+    kummer/16777729/c1/t4: 5337470146575355189
+    kummer/16777729/c1/t6: 14016555413821734805
+    kummer/16777729/c1/t8: 2574276575191720477
+    kummer/16777729/c2/t4: 2564293657957595623
+    kummer/16777729/c2/t6: 424115612230040544
+    kummer/16777729/c2/t8: 8812126797135636058
+    dickson/1049599/c0/t4: 3155981005055438761
+    dickson/1049599/c0/t6: 2118746520032967994
+    dickson/1049599/c0/t8: 37506953598447328
+    dickson/1049599/c1/t4: 5387756275857404945
+    dickson/1049599/c1/t6: 7047629953779542884
+    dickson/1049599/c1/t8: 9700398374005556631
+    dickson/1049599/c2/t4: 16911874679314616427
+    dickson/1049599/c2/t6: 4781021203000199802
+    dickson/1049599/c2/t8: 13146580483541063712
+    dickson/16780031/c0/t4: 5479868948465299270
+    dickson/16780031/c0/t6: 4483130442468001098
+    dickson/16780031/c0/t8: 15666102632841463945
+    dickson/16780031/c1/t4: 8770691062182160944
+    dickson/16780031/c1/t6: 10183228895524703850
+    dickson/16780031/c1/t8: 11710007457311663476
+    dickson/16780031/c2/t4: 6347742979283213921
+    dickson/16780031/c2/t6: 3799876297577403297
+    dickson/16780031/c2/t8: 17794471472019358775
+bus_address: executor-mechanical-p2coset
+background: true
+write_scope:
+- research/split_prime_ecdlp_20261107/followups/p2_twist_coset/runs/run-20261107T214118Z/
+- research/split_prime_ecdlp_20261107/followups/p2_twist_coset/cards/p2-run-01.receipt.json
+stop_when:
+- 'The tool exits with status 2 before any command runs: return the printed IMPEDIMENT text verbatim and nothing else.'
+- 'A command exits with a status other than 0 or reaches its timeout: the tool stops at that command; return the printed text verbatim, retry nothing, run no command yourself and edit nothing.'
+notes: Raw outputs are written by the commands into the run directory named in write_scope; the tool never overwrites. Nothing on this card is computed by the executor. The p2coset binary is built from
+  the bound sources into the target directory named in the build command.

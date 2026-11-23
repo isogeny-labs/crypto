@@ -1,0 +1,33 @@
+{
+  "id": "C108-validated-cold-harness-and-stronger-root-baseline",
+  "prepared_variant": "research/discriminant_roots_20261116_v107b",
+  "preconditions": "Require PREPARED_HARNESS_SYNTAX hashes; passed C106d kernel byte equality and exact frozen PANEL equality. Register new IDs, preserve both syntax failures.",
+  "commands": {
+    "binary_command": [
+      "python",
+      "-m",
+      "research.discriminant_roots_20261116_v107b.verified_profile_wrapper",
+      "discriminant-cold-binary-20261116-v108",
+      "cold_binary_raw",
+      "binary"
+    ],
+    "odd_command": [
+      "python",
+      "-m",
+      "research.discriminant_roots_20261116_v107b.verified_profile_wrapper",
+      "discriminant-cold-odd-20261116-v108",
+      "cold_odd_raw",
+      "odd"
+    ],
+    "precondition": "Register fresh source/input hashes; require prior passed kernel oracle and static syntax receipt.",
+    "budgets": {
+      "binary_outer_seconds": 240,
+      "odd_outer_seconds": 150,
+      "memory_mb": 4096,
+      "cpu": 0
+    },
+    "status": "prepared_not_executed"
+  },
+  "research_followup": "Implement the primary-source initial trace/Legendre split as a separately reviewed comparator; do not infer production speed superiority from weaker Python comparators.",
+  "qualified_speedup": null
+}

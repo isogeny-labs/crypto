@@ -1,0 +1,50 @@
+{
+  "schema": "bounded-root-library-validation/v1",
+  "status": "prospective_unadmitted",
+  "workspace": "/var/tmp/pencil-root-positive-1nchhc1e",
+  "unit": "pencil-root-positive-t1566-1nchhc1e.service",
+  "uid": 1000,
+  "gid": 1000,
+  "toolchain": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu",
+  "absolute_deadline": "2026-11-04T06:00:00+00:00",
+  "limits": {
+    "total_seconds": 1800,
+    "outer_term_seconds": 1795,
+    "outer_kill_grace_seconds": 5,
+    "aggregate_cpu": 2,
+    "aggregate_memory_bytes": 17179869184,
+    "target_stop_threshold_bytes": 6442450944,
+    "logs_stop_threshold_bytes": 268435456,
+    "minimum_free_bytes": 6442450944
+  },
+  "inputs_sha256": "fa8095d83862b82266e7a3938f10b8090fb45dbdf986efcf8d3e38f81cadbb43",
+  "recipe_files": {
+    "root-check-worker.py": "acb605adaff4ceb27459c65d29f3157568f875d181d828fd5765119ae5b224c3",
+    "root-check-launcher.py": "9d60ce6920fa216e10be68cf532e08a41921e8dc1916234917d9b4ba03f54562",
+    "ROOT-CHECK-RECIPE-DRAFT.md": "41a4ecb7b7a4ca9491196952aefa1a906613791b2a1d7cdb1daabe156c7bf76d",
+    "source-pins.json": "4ebe98508f644ff1708fdf43e0c43bd0764a0e762f4a0ddcc4d11aba48b005dd",
+    "fixture.json": "4b56e2057dcc196cab1d357df382a50292d740d609f9504a90792f01312bc980",
+    "historical-positive-join.json": "67030cb5557c0b993f7027133dfafd865ded3198b9f911e5734ef4315300c8ea",
+    "source-scanner-disposition.json": "0e60a7ea7caaaf1a7410b16ae0738bb42c2b21251020e686439ed38c154e3117",
+    "source-publication-label-correction.json": "db1c6172ddc25ca7dfec01ff273ac481e71705f182eaec76a1b149a293b820ba",
+    "cache-preparation-v2-receipt.json": "bee115b010c1160c36c8c42f32d5387611868169742682c7ace66355af63ecbf",
+    "root-check-tool-inputs.json": "dc136ba9d740efd9ebed49fec9e2fe461156ab2e94aaba5b5a4c6595fd147dbd"
+  },
+  "exact_tests": [
+    "cryptanalysis::ecbench::three_leads::pencil::tests::actual_some_none_known_answer_and_diagnostic_ledger",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_fake_dispatch_and_shared_meter",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_panic_clears_ownership",
+    "cryptanalysis::ecbench::three_leads::pencil::tests::audited_digest_covers_work_and_failures_but_excludes_observations"
+  ],
+  "launch_command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "1795s",
+    "python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/pencil-root-adapter-positive-control/root-check-launcher.py"
+  ],
+  "compiler_invoked": false,
+  "admission": false
+}

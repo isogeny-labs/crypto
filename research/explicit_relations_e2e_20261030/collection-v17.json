@@ -1,0 +1,24 @@
+{
+  "schema": "ecbench.collection-addendum/v1",
+  "created_utc": "2026-10-30T20:54:00Z",
+  "before_data": true,
+  "protocol_version": 17,
+  "protocol_sha256": "d0c604c4d92ac0350f935547fe62247083698924c9c9e80eb68ceddbd39cc967",
+  "source_commit": "83720a2463b20fce511ba67a86f45d4bbdd153cd",
+  "reason": "V16 disappeared before final archive. Preserve periodic partial evidence and tolerate transient provider reads.",
+  "computation_changes": [],
+  "collection_changes": [
+    "Every60s background tar and upload partial-latest.tgz; may contain incomplete files and is not accepted as final evidence without validation.",
+    "No process restoration; frozen checkpoint policy none remains.",
+    "Partial copies add host I/O; clocks remain L0 wall_valid=false for all arms.",
+    "Provider GET failure does not delete a potentially healthy pod; original controller deadline still applies.",
+    "V17 launch allowed after preservedV16exit22 and fresh verified absence, rather than requiringV16success.",
+    "Two complete inventories confirming absence10s apart close an interrupted pod; failed exits fetch latest partial archive before cleanup."
+  ],
+  "administrative_hashes": {
+    "controller.sh": "9d178c8457453e5d78f44d825ffbc4dd59934e67200050bf861f8925d595f827",
+    "bootstrap.sh": "2da89ed1e68e91a82d797b00aee547e19baea3d54d10e5fda6625b44c8839a66",
+    "pod-command.sh": "32a72486016c0b874da64173660906c3ff05665f51e9d8c2425db92204eabd99",
+    "prepare-request.py": "eb9b10359119c79f2bcf252662381135e5ac1fb4959666038cda025239bf729b"
+  }
+}

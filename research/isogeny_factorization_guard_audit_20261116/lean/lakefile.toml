@@ -1,0 +1,11 @@
+name = "isogeny_factorization_guard_audit"
+version = "0.1.0"
+defaultTargets = ["IsogenyFactorizationGuardAudit"]
+
+[[require]]
+name = "elliptic_field_norm_audit"
+path = "../../elliptic_field_norm_audit_20261116/lean"
+
+[[lean_lib]]
+name = "IsogenyFactorizationGuardAudit"
+roots = ["FrobeniusImports", "FrobeniusField", "FrobeniusPoints", "FactorizationBoundary", "IsogenyControls", "FactorizationCertificate"]

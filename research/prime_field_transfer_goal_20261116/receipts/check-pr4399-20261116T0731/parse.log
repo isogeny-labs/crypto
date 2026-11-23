@@ -1,0 +1,315 @@
+﻿2026-11-16T07:28:59.9557865Z Current runner version: '2.338.2'
+2026-11-16T07:28:59.9578798Z ##[group]Runner Image Provisioner
+2026-11-16T07:28:59.9579801Z Hosted Compute Agent
+2026-11-16T07:28:59.9580316Z Version: 20261103.629
+2026-11-16T07:28:59.9580915Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+2026-11-16T07:28:59.9581564Z Build Date: 2026-11-03T17:26:59Z
+2026-11-16T07:28:59.9582150Z Worker ID: {c4cdee49-df62-4698-bb0d-902220de6c2c}
+2026-11-16T07:28:59.9582834Z Region: northcentralus
+2026-11-16T07:28:59.9583335Z Cloud: Azure
+2026-11-16T07:28:59.9583901Z ##[endgroup]
+2026-11-16T07:28:59.9585061Z ##[group]Operating System
+2026-11-16T07:28:59.9585571Z Ubuntu
+2026-11-16T07:28:59.9586125Z 24.04.5
+2026-11-16T07:28:59.9586568Z LTS
+2026-11-16T07:28:59.9587035Z ##[endgroup]
+2026-11-16T07:28:59.9587528Z ##[group]Runner Image
+2026-11-16T07:28:59.9588034Z Image: ubuntu-24.04
+2026-11-16T07:28:59.9588590Z Version: 20261111.370.1
+2026-11-16T07:28:59.9589778Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261111.370/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-16T07:28:59.9591169Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261111.370
+2026-11-16T07:28:59.9591960Z ##[endgroup]
+2026-11-16T07:28:59.9592978Z ##[group]GITHUB_TOKEN Permissions
+2026-11-16T07:28:59.9594684Z Contents: read
+2026-11-16T07:28:59.9595320Z Metadata: read
+2026-11-16T07:28:59.9595820Z ##[endgroup]
+2026-11-16T07:28:59.9597573Z Secret source: Actions
+2026-11-16T07:28:59.9598341Z Cache mode: write
+2026-11-16T07:28:59.9599174Z Prepare workflow directory
+2026-11-16T07:28:59.9855217Z Prepare all required actions
+2026-11-16T07:28:59.9895352Z Getting action download info
+2026-11-16T07:29:00.1754096Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-16T07:29:00.2649848Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-16T07:29:00.4721200Z Complete job name: parse
+2026-11-16T07:29:00.5419792Z ##[group]Run actions/checkout@v4
+2026-11-16T07:29:00.5420640Z with:
+2026-11-16T07:29:00.5420982Z   filter: blob:none
+2026-11-16T07:29:00.5421374Z   sparse-checkout-cone-mode: false
+2026-11-16T07:29:00.5422626Z   sparse-checkout: /.github/workflows/
+/.github/scripts/
+/scripts/test_workflows_parse.py
+/research/weak_curve_properties_lean_20261011/EVIDENCE_SHA256.tsv
+/research/weak_curve_conjectures_20261012/EVIDENCE_SHA256SUMS
+
+2026-11-16T07:29:00.5423863Z   repository: isogeny-labs/crypto
+2026-11-16T07:29:00.5427110Z   token: ***
+2026-11-16T07:29:00.5427464Z   ssh-strict: true
+2026-11-16T07:29:00.5427813Z   ssh-user: git
+2026-11-16T07:29:00.5428173Z   persist-credentials: true
+2026-11-16T07:29:00.5428553Z   clean: true
+2026-11-16T07:29:00.5428883Z   fetch-depth: 1
+2026-11-16T07:29:00.5429441Z   fetch-tags: false
+2026-11-16T07:29:00.5429800Z   show-progress: true
+2026-11-16T07:29:00.5430154Z   lfs: false
+2026-11-16T07:29:00.5430480Z   submodules: false
+2026-11-16T07:29:00.5430873Z   set-safe-directory: true
+2026-11-16T07:29:00.5431280Z   allow-unsafe-pr-checkout: false
+2026-11-16T07:29:00.5431900Z ##[endgroup]
+2026-11-16T07:29:00.7214391Z Syncing repository: isogeny-labs/crypto
+2026-11-16T07:29:00.7216450Z ##[group]Getting Git version info
+2026-11-16T07:29:00.7217118Z Working directory is '/home/runner/work/crypto/crypto'
+2026-11-16T07:29:00.7218539Z [command]/usr/bin/git version
+2026-11-16T07:29:00.7257559Z git version 2.56.1
+2026-11-16T07:29:00.7275699Z ##[endgroup]
+2026-11-16T07:29:00.7288204Z Temporarily overriding HOME='/home/runner/work/_temp/acf34868-0913-409f-8856-5ee8be13e79e' before making global git config changes
+2026-11-16T07:29:00.7292755Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-16T07:29:00.7294419Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-16T07:29:00.7333463Z Deleting the contents of '/home/runner/work/crypto/crypto'
+2026-11-16T07:29:00.7337129Z ##[group]Initializing the repository
+2026-11-16T07:29:00.7340958Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+2026-11-16T07:29:00.7420081Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-16T07:29:00.7421370Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-16T07:29:00.7422201Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-16T07:29:00.7422854Z hint: call:
+2026-11-16T07:29:00.7423210Z hint:
+2026-11-16T07:29:00.7423679Z hint: 	git config --global init.defaultBranch <name>
+2026-11-16T07:29:00.7424213Z hint:
+2026-11-16T07:29:00.7424719Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-16T07:29:00.7425511Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-16T07:29:00.7426164Z hint:
+2026-11-16T07:29:00.7426537Z hint: 	git branch -m <name>
+2026-11-16T07:29:00.7426956Z hint:
+2026-11-16T07:29:00.7427529Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-16T07:29:00.7433805Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+2026-11-16T07:29:00.7443774Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/crypto
+2026-11-16T07:29:00.7486888Z ##[endgroup]
+2026-11-16T07:29:00.7488040Z ##[group]Disabling automatic garbage collection
+2026-11-16T07:29:00.7491463Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-16T07:29:00.7520920Z ##[endgroup]
+2026-11-16T07:29:00.7521951Z ##[group]Setting up auth
+2026-11-16T07:29:00.7526482Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T07:29:00.7559782Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T07:29:00.7888568Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T07:29:00.7928749Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T07:29:00.8132666Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T07:29:00.8168256Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-16T07:29:00.8371720Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-16T07:29:00.8527631Z ##[endgroup]
+2026-11-16T07:29:00.8528340Z ##[group]Fetching the repository
+2026-11-16T07:29:00.8537371Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +64083953708a404073944e13cb5bd8de73eea91f:refs/remotes/pull/4399/merge
+2026-11-16T07:29:01.8555966Z From https://github.com/isogeny-labs/crypto
+2026-11-16T07:29:01.8558156Z  * [new ref]           64083953708a404073944e13cb5bd8de73eea91f -> pull/4399/merge
+2026-11-16T07:29:01.8561445Z ##[endgroup]
+2026-11-16T07:29:01.8562138Z ##[group]Determining the checkout info
+2026-11-16T07:29:01.8563239Z ##[endgroup]
+2026-11-16T07:29:01.8563970Z ##[group]Setting up sparse checkout
+2026-11-16T07:29:01.8568528Z [command]/usr/bin/git config core.sparseCheckout true
+2026-11-16T07:29:01.8607812Z [command]/usr/bin/git rev-parse --git-path info/sparse-checkout
+2026-11-16T07:29:01.8633668Z .git/info/sparse-checkout
+2026-11-16T07:29:01.8639953Z ##[endgroup]
+2026-11-16T07:29:01.8643169Z ##[group]Checking out the ref
+2026-11-16T07:29:01.8643635Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/4399/merge
+2026-11-16T07:29:03.8386551Z Note: switching to 'refs/remotes/pull/4399/merge'.
+2026-11-16T07:29:03.8386931Z 
+2026-11-16T07:29:03.8387136Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-16T07:29:03.8387628Z changes and commit them, and you can discard any commits you make in this
+2026-11-16T07:29:03.8388401Z state without impacting any branches by switching back to a branch.
+2026-11-16T07:29:03.8388621Z 
+2026-11-16T07:29:03.8388769Z If you want to create a new branch to retain commits you create, you may
+2026-11-16T07:29:03.8389386Z do so (now or later) by using -c with the switch command. Example:
+2026-11-16T07:29:03.8389600Z 
+2026-11-16T07:29:03.8389699Z   git switch -c <new-branch-name>
+2026-11-16T07:29:03.8389851Z 
+2026-11-16T07:29:03.8389974Z Or undo this operation with:
+2026-11-16T07:29:03.8390884Z 
+2026-11-16T07:29:03.8391074Z   git switch -
+2026-11-16T07:29:03.8391362Z 
+2026-11-16T07:29:03.8391811Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-16T07:29:03.8392224Z 
+2026-11-16T07:29:03.8392678Z HEAD is now at 64083953 Merge 71040fd7a012c13a7f7f3160e94adc35c159efbe into 88112c5a930009c883059c1c2e3c6c92c4b23f18
+2026-11-16T07:29:03.8451762Z ##[endgroup]
+2026-11-16T07:29:03.8497555Z [command]/usr/bin/git log -1 --format=%H
+2026-11-16T07:29:03.8526381Z 64083953708a404073944e13cb5bd8de73eea91f
+2026-11-16T07:29:03.8817620Z ##[group]Run actions/setup-python@v5
+2026-11-16T07:29:03.8817859Z with:
+2026-11-16T07:29:03.8818038Z   python-version: 3.12
+2026-11-16T07:29:03.8818227Z   check-latest: false
+2026-11-16T07:29:03.8820503Z   token: ***
+2026-11-16T07:29:03.8820687Z   update-environment: true
+2026-11-16T07:29:03.8820890Z   allow-prereleases: false
+2026-11-16T07:29:03.8821076Z   freethreaded: false
+2026-11-16T07:29:03.8821252Z ##[endgroup]
+2026-11-16T07:29:03.9894233Z ##[group]Installed versions
+2026-11-16T07:29:04.0006829Z (node:2156) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-16T07:29:04.0007400Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-16T07:29:04.0008023Z Successfully set up CPython (3.12.16)
+2026-11-16T07:29:04.0008582Z ##[endgroup]
+2026-11-16T07:29:04.0116208Z ##[group]Run pip install --quiet pyyaml
+2026-11-16T07:29:04.0116582Z [36;1mpip install --quiet pyyaml[0m
+2026-11-16T07:29:04.0146971Z shell: /usr/bin/bash -e {0}
+2026-11-16T07:29:04.0147200Z env:
+2026-11-16T07:29:04.0147428Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:04.0147787Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-16T07:29:04.0148126Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:04.0148434Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:04.0148731Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:04.0149244Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-16T07:29:04.0149504Z ##[endgroup]
+2026-11-16T07:29:04.8717527Z ##[group]Run python3 -B scripts/test_workflows_parse.py -v
+2026-11-16T07:29:04.8717893Z [36;1mpython3 -B scripts/test_workflows_parse.py -v[0m
+2026-11-16T07:29:04.8736680Z shell: /usr/bin/bash -e {0}
+2026-11-16T07:29:04.8736890Z env:
+2026-11-16T07:29:04.8737120Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:04.8737480Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-16T07:29:04.8737809Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:04.8738109Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:04.8738399Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:04.8738695Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-16T07:29:04.8739360Z ##[endgroup]
+2026-11-16T07:29:04.9536722Z test_a_trailing_colon_in_a_run_step_is_caught (__main__.WorkflowsParse.test_a_trailing_colon_in_a_run_step_is_caught)
+2026-11-16T07:29:04.9544344Z The check discriminates: this is the exact text that broke main. ... ok
+2026-11-16T07:29:07.0527108Z test_every_workflow_declares_a_trigger_and_a_job (__main__.WorkflowsParse.test_every_workflow_declares_a_trigger_and_a_job) ... ok
+2026-11-16T07:29:09.1202887Z test_every_workflow_parses_as_yaml (__main__.WorkflowsParse.test_every_workflow_parses_as_yaml) ... ok
+2026-11-16T07:29:09.3974712Z test_historical_koblitz_stages_are_manual_only (__main__.WorkflowsParse.test_historical_koblitz_stages_are_manual_only) ... ok
+2026-11-16T07:29:09.3975368Z 
+2026-11-16T07:29:09.3975555Z ----------------------------------------------------------------------
+2026-11-16T07:29:09.3975948Z Ran 4 tests in 4.444s
+2026-11-16T07:29:09.3976110Z 
+2026-11-16T07:29:09.3976209Z OK
+2026-11-16T07:29:09.4082494Z ##[group]Run python3 -B .github/scripts/test_merge_sweeper.py -v
+2026-11-16T07:29:09.4082865Z [36;1mpython3 -B .github/scripts/test_merge_sweeper.py -v[0m
+2026-11-16T07:29:09.4101078Z shell: /usr/bin/bash -e {0}
+2026-11-16T07:29:09.4101279Z env:
+2026-11-16T07:29:09.4101492Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:09.4101832Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-16T07:29:09.4102165Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:09.4102485Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:09.4102773Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:09.4103062Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-16T07:29:09.4103317Z ##[endgroup]
+2026-11-16T07:29:09.5964446Z test_arbitrary_green_check_does_not_replace_merge_gates (__main__.Assess.test_arbitrary_green_check_does_not_replace_merge_gates) ... ok
+2026-11-16T07:29:09.5967255Z test_changes_requested_holds (__main__.Assess.test_changes_requested_holds) ... ok
+2026-11-16T07:29:09.5972545Z test_check_budget (__main__.Assess.test_check_budget) ... ok
+2026-11-16T07:29:09.5975855Z test_duplicate_gate_failure_cannot_be_hidden_by_a_success (__main__.Assess.test_duplicate_gate_failure_cannot_be_hidden_by_a_success) ... ok
+2026-11-16T07:29:09.5980732Z test_each_merge_gate_must_succeed (__main__.Assess.test_each_merge_gate_must_succeed) ... ok
+2026-11-16T07:29:09.5986091Z test_full_tier_marker_is_required_after_the_tiers_land (__main__.Assess.test_full_tier_marker_is_required_after_the_tiers_land) ... ok
+2026-11-16T07:29:09.5989356Z test_green_clean_pr_is_ready (__main__.Assess.test_green_clean_pr_is_ready) ... ok
+2026-11-16T07:29:09.5993333Z test_head_moved_is_not_ready (__main__.Assess.test_head_moved_is_not_ready) ... ok
+2026-11-16T07:29:09.5996355Z test_holds (__main__.Assess.test_holds) ... ok
+2026-11-16T07:29:09.6000520Z test_red_or_missing_checks_are_not_ready (__main__.Assess.test_red_or_missing_checks_are_not_ready) ... ok
+2026-11-16T07:29:09.6006267Z test_review_thread_read_error_never_becomes_ready (__main__.Assess.test_review_thread_read_error_never_becomes_ready) ... ok
+2026-11-16T07:29:09.6011510Z test_unclean_states_are_not_ready (__main__.Assess.test_unclean_states_are_not_ready) ... ok
+2026-11-16T07:29:09.6016163Z test_unresolved_thread_holds_even_when_github_reports_clean (__main__.Assess.test_unresolved_thread_holds_even_when_github_reports_clean) ... ok
+2026-11-16T07:29:09.6017256Z test_latest_decisive_review_wins (__main__.BlockingReviews.test_latest_decisive_review_wins) ... ok
+2026-11-16T07:29:09.6018281Z test_api_errors_do_not_clear_existing_capacity_labels (__main__.Capacity.test_api_errors_do_not_clear_existing_capacity_labels) ... ok
+2026-11-16T07:29:09.6022129Z test_applying_capacity_actions_does_not_change_draft_state (__main__.Capacity.test_applying_capacity_actions_does_not_change_draft_state) ... ok
+2026-11-16T07:29:09.6023333Z test_capacity_labels_clear_when_status_changes (__main__.Capacity.test_capacity_labels_clear_when_status_changes) ... ok
+2026-11-16T07:29:09.6024402Z test_drafts_are_never_changed_by_capacity_planning (__main__.Capacity.test_drafts_are_never_changed_by_capacity_planning) ... ok
+2026-11-16T07:29:09.6025397Z test_newest_ready_beyond_the_cap_wait (__main__.Capacity.test_newest_ready_beyond_the_cap_wait) ... ok
+2026-11-16T07:29:09.6026355Z test_red_prs_are_parked_and_held_ones_are_left (__main__.Capacity.test_red_prs_are_parked_and_held_ones_are_left) ... ok
+2026-11-16T07:29:09.6027921Z test_waiting_labels_prioritize_ready_prs_without_demoting_them (__main__.Capacity.test_waiting_labels_prioritize_ready_prs_without_demoting_them) ... ok
+2026-11-16T07:29:09.6028900Z test_all_green_passes (__main__.CheckVerdict.test_all_green_passes) ... ok
+2026-11-16T07:29:09.6029844Z test_budget_counts_only_started_checks (__main__.CheckVerdict.test_budget_counts_only_started_checks) ... ok
+2026-11-16T07:29:09.6031145Z test_cancelled_and_timed_out_fail (__main__.CheckVerdict.test_cancelled_and_timed_out_fail) ... ok
+2026-11-16T07:29:09.6031922Z test_failure_outranks_pending (__main__.CheckVerdict.test_failure_outranks_pending) ... ok
+2026-11-16T07:29:09.6032606Z test_no_checks_is_not_a_pass (__main__.CheckVerdict.test_no_checks_is_not_a_pass) ... ok
+2026-11-16T07:29:09.6033494Z test_only_newest_commit_status_per_context_counts (__main__.CheckVerdict.test_only_newest_commit_status_per_context_counts) ... ok
+2026-11-16T07:29:09.6034392Z test_own_check_is_ignored (__main__.CheckVerdict.test_own_check_is_ignored) ... ok
+2026-11-16T07:29:09.6035094Z test_queued_check_is_pending (__main__.CheckVerdict.test_queued_check_is_pending) ... ok
+2026-11-16T07:29:09.6036042Z test_merge_pins_the_checked_head_and_uses_a_merge_commit (__main__.Merge.test_merge_pins_the_checked_head_and_uses_a_merge_commit) ... ok
+2026-11-16T07:29:09.6042209Z test_merge_requires_an_explicit_success_confirmation (__main__.Merge.test_merge_requires_an_explicit_success_confirmation) ... ok
+2026-11-16T07:29:09.6048349Z test_api_errors_and_missing_data_fail_closed (__main__.ReviewThreads.test_api_errors_and_missing_data_fail_closed) ... ok
+2026-11-16T07:29:09.6049823Z test_empty_thread_set_is_clear (__main__.ReviewThreads.test_empty_thread_set_is_clear) ... ok
+2026-11-16T07:29:09.6052179Z test_every_page_is_read_and_closed_threads_do_not_block (__main__.ReviewThreads.test_every_page_is_read_and_closed_threads_do_not_block) ... ok
+2026-11-16T07:29:09.6054488Z test_repeated_pagination_cursor_fails_closed (__main__.ReviewThreads.test_repeated_pagination_cursor_fails_closed) ... ok
+2026-11-16T07:29:09.6055084Z 
+2026-11-16T07:29:09.6055278Z ----------------------------------------------------------------------
+2026-11-16T07:29:09.6055691Z Ran 35 tests in 0.010s
+2026-11-16T07:29:09.6055858Z 
+2026-11-16T07:29:09.6055953Z OK
+2026-11-16T07:29:09.6205899Z ##[group]Run python3 -B .github/scripts/draft_tier_gate.py --check
+2026-11-16T07:29:09.6206278Z [36;1mpython3 -B .github/scripts/draft_tier_gate.py --check[0m
+2026-11-16T07:29:09.6224147Z shell: /usr/bin/bash -e {0}
+2026-11-16T07:29:09.6224362Z env:
+2026-11-16T07:29:09.6224577Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:09.6224916Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-16T07:29:09.6225244Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:09.6225544Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:09.6225847Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-16T07:29:09.6226161Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-16T07:29:09.6226422Z ##[endgroup]
+2026-11-16T07:29:11.7111196Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7117494Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7118938Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7120500Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7121798Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7123055Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7124692Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7125964Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7127224Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7128495Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7130047Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7131327Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7132621Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7133891Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7135156Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7136419Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7137674Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7139126Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7140470Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7141795Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7143061Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7144566Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7145843Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7147102Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7167758Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7169820Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7171261Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7172578Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7173887Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7175174Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7176433Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7177692Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7178946Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7180413Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7181850Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7183095Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7184332Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7185673Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7186945Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7188182Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7189589Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7190837Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7192072Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7193303Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7194582Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7195835Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7197129Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7198378Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7199755Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7201142Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7202384Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7203620Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7204855Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7206129Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7207380Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7208628Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7210053Z ##[error]PR workflow is not draft-gated; run python3 .github/scripts/draft_tier_gate.py --apply or add it to FAST_TIER
+2026-11-16T07:29:11.7210829Z 57 PR workflows outside the draft tier gate
+2026-11-16T07:29:11.7212485Z ##[error]Process completed with exit code 1.
+2026-11-16T07:29:11.7339438Z Post job cleanup.
+2026-11-16T07:29:11.8069197Z [command]/usr/bin/git version
+2026-11-16T07:29:11.8107359Z git version 2.56.1
+2026-11-16T07:29:11.8140027Z Temporarily overriding HOME='/home/runner/work/_temp/7fb1b3d7-8ca1-416c-9209-b015c65a0cce' before making global git config changes
+2026-11-16T07:29:11.8141403Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-16T07:29:11.8142858Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-16T07:29:11.8176124Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T07:29:11.8206644Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T07:29:12.1071132Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T07:29:12.1102444Z http.https://github.com/.extraheader
+2026-11-16T07:29:12.1110641Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-16T07:29:12.1146900Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-16T07:29:12.1877399Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-16T07:29:12.1918446Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-16T07:29:12.2738747Z Cleaning up orphan processes
+2026-11-16T07:29:12.3036872Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

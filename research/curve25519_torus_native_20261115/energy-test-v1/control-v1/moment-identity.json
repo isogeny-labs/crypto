@@ -1,0 +1,367 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hf141ff81c695aa6e",
+  "statement": {
+    "name": "Collision-count variance, cleared combinatorial coefficients",
+    "source": "DGPP arXiv:1611.03579 section 2.1 Lemmas 2-3. Certificate checks only the polynomial simplification of 4(E[Z^2]-E[Z]^2), not the iid moment interpretation or any probability theorem.",
+    "variables": [
+      "n",
+      "q",
+      "t"
+    ],
+    "degree_bound": 6,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "n"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "n"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 1
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "n"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 2
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "n"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 3
+                  }
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "q"
+                },
+                {
+                  "op": "var",
+                  "args": "q"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 4
+            },
+            {
+              "op": "var",
+              "args": "n"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "n"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 1
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "n"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 2
+                  }
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "t"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 2
+            },
+            {
+              "op": "var",
+              "args": "n"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "n"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 1
+                  }
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "q"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "n"
+              },
+              {
+                "op": "var",
+                "args": "n"
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "n"
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "const",
+                      "args": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "n"
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "const",
+                      "args": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "q"
+                  },
+                  {
+                    "op": "var",
+                    "args": "q"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 2
+            },
+            {
+              "op": "var",
+              "args": "n"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "n"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 1
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "q"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "q"
+                      },
+                      {
+                        "op": "var",
+                        "args": "q"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 4
+            },
+            {
+              "op": "var",
+              "args": "n"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "n"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 1
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "n"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "const",
+                    "args": 2
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "t"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "q"
+                      },
+                      {
+                        "op": "var",
+                        "args": "q"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 202611150121,
+  "value_digest": "afc98a9132e3ac9c7e6a97596749355fecab543e4551e62e53a20bf4b8bff902",
+  "independence": "Producer polynomial identity only; formal probability interpretation remains open",
+  "proof": null
+}

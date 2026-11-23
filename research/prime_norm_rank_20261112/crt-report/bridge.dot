@@ -1,0 +1,13 @@
+digraph bridge {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.26"];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,margin="0.12",fillcolor="#e8f5ed"];
+ edge [fontname="Helvetica",fontsize=10];
+ input [label="Supplied monic F,H and Bezout data\nUF+V(fH)=1; 0<deg H; deg H+1<deg F",fillcolor="#fff1d5"];
+ crt [label="Bounded CRT reconstruction\nTop-coefficient reciprocity"];
+ lower [label="Actual weighted remainder relation\nmu(fR) = -coeff_top(RU mod H)"];
+ radical [label="Full polynomial block radical\nExactly (cF,dH) over any field"];
+ branch [label="Abstract branch-test lemma\nNonzero branch on a right-radical vector\nprevents extra restricted radical vectors"];
+ open [label="Still to assemble: actual coefficient matrix,\npencil membership and branch intersection\nThen public-input finder and search cost",fillcolor="#fff1d5"];
+ input -> crt -> lower -> radical -> branch;
+ branch -> open [style=dashed,label="separate proof obligations"];
+}

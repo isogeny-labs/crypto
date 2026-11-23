@@ -1,0 +1,28 @@
+{
+  "schema": "twist.PARI-receipt/v1",
+  "argv": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "300s",
+    "/workspace/shared/twist-tools-20261023/cas/root/usr/bin/gp",
+    "-f",
+    "-q",
+    "-s",
+    "64000000",
+    "research/twist_routes_1_3_20261021/execution-v7/checks/noncyclic-control.gp"
+  ],
+  "started_epoch_s": 1793087804,
+  "finished_epoch_s": 1793087804,
+  "exit_code": 0,
+  "signal": null,
+  "script_sha256": "b750bbcb27ca7075541cc014de34476cf1b213ca6e563569be1765f22fb6b85d",
+  "gp_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+  "stdout": "research/twist_routes_1_3_20261021/execution-v7/development-control-pari-v1/pari.stdout",
+  "stderr": "research/twist_routes_1_3_20261021/execution-v7/development-control-pari-v1/pari.stderr",
+  "stdout_sha256": "86710e9cdd3005ecac2d87c4b2630c82dfd09318ee99055227f9bcbb131b6d94",
+  "stderr_sha256": "8971d27eaec8de44fdae5dedb6bf4e0c3b40c12527d074dfbb390b381dd7a040",
+  "initial_stack_bytes": 64000000,
+  "original_script_unchanged": true,
+  "preload": null
+}

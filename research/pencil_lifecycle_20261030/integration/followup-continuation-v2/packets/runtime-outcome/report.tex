@@ -1,0 +1,22 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\begin{document}
+\section*{Runtime preparation: component outcome}
+\textbf{2026-10-31.} Local image assembly completed by adopting the previously built base and building the runtime layer once. No base rebuild occurred. The original permission failure remains retained.
+\subsection*{Qualification observations}
+Q0 passed: executable, runtime and metadata bytes, modes and selected ancestor metadata were checked. Q1 produced the expected positive report and process exit zero. Its gate observed PID 1, UID/GID 1000, pids.max 1 and pids.current 1 before tested-program execution.
+
+The qualifier then failed its empty writable-layer diff assertion. The exact additions were \texttt{/fixtures}, \texttt{/qualification}, and \texttt{/qualification/exec-gate}. Q1 was not promoted to a passed case. Q2, Q3 and Q4 were not completed. Container cleanup completed.
+\subsection*{Artifact identities}
+Runtime image: \texttt{sha256:1adcc3d49e5660bf25cd15f839f757786e0aa50455d6e255fe38cd19bc3cad60}.
+
+Binary: \texttt{d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b}.
+
+Source commit: \texttt{3c592af96f3916fef3403e4cf173f22b6f7ef536}.
+\subsection*{Next reviewable step}
+Account prospectively for the three observed mount-placeholder paths while preserving the distinction between daemon mount setup and program writes. The failed empty-diff assertion remains failed. No amended qualification has been executed.
+
+No scientific payload was launched. Remaining worker allowance and cohort cost ratios remain null. The companion \texttt{status.json} binds native receipts and exact diff by SHA-256; \texttt{flow.svg} provides the editable diagram. This report does not replace independent runtime review.
+\end{document}

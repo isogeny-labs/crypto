@@ -1,0 +1,36 @@
+{
+  "attestation_performed": false,
+  "binding_candidate": {
+    "launch_id": "offline-launch-1",
+    "observation_evidence_sha256": "d983963eb68eb9c1b92ac532c80125030eb90e5c4c33977b2aca41d917574839",
+    "observed_target": {
+      "cluster_identity": "arn:aws:eks:us-east-2:123456789012:cluster/offline-test",
+      "job_name": "offline-launch-test",
+      "namespace": "isolab"
+    },
+    "owner": {
+      "job_uid": "11111111-1111-4111-8111-111111111111",
+      "pod_uid": "22222222-2222-4222-8222-222222222222"
+    },
+    "reservation_sha256": "b003bc7b08d2c8896db1693960f3da26c58962cdd474e8ca045b21dd8897cd30",
+    "schema": "crypto.ml-dataset.budget-launch-binding/v1"
+  },
+  "grant_sha256": "3b283151157776e76602075b5961286a85b1e2d82bba10e5c515493620c0d260",
+  "helper_cloud_requests": 0,
+  "helper_grant_issued": false,
+  "native_binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+  "native_cloud_requests": 0,
+  "native_local_synthetic_grant_issued": true,
+  "negative_error": "dataset: launch binding differs from the reserved target or digest",
+  "negative_ledger_unchanged": true,
+  "negative_tampered_digest_rejected": true,
+  "notes": "Invented snapshots and prices do not attest Kubernetes, actual cost, or worker lifetime.",
+  "observation_evidence_sha256": "d983963eb68eb9c1b92ac532c80125030eb90e5c4c33977b2aca41d917574839",
+  "reconciler_sha256": "67907a02bfe6001b90f224c2822567995aa7f8d560466bbe36ff32c163f36186",
+  "reservation_sha256": "b003bc7b08d2c8896db1693960f3da26c58962cdd474e8ca045b21dd8897cd30",
+  "resource_lifetime_verified": false,
+  "schema": "crypto.ml-dataset.offline-launch-bind-fixture/v1",
+  "status_bound_launch_count": 1,
+  "status_pending_launch_count": 0,
+  "synthetic_only": true
+}

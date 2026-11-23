@@ -1,0 +1,19 @@
+research/quadratic_twist_evidence_20261021/native/pairing.cpp: In function ‘int main(int, char**)’:
+research/quadratic_twist_evidence_20261021/native/pairing.cpp:128:28: error: ‘sha’ was not declared in this scope
+  128 |     {"registry_sha256",str(sha(raw))},{"models",models},{"fixture",fixture},
+      |                            ^~~
+research/quadratic_twist_evidence_20261021/native/pairing.cpp:127:18: error: could not convert ‘{{"schema", str(const std::string&)()}, {"status", str(const std::string&)()}, {"registry_sha256", <expression error>}, {"models", models}, {"fixture", fixture}, {"summary", obj(std::initializer_list<std::pair<const std::__cxx11::basic_string<char>, Json> >)()}}’ from ‘<brace-enclosed initializer list>’ to ‘std::initializer_list<std::pair<const std::__cxx11::basic_string<char>, Json> >’
+  127 |   auto result=obj({{"schema",str("quadratic-twist-pairing-transfer/v1")},{"status",str("passed")},
+      |               ~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                  |
+      |                  <brace-enclosed initializer list>
+  128 |     {"registry_sha256",str(sha(raw))},{"models",models},{"fixture",fixture},
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  129 |     {"summary",obj({{"models",num(942)},{"shared_primes",num(shared)},{"nonshared_primes",num(nonshared)},
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  130 |       {"auxiliary_points",num(aux)},{"cofactor_zero_images",num(zero)},{"nontrivial_images",num(nonzero)}})}});
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+research/quadratic_twist_evidence_20261021/native/pairing.cpp:131:3: error: ‘write’ was not declared in this scope; did you mean ‘fwrite’?
+  131 |   write(argv[2],dump(result)+"\n");std::cout<<"PASS native pairing sweep: "<<shared<<" shared cases, "<<aux<<" auxiliary points\n";
+      |   ^~~~~
+      |   fwrite

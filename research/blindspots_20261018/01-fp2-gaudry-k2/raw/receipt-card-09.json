@@ -1,0 +1,304 @@
+{
+  "card_id": "CARD-BLINDSPOT-01-09",
+  "card_path": "research/blindspots_20261018/01-fp2-gaudry-k2/card-09.yaml",
+  "card_sha256": "8efaafd2cb562e696475c0e6092c404786952ab811dd789badc1dd87a3c0952f",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-01/card-09"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-01/card-09/b01",
+        "examples/blindspots_01_fp2_gaudry.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.231,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 10.231,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-01/card-09/b01",
+        "run",
+        "--family",
+        "gls",
+        "--bits",
+        "40",
+        "--idx",
+        "2",
+        "--arms",
+        "ic-gls-neg:0-1,ic-gls-psi:0-1,rho-neg:0-7,rho-psi:0-7",
+        "--inv-cost",
+        "4",
+        "--crosscheck",
+        "10",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b40-i2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 87.185,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gls-b40-i2",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b40-i2.jsonl": "d6dac2aec31bb293019d87b1064cdcfea363b4d58f34a113c72c8daa7657c445"
+      },
+      "seconds": 87.185,
+      "stderr_sha256": "fe9768d9d3900b25a9bf475bdf5ef5baea6b68a5c304a8ab657168eac88e18b3",
+      "stderr_tail": [
+        "[fp2-gls-b40-i2-p961189] n = 923882566708, r = 230970641677, cofactor 4"
+      ],
+      "stdout_sha256": "26c47538191012f5f44cec68ffba4143e5e0302dadd8ea71a20795e1ee7eb708",
+      "stdout_tail": [
+        "gls b40 i2 t0 ic-gls-neg: verified=true gae=153297605 S(w0)=318.98 S(w1)=376.13 wall=25.9s",
+        "gls b40 i2 t1 ic-gls-neg: verified=true gae=157392462 S(w0)=327.50 S(w1)=388.29 wall=27.2s",
+        "gls b40 i2 t0 ic-gls-psi: verified=true gae=86830092 S(w0)=180.67 S(w1)=215.96 wall=15.0s",
+        "gls b40 i2 t1 ic-gls-psi: verified=true gae=88809825 S(w0)=184.79 S(w1)=298.73 wall=17.4s",
+        "gls b40 i2 t0 rho-neg: verified=true gae=323682 S(w0)=0.67 S(w1)=2.68 wall=0.1s",
+        "gls b40 i2 t1 rho-neg: verified=true gae=482406 S(w0)=1.00 S(w1)=4.01 wall=0.1s",
+        "gls b40 i2 t2 rho-neg: verified=true gae=174195 S(w0)=0.36 S(w1)=1.44 wall=0.1s",
+        "gls b40 i2 t3 rho-neg: verified=true gae=493018 S(w0)=1.03 S(w1)=4.09 wall=0.2s",
+        "gls b40 i2 t4 rho-neg: verified=true gae=662987 S(w0)=1.38 S(w1)=5.51 wall=0.2s",
+        "gls b40 i2 t5 rho-neg: verified=true gae=340128 S(w0)=0.71 S(w1)=2.82 wall=0.1s",
+        "gls b40 i2 t6 rho-neg: verified=true gae=356460 S(w0)=0.74 S(w1)=2.96 wall=0.1s",
+        "gls b40 i2 t7 rho-neg: verified=true gae=382944 S(w0)=0.80 S(w1)=3.18 wall=0.1s",
+        "gls b40 i2 t0 rho-psi: verified=true gae=24819 S(w0)=0.05 S(w1)=0.24 wall=0.0s",
+        "gls b40 i2 t1 rho-psi: verified=true gae=307018 S(w0)=0.64 S(w1)=3.18 wall=0.1s",
+        "gls b40 i2 t2 rho-psi: verified=true gae=80204 S(w0)=0.17 S(w1)=0.82 wall=0.0s",
+        "gls b40 i2 t3 rho-psi: verified=true gae=249661 S(w0)=0.52 S(w1)=2.58 wall=0.1s",
+        "gls b40 i2 t4 rho-psi: verified=true gae=256927 S(w0)=0.53 S(w1)=2.66 wall=0.1s",
+        "gls b40 i2 t5 rho-psi: verified=true gae=70597 S(w0)=0.15 S(w1)=0.72 wall=0.0s",
+        "gls b40 i2 t6 rho-psi: verified=true gae=118485 S(w0)=0.25 S(w1)=1.22 wall=0.0s",
+        "gls b40 i2 t7 rho-psi: verified=true gae=299913 S(w0)=0.62 S(w1)=3.11 wall=0.1s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-01/card-09/b01",
+        "run",
+        "--family",
+        "torsion",
+        "--bits",
+        "40",
+        "--idx",
+        "1",
+        "--arms",
+        "control-shuffled-rate:0",
+        "--inv-cost",
+        "4",
+        "--control-trials",
+        "200",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i1.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 48.158,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "rate-b40-i1",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i1.jsonl": "81ed0660d62ddf13c1b11a4bd04124d30f0113e1bfda493354be5950699c7bfb"
+      },
+      "seconds": 48.158,
+      "stderr_sha256": "aa609fdeb922b7c221e28790b2e02e1589666bcc6cb973dfd18cd4fb9153b659",
+      "stderr_tail": [
+        "[fp2-torsion-b40-i1-p973487] n = 947675743052, r = 236918935763, cofactor 4"
+      ],
+      "stdout_sha256": "238256e63b4191f8eb5fcc14da03a45e930f1b835cc265566201323f0b64f100",
+      "stdout_tail": [
+        "torsion b40 i1 t0 control-shuffled-rate: verified=false gae=148138907 S(w0)=304.35 S(w1)=609.69 wall=48.0s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-01/card-09/b01",
+        "run",
+        "--family",
+        "torsion",
+        "--bits",
+        "40",
+        "--idx",
+        "2",
+        "--arms",
+        "control-shuffled-rate:0",
+        "--inv-cost",
+        "4",
+        "--control-trials",
+        "200",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 47.205,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "rate-b40-i2",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i2.jsonl": "bddf9dc33243bc2508f708be295e314e40dfc3e8fd23b3d6a37e818f50d39d83"
+      },
+      "seconds": 47.205,
+      "stderr_sha256": "76f66a5bf6e036cab3a978ff637b0ca5aa969b80665c94f22253328c66edc88b",
+      "stderr_tail": [
+        "[fp2-torsion-b40-i2-p992891] n = 985831966324, r = 246457991581, cofactor 4"
+      ],
+      "stdout_sha256": "1006d215187ee7605a541f75be224ab320596372aa9189670778400b16232e18",
+      "stdout_tail": [
+        "torsion b40 i2 t0 control-shuffled-rate: verified=false gae=152990629 S(w0)=308.17 S(w1)=617.34 wall=47.1s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-01/card-09/b01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "16d97a43fe881f07aa52dcd0e8b6486c9e3bf18e",
+  "dirty_after": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i1.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i2.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-08.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-08.json",
+    "xamples/blindspots_06_signature_gb.rs"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell1-planted-b.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-b-cell2-first.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/04-presentation-search/raw/receipt-card-08.json",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-build.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-08-l-15-5-4-g8.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-08.json",
+    "xamples/blindspots_06_signature_gb.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

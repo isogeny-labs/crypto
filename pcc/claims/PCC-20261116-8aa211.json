@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:54:36Z",
+ "id": "PCC-20261116-8aa211",
+ "kind": "execution",
+ "producer": {
+  "commit": "a8db8cde33489d3b140e47342ce04ac17c1be235",
+  "model": "GPT-6",
+  "session": "compact-analysis-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/analysis-development/core-post-call-01.json",
+    "sha256": "93ea5670974646f3bfa5824d478f428c119052120c818957ffee5a5423e7b7da"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/analysis-development/core-tests-01.log",
+    "sha256": "17ca437728583f636fd17f9ccf9476f6f3440b25d1203efb3d8e08ec66601b92"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115",
+ "statement": "Immutable analysis-library release qualifier at a8db8cde3 completed ten synthetic accounting/statistical correctness tests, with pre/post binary hash matching. No worker, CAS, elliptic-curve fixture or measured cryptographic timing was used."
+}
