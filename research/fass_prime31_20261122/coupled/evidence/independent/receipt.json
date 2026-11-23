@@ -1,0 +1,65 @@
+{
+  "schema": "fass-coupled-rank.same-team-replay/v1",
+  "reviewed_at_utc": "2026-11-23T01:47:27Z",
+  "reviewer": "map_cost_audit",
+  "standing": "unsigned separate-agent source review and same-host binary replay; PCC unverified",
+  "scope": "attempt2 main rank qualifier only; no certificate-mode audit; no source changes; no rebuild; no performance claim",
+  "limits_per_invocation": {
+    "timeout_seconds": 60,
+    "virtual_address_space_kib": 2097152,
+    "concurrent_replay_processes": 1,
+    "measured_rss": null
+  },
+  "source_sha256": {
+    "main.rs": "585172d4871b3b55591d1562eca95fb93ff44f9d08d0fb1bf92f2138f7e663ee",
+    "Cargo.toml": "72fed26cf35c939e85781de83ebdfd3ec498b441be77da45448f933fa402a2d5",
+    "Cargo.lock": "0756c7a19ceb2186aa2031934e34b29091bbc2ff526c3b9e52420aaa064ac2ac",
+    "src/cryptanalysis/semaev_prime_poly.rs": "c8249ba825c946dbdb37fa5d6762f8f32d15320344693443e8af0d52f122784a"
+  },
+  "binary_sha256": {
+    "qualifier-attempt2": "b7be1544faf395e62fea1461a54d356eec37175aedbeae953619e8fcde47aa1f",
+    "tests-attempt2": "28054d0e58dd2f8ea1b7c1ad13c4f9680ed400673356dc640fa1419f7b3ce2a8"
+  },
+  "source_binding": {
+    "producer_build_manifest": "../attempt2/manifest.build.txt",
+    "current_files_match_manifest": true,
+    "unchanged_across_replays": true,
+    "independent_rebuild": false
+  },
+  "qualifier": {
+    "exit_status": 0,
+    "stdout": "qualifier.stdout.jsonl",
+    "stdout_sha256": "861dd0b6fa43c38f57cc8269eee85b17fba7bfd8fb95847c35ed33506fde4a33",
+    "byte_equal_to_attempt2": true,
+    "rank_cells": 40,
+    "scalar_product_checks": 2690,
+    "sylvester_checks": 270,
+    "cusp_coefficient_columns": 269,
+    "cusp_determinant_checks": 20,
+    "leading_coefficient_check_invocations": 40,
+    "nonsingular_exception_checks": 1,
+    "prime31_degrees": [1, 2, 3, 6, 7, 9, 14, 18, 21, 31, 42, 63],
+    "prime31_rank_equals_degree_all_selected": true,
+    "degree_1302_executed": false
+  },
+  "unit_tests": {
+    "exit_status": 0,
+    "passed": 9,
+    "failed": 0,
+    "ignored": 0,
+    "new_qualifier_tests": 3,
+    "imported_module_tests": 6,
+    "stdout": "tests.stdout.log",
+    "stdout_sha256": "444ac07d388a73720ec83e5d4d006392e9258c13e97d057fd4912db30be80299"
+  },
+  "findings": {
+    "declared_scope_defects_found": [],
+    "material_interpretation_limits": [
+      "Twelve selected Prime31 degrees through 63, not every degree in the interval",
+      "d=1 leading check asserts vanished top coefficient only; the next-coefficient formula is explicitly scoped to d>=2",
+      "Source-to-binary association uses producer build manifest; this agent replayed frozen binaries without rebuilding",
+      "Full coefficient rank is not a signed relation rank, arbitrary circuit-size or per-query time lower bound",
+      "No d=1302 fixed-curve rank execution, signed-point recovery or group-order certification"
+    ]
+  }
+}

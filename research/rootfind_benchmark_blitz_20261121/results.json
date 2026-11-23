@@ -1,0 +1,2661 @@
+{
+  "classification": "engineering",
+  "pcc": "unverified",
+  "what": "Broad rootfind benchmark blitz (oracle wall + planted-log e2e). No security claim.",
+  "host": {
+    "nproc": 4,
+    "uname": "Linux cursor 6.12.113+ #1 SMP PREEMPT_DYNAMIC Wed Nov 18 19:58:29 UTC 2026 x86_64 x86_64",
+    "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "avx512ifma": true
+  },
+  "floor_oracle_wall": [
+    {
+      "bits": 20,
+      "m": 2,
+      "A": 64,
+      "abscissae": 64,
+      "floor_ns_per_target": 1232.3525390625,
+      "subtract_ns_per_target": 2240.416015625,
+      "floor_prepare_ns": 2817.0,
+      "subtract_prepare_ns": 1781.0,
+      "probe_speedup_subtract_over_floor": 1.8179992693725242,
+      "prepare_speedup_subtract_over_floor": 0.6322328718494853,
+      "hits": 11,
+      "charged_adds_match": false,
+      "charged_adds_floor": 129902,
+      "charged_adds_subtract": 129898
+    },
+    {
+      "bits": 20,
+      "m": 2,
+      "A": 128,
+      "abscissae": 128,
+      "floor_ns_per_target": 2162.7705078125,
+      "subtract_ns_per_target": 4343.234375,
+      "floor_prepare_ns": 3763.0,
+      "subtract_prepare_ns": 2296.0,
+      "probe_speedup_subtract_over_floor": 2.00818087694052,
+      "prepare_speedup_subtract_over_floor": 0.6101514748870582,
+      "hits": 34,
+      "charged_adds_match": false,
+      "charged_adds_floor": 255827,
+      "charged_adds_subtract": 255807
+    },
+    {
+      "bits": 20,
+      "m": 2,
+      "A": 256,
+      "abscissae": 256,
+      "floor_ns_per_target": 3979.2060546875,
+      "subtract_ns_per_target": 8129.1533203125,
+      "floor_prepare_ns": 4628.0,
+      "subtract_prepare_ns": 4305.0,
+      "probe_speedup_subtract_over_floor": 2.042908361263767,
+      "prepare_speedup_subtract_over_floor": 0.9302074330164217,
+      "hits": 125,
+      "charged_adds_match": false,
+      "charged_adds_floor": 480076,
+      "charged_adds_subtract": 480006
+    },
+    {
+      "bits": 20,
+      "m": 2,
+      "A": 512,
+      "abscissae": 512,
+      "floor_ns_per_target": 6686.404296875,
+      "subtract_ns_per_target": 13067.498046875,
+      "floor_prepare_ns": 14330.0,
+      "subtract_prepare_ns": 9719.0,
+      "probe_speedup_subtract_over_floor": 1.9543386051277678,
+      "prepare_speedup_subtract_over_floor": 0.6782274947662247,
+      "hits": 372,
+      "charged_adds_match": false,
+      "charged_adds_floor": 770902,
+      "charged_adds_subtract": 770703
+    },
+    {
+      "bits": 20,
+      "m": 2,
+      "A": 1024,
+      "abscissae": 1024,
+      "floor_ns_per_target": 8518.4404296875,
+      "subtract_ns_per_target": 14116.453125,
+      "floor_prepare_ns": 16630.0,
+      "subtract_prepare_ns": 19115.0,
+      "probe_speedup_subtract_over_floor": 1.6571640362481075,
+      "prepare_speedup_subtract_over_floor": 1.1494287432351173,
+      "hits": 873,
+      "charged_adds_match": false,
+      "charged_adds_floor": 700179,
+      "charged_adds_subtract": 699718
+    },
+    {
+      "bits": 20,
+      "m": 3,
+      "A": 64,
+      "abscissae": 64,
+      "floor_ns_per_target": 1045.4111328125,
+      "subtract_ns_per_target": 1940.404296875,
+      "floor_prepare_ns": 100546.0,
+      "subtract_prepare_ns": 124321.0,
+      "probe_speedup_subtract_over_floor": 1.8561159681308097,
+      "prepare_speedup_subtract_over_floor": 1.2364589342191634,
+      "hits": 298,
+      "charged_adds_match": true,
+      "charged_adds_floor": 102168,
+      "charged_adds_subtract": 102168
+    },
+    {
+      "bits": 20,
+      "m": 3,
+      "A": 128,
+      "abscissae": 128,
+      "floor_ns_per_target": 1058.0654296875,
+      "subtract_ns_per_target": 1482.4443359375,
+      "floor_prepare_ns": 538044.0,
+      "subtract_prepare_ns": 468019.0,
+      "probe_speedup_subtract_over_floor": 1.40108947362106,
+      "prepare_speedup_subtract_over_floor": 0.8698526514560148,
+      "hits": 958,
+      "charged_adds_match": true,
+      "charged_adds_floor": 51545,
+      "charged_adds_subtract": 51545
+    },
+    {
+      "bits": 20,
+      "m": 3,
+      "A": 256,
+      "abscissae": 256,
+      "floor_ns_per_target": 1536.958984375,
+      "subtract_ns_per_target": 1390.1982421875,
+      "floor_prepare_ns": 2194068.0,
+      "subtract_prepare_ns": 2033881.0,
+      "probe_speedup_subtract_over_floor": 0.9045122585055971,
+      "prepare_speedup_subtract_over_floor": 0.9269908681043614,
+      "hits": 1024,
+      "charged_adds_match": true,
+      "charged_adds_floor": 10005,
+      "charged_adds_subtract": 10005
+    },
+    {
+      "bits": 20,
+      "m": 3,
+      "A": 512,
+      "abscissae": 512,
+      "floor_ns_per_target": 2428.2451171875,
+      "subtract_ns_per_target": 2310.71484375,
+      "floor_prepare_ns": 10725786.0,
+      "subtract_prepare_ns": 9923362.0,
+      "probe_speedup_subtract_over_floor": 0.9515986781541936,
+      "prepare_speedup_subtract_over_floor": 0.9251873941919035,
+      "hits": 1024,
+      "charged_adds_match": true,
+      "charged_adds_floor": 3606,
+      "charged_adds_subtract": 3606
+    },
+    {
+      "bits": 20,
+      "m": 3,
+      "A": 1024,
+      "abscissae": 1024,
+      "floor_ns_per_target": 4360.5,
+      "subtract_ns_per_target": 4274.134765625,
+      "floor_prepare_ns": 55257625.0,
+      "subtract_prepare_ns": 53463103.0,
+      "probe_speedup_subtract_over_floor": 0.9801937313668158,
+      "prepare_speedup_subtract_over_floor": 0.9675244457212918,
+      "hits": 1024,
+      "charged_adds_match": true,
+      "charged_adds_floor": 2224,
+      "charged_adds_subtract": 2224
+    },
+    {
+      "bits": 24,
+      "m": 2,
+      "A": 64,
+      "abscissae": 64,
+      "floor_ns_per_target": 1217.9306640625,
+      "subtract_ns_per_target": 2314.8369140625,
+      "floor_prepare_ns": 2087.0,
+      "subtract_prepare_ns": 1075.0,
+      "probe_speedup_subtract_over_floor": 1.9006311133847194,
+      "prepare_speedup_subtract_over_floor": 0.515093435553426,
+      "hits": 0,
+      "charged_adds_match": true,
+      "charged_adds_floor": 131072,
+      "charged_adds_subtract": 131072
+    },
+    {
+      "bits": 24,
+      "m": 2,
+      "A": 128,
+      "abscissae": 128,
+      "floor_ns_per_target": 2205.38671875,
+      "subtract_ns_per_target": 4444.6884765625,
+      "floor_prepare_ns": 2520.0,
+      "subtract_prepare_ns": 1362.0,
+      "probe_speedup_subtract_over_floor": 2.015378273014051,
+      "prepare_speedup_subtract_over_floor": 0.5404761904761904,
+      "hits": 1,
+      "charged_adds_match": false,
+      "charged_adds_floor": 261912,
+      "charged_adds_subtract": 261911
+    },
+    {
+      "bits": 24,
+      "m": 2,
+      "A": 256,
+      "abscissae": 256,
+      "floor_ns_per_target": 4239.822265625,
+      "subtract_ns_per_target": 8576.7060546875,
+      "floor_prepare_ns": 4587.0,
+      "subtract_prepare_ns": 2615.0,
+      "probe_speedup_subtract_over_floor": 2.0228928283679344,
+      "prepare_speedup_subtract_over_floor": 0.5700893830390233,
+      "hits": 12,
+      "charged_adds_match": false,
+      "charged_adds_floor": 520186,
+      "charged_adds_subtract": 520178
+    },
+    {
+      "bits": 24,
+      "m": 2,
+      "A": 512,
+      "abscissae": 512,
+      "floor_ns_per_target": 8134.7998046875,
+      "subtract_ns_per_target": 16576.5947265625,
+      "floor_prepare_ns": 9083.0,
+      "subtract_prepare_ns": 4836.0,
+      "probe_speedup_subtract_over_floor": 2.037738496897072,
+      "prepare_speedup_subtract_over_floor": 0.5324232081911263,
+      "hits": 40,
+      "charged_adds_match": false,
+      "charged_adds_floor": 1017971,
+      "charged_adds_subtract": 1017953
+    },
+    {
+      "bits": 24,
+      "m": 2,
+      "A": 1024,
+      "abscissae": 1024,
+      "floor_ns_per_target": 15286.056640625,
+      "subtract_ns_per_target": 31432.501953125,
+      "floor_prepare_ns": 16685.0,
+      "subtract_prepare_ns": 9883.0,
+      "probe_speedup_subtract_over_floor": 2.0562858487380185,
+      "prepare_speedup_subtract_over_floor": 0.5923284387174108,
+      "hits": 127,
+      "charged_adds_match": false,
+      "charged_adds_floor": 1900612,
+      "charged_adds_subtract": 1900543
+    },
+    {
+      "bits": 24,
+      "m": 3,
+      "A": 64,
+      "abscissae": 64,
+      "floor_ns_per_target": 1205.259765625,
+      "subtract_ns_per_target": 2382.064453125,
+      "floor_prepare_ns": 101970.0,
+      "subtract_prepare_ns": 79197.0,
+      "probe_speedup_subtract_over_floor": 1.9763909167661924,
+      "prepare_speedup_subtract_over_floor": 0.7766696087084437,
+      "hits": 20,
+      "charged_adds_match": true,
+      "charged_adds_floor": 129476,
+      "charged_adds_subtract": 129476
+    },
+    {
+      "bits": 24,
+      "m": 3,
+      "A": 128,
+      "abscissae": 128,
+      "floor_ns_per_target": 2073.990234375,
+      "subtract_ns_per_target": 4201.3310546875,
+      "floor_prepare_ns": 382730.0,
+      "subtract_prepare_ns": 305878.0,
+      "probe_speedup_subtract_over_floor": 2.0257236437535964,
+      "prepare_speedup_subtract_over_floor": 0.7992004807566692,
+      "hits": 149,
+      "charged_adds_match": true,
+      "charged_adds_floor": 233440,
+      "charged_adds_subtract": 233440
+    },
+    {
+      "bits": 24,
+      "m": 3,
+      "A": 256,
+      "abscissae": 256,
+      "floor_ns_per_target": 2565.9580078125,
+      "subtract_ns_per_target": 4475.396484375,
+      "floor_prepare_ns": 1820502.0,
+      "subtract_prepare_ns": 1714559.0,
+      "probe_speedup_subtract_over_floor": 1.7441425271765503,
+      "prepare_speedup_subtract_over_floor": 0.9418056118587071,
+      "hits": 768,
+      "charged_adds_match": true,
+      "charged_adds_floor": 206477,
+      "charged_adds_subtract": 206477
+    },
+    {
+      "bits": 24,
+      "m": 3,
+      "A": 512,
+      "abscissae": 512,
+      "floor_ns_per_target": 2738.322265625,
+      "subtract_ns_per_target": 2971.1376953125,
+      "floor_prepare_ns": 8558587.0,
+      "subtract_prepare_ns": 8066597.0,
+      "probe_speedup_subtract_over_floor": 1.0850211944043635,
+      "prepare_speedup_subtract_over_floor": 0.9425150436631654,
+      "hits": 1024,
+      "charged_adds_match": true,
+      "charged_adds_floor": 36351,
+      "charged_adds_subtract": 36351
+    },
+    {
+      "bits": 24,
+      "m": 3,
+      "A": 1024,
+      "abscissae": 1024,
+      "floor_ns_per_target": 4552.1416015625,
+      "subtract_ns_per_target": 4574.685546875,
+      "floor_prepare_ns": 54540935.0,
+      "subtract_prepare_ns": 45639272.0,
+      "probe_speedup_subtract_over_floor": 1.004952382259981,
+      "prepare_speedup_subtract_over_floor": 0.8367893216352085,
+      "hits": 1024,
+      "charged_adds_match": true,
+      "charged_adds_floor": 9789,
+      "charged_adds_subtract": 9789
+    },
+    {
+      "bits": 28,
+      "m": 2,
+      "A": 64,
+      "abscissae": 64,
+      "floor_ns_per_target": 1240.8525390625,
+      "subtract_ns_per_target": 2346.357421875,
+      "floor_prepare_ns": 2032.0,
+      "subtract_prepare_ns": 1070.0,
+      "probe_speedup_subtract_over_floor": 1.8909236577359474,
+      "prepare_speedup_subtract_over_floor": 0.5265748031496063,
+      "hits": 0,
+      "charged_adds_match": true,
+      "charged_adds_floor": 131072,
+      "charged_adds_subtract": 131072
+    },
+    {
+      "bits": 28,
+      "m": 2,
+      "A": 128,
+      "abscissae": 128,
+      "floor_ns_per_target": 2233.748046875,
+      "subtract_ns_per_target": 4418.35546875,
+      "floor_prepare_ns": 2595.0,
+      "subtract_prepare_ns": 1340.0,
+      "probe_speedup_subtract_over_floor": 1.9780008201602024,
+      "prepare_speedup_subtract_over_floor": 0.5163776493256262,
+      "hits": 1,
+      "charged_adds_match": false,
+      "charged_adds_floor": 261958,
+      "charged_adds_subtract": 261957
+    },
+    {
+      "bits": 28,
+      "m": 2,
+      "A": 256,
+      "abscissae": 256,
+      "floor_ns_per_target": 4272.7978515625,
+      "subtract_ns_per_target": 8893.474609375,
+      "floor_prepare_ns": 4570.0,
+      "subtract_prepare_ns": 2503.0,
+      "probe_speedup_subtract_over_floor": 2.08141712253548,
+      "prepare_speedup_subtract_over_floor": 0.5477024070021882,
+      "hits": 3,
+      "charged_adds_match": false,
+      "charged_adds_floor": 523280,
+      "charged_adds_subtract": 523277
+    },
+    {
+      "bits": 28,
+      "m": 2,
+      "A": 512,
+      "abscissae": 512,
+      "floor_ns_per_target": 8338.6357421875,
+      "subtract_ns_per_target": 16947.525390625,
+      "floor_prepare_ns": 8790.0,
+      "subtract_prepare_ns": 5140.0,
+      "probe_speedup_subtract_over_floor": 2.0324098467190153,
+      "prepare_speedup_subtract_over_floor": 0.5847554038680318,
+      "hits": 6,
+      "charged_adds_match": false,
+      "charged_adds_floor": 1044651,
+      "charged_adds_subtract": 1044647
+    },
+    {
+      "bits": 28,
+      "m": 2,
+      "A": 1024,
+      "abscissae": 1024,
+      "floor_ns_per_target": 16329.8701171875,
+      "subtract_ns_per_target": 33842.802734375,
+      "floor_prepare_ns": 17443.0,
+      "subtract_prepare_ns": 9606.0,
+      "probe_speedup_subtract_over_floor": 2.0724477593214172,
+      "prepare_speedup_subtract_over_floor": 0.5507080204093333,
+      "hits": 11,
+      "charged_adds_match": false,
+      "charged_adds_floor": 2080653,
+      "charged_adds_subtract": 2080648
+    },
+    {
+      "bits": 28,
+      "m": 3,
+      "A": 64,
+      "abscissae": 64,
+      "floor_ns_per_target": 1260.9658203125,
+      "subtract_ns_per_target": 2418.6298828125,
+      "floor_prepare_ns": 106217.0,
+      "subtract_prepare_ns": 77532.0,
+      "probe_speedup_subtract_over_floor": 1.9180772736671807,
+      "prepare_speedup_subtract_over_floor": 0.7299396518448082,
+      "hits": 0,
+      "charged_adds_match": true,
+      "charged_adds_floor": 131072,
+      "charged_adds_subtract": 131072
+    },
+    {
+      "bits": 28,
+      "m": 3,
+      "A": 128,
+      "abscissae": 128,
+      "floor_ns_per_target": 2255.119140625,
+      "subtract_ns_per_target": 4620.267578125,
+      "floor_prepare_ns": 382511.0,
+      "subtract_prepare_ns": 304947.0,
+      "probe_speedup_subtract_over_floor": 2.048790901949644,
+      "prepare_speedup_subtract_over_floor": 0.797224132116462,
+      "hits": 8,
+      "charged_adds_match": true,
+      "charged_adds_floor": 260785,
+      "charged_adds_subtract": 260785
+    },
+    {
+      "bits": 28,
+      "m": 3,
+      "A": 256,
+      "abscissae": 256,
+      "floor_ns_per_target": 4179.0234375,
+      "subtract_ns_per_target": 8839.5302734375,
+      "floor_prepare_ns": 1562410.0,
+      "subtract_prepare_ns": 1707627.0,
+      "probe_speedup_subtract_over_floor": 2.1152143331183457,
+      "prepare_speedup_subtract_over_floor": 1.0929442335878548,
+      "hits": 93,
+      "charged_adds_match": true,
+      "charged_adds_floor": 487256,
+      "charged_adds_subtract": 487256
+    },
+    {
+      "bits": 28,
+      "m": 3,
+      "A": 512,
+      "abscissae": 512,
+      "floor_ns_per_target": 6207.7900390625,
+      "subtract_ns_per_target": 12654.146484375,
+      "floor_prepare_ns": 8390347.0,
+      "subtract_prepare_ns": 7694557.0,
+      "probe_speedup_subtract_over_floor": 2.0384301667338653,
+      "prepare_speedup_subtract_over_floor": 0.917072559692704,
+      "hits": 539,
+      "charged_adds_match": true,
+      "charged_adds_floor": 612970,
+      "charged_adds_subtract": 612970
+    },
+    {
+      "bits": 28,
+      "m": 3,
+      "A": 1024,
+      "abscissae": 1024,
+      "floor_ns_per_target": 5962.673828125,
+      "subtract_ns_per_target": 8022.880859375,
+      "floor_prepare_ns": 53813948.0,
+      "subtract_prepare_ns": 42734729.0,
+      "probe_speedup_subtract_over_floor": 1.3455173116349792,
+      "prepare_speedup_subtract_over_floor": 0.7941199370839693,
+      "hits": 1018,
+      "charged_adds_match": true,
+      "charged_adds_floor": 148435,
+      "charged_adds_subtract": 148435
+    },
+    {
+      "bits": 32,
+      "m": 2,
+      "A": 64,
+      "abscissae": 64,
+      "floor_ns_per_target": 1270.185546875,
+      "subtract_ns_per_target": 2338.3623046875,
+      "floor_prepare_ns": 2141.0,
+      "subtract_prepare_ns": 1155.0,
+      "probe_speedup_subtract_over_floor": 1.8409611969215867,
+      "prepare_speedup_subtract_over_floor": 0.5394675385333956,
+      "hits": 0,
+      "charged_adds_match": true,
+      "charged_adds_floor": 131072,
+      "charged_adds_subtract": 131072
+    },
+    {
+      "bits": 32,
+      "m": 2,
+      "A": 128,
+      "abscissae": 128,
+      "floor_ns_per_target": 2257.740234375,
+      "subtract_ns_per_target": 4444.2177734375,
+      "floor_prepare_ns": 2797.0,
+      "subtract_prepare_ns": 1441.0,
+      "probe_speedup_subtract_over_floor": 1.9684362734793415,
+      "prepare_speedup_subtract_over_floor": 0.515194851626743,
+      "hits": 0,
+      "charged_adds_match": true,
+      "charged_adds_floor": 262144,
+      "charged_adds_subtract": 262144
+    },
+    {
+      "bits": 32,
+      "m": 2,
+      "A": 256,
+      "abscissae": 256,
+      "floor_ns_per_target": 4309.2412109375,
+      "subtract_ns_per_target": 8760.4521484375,
+      "floor_prepare_ns": 4635.0,
+      "subtract_prepare_ns": 2619.0,
+      "probe_speedup_subtract_over_floor": 2.03294541187487,
+      "prepare_speedup_subtract_over_floor": 0.5650485436893203,
+      "hits": 0,
+      "charged_adds_match": true,
+      "charged_adds_floor": 524288,
+      "charged_adds_subtract": 524288
+    },
+    {
+      "bits": 32,
+      "m": 2,
+      "A": 512,
+      "abscissae": 512,
+      "floor_ns_per_target": 8344.3203125,
+      "subtract_ns_per_target": 17250.0234375,
+      "floor_prepare_ns": 8830.0,
+      "subtract_prepare_ns": 4839.0,
+      "probe_speedup_subtract_over_floor": 2.0672772366682803,
+      "prepare_speedup_subtract_over_floor": 0.5480181200453001,
+      "hits": 0,
+      "charged_adds_match": true,
+      "charged_adds_floor": 1048576,
+      "charged_adds_subtract": 1048576
+    },
+    {
+      "bits": 32,
+      "m": 2,
+      "A": 1024,
+      "abscissae": 1024,
+      "floor_ns_per_target": 16442.8203125,
+      "subtract_ns_per_target": 34606.0419921875,
+      "floor_prepare_ns": 16595.0,
+      "subtract_prepare_ns": 9893.0,
+      "probe_speedup_subtract_over_floor": 2.104629335752069,
+      "prepare_speedup_subtract_over_floor": 0.5961434166917746,
+      "hits": 0,
+      "charged_adds_match": true,
+      "charged_adds_floor": 2097152,
+      "charged_adds_subtract": 2097152
+    },
+    {
+      "bits": 32,
+      "m": 3,
+      "A": 64,
+      "abscissae": 64,
+      "floor_ns_per_target": 1267.0966796875,
+      "subtract_ns_per_target": 2444.74609375,
+      "floor_prepare_ns": 111691.0,
+      "subtract_prepare_ns": 80015.0,
+      "probe_speedup_subtract_over_floor": 1.929407702617404,
+      "prepare_speedup_subtract_over_floor": 0.7163961286048115,
+      "hits": 1,
+      "charged_adds_match": true,
+      "charged_adds_floor": 130978,
+      "charged_adds_subtract": 130978
+    },
+    {
+      "bits": 32,
+      "m": 3,
+      "A": 128,
+      "abscissae": 128,
+      "floor_ns_per_target": 2287.349609375,
+      "subtract_ns_per_target": 4619.21875,
+      "floor_prepare_ns": 392441.0,
+      "subtract_prepare_ns": 302059.0,
+      "probe_speedup_subtract_over_floor": 2.0194633697741398,
+      "prepare_speedup_subtract_over_floor": 0.7696927691041456,
+      "hits": 2,
+      "charged_adds_match": true,
+      "charged_adds_floor": 261734,
+      "charged_adds_subtract": 261734
+    },
+    {
+      "bits": 32,
+      "m": 3,
+      "A": 256,
+      "abscissae": 256,
+      "floor_ns_per_target": 4428.734375,
+      "subtract_ns_per_target": 9416.7646484375,
+      "floor_prepare_ns": 1589967.0,
+      "subtract_prepare_ns": 1705954.0,
+      "probe_speedup_subtract_over_floor": 2.1262879755432387,
+      "prepare_speedup_subtract_over_floor": 1.0729493127844791,
+      "hits": 7,
+      "charged_adds_match": true,
+      "charged_adds_floor": 521890,
+      "charged_adds_subtract": 521890
+    },
+    {
+      "bits": 32,
+      "m": 3,
+      "A": 512,
+      "abscissae": 512,
+      "floor_ns_per_target": 8580.478515625,
+      "subtract_ns_per_target": 19048.318359375,
+      "floor_prepare_ns": 8256340.0,
+      "subtract_prepare_ns": 7525973.0,
+      "probe_speedup_subtract_over_floor": 2.2199599153693033,
+      "prepare_speedup_subtract_over_floor": 0.9115386478754509,
+      "hits": 52,
+      "charged_adds_match": true,
+      "charged_adds_floor": 1008096,
+      "charged_adds_subtract": 1008096
+    },
+    {
+      "bits": 32,
+      "m": 3,
+      "A": 1024,
+      "abscissae": 1024,
+      "floor_ns_per_target": 18297.6484375,
+      "subtract_ns_per_target": 41244.177734375,
+      "floor_prepare_ns": 52622181.0,
+      "subtract_prepare_ns": 42624844.0,
+      "probe_speedup_subtract_over_floor": 2.254069853580058,
+      "prepare_speedup_subtract_over_floor": 0.8100166733872167,
+      "hits": 339,
+      "charged_adds_match": true,
+      "charged_adds_floor": 1565201,
+      "charged_adds_subtract": 1565201
+    }
+  ],
+  "kmitm_oracle_wall": [
+    {
+      "file": "kmitm_wall_b20_a14_t64.txt",
+      "bits": 20,
+      "size": 14,
+      "targets": 64,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 18835.0,
+          "probe_ns": 733.40625,
+          "lanes4_speedup": 1.4413634269921696,
+          "thr2_speedup": 0.15300244561372778,
+          "thr4_speedup": 0.40728120516499283,
+          "hits": 0
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 124155.0,
+          "probe_ns": 725.265625,
+          "lanes4_speedup": 1.429578983029967,
+          "thr2_speedup": 0.16126121813166783,
+          "thr4_speedup": 0.45821735763765353,
+          "hits": 0
+        },
+        {
+          "m": 5,
+          "ok": true,
+          "left_k": 4,
+          "right_k": 1,
+          "build_ns": 717844.0,
+          "probe_ns": 837.40625,
+          "lanes4_speedup": 1.4179057092967882,
+          "thr2_speedup": 0.09592891117184765,
+          "thr4_speedup": 0.23771725480045633,
+          "hits": 1
+        },
+        {
+          "m": 6,
+          "ok": true,
+          "left_k": 5,
+          "right_k": 1,
+          "build_ns": 2992763.0,
+          "probe_ns": 1020.046875,
+          "lanes4_speedup": 0.9476686795958658,
+          "thr2_speedup": 0.40394590108664646,
+          "thr4_speedup": 0.6652962721710253,
+          "hits": 5
+        },
+        {
+          "m": 8,
+          "ok": true,
+          "left_k": 7,
+          "right_k": 1,
+          "build_ns": 23996549.0,
+          "probe_ns": 3354.78125,
+          "lanes4_speedup": 0.9893009196969976,
+          "thr2_speedup": 0.4490366818572676,
+          "thr4_speedup": 0.5786568168477716,
+          "hits": 28
+        },
+        {
+          "m": 10,
+          "ok": true,
+          "left_k": 9,
+          "right_k": 1,
+          "build_ns": 64890912.0,
+          "probe_ns": 4469.3125,
+          "lanes4_speedup": 1.0157708766135762,
+          "thr2_speedup": 0.6594002464740517,
+          "thr4_speedup": 0.5043569333891914,
+          "hits": 42
+        },
+        {
+          "m": 12,
+          "ok": true,
+          "left_k": 9,
+          "right_k": 3,
+          "build_ns": 63638180.0,
+          "probe_ns": 100533.203125,
+          "lanes4_speedup": 0.9570752503274357,
+          "thr2_speedup": 1.503129551884725,
+          "thr4_speedup": 1.9275356339735161,
+          "hits": 53
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b20_a64_t128.txt",
+      "bits": 20,
+      "size": 64,
+      "targets": 128,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 293382.0,
+          "probe_ns": 2133.28125,
+          "lanes4_speedup": 0.9759322930441682,
+          "thr2_speedup": 0.6455000459845782,
+          "thr4_speedup": 1.6103865521863565,
+          "hits": 39
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 15019753.0,
+          "probe_ns": 2175.25,
+          "lanes4_speedup": 1.0525058402824505,
+          "thr2_speedup": 0.5963799074752888,
+          "thr4_speedup": 0.44451185848578434,
+          "hits": 128
+        },
+        {
+          "m": 5,
+          "ok": true,
+          "left_k": 4,
+          "right_k": 1,
+          "build_ns": 492411953.0,
+          "probe_ns": 2035.40625,
+          "lanes4_speedup": 1.0199382239986847,
+          "thr2_speedup": 0.4071052802991697,
+          "thr4_speedup": 1.3564147245999374,
+          "hits": 128
+        },
+        {
+          "m": 6,
+          "ok": true,
+          "left_k": 5,
+          "right_k": 1,
+          "build_ns": 15965553884.0,
+          "probe_ns": 2889.703125,
+          "lanes4_speedup": 1.1792262445602792,
+          "thr2_speedup": 0.5806628008047304,
+          "thr4_speedup": 0.5571480871674495,
+          "hits": 128
+        },
+        {
+          "m": 8,
+          "ok": false,
+          "error": "skip m=8: estimated left table ~4398046511104 over |Fx|=64 (host OOM guard)"
+        },
+        {
+          "m": 10,
+          "ok": false,
+          "error": "skip m=10: estimated left table ~18014398509481984 over |Fx|=64 (host OOM guard)"
+        },
+        {
+          "m": 12,
+          "ok": false,
+          "error": "skip m=12: estimated left table ~18014398509481984 over |Fx|=64 (host OOM guard)"
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b24_a128_t128.txt",
+      "bits": 24,
+      "size": 128,
+      "targets": 128,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 1166093.0,
+          "probe_ns": 4312.6953125,
+          "lanes4_speedup": 1.0129215039735184,
+          "thr2_speedup": 1.1189822575628208,
+          "thr4_speedup": 2.1594566066925043,
+          "hits": 14
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 171303706.0,
+          "probe_ns": 3160.8828125,
+          "lanes4_speedup": 1.1348745753964136,
+          "thr2_speedup": 0.4528653395374873,
+          "thr4_speedup": 0.7733720357084177,
+          "hits": 128
+        },
+        {
+          "m": 5,
+          "ok": true,
+          "left_k": 4,
+          "right_k": 1,
+          "build_ns": 15395432756.0,
+          "probe_ns": 3410.6796875,
+          "lanes4_speedup": 1.2084698939256373,
+          "thr2_speedup": 0.5662606093110651,
+          "thr4_speedup": 0.8253309244565677,
+          "hits": 128
+        },
+        {
+          "m": 6,
+          "ok": false,
+          "error": "skip m=6: estimated left table ~34359738368 over |Fx|=128 (host OOM guard)"
+        },
+        {
+          "m": 8,
+          "ok": false,
+          "error": "skip m=8: estimated left table ~562949953421312 over |Fx|=128 (host OOM guard)"
+        },
+        {
+          "m": 10,
+          "ok": false,
+          "error": "skip m=10: estimated left table ~9223372036854775808 over |Fx|=128 (host OOM guard)"
+        },
+        {
+          "m": 12,
+          "ok": false,
+          "error": "skip m=12: estimated left table ~9223372036854775808 over |Fx|=128 (host OOM guard)"
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b24_a14_t64.txt",
+      "bits": 24,
+      "size": 14,
+      "targets": 64,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 19411.0,
+          "probe_ns": 776.015625,
+          "lanes4_speedup": 1.1127416933658951,
+          "thr2_speedup": 0.16332481227033072,
+          "thr4_speedup": 0.5455940401401012,
+          "hits": 0
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 124160.0,
+          "probe_ns": 865.671875,
+          "lanes4_speedup": 1.6545617440645064,
+          "thr2_speedup": 0.46502480255522805,
+          "thr4_speedup": 0.1052537373108099,
+          "hits": 0
+        },
+        {
+          "m": 5,
+          "ok": true,
+          "left_k": 4,
+          "right_k": 1,
+          "build_ns": 778462.0,
+          "probe_ns": 843.53125,
+          "lanes4_speedup": 1.4662538363345012,
+          "thr2_speedup": 0.19541306146870616,
+          "thr4_speedup": 0.6068093526047825,
+          "hits": 0
+        },
+        {
+          "m": 6,
+          "ok": true,
+          "left_k": 5,
+          "right_k": 1,
+          "build_ns": 3200685.0,
+          "probe_ns": 759.15625,
+          "lanes4_speedup": 0.5940044502041715,
+          "thr2_speedup": 0.35738906247810676,
+          "thr4_speedup": 0.39765056202547433,
+          "hits": 1
+        },
+        {
+          "m": 8,
+          "ok": true,
+          "left_k": 7,
+          "right_k": 1,
+          "build_ns": 26617027.0,
+          "probe_ns": 1157.625,
+          "lanes4_speedup": 1.0619347255865954,
+          "thr2_speedup": 0.22103866258840285,
+          "thr4_speedup": 0.39998711438327683,
+          "hits": 3
+        },
+        {
+          "m": 10,
+          "ok": true,
+          "left_k": 9,
+          "right_k": 1,
+          "build_ns": 84013441.0,
+          "probe_ns": 2000.890625,
+          "lanes4_speedup": 1.1271234178886405,
+          "thr2_speedup": 0.35197433534691647,
+          "thr4_speedup": 0.2828067885475481,
+          "hits": 6
+        },
+        {
+          "m": 12,
+          "ok": true,
+          "left_k": 9,
+          "right_k": 3,
+          "build_ns": 81179236.0,
+          "probe_ns": 70538.4375,
+          "lanes4_speedup": 0.9688046224911879,
+          "thr2_speedup": 1.3026246427999624,
+          "thr4_speedup": 2.415741217711516,
+          "hits": 8
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b24_a256_t64.txt",
+      "bits": 24,
+      "size": 256,
+      "targets": 64,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 5298907.0,
+          "probe_ns": 7680.359375,
+          "lanes4_speedup": 1.0839807613003103,
+          "thr2_speedup": 0.7976477102086357,
+          "thr4_speedup": 1.1147507925491005,
+          "hits": 37
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 1573540229.0,
+          "probe_ns": 4749.765625,
+          "lanes4_speedup": 1.196998692686922,
+          "thr2_speedup": 0.5392099681235255,
+          "thr4_speedup": 0.6448031428815442,
+          "hits": 64
+        },
+        {
+          "m": 5,
+          "ok": false,
+          "error": "skip m=5: estimated left table ~4294967296 over |Fx|=256 (host OOM guard)"
+        },
+        {
+          "m": 6,
+          "ok": false,
+          "error": "skip m=6: estimated left table ~1099511627776 over |Fx|=256 (host OOM guard)"
+        },
+        {
+          "m": 8,
+          "ok": false,
+          "error": "skip m=8: estimated left table ~72057594037927936 over |Fx|=256 (host OOM guard)"
+        },
+        {
+          "m": 10,
+          "ok": false,
+          "error": "skip m=10: estimated left table ~4722366482869645213696 over |Fx|=256 (host OOM guard)"
+        },
+        {
+          "m": 12,
+          "ok": false,
+          "error": "skip m=12: estimated left table ~4722366482869645213696 over |Fx|=256 (host OOM guard)"
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b24_a64_t128.txt",
+      "bits": 24,
+      "size": 64,
+      "targets": 128,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 300693.0,
+          "probe_ns": 2347.0390625,
+          "lanes4_speedup": 0.973244136322405,
+          "thr2_speedup": 0.610070982703161,
+          "thr4_speedup": 1.1202162648901506,
+          "hits": 1
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 15311956.0,
+          "probe_ns": 3443.8046875,
+          "lanes4_speedup": 1.3098088505777865,
+          "thr2_speedup": 0.4634102771219088,
+          "thr4_speedup": 0.7640934354429731,
+          "hits": 43
+        },
+        {
+          "m": 5,
+          "ok": true,
+          "left_k": 4,
+          "right_k": 1,
+          "build_ns": 779567480.0,
+          "probe_ns": 2901.234375,
+          "lanes4_speedup": 1.2158371366645495,
+          "thr2_speedup": 0.4870624676561691,
+          "thr4_speedup": 0.9185437160981889,
+          "hits": 128
+        },
+        {
+          "m": 6,
+          "ok": true,
+          "left_k": 5,
+          "right_k": 1,
+          "build_ns": 25952276257.0,
+          "probe_ns": 2957.2421875,
+          "lanes4_speedup": 1.175670177378427,
+          "thr2_speedup": 0.47115199737109814,
+          "thr4_speedup": 0.6089916224594001,
+          "hits": 128
+        },
+        {
+          "m": 8,
+          "ok": false,
+          "error": "skip m=8: estimated left table ~4398046511104 over |Fx|=64 (host OOM guard)"
+        },
+        {
+          "m": 10,
+          "ok": false,
+          "error": "skip m=10: estimated left table ~18014398509481984 over |Fx|=64 (host OOM guard)"
+        },
+        {
+          "m": 12,
+          "ok": false,
+          "error": "skip m=12: estimated left table ~18014398509481984 over |Fx|=64 (host OOM guard)"
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b28_a128_t64.txt",
+      "bits": 28,
+      "size": 128,
+      "targets": 64,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 1240260.0,
+          "probe_ns": 4666.4375,
+          "lanes4_speedup": 1.0606029397663954,
+          "thr2_speedup": 1.0838511534890365,
+          "thr4_speedup": 1.6956503840318047,
+          "hits": 0
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 174467062.0,
+          "probe_ns": 6251.015625,
+          "lanes4_speedup": 1.643996893350702,
+          "thr2_speedup": 0.40173642132270404,
+          "thr4_speedup": 0.6801205862809836,
+          "hits": 33
+        },
+        {
+          "m": 5,
+          "ok": true,
+          "left_k": 4,
+          "right_k": 1,
+          "build_ns": 22415843622.0,
+          "probe_ns": 4290.71875,
+          "lanes4_speedup": 1.5173362655335703,
+          "thr2_speedup": 0.28235978513798576,
+          "thr4_speedup": 0.3176925413975984,
+          "hits": 64
+        },
+        {
+          "m": 6,
+          "ok": false,
+          "error": "a 5-sum table over 128 abscissae would hold about 4233062400 sums, above the limit 2147483648"
+        },
+        {
+          "m": 8,
+          "ok": false,
+          "error": "a 7-sum table over 128 abscissae would hold about 6049650892800 sums, above the limit 2147483648"
+        },
+        {
+          "m": 10,
+          "ok": false,
+          "error": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)"
+        },
+        {
+          "m": 12,
+          "ok": false,
+          "error": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)"
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b28_a14_t64.txt",
+      "bits": 28,
+      "size": 14,
+      "targets": 64,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 20299.0,
+          "probe_ns": 787.484375,
+          "lanes4_speedup": 1.1290098566308244,
+          "thr2_speedup": 0.18669820865097841,
+          "thr4_speedup": 0.4540556856432021,
+          "hits": 0
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 137043.0,
+          "probe_ns": 809.453125,
+          "lanes4_speedup": 1.5557057057057058,
+          "thr2_speedup": 0.1145063719166569,
+          "thr4_speedup": 0.1261459370710306,
+          "hits": 0
+        },
+        {
+          "m": 5,
+          "ok": true,
+          "left_k": 4,
+          "right_k": 1,
+          "build_ns": 833554.0,
+          "probe_ns": 791.09375,
+          "lanes4_speedup": 1.4945243085279099,
+          "thr2_speedup": 0.1174636326815438,
+          "thr4_speedup": 0.15732936812693019,
+          "hits": 0
+        },
+        {
+          "m": 6,
+          "ok": true,
+          "left_k": 5,
+          "right_k": 1,
+          "build_ns": 3410413.0,
+          "probe_ns": 884.25,
+          "lanes4_speedup": 1.1074538658734663,
+          "thr2_speedup": 0.18659080184275476,
+          "thr4_speedup": 0.21825214034976254,
+          "hits": 0
+        },
+        {
+          "m": 8,
+          "ok": true,
+          "left_k": 7,
+          "right_k": 1,
+          "build_ns": 27606242.0,
+          "probe_ns": 853.140625,
+          "lanes4_speedup": 1.1814562371524397,
+          "thr2_speedup": 0.14836949538474412,
+          "thr4_speedup": 0.18516709118505895,
+          "hits": 1
+        },
+        {
+          "m": 10,
+          "ok": true,
+          "left_k": 9,
+          "right_k": 1,
+          "build_ns": 86471057.0,
+          "probe_ns": 1052.015625,
+          "lanes4_speedup": 1.3648969166210545,
+          "thr2_speedup": 0.15400022840878144,
+          "thr4_speedup": 0.12062369261257294,
+          "hits": 0
+        },
+        {
+          "m": 12,
+          "ok": true,
+          "left_k": 9,
+          "right_k": 3,
+          "build_ns": 82906640.0,
+          "probe_ns": 41291.25,
+          "lanes4_speedup": 1.0063983359223472,
+          "thr2_speedup": 1.117864058735446,
+          "thr4_speedup": 2.1498579362999726,
+          "hits": 1
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b28_a256_t64.txt",
+      "bits": 28,
+      "size": 256,
+      "targets": 64,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 5672650.0,
+          "probe_ns": 9676.890625,
+          "lanes4_speedup": 1.1191988593341418,
+          "thr2_speedup": 1.0167756545858313,
+          "thr4_speedup": 1.0454069605836465,
+          "hits": 4
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 2020063160.0,
+          "probe_ns": 5356.375,
+          "lanes4_speedup": 1.281889434007419,
+          "thr2_speedup": 0.467430608918295,
+          "thr4_speedup": 0.6861003540668354,
+          "hits": 64
+        },
+        {
+          "m": 5,
+          "ok": false,
+          "error": "skip m=5: estimated left table ~4294967296 over |Fx|=256 (host OOM guard)"
+        },
+        {
+          "m": 6,
+          "ok": false,
+          "error": "skip m=6: estimated left table ~1099511627776 over |Fx|=256 (host OOM guard)"
+        },
+        {
+          "m": 8,
+          "ok": false,
+          "error": "skip m=8: estimated left table ~72057594037927936 over |Fx|=256 (host OOM guard)"
+        },
+        {
+          "m": 10,
+          "ok": false,
+          "error": "skip m=10: estimated left table ~4722366482869645213696 over |Fx|=256 (host OOM guard)"
+        },
+        {
+          "m": 12,
+          "ok": false,
+          "error": "skip m=12: estimated left table ~4722366482869645213696 over |Fx|=256 (host OOM guard)"
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b28_a64_t128.txt",
+      "bits": 28,
+      "size": 64,
+      "targets": 128,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 296371.0,
+          "probe_ns": 2319.390625,
+          "lanes4_speedup": 1.001626180836707,
+          "thr2_speedup": 0.5563057538881668,
+          "thr4_speedup": 1.791862099854436,
+          "hits": 0
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 16899140.0,
+          "probe_ns": 3260.5234375,
+          "lanes4_speedup": 1.3453779399628636,
+          "thr2_speedup": 0.4430381405343081,
+          "thr4_speedup": 1.1407291346492643,
+          "hits": 6
+        },
+        {
+          "m": 5,
+          "ok": true,
+          "left_k": 4,
+          "right_k": 1,
+          "build_ns": 872154047.0,
+          "probe_ns": 5253.6640625,
+          "lanes4_speedup": 1.5705140780598994,
+          "thr2_speedup": 0.4584646663040516,
+          "thr4_speedup": 0.7472966412560005,
+          "hits": 66
+        },
+        {
+          "m": 6,
+          "ok": true,
+          "left_k": 5,
+          "right_k": 1,
+          "build_ns": 36964646441.0,
+          "probe_ns": 3813.90625,
+          "lanes4_speedup": 1.4172245414588547,
+          "thr2_speedup": 0.5233883620748978,
+          "thr4_speedup": 1.27803449753409,
+          "hits": 128
+        },
+        {
+          "m": 8,
+          "ok": false,
+          "error": "skip m=8: estimated left table ~4398046511104 over |Fx|=64 (host OOM guard)"
+        },
+        {
+          "m": 10,
+          "ok": false,
+          "error": "skip m=10: estimated left table ~18014398509481984 over |Fx|=64 (host OOM guard)"
+        },
+        {
+          "m": 12,
+          "ok": false,
+          "error": "skip m=12: estimated left table ~18014398509481984 over |Fx|=64 (host OOM guard)"
+        }
+      ]
+    },
+    {
+      "file": "kmitm_wall_b32_a64_t128.txt",
+      "bits": 32,
+      "size": 64,
+      "targets": 128,
+      "rows": [
+        {
+          "m": 3,
+          "ok": true,
+          "left_k": 2,
+          "right_k": 1,
+          "build_ns": 305845.0,
+          "probe_ns": 2338.34375,
+          "lanes4_speedup": 1.0020354871108135,
+          "thr2_speedup": 0.6515463090657535,
+          "thr4_speedup": 1.5383830360289747,
+          "hits": 0
+        },
+        {
+          "m": 4,
+          "ok": true,
+          "left_k": 3,
+          "right_k": 1,
+          "build_ns": 17154604.0,
+          "probe_ns": 3575.8515625,
+          "lanes4_speedup": 1.6438512123029627,
+          "thr2_speedup": 0.45381152918917267,
+          "thr4_speedup": 1.1359631198414184,
+          "hits": 0
+        },
+        {
+          "m": 5,
+          "ok": true,
+          "left_k": 4,
+          "right_k": 1,
+          "build_ns": 882209081.0,
+          "probe_ns": 5828.7734375,
+          "lanes4_speedup": 1.9126900299946163,
+          "thr2_speedup": 0.4340128564461199,
+          "thr4_speedup": 0.6136407693002044,
+          "hits": 8
+        },
+        {
+          "m": 6,
+          "ok": true,
+          "left_k": 5,
+          "right_k": 1,
+          "build_ns": 44567702669.0,
+          "probe_ns": 8852.125,
+          "lanes4_speedup": 2.4491387490516403,
+          "thr2_speedup": 0.9708427492092856,
+          "thr4_speedup": 1.5789453984165291,
+          "hits": 90
+        },
+        {
+          "m": 8,
+          "ok": false,
+          "error": "skip m=8: estimated left table ~4398046511104 over |Fx|=64 (host OOM guard)"
+        },
+        {
+          "m": 10,
+          "ok": false,
+          "error": "skip m=10: estimated left table ~18014398509481984 over |Fx|=64 (host OOM guard)"
+        },
+        {
+          "m": 12,
+          "ok": false,
+          "error": "skip m=12: estimated left table ~18014398509481984 over |Fx|=64 (host OOM guard)"
+        }
+      ]
+    }
+  ],
+  "pipeline_e2e": [
+    {
+      "file": "e2e_b20_a14_full.txt",
+      "bits": 20,
+      "size": 14,
+      "panel": null,
+      "row_count": 105,
+      "unverified": 0,
+      "summary": [
+        {
+          "arm": "subtract:m=2",
+          "median_decomp_wall_s": 0.025420268,
+          "median_wall_s": 0.025533221,
+          "mode": "run_pipeline",
+          "repeats": 5,
+          "s": 890.8469019755897,
+          "verified_reps": 5
+        },
+        {
+          "arm": "subtract:m=3",
+          "median_decomp_wall_s": 0.003911717,
+          "median_wall_s": 0.003952547,
+          "mode": "run_pipeline",
+          "repeats": 5,
+          "s": 131.5657679004651,
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=2",
+          "median_decomp_wall_s": 0.012715011,
+          "median_wall_s": 0.012751054,
+          "mode": "run_pipeline",
+          "repeats": 5,
+          "s": 890.8508111662985,
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=3",
+          "median_decomp_wall_s": 0.002440724,
+          "median_wall_s": 0.002478276,
+          "mode": "run_pipeline",
+          "repeats": 5,
+          "s": 131.5657679004651,
+          "verified_reps": 5
+        },
+        {
+          "arm": "kmitm:m=3",
+          "median_decomp_wall_s": 0.003874558,
+          "median_wall_s": 0.003920581,
+          "mode": "run_pipeline",
+          "repeats": 5,
+          "s": 93.82546349990454,
+          "verified_reps": 5
+        },
+        {
+          "arm": "kmitm:m=4",
+          "median_decomp_wall_s": 0.000989676,
+          "median_wall_s": 0.001110844,
+          "mode": "run_pipeline",
+          "repeats": 5,
+          "s": 28.652413300246877,
+          "verified_reps": 5
+        },
+        {
+          "arm": "kmitm:m=6",
+          "median_decomp_wall_s": 0.000226783,
+          "median_wall_s": 0.003251274,
+          "mode": "run_pipeline",
+          "repeats": 5,
+          "s": 26.26096588413036,
+          "verified_reps": 5
+        },
+        {
+          "arm": "kmitm:m=10",
+          "median_decomp_wall_s": 0.00019531,
+          "median_wall_s": 0.057406743,
+          "mode": "run_pipeline",
+          "repeats": 5,
+          "s": 483.6489836850869,
+          "verified_reps": 5
+        },
+        {
+          "arm": "kmitm:m=12",
+          "median_decomp_wall_s": 0.001063735,
+          "median_wall_s": 0.058789071,
+          "mode": "run_pipeline",
+          "repeats": 5,
+          "s": 498.4501570063311,
+          "verified_reps": 5
+        },
+        {
+          "arm": "kmitm:m=12,thr=1",
+          "median_decomp_wall_s": 0.000881707,
+          "median_wall_s": 0.058527604,
+          "mode": "threaded_collect",
+          "repeats": 5,
+          "threads": 1,
+          "verified_reps": 5
+        },
+        {
+          "arm": "kmitm:m=12,thr=2",
+          "median_decomp_wall_s": 0.001113513,
+          "median_wall_s": 0.058481197,
+          "mode": "threaded_collect",
+          "repeats": 5,
+          "threads": 2,
+          "verified_reps": 5
+        },
+        {
+          "arm": "kmitm:m=12,thr=4",
+          "median_decomp_wall_s": 0.001330504,
+          "median_wall_s": 0.058656681,
+          "mode": "threaded_collect",
+          "repeats": 5,
+          "threads": 4,
+          "verified_reps": 5
+        }
+      ],
+      "breakthrough": [
+        {
+          "arm": "subtract:m=3/walk",
+          "median_decomp_wall_s": 0.003915045,
+          "median_wall_s": 0.003963662,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 5,
+          "s": 131.5657679004651,
+          "targets": "walk",
+          "verified_reps": 5
+        },
+        {
+          "arm": "subtract:m=3/batch8",
+          "median_decomp_wall_s": 0.00388245,
+          "median_wall_s": 0.003918756,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 5,
+          "s": 255.2515846296398,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=3/walk",
+          "median_decomp_wall_s": 0.002411854,
+          "median_wall_s": 0.002446724,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 5,
+          "s": 131.5657679004651,
+          "targets": "walk",
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=3/batch8",
+          "median_decomp_wall_s": 0.002373541,
+          "median_wall_s": 0.002411484,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 5,
+          "s": 255.2515846296398,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        },
+        {
+          "arm": "kmitm:m=4/walk",
+          "median_decomp_wall_s": 0.001001237,
+          "median_wall_s": 0.001134797,
+          "oracle": "rootfind-kmitm:m=4",
+          "repeats": 5,
+          "s": 28.652413300246877,
+          "targets": "walk",
+          "verified_reps": 5
+        },
+        {
+          "arm": "ifma:m=3/batch8",
+          "median_decomp_wall_s": 0.009217502,
+          "median_wall_s": 0.009317004,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 5,
+          "s": 255.2515846296398,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        },
+        {
+          "arm": "ifma:m=3/batch16",
+          "median_decomp_wall_s": 0.004828249,
+          "median_wall_s": 0.004945145,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 5,
+          "s": 215.18042526894936,
+          "targets": "walk-prime-batch-16",
+          "verified_reps": 5
+        },
+        {
+          "arm": "ifma:m=3/batch256",
+          "median_decomp_wall_s": 0.003415783,
+          "median_wall_s": 0.003510183,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 5,
+          "s": 123.63011076157414,
+          "targets": "walk-prime-batch-256",
+          "verified_reps": 5
+        },
+        {
+          "arm": "native:m=3/batch8",
+          "median_decomp_wall_s": 0.006737702,
+          "median_wall_s": 0.006861768,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,threads=4",
+          "repeats": 5,
+          "s": 255.2515846296398,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        }
+      ],
+      "vs_subtract": {
+        "floor_m3_vs_subtract": 1.6199873790423438,
+        "floor_median_wall_s": 0.002446724,
+        "subtract_median_wall_s": 0.003963662,
+        "kmitm_m4_vs_subtract": 3.4928379260784084,
+        "kmitm_m4_median_wall_s": 0.001134797
+      }
+    },
+    {
+      "file": "e2e_b20_a64_full.txt",
+      "bits": 20,
+      "size": 64,
+      "panel": null,
+      "row_count": 48,
+      "unverified": 0,
+      "summary": [
+        {
+          "arm": "subtract:m=2",
+          "median_decomp_wall_s": 0.012651482,
+          "median_wall_s": 0.012781308,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 1452.366964580237,
+          "verified_reps": 3
+        },
+        {
+          "arm": "subtract:m=3",
+          "median_decomp_wall_s": 0.000527074,
+          "median_wall_s": 0.000683049,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 51.54658868641181,
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=2",
+          "median_decomp_wall_s": 0.006834098,
+          "median_wall_s": 0.006895118,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 1452.3884651291355,
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3",
+          "median_decomp_wall_s": 0.000327149,
+          "median_wall_s": 0.000503893,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 51.54658868641181,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=3",
+          "median_decomp_wall_s": 0.000697374,
+          "median_wall_s": 0.000981721,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 39.2619568839661,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=4",
+          "median_decomp_wall_s": 0.000203824,
+          "median_wall_s": 0.014015264,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 97.89199913474755,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=6",
+          "median_decomp_wall_s": 0.000277987,
+          "median_wall_s": 15.435888882,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 64431.064302576015,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=10",
+          "mode": "run_pipeline",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true
+        },
+        {
+          "arm": "kmitm:m=12",
+          "mode": "run_pipeline",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true
+        },
+        {
+          "arm": "kmitm:m=12,thr=1",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 1
+        },
+        {
+          "arm": "kmitm:m=12,thr=2",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 2
+        },
+        {
+          "arm": "kmitm:m=12,thr=4",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 4
+        }
+      ],
+      "breakthrough": [
+        {
+          "arm": "subtract:m=3/walk",
+          "median_decomp_wall_s": 0.000537539,
+          "median_wall_s": 0.000693924,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 3,
+          "s": 51.54658868641181,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "subtract:m=3/batch8",
+          "median_decomp_wall_s": 0.000555414,
+          "median_wall_s": 0.000728214,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 3,
+          "s": 57.63319862003407,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3/walk",
+          "median_decomp_wall_s": 0.000326722,
+          "median_wall_s": 0.000496428,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 3,
+          "s": 51.54658868641181,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3/batch8",
+          "median_decomp_wall_s": 0.000359817,
+          "median_wall_s": 0.000547889,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 3,
+          "s": 57.63319862003407,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=4/walk",
+          "median_decomp_wall_s": 0.000196288,
+          "median_wall_s": 0.011901959,
+          "oracle": "rootfind-kmitm:m=4",
+          "repeats": 3,
+          "s": 97.89199913474755,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch8",
+          "median_decomp_wall_s": 0.001076433,
+          "median_wall_s": 0.001365101,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 57.63319862003407,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch16",
+          "median_decomp_wall_s": 0.00065142,
+          "median_wall_s": 0.000926449,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 49.360373782507985,
+          "targets": "walk-prime-batch-16",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch256",
+          "median_decomp_wall_s": 0.001371058,
+          "median_wall_s": 0.001682163,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 71.77567330684329,
+          "targets": "walk-prime-batch-256",
+          "verified_reps": 3
+        },
+        {
+          "arm": "native:m=3/batch8",
+          "median_decomp_wall_s": 0.000728438,
+          "median_wall_s": 0.001036428,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,threads=4",
+          "repeats": 3,
+          "s": 57.63319862003407,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        }
+      ],
+      "vs_subtract": {
+        "floor_m3_vs_subtract": 1.3978341270033114,
+        "floor_median_wall_s": 0.000496428,
+        "subtract_median_wall_s": 0.000693924,
+        "kmitm_m4_vs_subtract": 0.05830334317232986,
+        "kmitm_m4_median_wall_s": 0.011901959
+      }
+    },
+    {
+      "file": "e2e_b24_a128_full.txt",
+      "bits": 24,
+      "size": 128,
+      "panel": null,
+      "row_count": 45,
+      "unverified": 0,
+      "summary": [
+        {
+          "arm": "subtract:m=2",
+          "median_decomp_wall_s": 0.153790417,
+          "median_wall_s": 0.154056616,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 3900.1458020194627,
+          "verified_reps": 3
+        },
+        {
+          "arm": "subtract:m=3",
+          "median_decomp_wall_s": 0.003154858,
+          "median_wall_s": 0.003742554,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 89.22606495014358,
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=2",
+          "median_decomp_wall_s": 0.079064309,
+          "median_wall_s": 0.079286601,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 3900.1534377999014,
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3",
+          "median_decomp_wall_s": 0.001671046,
+          "median_wall_s": 0.002338327,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 89.22606495014358,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=3",
+          "median_decomp_wall_s": 0.004169824,
+          "median_wall_s": 0.005378447,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 66.2953236617443,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=4",
+          "median_decomp_wall_s": 0.000511464,
+          "median_wall_s": 0.162732906,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 188.05843432316243,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=6",
+          "mode": "run_pipeline",
+          "skip_reason": "a 5-sum table over 128 abscissae would hold about 4233062400 sums, above the limit 2147483648",
+          "skipped": true
+        },
+        {
+          "arm": "kmitm:m=10",
+          "mode": "run_pipeline",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)",
+          "skipped": true
+        },
+        {
+          "arm": "kmitm:m=12",
+          "mode": "run_pipeline",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)",
+          "skipped": true
+        },
+        {
+          "arm": "kmitm:m=12,thr=1",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 1
+        },
+        {
+          "arm": "kmitm:m=12,thr=2",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 2
+        },
+        {
+          "arm": "kmitm:m=12,thr=4",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 4
+        }
+      ],
+      "breakthrough": [
+        {
+          "arm": "subtract:m=3/walk",
+          "median_decomp_wall_s": 0.00323492,
+          "median_wall_s": 0.003811326,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 3,
+          "s": 89.22606495014358,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "subtract:m=3/batch8",
+          "median_decomp_wall_s": 0.003218759,
+          "median_wall_s": 0.003797374,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 3,
+          "s": 78.19753484168675,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3/walk",
+          "median_decomp_wall_s": 0.001670748,
+          "median_wall_s": 0.002329364,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 3,
+          "s": 89.22606495014358,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3/batch8",
+          "median_decomp_wall_s": 0.001704644,
+          "median_wall_s": 0.002358773,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 3,
+          "s": 78.19753484168675,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=4/walk",
+          "median_decomp_wall_s": 0.000510541,
+          "median_wall_s": 0.161322035,
+          "oracle": "rootfind-kmitm:m=4",
+          "repeats": 3,
+          "s": 188.05843432316243,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch8",
+          "median_decomp_wall_s": 0.004300587,
+          "median_wall_s": 0.005232657,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 78.19753484168675,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch16",
+          "median_decomp_wall_s": 0.002667701,
+          "median_wall_s": 0.003540896,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 75.51392749073224,
+          "targets": "walk-prime-batch-16",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch256",
+          "median_decomp_wall_s": 0.002951088,
+          "median_wall_s": 0.003771928,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 76.03907213251608,
+          "targets": "walk-prime-batch-256",
+          "verified_reps": 3
+        },
+        {
+          "arm": "native:m=3/batch8",
+          "median_decomp_wall_s": 0.002450549,
+          "median_wall_s": 0.003355101,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,threads=4",
+          "repeats": 3,
+          "s": 78.19753484168675,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        }
+      ],
+      "vs_subtract": {
+        "floor_m3_vs_subtract": 1.6362088535754824,
+        "floor_median_wall_s": 0.002329364,
+        "subtract_median_wall_s": 0.003811326,
+        "kmitm_m4_vs_subtract": 0.023625576010121618,
+        "kmitm_m4_median_wall_s": 0.161322035
+      }
+    },
+    {
+      "file": "e2e_b24_a256_breakthrough.txt",
+      "bits": 24,
+      "size": 256,
+      "panel": null,
+      "row_count": 20,
+      "unverified": 0,
+      "summary": [],
+      "breakthrough": [
+        {
+          "arm": "subtract:m=3/walk",
+          "median_decomp_wall_s": 0.001622739,
+          "median_wall_s": 0.003845258,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 5,
+          "s": 88.63663196337588,
+          "targets": "walk",
+          "verified_reps": 5
+        },
+        {
+          "arm": "subtract:m=3/batch8",
+          "median_decomp_wall_s": 0.001618528,
+          "median_wall_s": 0.003529096,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 5,
+          "s": 66.62957379256076,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=3/walk",
+          "median_decomp_wall_s": 0.000981883,
+          "median_wall_s": 0.003325477,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 5,
+          "s": 88.63663196337588,
+          "targets": "walk",
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=3/batch8",
+          "median_decomp_wall_s": 0.000992958,
+          "median_wall_s": 0.003328693,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 5,
+          "s": 66.62957379256076,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        }
+      ],
+      "vs_subtract": {
+        "floor_m3_vs_subtract": 1.1563026898096123,
+        "floor_median_wall_s": 0.003325477,
+        "subtract_median_wall_s": 0.003845258
+      }
+    },
+    {
+      "file": "e2e_b24_a64_full.txt",
+      "bits": 24,
+      "size": 64,
+      "panel": null,
+      "row_count": 48,
+      "unverified": 0,
+      "summary": [
+        {
+          "arm": "subtract:m=2",
+          "median_decomp_wall_s": 0.229319905,
+          "median_wall_s": 0.2295059,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 2547.825193723144,
+          "verified_reps": 3
+        },
+        {
+          "arm": "subtract:m=3",
+          "median_decomp_wall_s": 0.008116394,
+          "median_wall_s": 0.008339149,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 144.17043151651967,
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=2",
+          "median_decomp_wall_s": 0.125695972,
+          "median_wall_s": 0.125881284,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 2547.8276568781243,
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3",
+          "median_decomp_wall_s": 0.004335124,
+          "median_wall_s": 0.004573648,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 144.17043151651967,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=3",
+          "median_decomp_wall_s": 0.009718119,
+          "median_wall_s": 0.010062203,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 114.28349424846861,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=4",
+          "median_decomp_wall_s": 0.000593752,
+          "median_wall_s": 0.015376456,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 29.16350865035915,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=6",
+          "median_decomp_wall_s": 0.000310709,
+          "median_wall_s": 25.018953674,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 16241.590965398986,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=10",
+          "mode": "run_pipeline",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true
+        },
+        {
+          "arm": "kmitm:m=12",
+          "mode": "run_pipeline",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true
+        },
+        {
+          "arm": "kmitm:m=12,thr=1",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 1
+        },
+        {
+          "arm": "kmitm:m=12,thr=2",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 2
+        },
+        {
+          "arm": "kmitm:m=12,thr=4",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 4
+        }
+      ],
+      "breakthrough": [
+        {
+          "arm": "subtract:m=3/walk",
+          "median_decomp_wall_s": 0.008090475,
+          "median_wall_s": 0.008302444,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 3,
+          "s": 144.17043151651967,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "subtract:m=3/batch8",
+          "median_decomp_wall_s": 0.007845435,
+          "median_wall_s": 0.00805516,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 3,
+          "s": 155.6147421856384,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3/walk",
+          "median_decomp_wall_s": 0.004355703,
+          "median_wall_s": 0.00459123,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 3,
+          "s": 144.17043151651967,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3/batch8",
+          "median_decomp_wall_s": 0.004223046,
+          "median_wall_s": 0.004449288,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 3,
+          "s": 155.6147421856384,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=4/walk",
+          "median_decomp_wall_s": 0.00056499,
+          "median_wall_s": 0.013141887,
+          "oracle": "rootfind-kmitm:m=4",
+          "repeats": 3,
+          "s": 29.16350865035915,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch8",
+          "median_decomp_wall_s": 0.011499652,
+          "median_wall_s": 0.011891388,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 155.6147421856384,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch16",
+          "median_decomp_wall_s": 0.006311333,
+          "median_wall_s": 0.006650941,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 189.85037957127568,
+          "targets": "walk-prime-batch-16",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch256",
+          "median_decomp_wall_s": 0.004117465,
+          "median_wall_s": 0.00445736,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 170.0301103919038,
+          "targets": "walk-prime-batch-256",
+          "verified_reps": 3
+        },
+        {
+          "arm": "native:m=3/batch8",
+          "median_decomp_wall_s": 0.007061279,
+          "median_wall_s": 0.007423267,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,threads=4",
+          "repeats": 3,
+          "s": 155.6147421856384,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        }
+      ],
+      "vs_subtract": {
+        "floor_m3_vs_subtract": 1.8083267446849758,
+        "floor_median_wall_s": 0.00459123,
+        "subtract_median_wall_s": 0.008302444,
+        "kmitm_m4_vs_subtract": 0.6317543287352875,
+        "kmitm_m4_median_wall_s": 0.013141887
+      }
+    },
+    {
+      "file": "e2e_b28_a128_breakthrough.txt",
+      "bits": 28,
+      "size": 128,
+      "panel": null,
+      "row_count": 20,
+      "unverified": 0,
+      "summary": [],
+      "breakthrough": [
+        {
+          "arm": "subtract:m=3/walk",
+          "median_decomp_wall_s": 0.053549017,
+          "median_wall_s": 0.054144115,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 5,
+          "s": 337.1219636413694,
+          "targets": "walk",
+          "verified_reps": 5
+        },
+        {
+          "arm": "subtract:m=3/batch8",
+          "median_decomp_wall_s": 0.053101982,
+          "median_wall_s": 0.053695168,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 5,
+          "s": 338.3957623897085,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=3/walk",
+          "median_decomp_wall_s": 0.026897835,
+          "median_wall_s": 0.027574773,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 5,
+          "s": 337.1219636413694,
+          "targets": "walk",
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=3/batch8",
+          "median_decomp_wall_s": 0.02653193,
+          "median_wall_s": 0.027207654,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 5,
+          "s": 338.3957623897085,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        }
+      ],
+      "vs_subtract": {
+        "floor_m3_vs_subtract": 1.963538013531426,
+        "floor_median_wall_s": 0.027574773,
+        "subtract_median_wall_s": 0.054144115
+      }
+    },
+    {
+      "file": "e2e_b28_a512_breakthrough.txt",
+      "bits": 28,
+      "size": 512,
+      "panel": null,
+      "row_count": 20,
+      "unverified": 0,
+      "summary": [],
+      "breakthrough": [
+        {
+          "arm": "subtract:m=3/walk",
+          "median_decomp_wall_s": 0.01281159,
+          "median_wall_s": 0.021498214,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 5,
+          "s": 132.63036577628714,
+          "targets": "walk",
+          "verified_reps": 5
+        },
+        {
+          "arm": "subtract:m=3/batch8",
+          "median_decomp_wall_s": 0.013102186,
+          "median_wall_s": 0.021544872,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 5,
+          "s": 141.22818185702403,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=3/walk",
+          "median_decomp_wall_s": 0.006365208,
+          "median_wall_s": 0.016364246,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 5,
+          "s": 132.63036577628714,
+          "targets": "walk",
+          "verified_reps": 5
+        },
+        {
+          "arm": "floor:m=3/batch8",
+          "median_decomp_wall_s": 0.006477041,
+          "median_wall_s": 0.016501419,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 5,
+          "s": 141.22818185702403,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 5
+        }
+      ],
+      "vs_subtract": {
+        "floor_m3_vs_subtract": 1.313730800673615,
+        "floor_median_wall_s": 0.016364246,
+        "subtract_median_wall_s": 0.021498214
+      }
+    },
+    {
+      "file": "e2e_b28_a64_full.txt",
+      "bits": 28,
+      "size": 64,
+      "panel": null,
+      "row_count": 48,
+      "unverified": 0,
+      "summary": [
+        {
+          "arm": "subtract:m=2",
+          "median_decomp_wall_s": 2.880078128,
+          "median_wall_s": 2.881383121,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 12319.383254159204,
+          "verified_reps": 3
+        },
+        {
+          "arm": "subtract:m=3",
+          "median_decomp_wall_s": 0.112003746,
+          "median_wall_s": 0.112233849,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 704.2598754786227,
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=2",
+          "median_decomp_wall_s": 1.600129673,
+          "median_wall_s": 1.600276139,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 12319.384122080675,
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3",
+          "median_decomp_wall_s": 0.060446465,
+          "median_wall_s": 0.060693387,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 704.2598754786227,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=3",
+          "median_decomp_wall_s": 0.146052573,
+          "median_wall_s": 0.146423661,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 494.7260258299511,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=4",
+          "median_decomp_wall_s": 0.005294007,
+          "median_wall_s": 0.018773433,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 23.54472570371341,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=6",
+          "median_decomp_wall_s": 0.000415214,
+          "median_wall_s": 36.30624835,
+          "mode": "run_pipeline",
+          "repeats": 3,
+          "s": 4088.5607003233304,
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=10",
+          "mode": "run_pipeline",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true
+        },
+        {
+          "arm": "kmitm:m=12",
+          "mode": "run_pipeline",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true
+        },
+        {
+          "arm": "kmitm:m=12,thr=1",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 1
+        },
+        {
+          "arm": "kmitm:m=12,thr=2",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 2
+        },
+        {
+          "arm": "kmitm:m=12,thr=4",
+          "mode": "threaded_collect",
+          "skip_reason": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 128 points (fewer than 128 are allowed)",
+          "skipped": true,
+          "threads": 4
+        }
+      ],
+      "breakthrough": [
+        {
+          "arm": "subtract:m=3/walk",
+          "median_decomp_wall_s": 0.112048583,
+          "median_wall_s": 0.112274383,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 3,
+          "s": 704.2598754786227,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "subtract:m=3/batch8",
+          "median_decomp_wall_s": 0.125793953,
+          "median_wall_s": 0.126010421,
+          "oracle": "rootfind-subtract:m=3",
+          "repeats": 3,
+          "s": 800.9718071083099,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3/walk",
+          "median_decomp_wall_s": 0.060374589,
+          "median_wall_s": 0.060621166,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 3,
+          "s": 704.2598754786227,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "floor:m=3/batch8",
+          "median_decomp_wall_s": 0.067043522,
+          "median_wall_s": 0.067278872,
+          "oracle": "rootfind-floor:m=3",
+          "repeats": 3,
+          "s": 800.9718071083099,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "kmitm:m=4/walk",
+          "median_decomp_wall_s": 0.005223951,
+          "median_wall_s": 0.01879794,
+          "oracle": "rootfind-kmitm:m=4",
+          "repeats": 3,
+          "s": 23.54472570371341,
+          "targets": "walk",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch8",
+          "median_decomp_wall_s": 0.177312691,
+          "median_wall_s": 0.177691505,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 800.9718071083099,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch16",
+          "median_decomp_wall_s": 0.085795233,
+          "median_wall_s": 0.086188402,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 865.7614630241582,
+          "targets": "walk-prime-batch-16",
+          "verified_reps": 3
+        },
+        {
+          "arm": "ifma:m=3/batch256",
+          "median_decomp_wall_s": 0.040265522,
+          "median_wall_s": 0.040638411,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+          "repeats": 3,
+          "s": 755.54541722923,
+          "targets": "walk-prime-batch-256",
+          "verified_reps": 3
+        },
+        {
+          "arm": "native:m=3/batch8",
+          "median_decomp_wall_s": 0.100793823,
+          "median_wall_s": 0.101171598,
+          "oracle": "rootfind-subtract-gpu:m=3,worker=native,threads=4",
+          "repeats": 3,
+          "s": 800.9718071083099,
+          "targets": "walk-prime-batch-8",
+          "verified_reps": 3
+        }
+      ],
+      "vs_subtract": {
+        "floor_m3_vs_subtract": 1.852065712493884,
+        "floor_median_wall_s": 0.060621166,
+        "subtract_median_wall_s": 0.112274383,
+        "kmitm_m4_vs_subtract": 5.972696103934793,
+        "kmitm_m4_median_wall_s": 0.01879794
+      }
+    }
+  ]
+}

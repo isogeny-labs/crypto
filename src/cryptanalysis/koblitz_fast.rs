@@ -337,7 +337,7 @@ impl FastCurve {
         out: &mut Vec<FastPoint>,
         scratch: &mut BatchScratch,
     ) {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.field.folds() {
             // SAFETY: the field folds, as just checked.
             return unsafe { self.add_many_clmul(p, qs, out, scratch) };
@@ -345,16 +345,17 @@ impl FastCurve {
         self.add_many_inline(p, qs, out, scratch);
     }
 
-    /// [`Self::add_many`] compiled with `pclmulqdq`, so that every field
-    /// multiplication in it inlines instead of being a call (see
+    /// [`Self::add_many`] compiled with `pclmulqdq` / `aes,neon`, so that
+    /// every field multiplication in it inlines instead of being a call (see
     /// `Gf2::batch_inv_clmul`).  The other batched loops below and the
     /// scalar ladder have the same pair of bodies.
     ///
     /// # Safety
     ///
     /// The field must fold.
-    #[cfg(target_arch = "x86_64")]
-    #[target_feature(enable = "pclmulqdq")]
+    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+    #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+    #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes,neon"))]
     unsafe fn add_many_clmul(
         &self,
         p: FastPoint,
@@ -613,7 +614,7 @@ impl FastCurve {
         lambdas: &mut Vec<u64>,
         scratch: &mut BatchScratch,
     ) {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.field.folds() {
             // SAFETY: the field folds, as just checked.
             return unsafe { self.add_many_lazy_clmul(p, qs, out, lambdas, scratch) };
@@ -624,8 +625,9 @@ impl FastCurve {
     /// # Safety
     ///
     /// The field must fold.
-    #[cfg(target_arch = "x86_64")]
-    #[target_feature(enable = "pclmulqdq")]
+    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+    #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+    #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes,neon"))]
     unsafe fn add_many_lazy_clmul(
         &self,
         p: FastPoint,
@@ -703,7 +705,7 @@ impl FastCurve {
         scratch: &mut BatchScratch,
     ) {
         assert_eq!(ps.len(), qs.len(), "pairwise addition needs equal slices");
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.field.folds() {
             // SAFETY: the field folds, as just checked.
             return unsafe { self.add_pairwise_clmul(ps, qs, out, scratch) };
@@ -714,8 +716,9 @@ impl FastCurve {
     /// # Safety
     ///
     /// The field must fold.
-    #[cfg(target_arch = "x86_64")]
-    #[target_feature(enable = "pclmulqdq")]
+    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+    #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+    #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes,neon"))]
     unsafe fn add_pairwise_clmul(
         &self,
         ps: &[FastPoint],
@@ -791,7 +794,7 @@ impl FastCurve {
     /// The point is the same, so everything downstream — the probe, the
     /// pair table, the pinned counters — sees no difference.
     fn ladder(&self, p: FastPoint, bits: u64, bit: impl Fn(u64) -> bool) -> FastPoint {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.field.folds() {
             // SAFETY: the field folds, as just checked.
             return unsafe { self.ladder_clmul(p, bits, bit) };
@@ -805,8 +808,9 @@ impl FastCurve {
     /// # Safety
     ///
     /// The field must fold.
-    #[cfg(target_arch = "x86_64")]
-    #[target_feature(enable = "pclmulqdq")]
+    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+    #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+    #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes,neon"))]
     unsafe fn ladder_clmul(&self, p: FastPoint, bits: u64, bit: impl Fn(u64) -> bool) -> FastPoint {
         // SAFETY: the caller's contract.
         unsafe { std::hint::assert_unchecked(self.field.folds()) };
@@ -4170,6 +4174,10 @@ mod tests {
                 if std::arch::is_x86_feature_detected!("pclmulqdq") {
                     assert!(fast.field.folds(), "n = {n}: the pipeline's modulus folds");
                 }
+            }
+            #[cfg(target_arch = "aarch64")]
+            if std::arch::is_aarch64_feature_detected!("aes") {
+                assert!(fast.field.folds(), "n = {n}: the pipeline's modulus folds");
             }
             let bp: Vec<BinaryPoint> = random_points(&kc, 16, 11 * u64::from(n) + u64::from(a));
             let points: Vec<FastPoint> = bp.iter().map(|p| fast.lift(p)).collect();
