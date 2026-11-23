@@ -437,11 +437,13 @@ mod tests {
                     let mut base = old_rem(&mut f, &[1, 1], &modulus);
                     while exponent > 0 {
                         if exponent & 1 == 1 {
-                            acc = old_rem(&mut f, &f.mulmod(&acc, &base, &modulus), &modulus);
+                            let product = f.mulmod(&acc, &base, &modulus);
+                            acc = old_rem(&mut f, &product, &modulus);
                         }
                         exponent >>= 1;
                         if exponent != 0 {
-                            base = old_rem(&mut f, &f.mulmod(&base, &base, &modulus), &modulus);
+                            let square = f.mulmod(&base, &base, &modulus);
+                            base = old_rem(&mut f, &square, &modulus);
                         }
                     }
                     assert_eq!(optimized, acc);
