@@ -33,7 +33,6 @@
 //! **classical reference** here.
 
 use super::f2m::{F2mElement, IrreduciblePoly};
-use crate::cryptanalysis::group_op_count;
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Zero};
 use std::collections::HashMap;
@@ -75,7 +74,9 @@ impl BinaryCurve {
                 "ecc2k-130" => (131, &[0, 1, 2, 13],
                     "0000000000000000000000000000000000", "0000000000000000000000000000000001", "051C99BFA6F18DE467C80C23B98C7994AA", "042EA2D112ECEC71FCF7E000D7EFC978BD",
                     "06C997F3E7F2C66A4A5D2FDA13756A37B1", "04A38D11829D32D347BD0C0F584D546E9A", "200000000000000004D4FDD5703A3F269", "04"),
-                "ecc2-131" | "ecc2-130" => return crate::ecc::certicom::binary_challenge(name),
+                "ecc2-131" => (131, &[0, 1, 2, 13],
+                    "07EBCB7EECC296A1C4A1A14F2C9E44352E", "00610B0A57C73649AD0093BDD622A61D81", "00439CBC8DC73AA981030D5BC57B331663", "014904C07D4F25A16C2DE036D60B762BD4",
+                    "0602339C5DB0E9C694AC8908528C51C440", "04F7B99169FA1A0F2737813742B1588CB8", "0400000000000000026ABB991FE311FE83", "02"),
                 "ecc2k-163" => (163, &[0, 1, 2, 8],
                     "000000000000000000000000000000000000000001", "1", "02091945E42080CD9CBCF14A7107D8BC55CDD65EA9", "063315693833774294A39CF6F8C175D02B8E6A5587",
                     "007530EE864EDCF4A31C85AA17C197FFF5CAFECAE1", "075DB1E80D7C4A92C7BBB79EAE3EC545F8A31CFA6B", "04000000000000000000020108A2E0CC0D99F8A5EF", "02"),
@@ -782,12 +783,10 @@ pub fn point_add(curve: &BinaryCurve, p1: &BinaryPoint, p2: &BinaryPoint) -> Bin
                 // x₁ = x₂.  Either P + P (double) or P + (-P) = O.
                 if y1.add(y2) == *x1 {
                     // y₂ = y₁ + x₁ ⇒ P₂ = -P₁.
-                    group_op_count::count_adds(1);
                     return BinaryPoint::Infinity;
                 }
                 return point_double(curve, p1);
             }
-            group_op_count::count_adds(1);
             let irr = &curve.irreducible;
             let num = y1.add(y2);
             let den = x1.add(x2);
@@ -811,7 +810,6 @@ pub fn point_double(curve: &BinaryCurve, p: &BinaryPoint) -> BinaryPoint {
     match p {
         BinaryPoint::Infinity => BinaryPoint::Infinity,
         BinaryPoint::Affine { x: x1, y: y1 } => {
-            group_op_count::count_doubles(1);
             let irr = &curve.irreducible;
             if x1.is_zero() {
                 return BinaryPoint::Infinity;
@@ -829,24 +827,101 @@ pub fn point_double(curve: &BinaryCurve, p: &BinaryPoint) -> BinaryPoint {
     }
 }
 
-/// **ECPM**: scalar multiplication `[k]·P` via left-to-right
-/// double-and-add.  This is the operation analysed in Putranto
-/// et al. for quantum-resource estimation; classical version here
-/// for verification.
+/// **ECPM**: scalar multiplication `[k]·P` via the López–Dahab projective
+/// Montgomery ladder (`1` field inversion total instead of `O(log k)` affine
+/// inversions), with exact `y`-coordinate recovery (López & Dahab 1999,
+/// Algorithm 2A) and formula-compatible `b_eff = x³ + a·x² + y² + x·y` so
+/// off-curve test inputs match affine double-and-add bit-for-bit.
 pub fn scalar_mul(curve: &BinaryCurve, p: &BinaryPoint, k: &BigUint) -> BinaryPoint {
     if k.is_zero() {
         return BinaryPoint::Infinity;
     }
-    group_op_count::count_scalar_mults(1);
+    let (px, py) = match p {
+        BinaryPoint::Infinity => return BinaryPoint::Infinity,
+        BinaryPoint::Affine { x, y } => (x, y),
+    };
+    if px.is_zero() {
+        return if k.bit(0) {
+            p.clone()
+        } else {
+            BinaryPoint::Infinity
+        };
+    }
+
+    let irr = &curve.irreducible;
+    let m = curve.m;
+    let px2 = px.square(irr);
+    let b_eff = px2
+        .mul(px, irr)
+        .add(&curve.a.mul(&px2, irr))
+        .add(&py.square(irr))
+        .add(&px.mul(py, irr));
+
+    let mut x1 = px.clone();
+    let mut z1 = F2mElement::one(m);
+    let mut x2 = px2.square(irr).add(&b_eff);
+    let mut z2 = px2.clone();
+
     let bits = k.bits();
-    let mut result = BinaryPoint::Infinity;
-    for i in (0..bits).rev() {
-        result = point_double(curve, &result);
+    for i in (0..(bits - 1)).rev() {
         if k.bit(i) {
-            result = point_add(curve, &result, p);
+            let t1 = x1.mul(&z2, irr);
+            let t2 = x2.mul(&z1, irr);
+            let z_add = t1.add(&t2).square(irr);
+            let x_add = px.mul(&z_add, irr).add(&t1.mul(&t2, irr));
+
+            let d1 = x2.square(irr);
+            let d2 = z2.square(irr);
+            let z_dbl = d1.mul(&d2, irr);
+            let x_dbl = d1.square(irr).add(&b_eff.mul(&d2.square(irr), irr));
+
+            x1 = x_add;
+            z1 = z_add;
+            x2 = x_dbl;
+            z2 = z_dbl;
+        } else {
+            let t1 = x1.mul(&z2, irr);
+            let t2 = x2.mul(&z1, irr);
+            let z_add = t1.add(&t2).square(irr);
+            let x_add = px.mul(&z_add, irr).add(&t1.mul(&t2, irr));
+
+            let d1 = x1.square(irr);
+            let d2 = z1.square(irr);
+            let z_dbl = d1.mul(&d2, irr);
+            let x_dbl = d1.square(irr).add(&b_eff.mul(&d2.square(irr), irr));
+
+            x2 = x_add;
+            z2 = z_add;
+            x1 = x_dbl;
+            z1 = z_dbl;
         }
     }
-    result
+
+    if z1.is_zero() {
+        return BinaryPoint::Infinity;
+    }
+    if z2.is_zero() {
+        return point_neg(p);
+    }
+    let u1 = x1.add(&px.mul(&z1, irr));
+    if u1.is_zero() {
+        return p.clone();
+    }
+
+    // Single field inversion for both x_k = X1/Z1 and y_k via `den = px · Z1² · Z2`:
+    let z1_sq = z1.square(irr);
+    let z1z2 = z1.mul(&z2, irr);
+    let den = px.mul(&z1_sq.mul(&z2, irr), irr);
+    let inv_den = den.flt_inverse(irr).expect("non-zeropx * Z1^2 * Z2");
+    let inv_z1 = inv_den.mul(&px.mul(&z1z2, irr), irr);
+    let xk = x1.mul(&inv_z1, irr);
+
+    let u2 = x2.add(&px.mul(&z2, irr));
+    let px2_py = px2.add(py);
+    let inner = u1.mul(&u2, irr).add(&px2_py.mul(&z1z2, irr));
+    let yk = u1.mul(&inner, irr).mul(&inv_den, irr).add(py);
+
+    BinaryPoint::Affine { x: xk, y: yk }
 }
 
 /// Brute-force search for any valid point and its order, on a tiny

@@ -1,0 +1,60 @@
+--------------------------------------------------------------------------------
+Profile data file 'cg/new3.cg' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 559664068
+Trigger: Program termination
+Profiled target:  new3/jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0 --json new3.json (PID 7440, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+1,137,381,291 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                    file:function
+--------------------------------------------------------------------------------
+192,132,944 (16.89%)  ???:<<crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::Interned>::id [new3/jv_cover]
+129,575,760 (11.39%)  ???:<crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic [new3/jv_cover]
+ 89,460,501 ( 7.87%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41}> as core::iter::traits::iterator::Iterator>::try_fold::<(), <core::iter::adapters::GenericShunt<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41}>, core::option::Option<core::convert::Infallible>> as core::iter::traits::iterator::Iterator>::try_fold<(), core::iter::traits::iterator::Iterator::try_for_each::call<alloc::vec::Vec<u32>, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>::Break>::{closure#0}, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>>::{closure#0}, core::ops::control_flow::ControlFlow<core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>>> [new3/jv_cover]
+ 85,064,582 ( 7.48%)  ???:crypto_lib::cryptanalysis::f4_fp::rref32_deferred [new3/jv_cover]
+ 71,699,131 ( 6.30%)  ???:crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic [new3/jv_cover]
+ 64,218,903 ( 5.65%)  ???:<&crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41} as core::ops::function::FnMut<(&alloc::vec::Vec<(u32, u64)>,)>>::call_mut [new3/jv_cover]
+ 62,003,385 ( 5.45%)  ???:crypto_lib::cryptanalysis::f4_fp::add_lazy_avx2 [new3/jv_cover]
+ 48,324,372 ( 4.25%)  ???:<alloc::vec::Vec<u32> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u32, core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<u64>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#7}::{closure#0}>>>::from_iter [new3/jv_cover]
+ 35,010,093 ( 3.08%)  ???:<alloc::vec::Vec<(u128, u32)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(u128, u32), core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<u128>>, <crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::{closure#8}>>>::from_iter [new3/jv_cover]
+ 30,680,696 ( 2.70%)  ???:<crypto_lib::cryptanalysis::f4_fp::Cols>::get [new3/jv_cover]
+ 30,413,778 ( 2.67%)  ???:<alloc::vec::Vec<u32> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u32, core::iter::adapters::map::Map<core::slice::iter::Iter<usize>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41}::{closure#1}>>>::from_iter [new3/jv_cover]
+ 20,713,425 ( 1.82%)  ???:<alloc::vec::Vec<(u32, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(u32, u64), core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<alloc::vec::into_iter::IntoIter<u32>, core::slice::iter::Iter<(alloc::vec::Vec<u32>, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#30}::{closure#0}>>>::from_iter [new3/jv_cover]
+ 19,053,345 ( 1.68%)  ???:_rjem_sdallocx [new3/jv_cover]
+ 17,365,558 ( 1.53%)  ???:_rjem_je_tcache_bin_flush_small [new3/jv_cover]
+ 16,902,999 ( 1.49%)  ???:_rjem_malloc [new3/jv_cover]
+ 12,094,929 ( 1.06%)  ???:<alloc::vec::Vec<(alloc::vec::Vec<u32>, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(alloc::vec::Vec<u32>, u64), core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<u32>>, crypto_lib::cryptanalysis::f4_fp::interreduce_linear_with::{closure#14}::{closure#0}>, crypto_lib::cryptanalysis::f4_fp::interreduce_linear_with::{closure#14}::{closure#1}>>>::from_iter [new3/jv_cover]
+ 10,687,842 ( 0.94%)  ???:<hashbrown::map::HashMap<(usize, u128), (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::f4_fp::PackedHasher>>>::insert [new3/jv_cover]
+ 10,281,035 ( 0.90%)  ???:tcache_bin_flush_edatas_lookup.isra.0 [new3/jv_cover]
+  9,811,200 ( 0.86%)  ???:_rjem_je_arena_cache_bin_fill_small [new3/jv_cover]
+  9,208,304 ( 0.81%)  ???:crypto_lib::cryptanalysis::f4_fp::reduce_lazy_by [new3/jv_cover]
+  9,182,333 ( 0.81%)  ???:core::slice::sort::shared::smallsort::small_sort_general::<(u128, u32), <[(u128, u32)]>::sort_unstable_by_key<core::cmp::Reverse<u128>, crypto_lib::cryptanalysis::f4_fp_tower::f4_tower_cached::{closure#4}>::{closure#0}> [new3/jv_cover]
+  8,948,444 ( 0.79%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<u32>>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#1}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<(alloc::vec::Vec<u64>, usize), <alloc::vec::Vec<(alloc::vec::Vec<u64>, usize)>>::extend_trusted<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<u32>>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#1}>>::{closure#0}>::{closure#0}> [new3/jv_cover]
+  8,532,631 ( 0.75%)  ./string/../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S:__memset_avx2_unaligned_erms [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  7,522,221 ( 0.66%)  ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  7,029,352 ( 0.62%)  ???:<hashbrown::raw::RawTable<((usize, u128), ())>>::reserve_rehash::<hashbrown::map::make_hasher<(usize, u128), (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::f4_fp::PackedHasher>>::{closure#0}> [new3/jv_cover]
+  6,432,514 ( 0.57%)  ???:<&mut crypto_lib::cryptanalysis::f4_fp::interreduce_linear_with::{closure#0} as core::ops::function::FnMut<(&(usize, &alloc::vec::Vec<(alloc::vec::Vec<u32>, u64)>),)>>::call_mut [new3/jv_cover]
+  5,895,435 ( 0.52%)  ???:<core::iter::adapters::map::Map<core::ops::range::Range<usize>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#7}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<alloc::vec::Vec<u32>, <alloc::vec::Vec<alloc::vec::Vec<u32>>>::extend_trusted<core::iter::adapters::map::Map<core::ops::range::Range<usize>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#7}>>::{closure#0}>::{closure#0}> [new3/jv_cover]
+  5,762,766 ( 0.51%)  ???:core::slice::sort::unstable::quicksort::quicksort::<(u128, u32), <[(u128, u32)]>::sort_unstable_by_key<core::cmp::Reverse<u128>, <crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::{closure#9}>::{closure#0}> [new3/jv_cover]
+  5,649,307 ( 0.50%)  ???:core::slice::sort::unstable::quicksort::quicksort::<(u128, u32), <[(u128, u32)]>::sort_unstable_by_key<core::cmp::Reverse<u128>, <crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::{closure#9}>::{closure#0}>'2 [new3/jv_cover]
+  5,485,512 ( 0.48%)  ???:__rustc::__rust_dealloc [new3/jv_cover]
+  5,469,394 ( 0.48%)  ???:do_rallocx [new3/jv_cover]
+  5,093,159 ( 0.45%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Chunks<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::reduce_pairs_blocked::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<core::option::Option<alloc::vec::Vec<alloc::vec::Vec<u32>>>, <alloc::vec::Vec<core::option::Option<alloc::vec::Vec<alloc::vec::Vec<u32>>>>>::extend_trusted<core::iter::adapters::map::Map<core::slice::iter::Chunks<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::reduce_pairs_blocked::{closure#0}>>::{closure#0}>::{closure#0}> [new3/jv_cover]
+  4,889,311 ( 0.43%)  ???:_rjem_je_arena_ralloc [new3/jv_cover]
+  4,609,833 ( 0.41%)  ???:<hashbrown::map::HashMap<(usize, alloc::vec::Vec<u32>), (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::FxHasher>>>::insert [new3/jv_cover]
+  4,502,650 ( 0.40%)  ???:__rustc::__rust_alloc [new3/jv_cover]

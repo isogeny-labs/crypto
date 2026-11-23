@@ -92,6 +92,9 @@ use crate::cryptanalysis::ic_framework::plugins::{
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
+use crate::cryptanalysis::ic_framework::semaev_projection_oracle::SemaevProjectionOracle;
+use crate::cryptanalysis::ic_framework::rootfind_floor::RootfindFloorOracle;
+use crate::cryptanalysis::ic_framework::rootfind_kmitm::RootfindKMitmOracle;
 use crate::cryptanalysis::ic_framework::shared_rank::{
     run_shared_rank_targets, SharedRankSpec, SharedTargetSpec,
 };
@@ -143,6 +146,60 @@ pub struct MethodDecl {
     pub applies: Applies,
     pub params: &'static [ParamDecl],
 }
+
+const GROWING_ARITY_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "bits",
+        default: Some("16"),
+        help: "prime-order curve bit size for prime_instance_for (12..=40)",
+    },
+];
+
+const AUX_TOWER_SOLVER_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "bits",
+        default: Some("16"),
+        help: "prime-order curve bit size for prime_instance_for (14..=36); AUX prime-isogeny + rootfind-mitm",
+    },
+];
+
+const DIEM_KGROW_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "p",
+        default: Some("5"),
+        help: "base-field prime for the self-hosted E(F_{p^k}) cell",
+    },
+    ParamDecl {
+        name: "k",
+        default: Some("2"),
+        help: "extension degree, or `schedule` to use k_of_p(p,k_min,k_max)",
+    },
+    ParamDecl {
+        name: "k_min",
+        default: Some("2"),
+        help: "lower clamp for schedule mode",
+    },
+    ParamDecl {
+        name: "k_max",
+        default: Some("8"),
+        help: "upper clamp for schedule mode",
+    },
+    ParamDecl {
+        name: "trial_budget",
+        default: Some("2000000"),
+        help: "charged k-decomp trial budget",
+    },
+    ParamDecl {
+        name: "planted",
+        default: Some("2"),
+        help: "number of planted k-summand targets per cell",
+    },
+    ParamDecl {
+        name: "oracle",
+        default: Some("semaev"),
+        help: "`semaev` = LineOracle/LineS4Oracle; `brute` = exhaustive k-summand control",
+    },
+];
 
 const K4_PARAMS: &[ParamDecl] = &[
     ParamDecl {
@@ -227,7 +284,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3..9 (one probe a target into a negation-folded table of every signed m-sum of the base; m = 6..9 limit the base to 1023, 511, 255, 127 points); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch (same table with batched binary additions), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); rootfind-floor:m=2|3 (same search with x-only Montgomery candidates and a Bloom filter); rootfind-kmitm:m=3..12 (meet-in-the-middle half-sum table + complementary probe); ksum:m=3..9 (one probe a target into a negation-folded table of every signed m-sum of the base; m = 6..9 limit the base to 1023, 511, 255, 127 points); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch (same table with batched binary additions), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
         },
         ParamDecl {
             name: "solver",
@@ -765,6 +822,30 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::fp4::solve_k4",
             applies: Applies::Any,
             params: K4_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.diem_kgrow",
+            family: "ic",
+            summary: "Selectable-k Diem extension-IC lab cell: Semaev-line decomp (LineOracle S3 / LineS4Oracle Macaulay) on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r — not absolute F_p same-target",
+            entry: "ecbench::diem_kgrow::solve",
+            applies: Applies::Any,
+            params: DIEM_KGROW_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.growing_arity",
+            family: "ic",
+            summary: "Growing-arity prime-field ksum: m=m(L) from GROWING_ARITY_ORACLE_TARGET, B≤C m exp(L/m) capped for KSumOracle, prime_instance_for(bits)+prime-abscissa; matched S_ρ=√(π/2), [d]G=Q via pipeline verify — not extension-IC",
+            entry: "ecbench::growing_arity::solve",
+            applies: Applies::Any,
+            params: GROWING_ARITY_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.aux_tower_solver",
+            family: "ic",
+            summary: "AUX prime-isogeny tower FB + algebraic rootfind-mitm:m=3 on prime_instance_for(bits); t from schedule capped at T_MAX; matched S_ρ=√(π/2), [d]G=Q — not ksum, not absolute-F_p extension-IC",
+            entry: "ecbench::aux_tower_solver::solve",
+            applies: Applies::Any,
+            params: AUX_TOWER_SOLVER_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic",
@@ -3679,6 +3760,19 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             curve.slug, curve.family
         ));
     }
+    if id == "ic.diem_kgrow" {
+        // Self-hosted (p,k) cell; any workload is accepted as a carrier.
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
+    if id == "ic.growing_arity" {
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
+    if id == "ic.aux_tower_solver" {
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
     if id == NEG_STRONG {
         if !matches!(inst, Instance::F2m4(_)) {
             return Err(neg_strong_refusal(curve));
@@ -4152,6 +4246,19 @@ pub fn solve_measured(
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
     three_leads_applicable(m, inst, curve)?;
+    // Self-hosted extension geometry from params; workload curve unused.
+    if m.id == "ic.diem_kgrow" {
+        let _ = (inst, curve, target, oracle);
+        return super::diem_kgrow::solve(m, seed);
+    }
+    if m.id == "ic.growing_arity" {
+        let _ = (inst, curve, target, oracle);
+        return super::growing_arity::solve(m, seed);
+    }
+    if m.id == "ic.aux_tower_solver" {
+        let _ = (inst, curve, target, oracle);
+        return super::aux_tower_solver::solve(m, seed);
+    }
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -8017,7 +8124,11 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_mitm_batch = RootfindMitmOracle::new_prime_batch(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
+    let mut semaev_projection = SemaevProjectionOracle::new(ms);
+    let mut residual_sweep = ResidualSweepOracle::new();
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    let mut rootfind_floor = RootfindFloorOracle::new(ms, inst);
+    let mut rootfind_kmitm = RootfindKMitmOracle::new_prime(ms, inst);
     let mut rootfind_gpu =
         crate::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(ms, inst);
     let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
@@ -8044,7 +8155,11 @@ fn solve_ic_prime(
         "rootfind-mitm" => &mut rootfind_mitm,
         "rootfind-mitm-prime-batch" => &mut rootfind_mitm_batch,
         "rootfind-pairs" => &mut rootfind_pairs,
+        "semaev-projection" => &mut semaev_projection,
+        "residual-sweep" => &mut residual_sweep,
         "rootfind-subtract" => &mut rootfind,
+        "rootfind-floor" => &mut rootfind_floor,
+        "rootfind-kmitm" => &mut rootfind_kmitm,
         "rootfind-subtract-gpu" => &mut rootfind_gpu,
         other => match plugin_oracle.as_deref_mut() {
             Some(o) => o,
@@ -12516,6 +12631,9 @@ mod accounting_rules_tests {
         // Covered elsewhere (own tests, native backends, other curve shapes).
         covered.extend([
             "ic.k4_gaudry",           // curves over F_{p^4}: ecbench::fp4 tests
+            "ic.diem_kgrow",          // self-hosted E(F_{p^k}) charged cell + ladder example
+            "ic.growing_arity",       // growing-m ksum on prime_instance_for
+            "ic.aux_tower_solver",    // AUX prime-isogeny + rootfind-mitm ladder
             "ic.cm_folded_native_v1", // native backend binary
             "ic.cm_folded_recurrence_v1",
             "ic.cm_folded_native_d43_v1",
@@ -14015,5 +14133,60 @@ mod curve25519_pair_dispatch_tests {
         let narrow_spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
         let narrow = narrow_spec.build().unwrap();
         assert!(applicable(&method(1, 0, 1), &narrow, &narrow.facts(&narrow_spec)).is_err());
+    }
+
+    /// Unrestricted ordinary prime-field ECDLP: PKM isogeny FB vs negation rho (no MOV/k_emb).
+    #[test]
+    fn pkm_isogeny_vs_rho_ladder_20_24_28() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        for bits in [20u32, 24] {
+            let spec = CurveSpec::PrimeSearch {
+                bits,
+                seed: 0xA11CE ^ bits as u64,
+            };
+            let inst = spec.build().unwrap();
+            let facts = inst.facts(&spec);
+            let Instance::Prime(prime) = &inst else {
+                unreachable!()
+            };
+            let mut scratch = GroupOps::default();
+            let d = 12_345u128 % u128::from(prime.r);
+            let target = prime
+                .curve
+                .mul(&mut scratch, prime.generator_point(), d as u64);
+            let coords = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+            let t = match bits { 20 => 7, 24 => 8, _ => 9 };
+            let fb_spec = format!("prime-isogeny:t={t},seed=1");
+            let ic = resolve(&MethodSpec {
+                id: "ic.pipeline".into(),
+                params: [
+                    ("factor_base".to_string(), fb_spec),
+                    ("oracle".to_string(), "rootfind-mitm:m=3".to_string()),
+                ]
+                .into_iter()
+                .collect(),
+            })
+            .unwrap();
+            let rho = resolve(&MethodSpec {
+                id: "rho.negation".into(),
+                params: Default::default(),
+            })
+            .unwrap();
+            let ic_rep = solve(&ic, &inst, &facts, &coords, 3).unwrap();
+            let rho_rep = solve(&rho, &inst, &facts, &coords, 3).unwrap();
+            let d_exact = crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from(d);
+            eprintln!(
+                "PKM bits={} t={} ic_ok={} ic_gae={:.3e} rho_ok={} rho_gae={:.3e} speedup={:.3}",
+                bits,
+                t,
+                ic_rep.recovered == Some(d_exact),
+                ic_rep.total_gae,
+                rho_rep.recovered == Some(d_exact),
+                rho_rep.total_gae,
+                rho_rep.total_gae / ic_rep.total_gae.max(1.0),
+            );
+            assert_eq!(ic_rep.recovered, Some(d_exact));
+            assert_eq!(rho_rep.recovered, Some(d_exact));
+        }
     }
 }

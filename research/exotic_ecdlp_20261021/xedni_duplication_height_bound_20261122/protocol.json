@@ -1,0 +1,17 @@
+{
+  "schema": "xedni-duplication-height-bound-v1",
+  "frozen_at_utc_date": "2026-11-22",
+  "curve": "y^2=x^3-47*x^2+751*x-3997 over Q",
+  "height": "h(P)=log(max(abs(a),abs(b))) for x(P)=a/b in coprime integer coordinates, h(0)=0",
+  "duplication_numerator": "A^4-1502*A^2*B^2+31976*A*B^3-187435*B^4",
+  "duplication_denominator": "4*A^3*B-188*A^2*B^2+3004*A*B^3-15988*B^4",
+  "resultant_target": "8038359040000",
+  "archimedean_target": "max(abs(F(A,B)),abs(G(A,B))) >= max(abs(A),abs(B))^4/1024 for all real A,B",
+  "upper_target": "max(abs(F(A,B)),abs(G(A,B))) <= 2^18*max(abs(A),abs(B))^4 for all real A,B",
+  "gcd_target": "For coprime integers A,B, gcd(F(A,B),G(A,B)) divides 8038359040000",
+  "derived_target": "For rational points P on the fixed curve, abs(h(2P)-4*h(P)) <= 53*log(2), hence abs(H(P)-h(P)) <= (53/3)*log(2) < 14",
+  "method": "Exact integer/rational interval subdivision for the archimedean bound; polynomial Bezout identity and coprimality for the gcd bound; independent algebraic replay; Lean proof of the central algebraic and height implications where feasible.",
+  "pilot": "A pre-freeze floating scan found a normalized minimum near 0.00746 and Sympy gave the stated resultant; neither is promotion evidence.",
+  "proof_gate": "Pin Lean and dependencies, build actual theorem modules, print axioms; preserve conditional assumptions and exact unfinished bridges.",
+  "resource_cap": "Local exact arithmetic and Lean checks; no cloud jobs or measured performance claim."
+}
