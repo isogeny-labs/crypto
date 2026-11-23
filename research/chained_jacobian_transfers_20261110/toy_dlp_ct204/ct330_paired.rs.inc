@@ -45,7 +45,7 @@
                     .and_then(|num| num.parse::<u64>().ok())).unwrap_or(0);
             let order = if round == 1 { "BSGS_RHO" } else { "RHO_BSGS" };
             eprintln!(
-                "\\nCT330_PAIRED_JSON {{\"round\":{},\"order\":\"{}\",\"p\":103,\"subgroup_order\":109,\"target_x\":42,\"target_y\":71,\"rho_log\":{},\"bsgs_log\":73,\"rho_total_ns\":{},\"bsgs_total_ns\":{},\"rho_setup_ns\":{},\"rho_walk_ns\":{},\"rho_verify_ns\":{},\"rho_unclassified_ns\":{},\"rho_ec_adds\":{},\"rho_walk_steps\":{},\"rho_restarts\":{},\"rho_canonicalisations\":{},\"rho_negations\":{},\"rho_collisions\":{},\"rho_useless_collisions\":{},\"rho_table_entries\":{},\"rho_table_capacity\":{},\"bsgs_original_partial_adds\":{},\"bsgs_ct329_full_adds\":34,\"vmhwm_kb_processwide\":{},\"pcc\":\"unverified\"}}",
+                "\nCT330_PAIRED_JSON {{\"round\":{},\"order\":\"{}\",\"p\":103,\"subgroup_order\":109,\"target_x\":42,\"target_y\":71,\"rho_log\":{},\"bsgs_log\":73,\"rho_total_ns\":{},\"bsgs_total_ns\":{},\"rho_setup_ns\":{},\"rho_walk_ns\":{},\"rho_verify_ns\":{},\"rho_unclassified_ns\":{},\"rho_ec_adds\":{},\"rho_walk_steps\":{},\"rho_restarts\":{},\"rho_canonicalisations\":{},\"rho_negations\":{},\"rho_collisions\":{},\"rho_useless_collisions\":{},\"rho_table_entries\":{},\"rho_table_capacity\":{},\"bsgs_original_partial_adds\":{},\"bsgs_ct329_full_adds\":34,\"vmhwm_kb_processwide\":{},\"pcc\":\"unverified\"}}",
                 round, order, rho.log, rho.total_ns, bs.0,
                 rho.setup_ns, rho.walk_ns, rho.verification_ns, unknown,
                 rho.tally.ec_adds, rho.tally.walk_steps, rho.restarts,
@@ -55,5 +55,5 @@
                 bs.1, vmhwm_kb
             );
         }
-        eprintln!("\\nCT330_THREE_PAIRED_Q73_COMPLETE pcc=unverified");
+        eprintln!("\nCT330_THREE_PAIRED_Q73_COMPLETE pcc=unverified");
     }
