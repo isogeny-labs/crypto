@@ -1,3 +1,11 @@
+## Resume401: third unchanged blocked turn; stop_goal(blocked) final action
+
+Environmentready, trackedstateclean, no compiler/experimentjob. CanonicalKEY/fallbackstillabsent and no explicitprotocolchoice reply. Main143a0b91unchanged. This isTHIRDconsecutivegoalturn preventedfrommeaningfulprogress bysameexternaldependency (399/400/401); reconnection/metadata isnotresearchprogress. Finishpublishingthisblockedhandoff, then CALL stop_goal(outcome=blocked). Do NOT markcomplete. Onnextuserexplicitresume afterblocked, startfreshcount; environmentmessagesalone do notauthorizeprotocolwaiver orreactivategoal.
+
+Original15×goalUNACHIEVED. Publishedresearch b1c6da50b2 andmetadata9cab/e6f/030b onPR4989 remainvalidathistorical scopes. Actualmodule390+fresh393pass7tests, full8216rootruntime UNQUALIFIED; allfull380/384failuresretained. No newtiming/numericalrun, no activejob. Fullcontrol/proof/fullboundary/sixcase/repeatedAA/original15× acceptanceunchanged. LocalCPU0/onethread/zerocloud/checkpointS3waiver persists.
+
+RESUME DEPENDENCY: canonicalprotocolaccess OR explicit pendingdocument-onlywaiveracceptingpublished372. Required https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/experiment-protocol/SKILL.md says “Read the canonical SKILL.md and follow it.” No repeatedquestions/key/CIlookups, credentialhunting, gate/key/frozen-evidenceedits, unregisteredtimings orweakercontrols. Afterresolved qualifySEPARATEfinalprospective collector/analyzer/tool/source/inputpins, thenall36strongestmatchedcontrols/sixp31p53n3/4/6seed7LASTstar/fullboundary/fullproofs/repeatsAA/15×. PreviousrealratiosinsideAA remainno15×. No inferencesfromenvironmentmessage/elapsedtime/preselectedoption.
+
 ## Resume400: same protocol dependency; second consecutive blocked goal turn
 
 Environmentreadyagain; HEAD e6f36bd722f9f23510ad22c73256c37fac8b49df, trackedstateclean, no experimentprocess. No supportedKEY/fallback binding or explicitprotocolchoice reply. No numerical/timing/sourcework thisturn. Counter=2consecutivegoalturns withsameexternalblocker; metadataupdates do notresetcount. Keepgoalactive now. Ifthirdconsecutivegoalturn stillhasnomeaningfulprogress becauseaccess/explicitdecision isneeded, stop_goalblocked (nevercomplete), then summarize. Don'trepeatquestion, dispatchjobs, inferapprovalfromenvironmentmessages orclaim15×.
