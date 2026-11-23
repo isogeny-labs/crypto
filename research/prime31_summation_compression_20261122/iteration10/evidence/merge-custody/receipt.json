@@ -1,0 +1,182 @@
+{
+  "autonomy_registration": {
+    "add_episode_executed": false,
+    "add_intervention_executed": false,
+    "blocked_inputs": [
+      "No authoritative episode first-prompt timestamps or episode boundaries.",
+      "No authoritative per-message timestamps or confirmed mapping to the two PR episodes.",
+      "The incident recovery field permits SELF or HUMAN only; the observed failures remained unresolved before the external merges.",
+      "The complete CI-at-merge check set has not been independently reconstructed; scientific native validation failed.",
+      "The visible message subset does not establish an exhaustive human-intervention ledger."
+    ],
+    "canonical_entries_created": false,
+    "classifier_run_claimed": false,
+    "disposition": "Retain this noncanonical receipt and hash-only drafts until authoritative metadata is available; do not coerce missing values or label unresolved failures as recovered.",
+    "full_autonomy_success_claimed": false,
+    "merge_at_is_automatic_episode_end": false,
+    "metrics_or_costs_invented": false,
+    "pr_opened_at_is_episode_start": false,
+    "report_generated": false,
+    "retained_drafts": "intervention-drafts.json",
+    "reverted_check_reason": "Fourteen-day post-end window has not elapsed and episode end is unavailable.",
+    "reverted_check_recorded": false,
+    "schema_constraints": {
+      "ci_green_at_merge": "Boolean only",
+      "episode_ended": "Required ISO timestamp",
+      "episode_started": "Required ISO timestamp",
+      "incident_recovery_allowed": [
+        "SELF",
+        "HUMAN"
+      ],
+      "intervention_episode": "Required existing canonical episode reference",
+      "intervention_ts": "Required ISO timestamp"
+    },
+    "tool": "tools/autonomy_report.py"
+  },
+  "base_commit": "816f9c3a942efed569049618c056d12a0c56d693",
+  "bounded_prior_entry_search": {
+    "exhaustive_ledger_audit": false,
+    "observed": "Code search for the two PR numbers in autonomy and lesson directories found no matching PR record. One autonomy hit for 4928 was an unrelated 2026-11-04 intervention whose message hash happened to contain those digits.",
+    "source_commit": "816f9c3a942efed569049618c056d12a0c56d693"
+  },
+  "canonical_lessons": {
+    "entries": [
+      {
+        "bytes": 1254,
+        "created": "2026-11-23T06:03:09Z",
+        "git_blob_sha1": "1070bc1cf1f3259e82e17ff101714ee3ebfb4ea4",
+        "id": "O-494cc8c43d40",
+        "path": "docs/lessons/entries/O-494cc8c43d40.json",
+        "result": "blocked",
+        "sha256": "d76a0773be9d4a91bf12e9538c16da357d51cda0fd5c5ce8c21d1cb8169f8b48"
+      },
+      {
+        "bytes": 1092,
+        "created": "2026-11-23T06:03:09Z",
+        "git_blob_sha1": "ce52e097cd17badd19380f7f891593fd1abdfb30",
+        "id": "O-cb8790c26032",
+        "path": "docs/lessons/entries/O-cb8790c26032.json",
+        "result": "partial",
+        "sha256": "717a22b443c0a4f37f76ba8fb02c7c84a14a931cc9103ed66af3dbaef07fa514"
+      }
+    ],
+    "tool": "tools/lessons.py",
+    "verification": {
+      "command": "python merge-custody/base/tools/lessons.py --dir merge-custody/publish/docs/lessons/entries verify",
+      "exit_code": 0,
+      "scope": "Only these two newly generated entries; no whole-repository or historical-prefix verification claimed.",
+      "stdout": "lessons verify: 2 entries, 0 error(s)\n"
+    }
+  },
+  "created": "2026-11-23T06:05:56Z",
+  "destination_pr": 4977,
+  "maintained_sources": [
+    {
+      "bytes": 31161,
+      "git_blob_sha1": "58e14cd2f4392f0035180673eee9bb04b2ecfb28",
+      "path": "tools/autonomy_report.py",
+      "sha256": "d77577eed061879b5f6fdc4b7efd01252d36042653763152f8c60507a6446d46",
+      "source_commit": "816f9c3a942efed569049618c056d12a0c56d693"
+    },
+    {
+      "bytes": 15709,
+      "git_blob_sha1": "bf472b4e1b45559745ae49100f8f28ee66d9fa2a",
+      "path": "tools/lessons.py",
+      "sha256": "b2a1ec112d2c4802d2a321a2bbaa9e6f2f773a11c8d19d4e01eb92300651276a",
+      "source_commit": "816f9c3a942efed569049618c056d12a0c56d693"
+    },
+    {
+      "bytes": 3231,
+      "git_blob_sha1": "9e1e054562c0d2cd82ed070fef8ed90927380bf9",
+      "path": "benchmarks/agent-autonomy/README.md",
+      "sha256": "868f66083c92caefb7f8a566674e7240657e1461b0f5913620305b7620d540c6",
+      "source_commit": "816f9c3a942efed569049618c056d12a0c56d693"
+    }
+  ],
+  "provenance": {
+    "ci_and_source_audit": "Parent-supplied retained run/job evidence and independently audited unchanged-source identity; not rerun by this child agent.",
+    "created": "Actual receipt creation time; never substituted for session or human-message time.",
+    "pr_metadata": "Read-only GitHub PR metadata fetched during this custody task.",
+    "tool_sources": "Read-only fetches at the pinned base commit, verified against Git blob identities."
+  },
+  "publication_contract": {
+    "all_publish_paths_are_new": true,
+    "canonical_autonomy_ledger_modified": false,
+    "existing_main_files_modified_by_this_agent": false,
+    "full_git_prefix_check": "Not executed in this partial no-git materialization.",
+    "integration": "Parent integrates these new paths onto the current branch while retaining all existing tree entries; verify path absence before adding.",
+    "remote_writes_performed": false,
+    "shared_report_or_pcc_modified": false
+  },
+  "pull_requests": [
+    {
+      "ci_green_at_merge": null,
+      "episode_ended": null,
+      "episode_started": null,
+      "last_head": "fc184b03d47e13ec922c9b489f3b3f8a976a8bd9",
+      "lesson_outcome": "O-cb8790c26032",
+      "merge_commit": "2051d2f5b2c0a717deb5d47b8bdd7599264689e0",
+      "merge_performed_by_this_agent_or_root": false,
+      "merged_at": "2026-11-23T02:32:58Z",
+      "native_failure_evidence": [
+        {
+          "failure_area": "Inherited spec.rs compilation failure",
+          "job": 137436389923,
+          "recovery_at_merge": "unresolved",
+          "run": 45096187034,
+          "source": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
+          "url": "https://github.com/isogeny-labs/crypto/actions/runs/45096187034"
+        },
+        {
+          "failure_area": "Inherited ic_framework/mod.rs compilation failure",
+          "job": 137441679059,
+          "recovery_at_merge": "unresolved",
+          "run": 45097885135,
+          "source": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+          "url": "https://github.com/isogeny-labs/crypto/actions/runs/45097885135"
+        }
+      ],
+      "number": 4928,
+      "pr_opened_at": "2026-11-23T00:03:56Z",
+      "scientific_validation_status": "Native builds failed before candidate tests and identity issuance; no asymptotic gain established.",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4928"
+    },
+    {
+      "ci_green_at_merge": null,
+      "episode_ended": null,
+      "episode_started": null,
+      "last_head": "a675e7c495145c30399dfa33a63f01f9f1ab54c3",
+      "lesson_outcome": "O-494cc8c43d40",
+      "merge_commit": "b0a8d8b0a7ec3bf3469589dda7010d5612c9f70a",
+      "merge_performed_by_this_agent_or_root": false,
+      "merged_at": "2026-11-23T04:57:27Z",
+      "native_failure_evidence": [
+        {
+          "completed_at": "2026-11-23T04:56:20Z",
+          "failure_area": "Unchanged src/cryptanalysis/binary_hyperelliptic_index_calculus.rs, unclosed delimiters",
+          "failure_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+          "job": 137492117014,
+          "recovery_at_merge": "unresolved",
+          "run": 45113871392,
+          "source": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+          "url": "https://github.com/isogeny-labs/crypto/actions/runs/45113871392/job/137492117014"
+        }
+      ],
+      "number": 4962,
+      "pr_opened_at": "2026-11-23T04:40:53Z",
+      "scientific_validation_status": "All five independent command stages failed compilation before candidate tests or issuer execution. Replay was not executed after issuer compilation failed. No asymptotic gain established.",
+      "url": "https://github.com/isogeny-labs/crypto/pull/4962"
+    }
+  ],
+  "schema": "prime31.merge-custody-receipt/v1",
+  "scientific_result": {
+    "asymptotic_speedup_achieved": false,
+    "benchmarks_executed": false,
+    "candidate_native_tests_passed": false,
+    "formal_proof_obtained": false,
+    "research_objective": "open"
+  },
+  "scope": "Administrative custody of two external merges; no scientific computation or remote mutation performed by this child agent.",
+  "status": "partial_custody_autonomy_registration_blocked",
+  "tracking_commit_at_assignment": "c2c25f9799c3f5492ade4d638c7aa6a3900acbde"
+}

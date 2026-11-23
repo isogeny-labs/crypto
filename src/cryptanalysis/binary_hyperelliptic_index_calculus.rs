@@ -790,6 +790,7 @@ pub fn collect_relations(
                 }
             }
         };
+        let pos = pos;
         report.walk_wall_ns += started.elapsed().as_nanos() as u64;
 
         let (a, b, r) = (pos.a.clone(), pos.b.clone(), pos.r.clone());

@@ -3909,7 +3909,7 @@ fn x_fingerprint(x: &BigUint) -> u64 {
 /// checked against the factor-base points (one addition, only on a hit), so a fingerprint
 /// collision is a miss, never a wrong relation; the hit set equals the exact table's, and among
 /// sums with the same x the earliest inserted answers, as in the exact table.
-pub struct PairSumTable {
+pub struct CompactPairSumTable {
     fps: Vec<u64>,
     vals: Vec<u32>,
     points: Vec<Point>,
@@ -3917,7 +3917,7 @@ pub struct PairSumTable {
     entries: usize,
 }
 
-impl PairSumTable {
+impl CompactPairSumTable {
     fn slot(&self, fp: u64) -> usize {
         ((u128::from(fp) * self.fps.len() as u128) >> 64) as usize
     }
@@ -4005,7 +4005,7 @@ impl PairSumTable {
     }
 }
 
-pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+pub fn build_compact_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> CompactPairSumTable {
     assert!(
         factor_base.len() <= PAIR_SUM_TABLE_MAX_FB,
         "compact pair-sum table indexes at most {PAIR_SUM_TABLE_MAX_FB} factor-base points"
@@ -4013,7 +4013,7 @@ pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]
     let a_fe = curve.a_fe();
     let f = factor_base.len();
     let slots = (f * f * 5 / 3).max(16);
-    let mut table = PairSumTable {
+    let mut table = CompactPairSumTable {
         fps: vec![0; slots],
         vals: vec![0; slots],
         points: factor_base.iter().map(|e| e.point.clone()).collect(),
@@ -4089,7 +4089,7 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
     q: &Point,
-    table: &PairSumTable,
+    table: &CompactPairSumTable,
     max_trials: usize,
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
@@ -4221,7 +4221,7 @@ fn find_one_relation_table_walk<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
     q: &Point,
-    table: &PairSumTable,
+    table: &CompactPairSumTable,
     walk: &mut SampleWalk,
     max_trials: usize,
     rng: &mut R,
@@ -4310,7 +4310,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         count("sweep_collector_work_not_counted", 1);
     }
     let sum_table = if use_table {
-        Some(build_pair_sum_table(curve, &fb))
+        Some(build_compact_pair_sum_table(curve, &fb))
     } else {
         None
     };
@@ -4319,6 +4319,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     // the old per-attempt rebuild for A/A comparison (ignored with
     // `IC_FAST_SWEEP=1`, whose word loop always takes the hoisted index);
     // `IC_HOIST_SWEEP=1` is accepted and is the default.
+    // Default: word sweep when p fits u64 (`IC_FAST_SWEEP=0` forces BigUint sweep).
     let word_sweep = if !use_table && std::env::var("IC_FAST_SWEEP").as_deref() != Ok("0") {
         WordSweep::new(curve, &fb)
     } else {
@@ -5709,7 +5710,7 @@ mod tests {
         };
         let fb = build_factor_base(&curve, 12);
         let exact = build_pair_sum_table_exact(&curve, &fb);
-        let compact = build_pair_sum_table(&curve, &fb);
+        let compact = build_compact_pair_sum_table(&curve, &fb);
         assert!(compact.slot_bytes() < exact.len() * 170);
         let mut hits = 0usize;
         let mut k = BigUint::from(1u32);
@@ -5744,11 +5745,11 @@ mod tests {
             k += 1u32;
         }
         assert!(hits > 0, "no pair sum was hit");
-        let packed = PairSumTable::pack(11, -1, 7, 1);
-        assert_eq!(PairSumTable::unpack(packed), (11, -1, 7, 1));
-        let top = PairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
+        let packed = CompactPairSumTable::pack(11, -1, 7, 1);
+        assert_eq!(CompactPairSumTable::unpack(packed), (11, -1, 7, 1));
+        let top = CompactPairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
         assert_eq!(
-            PairSumTable::unpack(top),
+            CompactPairSumTable::unpack(top),
             (PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1)
         );
     }
@@ -5767,7 +5768,7 @@ mod tests {
         };
         let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
         let fb = build_factor_base(&curve, 12);
-        let table = build_pair_sum_table(&curve, &fb);
+        let table = build_compact_pair_sum_table(&curve, &fb);
         let check = |rel: &Relation| {
             let lhs = g
                 .scalar_mul(&rel.coef_a, &a_fe)
@@ -5919,7 +5920,7 @@ mod tests {
         let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
         for fb_size in [6usize, 12] {
             let fb = build_factor_base(&curve, fb_size);
-            let table = build_pair_sum_table(&curve, &fb);
+            let table = build_compact_pair_sum_table(&curve, &fb);
             let mut rng = rand::rngs::StdRng::seed_from_u64(31 + fb_size as u64);
             let m = fb.len();
             let mut rows = Vec::new();

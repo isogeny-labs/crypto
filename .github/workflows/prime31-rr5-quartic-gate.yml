@@ -5,9 +5,11 @@ on:
     branches:
       - main
       - lane/prime31-rr5-complete-controls-20261122
+      - lane/prime31-rr5-b677-circuit-20261122
     paths:
       - "examples/prime31_rr5_quartic.rs"
       - "research/prime31_four_summand_20261122/native/**"
+      - "src/cryptanalysis/f4_fp.rs"
       - ".github/workflows/prime31-rr5-quartic-gate.yml"
   workflow_dispatch:
 

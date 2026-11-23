@@ -1055,7 +1055,7 @@ impl PkmSemaevOracle {
         spec: &super::PipelineSpec,
         inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
     ) -> Result<Self, String> {
-        use super::prime_tower::{isogeny_tower, supersingular_tower, AuxKind, AuxFamily};
+        use super::prime_tower::{AuxFamily, isogeny_tower, supersingular_tower, AuxKind};
         let fb = &spec.factor_base_params;
         let oracle = match spec.factor_base.as_str() {
             "prime-kummer" => Self::new(m, fb.u64("t")? as u32, fb.u64_or("g", 1)?),
@@ -1066,7 +1066,7 @@ impl PkmSemaevOracle {
                 let kind = AuxKind::parse(fb.get("aux").unwrap_or("ordinary"), p)?;
                 let mut scratch = GroupOps::default();
                 let tower = if kind == AuxKind::Ordinary {
-                    isogeny_tower(p, t, seed, AuxFamily::parse(fb.get("family").unwrap_or("any"))?, &mut scratch)?
+                    isogeny_tower(p, t, seed, AuxFamily::Any, &mut scratch)?
                 } else {
                     supersingular_tower(p, t, seed, kind, &mut scratch)?
                 };
@@ -4250,7 +4250,7 @@ mod tests {
     /// the base's Vélu chain, and F4 matches the grid.
     #[test]
     fn isogeny_tower_form_agrees_with_grid() {
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
         let inst = instance();
         let t = 4;
         let b = PrimeIsogenyBase { instance: &inst };
@@ -4283,7 +4283,7 @@ mod tests {
     #[test]
     fn trace_agrees_with_plain_f4_and_grid() {
         use crate::cryptanalysis::ic_boundary::prime_factor_base;
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
         let inst = instance();
         let curve = &inst.curve;
         let t = 4;
@@ -4415,7 +4415,7 @@ mod tests {
     /// decomposable set with 1 and 2 guessed levels; `G ≥ t` is refused.
     #[test]
     fn isogeny_guessing_agrees_with_grid() {
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
         let inst = instance();
         let t = 4;
         let b = PrimeIsogenyBase { instance: &inst };
@@ -4716,7 +4716,7 @@ mod tests {
     /// `m = 3` on PKM's isogeny tower, both presentations.
     #[test]
     fn isogeny_tower_m3_agrees_with_grid() {
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
         let inst = instance();
         let t = 3;
         let b = PrimeIsogenyBase { instance: &inst };
