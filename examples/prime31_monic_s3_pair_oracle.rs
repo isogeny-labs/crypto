@@ -136,7 +136,7 @@ fn coeff_s3(f:Fp,z:u64)->(Poly,Poly) {
 fn factorbase(f:Fp,n:usize)->Vec<u64>{
     let mut w=vec![GX,X2G];
     if n==2{return w;}
-    for x in 0..1000u64 {
+    for x in 0..10_000u64 {
         let v=f.add(f.add(f.mul(f.mul(x,x),x),f.mul(A,x)),B);
         if (v==0 || f.pow(v,(P-1)/2)==1) && !w.contains(&x) {w.push(x);}
         if w.len()==n{return w;}
@@ -268,19 +268,46 @@ fn check(f:Fp,size:usize,z:u64) {
     let start=Instant::now();
     let (got,ddeg,ndeg,cdeg)=extract(f,&w,z).expect("non-table elimination / roots");
     let elapsed=start.elapsed().as_secs_f64()*1000.;
+    let reference_start=Instant::now();
     let expected=reference(f,&w,z);
+    let reference_ms=reference_start.elapsed().as_secs_f64()*1000.;
     assert_eq!(got,expected,"mismatched exact root set for B={size} target {z}");
     let start_tree=Instant::now();
     let tree=construct_balanced(f,&w,z);
     let tree_ms=start_tree.elapsed().as_secs_f64()*1000.;
     let (h0,h1,_,_,_,_,_)=construct(f,&w,z);
     assert_eq!(tree,(h0,h1),"balanced rank-four subproduct tree differs from Newton trace moments");
-    println!("monic-t-oracle p={P} B={size} z={z} Ddeg={ddeg} Ndeg={ndeg} gcd_deg={cdeg} verified_pairs={} online_ms={elapsed:.3} tree_build_ms={tree_ms:.3} tree_newton_coeff_equality=pass exact_reference=pass no_generic_table=true",got.len());
+    println!("monic-t-oracle p={P} B={size} z={z} Ddeg={ddeg} Ndeg={ndeg} gcd_deg={cdeg} verified_pairs={} online_ms={elapsed:.3} reference_scan_ms={reference_ms:.3} tree_build_ms={tree_ms:.3} tree_newton_coeff_equality=pass exact_reference=pass no_generic_table=true",got.len());
+}
+/// Fixed public affine abscissae on the same prime-order ordinary curve.
+/// No discrete-log indices are generated or passed to extract(); independent
+/// pair enumeration happens only *after* the candidate returns.
+fn public_curve_x_controls(f:Fp,count:usize)->Vec<u64>{
+    let mut state=0xC31B_A7ED_2026_1122u64;
+    let mut xs=Vec::new();
+    while xs.len()<count {
+        state=state.wrapping_mul(6_364_136_223_846_793_005)
+                   .wrapping_add(1_442_695_040_888_963_407);
+        let x=state%P;
+        let y2=f.add(f.add(f.mul(f.mul(x,x),x),f.mul(A,x)),B);
+        if y2!=0 && f.pow(y2,(P-1)/2)==1 && !xs.contains(&x) {
+            xs.push(x);
+        }
+    }
+    xs
 }
 fn main(){
     let f=Fp::new(P);
-    for size in [3usize,4,8,16,32] {
-        for z in [GX,X2G,X3G,X10G]{check(f,size,z);}
+    let scale=std::env::args().any(|a|a=="--scale");
+    let sizes:&[usize]=if scale { &[64,128,256,677] } else { &[3,4,8,16,32] };
+    let targets:Vec<u64>=if scale {
+        let mut x=vec![GX,X10G];
+        x.extend(public_curve_x_controls(f,4));
+        x
+    } else { vec![GX,X2G,X3G,X10G] };
+    println!("native original-Rust Prime31 non-table S3 pair elimination scale={} B={:?} z={:?}; no secret target indices supplied",scale,sizes,targets);
+    for &size in sizes {
+        for &z in &targets{check(f,size,z);}
     }
     println!("S3 x-roots only: full signed group checks, authentic RHS rank, cold solver and asymptotic speedup NOT established.");
 }
