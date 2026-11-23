@@ -19,20 +19,23 @@ except (OSError, AttributeError):
 
 s = Path("src/cryptanalysis/prime_radical_root.rs").read_text().split("\n#[cfg(test)]\n", 1)[0]
 new_linear = """                // The context already holds inverses of 3 and 4 for
-                // Cardano/Ferrari. Restrict cache dispatch to tiny leading
-                // coefficients and large p. Preserve the exact original
-                // fallback path for the overwhelmingly common random leads.
+                // Cardano/Ferrari. Cache hits beat Euclid at large primes;
+                // native Rust tests rejected the halving shortcut at a=2,
+                // and showed regressions on smaller prime fields.
                 let root = if c[0] == 0 { 0 }
                     else if c[1] == 1 { fp.neg(c[0]) }
-                    else if c[1] <= 4 && fp.p >= (1u64 << 20) {
-                        let inverse = match c[1] {
-                            3 => self.inv3,
-                            4 => self.inv4,
-                            _ => fp.inv(c[1]),
+                    else {
+                        let neg_c0 = fp.neg(c[0]);
+                        let inverse = if fp.p >= (1u64 << 20) {
+                            match c[1] {
+                                3 => self.inv3,
+                                4 => self.inv4,
+                                _ => fp.inv(c[1]),
+                            }
+                        } else {
+                            fp.inv(c[1])
                         };
-                        fp.mul(fp.neg(c[0]), inverse)
-                    } else {
-                        fp.mul(fp.neg(c[0]), fp.inv(c[1]))
+                        fp.mul(neg_c0, inverse)
                     };"""
 old_linear = """                let root = if c[0] == 0 { 0 }
                     else if c[1] == 1 { fp.neg(c[0]) }
