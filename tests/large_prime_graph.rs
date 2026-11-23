@@ -1,8 +1,8 @@
 //! Tests for `cryptanalysis::large_prime_graph` (integration tests: the lib
 //! test target is built separately).
 
-use crypto::cryptanalysis::large_prime_filter::PartialRelation;
-use crypto::cryptanalysis::large_prime_graph::*;
+use crypto_lib::cryptanalysis::large_prime_filter::PartialRelation;
+use crypto_lib::cryptanalysis::large_prime_graph::*;
 
 struct Rng(u64);
 impl Rng {
@@ -484,7 +484,7 @@ fn fm_partition_is_valid_and_not_worse_than_contiguous_bisection() {
 
 #[test]
 fn evaluator_runs_every_stage_and_replays_every_relation() {
-    use crypto::cryptanalysis::large_prime_graph::eval::*;
+    use crypto_lib::cryptanalysis::large_prime_graph::eval::*;
     let p = (1u64 << 61) - 1;
     for (seed, weights) in [(1u64, vec![1, 6, 12, 0]), (2, vec![1, 6, 12, 3])] {
         let synth = SyntheticParams {

@@ -11,8 +11,8 @@
 //! (`{"id","small","large","rhs"}`); otherwise a seeded synthetic stream is
 //! generated. The output is one `lp-graph-eval/v1` JSON record.
 
-use crypto::cryptanalysis::large_prime_filter::PartialRelation;
-use crypto::cryptanalysis::large_prime_graph::eval::{
+use crypto_lib::cryptanalysis::large_prime_filter::PartialRelation;
+use crypto_lib::cryptanalysis::large_prime_graph::eval::{
     evaluate_stream, synthetic_stream, EvalParams, SyntheticParams,
 };
 use std::io::BufRead;
