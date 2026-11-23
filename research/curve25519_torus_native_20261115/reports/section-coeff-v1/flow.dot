@@ -1,0 +1,11 @@
+digraph G {
+ graph [rankdir=LR,bgcolor="white",pad="0.12",nodesep="0.14",ranksep="0.25"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf1fa",color="#35546b",fontname="Helvetica",fontsize=12,margin="0.12,0.10"];
+ edge [color="#35546b",arrowsize=0.7];
+ c [label="Five Fp coefficients\nsupplied, not discovered"];
+ s [label="Monic norm sextic S\noriginal chart guards"];
+ h [label="First-power membership\nH = 0 mod S"];
+ d [label="Eightfold-image guard\nD3 unit mod S"];
+ r [label="Original indexed witness\nand signed group replay",fillcolor="#e7f3eb"];
+ c -> s -> h -> d -> r;
+}
