@@ -102,6 +102,37 @@ def canonical_key(row):
     return tuple(x*inverse % N for x in row)
 
 
+def canonicalized_extraction(candidate, a, b, base_size, label):
+    """Replay producer RelationAdapter canonicalization of an extracted SignedRelation.
+
+    An accepted receipt must match the *next* emitted candidate, not merely be
+    any true elliptic-curve equation supplied independently by the producer.
+    The producing code adds repeated signed leaves, removes cancellations,
+    sorts indices and globally flips coefficients and RHS if the first is
+    negative. This proves record-internal linkage, NOT that F4 actually ran.
+    """
+    if not isinstance(candidate, dict) or not isinstance(candidate.get("terms"), list):
+        raise ValueError(f"{label}: missing signed extraction terms")
+    coeffs = {}
+    leaves = 0
+    for term in candidate["terms"]:
+        if not isinstance(term, list) or len(term) != 2:
+            raise ValueError(f"{label}: malformed extracted term")
+        ix, c = term
+        ix = need_int(ix, base_size, f"{label} index")
+        if type(c) is not int or not -4 <= c <= 4:
+            raise ValueError(f"{label}: invalid extracted multiplicity")
+        leaves += abs(c)
+        if leaves > 4:
+            raise ValueError(f"{label}: more than four extracted leaves")
+        coeffs[ix] = coeffs.get(ix, 0) + c
+    terms = [[ix, c] for ix, c in sorted(coeffs.items()) if c]
+    if terms and terms[0][1] < 0:
+        terms = [[ix, -c] for ix, c in terms]
+        a, b = (-a) % N, (-b) % N
+    return terms, a, b
+
+
 def validate(data, base, q, rows, producer=None):
     if not 0 < len(base) <= 4096 or len(rows) > 65536:
         raise ValueError("unsupported row/base size")
@@ -224,19 +255,35 @@ def main():
         q = point(raw["target"],"producer target")
         rows=[]
         attempts=raw["attempts"]
+        extracted = 0
         for i,attempt in enumerate(attempts):
             aa=need_int(attempt["a"],N,f"attempt {i} a")
             bb=need_int(attempt["b"],N,f"attempt {i} b")
             pt=point(attempt["point"],"producer query point")
             if pt != add(scale(aa,G),scale(bb,q)):
                 raise ValueError(f"attempt {i}: public query point mismatch")
-            for row in attempt["receipts"]:
+            extraction=attempt.get("extraction")
+            candidates=extraction.get("relations") if isinstance(extraction,dict) else None
+            accepted=attempt.get("receipts")
+            if not isinstance(candidates,list) or not isinstance(accepted,list):
+                raise ValueError(f"attempt {i}: missing extractor/receipt arrays")
+            if len(accepted)>len(candidates):
+                raise ValueError(f"attempt {i}: accepted receipts exceed extracted rows")
+            # The native solver consumes each candidate in order and stops
+            # on rejection, deadline or recovered scalar. Accepted rows must
+            # therefore be the canonicalized PREFIX of that attempt's output.
+            for j,row in enumerate(accepted):
+                if not isinstance(row,dict):
+                    raise ValueError(f"attempt {i} accepted row {j}: malformed receipt")
+                expected=canonicalized_extraction(candidates[j],aa,bb,len(base),
+                                                  f"attempt {i} candidate {j}")
+                actual=(row.get("canonical_terms"),row.get("a"),row.get("b"))
+                if actual!=expected:
+                    raise ValueError(f"attempt {i} accepted row {j}: not canonical extraction prefix")
                 rows.append(row)
-        # Preserve the producer's total extraction denominator, including
-        # algebraic rows it could not accept before a cap or early success.
-        extracted = sum(len(a.get("extraction", {}).get("relations", [])) for a in attempts)
-        if extracted < len(rows):
-            raise ValueError("accepted receipts exceed recorded extracted rows")
+            extracted += len(candidates)
+        # Unaccepted/failed/censored extractor rows are preserved as reported
+        # denominator only. They never enter authenticated rank or recovery.
         extras={"input_sha256":rawhash,"base_sha256":basehash,
                 "input_type":"producer_SolveRecord","attempts_included":len(attempts),
                 "attempts_without_accepted_rows":sum(not a["receipts"] for a in attempts),
