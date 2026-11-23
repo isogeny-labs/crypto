@@ -71,6 +71,24 @@ ratios a screen against this *uniform residual* producer. An algebraic
 producer with a measurably different conditional LP distribution could
 change the conclusion and needs its own frozen experiment.
 
+## Pair-table extension of the same screen
+
+The existing S₄ meet-in-the-middle oracle builds a table of two-factor-base
+point sums and probes it with `R−F_k`. In an idealized point-keyed version,
+let `H` be the number of distinct table points, at most `B(B+1)/2` before
+sign variants. Replacing the third factor-base point by an external LP from
+a fixed pool changes the query from `R−F_k` to `R−L`. For uniform `R`, each
+fixed probe hits the same pair table with probability `H/n`, regardless of
+whether the queried point is a factor-base point or an external LP.
+After `M` probes, expected accepted partials are `MH/n`. To obtain `B+1`
+full rows, exact LP elimination needs `E−U≥B+1`, so the partial producer
+needs at least `B+1+U` accepted rows; direct full probes need only `B+1`.
+This rules out a relation-acquisition advantage **under this uniform
+point-keyed model** at equal table construction and probe cost. The actual
+implementation uses x-keyed sign variants and must be measured separately.
+An improvement requires a source with conditional yield, per-probe cost,
+or projected-rank behavior outside this model, with exact group replay.
+
 ## Prior work and claim boundary
 
 - Semaev, [*Summation polynomials and the discrete logarithm problem on
