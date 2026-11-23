@@ -37,3 +37,19 @@ This is a direct response to the missing *useful independent factor-base rank* o
 The rank/RHS consistency interpretation assumes the right-hand side is a known scalar and **every unknown logarithm, including the target logarithm**, appears as an explicit matrix column. If a collector instead encodes `alpha + beta*d` in the scalar RHS while keeping unknown `d` hidden, a nonzero reduced RHS is **not** evidence of invalid group relations. Re-encode `beta` as a protected target column and retain the known `alpha` as RHS, or treat this diagnostic as informational only. The implementation documents the precondition and a separate sparse-column test uses column ID `u32::MAX` to rule out any implicit dense allocation. This audit does not substitute for the target-uniqueness work in draft PR #4972 or final `[d]G=Q` replay.
 
 The initial source/test commit `6546a06b` ran in source-bound GitHub Actions [#45197339235](https://github.com/isogeny-labs/crypto/actions/runs/45197339235): **33/33 release Rust tests passed**, including all four new projected-rank tests, job `137771219897`, 2026-11-23 14:45 UTC. The workflow originally hashed only the parent graph/witness and existing filter/test sources. Follow-up commit `9736b33` extended the workflow to hash the new `projected_rank.rs` and changed the source trigger to cover the whole graph child directory; `28a94ac` clarified the hidden-target limitation; `656f64b` added the fifth regression. These source/test/workflow changes require a new terminal native receipt before attributing 34 tests to the final revision. No external PCC signer or complete solver run was invoked. [pcc:unverified]
+
+## Final exact-source native gate — PASS (2026-11-23 14:50 UTC)
+
+[GitHub Actions run #45198139106](https://github.com/isogeny-labs/crypto/actions/runs/45198139106), job `137774010764`: **34/34 release Rust integration tests PASSED**, zero failed, with original production graph, projected-rank, witness, pivot/MST filter and original test sources linked by the native harness. The five new projected-rank tests all PASSED: source-replayed F7 LP-vs-small rank; RHS inconsistency; 128 deterministic dense-rank/augmented-rank/selected-original-subset checks; noncanonical and F9 nonunit refusal; explicit large target-column counterexample. Rust compiler/toolchain installed by `dtolnay/rust-toolchain@stable`. Workflow syntax CI passed separately. [pcc:unverified]
+
+The CI original-source SHA-256 inventory was:
+```text
+48070937d7c7a6d046c545438c1a40794bec5d544c63f075f6bd48b35ec8d597  src/cryptanalysis/large_prime_graph.rs
+80dfe96e62779b661ca5a28a593ac91c65b23ec022d90f9a996e48d92b304fdc  src/cryptanalysis/large_prime_graph/witness.rs
+9c7c2cef51323ce9be930fdf4c8142002d13c55902b9c642eabf47c3747a1fec  src/cryptanalysis/large_prime_graph/projected_rank.rs
+b963fb4796cd9b314c5564f2f95672acdfc3c6528e977e590f681a25cdea5064  src/cryptanalysis/large_prime_filter.rs
+20f662bf5b720f8f68816098a2971e00fe7a0176ea846dc345162d40bc565165  src/cryptanalysis/large_prime_filter_mst.rs
+ae63445b26253a517de4b745eb793b37f929e92d3114254d648d894c22581288  tests/large_prime_graph.rs
+```
+
+The final input source/test revision was `656f64b6cedc4f0a65f4c428dcf95d92752a84d8`, with no later production-source/test changes; subsequent commits only update protocol, workflow metadata or shared handoff. This is **source-bound module qualification**, not unshimmed full-root `cargo test --release --lib`, external signed PCC validation, or naturally collected Prime31 execution. The stream-level control demonstrates LP nullity 3 but useful small rank 1 in synthetic F7. It is an algebraic correctness check, not elapsed-time or complete cold solver measurement. No paid compute or merge. [pcc:unverified]
