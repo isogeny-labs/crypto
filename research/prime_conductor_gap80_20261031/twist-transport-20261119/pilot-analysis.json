@@ -1,0 +1,133 @@
+{
+  "endpoint_ratio_admitted": false,
+  "groups": [
+    {
+      "all_verified": false,
+      "any_lower_bound": true,
+      "arm": "ic-bounded",
+      "attempts": 2,
+      "curve_slug": "icv1-fp53-t33555417-7e2a3b7a",
+      "field_bits": 53,
+      "isolation_levels": [
+        "L0"
+      ],
+      "max_RSS_KiB": 14304,
+      "mean_GAE_lower_bound": null,
+      "mean_S_lower_bound": null,
+      "mean_solve_seconds": null,
+      "median_solve_seconds": null,
+      "method": "ic.pipeline",
+      "outcomes": {
+        "exhausted": 2
+      },
+      "scope": "descriptive local diagnostic; no complete-case estimate for failed groups",
+      "session_id": "ECBS1h6c812e275bbc",
+      "subgroup_order": 5629830654216971,
+      "unpriced": [
+        "inversions_uncharged",
+        "legendre_symbols_uncharged",
+        "lookups_uncharged",
+        "sqrt_solves_uncharged",
+        "target_guard_probes_uncharged"
+      ],
+      "wall_admitted": false
+    },
+    {
+      "all_verified": true,
+      "any_lower_bound": true,
+      "arm": "rho-counted",
+      "attempts": 2,
+      "curve_slug": "icv1-fp53-t33555417-7e2a3b7a",
+      "field_bits": 53,
+      "isolation_levels": [
+        "L0"
+      ],
+      "max_RSS_KiB": 12620,
+      "mean_GAE_lower_bound": 47929288.0,
+      "mean_S_lower_bound": 0.6387829442388894,
+      "mean_solve_seconds": 7.6369364065,
+      "median_solve_seconds": 7.6369364065,
+      "method": "rho.negation",
+      "outcomes": {
+        "verified": 2
+      },
+      "scope": "descriptive local diagnostic; no complete-case estimate for failed groups",
+      "session_id": "ECBS1h6c812e275bbc",
+      "subgroup_order": 5629830654216971,
+      "unpriced": [
+        "canonicalisations_uncharged"
+      ],
+      "wall_admitted": false
+    },
+    {
+      "all_verified": false,
+      "any_lower_bound": true,
+      "arm": "ic-bounded",
+      "attempts": 2,
+      "curve_slug": "icv1-fp53-t33555417-ade0b980",
+      "field_bits": 53,
+      "isolation_levels": [
+        "L0"
+      ],
+      "max_RSS_KiB": 14420,
+      "mean_GAE_lower_bound": null,
+      "mean_S_lower_bound": null,
+      "mean_solve_seconds": null,
+      "median_solve_seconds": null,
+      "method": "ic.pipeline",
+      "outcomes": {
+        "exhausted": 2
+      },
+      "scope": "descriptive local diagnostic; no complete-case estimate for failed groups",
+      "session_id": "ECBS1h6c812e275bbc",
+      "subgroup_order": 5629830654216971,
+      "unpriced": [
+        "inversions_uncharged",
+        "legendre_symbols_uncharged",
+        "lookups_uncharged",
+        "sqrt_solves_uncharged",
+        "target_guard_probes_uncharged"
+      ],
+      "wall_admitted": false
+    },
+    {
+      "all_verified": true,
+      "any_lower_bound": true,
+      "arm": "rho-counted",
+      "attempts": 2,
+      "curve_slug": "icv1-fp53-t33555417-ade0b980",
+      "field_bits": 53,
+      "isolation_levels": [
+        "L0"
+      ],
+      "max_RSS_KiB": 12512,
+      "mean_GAE_lower_bound": 64090602.5,
+      "mean_S_lower_bound": 0.8541746700471395,
+      "mean_solve_seconds": 10.318364511,
+      "median_solve_seconds": 10.318364511,
+      "method": "rho.negation",
+      "outcomes": {
+        "verified": 2
+      },
+      "scope": "descriptive local diagnostic; no complete-case estimate for failed groups",
+      "session_id": "ECBS1h6c812e275bbc",
+      "subgroup_order": 5629830654216971,
+      "unpriced": [
+        "canonicalisations_uncharged"
+      ],
+      "wall_admitted": false
+    }
+  ],
+  "sessions": [
+    {
+      "dir": "research/prime_conductor_gap80_20261031/twist-transport-20261119/results/pilot-l0",
+      "record_count": 8,
+      "recorded_status_counts": {
+        "exhausted": 4,
+        "verified": 4
+      },
+      "session_id": "ECBS1h6c812e275bbc",
+      "status": "complete"
+    }
+  ]
+}

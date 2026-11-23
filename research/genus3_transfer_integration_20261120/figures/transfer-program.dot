@@ -1,0 +1,22 @@
+digraph transfer_program {
+  graph [rankdir=LR, bgcolor="white", pad=0.15, nodesep=0.45, ranksep=0.7];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11,
+        color="#334155", penwidth=1.1, margin="0.16,0.10"];
+  edge [fontname="Helvetica", fontsize=9.5, color="#475569", penwidth=1.1];
+
+  e [label="ECDLP subgroup\nE[n] / F_q", fillcolor="#dbeafe"];
+  h [label="cover image\nf*E[n] in J_H", fillcolor="#e0e7ff"];
+  c [label="Smith target\nJ_C, plane quartic", fillcolor="#dcfce7"];
+  ic [label="Diem index calculus\nmodeled soft-O(q)", fillcolor="#dcfce7"];
+  toy [label="measured source-Jacobian toy panel\n7 curves; 20 targets each", fillcolor="#fef3c7"];
+  nist [label="NIST same-field route\nO(p) loses to rho O(sqrt(p))", fillcolor="#fee2e2", color="#dc2626"];
+  p256 [label="next gate\nP-256 full-bitangent descent", fillcolor="#ffedd5", color="#ea580c"];
+  signed [label="signed divisor map + dual\nOPEN", fillcolor="#fee2e2", color="#dc2626"];
+
+  e -> h [label="verified cover required"];
+  h -> c [label="(2,2,2) construction OPEN", style=dashed];
+  c -> ic [label="published destination model"];
+  h -> toy [label="Cantor IC + LA + descent"];
+  ic -> nist [label="same prime field"];
+  p256 -> signed [label="then pi^dagger pi=[3]"];
+}

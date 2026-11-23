@@ -1,0 +1,54 @@
+--- binary.sha256
+f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7  /usr/local/bin/pkm_tower_pilot
+7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a  /usr/local/bin/prime_fall_degree_tools
+c36d324e8a60b0d8e827982baf7e07e0ce155664c67ce8c11b4debc410b95c6e  /usr/local/bin/hky_fp_tower_check
+962833611e13e78a3dc5fbb9ab6bfc498fde9cccab255c704ed6e2ff12a03354  /usr/local/bin/pfd_grid_zeros
+--- host.txt (first 7 lines)
+argv: cap:14:0:7:54000000000
+nproc: 32
+rayon: 12
+seed: 1347112276
+model name	: AMD Ryzen Threadripper 7960X 24-Cores
+MemTotal:       395520880 kB
+6.8.0-138-generic
+--- progress.txt
+2026-11-21T23:40:51Z start X-m2-t14-k0-c7
+2026-11-22T06:29:29Z end X-m2-t14-k0-c7 exit 134
+2026-11-22T06:29:29Z end X-m2-t14-k0-c7.gridzeros exit 0
+--- runner_state.json
+{"state": "done", "exit": 1, "started": "2026-11-21T23:40:51Z", "ended": "2026-11-22T06:29:29Z", "stages": ["cap:14:0:7:54000000000"]}--- largest pilot memory peak line (VmHWM, MiB)
+tower step 33: degree 6, 6256 critical + 1360 tower pairs, 7616 S-rows + 215713 reducers + 4606 promoted x 271300 cols, nnz 3477130156, residue 7616 x 50981, fresh 977 (lowest degree 5), basis 47331, pairs left 668678, 2021695.7 ms (rows 40586, A 1751467, B 224010, update 2683), B' 10662114798 entries, kept 68581 elements with 2973873961 entries, muladds 54244799338296, memory 27771 MB (peak 64823 MB)
+--- cgroup
+final-at:
+2026-11-22T06:29:31Z
+fstype:
+tmpfs
+max_map_count:
+65530
+memory_memory.failcnt:
+0
+memory_memory.limit_in_bytes:
+256000000000
+memory_memory.max_usage_in_bytes:
+68165406720
+memory_memory.oom_control:
+oom_kill_disable 0
+under_oom 0
+oom_kill 0
+proc-self-cgroup:
+13:rdma:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+12:freezer:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+11:cpuset:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+10:pids:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+9:devices:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+8:hugetlb:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+7:cpu,cpuacct:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+6:memory:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+5:perf_event:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+4:blkio:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+3:net_cls,net_prio:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+2:misc:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+1:name=systemd:/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+0::/docker/02371286423aefd8203cd6bf53e4b71de2060f78327b47393ca731385f6b784e
+snapshot-at:
+2026-11-22T06:29:31Z

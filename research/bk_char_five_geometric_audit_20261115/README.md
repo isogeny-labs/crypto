@@ -13,6 +13,7 @@ The closed theorem is `BKCharFiveGeometricAudit.bk_char_five_geometric_certifica
 | Module | Actual content |
 |:--|:--|
 | [S3Roots](lean/S3Roots.lean), [S3Completion](lean/S3Completion.lean) | Credited prior actual S3/group arguments, adapted only with module/public wrappers. Mathematical argument bodies checked literally unchanged. |
+| [S3Certificate](lean/S3Certificate.lean) | Additive univariate S3 package: exact evaluation, degree at most two, nonzero under distinct first coordinates, and vanishing from an actual affine three-point zero sum. This is a base certificate, not the general even-arity dilation polynomial. |
 | [Eliminant](lean/Eliminant.lean) | Two actual doubling relations imply an eliminant zero; concrete F5 polynomial factorization checked coefficientwise in the kernel, transported to every characteristic5 field. |
 | [FiveCoordinates](lean/FiveCoordinates.lean) | Actual nonzero5-torsion has x1/2 and y±1, using repeated S3 and coprime3/5 group-order control. |
 | [BaseCurve](lean/BaseCurve.lean) | Actual nonsingular base curve/count5/all basepoints killed5/four explicit exact pointorders5. |
@@ -28,6 +29,13 @@ See [proof map](proof-map.json), [source plan](sources.json), [preflight](prefli
 ## Validation and provenance
 
 Whole repository Lean gate61theorems/0failures/0trusted native, only propext/Classical.choice/Quot.sound. Full final15 log has exactly seven inherited S3 argument style advisories and no new-module advisories/errors; the advisories are retained, not waived. Seven modules/ten formal-config+15artifactpins. Lean4.35.0/Mathlib56a005855ea17e0b0958f73ec801ae140b0a1679/defaults. [pcc:unverified]
+
+The later additive `S3Certificate` target builds from the same exact pin in
+3,157 jobs. Its focused transitive audit reports six theorems, zero failures
+and zero trusted/native declarations, with only `propext`,
+`Classical.choice` and `Quot.sound`; `leanchecker --fresh S3Certificate`
+exits zero. This focused evidence does not replace or retroactively alter the
+historical whole-project packet above. [pcc:unverified]
 
 Fifteen snapshots retain thirteen failed states01–08/10–14 and successes09/15. Early attempts resolved finite-field coefficient normalization and explicit mapped powers. Build06 exposed legacy/modern module import incompatibility; a pre-edit protocol amendment added module/public wrappers only to two new unissued copies. Raw byte-identical copies remain in snapshots01–06; current adapted copies are not described as byte-identical. Frozen originals were never edited. Later failures resolved explicit point inference, dependent curve equality transport, source ring instances and generated constructor equality. A failed API probe is retained. Error-recovery outputs are never accepted as proofs. [pcc:unverified]
 
