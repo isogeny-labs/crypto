@@ -1,0 +1,81 @@
+{
+  "date_utc": "2026-11-23",
+  "status": "producer mathematical check only; PCC unverified; independent signed validation and native Rust execution absent",
+  "original_curve": "y^2+y=x^5+x+1 over GF(8)",
+  "prime_field_target": "p=2^31-1, unchanged and untested in this particular fixture",
+  "base_field": "GF(2)[z]/(z^3+z+1)",
+  "x_at_point": 2,
+  "y_at_point": 6,
+  "original_divisor": "u=x+z,v=z^2+z",
+  "field_model_for_N2": "GF(2)[w]/(w^6+w+1)",
+  "traces": {
+    "N1": 13,
+    "N2": 81,
+    "jacobian_cardinality": 117,
+    "trace_zero_x_F8": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "trace_zero_x_F64_count": 40
+  },
+  "riemann_roch": {
+    "uniformizer": "t=x-z",
+    "basis": "x^j with 2j<=k and x^j*y with 2j+5<=k",
+    "jets": "y(t)^2+y(t)=f(z+t)",
+    "row_count": "k",
+    "column_count": "k-1",
+    "cells": [
+      {
+        "k": 9,
+        "rank": 8,
+        "leading_minor_det_F8": 1,
+        "nonprincipal": true
+      },
+      {
+        "k": 39,
+        "rank": 38,
+        "leading_minor_det_F8": 5,
+        "nonprincipal": true
+      },
+      {
+        "k": 117,
+        "rank": 115,
+        "leading_minor_det_F8": 0,
+        "nonprincipal": false
+      }
+    ]
+  },
+  "proof_conclusion": "ord(D) divides 117 and neither [9]D nor [39]D vanishes; hence ord(D)=117",
+  "source": {
+    "rust_path": "research/prime31_summation_compression_20261122/iteration11/rr_jet_order117.rs",
+    "rust_git_blob": "0fd14e5a5bbf109fc07c20b3b9811bf489ceea5c",
+    "math_path": "research/prime31_summation_compression_20261122/iteration11/RIEMANN_ROCH_ORDER117_CERTIFICATE.md",
+    "math_git_blob": "b5b444fea7d962ce1454c882593a14eaec336eac",
+    "prior_original_arithmetic_fixture_blob": "7a36dd405e362c0a9a84cdeebdbd060caad90b29",
+    "original_root_source_blob": "715f26d223ddf3b09c1ddd0b934ff15b5fd06389",
+    "prior_merged_prs": [
+      4977,
+      4979
+    ]
+  },
+  "commands_and_execution": [
+    "GitHub fetch live AGENTS.md, ACTIVE.md, source note and PR metadata",
+    "checked producer-side GF8/GF64 trace counts and independent RR jet matrix arithmetic using same-coordinator local Python finite field implementation",
+    "Published a standalone standard-library Rust test source, but rustc/cargo unavailable and ZERO Rust tests executed",
+    "Read back exact GitHub Rust and mathematical note blob SHA"
+  ],
+  "validation_limits": {
+    "native_agent_workers": 0,
+    "cryptographic_runs": 0,
+    "original_root_compilations": 0,
+    "full_edclp_executions": 0,
+    "signed_verifier_attestations": 0,
+    "new_solver_implementation": false,
+    "cloud_spend_usd": 0
+  },
+  "next_step": "Independent review of determinant witnesses and execution of the standalone Rust source at frozen blob, then original-root divisor-order BSGS old/fixed regression after the both-parent repair; separately continue Prime31 exact query math."
+}
