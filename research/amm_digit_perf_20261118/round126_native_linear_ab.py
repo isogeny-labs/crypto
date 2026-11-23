@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Round 126: exact production Rust A/B for root polynomial degree trimming.
-The baseline restores precisely the two changed source blocks. All other code
-and compiler options are identical. No external Rust crate or stubbing in the
-hot path; Frobenius fallback is forbidden by the chosen test inputs.
+"""Round 126: exact production Rust A/B for small-coefficient linear roots.
+The baseline restores only the original linear-root match arm. Field arithmetic
+and all other compiler options are identical. Unused tracing dependencies are
+stubbed in the isolated harness; full root operations use the actual Rust source.
+The chosen polynomial inputs do not invoke the Frobenius fallback.
 """
 import os
 import subprocess
