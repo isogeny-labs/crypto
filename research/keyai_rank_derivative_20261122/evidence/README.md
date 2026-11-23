@@ -24,7 +24,11 @@ target; no production arithmetic was replaced. Its original binary/source
 copies and Cargo event streams are listed in the
 [artifact inventory](qualifier/artifact-inventory.json).
 
-The full root-library release gate is separate. A scoped qualification does
-not establish its outcome. Root command, pre-call, raw output and terminal
-post-call records are retained separately when that gate completes. No timing
-or performance comparison is inferred from test-runner durations.
+The full root-library release gate exited 101 before tests because of delimiter
+errors in the untouched binary-hyperelliptic module. Its source is byte-equal
+to the pinned base, and a parser-only check of that exact base file also fails.
+The [baseline receipt](root-library-baseline.json), [compiler output](root-library.stderr.log)
+and [terminal record](root-library.post-call.txt) retain the evidence. This is
+recorded as unsigned statement `PCC-20261123-db257a`; it is not a full-library
+pass. No timing or performance comparison is inferred from test-runner
+durations. [pcc:unverified]
