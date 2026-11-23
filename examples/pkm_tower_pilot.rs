@@ -2600,6 +2600,7 @@ fn run_wide(a: &Args, sink: &mut Sink) {
         let wk = match kind {
             Kind::Kummer => wide::WKind::Kummer,
             Kind::DicksonTorus => wide::WKind::DicksonTorus,
+            Kind::Isogeny => wide::WKind::Isogeny,
             other => panic!("the wide builder has no {} tower", other.name()),
         };
         for &m in &a.ms {
@@ -2712,7 +2713,8 @@ struct Args {
     p_label: String,
     /// `--engine generic` only: the backend.
     backend: Backend,
-    /// `--builder wide`: build the systems over the backend
+    /// `--builder wide`: build the systems over the backend (kummer,
+    /// dickson-torus and isogeny kinds)
     /// (`pkm_tower_wide`), Kummer and torus only; forced above `2⁶³`.
     wide: bool,
     /// Select the named NIST curve instead of a random curve over its prime.
