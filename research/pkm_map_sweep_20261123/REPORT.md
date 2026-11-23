@@ -20,4 +20,12 @@ The sweeper writes and fsyncs each row, then skips completed candidate IDs on re
 
 This rung found no confirmed placement gain. The next experiment should vary **genuine low-degree map chains or auxiliary curves**, not merely translate the same two fibers, with the same target/size-matched controls and a frozen cost metric. `docs/ic/SWEEPER.md` already provides a `prime-algebraic` F4 space for ordinary auxiliary 2-isogeny towers; a second rung can feed its generated maps through this component gate, then use that F4 space for any candidate that passes. P-192 and the 59-bit fields need their own frozen workload and cannot inherit this field's measured yield. A claimed faster map needs a cold setup-charged, same-target comparison to proceed beyond component status.
 
+## Second rung: actual auxiliary-curve cosets
+
+After freezing [PROTOCOL_COSETS.md](PROTOCOL_COSETS.md), [coset_sweep.py](coset_sweep.py) generated 16 distinct `R'+<Q>` cosets for each source auxiliary curve and recomputed the terminal `c=Φ_x(x(R'))`. These are different fibers of the actual degree-1408 or degree-720 Vélu composition. The low-degree steps stay fixed. [coset_results.jsonl](coset_results.jsonl) contains 32 candidates and 26 size-matched interval controls; every fiber passed distinctness and full rational-map evaluation. No candidate passed the `0.01/32 = 0.0003125` confirmation gate [pcc:unverified].
+
+The smallest paired confirmation `p` was 0.02048 for `cm:coset=5`: 72/96 successes against 59/96 for its 688-abscissa interval. Its screen was 25/48 against 29/48, and full-query CPU was 0.207 s against 0.197 s. The best Method 1 paired `p` was 0.06625 for `isogeny:coset=12`: 30/96 against 20/96, with screen 12/48 against 17/48. These selected extremes do not establish a repeatable relation-yield or speed gain. The result SHA-256 is `bf70d5095807415567c10d47622e02dd58cb6557e4c435f78f4759c71a9231b2`.
+
+The next discriminating rung is now narrower: change the **isogeny chain or auxiliary curve**, not just `R'`. Search and construction, F4 solving, relation collection, rank and scalar recovery all remain to be charged before any full algorithm comparison.
+
 Sources checked: Petit–Kosters–Messeng, [Algebraic approaches for the ECDLP over prime fields](https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf), §§3.1–3.4; the repository `docs/ic/SWEEPER.md` and `research/isogeny_vs_mu_factor_base_20261102/`; KB `source:81a446d8a0f88023cfe934a2fcb608bb` (existing prime-algebraic sweep and its provisional baseline).
