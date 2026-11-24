@@ -245,6 +245,7 @@ struct PackedRowMap {
     coefficients: Vec<[u64; 4]>,
     rhs: Vec<u16>,
     rows: usize,
+    bits: usize,
 }
 impl PackedRowMap {
     fn new(equations: &[Vec<WordMask>], rhs: &[WordMask], n: u32) -> Option<Self> {
@@ -253,14 +254,16 @@ impl PackedRowMap {
             return None;
         }
         let rows = equations.len().min(16);
-        let groups = (n as usize).div_ceil(8);
-        let mut coefficients = vec![[0; 4]; groups * 256];
-        let mut rhs_table = vec![0u16; groups * 256];
+        let bits = if n <= 96 { 4 } else { 8 };
+        let entries = 1usize << bits;
+        let groups = (n as usize).div_ceil(bits);
+        let mut coefficients = vec![[0; 4]; groups * entries];
+        let mut rhs_table = vec![0u16; groups * entries];
         for group in 0..groups {
             let mut basis = [[0u64; 4]; 8];
             let mut rhs_basis = [0u16; 8];
-            for b in 0..8 {
-                let bit = group * 8 + b;
+            for b in 0..bits {
+                let bit = group * bits + b;
                 if bit >= n as usize {
                     continue;
                 }
@@ -272,36 +275,52 @@ impl PackedRowMap {
                     rhs_basis[b] |= (((rhs[row][bit / 64] >> (bit % 64)) & 1) as u16) << row;
                 }
             }
-            for value in 1usize..256 {
-                let prev = group * 256 + (value & (value - 1));
+            for value in 1usize..entries {
+                let prev = group * entries + (value & (value - 1));
                 let b = value.trailing_zeros() as usize;
-                coefficients[group * 256 + value] =
+                coefficients[group * entries + value] =
                     std::array::from_fn(|i| coefficients[prev][i] ^ basis[b][i]);
-                rhs_table[group * 256 + value] = rhs_table[prev] ^ rhs_basis[b];
+                rhs_table[group * entries + value] = rhs_table[prev] ^ rhs_basis[b];
             }
         }
         Some(Self {
             coefficients,
             rhs: rhs_table,
             rows,
+            bits,
         })
     }
     fn evaluate(&self, z: WordMask, target: WordMask) -> ([u64; 4], u16) {
+        if self.bits == 4 {
+            self.evaluate_bits::<4>(z, target)
+        } else {
+            self.evaluate_bits::<8>(z, target)
+        }
+    }
+    #[inline]
+    fn evaluate_bits<const BITS: usize>(&self, z: WordMask, target: WordMask) -> ([u64; 4], u16) {
         let mut coefficients = [0; 4];
         let mut rhs = 0;
+        let entries = 1usize << BITS;
+        let groups_per_word = 64 / BITS;
         // Extract each field word once; only the last word may have fewer
         // than eight byte tables. No dynamic field-word index per byte.
-        for (word, tables) in self.coefficients.chunks(8 * 256).enumerate() {
+        for (word, tables) in self
+            .coefficients
+            .chunks(groups_per_word * entries)
+            .enumerate()
+        {
             let mut zi = z[word];
             let mut ti = target[word];
-            for (byte, table) in tables.chunks_exact(256).enumerate() {
-                let c = table[(zi & 255) as usize];
+            for (group, table) in tables.chunks_exact(entries).enumerate() {
+                let c = table[(zi as usize) & (entries - 1)];
                 for i in 0..4 {
                     coefficients[i] ^= c[i];
                 }
-                rhs ^= self.rhs[(word * 8 + byte) * 256 + (ti & 255) as usize];
-                zi >>= 8;
-                ti >>= 8;
+                rhs ^= self.rhs
+                    [(word * groups_per_word + group) * entries + ((ti as usize) & (entries - 1))];
+                zi >>= BITS;
+                ti >>= BITS;
             }
         }
         (coefficients, rhs)
@@ -1229,7 +1248,10 @@ mod tests {
                 let rhs: Vec<_> = (0..21).map(|_| [draw(), draw(), draw()]).collect();
                 let map = PackedRowMap::new(&equations, &rhs, n).unwrap();
                 assert_eq!(map.rows, 16);
-                assert_eq!(map.coefficients.len(), (n as usize).div_ceil(8) * 256);
+                assert_eq!(
+                    map.coefficients.len(),
+                    (n as usize).div_ceil(map.bits) * (1 << map.bits)
+                );
                 let mut pairs = vec![([0; 3], [0; 3])];
                 for bit in 0..n as usize {
                     let mut e = [0; 3];

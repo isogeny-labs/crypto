@@ -279,26 +279,31 @@ impl F2mElement {
             return None;
         }
         let mut out = Self::zero(m);
-        let mut chunks = hex.as_bytes().rchunks_exact(8);
+        let mut chunks = hex.as_bytes().rchunks_exact(16);
         for (i, chunk) in chunks.by_ref().enumerate() {
-            let value = parse_ascii_hex8(chunk)? as u64;
-            if i / 2 < out.bits.len() {
-                out.bits[i / 2] |= value << ((i % 2) * 32);
+            let value = parse_ascii_hex16(chunk)?;
+            if i < out.bits.len() {
+                out.bits[i] = value;
             }
         }
-        let mut prefix = 0u32;
-        for &byte in chunks.remainder() {
+        let remaining = chunks.remainder();
+        let (mut prefix, rest) = if remaining.len() >= 8 {
+            (parse_ascii_hex8(&remaining[..8])? as u64, &remaining[8..])
+        } else {
+            (0, remaining)
+        };
+        for &byte in rest {
             let digit = match byte {
                 b'0'..=b'9' => byte - b'0',
                 b'a'..=b'f' => byte - b'a' + 10,
                 b'A'..=b'F' => byte - b'A' + 10,
                 _ => return None,
             };
-            prefix = (prefix << 4) | digit as u32;
+            prefix = (prefix << 4) | digit as u64;
         }
-        let i = hex.len() / 8;
-        if i / 2 < out.bits.len() {
-            out.bits[i / 2] |= (prefix as u64) << ((i % 2) * 32);
+        let i = hex.len() / 16;
+        if i < out.bits.len() {
+            out.bits[i] = prefix;
         }
         out.mask_in_place();
         Some(out)
@@ -748,6 +753,49 @@ impl F2mElement {
     }
 }
 
+/// Validate sixteen ASCII hex digits and pack one complete field word.
+#[cfg(target_arch = "x86_64")]
+#[inline]
+fn parse_ascii_hex16(bytes: &[u8]) -> Option<u64> {
+    use std::arch::x86_64::*;
+    if bytes.len() != 16 {
+        return None;
+    }
+    // SAFETY: a complete sixteen-byte slice is available; x86-64 has SSE2.
+    unsafe {
+        let v = _mm_loadu_si128(bytes.as_ptr().cast());
+        let lower = _mm_or_si128(v, _mm_set1_epi8(0x20));
+        let digits = _mm_and_si128(
+            _mm_cmpgt_epi8(v, _mm_set1_epi8(b'0' as i8 - 1)),
+            _mm_cmpgt_epi8(_mm_set1_epi8(b':' as i8), v),
+        );
+        let letters = _mm_and_si128(
+            _mm_cmpgt_epi8(lower, _mm_set1_epi8(b'a' as i8 - 1)),
+            _mm_cmpgt_epi8(_mm_set1_epi8(b'g' as i8), lower),
+        );
+        if _mm_movemask_epi8(_mm_or_si128(digits, letters)) != 65535 {
+            return None;
+        }
+        let nibble = _mm_add_epi8(
+            _mm_and_si128(v, _mm_set1_epi8(15)),
+            _mm_and_si128(letters, _mm_set1_epi8(9)),
+        );
+        let pairs = _mm_and_si128(
+            _mm_or_si128(_mm_slli_epi16::<4>(nibble), _mm_srli_epi16::<8>(nibble)),
+            _mm_set1_epi16(255),
+        );
+        Some((_mm_cvtsi128_si64(_mm_packus_epi16(pairs, _mm_setzero_si128())) as u64).swap_bytes())
+    }
+}
+#[cfg(not(target_arch = "x86_64"))]
+#[inline]
+fn parse_ascii_hex16(bytes: &[u8]) -> Option<u64> {
+    if bytes.len() != 16 {
+        return None;
+    }
+    Some(((parse_ascii_hex8(&bytes[..8])? as u64) << 32) | parse_ascii_hex8(&bytes[8..])? as u64)
+}
+
 /// Validate and pack eight ASCII hex digits. SSE2 is part of x86-64's
 /// baseline; this needs no stronger feature or unchecked input load.
 #[cfg(target_arch = "x86_64")]
@@ -1068,17 +1116,24 @@ impl CompactLinearMaps {
     }
     #[inline]
     pub(crate) fn half(&self, a: [u64; 3]) -> [u64; 3] {
-        let t = &self.tables;
+        match self.tables.nw {
+            1 => self.half_words::<1>(a),
+            2 => self.half_words::<2>(a),
+            3 => self.half_words::<3>(a),
+            _ => unreachable!("compact field width"),
+        }
+    }
+    #[inline]
+    fn half_words<const WORDS: usize>(&self, a: [u64; 3]) -> [u64; 3] {
         let mut out = [0; 3];
-        for byte in 0..t.n_bytes {
-            let value = ((a[byte / 8] >> (8 * (byte % 8))) & 255) as usize;
-            let at = (byte * 256 + value) * t.nw;
-            out[0] ^= t.half_trace[at];
-            if t.nw >= 2 {
-                out[1] ^= t.half_trace[at + 1];
-            }
-            if t.nw == 3 {
-                out[2] ^= t.half_trace[at + 2];
+        for (word, tables) in self.tables.half_trace.chunks(8 * 256 * WORDS).enumerate() {
+            let mut value = a[word];
+            for table in tables.chunks_exact(256 * WORDS) {
+                let at = (value as usize & 255) * WORDS;
+                for w in 0..WORDS {
+                    out[w] ^= table[at + w];
+                }
+                value >>= 8;
             }
         }
         out
@@ -1760,6 +1815,40 @@ unsafe fn mul_mod131_hw(a: &[u64; 3], b: &[u64; 3]) -> [u64; 3] {
     // its intermediate words need not cross the general reduction ABI.
     let mut p = [0u64; 6];
     mul_words_hw(a, b, &mut p);
+    reduce_mod131_product(p)
+}
+
+/// Canonical131-bit squaring needs only two64-bit carryless squares. The
+/// three-bit high limb is spread directly; other ISAs keep the scalar path.
+#[inline]
+pub(crate) fn square_mod131(a: &[u64; 3]) -> Option<[u64; 3]> {
+    debug_assert_eq!(a[2] & !7, 0);
+    #[cfg(target_arch = "x86_64")]
+    if has_hw_clmul() {
+        // SAFETY: runtime detection and complete canonical operand width.
+        return Some(unsafe { square_mod131_hw(a) });
+    }
+    None
+}
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "pclmulqdq")]
+unsafe fn square_mod131_hw(a: &[u64; 3]) -> [u64; 3] {
+    use std::arch::x86_64::*;
+    let v = _mm_loadu_si128(a.as_ptr().cast());
+    let p0 = _mm_clmulepi64_si128::<0>(v, v);
+    let p1 = _mm_clmulepi64_si128::<0x11>(v, v);
+    let top = (a[2] & 1) | ((a[2] & 2) << 1) | ((a[2] & 4) << 2);
+    reduce_mod131_product([
+        _mm_cvtsi128_si64(p0) as u64,
+        _mm_cvtsi128_si64(_mm_srli_si128::<8>(p0)) as u64,
+        _mm_cvtsi128_si64(p1) as u64,
+        _mm_cvtsi128_si64(_mm_srli_si128::<8>(p1)) as u64,
+        top,
+        0,
+    ])
+}
+#[inline(always)]
+fn reduce_mod131_product(p: [u64; 6]) -> [u64; 3] {
     let s0 = (p[2] >> 3) | (p[3] << 61);
     let s1 = (p[3] >> 3) | (p[4] << 61);
     let s2 = (p[4] >> 3) | (p[5] << 61);
@@ -1996,6 +2085,64 @@ fn reduce_chunked(value: &mut [u64], irreducible: &IrreduciblePoly) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn hex_word_pack_validates_every_byte_and_keeps_full_word_order() {
+        for position in 0..16 {
+            for byte in 0..=255u8 {
+                let mut text = *b"01aBCd2378EF4569";
+                text[position] = byte;
+                let expected = if text.iter().all(u8::is_ascii_hexdigit) {
+                    Some(u64::from_str_radix(std::str::from_utf8(&text).unwrap(), 16).unwrap())
+                } else {
+                    None
+                };
+                assert_eq!(
+                    parse_ascii_hex16(&text),
+                    expected,
+                    "position={position}, byte={byte}"
+                );
+            }
+        }
+        assert_eq!(parse_ascii_hex16(b"123456789abcdef"), None);
+        assert_eq!(parse_ascii_hex16(b"123456789abcdef01"), None);
+    }
+
+    #[test]
+    fn canonical_131_square_matches_independent_bit_doubling_and_reduction() {
+        if !has_hw_clmul() {
+            assert_eq!(square_mod131(&[1, 0, 0]), None);
+            return;
+        }
+        let irr = IrreduciblePoly {
+            degree: 131,
+            low_terms: vec![0, 1, 2, 13],
+        };
+        let mut seed = 20261124u64;
+        for trial in 0..643 {
+            let a = if trial < 131 {
+                let mut a = [0; 3];
+                a[trial / 64] = 1u64 << (trial % 64);
+                a
+            } else {
+                let mut draw = || {
+                    seed ^= seed << 13;
+                    seed ^= seed >> 7;
+                    seed ^= seed << 17;
+                    seed
+                };
+                [draw(), draw(), draw() & 7]
+            };
+            let mut raw = [0; 6];
+            for bit in 0..131 {
+                if a[bit / 64] >> (bit % 64) & 1 != 0 {
+                    raw[2 * bit / 64] ^= 1u64 << (2 * bit % 64);
+                }
+            }
+            reduce_bitwise(&mut raw, &irr);
+            assert_eq!(square_mod131(&a).unwrap(), raw[..3], "trial{trial}");
+        }
+    }
 
     #[cfg(target_arch = "x86_64")]
     #[test]

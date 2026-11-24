@@ -13,6 +13,8 @@ num-traits = "0.2"
 serde_json = "1"
 [profile.release]
 debug = "line-tables-only"
+lto = "fat"
+codegen-units = 1
 
 [features]
 legacy-halftrace = ["full-trace-zero-backend/legacy-halftrace"]
