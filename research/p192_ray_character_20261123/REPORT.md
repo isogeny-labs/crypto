@@ -164,47 +164,62 @@ degree. This degree bound does not imply a running-time bound for a
 compact high-degree function and does not cover combinations of
 features or a biased rather than exact predictor. [pcc:unverified]
 
-## Three-coordinate combination gate
+## Forty-one-coordinate combination gate
 
-The first small combination of such features can also be screened.
-Fix `k ≤ 3` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192 isogenous
-endpoint, and let the feature vector consist of the field quadratic
-characters of `x(R)-cᵢ`. An arbitrary function of these `k` signs,
-including a rule for zero values, **cannot equal the scalar quadratic
-character at every nonidentity point**. Any rational isogeny that is
-nonzero on rational points merely permutes the endpoint points, so the
-same statement holds after a chain. [pcc:unverified]
+Fix `k ≤ 41` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192
+isogenous endpoint, and let the feature vector consist of the field
+quadratic characters of `x(R)-cᵢ`. An arbitrary function of these `k`
+signs, including a rule for zero values, **cannot equal the scalar
+quadratic character at every nonidentity point**. Any rational isogeny
+that is nonzero on rational points merely permutes the endpoint
+points, so the same statement holds after a chain. [pcc:unverified]
 
-Here is the finite-field count. Let `a` and `b` select features at
-`R` and `[2]R`, respectively, with at least one selection nonempty.
-The product of their underlying rational
-functions has degree at most `2|a|+8|b| ≤ 10k` and is a geometric
-nonsquare. Indeed, the odd-valuation zero supports of distinct
-`x-cᵢ` are disjoint two-point sets; their inverse doubling supports
-are disjoint eight-point sets. If `b` is nonempty, its support has at
-least eight points, while the `a` support has at most six, so the two
-cannot cancel. If `b` is empty, the nonempty `a` support remains.
-There are no rational 2-torsion points, so these zero sets have the
-stated sizes. [pcc:unverified]
+Use `[7]R` rather than doubling: `7` is a square modulo `r`, so the
+target scalar sign is unchanged. Let `a` and `b` select features at
+`R` and `[7]R`, respectively, with at least one selection nonempty.
+The product of their underlying rational functions has degree at most
+`2|a|+98|b| ≤ 100k` and is a geometric nonsquare. Distinct `x-cᵢ`
+have disjoint two-point odd-valuation zero supports; their inverse
+`[7]` supports are disjoint 98-point sets. If `b` is nonempty, its
+support has at least 98 points, while the `a` support has at most
+`2k ≤ 82`, so they cannot cancel. If `b` is empty, the nonempty `a`
+support remains. The endpoint has no rational 2-torsion, and `[7]`
+is separable, giving the stated support sizes. [pcc:unverified]
 
 Remove the identity and at most `4k` rational points at which one of
-the `2k` features at `R` or `[2]R` is zero. On the remaining set `U`,
+the `2k` features at `R` or `[7]R` is zero. On the remaining set `U`,
 [Perret's bound](https://inspirehep.net/files/e5d2251413a4ea90899d95c2354cc66a)
 and the removed-point count bound every nontrivial product-character
-sum by `20k√p + 1 + 4k`. Expanding the sign-pattern indicator gives,
+sum by `200k√p + 1 + 4k`. Expanding the sign-pattern indicator gives,
 for every pair of `k`-bit patterns, at least
 
-`[r-1-4k - (4^k-1)(20k√p+1+4k)] / 4^k`
+`[r-1-4k - (4^k-1)(200k√p+1+4k)] / 4^k`
 
-points realizing that pair at `R` and `[2]R`. This is positive for
-`k ≤ 3`; at `k=3` it reduces to `r-832 > 3780√p`, checked by
-`(r-832)^2 > 3780^2 p`. Since `(2/r)=+1`, the target sign is unchanged by
-doubling, an exact rule would have to give the same output on *every*
-pair of nonzero feature patterns, hence be constant on `U`. Both target
-signs still occur on `U`, a contradiction. This excludes exact
-classifiers with at most three distinct endpoint coordinate signs;
-it does not bound their possible bias, or combinations of four or
-more signs or different rational features. [pcc:unverified]
+points realizing that pair at `R` and `[7]R`. This is positive for
+every `k ≤ 41`; at `k=41`, set `A=(4^41-1)·8200` and
+`B=(4^41-1)·165`. The exact integer checks are `7^((r-1)/2)=1
+(mod r)`, `C=r-165-B>0`, and `C²>A²p`. Since the target sign is
+unchanged by `[7]`, an exact rule would have to give the same output
+on *every* pair of nonzero feature patterns, hence be constant on
+`U`. Both target signs still occur on `U`, a contradiction. This
+excludes exact classifiers with at most 41 distinct endpoint
+coordinate signs. It does not bound their possible bias, or
+combinations of 42 or more signs or different rational features.
+[pcc:unverified]
+
+The three arithmetic checks above can be replayed in PARI/GP:
+
+```gp
+p = 6277101735386680763835789423207666416083908700390324961279;
+r = 6277101735386680763835789423176059013767194773182842284081;
+k = 41; A = (4^k-1)*8200; B = (4^k-1)*165; C = r-165-B;
+print(lift(Mod(7,r)^((r-1)/2)) == 1);
+print(C > 0);
+print(C^2 > A^2*p);
+```
+
+Each output is `1`. This checks the numeric gate and quadratic-residue
+claim, not the divisor or character-sum derivation. [pcc:unverified]
 
 ## Reproduction and checks
 
