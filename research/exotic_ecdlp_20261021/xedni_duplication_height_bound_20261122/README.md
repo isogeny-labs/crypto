@@ -48,23 +48,23 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 | Result | Evidence | Status |
 | --- | --- | --- |
 | Forms match fixed-curve doubling | `naiveHeight_double_ne` and `naiveHeight_double_eq` in `PointBridge.lean`; `check_sage.py` replays 30 signed multiples | Lean checked for all nonsingular affine points, including doubling to the identity; finite replay agrees |
-| Rational x-coordinate normalized to the integer forms | `primitive_x`, `duplication_fraction_normalized`, and `naiveHeight_double_normalized` in `RationalBridge.lean` | Lean checked for all rational x-coordinates and every nonsingular affine point outside the doubling-to-identity case |
+| Rational x-coordinate normalized to the integer forms | `primitive_x`, `duplication_fraction_normalized`, `denominator_ne_of_double_ne`, and `naiveHeight_double_normalized` in `RationalBridge.lean` | Lean checked: the denominator form is nonzero for every nonsingular affine point whose double is not the identity |
 | Homogeneous Bézout identity, coefficient and tail inequalities | `Bounds.lean`, pinned build and `#print axioms` | Lean checked |
 | Quartic Bernstein coefficient lower-bound rule | `bernstein_quartic_lower` in `Bounds.lean` | Lean checked for arbitrary coefficients and `s∈[0,1]` |
 | Certificate cell 26 (`191/16≤A/B≤383/32`) | `interval_26_positive_F` in `Bounds.lean` | Lean checked with its exact rational coefficients |
 | Finite-range archimedean lower bound on `[-128,128]` | `finite_archimedean_lower` in generated `Cells.lean`; generator agrees with `certificate.json` | All 91 cells and coverage Lean checked |
 | Global real and homogeneous archimedean lower bound | `global_univariate_lower` and `global_homogeneous_lower` in `Global.lean` | Lean checked for all real inputs, including both outer tails and `B=0` |
 | Primitive integer input and a common divisor of both forms | `integer_homogeneous_lower` and `reduced_forms_lower` in `IntegerBridge.lean` | Lean checked: if `gcd(A,B)=1`, `d>0`, `F=d f`, and `G=d g`, then `max(|A|,|B|)^4 ≤ 1024·8038359040000·max(|f|,|g|)` |
-| Canonical reduced output pair | `canonical_output_lower` in `OutputBridge.lean` | Lean checked for `gcd(A,B)=1` and `G(A,B)≠0`: the same lower bound holds with `f=q.num`, `g=q.den`, `q=F(A,B)/G(A,B)` |
+| Canonical reduced output pair | `canonical_output_lower` and `point_canonical_output_lower` in `OutputBridge.lean` | Lean checked: the same lower bound holds with `f=q.num`, `g=q.den`, `q=F(A,B)/G(A,B)`; the point theorem discharges both primitive-input and nonzero-denominator hypotheses |
 | Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
 | Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Mathematical derivation; integer-coordinate height comparison in Lean remains open |
 
 The polynomial, divisibility, global archimedean and numerical Lean declarations
 use only standard foundations in their `#print axioms` output. The packet is
-**partially formalized** until the point-side nonidentity condition is used
-to show `G(A,B)≠0`, `Rat.logHeight₁_eq_log_max` is applied to the canonical
-output pair, and the matching upper height inequality is combined with it.
-The resulting uniform doubling defect remains a point-level Lean obligation.
+**partially formalized** until `Rat.logHeight₁_eq_log_max` is applied to the
+canonical output pair and the matching upper height inequality is combined
+with it. The resulting uniform doubling defect remains a point-level Lean
+obligation.
 The canonical-limit packet already proves quadraticity for integer multiples.
 Mordell–Weil generation and rational-to-finite reduction remain separate
 obligations for a complete fixed-curve exclusion theorem.

@@ -3,6 +3,7 @@ import RationalBridge
 namespace XedniDuplicationOutputBridge
 
 open XedniDuplicationBound XedniDuplicationIntegerBridge
+  XedniDuplicationRationalBridge XedniDuplicationPointBridge
 
 theorem canonical_output_lower (A B : ℤ) (hAB : Int.gcd A B = 1)
     (hG : G A B ≠ 0) :
@@ -39,6 +40,15 @@ theorem canonical_output_lower (A B : ℤ) (hAB : Int.gcd A B = 1)
   have hscale := mul_nonneg (sub_nonneg.mpr hcRreal) hmax
   nlinarith
 
+theorem point_canonical_output_lower {x y : ℚ}
+    (h : FixedCurve.Nonsingular x y) (hn : y ≠ FixedCurve.negY x y) :
+    let q : ℚ := (F x.num x.den : ℚ) / (G x.num x.den : ℚ)
+    (max |(x.num : ℝ)| |(x.den : ℝ)|) ^ 4 ≤
+      1024 * 8038359040000 * max |(q.num : ℝ)| |(q.den : ℝ)| :=
+  canonical_output_lower x.num x.den (primitive_x x)
+    (denominator_ne_of_double_ne h hn)
+
 #print axioms canonical_output_lower
+#print axioms point_canonical_output_lower
 
 end XedniDuplicationOutputBridge

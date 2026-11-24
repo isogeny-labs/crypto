@@ -42,6 +42,28 @@ theorem duplication_fraction_normalized (x : ℚ) :
   · simp [hG]
   · field_simp
 
+theorem denominator_ne_of_double_ne {x y : ℚ}
+    (h : FixedCurve.Nonsingular x y) (hn : y ≠ FixedCurve.negY x y) :
+    G x.num x.den ≠ 0 := by
+  have hy : y ≠ 0 := by
+    intro hy0
+    apply hn
+    simp [FixedCurve, WeierstrassCurve.Affine.negY, hy0]
+  have heq : y ^ 2 = x ^ 3 - 47 * x ^ 2 + 751 * x - 3997 := by
+    have heq0 := (FixedCurve.equation_iff x y).mp h.1
+    norm_num [FixedCurve] at heq0
+    convert heq0 using 1; ring
+  have hden : denForm x = 4 * y ^ 2 := by
+    dsimp [denForm]
+    nlinarith [heq]
+  have hdennz : denForm x ≠ 0 := by
+    rw [hden]
+    exact mul_ne_zero (by norm_num) (pow_ne_zero _ hy)
+  intro hG
+  apply hdennz
+  rw [denForm_normalized, hG]
+  simp
+
 theorem naiveHeight_double_normalized {x y : ℚ}
     (h : FixedCurve.Nonsingular x y) (hn : y ≠ FixedCurve.negY x y) :
     (WeierstrassCurve.Affine.Point.some x y h +
@@ -52,6 +74,7 @@ theorem naiveHeight_double_normalized {x y : ℚ}
 
 #print axioms primitive_x
 #print axioms duplication_fraction_normalized
+#print axioms denominator_ne_of_double_ne
 #print axioms naiveHeight_double_normalized
 
 end XedniDuplicationRationalBridge
