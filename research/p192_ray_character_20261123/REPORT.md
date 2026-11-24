@@ -471,6 +471,27 @@ a bound without the scalar weight does not
 meet this gate. This numerical threshold omits feature selection,
 exact sample-count rounding, and other field costs. [pcc:unverified]
 
+The published bilinear estimate supplies a nontrivial **unshifted**
+upper bound, but does not settle this gate. Put
+`S_0=Σ_{d=1}^{r-1}χ_r(d)χ_p(x([d]G))`. In
+[Ahmadi–Shparlinski, Theorem 2.2](https://research-management.mq.edu.au/ws/portalfiles/portal/62254405/Publisher%20version%20%28open%20access%29.pdf),
+take both scalar sets to be `F_r^×` and both weights to be `χ_r`.
+Every product scalar has `n=r-1` factorizations, so the bilinear
+sum is exactly `nS_0`. With its parameter `ν=1`, the theorem gives
+
+`|S_0| ≪ n^(1/6) r^(2/3) p^(1/12) (log p)^(1/3)`.
+
+The displayed P-192 scale before the unspecified implied constant
+is about `2^178.352`, **27.770 bits above** the nominal
+`ng≈2^150.582` cold threshold. This upper bound therefore neither
+certifies useful bias nor excludes it at the required scale. The
+theorem is stated for `χ_p(x([d]G))`, not for a fixed shifted
+`χ_p(x([d]G)-c)`; applying it to `c=x([a]G)` would require a new
+argument. The older [Lange–Shparlinski](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/060B1D110572EACEB6EC6F41EC0AB1CA/S0008414X00018745a.pdf/div-class-title-certain-exponential-sums-and-random-walks-on-elliptic-curves-div.pdf)
+result bounds *additive* field-character sums of `x([d]G)`, so it
+does not directly bound the multiplicative field character here.
+[pcc:unverified]
+
 There is a small exact bias floor for every known-point offset, but
 it does not approach this gate. Since `χ_r(-1)=1`, the summands for
 `d` and `-d` agree. Among the `n/2` pairs, exactly the pair
