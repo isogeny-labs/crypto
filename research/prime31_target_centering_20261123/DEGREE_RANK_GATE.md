@@ -48,6 +48,22 @@ degree-two maps, not a claim about Groebner solving degree, restricted
 finite selectors, or higher-degree morphisms. Exceptional and ramified
 fibers can have fewer values.
 
+## What a Mobius change can and cannot lower
+
+For a fixed translation `U`, replace each centered abscissa `z_i` by
+`h(z_i)` for `h in PGL2(F_p)`. Homogenize each coordinate on its own
+`P1` factor and transform the selector equations along with the
+summation equation. The resulting exact relation-and-selector ideal is
+the image of the original ideal under an automorphism of `(P1)^4`.
+That automorphism preserves the multigrading: the defining
+multidegrees, multigraded Hilbert function and graded syzygy degrees
+are unchanged. In particular, a Mobius rewrite alone cannot lower
+those intrinsic degree measures while retaining the same selector.
+Affine chart choice, monomial order, sparsity and F4 resource use can
+still change, so a claim about **measured** solving degree or work needs
+a completed equal-input comparison. A target-dependent translation is
+a different operation: it changes the selector and has the costs above.
+
 ## Rank limit for an unlabelled fixed base
 
 Suppose a finite list of fixed translated points is `Fi=U+Zi`, and a
