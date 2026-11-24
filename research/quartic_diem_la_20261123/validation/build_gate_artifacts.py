@@ -45,6 +45,7 @@ def main():
     load = lambda n: json.load(open(os.path.join(vd, n)))
     certs, rec, rep, ext = (load("certificates.json"), load("recompute.json"),
                             load("replay_compare.json"), load("checks_extra.json"))
+    dg = load("diag_check.json")["summary"]
     ana = json.loads(git(repo, "show", f"{sha}:{STUDY}/analysis.json"))
     rows = [json.loads(l) for fn in FILES
             for l in git(repo, "show", f"{sha}:{STUDY}/{fn}").decode().splitlines() if l.strip()]
@@ -198,10 +199,15 @@ def main():
             "analysis_json_byte_reproduced_by_frozen_script": repro_ok,
             "stress_trim_sge_charge_x100_w1": ex["stress_trim_sge_charge"]["x100_w1.0"],
             "structural_counter_identities": struct_ok,
+            "diag_flag_leaves_committed_fields_unchanged": dg["committed_fields_equal"] == dg["diag_runs"],
+            "amendment_mechanism_attempt1_t_undetermined": {
+                s: {"multi_attempt_runs": dg[s]["multi_attempt_runs"],
+                    "attempt1_t_determined": dg[s]["attempt1_t_determined_in_multi_attempt_runs"],
+                    "attempt1_outcomes": dg[s]["attempt1_outcomes_in_multi_attempt_runs"]} for s in ("grid", "dev")},
         },
-        "errata": "validator-report.md, section Errata (E1-E5) and process findings (P1-P4)",
+        "errata": "validator-report.md, section Errata (E1-E6) and process findings (P1-P5)",
         "scripts": ["replay.sh", "compare_replay.py", "verify_certificates.py", "picarith.py",
-                    "recompute.py", "checks_extra.py", "build_gate_artifacts.py"],
+                    "recompute.py", "checks_extra.py", "diag_check.py", "build_gate_artifacts.py"],
         "label": "[pcc:unverified] (no pcc claim was created by the validator)",
     }
     rpath = os.path.join(vd, "validator-report.json")
