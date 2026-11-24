@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T21:29:43Z",
+ "id": "PCC-20261124-0eec2a",
+ "kind": "statement",
+ "producer": {
+  "commit": "5ea8e6940eed86899c2d49daadd2c7c63bbc7a12",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-cofactor-msolve-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/cofactor_msolve_v1/f127_d4.jsonl",
+    "sha256": "f37f2b62c629e186774af95a822caf424cce440ea909532788f1712a976a7190"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/cofactor_msolve_v1/f127_d4.stderr",
+    "sha256": "07b9f1a5072e16c7f8b53559ebc19296c928165bed846e9d229c8a0980528a66"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/cofactor_msolve_v1/f127_d4.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-cofactor-msolve",
+ "statement": "The first frozen same-equation msolve F127 panel exited 1 after one complete nine-relation query. The second query returned seven signed rows against ten in the direct reference, so exactness failed and later panel targets were not executed. The recorded mismatch is retained; the representation versus extraction cause is not yet established. Unsigned local development evidence only."
+}

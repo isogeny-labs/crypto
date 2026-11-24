@@ -853,14 +853,18 @@ fn main() -> Result<(), String> {
                 &scratch,
                 Duration::from_secs(3),
             );
+            let mismatch = match &discovery.result {
+                Ok(recovered) if recovered != &want => Some(format!(
+                    "{mode:?} mismatch for {target:?}: {recovered:?} != {want:?}"
+                )),
+                _ => None,
+            };
             let record = match discovery.result {
                 Ok(recovered) if recovered == want => {
                     json!({"status":"exact","relations":recovered.len(),"rows":recovered})
                 }
                 Ok(recovered) => {
-                    return Err(format!(
-                        "{mode:?} mismatch for {target:?}: {recovered:?} != {want:?}"
-                    ))
+                    json!({"status":"mismatch","relations":recovered.len(),"rows":recovered,"expected_rows":want})
                 }
                 Err(error) => json!({"status":"undetermined","reason":error}),
             };
@@ -874,6 +878,9 @@ fn main() -> Result<(), String> {
                     "planted":trial>=unplanted,
                 })
             );
+            if let Some(error) = mismatch {
+                return Err(error);
+            }
         }
     }
     Ok(())
