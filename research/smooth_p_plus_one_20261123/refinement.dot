@@ -1,0 +1,12 @@
+digraph refinement {
+  graph [bgcolor="white",rankdir=TB,pad=0.15,nodesep=0.35,ranksep=0.35];
+  node [shape=box,fontname="Helvetica",fontsize=12,style="rounded,filled",fillcolor="#f1f5fb",color="#60809d",margin="0.16,0.10"];
+  edge [fontname="Helvetica",fontsize=10,color="#55718a"];
+  target [label="Same F8191 degree-32 selector\nSame regular four-summand relation set"];
+  single [label="One coefficient-chain system\n11 variables / 12 equations\n0 of 5 target queries completed",fillcolor="#f8eee9",color="#a17a69"];
+  split [label="Stop one map step earlier\n8 occupied fine-image charts\n7 variables / 8 equations per chart",fillcolor="#edf7f0",color="#54866a"];
+  union [label="Complete disjoint union + signed replay\n5 of 5 target queries completed\nAll charts share a 3-second query deadline",fillcolor="#edf7f0",color="#54866a"];
+  target -> single;
+  target -> split;
+  split -> union;
+}

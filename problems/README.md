@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Refined RR5 cold comparison](refined-rr5-cold-comparison.md) | open | fully charged speedup over the production algebraic controls | common adapter, exact signed replay, source-bound EKS build and admitted setup/collection/linear-algebra comparison |
 | [Vitse Prime31 full-library validation](vitse-prime31-full-library-validation.md) | blocked: duplicate production test module | completed unfiltered root-library validation for the compatibility study | root-finding test-module repair, source-bound full suite, exact-head CI/review |
 | [Extension-field graph IC trace measurement admission](extension-ic-trace-measurement-admission.md) | open | new Rust/Runpod matched IC-rho trial | funded provider, checkpoint route, frozen native isolation/replay protocol; complete accounting and root gate remain separate |
 | [Exact Prime31 pair-spectrum queries](prime31-exact-pair-spectrum-query.md) | open | sublinear empty-inclusive solving on the actual Dickson-derived pair spectrum; original-root native gate | exact component cost below the named quasi-linear-in-D baseline with charged setup/output; separate stronger pipeline exponent and original-source validation |
