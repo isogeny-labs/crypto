@@ -38,6 +38,24 @@ Kosters and Yeo's [Notes on summation polynomials](https://arxiv.org/abs/1503.08
 is a further caution against identifying first-fall degree with completed
 solving degree.
 
+## Degree-three `y`-coordinate screen on B677
+
+The ordinary `y:E -> P1` map has degree three because `y` has a pole of
+order three at the identity. On the B677 curve, the fibers at `y=3,8,27`
+each have three distinct rational points. For each of the two fixed public
+targets `G` and `Q`, taking all 27 triples from these fibers and evaluating
+`y(R-P1-P2-P3)` produces 27 distinct fourth coordinates. The independent
+integer-group-law replay is `verify_y_fiber_degree.py`; it checks all nine
+input points, both targets and hashes of the sorted outputs.
+
+For either **fixed** target, a generic triple of `y` values has at most
+`3^3=27` fourth values. The exhibited unramified specialization attains
+27, so its generic fourth-coordinate fiber has degree exactly 27. This
+rules out a lower intrinsic fourth-coordinate degree from simply replacing
+ordinary `x` by ordinary `y` on these two targets. It does not compare
+completed solving degrees or costs, and it does not rule out restricted
+selectors, other maps, or special targets.
+
 ## Exact equations on a finite selector
 
 Let `S` be a public set of `B` distinct **liftable** abscissae and let
