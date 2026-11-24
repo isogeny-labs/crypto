@@ -1,6 +1,7 @@
 #include "json.hpp"
 #include <algorithm>
 #include <array>
+#include <iostream>
 #include <tuple>
 
 using Incidence=std::array<int,3>;
