@@ -11,6 +11,7 @@ use std::time::{Duration, Instant};
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct FrozenF101Input {
+    schema_version: u32,
     p: u64,
     n_vars: usize,
     polynomials: Vec<Poly>,
@@ -21,13 +22,14 @@ struct FrozenF101Input {
 fn frozen_f101_input(raw: &[u8]) -> Result<(FrozenF101Input, u64, String), String> {
     let digest = hex::encode(Sha256::digest(raw));
     let target_x = match digest.as_str() {
-        "8045445aef2e8831dc8adf32ea17be90bb7ec6f0d8bc852d1dd53b83006a5351" => 83,
-        "b7f6e57a7049fcfd81692d5b02ff5f9f0f8b3cbdcfcd82d9a6373d155c364e28" => 8,
+        "0cb1aa8a2b3b9afe818002067cfa20349e8186a025b2b8182c322a9823538bb1" => 83,
+        "3a6d99c72ca0a48bbb690d8cf11884c74547817c3d08a9262aa411f8989d6930" => 8,
         _ => return Err(format!("unrecognized frozen F101 input SHA-256: {digest}")),
     };
     let input: FrozenF101Input =
         serde_json::from_slice(raw).map_err(|e| format!("invalid frozen F101 JSON: {e}"))?;
-    if input.p != 101
+    if input.schema_version != 1
+        || input.p != 101
         || input.n_vars != 3
         || input.polynomials.len() != 4
         || input.degree_bound != 16
@@ -42,6 +44,21 @@ fn frozen_f101_input(raw: &[u8]) -> Result<(FrozenF101Input, u64, String), Strin
         return Err("frozen F101 shape or settings changed".into());
     }
     Ok((input, target_x, digest))
+}
+
+fn validate_frozen_f101(path: &str) -> Result<(), String> {
+    let raw = fs::read(path).map_err(|e| format!("cannot read frozen F101 input: {e}"))?;
+    let (_, target_x, digest) = frozen_f101_input(&raw)?;
+    println!(
+        "{}",
+        json!({
+            "schema": "g33-frozen-f101-input-validation/v1",
+            "input_sha256": digest,
+            "target_x": target_x,
+            "valid": true,
+        })
+    );
+    Ok(())
 }
 
 fn run_frozen_f101(path: &str) -> Result<(), String> {
@@ -264,6 +281,20 @@ fn run(
 }
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
+    if args
+        .first()
+        .is_some_and(|arg| arg == "--validate-frozen-f101-input")
+    {
+        if args.len() != 2 {
+            eprintln!("usage: five_leads_mixed_f4 --validate-frozen-f101-input INPUT.json");
+            std::process::exit(2);
+        }
+        if let Err(error) = validate_frozen_f101(&args[1]) {
+            eprintln!("{error}");
+            std::process::exit(2);
+        }
+        return;
+    }
     if args.first().is_some_and(|arg| arg == "--frozen-f101-input") {
         if args.len() != 2 {
             eprintln!("usage: five_leads_mixed_f4 --frozen-f101-input INPUT.json");
