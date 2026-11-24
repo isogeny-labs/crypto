@@ -15,8 +15,11 @@ pub mod trace_zero_relations;
 #[cfg(not(any(feature = "legacy-halftrace", feature = "incumbent")))]
 #[path = "../../../../../src/cryptanalysis/trace_zero_linearized.rs"]
 pub mod trace_zero_linearized;
-#[cfg(any(feature = "legacy-halftrace", feature = "incumbent"))]
+#[cfg(feature = "legacy-halftrace")]
 #[path = "../../../baseline_linearized_snapshot.rs"]
+pub mod trace_zero_linearized;
+#[cfg(feature = "incumbent")]
+#[path = "../../../incumbent_linearized_snapshot.rs"]
 pub mod trace_zero_linearized;
 #[cfg(not(any(feature = "legacy-halftrace", feature = "incumbent")))]
 #[path = "../../../../../src/cryptanalysis/trace_zero_word_field.rs"]

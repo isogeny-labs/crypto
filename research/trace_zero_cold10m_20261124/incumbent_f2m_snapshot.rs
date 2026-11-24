@@ -1125,6 +1125,28 @@ impl CompactLinearMaps {
     }
     #[inline]
     fn half_words<const WORDS: usize>(&self, a: [u64; 3]) -> [u64; 3] {
+        match self.tables.n_bytes {
+            11 if WORDS == 2 => self.half_fixed::<WORDS, 11>(a),
+            17 if WORDS == 3 => self.half_fixed::<WORDS, 17>(a),
+            _ => self.half_dynamic::<WORDS>(a),
+        }
+    }
+    #[inline(always)]
+    fn half_fixed<const WORDS: usize, const BYTES: usize>(&self, a: [u64; 3]) -> [u64; 3] {
+        debug_assert_eq!(self.tables.half_trace.len(), BYTES * 256 * WORDS);
+        let mut out = [0; 3];
+        for k in 0..BYTES {
+            let at = (k * 256 + ((a[k / 8] >> (8 * (k % 8))) & 255) as usize) * WORDS;
+            for w in 0..WORDS {
+                // SAFETY: fixed constructor-selected table width; k<BYTES,
+                // byte<256 and w<WORDS give at+w<table.len().
+                out[w] ^= unsafe { *self.tables.half_trace.get_unchecked(at + w) };
+            }
+        }
+        out
+    }
+    #[inline]
+    fn half_dynamic<const WORDS: usize>(&self, a: [u64; 3]) -> [u64; 3] {
         let mut out = [0; 3];
         for (word, tables) in self.tables.half_trace.chunks(8 * 256 * WORDS).enumerate() {
             let mut value = a[word];

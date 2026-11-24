@@ -68,6 +68,24 @@ pub struct BorrowedCase<'a> {
     pub truth: bool,
     pub truth_witness: Option<Vec<usize>>,
 }
+/// Metadata has the exact required types. Raw point JSON remains fully syntax
+/// validated by serde_json, then the candidate separately checks point shapes
+/// and every coordinate before direct construction. Other syntax falls back.
+#[derive(Deserialize)]
+#[allow(dead_code)]
+pub struct RawPointCase<'a> {
+    pub id: &'a str,
+    pub n: u32,
+    pub dimension: usize,
+    pub kind: &'a str,
+    pub seed: u64,
+    #[serde(borrow)]
+    pub base: &'a serde_json::value::RawValue,
+    #[serde(borrow)]
+    pub target: &'a serde_json::value::RawValue,
+    pub truth: bool,
+    pub truth_witness: Option<Vec<usize>>,
+}
 pub fn unwire_borrowed(p: &Option<[&str; 2]>, n: u32) -> BinaryPoint {
     match p {
         None => BinaryPoint::Infinity,

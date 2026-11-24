@@ -14,7 +14,7 @@ use crate::cryptanalysis::{
     },
 };
 use num_bigint::BigUint;
-use std::{collections::BTreeMap, time::Instant};
+use std::{collections::BTreeMap, sync::OnceLock, time::Instant};
 
 #[derive(Clone, Debug, Default)]
 pub struct TraceZeroLinearizedReport {
@@ -291,11 +291,42 @@ impl PackedRowMap {
         })
     }
     fn evaluate(&self, z: WordMask, target: WordMask) -> ([u64; 4], u16) {
+        if self.bits == 4 && self.coefficients.len() == 21 * 16 {
+            return self.evaluate_fixed::<4, 21>(z, target);
+        }
+        if self.bits == 8 && self.coefficients.len() == 17 * 256 {
+            return self.evaluate_fixed::<8, 17>(z, target);
+        }
         if self.bits == 4 {
             self.evaluate_bits::<4>(z, target)
         } else {
             self.evaluate_bits::<8>(z, target)
         }
+    }
+    #[inline(always)]
+    fn evaluate_fixed<const BITS: usize, const GROUPS: usize>(
+        &self,
+        z: WordMask,
+        target: WordMask,
+    ) -> ([u64; 4], u16) {
+        let entries = 1usize << BITS;
+        debug_assert_eq!(self.coefficients.len(), GROUPS * entries);
+        debug_assert_eq!(self.rhs.len(), GROUPS * entries);
+        let mut coefficients = [0; 4];
+        let mut rhs = 0;
+        for group in 0..GROUPS {
+            let shift = (group % (64 / BITS)) * BITS;
+            let zi = ((z[group / (64 / BITS)] >> shift) as usize) & (entries - 1);
+            let ti = ((target[group / (64 / BITS)] >> shift) as usize) & (entries - 1);
+            // SAFETY: private constructor makes equal-length tables. The
+            // selected fixed layout has GROUPS groups; each index<entries.
+            let c = unsafe { self.coefficients.get_unchecked(group * entries + zi) };
+            for i in 0..4 {
+                coefficients[i] ^= c[i];
+            }
+            rhs ^= unsafe { *self.rhs.get_unchecked(group * entries + ti) };
+        }
+        (coefficients, rhs)
     }
     #[inline]
     fn evaluate_bits<const BITS: usize>(&self, z: WordMask, target: WordMask) -> ([u64; 4], u16) {
@@ -421,6 +452,8 @@ struct ProductProjection {
     w_support: WordMask,
     row_map: Option<PackedRowMap>,
     half_combinations: Vec<[[u64; 3]; 16]>,
+    tail_equations: OnceLock<Vec<Vec<WordMask>>>,
+    adjoint: bool,
 }
 impl ProductProjection {
     fn reduce_with(pivots: &[(usize, WordMask)], mut a: WordMask) -> WordMask {
@@ -480,7 +513,8 @@ impl ProductProjection {
                     .expect("odd field")
             })
             .collect();
-        let mut equations = vec![vec![[0; 3]; xs.len() + 1]; coordinates.len()];
+        let eager_rows = coordinates.len().min(16);
+        let mut equations = vec![vec![[0; 3]; xs.len() + 1]; eager_rows];
         if let Some(map) = adjoint.then(|| AdjointMap::new(c)).flatten() {
             for (row, mask) in equations.iter_mut().zip(&rhs) {
                 let numerator = map.forward(*mask);
@@ -493,7 +527,7 @@ impl ProductProjection {
                 let mut multiple = words(h);
                 for bit in 0..c.m as usize {
                     let image = Self::reduce_with(&pivots, multiple);
-                    for (j, &coord) in coordinates.iter().enumerate() {
+                    for (j, &coord) in coordinates.iter().take(eager_rows).enumerate() {
                         if image[coord / 64] & (1u64 << (coord % 64)) != 0 {
                             equations[j][i][bit / 64] |= 1u64 << (bit % 64);
                         }
@@ -533,6 +567,8 @@ impl ProductProjection {
             w_support,
             row_map,
             half_combinations,
+            tail_equations: OnceLock::new(),
+            adjoint,
         }
     }
 
@@ -627,7 +663,48 @@ impl ProductProjection {
                 });
             insert_row!(row, j);
         }
-        (ProjectedResult::Deficient, self.equations.len())
+        let start = self.equations.len();
+        for (index, columns) in self.coefficient_tail(c, field).iter().enumerate() {
+            let j = start + index;
+            let row = columns
+                .iter()
+                .enumerate()
+                .fold(parity(&self.rhs[j], &target) << width, |r, (i, col)| {
+                    r | (parity(col, &zw) << i)
+                });
+            insert_row!(row, j);
+        }
+        (ProjectedResult::Deficient, self.rhs.len())
+    }
+    /// Only rank-deficient prefixes need further coefficient maps. The exact
+    /// W remainder in finish_unique already checks all omitted coordinates.
+    fn coefficient_tail(&self, c: &BinaryCurve, field: &WordField) -> &Vec<Vec<WordMask>> {
+        self.tail_equations.get_or_init(|| {
+            let masks = &self.rhs[self.equations.len()..];
+            let mut rows = vec![vec![[0; 3]; self.halves.len() + 1]; masks.len()];
+            if let Some(map) = self.adjoint.then(|| AdjointMap::new(c)).flatten() {
+                for (row, mask) in rows.iter_mut().zip(masks) {
+                    let numerator = map.forward(*mask);
+                    for (i, h) in self.halves.iter().enumerate() {
+                        row[i] = map.inverse(field.mul(numerator, words(h)));
+                    }
+                }
+            } else {
+                for (i, h) in self.halves.iter().enumerate() {
+                    let mut multiple = words(h);
+                    for bit in 0..c.m as usize {
+                        for (row, mask) in rows.iter_mut().zip(masks) {
+                            row[i][bit / 64] |= parity(mask, &multiple) << (bit % 64);
+                        }
+                        multiple = field.times_x(multiple);
+                    }
+                }
+            }
+            for (row, mask) in rows.iter_mut().zip(masks) {
+                row[self.halves.len()] = *mask;
+            }
+            rows
+        })
     }
     fn finish_unique(
         &self,
@@ -1355,11 +1432,35 @@ mod tests {
                 let old = ProductProjection::build(&xs, &ws, &c, &field, false);
                 let new = ProductProjection::build(&xs, &ws, &c, &field, true);
                 assert_eq!(old.equations, new.equations, "n{n}/d{d}");
+                assert_eq!(
+                    old.coefficient_tail(&c, &field),
+                    new.coefficient_tail(&c, &field),
+                    "tail n{n}/d{d}"
+                );
                 assert_eq!(old.rhs, new.rhs);
                 assert_eq!(old.w_pivots, new.w_pivots);
                 assert_eq!(old.halves, new.halves);
                 assert_eq!(old.w_support, new.w_support);
             }
+        }
+    }
+
+    #[test]
+    fn omitted_coefficient_maps_remain_lazy_and_complete_deficient_fallback() {
+        for n in [83, 131] {
+            let c = adjoint_curve(n);
+            let field = WordField::new(&c);
+            let xs: Vec<_> = (1..=12)
+                .map(|i| F2mElement::from_bit_positions(&[i], n))
+                .collect();
+            let p = ProductProjection::new_with_field(&xs, &[], &c, &field);
+            assert_eq!(p.equations.len(), 16);
+            assert!(p.tail_equations.get().is_none());
+            assert_eq!(
+                p.solve_compact(&xs, &c, [0; 3], [0; 3], &field),
+                (ProjectedResult::Deficient, n as usize)
+            );
+            assert_eq!(p.tail_equations.get().unwrap().len(), n as usize - 16);
         }
     }
 

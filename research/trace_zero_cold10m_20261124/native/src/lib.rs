@@ -1,3 +1,5 @@
+#[cfg(not(any(feature = "legacy-halftrace", feature = "incumbent")))]
+mod wire_ascii;
 #[cfg(test)]
 #[path = "../../../../src/binary_ecc/operation_tally.rs"]
 mod tally_unit_tests;
@@ -94,6 +96,16 @@ pub fn execute(case: &Case, arm: &str) -> Value {
     })
 }
 pub fn execute_wire_json(bytes: &[u8], arm: &str) -> Result<Value, serde_json::Error> {
+    #[cfg(not(any(feature = "legacy-halftrace", feature = "incumbent")))]
+    if let Ok(case) = serde_json::from_slice::<trace_zero_experiments::RawPointCase<'_>>(bytes) {
+        // These known fixture fields also bound allocations before the ordinary
+        // context constructor. All other inputs retain the original decoder.
+        if matches!(case.n,83|131) {
+            if let Some(points) = wire_ascii::decode(case.base.get(),case.target.get(),case.n) {
+                return Ok(execute_input(case.n,case.truth,arm, |_| points));
+            }
+        }
+    }
     if true {
         if let Ok(case) = serde_json::from_slice::<trace_zero_experiments::BorrowedCase<'_>>(bytes)
         {

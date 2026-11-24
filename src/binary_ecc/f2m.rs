@@ -272,11 +272,50 @@ impl F2mElement {
         Self::from_biguint(&big, m)
     }
 
-    /// Ordinary hexadecimal coordinates need neither a cleaned String nor
-    /// a temporary BigUint. Unusual accepted syntax keeps the original parser.
-    fn from_ascii_hex(hex: &str, m: u32) -> Option<Self> {
+    /// Checked ordinary ASCII hexadecimal, truncating exactly as from_hex.
+    /// Returns None for extended syntax so callers can retain the legacy parser.
+    pub fn from_ascii_hex(hex: &str, m: u32) -> Option<Self> {
         if hex.is_empty() {
             return None;
+        }
+        if (1..=192).contains(&m) {
+            let nw = m.div_ceil(64) as usize;
+            let mut words = [0u64; 3];
+            let mut chunks = hex.as_bytes().rchunks_exact(16);
+            for (i, chunk) in chunks.by_ref().enumerate() {
+                let value = parse_ascii_hex16(chunk)?;
+                if i < nw {
+                    words[i] = value;
+                }
+            }
+            let remaining = chunks.remainder();
+            let (mut prefix, rest) = if remaining.len() >= 8 {
+                (parse_ascii_hex8(&remaining[..8])? as u64, &remaining[8..])
+            } else {
+                (0, remaining)
+            };
+            for &byte in rest {
+                let digit = match byte {
+                    b'0'..=b'9' => byte - b'0',
+                    b'a'..=b'f' => byte - b'a' + 10,
+                    b'A'..=b'F' => byte - b'A' + 10,
+                    _ => return None,
+                };
+                prefix = (prefix << 4) | digit as u64;
+            }
+            let i = hex.len() / 16;
+            if i < nw {
+                words[i] = prefix;
+            }
+            if m % 64 != 0 {
+                words[nw - 1] &= (1u64 << (m % 64)) - 1;
+            }
+            let mut w = [0; INLINE_WORDS];
+            w[..3].copy_from_slice(&words);
+            return Some(Self {
+                bits: Words::Inline { len: nw as u8, w },
+                m,
+            });
         }
         let mut out = Self::zero(m);
         let mut chunks = hex.as_bytes().rchunks_exact(16);
@@ -944,8 +983,15 @@ fn half_trace_basis_by_elimination(
         let unit = F2mElement::from_bit_positions(&[col as u32], irreducible.degree);
         let mut image = unit.square(irreducible).add(&unit);
         image.bits[0] ^= (trace_mask[col / 64] >> (col % 64)) & 1;
-        for (row, data) in rows.iter_mut().enumerate() {
-            data[col / 64] |= ((image.bits[row / 64] >> (row % 64)) & 1) << (col % 64);
+        // A squared monomial plus itself is sparse for these moduli. Visit
+        // its set coefficients instead of testing every matrix row.
+        for (word, &bits) in image.bits.iter().enumerate() {
+            let mut bits = bits;
+            while bits != 0 {
+                let row = word * 64 + bits.trailing_zeros() as usize;
+                rows[row][col / 64] |= 1u64 << (col % 64);
+                bits &= bits - 1;
+            }
         }
     }
     for (row, data) in rows.iter_mut().enumerate() {
@@ -1038,18 +1084,20 @@ impl TraceTables {
             let n_bytes = m.div_ceil(8) as usize;
             let mut tab = vec![0u64; n_bytes * 256 * nw];
             for k in 0..n_bytes {
+                // Fetch each basis column once per byte, retaining the exact
+                // strided table layout shared by all public field callers.
+                let mut columns = vec![vec![0u64; nw]; 8];
+                for (bit, column) in columns.iter_mut().enumerate() {
+                    if let Some(image) = basis.get(8 * k + bit) {
+                        column.copy_from_slice(&image.bits);
+                    }
+                }
                 for v in 1..256usize {
-                    let j = v.trailing_zeros() as usize;
+                    let column = &columns[v.trailing_zeros() as usize];
                     let prev = (k * 256 + (v & (v - 1))) * nw;
                     let at = (k * 256 + v) * nw;
-                    let bit = 8 * k + j;
                     for w in 0..nw {
-                        let b = if bit < m as usize {
-                            basis[bit].bits[w]
-                        } else {
-                            0
-                        };
-                        tab[at + w] = tab[prev + w] ^ b;
+                        tab[at + w] = tab[prev + w] ^ column[w];
                     }
                 }
             }
