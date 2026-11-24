@@ -69,6 +69,7 @@ pub mod explicit_base;
 pub mod fiber;
 pub mod genroot;
 pub mod hashed;
+pub mod indexed_resultant;
 pub mod large_prime;
 pub mod linalg;
 pub mod linalg_mixed;
@@ -1048,6 +1049,12 @@ fn run_pipeline_inner<G: CountedGroup>(
             "genroot charges each S3 fiber as two group additions; the root-finding inside a fiber \
              (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted \
              but not priced",
+        );
+    }
+    if oracle.name() == "indexed-s3" {
+        unpriced_work.push(
+            "indexed-s3 counts chart multiplications, squarings, table insertions and point \
+             negations outside the group-addition-equivalent estimate",
         );
     }
     if oracle.name() == "hashed-tensor" && !tensor_steps_pinned {

@@ -345,6 +345,20 @@ The F4 arm uses the same prefix slicing, with two membership polynomials for the
 
 The nine repetitions per target each run in a fresh process, and each arm rebuilds the base and its own solver data for a single target. The times include setup and complete recovery. The minimum paired speedup among all 18 repetitions is 11.88×. These results compare complete prefix-sliced solvers on this 16-abscissa M31 workload. A separate attempt to solve the direct 20-variable degree-20 S6 system with native F4 returned undetermined under its allocation limits, so it is recorded separately from the completed comparisons. [pcc:unverified]
 
+#### IC integration
+
+`indexed-s3` is an opt-in five-summand oracle for finite prime-field factor bases. It builds the quadratic pair index in setup and returns the first signed witness that sums to the target. Setup visits one chart per unordered pair of abscissae, with repetition. A miss visits every unordered signed triple, with repetition. The IC framework handles relation verification, rank, and recovery. The table above measures full ordered solution recovery in the standalone experiment.
+
+```sh
+cargo build --locked --release --bin ic
+cargo test --locked --release --lib indexed_resultant
+target/release/ic bench --bits 31 --family p31-subexp \
+  --factor-base prime-abscissa:size=16 --oracle indexed-s3 \
+  --seed 11781661 --max-trials 64 --rho-runs 0
+```
+
+The unit test replays the exact factor base and both targets from the matched experiment. The CLI command exercises the IC pipeline on its standard Mersenne-field benchmark curve.
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
