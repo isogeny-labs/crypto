@@ -186,6 +186,7 @@ pub mod efd_representations;
 pub mod endo_rho;
 pub mod ext_curve;
 pub mod exact_modular_matrix;
+pub mod f4_gf2;
 pub mod f4_fp;
 pub mod f4_fp_tower;
 pub mod f4_fp_tower_radix;
