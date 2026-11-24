@@ -333,6 +333,20 @@ def main():
     }
     res["paired_sge_over_sfb"] = {m: summarize(m, curve_vals(fn), rng) for m, fn in metrics.items()}
 
+    # ── bootstrap noise: 400 independent 4000-replicate MC runs of the pooled CI ──
+    nrng = np.random.default_rng(SEED_MC + 1)
+    noise = {}
+    for m, fn in metrics.items():
+        L = {p: np.log(np.asarray(v, dtype=float)) for p, v in curve_vals(fn).items()}
+        ends = []
+        for _ in range(400):
+            M = np.stack([L[p][nrng.integers(0, 5, size=(NREP, 5))].mean(axis=1) for p in PRIMES], axis=1)
+            ends.append(np.percentile(np.exp(M.mean(axis=1)), [2.5, 97.5]))
+        ends = np.array(ends)
+        noise[m] = {"lo_range": [float(ends[:, 0].min()), float(ends[:, 0].max())],
+                    "hi_range": [float(ends[:, 1].min()), float(ends[:, 1].max())]}
+    res["bootstrap_noise_pooled_ci_400x4000"] = noise
+
     # ── IC / rho ──
     icr = {}
     verd = {}
