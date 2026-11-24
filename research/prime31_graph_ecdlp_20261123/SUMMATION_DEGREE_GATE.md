@@ -377,6 +377,11 @@ one bit per slot. Their top-quotient lengths are 6,291,456 and
 677 abscissae; selecting exactly B677 needs an additional exact
 restriction with a new degree and cost account. This support theorem
 does not supply four-summand extraction or a completed solver result.
+Replay both probability bounds with exact rational arithmetic using
+`python3 research/prime31_graph_ecdlp_20261123/verify_offset_support_bounds.py`.
+Its exhaustive F17 two-bit check independently verifies the mean,
+pairwise variance and duplicate-loss inequality on a finite example;
+the M31 calculation uses the displayed point and split-count bounds.
 
 This is a two-summand secant theorem. A four-summand B677 relation
 would need a sound composition with target, sign, distinct-index and
