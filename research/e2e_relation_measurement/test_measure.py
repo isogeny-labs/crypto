@@ -29,6 +29,16 @@ class MeasurementTest(unittest.TestCase):
             out=pathlib.Path(d)/'out.json'
             subprocess.run(['sage','-python',str(HERE/'measure.py'),'--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27','--mode',mode,'--seed','42','--block-size','4','--output',str(out),*extra],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             return json.loads(out.read_text())
+    def test_reject_unsupported_field(self):
+        with tempfile.TemporaryDirectory() as d:
+            out=pathlib.Path(d)/'out.json'; checkpoint=pathlib.Path(d)/'checkpoint.json'
+            cmd=['sage','-python',str(HERE/'measure.py'),'--p','3','--curve-a','1','--curve-b','1','--px','0','--py','1','--qx','0','--qy','1','--mode','independent','--seed','1','--output',str(out),'--checkpoint',str(checkpoint)]
+            proc=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            self.assertNotEqual(proc.returncode,0)
+            self.assertIn(b'p must be a prime greater than 3',proc.stderr)
+            self.assertFalse(out.exists())
+            self.assertEqual(json.loads(checkpoint.read_text())['phase'],'setup')
+
     def test_panel_partial_cost_coverage(self):
         spec=importlib.util.spec_from_file_location('panel', HERE/'panel.py')
         module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
@@ -74,6 +84,16 @@ class MeasurementTest(unittest.TestCase):
     def test_positive_signed_relations(self):
         r=self.run_case('independent',['--block-size','10'])
         self.assertEqual(len(r['roots']),3)
+        system=r['system']; self.assertEqual(system['coefficient_modulus'],MOD)
+        accepted=[c for c in r['candidates'] if c['status']=='accepted']
+        for x,y in ((0,0),(3,8),(67,75)):
+            actual=[sum(t['coefficient'] * pow(x,t['exponents'][0],MOD) * pow(y,t['exponents'][1],MOD) for t in terms)%MOD for terms in system['input_terms']]
+            z=r['target']['point'][0]
+            s3=((x-y)**2*z*z-2*((x+y)*(x*y+1)+64)*z+(x*y-1)**2-128*(x+y))%MOD
+            expected=[s3,1,1]
+            for i,c in enumerate(accepted): expected[1+i//10]=expected[1+i//10]*(x-c['point'][0] if i<10 else y-c['point'][0])%MOD
+            self.assertEqual(actual,expected)
+        self.assertEqual(system['input_term_counts'],[len(terms) for terms in system['input_terms']])
         self.assertGreater(r['useful_relations'],0)
         self.assertEqual(r['relation_counts']['nonzero_b'],r['useful_relations'])
         self.assertEqual(r['relation_counts']['nonzero_b_verification_failed'],0)
@@ -141,6 +161,7 @@ else: raise AssertionError('failure was not injected')
             self.assertEqual(r['status'],'running')
             self.assertEqual(len(r['candidates']),r['counts']['candidates'])
             self.assertEqual(len(r['system']['input_polynomials']),3)
+            self.assertEqual(len(r['system']['input_terms']),3)
             self.assertIn('generation',r['timings'])
             self.assertIn('polynomial_construction',r['timings'])
             self.assertNotIn('groebner_basis',r['timings'])

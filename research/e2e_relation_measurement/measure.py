@@ -21,6 +21,8 @@ def run(args):
             tmp.write_text(json.dumps(output, indent=2, sort_keys=True) + '\n')
             os.replace(tmp, path)
     checkpoint()
+    if args.p <= 3 or not is_prime(args.p):
+        raise ValueError('p must be a prime greater than 3')
     F = GF(args.p); E = EllipticCurve(F, [args.curve_a, args.curve_b]); O = E(0)
     P = E(args.px, args.py); n = int(P.order())
     if not is_prime(n):
@@ -81,7 +83,8 @@ def run(args):
             f=prod(x-F(t['point'][0]) for t in rows[:args.block_size]); g=prod(y-F(t['point'][0]) for t in rows[args.block_size:])
             return ring,[s3,f,g]
         ring,polys=phase('polynomial_construction', construct)
-        output['system']={'variables':['x','y'],'order':'degrevlex','input_polynomials':[str(x) for x in polys], 'input_degrees':[int(x.total_degree()) for x in polys]}
+        input_terms = [sorted(({'exponents':[int(e) for e in exp], 'coefficient':int(coef)} for exp,coef in poly.dict().items()), key=lambda item: item['exponents']) for poly in polys]
+        output['system']={'variables':['x','y'],'order':'degrevlex','coefficient_modulus':args.p,'input_polynomials':[str(x) for x in polys], 'input_degrees':[int(x.total_degree()) for x in polys], 'input_terms':input_terms, 'input_term_counts':[len(terms) for terms in input_terms]}
         basis=phase('groebner_basis', lambda:ring.ideal(polys).groebner_basis())
         output['system']['groebner_basis']=[str(x) for x in basis]
         output['metrics']['maximum_output_basis_degree']=max((int(x.total_degree()) for x in basis),default=0)
