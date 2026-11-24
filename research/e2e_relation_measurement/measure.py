@@ -1,6 +1,6 @@
 #!/usr/bin/env sage -python
 """Bounded, replayable two-summand relation measurement; see README.md."""
-import argparse, hashlib, json, math, os, platform, random, resource, time
+import argparse, ctypes, hashlib, json, math, os, platform, random, resource, sys, time
 from pathlib import Path
 from sage.all import GF, EllipticCurve, PolynomialRing, prod, version, is_prime
 from accounting import count_witnesses
@@ -86,7 +86,20 @@ def run(args):
         input_terms = [sorted(({'exponents':[int(e) for e in exp], 'coefficient':int(coef)} for exp,coef in poly.dict().items()), key=lambda item: item['exponents']) for poly in polys]
         output['solver']={'backend':'sage/libsingular:std','protocol_requested':args.solver_protocol,'protocol_stream':'stdout' if args.solver_protocol else None,'root_extraction':'sage ideal variety; backend selected by Sage'}
         output['system']={'variables':['x','y'],'order':'degrevlex','coefficient_modulus':args.p,'input_polynomials':[str(x) for x in polys], 'input_degrees':[int(x.total_degree()) for x in polys], 'input_terms':input_terms, 'input_term_counts':[len(terms) for terms in input_terms]}
-        basis=phase('groebner_basis', lambda:ring.ideal(polys).groebner_basis(algorithm='libsingular:std', prot=args.solver_protocol))
+        def compute_basis():
+            # libSingular writes via C stdio, which must be flushed on both
+            # sides of our markers for the saved stream to preserve ordering.
+            libc = ctypes.CDLL(None) if args.solver_protocol else None
+            if libc:
+                sys.stdout.flush(); libc.fflush(None)
+                print('=== BEGIN GROEBNER BASIS PROTOCOL ===', flush=True)
+            try:
+                return ring.ideal(polys).groebner_basis(algorithm='libsingular:std', prot=args.solver_protocol)
+            finally:
+                if libc:
+                    sys.stdout.flush(); libc.fflush(None)
+                    print('=== END GROEBNER BASIS PROTOCOL ===', flush=True)
+        basis=phase('groebner_basis', compute_basis)
         output['system']['groebner_basis']=[str(x) for x in basis]
         output['metrics']['maximum_output_basis_degree']=max((int(x.total_degree()) for x in basis),default=0)
         solutions=phase('root_extraction',lambda:ring.ideal(basis).variety())

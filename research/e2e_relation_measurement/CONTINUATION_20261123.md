@@ -57,3 +57,13 @@ Sage's `groebner_basis` documentation lists `libsingular:std` and a `prot=True` 
 The focused protocol, checkpoint and positive-relation checks passed (3 tests, 5.695 seconds). The protocol flag emitted Singular's product-criterion line into stdout, the recorded backend was `sage/libsingular:std`, and the run retained verified useful witnesses. Solving degree remains null. Run the full suite before publication.
 
 The complete local correctness suite passed (11 tests, 29.715 seconds) with the explicit Singular backend. Protocol output remains a raw backend observation, with no automatic degree or operation-count claim. Sage's previous autoselection was not pinned; earlier timing data must not be combined as if it had the same identified backend. Solver-native degree/operation telemetry and the requested matched end-to-end comparison remain open.
+
+## 2026-11-23 — trace attribution
+
+Reviewed the Singular 4.4.1 option manual, https://www.singular.uni-kl.de/Manual/latest/sing_324.htm, and the Sage libSingular option documentation, https://sagemath.gitlab.io/documentation/html/en/reference/libs/sage/libs/singular/option.html. The `std` protocol's `[m:n]` is a representation change, while a separate bare integer indicates a current leading-term degree; the meaning of degree depends on command and ordering. Neither is automatically a certified solving degree or regularity. Existing stdout can also include root-extraction output. Add flushed begin/end markers around the actual basis call, retaining raw stdout and treating missing end markers as incomplete; validate marker placement on a fixed correctness control.
+
+Focused protocol and checkpoint checks passed (2 tests, 6.952 seconds): the raw Singular product-criterion text was between exactly one begin and one end marker. Extended the injected-failure check to assert markers are also closed on a Python exception; a killed process may still lack the end marker.
+
+The strengthened protocol and injected-exception checks passed (2 tests, 3.881 seconds); the end marker denotes that the call returned or raised, not that it succeeded. Begin the complete functional suite.
+
+The complete correctness suite passed (11 tests, 29.193 seconds). Documentation now identifies the `std` protocol symbols and ordering caveat using the Singular manual and Sage libSingular documentation. This work establishes trace attribution, not a solving-degree, regularity, or operation-count measurement; those and the matched cost comparison remain open.

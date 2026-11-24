@@ -38,7 +38,12 @@ class MeasurementTest(unittest.TestCase):
             self.assertEqual(record['status'],'complete')
             self.assertTrue(record['solver']['protocol_requested'])
             self.assertEqual(record['solver']['backend'],'sage/libsingular:std')
-            self.assertIn(b'product criterion:',proc.stdout)
+            begin=b'=== BEGIN GROEBNER BASIS PROTOCOL ==='
+            end=b'=== END GROEBNER BASIS PROTOCOL ==='
+            self.assertEqual(proc.stdout.count(begin),1)
+            self.assertEqual(proc.stdout.count(end),1)
+            trace=proc.stdout.split(begin,1)[1].split(end,1)[0]
+            self.assertIn(b'product criterion:',trace)
             self.assertGreater(record['useful_relations'],0)
             self.assertIsNone(record['metrics']['solving_degree'])
 
@@ -161,7 +166,7 @@ class StopBeforeSolver:
     def ideal(self, *args): raise RuntimeError('injected solver failure')
 def intercepted(*args, **kwargs): return StopBeforeSolver(original(*args, **kwargs))
 m.PolynomialRing=intercepted
-a=argparse.Namespace(p=101,curve_a=1,curve_b=32,px=4,py=10,qx=82,qy=27,mode='independent',seed=42,block_size=4,group_size=8,max_candidates=1000,modulus=1,residue=0,x_min=0,x_max=100,walk_length=8,output='unused',checkpoint=sys.argv[2],solver_protocol=False)
+a=argparse.Namespace(p=101,curve_a=1,curve_b=32,px=4,py=10,qx=82,qy=27,mode='independent',seed=42,block_size=4,group_size=8,max_candidates=1000,modulus=1,residue=0,x_min=0,x_max=100,walk_length=8,output='unused',checkpoint=sys.argv[2],solver_protocol=True)
 try: m.run(a)
 except RuntimeError as exc:
     assert str(exc)=='injected solver failure'
@@ -169,7 +174,9 @@ else: raise AssertionError('failure was not injected')
 """
         with tempfile.TemporaryDirectory() as d:
             checkpoint=pathlib.Path(d)/'checkpoint.json'
-            subprocess.run(['sage','-python','-c',program,str(HERE/'measure.py'),str(checkpoint)],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+            proc=subprocess.run(['sage','-python','-c',program,str(HERE/'measure.py'),str(checkpoint)],check=True,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+            self.assertIn(b'=== BEGIN GROEBNER BASIS PROTOCOL ===',proc.stdout)
+            self.assertIn(b'=== END GROEBNER BASIS PROTOCOL ===',proc.stdout)
             r=json.loads(checkpoint.read_text())
             self.assertEqual(r['phase'],'groebner_basis')
             self.assertEqual(r['solver']['backend'],'sage/libsingular:std')
