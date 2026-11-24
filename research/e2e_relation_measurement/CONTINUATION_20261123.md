@@ -49,3 +49,11 @@ The structured-polynomial and injected-failure checks passed (2 tests, 11.371 se
 The prime-characteristic guard and solver-failure checkpoint checks passed (2 tests, 8.723 seconds). An invalid characteristic exits before curve setup, with a setup checkpoint and no result file. The checkpoint also retains the new structured terms after polynomial construction. Run the full test suite next.
 
 The full local correctness suite passed: 10 tests in 40.507 seconds. The structured polynomial values were independently checked at three points, the positive signed-relation control remains valid, and an unsupported field was rejected before system construction. This validates representation and domain guards; it is not backend telemetry or comparative performance evidence.
+
+## 2026-11-23 — explicit backend and raw solver protocol
+
+Sage's `groebner_basis` documentation lists `libsingular:std` and a `prot=True` option that prints Singular's computation protocol. A bounded test of a two-variable polynomial ideal confirmed that this local Sage installation emits a raw protocol. Add an explicitly identified Singular backend and an opt-in protocol flag, preserving the protocol in the panel's raw stdout and recording stdout/stderr hashes. Do not parse protocol digits into solving degree or regularity. The instrumentation affects overhead and the selected backend changes the workload compared with earlier default-autoselection runs.
+
+The focused protocol, checkpoint and positive-relation checks passed (3 tests, 5.695 seconds). The protocol flag emitted Singular's product-criterion line into stdout, the recorded backend was `sage/libsingular:std`, and the run retained verified useful witnesses. Solving degree remains null. Run the full suite before publication.
+
+The complete local correctness suite passed (11 tests, 29.715 seconds) with the explicit Singular backend. Protocol output remains a raw backend observation, with no automatic degree or operation-count claim. Sage's previous autoselection was not pinned; earlier timing data must not be combined as if it had the same identified backend. Solver-native degree/operation telemetry and the requested matched end-to-end comparison remain open.

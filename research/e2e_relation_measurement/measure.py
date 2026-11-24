@@ -84,8 +84,9 @@ def run(args):
             return ring,[s3,f,g]
         ring,polys=phase('polynomial_construction', construct)
         input_terms = [sorted(({'exponents':[int(e) for e in exp], 'coefficient':int(coef)} for exp,coef in poly.dict().items()), key=lambda item: item['exponents']) for poly in polys]
+        output['solver']={'backend':'sage/libsingular:std','protocol_requested':args.solver_protocol,'protocol_stream':'stdout' if args.solver_protocol else None,'root_extraction':'sage ideal variety; backend selected by Sage'}
         output['system']={'variables':['x','y'],'order':'degrevlex','coefficient_modulus':args.p,'input_polynomials':[str(x) for x in polys], 'input_degrees':[int(x.total_degree()) for x in polys], 'input_terms':input_terms, 'input_term_counts':[len(terms) for terms in input_terms]}
-        basis=phase('groebner_basis', lambda:ring.ideal(polys).groebner_basis())
+        basis=phase('groebner_basis', lambda:ring.ideal(polys).groebner_basis(algorithm='libsingular:std', prot=args.solver_protocol))
         output['system']['groebner_basis']=[str(x) for x in basis]
         output['metrics']['maximum_output_basis_degree']=max((int(x.total_degree()) for x in basis),default=0)
         solutions=phase('root_extraction',lambda:ring.ideal(basis).variety())
@@ -120,7 +121,7 @@ def main():
     p=argparse.ArgumentParser(); p.add_argument('--p',type=int,required=True); p.add_argument('--curve-a',type=int,required=True); p.add_argument('--curve-b',type=int,required=True)
     for name in ('px','py','qx','qy'): p.add_argument('--'+name,type=int,required=True)
     p.add_argument('--walk-length',type=int,default=8); p.add_argument('--x-min',type=int,default=0); p.add_argument('--x-max',type=int,default=None)
-    p.add_argument('--checkpoint', default=None)
+    p.add_argument('--checkpoint', default=None); p.add_argument('--solver-protocol', action='store_true')
     p.add_argument('--mode',choices=['independent','walk','two-group'],required=True); p.add_argument('--seed',type=int,required=True); p.add_argument('--block-size',type=int,default=4); p.add_argument('--group-size',type=int,default=8); p.add_argument('--max-candidates',type=int,default=1000); p.add_argument('--modulus',type=int,default=1); p.add_argument('--residue',type=int,default=0); p.add_argument('--output',required=True)
     a=p.parse_args()
     if a.checkpoint and Path(a.checkpoint).resolve() == Path(a.output).resolve(): p.error('checkpoint and output paths must differ')

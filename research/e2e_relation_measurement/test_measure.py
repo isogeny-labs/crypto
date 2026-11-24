@@ -29,6 +29,19 @@ class MeasurementTest(unittest.TestCase):
             out=pathlib.Path(d)/'out.json'
             subprocess.run(['sage','-python',str(HERE/'measure.py'),'--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27','--mode',mode,'--seed','42','--block-size','4','--output',str(out),*extra],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             return json.loads(out.read_text())
+    def test_solver_protocol(self):
+        with tempfile.TemporaryDirectory() as d:
+            out=pathlib.Path(d)/'out.json'
+            cmd=['sage','-python',str(HERE/'measure.py'),'--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27','--mode','independent','--seed','42','--block-size','10','--output',str(out),'--solver-protocol']
+            proc=subprocess.run(cmd,check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            record=json.loads(out.read_text())
+            self.assertEqual(record['status'],'complete')
+            self.assertTrue(record['solver']['protocol_requested'])
+            self.assertEqual(record['solver']['backend'],'sage/libsingular:std')
+            self.assertIn(b'product criterion:',proc.stdout)
+            self.assertGreater(record['useful_relations'],0)
+            self.assertIsNone(record['metrics']['solving_degree'])
+
     def test_reject_unsupported_field(self):
         with tempfile.TemporaryDirectory() as d:
             out=pathlib.Path(d)/'out.json'; checkpoint=pathlib.Path(d)/'checkpoint.json'
@@ -129,6 +142,7 @@ class MeasurementTest(unittest.TestCase):
                 r=next(r for r in summary['runs'] if r['mode']==mode)
                 checkpoint=out/('seed-42-'+mode+'.checkpoint.json')
                 self.assertEqual(r['checkpoint_sha256'],hashlib.sha256(checkpoint.read_bytes()).hexdigest())
+                self.assertEqual(r['stdout_sha256'],hashlib.sha256((out/('seed-42-'+mode+'.stdout')).read_bytes()).hexdigest())
                 snapshot=json.loads(checkpoint.read_text())
                 self.assertEqual(snapshot['phase'],'finished')
                 self.assertEqual(snapshot['source_sha256_at_start'],summary['measure_sha256_at_start'])
@@ -147,7 +161,7 @@ class StopBeforeSolver:
     def ideal(self, *args): raise RuntimeError('injected solver failure')
 def intercepted(*args, **kwargs): return StopBeforeSolver(original(*args, **kwargs))
 m.PolynomialRing=intercepted
-a=argparse.Namespace(p=101,curve_a=1,curve_b=32,px=4,py=10,qx=82,qy=27,mode='independent',seed=42,block_size=4,group_size=8,max_candidates=1000,modulus=1,residue=0,x_min=0,x_max=100,walk_length=8,output='unused',checkpoint=sys.argv[2])
+a=argparse.Namespace(p=101,curve_a=1,curve_b=32,px=4,py=10,qx=82,qy=27,mode='independent',seed=42,block_size=4,group_size=8,max_candidates=1000,modulus=1,residue=0,x_min=0,x_max=100,walk_length=8,output='unused',checkpoint=sys.argv[2],solver_protocol=False)
 try: m.run(a)
 except RuntimeError as exc:
     assert str(exc)=='injected solver failure'
@@ -158,6 +172,7 @@ else: raise AssertionError('failure was not injected')
             subprocess.run(['sage','-python','-c',program,str(HERE/'measure.py'),str(checkpoint)],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             r=json.loads(checkpoint.read_text())
             self.assertEqual(r['phase'],'groebner_basis')
+            self.assertEqual(r['solver']['backend'],'sage/libsingular:std')
             self.assertEqual(r['status'],'running')
             self.assertEqual(len(r['candidates']),r['counts']['candidates'])
             self.assertEqual(len(r['system']['input_polynomials']),3)
