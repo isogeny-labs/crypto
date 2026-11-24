@@ -1,0 +1,72 @@
+FILE /workspace/scratch/cold15m-candidate3-v3-primary/r0-scale-n131-d12-uniform-elimination/callgrind.out.1
+     1090920 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::TraceTables>::new
+      721094 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex
+      411506 unknown-52:<serde_json::read::SliceRead>::skip_to_escape
+      397187 /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/str/converts.rs:core::str::converts::from_utf8
+      211439 /workspace/scratch/rust/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/de.rs:<serde_json::de::SeqAccess<_> as serde_core::de::SeqAccess>::next_element_seed::has_next_element::<serde_json::read::SliceRead>
+      208052 unknown-52:<serde_json::read::SliceRead as serde_json::read::Read>::parse_str
+      193515 unknown-56:<core::marker::PhantomData<core::option::Option<[&str; 2]>> as serde_core::de::DeserializeSeed>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>>
+      151696 unknown-56:<core::marker::PhantomData<&str> as serde_core::de::DeserializeSeed>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>>
+      149226 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mask_in_place
+      109054 ???:0x0000000000163280
+       98674 /workspace/crypto/research/trace_zero_cold15m_20261124/native/src/lib.rs:trace_zero_halftrace::execute_wire_json
+       64329 ???:0x0000000000162880
+       62253 ???:0x000000000000a220
+       53945 unknown-56:<core::marker::PhantomData<alloc::vec::Vec<core::option::Option<[&str; 2]>>> as serde_core::de::DeserializeSeed>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>>
+       53313 ???:0x000000000000e870
+       51148 ???:0x0000000000064ff0
+       50566 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square::{closure#0}
+       42246 ???:0x000000000000ae90
+       34010 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::fold_words_clmul_hw
+       33932 /workspace/scratch/rust/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/de.rs:<serde_json::de::Deserializer<serde_json::read::SliceRead>>::end_seq
+       29876 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::reduce_words
+       25590 unknown-87:num_bigint::biguint::shift::biguint_shl2
+       25316 ???:__strtoul_internal
+       24729 ???:0x0000000000013780
+       24553 unknown-76:<full_trace_zero_backend::binary_ecc::trace_zero::TraceZeroVariety>::new
+       23465 ???:0x0000000000024740
+       23318 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square
+       19199 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_bit_positions
+       13231 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::trace
+       12889 ???:0x000000000000a0a0
+       12075 ???:0x0000000000013e00
+       10953 unknown-99:<num_bigint::bigint::BigInt as core::ops::arith::Sub>::sub
+        9432 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_words
+        7994 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::trace_tables
+        7788 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::add
+FILE /workspace/scratch/cold15m-candidate3-v3-primary/r0-scale-n131-d12-uniform-elimination/callgrind.out.2
+     5370536 unknown-138:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized
+     1010331 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/operation_tally.rs:full_trace_zero_backend::binary_ecc::operation_tally::tick
+      944988 /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/../../stdarch/crates/core_arch/src/simd.rs:full_trace_zero_backend::binary_ecc::f2m::mul_mod131_hw
+      789360 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::CompactLinearMaps>::half
+      537344 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::residuals
+      380404 ???:0x0000000000163280
+      361944 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::square_mod131_hw
+      206740 ???:0x0000000000162880
+      108108 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordPoint>::from_point
+       40988 unknown-10:core::ptr::drop_glue::<full_trace_zero_backend::cryptanalysis::trace_zero_linearized::BaseIndex>
+       39172 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::fold_words_clmul_hw
+       35682 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::reduce_words
+       25967 ???:0x00000000000a0fe0
+       24300 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square_k_times::{closure#0}
+       21409 ???:0x0000000000162120
+       12610 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mul
+       12055 ???:0x00000000000a02e0
+       10615 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square::{closure#0}
+        9620 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::mul_words_hw
+        8711 ???:free
+        7752 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mask_in_place
+        6462 ???:malloc
+        6033 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::half_trace
+        5850 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mul::{closure#0}
+        5382 ???:realloc
+        5366 ???:0x00000000000a20c0
+        4926 ???:0x000000000009ed80
+        4895 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square
+        3900 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::mul_words_into
+        3630 ???:0x000000000009eaf0
+        3396 unknown-24:<alloc::raw_vec::RawVecInner>::finish_grow
+        2592 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_words
+        2360 /workspace/crypto/research/trace_zero_cold15m_20261124/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::add
+        1344 unknown-24:<alloc::raw_vec::RawVec<(usize, [u64; 3], [u64; 3], [u64; 3])>>::grow_one
+        1150 /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/collections/btree/map.rs:<alloc::collections::btree::map::BTreeMap<alloc::string::String, serde_json::value::Value>>::insert
