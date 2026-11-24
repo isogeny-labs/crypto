@@ -125,6 +125,31 @@ before table construction or lookup. This is a counting gate for this
 enumerative interface; it does not constrain algebraic aggregation of many
 labels into one point-dependent evaluation. [pcc:unverified]
 
+## Single endpoint character gate
+
+A separate candidate applies a rational horizontal isogeny chain
+`φ:E → E′`, then returns the field quadratic character of
+`x(φ(P)) - c` as the ray sign. If its degrees are `ℓ₁,…,ℓₖ`, the
+pullback rational function has map degree `D = 2∏ℓᵢ`. For any *single*
+rational function whose field quadratic character equals the scalar's
+Legendre symbol at every nonidentity P-192 point, a character-sum
+argument gives `D > 2^92`: since `(2/r)=+1`, the character of
+`h=(f∘[2])/f` is `+1` on the nonidentity points, while the
+[Perret bound](https://inspirehep.net/files/e5d2251413a4ea90899d95c2354cc66a)
+gives `r-2 ≤ 2 deg(h)√p ≤ 10D√p`. The needed integer check is
+`(r-2)^2 > 100·2^184·p`. The bound applies because `h` is not a
+geometric square: otherwise the odd-valuation support of `f` would be
+fixed under inverse `[2]`, which quadruples its size. Empty support
+would make `f` a constant times a square over `F_p(E)` (the rational
+degree-zero divisor class group has odd order), contradicting the
+balanced scalar signs. [pcc:unverified]
+
+Consequently `∏ℓᵢ > 2^91` is necessary for that endpoint character:
+at least 25 degree-13 maps, 27 degree-11 maps, or 40 degree-5 maps.
+These thresholds exclude shorter chains in this specific model. They do
+not establish exactness or low evaluation cost for longer chains, and do
+not cover combinations of endpoint features. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
