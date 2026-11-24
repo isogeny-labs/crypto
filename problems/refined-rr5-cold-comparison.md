@@ -29,7 +29,12 @@ the requested end-to-end cost conclusion.
   is available as an optional feature. All thirteen fixed full-base queries
   reached their original native allocation limits; a separate planted four-leaf
   integration control passed. These are local, unsigned results. [pcc:unverified]
-- **Missing capability:** a successful full-base production comparison, a
+- **New local output control:** the [same-equation external adapter](../research/smooth_p_plus_one_20261123/COFACTOR_OUTPUT_RESULT.md)
+  now rejects a captured partial RUR. Eight degree-16 full-set controls pass
+  using fixed forms; five degree-32 controls still time out. Nine Refined
+  regressions match their narrower regular-chart references. Initial partial
+  outputs and the native allocation refusals remain retained. [pcc:unverified]
+- **Missing capability:** a complete degree-32 full-base comparison, a
   complete four-summand oriented-S3 adapter, qualified counters or timing for
   every phase, an exact-source registered EKS image, and independent replay.
   Current local records price neither cold setup nor linear algebra.
@@ -42,8 +47,10 @@ the requested end-to-end cost conclusion.
 
 - [x] Implement the bounded exact-source cofactor adapter, retain native
   incomplete status and replay accepted signed rows.
-- [ ] Complete its full-base signed-output gate and the applicable four-leaf
-  oriented-S3 adapter, with explicit chart scope, mask sequence and success.
+- [x] Add a local external-backend full-set control on both degree-16 fixtures,
+  preserving native equations and explicit incomplete status. [pcc:unverified]
+- [ ] Complete the degree-32 full-base signed-output gate and the applicable
+  four-leaf oriented-S3 adapter, with explicit chart scope, mask sequence and success.
 - [ ] Freeze the cold setup, all queries including failures, extraction,
   incremental rank, linear algebra and final verification intervals, with
   equal-output component controls and a complete recovery comparison.
@@ -57,11 +64,13 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Complete the production adapter's full-base exact signed-output control first.
-Use the existing F127 and F8191 fixtures and the already published seed 781815
-before considering a separately frozen larger fixture. Keep the three-second
-cooperative query deadline and report unsupported or incomplete charts.
-Do not infer that the 30-draw trial succeeded from the later extension.
+Implement the complete four-leaf oriented-S3 comparator on the existing F127
+and F8191 fixtures, explicitly binding signed rows and chart scope. The
+degree-16 cofactor control is available for equal-output checks; degree-32
+cofactor completeness remains open under the fixed budget. Then instrument
+the common recovery schedule (published seed 781815) and every cold phase
+before an admitted comparison. Do not infer that the 30-draw Refined trial
+succeeded from the later extension, or increase frozen limits retrospectively.
 
 No paid run is scheduled by this record. Freeze the full resource, retry and
 cost limits and verify the supported image/build route before submission.
@@ -74,3 +83,8 @@ record when the adapter or execution route changes.
 2026-11-24: recorded after the local degree-32 and recovery controls. Added
 the cofactor adapter, thirteen retained cap failures and a separate planted
 positive unit control. No cap increase or full-cost conclusion. Unresolved.
+
+2026-11-24, external continuation: exported the exact native equations, retained
+two partial-RUR failures, and added a conservative degree/dimension guard plus
+fixed forms. Eight degree-16 full-set controls now pass locally; five degree-32
+controls still time out. The full objective remains unresolved. [pcc:unverified]

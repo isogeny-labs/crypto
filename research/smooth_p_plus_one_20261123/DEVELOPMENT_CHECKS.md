@@ -45,3 +45,25 @@ without changing the panel executable. Evidence and before-call identities
 live in `evidence/production_v1`. The earlier root compilation limitation and
 unchanged historical benchmark-record gate error remain open. No broad root
 test rerun or cost measurement is represented as successful.
+
+## Same-equation external output continuation
+
+The [new output report](COFACTOR_OUTPUT_RESULT.md) retains the initial export
+metadata test failure, two full-set mismatches, their source revisions, and
+the subsequently frozen RUR guard and fixed-form protocol. Final feature
+tests pass 15/15 and default tests pass 6/6; the original library's 32 tests
+and 8 public-example tests passed after the export change. All are local,
+unsigned evidence. [pcc:unverified]
+
+The frozen source is `3176dae78f`. Three new panels produce 22 records: eight
+complete cofactor calls, five cofactor timeouts, and nine complete Refined
+regressions. No full-base answer is inferred from a narrower regular chart.
+Every accepted cofactor RUR is retained. [pcc:unverified]
+
+The exact source and protocol, raw fixtures, test/build logs and complete
+records are under `evidence/separating_v1`; earlier failures remain under
+`evidence/cofactor_msolve_v1` and `evidence/cofactor_diagnostic_v1`.
+The new manifest is `evidence/COFACTOR_OUTPUT_SHA256SUMS`. Raw solver whitespace
+and full test logs are preserved, including Git whitespace warnings on those
+data files. The root-library build limitation and unchanged historical
+benchmark-record gate failure above are still open. No EKS job was submitted.
