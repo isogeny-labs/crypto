@@ -235,15 +235,26 @@ fn parse() -> Result<Cfg, String> {
                 }
                 c.quartic_sge = (
                     f[0].parse().map_err(|e| format!("--quartic-sge W: {e}"))?,
-                    f[1].parse().map_err(|e| format!("--quartic-sge FILL: {e}"))?,
-                    f[2].parse().map_err(|e| format!("--quartic-sge EXCESS: {e}"))?,
+                    f[1].parse()
+                        .map_err(|e| format!("--quartic-sge FILL: {e}"))?,
+                    f[2].parse()
+                        .map_err(|e| format!("--quartic-sge EXCESS: {e}"))?,
                 );
             }
             "--quartic-arms" => {
                 c.quartic_arms = v.split(',').map(String::from).collect();
                 for a in &c.quartic_arms {
-                    if !["full", "2lp", "2lp-alg", "2lp-kick", "2lp-new", "2lp-sfb", "2lp-sfb-sge"]
-                        .contains(&a.as_str()) {
+                    if ![
+                        "full",
+                        "2lp",
+                        "2lp-alg",
+                        "2lp-kick",
+                        "2lp-new",
+                        "2lp-sfb",
+                        "2lp-sfb-sge",
+                    ]
+                    .contains(&a.as_str())
+                    {
                         return Err(format!("--quartic-arms: unknown arm {a}"));
                     }
                 }
@@ -256,7 +267,10 @@ fn parse() -> Result<Cfg, String> {
                     let p: u64 = p.parse().map_err(|e| format!("--quartic-seeds p: {e}"))?;
                     let ss = ss
                         .split('/')
-                        .map(|x| x.parse::<u64>().map_err(|e| format!("--quartic-seeds: {e}")))
+                        .map(|x| {
+                            x.parse::<u64>()
+                                .map_err(|e| format!("--quartic-seeds: {e}"))
+                        })
                         .collect::<Result<Vec<_>, _>>()?;
                     c.quartic_seeds.insert(p, ss);
                 }
@@ -893,7 +907,10 @@ fn main() -> ExitCode {
                 .expect("admitted quartic");
             let mut head = json!({"family": "quartic", "p": q, "g": 3, "curve_seed": curve_seed,
                 "seed": seed, "r": inst.r, "h": inst.h});
-            let sfb_any = cfg.quartic_arms.iter().any(|a| a == "2lp-sfb" || a == "2lp-sfb-sge");
+            let sfb_any = cfg
+                .quartic_arms
+                .iter()
+                .any(|a| a == "2lp-sfb" || a == "2lp-sfb-sge");
             let sge_arm = cfg.quartic_arms.iter().any(|a| a == "2lp-sfb-sge");
             if sfb_any {
                 // the instance in full, so certificates can be re-checked independently
@@ -946,7 +963,11 @@ fn main() -> ExitCode {
                         descent,
                         solve,
                         diag: cfg.quartic_diag,
-                        inhom_rows: if solve == ql::QSolve::Linked { cfg.quartic_inhom } else { 8 },
+                        inhom_rows: if solve == ql::QSolve::Linked {
+                            cfg.quartic_inhom
+                        } else {
+                            8
+                        },
                         kick_t,
                         fb,
                         la,
@@ -957,9 +978,11 @@ fn main() -> ExitCode {
                     rec["diag"] = json!(o
                         .diag
                         .iter()
-                        .map(|d| json!({"core_rows": d.core_rows, "core_cols": d.core_cols,
+                        .map(
+                            |d| json!({"core_rows": d.core_rows, "core_cols": d.core_cols,
                             "t_weight": d.t_weight, "rank": d.rank, "rank_no_t": d.rank_no_t,
-                            "outcome": d.outcome, "inhom": d.inhom, "inhom_linked": d.inhom_linked}))
+                            "outcome": d.outcome, "inhom": d.inhom, "inhom_linked": d.inhom_linked})
+                        )
                         .collect::<Vec<_>>());
                 }
                 rec["kind"] = json!("run");
@@ -975,7 +998,11 @@ fn main() -> ExitCode {
                     rec["decomp_fallbacks"] = json!(o.decomp_fallbacks);
                     rec["inhom_linked"] = json!(o.inhom_linked);
                     rec["la_skipped"] = json!(o.la_skipped);
-                    rec["inhom_rows"] = json!(if solve == ql::QSolve::Linked { cfg.quartic_inhom } else { 8 });
+                    rec["inhom_rows"] = json!(if solve == ql::QSolve::Linked {
+                        cfg.quartic_inhom
+                    } else {
+                        8
+                    });
                     rec["lines_tried"] = json!(o.lines_tried);
                     if sfb_any {
                         rec["fb_mode"] = json!(format!("{fb:?}"));
@@ -991,10 +1018,17 @@ fn main() -> ExitCode {
                     if sge_arm {
                         // per-source split of la (sums to la_mul / la_add)
                         let sp = &o.la_split;
-                        for (k, n) in [("rows", sp.rows), ("dsu", sp.dsu), ("peel", sp.peel),
-                            ("tscan", sp.tscan), ("trim", sp.trim), ("sge", sp.sge),
-                            ("spmv", sp.spmv), ("bm", sp.bm), ("vec", sp.vec)]
-                        {
+                        for (k, n) in [
+                            ("rows", sp.rows),
+                            ("dsu", sp.dsu),
+                            ("peel", sp.peel),
+                            ("tscan", sp.tscan),
+                            ("trim", sp.trim),
+                            ("sge", sp.sge),
+                            ("spmv", sp.spmv),
+                            ("bm", sp.bm),
+                            ("vec", sp.vec),
+                        ] {
                             rec[format!("la_{k}_mul")] = json!(n.mul);
                             rec[format!("la_{k}_add")] = json!(n.add);
                         }
