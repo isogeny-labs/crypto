@@ -455,10 +455,9 @@ correlation magnitude is only `|ρ(x([a]G))|≥2/n≈2^-191`, which is
 undetermined. This parity fact also precludes proving `S_a=0` for
 these offsets. [pcc:unverified]
 
-### Exact modulo-eight reduction for a known-point offset
+### Exact modulo-eight identity and its circularity
 
-The same sum has a sharper arithmetic interpretation that avoids a
-large-bias premise but leaves a new evaluation problem. Put
+The same sum has an exact modular identity. Put
 `m=(r-1)/2`, let `𝒳={x([j]G):1≤j≤m}`, and define the monic kernel
 polynomial `F(Z)=∏_{u∈𝒳}(Z-u)`. For `c=x([a]G)`, choose one scalar
 representative for each `x`-class and set
@@ -481,10 +480,16 @@ opposite outputs. The derivative itself has the compact identity
 `x(P)-x([j]P)=ψ_{j+1}(P)ψ_{j-1}(P)/ψ_j(P)^2` for `2≤j≤m`.
 Its EDS recurrence reaches these indices in logarithmic depth.
 The missing operation is a charged point-dependent evaluation of
-`S_a mod 8`; parity alone gives only `S_a mod 4`. Computing that
-residue by summing all `m-1` terms retains about `2^191` point
-indices. This identity is a reduction to a precise modular-sum
-problem, not a sub-reference evaluator. [pcc:unverified]
+`S_a mod 8`; parity alone gives only `S_a mod 4`. Conversely, the
+displayed formula and the same compact derivative compute `S_a mod 8`
+immediately **from the desired sign**: it is `6` when
+`χ_r(a)χ_p(F′(c))=+1`, and `2` otherwise. Thus evaluating this
+residue and evaluating the sign are computationally equivalent up to
+the derivative cost. Replacing the sum by the product of its summand
+signs only returns `χ_r(a)χ_p(F′(c))`, so that product is circular as
+an evaluation method. Directly summing all `m-1` terms retains about
+`2^191` point indices. The modular identity supplies no independent
+sub-reference route. [pcc:unverified]
 
 The standalone [`mod8_control.sage`](mod8_control.sage) replay makes
 an exhaustive independent-coordinate check on
