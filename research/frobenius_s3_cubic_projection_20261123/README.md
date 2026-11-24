@@ -214,7 +214,7 @@ For the earlier prime-degree geometries, put \(W=\operatorname{span}_{\mathbb F_
 
 Replacing \(p=u_1u_2\) by \(p\in W\) leaves every sum \(s\in U\) alive at each nonzero trace-compatible rational target on the toy curve. Since the shift is 1, the original product \(z=1+s+p\) has trace one. The equation \(z^2+tz=t^2s^2+1\) has two roots because \(\operatorname{Tr}(s)=\operatorname{Tr}(1/t^2)=0\). They differ by \(t\), which has trace one. Exactly one root has trace one and yields \(p\in W\). The relaxed linear system thus has \(2^k\) solutions, one per sum, and the omitted product-membership condition still has to be enforced. This rules out the product-span relaxation as a bounded-candidate solver for these prime-degree geometries. [pcc:unverified]
 
-The quadratic-extension result changes the factor-base geometry. It gives a decomposition bound for composite field degrees. In the coset controls the relative trace of \(a\) is 1 and \(k\) is odd, so every factor-base point has absolute trace-one abscissa. The finite doubles on this even-degree toy curve have trace-zero abscissa by the same doubling criterion. Since the doubling subgroup has index two, every three-term sum in the coset controls lies outside it. A relation collector targeting an odd-order subgroup would need to account for this coset constraint. The native experiment below measures relation rank. Total ECDLP cost for this family remains open. [pcc:unverified]
+The quadratic-extension result changes the factor-base geometry. It gives a decomposition bound for composite field degrees. In the coset controls the relative trace of \(a\) is 1 and \(k\) is odd, so every factor-base point has absolute trace-one abscissa. The finite doubles on this even-degree toy curve have trace-zero abscissa by the same doubling criterion. Since the doubling subgroup has index two, every three-term sum in the coset controls lies outside it. The native recovery experiment accounts for this constraint by shifting its targets. [pcc:unverified]
 
 ## Native Rust comparison and larger extension degrees
 
@@ -232,9 +232,24 @@ Each seed supplies 24 uniform finite curve targets and 24 planted three-summand 
 | 22-bit quadratic, seed 12675811 | 1,058 / 1,058 | 6 | 0.972 s | 0.131 s |
 | 18-bit cubic, either seed | 3 / 32 | — | — | — |
 
-At 22 bits, each full uniform panel performs about 107 million checks in the direct complement join. The linearized join examines 48,046 and 56,680 sum–product candidates and achieves the same full-rank prefixes as the direct join. At 18 bits the quadratic coset reaches rank 254 of 254 on both uniform panels. The cubic coset has 32 factor-base abscissae and reaches rank 3 of 32 on both. This matched field-degree comparison shows how a cheaper decomposition can still lose relation yield when the factor base shrinks. The modular rank reduction uses prime 991 at 22 bits, and full discrete-log recovery remains open for this geometry. [pcc:unverified]
+At 22 bits, each full uniform panel performs about 107 million checks in the direct complement join. The linearized join examines 48,046 and 56,680 sum–product candidates and achieves the same full-rank prefixes as the direct join. At 18 bits the quadratic coset reaches rank 254 of 254 on both uniform panels. The cubic coset has 32 factor-base abscissae and reaches rank 3 of 32 on both. This matched field-degree comparison shows how a cheaper decomposition can still lose relation yield when the factor base shrinks. The modular rank reduction uses prime 991 at 22 bits. [pcc:unverified]
 
 The JSON field "full_rank_prefix" records the number of targets and the elapsed work for the direct, linearized, and cached linearized arms, in that order. Its value is null when the panel does not reach full rank.
+
+### Native prime-subgroup recovery
+
+Let \(G\) generate the largest odd prime-order subgroup of order \(r\) in the toy instance, and let \(T\) have maximal 2-power order. The relation targets are \(jG+T\), and the descent targets are \(Q+jG+T\). The point \(T\) places the targets in the three-summand coset and vanishes under projection to the odd subgroup. The coefficient matrix uses nonzero projected factor-base points up to sign as its columns. The experiment charges target generation, decomposition, elimination, descent, and point verification of the representative logs and recovered scalar. [pcc:unverified]
+
+The Frobenius compression uses the scalar \(\mu\) satisfying \(\mu G=\tau G\), so signed orbit images contribute weights \(\pm\mu^i\). The split projection uses \(\sigma=\tau^k\) and chooses \(\epsilon\in\{1,-1\}\) by \(\sigma G=\epsilon G\). Then \(P+\epsilon\sigma P\) belongs to the chosen eigensubgroup of order \(N_\epsilon\). Multiplication by \(N_\epsilon/r\) maps it into the order-\(r\) subgroup. This replaces scalar multiplication by the full curve cofactor with one point addition and a smaller scalar multiplication. The projected generator is scaled by \(2N_\epsilon/r\), which is invertible modulo \(r\) in the measured groups. [pcc:unverified]
+
+All four methods recover the same challenge scalars in both seeded runs at 14, 18, and 22 bits. The 22-bit curve has 1,058 factor-base abscissae. It gives 264 distinct nonzero projected columns up to sign and 24 columns after Frobenius compression. Each arm reaches full rank on its first collection target and descends on its first shifted challenge. [pcc:unverified]
+
+| 22-bit seed | Direct group join | Linearized join | Linearized with Frobenius compression | Linearized with compression and split projection |
+| ---: | ---: | ---: | ---: | ---: |
+| 11781661 | 270.32 ms | 12.14 ms | 9.15 ms | 7.74 ms |
+| 12675811 | 271.99 ms | 11.08 ms | 8.85 ms | 8.06 ms |
+
+The times include setup and verification. The split projection reduces setup from approximately 1.9 ms to 0.8 ms within the compressed arm. An independent baby-step giant-step check takes about 7–11 microseconds on the supplied 991-order subgroup challenges, including its baby table. The result establishes a faster complete relation-based recovery on these toys. The largest subgroup and generic baseline remain relevant to any scaling claim for this curve family. [pcc:unverified]
 
 ## Reproduction
 
@@ -341,8 +356,9 @@ Run the native comparison with Rust and Python available. The shell runner extra
 ~~~sh
 bash research/frobenius_s3_cubic_projection_20261123/run_native_coset.sh 24 11781661
 bash research/frobenius_s3_cubic_projection_20261123/run_native_coset.sh 24 12675811
+bash research/frobenius_s3_cubic_projection_20261123/run_native_coset.sh recovery
 ~~~
 
-The native workload and rank records are in [native-coset.jsonl](native-coset.jsonl).
+The native records are in [native-coset.jsonl](native-coset.jsonl) and [native-recovery.jsonl](native-recovery.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)

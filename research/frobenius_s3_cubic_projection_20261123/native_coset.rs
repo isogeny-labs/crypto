@@ -11,6 +11,7 @@ mod upstream {
     include!(env!("S3_FIELD_KERNEL"));
 }
 use upstream::{Gf2, IrreduciblePoly};
+mod native_recovery;
 
 fn span(basis: &[u64]) -> Vec<u64> {
     let mut values = vec![0];
@@ -280,12 +281,16 @@ fn largest_prime_factor(mut order: u64) -> u64 {
     largest.max(order)
 }
 
-fn subgroup_prime(n: u32) -> u64 {
+fn curve_order(n: u32) -> u64 {
     let (mut previous, mut trace) = (2i64, 1i64);
     for _ in 1..n {
         (previous, trace) = (trace, trace - 2 * previous);
     }
-    largest_prime_factor(((1i64 << n) + 1 - trace) as u64)
+    ((1i64 << n) + 1 - trace) as u64
+}
+
+fn subgroup_prime(n: u32) -> u64 {
+    largest_prime_factor(curve_order(n))
 }
 
 fn pow_mod(mut a: u64, mut b: u64, p: u64) -> u64 {
@@ -516,6 +521,10 @@ fn benchmark(n: u32, k: u32, polynomial: u64, trials: usize, panel: u64) {
 }
 
 fn main() {
+    if std::env::args().nth(1).as_deref() == Some("recovery") {
+        native_recovery::run();
+        return;
+    }
     let trials = std::env::args()
         .nth(1)
         .map(|v| v.parse().unwrap())
