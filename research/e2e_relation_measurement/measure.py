@@ -10,6 +10,21 @@ def pt(P):
     return None if P.is_zero() else [int(P[0]), int(P[1])]
 
 
+def top_form_regularity(input_terms, block_size):
+    """First zero degree of the quotient by these three input top forms."""
+    observed=[]
+    for terms in input_terms:
+        degree=max((sum(t['exponents']) for t in terms),default=-1)
+        observed.append(sorted((tuple(t['exponents']),t['coefficient']) for t in terms if sum(t['exponents'])==degree))
+    expected=[[((2,2),1)], [((block_size,0),1)], [((0,block_size),1)]]
+    if observed != expected:
+        return {'status':'unsupported_shape','degree':None,'top_forms':observed}
+    return {'status':'exact_monomial_ideal', 'degree':1 if block_size==1 else block_size+1,
+            'top_forms':observed, 'definition':'first d with <input highest-degree forms>_d equal to the degree-d homogeneous component',
+            'last_surviving_monomial':[0,0] if block_size==1 else [block_size-1,1],
+            'scope':'input-generator top-form ideal; not a backend solving degree or field-operation count'}
+
+
 def run(args):
     start = time.perf_counter_ns(); cpu = time.process_time_ns()
     timings = {}
@@ -95,6 +110,10 @@ def run(args):
         input_terms = [sorted(({'exponents':[int(e) for e in exp], 'coefficient':int(coef)} for exp,coef in poly.dict().items()), key=lambda item: item['exponents']) for poly in polys]
         output['solver']={'backend':'sage/libsingular:std','protocol_requested':args.solver_protocol,'protocol_stream':'stdout' if args.solver_protocol else None,'root_extraction':'sage ideal variety; backend selected by Sage'}
         output['system']={'variables':['x','y'],'order':'degrevlex','coefficient_modulus':args.p,'input_polynomials':[str(x) for x in polys], 'input_degrees':[int(x.total_degree()) for x in polys], 'input_terms':input_terms, 'input_term_counts':[len(terms) for terms in input_terms]}
+        regularity=phase('top_form_regularity',lambda:top_form_regularity(input_terms,args.block_size))
+        output['metrics']['degree_of_regularity']=regularity['degree']
+        output['metric_notes']['degree_of_regularity']=('exact first-zero degree for this input top-form ideal; not solver solving degree' if regularity['degree'] is not None else 'unsupported top-form shape; no value reported')
+        output['top_form_regularity']=regularity
         def compute_basis():
             # libSingular writes via C stdio, which must be flushed on both
             # sides of our markers for the saved stream to preserve ordering.

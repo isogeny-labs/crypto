@@ -43,7 +43,7 @@ def resource_metadata():
             'parent_limits':limits,'thread_environment':{key:os.environ.get(key) for key in variables},
             'rss_native_unit':'bytes' if sys.platform=='darwin' else 'KiB' if sys.platform.startswith('linux') else 'platform-dependent'}
 
-PHASES = ('generation', 'polynomial_construction', 'groebner_basis', 'root_extraction', 'relation_verification')
+PHASES = ('generation', 'polynomial_construction', 'top_form_regularity', 'groebner_basis', 'root_extraction', 'relation_verification')
 CANDIDATE_COUNTS = ('candidates', 'identity', 'filtered', 'duplicate_x')
 GENERATION_OPERATIONS = ('target_draws', 'scalar_multiplication_calls', 'point_addition_calls')
 
@@ -173,7 +173,7 @@ def main():
                     pass
             observed=data if outcome is not None else snapshot
             independent_audit=audit_result(out,name,result,data,timeout) if outcome=='complete' else {'status':'not_attempted','wall_ns':None,'result_sha256':None,'stdout_sha256':None,'stderr_sha256':None,'exit_code':None}
-            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':digest(stdout_path),'stderr_sha256':digest(stderr_path),'whole_process_wall_ns':elapsed,'result_status':outcome,'independent_audit':independent_audit,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'observed_total':observed.get('total') if observed is not None else None,'generation_operations':observed.get('generation_operations') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'target':data.get('target') if outcome is not None else None}
+            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':digest(stdout_path),'stderr_sha256':digest(stderr_path),'whole_process_wall_ns':elapsed,'result_status':outcome,'independent_audit':independent_audit,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'observed_total':observed.get('total') if observed is not None else None,'generation_operations':observed.get('generation_operations') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'top_form_degree':(observed.get('metrics') or {}).get('degree_of_regularity') if observed is not None else None,'target':data.get('target') if outcome is not None else None}
             (out/(name+'.receipt.json')).write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
             receipts.append(receipt)
     pairing={}

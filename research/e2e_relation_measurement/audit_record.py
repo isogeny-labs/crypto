@@ -159,6 +159,19 @@ def audit(record):
     require(status=='complete' and len(accepted)==2*block,'record is not a completed valid run')
     system=decode_terms(record['system'],p)
     require(system==expected_system(p,e.a,e.b,R[0],[v[2][0] for v in accepted[:block]],[v[2][0] for v in accepted[block:]]),'system coefficients mismatch')
+    regularity=record.get('top_form_regularity')
+    regularity_verified=None
+    if regularity is not None:
+        # Independent enumeration of the standard monomial staircase of
+        # (x^2*y^2, x^block, y^block), avoiding the driver's closed form.
+        last=max(i+j for i in range(block) for j in range(min(block,2)))
+        expected_tops=[[[[2,2],1]], [[[block,0],1]], [[[0,block],1]]]
+        require(regularity.get('top_forms')==expected_tops, 'reported top forms mismatch')
+        survivor=[0,0] if block==1 else [block-1,1]
+        require(regularity.get('last_surviving_monomial')==survivor, 'regularity witness mismatch')
+        require(regularity.get('status')=='exact_monomial_ideal' and type(regularity.get('degree')) is int and regularity.get('degree')==last+1, 'top-form regularity mismatch')
+        require(record['metrics']['degree_of_regularity']==last+1,'regularity metric mismatch')
+        regularity_verified=last+1
     roots=record['roots']; require(isinstance(roots,list),'invalid root list')
     root_set=set()
     for root in roots:
@@ -193,7 +206,7 @@ def audit(record):
     require(actual==expected_witnesses,'missing signed witnesses for reported roots')
     counts={'total':len(actual),'zero_b':zero,'nonzero_b':nonzero,'nonzero_b_verified':verified,'nonzero_b_verification_failed':0}
     require(record['relation_counts']==counts and record['useful_relations']==verified,'relation counts mismatch')
-    return {'status':'verified','candidates':len(trace),'accepted':len(accepted),'reported_roots':len(roots),'signed_witnesses':len(actual),'nonzero_b':nonzero}
+    return {'status':'verified','candidates':len(trace),'accepted':len(accepted),'reported_roots':len(roots),'signed_witnesses':len(actual),'nonzero_b':nonzero,'top_form_regularity_verified':regularity_verified}
 
 
 def main():

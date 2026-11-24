@@ -50,6 +50,36 @@ class MeasurementTest(unittest.TestCase):
             self.assertGreater(record['useful_relations'],0)
             self.assertIsNone(record['metrics']['solving_degree'])
 
+    def test_top_form_degree_against_exact_matrix_ranks(self):
+        program=r"""
+import sys
+sys.path.insert(0,sys.argv[1])
+from sage.all import GF, PolynomialRing, matrix
+import measure
+F=GF(101); ring=PolynomialRing(F,names=('x','y'),order='degrevlex'); x,y=ring.gens()
+for block in range(1,9):
+    polys=[x*x*y*y + 3*x*y + 7, ring.prod(x-i for i in range(block)), ring.prod(y-i for i in range(block))]
+    encoded=[[{'exponents':[int(e) for e in exp],'coefficient':int(c)} for exp,c in f.dict().items()] for f in polys]
+    result=measure.top_form_regularity(encoded,block)
+    tops=[x*x*y*y,x**block,y**block]
+    first_zero=None
+    for d in range(2*block+1):
+        rows=[]
+        for f in tops:
+            diff=d-int(f.total_degree())
+            if diff<0: continue
+            for i in range(diff+1):
+                row=[F(0)]*(d+1)
+                for exp,c in (f*x**i*y**(diff-i)).dict().items(): row[int(exp[0])]=c
+                rows.append(row)
+        M=matrix(F,rows) if rows else matrix(F,0,d+1)
+        if d+1-M.rank()==0: first_zero=d; break
+    assert result['degree']==first_zero
+    encoded[0].append({'exponents':[5,0],'coefficient':1})
+    assert measure.top_form_regularity(encoded,block)['degree'] is None
+"""
+        subprocess.run(['sage','-python','-c',program,str(HERE)],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+
     def test_reject_unsupported_field(self):
         with tempfile.TemporaryDirectory() as d:
             out=pathlib.Path(d)/'out.json'; checkpoint=pathlib.Path(d)/'checkpoint.json'
@@ -88,6 +118,8 @@ class MeasurementTest(unittest.TestCase):
             with self.subTest(mode=mode):
                 r=self.run_case(mode); self.assertEqual(r['status'],'complete')
                 self.assertEqual(audit_record.audit(r)['status'],'verified')
+                self.assertEqual(r['metrics']['degree_of_regularity'],5)
+                self.assertIsNone(r['metrics']['solving_degree'])
                 t=r['target']; self.assertEqual(add(mul(t['a'],P),mul(t['b'],Q)),point(t['point']))
                 accepted=[]
                 for c in r['candidates']:
@@ -117,6 +149,8 @@ class MeasurementTest(unittest.TestCase):
     def test_positive_signed_relations(self):
         r=self.run_case('independent',['--block-size','10'])
         self.assertEqual(len(r['roots']),3)
+        self.assertEqual(r['metrics']['degree_of_regularity'],11)
+        self.assertEqual(r['top_form_regularity']['status'],'exact_monomial_ideal')
         system=r['system']; self.assertEqual(system['coefficient_modulus'],MOD)
         accepted=[c for c in r['candidates'] if c['status']=='accepted']
         for x,y in ((0,0),(3,8),(67,75)):
@@ -133,6 +167,7 @@ class MeasurementTest(unittest.TestCase):
         audited=audit_record.audit(r)
         self.assertEqual(audited['status'],'verified')
         self.assertEqual(audited['nonzero_b'],r['relation_counts']['nonzero_b'])
+        self.assertEqual(audited['top_form_regularity_verified'],11)
         with tempfile.TemporaryDirectory() as d:
             source=pathlib.Path(d)/'record.json'; output=pathlib.Path(d)/'audit.json'
             source.write_text(json.dumps(r))
@@ -146,11 +181,14 @@ class MeasurementTest(unittest.TestCase):
             proc=subprocess.run(['python3',str(HERE/'audit_record.py'),str(source),'--output',str(invalid)],stdout=subprocess.DEVNULL)
             self.assertEqual(proc.returncode,1)
             self.assertEqual(json.loads(invalid.read_text())['status'],'invalid')
-        for corruption in ('candidate','polynomial','missing_witness','scalar'):
+        for corruption in ('candidate','polynomial','missing_witness','scalar','regularity','top_form','regularity_witness'):
             bad=json.loads(json.dumps(r))
             if corruption=='candidate': bad['candidates'][0]['a']=(bad['candidates'][0]['a']+1)%N
             elif corruption=='polynomial': bad['system']['input_terms'][0][0]['coefficient']=(bad['system']['input_terms'][0][0]['coefficient']%100)+1
             elif corruption=='missing_witness': bad['witnesses'].pop()
+            elif corruption=='regularity': bad['metrics']['degree_of_regularity']+=1
+            elif corruption=='top_form': bad['top_form_regularity']['top_forms'][0][0][0][0]+=1
+            elif corruption=='regularity_witness': bad['top_form_regularity']['last_surviving_monomial'][0]+=1
             else: bad['witnesses'][0]['scalar']=(bad['witnesses'][0]['scalar']+1)%N
             with self.subTest(corruption=corruption), self.assertRaises(audit_record.Invalid): audit_record.audit(bad)
         accepted=[c for c in r['candidates'] if c['status']=='accepted']
@@ -180,12 +218,14 @@ class MeasurementTest(unittest.TestCase):
             comparison=compare.compare(out,out)
             self.assertTrue(comparison['matching_checks_pass'])
             self.assertEqual(comparison['resource_metadata_status'],'metadata_match_only')
+            self.assertTrue(all(pair['left_top_form_degree']==5 and pair['right_top_form_degree']==5 for pair in comparison['pairs']))
             self.assertIn('rss_native_unit',summary['resource_metadata_at_start'])
             self.assertTrue(summary['measure_source_unchanged'])
             self.assertTrue(summary['accounting_source_unchanged'])
             for mode in ('independent','walk','two-group'):
                 self.assertEqual(summary['per_mode'][mode]['completed'],1)
                 self.assertEqual(summary['per_mode'][mode]['independently_verified_runs'],1)
+                self.assertEqual(summary['per_mode'][mode]['phase_wall_ns']['top_form_regularity']['observed_attempts'],1)
                 self.assertEqual(summary['per_mode'][mode]['independent_audit_wall_ns']['unknown_attempts'],0)
                 self.assertEqual(summary['per_mode'][mode]['attempts'],1)
                 self.assertEqual(summary['per_mode'][mode]['driver_cpu_ns']['observed_attempts'],1)
@@ -257,6 +297,7 @@ else: raise AssertionError('failure was not injected')
             self.assertTrue(result['matching_checks_pass'],result['mismatch_or_unknown'])
             self.assertEqual(len(result['pairs']),3)
             self.assertTrue(all(row['target_match'] for row in result['pairs']))
+            self.assertTrue(all(row['left_top_form_degree']==5 and row['right_top_form_degree']==5 for row in result['pairs']))
             summary=json.loads((outputs[1]/'summary.json').read_text())
             self.assertGreater(sum(row['candidate_counts']['filtered'] for row in summary['runs']),0)
 

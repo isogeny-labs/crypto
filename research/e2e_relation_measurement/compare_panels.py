@@ -121,7 +121,8 @@ def load(directory):
                 raise ValueError(f'inconsistent audit status: {directory} {key}')
             audit_report=json.loads((directory / f'{name}.audit.json').read_text())
             if (audit_report.get('status')!='verified' or audit_report.get('record_sha256')!=row['result_sha256'] or
-                audit_report.get('audit_source_sha256')!=summary['audit_sha256_at_start']):
+                audit_report.get('audit_source_sha256')!=summary['audit_sha256_at_start'] or
+                audit_report.get('top_form_regularity_verified')!=row.get('top_form_degree')):
                 raise ValueError(f'audit does not match result or source: {directory} {key}')
         if row['result_status'] is not None:
             if row['status'] != 'exited' or row.get('exit_code') != 0 or row['result_sha256'] is None:
@@ -132,6 +133,7 @@ def load(directory):
                 result.get('status') != row['result_status'] or result.get('target') != row['target'] or
                 result.get('useful_relations') != row['useful_relations'] or result.get('relation_counts') != row['relation_counts'] or
                 result.get('counts') != row.get('candidate_counts') or result.get('total') != row.get('observed_total') or
+                (result.get('metrics') or {}).get('degree_of_regularity') != row.get('top_form_degree') or
                 result.get('source_sha256_at_start') != summary['measure_sha256_at_start'] or
                 result.get('accounting_sha256_at_start') != summary['accounting_sha256_at_start']):
                 raise ValueError(f'result does not match receipt or sources: {directory} {key}')
@@ -142,6 +144,7 @@ def load(directory):
             if (snapshot.get('schema') != 'e2e-relation-measurement/v1' or
                 not config_matches(snapshot.get('config'),expected_args) or
                 snapshot.get('counts') != row.get('candidate_counts') or snapshot.get('total') != row.get('observed_total') or
+                (snapshot.get('metrics') or {}).get('degree_of_regularity') != row.get('top_form_degree') or
                 snapshot.get('source_sha256_at_start') != summary['measure_sha256_at_start'] or
                 snapshot.get('accounting_sha256_at_start') != summary['accounting_sha256_at_start']):
                 raise ValueError(f'checkpoint does not match receipt or sources: {directory} {key}')
@@ -219,6 +222,7 @@ def compare(left_dir, right_dir):
                       'left_status':left['result_status'], 'right_status':right['result_status'],
                       'left_exit_status':left['status'], 'right_exit_status':right['status'],
                       'left_wall_ns':left['whole_process_wall_ns'], 'right_wall_ns':right['whole_process_wall_ns'],
+                      'left_top_form_degree':left.get('top_form_degree'),'right_top_form_degree':right.get('top_form_degree'),
                       'left_nonzero_b':None if left['relation_counts'] is None else left['relation_counts']['nonzero_b'],
                       'right_nonzero_b':None if right['relation_counts'] is None else right['relation_counts']['nonzero_b'],
                       'left_useful':left['useful_relations'], 'right_useful':right['useful_relations'],
