@@ -414,6 +414,16 @@ roots, Hasse--Weil and at most five branch values give
 
 As a concrete check, SymPy found that the cubic-fiber discriminant for
 `a=3,b=5` has degree four in `t` and is squarefree modulo M31.
+For this same fixed graph, the fibers at `t=3,5,28` each have three
+distinct B677 rational points. All 27 triples produce 27 distinct
+fourth values of `tau_3(R-P1-P2-P3)` for each public target `R=G,Q`.
+`verify_y_fiber_degree.py` replays every point equation and group sum,
+then checks hashes of the sorted fourth-value sets. The generic
+fourth-coordinate fiber degree for this graph and either fixed target
+is therefore **27**, by the 27-value upper bound and one unramified
+specialization attaining it. This is a coordinate-degree certificate,
+not a completed solving-degree or relation-cost comparison; it leaves
+other linear graphs and restricted selectors open.
 
 The global three-root density is therefore approximately `1/6` for
 every fixed linear graph. A 256-label offset family covering 677
