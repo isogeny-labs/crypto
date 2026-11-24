@@ -1,3 +1,5 @@
+Latest research priority: read [the pair-yield addendum](pair-yield-v1/addendum.pdf) and [NEXT_V2](NEXT_V2.md). They supersede the old pair-selector priority while preserving the original report. [pcc:PCC-20261124-26c2bd]
+
 # Anchored ratio queries
 
 Read [report.pdf](report.pdf) or [report.md](report.md), then
