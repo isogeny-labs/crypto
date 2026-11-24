@@ -172,6 +172,27 @@ Reproduction: with Python FLINT, factor
 `nmod_poly([b,a,0,1], 2147483647)` for each row; compute
 `j = 1728*4*a^3/(4*a^3+27*b^2) mod p`.
 
+### Isogeny pullback is the codomain locus
+
+Let `psi:E -> E'` be the recorded separable degree-three isogeny and set
+`phi=x_E' o psi`, a degree-six morphism on `E`. For a fixed target `R`,
+the four-coordinate sum locus for `phi` is **exactly** the ordinary
+abscissa sum locus on `E'` with target `psi(R)`, over the algebraic closure.
+One inclusion follows by applying `psi` to a source relation. Conversely,
+choose source lifts of any four codomain points summing to `psi(R)`.
+Their source sum differs from `R` by a kernel point `K`; subtracting `K`
+from one lift preserves its `phi` coordinate and makes the source sum
+equal `R`. By uniqueness of the irreducible polynomial for a fixed
+morphism, the defining relation polynomial is the codomain specialized
+`S5` up to scalar. Its generic fourth-coordinate degree is eight for
+the non-2-torsion targets here, despite `deg(phi)=6`.
+
+The isogeny restricts to a bijection between the two rational groups of
+the same prime order, so the rational-point relation sets correspond as
+well. This composition supplies no distinct lower-degree summation
+polynomial. A changed codomain selector or polynomial presentation may
+still change measured work and must carry its map and factor-base costs.
+
 ## Existing presentations and the next falsifier
 
 The balanced S4/S3 eight-leaf presentation and the S4-to-two-S3 auxiliary
