@@ -392,6 +392,28 @@ widths, completed affine solving degrees or runtime estimates. The
 ten-bit support result therefore leaves the principal solving-cost
 gate unresolved despite its ample rational support.
 
+### Quadratic-offset fourth-coordinate degree on B677
+
+For `h0(x)=3*x^2+5*x`, the quartics `(h0(x)+t)^2-f(x)` at
+`t=20,33,85` each have four distinct rational roots. Their abscissae
+are recorded in `verify_y_fiber_degree.py`, which checks all twelve
+curve points and all `4^3=64` triples. For each fixed public target
+`R=G,Q`, the 64 values of
+`tau(R-P1-P2-P3)`, where `tau=y-h0(x)`, are distinct. An independent
+SageMath elliptic-curve replay agreed with the verifier's sorted-value
+SHA-256 digests for both targets.
+
+Each generic input offset has four points in its fiber, so 64 is an
+upper bound on the fourth-coordinate degree. The squarefree input
+fibers and distinct fourth values at this specialization show that
+the bound is attained over the function field of the three input
+offsets for each of these fixed targets. Thus this quadratic graph's
+four-summand locus has **fourth-coordinate degree 64** for `G` and
+`Q`. The same witness makes the discriminant nonzero on a Zariski-open
+set of quadratic coefficients and input offsets. This concerns the
+intrinsic coordinate fiber, not a selector-restricted presentation,
+completed solving degree or relation cost.
+
 ### A cubic-offset alternative and its support gate
 
 The linear graph `y=a*x+b+t` gives a map
