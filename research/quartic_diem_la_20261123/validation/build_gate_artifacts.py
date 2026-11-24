@@ -54,7 +54,9 @@ def main():
     s = rep["summary"]
     replay_ok = (bool(runs) and all(e["found"] and e["bytes_equal"] and e["fields_equal"] for e in runs)
                  and s["runs_replayed"] == s["runs_certified_and_correct"] == 80
-                 and s["rows_replayed"] == s["rows_bytes_equal"] == s["rows_fields_equal"])
+                 and s["rows_replayed"] == s["rows_bytes_equal"] == s["rows_fields_equal"]
+                 and s["duplicate_replayed_keys"] == 0
+                 and s["committed_rows"] == s["committed_rows_covered"] == s["rows_replayed"])
     cert = {
         "schema": "replay-certificate/v1",
         "study": STUDY,

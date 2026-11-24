@@ -49,6 +49,7 @@ def main():
     report = {"schema": "validator-replay-compare/v1", "rows": [], "summary": {}}
     n = eq_b = eq_f = runs = runs_ok = 0
     cfg = []
+    seen = {}
     for f in ("replay_main.jsonl", "replay_131101.jsonl"):
         try:
             rr = rows(f"{replay}/{f}")
@@ -61,6 +62,7 @@ def main():
             if r["kind"] == "done":
                 continue
             k = key(r)
+            seen[k] = seen.get(k, 0) + 1
             n += 1
             ent = {"replay_file": f, "kind": r["kind"], "arm": r.get("arm"), "p": r.get("p"),
                    "curve_seed": r.get("curve_seed"), "seed": r.get("seed")}
@@ -95,7 +97,10 @@ def main():
                          "runs_replayed": runs, "runs_certified_and_correct": runs_ok,
                          "by_kind_replayed_equal": kinds,
                          "fallback_runs_replayed": sum(1 for e in report["rows"]
-                                                       if e["kind"] == "run" and e.get("la_fallbacks", 0) > 0)}
+                                                       if e["kind"] == "run" and e.get("la_fallbacks", 0) > 0),
+                         "duplicate_replayed_keys": sum(1 for v in seen.values() if v > 1),
+                         "committed_rows": len(committed),
+                         "committed_rows_covered": sum(1 for k in committed if k in seen)}
     report["replay_configs"] = cfg
     json.dump(report, open(out_path, "w"), indent=1)
     print(json.dumps(report["summary"]))
