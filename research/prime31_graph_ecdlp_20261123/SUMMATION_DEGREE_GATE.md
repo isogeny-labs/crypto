@@ -377,6 +377,21 @@ one bit per slot. Their top-quotient lengths are 6,291,456 and
 677 abscissae; selecting exactly B677 needs an additional exact
 restriction with a new degree and cost account. This support theorem
 does not supply four-summand extraction or a completed solver result.
+
+The full affine monomial envelopes through the respective canonical
+first-vanishing degrees expose the variable tax:
+
+| Bits per slot | Canonical degree | All-bit variables / envelope | One-bit-projected variables / envelope |
+| ---: | ---: | ---: | ---: |
+| 8 | 19 | 19 / `C(38,19)=35,345,263,800` | 17 / `C(36,19)=8,597,496,600` |
+| 10 | 23 | 23 / `C(46,23)=8,233,430,727,600` | 21 / `C(44,23)=2,012,616,400,080` |
+
+These are derived counts of *possible* monomials of degree at most
+the displayed value. They are not observed symbolic rows, F4 matrix
+widths, completed affine solving degrees or runtime estimates. The
+ten-bit support result therefore leaves the principal solving-cost
+gate unresolved despite its ample rational support.
+
 Replay both probability bounds with exact rational arithmetic using
 `python3 research/prime31_graph_ecdlp_20261123/verify_offset_support_bounds.py`.
 Its exhaustive F17 two-bit check independently verifies the mean,
