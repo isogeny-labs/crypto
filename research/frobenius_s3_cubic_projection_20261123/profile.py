@@ -54,8 +54,8 @@ def kernel(columns):
     return free
 
 
-def row_kernel(rows, variables):
-    """Return the dual basis to the quotient by the packed row span."""
+def quotient_coordinates(rows, variables):
+    """Reduce each coordinate vector modulo the span of packed rows."""
     pivots = {}
     for row in rows:
         while row:
@@ -72,6 +72,12 @@ def row_kernel(rows, variables):
         else:
             quotient.append(1 << dimension)
             dimension += 1
+    return quotient, dimension
+
+
+def row_kernel(rows, variables):
+    """Return the dual basis to the quotient by the packed row span."""
+    quotient, dimension = quotient_coordinates(rows, variables)
     basis = [0] * dimension
     for i, word in enumerate(quotient):
         while word:

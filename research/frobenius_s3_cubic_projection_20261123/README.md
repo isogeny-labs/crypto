@@ -53,6 +53,24 @@ For \(k>3\), multiplying the four displayed \(\alpha_r\) by arbitrary Boolean sc
 
 For each of the six subspaces at these sizes, the verifier also finds a rational target on \(y^2+xy=x^3+x^2+1\) and a nonzero sum that passes all four checks. Adding the actual normalized S3 right-hand side raises the image rank from \(k-1\) to \(k\). These false positives rule out sufficiency of the cubic projection even on the S3 target family, in the tested geometries. Higher-degree multipliers, additional target-dependent equations, and other formulations remain open. Rank coverage, the solving degree of a projected presentation, and the index-calculus exponent are separate quantities. [pcc:unverified]
 
+## Compiled quadratic selector projection at 23 bits
+
+For a fixed Frobenius geometry, write \(A\) for the packed row space of coefficient constraints that force \(\operatorname{Tr}(\alpha(s)(x^2+sx))=0\). For a target \(t\), let \(v_m(t)\) be the linear functional on the multiplier coefficients that returns the coefficient of \(s^m\) in \(\operatorname{Tr}(\alpha(s)p_t(s))\). A multiplier produces a selector equation of degree at most two precisely when it annihilates \(A\) and all the \(v_m(t)\) with \(|m|>2\). Compile the quotient by \(A\) once, then reduce by the high-degree functionals after specializing each target. Dualizing the images of the remaining functionals gives exactly the degree-at-most-two selector equations in the projected span. This builds the quadratic equations without forming or closing a system of quartic polynomials. The coefficient stage still uses the cubic and quartic supports in the selector variables. [pcc:unverified]
+
+The comparison uses four shared targets, a planted target with two distinct solution sums, and eight seeded additional targets for each 23-bit factor. The unrestricted cubic multiplier space has dimension 761. The compiler uses 562 selector monomial coordinates in its coefficient stage, including the 495 high-degree coefficient functionals. It outputs 33 independent quadratic selector equations for every target. The other controls, unrestricted quadratic multipliers and equivariant cubic multipliers, give one quadratic selector equation each. Adding the controls' consequences through degree three leaves the original system's solving degree at four. [pcc:unverified]
+
+| Presentation | Variables | First fall degree | Last fall degree | Solving degree | Columns at solving degree |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Direct normalized equations | 22 | 3 | 4 | 4 | 9,109 |
+| Direct equations plus the 33 compiled quadratics | 22 | 3 | 3 | 3 | 1,794 |
+| 33 compiled selector quadratics alone | 11 | 3 | 3 | 3 | 232 |
+
+The direct and augmented systems have reduced basis degree zero on the 13 misses and degree two on the 13 hits. The selector-only system has reduced basis degree zero on the misses, degree one on the 11 singleton sums, and degree two on the two multiple-sum targets. For the online check, bounded closure either produces the constant 1 or yields an affine slice of at most eight assignments. Evaluation of the input quadratics validates the slice, then half trace recovers both orientations of every nonzero sum. The extraction code receives no root count or reference points, and the verifier compares its output with the independent rank-and-recovery reference. [pcc:unverified]
+
+On this bounded-closure benchmark, the original two-coordinate extraction takes 15.30 s over the 26 targets. The compiled extraction takes 2.56 s, including 1.85 s of fixed setup across the two factors, target specialization, closure, and recovery of the original orientations. Both totals include normalization and exclude the independent reference computation. This benchmark covers two-coordinate extraction. The complete toy solves below use the earlier resultant join. [pcc:unverified]
+
+The degree reduction is for the specialized presentation at 23 bits. At 47 bits the unrestricted cubic multiplier span fails on rational targets even if all its projected equations are retained, so the quadratic subspace of that span also fails. [pcc:unverified]
+
 ## Quartic multipliers at 47 bits
 
 For the two 47-bit subspaces, increasing the multiplier degree to four gives block dimensions 281, 281, and 283. The unrestricted dimension is 13,253, which equals \(\sum_{j=0}^4(5-j)\binom{23}{j}\), the scalar-multiple span of \(\alpha_0,\ldots,\alpha_4\). The fourth telescoping image adds \(u^4s\), so these five values are independent at every nonzero sum. The same span argument now gives pointwise rank five. Each subspace again has a rational target and a nonzero sum passing all five checks with inconsistent augmented rank. An exact projection using only target-independent trace multipliers of this form therefore requires multiplier degree at least five on these geometries. [pcc:unverified]
@@ -209,6 +227,14 @@ SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_2026112
 The quadratic comparison and capped closure records are in [quadratic-multiples.jsonl](quadratic-multiples.jsonl) and [selector-closure-d4-partial.jsonl](selector-closure-d4-partial.jsonl).
 
 The quotient results are in [quotient-degrees.jsonl](quotient-degrees.jsonl), [quotient-witnesses.jsonl](quotient-witnesses.jsonl), and [quotient-spans.jsonl](quotient-spans.jsonl).
+
+Use the same ranker to replay the coefficient compilation and degree comparison.
+
+~~~sh
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/compiled_projection.py --ranker /tmp/s3-selector-elimination
+~~~
+
+The specialization and recovery records are in [compiled-projection.jsonl](compiled-projection.jsonl).
 
 The elimination records are in [selector-closure-d3.jsonl](selector-closure-d3.jsonl), [selector-macaulay-d4.jsonl](selector-macaulay-d4.jsonl), and [selector-chart-d4.jsonl](selector-chart-d4.jsonl).
 

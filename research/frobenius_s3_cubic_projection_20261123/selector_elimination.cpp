@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     unsigned k, right, degree, closure, neq, time_limit, check_count;
     Word witness;
     if (!(std::cin >> k >> right >> degree >> closure >> neq >> witness >> time_limit >> check_count) ||
-        !k || k >= 128 || right >= 64 || right >= 128 - k || degree < 2 || degree > 4 || closure > 1) {
+        (!k && !right) || k >= 128 || right >= 64 || right >= 128 - k || degree < 2 || degree > 4 || closure > 1) {
         return 1;
     }
     auto start = Clock::now();
@@ -94,8 +94,13 @@ int main(int argc, char** argv) {
         return true;
     };
     std::vector<std::vector<Monomial>> equations(neq), checks(check_count);
+    std::vector<unsigned> input_degrees;
+    input_degrees.reserve(neq);
     for (auto& equation : equations) {
-        if (!read_equation(equation) || std::any_of(equation.begin(), equation.end(), [](Monomial m) { return degree_of(m) > 2; })) return 1;
+        if (!read_equation(equation)) return 1;
+        unsigned nominal = 2;
+        for (Monomial m : equation) nominal = std::max(nominal, static_cast<unsigned>(degree_of(m)));
+        input_degrees.push_back(nominal);
     }
     for (auto& check : checks) if (!read_equation(check)) return 1;
     auto has_polynomial = [&](const std::vector<Monomial>& terms, const std::vector<Row>& pivots) {
@@ -165,7 +170,10 @@ int main(int argc, char** argv) {
     auto elapsed = [&]{ return std::chrono::duration<double>(Clock::now()-start).count(); };
     for (Monomial m : multipliers) {
         if (elapsed() > time_limit) { timeout = true; break; }
-        for (const auto& eq : equations) {
+        for (unsigned j = 0; j < neq; ++j) {
+            const unsigned nominal = degree_of(m) + input_degrees[j];
+            if (nominal > degree) continue;
+            const auto& eq = equations[j];
             std::fill(row.begin(), row.end(), 0);
             int top = 0;
             for (Monomial term : eq) {
@@ -173,7 +181,7 @@ int main(int argc, char** argv) {
                 row[i/64] ^= Word{1} << (i%64);
                 top = std::max(top, static_cast<int>(i / 64));
             }
-            if (!processed.empty() && degree_of(m) + 2 < degree) {
+            if (!processed.empty() && nominal < degree) {
                 // Every variable multiple already occurs in the raw matrix.
                 Row lower_source(row.begin(), row.begin() + top + 1);
                 remember_products(lower_source);
@@ -228,6 +236,10 @@ int main(int argc, char** argv) {
     for (unsigned i=0; i<columns && !rejected && checks.empty(); ++i) {
         if ((monomials[i] & xmask) || pivots[i].empty()) continue;
         ++pure;
+        if (!k && degree_of(monomials[i]) > 1) {
+            ++selector_rank;
+            continue;
+        }
         row=pivots[i];
         int top=row.size()-1;
         bool has_mixed=false;
@@ -249,7 +261,7 @@ int main(int argc, char** argv) {
         }
         if (!has_mixed) {
             ++selector_rank;
-            if (degree == 3) {
+            if (!k || degree == 3) {
                 auto& terms = selector_rows.emplace_back();
                 for (unsigned w = 0; w < row.size(); ++w) {
                     for (Word bits = row[w]; bits; bits &= bits - 1) {
@@ -259,7 +271,7 @@ int main(int argc, char** argv) {
             }
             unsigned parity=0;
             for (unsigned w=0; w<row.size(); ++w) parity^=std::popcount(row[w]&evaluation[w]);
-            rejected=(parity&1)!=0;
+            rejected=k && (parity&1)!=0;
         }
     }
     std::cout << "{\"rejected\":" << (rejected ? "true" : "false")

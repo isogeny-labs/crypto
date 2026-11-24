@@ -94,31 +94,37 @@ def block_rank(binary, n, modulus, rows, columns, verify_arithmetic, timeout=120
     return rank
 
 
-def direct_dimension(n, modulus):
-    """Independent rank calculation in physical-field coordinates for small n."""
-    field, basis, _ = geometry(n, modulus)
-    terms = domains(len(basis), 3)
+def trace_dual(field):
+    n = field.n
     trace_mask = sum(field.tr(1 << i) << i for i in range(n))
 
     @cache
     def dual(value):
         return sum(((field.mul(value, 1 << j) & trace_mask).bit_count() & 1) << j
                    for j in range(n))
+    return dual
 
-    def constraints():
-        for x in basis:
-            square = dual(field.sq(x))
-            products = [dual(field.mul(x, s)) for s in basis]
-            rows = {}
-            for j, monomial in enumerate(terms):
-                offset = j * n
-                rows[monomial] = rows.get(monomial, 0) ^ (square << offset)
-                for i, coefficient in enumerate(products):
-                    support = monomial | (1 << i)
-                    rows[support] = rows.get(support, 0) ^ (coefficient << offset)
-            yield from rows.values()
 
-    return n * len(terms) - rank_f2(constraints())
+def direct_constraints(field, basis, terms, dual):
+    """Coefficient rows for annihilating the x-dependent part of S3."""
+    for x in basis:
+        square = dual(field.sq(x))
+        products = [dual(field.mul(x, s)) for s in basis]
+        rows = {}
+        for j, monomial in enumerate(terms):
+            offset = j * field.n
+            rows[monomial] = rows.get(monomial, 0) ^ (square << offset)
+            for i, coefficient in enumerate(products):
+                support = monomial | (1 << i)
+                rows[support] = rows.get(support, 0) ^ (coefficient << offset)
+        yield from rows.values()
+
+
+def direct_dimension(n, modulus):
+    """Independent rank calculation in physical-field coordinates for small n."""
+    field, basis, _ = geometry(n, modulus)
+    terms = domains(len(basis), 3)
+    return n * len(terms) - rank_f2(direct_constraints(field, basis, terms, trace_dual(field)))
 
 
 def false_positive(n, modulus, degree=3):
