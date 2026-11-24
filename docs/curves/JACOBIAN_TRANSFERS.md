@@ -49,8 +49,10 @@ degree, group order, the largest subgroup order recorded among the row's
 representations, and whether the slug appears in the supplied transfer report.
 The subgroup choice is a metadata summary, not a claim about every generator:
 inspect the relevant representation and independently verify its order. A
-recorded subgroup is **unverified**; missing orders remain null. Report membership does not establish that the
-report is fresh: use `jacobian_transfers check` separately. The command fails
+recorded subgroup is **unverified**; missing orders remain null. The `report_input_digest` compares the report's
+stored digest with the current manifest-selected registry rows. A mismatch
+marks the report's inputs stale. A match does not verify calculations or code
+freshness: use `jacobian_transfers check` separately. The command fails
 if registry parsing or the report fails; it does not silently omit bad rows.
 
 Every row needs a concrete review. Check source provenance and field

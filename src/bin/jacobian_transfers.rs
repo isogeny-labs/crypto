@@ -61,6 +61,9 @@ enum Cmd {
         registry: String,
         #[arg(long, default_value = OUT)]
         report: String,
+        /// Manifest used to check the report's source-row digest.
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
         /// Case-insensitive substring of the slug or standard name.
         #[arg(long)]
         name: Option<String>,
@@ -273,16 +276,27 @@ fn run(cli: Cli) -> Result<bool, String> {
         Cmd::ExtensionFields {
             registry,
             report,
+            catalog,
             name,
         } => {
             let text =
                 std::fs::read_to_string(&registry).map_err(|e| format!("{registry}: {e}"))?;
+            let manifest =
+                std::fs::read_to_string(&catalog).map_err(|e| format!("{catalog}: {e}"))?;
+            let restricted = crypto_lib::cryptanalysis::cover_catalog::restrict(&text, &manifest)?;
+            let digest = crypto_lib::cryptanalysis::cover_catalog::rows_sha256(&restricted);
             let curves = read_registry(&text)?;
             let file = load(&report)?;
+            let mut inventory = extension_inventory(&curves, &file, name.as_deref());
+            inventory["report_input_digest"] = serde_json::json!({
+                "status": if digest == file.catalog_rows_sha256 { "matching" } else { "mismatch" },
+                "current": digest,
+                "report": file.catalog_rows_sha256,
+                "scope": "manifest-selected registry rows only; matching does not verify report calculations or code freshness"
+            });
             println!(
                 "{}",
-                serde_json::to_string_pretty(&extension_inventory(&curves, &file, name.as_deref()))
-                    .map_err(|e| e.to_string())?
+                serde_json::to_string_pretty(&inventory).map_err(|e| e.to_string())?
             );
             Ok(true)
         }
