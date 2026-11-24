@@ -134,16 +134,20 @@ Take signed factor-base points with abscissae in \(1+U\) and a target point \(R\
 
 All factor-base points lie in \(2E(K)\), so both solvers reject targets outside that subgroup up front. Membership for a finite point \(W=(t,y)\) is equivalent to \(\operatorname{Tr}(t)=1\). Doubling gives \(t=\lambda^2+\lambda+1\), hence the forward implication. For the converse, take a solution \(\lambda\) to this equation, let \(u^2=y+(\lambda+1)t\), and set \(v=(\lambda+u)u\). The curve equation at \(W\) gives \(u^4+tu^2+1=0\), so \(u\ne0\) and \((u,v)\) lies on the curve. Its double is \(W\). The two solvers share this gate and the intermediate-point calculations. The reference enumerates one signed pair point and computes its complement by group arithmetic with batched inversion. [pcc:unverified]
 
-The image coefficients depend on the sum \(s\) alone and can be cached across targets. A fixed \(R\) and an intermediate abscissa \(t\) allow at most two different third points because \(W\) has at most two signs and \(C=R-W\) is unique for each. With \(B\) factor-base abscissae and all \(2B\) thirds allowed, an eligible target has between \(B\) and \(2B\) nonidentity intermediate abscissae. The cached recurrence must therefore visit \(\Theta(B2^k)\) selectors per target in this sliced join. The GCD arm constructs a sparse residual for each distinct intermediate abscissa, then materializes its dense coefficient array and isolates the common roots. This analysis concerns the sliced algorithm. A join that processes the intermediates together remains open. [pcc:unverified]
+The image coefficients depend on the sum \(s\) alone and can be cached across targets. A fixed \(R\) and an intermediate abscissa \(t\) allow at most two different third points because \(W\) has at most two signs and \(C=R-W\) is unique for each. With \(B\) factor-base abscissae and all \(2B\) thirds allowed, an eligible target has between \(B\) and \(2B\) nonidentity intermediate abscissae. The cached recurrence must therefore visit \(\Theta(B2^k)\) selectors per target in this sliced join. The individual GCD arm constructs a sparse residual for each distinct intermediate abscissa, then materializes its dense coefficient array and isolates the common roots. [pcc:unverified]
 
-All three methods produced identical signed triple sets on the measured panels. At 7 bits the panel exhausts the finite targets and signed thirds for each subspace, and independently checks the 142 subgroup rejections by group arithmetic. At 23 bits it uses eight signed thirds per subspace and five targets, one planted and four shared with the two-coordinate comparison. Of the 80 intermediate abscissae, 47 give no selector root. The GCD arm constructs 200 nonzero terms and materializes 2,048 coefficient slots per intermediate. [pcc:unverified]
+The batch arm builds a balanced product tree of the residuals modulo \(L_U\). A single GCD of the root polynomial with \(L_U\) has exactly the union of the selector roots. To recover the intermediate labels, take the GCD of the surviving root polynomial with each child product, descending only into children with a nonconstant GCD. Because \(L_U\) is squarefree, the resulting leaf polynomials give the full root sets, including any root shared by multiple leaves. [pcc:unverified]
 
-| Field degree | Targets across both factors | Verified signed triples | Direct group join | Cached recurrence | Sparse build with dense GCD |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 7 | 282 | 560 | 0.152 s | 0.248 s | 0.442 s |
-| 23 | 10 | 37 | 2.94 s | 10.24 s | 15.45 s |
+All four methods produced identical signed triple sets. The three resultant arms also agreed on the selector roots for every intermediate. At 7 bits the panel exhausts the finite targets and signed thirds for each subspace, and independently checks the 142 subgroup rejections by group arithmetic. At 23 bits it uses eight signed thirds per subspace and five targets, one planted and four shared with the two-coordinate comparison. Of the 80 intermediate abscissae, 47 give no selector root. Each GCD leaf constructs 200 nonzero terms and materializes 2,048 coefficient slots. The batch arm stores seven internal polynomials with 2,048 slots each per target. [pcc:unverified]
 
-Totals include shared factor-base setup once per factor, intermediate construction, failed searches, and pair recovery. The scan total also includes its image cache. The supplied target and third-summand panels are fixed across arms. At 23 bits, this comes to about 0.079 s, 0.277 s, and 0.418 s per verified triple, respectively. This counts triples with distinct abscissae, without measuring their effect on relation-matrix rank or running a complete ECDLP solve. [pcc:unverified]
+| Field degree | Targets across both factors | Verified signed triples | Direct group join | Cached recurrence | Individual dense GCD | Batch dense GCD |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 7 | 282 | 560 | 0.160 s | 0.254 s | 0.486 s | 0.415 s |
+| 23 | 10 | 37 | 3.01 s | 9.62 s | 15.11 s | 3.92 s |
+
+Totals include shared factor-base setup once per factor, intermediate construction, failed searches, and pair recovery. The scan total also includes its image cache. The supplied target and third-summand panels are fixed across arms. At 23 bits, direct arithmetic takes 0.081 s per verified triple and batched GCD takes 0.106 s. This counts triples with distinct abscissae. Relation-matrix rank and complete ECDLP solve cost remain unmeasured. [pcc:unverified]
+
+In a separate planted panel of eight intermediates per factor, the reduced 23-bit products become fully dense after combining four 200-term residuals. At 47 bits, each input has 1,822 terms and a reduced two-leaf product has 229,090 or 265,541 terms depending on the factor. The next schoolbook products would require over 52 billion coefficient pairs each. They were capped before multiplication. This measures the support of explicit product representations. A joint method that avoids forming the growing products remains open. [pcc:unverified]
 
 ## Reproduction
 
@@ -204,9 +208,19 @@ The resultant results are in [subspace-resultant.jsonl](subspace-resultant.jsonl
 Run the three-summand comparison with the same dependencies.
 
 ~~~sh
-SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/three_summand_join.py 7 23 --dense-gcd
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/three_summand_join.py 7 23 --dense-gcd --batch-gcd
 ~~~
 
 The join results are in [three-summand-join.jsonl](three-summand-join.jsonl).
+
+Measure the sparse product support with a standard C++20 build. A build using the optional carryless-multiply instruction can be cross-checked coefficient by coefficient with the portable build.
+
+~~~sh
+c++ -O3 -std=c++20 research/frobenius_s3_cubic_projection_20261123/sparse_product.cpp -o /tmp/s3-sparse-portable
+c++ -O3 -std=c++20 -mpclmul research/frobenius_s3_cubic_projection_20261123/sparse_product.cpp -o /tmp/s3-sparse-product
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/batch_support.py 23 47 --multiplier /tmp/s3-sparse-product --control /tmp/s3-sparse-portable
+~~~
+
+The support results are in [batch-product-support.jsonl](batch-product-support.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)

@@ -117,6 +117,14 @@ def patch_zero(terms, subspace, desired):
                 terms.pop(degree, None)
 
 
+def target_residual(field, subspace, target, constant):
+    linear = linearized_rhs(field, subspace, target)
+    terms = sparse_residual(field, subspace, constant, linear)
+    patch_zero(terms, subspace, evaluate(field, subspace, constant))
+    return terms
+
+
+
 def anf(values):
     result = values.copy()
     bit = 1
@@ -146,32 +154,85 @@ def witness_entry(degree, g):
     raise ValueError(f"No cubic witness for {degree}, {g}")
 
 
-def gcd_roots(field, subspace, terms):
+def flint_polynomials(field):
     from flint import fmpz_mod_poly_ctx, fq_default_ctx, fq_default_poly_ctx
 
     def bits(word, width):
         return [(word >> i) & 1 for i in range(width)]
 
-    start = perf_counter()
     modulus = fmpz_mod_poly_ctx(2)(bits(field.poly, field.n + 1))
     coeffs = fq_default_ctx(modulus=modulus, fq_type="FQ_NMOD")
     ring = fq_default_poly_ctx(coeffs)
-    dense = [coeffs(0)] * (max(terms, default=0) + 1)
-    for degree, value in terms.items():
-        dense[degree] = coeffs(bits(value, field.n))
-    expression = ring(dense)
+
+    def polynomial(terms):
+        dense = [coeffs(0)] * (max(terms, default=0) + 1)
+        for degree, value in terms.items():
+            dense[degree] = coeffs(bits(value, field.n))
+        return ring(dense)
+
+    return ring, polynomial
+
+
+def subspace_polynomial(ring, subspace):
     x = ring.gen()
-    domain = sum((x ** (1 << j) for j, value in enumerate(subspace) if value), ring.zero())
+    return sum((x ** (1 << j) for j, value in enumerate(subspace) if value), ring.zero())
+
+
+def unpack_roots(polynomial):
+    return {sum(int(bit) << i for i, bit in enumerate(root.to_list()))
+            for root, _ in polynomial.roots()}
+
+
+def gcd_roots(field, subspace, terms):
+    start = perf_counter()
+    ring, polynomial = flint_polynomials(field)
+    expression = polynomial(terms)
+    domain = subspace_polynomial(ring, subspace)
     built = perf_counter()
     common = expression.gcd(domain)
     isolated = perf_counter()
-    roots = {sum(int(bit) << i for i, bit in enumerate(root.to_list()))
-             for root, _ in common.roots()}
+    roots = unpack_roots(common)
     return roots, dict(
-        gcd_degree=common.degree(), dense_coefficients=len(dense),
+        gcd_degree=common.degree(), dense_coefficients=max(terms, default=0) + 1,
         dense_build_seconds=built - start, gcd_seconds=isolated - built,
         root_isolation_seconds=perf_counter() - isolated,
     )
+
+
+def batch_gcd_roots(field, subspace, residuals):
+    """Find the labeled root sets using a product tree modulo the domain."""
+    if not residuals:
+        return [], 0
+    ring, polynomial = flint_polynomials(field)
+    domain = subspace_polynomial(ring, subspace)
+    levels = [[polynomial(terms) for terms in residuals]]
+    work = 0
+    while len(levels[-1]) > 1:
+        row = levels[-1]
+        joined = [(row[j] * row[j + 1]) % domain for j in range(0, len(row) - 1, 2)]
+        work += sum(poly.degree() + 1 for poly in joined)
+        if len(row) % 2:
+            joined.append(row[-1])
+        levels.append(joined)
+    roots = [set() for _ in residuals]
+    common = levels[-1][0].gcd(domain)
+
+    def recover(depth, index, remaining):
+        if remaining.degree() == 0:
+            return
+        if depth == 0:
+            roots[index] = unpack_roots(remaining)
+            return
+        row = levels[depth - 1]
+        left = 2 * index
+        if left + 1 == len(row):
+            recover(depth - 1, left, remaining)
+        else:
+            for j in (left, left + 1):
+                recover(depth - 1, j, remaining.gcd(row[j]))
+
+    recover(len(levels) - 1, 0, common)
+    return roots, work
 
 
 def verify_sample(field, basis, subspace):

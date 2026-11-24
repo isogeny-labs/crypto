@@ -10,7 +10,7 @@ from profile import factors, geometry, span
 from quotient import half_trace, linear_map
 from selector_elimination import normalized_rhs
 from subspace_resultant import (
-    evaluate, gcd_roots, image_coefficients, linearized_rhs, patch_zero, sparse_residual,
+    batch_gcd_roots, evaluate, gcd_roots, image_coefficients, target_residual,
 )
 
 
@@ -116,9 +116,7 @@ def scan(curve, sums, images, constant, linear):
 
 def sparse_gcd(curve, subspace, target, constant):
     f = curve.field
-    linear = linearized_rhs(f, subspace, target)
-    terms = sparse_residual(f, subspace, constant, linear)
-    patch_zero(terms, subspace, evaluate(f, subspace, constant))
+    terms = target_residual(f, subspace, target, constant)
     roots, costs = gcd_roots(f, subspace, terms)
     roots.discard(0)
     return roots, len(terms), costs["dense_coefficients"]
@@ -139,19 +137,33 @@ def resultant_join(curve, basis, subspace, sums, images, by_x, jobs, method):
         if intermediate is not None:
             grouped[intermediate[0]].append((intermediate, third))
     sum_solutions = selector_visits = lift_failures = empty_intermediates = 0
-    sparse_terms = dense_slots = 0
+    sparse_terms = dense_slots = internal_slots = 0
     relations = set()
+    assert all(curve.trace(t) and len(matches) <= 2 for t, matches in grouped.items())
+    right_sides = {t: normalized_rhs(curve.field, basis, t) for t in grouped}
+    if method == "batch":
+        residuals = [target_residual(curve.field, subspace, t, c)
+                     for t, (c, _) in right_sides.items()]
+        isolated, internal_slots = batch_gcd_roots(curve.field, subspace, residuals)
+        for roots in isolated:
+            roots.discard(0)
+        root_sets = dict(zip(right_sides, isolated))
+        sparse_terms = sum(map(len, residuals))
+        dense_slots = sum(max(terms, default=0) + 1 for terms in residuals)
+    else:
+        root_sets = {}
     for target, matches in grouped.items():
-        assert curve.trace(target)
-        assert len(matches) <= 2
-        constant, linear = normalized_rhs(curve.field, basis, target)
+        constant, linear = right_sides[target]
         if method == "scan":
             roots = scan(curve, sums, images, constant, linear)
             selector_visits += len(sums) - 1
-        else:
+        elif method == "gcd":
             roots, terms, slots = sparse_gcd(curve, subspace, target, constant)
             sparse_terms += terms
             dense_slots += slots
+        else:
+            roots = root_sets[target]
+        root_sets[target] = roots
         sum_solutions += len(roots)
         empty_intermediates += not roots
         for s in roots:
@@ -170,10 +182,11 @@ def resultant_join(curve, basis, subspace, sums, images, by_x, jobs, method):
                             relation = triple(p, q, third)
                             if relation:
                                 relations.add(relation)
-    return relations, dict(
+    return relations, root_sets, dict(
         distinct_intermediate_abscissae=len(grouped), empty_intermediate_abscissae=empty_intermediates,
         selector_visits=selector_visits, recovered_sums=sum_solutions, lift_failures=lift_failures,
         sparse_terms=sparse_terms, dense_coefficient_slots=dense_slots,
+        internal_coefficient_slots=internal_slots,
     )
 
 
@@ -188,7 +201,7 @@ def panel(curve, points, degree, g):
     return [planted, *targets], thirds
 
 
-def run(degree, dense_gcd):
+def run(degree, methods):
     for g in factors(degree):
         start_setup = perf_counter()
         field, basis, _ = geometry(degree, g)
@@ -229,11 +242,17 @@ def run(degree, dense_gcd):
                 intermediate_seconds=grouped - start, direct_seconds=direct,
                 image_cache_seconds=cache_seconds,
             )
-            for method in ("scan", "gcd") if dense_gcd else ("scan",):
+            expected_roots = None
+            for method in methods:
                 start = perf_counter()
-                found, counts = resultant_join(curve, basis, subspace, sums, images, by_x, jobs, method)
+                found, root_sets, counts = resultant_join(curve, basis, subspace, sums, images,
+                                                         by_x, jobs, method)
                 result[method + "_seconds"] = perf_counter() - start
                 assert reference == found, (degree, g, target, reference ^ found)
+                if expected_roots is None:
+                    expected_roots = root_sets
+                else:
+                    assert root_sets == expected_roots
                 result[method] = counts
             print(json.dumps(result), flush=True)
 
@@ -242,6 +261,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("fields", nargs="+", type=int, choices=(7, 23))
     parser.add_argument("--dense-gcd", action="store_true", help="also run dense FLINT GCD")
+    parser.add_argument("--batch-gcd", action="store_true", help="also run the FLINT product tree")
     args = parser.parse_args()
+    methods = ["scan"]
+    if args.dense_gcd:
+        methods.append("gcd")
+    if args.batch_gcd:
+        methods.append("batch")
     for n in args.fields:
-        run(n, args.dense_gcd)
+        run(n, methods)
