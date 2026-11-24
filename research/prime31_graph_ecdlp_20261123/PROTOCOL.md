@@ -327,6 +327,18 @@ unplanted public query under a frozen resource budget, with every candidate
 relation independently replayed. Only then can graph rank and a cold
 same-target cost be measured for this algebraic source.
 
+A conditional cold-cost screen sharpens that gate. The matched rho run
+below took 25.411 ms for this same public `Q`; an eleven-query algebraic
+campaign with equal-cost calls would have at most 2.310 ms per query even
+if selector setup, graph work and linear algebra cost zero. The promoted
+public-`Q` split arm at the two-million matrix and 8,192-monomial caps
+already spent 241 ms before returning `ResourceLimit` with no row, about
+9.48 times that rho wall time. Its completed extraction cost is unknown
+and can only exceed this recorded stop time for the exact execution.
+These are unisolated, separate-run wall observations and a conditional
+eleven-query budget, not a measured algebraic-source speed ratio or a
+bound on a different solver, source yield, or query count.
+
 ### Generic signed four-sum end-to-end control on the B677 curve
 
 `native/mitm_four.rs` supplies a separate, point-keyed meet-in-the-middle
