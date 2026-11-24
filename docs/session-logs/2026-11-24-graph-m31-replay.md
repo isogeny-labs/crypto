@@ -13,3 +13,6 @@ Execute the saved-data native replay in the existing CI job. Record actual ranks
 
 ## Errors
 Local Rust/Cargo and Conductor are unavailable. Fetching main obtained e1552f1e but returned a separate missing-submodule error; no source working tree changed. Used exact GitHub source reads and the fetched commit for current instructions/journal. Native validation is pending; no pass inferred from source review.
+
+## Native execution transport continuation
+The published implementation at 8233cbb8 was blocked from pull-request CI by real ACTIVE and ledger conflicts with main. Copilot received the standing conflict-resolution request but did not respond during a wait exceeding 53 minutes. A browser connection stalled and was stopped before any workflow dispatch action. Used the documented coordinator fallback: merge main81f0308c, preserve all 1845 main ledger entries as exact bytes, archive the original branch envelope and re-envelope the unchanged claim at sequence1845. The metadata helper and full chain/prefix/claim/ACTIVE checks passed; mapping and exact old/new envelopes are retained in evidence/m31-main-sync-20261124. The crypto source, frozen input/protocol and native workflow are unchanged. Native M31 execution remains pending. No PR merge or paid compute.
