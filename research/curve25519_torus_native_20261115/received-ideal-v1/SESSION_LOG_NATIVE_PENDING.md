@@ -33,3 +33,71 @@ git show rather than infer absence. No raw, source pin, claim, verifier or
 published journal was changed. The earlier Mathlib cache incident and bare
 file-import failure remain frozen with their configured-environment recovery.
 [pcc:unverified]
+
+## 2026-11-24T00:30:07.284812+00:00 — Received-ideal report and identity format completed
+
+### What was done (commands, files, features)
+Nativefce173/source/summaries and separate issuer source0386e6b1dd published
+as a6eb209fcb342105955ffd85af572359acb2e1de before the fixed issuance.
+IDC1h5d7a5b64ec47d105 accepts32+32points over2^61-1 at degree20 and rejects
+plus-one checking/false issuance; collision exits1, positive exits0. Both
+pages of the final PDF were opened and inspected; final TeX has no overfull
+box. Diagram/rank CSV/plot source and scope table retained. [pcc:unverified]
+
+### Decisions made (and why)
+Keep the identity issuer separate from frozen102 native inputs. Its22
+maintained module tests/build/fmt pass; strict Clippy's five inherited SHA
+style findings stay an explicit failed log with no library edit/exemption.
+Treat automatic curve kernel as fully accounted for only in the declared
+box; return to target-dependent selection rather than count it as a solver.
+[pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Finish report attestation/metadata publication and fresh-head PR readback.
+Full selected raw publication, canonical journal histories and immutable8d
+remedy remain pending. Successor non-enumerating section discovery/q,K cold
+cost/useful-yield/rank/recovery remains open and unrun. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+Issuer first relative module path and missing hex dependency failed before
+issuance; exact failed source/logs retained. Unchanged canonical SHA emits
+five style findings under Rust1.100; recorded rather than waive. First TeX
+had one1.54pt overfull line; first source/log retained and final layout wraps.
+One report negative-scope sentence tripped standing lint; reworded before
+freezing. Original Lean/native subjects and all inspected raw bytes unchanged.
+[pcc:unverified]
+
+## 2026-11-24T00:32:52.673327+00:00 — Final metadata and scope checks
+
+### What was done (commands, files, features)
+All102 native inputs and6 separate issuer inputs match; formal09b has8,
+nativefce15 and report631ec8 has37 exact attestation subjects. Ledger1851
+retains the published1850 prefix and chain; lessons1017 verify0errors.
+All FOUR selected archives retain exact inspected sizes/hashes and remain
+untracked. Actual tracked artifact policy check selects no new staged data.
+Outcomes O-9a2b0393f6b8/O-56cf075b11e4/O-9b14f8cea199 and transport test
+T-02a38cf27f2d recorded; new candidate lessons L-57c1693c062f/L-f31a2ce706f6
+cover Lake search paths and cache capacity, not algorithmic results.
+[pcc:unverified]
+
+### Decisions made (and why)
+Use the Git index for pending journal inventory, including sparse paths;
+earlier bounded counts were incomplete materializations and must not be used
+to select/drop entries. Preserve every pending file, canonical block and
+published history. Keep ACTIVE_UPDATE_PENDING separately while integration
+remains pending. Never trim report/native raw or frozen SVG/CSV to turn the
+whole whitespace check green. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Publish the report/identity metadata, verify actual remote tree/PR and read
+fresh-head gates once. Resume the SAME CI-only checker after publication.
+No successor scientific run is scheduled by that checker. Selection/cost and
+store/canonical repair dependencies remain open. [pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+New/whole-diff whitespace checks include preserved TeX logs and native plot
+SVG/CSV advisories; they are NOT PASS. Lossless diagnostics/hashes retained.
+A private print attempted UTF8 decode of Git diagnostic bytes and failed only
+after the complete raw bytes had already been gzipped and metadata written;
+read effects first, corrected display handling without repeating mutations.
+No scientific result or frozen subject changed. [pcc:unverified]
