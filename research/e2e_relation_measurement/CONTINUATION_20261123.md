@@ -67,3 +67,11 @@ Focused protocol and checkpoint checks passed (2 tests, 6.952 seconds): the raw 
 The strengthened protocol and injected-exception checks passed (2 tests, 3.881 seconds); the end marker denotes that the call returned or raised, not that it succeeded. Begin the complete functional suite.
 
 The complete correctness suite passed (11 tests, 29.193 seconds). Documentation now identifies the `std` protocol symbols and ordering caveat using the Singular manual and Sage libSingular documentation. This work establishes trace attribution, not a solving-degree, regularity, or operation-count measurement; those and the matched cost comparison remain open.
+
+## 2026-11-23 — point-generation operation counts
+
+Add explicit counters around point-addition and scalar-multiplication API calls made in the generation phase, including repeated target draws, short-walk setup, and two-group precomputation. Counters describe high-level calls only; they cannot be interpreted as field operations, scalar-multiplication internals, or work outside generation. Test each strategy against independent count formulas and retain incomplete coverage in panel summaries.
+
+The three focused tests passed (20.405 seconds): all three generation strategies matched independently derived API-call count formulas, the paired panel retained the counters, and the one-candidate cap was charged. The counters include target draws and generation setup, and exclude subgroup validation, scalar-multiplication internals, polynomial solving and relation verification. Run the full suite next.
+
+The complete local correctness suite passed (11 tests, 32.786 seconds). The new counters provide exact instrumented API-call counts for the generation phase, not field-level operations or whole-solver work. Full solver telemetry and the matched complete-cost comparison are still outstanding.

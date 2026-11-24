@@ -10,6 +10,7 @@ def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 
 PHASES = ('generation', 'polynomial_construction', 'groebner_basis', 'root_extraction', 'relation_verification')
 CANDIDATE_COUNTS = ('candidates', 'identity', 'filtered', 'duplicate_x')
+GENERATION_OPERATIONS = ('target_draws', 'scalar_multiplication_calls', 'point_addition_calls')
 
 
 def coverage_sum(records, field, key):
@@ -38,6 +39,7 @@ def mode_summary(receipts, mode):
         'total_process_wall_ns': sum(r['whole_process_wall_ns'] for r in rows),
         'phase_wall_ns': {name: coverage_sum(rows, 'observed_timings', name) for name in PHASES},
         'candidate_counts': {name: coverage_sum(rows, 'candidate_counts', name) for name in CANDIDATE_COUNTS},
+        'generation_operations': {name: coverage_sum(rows, 'generation_operations', name) for name in GENERATION_OPERATIONS},
     }
 
 
@@ -87,7 +89,7 @@ def main():
                 except (OSError,ValueError):
                     pass
             observed=data if outcome is not None else snapshot
-            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':hashlib.sha256(stdout).hexdigest(),'stderr_sha256':hashlib.sha256(stderr).hexdigest(),'whole_process_wall_ns':elapsed,'result_status':outcome,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'target':data.get('target') if outcome is not None else None}
+            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':hashlib.sha256(stdout).hexdigest(),'stderr_sha256':hashlib.sha256(stderr).hexdigest(),'whole_process_wall_ns':elapsed,'result_status':outcome,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'generation_operations':observed.get('generation_operations') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'target':data.get('target') if outcome is not None else None}
             (out/(name+'.receipt.json')).write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
             receipts.append(receipt)
     pairing={}

@@ -90,7 +90,18 @@ class MeasurementTest(unittest.TestCase):
                     self.assertEqual(add(mul(c['a'],P),mul(c['b'],Q)),point(c['point']))
                     if c['status']=='accepted': accepted.append(c)
                 self.assertEqual(len({c['point'][0] for c in accepted}),8)
-                if mode == 'walk': self.assertGreaterEqual(len(r['generator']['walks']),1)
+                ops=r['generation_operations']; candidates=r['counts']['candidates']; draws=ops['target_draws']
+                self.assertGreaterEqual(draws,1)
+                if mode == 'independent':
+                    self.assertEqual(ops['scalar_multiplication_calls'],2*(draws+candidates))
+                    self.assertEqual(ops['point_addition_calls'],draws+candidates)
+                elif mode == 'walk':
+                    starts=len(r['generator']['walks']); self.assertGreaterEqual(starts,1)
+                    self.assertEqual(ops['scalar_multiplication_calls'],2*draws+4*starts)
+                    self.assertEqual(ops['point_addition_calls'],draws+2*starts+candidates)
+                else:
+                    self.assertEqual(ops['scalar_multiplication_calls'],2*draws+2*r['config']['group_size'])
+                    self.assertEqual(ops['point_addition_calls'],draws+candidates)
                 for w in r['witnesses']:
                     u,v=(accepted[i] for i in w['indices']); su,sv=w['signs']
                     self.assertEqual(add(mul(su%N,point(u['point'])),mul(sv%N,point(v['point']))),point(t['point']))
@@ -144,6 +155,7 @@ class MeasurementTest(unittest.TestCase):
                 self.assertEqual(summary['per_mode'][mode]['attempts'],1)
                 self.assertEqual(summary['per_mode'][mode]['phase_wall_ns']['generation']['observed_attempts'],1)
                 self.assertEqual(summary['per_mode'][mode]['candidate_counts']['candidates']['unknown_attempts'],0)
+                self.assertEqual(summary['per_mode'][mode]['generation_operations']['point_addition_calls']['unknown_attempts'],0)
                 r=next(r for r in summary['runs'] if r['mode']==mode)
                 checkpoint=out/('seed-42-'+mode+'.checkpoint.json')
                 self.assertEqual(r['checkpoint_sha256'],hashlib.sha256(checkpoint.read_bytes()).hexdigest())
@@ -208,6 +220,7 @@ else: raise AssertionError('failure was not injected')
     def test_exhaustion_is_recorded(self):
         r=self.run_case('independent',['--max-candidates','1'])
         self.assertEqual(r['status'],'candidate_budget_exhausted'); self.assertEqual(r['counts']['candidates'],1)
+        self.assertEqual(r['generation_operations']['point_addition_calls'],r['generation_operations']['target_draws']+1)
         self.assertNotIn('witnesses',r)
 
 if __name__=='__main__': unittest.main()

@@ -40,27 +40,36 @@ def run(args):
         t = time.perf_counter_ns(); c = time.process_time_ns()
         result = fn(); timings[name] = {'wall_ns': time.perf_counter_ns()-t, 'cpu_ns': time.process_time_ns()-c}; return result
     def acquire():
+        # These counters cover explicit calls in this phase, not the internals of scalar multiplication.
+        ops={'target_draws':0, 'scalar_multiplication_calls':0, 'point_addition_calls':0}
+        def gmul(k, point):
+            ops['scalar_multiplication_calls']+=1
+            return k*point
+        def gadd(left, right):
+            ops['point_addition_calls']+=1
+            return left+right
         # Target is a fresh known coefficient pair, not a planted decomposition.
         while True:
-            ar, br = rand(), rand(); R = ar*P + br*Q
+            ops['target_draws']+=1
+            ar, br = rand(), rand(); R = gadd(gmul(ar,P),gmul(br,Q))
             if R != O: break
         rows=[]; seen=set(); trace=[]
         walks=[]; aa=[]; bb=[]
         if args.mode == 'two-group':
             aa=[rand() for _ in range(args.group_size)]; bb=[rand() for _ in range(args.group_size)]
-            ap=[a*P for a in aa]; bq=[b*Q for b in bb]
+            ap=[gmul(a,P) for a in aa]; bq=[gmul(b,Q) for b in bb]
         for idx in range(args.max_candidates):
             if len(rows) == 2*args.block_size: break
-            if args.mode == 'independent': a,b=rand(),rand(); point=a*P+b*Q
+            if args.mode == 'independent': a,b=rand(),rand(); point=gadd(gmul(a,P),gmul(b,Q))
             elif args.mode == 'walk':
                 if idx % args.walk_length == 0:
                     walk_a,walk_b=rand(),rand(); da,db=rand(),rand()
                     walks.append({'start':[walk_a,walk_b], 'step':[da,db], 'first_candidate':idx})
-                    walk=walk_a*P+walk_b*Q; delta=da*P+db*Q
+                    walk=gadd(gmul(walk_a,P),gmul(walk_b,Q)); delta=gadd(gmul(da,P),gmul(db,Q))
                 a,b,point=walk_a,walk_b,walk
-                walk_a=(walk_a+da)%n; walk_b=(walk_b+db)%n; walk=walk+delta
+                walk_a=(walk_a+da)%n; walk_b=(walk_b+db)%n; walk=gadd(walk,delta)
             else:
-                i=rng.randrange(len(aa)); j=rng.randrange(len(bb)); a,b=aa[i],bb[j]; point=ap[i]+bq[j]
+                i=rng.randrange(len(aa)); j=rng.randrange(len(bb)); a,b=aa[i],bb[j]; point=gadd(ap[i],bq[j])
             counts['candidates']+=1
             record={'index':idx,'a':a,'b':b,'point':pt(point)}
             if point == O: reason='identity'
@@ -70,9 +79,9 @@ def run(args):
                 reason='accepted'; seen.add(int(point[0])); rows.append(record.copy())
             if reason != 'accepted': counts[reason]+=1
             record['status']=reason; trace.append(record)
-        return ar,br,R,rows,trace,{'walks':walks, 'group_a':aa,'group_b':bb}
-    ar,br,R,rows,trace,generator=phase('generation', acquire)
-    output.update({'curve':{'p':args.p,'a':args.curve_a,'b':args.curve_b,'P':pt(P),'Q':pt(Q),'n':n},'target':{'a':ar,'b':br,'point':pt(R)},'generator':generator,'candidates':trace,'counts':counts,'timings':timings,'status':'running', 'metrics':{'degree_of_regularity':None,'solving_degree':None,'solver_operations':None},'metric_notes':{'degree_of_regularity':'not exported by backend','solving_degree':'not exported by backend','solver_operations':'not exported by backend'}})
+        return ar,br,R,rows,trace,{'walks':walks, 'group_a':aa,'group_b':bb},ops
+    ar,br,R,rows,trace,generator,generation_operations=phase('generation', acquire)
+    output.update({'curve':{'p':args.p,'a':args.curve_a,'b':args.curve_b,'P':pt(P),'Q':pt(Q),'n':n},'target':{'a':ar,'b':br,'point':pt(R)},'generator':generator,'generation_operations':generation_operations,'candidates':trace,'counts':counts,'timings':timings,'status':'running', 'metrics':{'degree_of_regularity':None,'solving_degree':None,'solver_operations':None},'metric_notes':{'degree_of_regularity':'not exported by backend','solving_degree':'not exported by backend','solver_operations':'not exported by backend'}})
     checkpoint()
     if len(rows) < 2*args.block_size:
         output['status']='candidate_budget_exhausted'
