@@ -39,10 +39,15 @@ the requested end-to-end cost conclusion.
   extraction. All 26 full-base calls reach the fixed matrix limit; a separate
   fixed-slot native control and ordered semantic checks pass. It supplies no
   successful full-base comparison. [pcc:unverified]
+- **Cold accounting component:** the [local control](../research/smooth_p_plus_one_20261123/COLD_ACCOUNTING_RESULT.md)
+  uses the production consumer and fresh child processes. All three F127 arms
+  recover and reconcile their intervals; five cofactor target-in-base refusals
+  remain included. No admitted timing ratio. [pcc:unverified]
 - **Missing capability:** a complete degree-32 full-base comparison,
   successful full-base oriented-S3 output, qualified counters or timing for
   every phase, an exact-source registered EKS image, and independent replay.
-  Current local records price neither cold setup nor linear algebra.
+  Local diagnostic intervals now include cold setup and linear algebra, but
+  admitted comparable prices and measured peak memory remain absent.
 - **Limits:** deadline completion and smaller individual systems are not a
   measured total-cost advantage. The Direct control uses generic decomposition
   and additional relation charts. The absence of an admitted comparison gives
@@ -58,9 +63,10 @@ the requested end-to-end cost conclusion.
   with explicit signed extraction, chart scope and incomplete status. [pcc:unverified]
 - [ ] Complete the degree-32 cofactor and full-base oriented signed-output
   gates, retaining the fixed-limit failures and explicit source/target schedule.
-- [ ] Freeze the cold setup, all queries including failures, extraction,
-  incremental rank, linear algebra and final verification intervals, with
-  equal-output component controls and a complete recovery comparison.
+- [x] Freeze and locally qualify common cold intervals, every draw/failure,
+  production rank/linear algebra and final replay on the F127 control. [pcc:unverified]
+- [ ] Close cofactor target-in-base coverage and complete a matched, equal-scope
+  full recovery comparison with admitted costs.
 - [ ] Publish and build the exact workload revision through the supported
   EKS route, obtain budget/isolation admission, and retain raw evidence and
   independent replay. An available generic ecbench image alone is insufficient.
@@ -71,14 +77,14 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Instrument the common recovery schedule (published seed 781815) and every
-cold phase on the already qualified degree-16 cofactor/Refined fixtures,
-preserving their differing relation scopes and direct-reference behavior.
-Degree-32 cofactor and full-base oriented completeness remain open under their
-fixed budgets. A new presentation or cap study needs a discriminating
-hypothesis; lower input degree alone did not produce complete oriented output.
-Do not infer that the 30-draw Refined trial succeeded from the later extension,
-or increase frozen limits retrospectively.
+Handle the exposed target-in-base residuals in a separately frozen comparison
+applied equally to every arm: either preserve four-leaf target-disjoint semantics
+in the cofactor builder or explicitly add a common easy-relation prepass. Retain
+all five original refusals and price the added setup/query work. Then extend
+qualified accounting to the supported registered workload. Degree-32 cofactor
+and full-base oriented completeness remain open under their fixed budgets.
+Do not infer that the original 30-draw Refined trial succeeded from the later
+extension, or increase frozen limits retrospectively.
 
 No paid run is scheduled by this record. Freeze the full resource, retry and
 cost limits and verify the supported image/build route before submission.
@@ -101,3 +107,10 @@ controls still time out. The full objective remains unresolved. [pcc:unverified]
 all 26 dense/tower full-base calls reach matrix admission limits. Retained a
 separate planted native control and 312 ordered semantic witnesses per model.
 No full-base output or full-cost conclusion. [pcc:unverified]
+
+2026-11-24, cold-accounting continuation: actual production-consumer integration,
+fresh child processes and every-draw accounting qualify on the fixed F127
+control. All three arms recover; five cofactor target-in-base refusals remain.
+The new intervals are development diagnostics, not an admitted cost comparison.
+Canonical export schema access and registered payload integration remain open.
+[pcc:unverified]

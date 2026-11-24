@@ -15,10 +15,16 @@ a conservative acceptance guard plus fixed parameter forms. Eight degree-16
 full-set controls complete; five degree-32 controls time out. Nine Refined
 regressions pass on their narrower chart. [pcc:unverified]
 
-The latest [oriented-chain report](ORIENTED_RESULT.md) ([PDF](ORIENTED_RESULT.pdf))
+The [oriented-chain report](ORIENTED_RESULT.md) ([PDF](ORIENTED_RESULT.pdf))
 composes the existing oriented-pair S3 identity into a bounded four-leaf
 interface. All 26 full-base dense/tower calls reach the native matrix limit;
 separate semantic and planted controls pass locally. [pcc:unverified]
+
+The latest [cold-accounting report](COLD_ACCOUNTING_RESULT.md)
+([PDF](COLD_ACCOUNTING_RESULT.pdf)) binds the actual production relation
+consumer to fresh-process recovery. All three F127 arms recover with reconciled
+intervals; five cofactor target-in-base refusals remain retained. This is local
+software qualification, without a timing ratio. [pcc:unverified]
 
 - [Initial rank argument](REPORT.md) ([PDF](REPORT.pdf)): collapsed and distinct-image charts.
 - [Initial native controls](NATIVE.md) ([PDF](NATIVE.pdf)): original encodings and retained failures.
@@ -28,6 +34,7 @@ separate semantic and planted controls pass locally. [pcc:unverified]
 - [Production reproduction instructions](PRODUCTION_REPRODUCE.md).
 - [Fixed-form output protocol](SEPARATING_FORMS.md) and [reproduction](COFACTOR_OUTPUT_REPRODUCE.md).
 - [Oriented-chain protocol](ORIENTED_CHAIN.md) and [reproduction](ORIENTED_REPRODUCE.md).
+- [Cold-accounting protocol](COLD_ACCOUNTING.md) and [reproduction](COLD_ACCOUNTING_REPRODUCE.md).
 - [Native source](native/src/main.rs) and [evidence](evidence/).
 
 The original reports and manifests retain their historical revision scope.

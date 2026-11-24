@@ -87,3 +87,37 @@ test/build receipts and original production inventory. The separate manifest
 is `evidence/ORIENTED_SHA256SUMS`. The production engine, original comparator
 and root source have not changed in this continuation; previous full-library
 and historical benchmark-record limitations remain open.
+
+## Cold-accounting continuation
+
+The [new report](COLD_ACCOUNTING_RESULT.md) binds the actual production consumer
+to every-draw child records and a full process interval. Frozen source a4cd5ee0b3
+passes 23 feature tests and six default tests; its release build succeeds.
+Three F127 arms recover scalar 69 with reconciled process receipts: Direct
+9 queries, Refined 10, cofactor 12. Five cofactor queries are unsupported because
+the target is in the base. Nineteen Direct/Refined histories match the prior
+recorded control. Local and unsigned only. [pcc:unverified]
+
+The 22:54 CI inspection of 7d4ecdff41 found one real historical source-pin
+mismatch in PCC-20261124-f6947c. The [layout note](native/SOURCE_LAYOUT.md)
+describes the repair: restore exact historical bytes at the pinned path and
+compile the current byte-identical implementation from production_current.rs.
+Claims, ledger history and gate logic are unchanged. Post-repair test and PCC
+receipts are retained separately; no control was rerun.
+
+The canonical experiment-export schema/tooling is unreadable through the
+available GitHub retrieval paths; development_flow.json is explicitly a local
+receipt, not a schema-validated canonical export. Root-library compilation,
+historical benchmark-record gate and registered EKS workload dependencies remain
+as documented above. No admitted measurement or cloud submission occurred.
+
+After the source-layout repair, all 23 feature tests pass again and all 26
+branch-added claims return not_covered with no local verifier failures. These
+are not signed verification. Claim PCC-20261124-5d70b3 binds the byte-equality
+and test receipts. [pcc:unverified]
+
+The frozen COLD_ACCOUNTING.md protocol is unchanged from its pre-run hash.
+The prose linter flags its negated phrase "not a faster relation method" at
+line 20, which asserts no advantage. This historical annotation finding is
+retained rather than changing the frozen protocol after the run. The current
+result/reproduction reports and PR body are linted separately.

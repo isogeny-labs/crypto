@@ -5,6 +5,7 @@ mod accounting;
 mod oriented;
 mod polynomial;
 #[cfg(feature = "production-controls")]
+#[path = "production_current.rs"]
 mod production;
 mod system;
 
