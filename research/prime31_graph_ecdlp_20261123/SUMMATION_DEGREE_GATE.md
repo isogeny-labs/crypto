@@ -38,6 +38,36 @@ Kosters and Yeo's [Notes on summation polynomials](https://arxiv.org/abs/1503.08
 is a further caution against identifying first-fall degree with completed
 solving degree.
 
+## Exact equations on a finite selector
+
+Let `S` be a public set of `B` distinct **liftable** abscissae and let
+`H(X)=product_(s in S)(X-s)`. For a fixed public target `R`, write
+`F_R=S5(X1,X2,X3,X4,x(R))`. Because `H` is split and squarefree, the
+selector coordinate ring is
+
+`A = F_p[X1,X2,X3,X4]/(H(X1),H(X2),H(X3),H(X4))
+   ~= product_(s in S^4) F_p`.
+
+Suppose a proposed single equation `C_R` accepts **exactly** the same
+ordered tuples in `S^4` as `F_R`. In `A`, there is a unit `u` with
+`C_R=u*F_R`: at each tuple where `F_R` is nonzero take the ratio
+`C_R/F_R`, and at each common zero choose any nonzero unit value.
+Conversely, a unit multiple has the same zero set. Consequently
+`(C_R,H(X1),...,H(X4))` and `(F_R,H(X1),...,H(X4))` are the **same ideal**
+in the polynomial ring. They have the same quotient algebra and reduced
+Groebner basis for a fixed monomial order. This is a finite-product-ring
+deduction, not a new summation-polynomial construction.
+
+A lower-degree representative `C_R` could still change the work of a
+particular F4 presentation; equality of ideals does not make generator
+choice free. The candidate must be built from public selector and target
+data without first enumerating its accepted tuples, preserve the same
+distinct-index and rational-point semantics, and finish an equal-input
+cost comparison. The statement applies to the **actual** liftable base;
+the B677 algebraic selector's larger off-curve superset needs its own
+lifting and rejection account. Auxiliary-variable systems and
+non-squarefree selector schemes are outside this unit-equivalence claim.
+
 ## Curve-specific symmetry screen
 
 The direct factorization of `x^3 + ax + b` over `F_p` is irreducible on
