@@ -164,7 +164,7 @@ degree. This degree bound does not imply a running-time bound for a
 compact high-degree function and does not cover combinations of
 features or a biased rather than exact predictor. [pcc:unverified]
 
-## Forty-two-coordinate combination gate
+## Forty-two-coordinate pair-pattern gate
 
 Fix `k ≤ 42` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192
 isogenous endpoint, and let the feature vector consist of the field
@@ -223,9 +223,10 @@ Since the target sign is unchanged by `[7]`, an exact rule would have
 to give the same output on *every* pair of nonzero feature patterns,
 hence be constant away from the exceptions. Both target signs still
 occur there, a contradiction. This excludes exact classifiers with
-at most 42 distinct endpoint coordinate signs. It does not bound
-their possible bias, or combinations of 43 or more signs or other
-rational features. [pcc:unverified]
+at most 42 distinct endpoint coordinate signs by this pair-pattern
+argument. Its stronger invariant-rule sequel below reaches 82 signs;
+neither argument bounds bias or other rational features.
+[pcc:unverified]
 
 The three arithmetic checks above can be replayed in PARI/GP:
 
@@ -242,6 +243,76 @@ print(C^2 > A^2*p);
 Each output is `1`. This checks the numeric gate and quadratic-residue
 claim, not the divisor, genus, or character-sum derivation.
 [pcc:unverified]
+
+## Eighty-two-coordinate invariant-rule gate
+
+The preceding argument requires *every* pair of feature patterns to
+occur. Exact classification has a weaker necessary condition: if `7`
+is a square modulo `r`, any exact rule `F` must satisfy
+`F(z(R))=F(z([7]R))` wherever all features are nonzero, while its
+mean over all nonidentity points must be zero. Applying the same
+character-sum estimates directly to these two requirements excludes
+**up to 82 distinct coordinate signs** on one P-192 endpoint.
+[pcc:unverified]
+
+The geometric nonsquare check remains valid beyond 42 features.
+For `c∈F_p`, the two geometric points with x-coordinate `c` are
+not 2-torsion because `#E(F_p)=r` is odd. Each has 49 inverse images
+under `[7]`. If an inverse image `P` has `x(P)∈F_p`, then Frobenius
+sends `P` to `±P`, with the same sign as at `[7]P`. There is at most
+one such inverse image for each of the two points: `7∤r`, and `7`
+also does not divide the quadratic-twist order `2p+2-r` (its residue
+is `3 mod 7`). Thus at least 96 of the 98 zeros of
+`x([7]P)-c` have x-coordinate outside `F_p`. Zeros of any product
+of `x(P)-cᵢ` with rational offsets all have x-coordinate in `F_p`;
+the 98-zero supports for distinct `[7]` offsets are disjoint.
+Consequently a product using at least one `[7]` feature has an
+uncancelled odd valuation. A nonempty product using only first-point
+features is nonsquare by disjointness. [pcc:unverified]
+
+Let `U` remove the identity and at most `4k` zero-feature points,
+and write `N=|U|≥r-1-4k`. Expand any rule
+`F:{±1}^k→{±1}` in Walsh characters, with constant coefficient
+`μ` and coefficients `f_S`. Parseval gives `Σ_S f_S²=1` and
+`Σ_S|f_S|≤2^(k/2)`. The cover-genus character-sum bound above,
+with the removed-point correction, bounds every nonconstant
+one-point feature sum on `U` by
+
+`B₁=(2k+4)√p+1+4k`,
+
+and every nonconstant product of a feature at `R` and one at
+`[7]R` by
+
+`B₂=(100k+4)√p+1+4k`.
+
+If `F(z(R))` were the exact scalar sign, its sum on `U` would have
+absolute value at most `4k`, since the full scalar-sign sum is zero.
+Also `F(z(R))F(z([7]R))=1` at every point of `U`. The Fourier
+expansions and the two bounds therefore require simultaneously
+
+`|μ|N≤4k+B₁·2^(k/2)` and `N(1-μ²)≤B₂·2^k`.
+
+Both are necessary regardless of how `F` was chosen. For an exact
+integer check, set `L=r-1-4k`, `q=ceil(√p)`,
+`H=ceil(√(2^k))`, `b₁=(2k+4)q+1+4k`,
+`b₂=(100k+4)q+1+4k`, and `a=4k+b₁H`. The inequalities
+`a<L` and `L²-a²>L·b₂·2^k` contradict those two necessary
+conditions. This PARI/GP replay returns `1` for every `1≤k≤82`;
+the same sufficient inequality fails at `k=83`:
+
+```gp
+p = 6277101735386680763835789423207666416083908700390324961279;
+r = 6277101735386680763835789423176059013767194773182842284081;
+q = sqrtint(p)+1; ok = 1;
+print((2*p+2-r)%7 == 3);
+print(lift(Mod(7,r)^((r-1)/2)) == 1);
+for(k=1,82,L=r-1-4*k;H=sqrtint(2^k-1)+1;b1=(2*k+4)*q+1+4*k;b2=(100*k+4)*q+1+4*k;a=4*k+b1*H;if(!(a<L && L^2-a^2>L*b2*2^k),ok=0));
+print(ok);
+```
+
+This extends only the **exactness exclusion**. It does not bound
+the bias of an 82-feature rule, nor exclude other point functions or
+a compact high-degree evaluator. [pcc:unverified]
 
 ## Random-offset correlation gate
 
