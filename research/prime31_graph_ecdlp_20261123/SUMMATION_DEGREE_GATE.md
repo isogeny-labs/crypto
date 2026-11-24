@@ -350,6 +350,34 @@ collide. This bound applies to the specified random-coefficient draw.
 Adaptive selection, deterministic designs, construction work and
 completed relation-solving yield remain open.
 
+At **ten bits**, support capacity becomes a provable existence result
+when `t0,w_1,...,w_10` are independent uniform M31 elements. Let
+`m=1024`. Let `S` be the sum of the root counts over its labelled
+offsets, and `U` the number of distinct abscissae in their union. With
+`mu=(#E(F_p)-1)/p`, pairwise independence and `0<=N(t)<=4` give
+`E[S]=m*mu=1023.982444...` and
+`Var(S)<=m*(4*mu-mu^2)=3071.964889...`.
+Because the B677 group has odd order, each liftable abscissa has two
+different ordinate values and therefore two offsets for a fixed `h0`.
+For two independent uniform offset labels, the expected number of
+shared abscissae is `2*(#E(F_p)-1)/p^2`. Counting all label pairs
+bounds the expected duplicate loss by
+`E[S-U]<=C(m,2)*2*(#E(F_p)-1)/p^2<0.000488`.
+
+Cantelli's lower-tail bound and Markov's inequality now give
+
+`Pr[U<677] <= Var(S)/(Var(S)+(E[S]-676)^2)+E[S-U] < 0.0252291`.
+
+Thus a uniformly drawn ten-bit family has **more than 97.47%**
+probability of at least 677 distinct rational abscissae, and such
+families exist. The same two-slot top-degree formula gives degree 23
+with 23 variables before projection or 21 variables after projecting
+one bit per slot. Their top-quotient lengths are 6,291,456 and
+3,670,016, respectively. The resulting base generally has more than
+677 abscissae; selecting exactly B677 needs an additional exact
+restriction with a new degree and cost account. This support theorem
+does not supply four-summand extraction or a completed solver result.
+
 This is a two-summand secant theorem. A four-summand B677 relation
 would need a sound composition with target, sign, distinct-index and
 root-extraction semantics. Before a lower-total-work claim, a concrete
