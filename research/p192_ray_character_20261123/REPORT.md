@@ -141,7 +141,7 @@ therefore make the degree-two function `f′(R)=x(R)-c` an exact scalar
 quadratic character, up to a fixed sign, on every nonidentity point of
 `E′(F_p)`. Since `(2/r)=+1`, the field character of
 `h′=(f′∘[2])/f′` would be `+1` there. The
-[Perret bound](https://inspirehep.net/files/e5d2251413a4ea90899d95c2354cc66a)
+[Shparlinski–Stange, Lemma 4.1](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/6D1DC44634CB19BEF784CE153323C084/S0008439500021871a.pdf/character-sums-with-division-polynomials.pdf)
 gives `r-2 ≤ 2 deg(h′)√p ≤ 20√p`, impossible for P-192:
 `(r-2)^2 > 400p`. The bound applies because `h′` is not a geometric
 square: the odd-valuation support of `f′` is nonempty (there is no
@@ -188,7 +188,7 @@ is separable, giving the stated support sizes. [pcc:unverified]
 
 Remove the identity and at most `4k` rational points at which one of
 the `2k` features at `R` or `[7]R` is zero. On the remaining set `U`,
-[Perret's bound](https://inspirehep.net/files/e5d2251413a4ea90899d95c2354cc66a)
+[Shparlinski–Stange, Lemma 4.1](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/6D1DC44634CB19BEF784CE153323C084/S0008439500021871a.pdf/character-sums-with-division-polynomials.pdf)
 and the removed-point count bound every nontrivial product-character
 sum by `200k√p + 1 + 4k`. Expanding the sign-pattern indicator gives,
 for every pair of `k`-bit patterns, at least
@@ -324,6 +324,14 @@ establishes a method and finite controls, with no measured evaluator speedup.
   supplies the rotation gap theorem. The multiplicity formula and floor-sum
   implementation used here have direct finite controls; a machine-checked
   specialization remains an open proof obligation.
+- Shparlinski and Stange,
+  [*Character Sums with Division Polynomials*, Lemma 4.1](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/6D1DC44634CB19BEF784CE153323C084/S0008439500021871a.pdf/character-sums-with-division-polynomials.pdf),
+  explicitly states the `2D√p` estimate for a geometrically nonsquare
+  rational function on an elliptic curve. We use it only for *unweighted*
+  product-character sums. Its optional point-group character is additive
+  under the group law; the scalar Legendre sign `χ_r(d)` is not such a
+  character. The lemma therefore does not bound a fixed-offset scalar-sign
+  correlation directly. [pcc:unverified]
 
 This report makes no new polynomial identity claim for the repository's
 `identity.certificate/v1` format. The gap counting identity is combinatorial;
