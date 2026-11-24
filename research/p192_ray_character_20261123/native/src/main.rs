@@ -269,7 +269,11 @@ fn optimistic_point_cost(report: &GapReport, table_points: &BigUint) -> Result<(
         return Err("optimistic cost requires a full-cover grid".into());
     }
     let (full, remainder) = report.modulus.div_rem(table_points);
-    let first_hit_sum = table_points * &full * (&full - BigUint::one()) / bu(2) + remainder * &full;
+    let first_hit_sum = if full.is_zero() {
+        BigUint::zero()
+    } else {
+        table_points * &full * (&full - BigUint::one()) / bu(2) + remainder * &full
+    };
     let mean = to_f64(&first_hit_sum)? / to_f64(&report.modulus)?;
     let table_cost = 0.5 * to_f64(&(table_points - BigUint::one()))?;
     let query_cost = 0.75 * (to_f64(&(&report.query_points - BigUint::one()))? + mean);
@@ -647,5 +651,19 @@ mod tests {
         let too_short = &report.largest_gap - BigUint::one();
         assert!(covered_labels(&report, &too_short).unwrap() < bu(60));
         assert!(first_hit_bounds(&report, &too_short, 8).is_err());
+    }
+
+    #[test]
+    fn table_longer_than_label_circle_has_zero_first_hit_index() {
+        let report = gap_report(&bu(60), &bu(11), &bu(5)).unwrap();
+        let table = bu(61);
+        assert_eq!(covered_labels(&report, &table).unwrap(), bu(60));
+        assert!(optimistic_point_cost(&report, &table)
+            .unwrap()
+            .0
+            .is_finite());
+        let bounds = first_hit_bounds(&report, &table, 8).unwrap();
+        assert_eq!(bounds.sum_low, BigUint::zero());
+        assert_eq!(bounds.sum_high, BigUint::zero());
     }
 }

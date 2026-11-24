@@ -96,6 +96,21 @@ primitive `N`-th root of unity: the interval transform is nonzero for `M<N`,
 forcing the query transform to vanish. Hence `ord(5)` divides `L`, which is
 incompatible with balanced `L` and `ML=N`. [pcc:unverified]
 
+The 1-PiB gate extends beyond the specific 2/5 rotation to any *zero-error
+enumerative two-list test* that stores at most `M` labels and checks one
+target-dependent ratio against those labels per query. On a negative input,
+every query returns a miss; even adaptive query choices follow this all-miss
+path. Each query can exclude at most `M` square labels, so certifying the
+negative class requires `L ≥ ceil(N/M)`. At `M = 2^45`, the exact minimum is
+`44,601,490,397,061,246,283,071,436,545,072,138,910,705,880`
+(approximately `2^145`) queries. For uniformly random input scalars, the
+negative half alone contributes at least `(L-1)/2` queries in expectation.
+To fit that contribution under the rho point-work reference, each query
+would need to cost less than about `2^-48.174` group-addition equivalents,
+before table construction or lookup. This is a counting gate for this
+enumerative interface; it does not constrain algebraic aggregation of many
+labels into one point-dependent evaluation. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
@@ -113,6 +128,10 @@ completed on this branch: 13,928 direct finite-rotation/gap/coverage cases,
 check `c mod 47780 = 32974`. These are implementation controls, not independent
 verification of the large P-192 grid or of the three-gap derivation.
 [pcc:unverified]
+
+The `table_points > N` boundary is also checked: all labels have first-hit
+index zero, and the optimistic first-hit arithmetic returns zero without
+underflow. [pcc:unverified]
 
 The full public exponent was not available at the time of this report. A
 P-192 numerical grid row and a measured runtime comparison therefore remain
