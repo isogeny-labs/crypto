@@ -392,6 +392,17 @@ widths, completed affine solving degrees or runtime estimates. The
 ten-bit support result therefore leaves the principal solving-cost
 gate unresolved despite its ample rational support.
 
+Combining this support with the target-centered degree-four `S4`
+presentation has a separate rank gate. As proved in
+`research/prime31_target_centering_20261123/DEGREE_RANK_GATE.md`, four-sum
+rows on a fixed centered base have incidence matrix `M` with
+`M*1=4*1`; the augmented target-log system retains the kernel vector
+`(1,...,1,4)`. The 677-column support threshold, or a larger ten-bit
+graph support, does not remove that gauge. Recomputing the centering
+point from each public query changes the selector and requires an
+exact transfer and cost account. A useful degree-four route needs a
+charged rank breaker and completed same-target comparison.
+
 Replay both probability bounds with exact rational arithmetic using
 `python3 research/prime31_graph_ecdlp_20261123/verify_offset_support_bounds.py`.
 Its exhaustive F17 two-bit check independently verifies the mean,
