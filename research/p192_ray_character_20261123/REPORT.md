@@ -1,6 +1,6 @@
 # P-192 ray-character square grid: exact coverage and point-work gate
 
-2026-11-23 (America/Los_Angeles) · status: research certificate, [pcc:unverified]
+2026-11-23, updated 2026-11-24 (America/Los_Angeles) · status: research certificate, [pcc:unverified]
 
 ## Question and scope
 
@@ -95,6 +95,20 @@ obstruction follows by evaluating the interval/query convolution at a
 primitive `N`-th root of unity: the interval transform is nonzero for `M<N`,
 forcing the query transform to vanish. Hence `ord(5)` divides `L`, which is
 incompatible with balanced `L` and `ML=N`. [pcc:unverified]
+
+This also classifies the *perfect* 2/5 rectangles. The query step 5 has
+period `N/2`, so a nonrepeating query list has `L ≤ N/2`. In any perfect
+tiling with `ML=N` and `M<N`, the primitive-root argument above forces
+`N/2 | L`; hence `L=N/2` and `M=2`. This pair really is a tiling: the 5
+orbit is the even exponent classes and the two table entries are the even
+and odd cosets. The only other rectangle with `ML=N` is the degenerate full
+table `(M,L)=(N,1)`. In the stated point-work model, the nondegenerate
+tiling has `E[J]=(L-1)/2` and exact expected cost
+`C=(9N-10)/16 ≈ 2^189.170` addition equivalents. The full-table option
+costs `(N-1)/2 ≈ 2^189`. Both are over `2^93` times the rho reference,
+before memory or lookup. A near-balanced sub-reference grid therefore
+necessarily has `ML>N` and overlap; the perfect-packing arithmetic lower
+bound is unattainable there. [pcc:unverified]
 
 The 1-PiB gate extends beyond the specific 2/5 rotation to any *zero-error
 enumerative two-list test* that stores at most `M` labels and checks one
