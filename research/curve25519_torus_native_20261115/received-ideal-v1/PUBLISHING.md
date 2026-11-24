@@ -50,8 +50,16 @@ or policy was changed. All attestations remain unsigned/not_covered and
 independently signed standing is unverified.
 
 Current24November source checkpoint is in the new dated canonical journal;
-23November conflicted file was not edited. Preserve all SEVEN older complete
-pending files and all canonical block multiplicities/ledger/claim prefixes.
+23November conflicted file was not edited. Preserve every earlier complete
+pending file in the Git index, including sparse-missing paths and all canonical block multiplicities/ledger/claim prefixes.
 Single Copilot request and immutable8d8628 canonical remedy remain open.
 Never rewrite published records or register published suffixes as unpublished.
 [pcc:unverified]
+
+Nativefce173/source/summaries and separate identity issuer0386e6b1dd are now
+published as a6eb209fcb342105955ffd85af572359acb2e1de; trees match. The
+separate identity record is not part of frozen102 inputs. No existing
+source/claim/archive changed. See identity-v1 PRECALL/POSTCALL for its six
+inputs and exact retained binary. Issuer strict Clippy retains five existing
+canonical SHA style findings;22 maintained tests/build/fmt pass. No library
+edit, warning exemption or failed-check promotion. [pcc:unverified]

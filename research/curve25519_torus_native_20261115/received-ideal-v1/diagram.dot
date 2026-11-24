@@ -1,0 +1,13 @@
+digraph received {
+  rankdir=LR;
+  graph [bgcolor="transparent", pad="0.1", nodesep="0.15", ranksep="0.3"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3f9", color="#58718e", fontname="DejaVu Sans", fontsize=12, margin="0.12,0.1"];
+  edge [color="#58718e", arrowsize=0.6];
+  raw [label="Original raw rows\n108 parameters / two signs"];
+  ideal [label="Universal G = H+ H-\nconditional algebra"];
+  box [label="55 columns, rank 54\nkernel = span(G)"];
+  quotient [label="Remove G direction\n54 columns, rank 54", fillcolor="#dcebdd"];
+  next [label="Target-dependent section\nselection remains open", style="rounded,dashed", fillcolor="white"];
+  raw -> ideal -> box -> quotient;
+  quotient -> next [style=dashed];
+}
