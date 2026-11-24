@@ -342,6 +342,27 @@ checks. This screens uniform random search in the specified feature
 and cost model;
 structured selection of `a` remains open. [pcc:unverified]
 
+The single-offset random-search gate must **not** be applied to a
+bundle of known-point offsets. If `k` public scalars `aᵢ` are sampled
+independently and uniformly, their offsets are independent and
+uniform on `S`, not on all of `F_p`. Write `m=|S|=n/2` and let `Z`
+be the sum of squared Fourier correlations in the random-offset
+section. For a subset of `s` features, conditioning its nonnegative
+square on `S^s` raises the full-field moment by at most `(p/m)^s`.
+Summing over feature subsets gives the valid, but weaker, bound
+
+`E_{a₁,…,aₖ}[Z] ≤ (2/n)[(1+(p-1)/m)^k-(1-1/m)^k]`.
+
+The same zero correction and Markov step show that, at `k=41` and
+the illustrative cold threshold `g`, the fraction of uniform
+known-point *bundles* admitting any classifier with `|ρ_F|≥g` is
+less than `2^-43` (80-digit PARI/GP base-two log about `-43.181`).
+This does **not** rule out a search of multiple known-point offsets
+within a rho-sized candidate count: the bound allows far more such
+tuples than the one-offset calculation. It is an upper bound, not
+evidence that qualifying tuples exist or can be recognized cheaply.
+[pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
