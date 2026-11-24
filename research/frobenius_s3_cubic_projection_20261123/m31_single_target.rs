@@ -8,7 +8,7 @@ fn random(state: &mut u64) -> u64 {
     *state
 }
 
-fn target(c: Curve, base: &[Point], seed: u64, kind: &str) -> Point {
+pub(super) fn target(c: Curve, base: &[Point], seed: u64, kind: &str, summands: usize) -> Point {
     let mut rng = seed;
     if kind == "unplanted" {
         loop {
@@ -24,7 +24,7 @@ fn target(c: Curve, base: &[Point], seed: u64, kind: &str) -> Point {
     }
     let mut indices: Vec<_> = (0..SIZE).collect();
     let mut sum = None;
-    for i in 0..5 {
+    for i in 0..summands {
         let draw = random(&mut rng);
         indices.swap(i, i + (draw % (SIZE - i) as u64) as usize);
         let point = base[indices[i]];
@@ -58,9 +58,9 @@ fn multisets<const N: usize>(mut visit: impl FnMut(&[u8; N])) {
     visit_tail(&mut [0; N], 0, 0, &mut visit);
 }
 
-fn ordered_labels(sorted: &[u8; 5], output: &mut BTreeSet<usize>) {
+fn ordered_labels(sorted: &[u8], output: &mut BTreeSet<usize>) {
     fn permutations(
-        values: &[u8; 5],
+        values: &[u8],
         used: u32,
         position: usize,
         label: usize,
@@ -99,7 +99,11 @@ fn direct_solve(c: Curve, base: &[Point], target: Point) -> BTreeSet<usize> {
     solutions
 }
 
-fn signed_group_solve(c: Curve, base: &[Point], target: Point) -> BTreeSet<usize> {
+pub(super) fn signed_group_solve<const PREFIX: usize>(
+    c: Curve,
+    base: &[Point],
+    target: Point,
+) -> BTreeSet<usize> {
     let mut pairs = HashMap::<Option<Point>, Vec<[u8; 2]>>::new();
     multisets::<2>(|indices| {
         for sum in signed_sum(c, indices.iter().map(|&i| base[i as usize])) {
@@ -107,12 +111,13 @@ fn signed_group_solve(c: Curve, base: &[Point], target: Point) -> BTreeSet<usize
         }
     });
     let mut multisets_found = BTreeSet::new();
-    multisets::<3>(|[i, j, k]| {
-        for sum in signed_sum(c, [base[*i as usize], base[*j as usize], base[*k as usize]]) {
+    multisets::<PREFIX>(|prefix| {
+        for sum in signed_sum(c, prefix.iter().map(|&i| base[i as usize])) {
             let complement = group_add(c, Some(target), sum.map(|point| neg(c.f, point)));
             if let Some(matches) = pairs.get(&complement) {
                 for &[a, b] in matches {
-                    let mut candidate = [*i, *j, *k, a, b];
+                    let mut candidate = prefix.to_vec();
+                    candidate.extend([a, b]);
                     candidate.sort_unstable();
                     multisets_found.insert(candidate);
                 }
@@ -144,7 +149,7 @@ pub(super) fn run() {
             let started = Instant::now();
             let c = Curve::new(P, A, B);
             let base = factor_base(c);
-            let input = target(c, &base, seed, &kind);
+            let input = target(c, &base, seed, &kind, 5);
             let setup = started.elapsed().as_secs_f64();
             let entered = Instant::now();
             let roots = match arm {
@@ -153,7 +158,7 @@ pub(super) fn run() {
                     let (charts, _) = charted(c, &base, input);
                     assemble(c, &charts, None).0
                 }
-                "signed_group" => signed_group_solve(c, &base, input),
+                "signed_group" => signed_group_solve::<3>(c, &base, input),
                 _ => unreachable!(),
             };
             let solve = entered.elapsed().as_secs_f64();

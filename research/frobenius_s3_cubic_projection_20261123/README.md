@@ -332,6 +332,19 @@ The direct-resultant solver computes a homogeneous resultant per multiset of fiv
 
 Entries are the medians of the nine setup-inclusive single-target times per arm. The charted solver is 2.05 times as fast as direct resultant on the planted instance. The signed-group lookup is fastest on both. These timings are separate from the Boolean solving-degree certificates. [pcc:unverified]
 
+#### Native F4 comparison on the same targets
+
+The indexed charted solver builds a map from finite pair-sum abscissae to unordered factor-base pairs. For each of the 136 pairs with repetition it computes the roots of the quadratic S3 in the intermediate abscissa. The inputs are rational, so each finite root represents a signed sum of the pair. Both residual signs give the same set of abscissa pairs by negating both points. An identity residual takes the existing diagonal chart. The index replaces approximately 88,000 suffix quadratic queries with 136 cold pair-resultant queries and one lookup at each distinct residual. The chart graph restores all ordered labels. [pcc:unverified]
+
+The F4 arm uses the same prefix slicing, with two membership polynomials for the same 16-abscissa base and a bivariate S3 for each distinct residual. It shares the membership rows and runs the repository's original prime-field F4 implementation through its finite-domain visitor. The comparison uses four Rayon workers, a degree cap of 34, a staircase stop at 16, and native sibling batching for root recovery. The ordinary finite-domain visitor also completes on both targets. F4 completes all 5,504 residual systems in each repetition with batching, including those with no pair solutions. The runner verifies exact equality of the final ordered solution sets and independently checks the indexed result with signed group arithmetic. [pcc:unverified]
+
+| Fixed target, seed 11781661 | Ordered solutions | Indexed charted, median | Batched F4, median | Median paired speedup |
+| --- | ---: | ---: | ---: | ---: |
+| Planted | 120 | 30.24 ms | 923.39 ms | 30.54× |
+| Unplanted | 0 | 29.90 ms | 878.74 ms | 28.88× |
+
+The nine repetitions per target each run in a fresh process, and each arm rebuilds the base and its own solver data for a single target. The times include setup and complete recovery. The minimum paired speedup among all 18 repetitions is 11.88×. These results compare complete prefix-sliced solvers on this 16-abscissa M31 workload. A separate attempt to solve the direct 20-variable degree-20 S6 system with native F4 returned undetermined under its allocation limits, so it is recorded separately from the completed comparisons. [pcc:unverified]
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
@@ -486,5 +499,15 @@ bash research/frobenius_s3_cubic_projection_20261123/run_m31_charted.sh single-t
 ~~~
 
 The per-trial times are in [m31-single-target.jsonl](m31-single-target.jsonl).
+
+Build the native F4 comparison from a full repository checkout. The benchmark crate uses the repository's existing source-bound F4 build. Its lock file fixes the dependency versions.
+
+~~~sh
+manifest=research/frobenius_s3_cubic_projection_20261123/native-f4-bench/Cargo.toml
+RAYON_NUM_THREADS=4 cargo run --release --locked --manifest-path "$manifest" -- f4-single 11781661 5 90 planted sliced-batched
+RAYON_NUM_THREADS=4 cargo run --release --locked --manifest-path "$manifest" -- f4-single 11781661 5 90 unplanted sliced-batched
+~~~
+
+The matched measurements are in [m31-f4-matched.jsonl](m31-f4-matched.jsonl). The separate direct-input probe is in [m31-f4-direct-probe.jsonl](m31-f4-direct-probe.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)

@@ -10,6 +10,8 @@ mod upstream {
     include!(env!("S3_PRIME_FIELD"));
 }
 use upstream::{resultant_formal, Curve, Fp};
+#[cfg(feature = "native-f4")]
+mod m31_f4_bench;
 mod m31_single_target;
 
 const P: u64 = 2_147_483_647;
@@ -171,25 +173,29 @@ fn polynomial<'a>(
     &cache[key]
 }
 
+fn quadratic_roots(f: Fp, row: [u64; 3]) -> Option<[u64; 2]> {
+    let [a, b, d] = row;
+    if a != 0 {
+        sqrt(f, f.sub(f.mul(b, b), f.mul(f.mul(4, a), d))).map(|r| {
+            let inv = f.inv(f.mul(2, a));
+            [f.mul(f.sub(r, b), inv), f.mul(f.neg(f.add(r, b)), inv)]
+        })
+    } else if b != 0 {
+        let r = f.mul(f.neg(d), f.inv(b));
+        Some([r, r])
+    } else {
+        assert_ne!(d, 0, "singular quadratic on a nonsingular curve");
+        None
+    }
+}
+
 fn pair_roots(c: Curve, base: &[Point], target: Point) -> BTreeSet<(usize, usize)> {
     let f = c.f;
     let mut out = BTreeSet::new();
     let start = base[0].0;
     for (i, &point) in base.iter().enumerate() {
         let row = coefficients(c, point.0).map(|coeff| evaluate(f, &coeff, target.0));
-        let [a, b, d] = row;
-        let roots = if a != 0 {
-            sqrt(f, f.sub(f.mul(b, b), f.mul(f.mul(4, a), d))).map(|r| {
-                let inv = f.inv(f.mul(2, a));
-                [f.mul(f.sub(r, b), inv), f.mul(f.neg(f.add(r, b)), inv)]
-            })
-        } else if b != 0 {
-            let r = f.mul(f.neg(d), f.inv(b));
-            Some([r, r])
-        } else {
-            assert_ne!(d, 0, "singular quadratic on a nonsingular curve");
-            None
-        };
+        let roots = quadratic_roots(f, row);
         for root in roots.into_iter().flatten() {
             if !(start..start + SIZE as u64).contains(&root) {
                 continue;
@@ -233,6 +239,15 @@ struct Work {
 }
 
 fn charted(c: Curve, base: &[Point], target: Point) -> (Vec<Chart>, Work) {
+    charted_with(c, base, target, |w| Some(pair_roots(c, base, w))).unwrap()
+}
+
+fn charted_with(
+    c: Curve,
+    base: &[Point],
+    target: Point,
+    mut query: impl FnMut(Point) -> Option<BTreeSet<(usize, usize)>>,
+) -> Option<(Vec<Chart>, Work)> {
     let mut cache = HashMap::new();
     let mut charts = BTreeSet::new();
     let mut work = Work::default();
@@ -248,13 +263,10 @@ fn charted(c: Curve, base: &[Point], target: Point) -> (Vec<Chart>, Work) {
                     if let Some(w) = residual {
                         // The abscissa polynomial is independent of the residual sign.
                         // Negating both summands transports a verified pair between signs.
-                        pairs.extend(
-                            cache
-                                .entry(w.0)
-                                .or_insert_with(|| pair_roots(c, base, w))
-                                .iter()
-                                .copied(),
-                        );
+                        if let std::collections::hash_map::Entry::Vacant(entry) = cache.entry(w.0) {
+                            entry.insert(query(w)?);
+                        }
+                        pairs.extend(cache[&w.0].iter().copied());
                     } else {
                         diagonals = true;
                     }
@@ -299,7 +311,7 @@ fn charted(c: Curve, base: &[Point], target: Point) -> (Vec<Chart>, Work) {
         }
     }
     work.residuals = cache.len();
-    (charts.into_iter().collect(), work)
+    Some((charts.into_iter().collect(), work))
 }
 
 fn bits(word: usize, coordinate: usize) -> u64 {
@@ -470,6 +482,14 @@ fn point_sum(c: Curve, base: &[Point], indices: &[usize]) -> Point {
 }
 
 fn main() {
+    #[cfg(feature = "native-f4")]
+    if std::env::args_os()
+        .nth(1)
+        .is_some_and(|arg| arg == "f4-single")
+    {
+        m31_f4_bench::run();
+        return;
+    }
     if std::env::args_os()
         .nth(1)
         .is_some_and(|arg| arg == "single-target")

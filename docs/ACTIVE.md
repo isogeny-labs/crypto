@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Test the scaling of cubic trace multipliers for binary S3 selector projection and native coset decomposition (Codex, started 2026-11-23, branch codex/frobenius-s3-cubic-projection-20261123, PR #5116)
+- [ ] Test the scaling of cubic trace multipliers for binary S3 selector projection and native coset and matched F4 decomposition (Codex, started 2026-11-23, branch codex/frobenius-s3-cubic-projection-20261123, PR #5116)
 - [x] Classify minimal three-row split-tangent supports and test their necessary identities on frozen P-192 traces: complete U/V/W coverage and zero witnesses; conditional minimum of four added rows, native controls/report/PDF retained (Codex, completed frozen-data component 2026-11-24, branch lane/p192-three-row-circuits-20261124, PR #5112; actual individual-image collection remains unexecuted). [pcc:unverified]
 - [x] Test necessary norm identities for two-row closure of the frozen P-192 split-tangent family: no AA/AB witness in the fixed domain; derived minimum of three added rows under recorded support premises; GMP/OpenSSL and controls pass, report/PDF retained (Codex, completed frozen-data component 2026-11-24, branch lane/p192-two-row-closure-20261124, PR #5108; actual individual-image collection remains unexecuted). [pcc:unverified]
 - [x] Add frozen-input preflight before split-tangent collection:exact reference/construction pins,17 deterministic baseline fields,recorded-data drift controls and portable stub driver transport pass (Codex, completed source component 2026-11-24, branch lane/p192-frozen-input-preflight-20261124, PR #5107; follows merged #5104; live collection remains unexecuted). [pcc:unverified]
