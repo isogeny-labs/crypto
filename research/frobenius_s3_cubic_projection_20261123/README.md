@@ -1,6 +1,6 @@
 # Cubic trace multipliers for the binary S3 selector
 
-At field degree 23, cubic Frobenius-equivariant trace multipliers span the 13-dimensional left kernel of the normalized two-coordinate equation at every nonzero sum, for both tested Frobenius subspaces. At field degree 47 the same family has pointwise rank 4, while the left kernel has dimension 25. The 47-bit result follows from a symbolic span certificate for both subspaces. [pcc:unverified]
+At field degree 23, cubic Frobenius-equivariant trace multipliers span the 13-dimensional left kernel of the normalized two-coordinate equation at every nonzero sum, for both tested Frobenius subspaces. At field degrees 47, 71, and 79 the entire cubic multiplier space has pointwise rank 4, while the left kernels have dimensions 25, 37, and 41. The unrestricted result follows from spectral block ranks and a span certificate in both subspaces at each size. [pcc:unverified]
 
 | Field degree | Selector dimension | Cubic equivariant space | Pointwise rank | Full left-kernel dimension |
 | ---: | ---: | ---: | ---: | ---: |
@@ -29,7 +29,29 @@ The script forms the span of each \(\alpha_r\) multiplied by the Frobenius-invar
 
 For the lower bound on rank, \(T_s(a)=\sqrt a+sa\) sends \(\alpha_r(s)\) to \((\tau^r+\tau^{-r})s\) for \(r>0\) by cancellation, and sends 1 to \(1+s\). On \(U\), \(u=\tau+\tau^{-1}\) has minimal polynomial of degree 23. If a Frobenius conjugate of an eigenvalue \(\zeta\) fixes \(\zeta+\zeta^{-1}\), it sends \(\zeta\) to itself or its inverse. The powers of 2 modulo 47 have odd order 23, so inversion is excluded. The three operators are \(u,u^2,u^3+u\), which are independent on every nonzero \(s\in U\). The value \(1+s\) has trace one. This gives rank four at every nonzero sum. [pcc:unverified]
 
-The certificate concerns Frobenius-equivariant multipliers. The unrestricted cubic space at 47 bits remains open. Rank coverage provides a criterion for the projected equations to test consistency for arbitrary right-hand sides. It leaves the solving degree of the projected equations, the cost of solving them, and the index-calculus exponent as separate questions.
+## Unrestricted cubic multipliers
+
+The coefficient Frobenius \(\sigma\) on \(K\) has a normal basis and therefore has each \(n\)-th root of unity as an eigenvalue once after extending scalars to \(E=\mathbb F_{2^k}\). Let \(\zeta\in E\) be a root of \(g\). Write \(Q=\{2^i\bmod n:0\le i<k\}\), let \(\phi\) act on the coordinate functions, and set
+
+\[
+Y_j=\sum_{r=0}^{n-1}\zeta^{-jr}\phi^r(Z_0),\qquad j\in Q.
+\]
+
+These satisfy \(\phi(Y_j)=\zeta^jY_j\), \(Z_1=\sum_{j\in Q}\zeta^jY_j\), and \(Y_j^2=\zeta^{2j}Y_{2j}\). In the coefficient block \(\sigma=\zeta^\ell\), the squared multiplier test applies \(g(\zeta^\ell\phi)(1+\zeta^\ell\phi)\) to \(\alpha+\zeta^\ell Z_1\phi(\alpha)\). The first operator is diagonal on products of distinct \(Y_j\). A monomial's coefficient must vanish when its weight plus \(\ell\) lies outside \(Q\cup\{0\}\), where the weight is the sum of its indices modulo \(n\). For each degree-four monomial, all contributing terms add one previously absent index, and hence have the same nonzero coefficient. The verifier first solves those rows over \(\mathbb F_2\), then handles the lower-degree rows over \(E\), including repeated-index reductions. [pcc:unverified]
+
+The blocks for \(\ell=0,1,-1\) give the three Frobenius orbit representatives. If their kernel dimensions are \(d_0,d_+,d_-\), the unrestricted binary dimension is \(d_0+k(d_++d_-)\). The two choices of \(g\) gave the same dimensions at each field degree. [pcc:unverified]
+
+| Field degree | Block dimensions | Unrestricted dimension | Scalar-multiple dimension |
+| ---: | ---: | ---: | ---: |
+| 7 | 6, 6, 5 | 39 | — |
+| 23 | 35, 33, 33 | 761 | 312 |
+| 47 | 50, 50, 50 | 2,350 | 2,350 |
+| 71 | 109, 111, 110 | 7,844 | 7,844 |
+| 79 | 134, 137, 135 | 10,742 | 10,742 |
+
+For \(k>3\), multiplying the four displayed \(\alpha_r\) by arbitrary Boolean scalars of degree at most \(3-r\) gives an admissible subspace of dimension \(\sum_{j=0}^3(4-j)\binom{k}{j}\). Indeed, the four \(\alpha_r(s)\) are independent at every nonzero sum by the argument above, which also holds at 71 and 79 bits, where the orders of 2 are 35 and 39. Any polynomial dependency would force each scalar to vanish off zero. The indicator of zero has degree \(k\), so the allowed scalar degrees exclude such a dependency. Equality of dimensions at 47, 71, and 79 bits proves this subspace is the entire cubic family. In particular, unrestricted coefficients still give only four pointwise directions. [pcc:unverified]
+
+For each of the six subspaces at these sizes, the verifier also finds a rational target on \(y^2+xy=x^3+x^2+1\) and a nonzero sum that passes all four checks. Adding the actual normalized S3 right-hand side raises the image rank from \(k-1\) to \(k\). These false positives rule out sufficiency of the cubic projection even on the S3 target family, in the tested geometries. Higher-degree multipliers, additional target-dependent equations, and other formulations remain open. Rank coverage, the solving degree of a projected presentation, and the index-calculus exponent are separate quantities. [pcc:unverified]
 
 ## Reproduction
 
@@ -38,6 +60,8 @@ Run from the repository root with Python and SymPy installed.
 ```sh
 SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/profile.py 7 23 47
 SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/profile.py 23 --degree 2
+c++ -std=c++20 -O3 research/frobenius_s3_cubic_projection_20261123/extension_rank.cpp -o /tmp/s3-extension-rank
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/unrestricted.py 7 23 47 71 79 --ranker /tmp/s3-extension-rank --verify
 ```
 
-The records are in [cubic-ranks.jsonl](cubic-ranks.jsonl) and [quadratic-ranks.jsonl](quadratic-ranks.jsonl). The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
+The records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), and [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
