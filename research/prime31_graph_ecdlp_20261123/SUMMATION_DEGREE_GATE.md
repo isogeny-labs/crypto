@@ -88,6 +88,30 @@ resource-limited before root extraction. The count identifies algebraic
 work that the compact selector may have to eliminate, without asserting
 that any off-curve choice survives the target equations.
 
+### Meaning of the local split-circuit resource limits
+
+As of 2026-11-24, seven local 2+2 development receipts (positive and
+public-query cases) all report `ResourceLimit` before root extraction.
+They and the split-circuit source are **uncommitted worktree artifacts**,
+not reproducible PR-head evidence. The planted-assignment unit test
+passes one known positive gate assignment, which is a construction check
+rather than completed extraction.
+
+In `src/cryptanalysis/f4_fp.rs`, `symbolic_step` calls the resource guard
+*before* adding a prospective symbolic row or monomial. Its
+`matrix_entries` field is a weighted workspace estimate: it includes
+`8*rows*cols + 4*rows + 4*cols` and extra trace-storage terms when
+recording. It is not a count of allocated matrix entries. The reported
+`max_rows` and `max_cols` update after a matrix is built, so they can
+remain small when a later prospective workspace is refused. For example,
+the local positive cap-64-million receipt rejects a prospective estimate
+of 64,009,887 while reporting completed maxima of 228 rows and 451
+columns and partial solving degree three. It does **not** document a
+64-million-entry allocated matrix, peak RSS, completed Gröbner basis,
+or a root result. A separate batch-one arm reaches a symbolic-monomial
+admission of 8,202 against 8,192; changing the matrix budget alone does
+not explain that stop. All these observations remain censored stage data.
+
 ## Curve-specific symmetry screen
 
 The direct factorization of `x^3 + ax + b` over `F_p` is irreducible on
