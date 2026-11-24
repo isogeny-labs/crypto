@@ -25,3 +25,36 @@ No new failure. Known parent conflict/six-object403, immutable malformed claim
 and owner CI billing dependencies remain separate; no unchanged retry.
 No loaded KB/Conductor; no reservation or novelty clearance inferred.
 [pcc:unverified]
+
+## 2026-11-24T04:03:16.453046+00:00 — Public query source qualified before primary call
+
+### What was done (commands, files, features)
+Tracking5b394bcff3 publishedf6a92ad751 before source. Primary HAC3.56 and
+original index/map/circuit/large-prime law review retained. New Rust public
+query uses old-column signs, inverse fibres, small-coset j BSGS, implicit
+ratio powering and unchanged original target witness. Numeric t replay is
+separate. Three release tests/fmt/strictClippy/build pass. Source118=old111
+plus7new, sixarchives, fivecompiled inputs/retainedbinary match. No primary
+call yet. [pcc:unverified]
+
+### Decisions made (and why)
+Full old-list validation is counted separately from FIRST prefix visits.
+Counters remain partial, no free setup/index or speed inference. Publish
+exact source before immutable qualifier, transport ownership checks and one
+600second/2GiB fixed correctness call. No old source/criterion edited.
+[pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Publish source, qualify immutable binary, run transport positive/collisions
+then fixed four groups. Preserve all outcomes without tuning this version.
+Compare ALL/first/direct toy roots, actual selected roots, numeric indexing
+and synthetic tree/zero-tag/informative closure separately.
+
+### Errors (what went wrong, how it was handled)
+First positive unit used excluded identity-sum toy fixture; preserved source
+and failure. Corrected validator sign choice to nonzero before qualification.
+Clippy range-loop/slice clone corrected, retained source/logs. An atomic
+multi-file patch failed on a protocol context; unchanged tests/Clippy were
+inadvertently repeated once before confirming no partial patch took effect.
+Both repeat logs preserved, then actual source repair checked. No primary
+call/cap/fixture tuning occurred. [pcc:unverified]
