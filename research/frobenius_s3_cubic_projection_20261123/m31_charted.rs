@@ -10,6 +10,7 @@ mod upstream {
     include!(env!("S3_PRIME_FIELD"));
 }
 use upstream::{resultant_formal, Curve, Fp};
+mod m31_single_target;
 
 const P: u64 = 2_147_483_647;
 const A: u64 = 847_514_846;
@@ -469,6 +470,13 @@ fn point_sum(c: Curve, base: &[Point], indices: &[usize]) -> Point {
 }
 
 fn main() {
+    if std::env::args_os()
+        .nth(1)
+        .is_some_and(|arg| arg == "single-target")
+    {
+        m31_single_target::run();
+        return;
+    }
     let output_dir = std::env::args_os().nth(1).map(PathBuf::from);
     let c = Curve::new(P, A, B);
     let started = Instant::now();

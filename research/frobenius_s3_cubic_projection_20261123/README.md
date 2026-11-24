@@ -319,6 +319,19 @@ The charted arm uses an exact S3 quadratic in the second suffix abscissa for eac
 
 The constant at the end of a miss is obtained after the suffix queries. The table charges their degree-two cap to those runs. Building the shared base takes 23.3 ms. Chart extraction, writing the basis, and reconstructing the original solutions take 43–64 ms per target. Direct exact evaluation takes 40–41 ms per warm target and 152 ms for the first, which builds the polynomial cache. These direct timings measure exhaustive evaluation and checking, with the direct solving-degree bound certified separately. The M31 result covers this 16-abscissa base. Larger pair-spectrum workloads and prime-degree binary n83 remain separate measurements. [pcc:unverified]
 
+#### Cold, same-seed single-target timings
+
+Seed 11781661 supplies a fixed planted point at abscissa 16739214. The unplanted control uses the same seed with the unplanted generator and yields a fixed point at abscissa 1501288703. Each arm rebuilds the identical factor base and its own target-dependent data for each repetition. The runner checks both target coordinates, all factor-base points, and equality of the complete ordered solution sets. There are nine repetitions per target and arm, with rotating arm order. Every repetition solves one target with fresh algorithm data. [pcc:unverified]
+
+The direct-resultant solver computes a homogeneous resultant per multiset of five labels and restores all orderings of any zeros. Its cache is local to one solve. The charted solver builds the pair charts and their quadratic graph, then reconstructs all ordered solutions. The independent signed-group solver builds a table of signed pair sums, looks up the complement of each signed triple, and restores the same ordered outputs. The timing compares in-memory solution sets. Shared output equality checks and writing the benchmark records occur after the timer. [pcc:unverified]
+
+| Fixed target | Solutions | Direct resultant | Charted resultant | Signed-group lookup |
+| --- | ---: | ---: | ---: | ---: |
+| Planted, \(x=16739214\) | 120 | 139.74 ms | 68.22 ms | 27.87 ms |
+| Unplanted, \(x=1501288703\) | 0 | 143.05 ms | 68.48 ms | 27.50 ms |
+
+Entries are the medians of the nine setup-inclusive single-target times per arm. The charted solver is 2.05 times as fast as direct resultant on the planted instance. The signed-group lookup is fastest on both. These timings are separate from the Boolean solving-degree certificates. [pcc:unverified]
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
@@ -464,5 +477,14 @@ python3 research/frobenius_s3_cubic_projection_20261123/verify_chart_export.py /
 ~~~
 
 The M31 records are in [m31-charted.jsonl](m31-charted.jsonl).
+
+Replay the cold single-target timing.
+
+~~~sh
+bash research/frobenius_s3_cubic_projection_20261123/run_m31_charted.sh single-target 11781661 9 planted
+bash research/frobenius_s3_cubic_projection_20261123/run_m31_charted.sh single-target 11781661 9 unplanted
+~~~
+
+The per-trial times are in [m31-single-target.jsonl](m31-single-target.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
