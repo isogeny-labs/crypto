@@ -6,7 +6,12 @@ from pathlib import Path
 HERE=Path(__file__).resolve().parent
 MODES=('independent','walk','two-group')
 
-def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+def digest(path):
+    h=hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda:stream.read(1024*1024),b''):
+            h.update(chunk)
+    return h.hexdigest()
 
 
 def resource_metadata():
@@ -102,17 +107,20 @@ def main():
             name=f'seed-{seed}-{mode}'; result=out/(name+'.result.json'); checkpoint=out/(name+'.checkpoint.json')
             cmd=['sage','-python',str(HERE/'measure.py'),*common,'--mode',mode,'--seed',str(seed),'--output',str(result.resolve()),'--checkpoint',str(checkpoint.resolve())]
             started=time.perf_counter_ns()
-            try:
-                proc=subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+            stdout_path=out/(name+'.stdout'); stderr_path=out/(name+'.stderr')
+            with stdout_path.open('xb') as stdout_file, stderr_path.open('xb') as stderr_file:
                 try:
-                    stdout,stderr=proc.communicate(timeout=timeout); status='exited'
-                except subprocess.TimeoutExpired:
-                    os.killpg(proc.pid,signal.SIGKILL); stdout,stderr=proc.communicate(); status='timeout'
-                rc=proc.returncode
-            except OSError as exc:
-                stdout=b''; stderr=str(exc).encode(); status='launch_error'; rc=None
+                    proc=subprocess.Popen(cmd,stdout=stdout_file,stderr=stderr_file,start_new_session=True)
+                    try:
+                        proc.wait(timeout=timeout); status='exited'
+                    except subprocess.TimeoutExpired:
+                        try: os.killpg(proc.pid,signal.SIGKILL)
+                        except ProcessLookupError: pass
+                        proc.wait(); status='timeout'
+                    rc=proc.returncode
+                except OSError as exc:
+                    stderr_file.write(str(exc).encode()); status='launch_error'; rc=None
             elapsed=time.perf_counter_ns()-started
-            (out/(name+'.stdout')).write_bytes(stdout); (out/(name+'.stderr')).write_bytes(stderr)
             data=None; parse_error=None
             if result.exists():
                 try: data=json.loads(result.read_text())
@@ -129,7 +137,7 @@ def main():
                 except (OSError,ValueError):
                     pass
             observed=data if outcome is not None else snapshot
-            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':hashlib.sha256(stdout).hexdigest(),'stderr_sha256':hashlib.sha256(stderr).hexdigest(),'whole_process_wall_ns':elapsed,'result_status':outcome,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'observed_total':observed.get('total') if observed is not None else None,'generation_operations':observed.get('generation_operations') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'target':data.get('target') if outcome is not None else None}
+            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':digest(stdout_path),'stderr_sha256':digest(stderr_path),'whole_process_wall_ns':elapsed,'result_status':outcome,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'observed_total':observed.get('total') if observed is not None else None,'generation_operations':observed.get('generation_operations') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'target':data.get('target') if outcome is not None else None}
             (out/(name+'.receipt.json')).write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
             receipts.append(receipt)
     pairing={}

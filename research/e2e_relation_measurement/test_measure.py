@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Independent affine arithmetic checks for the bounded driver."""
-import hashlib, importlib.util, json, pathlib, subprocess, tempfile, unittest
+import hashlib, importlib.util, json, os, pathlib, subprocess, sys, tempfile, unittest
 
 HERE=pathlib.Path(__file__).resolve().parent
 P=(4,10); Q=(82,27); MOD=101; N=101
+
+spec=importlib.util.spec_from_file_location('audit_record', HERE/'audit_record.py')
+audit_record=importlib.util.module_from_spec(spec); spec.loader.exec_module(audit_record)
 
 def add(p,q):
     if p is None: return q
@@ -84,6 +87,7 @@ class MeasurementTest(unittest.TestCase):
         for mode in ('independent','walk','two-group'):
             with self.subTest(mode=mode):
                 r=self.run_case(mode); self.assertEqual(r['status'],'complete')
+                self.assertEqual(audit_record.audit(r)['status'],'verified')
                 t=r['target']; self.assertEqual(add(mul(t['a'],P),mul(t['b'],Q)),point(t['point']))
                 accepted=[]
                 for c in r['candidates']:
@@ -126,6 +130,29 @@ class MeasurementTest(unittest.TestCase):
         self.assertGreater(r['useful_relations'],0)
         self.assertEqual(r['relation_counts']['nonzero_b'],r['useful_relations'])
         self.assertEqual(r['relation_counts']['nonzero_b_verification_failed'],0)
+        audited=audit_record.audit(r)
+        self.assertEqual(audited['status'],'verified')
+        self.assertEqual(audited['nonzero_b'],r['relation_counts']['nonzero_b'])
+        with tempfile.TemporaryDirectory() as d:
+            source=pathlib.Path(d)/'record.json'; output=pathlib.Path(d)/'audit.json'
+            source.write_text(json.dumps(r))
+            subprocess.run(['python3',str(HERE/'audit_record.py'),str(source),'--output',str(output)],check=True,stdout=subprocess.DEVNULL)
+            receipt=json.loads(output.read_text())
+            self.assertEqual(receipt['status'],'verified')
+            self.assertEqual(receipt['record_sha256'],hashlib.sha256(source.read_bytes()).hexdigest())
+            self.assertGreater(receipt['audit_interval']['wall_ns'],0)
+            bad=json.loads(source.read_text()); bad['witnesses'][0]['scalar']=(bad['witnesses'][0]['scalar']+1)%N
+            source.write_text(json.dumps(bad)); invalid=pathlib.Path(d)/'invalid.json'
+            proc=subprocess.run(['python3',str(HERE/'audit_record.py'),str(source),'--output',str(invalid)],stdout=subprocess.DEVNULL)
+            self.assertEqual(proc.returncode,1)
+            self.assertEqual(json.loads(invalid.read_text())['status'],'invalid')
+        for corruption in ('candidate','polynomial','missing_witness','scalar'):
+            bad=json.loads(json.dumps(r))
+            if corruption=='candidate': bad['candidates'][0]['a']=(bad['candidates'][0]['a']+1)%N
+            elif corruption=='polynomial': bad['system']['input_terms'][0][0]['coefficient']=(bad['system']['input_terms'][0][0]['coefficient']%100)+1
+            elif corruption=='missing_witness': bad['witnesses'].pop()
+            else: bad['witnesses'][0]['scalar']=(bad['witnesses'][0]['scalar']+1)%N
+            with self.subTest(corruption=corruption), self.assertRaises(audit_record.Invalid): audit_record.audit(bad)
         accepted=[c for c in r['candidates'] if c['status']=='accepted']
         for w in r['witnesses']:
             u,v=(accepted[i] for i in w['indices']); su,sv=w['signs']
@@ -231,6 +258,36 @@ else: raise AssertionError('failure was not injected')
             summary=json.loads((outputs[1]/'summary.json').read_text())
             self.assertGreater(sum(row['candidate_counts']['filtered'] for row in summary['runs']),0)
 
+    def test_panel_records_launch_failure(self):
+        with tempfile.TemporaryDirectory() as d:
+            directory=pathlib.Path(d); out=directory/'panel'; plan=directory/'plan.json'
+            plan.write_text(json.dumps({'common_args':[],'seeds':[7],'timeout_seconds':5}))
+            env=os.environ.copy(); env['PATH']=str(directory)
+            subprocess.run([sys.executable,str(HERE/'panel.py'),'--plan',str(plan),'--out',str(out)],check=True,stdout=subprocess.DEVNULL,env=env)
+            summary=json.loads((out/'summary.json').read_text())
+            for row in summary['runs']:
+                self.assertEqual(row['status'],'launch_error'); self.assertIsNone(row['exit_code'])
+                error=out/('seed-7-'+row['mode']+'.stderr')
+                self.assertTrue(error.read_bytes())
+                self.assertEqual(row['stderr_sha256'],hashlib.sha256(error.read_bytes()).hexdigest())
+
+    def test_panel_streams_and_hashes_output(self):
+        with tempfile.TemporaryDirectory() as d:
+            directory=pathlib.Path(d); fake=directory/'sage'; out=directory/'panel'; plan=directory/'plan.json'
+            fake.write_text("#!/usr/bin/env python3\nimport os\nfor _ in range(32):\n os.write(1,b'x'*65536); os.write(2,b'y'*65536)\n")
+            fake.chmod(0o755); plan.write_text(json.dumps({'common_args':[],'seeds':[7],'timeout_seconds':30}))
+            env=os.environ.copy(); env['PATH']=str(directory)+os.pathsep+env.get('PATH','')
+            subprocess.run(['python3',str(HERE/'panel.py'),'--plan',str(plan),'--out',str(out)],check=True,stdout=subprocess.DEVNULL,env=env)
+            summary=json.loads((out/'summary.json').read_text())
+            for row in summary['runs']:
+                name='seed-7-'+row['mode']
+                for suffix,byte,key in (('stdout',b'x','stdout_sha256'),('stderr',b'y','stderr_sha256')):
+                    path=out/(name+'.'+suffix)
+                    self.assertEqual(path.stat().st_size,32*65536)
+                    self.assertEqual(row[key],hashlib.sha256(byte*(32*65536)).hexdigest())
+                self.assertEqual(row['status'],'exited')
+                self.assertIsNone(row['result_status'])
+
     def test_panel_preserves_timeout(self):
         with tempfile.TemporaryDirectory() as d:
             plan=pathlib.Path(d)/'plan.json'; out=pathlib.Path(d)/'panel'
@@ -254,5 +311,6 @@ else: raise AssertionError('failure was not injected')
         self.assertEqual(r['status'],'candidate_budget_exhausted'); self.assertEqual(r['counts']['candidates'],1)
         self.assertEqual(r['generation_operations']['point_addition_calls'],r['generation_operations']['target_draws']+1)
         self.assertNotIn('witnesses',r)
+        self.assertEqual(audit_record.audit(r)['status'],'verified_partial')
 
 if __name__=='__main__': unittest.main()

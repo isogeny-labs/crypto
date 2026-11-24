@@ -13,7 +13,11 @@ BOOL_FLAGS = {'--solver-protocol'}
 
 
 def sha(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    h=hashlib.sha256()
+    with path.open('rb') as stream:
+        for chunk in iter(lambda:stream.read(1024*1024),b''):
+            h.update(chunk)
+    return h.hexdigest()
 
 
 def flags(argv):
