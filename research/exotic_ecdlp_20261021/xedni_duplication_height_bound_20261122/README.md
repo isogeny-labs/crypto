@@ -53,14 +53,16 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 | Certificate cell 26 (`191/16≤A/B≤383/32`) | `interval_26_positive_F` in `Bounds.lean` | Lean checked with its exact rational coefficients |
 | Finite-range archimedean lower bound on `[-128,128]` | `finite_archimedean_lower` in generated `Cells.lean`; generator agrees with `certificate.json` | All 91 cells and coverage Lean checked |
 | Global real and homogeneous archimedean lower bound | `global_univariate_lower` and `global_homogeneous_lower` in `Global.lean` | Lean checked for all real inputs, including both outer tails and `B=0` |
+| Primitive integer input and a common divisor of both forms | `integer_homogeneous_lower` and `reduced_forms_lower` in `IntegerBridge.lean` | Lean checked: if `gcd(A,B)=1`, `d>0`, `F=d f`, and `G=d g`, then `max(|A|,|B|)^4 ≤ 1024·8038359040000·max(|f|,|g|)` |
 | Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
 | Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Mathematical derivation; integer-coordinate height comparison in Lean remains open |
 
 The polynomial, divisibility, global archimedean and numerical Lean declarations
 use only standard foundations in their `#print axioms` output. The packet is
 **partially formalized** until the rational coordinate in `PointBridge.lean`
-is reduced to coprime integers and its height is bounded using the
-homogeneous forms and resultant divisibility theorem.
+is reduced to coprime integers and its height is identified with the
+reduced output pair in `IntegerBridge.lean`. The upper height inequality
+and the resulting uniform doubling defect also need their point-level Lean bridge.
 The canonical-limit packet already proves quadraticity for integer multiples.
 Mordell–Weil generation and rational-to-finite reduction remain separate
 obligations for a complete fixed-curve exclusion theorem.
