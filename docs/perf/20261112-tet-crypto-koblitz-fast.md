@@ -35,7 +35,7 @@ Counters (`count_canonicalisations`), RNG, records unchanged.
 | koblitz_descent_k0n53_m2_x4 | 420,896,988 | 368,692,492 | -12.4% | a0fb1ad57bf29cd2 = |
 | koblitz_pair_table_k0n41_folded | 103,733,389 | 91,170,180 | -12.1% | 2778abd161ae396d = |
 
-canon_in_place went from 203.2M to ~154M Ir (k0n41 collect). Binaries were [pcc:unverified]
+canon_in_place went from 203.2M to ~154M Ir (icv1-f2m41-tm2308219-7f48b14a collect). Binaries were [pcc:unverified]
 measured as `perfbench.c2`; the final commit differs from it only in one
 comment line (verified by diff of the source change).
 

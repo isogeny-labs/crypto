@@ -5884,77 +5884,77 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0044 | 42 | 0.9842–1.0301 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0078 | 42 | 0.9908–1.0334 | 0.3386% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0044 | 42 | 0.9842–1.0301 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0078 | 42 | 0.9908–1.0334 | 0.3386% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · build_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9971 | 42 | 0.9785–1.0145 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 0.9996 | 42 | 0.9791–1.018 | 0.2514% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9971 | 42 | 0.9785–1.0145 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 0.9996 | 42 | 0.9791–1.018 | 0.2514% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · build_one_over_split_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0303 | 42 | 0.9845–1.0419 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0303 | 42 | 0.9845–1.0419 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
 
 ### ic:koblitz_collect_phase · build_one_over_split_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0016 | 42 | 0.9932–1.0224 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0016 | 42 | 0.9932–1.0224 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
 
 ### ic:koblitz_collect_phase · build_perkey_over_block_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 0.9971 | 42 | 0.9632–1.0232 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 0.9971 | 42 | 0.9632–1.0232 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · build_perkey_over_block_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 0.9961 | 42 | 0.9827–1.014 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 0.9961 | 42 | 0.9827–1.014 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · collect_aa_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9925 | 42 | 0.9678–1.031 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0024 | 42 | 0.9802–1.042 | 0.9998% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9925 | 42 | 0.9678–1.031 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0024 | 42 | 0.9802–1.042 | 0.9998% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · collect_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9933 | 42 | 0.9831–1.0092 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0074 | 42 | 0.9852–1.0227 | 1.4182% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9933 | 42 | 0.9831–1.0092 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0074 | 42 | 0.9852–1.0227 | 1.4182% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · collect_one_over_split_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0202 | 42 | 1.0065–1.0344 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0202 | 42 | 1.0065–1.0344 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
 
 ### ic:koblitz_collect_phase · collect_one_over_split_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0193 | 42 | 1.0049–1.0352 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0193 | 42 | 1.0049–1.0352 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
 
 ### ic:koblitz_collect_phase · collect_perkey_over_block_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.087 | 42 | 1.071–1.122 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.087 | 42 | 1.071–1.122 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · collect_perkey_over_block_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0974 | 42 | 1.0765–1.1153 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0974 | 42 | 1.0765–1.1153 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · collect_unpaired_over_paired_k0n53 [ratio]
 
@@ -5972,39 +5972,39 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9996 | 42 | 0.9662–1.0401 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0124 | 42 | 0.9911–1.0439 | 1.2788% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9996 | 42 | 0.9662–1.0401 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0124 | 42 | 0.9911–1.0439 | 1.2788% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · setup_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9963 | 42 | 0.9816–1.0055 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0076 | 42 | 0.9922–1.0205 | 1.136% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 0.9963 | 42 | 0.9816–1.0055 | -0% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0076 | 42 | 0.9922–1.0205 | 1.136% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · setup_one_over_split_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.03 | 42 | 1.0097–1.0486 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.03 | 42 | 1.0097–1.0486 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
 
 ### ic:koblitz_collect_phase · setup_one_over_split_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0168 | 42 | 1.005–1.0289 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (k0n53), 1.019 [1.004,1.035] (k0n61), not established vs A/A; de |
+| 2026-11-14 | `20261114T1911Z-ic-key-chains-ab` | `939ededac908` | 1.0168 | 42 | 1.005–1.0289 | –% | – | Split min chains: collect one/split 1.020 [1.006,1.034] (icv1-f2m53-tm56619371-dac20a85), 1.019 [1.004,1.035] (icv1-f2m61-t158598901-ab42b6c5), not established vs A/A; de |
 
 ### ic:koblitz_collect_phase · setup_perkey_over_block_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0498 | 42 | 1.0275–1.0741 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.0498 | 42 | 1.0275–1.0741 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · setup_perkey_over_block_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.086 | 42 | 1.0565–1.1026 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (k0n53), 1.097 [1.076,1.115] (k0n61), established;  |
+| 2026-11-14 | `20261114T2243Z-ic-scan-vfilter-ab` | `d9d14dbbd7f4` | 1.086 | 42 | 1.0565–1.1026 | –% | – | Block-filled filter tests: collect per-key/block 1.086 [1.071,1.121] (icv1-f2m53-tm56619371-dac20a85), 1.097 [1.076,1.115] (icv1-f2m61-t158598901-ab42b6c5), established;  |
 
 ### ic:koblitz_collect_phase · setup_unpaired_over_paired_k0n53 [ratio]
 
@@ -6022,65 +6022,65 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9937 | 23 | 0.9545–1.0698 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0002 | 24 | 0.9625–1.0527 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9937 | 23 | 0.9545–1.0698 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0002 | 24 | 0.9625–1.0527 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · admitted_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9907 | 24 | 0.9738–1.0112 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9909 | 24 | 0.9634–1.0152 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9907 | 24 | 0.9738–1.0112 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9909 | 24 | 0.9634–1.0152 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · admitted_off_over_on_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.076 | 23 | 1.0098–1.1132 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.076 | 23 | 1.0098–1.1132 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · admitted_off_over_on_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0837 | 24 | 1.0734–1.1082 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0837 | 24 | 1.0734–1.1082 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · admitted_single_over_doubled_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 2.6073 | 24 | 2.4827–2.7174 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 2.6073 | 24 | 2.4827–2.7174 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · admitted_single_over_doubled_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 2.5736 | 24 | 2.5005–2.6542 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 2.5736 | 24 | 2.5005–2.6542 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · build_aa_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0253 | 23 | 0.9775–1.1089 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9701 | 24 | 0.9149–1.0223 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0253 | 23 | 0.9775–1.1089 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9701 | 24 | 0.9149–1.0223 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · build_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0098 | 24 | 0.9615–1.0282 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0123 | 24 | 0.9798–1.0541 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0098 | 24 | 0.9615–1.0282 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0123 | 24 | 0.9798–1.0541 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · build_off_over_on_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0754 | 23 | 1.0307–1.1184 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0754 | 23 | 1.0307–1.1184 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · build_off_over_on_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0356 | 24 | 0.9905–1.0721 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0356 | 24 | 0.9905–1.0721 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · build_row_add_share_k0n53 [percent]
 
@@ -6110,13 +6110,13 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0122 | 24 | 0.9818–1.043 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0122 | 24 | 0.9818–1.043 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · build_single_over_doubled_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9871 | 24 | 0.9356–1.0536 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9871 | 24 | 0.9356–1.0536 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · build_sort_fill_share_k0n53 [percent]
 
@@ -6158,115 +6158,115 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9976 | 23 | 0.9881–1.0296 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9936 | 24 | 0.9758–1.0177 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9976 | 23 | 0.9881–1.0296 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9936 | 24 | 0.9758–1.0177 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · collect_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9869 | 24 | 0.962–1.0138 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9806 | 24 | 0.964–1.0162 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9869 | 24 | 0.962–1.0138 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9806 | 24 | 0.964–1.0162 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · collect_off_over_on_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0289 | 23 | 1.0014–1.0656 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0289 | 23 | 1.0014–1.0656 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · collect_off_over_on_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0468 | 24 | 1.025–1.0711 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0468 | 24 | 1.025–1.0711 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · collect_single_over_doubled_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0996 | 24 | 1.063–1.1249 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0996 | 24 | 1.063–1.1249 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · collect_single_over_doubled_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0789 | 24 | 1.0626–1.115 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0789 | 24 | 1.0626–1.115 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · filter_aa_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0073 | 23 | 0.9569–1.0496 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9992 | 24 | 0.9512–1.0536 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0073 | 23 | 0.9569–1.0496 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9992 | 24 | 0.9512–1.0536 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · filter_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9857 | 24 | 0.9493–1.0164 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9908 | 24 | 0.9686–1.0237 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9857 | 24 | 0.9493–1.0164 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9908 | 24 | 0.9686–1.0237 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · filter_off_over_on_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0667 | 23 | 0.9894–1.0861 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0667 | 23 | 0.9894–1.0861 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · filter_off_over_on_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.1157 | 24 | 1.0983–1.1743 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.1157 | 24 | 1.0983–1.1743 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · filter_single_over_doubled_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.2944 | 24 | 1.2258–1.3423 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.2944 | 24 | 1.2258–1.3423 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · filter_single_over_doubled_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.2096 | 24 | 1.1758–1.2359 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.2096 | 24 | 1.1758–1.2359 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · setup_aa_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0185 | 23 | 0.996–1.1114 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9932 | 24 | 0.971–1.017 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0185 | 23 | 0.996–1.1114 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9932 | 24 | 0.971–1.017 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · setup_aa_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9931 | 24 | 0.9641–1.0193 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9862 | 24 | 0.9679–1.0363 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 0.9931 | 24 | 0.9641–1.0193 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 0.9862 | 24 | 0.9679–1.0363 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · setup_off_over_on_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0546 | 23 | 1.0173–1.0738 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0546 | 23 | 1.0173–1.0738 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · setup_off_over_on_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0401 | 24 | 1.0272–1.0703 | –% | – | Huge-page advice for the pair table: k0n61 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
+| 2026-11-15 | `20261115T1729Z-ic-huge-pages-ab` | `35eb722035ac` | 1.0401 | 24 | 1.0272–1.0703 | –% | – | Huge-page advice for the pair table: icv1-f2m61-t158598901-ab42b6c5 filter 1.116 [1.098,1.174], collect 1.047, set-up 1.040 [1.027,1.070] establi |
 
 ### ic:koblitz_setup_phase · setup_single_over_doubled_k0n53 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0624 | 24 | 1.0463–1.0812 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0624 | 24 | 1.0463–1.0812 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:koblitz_setup_phase · setup_single_over_doubled_k0n61 [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0658 | 24 | 1.0448–1.0987 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (k0n53), 1.079 [1.063,1.115] (k0n61); set-up 1.062,  |
+| 2026-11-15 | `20261115T2132Z-ic-filter-double-ab` | `2826b353f98c` | 1.0658 | 24 | 1.0448–1.0987 | –% | – | Doubled presence filter for Top tables: collect 1.100 [1.063,1.125] (icv1-f2m53-tm56619371-dac20a85), 1.079 [1.063,1.115] (icv1-f2m61-t158598901-ab42b6c5); set-up 1.062,  |
 
 ### ic:ksum_prefix_joint_tableb · gap_joint_over_rho_neg_w0_b27 [ratio]
 
