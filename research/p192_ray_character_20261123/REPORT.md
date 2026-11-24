@@ -268,7 +268,8 @@ cold single-target route based on a biased classifier must also learn
 its correlation sign (unless that sign is proved analytically). For a
 fixed classifier with a separately justified `|ρ_F|≥γ`, independent
 labeled calibration points and independent online randomizations each
-give ±1 observations of means `ρ_F` and `χ_r(d)ρ_F`, respectively.
+give observations in `[-1,1]` with means `ρ_F` and `χ_r(d)ρ_F`,
+respectively.
 Allocating error at most `0.005` to each sign decision, Hoeffding's
 inequality supplies the sufficient sample count
 `2 ln(200)/γ²` for **each** stage. If each trial costs the illustrative
@@ -313,6 +314,22 @@ Their stated results do not bound this selected shift with the
 additional scalar Legendre weight `χ_r(d)`. The identity supplies a
 precise structured-offset formulation, but neither an exact sign
 evaluator nor a certified useful bias. [pcc:unverified]
+
+In particular, define the complete *scalar-weighted fixed-shift*
+sum
+
+`S_a = Σ_{d=1}^{r-1} χ_r(d)χ_p(ψ_{d+a}(G)ψ_{d-a}(G))`.
+
+The identity above makes `ρ(x([a]G))=-S_a/n` exactly, including
+the two zero terms. In the illustrative fixed-feature cold model
+(`C=384`, two 0.5% sign-error allocations), the nominal correlation
+threshold `g≈2^-41.418` is the unnormalized target
+`|S_a|>ng≈2^150.582`. A proposed analytic result must establish
+the magnitude for a *specified public* `a`; the orientation can be
+learned by the charged calibration stage. An average over shifts or
+a bound without the scalar weight does not
+meet this gate. This numerical threshold omits feature selection,
+exact sample-count rounding, and other field costs. [pcc:unverified]
 
 There is nevertheless a deterministic **average over all public
 known-point offsets**. Let `S={x([a]G):1≤a<r}`, of size `n/2`, and
