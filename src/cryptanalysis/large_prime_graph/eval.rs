@@ -25,7 +25,7 @@ use crate::cryptanalysis::large_prime_filter::{
 use std::time::Instant;
 
 #[path = "../jv_large_prime_rank_bound.rs"]
-#[allow(dead_code)]
+#[allow(dead_code, clippy::duplicate_mod)]
 mod structural_rank_bound;
 use structural_rank_bound::StructuralRankBound;
 

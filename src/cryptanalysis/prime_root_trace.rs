@@ -3197,7 +3197,7 @@ mod tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };

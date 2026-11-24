@@ -1004,9 +1004,11 @@ impl OpenCoefMap {
     // Complete occupied-entry views used by the original collision-ledger tests.
     #[cfg(test)]
     fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
-        self.keys.iter().enumerate().filter_map(move |(i, &key)| {
-            (key != 0).then(|| (key, (self.us[i], self.zs[i], self.bs[i])))
-        })
+        self.keys
+            .iter()
+            .enumerate()
+            .filter(|&(_, &key)| key != 0)
+            .map(move |(i, &key)| (key, (self.us[i], self.zs[i], self.bs[i])))
     }
 
     #[cfg(test)]

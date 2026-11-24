@@ -761,7 +761,6 @@ mod tests {
             trial_budget: 2_000_000,
             seed: 2,
             oracle: "semaev".into(),
-            ..CellRequest::default()
         };
         let rep = run_cell(&req).expect("schedule cell");
         assert!(rep.k_from_schedule);

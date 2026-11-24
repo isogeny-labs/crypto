@@ -732,7 +732,7 @@ mod tests {
         let p = f.modulus();
         let mut n = BigUint::one(); // the identity
         let mut x = BigUint::zero();
-        while &x < &p {
+        while &x < p {
             let r = e.rhs(f, f.from_biguint(&x));
             n += BigUint::from(match f.legendre(r) {
                 1 => 2u32,
@@ -756,7 +756,7 @@ mod tests {
             let p = f.modulus().clone();
             let mut x = BigUint::zero();
             let mut roots = 0u64;
-            while &x < &p {
+            while x < p {
                 if tower.eval(f, f.from_biguint(&x)) == Some(tower.c) {
                     roots += 1;
                 }
