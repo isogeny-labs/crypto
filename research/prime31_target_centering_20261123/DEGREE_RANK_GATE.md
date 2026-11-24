@@ -23,13 +23,30 @@ Proposition 5. Over the algebraic closure, the four-summand `S4` condition
 still requires rational point lifting and exceptional-branch checks before
 it can certify finite-field relations.
 
-For a *fixed* rational translation `U`, write `D=R-4U`. The generic fourth
-abscissa is `x(D-Z1-Z2-Z3)` for each of eight sign choices of the first
-three `Zi`. Opposite sign choices yield the same fourth abscissa only if
-`2D=O`. On these two rational prime-order groups, that means `D=O`.
-Thus the degree-four branch pairing applies to `R=4U`; varying the public
-query while retaining this translated factor base restores the generic
-degree-eight condition. Other nongeneric inputs are outside this statement.
+## Exhaustion of rational degree-two coordinates
+
+The branch count covers every degree-two morphism `phi:E -> P1` defined
+over `F_p` on these curves. The separable quadratic function-field
+extension has a unique deck involution `iota` over `F_p`. Proposition 5
+above shows over the algebraic closure that this involution is
+`iota(P)=T-P` for a point `T`. Since `T=iota(O)`, it is rational. Each
+rational group has odd prime order, so `T=2U` for a unique rational `U`.
+The functions `phi(P)` and `x(P-U)` have the same invariant subfield;
+therefore `phi(P)=h(x(P-U))` for some `h in PGL2(F_p)`.
+
+Write `D=R-4U`. Given three generic `phi` values, the two point
+preimages of each can be written `U +/- Zi`. The eight possible fourth
+values are `h(x(D-e1*Z1-e2*Z2-e3*Z3))`, with signs `ei=+/-1`.
+Two values coincide if the signed sums are equal or sum to `2D`.
+Generically the first condition forces identical signs; the second
+pairs opposite signs exactly when `2D=O`. On these rational odd-order
+groups that means `D=O`. Hence the generic fourth-coordinate fiber has
+eight values for `R!=4U` and four for `R=4U`. Varying the public query
+while retaining the same translated factor base restores the eight-value
+case. This is a geometric fiber-degree classification for rational
+degree-two maps, not a claim about Groebner solving degree, restricted
+finite selectors, or higher-degree morphisms. Exceptional and ramified
+fibers can have fewer values.
 
 ## Why fixed-target rows do not determine its scalar
 
