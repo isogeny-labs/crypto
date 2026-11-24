@@ -1192,6 +1192,8 @@ impl FixedBase {
             affine_subspace: self.fb.affine_subspace.clone(),
             known_logs: self.fb.known_logs.clone(),
             frobenius_orbit_layout: self.fb.frobenius_orbit_layout,
+            generator_ladder: self.fb.generator_ladder.clone(),
+            negations_deferred: self.fb.negations_deferred,
         }
     }
 }
@@ -1308,7 +1310,8 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S5Oracle<'_> {
             first_fall_degree: None,
             last_fall_degree: None,
             degree_of_regularity_observed: None,
-            degree_trace: Vec::new(),            ops: call.word_xors,
+            degree_trace: Vec::new(),
+            ops: call.word_xors,
             op_unit: "word XORs (elimination, specialisation and linear elimination only)".into(),
             wall_ns: call.wall_ns,
             peak_bytes: 0,

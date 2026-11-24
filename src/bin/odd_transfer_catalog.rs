@@ -1111,7 +1111,7 @@ fn supported_direct_record(
         "recovered_generator": point_json(&recovered),
         "field_primality": prime_proof_evidence(cover.modulus()),
         "exact_order_evidence": {
-            "annihilator_primality": prime_proof_evidence(&annihilator),
+            "annihilator_primality": prime_proof_evidence(annihilator),
             "generated_subgroup_cardinality": {
                 "status": "proved",
                 "argument": "prime annihilator plus checked nonidentity and annihilation",
