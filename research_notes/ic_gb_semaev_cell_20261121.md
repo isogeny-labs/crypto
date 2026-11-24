@@ -183,3 +183,38 @@ python3 scripts/ic_semaev_msolve.py 8 12 20 30
 ```
 (add `40` or `50` for the long cells; each run prints k, family, actual base
 size, wall time, and msolve's reported ideal degree).
+
+## L25 — matched-solution-count comparison (2026-11-24)
+
+The earlier k=30 window/pullback timings (30.4 s vs 24.5 s) were not a
+controlled comparison: the two runs had different msolve ideal degrees (49 vs
+37), because each family used its own first decomposable target.
+
+**Fix:** select one target x-coordinate with the same **x-space solution
+count** — the number of ordered base x-triples satisfying S4 = 0 — and run both
+families on that same target. Matching the *point*-tuple count is not enough:
+matching ordered triple counts (3 vs 3) still gave ideal degrees 42 vs 45,
+because each x-value carries two signs.
+
+At k = 20, p = 4099, target xQ = 1402, x-space count = 15:
+
+| family | x-space count | msolve ideal degree | wall |
+|---|---:|---:|---:|
+| window | 15 | 15 | 3.32 s |
+| pullback | 15 | 15 | 3.28 s |
+
+**Result:** at matched solution count the two bases cost the same within 1%.
+The apparent pullback advantage at k=30 was an artifact of comparing different
+solution sets. This closes the "parametrized membership is cheaper to solve"
+hypothesis at matched degree for k = 20, and explains the earlier k=30 numbers.
+
+Reproduce:
+
+```sh
+python3 scripts/ic_semaev_msolve.py matchedx 20
+```
+
+**Not done:** k = 30 matched-cell (the x-space count search is ~27k polynomial
+evaluations per candidate target; the same method applies but costs minutes per
+family). `matched` (tuple-count) mode is retained only to document why it is
+insufficient.

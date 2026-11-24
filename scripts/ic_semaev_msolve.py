@@ -97,10 +97,26 @@ def eadd(P1, P2, p=P, a=A):
     x3 = (lam*lam - x1 - x2) % p
     return (x3, (lam*(x1 - x3) - y1) % p)
 
-def run(k, family="window", timeout=900, threads=8):
+by_x0 = {}
+
+
+def decomposition_counts(xset):
+    """Ordered triple counts for every reachable sum over this base."""
+    pts = [by_x0[x] for x in xset]
+    counts = {}
+    for P in pts:
+        for Q in pts:
+            for R in pts:
+                s = eadd(eadd(P, Q), R)
+                if s is not None:
+                    counts[s] = counts.get(s, 0) + 1
+    return counts
+
+def run(k, family="window", timeout=900, threads=8, want_count=None, force_xq=None):
     aff = curve_affine()
     by_x = {}
     for q in aff: by_x.setdefault(q[0], q)
+    by_x0.clear(); by_x0.update(by_x)
     xs_all = sorted(by_x)
     if family == "window":
         xset = xs_all[:k]
@@ -117,14 +133,21 @@ def run(k, family="window", timeout=900, threads=8):
             print(f"  [warn] pullback k={k}: only {len(xset)} on-curve x-values", file=sys.stderr)
     pts = [by_x[x] for x in xset]
     target = None
-    for i in range(len(pts)):
-        for j in range(len(pts)):
-            for l in range(len(pts)):
-                s = eadd(eadd(pts[i], pts[j]), pts[l])
-                if s is not None: target = s; break
+    if want_count is None:
+        for i in range(len(pts)):
+            for j in range(len(pts)):
+                for l in range(len(pts)):
+                    s = eadd(eadd(pts[i], pts[j]), pts[l])
+                    if s is not None: target = s; break
+                if target: break
             if target: break
-        if target: break
-    xq = target[0]
+    else:
+        counts = decomposition_counts(xset)
+        cands = [t for t, c in counts.items() if c == want_count and t is not None]
+        if not cands:
+            return dict(k=k, family=family, actual_k=len(xset), error=f"no target with count {want_count}")
+        target = cands[0]
+    xq = force_xq if force_xq is not None else target[0]
     polys = [render(s4(var(0), var(1), var(2), const(xq))),
              render(membership(xset, 0)),
              render(membership(xset, 1)),
@@ -150,7 +173,109 @@ def run(k, family="window", timeout=900, threads=8):
                     n_terms=len(polys[0].split("+")), out_head=o[:120],
                     stderr="\n".join(lines))
 
+def s4_eval(x1, x2, x3, x4):
+    """S4 at concrete field elements, via the two-quadratic resultant."""
+    def abc(u, v):
+        A_ = (u - v) * (u - v) % P
+        B_ = (-2 * (((u + v) * (u * v + A) + 2 * B) % P)) % P
+        C_ = (((u * v - A) % P) ** 2 - 4 * B * (u + v)) % P
+        return A_, B_, C_
+    a1, b1, c1 = abc(x1, x2)
+    a2, b2, c2 = abc(x3, x4)
+    ac = (a1 * c2 - a2 * c1) % P
+    ab = (a1 * b2 - a2 * b1) % P
+    bc = (b1 * c2 - b2 * c1) % P
+    return (ac * ac - ab * bc) % P
+
+def xspace_count(xset, xq):
+    """Ordered triples of base x-values satisfying S4(x1,x2,x3,xq)=0."""
+    n = 0
+    for a in xset:
+        for b in xset:
+            for c in xset:
+                if s4_eval(a, b, c, xq) == 0:
+                    n += 1
+    return n
+
+def matched_targets_xspace(k, pool=120):
+    """One target per family with the SAME x-space solution count."""
+    sets = {}
+    for fam in ("window", "pullback"):
+        aff = curve_affine(); by_x = {}
+        for q in aff: by_x.setdefault(q[0], q)
+        xs_all = sorted(by_x)
+        if fam == "window":
+            xset = xs_all[:k]
+        else:
+            Tset, xset = set(), []
+            for x in (v for v in xs_all if v):
+                Tset.add(x * x % P)
+                pre = [y for y in xs_all if (y * y % P) in Tset]
+                if len(pre) >= k:
+                    xset = pre[:k]; break
+        sets[fam] = xset
+    pool_t = {}
+    for fam, xset in sets.items():
+        pts = [by_x0[x] for x in xset] if by_x0 else None
+        # reachable x-coordinates (cheap: point triples on that base)
+        aff = curve_affine(); by_x = {}
+        for q in aff: by_x.setdefault(q[0], q)
+        pts = [by_x[x] for x in xset]
+        cand = {}
+        for i in range(0, len(pts), max(1, len(pts)//pool)):
+            for j in range(len(pts)):
+                s = eadd(eadd(pts[i], pts[j]), pts[0])
+                if s is not None:
+                    cand.setdefault(s[0], xspace_count(xset, s[0]))
+        pool_t[fam] = cand
+    best = None
+    for xq_w, c in pool_t["window"].items():
+        if pool_t["pullback"].get(xq_w) == c and c > 0:
+            best = (c, xq_w); break
+    return sets, best
+
+def matched_targets(k):
+    """Pick one target per family with the same ordered decomposition count."""
+    sets = {}
+    for fam in ("window", "pullback"):
+        aff = curve_affine(); by_x = {}
+        for q in aff: by_x.setdefault(q[0], q)
+        by_x0.clear(); by_x0.update(by_x)
+        xs_all = sorted(by_x)
+        if fam == "window":
+            xset = xs_all[:k]
+        else:
+            Tset, xset = set(), []
+            for x in (v for v in xs_all if v):
+                Tset.add(x * x % P)
+                pre = [y for y in xs_all if (y * y % P) in Tset]
+                if len(pre) >= k:
+                    xset = pre[:k]; break
+        sets[fam] = xset
+    common = None
+    for c in range(2, 40):
+        ok = all(any(v == c for v in decomposition_counts(sets[f]).values()) for f in sets)
+        if ok:
+            common = c; break
+    return sets, common
+
 if __name__ == "__main__":
-    for k in [int(a) for a in sys.argv[1:]] or [12, 20]:
+    if len(sys.argv) > 1 and sys.argv[1] == "matchedx":
+        k = int(sys.argv[2]) if len(sys.argv) > 2 else 20
+        sets, best = matched_targets_xspace(k)
+        print("x-space matched:", best, flush=True)
+        if best:
+            c, xq = best
+            for fam in ("window", "pullback"):
+                print(run(k, fam, want_count=None, force_xq=xq), flush=True)
+        sys.exit(0)
+    if len(sys.argv) > 1 and sys.argv[1] == "matched":
+        k = int(sys.argv[2]) if len(sys.argv) > 2 else 30
+        sets, c = matched_targets(k)
+        print("common decomposition count:", c, flush=True)
         for fam in ("window", "pullback"):
-            print(run(k, fam), flush=True)
+            print(run(k, fam, want_count=c), flush=True)
+    else:
+        for k in [int(a) for a in sys.argv[1:]] or [12, 20]:
+            for fam in ("window", "pullback"):
+                print(run(k, fam), flush=True)
