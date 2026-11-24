@@ -11,6 +11,10 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
+Pursue another50x improvement for ECC2K-130 index calculus from the frozen21,360,373 cold-query simulated-instruction baseline, with the same complete charged workload and exact outputs. (Owner,2026-11-24; branch lane/ecc2k-ic-half-trace-setup, PR #5070.)
+
+Previous pinned goal, retained for ongoing lanes:
+
 Develop and independently validate a Rust index-calculus method exploiting chained S3 equations on ordinary prime-field elliptic curves. Principal benchmark: p = 2^31 - 1 on at least three eligible curves, with complete cold single-target cost against the strongest reproducible IC baseline and matched optimized negation-map rho; preserve failed attempts, memory, independent replay and statistical criteria. (Owner, 2026-11-22.)
 
 Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
