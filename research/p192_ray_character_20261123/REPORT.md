@@ -150,10 +150,19 @@ would quadruple its size if `h′` were square. If `φ` is zero on rational
 points, its output is constant there and cannot give balanced scalar
 signs. [pcc:unverified]
 
-This excludes exactness only for one endpoint function `x-c` followed
-by one field quadratic character. It does not rule out combinations of
-features, other endpoint functions of sufficiently high degree, or a
-biased rather than exact predictor. [pcc:unverified]
+The same reasoning gives a chain-independent gate for **any one**
+endpoint rational function `f′` defined and nonzero at all nonidentity
+rational points. If its field character equals the scalar sign exactly,
+then `h′=(f′∘[2])/f′` has degree at most `5D′`, where
+`D′=deg(f′)`. Its geometric nonsquare property follows from the
+odd-valuation support argument; if that support were empty, the odd
+order of `Pic⁰(E′)(F_p)` would force `f′` to be a constant times a
+square, contradicting balanced signs. Thus `r-2 ≤ 10D′√p`, and the
+checked inequality `(r-2)^2 > 100·2^184·p` forces `D′ > 2^92`.
+Arbitrarily increasing `deg(φ)` does not lower this necessary endpoint
+degree. This degree bound does not imply a running-time bound for a
+compact high-degree function and does not cover combinations of
+features or a biased rather than exact predictor. [pcc:unverified]
 
 ## Reproduction and checks
 
