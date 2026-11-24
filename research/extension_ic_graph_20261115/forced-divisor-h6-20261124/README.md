@@ -27,7 +27,7 @@ retained-point call. Native/launcher/posthash statuses0 and empty stderr.
 Qualification PCC-20261124-4993a9 is unsigned. [pcc:unverified]
 
 - [Source/geometry plan](PLAN.md) and [exact source commit](geometry-source-commit.txt).
-- [Rust family](/src/cryptanalysis/jv_forced_divisor.rs), [driver](driver.rs),
+- [Rust family](../../../src/cryptanalysis/jv_forced_divisor.rs), [driver](driver.rs),
   [public fixture](fixture/public.json) and [pins](source-worker-input.sha256).
 - [Complete geometry output](results/geometry.json),
   [raw-data archive](results/geometry-raw.tar.xz). Executable remains a

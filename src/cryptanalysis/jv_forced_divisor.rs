@@ -3,7 +3,7 @@
 //! Map/word/allocation work is not completely instrumented; no native total.
 use crate::cryptanalysis::{
     f4_fp::{self, Poly},
-    jv_cover::{Fld, Fq, E2},
+    jv_cover::{Div, Fld, Fq, E2},
     residual_walk::{is_prime_u64, pow_mod},
 };
 use std::collections::BTreeMap;
@@ -133,6 +133,13 @@ pub struct CandidateFunction {
     pub c: Numeric,
     pub norm: Numeric,
     pub quotient: Numeric,
+}
+/// Actual ordinates/signs, before canonical graph encoding. A caller still
+/// replays the original Jacobian relation and the graph projection witness.
+#[derive(Clone, Debug)]
+pub struct FunctionSupport {
+    pub small: Vec<(u64, E2)>,
+    pub quadratic: Vec<Div<E2>>,
 }
 impl Family {
     pub fn new(f: &Fq, h: &[E2], u: &[E2], v: &[E2]) -> Result<Self, &'static str> {
@@ -330,6 +337,101 @@ impl Family {
         }
         Ok(z)
     }
+
+    /// Prove complete five/seven-small-point support. The five-point case
+    /// requires one further irreducible quadratic. This does not admit rank.
+    pub fn materialize(
+        &self,
+        f: &Fq,
+        function: &CandidateFunction,
+        roots: &[u64],
+    ) -> Result<FunctionSupport, &'static str> {
+        if ![5, 7].contains(&roots.len())
+            || roots.iter().any(|&x| x >= self.p)
+            || roots.windows(2).any(|w| w[0] >= w[1])
+        {
+            return Err("five or seven distinct canonical small roots required");
+        }
+        let z = self.recover_parameters(f, &function.a, &function.c)?;
+        let check = self.instantiate(f, &z)?;
+        if function.a != check.a
+            || function.c != check.c
+            || function.norm != check.norm
+            || function.quotient != check.quotient
+        {
+            return Err("candidate replay mismatch");
+        }
+        let peval = |a: &[E2], x: u64| {
+            a.iter()
+                .rev()
+                .fold(E2::ZERO, |v, c| f.add(&f.scale(&v, x), c))
+        };
+        let mut tail = check.quotient.clone();
+        let mut product = vec![E2::ONE];
+        let mut small = Vec::new();
+        for &x in roots {
+            let den = peval(&check.c, x);
+            if den == E2::ZERO {
+                return Err("C vanishes on small support");
+            }
+            let y = f.neg(&f.mul(&peval(&check.a, x), &f.inv(&den)));
+            if y == E2::ZERO || f.sq(&y) != peval(&self.h, x) {
+                return Err("original small ordinate");
+            }
+            let linear = vec![f.neg(&f.from_fp(x)), E2::ONE];
+            let (q, r) = divide(f, &tail, &linear);
+            if !r.is_empty() {
+                return Err("small root exact division");
+            }
+            tail = q;
+            product = mul(f, &product, &linear);
+            small.push((x, y));
+        }
+        if mul(f, &self.u, &mul(f, &product, &tail)) != check.norm {
+            return Err("complete support factorization");
+        }
+        let mut quadratic = vec![Div {
+            u: self.u.clone(),
+            v: self.v.clone(),
+        }];
+        if roots.len() == 7 {
+            if tail.len() != 1 || tail[0] == E2::ZERO {
+                return Err("constant full tail");
+            }
+        } else {
+            if tail.len() != 3 || tail[2] == E2::ZERO {
+                return Err("quadratic tail");
+            }
+            let inv = f.inv(&tail[2]);
+            let u: Vec<_> = tail.iter().map(|v| f.mul(v, &inv)).collect();
+            if u.iter().any(|v| !v.in_fp()) || u == self.u {
+                return Err("distinct Fp quadratic tail required");
+            }
+            let disc = (u[1].0[0] as u128 * u[1].0[0] as u128 + 4 * self.p as u128
+                - (4 * u[0].0[0] as u128) % self.p as u128)
+                % self.p as u128;
+            if disc == 0 || pow_mod(disc as u64, (self.p - 1) / 2, self.p) != self.p - 1 {
+                return Err("irreducible quadratic tail required");
+            }
+            let c = check.c[0];
+            // (x+c)^-1=(c-u1-x)/(c²-u1*c+u0), modulo monic u.
+            let den = f.add(&f.sub(&f.sq(&c), &f.mul(&u[1], &c)), &u[0]);
+            if den == E2::ZERO {
+                return Err("C is not invertible on remaining divisor");
+            }
+            let inv = f.inv(&den);
+            let inv_c = vec![f.mul(&f.sub(&c, &u[1]), &inv), f.neg(&inv)];
+            let (_, a_mod) = divide(f, &check.a, &u);
+            let (_, v) = divide(f, &mul(f, &a_mod, &inv_c), &u);
+            let v: Vec<_> = v.iter().map(|x| f.neg(x)).collect();
+            let (_, r) = divide(f, &sub(f, &self.h, &mul(f, &v, &v)), &u);
+            if !r.is_empty() {
+                return Err("remaining original Mumford identity");
+            }
+            quadratic.push(Div { u, v });
+        }
+        Ok(FunctionSupport { small, quadratic })
+    }
 }
 
 #[cfg(test)]
@@ -433,5 +535,101 @@ mod tests {
             g.instantiate(&f, &z).unwrap_err(),
             "C is not invertible on forced divisor"
         );
+    }
+    #[test]
+    fn seven_small_points_leave_exactly_the_forced_quadratic() {
+        let f = Fq::new(11);
+        let u = vec![E2::ONE, E2::ZERO, E2::ONE];
+        let roots: Vec<u64> = (1..8).collect();
+        let mut s = vec![f.neg(&E2::ONE)];
+        for &r in &roots {
+            s = mul(&f, &s, &[f.neg(&f.from_fp(r)), E2::ONE]);
+        }
+        let a0 = (0..11)
+            .flat_map(|a| (0..11).map(move |b| E2([a, b])))
+            .find(|a| f.sq(a) == s[0])
+            .unwrap();
+        let a1 = f.mul(&s[1], &f.inv(&f.scale(&a0, 2)));
+        let a = vec![a0, a1, E2::ONE];
+        let c = vec![E2::ZERO, E2::ONE];
+        let (h, remainder) = divide(
+            &f,
+            &sub(&f, &mul(&f, &a, &a), &mul(&f, &u, &s)),
+            &mul(&f, &c, &c),
+        );
+        assert!(remainder.is_empty());
+        let (_, v) = divide(&f, &mul(&f, &a, &[E2::ZERO, E2::ONE]), &u);
+        let g = Family::new(&f, &h, &u, &v).unwrap();
+        let z = g.recover_parameters(&f, &a, &c).unwrap();
+        let value = g.instantiate(&f, &z).unwrap();
+        let support = g.materialize(&f, &value, &roots).unwrap();
+        assert_eq!(support.small.len(), 7);
+        assert_eq!(support.quadratic, vec![Div { u, v }]);
+        assert_eq!(value.quotient, s);
+    }
+    #[test]
+    fn retained_positive_support_matches_original_row_and_refuses_tampering() {
+        let raw:serde_json::Value=serde_json::from_str(include_str!("../../research/extension_ic_graph_20261115/forced-divisor-h6-20261124/fixture/public.json")).unwrap();
+        let f = Fq::new(1009);
+        let decode = |v: &serde_json::Value| {
+            serde_json::from_value::<Vec<[u64; 2]>>(v.clone())
+                .unwrap()
+                .into_iter()
+                .map(E2)
+                .collect::<Vec<_>>()
+        };
+        let h = decode(&raw["h"]);
+        let a = decode(&raw["a"]);
+        let c = decode(&raw["c"]);
+        let signed = |v: &serde_json::Value| {
+            let k: Vec<u64> = serde_json::from_value(v["key"].clone()).unwrap();
+            let mut vv = vec![E2([k[2], k[3]]), E2([k[4], k[5]])];
+            if v["coefficient"] == -1 {
+                for e in &mut vv {
+                    *e = f.neg(e);
+                }
+            }
+            Div {
+                u: vec![f.from_fp(k[0]), f.from_fp(k[1]), E2::ONE],
+                v: trim(vv),
+            }
+        };
+        let q = signed(&raw["remainders"][0]);
+        let other = signed(&raw["remainders"][1]);
+        let g = Family::new(&f, &h, &q.u, &q.v).unwrap();
+        let z = g.recover_parameters(&f, &a, &c).unwrap();
+        let value = g.instantiate(&f, &z).unwrap();
+        let roots: Vec<u64> = raw["small"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|b| b["x"].as_u64().unwrap())
+            .collect();
+        let support = g.materialize(&f, &value, &roots).unwrap();
+        assert_eq!(support.quadratic, vec![q, other]);
+        let jac = crate::cryptanalysis::jv_cover::Hyp { f: &f, h, g: 3 };
+        let mut sum = jac.identity();
+        for ((x, y), b) in support.small.iter().zip(raw["small"].as_array().unwrap()) {
+            let yy: E2 = E2(serde_json::from_value(b["y"].clone()).unwrap());
+            assert_eq!(*y, if b["sign"] == -1 { f.neg(&yy) } else { yy });
+            sum = jac.add(
+                &sum,
+                &Div {
+                    u: vec![f.neg(&f.from_fp(*x)), E2::ONE],
+                    v: vec![*y],
+                },
+            );
+        }
+        for d in support.quadratic {
+            sum = jac.add(&sum, &d);
+        }
+        assert!(jac.is_identity(&sum));
+        let mut damaged = value.clone();
+        damaged.norm[0] = f.add(&damaged.norm[0], &E2::ONE);
+        assert!(g.materialize(&f, &damaged, &roots).is_err());
+        assert!(g.materialize(&f, &value, &roots[..4]).is_err());
+        let mut repeated = roots;
+        repeated[1] = repeated[0];
+        assert!(g.materialize(&f, &value, &repeated).is_err());
     }
 }
