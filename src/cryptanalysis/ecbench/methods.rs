@@ -86,7 +86,7 @@ use crate::cryptanalysis::ic_framework::fiber::{
 };
 use crate::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
-    CyclotomicBase, DescentAlgebraicOracle, FrobeniusKSumOracle, FrobeniusMitmOracle, GlvOrbitBase,
+    CyclotomicBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase,
     KSumOracle, KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase,
     PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, ResidualSweepOracle, RootfindSubtractOracle,
     SubtractOracle, WSumOracle, WWalkOracle,

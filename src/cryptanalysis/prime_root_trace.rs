@@ -5,8 +5,6 @@
 //! A separate arithmetic checker verifies the certificate without root finding.
 //! Counters measure native field operations, including inverse exponentiation;
 //! primality validation, serialization, and certificate replay are excluded.
-#[cfg(test)]
-
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 

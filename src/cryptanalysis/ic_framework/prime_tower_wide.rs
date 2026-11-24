@@ -723,6 +723,7 @@ pub fn supersingular_tower_wide<F: PrimeField>(
 
 #[cfg(test)]
 mod tests {
+    use num_integer::Integer;
     use super::*;
     use crate::cryptanalysis::fp_backend::{Fp32, Fp64, FpP192};
 
