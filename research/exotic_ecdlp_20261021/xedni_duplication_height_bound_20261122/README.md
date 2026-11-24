@@ -62,6 +62,7 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 | Rational root and two-torsion exclusion | `no_integer_cubic_root`, `no_rational_cubic_root`, and `no_affine_two_torsion` in `TorsionBridge.lean` | Lean checked: the cubic has no root modulo 3 after the monic rational-root reduction, so every nonsingular affine rational point doubles to an affine point |
 | All-point duplication defect | `all_point_abs_height_defect` in `TorsionBridge.lean` | Lean checked for every rational point on the fixed curve, including the identity: `|h(2P)−4h(P)|≤53 log 2` |
 | Explicit canonical-height comparison | `explicit_fixed_curve_canonical_height` and `explicit_fixed_curve_height_gap_lt14` in `CanonicalBridge.lean`, importing the pinned `CanonicalLimit.lean` | Lean checked: there is a quadratic limit function `H` on all rational points with `|H(P)−h(P)|≤(53/3)log 2<14` |
+| Fixed-curve height-cap bridge | `no_bounded_target_class_lift` in `HeightExclusionBridge.lean`, importing the pinned `HeightExclusion.lean` | Lean checked: a point `P=nQ` with `n mod 43=22`, the stated `65Q` witness lower bound, and `h(P)≤260 log 2` leads to contradiction; generator, residue class, witness, and cap are explicit hypotheses |
 | Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
 | Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Both the all-point defect and explicit canonical-height comparison Lean checked |
 
@@ -73,12 +74,16 @@ is now formalized.
 The defining cubic's rational-root exclusion is formalized using Mathlib's
 [integral root theorem](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/RingTheory/Polynomial/RationalRoot.lean)
 and a three-residue certificate.
-Mordell–Weil generation and rational-to-finite reduction remain separate
-obligations for a complete fixed-curve exclusion theorem.
+Mordell–Weil generation, rational-to-finite reduction, and a Lean certificate
+for the exact `65Q` coordinate remain separate obligations for a complete
+fixed-curve exclusion theorem. The cap in the bridge is a bound on Mathlib's
+naive logarithmic height; converting the candidate's `max(|a|,b)` rule to this
+bound is another explicit step.
 
 ## Literature and library check
 
 Jacobson, Koblitz, Silverman, Stein and Teske, [*Analysis of the Xedni Calculus Attack*](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf), §4 and Lemma 4.1, analyze a family of rational lifts under an explicit conditional height premise. The bound here applies to the one displayed rational curve and supplies its numerical comparison directly. Mathlib's [affine point doubling lemmas](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Point.lean), [naive-height definition](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/NumberTheory/Height/EllipticCurve.lean), and [rational height formula](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/NumberTheory/Height/NumberField.lean) supply the formal coordinate and height bridge. The existing [canonical-limit packet](../xedni_canonical_height_limit_20261122/README.md) supplies the geometric tail and quadraticity once the explicit duplication defect is available.
+The [rank-one generator certificate](../xedni_rank1_generator_certificate_20261121/README.md) and [height-exclusion packet](../xedni_explicit_height_exclusion_20261121/README.md) supply the exact computational inputs and conditional arithmetic theorem reused here. Mathlib's [curve reduction module](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/AlgebraicGeometry/EllipticCurve/Reduction.lean) defines reduction of a Weierstrass equation; its affine point `map` requires a field embedding, so the rational-to-finite point homomorphism remains to be built.
 
 Replay from this directory:
 
