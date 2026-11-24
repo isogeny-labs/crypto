@@ -83,14 +83,24 @@ def main():
     assert candidate["status"] == "ResourceLimit"
     assert "matrix_entries admission" in candidate["reason"]
     assert not candidate["relations"]
-    larger = json.loads((ROOT / "evidence" / "rr5-b677-prerequisite-01" / "structured-cap8m.json").read_text())
-    assert larger["curve"] == curve
-    assert larger["fixture_certificate"] == source["fixture_certificate"]
-    assert larger["query"] == source["public_target"]
-    assert larger["control_planted_terms"] == witness
-    assert larger["status"] == "ResourceLimit"
-    assert "matrix_entries admission" in larger["reason"]
-    assert not larger["relations"]
+    larger_attempts = []
+    for cap in (8, 32):
+        larger = json.loads((ROOT / "evidence" / "rr5-b677-prerequisite-01"
+                             / f"structured-cap{cap}m.json").read_text())
+        assert larger["curve"] == curve
+        assert larger["fixture_certificate"] == source["fixture_certificate"]
+        assert larger["query"] == source["public_target"]
+        assert larger["control_planted_terms"] == witness
+        assert larger["status"] == "ResourceLimit"
+        assert "matrix_entries admission" in larger["reason"]
+        assert not larger["relations"]
+        assert larger["traversal"]["complete"] is False
+        assert larger["traversal"]["solutions_visited"] == 0
+        assert larger["traversal"]["resource_limit"]["limit"] == cap * 1_000_000
+        larger_attempts.append({"matrix_entry_cap": cap * 1_000_000,
+                                "status": larger["status"],
+                                "reason": larger["reason"],
+                                "accepted_rows": len(larger["relations"])})
     print(json.dumps({
         "scope": "second ordinary curve over the same p; exact witness counts, not extraction yield",
         "curve": curve,
@@ -101,9 +111,7 @@ def main():
         "positive_gate_status": candidate["status"],
         "positive_gate_reason": candidate["reason"],
         "positive_gate_accepted_rows": len(candidate["relations"]),
-        "cap8m_status": larger["status"],
-        "cap8m_reason": larger["reason"],
-        "cap8m_accepted_rows": len(larger["relations"]),
+        "larger_cap_attempts": larger_attempts,
     }, indent=2))
 
 

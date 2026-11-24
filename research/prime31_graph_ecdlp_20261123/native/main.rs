@@ -44,7 +44,7 @@ fn signed_sum(points: &[(u64, u64)], terms: &[(usize, i64)]) -> Point {
     sum
 }
 
-fn bounded_b677() {
+fn bounded_b677(matrix_cap: usize) {
     let fixture = Hybrid677::build().expect("source-bound B677 fixture");
     let points = fixture.points();
     let planted = [(0, 1), (1, 1), (2, -1), (5, 1)];
@@ -72,7 +72,7 @@ fn bounded_b677() {
         F4ResourceLimits {
             max_pairs: 20_000,
             max_symbolic_monomials: 8_192,
-            max_matrix_entries: 8_000_000,
+            max_matrix_entries: matrix_cap,
         },
     );
     println!(
@@ -86,9 +86,10 @@ fn bounded_b677() {
             "reason": result.reason,
             "relations": result.relations,
             "diagnostics": result.diagnostics,
+            "traversal": result.traversal,
             "elapsed_ms": started.elapsed().as_millis(),
             "limits": {"max_pairs": 20_000, "max_symbolic_monomials": 8_192,
-                       "max_matrix_entries": 8_000_000},
+                       "max_matrix_entries": matrix_cap},
         }))
         .unwrap()
     );
@@ -173,8 +174,12 @@ fn public_panel() {
 
 fn main() {
     let mode = std::env::args().nth(1).unwrap_or_default();
-    if mode == "b677" {
-        bounded_b677();
+    if mode == "b677" || mode == "b67732" {
+        bounded_b677(if mode == "b67732" {
+            32_000_000
+        } else {
+            8_000_000
+        });
         return;
     }
     if mode == "panel" {

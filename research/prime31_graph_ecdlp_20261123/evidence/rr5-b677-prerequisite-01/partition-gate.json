@@ -53,7 +53,18 @@
   "positive_gate_status": "ResourceLimit",
   "positive_gate_reason": "symbolic_workspace: matrix_entries admission 2000016 exceeds 2000000",
   "positive_gate_accepted_rows": 0,
-  "cap8m_status": "ResourceLimit",
-  "cap8m_reason": "symbolic_workspace: matrix_entries admission 8000881 exceeds 8000000",
-  "cap8m_accepted_rows": 0
+  "larger_cap_attempts": [
+    {
+      "matrix_entry_cap": 8000000,
+      "status": "ResourceLimit",
+      "reason": "symbolic_workspace: matrix_entries admission 8000881 exceeds 8000000",
+      "accepted_rows": 0
+    },
+    {
+      "matrix_entry_cap": 32000000,
+      "status": "ResourceLimit",
+      "reason": "symbolic_workspace: matrix_entries admission 32017996 exceeds 32000000",
+      "accepted_rows": 0
+    }
+  ]
 }

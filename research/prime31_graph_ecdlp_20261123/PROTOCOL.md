@@ -245,10 +245,13 @@ was executed with its frozen 30-second and two-million matrix-entry limits.
 It returned `ResourceLimit`: the next matrix admission needed 2,000,016
 entries. A follow-up with the same curve, fixture, target, and symbolic caps
 raised only matrix admission to eight million; it again returned
-`ResourceLimit`, now requiring 8,000,881 entries. Both runs extracted zero
-rows. The original gate had zero adapter rank because no row reached it,
+`ResourceLimit`, now requiring 8,000,881 entries. A final bounded 32-million
+entry arm reached the same `symbolic_workspace` admission stop at 32,017,996
+entries. Both larger-cap traces record one F4 run, zero visited solutions,
+and incomplete traversal. All three runs extracted zero rows. The original
+gate had zero adapter rank because no row reached it,
 although the independent grader supplies a valid two-LP witness.
-`structured-positive.stdout`, `structured-cap8m.json`, their stderr, and
+`structured-positive.stdout`, `structured-cap{8,32}m.json`, their stderr, and
 source hashes preserve these incomplete attempts. The high tuple counts
 therefore establish a **potential relation
 population**, not an achieved relation stream or a cost advantage. The next
