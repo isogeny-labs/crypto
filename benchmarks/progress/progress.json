@@ -157,13 +157,13 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261124T0233Z-ecc2k-cold50x-inline-primary",
+  "latest_record": "20261124T0350Z-ecc2k-cold15m-candidate3-primary",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
     "invalid": 11,
-    "measured": 325,
-    "open": 66
+    "measured": 331,
+    "open": 62
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -457,10 +457,10 @@
     {
       "better": "lower",
       "first": 21566178.0,
-      "latest": 20006773.0,
+      "latest": 14688697.0,
       "latest_derived": {
-        "improvement_vs_first_percent": 7.2308,
-        "improvement_vs_previous_percent": 7.2308
+        "improvement_vs_first_percent": 31.8901,
+        "improvement_vs_previous_percent": 8.3871
       },
       "metric": "complete_cold_query_ir",
       "points": [
@@ -498,6 +498,60 @@
           ],
           "summary": "Complete frozen120-row inline index component gains6.28% whole and9.71% oracle against matched previous best, all six controls pass,80 tuples replay. Requested50x unmet. Complete raw/binaries include rejected prior panel and invalid pilots; unsigned local custody only.",
           "value": 20006773.0
+        },
+        {
+          "commit": "f3ae17d0d3c3",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 19.8401,
+            "improvement_vs_previous_percent": 13.5921
+          },
+          "n": 5,
+          "record": "20261124T0314Z-ecc2k-cold15m-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            17287437.0,
+            17287437.0
+          ],
+          "summary": "First candidate misses15M and one n83 oracle guard; all raw rows retained. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 17287437.0
+        },
+        {
+          "commit": "1837c3ffa516",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 25.6547,
+            "improvement_vs_previous_percent": 7.2538
+          },
+          "n": 5,
+          "record": "20261124T0331Z-ecc2k-cold15m-candidate2-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            16033438.0,
+            16033438.0
+          ],
+          "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 16033438.0
+        },
+        {
+          "commit": "781e12c34c58",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 31.8901,
+            "improvement_vs_previous_percent": 8.3871
+          },
+          "n": 5,
+          "record": "20261124T0350Z-ecc2k-cold15m-candidate3-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            14688697.0,
+            14688697.0
+          ],
+          "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 14688697.0
         }
       ],
       "problem": "ecc2k130-index-calculus-cold-query",
@@ -506,14 +560,19 @@
     {
       "better": "lower",
       "first": 12458426.0,
-      "latest": 12458426.0,
-      "latest_derived": {},
+      "latest": 10024047.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 19.54,
+        "improvement_vs_previous_percent": 11.8282
+      },
       "metric": "complete_oracle_ir",
       "points": [
         {
           "commit": "bd865aacc0c2",
           "date": "2026-11-24",
-          "derived": {},
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
           "n": 5,
           "record": "20261124T0233Z-ecc2k-cold50x-inline-primary",
           "reference": null,
@@ -524,6 +583,60 @@
           ],
           "summary": "Complete frozen120-row inline index component gains6.28% whole and9.71% oracle against matched previous best, all six controls pass,80 tuples replay. Requested50x unmet. Complete raw/binaries include rejected prior panel and invalid pilots; unsigned local custody only.",
           "value": 12458426.0
+        },
+        {
+          "commit": "f3ae17d0d3c3",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 1.3915,
+            "improvement_vs_previous_percent": 1.3915
+          },
+          "n": 5,
+          "record": "20261124T0314Z-ecc2k-cold15m-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            12285072.0,
+            12285072.0
+          ],
+          "summary": "First candidate misses15M and one n83 oracle guard; all raw rows retained. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 12285072.0
+        },
+        {
+          "commit": "1837c3ffa516",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 8.7463,
+            "improvement_vs_previous_percent": 7.4587
+          },
+          "n": 5,
+          "record": "20261124T0331Z-ecc2k-cold15m-candidate2-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            11368770.0,
+            11368770.0
+          ],
+          "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 11368770.0
+        },
+        {
+          "commit": "781e12c34c58",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 19.54,
+            "improvement_vs_previous_percent": 11.8282
+          },
+          "n": 5,
+          "record": "20261124T0350Z-ecc2k-cold15m-candidate3-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            10024047.0,
+            10024047.0
+          ],
+          "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 10024047.0
         }
       ],
       "problem": "ecc2k130-index-calculus-cold-query",
@@ -551,6 +664,73 @@
       ],
       "problem": "ecc2k130-index-calculus-cold-query",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 17273580.0,
+      "latest": 14689119.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 14.9619,
+        "improvement_vs_previous_percent": 8.3057
+      },
+      "metric": "pilot_complete_cold_query_ir",
+      "points": [
+        {
+          "commit": "14819dcac965",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1,
+          "record": "20261124T0312Z-ecc2k-cold15m-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            17273580.0,
+            17273580.0
+          ],
+          "summary": "First candidate misses15M and one n83 oracle guard; all raw rows retained. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 17273580.0
+        },
+        {
+          "commit": "4b2821dba553",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 7.2592,
+            "improvement_vs_previous_percent": 7.2592
+          },
+          "n": 1,
+          "record": "20261124T0327Z-ecc2k-cold15m-candidate2-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            16019656.0,
+            16019656.0
+          ],
+          "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 16019656.0
+        },
+        {
+          "commit": "56102c19bf36",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 14.9619,
+            "improvement_vs_previous_percent": 8.3057
+          },
+          "n": 1,
+          "record": "20261124T0347Z-ecc2k-cold15m-candidate3-v3-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            14689119.0,
+            14689119.0
+          ],
+          "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 14689119.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "ir"
     },
     {
       "better": "higher",

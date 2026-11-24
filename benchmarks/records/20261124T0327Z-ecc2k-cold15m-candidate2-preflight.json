@@ -1,6 +1,6 @@
 {
   "branch": "lane/ecc2k-ic-half-trace-setup",
-  "closed_utc": null,
+  "closed_utc": "2026-11-24T03:58:35+00:00",
   "commands": [
     {
       "argv": [
@@ -19,7 +19,9 @@
   "commit_dirty": true,
   "created_utc": "2026-11-24T03:27:48+00:00",
   "curve_uid": null,
-  "entries": [],
+  "entries": [
+    "benchmarks/20261124-ecc2k-cold15m"
+  ],
   "host": {
     "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
     "cpus_online": 5,
@@ -28,19 +30,75 @@
     "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
   },
   "id": "20261124T0327Z-ecc2k-cold15m-candidate2-preflight",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 20779655.0,
+      "better": "lower",
+      "n": 1,
+      "name": "pilot_complete_cold_query_ir",
+      "note": "Exact copied Rust result; complete cold/oracle boundary. No native-time or instruction-rate claim. Remote raw custody pending, uploaded=false.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        16019656.0,
+        16019656.0
+      ],
+      "unit": "ir",
+      "value": 16019656.0
+    }
+  ],
   "problem": "ecc2k130-index-calculus-cold-query",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 26534,
+      "path": "research/trace_zero_cold15m_20261124/candidate2/preflight.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/3872089aa7d88e23fcb35a40a026bbb937a5d3fae71942577c7c826d41f379c2",
+      "sha256": "3872089aa7d88e23fcb35a40a026bbb937a5d3fae71942577c7c826d41f379c2",
+      "uploaded": false
+    },
+    {
+      "bytes": 1774,
+      "path": "research/trace_zero_cold15m_20261124/candidate2/calibration.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ca/cafdd1482dae1d45af08f65d3d3a2a180a47b9cbdd10c4f89a1ad664d47e0030",
+      "sha256": "cafdd1482dae1d45af08f65d3d3a2a180a47b9cbdd10c4f89a1ad664d47e0030",
+      "uploaded": false
+    },
+    {
+      "bytes": 177,
+      "path": "research/trace_zero_cold15m_20261124/candidate2/preflight-gate.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/32/3221e539353aaa898bbc8aaa7def541907bfab3c8258a7570391252afeba36e1",
+      "sha256": "3221e539353aaa898bbc8aaa7def541907bfab3c8258a7570391252afeba36e1",
+      "uploaded": false
+    },
+    {
+      "bytes": 1166452,
+      "path": "research/trace_zero_cold15m_20261124/RAW-ALL.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/27/27e2eec6117fd91bf3349a00ef7c748136429cb089d2eb854eec3716800f7d0c",
+      "sha256": "27e2eec6117fd91bf3349a00ef7c748136429cb089d2eb854eec3716800f7d0c",
+      "uploaded": false
+    },
+    {
+      "bytes": 17245068,
+      "path": "research/trace_zero_cold15m_20261124/FROZEN-EXECUTABLES.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e6/e6de0f5c7ca0b23d93740339307defd9f7ff1557862b7f47605099055797ad11",
+      "sha256": "e6de0f5c7ca0b23d93740339307defd9f7ff1557862b7f47605099055797ad11",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/trace_zero_cold15m_20261124/report.pdf",
+    "png": [
+      "research/trace_zero_cold15m_20261124/instructions.png"
+    ],
+    "svg": [
+      "research/trace_zero_cold15m_20261124/instructions.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "ecc2k-cold15m-candidate2-preflight",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
   "validation": null
 }
