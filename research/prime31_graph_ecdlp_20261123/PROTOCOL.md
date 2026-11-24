@@ -84,8 +84,9 @@ After `M` probes, expected accepted partials are `MH/n`. To obtain `B+1`
 full rows, exact LP elimination needs `E−U≥B+1`, so the partial producer
 needs at least `B+1+U` accepted rows; direct full probes need only `B+1`.
 This rules out a relation-acquisition advantage **under this uniform
-point-keyed model** at equal table construction and probe cost. The actual
-implementation uses x-keyed sign variants and must be measured separately.
+point-keyed model** at equal table construction and probe cost. The native
+B677 control also uses full point keys, with signed pair variants; its
+candidate rejection and costs are measured separately below.
 An improvement requires a source with conditional yield, per-probe cost,
 or projected-rank behavior outside this model, with exact group replay.
 
@@ -93,22 +94,22 @@ or projected-rank behavior outside this model, with exact group replay.
 
 The same uniform model gives an asymptotic cost gate. Let `L` count
 stored signed pair entries **with multiplicity**, and let `M` count a fixed
-schedule of probes of the form `x(R-D_j)` across uniform public queries
+schedule of full-point probes of the form `R-D_j` across uniform public queries
 `R`. The offsets `D_j` and the table are chosen independently of those
-queries. For any fixed nonidentity table point and probe offset, at most
-two group elements `R` have the matching abscissa. By linearity of
-expectation, the number `C` of entry-probe matches therefore obeys
-`E[C] <= 2*L*M/n`, even when probes from one query and table entries are
-dependent. For full point keys the factor two becomes one. Rejected
-signs, repeated rows and rank deficiency can only reduce the useful
-row count.
+queries. For each fixed table point and probe offset, exactly one
+group element `R` gives a point-key match. By linearity of expectation,
+the number `C` of entry-probe matches therefore obeys `E[C]=L*M/n`,
+even when probes from one query and table entries are dependent. An
+abscissa-keyed variant would instead have at most two matches per
+entry-probe pair. Rejected index overlaps, repeated rows and rank
+deficiency can only reduce the useful row count.
 
 If `r` independent rows are required with success probability at least
-`eta`, then `C>=r` on success and hence `M>=eta*r*n/(2*L)` for the
-abscissa-keyed table. Charging `c_s>0` per materialized entry and
+`eta`, then `C>=r` on success and hence `M>=eta*r*n/L` for the
+full-point table. Charging `c_s>0` per materialized entry and
 `c_p>0` per probe gives the conditional cold-work floor
 
-`W >= c_s*L+c_p*M >= 2*sqrt(c_s*c_p*eta*r*n/2)`.
+`W >= c_s*L+c_p*M >= 2*sqrt(c_s*c_p*eta*r*n)`.
 
 For a full-rank factor-base collection with `r=Theta(B)` and
 `B=Theta(n^alpha)`, fixed positive `eta,c_s,c_p` give
@@ -121,7 +122,7 @@ targets, or an early target-only dependency.
 
 At the frozen B677 size, `L=915,304` signed entries. Setting the
 optimistic expected match count to `r=B=677` requires at least
-`ceil(B*n/(2*L))=794,175` abscissa probes, or 1,709,479 entry/probe
+`ceil(B*n/L)=1,588,349` point probes, or 2,503,653 entry/probe
 units including setup. This expectation threshold alone does not give a
 success probability, and these mixed units cannot be compared directly
 with the receipt's charged group additions. The observed source also
