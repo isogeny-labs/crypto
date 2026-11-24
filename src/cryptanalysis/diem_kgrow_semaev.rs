@@ -21,9 +21,10 @@ use crate::cryptanalysis::line_oracle::{semaev_s3, LineOracle};
 use crate::cryptanalysis::line_s4_oracle::LineS4Oracle;
 
 /// Which decomposition instrument a cell uses.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum OracleKind {
     Brute,
+    #[default]
     Semaev,
 }
 
