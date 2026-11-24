@@ -275,6 +275,20 @@ quartic `U`, it independently checks `U=U_D*U_Y`, where `U_D=gcd(U,D)` and
 `U_Y=gcd(U,Y)` have degrees two and two. This is a structural certificate,
 not an extraction of an unknown public-query relation.
 
+The separate `verify_selector_admission.py` checks the finite-field
+hypotheses used by the four-leaf anti-Frobenius argument. It enumerates
+all 1,024 Dickson and 168 Y7 roots with FLINT, checks monicity,
+squarefreeness, complete splitting and coprimality, and independently
+tests curve liftability. Exactly 509 Dickson roots and all 168 Y7 roots
+lift; their union is exactly the frozen 677-point base, with 515
+nonliftable Dickson roots and no zero-ordinate roots. It also verifies
+the full odd curve order from the prime generator order and Hasse bound,
+and checks that both the positive target and public `Q` lie outside the
+selector. The deterministic result and three-file source manifest are
+`selector-admission-20261124.json` and
+`selector-admission-sources.sha256` in the same evidence directory.
+These are admission checks, not a solver or cost result.
+
 The coprime factorization gives an exact branch decomposition for any
 squarefree quartic with `U | D*Y`: its Dickson and Y7 factors have degrees
 `(4,0)`, `(3,1)`, `(2,2)`, `(1,3)`, or `(0,4)`. The first three can feed the
