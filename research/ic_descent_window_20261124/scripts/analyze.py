@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Summarise the descent-window sweep: summary.json, summary.md, descent_window.svg.
 
-usage: analyze.py DIR   (DIR holds data/rows.jsonl and data/isolation.jsonl)
+usage: analyze.py DIR   (DIR holds data/rows.jsonl and data/isolation.jsonl.gz)
 """
 import json, math, statistics as st, sys, collections, pathlib
 D = pathlib.Path(sys.argv[1])
 rows = [json.loads(l) for l in open(D / 'data/rows.jsonl')]
-iso = [json.loads(l) for l in open(D / 'data/isolation.jsonl')]
+import gzip
+iso = [json.loads(l) for l in gzip.open(D / 'data/isolation.jsonl.gz', 'rt')]
 W = {'w16': 16, 'w32': 32, 'w64': 64, 'w128': 128, 'w207': 207, 'unset': 207, 'w414': 414,
      'w828': 828, 'd3': 2187, 'full': 6560}
 ORDER = ['w16', 'w32', 'w64', 'w128', 'w207', 'unset', 'w414', 'w828', 'd3', 'full']

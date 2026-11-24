@@ -14,7 +14,7 @@ Since #4899, the `m = 3` descent walk scans a cyclic third-summand window
 aimed collection) and descends with `m = 3`, so its descent scans 207 of the
 6,560 base points a trial. v6 froze the full scan. Is that window a
 regression in descent cost, an improvement, or neither, and where is the
-optimum?
+optimum? [pcc:unverified]
 
 ## Boundary and method
 
@@ -22,7 +22,7 @@ optimum?
   targets' own `elapsed_seconds`, which is the gate's
   `ic_descent_seconds_total`. Select, collect and logs run in every arm and
   are identical; ρ is off (`baseline.rho: false`, `params/k0n41-w-norho.json`,
-  otherwise the rung's file byte for byte).
+  otherwise the rung's file byte for byte). [pcc:unverified]
 - **Arms.** One binary, `main` at `dae5b3dc9e` plus `KIC_DESCENT_WINDOW`
   (this PR): `w16`, `w32`, `w64`, `w128`, `w207`, `unset`, `w414`, `w828`,
   `d3` (⌈|F|/3⌉ = 2,187) and `full` (`0`, the v6 behaviour). `unset` and
@@ -30,7 +30,7 @@ optimum?
 - **Runs.** 5 rounds × 10 arms, arm order rotated each round
   (`scripts/sweep.py`). Each run is a fresh `ic workflow` in its own
   directory, so every run is cold, under `tools/isolated_bench.py run --cpus 3`
-  with `RAYON_NUM_THREADS=1`. Isolation records: `data/isolation.jsonl`,
+  with `RAYON_NUM_THREADS=1`. Isolation records: `data/isolation.jsonl.gz` (gzipped to stay under the artifact policy's 64 KiB data limit),
   0 of 50 contended.
 - **Host.** 4-vCPU KVM guest, Intel Xeon @ 2.10 GHz with AVX-512 (F, BW, DQ,
   VL, VBMI2, IFMA, VPOPCNTDQ), GFNI, VPCLMULQDQ; 16 GB; Linux
@@ -84,7 +84,7 @@ Paired within a round:
    the optimum by accident of scale (|F|/32 for aimed collection); a rung that
    tunes `collection_window` far below |F|/32 would push the descent onto the
    steep side (w ≤ 64 costs 1.6–5.5×). Decoupling it is left to the owner of
-   #4899; `KIC_DESCENT_WINDOW` is only an experiment control.
+   #4899; `KIC_DESCENT_WINDOW` is only an experiment control. [pcc:unverified]
 
 ## Tried and dropped
 
@@ -111,4 +111,4 @@ python3 research/ic_descent_window_20261124/scripts/analyze.py research/ic_desce
 
 `sweep.py` expects `params/` beside its own directory and writes
 `OUT/rows.jsonl` and `OUT/isolation.jsonl`; `analyze.py` reads them from
-`data/`.
+`data/` (gzip `isolation.jsonl` first).
