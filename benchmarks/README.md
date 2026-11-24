@@ -29,6 +29,12 @@ respectively1.4367x/1.5414x their frozen seven-variable solver counts.
 All outputs match, no new rows. AMD EPYC9V74, reservedCPU0, partial count
 only; unsigned and excluded from the admitted table. [pcc:unverified]
 
+[Anchored graph support-policy diagnostic, 2026-11-24](20261124-anchored-support-policy-01/README.md):
+258 matching calls, expanded policy1 extra deferred edge versus0 old,
+zero full relations; traced172,312,093 F4+linear products over129 fibers.
+AMD EPYC9V74/localCPU0, partial count only, unsigned/unadmitted.
+[pcc:unverified]
+
 **Gate audit, 2026-10-24 (base `5cb5538` plus rule-v6/v7 validation):**
 all rows remaining in this admitted table have a passing gate standing in the
 complete local source tree. Twenty-one post-freeze rows lacking independent
