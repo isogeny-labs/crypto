@@ -224,6 +224,21 @@ fn extension_inventory(
     })
 }
 
+fn report_input_digest(
+    registry: &str,
+    manifest: &str,
+    report: &TransferFile,
+) -> Result<serde_json::Value, String> {
+    let restricted = crypto_lib::cryptanalysis::cover_catalog::restrict(registry, manifest)?;
+    let digest = crypto_lib::cryptanalysis::cover_catalog::rows_sha256(&restricted);
+    Ok(serde_json::json!({
+        "status": if digest == report.catalog_rows_sha256 { "matching" } else { "mismatch" },
+        "current": digest,
+        "report": report.catalog_rows_sha256,
+        "scope": "manifest-selected registry rows only; matching does not verify report calculations or code freshness"
+    }))
+}
+
 fn run(cli: Cli) -> Result<bool, String> {
     match cli.cmd {
         Cmd::Build {
@@ -283,17 +298,10 @@ fn run(cli: Cli) -> Result<bool, String> {
                 std::fs::read_to_string(&registry).map_err(|e| format!("{registry}: {e}"))?;
             let manifest =
                 std::fs::read_to_string(&catalog).map_err(|e| format!("{catalog}: {e}"))?;
-            let restricted = crypto_lib::cryptanalysis::cover_catalog::restrict(&text, &manifest)?;
-            let digest = crypto_lib::cryptanalysis::cover_catalog::rows_sha256(&restricted);
             let curves = read_registry(&text)?;
             let file = load(&report)?;
             let mut inventory = extension_inventory(&curves, &file, name.as_deref());
-            inventory["report_input_digest"] = serde_json::json!({
-                "status": if digest == file.catalog_rows_sha256 { "matching" } else { "mismatch" },
-                "current": digest,
-                "report": file.catalog_rows_sha256,
-                "scope": "manifest-selected registry rows only; matching does not verify report calculations or code freshness"
-            });
+            inventory["report_input_digest"] = report_input_digest(&text, &manifest, &file)?;
             println!(
                 "{}",
                 serde_json::to_string_pretty(&inventory).map_err(|e| e.to_string())?
@@ -440,6 +448,24 @@ fn main() -> ExitCode {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn report_digest_detects_mismatch_and_only_confirms_input_equality() {
+        let registry = std::fs::read_to_string(REGISTRY).unwrap();
+        let manifest = std::fs::read_to_string(CATALOG).unwrap();
+        let mut report = load(OUT).unwrap();
+        report.catalog_rows_sha256 = "deliberately different".into();
+        let mismatch = report_input_digest(&registry, &manifest, &report).unwrap();
+        assert_eq!(mismatch["status"], "mismatch");
+        report.catalog_rows_sha256 = mismatch["current"].as_str().unwrap().to_string();
+        let matching = report_input_digest(&registry, &manifest, &report).unwrap();
+        assert_eq!(matching["status"], "matching");
+        assert!(matching["scope"]
+            .as_str()
+            .unwrap()
+            .contains("does not verify"));
+        assert!(report_input_digest(&registry, "{}", &report).is_err());
+    }
 
     #[test]
     fn inventory_finds_both_extension_families_and_reports_membership() {
