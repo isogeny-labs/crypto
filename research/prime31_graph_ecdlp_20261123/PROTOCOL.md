@@ -424,6 +424,16 @@ Maximum independent set and spectral partitioning have no measured benefit
 on this stream yet, so neither is promoted into the native pipeline.
 `graph-order-comparison.json` records the source receipt hash and all arms.
 
+For this exact eleven-query source-bound solve, pair construction and
+complement probing alone charge `915,304*(1+11)=10,983,648`
+group-addition-scale operations. That is 109.87 times the matched rho
+control's 99,970 charged group additions before any graph or final linear
+algebra work. Even a zero-cost graph consumer cannot reverse this
+group-operation comparison while retaining this recorded relation source
+and query stream. This is a stage-cost floor for the fixed run, not a
+wall-time theorem, an early-stop bound for other streams, or a bound on
+an algebraic relation producer.
+
 ### All-base necessity control for the generic source
 
 `all_base_control.py` independently replays the same frozen signed equations
