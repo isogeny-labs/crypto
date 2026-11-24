@@ -24,8 +24,8 @@ field changes.
 
 ## Frozen panel
 
-- **Primary sizes:** `K_0/GF(2^37)`, `K_1/GF(2^47)`, and
-  `K_0/GF(2^57)` from suite v1, identified by their ICV1 slugs in
+- **Primary sizes:** `icv1-f2m37-tm534059-32aad96b`, `icv1-f2m47-t22705043-f4e44623`, and
+  `icv1-f2m57-tm747311035-c1f545af` from suite v1, identified by their ICV1 slugs in
   `suite/v1/`. These are the three R12 sizes where the pass cost time.
 - **Suite rows:** M1's two rows at all eleven sizes, plus all eight
   suite rows at each primary size. One previously unseen public target
