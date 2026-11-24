@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Derive the actual CM19 canonical ramification line, full line-quartic divisor and residual field algebra, then evaluate every residual branch point from the actual degree4 functions without assuming a factor pattern (Codex, started 2026-11-24, branch lane/chained-cm19-ramification-20261124; follows #5103 ff41265d; exact fixed correctness source-only before frozen qualification). [pcc:unverified]
+- [ ] Derive the actual CM19 canonical ramification line, full line-quartic divisor and residual field algebra, then evaluate every residual branch point from the actual degree4 functions without assuming a factor pattern (Codex, started 2026-11-24, branch lane/chained-cm19-ramification-20261124, PR #5110; follows #5103 ff41265d; exact fixed correctness source-only before frozen qualification). [pcc:unverified]
 
 - [x] Construct actual degree4 CM19 functions and complete local evaluation (Codex, completed 2026-11-24, branch lane/chained-cm19-fibres-20261124, PR #5103, ready ff41265d; E/F native and91 partial no-axiom Int leaves, report; original whole custody and CI/parent/ledger holds retained). [pcc:unverified]
 - [x] Add frozen-input preflight before split-tangent collection:exact reference/construction pins,17 deterministic baseline fields,recorded-data drift controls and portable stub driver transport pass (Codex, completed source component 2026-11-24, branch lane/p192-frozen-input-preflight-20261124, PR #5107; follows merged #5104; live collection remains unexecuted). [pcc:unverified]
