@@ -2405,7 +2405,9 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             } => {
                 canonical(accumulator, p)?;
                 canonical(base, p)?;
-                let state = powers.get_mut(id).ok_or("missing power begin")?;
+                let Some(Some(TraceComputation::Power(state))) = computations.get_mut(*id as usize) else {
+                    return Err("missing power begin".into());
+                };
                 if state.exponent == 0 {
                     return Err("power continued after completion".into());
                 }
@@ -2440,7 +2442,9 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::PowerEnd { id, value } => {
                 canonical(value, p)?;
-                let state = powers.remove(id).ok_or("missing power begin")?;
+                let Some(TraceComputation::Power(state)) = computations.get_mut(*id as usize).and_then(Option::take) else {
+                    return Err("missing power begin".into());
+                };
                 if state.exponent != 0 || state.acc != *value {
                     return Err("incomplete power chain".into());
                 }
@@ -2517,7 +2521,9 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::GcdEnd { id, value } => {
                 canonical(value, p)?;
-                let (a, b) = gcds.remove(id).ok_or("missing gcd begin")?;
+                let Some(TraceComputation::Gcd((a, b))) = computations.get_mut(*id as usize).and_then(Option::take) else {
+                    return Err("missing gcd begin".into());
+                };
                 if !b.is_empty() || vmonic(a, p) != *value {
                     return Err("incomplete Euclidean chain".into());
                 }
@@ -2605,7 +2611,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 for v in [xp_mod_f, linear_part] {
                     canonical(v, p)?;
                 }
-                if !powers.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+                if computations.iter().any(Option::is_some) || inverse.is_some() || split.is_some() {
                     return Err("unfinished native computation".into());
                 }
                 let acknowledged = index < report.events.len();
@@ -2693,11 +2699,6 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         if g != *linear_part || product != g {
                             return Err("distinct-root completeness failed".into());
                         }
-                        previous = Some(r);
-                        product = vproduct(&product, &[(p - r) % p, 1], p);
-                    }
-                    if g != *linear_part || product != g {
-                        return Err("distinct-root completeness failed".into());
                     }
                 }
                 finished = true;
@@ -3478,7 +3479,7 @@ mod tests {
                 }
                 let reference = vdiv(&a, &b, p).unwrap();
                 let mut sink = |_event: &RootEvent| Ok(());
-                let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 },
+                let mut engine = Engine {
                     report: RootReport {
                         schema: "prime-root-trace/v1".into(),
                         p,

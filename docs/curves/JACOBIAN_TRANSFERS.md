@@ -45,9 +45,11 @@ workflow [`jacobian-transfers.yml`](../../.github/workflows/jacobian-transfers.y
 whose field has extension degree greater than one. It includes binary fields
 as well as `fpk` fields, and searches all rows of the supplied registry rather
 than only the transfer-report manifest. The JSON identifies the characteristic,
-degree, group order, registry-recorded subgroup order and whether the slug
-appears in the supplied transfer report. A recorded subgroup is **unverified**;
-missing orders remain null. Report membership does not establish that the
+degree, group order, the largest subgroup order recorded among the row's
+representations, and whether the slug appears in the supplied transfer report.
+The subgroup choice is a metadata summary, not a claim about every generator:
+inspect the relevant representation and independently verify its order. A
+recorded subgroup is **unverified**; missing orders remain null. Report membership does not establish that the
 report is fresh: use `jacobian_transfers check` separately. The command fails
 if registry parsing or the report fails; it does not silently omit bad rows.
 
