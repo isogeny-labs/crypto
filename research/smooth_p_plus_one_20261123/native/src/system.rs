@@ -179,16 +179,49 @@ pub struct System {
 }
 
 impl System {
+    pub fn at_cutoff(curve: Fixture, target: Point, levels: usize, expected: [i64; 4]) -> Self {
+        assert!(levels <= 4);
+        let mut names = vec![];
+        for step in (1..levels).rev() {
+            names.extend((0..4).map(|i| format!("c{step}_{i}")));
+        }
+        names.extend(["a0", "a1", "t0"].map(str::to_owned));
+        let variables: Vec<_> = (0..names.len())
+            .map(|i| Polynomial::variable(curve.p, names.len(), i))
+            .collect();
+        let variable =
+            |name: &str| &variables[names.iter().position(|known| known == name).unwrap()];
+        let a0 = variable("a0");
+        let mut state = quartic(curve, target, a0, variable("a1"), variable("t0"));
+        let mut equations = vec![];
+        for step in 1..=levels {
+            let advanced = advance(&state);
+            if step == levels {
+                state = advanced;
+            } else {
+                state = std::array::from_fn(|i| variable(&format!("c{step}_{i}")).clone());
+                equations.extend(advanced.iter().zip(&state).map(|(lhs, rhs)| lhs - rhs));
+            }
+        }
+        equations.extend(
+            state
+                .iter()
+                .zip(expected)
+                .map(|(lhs, rhs)| lhs - &a0.constant(rhs)),
+        );
+        equations.retain(|polynomial| !polynomial.terms.is_empty());
+        Self { names, equations }
+    }
+
     pub fn build(curve: Fixture, target: Point, depth: usize, terminal: i64, mode: Mode) -> Self {
         assert!((2..=6).contains(&depth));
         let levels = depth - 2;
+        if mode == Mode::Distinct {
+            return Self::at_cutoff(curve, target, levels, [2 - terminal, 0, -4, 0]);
+        }
         let mut names = vec![];
         match mode {
-            Mode::Distinct => {
-                for step in (1..levels).rev() {
-                    names.extend((0..4).map(|i| format!("c{step}_{i}")));
-                }
-            }
+            Mode::Distinct => unreachable!("handled by the cutoff constructor"),
             Mode::Expanded => assert!(depth <= 4, "expanded control is limited to degree sixteen"),
             Mode::Quadratic => {
                 for step in (0..levels).rev() {
@@ -211,20 +244,7 @@ impl System {
         let f = |value| a0.constant(value);
         let mut equations = vec![];
         match mode {
-            Mode::Distinct => {
-                let mut state = q;
-                for step in 1..=levels {
-                    let advanced = advance(&state);
-                    if step == levels {
-                        state = advanced;
-                    } else {
-                        state = std::array::from_fn(|i| variable(&format!("c{step}_{i}")).clone());
-                        equations.extend(advanced.iter().zip(&state).map(|(lhs, rhs)| lhs - rhs));
-                    }
-                }
-                let expected = [2 - terminal, 0, -4, 0];
-                equations.extend(state.iter().zip(expected).map(|(lhs, rhs)| lhs - &f(rhs)));
-            }
+            Mode::Distinct => unreachable!("handled by the cutoff constructor"),
             Mode::Expanded => {
                 let mut selector = vec![0, 1];
                 for _ in 0..depth {

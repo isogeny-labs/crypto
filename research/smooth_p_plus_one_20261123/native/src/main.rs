@@ -116,6 +116,23 @@ fn torus_pow(mut base: (i64, i64), mut exponent: i64, p: i64) -> (i64, i64) {
 
 type Relation = [i32; 4];
 
+#[derive(Clone, Debug)]
+struct Refinement {
+    images: [i64; 4],
+    polynomial: [i64; 4],
+}
+
+impl Refinement {
+    fn contains(&self, base: &Base, row: &Relation) -> bool {
+        let mut images =
+            row.map(|label| dickson(base.orient(label).x, base.depth - 3, base.curve.p));
+        images.sort_unstable();
+        let mut expected = self.images;
+        expected.sort_unstable();
+        images == expected
+    }
+}
+
 struct Base {
     curve: Fixture,
     depth: usize,
@@ -186,6 +203,46 @@ impl Base {
             .collect::<BTreeSet<_>>()
             .len()
             == 4
+    }
+
+    fn refinements(&self) -> Vec<Refinement> {
+        assert!(self.depth >= 3);
+        let mut pools = BTreeMap::<i64, BTreeSet<i64>>::new();
+        for point in &self.unsigned {
+            let fine = dickson(point.x, self.depth - 3, self.curve.p);
+            let coarse = dickson(fine, 1, self.curve.p);
+            pools.entry(coarse).or_default().insert(fine);
+        }
+        if pools.len() != 4 {
+            return vec![];
+        }
+        let mut choices = vec![vec![]];
+        for pool in pools.values() {
+            assert!(pool.len() <= 2);
+            choices = choices
+                .iter()
+                .flat_map(|choice| {
+                    pool.iter().map(move |image| {
+                        let mut extended = choice.clone();
+                        extended.push(*image);
+                        extended
+                    })
+                })
+                .collect();
+        }
+        choices
+            .into_iter()
+            .map(|images| {
+                let mut polynomial = vec![1];
+                for image in &images {
+                    polynomial = polynomial::product(&polynomial, &[-image, 1], self.curve.p);
+                }
+                Refinement {
+                    images: images.try_into().expect("four coarse image pools"),
+                    polynomial: polynomial[..4].try_into().unwrap(),
+                }
+            })
+            .collect()
     }
 
     fn pair_index(&self) -> BTreeMap<Option<Point>, Vec<[i32; 2]>> {
@@ -353,9 +410,12 @@ impl Drop for Scratch {
 fn run_solver(
     binary: &Path,
     input: &str,
-    budget: Duration,
+    deadline: Instant,
     scratch: &Scratch,
 ) -> Result<String, String> {
+    if Instant::now() >= deadline {
+        return Err("oracle budget exhausted".into());
+    }
     let input_path = scratch.0.join("input.ms");
     let output_path = scratch.0.join("output.txt");
     let stderr_path = scratch.0.join("stderr.txt");
@@ -364,6 +424,9 @@ fn run_solver(
     }
     fs::write(&input_path, input).map_err(|error| error.to_string())?;
     let stderr = File::create(&stderr_path).map_err(|error| error.to_string())?;
+    if Instant::now() >= deadline {
+        return Err("oracle budget exhausted".into());
+    }
     let mut child = Command::new(binary)
         .arg("-f")
         .arg(input_path)
@@ -374,7 +437,6 @@ fn run_solver(
         .stderr(stderr)
         .spawn()
         .map_err(|error| error.to_string())?;
-    let deadline = Instant::now() + budget;
     loop {
         if let Some(status) = child.try_wait().map_err(|error| error.to_string())? {
             if !status.success() {
@@ -391,13 +453,111 @@ fn run_solver(
     }
 }
 
-fn mode(value: &str) -> Option<Mode> {
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Method {
+    Single(Mode),
+    Refined,
+}
+
+impl Method {
+    fn name(self) -> String {
+        match self {
+            Self::Single(mode) => format!("{mode:?}"),
+            Self::Refined => "Refined".into(),
+        }
+    }
+
+    fn encoding(self) -> Mode {
+        match self {
+            Self::Single(mode) => mode,
+            Self::Refined => Mode::Distinct,
+        }
+    }
+}
+
+fn mode(value: &str) -> Option<Method> {
     match value {
-        "distinct" => Some(Mode::Distinct),
-        "expanded" => Some(Mode::Expanded),
-        "quadratic" => Some(Mode::Quadratic),
+        "distinct" => Some(Method::Single(Mode::Distinct)),
+        "refined" => Some(Method::Refined),
+        "expanded" => Some(Method::Single(Mode::Expanded)),
+        "quadratic" => Some(Method::Single(Mode::Quadratic)),
         _ => None,
     }
+}
+
+struct Discovery {
+    result: Result<BTreeSet<Relation>, String>,
+    planned: usize,
+    completed: usize,
+    systems: Vec<Value>,
+}
+
+fn discover(
+    base: &Base,
+    target: Point,
+    method: Method,
+    solver: &Path,
+    scratch: &Scratch,
+    budget: Duration,
+) -> Discovery {
+    let deadline = Instant::now() + budget;
+    let mut outcome = Discovery {
+        result: Err("oracle budget exhausted".into()),
+        planned: 0,
+        completed: 0,
+        systems: vec![],
+    };
+    if Instant::now() >= deadline {
+        return outcome;
+    }
+    let charts = (method == Method::Refined).then(|| base.refinements());
+    outcome.planned = charts.as_ref().map_or(1, Vec::len);
+    let mut union = BTreeSet::new();
+    for index in 0..outcome.planned {
+        if Instant::now() >= deadline {
+            return outcome;
+        }
+        let chart = charts.as_ref().map(|charts| &charts[index]);
+        let system = if let Some(chart) = chart {
+            System::at_cutoff(base.curve, target, base.depth - 3, chart.polynomial)
+        } else {
+            System::build(
+                base.curve,
+                target,
+                base.depth,
+                base.terminal,
+                method.encoding(),
+            )
+        };
+        let (variables, equations, terms, degree) = system.metrics();
+        outcome.systems.push(json!({
+            "variables":variables,"equations":equations,"terms":terms,"degree":degree,
+            "fine_images":chart.map(|chart| chart.images),
+        }));
+        let result = run_solver(solver, &system.render(base.curve.p), deadline, scratch)
+            .and_then(|raw| extract(&raw, base, target, method.encoding()));
+        let rows = match result {
+            Ok(rows) => rows,
+            Err(error) => {
+                outcome.result = Err(error);
+                return outcome;
+            }
+        };
+        if Instant::now() >= deadline {
+            return outcome;
+        }
+        for row in rows {
+            if chart.is_some_and(|chart| !chart.contains(base, &row)) || !union.insert(row) {
+                outcome.result = Err("overlapping or incorrect refinement chart".into());
+                return outcome;
+            }
+        }
+        outcome.completed += 1;
+    }
+    if Instant::now() < deadline {
+        outcome.result = Ok(union);
+    }
+    outcome
 }
 
 struct Recovery {
@@ -463,7 +623,7 @@ fn recover(
     depth: usize,
     solver: &Path,
     scratch: &Scratch,
-    method: Option<Mode>,
+    method: Option<Method>,
     mut seed: u64,
 ) {
     let base = Base::new(curve, depth);
@@ -474,7 +634,7 @@ fn recover(
         pivots: BTreeMap::new(),
     };
     let mut visited = BTreeSet::from([None]);
-    let label = method.map_or("Direct".into(), |mode| format!("{mode:?}"));
+    let label = method.map_or("Direct".into(), Method::name);
     let original_seed = seed;
     let mut scalar = None;
     let mut used = 0;
@@ -488,15 +648,18 @@ fn recover(
         }
         let target = residual.expect("identity is excluded");
         oracle_calls += 1;
-        let relations = if let Some(mode) = method {
-            let system = System::build(curve, target, depth, base.terminal, mode);
-            run_solver(
+        let mut chart_counts = None;
+        let relations = if let Some(method) = method {
+            let discovery = discover(
+                &base,
+                target,
+                method,
                 solver,
-                &system.render(curve.p),
-                Duration::from_secs(3),
                 scratch,
-            )
-            .and_then(|raw| extract(&raw, &base, target, mode))
+                Duration::from_secs(3),
+            );
+            chart_counts = Some((discovery.planned, discovery.completed));
+            discovery.result
         } else {
             Ok(base.reference(pair_index.as_ref().unwrap(), target))
         };
@@ -514,7 +677,7 @@ fn recover(
             "{}",
             json!({
                 "kind":"attempt","mode":label,"seed":original_seed,"draw":attempt,
-                "a":a,"b":b,"target":[target.x,target.y],"result":result,
+                "a":a,"b":b,"target":[target.x,target.y],"result":result,"chart_counts":chart_counts,
             })
         );
         if let Some(found) = scalar {
@@ -535,7 +698,7 @@ fn main() -> Result<(), String> {
     let argv: Vec<_> = std::env::args().skip(1).collect();
     let [prime, depth, solver, modes @ ..] = argv.as_slice() else {
         return Err(
-            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED] [distinct expanded quadratic]".into(),
+            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED] [distinct refined expanded quadratic]".into(),
         );
     };
     let curve = *FIXTURES
@@ -563,14 +726,20 @@ fn main() -> Result<(), String> {
         };
     let modes: Vec<_> = if modes.is_empty() {
         vec![Mode::Distinct, Mode::Expanded, Mode::Quadratic]
+            .into_iter()
+            .map(Method::Single)
+            .collect()
     } else {
         modes
             .iter()
             .map(|label| mode(label).ok_or("unknown mode"))
             .collect::<Result<_, _>>()?
     };
-    if depth > 4 && modes.contains(&Mode::Expanded) {
+    if depth > 4 && modes.contains(&Method::Single(Mode::Expanded)) {
         return Err("expanded control is limited to depths of at most four".into());
+    }
+    if depth < 3 && modes.contains(&Method::Refined) {
+        return Err("refinement needs depth at least three".into());
     }
     if let Some(seed) = recovery_seed {
         recover(curve, depth, Path::new(solver), &scratch, None, seed);
@@ -615,21 +784,20 @@ fn main() -> Result<(), String> {
     for (trial, target) in targets.into_iter().enumerate() {
         let expected = base.reference(&pairs, target);
         for mode in &modes {
-            let system = System::build(curve, target, depth, base.terminal, *mode);
-            let (variables, equations, terms, degree) = system.metrics();
             let want: BTreeSet<_> = expected
                 .iter()
-                .filter(|row| *mode != Mode::Distinct || base.separated(row))
+                .filter(|row| mode.encoding() != Mode::Distinct || base.separated(row))
                 .copied()
                 .collect();
-            let result = run_solver(
+            let discovery = discover(
+                &base,
+                target,
+                *mode,
                 Path::new(solver),
-                &system.render(curve.p),
-                Duration::from_secs(3),
                 &scratch,
-            )
-            .and_then(|raw| extract(&raw, &base, target, *mode));
-            let record = match result {
+                Duration::from_secs(3),
+            );
+            let record = match discovery.result {
                 Ok(recovered) if recovered == want => {
                     json!({"status":"exact","relations":recovered.len()})
                 }
@@ -644,12 +812,103 @@ fn main() -> Result<(), String> {
                 "{}",
                 json!({
                     "prime":curve.p,"depth":depth,"target":[target.x,target.y],
-                    "mode":format!("{mode:?}"),"variables":variables,"equations":equations,
-                    "terms":terms,"degree":degree,"expected":want.len(),"result":record,
+                    "mode":mode.name(),"systems":discovery.systems,
+                    "charts_planned":discovery.planned,"charts_completed":discovery.completed,
+                    "query_budget_ms":3000,"expected":want.len(),"result":record,
                     "planted":trial>=unplanted,
                 })
             );
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn refinements_partition_all_regular_unsigned_tuples() {
+        for (curve, depth) in [
+            (FIXTURES[0], 3),
+            (FIXTURES[0], 4),
+            (FIXTURES[1], 4),
+            (FIXTURES[1], 5),
+            (FIXTURES[1], 6),
+        ] {
+            let base = Base::new(curve, depth);
+            let charts = base.refinements();
+            assert!(charts.len() <= 16);
+            for chart in &charts {
+                let mut polynomial = chart.polynomial.to_vec();
+                polynomial.push(1);
+                assert_eq!(
+                    field_roots(polynomial, curve.p)
+                        .unwrap()
+                        .into_iter()
+                        .collect::<BTreeSet<_>>(),
+                    chart.images.into_iter().collect(),
+                );
+            }
+            let n = base.unsigned.len() as i32;
+            let mut regular = 0;
+            for a in 1..=n {
+                for b in a + 1..=n {
+                    for c in b + 1..=n {
+                        for d in c + 1..=n {
+                            let row = [a, -b, c, -d];
+                            let expected = usize::from(base.separated(&row));
+                            let count = charts
+                                .iter()
+                                .filter(|chart| chart.contains(&base, &row))
+                                .count();
+                            assert_eq!(count, expected, "p={} depth={depth}, {row:?}", curve.p);
+                            regular += expected;
+                        }
+                    }
+                }
+            }
+            assert_eq!(regular == 0, charts.is_empty());
+        }
+    }
+
+    #[test]
+    fn exhausted_budget_never_calls_solver() {
+        let base = Base::new(FIXTURES[0], 4);
+        let scratch = Scratch::new().unwrap();
+        for method in [Method::Single(Mode::Distinct), Method::Refined] {
+            let result = discover(
+                &base,
+                base.curve.q,
+                method,
+                Path::new("/nonexistent-msolve"),
+                &scratch,
+                Duration::ZERO,
+            );
+            assert_eq!(result.completed, 0);
+            assert_eq!(result.result.unwrap_err(), "oracle budget exhausted");
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn failed_refinement_keeps_partial_union_undetermined() {
+        use std::os::unix::fs::PermissionsExt;
+        let scratch = Scratch::new().unwrap();
+        let solver = scratch.0.join("partial-solver.sh");
+        fs::write(&solver, "#!/bin/sh\nif [ -e \"$2.seen\" ]; then exit 9; fi\n: > \"$2.seen\"\nprintf '[-1]:' > \"$4\"\n").unwrap();
+        fs::set_permissions(&solver, fs::Permissions::from_mode(0o700)).unwrap();
+        let base = Base::new(FIXTURES[1], 5);
+        let outcome = discover(
+            &base,
+            base.curve.q,
+            Method::Refined,
+            &solver,
+            &scratch,
+            Duration::from_secs(3),
+        );
+        assert!(outcome.planned > 1);
+        assert_eq!(outcome.completed, 1);
+        assert!(outcome.result.unwrap_err().starts_with("solver exit"));
+    }
 }
