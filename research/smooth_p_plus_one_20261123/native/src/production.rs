@@ -1,13 +1,16 @@
 //! Bounded adapter to the unchanged Isogeny Labs monic-cofactor extractor.
 //! No reference pair index or target scalar enters the production call.
 
-use super::{Base, Discovery, Point, Relation};
+use super::{Base, Discovery, Point, Relation, Scratch};
 use crypto_lib::cryptanalysis::f4_fp::F4ResourceLimits;
 use prime31_algebraic_ic::Curve;
-use prime31_four_summand::extractor::{extract_cofactor, Limits, ResultRow, Status};
+use prime31_four_summand::extractor::{
+    extract_cofactor, prepare_cofactor, Limits, PreparedCofactor, ResultRow, Status,
+};
 use prime31_four_summand::relation_adapter::SignedRelation;
 use serde_json::json;
 use std::collections::BTreeSet;
+use std::path::Path;
 use std::time::{Duration, Instant};
 
 const RESOURCES: F4ResourceLimits = F4ResourceLimits {
@@ -15,6 +18,140 @@ const RESOURCES: F4ResourceLimits = F4ResourceLimits {
     max_symbolic_monomials: 8_192,
     max_matrix_entries: 2_000_000,
 };
+
+fn public_input(base: &Base) -> (Curve, Vec<(u64, u64)>) {
+    let e = base.curve;
+    (
+        Curve {
+            p: e.p as u64,
+            a: e.a as u64,
+            b: e.b as u64,
+            n: e.n as u64,
+            g: (e.g.x as u64, e.g.y as u64),
+        },
+        base.unsigned
+            .iter()
+            .map(|point| (point.x as u64, point.y as u64))
+            .collect(),
+    )
+}
+
+fn construction_limits(budget: Duration) -> Limits {
+    Limits {
+        max_degree: 10,
+        seconds: budget.as_secs().max(1),
+        max_polynomial_terms: 20_000,
+        max_assignments: 4_096,
+    }
+}
+
+fn render(prepared: &PreparedCofactor) -> String {
+    // Native parameters b,c,d mean t0,a1,a0 in the existing RUR extractor.
+    let mut names = vec!["t0".to_string(), "a1".into(), "a0".into()];
+    names.extend((3..prepared.variables).map(|index| format!("w{}", index - 3)));
+    let polynomials: Vec<_> = prepared
+        .equations
+        .iter()
+        .map(|polynomial| {
+            if polynomial.is_empty() {
+                return "0".to_string();
+            }
+            polynomial
+                .iter()
+                .map(|(exponents, coefficient)| {
+                    assert_eq!(exponents.len(), names.len());
+                    let mut term = coefficient.to_string();
+                    for (name, exponent) in names.iter().zip(exponents) {
+                        if *exponent != 0 {
+                            term.push('*');
+                            term.push_str(name);
+                            if *exponent != 1 {
+                                term.push_str(&format!("^{exponent}"));
+                            }
+                        }
+                    }
+                    term
+                })
+                .collect::<Vec<_>>()
+                .join("+")
+        })
+        .collect();
+    format!(
+        "{}\n{}\n{}\n",
+        names.join(","),
+        prepared.prime,
+        polynomials.join(",\n")
+    )
+}
+
+pub(super) fn discover_msolve(
+    base: &Base,
+    target: Point,
+    solver: &Path,
+    scratch: &Scratch,
+    deadline: Instant,
+    budget: Duration,
+) -> Discovery {
+    let mut outcome = Discovery {
+        result: Err("oracle budget exhausted".into()),
+        planned: 1,
+        completed: 0,
+        systems: vec![],
+    };
+    if Instant::now() >= deadline || budget.is_zero() {
+        return outcome;
+    }
+    let (curve, points) = public_input(base);
+    let prepared = match prepare_cofactor(
+        curve,
+        &points,
+        Some((target.x as u64, target.y as u64)),
+        construction_limits(budget),
+    ) {
+        Ok(prepared) => prepared,
+        Err(native) => {
+            if Instant::now() < deadline {
+                outcome.result = accepted_rows(base, target, &native);
+                outcome.completed = usize::from(outcome.result.is_ok());
+            }
+            outcome.systems.push(
+                json!({"backend":"production_equations_msolve", "preparation_result":native}),
+            );
+            return outcome;
+        }
+    };
+    let input = render(&prepared);
+    let mut record = json!({
+        "backend":"production_equations_msolve",
+        "scope":"full_distinct_x_target_disjoint_rr5",
+        "prepared":prepared,
+        "input":input,
+        "accounting":"local_correctness_only",
+    });
+    let rows = match super::run_solver(solver, &input, deadline, scratch) {
+        Ok(raw) => {
+            record["rur_bytes"] = json!(raw.len());
+            if raw.len() <= 262_144 {
+                record["rur"] = json!(raw);
+            } else {
+                record["rur_capture"] = json!("omitted_over_262144_bytes");
+            }
+            super::extract(&raw, base, target, super::Mode::Quadratic)
+        }
+        Err(error) => Err(error),
+    };
+    record["matched_regular_rows"] = json!(rows.as_ref().ok().map(|rows| rows
+        .iter()
+        .filter(|row| base.separated(row))
+        .copied()
+        .collect::<Vec<_>>()));
+    outcome.systems.push(record);
+    if Instant::now() < deadline {
+        outcome.completed = usize::from(rows.is_ok());
+        outcome.result = rows;
+    }
+    outcome
+}
 
 fn convert(base: &Base, target: Point, relation: &SignedRelation) -> Result<Relation, String> {
     if relation.terms.len() != 4 {
@@ -77,32 +214,14 @@ pub(super) fn discover(
     if Instant::now() >= deadline || budget.is_zero() {
         return outcome;
     }
-    let e = base.curve;
-    let curve = Curve {
-        p: e.p as u64,
-        a: e.a as u64,
-        b: e.b as u64,
-        n: e.n as u64,
-        g: (e.g.x as u64, e.g.y as u64),
-    };
-    let points: Vec<_> = base
-        .unsigned
-        .iter()
-        .map(|point| (point.x as u64, point.y as u64))
-        .collect();
+    let (curve, points) = public_input(base);
     let native = extract_cofactor(
         curve,
         &points,
         Some((target.x as u64, target.y as u64)),
-        Limits {
-            max_degree: 10,
-            // The existing API takes whole seconds and starts its deadline
-            // after validation. The enclosing absolute deadline still governs
-            // acceptance, including conversion and replay. This is cooperative.
-            seconds: budget.as_secs().max(1),
-            max_polynomial_terms: 20_000,
-            max_assignments: 4_096,
-        },
+        // The original API uses whole seconds after validation. The enclosing
+        // absolute deadline still governs acceptance, including signed replay.
+        construction_limits(budget),
         RESOURCES,
     );
     let rows = accepted_rows(base, target, &native);
@@ -194,6 +313,127 @@ mod tests {
         native.status = Status::Complete;
         native.diagnostics.forbidden_domain_evaluations = 1;
         assert!(accepted_rows(&base, target, &native).is_err());
+    }
+
+    #[test]
+    fn exported_equations_bind_to_independent_numeric_quartic() {
+        for (curve, depth, target) in [
+            (FIXTURES[0], 4, Point { x: 20, y: 91 }),
+            (FIXTURES[1], 5, Point { x: 792, y: 883 }),
+        ] {
+            let base = Base::new(curve, depth);
+            let (native_curve, points) = public_input(&base);
+            let prepared = prepare_cofactor(
+                native_curve,
+                &points,
+                Some((target.x as u64, target.y as u64)),
+                construction_limits(Duration::from_secs(3)),
+            )
+            .unwrap();
+            assert_eq!(prepared.variables, base.unsigned.len() - 1);
+            assert_eq!(prepared.equations.len(), base.unsigned.len());
+            let input = render(&prepared);
+            assert!(input.starts_with("t0,a1,a0,w0,"));
+            let evaluate = |poly: &crypto_lib::cryptanalysis::f4_fp::Poly, assignment: &[i64]| {
+                poly.iter().fold(0i64, |sum, (powers, coefficient)| {
+                    let term = powers.iter().zip(assignment).fold(
+                        *coefficient as i64,
+                        |value, (exponent, coordinate)| {
+                            value * crate::polynomial::pow(*coordinate, *exponent as i64, curve.p)
+                                % curve.p
+                        },
+                    );
+                    (sum + term).rem_euclid(curve.p)
+                })
+            };
+            let h = base.unsigned.iter().fold(vec![1], |h, point| {
+                crate::polynomial::product(&h, &[-point.x, 1], curve.p)
+            });
+            for alpha in [0, 1, curve.p - 1] {
+                for beta in [0, 1, curve.p - 1] {
+                    for t in [0, 1, curve.p - 1] {
+                        let mut assignment = vec![t, beta, alpha];
+                        assignment
+                            .extend((3..prepared.variables).map(|i| (3 * i as i64 + 2) % curve.p));
+                        let numeric = crate::system::numeric_quartic(curve, target, alpha, beta, t);
+                        assert_eq!(
+                            prepared
+                                .quartic
+                                .iter()
+                                .map(|poly| evaluate(poly, &assignment))
+                                .collect::<Vec<_>>(),
+                            numeric
+                        );
+                        let mut w = assignment[3..].to_vec();
+                        w.push(1);
+                        let product = crate::polynomial::product(&numeric, &w, curve.p);
+                        let expected: Vec<_> = product
+                            .iter()
+                            .zip(&h)
+                            .take(h.len() - 1)
+                            .map(|(a, b)| (a - b).rem_euclid(curve.p))
+                            .zip(&prepared.equation_multipliers)
+                            .map(|(value, scale)| value * *scale as i64 % curve.p)
+                            .collect();
+                        let actual: Vec<_> = prepared
+                            .equations
+                            .iter()
+                            .map(|poly| evaluate(poly, &assignment))
+                            .collect();
+                        assert_eq!(actual, expected);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn preparation_preserves_invalid_and_unsupported_boundaries() {
+        let (base, target, _) = fixture();
+        let (curve, mut points) = public_input(&base);
+        let limits = construction_limits(Duration::from_secs(3));
+        assert_eq!(
+            prepare_cofactor(curve, &points, None, limits)
+                .unwrap_err()
+                .status,
+            Status::UnsupportedChart
+        );
+        assert_eq!(
+            prepare_cofactor(curve, &points, Some(points[0]), limits)
+                .unwrap_err()
+                .status,
+            Status::UnsupportedChart
+        );
+        points[1] = points[0];
+        assert_eq!(
+            prepare_cofactor(
+                curve,
+                &points,
+                Some((target.x as u64, target.y as u64)),
+                limits
+            )
+            .unwrap_err()
+            .status,
+            Status::InvalidInput
+        );
+    }
+
+    #[test]
+    fn expired_external_query_never_starts_solver() {
+        let (base, target, _) = fixture();
+        let scratch = Scratch::new().unwrap();
+        let got = discover_msolve(
+            &base,
+            target,
+            Path::new("/must-not-be-run"),
+            &scratch,
+            Instant::now(),
+            Duration::ZERO,
+        );
+        assert!(got.result.is_err());
+        assert!(got.systems.is_empty());
+        assert_eq!(got.completed, 0);
+        assert!(scratch.0.read_dir().unwrap().next().is_none());
     }
 
     #[test]

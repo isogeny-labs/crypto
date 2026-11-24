@@ -84,6 +84,21 @@ pub struct ResultRow {
     pub traversal: Option<VisitReport>,
 }
 
+/// Validated equations from the same construction boundary used by native F4.
+/// Variables are b,c,d followed by the monic cofactor's lower coefficients.
+/// The unscaled quartic coefficients are in ascending X order. This is input data,
+/// not a solved system or an assertion of completeness.
+#[derive(Clone, Debug, Serialize)]
+pub struct PreparedCofactor {
+    pub prime: u64,
+    pub variables: usize,
+    pub equations: Vec<Poly>,
+    /// Each normalized equation is this scalar times its raw U*W-h coefficient.
+    pub equation_multipliers: Vec<u64>,
+    pub quartic: Vec<Poly>,
+    pub diagnostics: Diagnostics,
+}
+
 pub(crate) struct Builder {
     pub(crate) p: u64,
     pub(crate) variables: usize,
@@ -314,7 +329,14 @@ fn is_nonzero_constant(g: &Poly) -> bool {
 
 /// No scalar or decomposition hint is accepted by this interface.
 pub fn extract(e: Curve, base: &[(u64, u64)], q: Point, limits: Limits) -> ResultRow {
-    extract_internal(e, base, q, limits, Presentation::Automatic, None)
+    extract_internal(
+        e,
+        base,
+        q,
+        limits,
+        Presentation::Automatic,
+        Execution::F4(None),
+    )
 }
 
 /// Exact public monic-cofactor reference, with explicit native allocation caps.
@@ -331,8 +353,30 @@ pub fn extract_cofactor(
         q,
         limits,
         Presentation::Cofactor,
-        Some(resource_limits),
+        Execution::F4(Some(resource_limits)),
     )
+}
+
+/// Build the exact cofactor equations without invoking F4 or root extraction.
+/// Input validation, chart omissions and construction limits are unchanged.
+/// A pre-construction Empty/UnsupportedChart/etc. is returned in the error
+/// channel so that callers cannot mistake it for a prepared equation system.
+pub fn prepare_cofactor(
+    e: Curve,
+    base: &[(u64, u64)],
+    q: Point,
+    limits: Limits,
+) -> Result<PreparedCofactor, Box<ResultRow>> {
+    let mut prepared = None;
+    let result = extract_internal(
+        e,
+        base,
+        q,
+        limits,
+        Presentation::Cofactor,
+        Execution::Prepare(&mut prepared),
+    );
+    prepared.ok_or_else(|| Box::new(result))
 }
 
 /// The validated original hybrid base; no scalar or decomposition enters here.
@@ -348,7 +392,7 @@ pub fn extract_hybrid677(
         q,
         limits,
         Presentation::Hybrid(base),
-        Some(resource_limits),
+        Execution::F4(Some(resource_limits)),
     )
 }
 
@@ -359,13 +403,18 @@ enum Presentation<'a> {
     Hybrid(&'a Hybrid677),
 }
 
+enum Execution<'a> {
+    F4(Option<F4ResourceLimits>),
+    Prepare(&'a mut Option<PreparedCofactor>),
+}
+
 fn extract_internal(
     e: Curve,
     base: &[(u64, u64)],
     q: Point,
     limits: Limits,
     presentation: Presentation<'_>,
-    resource_limits: Option<F4ResourceLimits>,
+    execution: Execution<'_>,
 ) -> ResultRow {
     let use_product = matches!(presentation, Presentation::Cofactor)
         || matches!(presentation, Presentation::Automatic) && (5..=8).contains(&base.len());
@@ -500,6 +549,35 @@ fn extract_internal(
         .flat_map(|f| f.iter().map(|(e, _)| e.iter().sum()))
         .max()
         .unwrap_or(0);
+    let resource_limits = match execution {
+        Execution::F4(limits) => limits,
+        Execution::Prepare(output) => {
+            result.diagnostics.curve_work = ar.counts;
+            let equation_multipliers = constraints
+                .iter()
+                .zip(&equations)
+                .map(|(raw, normalized)| {
+                    normalized.first().map_or(1, |(exponents, coefficient)| {
+                        mm(*coefficient, pow(raw[exponents], e.p - 2, e.p), e.p)
+                    })
+                })
+                .collect();
+            *output = Some(PreparedCofactor {
+                prime: e.p,
+                variables,
+                equations,
+                equation_multipliers,
+                quartic: u
+                    .iter()
+                    .map(|f| f.iter().map(|(e, c)| (e.clone(), *c)).collect())
+                    .collect(),
+                diagnostics: result.diagnostics.clone(),
+            });
+            result.status = Status::Inconclusive;
+            result.reason = "cofactor equations prepared; solving not attempted".into();
+            return result;
+        }
+    };
     let mut opts = F4Options::new(ordering, limits.max_degree);
     opts.deadline = Some(deadline);
     opts.resource_limits = resource_limits;
