@@ -303,6 +303,22 @@ Use a selector \(z_i\) for every chart except chart zero, and one variable per l
 
 The independent direct-resultant computation confirms all four complete solution sets over the original variables. Each candidate run visits 5,984 distinct signed-prefix sums counted within their prefix groups and solves 5,093–5,232 distinct intermediate systems. A separate parser verifies the emitted leading terms, their standard-monomial counts, and the sparse row counts. With a disk export, candidate construction and reconstruction take 5–28 ms on this machine, excluding the independent reference and parser. The tenfold bound is a solving-degree result for the lifted presentation. Its cost includes the signed-prefix search and tens to hundreds of thousands of sparse basis rows. [pcc:unverified]
 
+### M31 transfer
+
+The native M31 control uses \(p=2^{31}-1\) and the curve coefficients \(a=847514846\), \(b=2087444724\) from the repository's Prime31 S3 example. The matched factor base is the first length-16 run of consecutive nonzero abscissae with two rational signs, starting at 154076. The four label bits enter each abscissa affinely, \(x=154076+\sum_{j=0}^3 2^j u_j\). This keeps the domain linear in the Boolean labels in both arms. The panel consists of three planted sums of five distinct points, a planted three-point sum to test cancellation, and two unplanted finite targets. [Prime31 S3 example](../../examples/prime31_monic_s3_pair_oracle.rs)
+
+The M31 direct input is the S6 resultant and the 20 Boolean equations over \(\mathbb F_p\). The coefficient of the product of all 20 label variables is the alternating evaluation sum over the Boolean cube. It is nonzero on all six targets. The Boolean equations alone leave the entire cube, so bounded closure below degree 20 cannot solve the direct presentation. The reference computes the full solution set by an exact homogeneous resultant. It cross-checks the norm step against 256 specializations of the upstream Sylvester determinant, including zero leading coefficients. [pcc:unverified]
+
+The charted arm uses an exact S3 quadratic in the second suffix abscissa for each fixed first suffix abscissa and residual. It checks membership in the 16-label base and verifies both signs. This costs about 88,000 suffix quadratic queries per target. The output uses the same graph-basis leading monomials as in characteristic two, with \(v^2-v\), \(zr-r\), and signed affine coordinate differences. Both arms agree on the full solution sets. The parser verifies the text exports and counts their standard monomials. [pcc:unverified]
+
+| M31 control | Targets | Solutions per target | Auxiliary variables | Basis rows | Direct lower bound → charted cap |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Five distinct abscissae | 3 | 120 | 119 | 7,160 | ≥20 → 2 |
+| Signed cancellation | 1 | 840 | 773 | 299,135 | ≥20 → 2 |
+| Misses | 2 | 0 | 0 | 1 | ≥20 → 2 |
+
+The constant at the end of a miss is obtained after the suffix queries. The table charges their degree-two cap to those runs. Building the shared base takes 23.3 ms. Chart extraction, writing the basis, and reconstructing the original solutions take 43–64 ms per target. Direct exact evaluation takes 40–41 ms per warm target and 152 ms for the first, which builds the polynomial cache. These direct timings measure exhaustive evaluation and checking, with the direct solving-degree bound certified separately. The M31 result covers this 16-abscissa base. Larger pair-spectrum workloads and prime-degree binary n83 remain separate measurements. [pcc:unverified]
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
@@ -438,5 +454,15 @@ python3 research/frobenius_s3_cubic_projection_20261123/verify_chart_export.py /
 ~~~
 
 The chart construction, export, and reconstruction records are in [charted-resultant.jsonl](charted-resultant.jsonl).
+
+Run the same degree comparison on M31.
+
+~~~sh
+mkdir -p /tmp/s3-m31-bases
+bash research/frobenius_s3_cubic_projection_20261123/run_m31_charted.sh /tmp/s3-m31-bases > /tmp/s3-m31.jsonl
+python3 research/frobenius_s3_cubic_projection_20261123/verify_chart_export.py /tmp/s3-m31.jsonl /tmp/s3-m31-bases
+~~~
+
+The M31 records are in [m31-charted.jsonl](m31-charted.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)

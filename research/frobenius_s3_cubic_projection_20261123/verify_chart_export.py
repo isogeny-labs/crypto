@@ -19,9 +19,17 @@ def verify(record, directory):
     gates = {}
     products = 0
     target = record["target"]
-    with (directory / f"target-{target}.basis.txt").open() as file:
+    path = directory / f"target-{target}.basis.txt"
+    if not record["roots"]:
+        assert record["basis_rows"] == 1 and path.read_text().strip() == "1"
+        print(f"Target {target}: constant refutation")
+        return
+    with path.open() as file:
         for line in file:
             row = line.rstrip("\n")
+            if "p" in record and row.startswith("v"):
+                assert " + " not in row
+            row = row.replace(" - ", " + ")
             if match := PRODUCT.fullmatch(row):
                 a, b = (int(value) for value in match.groups()[:2])
                 assert 0 <= a < b < width and allowed[a] >> b & 1
