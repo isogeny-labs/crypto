@@ -1,3 +1,21 @@
+# Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (PR #5081): quartic Diem la_add study
+
+## Goal
+Owner (2026-11-23, "Yes to all"): run the frozen la_add study research/quartic_diem_la_20261123/
+(2lp-sfb vs 2lp-sfb-sge, SGE + coordinate Wiedemann on a square subsystem).
+
+## Spec
+research/quartic_diem_la_20261123/PROTOCOL.md (draft; section 4 dev grid fixes W, FILL, EXCESS, then freeze).
+Binary: scratchpad/bin/genus_ladder.qla built from 4faca82a6f0 (cargo build --release --bin genus_ladder).
+
+## State
+Build repaired (4faca82a6f0). Study frozen (612f8dee20e, W=8 FILL=1.5 EXCESS=64), 80 runs done, frozen rule
+IMPROVEMENT (paired GAE_1 0.371 [0.340,0.406]); RESULTS/fig/PDF committed (23384701f18); main merged (26d51bfc868).
+
+## Next
+Validator report in research/quartic_diem_la_20261123/validation/ -> benchmarks/20261124-quartic-diem-la/ + README row
+-> mark PR #5081 ready. Lead: skip the doomed full-core fallback (new protocol).
+
 # Resume: crypto @ claude/humbert-next-leads-20261120 (PR #4848) — crossover at q < 2^17 + rho audit
 
 ## Goal
