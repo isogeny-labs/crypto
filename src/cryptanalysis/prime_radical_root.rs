@@ -614,6 +614,7 @@ pub(crate) struct Cube<R: Ring> {
     // Cache repeated AMM digit corrections for all roots in this field.
     w_squared: R::E,
     c_inv_squared: R::E,
+    #[allow(dead_code)]
     p3s: u128,
 }
 impl<R: Ring> Cube<R> {
