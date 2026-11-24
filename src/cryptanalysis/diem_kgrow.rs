@@ -296,8 +296,7 @@ pub fn charged_rho(
         for d in 0..order {
             if acc == *target {
                 let mut check_adds = 0u64;
-                let check =
-                    scalar_mul_charged(curve, &BigUint::from(d), g, &mut check_adds);
+                let check = scalar_mul_charged(curve, &BigUint::from(d), g, &mut check_adds);
                 if check != *target {
                     return Err("rho exhaustive: [d]G ≠ Q".into());
                 }
@@ -485,7 +484,9 @@ pub fn run_cell_charged(req: &CellRequest) -> Result<ChargedCellReport, String> 
         return crate::cryptanalysis::diem_kgrow_semaev::run_semaev_cell(req);
     }
     if oracle != "brute" {
-        return Err(format!("unknown diem_kgrow oracle `{oracle}` (use semaev|brute)"));
+        return Err(format!(
+            "unknown diem_kgrow oracle `{oracle}` (use semaev|brute)"
+        ));
     }
     run_cell_charged_brute(req)
 }
@@ -728,7 +729,10 @@ mod tests {
         };
         let rep = run_cell(&req).expect("k=2 cell");
         assert_eq!(rep.k, 2);
-        assert!(rep.recovered >= 1, "expected ≥1 recovered decomp, got {rep:?}");
+        assert!(
+            rep.recovered >= 1,
+            "expected ≥1 recovered decomp, got {rep:?}"
+        );
     }
 
     #[test]

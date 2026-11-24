@@ -292,7 +292,10 @@ impl<E: Copy + PartialEq + std::hash::Hash + Eq> WTower<E> {
     fn step<F: PrimeField<Elem = E>>(&self, f: &F, j: usize, y: E) -> E {
         if let Some(vs) = &self.velu {
             let (xi, tau) = vs[j];
-            f.add(y, f.mul(tau, f.inv(f.sub(y, xi)).expect("x ∈ V avoids the kernels")))
+            f.add(
+                y,
+                f.mul(tau, f.inv(f.sub(y, xi)).expect("x ∈ V avoids the kernels")),
+            )
         } else if self.dickson() {
             f.sub(f.sqr(y), f.from_u64(2))
         } else {
@@ -582,8 +585,8 @@ fn isogeny<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::Elem> 
     } else {
         None
     };
-    let supersingular = ss_kind.is_some()
-        && (p.clone() + BigUint::one()).trailing_zeros().unwrap_or(0) >= t as u64;
+    let supersingular =
+        ss_kind.is_some() && (p.clone() + BigUint::one()).trailing_zeros().unwrap_or(0) >= t as u64;
     let (tower, which) = if supersingular {
         (
             supersingular_tower_wide(f, t as u32, seed, ss_kind.expect("checked"), &mut ops)
@@ -592,12 +595,12 @@ fn isogeny<F: PrimeField>(f: &F, t: usize, rng: &mut StdRng) -> WTower<F::Elem> 
         )
     } else {
         (
-            isogeny_tower_wide(f, t as u32, seed, AuxFamily::Any, &mut ops).expect("ordinary tower"),
+            isogeny_tower_wide(f, t as u32, seed, AuxFamily::Any, &mut ops)
+                .expect("ordinary tower"),
             "ordinary",
         )
     };
-    let steps: Vec<(F::Elem, F::Elem)> =
-        tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
+    let steps: Vec<(F::Elem, F::Elem)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
     WTower {
         kind: WKind::Isogeny,
         t,

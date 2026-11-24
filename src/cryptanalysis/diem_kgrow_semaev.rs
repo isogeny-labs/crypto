@@ -13,9 +13,7 @@ use crate::cryptanalysis::diem_kgrow::{
     k_of_p, log2_extension_ic_catalog, log2_rho_catalog, CellRequest, ChargedCellReport,
 };
 use crate::cryptanalysis::ext_curve::{ExtCurve, ExtField, ExtPoint, Fp2, Fp3};
-use crate::cryptanalysis::ic_boundary::{
-    CountedGroup, FactorBase, GroupOps, OracleCounters,
-};
+use crate::cryptanalysis::ic_boundary::{CountedGroup, FactorBase, GroupOps, OracleCounters};
 use crate::cryptanalysis::ic_framework::stages::{DecompositionOracle, InstanceCtx, Params};
 use crate::cryptanalysis::line_oracle::{semaev_s3, LineOracle};
 use crate::cryptanalysis::line_s4_oracle::LineS4Oracle;
@@ -60,7 +58,11 @@ where
         for (j, pt) in lifts.into_iter().enumerate() {
             points.push(pt);
             col_of.push(col);
-            coef_of.push(if j == 0 { 1 } else { p.saturating_sub(1).max(1) });
+            coef_of.push(if j == 0 {
+                1
+            } else {
+                p.saturating_sub(1).max(1)
+            });
         }
     }
     if points.len() < 2 {
@@ -99,7 +101,11 @@ fn frobenius_line_base(
         for (j, pt) in lifts.into_iter().enumerate() {
             points.push(pt);
             col_of.push(col);
-            coef_of.push(if j == 0 { 1 } else { p.saturating_sub(1).max(1) });
+            coef_of.push(if j == 0 {
+                1
+            } else {
+                p.saturating_sub(1).max(1)
+            });
         }
     }
     if points.len() < 3 {

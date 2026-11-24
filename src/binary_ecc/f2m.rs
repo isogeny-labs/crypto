@@ -345,10 +345,8 @@ impl F2mElement {
     #[inline]
     pub fn add(&self, other: &Self) -> Self {
         debug_assert_eq!(self.m, other.m);
-        if let (
-            Words::Inline { len: la, w: wa },
-            Words::Inline { len: lb, w: wb },
-        ) = (&self.bits, &other.bits)
+        if let (Words::Inline { len: la, w: wa }, Words::Inline { len: lb, w: wb }) =
+            (&self.bits, &other.bits)
         {
             let len = (*la).max(*lb);
             let mut w = [0u64; INLINE_WORDS];

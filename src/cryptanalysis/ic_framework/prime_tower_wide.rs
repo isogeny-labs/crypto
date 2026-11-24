@@ -263,10 +263,10 @@ fn class_hits_w<F: PrimeField>(
         } else if let Some(s) = s {
             if let Some(neg) = e.neg(f, Some(s)) {
                 if let Some(&j) = table.get(&neg) {
-                let cand = base.clone() + BigUint::from(j);
-                if cand <= i1 {
-                    hits.push(cand);
-                }
+                    let cand = base.clone() + BigUint::from(j);
+                    if cand <= i1 {
+                        hits.push(cand);
+                    }
                 }
             }
         }
@@ -422,10 +422,7 @@ fn finish_tower_wide<F: PrimeField>(
     if acc.is_some() {
         return Err("Q does not have order 2^t".into());
     }
-    let keys: HashSet<(F::Elem, F::Elem)> = multiples
-        .iter()
-        .filter_map(|m| *m)
-        .collect();
+    let keys: HashSet<(F::Elem, F::Elem)> = multiples.iter().filter_map(|m| *m).collect();
     let r0 = loop {
         let r = random_point_w(f, &aux, rng, &mut cost);
         let r2 = aux.double(f, ops, r);
@@ -499,7 +496,10 @@ fn wide_rng(p: &BigUint, t: u32, seed: u64, salt: u64) -> StdRng {
     let mask = (BigUint::one() << 64u32) - BigUint::one();
     let low = (p & &mask).to_u64().unwrap_or(0);
     StdRng::seed_from_u64(
-        seed.rotate_left(17) ^ (u64::from(t) << 40) ^ low.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ salt,
+        seed.rotate_left(17)
+            ^ (u64::from(t) << 40)
+            ^ low.wrapping_mul(0x9E37_79B9_7F4A_7C15)
+            ^ salt,
     )
 }
 
@@ -527,7 +527,10 @@ pub fn isogeny_tower_wide<F: PrimeField>(
         );
     }
     let w4 = (BigUint::from(4u32) * &p).sqrt();
-    let (lo, hi) = (p.clone() + BigUint::one() - &w4, p.clone() + BigUint::one() + &w4);
+    let (lo, hi) = (
+        p.clone() + BigUint::one() - &w4,
+        p.clone() + BigUint::one() + &w4,
+    );
     let mut rng = wide_rng(&p, t, seed, 0x5749_4455);
     let mut cost = IsogenyTowerCost::default();
     let gae = |o: &GroupOps| o.adds + o.doubles;
@@ -537,7 +540,9 @@ pub fn isogeny_tower_wide<F: PrimeField>(
     let inv27 = f.inv(f.from_u64(27)).expect("p ≠ 3");
     loop {
         if tried_limit == 0 {
-            return Err(format!("no auxiliary curve with a point of order 2^{t} found"));
+            return Err(format!(
+                "no auxiliary curve with a point of order 2^{t} found"
+            ));
         }
         tried_limit -= 1;
         cost.curves_tried += 1;
@@ -585,7 +590,16 @@ pub fn isogeny_tower_wide<F: PrimeField>(
         let e = WideCurve { a, b };
         let before = gae(ops);
         let pt = random_point_w(f, &e, &mut rng, &mut cost);
-        let (hits, _, _) = class_hits_w(f, &e, pt, &two_t, &lo, &hi, ops, &mut cost.bsgs_table_entries);
+        let (hits, _, _) = class_hits_w(
+            f,
+            &e,
+            pt,
+            &two_t,
+            &lo,
+            &hi,
+            ops,
+            &mut cost.bsgs_table_entries,
+        );
         if hits == 0 {
             cost.filtered_out += 1;
             cost.search_gae += gae(ops) - before;
@@ -633,10 +647,7 @@ pub fn isogeny_tower_wide<F: PrimeField>(
 }
 
 /// The supersingular auxiliary curve of `kind` (`#E' = p + 1` by Deuring).
-fn supersingular_aux_w<F: PrimeField>(
-    f: &F,
-    kind: AuxKind,
-) -> Result<WideCurve<F::Elem>, String> {
+fn supersingular_aux_w<F: PrimeField>(f: &F, kind: AuxKind) -> Result<WideCurve<F::Elem>, String> {
     let p = f.modulus().clone();
     let (a, b) = match kind {
         AuxKind::Ordinary => return Err("kind = ordinary is not a supersingular curve".into()),
@@ -651,7 +662,10 @@ fn supersingular_aux_w<F: PrimeField>(
                 }
                 d += 1u32;
             }
-            (f.zero(), f.pow_biguint(f.from_biguint(&d), &BigUint::from(3u32)))
+            (
+                f.zero(),
+                f.pow_biguint(f.from_biguint(&d), &BigUint::from(3u32)),
+            )
         }
     };
     let four = BigUint::from(4u32);
@@ -723,9 +737,9 @@ pub fn supersingular_tower_wide<F: PrimeField>(
 
 #[cfg(test)]
 mod tests {
-    use num_integer::Integer;
     use super::*;
     use crate::cryptanalysis::fp_backend::{Fp32, Fp64, FpP192};
+    use num_integer::Integer;
 
     /// `#E(F_p)` by Legendre sums — the exhaustive check at small primes.
     fn point_count<F: PrimeField>(f: &F, e: &WideCurve<F::Elem>) -> BigUint {
@@ -781,12 +795,14 @@ mod tests {
         assert_eq!(ops.adds + ops.doubles, c.search_gae + c.build_gae);
         assert_eq!(
             c.curves_tried,
-            1 + c.singular + c.filtered_out + c.filter_false_positives + c.orders_undetermined
+            1 + c.singular
+                + c.filtered_out
+                + c.filter_false_positives
+                + c.orders_undetermined
                 + c.two_sylow_rejected
         );
         // Deterministic in (p, t, seed, family).
-        let again = isogeny_tower_wide(&f, 6, 5, AuxFamily::Any, &mut GroupOps::default())
-            .unwrap();
+        let again = isogeny_tower_wide(&f, 6, 5, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         assert_eq!(
             again.v.iter().map(|x| f.to_biguint(*x)).collect::<Vec<_>>(),
             tower.v.iter().map(|x| f.to_biguint(*x)).collect::<Vec<_>>()
@@ -809,10 +825,12 @@ mod tests {
         );
         // 786,433 is 1 mod 4: refused.
         let g = Fp64::new(786_433);
-        assert!(isogeny_tower_wide(&g, 8, 5, AuxFamily::Z2xZ8, &mut GroupOps::default())
-            .err()
-            .unwrap()
-            .contains("3 mod 4"));
+        assert!(
+            isogeny_tower_wide(&g, 8, 5, AuxFamily::Z2xZ8, &mut GroupOps::default())
+                .err()
+                .unwrap()
+                .contains("3 mod 4")
+        );
     }
 
     #[test]
@@ -822,8 +840,7 @@ mod tests {
         let f = FpP192::new();
         let p = f.modulus();
         let mut ops = GroupOps::default();
-        let tower =
-            supersingular_tower_wide(&f, 8, 7, AuxKind::SsJ1728, &mut ops).unwrap();
+        let tower = supersingular_tower_wide(&f, 8, 7, AuxKind::SsJ1728, &mut ops).unwrap();
         assert_eq!(tower.aux_order, p + BigUint::one());
         check_roots(&f, &tower);
         // Q has exact order 2^t, independently, by repeated doubling.
@@ -852,8 +869,8 @@ mod tests {
         let y0 = tower.values(&f, tower.v[0]);
         assert_eq!(y0.len(), tower.t as usize);
         // Determinism.
-        let again = supersingular_tower_wide(&f, 8, 7, AuxKind::SsJ1728, &mut GroupOps::default())
-            .unwrap();
+        let again =
+            supersingular_tower_wide(&f, 8, 7, AuxKind::SsJ1728, &mut GroupOps::default()).unwrap();
         assert_eq!(
             again.v.iter().map(|x| f.to_biguint(*x)).collect::<Vec<_>>(),
             tower.v.iter().map(|x| f.to_biguint(*x)).collect::<Vec<_>>()
@@ -863,18 +880,24 @@ mod tests {
     #[test]
     fn wide_tower_limits() {
         let f = Fp32::new(10_007);
-        assert!(isogeny_tower_wide(&f, 0, 1, AuxFamily::Any, &mut GroupOps::default())
-            .err()
-            .unwrap()
-            .contains("outside"));
-        assert!(isogeny_tower_wide(&f, 64, 1, AuxFamily::Any, &mut GroupOps::default())
-            .err()
-            .unwrap()
-            .contains("outside"));
+        assert!(
+            isogeny_tower_wide(&f, 0, 1, AuxFamily::Any, &mut GroupOps::default())
+                .err()
+                .unwrap()
+                .contains("outside")
+        );
+        assert!(
+            isogeny_tower_wide(&f, 64, 1, AuxFamily::Any, &mut GroupOps::default())
+                .err()
+                .unwrap()
+                .contains("outside")
+        );
         // v₂(p + 1) = 4 at 10,007 < t = 5: no supersingular point of order 32.
-        assert!(supersingular_tower_wide(&f, 5, 1, AuxKind::SsJ1728, &mut GroupOps::default())
-            .err()
-            .unwrap()
-            .contains("v₂(p + 1)"));
+        assert!(
+            supersingular_tower_wide(&f, 5, 1, AuxKind::SsJ1728, &mut GroupOps::default())
+                .err()
+                .unwrap()
+                .contains("v₂(p + 1)")
+        );
     }
 }

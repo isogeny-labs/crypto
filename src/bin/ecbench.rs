@@ -1692,10 +1692,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     "canonical panel: subgroup bits = ceil(log2(r)); source {}",
                     panel::PANEL_SOURCE
                 );
-                println!(
-                    "{:<5} {:<34} {:<22} blockers",
-                    "phase", "lane", "state"
-                );
+                println!("{:<5} {:<34} {:<22} blockers", "phase", "lane", "state");
                 for (record, entry) in lane_rows {
                     println!(
                         "{:<5} {:<34} {:<22} {}",
@@ -1766,11 +1763,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     println!("transfer routes");
                     println!(
                         "{:<5} {:<27} {:<14} {:>6} {:<28} destination methods / controls",
-                        "phase",
-                        "route",
-                        "source",
-                        "degree",
-                        "source reference"
+                        "phase", "route", "source", "degree", "source reference"
                     );
                     for route in route_rows {
                         println!(

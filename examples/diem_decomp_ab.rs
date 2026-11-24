@@ -101,8 +101,16 @@ fn planted_targets(curve: &ECurveFpk, fb: &[Pt], n: usize) -> Vec<Pt> {
     while out.len() < n && !fb.is_empty() {
         let p1 = &fb[i % fb.len()];
         let p2 = &fb[(i * 3 + 1) % fb.len()];
-        let s1 = if i.is_multiple_of(2) { p1.clone() } else { p1.neg() };
-        let s2 = if i.is_multiple_of(3) { p2.clone() } else { p2.neg() };
+        let s1 = if i.is_multiple_of(2) {
+            p1.clone()
+        } else {
+            p1.neg()
+        };
+        let s2 = if i.is_multiple_of(3) {
+            p2.clone()
+        } else {
+            p2.neg()
+        };
         out.push(curve.add(&s1, &s2));
         i += 1;
     }

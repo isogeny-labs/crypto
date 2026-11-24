@@ -31,9 +31,7 @@ fn bench_fp_mul(inst: &PrimeInstance, samples: u64, seed: u64) -> f64 {
 fn sample_points(inst: &PrimeInstance) -> Vec<PrimePoint> {
     let g = inst.generator_point();
     let mut ops = GroupOps::default();
-    (1..=8u64)
-        .map(|k| inst.curve.mul(&mut ops, g, k))
-        .collect()
+    (1..=8u64).map(|k| inst.curve.mul(&mut ops, g, k)).collect()
 }
 
 fn main() {

@@ -4,7 +4,7 @@
 //!   TMPDIR=/Volumes/SSD990-2/tmp CARGO_TARGET_DIR=/Volumes/SSD990-2/cargo-target-perf \
 //!   /usr/sbin/taskpolicy -a cargo run --release --example ic_fb_crossover_ab
 use crypto_lib::cryptanalysis::ec_index_calculus::{
-    build_factor_base, build_compact_pair_sum_table, ec_index_calculus_dlp_staged_seeded,
+    build_compact_pair_sum_table, build_factor_base, ec_index_calculus_dlp_staged_seeded,
 };
 use crypto_lib::ecc::curve::CurveParams;
 use num_bigint::BigUint;

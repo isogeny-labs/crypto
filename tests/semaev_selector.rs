@@ -10,7 +10,9 @@
 use std::collections::BTreeSet;
 
 use crypto_lib::cryptanalysis::pkm_smooth_tower::{is_prime, powm, sqrtm, Curve, Pt};
-use crypto_lib::cryptanalysis::semaev_prime_poly::{resultant_formal, Curve as PolynomialCurve, Fp};
+use crypto_lib::cryptanalysis::semaev_prime_poly::{
+    resultant_formal, Curve as PolynomialCurve, Fp,
+};
 use crypto_lib::cryptanalysis::semaev_selector::{
     lift_selector_pairs, quadratic_selector_resultant, selector_coordinate_pairs, SelectorError,
     SelectorExtraction, SignedPair, MAX_SELECTOR_DEGREE,

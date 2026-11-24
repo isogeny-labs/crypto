@@ -41,14 +41,8 @@ fn scaled_add(f: Fp, a: Jet, k: u64, b: Jet) -> Jet {
 fn step(f: Fp, s: u64, t: u64, before: Jet, current: Jet) -> Jet {
     Jet::new(
         f.sub(f.mul(s, current.v), f.mul(t, before.v)),
-        f.sub(
-            f.add(current.v, f.mul(s, current.ds)),
-            f.mul(t, before.ds),
-        ),
-        f.sub(
-            f.mul(s, current.dt),
-            f.add(before.v, f.mul(t, before.dt)),
-        ),
+        f.sub(f.add(current.v, f.mul(s, current.ds)), f.mul(t, before.ds)),
+        f.sub(f.mul(s, current.dt), f.add(before.v, f.mul(t, before.dt))),
     )
 }
 
@@ -132,10 +126,7 @@ fn prime31_factor_base() -> Vec<u64> {
     let f = Fp::new(P31);
     let mut roots = Vec::new();
     for x in 0..1000 {
-        let rhs = f.add(
-            f.add(f.mul(f.mul(x, x), x), f.mul(A31, x)),
-            B31,
-        );
+        let rhs = f.add(f.add(f.mul(f.mul(x, x), x), f.mul(A31, x)), B31);
         if rhs == 0 || f.pow(rhs, (P31 - 1) / 2) == 1 {
             roots.push(x);
         }
@@ -177,8 +168,15 @@ fn main() {
     }
     let rhs = f.add(f.add(f.mul(f.mul(GX, GX), GX), f.mul(A31, GX)), B31);
     assert_eq!(f.mul(GY, GY), rhs);
-    println!("Prime31 p={P31} B={} unordered-pairs={} radical-Jacobians={} S3-parity=pass", roots.len(), valid, valid);
-    println!("Exact membership/polynomial stage only; NO Rust cost advantage or DLP recovery claim.");
+    println!(
+        "Prime31 p={P31} B={} unordered-pairs={} radical-Jacobians={} S3-parity=pass",
+        roots.len(),
+        valid,
+        valid
+    );
+    println!(
+        "Exact membership/polynomial stage only; NO Rust cost advantage or DLP recovery claim."
+    );
 }
 
 #[cfg(test)]

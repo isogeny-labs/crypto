@@ -961,16 +961,7 @@ where
                 if next_job < jobs.len() {
                     let (a_idx, s) = jobs[next_job];
                     let (inst, lens) = get_arm(a_idx);
-                    active[l] = Walker::init(
-                        f,
-                        next_job,
-                        a_idx,
-                        s,
-                        inst,
-                        lens,
-                        n,
-                        seed_base ^ s,
-                    );
+                    active[l] = Walker::init(f, next_job, a_idx, s, inst, lens, n, seed_base ^ s);
                     next_job += 1;
                 } else {
                     // Swap-remove and ALSO keep `nums/dens/x2s/is_inf` aligned for remaining `l..`!
@@ -987,7 +978,9 @@ where
         }
     }
 
-    out.into_iter().map(|e| e.expect("all jobs solved")).collect()
+    out.into_iter()
+        .map(|e| e.expect("all jobs solved"))
+        .collect()
 }
 
 /// One solve by the cryptanalysis repository's `ca solve --alg rho`:
@@ -2224,7 +2217,14 @@ fn main() {
         let chunk_sz = jobs.len().div_ceil(n_threads).max(16);
         jobs.par_chunks(chunk_sz)
             .flat_map_iter(|chunk| {
-                rho_batch_jobs(&f, chunk, |a| (&arms[a].inst, &arms[a].lens), n, seed_base, dp_bits)
+                rho_batch_jobs(
+                    &f,
+                    chunk,
+                    |a| (&arms[a].inst, &arms[a].lens),
+                    n,
+                    seed_base,
+                    dp_bits,
+                )
             })
             .collect()
     };

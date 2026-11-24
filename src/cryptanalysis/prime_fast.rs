@@ -1187,13 +1187,7 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
             }
             continue;
         }
-        pt_buf.resize(
-            jac_buf.len(),
-            Pt {
-                x: 0,
-                y: 0,
-            },
-        );
+        pt_buf.resize(jac_buf.len(), Pt { x: 0, y: 0 });
         curve.jac_to_affine_many(&jac_buf, &mut pt_buf, &mut z_buf, &mut inv_scratch);
         for (i, &pt) in pt_buf.iter().enumerate() {
             let (u, v) = uv_buf[i];

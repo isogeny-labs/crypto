@@ -1559,8 +1559,7 @@ impl PairProjection {
         (witness, stats)
     }
 
-
-/// Fast build: `B` square roots (one canonical `y_i` per base `x_i`), one
+    /// Fast build: `B` square roots (one canonical `y_i` per base `x_i`), one
     /// batch inversion for all pair quadratics, no per-pair `sqrtm`.
     /// Produces the same `witnesses`/`finite_witnesses`/stats as
     /// `build_generic`.
@@ -1637,7 +1636,10 @@ impl PairProjection {
         }
         stats.distinct_keys = witnesses.len();
         stats.distinct_base_roots = finite_witnesses.len();
-        let finite_list = fast_finite_list.iter().map(|&(u, y, x1, x2)| (u, y, (x1, x2))).collect();
+        let finite_list = fast_finite_list
+            .iter()
+            .map(|&(u, y, x1, x2)| (u, y, (x1, x2)))
+            .collect();
         let base_y = ys.iter().map(|&y| canonical_y(y, p)).collect();
         Ok(Self {
             singular: curve.is_singular(),
@@ -1654,15 +1656,22 @@ impl PairProjection {
         })
     }
 
-/// `y` of the sum/difference point whose abscissa is `root`, from the
+    /// `y` of the sum/difference point whose abscissa is `root`, from the
     /// group law with the already-batched inverse (no extra inversion, no
     /// square root).  `d = x2 - x1`; `inv = d^-2` if `d != 0` else `c1^-1`.
     #[allow(clippy::too_many_arguments)]
-    fn root_y(curve: &Curve, x1: u64, y1: u64, x2: u64, y2: u64, d: u64, inv: u64, root: u64) -> u64 {
+    fn root_y(
+        curve: &Curve,
+        x1: u64,
+        y1: u64,
+        x2: u64,
+        y2: u64,
+        d: u64,
+        inv: u64,
+        root: u64,
+    ) -> u64 {
         let p = curve.p;
-        let lam_y = |lambda: u64, x_third: u64| {
-            subm(mulm(lambda, subm(x1, x_third, p), p), y1, p)
-        };
+        let lam_y = |lambda: u64, x_third: u64| subm(mulm(lambda, subm(x1, x_third, p), p), y1, p);
         if d != 0 {
             // inv = d^-2, so d^-1 = d * inv.
             let inv_d = mulm(d, inv, p);
@@ -1687,7 +1696,7 @@ impl PairProjection {
         sqrtm(curve.rhs(root), p).unwrap_or(0)
     }
 
-/// Reference build: per-pair `invm` + Tonelli-Shanks `sqrtm`.
+    /// Reference build: per-pair `invm` + Tonelli-Shanks `sqrtm`.
     pub fn build_generic(curve: Curve, base: &[u64]) -> Result<Self, String> {
         if curve.p <= 2 {
             return Err("projection join requires an odd prime field".into());
@@ -1751,7 +1760,7 @@ impl PairProjection {
         })
     }
 
-/// Exact three-summand query, including the pair-cancellation component
+    /// Exact three-summand query, including the pair-cancellation component
     /// omitted by a finite affine auxiliary variable.
     pub fn decompose_three_fast_path(&self, target: u64) -> (Option<ThreeSumWitness>, QueryStats) {
         if self.fast_ready() {
@@ -1764,11 +1773,12 @@ impl PairProjection {
         self.decompose_three_generic(target)
     }
 
-fn fast_ready(&self) -> bool {
-        self.ys.len() == self.base.len() && self.fast_finite_list.len() == self.finite_witnesses.len()
+    fn fast_ready(&self) -> bool {
+        self.ys.len() == self.base.len()
+            && self.fast_finite_list.len() == self.finite_witnesses.len()
     }
 
-fn decompose_three_fast(&self, target: u64, yt: u64) -> (Option<ThreeSumWitness>, QueryStats) {
+    fn decompose_three_fast(&self, target: u64, yt: u64) -> (Option<ThreeSumWitness>, QueryStats) {
         let mut stats = QueryStats::default();
         stats.cancellation_checks += 1;
         if !self.base.is_empty() && self.base.binary_search(&target).is_ok() {
@@ -1781,7 +1791,12 @@ fn decompose_three_fast(&self, target: u64, yt: u64) -> (Option<ThreeSumWitness>
                 stats,
             );
         }
-        let pts: Vec<(u64, u64)> = self.base.iter().copied().zip(self.ys.iter().copied()).collect();
+        let pts: Vec<(u64, u64)> = self
+            .base
+            .iter()
+            .copied()
+            .zip(self.ys.iter().copied())
+            .collect();
         let all_roots = roots_batch(&self.curve, &pts, target, yt);
         for (&x3, roots) in self.base.iter().zip(all_roots) {
             stats.quadratics += 1;
@@ -1792,18 +1807,29 @@ fn decompose_three_fast(&self, target: u64, yt: u64) -> (Option<ThreeSumWitness>
         (None, stats)
     }
 
-/// Shared per-`x3` logic of the three-summand query.
-    fn three_step(&self, roots: QuadraticRoots, x3: u64, stats: &mut QueryStats) -> Option<ThreeSumWitness> {
+    /// Shared per-`x3` logic of the three-summand query.
+    fn three_step(
+        &self,
+        roots: QuadraticRoots,
+        x3: u64,
+        stats: &mut QueryStats,
+    ) -> Option<ThreeSumWitness> {
         match roots {
             QuadraticRoots::None => {}
             QuadraticRoots::All => {
                 if let Some((&key, &(x1, x2))) = self.witnesses.iter().next() {
                     stats.compatible_keys += 1;
-                    return Some(ThreeSumWitness { x: [x1, x2, x3], auxiliary: Some(key) });
+                    return Some(ThreeSumWitness {
+                        x: [x1, x2, x3],
+                        auxiliary: Some(key),
+                    });
                 }
                 if let Some((x1, x2)) = self.universal_pair {
                     stats.compatible_keys += 1;
-                    return Some(ThreeSumWitness { x: [x1, x2, x3], auxiliary: None });
+                    return Some(ThreeSumWitness {
+                        x: [x1, x2, x3],
+                        auxiliary: None,
+                    });
                 }
             }
             QuadraticRoots::Finite(keys) => {
@@ -1812,11 +1838,17 @@ fn decompose_three_fast(&self, target: u64, yt: u64) -> (Option<ThreeSumWitness>
                     stats.lookups += 1;
                     if let Some(&(x1, x2)) = self.witnesses.get(&key) {
                         stats.compatible_keys += 1;
-                        return Some(ThreeSumWitness { x: [x1, x2, x3], auxiliary: Some(key) });
+                        return Some(ThreeSumWitness {
+                            x: [x1, x2, x3],
+                            auxiliary: Some(key),
+                        });
                     }
                     if let Some((x1, x2)) = self.universal_pair {
                         stats.compatible_keys += 1;
-                        return Some(ThreeSumWitness { x: [x1, x2, x3], auxiliary: Some(key) });
+                        return Some(ThreeSumWitness {
+                            x: [x1, x2, x3],
+                            auxiliary: Some(key),
+                        });
                     }
                 }
             }
@@ -1824,7 +1856,7 @@ fn decompose_three_fast(&self, target: u64, yt: u64) -> (Option<ThreeSumWitness>
         None
     }
 
-/// Reference three-summand query: per-`x3` `invm` + `sqrtm`.
+    /// Reference three-summand query: per-`x3` `invm` + `sqrtm`.
     pub fn decompose_three_generic(&self, target: u64) -> (Option<ThreeSumWitness>, QueryStats) {
         let p = self.curve.p;
         let target = target % p;
@@ -1899,20 +1931,24 @@ fn decompose_three_fast(&self, target: u64, yt: u64) -> (Option<ThreeSumWitness>
         (None, stats)
     }
 
-/// Exact balanced four-summand query.  `compatible_keys` counts all
+    /// Exact balanced four-summand query.  `compatible_keys` counts all
     /// finite pair-root matches examined, so it is also a target function
     /// suitable for the parametric-compression falsifier.
     pub fn decompose_four_fast_path(&self, target: u64) -> (Option<FourSumWitness>, QueryStats) {
         self.decompose_four_dispatch(target, false)
     }
 
-/// Like `decompose_four` but returns at the first witness, so
+    /// Like `decompose_four` but returns at the first witness, so
     /// `compatible_keys` is no longer the full match count.
     pub fn decompose_four_first(&self, target: u64) -> (Option<FourSumWitness>, QueryStats) {
         self.decompose_four_dispatch(target, true)
     }
 
-fn decompose_four_dispatch(&self, target: u64, early_exit: bool) -> (Option<FourSumWitness>, QueryStats) {
+    fn decompose_four_dispatch(
+        &self,
+        target: u64,
+        early_exit: bool,
+    ) -> (Option<FourSumWitness>, QueryStats) {
         if self.fast_ready() {
             let t = target % self.curve.p;
             if let Some(yt) = sqrtm(self.curve.rhs(t), self.curve.p) {
@@ -1922,7 +1958,12 @@ fn decompose_four_dispatch(&self, target: u64, early_exit: bool) -> (Option<Four
         self.decompose_four_generic(target)
     }
 
-fn decompose_four_fast(&self, target: u64, yt: u64, early_exit: bool) -> (Option<FourSumWitness>, QueryStats) {
+    fn decompose_four_fast(
+        &self,
+        target: u64,
+        yt: u64,
+        early_exit: bool,
+    ) -> (Option<FourSumWitness>, QueryStats) {
         let mut stats = QueryStats::default();
         let mut witness = None;
         stats.cancellation_checks += 1;
@@ -1937,7 +1978,11 @@ fn decompose_four_fast(&self, target: u64, yt: u64, early_exit: bool) -> (Option
                 return (witness, stats);
             }
         }
-        let pts: Vec<(u64, u64)> = self.fast_finite_list.iter().map(|&(u, yu, _, _)| (u, yu)).collect();
+        let pts: Vec<(u64, u64)> = self
+            .fast_finite_list
+            .iter()
+            .map(|&(u, yu, _, _)| (u, yu))
+            .collect();
         let all_roots = roots_batch(&self.curve, &pts, target, yt);
         for (&(u, _, x1, x2), roots) in self.fast_finite_list.iter().zip(all_roots) {
             stats.quadratics += 1;
@@ -1976,7 +2021,7 @@ fn decompose_four_fast(&self, target: u64, yt: u64, early_exit: bool) -> (Option
         (witness, stats)
     }
 
-/// Reference four-summand query: per-`u` `invm` + `sqrtm`, full scan.
+    /// Reference four-summand query: per-`u` `invm` + `sqrtm`, full scan.
     pub fn decompose_four_generic(&self, target: u64) -> (Option<FourSumWitness>, QueryStats) {
         let p = self.curve.p;
         let target = target % p;
@@ -2140,7 +2185,10 @@ pub fn quadratic_roots_known_sqrt(
 /// point `(t, yt)`, with one batch inversion.
 fn roots_batch(curve: &Curve, pts: &[(u64, u64)], t: u64, yt: u64) -> Vec<QuadraticRoots> {
     let p = curve.p;
-    let qs: Vec<[u64; 3]> = pts.iter().map(|&(x, _)| s3_quadratic(curve, x, t)).collect();
+    let qs: Vec<[u64; 3]> = pts
+        .iter()
+        .map(|&(x, _)| s3_quadratic(curve, x, t))
+        .collect();
     let ds: Vec<u64> = pts.iter().map(|&(x, _)| subm(x, t, p)).collect();
     let dens: Vec<u64> = qs.iter().zip(&ds).map(|(&q, &d)| fast_den(q, d)).collect();
     let invs = batch_invm(&dens, p);
@@ -2519,7 +2567,7 @@ mod tests {
         }
     }
 
-#[test]
+    #[test]
     fn fast_path_matches_generic_small() {
         let e = curve();
         let base = interval_factor_base(&e, 30);
@@ -2547,12 +2595,16 @@ mod tests {
         }
     }
 
-/// Op-count comparison on Prime31 (p = 2^31 - 1), B = 64.
+    /// Op-count comparison on Prime31 (p = 2^31 - 1), B = 64.
     /// Run with `--nocapture` to print the table.
     #[test]
     fn prime31_opcount_old_vs_new() {
         use crate::cryptanalysis::pkm_smooth_tower::opcount;
-        let e = Curve { p: 2_147_483_647, a: 2, b: 3 };
+        let e = Curve {
+            p: 2_147_483_647,
+            a: 2,
+            b: 3,
+        };
         assert!(!e.is_singular());
         let base: Vec<u64> = interval_factor_base(&e, 400).into_iter().take(64).collect();
         assert_eq!(base.len(), 64);
@@ -2571,32 +2623,66 @@ mod tests {
         assert_eq!(old.stats.unordered_pairs, 2080); // 64*65/2 incl. diagonal
 
         // queries: 40 point targets (some in base), then 8 non-points
-        let targets: Vec<u64> = interval_factor_base(&e, 1500).into_iter().skip(10).step_by(7).take(40).collect();
+        let targets: Vec<u64> = interval_factor_base(&e, 1500)
+            .into_iter()
+            .skip(10)
+            .step_by(7)
+            .take(40)
+            .collect();
         let (mut mism3, mut eq3, mut mism4) = (0, 0, 0);
         let mut c = [[0u64; 3]; 4];
         for &t in &targets {
             opcount::reset();
             let (a3, _) = old.decompose_three_generic(t);
-            let s = opcount::snapshot(); for k in 0..3 { c[0][k] += [s.0, s.1, s.2][k]; }
+            let s = opcount::snapshot();
+            for k in 0..3 {
+                c[0][k] += [s.0, s.1, s.2][k];
+            }
             opcount::reset();
             let (b3, _) = new.decompose_three_fast_path(t);
-            let s = opcount::snapshot(); for k in 0..3 { c[1][k] += [s.0, s.1, s.2][k]; }
+            let s = opcount::snapshot();
+            for k in 0..3 {
+                c[1][k] += [s.0, s.1, s.2][k];
+            }
             opcount::reset();
             let (a4, sa) = old.decompose_four_generic(t);
-            let s = opcount::snapshot(); for k in 0..3 { c[2][k] += [s.0, s.1, s.2][k]; }
+            let s = opcount::snapshot();
+            for k in 0..3 {
+                c[2][k] += [s.0, s.1, s.2][k];
+            }
             opcount::reset();
             let (b4, sb) = new.decompose_four_first(t);
-            let s = opcount::snapshot(); for k in 0..3 { c[3][k] += [s.0, s.1, s.2][k]; }
-            if a3.is_some() != b3.is_some() { mism3 += 1; }
-            if a3 == b3 { eq3 += 1; }
-            if a3.is_some() != b3.is_some() { mism3 += 1; }
-            if a4.is_some() != b4.is_some() { mism4 += 1; }
-            if let Some(w) = &b4 { assert!(witness_reaches(&e, &w.x, t)); }
-            if let Some(w) = &b3 { assert!(witness_reaches(&e, &w.x, t)); }
+            let s = opcount::snapshot();
+            for k in 0..3 {
+                c[3][k] += [s.0, s.1, s.2][k];
+            }
+            if a3.is_some() != b3.is_some() {
+                mism3 += 1;
+            }
+            if a3 == b3 {
+                eq3 += 1;
+            }
+            if a3.is_some() != b3.is_some() {
+                mism3 += 1;
+            }
+            if a4.is_some() != b4.is_some() {
+                mism4 += 1;
+            }
+            if let Some(w) = &b4 {
+                assert!(witness_reaches(&e, &w.x, t));
+            }
+            if let Some(w) = &b3 {
+                assert!(witness_reaches(&e, &w.x, t));
+            }
             let _ = (sa, sb);
         }
         println!("Q3 over {} targets: old (sqrtm,invm,mulm)={:?} new={:?}; found/none mismatches={mism3}; exact-equal witnesses={eq3}", targets.len(), c[0], c[1]);
-        println!("Q4 over {} targets: old={:?} new(first)={:?}; found/none mismatches={mism4}", targets.len(), c[2], c[3]);
+        println!(
+            "Q4 over {} targets: old={:?} new(first)={:?}; found/none mismatches={mism4}",
+            targets.len(),
+            c[2],
+            c[3]
+        );
         assert_eq!(mism3, 0);
         assert_eq!(mism4, 0);
     }
@@ -2612,20 +2698,35 @@ mod tests {
         assert_eq!(fast.finite_witnesses, batched.finite_witnesses);
         for target in 0..e.p {
             let three = generic.decompose_three_generic(target).0;
-            for got in [fast.decompose_three_fast_path(target).0, batched.decompose_three(target).0] {
+            for got in [
+                fast.decompose_three_fast_path(target).0,
+                batched.decompose_three(target).0,
+            ] {
                 assert_eq!(got.is_some(), three.is_some());
-                if let Some(w) = got { assert!(witness_reaches(&e, &w.x, target)); }
+                if let Some(w) = got {
+                    assert!(witness_reaches(&e, &w.x, target));
+                }
             }
             let (four, expected) = generic.decompose_four_generic(target);
-            for (got, stats) in [fast.decompose_four_fast_path(target), batched.decompose_four_exhaustive(target)] {
+            for (got, stats) in [
+                fast.decompose_four_fast_path(target),
+                batched.decompose_four_exhaustive(target),
+            ] {
                 assert_eq!(got.is_some(), four.is_some());
                 assert_eq!(stats.compatible_keys, expected.compatible_keys);
-                if let Some(w) = got { assert!(witness_reaches(&e, &w.x, target)); }
+                if let Some(w) = got {
+                    assert!(witness_reaches(&e, &w.x, target));
+                }
             }
             let mut ops = FpOpCounts::default();
-            assert_eq!(generic.decompose_four_counted(target, &mut ops).0.is_some(), four.is_some());
-            assert_eq!(fast.decompose_four_first(target).0.is_some(), four.is_some());
+            assert_eq!(
+                generic.decompose_four_counted(target, &mut ops).0.is_some(),
+                four.is_some()
+            );
+            assert_eq!(
+                fast.decompose_four_first(target).0.is_some(),
+                four.is_some()
+            );
         }
     }
-
 }

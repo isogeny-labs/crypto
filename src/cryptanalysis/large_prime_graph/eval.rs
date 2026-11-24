@@ -432,8 +432,11 @@ pub fn evaluate_stream(
             let witness_ns = ns(t);
             let t = Instant::now();
             let produced = witness::materialize_complete_relations(
-                &index, &batch, relations,
-                params.filter_max_small_weight, params.filter_max_sources,
+                &index,
+                &batch,
+                relations,
+                params.filter_max_small_weight,
+                params.filter_max_sources,
             );
             let materialization_ns = ns(t);
             let refused = produced.is_none();
@@ -443,8 +446,10 @@ pub fn evaluate_stream(
             let mut output = (0, 0, 0, 0, 0, 0);
             if let Some(ref relations_out) = produced {
                 let t = Instant::now();
-                exact_projected_rank =
-                    Some(projected_rank::audit_projected_rank(relations_out, modulus)?);
+                exact_projected_rank = Some(projected_rank::audit_projected_rank(
+                    relations_out,
+                    modulus,
+                )?);
                 rank_audit_ns = Some(ns(t));
                 let t = Instant::now();
                 output = summarize_output(relations_out, relations, modulus);
