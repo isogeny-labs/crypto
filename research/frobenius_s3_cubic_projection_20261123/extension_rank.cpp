@@ -1,5 +1,9 @@
 // Rank of a sparse-input matrix over F_2[z]/g(z).
 #include <cstdint>
+#if defined(__PCLMUL__)
+#include <array>
+#include <immintrin.h>
+#endif
 #include <iostream>
 #include <string_view>
 #include <vector>
@@ -8,9 +12,27 @@ using Word = std::uint64_t;
 
 class Field {
 public:
-    Field(unsigned degree, Word modulus, bool use_log)
+    Field(unsigned degree, Word modulus, bool fast_arithmetic)
         : leading(Word{1} << degree), modulus(modulus), order(leading - 1) {
-        if (!use_log || degree > 23) {
+#if defined(__PCLMUL__)
+        if (fast_arithmetic && degree <= 31) {
+            carryless_degree = degree;
+            Word reduction = modulus ^ leading;
+            for (auto& slice : slices) {
+                for (unsigned bit = 0; bit < 8; ++bit) {
+                    for (unsigned i = 0; i < (1U << bit); ++i) {
+                        slice[i | (1U << bit)] = slice[i] ^ reduction;
+                    }
+                    reduction <<= 1;
+                    if (reduction & leading) {
+                        reduction ^= modulus;
+                    }
+                }
+            }
+            return;
+        }
+#endif
+        if (!fast_arithmetic || degree > 23) {
             return;
         }
         std::vector<Word> factors;
@@ -57,6 +79,16 @@ public:
         if (a == 1 || b == 1) {
             return a == 1 ? b : a;
         }
+#if defined(__PCLMUL__)
+        if (carryless_degree) {
+            auto left = _mm_cvtsi64_si128(a);
+            auto right = _mm_cvtsi64_si128(b);
+            Word raw = _mm_cvtsi128_si64(_mm_clmulepi64_si128(left, right, 0));
+            Word high = raw >> carryless_degree;
+            return (raw & (leading - 1)) ^ slices[0][high & 255] ^ slices[1][(high >> 8) & 255]
+                   ^ slices[2][(high >> 16) & 255] ^ slices[3][high >> 24];
+        }
+#endif
         if (log.empty()) {
             return polynomial_mul(a, b);
         }
@@ -102,6 +134,10 @@ private:
     Word leading;
     Word modulus;
     Word order;
+#if defined(__PCLMUL__)
+    unsigned carryless_degree = 0;
+    std::array<std::array<Word, 256>, 4> slices{};
+#endif
     std::vector<std::uint32_t> log;
     std::vector<std::uint32_t> exp;
 };
@@ -152,8 +188,16 @@ int main(int argc, char** argv) {
                 ++rank;
                 break;
             }
-            for (unsigned w = col; w < columns; ++w) {
-                row[w] ^= field.mul(value, pivot[w]);
+            if (value == 1) {
+                for (unsigned w = col; w < columns; ++w) {
+                    row[w] ^= pivot[w];
+                }
+            } else {
+                for (unsigned w = col; w < columns; ++w) {
+                    if (pivot[w]) {
+                        row[w] ^= field.mul(value, pivot[w]);
+                    }
+                }
             }
         }
     }

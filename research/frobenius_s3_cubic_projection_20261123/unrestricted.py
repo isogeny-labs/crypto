@@ -1,4 +1,4 @@
-"""Split the unrestricted cubic-multiplier matrix by coefficient eigenvalue."""
+"""Split the unrestricted multiplier matrix by coefficient eigenvalue."""
 import argparse
 import json
 from functools import cache
@@ -78,14 +78,14 @@ def lower_system(n, modulus, shift, degree=3):
     return rows, len(terms), len(top_rows), len(top_kernel)
 
 
-def block_rank(binary, n, modulus, rows, columns, verify_arithmetic):
+def block_rank(binary, n, modulus, rows, columns, verify_arithmetic, timeout=120):
     payload = [f'{(n - 1) // 2} {modulus} {columns} {len(rows)}']
     payload.extend(' '.join([str(len(row)), *(f'{i} {v}' for i, v in row.items())]) for row in rows)
     data = '\n'.join(payload) + '\n'
 
     def run(*args):
         result = subprocess.run([binary, *args], input=data, capture_output=True,
-                                text=True, check=True, timeout=120)
+                                text=True, check=True, timeout=timeout)
         return int(result.stdout)
 
     rank = run()
@@ -121,8 +121,8 @@ def direct_dimension(n, modulus):
     return n * len(terms) - rank_f2(constraints())
 
 
-def false_positive(n, modulus):
-    """Find an actual S3 target with a sum surviving the cubic family."""
+def false_positive(n, modulus, degree=3):
+    """Find an S3 target with a sum surviving the telescoping multipliers."""
     field, basis, square = geometry(n, modulus)
     rng = Random(n + 0x5A39)
 
@@ -143,15 +143,20 @@ def false_positive(n, modulus):
         conjugates = [s]
         for _ in range(n - 1):
             conjugates.append(square(conjugates[-1]))
-        a1 = s
-        a2 = field.mul(s, conjugates[1]) ^ conjugates[-1]
-        a3 = (field.mul(field.mul(s, conjugates[1]), conjugates[2])
-              ^ field.mul(conjugates[-1], conjugates[1]) ^ conjugates[-2])
+        multipliers = [1]
+        for r in range(1, degree + 1):
+            alpha = 0
+            for j in range(r):
+                term = conjugates[-j]
+                for i in range(1, r - j):
+                    term = field.mul(term, conjugates[i])
+                alpha ^= term
+            multipliers.append(alpha)
         product = field.mul(target, half_trace(inverse_square ^ square(s)))
         if not field.tr(product):
             product ^= target
         rhs = product ^ s ^ 1
-        checks = [field.tr(field.mul(alpha, rhs)) for alpha in (1, a1, a2, a3)]
+        checks = [field.tr(field.mul(alpha, rhs)) for alpha in multipliers]
         if any(checks):
             continue
         columns = [square(x) ^ field.mul(x, s) for x in basis]
@@ -165,31 +170,35 @@ def false_positive(n, modulus):
         y = field.mul(target, half_trace(target ^ 1 ^ inverse_square))
         assert (square(y) ^ field.mul(target, y)) == field.mul(square(target), target) ^ square(target) ^ 1
         return dict(field_modulus=field.poly, target_x=target, target_y=y, sum_x=s,
-                    normalized_rhs=rhs, cubic_checks=checks, image_rank=rank,
+                    normalized_rhs=rhs, trace_checks=checks, image_rank=rank,
                     augmented_rank=augmented)
     raise AssertionError('no false positive found in the deterministic target stream')
 
 
-def measure(binary, n, verify=False):
+def measure(binary, n, verify=False, degree=3, timeout=120):
     k = (n - 1) // 2
     for modulus in factors(n):
         dimensions = []
         details = []
         for shift in (0, 1, n - 1):
             start = perf_counter()
-            rows, initial, top_rows, top_kernel = lower_system(n, modulus, shift)
-            rank = block_rank(binary, n, modulus, rows, top_kernel, verify and k <= 23)
+            rows, initial, top_rows, top_kernel = lower_system(n, modulus, shift, degree)
+            if degree == 4:
+                rows.sort(key=len)
+            rank = block_rank(binary, n, modulus, rows, top_kernel,
+                              verify and k <= 23 and degree == 3, timeout)
             dimensions.append(top_kernel - rank)
             details.append(dict(shift=shift, original_columns=initial, top_rows=top_rows,
                                 after_top=top_kernel, lower_rows=len(rows), lower_rank=rank,
                                 dimension=top_kernel - rank, seconds=perf_counter() - start))
-        scalar_span = sum(comb(k, j) * (4 - j) for j in range(4)) if k > 3 else None
+        scalar_span = (sum(comb(k, j) * (degree + 1 - j) for j in range(degree + 1))
+                       if k > degree else None)
         dimension = dimensions[0] + k * sum(dimensions[1:])
-        direct = direct_dimension(n, modulus) if verify and n <= 23 else None
+        direct = direct_dimension(n, modulus) if verify and n <= 23 and degree == 3 else None
         if direct is not None:
             assert direct == dimension
-        witness = false_positive(n, modulus) if dimension == scalar_span else None
-        print(json.dumps(dict(n=n, g=modulus, k=k, components=details,
+        witness = false_positive(n, modulus, degree) if dimension == scalar_span else None
+        print(json.dumps(dict(n=n, g=modulus, k=k, multiplier_degree=degree, components=details,
                               false_positive=witness,
                               direct_dimension=direct,
                               unrestricted_dimension=dimension, scalar_multiple_dimension=scalar_span,
@@ -201,6 +210,8 @@ if __name__ == '__main__':
     parser.add_argument('n', type=int, nargs='+', choices=(7, 23, 47, 71, 79))
     parser.add_argument('--ranker', type=Path, required=True)
     parser.add_argument('--verify', action='store_true')
+    parser.add_argument('--degree', choices=(3, 4), type=int, default=3)
+    parser.add_argument('--rank-timeout', type=int, default=120)
     args = parser.parse_args()
     for n in args.n:
-        measure(args.ranker.resolve(), n, args.verify)
+        measure(args.ranker.resolve(), n, args.verify, args.degree, args.rank_timeout)
