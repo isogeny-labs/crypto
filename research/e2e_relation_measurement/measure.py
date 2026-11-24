@@ -1,6 +1,6 @@
 #!/usr/bin/env sage -python
 """Bounded, replayable two-summand relation measurement; see README.md."""
-import argparse, hashlib, json, math, platform, random, resource, time
+import argparse, hashlib, json, math, os, platform, random, resource, time
 from pathlib import Path
 from sage.all import GF, EllipticCurve, PolynomialRing, prod, version, is_prime
 
@@ -11,6 +11,15 @@ def pt(P):
 
 def run(args):
     start = time.perf_counter_ns(); cpu = time.process_time_ns()
+    timings = {}
+    output = {'schema':'e2e-relation-measurement/v1', 'config':vars(args), 'status':'running', 'phase':'setup', 'timings':timings, 'source_sha256_at_start':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+    def checkpoint():
+        if args.checkpoint:
+            path = Path(args.checkpoint)
+            tmp = path.with_name(path.name + '.tmp')
+            tmp.write_text(json.dumps(output, indent=2, sort_keys=True) + '\n')
+            os.replace(tmp, path)
+    checkpoint()
     F = GF(args.p); E = EllipticCurve(F, [args.curve_a, args.curve_b]); O = E(0)
     P = E(args.px, args.py); n = int(P.order())
     if not is_prime(n):
@@ -22,8 +31,9 @@ def run(args):
         raise ValueError('Q must be a nonidentity point in the P subgroup')
     rng = random.Random(args.seed)
     rand = lambda: rng.randrange(n)
-    timings = {}; stages = {}; counts = {'candidates': 0, 'identity': 0, 'filtered': 0, 'duplicate_x': 0}
+    counts = {'candidates': 0, 'identity': 0, 'filtered': 0, 'duplicate_x': 0}
     def phase(name, fn):
+        output['phase'] = name; checkpoint()
         t = time.perf_counter_ns(); c = time.process_time_ns()
         result = fn(); timings[name] = {'wall_ns': time.perf_counter_ns()-t, 'cpu_ns': time.process_time_ns()-c}; return result
     def acquire():
@@ -59,7 +69,8 @@ def run(args):
             record['status']=reason; trace.append(record)
         return ar,br,R,rows,trace,{'walks':walks, 'group_a':aa,'group_b':bb}
     ar,br,R,rows,trace,generator=phase('generation', acquire)
-    output={'schema':'e2e-relation-measurement/v1','config':vars(args),'curve':{'p':args.p,'a':args.curve_a,'b':args.curve_b,'P':pt(P),'Q':pt(Q),'n':n},'target':{'a':ar,'b':br,'point':pt(R)},'generator':generator,'candidates':trace,'counts':counts,'timings':timings,'status':'incomplete', 'metrics':{'degree_of_regularity':None,'solving_degree':None,'solver_operations':None},'metric_notes':{'degree_of_regularity':'not exported by backend','solving_degree':'not exported by backend','solver_operations':'not exported by backend'}}
+    output.update({'curve':{'p':args.p,'a':args.curve_a,'b':args.curve_b,'P':pt(P),'Q':pt(Q),'n':n},'target':{'a':ar,'b':br,'point':pt(R)},'generator':generator,'candidates':trace,'counts':counts,'timings':timings,'status':'running', 'metrics':{'degree_of_regularity':None,'solving_degree':None,'solver_operations':None},'metric_notes':{'degree_of_regularity':'not exported by backend','solving_degree':'not exported by backend','solver_operations':'not exported by backend'}})
+    checkpoint()
     if len(rows) < 2*args.block_size:
         output['status']='candidate_budget_exhausted'
     else:
@@ -94,6 +105,8 @@ def run(args):
         output['status']='complete'; output['useful_relations']=sum(bool(w['verified']) for w in output['witnesses'])
     output['total']={'wall_ns':time.perf_counter_ns()-start,'cpu_ns':time.process_time_ns()-cpu,'peak_rss_native':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'peak_rss_note':'process lifetime; bytes on macOS, KiB on Linux'}
     output['environment']={'sage':version(),'python':platform.python_version(),'platform':platform.platform(),'source_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+    output['phase']='finished'
+    checkpoint()
     return output
 
 
@@ -101,8 +114,10 @@ def main():
     p=argparse.ArgumentParser(); p.add_argument('--p',type=int,required=True); p.add_argument('--curve-a',type=int,required=True); p.add_argument('--curve-b',type=int,required=True)
     for name in ('px','py','qx','qy'): p.add_argument('--'+name,type=int,required=True)
     p.add_argument('--walk-length',type=int,default=8); p.add_argument('--x-min',type=int,default=0); p.add_argument('--x-max',type=int,default=None)
+    p.add_argument('--checkpoint', default=None)
     p.add_argument('--mode',choices=['independent','walk','two-group'],required=True); p.add_argument('--seed',type=int,required=True); p.add_argument('--block-size',type=int,default=4); p.add_argument('--group-size',type=int,default=8); p.add_argument('--max-candidates',type=int,default=1000); p.add_argument('--modulus',type=int,default=1); p.add_argument('--residue',type=int,default=0); p.add_argument('--output',required=True)
     a=p.parse_args()
+    if a.checkpoint and Path(a.checkpoint).resolve() == Path(a.output).resolve(): p.error('checkpoint and output paths must differ')
     if a.x_max is None: a.x_max=a.p-1
     if not 0 <= a.x_min <= a.x_max < a.p: p.error('invalid x interval')
     if min(a.walk_length,a.block_size,a.group_size,a.max_candidates,a.modulus)<1 or not 0<=a.residue<a.modulus: p.error('invalid sizes or residue')

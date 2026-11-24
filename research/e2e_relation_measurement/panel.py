@@ -14,16 +14,17 @@ def main():
     if set(plan) != {'common_args','seeds','timeout_seconds'}: p.error('plan requires common_args, seeds and timeout_seconds')
     common=plan['common_args']; seeds=plan['seeds']; timeout=plan['timeout_seconds']
     if not isinstance(common,list) or not all(isinstance(x,str) for x in common): p.error('common_args must be strings')
-    if any(x.split('=')[0] in ('--mode','--seed','--output') for x in common): p.error('common_args cannot override mode, seed or output')
+    if any(x.split('=')[0] in ('--mode','--seed','--output','--checkpoint') for x in common): p.error('common_args cannot override mode, seed or output')
     if not isinstance(seeds,list) or not seeds or any(type(x)!=int for x in seeds) or len(seeds)!=len(set(seeds)): p.error('seeds must be distinct integers')
     if not isinstance(timeout,(int,float)) or not 0 < timeout <= 86400: p.error('invalid timeout')
     out=Path(args.out); out.mkdir(parents=True,exist_ok=False)
     (out/'plan.json').write_bytes(plan_path.read_bytes())
     receipts=[]
+    source_before=digest(HERE/'measure.py')
     for seed in seeds:
         for mode in MODES:
-            name=f'seed-{seed}-{mode}'; result=out/(name+'.result.json')
-            cmd=['sage','-python',str(HERE/'measure.py'),*common,'--mode',mode,'--seed',str(seed),'--output',str(result.resolve())]
+            name=f'seed-{seed}-{mode}'; result=out/(name+'.result.json'); checkpoint=out/(name+'.checkpoint.json')
+            cmd=['sage','-python',str(HERE/'measure.py'),*common,'--mode',mode,'--seed',str(seed),'--output',str(result.resolve()),'--checkpoint',str(checkpoint.resolve())]
             started=time.perf_counter_ns()
             try:
                 proc=subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
@@ -43,14 +44,15 @@ def main():
             valid = isinstance(data,dict) and data.get('schema')=='e2e-relation-measurement/v1' and data.get('config',{}).get('seed')==seed and data.get('config',{}).get('mode')==mode
             outcome=data.get('status') if valid and status=='exited' and rc==0 else None
             if data is not None and not valid: parse_error='invalid schema, seed or mode'
-            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'whole_process_wall_ns':elapsed,'result_status':outcome,'result_sha256':digest(result) if result.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome=='complete' else None,'target':data.get('target') if outcome is not None else None}
+            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'whole_process_wall_ns':elapsed,'result_status':outcome,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome=='complete' else None,'target':data.get('target') if outcome is not None else None}
             (out/(name+'.receipt.json')).write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
             receipts.append(receipt)
     pairing={}
     for seed in seeds:
         targets=[r['target'] for r in receipts if r['seed']==seed]
         pairing[str(seed)] = None if any(t is None for t in targets) else all(t==targets[0] for t in targets)
-    summary={'target_pairing_by_seed':pairing,'plan_sha256':digest(out/'plan.json'),'measure_sha256':digest(HERE/'measure.py'),'panel_sha256':digest(Path(__file__)),'platform':platform.platform(),'python':sys.version,'runs':receipts,'per_mode':{mode:{'attempts':sum(r['mode']==mode for r in receipts),'completed':sum(r['mode']==mode and r['result_status']=='complete' for r in receipts),'useful_runs':sum(r['mode']==mode and (r['useful_relations'] or 0)>0 for r in receipts),'failed_or_incomplete':sum(r['mode']==mode and r['result_status']!='complete' for r in receipts),'total_process_wall_ns':sum(r['whole_process_wall_ns'] for r in receipts if r['mode']==mode)} for mode in MODES}}
+    source_after=digest(HERE/'measure.py')
+    summary={'target_pairing_by_seed':pairing,'measure_sha256_at_start':source_before,'measure_sha256_at_end':source_after,'measure_source_unchanged':source_before==source_after,'plan_sha256':digest(out/'plan.json'),'measure_sha256':digest(HERE/'measure.py'),'panel_sha256':digest(Path(__file__)),'platform':platform.platform(),'python':sys.version,'runs':receipts,'per_mode':{mode:{'attempts':sum(r['mode']==mode for r in receipts),'completed':sum(r['mode']==mode and r['result_status']=='complete' for r in receipts),'useful_runs':sum(r['mode']==mode and (r['useful_relations'] or 0)>0 for r in receipts),'failed_or_incomplete':sum(r['mode']==mode and r['result_status']!='complete' for r in receipts),'total_process_wall_ns':sum(r['whole_process_wall_ns'] for r in receipts if r['mode']==mode)} for mode in MODES}}
     (out/'summary.json').write_text(json.dumps(summary,indent=2,sort_keys=True)+'\n')
     print(json.dumps(summary['per_mode'],sort_keys=True))
 
