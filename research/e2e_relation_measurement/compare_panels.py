@@ -39,18 +39,44 @@ def flags(argv):
     return parsed
 
 
+def expected_config(plan, seed, mode):
+    parsed=flags(plan['common_args'])
+    required=('--p','--curve-a','--curve-b','--px','--py','--qx','--qy')
+    if any(key not in parsed for key in required):
+        raise ValueError('plan is missing required curve or target arguments')
+    defaults={'walk-length':8,'x-min':0,'block-size':4,'group-size':8,
+              'max-candidates':1000,'modulus':1,'residue':0}
+    expected={key.lstrip('-').replace('-','_'):int(parsed[key]) for key in required}
+    for key,default in defaults.items():
+        expected[key.replace('-','_')]=int(parsed.get('--'+key,default))
+    expected['x_max']=int(parsed.get('--x-max',expected['p']-1))
+    expected['solver_protocol']=parsed.get('--solver-protocol',False)
+    expected['seed']=seed
+    expected['mode']=mode
+    return expected
+
+
+def config_matches(actual, expected):
+    # Output and checkpoint paths are per-attempt locations, not plan inputs.
+    return isinstance(actual,dict) and all(type(actual.get(key)) is type(value) and actual.get(key)==value for key,value in expected.items())
+
+
 def load(directory):
     directory = Path(directory)
     plan = json.loads((directory / 'plan.json').read_text())
     summary = json.loads((directory / 'summary.json').read_text())
     if sha(directory / 'plan.json') != summary['plan_sha256']:
         raise ValueError(f'plan hash mismatch: {directory}')
-    if not summary['measure_source_unchanged'] or not summary['accounting_source_unchanged']:
+    if (not summary['measure_source_unchanged'] or not summary['accounting_source_unchanged'] or
+        summary['measure_sha256_at_start'] != summary['measure_sha256_at_end'] or
+        summary['measure_sha256_at_end'] != summary['measure_sha256'] or
+        summary['accounting_sha256_at_start'] != summary['accounting_sha256_at_end']):
         raise ValueError(f'source changed during panel: {directory}')
     expected = {(seed, mode) for seed in plan['seeds'] for mode in MODES}
     rows = {}
     for row in summary['runs']:
         key = (row['seed'], row['mode'])
+        expected_args=expected_config(plan,*key)
         if key in rows or key not in expected:
             raise ValueError(f'duplicate or unexpected attempt: {directory} {key}')
         name = f'seed-{key[0]}-{key[1]}'
@@ -63,12 +89,14 @@ def load(directory):
             path = directory / f'{name}.{suffix}'
             if expected_hash is not None and (not path.is_file() or sha(path) != expected_hash):
                 raise ValueError(f'artifact hash mismatch: {path}')
+        if row['result_status'] is None and any(row.get(key) is not None for key in ('target','useful_relations','relation_counts')):
+            raise ValueError(f'unfinished attempt claims a result: {directory} {key}')
         if row['result_status'] is not None:
             if row['status'] != 'exited' or row.get('exit_code') != 0 or row['result_sha256'] is None:
                 raise ValueError(f'inconsistent completed result: {directory} {key}')
             result = json.loads((directory / f'{name}.result.json').read_text())
             if (result.get('schema') != 'e2e-relation-measurement/v1' or
-                result.get('config',{}).get('seed') != key[0] or result.get('config',{}).get('mode') != key[1] or
+                not config_matches(result.get('config'),expected_args) or
                 result.get('status') != row['result_status'] or result.get('target') != row['target'] or
                 result.get('useful_relations') != row['useful_relations'] or result.get('relation_counts') != row['relation_counts'] or
                 result.get('counts') != row.get('candidate_counts') or result.get('total') != row.get('observed_total') or
@@ -80,7 +108,7 @@ def load(directory):
                 raise ValueError(f'missing observed checkpoint: {directory} {key}')
             snapshot=json.loads((directory / f'{name}.checkpoint.json').read_text())
             if (snapshot.get('schema') != 'e2e-relation-measurement/v1' or
-                snapshot.get('config',{}).get('seed') != key[0] or snapshot.get('config',{}).get('mode') != key[1] or
+                not config_matches(snapshot.get('config'),expected_args) or
                 snapshot.get('counts') != row.get('candidate_counts') or snapshot.get('total') != row.get('observed_total') or
                 snapshot.get('source_sha256_at_start') != summary['measure_sha256_at_start'] or
                 snapshot.get('accounting_sha256_at_start') != summary['accounting_sha256_at_start']):

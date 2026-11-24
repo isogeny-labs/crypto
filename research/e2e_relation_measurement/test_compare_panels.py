@@ -13,7 +13,7 @@ def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def fixture(directory, *, filtered=False, target=17, incomplete=False, mode_targets=None):
     directory.mkdir()
-    plan={'common_args':['--p','101','--curve-a','1','--curve-b','32'] + (['--modulus','2','--residue','0'] if filtered else []), 'seeds':[7], 'timeout_seconds':10}
+    plan={'common_args':['--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27'] + (['--modulus','2','--residue','0'] if filtered else []), 'seeds':[7], 'timeout_seconds':10}
     save(directory/'plan.json',plan)
     rows=[]
     for mode in compare.MODES:
@@ -22,11 +22,11 @@ def fixture(directory, *, filtered=False, target=17, incomplete=False, mode_targ
         for suffix in ('stdout','stderr'):
             (directory/f'{name}.{suffix}').write_bytes(b'')
         result=directory/f'{name}.result.json'
-        save(result,{'schema':'e2e-relation-measurement/v1','config':{'seed':7,'mode':mode},'status':'complete','target':{'a':1,'b':2,'point':[actual_target,1]},'useful_relations':1,'relation_counts':{'nonzero_b':1},'source_sha256_at_start':'m','accounting_sha256_at_start':'a'})
+        save(result,{'schema':'e2e-relation-measurement/v1','config':compare.expected_config(plan,7,mode),'status':'complete','target':{'a':1,'b':2,'point':[actual_target,1]},'useful_relations':1,'relation_counts':{'nonzero_b':1},'source_sha256_at_start':'m','accounting_sha256_at_start':'a'})
         missing=incomplete and mode=='walk'
         row={'seed':7,'mode':mode,'status':'timeout' if missing else 'exited', 'exit_code':-9 if missing else 0, 'result_status':None if missing else 'complete', 'target':None if missing else {'a':1,'b':2,'point':[actual_target,1]},'whole_process_wall_ns':20,'relation_counts':None if missing else {'nonzero_b':1},'useful_relations':None if missing else 1,'result_sha256':digest(result),'checkpoint_sha256':None,'stdout_sha256':digest(directory/f'{name}.stdout'),'stderr_sha256':digest(directory/f'{name}.stderr')}
         rows.append(row); save(directory/f'{name}.receipt.json',row)
-    summary={'plan_sha256':digest(directory/'plan.json'),'measure_source_unchanged':True,'accounting_source_unchanged':True,'measure_sha256_at_start':'m','accounting_sha256_at_start':'a','panel_sha256':'p','platform':'host','resource_metadata_at_start':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'resource_metadata_at_end':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'runs':rows}
+    summary={'plan_sha256':digest(directory/'plan.json'),'measure_source_unchanged':True,'accounting_source_unchanged':True,'measure_sha256_at_start':'m','measure_sha256_at_end':'m','measure_sha256':'m','accounting_sha256_at_start':'a','accounting_sha256_at_end':'a','panel_sha256':'p','platform':'host','resource_metadata_at_start':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'resource_metadata_at_end':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'runs':rows}
     save(directory/'summary.json',summary)
 
 
@@ -59,12 +59,16 @@ class ComparisonTest(unittest.TestCase):
             summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
             row=next(row for row in summary['runs'] if row['mode']=='walk')
             checkpoint=b/'seed-7-walk.checkpoint.json'
-            save(checkpoint,{'schema':'e2e-relation-measurement/v1','config':{'seed':7,'mode':'walk'},'counts':{'candidates':9},'source_sha256_at_start':'m','accounting_sha256_at_start':'a'})
+            save(checkpoint,{'schema':'e2e-relation-measurement/v1','config':compare.expected_config(json.loads((b/'plan.json').read_text()),7,'walk'),'counts':{'candidates':9},'source_sha256_at_start':'m','accounting_sha256_at_start':'a'})
             row['observation_source']='checkpoint'; row['checkpoint_sha256']=digest(checkpoint); row['candidate_counts']={'candidates':9}
             save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
             result=compare.compare(a,b)
             self.assertEqual(result['per_mode']['walk']['right']['candidates']['observed_sum'],9)
             row['candidate_counts']={'candidates':99}; save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'checkpoint does not match receipt'): compare.compare(a,b)
+            row['candidate_counts']={'candidates':9}
+            snapshot=json.loads(checkpoint.read_text()); snapshot['config']['x_min']=7; save(checkpoint,snapshot)
+            row['checkpoint_sha256']=digest(checkpoint); save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
             with self.assertRaisesRegex(ValueError,'checkpoint does not match receipt'): compare.compare(a,b)
 
     def test_modes_must_share_target_within_each_panel(self):
@@ -82,6 +86,24 @@ class ComparisonTest(unittest.TestCase):
             row=summary['runs'][0]; row['target']={'a':9,'b':9,'point':[9,9]}
             save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
             with self.assertRaisesRegex(ValueError,'result does not match receipt'): compare.compare(a,b)
+
+    def test_result_configuration_must_match_frozen_plan(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            result_path=b/'seed-7-independent.result.json'; result=json.loads(result_path.read_text())
+            result['config']['block_size']=999; save(result_path,result)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=summary['runs'][0]; row['result_sha256']=digest(result_path)
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'result does not match receipt or sources'): compare.compare(a,b)
+
+    def test_timeout_cannot_claim_a_relation(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b,incomplete=True)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=next(row for row in summary['runs'] if row['mode']=='walk'); row['relation_counts']={'nonzero_b':1}
+            save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'unfinished attempt claims a result'): compare.compare(a,b)
 
     def test_resource_observation_cannot_be_relabelled(self):
         with tempfile.TemporaryDirectory() as d:
