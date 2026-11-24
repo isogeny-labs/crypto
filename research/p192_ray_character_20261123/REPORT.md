@@ -263,6 +263,23 @@ deliberately structured offset tuple or a feature family other than
 coordinate quadratic signs. It also supplies no online evaluation
 method. [pcc:unverified]
 
+The `2^-42` threshold above is an **online-only illustration**. A
+cold single-target route based on a biased classifier must also learn
+its correlation sign (unless that sign is proved analytically). For a
+fixed classifier with a separately justified `|ρ_F|≥γ`, independent
+labeled calibration points and independent online randomizations each
+give ±1 observations of means `ρ_F` and `χ_r(d)ρ_F`, respectively.
+Allocating error at most `0.005` to each sign decision, Hoeffding's
+inequality supplies the sufficient sample count
+`2 ln(200)/γ²` for **each** stage. If each trial costs the illustrative
+`C=384` group-addition equivalents in both stages, the modeled cold
+cost is `4C ln(200)/γ²`, before selecting or proving the feature.
+It lies below `R=sqrt(πr/4)` only for
+`γ>sqrt(4C ln(200)/R)≈2^-41.418`. This is the gate for that specified
+sampling procedure, not a lower bound on all certification methods;
+using the calibration data to choose the classifier would require
+additional selection control. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
