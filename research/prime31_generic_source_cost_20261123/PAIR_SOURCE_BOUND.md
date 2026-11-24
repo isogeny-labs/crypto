@@ -53,6 +53,38 @@ panel. In particular, completion of the 2+2 positive control alone
 would not demonstrate extraction across the other four classes or an
 end-to-end source replacement.
 
+### Signed large-prime rank on the same frozen rows
+
+Let `L` be the signed coefficient block on the 168 Y7 large-prime
+columns, reduced modulo the curve's prime group order. For any chosen
+row family, the dimension of its space of LP-free linear combinations
+is exactly `row_count - rank(L)`; useful factor-base rank can be lower.
+Independent modular elimination of the frozen rows gives:
+
+| Row family | Rows | Occupied LP columns | `rank(L)` | LP-free dimension |
+| --- | ---: | ---: | ---: | ---: |
+| 2 Dickson + 2 Y7 | 154 | 142 | 134 | 20 |
+| 3 Dickson + 1 Y7 | 294 | 138 | 138 | 156 |
+| Both families | 448 | 162 | 162 | 286 |
+
+The 2+2 signed-edge graph has 142 vertices and nine connected
+components. Its ordinary cycle dimension is `154-142+9=21`, but one
+component is sign-unbalanced, so the modular LP kernel has dimension
+20. Adding the 2+2 rows after the 3+1 rows increases the combined
+LP-free dimension by `286-156=130`, even though 2+2 alone supplies at
+most 20. This measures a real cross-family graph effect, **not** 130
+new independent factor-base equations or a completed algebraic-source
+gain. The 221 direct four-Dickson rows have no LP columns and are
+separate from this table.
+
+The exact source receipt is
+`research/prime31_graph_ecdlp_20261123/evidence/mitm-b677-control-01/forty-cap-full-cost.json`
+with SHA-256 `6214084754ef21a0fa830f50a623b3789214010879a08e53c8768346dcbb73bd`.
+The public support classification was recomputed from the fixture in
+`research/prime31_graph_ecdlp_20261123/evidence/rr5-b677-prerequisite-01/structured-positive.stdout` using
+the ten Dickson iterations; that file's SHA-256 is
+`146b5893d8bd5f5d55392bae6de20c4792f5ee950a2131b54ca079e9630b6468`.
+
 ## Cost within this materialized-pair design
 
 The source constructs `4*C(B,2)` signed pairs, then probes one complement
