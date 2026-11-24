@@ -19,7 +19,7 @@ Every number here is **[pcc:unverified]**. The run is on one shared host with pl
 
 ## Decision (PROTOCOL.md section 6): **IMPROVEMENT**
 
-This is a component speed-up of the index-calculus baseline, not a claim against rho.
+This is a component speed-up of the index-calculus baseline [pcc:unverified], not a claim against rho.
 
 Paired GAE ratio sge/sfb, pooled with equal weight per prime, cluster bootstrap 95%:
 
