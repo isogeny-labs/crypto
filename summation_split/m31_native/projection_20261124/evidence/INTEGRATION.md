@@ -62,3 +62,20 @@ The canonical ledger checks are retained as `PCC_LEDGER_BRANCH.txt` and
 `PCC_LEDGER_MAIN.txt`, with separate exit files. Append-only history is
 preserved. Main-prefix reconciliation is an integration task; rewriting or
 rehashing previous entries is not an acceptable substitute.
+
+## Observed GitHub artifact migration
+
+On source commit `9ce6aa69200ad155e5512d11e04b27c628f8fc56`, GitHub's
+`migrate` check failed in the step `Upload changed data and replay remote
+bytes`. The subsequent pointer-commit step was skipped. The log reports an
+S3 `HeadObject` 403 for content hash
+`a61cf6887d76c675608f5d4f5b2e71aebf9cbb556c6ce7abd797adbde81cd800`, the
+earlier preserved prepared-input archive. That response alone does not
+distinguish an inaccessible object from an absent key without list access.
+The workflow exited 2. Artifact-store access must be reconciled before this
+integration gate can complete.
+
+[Observed job](https://github.com/isogeny-labs/crypto/actions/runs/45441435994/job/138613342662).
+The minimal relevant log excerpt and step results are retained in
+`CI_ARTIFACT_MIGRATION.json`. The same source had a skipped review check;
+it did not receive a passing full CI verdict.

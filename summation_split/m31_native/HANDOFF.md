@@ -1,5 +1,11 @@
 # Current continuation: checked native projection
 
+Source/evidence commit:
+`9ce6aa69200ad155e5512d11e04b27c628f8fc56`. All 79 changed blob identities
+matched after fetching the remote commit. The exact subjects are recorded in
+[SOURCE_PUBLICATION.json](projection_20261124/evidence/SOURCE_PUBLICATION.json).
+This is a producer-local publication check. [pcc:unverified]
+
 The 2026-11-24 continuation adds exact geometric projection from the checked
 native basis on the fixed four-point M31 section. The first frozen attempt
 passed 40 library and five CLI tests. The existing unique m3/case0 geometric
@@ -21,6 +27,11 @@ instance was launched through the CLI. The next admitted execution remains
 the full 50-per-configuration projected-output gate and matched cost panel.
 Authenticated shared admission and checkpoint custody remain unavailable.
 Keep the existing PR draft; the broader comparison is unfinished.
+
+The source publication's GitHub artifact-migration job stopped at an S3
+`HeadObject` 403 for the preserved prepared-input archive. See the integration
+record and CI receipt for the exact job and failure. Artifact-store access,
+the full-root gate and main-ledger reconciliation remain open.
 
 The remainder of this file preserves the earlier handoff as historical
 context. Its statements about absent native projection and 29-test counts
