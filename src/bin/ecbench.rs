@@ -1692,10 +1692,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     "canonical panel: subgroup bits = ceil(log2(r)); source {}",
                     panel::PANEL_SOURCE
                 );
-                println!(
-                    "{:<5} {:<34} {:<22} {}",
-                    "phase", "lane", "state", "blockers"
-                );
+                println!("{:<5} {:<34} {:<22} blockers", "phase", "lane", "state");
                 for (record, entry) in lane_rows {
                     println!(
                         "{:<5} {:<34} {:<22} {}",
@@ -1713,8 +1710,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     println!();
                     println!("source cells");
                     println!(
-                        "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
-                        "phase", "cell", "family", "r bits", "field", "identity", "status"
+                        "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} status",
+                        "phase", "cell", "family", "r bits", "field", "identity"
                     );
                     for (record, cell) in rows {
                         let identity = cell
@@ -1739,8 +1736,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     println!();
                     println!("destination cells");
                     println!(
-                        "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
-                        "phase", "cell", "family", "r bits", "field", "identity", "status"
+                        "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} status",
+                        "phase", "cell", "family", "r bits", "field", "identity"
                     );
                     for (record, cell) in destination_rows {
                         let identity = cell
@@ -1765,13 +1762,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     println!();
                     println!("transfer routes");
                     println!(
-                        "{:<5} {:<27} {:<14} {:>6} {:<28} {}",
-                        "phase",
-                        "route",
-                        "source",
-                        "degree",
-                        "source reference",
-                        "destination methods / controls"
+                        "{:<5} {:<27} {:<14} {:>6} {:<28} destination methods / controls",
+                        "phase", "route", "source", "degree", "source reference"
                     );
                     for route in route_rows {
                         println!(

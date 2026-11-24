@@ -1862,11 +1862,13 @@ fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
 #[test]
 fn evaluator_forest_same_source_seeded_rank_identity() {
     use crypto_lib::cryptanalysis::large_prime_graph::eval::*;
-    let mut p = EvalParams::default();
-    p.compare_exact_forest = true;
-    p.forest_max_rows = 64;
-    p.filter_max_sources = 4096;
-    p.filter_max_small_weight = 4096;
+    let mut p = EvalParams {
+        compare_exact_forest: true,
+        forest_max_rows: 64,
+        filter_max_sources: 4096,
+        filter_max_small_weight: 4096,
+        ..EvalParams::default()
+    };
     p.partition_parts.clear();
     for seed in 1..=24u64 {
         let ell = [7u64, 101, 2_147_446_831][(seed as usize) % 3];
@@ -1920,7 +1922,6 @@ fn evaluator_forest_same_source_seeded_rank_identity() {
     }
 }
 
-
 #[test]
 fn augmented_basis_selects_original_rows_and_preserves_affine_span() {
     use crypto_lib::cryptanalysis::large_prime_filter::CompleteRelation;
@@ -1946,7 +1947,10 @@ fn augmented_basis_selects_original_rows_and_preserves_affine_span() {
     assert_eq!(audit.useful_small_rank, 2);
     assert_eq!(audit.augmented_rank, 3);
     assert_eq!(audit.augmented_basis_row_indices, vec![0, 2, 3]);
-    assert_eq!(kept, vec![input[0].clone(), input[2].clone(), input[3].clone()]);
+    assert_eq!(
+        kept,
+        vec![input[0].clone(), input[2].clone(), input[3].clone()]
+    );
     assert_eq!(audit.augmented_basis_nonzeros, 4);
     assert_eq!(audit.augmented_basis_source_terms, 3);
     // Invalid rows must be refused without returning partially pruned data.
@@ -2017,8 +2021,14 @@ fn augmented_basis_randomized_original_rank_and_source_conservation() {
         let original_augmented =
             dense_rank(&dense_matrix(&input, ncols, true), ncols + 1, ell).unwrap();
         let (kept, audit) = select_augmented_basis(&input, ell).unwrap();
-        assert_eq!(audit.useful_small_rank, original_small, "small trial {trial}");
-        assert_eq!(audit.augmented_rank, original_augmented, "augmented trial {trial}");
+        assert_eq!(
+            audit.useful_small_rank, original_small,
+            "small trial {trial}"
+        );
+        assert_eq!(
+            audit.augmented_rank, original_augmented,
+            "augmented trial {trial}"
+        );
         assert_eq!(kept.len(), original_augmented, "basis size trial {trial}");
         assert_eq!(
             dense_rank(&dense_matrix(&kept, ncols, false), ncols, ell).unwrap(),
@@ -2031,12 +2041,16 @@ fn augmented_basis_randomized_original_rank_and_source_conservation() {
             "retained augmented trial {trial}"
         );
         assert!(
-            audit.augmented_basis_row_indices.windows(2).all(|w| w[0] < w[1]),
+            audit
+                .augmented_basis_row_indices
+                .windows(2)
+                .all(|w| w[0] < w[1]),
             "indices must be strictly increasing trial {trial}"
         );
         assert_eq!(
             kept,
-            audit.augmented_basis_row_indices
+            audit
+                .augmented_basis_row_indices
                 .iter()
                 .map(|&i| input[i].clone())
                 .collect::<Vec<_>>(),
@@ -2081,9 +2095,18 @@ fn augmented_basis_min_payload_fixed_optimum_and_explicit_target_column() {
     assert_eq!(new.useful_small_rank, old.useful_small_rank);
     assert_eq!(old.augmented_basis_row_indices, vec![0, 1, 4]);
     assert_eq!(new.augmented_basis_row_indices, vec![1, 2, 4]);
-    assert_eq!(selected, vec![input[1].clone(), input[2].clone(), input[4].clone()]);
-    assert_eq!(new.augmented_basis_nonzeros + new.augmented_basis_source_terms, 5);
-    assert_eq!(old.augmented_basis_nonzeros + old.augmented_basis_source_terms, 10);
+    assert_eq!(
+        selected,
+        vec![input[1].clone(), input[2].clone(), input[4].clone()]
+    );
+    assert_eq!(
+        new.augmented_basis_nonzeros + new.augmented_basis_source_terms,
+        5
+    );
+    assert_eq!(
+        old.augmented_basis_nonzeros + old.augmented_basis_source_terms,
+        10
+    );
     assert!(!legacy.is_empty());
     assert!(compares > 0);
 
@@ -2105,12 +2128,10 @@ fn augmented_basis_min_payload_fixed_optimum_and_explicit_target_column() {
     assert_eq!(empty_audit.augmented_rank, 0);
     assert_eq!(empty_comparisons, 0);
 
-    assert!(select_min_payload_augmented_basis(
-        &[mk(vec![(0, 1), (0, 2)], 0, 20, 1)], 101
-    ).is_err());
-    assert!(select_min_payload_augmented_basis(
-        &[mk(vec![(0, 3)], 0, 21, 1)], 9
-    ).is_err());
+    assert!(
+        select_min_payload_augmented_basis(&[mk(vec![(0, 1), (0, 2)], 0, 20, 1)], 101).is_err()
+    );
+    assert!(select_min_payload_augmented_basis(&[mk(vec![(0, 3)], 0, 21, 1)], 9).is_err());
 }
 
 #[test]
@@ -2121,14 +2142,19 @@ fn augmented_basis_min_payload_exact_dense_oracle_and_exhaustive_optimum() {
     };
 
     fn augmented(rows: &[CompleteRelation], ncols: usize) -> Vec<Vec<(usize, u64)>> {
-        rows.iter().map(|row| {
-            let mut out: Vec<_> = row.small.iter()
-                .map(|&(column, coefficient)| (column as usize, coefficient)).collect();
-            if row.rhs != 0 {
-                out.push((ncols, row.rhs));
-            }
-            out
-        }).collect()
+        rows.iter()
+            .map(|row| {
+                let mut out: Vec<_> = row
+                    .small
+                    .iter()
+                    .map(|&(column, coefficient)| (column as usize, coefficient))
+                    .collect();
+                if row.rhs != 0 {
+                    out.push((ncols, row.rhs));
+                }
+                out
+            })
+            .collect()
     }
     let mut rng = Rng(0x0ca5_1ca1_2026_1123);
     // Small enough to exhaust all original-row subsets with no algorithmic
@@ -2156,31 +2182,48 @@ fn augmented_basis_min_payload_exact_dense_oracle_and_exhaustive_optimum() {
         }
         let full_rank = dense_rank(&augmented(&input, ncols), ncols + 1, ell).unwrap();
         let (legacy_rows, legacy) = select_augmented_basis(&input, ell).unwrap();
-        let (kept, audit, comparisons) =
-            select_min_payload_augmented_basis(&input, ell).unwrap();
+        let (kept, audit, comparisons) = select_min_payload_augmented_basis(&input, ell).unwrap();
         let kept_rank = dense_rank(&augmented(&kept, ncols), ncols + 1, ell).unwrap();
         assert_eq!(audit.augmented_rank, full_rank, "trial {trial}");
         assert_eq!(kept_rank, full_rank, "trial {trial}");
         assert_eq!(kept.len(), full_rank, "trial {trial}");
-        assert_eq!(kept, audit.augmented_basis_row_indices.iter()
-            .map(|&i| input[i].clone()).collect::<Vec<_>>(), "trial {trial}");
-        assert!(audit.augmented_basis_row_indices.windows(2).all(|w| w[0] < w[1]));
+        assert_eq!(
+            kept,
+            audit
+                .augmented_basis_row_indices
+                .iter()
+                .map(|&i| input[i].clone())
+                .collect::<Vec<_>>(),
+            "trial {trial}"
+        );
+        assert!(audit
+            .augmented_basis_row_indices
+            .windows(2)
+            .all(|w| w[0] < w[1]));
         let weight = audit.augmented_basis_nonzeros + audit.augmented_basis_source_terms;
         let old_weight = legacy.augmented_basis_nonzeros + legacy.augmented_basis_source_terms;
-        assert!(weight <= old_weight, "trial {trial}: {weight} > {old_weight}");
+        assert!(
+            weight <= old_weight,
+            "trial {trial}: {weight} > {old_weight}"
+        );
         assert_eq!(legacy_rows.len(), kept.len());
-        assert!(comparisons <= (nrows * nrows), "unexpected sort comparisons");
+        assert!(
+            comparisons <= (nrows * nrows),
+            "unexpected sort comparisons"
+        );
 
         let mut min_weight = usize::MAX;
         for mask in 0usize..(1usize << nrows) {
             if mask.count_ones() as usize != full_rank {
                 continue;
             }
-            let subset: Vec<_> = (0..nrows).filter(|i| mask & (1usize << i) != 0)
-                .map(|i| input[i].clone()).collect();
+            let subset: Vec<_> = (0..nrows)
+                .filter(|i| mask & (1usize << i) != 0)
+                .map(|i| input[i].clone())
+                .collect();
             if dense_rank(&augmented(&subset, ncols), ncols + 1, ell).unwrap() == full_rank {
-                let candidate_weight: usize = subset.iter()
-                    .map(|r| r.small.len() + r.sources.len()).sum();
+                let candidate_weight: usize =
+                    subset.iter().map(|r| r.small.len() + r.sources.len()).sum();
                 min_weight = min_weight.min(candidate_weight);
             }
         }
