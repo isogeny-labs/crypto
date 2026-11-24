@@ -63,3 +63,10 @@ source/claim/archive changed. See identity-v1 PRECALL/POSTCALL for its six
 inputs and exact retained binary. Issuer strict Clippy retains five existing
 canonical SHA style findings;22 maintained tests/build/fmt pass. No library
 edit, warning exemption or failed-check promotion. [pcc:unverified]
+
+Report/identity/metadata localbb21b2ef858c95bee925dd2111ad6dc98ece162f published as 599c7c7c7cfc6651707f95b568a2775d9bdd68ce,
+treee917467b0d19af5903ace9f9345b7116326a4868; exact remote Git blobs for report/PDF/inspection/identity/checks
+match. Report631ec8 binds37 final subjects. This is source custody only;
+full selected raw receipt remains absent. Final handoff tracks this component
+with the related PR and leaves all original acceptance requirements open.
+[pcc:unverified]
