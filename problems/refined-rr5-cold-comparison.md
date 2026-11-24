@@ -43,6 +43,11 @@ the requested end-to-end cost conclusion.
   uses the production consumer and fresh child processes. All three F127 arms
   recover and reconcile their intervals; five cofactor target-in-base refusals
   remain included. No admitted timing ratio. [pcc:unverified]
+- **Common base-lookup component:** the [new control](../research/smooth_p_plus_one_20261123/BASE_LOOKUP_RESULT.md)
+  applies one-term signed membership to every arm before the original oracle.
+  All three F127 arms recover with four four-leaf calls each; the original
+  histories and five refusals remain intact. This extends the recovery policy,
+  not the unsupported four-leaf chart. [pcc:unverified]
 - **Missing capability:** a complete degree-32 full-base comparison,
   successful full-base oriented-S3 output, qualified counters or timing for
   every phase, an exact-source registered EKS image, and independent replay.
@@ -65,8 +70,10 @@ the requested end-to-end cost conclusion.
   gates, retaining the fixed-limit failures and explicit source/target schedule.
 - [x] Freeze and locally qualify common cold intervals, every draw/failure,
   production rank/linear algebra and final replay on the F127 control. [pcc:unverified]
-- [ ] Close cofactor target-in-base coverage and complete a matched, equal-scope
-  full recovery comparison with admitted costs.
+- [x] Qualify common one-term target-in-base handling at the recovery-policy
+  layer, preserving the original four-leaf refusals. [pcc:unverified]
+- [ ] Qualify full-output relation consumption equally across arms, then
+  complete a matched, equal-scope recovery comparison with admitted costs.
 - [ ] Publish and build the exact workload revision through the supported
   EKS route, obtain budget/isolation admission, and retain raw evidence and
   independent replay. An available generic ecbench image alone is insufficient.
@@ -77,14 +84,14 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Handle the exposed target-in-base residuals in a separately frozen comparison
-applied equally to every arm: either preserve four-leaf target-disjoint semantics
-in the cofactor builder or explicitly add a common easy-relation prepass. Retain
-all five original refusals and price the added setup/query work. Then extend
-qualified accounting to the supported registered workload. Degree-32 cofactor
-and full-base oriented completeness remain open under their fixed budgets.
-Do not infer that the original 30-draw Refined trial succeeded from the later
-extension, or increase frozen limits retrospectively.
+Consume every emitted relation under an explicit common policy, charging all
+replay, duplicate handling and exact rank work. The current first-row policy
+discards other complete oracle outputs and is not a strongest-reference claim.
+Keep both first-row/lookup controls and their source identities frozen. Then
+extend qualification to the larger supported workload and registered EKS build.
+Degree-32 cofactor and full-base oriented completeness remain open under fixed
+budgets; the common lookup does not implement the missing target-in-base
+four-leaf chart. Do not raise historical caps or replace incomplete records.
 
 No paid run is scheduled by this record. Freeze the full resource, retry and
 cost limits and verify the supported image/build route before submission.
@@ -113,4 +120,11 @@ fresh child processes and every-draw accounting qualify on the fixed F127
 control. All three arms recover; five cofactor target-in-base refusals remain.
 The new intervals are development diagnostics, not an admitted cost comparison.
 Canonical export schema access and registered payload integration remain open.
+[pcc:unverified]
+
+2026-11-24, common-lookup continuation: shared signed-base membership supplies
+one-term relations before each arm's original oracle. The two F127 policy
+suites recover in all six arms and retain all prior failures/history. Four-leaf
+query counts fall under the shared policy; no total-cost ratio or new map is
+claimed. Full-output relation consumption remains the next baseline obligation.
 [pcc:unverified]

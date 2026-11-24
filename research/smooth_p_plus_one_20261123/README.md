@@ -20,11 +20,17 @@ composes the existing oriented-pair S3 identity into a bounded four-leaf
 interface. All 26 full-base dense/tower calls reach the native matrix limit;
 separate semantic and planted controls pass locally. [pcc:unverified]
 
-The latest [cold-accounting report](COLD_ACCOUNTING_RESULT.md)
+The [cold-accounting report](COLD_ACCOUNTING_RESULT.md)
 ([PDF](COLD_ACCOUNTING_RESULT.pdf)) binds the actual production relation
 consumer to fresh-process recovery. All three F127 arms recover with reconciled
 intervals; five cofactor target-in-base refusals remain retained. This is local
 software qualification, without a timing ratio. [pcc:unverified]
+
+The latest [common-lookup report](BASE_LOOKUP_RESULT.md)
+([PDF](BASE_LOOKUP_RESULT.pdf)) applies the same signed-base lookup to every
+arm. All three F127 arms recover with four four-leaf calls each; the original
+policy retains all five cofactor refusals and matches its recorded history.
+This is a recovery-policy coverage result, with no cost ratio. [pcc:unverified]
 
 - [Initial rank argument](REPORT.md) ([PDF](REPORT.pdf)): collapsed and distinct-image charts.
 - [Initial native controls](NATIVE.md) ([PDF](NATIVE.pdf)): original encodings and retained failures.
@@ -35,6 +41,7 @@ software qualification, without a timing ratio. [pcc:unverified]
 - [Fixed-form output protocol](SEPARATING_FORMS.md) and [reproduction](COFACTOR_OUTPUT_REPRODUCE.md).
 - [Oriented-chain protocol](ORIENTED_CHAIN.md) and [reproduction](ORIENTED_REPRODUCE.md).
 - [Cold-accounting protocol](COLD_ACCOUNTING.md) and [reproduction](COLD_ACCOUNTING_REPRODUCE.md).
+- [Common-lookup protocol](BASE_LOOKUP.md) and [reproduction](BASE_LOOKUP_REPRODUCE.md).
 - [Native source](native/src/main.rs) and [evidence](evidence/).
 
 The original reports and manifests retain their historical revision scope.

@@ -121,3 +121,21 @@ The prose linter flags its negated phrase "not a faster relation method" at
 line 20, which asserts no advantage. This historical annotation finding is
 retained rather than changing the frozen protocol after the run. The current
 result/reproduction reports and PR body are linted separately.
+
+## Common signed-base lookup continuation
+
+Frozen source 6a0c732e8e passes 27 feature tests and six default tests, and the
+release build succeeds. The [new report](BASE_LOOKUP_RESULT.md) records two
+three-arm F127 suites: all six recover with valid process receipts. Original
+Direct/Refined/cofactor use 9/10/12 four-leaf calls and match all 31 earlier
+mask/row/consumer histories. The shared lookup uses 8/7/8 draws, 4/3/4 singleton
+hits and four four-leaf calls per arm. It introduces no new map or admitted cost
+comparison. Claims c54b6a, 1a672f and 98f805 remain unverified. [pcc:unverified]
+
+All five original target-in-base failures are retained. The lookup accepts a
+different one-term relation; it does not implement that missing four-leaf chart.
+Misses still call the old oracle. Every original oracle answer still contributes
+only its first sorted relation, so full-output consumption is the next common
+policy to qualify before a strongest-reference claim. The prior historical
+source snapshot, protocols, controls and manifests are unchanged. No cloud job
+or canonical export validation is represented as completed.
