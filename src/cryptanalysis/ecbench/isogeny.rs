@@ -904,7 +904,8 @@ mod tests {
         // applied when 3 is a quadratic residue.
         for p in [11u64, 13, 23, 37, 65_521, 4_294_967_291] {
             assert!(!matches!(p % 12, 5 | 7));
-            for a in 1..32u64 {
+            // a ≡ 0 (mod p) with b = 0 is the singular curve y² = x³.
+            for a in (1..32u64).filter(|a| a % p != 0) {
                 let mut tally = FieldTally::default();
                 let mut field = Fp { p, tally: &mut tally };
                 let poly = [
