@@ -67,3 +67,23 @@ The new manifest is `evidence/COFACTOR_OUTPUT_SHA256SUMS`. Raw solver whitespace
 and full test logs are preserved, including Git whitespace warnings on those
 data files. The root-library build limitation and unchanged historical
 benchmark-record gate failure above are still open. No EKS job was submitted.
+
+## Four-leaf oriented-chain continuation
+
+The [oriented report](ORIENTED_RESULT.md) retains a new composition of the
+existing pair identity, using the unchanged production F4/root visitor.
+Source `21a7ef9221` passes eighteen feature tests and six default tests, with
+the initial converter compilation failure preserved. Both membership models
+accept/replay 312 ordered witnesses; a separate fixed-slot native integration
+control completes. [pcc:unverified]
+
+All 26 fixed full-base calls are incomplete at matrix admission. Dense asks
+for 2,006,513 entries and tower for 2,001,665, against 2,000,000, on every
+target. No assignment or forbidden domain evaluation occurs. The tests do
+not replace these failed full-base controls. [pcc:unverified]
+
+`evidence/oriented_v1` contains the source/binary identity, complete records,
+test/build receipts and original production inventory. The separate manifest
+is `evidence/ORIENTED_SHA256SUMS`. The production engine, original comparator
+and root source have not changed in this continuation; previous full-library
+and historical benchmark-record limitations remain open.
