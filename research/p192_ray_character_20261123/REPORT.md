@@ -622,6 +622,34 @@ eight P-192 markings. The proof uses the composition identities;
 the finite checks validate their implementation and sign convention.
 [pcc:unverified]
 
+### Second division-polynomial jet: a compact exactness screen
+
+The first derivative of `ψ_r` at `x(P)` was screened in the local
+ray-character note. A distinct point-only feature uses its second
+local coefficient. For `P=(x₀,y₀)`, lift `x=x₀+ε` and
+`y=y₀+y₁ε+y₂ε²` in `F_p[ε]/(ε³)`, where
+`y₁=(3x₀²-3)/(2y₀)` and `y₂=(3x₀-y₁²)/(2y₀)` on P-192.
+The division-polynomial recurrence then gives
+`ψ_r(P_ε)=A(P)ε+B(P)ε²`; set `J(P)=2B(P)/A(P)` when
+`A(P)≠0`. Since `r` is odd, `J(P)=ψ_r″(x(P))/ψ_r′(x(P))`.
+This evaluates the local jet by a logarithmic-depth recurrence,
+without expanding the degree-`(r²-1)/2` polynomial. It is
+invariant under `P↦-P`, as required for a candidate ray-sign
+feature. [pcc:unverified]
+
+A bounded exactness check first matched both jet coefficients to
+Sage's directly expanded `ψ_97` at three markings of the
+`E/F_79, r=97` control. On P-192 the normalized character
+`χ_p(J([d]G)/J(G))` for fixed `d=1,2,3,5` was respectively
+`+1,+1,+1,-1`, while `χ_r(d)` was `+1,+1,-1,+1`.
+At `d=3`, the field ratio was
+`3521548954184193748496366485580073240150461272207915131309`,
+a square modulo `p`; `3` is a nonsquare modulo `r`.
+Thus this specified compact second-jet feature is **not an exact
+sign evaluator on P-192**. Four selected markings cannot estimate
+its full-group bias; no useful-bias or cold-cost claim follows.
+[pcc:unverified]
+
 ### Oracle-model check: EDS residue and shifted Legendre
 
 Two published oracle problems are adjacent to this sign goal but do
