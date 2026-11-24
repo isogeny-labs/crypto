@@ -1553,7 +1553,7 @@ fn iso_census(k: u32, t: u32, seed_lo: u64, seed_hi: u64) {
     use crypto_lib::cryptanalysis::ic_boundary::{
         CountedGroup, GroupOps, PrimeCurve, PrimeInstance, PrimePoint,
     };
-    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{AuxFamily, PrimeIsogenyBase};
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::PrimeIsogenyBase;
     use crypto_lib::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
     let m = build_miniature(k);
     let inst = PrimeInstance {

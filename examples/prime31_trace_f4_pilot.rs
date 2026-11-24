@@ -40,7 +40,7 @@ fn var(n: usize, i: usize) -> Mpoly {
 }
 
 fn scale(f: Fp, a: &Mpoly, k: u64) -> Mpoly {
-    if k % f.p == 0 {
+    if k.is_multiple_of(f.p) {
         return Mpoly::new();
     }
     a.iter()

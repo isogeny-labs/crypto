@@ -185,7 +185,7 @@ fn actual_jacobian(f: Fp, jets: &[Jet]) -> u64 {
 /// (-1)^(m(m-1)/2) * prod_w multiplicity(w)! * prod_i h'(x_i).
 fn expected_jacobian(f: Fp, h: &[u64], xs: &[u64]) -> u64 {
     let m = xs.len();
-    let mut ans = if (m * (m - 1) / 2) % 2 == 0 { 1 } else { f.neg(1) };
+    let mut ans = if (m * (m - 1) / 2).is_multiple_of(2) { 1 } else { f.neg(1) };
     let mut counts = BTreeMap::new();
     for &x in xs {
         assert_eq!(evaluate(f, h, x), 0);

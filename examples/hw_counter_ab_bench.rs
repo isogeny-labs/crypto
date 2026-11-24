@@ -21,7 +21,9 @@ use num_bigint::{BigUint, RandBigInt};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 use std::hint::black_box;
+#[cfg_attr(not(target_os = "macos"), allow(unused_imports))]
 use std::path::Path;
+#[cfg_attr(not(target_os = "macos"), allow(unused_imports))]
 use std::process::{Command, Stdio};
 use std::time::Instant;
 
@@ -118,6 +120,7 @@ mod macos_pmu {
     pub fn read_self_counters() -> (u64, u64) {
         (0, 0)
     }
+    #[allow(dead_code)]
     pub fn read_pid_counters(_pid: i32) -> Option<(u64, u64)> {
         None
     }

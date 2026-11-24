@@ -29,6 +29,7 @@ impl Rng {
     }
 }
 
+#[allow(dead_code)]
 fn mulmod(a: u64, b: u64, p: u64) -> u64 {
     ((a as u128 * b as u128) % p as u128) as u64
 }

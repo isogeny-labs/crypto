@@ -251,13 +251,13 @@ fn main() {
         let px: Vec<u64> = (0..p).filter(|x| t.contains(&mulmod(*x, *x, p))).collect();
         // decomposable target from the window base (real points only)
         let wpts: Vec<(u64, u64)> = wx.iter().filter_map(|x| by_x.get(x).copied()).collect();
-        let mut target = None;
+        let mut _target = None;
         'outer: for i in 0..wpts.len() {
             for j in 0..wpts.len() {
                 for l in 0..wpts.len() {
                     if let Some(s12) = eadd(p, a, wpts[i], wpts[j]) {
                         if let Some(s123) = eadd(p, a, s12, wpts[l]) {
-                            target = Some(s123.0);
+                            _target = Some(s123.0);
                             break 'outer;
                         }
                     }

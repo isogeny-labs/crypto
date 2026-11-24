@@ -98,6 +98,7 @@ fn polynomial_from_roots(f: Fp, roots: &[u64]) -> Vec<u64> {
 }
 
 /// Horner evaluation of h'(x) without factorials.
+#[allow(dead_code)]
 fn derivative_horner(f: Fp, h: &[u64], x: u64) -> u64 {
     let mut value = 0u64;
     for i in (1..h.len()).rev() {
@@ -110,6 +111,7 @@ fn jacobian(f: Fp, a: Jet, k: Jet) -> u64 {
     f.sub(f.mul(a.ds, k.dt), f.mul(a.dt, k.ds))
 }
 
+#[allow(dead_code)]
 fn point_image(xs: &[u64], p: u64) -> BTreeSet<(u64, u64)> {
     let mut result = BTreeSet::new();
     for (i, &x) in xs.iter().enumerate() {
