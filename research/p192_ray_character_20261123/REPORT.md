@@ -689,6 +689,36 @@ correlation magnitude is only `|ρ(x([a]G))|≥2/n≈2^-191`, which is
 undetermined. This parity fact also precludes proving `S_a=0` for
 these offsets. [pcc:unverified]
 
+### Exact offset second moment and a search-frequency gate
+
+The earlier CM point-relation bridge records the all-field offset
+identity. Here it is specialized to known-point offsets and the
+report's threshold. Let `X` be the
+`n/2` distinct nonzero rational-point `x`-coordinates. Each has a
+well-defined weight `w_x=χ_r(d)` for `x=x([d]G)`, because
+`χ_r(-1)=1`, and `Σ_{x∈X} w_x=0`. Define
+`T(c)=2Σ_{x∈X}w_xχ_p(x-c)` for every `c∈F_p`; then
+`T(x([a]G))=-S_a`. The elementary field sums
+`Σ_c χ_p((x-c)(y-c))=p-1` for `x=y`, and `-1` for
+`x≠y`, give the **exact** identity
+
+`Σ_{c∈F_p} T(c)² = 2pn`.
+
+All terms are nonnegative. At the report's illustrative fixed-feature
+cold threshold `g=sqrt(4·384·ln(200)/sqrt(πr/4))≈2^-41.418`,
+at most `2p/(n g²)≈2^83.835` of the `n/2` known-point offsets
+can have `|S_a|≥ng`. Their fraction is at most
+`4p/(n²g²)≈2^-107.165`. This is a deterministic bound for
+uniformly sampled known-point offsets, with `a` and `-a`
+counted once. Even if a hit could be recognized for free, uniform
+sampling would require at least `2^107.165` draws in expectation
+when hits exist, above the `2^95.826` addition-count reference
+before charging each draw. It does not exclude a specially selected
+public offset, establish a useful bias for one, or price finding one.
+The order-113 control gives `Σ_{c∈F_127}T(c)²=28,448=2·127·112`;
+the 56 known-point offsets contribute 12,288 of that total.
+[pcc:unverified]
+
 ### Exact modulo-eight identity and its circularity
 
 The same sum has an exact modular identity. Put
