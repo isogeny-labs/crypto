@@ -288,6 +288,32 @@ precision gives `log₂[(2^42/(r-1))/(g-164/(r-1))²] ≈ -67.165`.
 This is a numerical consequence of the assumed trial cost, not a
 restriction on deliberately selected offsets. [pcc:unverified]
 
+## Known-multiple offsets as shifted EDS products
+
+One structured family chooses `c=x([a]G)` for a public nonzero scalar
+`a`. The division-polynomial addition identity, for `Q=[d]G`, is
+
+`x(Q)-x([a]G) = -ψ_{d+a}(G)ψ_{d-a}(G) / [ψ_d(G)²ψ_a(G)²]`.
+
+The denominator is a nonzero square for nonzero `a,d (mod r)`.
+Because `p≡3 (mod 4)`, the field character of the easily computed
+coordinate difference is `-χ_p(ψ_{d+a}(G)ψ_{d-a}(G))`, including
+the zero cases `d=±a`. Thus a deliberately chosen known-point
+offset is a **fixed-shift pair product** of EDS characters, with
+shift `2a`, even though its two individual EDS terms have hidden
+indices. A direct finite-field control on `y²=x³+2x+3` over
+`F_103`, with `G=(2,18)` of order 54 and `a=2,d=5`, gave sign
+`-1` on both sides using Sage's division polynomials. This checks
+the identity's sign convention, not a P-192 bias. [pcc:unverified]
+
+[Bhakta–Shparlinski (2025)](https://arxiv.org/abs/2507.09271)
+study *unweighted averages over shifts* of EDS-character
+correlations and explicitly leave their fixed-shift question open.
+Their stated results do not bound this selected shift with the
+additional scalar Legendre weight `χ_r(d)`. The identity supplies a
+precise structured-offset formulation, but neither an exact sign
+evaluator nor a certified useful bias. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
