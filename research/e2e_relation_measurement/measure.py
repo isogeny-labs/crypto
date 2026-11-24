@@ -32,10 +32,7 @@ def run(args):
             ar, br = rand(), rand(); R = ar*P + br*Q
             if R != O: break
         rows=[]; seen=set(); trace=[]
-        walk_start=None; da=db=None; aa=[]; bb=[]
-        if args.mode == 'walk':
-            walk_a, walk_b = rand(), rand(); walk_start=[walk_a,walk_b]; da, db = rand(), rand()
-            walk = walk_a*P + walk_b*Q; delta = da*P + db*Q
+        walks=[]; aa=[]; bb=[]
         if args.mode == 'two-group':
             aa=[rand() for _ in range(args.group_size)]; bb=[rand() for _ in range(args.group_size)]
             ap=[a*P for a in aa]; bq=[b*Q for b in bb]
@@ -43,6 +40,10 @@ def run(args):
             if len(rows) == 2*args.block_size: break
             if args.mode == 'independent': a,b=rand(),rand(); point=a*P+b*Q
             elif args.mode == 'walk':
+                if idx % args.walk_length == 0:
+                    walk_a,walk_b=rand(),rand(); da,db=rand(),rand()
+                    walks.append({'start':[walk_a,walk_b], 'step':[da,db], 'first_candidate':idx})
+                    walk=walk_a*P+walk_b*Q; delta=da*P+db*Q
                 a,b,point=walk_a,walk_b,walk
                 walk_a=(walk_a+da)%n; walk_b=(walk_b+db)%n; walk=walk+delta
             else:
@@ -50,13 +51,13 @@ def run(args):
             counts['candidates']+=1
             record={'index':idx,'a':a,'b':b,'point':pt(point)}
             if point == O: reason='identity'
-            elif int(point[0]) % args.modulus != args.residue: reason='filtered'
+            elif not args.x_min <= int(point[0]) <= args.x_max or int(point[0]) % args.modulus != args.residue: reason='filtered'
             elif int(point[0]) in seen: reason='duplicate_x'
             else:
                 reason='accepted'; seen.add(int(point[0])); rows.append(record.copy())
             if reason != 'accepted': counts[reason]+=1
             record['status']=reason; trace.append(record)
-        return ar,br,R,rows,trace,{'walk_start':walk_start,'walk_step':[da,db] if walk_start is not None else None, 'group_a':aa,'group_b':bb}
+        return ar,br,R,rows,trace,{'walks':walks, 'group_a':aa,'group_b':bb}
     ar,br,R,rows,trace,generator=phase('generation', acquire)
     output={'schema':'e2e-relation-measurement/v1','config':vars(args),'curve':{'p':args.p,'a':args.curve_a,'b':args.curve_b,'P':pt(P),'Q':pt(Q),'n':n},'target':{'a':ar,'b':br,'point':pt(R)},'generator':generator,'candidates':trace,'counts':counts,'timings':timings,'status':'incomplete', 'metrics':{'degree_of_regularity':None,'solving_degree':None,'solver_operations':None},'metric_notes':{'degree_of_regularity':'not exported by backend','solving_degree':'not exported by backend','solver_operations':'not exported by backend'}}
     if len(rows) < 2*args.block_size:
@@ -99,8 +100,11 @@ def run(args):
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--p',type=int,required=True); p.add_argument('--curve-a',type=int,required=True); p.add_argument('--curve-b',type=int,required=True)
     for name in ('px','py','qx','qy'): p.add_argument('--'+name,type=int,required=True)
+    p.add_argument('--walk-length',type=int,default=8); p.add_argument('--x-min',type=int,default=0); p.add_argument('--x-max',type=int,default=None)
     p.add_argument('--mode',choices=['independent','walk','two-group'],required=True); p.add_argument('--seed',type=int,required=True); p.add_argument('--block-size',type=int,default=4); p.add_argument('--group-size',type=int,default=8); p.add_argument('--max-candidates',type=int,default=1000); p.add_argument('--modulus',type=int,default=1); p.add_argument('--residue',type=int,default=0); p.add_argument('--output',required=True)
     a=p.parse_args()
-    if min(a.block_size,a.group_size,a.max_candidates,a.modulus)<1 or not 0<=a.residue<a.modulus: p.error('invalid sizes or residue')
+    if a.x_max is None: a.x_max=a.p-1
+    if not 0 <= a.x_min <= a.x_max < a.p: p.error('invalid x interval')
+    if min(a.walk_length,a.block_size,a.group_size,a.max_candidates,a.modulus)<1 or not 0<=a.residue<a.modulus: p.error('invalid sizes or residue')
     Path(a.output).write_text(json.dumps(run(a),indent=2,sort_keys=True)+'\n')
 if __name__=='__main__': main()

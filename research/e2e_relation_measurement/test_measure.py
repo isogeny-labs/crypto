@@ -39,6 +39,7 @@ class MeasurementTest(unittest.TestCase):
                     self.assertEqual(add(mul(c['a'],P),mul(c['b'],Q)),point(c['point']))
                     if c['status']=='accepted': accepted.append(c)
                 self.assertEqual(len({c['point'][0] for c in accepted}),8)
+                if mode == 'walk': self.assertGreaterEqual(len(r['generator']['walks']),1)
                 for w in r['witnesses']:
                     u,v=(accepted[i] for i in w['indices']); su,sv=w['signs']
                     self.assertEqual(add(mul(su%N,point(u['point'])),mul(sv%N,point(v['point']))),point(t['point']))
@@ -58,6 +59,37 @@ class MeasurementTest(unittest.TestCase):
             self.assertEqual((su*u['a']+sv*v['a']-r['target']['a'])%N,w['A'])
             self.assertEqual((su*u['b']+sv*v['b']-r['target']['b'])%N,w['B'])
             self.assertEqual(mul(w['scalar'],P),Q)
+
+    def test_interval_filter(self):
+        r=self.run_case('independent',['--x-min','0','--x-max','50','--modulus','2','--residue','0'])
+        self.assertEqual(r['status'],'complete')
+        self.assertGreater(r['counts']['filtered'],0)
+        for c in r['candidates']:
+            if c['status']=='accepted': self.assertTrue(0 <= c['point'][0] <= 50 and c['point'][0] % 2 == 0)
+
+    def test_panel_pairs_targets(self):
+        with tempfile.TemporaryDirectory() as d:
+            plan=pathlib.Path(d)/'plan.json'; out=pathlib.Path(d)/'panel'
+            plan.write_text(json.dumps({'common_args':['--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27','--block-size','4'],'seeds':[42],'timeout_seconds':30}))
+            subprocess.run(['python3',str(HERE/'panel.py'),'--plan',str(plan),'--out',str(out)],check=True,stdout=subprocess.DEVNULL)
+            summary=json.loads((out/'summary.json').read_text())
+            self.assertTrue(summary['target_pairing_by_seed']['42'])
+            for mode in ('independent','walk','two-group'):
+                self.assertEqual(summary['per_mode'][mode]['completed'],1)
+                self.assertEqual(summary['per_mode'][mode]['attempts'],1)
+
+    def test_panel_preserves_timeout(self):
+        with tempfile.TemporaryDirectory() as d:
+            plan=pathlib.Path(d)/'plan.json'; out=pathlib.Path(d)/'panel'
+            plan.write_text(json.dumps({'common_args':['--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27'],'seeds':[42],'timeout_seconds':0.001}))
+            subprocess.run(['python3',str(HERE/'panel.py'),'--plan',str(plan),'--out',str(out)],check=True,stdout=subprocess.DEVNULL)
+            summary=json.loads((out/'summary.json').read_text())
+            self.assertEqual(len(summary['runs']),3)
+            for r in summary['runs']:
+                self.assertEqual(r['status'],'timeout')
+                self.assertIsNone(r['useful_relations'])
+                self.assertGreater(r['whole_process_wall_ns'],0)
+                self.assertTrue((out/('seed-42-'+r['mode']+'.receipt.json')).exists())
 
     def test_exhaustion_is_recorded(self):
         r=self.run_case('independent',['--max-candidates','1'])
