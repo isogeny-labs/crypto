@@ -219,6 +219,40 @@ a degree-and-support screen, not a lower bound on iterative solver work
 or on unions of graphs and Boolean-offset variants; those require their
 own exact support, source-cost and rank comparison.
 
+### Boolean-offset quadratic graphs: conditional capacity screen
+
+The existing Boolean-offset construction in
+`research/prime_factor_base_degree_20261031/pencil_search_20261101/`
+uses `h_u(x)=a*x^2+b*x+c+t0+sum(w_i*u_i)` with `k` bits per
+two-summand slot. Its Lean result proves exact relation semantics and
+canonical homogeneous first-vanishing degree `2k+3`, assuming the two
+quadratic leading coefficients are nonzero and the field has odd
+characteristic. This theorem applies to presentations over M31, but its
+reported fixture and same-base dense comparison are over F17. It does
+not establish completed affine solving degree or relation cost over M31.
+
+For each Boolean label, `h_u(x)^2-f(x)` is a nonzero quartic, hence has
+at most four distinct abscissa roots over M31. A union of `2^k` labelled
+quadratic graphs therefore has at most `4*2^k` distinct abscissae,
+regardless of duplicate roots between labels. Reaching 677 abscissae
+requires `k>=8`: seven bits permit at most 512, while eight permit at
+most 1,024. At `k=8` the proved two-slot canonical degree is 19,
+with 16 Boolean variables and three core variables. The bound is only
+capacity; it supplies no 677-column M31 construction, rational-root
+yield, or same-base comparison. The F17 eight-column fixture cannot be
+scaled by replacing field coefficients in its proof.
+
+This is a two-summand secant theorem. A four-summand B677 relation
+would need a sound composition with target, sign, distinct-index and
+root-extraction semantics. Before a lower-total-work claim, a concrete
+public M31 selector must demonstrate its distinct liftable support and
+charge the search for its coefficients, all labelled branches, completed
+relation solving, failures and independent-row rank against the frozen
+single-target rho control. For any proposed eight-bit selector, the next
+falsifier is fewer than 677 distinct liftable abscissae, or a matched
+completed solver run whose charged work is no lower than its same-base
+control. Neither has been measured here.
+
 ## Existing presentations and the next falsifier
 
 The balanced S4/S3 eight-leaf presentation and the S4-to-two-S3 auxiliary
