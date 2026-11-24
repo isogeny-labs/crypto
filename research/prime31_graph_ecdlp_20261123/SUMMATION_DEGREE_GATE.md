@@ -454,6 +454,55 @@ exact statement about the displayed generators' leading-form ideal;
 elimination consequences, a different grading or an affine Groebner
 run can behave differently and need their own completed cost test.
 
+### Fourth-moment capacity refinement for uniform offsets
+
+The preceding pairwise-independence bounds are conservative. For either
+map `tau=y-h0(x)` of degree `d=4` (quadratic graph) or `d=3` (linear
+graph), let `N(t)` count rational points in its finite fiber and set
+`mu=(#E(F_p)-1)/p` and `f(t)=N(t)-mu`. The `S_d` monodromy proved above
+makes the ordered-distinct-pair fiber cover geometrically connected.
+Its degree is `d*(d-1)`. Acting on ordered pairs, the branch-permutation
+indices are `5,6,8,9` for degree-four cycle types `(2),(2,2),(3),(4)`,
+and `3,4` for degree-three types `(2),(3)`. Tame Riemann--Hurwitz gives
+genus at most six and three respectively. Hasse--Weil, with at most
+five or four finite branch values charged separately, bounds
+`v=E[f(t)^2]` by `V`, where
+
+`B=p+1+2*g_max*ceil(sqrt(p))+b_max*d*(d-1)` and
+`V=((#E-1+B)*p-(#E-1)^2)/p^2`.
+
+For uniform independent coefficients `t0,w_1,...,w_k`, any three
+distinct Boolean-label offsets are independent. Among four distinct
+labels, the only dependencies are affine parallelograms; their exact
+ordered count is `D=3*(6^k-2*4^k+2^k)`. The centered Fourier
+coefficients of `N` satisfy `|fhat(s)|<=(d+1)/sqrt(p)` for `s!=0`:
+the corresponding Artin--Schreier sheaf on `E` has one pole of order
+`d<p`, compact-support cohomology dimension `d+1`, and the usual weight
+bound. Parseval therefore bounds a dependent four-label expectation
+by `(d+1)^2*V/p`. With `m=2^k`, the fourth centered moment of the
+labelled root total `S` is at most
+
+`M=m*(d-mu)^2*V+3*m*(m-1)*V^2+D*(d+1)^2*V/p`.
+
+Markov's fourth-moment inequality and the earlier duplicate-root
+charge then give these **derived upper/lower bounds for uniform draws**:
+
+| Map degree | Eight-bit `Pr[U>=677]` upper | Nine-bit `Pr[U>=677]` upper | Ten-bit `Pr[U>=677]` lower |
+| ---: | ---: | ---: | ---: |
+| 4 | 0.000631064% | 0.106553% | 99.97149% |
+| 3 | 0.000626826% | 0.106181% | 99.97154% |
+
+For ten bits, the failure split uses `U<=676 => S<=688` or
+`S-U>=13`. The calculation and pair-index enumeration are replayed
+with exact rational arithmetic by `verify_offset_support_bounds.py`.
+This independently checks and incorporates the derivation first
+posted in the [PR discussion](https://github.com/isogeny-labs/crypto/pull/5097#issuecomment-7144814589).
+These bounds do not constrain adaptive coefficient selection, determine
+the exact B677 selector, or supply completed useful relations or solver
+cost. They make a uniform eight- or nine-bit capacity search a weak
+priority under this model; ten-bit support still carries its selector
+and algebraic-variable costs.
+
 Combining the quadratic-offset support with the target-centered degree-four `S4`
 presentation has a separate rank gate. As proved in
 `research/prime31_target_centering_20261123/DEGREE_RANK_GATE.md`, four-sum

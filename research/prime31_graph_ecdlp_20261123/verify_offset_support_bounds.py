@@ -47,6 +47,17 @@ def small_field_check() -> None:
     assert mean_sum == 4 * mean_root
     assert variance_sum == 4 * variance_root
     assert duplicate_mean <= duplicate_pair_bound
+    centered = [Fraction(len(r), 1) - mean_root for r in roots]
+    fourth_sum = Fraction(sum((Fraction(s) - mean_sum) ** 4 for s in sums), len(sums))
+    fourth_root = sum(x**4 for x in centered) / p
+    parallelogram = sum(
+        centered[a] * centered[b] * centered[c]
+        * centered[(a + b - c) % p]
+        for a, b, c in product(range(p), repeat=3)
+    ) / p**3
+    dependent = 3 * (6**2 - 2 * 4**2 + 2**2)
+    assert dependent == 24
+    assert fourth_sum == 4 * fourth_root + 3 * 4 * 3 * variance_root**2 + dependent * parallelogram
     print("F17 exhaustive moment and duplicate checks: PASS")
 
 
@@ -100,7 +111,67 @@ def m31_bounds() -> None:
     print("M31 linear-graph ten-bit support success lower:", decimal(cubic_success_lower))
 
 
+def pair_index(permutation: tuple[int, ...]) -> int:
+    """Ramification index of a permutation acting on ordered distinct pairs."""
+    n = len(permutation)
+    pairs = [(i, j) for i in range(n) for j in range(n) if i != j]
+    unseen = set(pairs)
+    cycles = 0
+    while unseen:
+        i, j = next(iter(unseen))
+        cycles += 1
+        while (i, j) in unseen:
+            unseen.remove((i, j))
+            i, j = permutation[i], permutation[j]
+    return len(pairs) - cycles
+
+
+def fourth_moment_bounds() -> None:
+    p = 2**31 - 1
+    affine = 2147446830
+    mu = Fraction(affine, p)
+    root_ceiling = isqrt(p) + 1
+    assert [pair_index(x) for x in ((1, 0, 2, 3), (1, 0, 3, 2), (1, 2, 0, 3), (1, 2, 3, 0))] == [5, 6, 8, 9]
+    assert [pair_index(x) for x in ((1, 0, 2), (1, 2, 0))] == [3, 4]
+
+    for degree, genus, branch_values in ((4, 6, 5), (3, 3, 4)):
+        pair_points_upper = (
+            p + 1 + 2 * genus * root_ceiling
+            + branch_values * degree * (degree - 1)
+        )
+        variance_upper = Fraction((affine + pair_points_upper) * p - affine**2, p**2)
+        assert variance_upper > 0
+        for bits in (8, 9, 10):
+            labels = 1 << bits
+            dependent = 3 * (6**bits - 2 * 4**bits + 2**bits)
+            assert dependent >= 0
+            fourth_upper = (
+                labels * (degree - mu) ** 2 * variance_upper
+                + 3 * labels * (labels - 1) * variance_upper**2
+                + Fraction(dependent * (degree + 1) ** 2, p) * variance_upper
+            )
+            if bits < 10:
+                capacity_upper = fourth_upper / (677 - labels * mu) ** 4
+                thresholds = {(4, 8): Fraction(631064, 10**11),
+                              (3, 8): Fraction(626826, 10**11),
+                              (4, 9): Fraction(106553, 10**8),
+                              (3, 9): Fraction(106181, 10**8)}
+                assert capacity_upper < thresholds[(degree, bits)]
+                print(f"M31 degree-{degree} {bits}-bit fourth-moment capacity upper:", decimal(capacity_upper))
+            else:
+                duplicate_upper = Fraction(labels * (labels - 1) * affine, p**2)
+                failure_upper = (
+                    fourth_upper / (labels * mu - 688) ** 4
+                    + duplicate_upper / 13
+                )
+                success_lower = 1 - failure_upper
+                assert success_lower > {(4, 10): Fraction(9997149, 10**7),
+                                        (3, 10): Fraction(9997154, 10**7)}[(degree, bits)]
+                print(f"M31 degree-{degree} ten-bit fourth-moment support lower:", decimal(success_lower))
+
+
 if __name__ == "__main__":
     getcontext().prec = 35
     small_field_check()
     m31_bounds()
+    fourth_moment_bounds()
