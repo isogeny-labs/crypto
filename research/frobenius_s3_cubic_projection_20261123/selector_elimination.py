@@ -56,11 +56,12 @@ def normalized(field, basis, target):
 
 
 
-def run_ranker(binary, equations, k, degree, witness, limit, closure, *, right=None, checks=()):
+def run_ranker(binary, equations, k, degree, witness, limit, closure, *, right=None, checks=(), repeat_products=False):
     right = k if right is None else right
     rows = [f'{k} {right} {degree} {int(closure)} {len(equations)} {witness} {limit} {len(checks)}']
     rows.extend(' '.join(map(str, [len(row), *row])) for row in (*equations, *checks))
-    result = subprocess.run([binary], input='\n'.join(rows) + '\n', text=True,
+    command = [binary, '--repeat-products'] if repeat_products else [binary]
+    result = subprocess.run(command, input='\n'.join(rows) + '\n', text=True,
                             capture_output=True, check=True, timeout=limit + 60)
     return json.loads(result.stdout)
 
@@ -127,11 +128,15 @@ def main():
     parser.add_argument('--closure', action='store_true')
     parser.add_argument('--chart', action='store_true')
     parser.add_argument('--limit', type=int, default=150)
+    parser.add_argument('--factor', type=int)
+    parser.add_argument('--repeat-products', action='store_true')
     args = parser.parse_args()
     binary = args.ranker.resolve()
     controls(binary)
     path = Path(__file__).with_name('unrestricted-quartic-ranks.jsonl')
     for entry in map(json.loads, path.read_text().splitlines()):
+        if args.factor is not None and entry['g'] != args.factor:
+            continue
         field, basis, _ = geometry(entry['n'], entry['g'])
         w = entry['false_positive']
         rows, constant, linear = normalized(field, basis, w['target_x'])
@@ -141,7 +146,8 @@ def main():
         if args.chart:
             rows, witness, pivot = chart(rows, witness, width)
             width -= 1
-        result = run_ranker(binary, rows, width, args.degree, witness, args.limit, args.closure)
+        result = run_ranker(binary, rows, width, args.degree, witness, args.limit, args.closure,
+                            repeat_products=args.repeat_products)
         selector_rows = result.pop('selector_rows')
         result.pop('members')
         if args.closure and args.degree == 3 and not args.chart and not result['timeout']:

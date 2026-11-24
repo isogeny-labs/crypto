@@ -6,6 +6,7 @@
 #include <iostream>
 #include <queue>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <unordered_map>
 #include <vector>
@@ -37,7 +38,9 @@ void subsets(std::vector<Monomial>& result, unsigned variables, unsigned degree,
     }
 }
 
-int main() {
+int main(int argc, char** argv) {
+    const bool omit_repeated_products = argc == 1;
+    if (!omit_repeated_products && (argc != 2 || std::string_view(argv[1]) != "--repeat-products")) return 1;
     unsigned k, right, degree, closure, neq, time_limit, check_count;
     Word witness;
     if (!(std::cin >> k >> right >> degree >> closure >> neq >> witness >> time_limit >> check_count) ||
@@ -113,6 +116,23 @@ int main() {
     };
     std::uint64_t xors=0, rank=0, attempted=0, words=0, iterations=0;
     bool rejected=false, timeout=false;
+    std::uint64_t repeated_products_skipped = 0;
+    std::vector<Row> processed(closure && omit_repeated_products ? lower : 0);
+    auto remember_products = [&](Row& value) {
+        for (int top = static_cast<int>(value.size()) - 1; top >= 0; --top) {
+            while (value[top]) {
+                unsigned leading = 64 * top + std::bit_width(value[top]) - 1;
+                auto& previous = processed[leading];
+                if (previous.empty()) {
+                    previous.assign(value.begin(), value.begin() + top + 1);
+                    value.resize(top + 1);
+                    return true;
+                }
+                for (int j = 0; j <= top; ++j) value[j] ^= previous[j];
+            }
+        }
+        return false;
+    };
     std::vector<Row> pivots(columns);
     Row row(row_width);
     using Job = std::tuple<unsigned, unsigned, unsigned>;
@@ -153,6 +173,11 @@ int main() {
                 row[i/64] ^= Word{1} << (i%64);
                 top = std::max(top, static_cast<int>(i / 64));
             }
+            if (!processed.empty() && degree_of(m) + 2 < degree) {
+                // Every variable multiple already occurs in the raw matrix.
+                Row lower_source(row.begin(), row.begin() + top + 1);
+                remember_products(lower_source);
+            }
             if ((rejected = insert(top))) break;
         }
         if (rejected) break;
@@ -173,9 +198,14 @@ int main() {
         ++iterations;
         auto i=std::get<2>(queue.top());
         queue.pop();
+        Row source = pivots[i];
+        if (!processed.empty() && !remember_products(source)) {
+            ++repeated_products_skipped;
+            continue;
+        }
         support.clear();
-        for (unsigned j=0; j<pivots[i].size(); ++j) {
-            for (Word bits=pivots[i][j]; bits; bits&=bits-1) {
+        for (unsigned j = 0; j < source.size(); ++j) {
+            for (Word bits = source[j]; bits; bits &= bits-1) {
                 support.push_back(j*64+std::countr_zero(bits));
             }
         }
@@ -236,7 +266,8 @@ int main() {
               << ",\"timeout\":" << (timeout ? "true" : "false") << ",\"columns\":" << columns
               << ",\"rank\":" << rank << ",\"raw_rank\":" << raw_rank << ",\"raw_rows\":" << raw_count
               << ",\"pure_pivots\":" << pure << ",\"selector_rank\":" << selector_rank
-              << ",\"iterations\":" << iterations << ",\"attempts\":" << attempted << ",\"row_xors\":" << xors
+              << ",\"iterations\":" << iterations << ",\"skipped\":" << repeated_products_skipped
+              << ",\"attempts\":" << attempted << ",\"row_xors\":" << xors
               << ",\"word_xors\":" << words << ",\"seconds\":" << std::chrono::duration<double>(Clock::now()-start).count()
               << ",\"selector_rows\":[";
     for (unsigned i = 0; i < selector_rows.size(); ++i) {

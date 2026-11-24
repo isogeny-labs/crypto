@@ -65,6 +65,16 @@ The mixed-coordinate experiment uses the full Boolean equations in \(x,s\) at th
 
 Degree-three closure completed in both 46-variable systems. Its selector-only subspace has dimension 25 and equals the span of \(f_2\), \(f_1\), and \(s_i f_1\), where \(f_j(s)=\operatorname{Tr}(\alpha_j(s)p(s))\) for \(j=1,2\). This equality was checked by taking the rank of the union of the computed and independently generated rows. Both witnesses survive. The degree-two trace multipliers already put the same 25 rows in the degree-four Macaulay selector span, whose computed dimension is 25. Hence the mixed-coordinate products give no additional selector rows there. The complete degree-four Macaulay spans leave both witnesses alive, including after setting \(s_0=1\) and \(x_0=0\) in their symmetry charts. Both degree-four closure pilots reached the time cap, so they leave the full degree-four closure question open. [pcc:unverified]
 
+The closure verifier tracks the span of rows whose variable products have already been inserted. It initializes that span with all raw sources of nominal degree below the cap, since the raw matrix already contains their products. Before multiplying a low-degree pivot, it reduces the pivot by that span. Multiplying the remainder gives the same enlarged span, and a zero remainder requires no new products. On both degree-three witness runs the rank and the selector span agree with the repeated-product algorithm. The number of submitted rows drops from 8,602 to 6,486. In two capped degree-four runs the partial selector rank reached 272 and neither witness separated before the 360-second cap. Full degree-four closure remains open. [pcc:unverified]
+
+## Quadratic field multiples
+
+Write (F=x^2+sx+p(s)), where (p) is affine. Over Boolean coordinates, field squaring is linear. Consequently both (sF=sx^2+s^2x+sp(s)) and (xF=x^3+sx^2+xp(s)) are quadratic, using (x^3=xcdot x^2). Their binary coordinates belong to (V_3(F)), since each is a linear combination of products of coordinates of (F) by variables. They preserve the solution set and can be generated directly as quadratics. If (G) is the system obtained by adjoining these coordinates, then (V_D(G)=V_D(F)) for (Dge3): every input row of (G) lies in (V_D(F)), which is already closed under the permitted products. The construction can still change (V_2). [pcc:unverified]
+
+For the telescoping multiplier (alpha_r) with (rge2), the term with (j=0) has a factor (s). Multiply (sF) by the remaining (r-1) Frobenius-linear factors. The other terms in (alpha_r) have degree at most (r-1). This derives (operatorname{Tr}(alpha_r p)) in (V_{r+1}(F)) and saves one degree relative to the raw bound (r+2) for these consequences. The left-kernel coverage still depends on the multiplier family. [pcc:unverified]
+
+On the same 28 seven-bit targets used for the quotient comparison, adjoining both multiples lowers the last fall degree and solving degree from three to two in all 28 cases. The first fall degree also drops from three to two. The mixed-coordinate column count at the solving degree drops from 42 to 22. With (sF) alone the solving degree drops on 21 targets. On the four 23-bit targets, the solving degree and last fall degree remain four, as implied by the (V_D) equality. This establishes a degree reduction on the seven-bit panel. A reduction at larger field sizes or in the decomposition exponent remains open. [pcc:unverified]
+
 ## Quotient coordinates
 
 For nonzero \(s\), introduce \(w=p(s)/s^2\) in the trace-zero subspace of the coefficient field. Let \(H\) be the odd-degree half trace. The two constraints are
@@ -120,6 +130,15 @@ SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_2026112
 SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/quotient.py witnesses --ranker /tmp/s3-selector-elimination
 SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/quotient.py spans
 ```
+
+The same build also runs the quadratic augmentation comparison. The degree-four closure command reproduces the capped experiment, whose partial ranks depend on hardware speed.
+
+```sh
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/quadratic_multiples.py --ranker /tmp/s3-selector-elimination
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/selector_elimination.py --ranker /tmp/s3-selector-elimination --degree 4 --closure --limit 360
+```
+
+The quadratic comparison and capped closure records are in [quadratic-multiples.jsonl](quadratic-multiples.jsonl) and [selector-closure-d4-partial.jsonl](selector-closure-d4-partial.jsonl).
 
 The quotient results are in [quotient-degrees.jsonl](quotient-degrees.jsonl), [quotient-witnesses.jsonl](quotient-witnesses.jsonl), and [quotient-spans.jsonl](quotient-spans.jsonl).
 
