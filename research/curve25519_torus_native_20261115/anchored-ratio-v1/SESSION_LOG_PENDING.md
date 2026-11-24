@@ -123,3 +123,35 @@ handles, and issued the replacement through maintained claim tooling. Native
 claim0a02aa, its registration, and every published1859event prefix stayed
 byte-identical; no rechain or frozen/raw/source change. Scoped prose now0.
 [pcc:unverified]
+
+## 2026-11-24T04:21:12.243307+00:00 — Fixed-base pair yield closes this as the next attack route
+
+### What was done (commands, files, features)
+Native/report results5a1d9d12e5 published4174d38adb. Before final head handoff,
+counted all original signed pairs: |S|<=2Kq implies |S+S|<=(2Kq)^2. Two
+closed parameter inequalities have focused Lean gate2named/0failing/0trusted,
+noaxioms. Inspected final one-page pair-yield addendum/nooverfull. Claim26c2bd
+binds two explicit declarations and its readable/model/report subjects.
+[pcc:PCC-20261124-26c2bd]
+
+### Decisions made (and why)
+Pair-hit or identity probability for a fresh raw tagged draw is <2^-165 under
+the written original-base/group/uniformity hypotheses, so <=2^164draws have
+row-path success<1/2 even with a free pair oracle. Selected fixtures are
+correctness evidence, not that distribution. Redirect next exponent research
+to JOINT six-member extraction or a changed base/model; keep pair code as a
+component. NEXT_V2/addendum preserve the pinned NEXT/report bytes.
+[pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Publish scoped addendum, read only actual final-head PR gates and resume same
+checker. Joint common-base solver full cold attempt/yield/index/selection/
+rank/kernel/memory recovery gates stay open. No campaign scheduled.
+
+### Errors (what went wrong, how it was handled)
+A private two-arithmetic feasibility probe preceded the new pair-yield proof
+map; disclosed actual order. Committed endpoint edits followed the map and
+reuse core Nat, not a new generic law. Full finite-base/native-map and sampler
+probability bridges are written, not inferred from numeric Lean checks.
+Original source118/binary/native raw/report subjects unchanged.
+[pcc:unverified]

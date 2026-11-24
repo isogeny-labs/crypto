@@ -43,3 +43,9 @@ is preserved losslessly and hashed. Prose0findings, ledger1861/chainOK with
 1859publishedprefix and lessons1039/0errors. Latest main9ef955b17dc3 has
 unchanged AGENTS; newest journal read. Local checks are not hosted gates.
 [pcc:unverified]
+
+Scientific follow-up26c2bd adds two scoped Nat endpoints and an inspected
+one-page pair-yield addendum; it supersedes only the next-priority note.
+Original source118/native0a02aa/reportd66df2 subjects stay byte-identical.
+NEXT_V2 states conditional pair support and six-member cost-model gates;
+it is not a full native/group/sampler theorem. [pcc:unverified]
