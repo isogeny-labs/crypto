@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 from verify_mitm_graph import A, B, G, N, P, Q, add
@@ -10,6 +11,9 @@ ROOT = Path(__file__).parent
 EVIDENCE = ROOT / "evidence/rr5-b677-prerequisite-01"
 INPUT = EVIDENCE / "structured-positive.stdout"
 OUT = EVIDENCE / "split22-admission-summary.json"
+SOURCE_COMMIT = "5096df8283bd1a6991d1119ab23b58f2d535d98c"
+SOURCE_MANIFEST = EVIDENCE / "split22-sources.sha256"
+REPO = ROOT.parents[1]
 ARMS = [
     "split22-final-positive-m2m-p1-s8k",
     "split22-final-positive-m2m-p4-s8k",
@@ -22,6 +26,19 @@ ARMS = [
 
 
 def main():
+    source_drifts = []
+    manifest_rows = SOURCE_MANIFEST.read_text().splitlines()
+    assert len(manifest_rows) == 14
+    for row in manifest_rows:
+        expected, path = row.split("  ", 1)
+        recorded = subprocess.run(
+            ["git", "-C", str(REPO), "show", f"{SOURCE_COMMIT}:{path}"],
+            check=True, capture_output=True,
+        ).stdout
+        assert hashlib.sha256(recorded).hexdigest() == expected, path
+        current = (REPO / path).read_bytes()
+        if hashlib.sha256(current).hexdigest() != expected:
+            source_drifts.append(path)
     frozen = json.loads(next(line.split(" ", 1)[1] for line in INPUT.read_text().splitlines()
                              if line.startswith("B677_INPUT ")))
     curve = {"p": P, "a": A, "b": B, "n": N, "g": list(G)}
@@ -67,6 +84,9 @@ def main():
         "positive_query": positive,
         "positive_witness_point_replay": True,
         "source_closure": "split22-sources.sha256",
+        "source_commit": SOURCE_COMMIT,
+        "recorded_source_hashes_verified": len(manifest_rows),
+        "current_source_drifts": source_drifts,
         "audited_arms": audited,
         "claim_boundary": "all arms incomplete; no unknown-query extraction or target solve",
     }
