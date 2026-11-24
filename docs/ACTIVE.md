@@ -11,6 +11,10 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
+Investigate the owner request below15m instructions per second for ECC2K-130 index calculus; clarify total instructions per fixed cold query versus execution rate, preserve the complete charged boundary and exact outputs. (Owner,2026-11-24; branch lane/ecc2k-ic-half-trace-setup, PR #5070; unit clarification pending.)
+
+Previous pinned goal, retained for ongoing lanes:
+
 Pursue another50x improvement for ECC2K-130 index calculus from the frozen21,360,373 cold-query simulated-instruction baseline, with the same complete charged workload and exact outputs. (Owner,2026-11-24; branch lane/ecc2k-ic-half-trace-setup, PR #5070.)
 
 Previous pinned goal, retained for ongoing lanes:
@@ -20,6 +24,7 @@ Develop and independently validate a Rust index-calculus method exploiting chain
 Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items
+- [ ] Pursue below15M instruction target for the same ECC2K-130 cold relation query, with explicit unit clarification and matched full-cost validation (Codex, started 2026-11-24, branch lane/ecc2k-ic-half-trace-setup, PR #5070; investigate current setup/oracle costs first; acceptance unit pending).
 - [x] Reach fixed-baseline 50% goal for unchanged ECC2K-130 d12 uniform relation query:21,360,373 coldIr,51.48% below original44,023,404; simultaneous-control reduction51.50%, oracle23.62%;49 focused checks,120 matched primary rows and80 tuple replays (Codex, 2026-11-23, branch lane/ecc2k-ic-half-trace-setup, PR #5070; root/storage/historical-validator/signed-admission gates remain open). [pcc:unverified]
 - [ ] Pursue another 50x reduction from the frozen21,360,373Ir ECC2K-130 d12 uniform index-calculus cold-query baseline (target <=427,207Ir), preserving full charged workload and exact relation semantics; profile, derive and test candidates (Codex, started 2026-11-24, branch lane/ecc2k-ic-half-trace-setup, PR #5070; 50x open: inline dictionary20,006,773Ir,1.067x/6.28% lower versus matched previous best;52 tests,120-row panel,80 tuple replays; first index regression and global-S4 filter miss retained. PCC unverified).
 - [x] Classify minimal three-row split-tangent supports and test their necessary identities on frozen P-192 traces: complete U/V/W coverage and zero witnesses; conditional minimum of four added rows, native controls/report/PDF retained (Codex, completed frozen-data component 2026-11-24, branch lane/p192-three-row-circuits-20261124, PR #5112; actual individual-image collection remains unexecuted). [pcc:unverified]
