@@ -25,9 +25,14 @@ the requested end-to-end cost conclusion.
   into at most 16 systems. The [argument](../research/smooth_p_plus_one_20261123/REFINEMENT.md)
   awaits independent proof standing. It preserves existing collision-chart
   omissions and supplies no complexity bound for elimination. [pcc:unverified]
-- **Missing capability:** a common production adapter, qualified counters or
-  timing for every phase, an exact-source registered EKS image, and independent
-  replay. Current local records price neither cold setup nor linear algebra.
+- **Implemented component:** the [exact-source cofactor adapter](../research/smooth_p_plus_one_20261123/PRODUCTION_RESULT.md)
+  is available as an optional feature. All thirteen fixed full-base queries
+  reached their original native allocation limits; a separate planted four-leaf
+  integration control passed. These are local, unsigned results. [pcc:unverified]
+- **Missing capability:** a successful full-base production comparison, a
+  complete four-summand oriented-S3 adapter, qualified counters or timing for
+  every phase, an exact-source registered EKS image, and independent replay.
+  Current local records price neither cold setup nor linear algebra.
 - **Limits:** deadline completion and smaller individual systems are not a
   measured total-cost advantage. The Direct control uses generic decomposition
   and additional relation charts. The absence of an admitted comparison gives
@@ -35,8 +40,10 @@ the requested end-to-end cost conclusion.
 
 ## What would unblock it
 
-- [ ] Implement production adapters on the same public fixtures, explicit
-  chart scope, mask sequence and success criterion; replay every signed row.
+- [x] Implement the bounded exact-source cofactor adapter, retain native
+  incomplete status and replay accepted signed rows.
+- [ ] Complete its full-base signed-output gate and the applicable four-leaf
+  oriented-S3 adapter, with explicit chart scope, mask sequence and success.
 - [ ] Freeze the cold setup, all queries including failures, extraction,
   incremental rank, linear algebra and final verification intervals, with
   equal-output component controls and a complete recovery comparison.
@@ -50,7 +57,7 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Implement the production adapter and its exact signed-output control first.
+Complete the production adapter's full-base exact signed-output control first.
 Use the existing F127 and F8191 fixtures and the already published seed 781815
 before considering a separately frozen larger fixture. Keep the three-second
 cooperative query deadline and report unsupported or incomplete charts.
@@ -64,4 +71,6 @@ record when the adapter or execution route changes.
 
 ## Resolution and history
 
-2026-11-24: recorded after the local degree-32 and recovery controls. Unresolved.
+2026-11-24: recorded after the local degree-32 and recovery controls. Added
+the cofactor adapter, thirteen retained cap failures and a separate planted
+positive unit control. No cap increase or full-cost conclusion. Unresolved.

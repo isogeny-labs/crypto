@@ -197,6 +197,38 @@ mod tests {
     }
 
     #[test]
+    fn real_production_output_matches_planted_four_leaf_reference() {
+        let (base, target, relation) = fixture();
+        let mut points: Vec<_> = relation
+            .terms
+            .iter()
+            .map(|&(index, _)| base.unsigned[index])
+            .collect();
+        points.sort_unstable();
+        let signed = points
+            .iter()
+            .enumerate()
+            .flat_map(|(index, &point)| {
+                let label = index as i32 + 1;
+                [(point, label), (base.curve.negate(point), -label)]
+            })
+            .collect();
+        // This deliberately planted sub-base is a positive integration test,
+        // not the complete Dickson base or a substitute for its failed panel.
+        let reduced = Base {
+            unsigned: points,
+            signed,
+            ..base
+        };
+        let expected = reduced.reference(&reduced.pair_index(), target);
+        assert!(!expected.is_empty());
+        let budget = Duration::from_secs(3);
+        let actual = discover(&reduced, target, Instant::now() + budget, budget);
+        assert_eq!(actual.completed, 1);
+        assert_eq!(actual.result.unwrap(), expected);
+    }
+
+    #[test]
     fn zero_budget_does_not_call_production() {
         let (base, target, _) = fixture();
         let result = discover(&base, target, Instant::now(), Duration::ZERO);

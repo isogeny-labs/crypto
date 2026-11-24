@@ -1,0 +1,189 @@
+warning: struct `MaskHasher` is never constructed
+  --> /workspace/scratch/isogeny-labs-crypto/research/prime31_four_summand_20261122/native/f4-source/src/../../../../../src/cryptanalysis/fx_hash.rs:89:19
+   |
+89 | pub(crate) struct MaskHasher(u64);
+   |                   ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: type alias `MaskMap` is never used
+   --> /workspace/scratch/isogeny-labs-crypto/research/prime31_four_summand_20261122/native/f4-source/src/../../../../../src/cryptanalysis/fx_hash.rs:128:17
+    |
+128 | pub(crate) type MaskMap<V> = HashMap<Mask, V, BuildHasherDefault<MaskHasher>>;
+    |                 ^^^^^^^
+
+warning: type alias `MaskSet` is never used
+   --> /workspace/scratch/isogeny-labs-crypto/research/prime31_four_summand_20261122/native/f4-source/src/../../../../../src/cryptanalysis/fx_hash.rs:131:17
+    |
+131 | pub(crate) type MaskSet = HashSet<Mask, BuildHasherDefault<MaskHasher>>;
+    |                 ^^^^^^^
+
+warning: type alias `FastMap` is never used
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/ic_boundary.rs:101:17
+    |
+101 | pub(crate) type FastMap<V> = HashMap<u64, V, BuildHasherDefault<MixHasher>>;
+    |                 ^^^^^^^
+
+warning: function `fast_map` is never used
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/ic_boundary.rs:103:15
+    |
+103 | pub(crate) fn fast_map<V>(capacity: usize) -> FastMap<V> {
+    |               ^^^^^^^^
+
+warning: struct `OpenCoefMap` is never constructed
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/ic_boundary.rs:111:8
+    |
+111 | struct OpenCoefMap {
+    |        ^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/ic_boundary.rs:121:8
+    |
+120 | impl OpenCoefMap {
+    | ---------------- associated items in this implementation
+121 |     fn with_capacity(slots: usize) -> Self {
+    |        ^^^^^^^^^^^^^
+...
+135 |     fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+157 |     fn home(&self, key: u64) -> usize {
+    |        ^^^^
+...
+162 |     fn prefetch(&self, key: u64) {
+    |        ^^^^^^^^
+...
+167 |     fn len(&self) -> usize {
+    |        ^^^
+...
+173 |     fn insert_vacant(&mut self, key: u64, val: (u128, u64, u64)) -> Result<(), (u128, u64, u64)> {
+    |        ^^^^^^^^^^^^^
+...
+197 |     fn get(&self, key: u64) -> Option<(u128, u64, u64)> {
+    |        ^^^
+...
+214 |     fn grow(&mut self) {
+    |        ^^^^
+
+warning: struct `OpenRefMap` is never constructed
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/ic_boundary.rs:232:8
+    |
+232 | struct OpenRefMap {
+    |        ^^^^^^^^^^
+
+warning: associated items `with_capacity_bound`, `home`, `insert`, `grow`, and `get` are never used
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/ic_boundary.rs:243:8
+    |
+242 | impl OpenRefMap {
+    | --------------- associated items in this implementation
+243 |     fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+257 |     fn home(&self, key: u64) -> usize {
+    |        ^^^^
+...
+262 |     fn insert(&mut self, key: u64, val: (usize, usize, bool, u64)) {
+    |        ^^^^^^
+...
+287 |     fn grow(&mut self) {
+    |        ^^^^
+...
+307 |     fn get(&self, key: u64) -> Option<(usize, usize, bool, u64)> {
+    |        ^^^
+
+warning: function `powmod` is never used
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/ic_boundary.rs:403:4
+    |
+403 | fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
+    |    ^^^^^^
+
+warning: field `r` is never read
+    --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/ic_boundary.rs:1082:5
+     |
+1081 | pub struct CubicClasses {
+     |            ------------ field in this struct
+1082 |     r: u64,
+     |     ^
+
+warning: function `prefetch_cache_line` is never used
+    --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/ic_boundary.rs:2049:4
+     |
+2049 | fn prefetch_cache_line<T>(lines: &[T], index: usize) {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `add_mod` is never used
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/prime_fast.rs:395:4
+    |
+395 | fn add_mod(a: u64, b: u64, n: u64) -> u64 {
+    |    ^^^^^^^
+
+warning: function `neg_mod` is never used
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/prime_fast.rs:405:4
+    |
+405 | fn neg_mod(a: u64, n: u64) -> u64 {
+    |    ^^^^^^^
+
+warning: method `jac_to_affine_many` is never used
+   --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/prime_fast.rs:667:8
+    |
+463 | impl FastCurve {
+    | -------------- method in this implementation
+...
+667 |     fn jac_to_affine_many(
+    |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `add_mod` is never used
+  --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/residual_arithmetic.rs:22:4
+   |
+22 | fn add_mod(a: u64, b: u64, p: u64) -> u64 {
+   |    ^^^^^^^
+
+warning: function `sub_mod` is never used
+  --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/residual_arithmetic.rs:29:4
+   |
+29 | fn sub_mod(a: u64, b: u64, p: u64) -> u64 {
+   |    ^^^^^^^
+
+warning: constant `SHOUP_MAX_MODULUS` is never used
+  --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/residual_arithmetic.rs:37:7
+   |
+37 | const SHOUP_MAX_MODULUS: u64 = 1 << 63;
+   |       ^^^^^^^^^^^^^^^^^
+
+warning: struct `FixedFactor` is never constructed
+  --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/residual_arithmetic.rs:48:8
+   |
+48 | struct FixedFactor {
+   |        ^^^^^^^^^^^
+
+warning: associated items `new` and `mul` are never used
+  --> /workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-569c181d489dc31a/out/residual_arithmetic.rs:55:8
+   |
+53 | impl FixedFactor {
+   | ---------------- associated items in this implementation
+54 |     #[inline]
+55 |     fn new<const SHOUP: bool>(w: u64, n: u64) -> FixedFactor {
+   |        ^^^
+...
+70 |     fn mul<const SHOUP: bool>(self, x: u64, n: u64) -> u64 {
+   |        ^^^
+
+warning: `rr5-original-f4-closure` (lib) generated 20 warnings
+   Compiling dickson-four-summand v0.1.0 (/workspace/scratch/isogeny-labs-crypto/research/smooth_p_plus_one_20261123/native)
+    Finished `release` profile [optimized] target(s) in 5.26s
+     Running unittests src/main.rs (/workspace/scratch/rr5-production-target/release/deps/dickson_four_summand-ab302443f229d6f0)
+
+running 10 tests
+test polynomial::tests::rational_roots_without_duplicates ... ok
+test production::tests::conversion_replays_signs_and_rejects_invalid_rows ... ok
+test production::tests::incomplete_or_enumerated_output_never_becomes_exact ... ok
+test production::tests::real_production_output_matches_planted_four_leaf_reference ... ok
+test production::tests::zero_budget_does_not_call_production ... ok
+test system::tests::quadratic_control_is_quadratic ... ok
+test system::tests::quadratic_ladder_agrees_with_expanded_remainder ... ok
+test tests::exhausted_budget_never_calls_solver ... ok
+test tests::failed_refinement_keeps_partial_union_undetermined ... ok
+test tests::refinements_partition_all_regular_unsigned_tuples ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+

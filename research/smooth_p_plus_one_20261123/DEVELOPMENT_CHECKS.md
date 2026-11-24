@@ -30,3 +30,18 @@
 
 The complete root library suite, admitted measurement and independent replay
 are not represented as passed. The public PR reports those remaining checks.
+
+## Production comparator continuation
+
+The [new report](PRODUCTION_RESULT.md) and [reproduction instructions](PRODUCTION_REPRODUCE.md)
+retain the optional source integration and all thirteen full-base resource
+refusals. The final adapter suite passes ten tests; the production closure's
+32 library tests, eight public-example tests, and six unchanged default-feature
+tests also pass locally. A separate planted four-leaf unit control exercises
+successful native output and adapter conversion. [pcc:unverified]
+
+The frozen panel source is 8be878c873; the later source adds that unit test
+without changing the panel executable. Evidence and before-call identities
+live in `evidence/production_v1`. The earlier root compilation limitation and
+unchanged historical benchmark-record gate error remain open. No broad root
+test rerun or cost measurement is represented as successful.
