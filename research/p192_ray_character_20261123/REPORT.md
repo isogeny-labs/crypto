@@ -363,6 +363,32 @@ tuples than the one-offset calculation. It is an upper bound, not
 evidence that qualifying tuples exist or can be recognized cheaply.
 [pcc:unverified]
 
+**Refinement using the curve's x-coordinate set.** The preceding
+`2^-43` bound used only `S⊂F_p` and is conservative. For distinct
+`u,v∈S`, the function `(x-u)(x-v)` on the endpoint curve has degree
+four and is a geometric nonsquare: its four zeros are simple.
+[Shparlinski–Stange, Lemma 4.1](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/6D1DC44634CB19BEF784CE153323C084/S0008439500021871a.pdf/character-sums-with-division-polynomials.pdf)
+therefore bounds its complete field-character sum by `8√p`.
+Every element of `S` occurs twice as a nonidentity point's
+x-coordinate, so for a uniform `c∈S`,
+`|E_c χ_p((u-c)(v-c))| ≤ b=4√p/m`. For `u=v`, that average is
+exactly `a=1-1/m`. [pcc:unverified]
+
+For a feature subset of size `s≥2`, separating equal and unequal
+x-coordinate pairs now gives
+`E C_S² ≤ (2/n)a^s+(1-2/n)b^s`. Retain the tighter single-feature
+bound `E C_i²≤4p/n²`. Summing over all nonempty subsets yields
+
+`E Z ≤ 4kp/n² + (2/n)[(1+a)^k-1-ka]`
+` + (1-2/n)[(1+b)^k-1-kb]`.
+
+At `k=41`, the same zero correction and cold threshold `g` give a
+Markov fraction below `2^-67` for uniform known-point bundles;
+100-digit PARI/GP puts the base-two log near `-67.165`. This
+supersedes the earlier `2^-43` numeric bound but still does not
+exclude a rho-sized *count* of candidate bundles. It says nothing
+about how to find or validate a qualifying one. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
