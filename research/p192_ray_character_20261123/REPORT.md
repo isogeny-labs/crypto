@@ -910,10 +910,11 @@ that would require a margin or tighter calibration. [pcc:unverified]
 
 ## Two-offset dense-resultant screen (2026-11-24)
 
-A second additive offset axis can generate a set of `m` distinct
-nonzero offsets from about `2√m` point sequences. This improves
-*offset generation* in the paired `y`-product construction, but it
-does not shrink a dense outer resultant. For center coordinate `Z`,
+A second additive offset axis can represent `m` distinct nonzero
+offsets as sums from two point sequences of length about `√m`.
+This reduces the number of sequence points needed to describe the
+grid; it does not make explicit evaluation of all `m` offset points
+cheap, or shrink a dense outer resultant. For center coordinate `Z`,
 its numerator is `F(Z)=∏_{t∈T} N(Z,x([t]P))`, where the
 paired-factor identity is
 `y(U+V)y(U-V)=N(x(U),x(V))/(x(V)-x(U))³` on
