@@ -889,7 +889,8 @@ mod tests {
 
     #[test]
     fn round139_no_rational_three_kernel_when_three_nonsquare() {
-        for p in [5u64, 7, 17, 19, 29, 31, 1_000_000_007,
+        // 1_000_000_007 ≡ 11 (mod 12) has 3 as a residue; 1_000_000_087 ≡ 7.
+        for p in [5u64, 7, 17, 19, 29, 31, 1_000_000_087,
                   (1u64 << 61) - 1] {
             assert!(matches!(p % 12, 5 | 7));
             for a in 1..64u64 {
