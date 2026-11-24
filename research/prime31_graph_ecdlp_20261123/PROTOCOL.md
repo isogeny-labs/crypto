@@ -333,6 +333,36 @@ checkout because unrelated `prime_root_trace` name errors and unstable
 does not replace a tuned same-target baseline. All source, raw run and
 `time -l` records are in `evidence/mitm-b677-control-01/`.
 
+### Same-stream graph ordering selection
+
+`compare_graph_orders.py` replays the same 669 point-checked eligible rows
+from `forty-cap-full-cost.json` and changes only the LP pivot admission
+order. The graph has 168 LP vertices plus a root, 448 one- and two-LP
+edges, and an exact LP rank of 162. It compares stream order, BFS forest,
+a weighted minimum spanning forest, and a weighted shortest-path forest.
+The last is equivalent to independent uncapacitated unit-demand min-cost
+flows from each component root, with edge cost equal to the number of
+factor-base leaves in that partial row. Each ordering is followed by exact
+modular LP elimination and independent FLINT RREF of the projected rows.
+
+| Pivot order | Projected nonzeros | Modular updates | Largest projected row |
+| --- | ---: | ---: | ---: |
+| Stream | 4,276 | 3,996 | 22 |
+| BFS forest | 3,924 | 2,734 | 14 |
+| Weighted minimum spanning forest | 7,194 | 14,800 | 39 |
+| Unit min-cost paths | **3,919** | **2,722** | **14** |
+
+Every arm has 507 projected rows, augmented rank 506, and the same
+target-only row `d=987654321`. The selected min-cost-path order reduced
+projected nonzeros by 8.35% and modular updates by 31.88% relative to stream
+order. BFS is within five nonzeros of the selected order. These are
+deterministic component metrics on this fixed relation stream; the script's
+one-run Python wall timings are not comparative native solver timings.
+The relation source, which accounts for millions of additions, is unchanged.
+Maximum independent set and spectral partitioning have no measured benefit
+on this stream yet, so neither is promoted into the native pipeline.
+`graph-order-comparison.json` records the source receipt hash and all arms.
+
 ## Prior work and claim boundary
 
 - Semaev, [*Summation polynomials and the discrete logarithm problem on
