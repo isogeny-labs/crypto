@@ -164,6 +164,48 @@ degree. This degree bound does not imply a running-time bound for a
 compact high-degree function and does not cover combinations of
 features or a biased rather than exact predictor. [pcc:unverified]
 
+## Three-coordinate combination gate
+
+The first small combination of such features can also be screened.
+Fix `k ≤ 3` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192 isogenous
+endpoint, and let the feature vector consist of the field quadratic
+characters of `x(R)-cᵢ`. An arbitrary function of these `k` signs,
+including a rule for zero values, **cannot equal the scalar quadratic
+character at every nonidentity point**. Any rational isogeny that is
+nonzero on rational points merely permutes the endpoint points, so the
+same statement holds after a chain. [pcc:unverified]
+
+Here is the finite-field count. Let `a` and `b` select features at
+`R` and `[2]R`, respectively, with at least one selection nonempty.
+The product of their underlying rational
+functions has degree at most `2|a|+8|b| ≤ 10k` and is a geometric
+nonsquare. Indeed, the odd-valuation zero supports of distinct
+`x-cᵢ` are disjoint two-point sets; their inverse doubling supports
+are disjoint eight-point sets. If `b` is nonempty, its support has at
+least eight points, while the `a` support has at most six, so the two
+cannot cancel. If `b` is empty, the nonempty `a` support remains.
+There are no rational 2-torsion points, so these zero sets have the
+stated sizes. [pcc:unverified]
+
+Remove the identity and at most `4k` rational points at which one of
+the `2k` features at `R` or `[2]R` is zero. On the remaining set `U`,
+[Perret's bound](https://inspirehep.net/files/e5d2251413a4ea90899d95c2354cc66a)
+and the removed-point count bound every nontrivial product-character
+sum by `20k√p + 1 + 4k`. Expanding the sign-pattern indicator gives,
+for every pair of `k`-bit patterns, at least
+
+`[r-1-4k - (4^k-1)(20k√p+1+4k)] / 4^k`
+
+points realizing that pair at `R` and `[2]R`. This is positive for
+`k ≤ 3`; at `k=3` it reduces to `r-832 > 3780√p`, checked by
+`(r-832)^2 > 3780^2 p`. Since `(2/r)=+1`, the target sign is unchanged by
+doubling, an exact rule would have to give the same output on *every*
+pair of nonzero feature patterns, hence be constant on `U`. Both target
+signs still occur on `U`, a contradiction. This excludes exact
+classifiers with at most three distinct endpoint coordinate signs;
+it does not bound their possible bias, or combinations of four or
+more signs or different rational features. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
