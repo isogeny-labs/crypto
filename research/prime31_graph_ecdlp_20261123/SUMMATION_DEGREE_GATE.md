@@ -392,6 +392,49 @@ widths, completed affine solving degrees or runtime estimates. The
 ten-bit support result therefore leaves the principal solving-cost
 gate unresolved despite its ample rational support.
 
+### A cubic-offset alternative and its support gate
+
+The linear graph `y=a*x+b+t` gives a map
+`tau_3=y-a*x-b:E -> P1` with one pole, `3*O`; its finite fibers are
+roots of the cubic `(a*x+b+t)^2-f(x)`. On the B677 curve its geometric
+monodromy is `S3`. A transitive cubic cover is cyclic or `S3`; the
+cyclic case would give a deck automorphism of order three fixing `O`,
+which requires `j(E)=0`. The B677 Weierstrass coefficient
+`a_E=847514846` is nonzero, so `j(E)` is nonzero. The arithmetic
+monodromy is also `S3`.
+
+The map has total ramification six. Infinity contributes two, leaving
+index sum four at finite branch values. Its six-sheeted Galois closure
+has genus at most three: infinity contributes four to
+Riemann--Hurwitz, and each finite contribution is at most three times
+its index. If `N3` counts finite squarefree offsets with three rational
+roots, Hasse--Weil and at most five branch values give
+
+`abs(N3-(p+1)/6) <= sqrt(p)+5`.
+
+As a concrete check, SymPy found that the cubic-fiber discriminant for
+`a=3,b=5` has degree four in `t` and is squarefree modulo M31.
+
+The global three-root density is therefore approximately `1/6` for
+every fixed linear graph. A 256-label offset family covering 677
+distinct abscissae needs at least **165 three-root fibers**: even
+granting two roots to every other label gives only `512+X` roots when
+`X` labels have three. With independent uniform `t0,w_1,...,w_8`,
+the labelled offsets are pairwise independent. The upper density
+bound and Cantelli give `Pr[X>=165]<0.002371`. This screens that
+random family; it does not bound adaptive designs.
+
+At ten bits, the point-count identity gives expected labelled root
+total `1024*(#E(F_p)-1)/p`. Replacing the quartic bound `N(t)<=4`
+above by `N(t)<=3` yields `Var(S)<=2047.983`; the same duplicate-root
+charge and one-sided variance bound give `Pr[U>=677]>0.98288` for
+uniform random coefficients. This proves support existence for a
+larger linear-graph family. It does not identify the exact B677
+selector, lower a completed summation-polynomial solving degree, or
+price useful relations. A cubic coordinate has three generic point
+preimages, so a lower membership degree alone is not a four-summand
+relation-cost argument.
+
 Combining this support with the target-centered degree-four `S4`
 presentation has a separate rank gate. As proved in
 `research/prime31_target_centering_20261123/DEGREE_RANK_GATE.md`, four-sum
