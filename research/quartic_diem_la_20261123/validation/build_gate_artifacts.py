@@ -158,8 +158,14 @@ def main():
     dev_ok = (da["every_setting_has_4_fallbacks"] and da["every_fallback_on_sfb_multi_attempt_pair"]
               and da["fill_has_no_effect_on_any_field_except_wall_ns"] and da["pick_matches_protocol"])
     repro_ok = ex["analyze_reproduction"]["byte_identical"]
+    stx = ex["structural"]
+    struct_ok = (stx["sge_single_attempt_runs"] == stx["sge_spmv_add_equals_(2N+2)*sq_nnz"]
+                 == stx["sge_trim_rows_in_equals_min(core_rows, core_cols+64)"]
+                 == stx["sge_sq_dim_equals_sge_cols_out"] == 32
+                 and 0.99 <= stx["sfb_spmv_add_over_2nnz(3c+2)_range"][0]
+                 and stx["sfb_spmv_add_over_2nnz(3c+2)_range"][1] <= 1.01)
     status = "pass" if all((heads_ok, ci_ok, certs_ok, integ_ok, dec_ok, verd_ok, bind_ok, time_ok,
-                            dev_ok, repro_ok, replay_ok)) else "fail"
+                            dev_ok, repro_ok, replay_ok, struct_ok)) else "fail"
     report = {
         "schema": "validator-report/v1",
         "study": STUDY,

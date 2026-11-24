@@ -194,6 +194,23 @@ def main():
                 lp.append(sum(math.log(x) for x in cv) / len(cv))
             stress[f"x{k}_w{w}"] = math.exp(sum(lp) / len(lp))
     out["stress_trim_sge_charge"] = stress
+
+    # ── structural identities: the dominant counted cost against the reported dimensions ──
+    # coord_square_split: 2N + 2 products by the square A', each q_mat_vec charging one
+    # addition per stored entry, so la_spmv_add = (2 sq_dim + 2) sq_nnz in a single attempt.
+    one_sge = [r for r in rows if r["arm"] == SGE and r["attempts"] == 1]
+    one_sfb = [r for r in rows if r["arm"] == SFB and r["attempts"] == 1]
+    sfb_model = [r["la_spmv_add"] / (2 * r["core_nnz"] * (3 * r["core_cols"] + 2)) for r in one_sfb]
+    out["structural"] = {
+        "sge_single_attempt_runs": len(one_sge),
+        "sge_spmv_add_equals_(2N+2)*sq_nnz": sum(r["la_spmv_add"] == (2 * r["sq_dim"] + 2) * r["sq_nnz"]
+                                                 for r in one_sge),
+        "sge_trim_rows_in_equals_min(core_rows, core_cols+64)": sum(
+            r["sge_rows_in"] == min(r["core_rows"], r["core_cols"] + 64) for r in one_sge),
+        "sge_sq_dim_equals_sge_cols_out": sum(r["sq_dim"] == r["sge_cols_out"] for r in one_sge),
+        "sfb_single_attempt_runs": len(one_sfb),
+        "sfb_spmv_add_over_2nnz(3c+2)_range": [min(sfb_model), max(sfb_model)],
+    }
     json.dump(out, open(outp, "w"), indent=1)
     print(json.dumps({k: (v if not isinstance(v, dict) else {kk: vv for kk, vv in v.items()
                                                              if not isinstance(vv, (dict, list))})
