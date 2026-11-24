@@ -7,7 +7,8 @@ decomposition-triple count and a matched-degree timing run.
 
 Usage:
     python3 scripts/l25_matched_count.py scan   # degree table, -t 2, 4 jobs
-    python3 scripts/l25_matched_count.py run    # matched degree-60 pair, -t 8
+    python3 scripts/l25_matched_count.py runx   # matched x-space count 30, -t 8
+    python3 scripts/l25_matched_count.py run    # matched degree-60 control, -t 8
 """
 import collections
 import concurrent.futures
@@ -22,6 +23,7 @@ import time
 
 P, A, B = 4099, 1, 1
 MATCHED = [("window", 2037), ("pullback", 2575)]
+MATCHED_XSPACE = [("window", 3106), ("pullback", 3106)]
 
 
 # ── dense polynomials over F_p ───────────────────────────────────────
@@ -221,25 +223,32 @@ def scan(k=30):
     return rows
 
 
-def run(k=30, reps=2, threads=8):
+def run(k=30, reps=2, threads=8, pair=None, out="matched60.json"):
     by_x, win, pull = base_sets(k)
     sets = {"window": win, "pullback": pull}
     rows = []
     for rep in range(reps):
-        for name, xq in MATCHED:
+        for name, xq in (pair or MATCHED):
             r = solve(sets[name], xq, threads=threads)
             r.update(family=name, xq=xq, rep=rep, threads=threads)
             print(r, flush=True)
             rows.append(r)
-    json.dump(rows, open("matched60.json", "w"), indent=1)
+    json.dump(rows, open(out, "w"), indent=1)
     return rows
+
+
+def runx(k=30, reps=2, threads=8):
+    return run(k=k, reps=reps, threads=threads, pair=MATCHED_XSPACE,
+               out="matched_xspace30.json")
 
 
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else "run"
     if mode == "scan":
         scan()
+    elif mode == "runx":
+        runx()
     elif mode == "run":
         run()
     else:
-        raise SystemExit("usage: l25_matched_count.py [scan|run]")
+        raise SystemExit("usage: l25_matched_count.py [scan|runx|run]")

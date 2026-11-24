@@ -3,14 +3,19 @@
 **Lead:** L25 (spawned by L13) in `crypto-autoresearcher/docs/open-leads-20261123.md`.
 **Question:** the L13 k=30 timings (window 30.4 s, ideal degree 49; pullback
 24.5 s, ideal degree 37) were not controlled, because each family used its own
-decomposable target. Does the window/pullback time gap survive at a **matched
-msolve ideal degree**?
+decomposable target. Does the window/pullback time gap survive a controlled
+comparison at k=30?
 
-**Answer:** yes at this cell. At matched ideal degree 60, pullback is
-22.91 s mean wall vs window 28.07 s (8 threads, two alternating reps), a factor
-1.225. The uncontrolled L13 ratio was 1.24. Matching the degree does not remove
-the gap, so pullback is a genuine cheaper decomposition at k=30 — not an artifact
-of the degree mismatch.
+**Answer:** yes, once the control variable is chosen correctly. The k=30 gap
+disappears when both families use the **same target and the same x-space solution
+count** (30): window 17.99 s mean vs pullback 18.32 s mean (ratio 1.02, and the
+ordering flips between reps). Matching only the msolve quotient degree
+(60 vs 60) is **not** sufficient: the x-space counts are then 27 vs 6 and a
+1.23x gap remains. The control variable is x-space solution count, not quotient
+degree.
+
+This confirms, at k=30 rather than k=20, the result already recorded in the
+leads doc: `matchedx` at k=20 (count 15, degree 15 both) gave 3.32 s vs 3.28 s.
 
 ## Cell and instrument
 
@@ -21,24 +26,50 @@ of the degree mismatch.
   `d_reg`.** `d_reg` remains the calibrated `f4_fp` metric (8/8 semi-regular
   cells, `crypto/tests/f4_fp_calibration.rs`, PR #5134). No `d_reg` claim is made
   here.
-- The two systems are byte-identical except for the base x-set and target:
+- "x-space solution count" = ordered triples `(x1,x2,x3)` of base x-values with
+  `S4(x1,x2,x3,xQ) = 0` over `F_p`, computed directly from the curve arithmetic.
 
-| family | target `xQ` | ordered decomposition triples | input SHA-256 |
+## Primary result: matched x-space count 30, same target
+
+Both families use `xQ = 3106`; each has 30 x-space solutions; msolve reports
+ideal degree 30 for both. Two reps, families alternated, same host, `-t 8`:
+
+| rep | family | wall s | msolve elapsed s | msolve CPU s | ideal degree |
+|---:|---|---:|---:|---:|---:|
+| 0 | window | 18.11 | 18.07 | 21.34 | 30 |
+| 0 | pullback | 17.31 | 17.30 | 20.97 | 30 |
+| 1 | window | 17.87 | 17.86 | 21.16 | 30 |
+| 1 | pullback | 19.33 | 19.32 | 21.83 | 30 |
+| mean | window | **17.99** | 17.97 | 21.25 | 30 |
+| mean | pullback | **18.32** | 18.31 | 21.40 | 30 |
+
+Ratio of means: `18.32 / 17.99 = 1.018`. The per-rep ordering is not stable
+(rep 0 pullback faster, rep 1 window faster), so the gap is within run-to-run
+noise at this cell. The uncontrolled L13 ratio was `30.4 / 24.5 = 1.24`.
+
+| family | target `xQ` | x-space count | input SHA-256 |
 |---|---:|---:|---|
-| window | 2037 | 27 | `ccd70352f57afb1cb860c9d29290315ce0423cfd648b84226895e9cc8b26f4a6` |
-| pullback | 2575 | 6 | `2ae4a67c4e63c591b8eed3a6bb8ccbb44c9218e2d8b436f564e593df228e7fa3` |
+| window | 3106 | 30 | `f57631c10d0c8687f9f02563608be80abef8e8fae668b7277338cae027c5b60d` |
+| pullback | 3106 | 30 | `bcad84a2979b4b9e6e06f4fbccd6218af2ef745cea80ea48b1005bded0f2404e` |
 
-Both systems report `degree of ideal = 60` (checked from `msolve` stderr and the
-degree line in the output file).
+## Control: matching quotient degree alone is insufficient
 
-## Target selection (why these two)
+A separate search selected targets with the same msolve ideal degree (60) but
+different x-space counts (window 27, pullback 6). That pair still shows a gap:
 
-We enumerated all ordered triples of base points for each family, grouped
-reachable targets by their ordered-triple count, then ran one representative per
-count. Degrees are not monotone in the triple count, and 60 occurs in both
-families:
+| family | target `xQ` | x-space triples | mean wall (2 reps, `-t 8`) | ideal degree |
+|---|---:|---:|---:|---:|
+| window | 2037 | 27 | 28.07 s | 60 |
+| pullback | 2575 | 6 | 22.91 s | 60 |
 
-| family | triples | ideal degree |
+Ratio `28.07 / 22.91 = 1.225`. So matching the quotient dimension does not
+control the comparison; L25's "solution count" must mean the x-space count.
+
+The degree scan that found the degree-60 pair (selection run only, `-t 2`,
+four concurrent jobs) also shows that quotient degree is not monotone in x-space
+count:
+
+| family | x-space triples | ideal degree |
 |---|---:|---:|
 | window | 6 | 42 |
 | window | 13 | 49 |
@@ -49,37 +80,22 @@ families:
 | pullback | 27 | 69 |
 | pullback | 48 | 84 |
 
-The scan used `-t 2` with four concurrent jobs and is a **selection** run, not a
-timing run. Only the matched pair below is used for timing.
-
-## Matched-degree timing
-
-Two reps, families alternated, same host, same `-t 8`:
-
-| rep | family | wall s | msolve elapsed s | msolve CPU s | ideal degree |
-|---:|---|---:|---:|---:|---:|
-| 0 | window | 28.15 | 28.04 | 34.49 | 60 |
-| 0 | pullback | 23.16 | 23.13 | 28.11 | 60 |
-| 1 | window | 27.98 | 27.94 | 34.16 | 60 |
-| 1 | pullback | 22.65 | 22.61 | 27.78 | 60 |
-| mean | window | **28.07** | 27.99 | 34.33 | 60 |
-| mean | pullback | **22.91** | 22.87 | 27.95 | 60 |
-
-Ratio of means: `28.07 / 22.91 = 1.225`. Wall-time difference: 5.16 s.
-
 ## Exact commands
 
 ```sh
-# Selection scan (8 runs): produces the degree table above.
-python3 scripts/l25_matched_count.py scan
+# Primary: matched x-space count 30 at k=30, 2 alternating reps, -t 8.
+python3 scripts/l25_matched_count.py runx
 
-# Matched pair: 2 alternating reps, writes matched60.json.
+# Control: matched quotient degree 60 with different x-space counts.
 python3 scripts/l25_matched_count.py run
 
-# Direct reproduction of either system without Python:
-msolve -f research_notes/l25_matched_count_k30_20261124/window_k30_xQ2037.ms \
+# Selection scan for the degree-60 control (8 runs, -t 2, 4 concurrent).
+python3 scripts/l25_matched_count.py scan
+
+# Direct reproduction of the primary pair without Python:
+msolve -f research_notes/l25_matched_count_k30_20261124/window_k30_xQ3106.ms \
        -o /tmp/win.out -t 8 -v 2
-msolve -f research_notes/l25_matched_count_k30_20261124/pullback_k30_xQ2575.ms \
+msolve -f research_notes/l25_matched_count_k30_20261124/pullback_k30_xQ3106.ms \
        -o /tmp/pull.out -t 8 -v 2
 ```
 
@@ -89,11 +105,13 @@ this record does not depend on an unmerged branch.
 
 ## What this establishes
 
-- At `p = 4099`, `k = 30`, one curve, the window/pullback gap is **not** explained
-  by the 49-vs-37 ideal-degree mismatch: at matched degree 60 the pullback target
-  is still ~1.23x faster.
-- Ideal degree varies by a factor >2 across targets at fixed `k` (37 to 105), so
-  any future window-vs-pullback timing must name the target and degree.
+- At `p = 4099`, `k = 30`, one curve, matching the **same target and x-space
+  solution count** removes the window/pullback timing gap (17.99 vs 18.32 s,
+  ratio 1.02).
+- The original 30.4-vs-24.5 s gap is explained by the uncontrolled solution
+  count, not by a structural advantage of the pullback base.
+- Matching the quotient degree alone is not enough: degree 60/60 with x-space
+  counts 27/6 still leaves a 1.23x gap.
 
 ## What this does not establish
 
@@ -102,13 +120,14 @@ this record does not depend on an unmerged branch.
 - Not a `d_reg` measurement; `msolve` ideal degree is not `d_reg`.
 - Not a statement about relation yield or the full IC cost; only the dense
   Gröbner-basis step is timed.
-- Wall times are host/load dependent; the paired alternation controls drift, not
+- Wall times are host/load dependent; paired alternation controls drift, not
   absolute throughput.
 
 ## Consequence for L5
 
 L5's target `k = 50` still exceeds the 15-minute budget on the default window
-target. This result says a cheaper target at the same `k` can change the degree
-substantially (37 to 105 at `k = 30`), so the next L5 attempt should first select
-a low-degree target, not simply buy a longer timeout. A `k = 50` run remains
-unmeasured here and would exceed the 30-minute per-cycle compute cap.
+target. At fixed k, target choice moves the quotient degree by >2x (37 to 105 at
+k=30), but the primary result says the *x-space solution count*, not the quotient
+degree, is the cost-relevant control. The next k=50 attempt should first select a
+low-x-space-count target, then price that cell; k=50 is still unmeasured and a
+run would exceed this cycle's 30-minute cap.
