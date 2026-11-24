@@ -17,6 +17,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [ ] Extend existing certified-relations diagnostics with raw-versus-closed rank and original-ideal witnesses, plus a P/Q coefficient audit; correctness only, original speed goal unchanged (Codex, started 2026-11-24, branch lane/relation-information-leads-20261123; PR #5102).
+
 - [x] Devise and document new relation leads: coefficient-information audit, certified degree-fall selection and overlapping line families; final reader405/PDF and two limited native identity checks, source-only Lean explicitly unverified; no measured gain (Codex, completed 2026-11-24, branch lane/relation-information-leads-20261123; PR #5102; follows merged #4989). [pcc:unverified]
 - [x] Pursue five recorded-pool P-192 hypotheses with exhaustive canonical/signed searches, tangent residual traces and closed-divisor target checks;102 split residual quadratics retained as the next fixed collection input (Codex, completed static component 2026-11-23, branch lane/p192-recorded-pool-hypotheses-20261123, PR #5093; actual new collection proposed, original full goal remains open). [pcc:unverified]
 - [x] Parallelize APS point-batch collection and independent relation workers with a bounded queue and verified recovery (Codex, started 2026-11-23, branch codex/aps-queued-workers-20261123, PR #5092; isolated library check and one/four-worker public-fixture runs passed 2026-11-23)
