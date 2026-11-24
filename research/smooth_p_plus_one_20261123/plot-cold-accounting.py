@@ -23,3 +23,7 @@ fig.text(.5,.01,'Counts only; no timing comparison or sampling uncertainty estim
 fig.tight_layout(rect=(0,.04,1,1))
 fig.savefig(root/'cold-accounting-counts.svg')
 fig.savefig(root/'cold-accounting-counts.pdf')
+
+# Keep generated XML paths free of renderer-only trailing whitespace.
+svg_path=root/'cold-accounting-counts.svg'
+svg_path.write_text('\n'.join(line.rstrip() for line in svg_path.read_text().splitlines())+'\n')
