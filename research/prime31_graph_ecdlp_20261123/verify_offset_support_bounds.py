@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact arithmetic replay of the quadratic-offset support bounds.
+"""Exact arithmetic replay of the quadratic and linear offset support bounds.
 
 The M31 calculation uses only the proved point count and global split-count
 interval. An exhaustive F17 check independently tests the moment and
@@ -9,7 +9,7 @@ duplicate-loss identities used by the bound. Standard library only.
 from decimal import Decimal, getcontext
 from fractions import Fraction
 from itertools import product
-from math import comb
+from math import comb, isqrt
 
 
 def decimal(value: Fraction) -> str:
@@ -75,6 +75,29 @@ def m31_bounds() -> None:
     print("M31 eight-bit full-split tail upper:", decimal(eight_tail))
     print("M31 ten-bit duplicate-loss mean upper:", decimal(duplicate10_upper))
     print("M31 ten-bit support success lower:", decimal(1 - failure10_upper))
+
+    # For the linear graph, the degree-three S3 closure has genus at most
+    # three, hence N3 <= (p+1)/6 + sqrt(p) + 5. Round sqrt(p) upward so
+    # every following bound is a rational number checked exactly.
+    root_ceiling = isqrt(p) + 1
+    assert (root_ceiling - 1) ** 2 < p < root_ceiling**2
+    triple_upper = Fraction(p + 1, 6) + root_ceiling + 5
+    triple_density_upper = triple_upper / p
+    cubic_mean8_upper = 256 * triple_density_upper
+    cubic_variance8_upper = 256 * triple_density_upper * (1 - triple_density_upper)
+    cubic_tail = cubic_variance8_upper / (
+        cubic_variance8_upper + (165 - cubic_mean8_upper) ** 2
+    )
+    assert cubic_tail < Fraction(2371, 10**6)
+
+    cubic_variance10_upper = m * (3 * mu - mu**2)
+    cubic_lower_tail = cubic_variance10_upper / (
+        cubic_variance10_upper + (mean10 - 676) ** 2
+    )
+    cubic_success_lower = 1 - cubic_lower_tail - duplicate10_upper
+    assert cubic_success_lower > Fraction(98288, 10**5)
+    print("M31 linear-graph eight-bit three-root tail upper:", decimal(cubic_tail))
+    print("M31 linear-graph ten-bit support success lower:", decimal(cubic_success_lower))
 
 
 if __name__ == "__main__":
