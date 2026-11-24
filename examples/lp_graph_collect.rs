@@ -101,8 +101,10 @@ fn main() {
     // Exact factor-base rank is optional: default output stays compatible with
     // the previously recorded binary-curve runs. A cap applies to *all*
     // expensive same-stream rank auditors inside evaluate_stream.
-    let mut params = EvalParams::default();
-    params.compare_exact_forest = args.iter().any(|arg| arg == "--exact-forest");
+    let mut params = EvalParams {
+        compare_exact_forest: args.iter().any(|arg| arg == "--exact-forest"),
+        ..EvalParams::default()
+    };
     if let Some(v) = args
         .iter()
         .position(|arg| arg == "--forest-max-rows")
