@@ -582,6 +582,31 @@ eight P-192 markings. The proof uses the composition identities;
 the finite checks validate their implementation and sign convention.
 [pcc:unverified]
 
+### Oracle-model check: EDS residue and shifted Legendre
+
+Two published oracle problems are adjacent to this sign goal but do
+not provide its evaluator. [Lauter–Stange, Corollary 2](https://eprint.iacr.org/2008/099.pdf)
+reduces scalar recovery to an oracle for the field residuosity of the
+unknown-index EDS term `ψ_d(G)`. On P-192 the computable normalizer
+obeys `χ_p(φ(Q))=χ_p(φ(G))^d² χ_p(ψ_d(G))`, and the checked
+`χ_p(φ(G))=-1`. Thus the missing EDS-residue bit carries the
+unknown *integer parity* of `d`; the available `φ(Q)` value does not
+evaluate it. Integer parity and the requested `χ_r(d)` are different
+predicates. The
+[`derivative_normalizer_control.sage`](derivative_normalizer_control.sage)
+replay asserts the P-192 normalizer character at `G`. [pcc:unverified]
+
+If a point-only oracle for `χ_r(d)` were already available, additive
+point queries would return the shifted Legendre sequence
+`χ_r(d+k)`. [Russell–Shparlinski](https://arxiv.org/abs/quant-ph/0212016)
+and the later [Legendre-PRF key-recovery work](https://eprint.iacr.org/2020/098.pdf)
+analyze recovery *given* such an oracle. The latter's square-root-scale
+word-operation bound assumes oracle calls are available; it does not
+construct the missing map from `Q` to `χ_r(d)`. Known-scalar
+multiples yield only `χ_r(kd)=χ_r(k)χ_r(d)`. Neither reduction
+supplies a below-reference point-dependent sign computation; any
+candidate must charge the oracle implementation itself. [pcc:unverified]
+
 There is nevertheless a deterministic **average over all public
 known-point offsets**. Let `S={x([a]G):1≤a<r}`, of size `n/2`, and
 let `ρ(c)=n⁻¹Σ_{P≠O}t(P)χ_p(x(P)-c)`. The single-offset second

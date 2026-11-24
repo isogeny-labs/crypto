@@ -36,7 +36,8 @@ def division_values(E, P):
     return psi
 
 
-def check(E, G, p, r, scalars, direct_roots=False):
+def check(E, G, p, r, scalars, direct_roots=False,
+          expected_base_character=None):
     assert r * G == E(0) and gcd(r, p - 1) == 1
     m = (r - 1) // 2
     roots = [(j * G)[0] for j in range(1, m + 1)] if direct_roots else None
@@ -47,6 +48,8 @@ def check(E, G, p, r, scalars, direct_roots=False):
         P = d * G
         psi = division_values(E, P)
         phi = (psi(p - 1) / psi(p - 1 + r)) ** root_exponent
+        if d == 1 and expected_base_character is not None:
+            assert kronecker(ZZ(phi), p) == expected_base_character
         derivative = psi(m + 1) / (psi(2) * psi(m))
         assert derivative * psi(2) * phi ** r == -1
         assert kronecker(ZZ(derivative), p) == -kronecker(ZZ(phi / psi(2)), p)
@@ -69,4 +72,5 @@ b = 0x64210519E59C80E70FA7E9AB72243049FEB8DEECC146B9B1
 E = EllipticCurve(GF(p), [-3, b])
 G = E(0x188DA80EB03090F67CBF20EB43A18800F4FF0AFD82FF1012,
       0x07192B95FFC8DA78631011ED6B24CDD573F977A11E794811)
-check(E, G, p, r, (1, 2, 3, 5, 7, 11, 17, 31))
+check(E, G, p, r, (1, 2, 3, 5, 7, 11, 17, 31),
+      expected_base_character=-1)
