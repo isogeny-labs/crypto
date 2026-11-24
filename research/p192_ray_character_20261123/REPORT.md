@@ -443,6 +443,18 @@ a bound without the scalar weight does not
 meet this gate. This numerical threshold omits feature selection,
 exact sample-count rounding, and other field costs. [pcc:unverified]
 
+There is a small exact bias floor for every known-point offset, but
+it does not approach this gate. Since `χ_r(-1)=1`, the summands for
+`d` and `-d` agree. Among the `n/2` pairs, exactly the pair
+`d=±a` contributes zero. P-192 has `r≡1 (mod 16)`, so `n/2` is
+even and the remaining `n/2-1` pair contributions are an odd
+number of `±1` terms. Consequently `S_a/2` is odd,
+`S_a≡2 (mod 4)`, and `|S_a|≥2` for every nonzero `a`. The certified
+correlation magnitude is only `|ρ(x([a]G))|≥2/n≈2^-191`, which is
+`149.582` bits below `g`. Its sign and any larger magnitude remain
+undetermined. This parity fact also precludes proving `S_a=0` for
+these offsets. [pcc:unverified]
+
 There is nevertheless a deterministic **average over all public
 known-point offsets**. Let `S={x([a]G):1≤a<r}`, of size `n/2`, and
 let `ρ(c)=n⁻¹Σ_{P≠O}t(P)χ_p(x(P)-c)`. The single-offset second
