@@ -318,9 +318,11 @@ fn main() {
             "recovered_scalar": recovered,
             "recovered_scalar_replay": recovered.is_some(),
             "fixture_ms": fixture_ms,
+            "fixture_work": fixture.counts(),
             "table_ms": table_ms,
             "cold_wall_ms": cold.elapsed().as_millis(),
             "charged_group_work": ar.counts,
+            "total_group_additions": fixture.counts().group_additions + ar.counts.group_additions,
         }))
         .unwrap()
     );

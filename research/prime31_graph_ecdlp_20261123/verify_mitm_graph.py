@@ -12,7 +12,7 @@ from flint import nmod_mat
 
 
 ROOT = Path(__file__).parent
-RECEIPT = ROOT / "evidence" / "mitm-b677-control-01" / "forty-cap.json"
+RECEIPT = ROOT / "evidence" / "mitm-b677-control-01" / "forty-cap-full-cost.json"
 B677_INPUT = ROOT / "evidence" / "rr5-b677-prerequisite-01" / "structured-positive.stdout"
 N = 2_147_446_831
 P = 2_147_483_647
