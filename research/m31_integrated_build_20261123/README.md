@@ -102,7 +102,20 @@ This bounded local wrapper runs the three component release gates, records
 each exit and continues subsequent planned components after a failure.
 Set `CARGO` and `RUSTC` to explicit installed executable paths when needed;
 set `OFFLINE=1` to use a populated registry cache. The constituent commands
-were executed directly; the wrapper itself is syntax-checked.
+and the corrected wrapper have both been executed. The wrapper selects the
+graph's dedicated `--test graph_suite` target and `--all-targets` for the
+structured and RR5 crates. Its final cached release invocation returned zero
+for every component, repeating the same 70 tests; see the separately retained
+[wrapper receipt](evidence/wrapper-final-v1/receipt.json) and
+[correction note](evidence/WRAPPER_CORRECTION.md). Producer claim
+`PCC-20261124-9f9ff4` is unsigned. [pcc:unverified]
+
+The original aggregate manifest, source hashes and report remain immutable
+records of source commit `709a68ad`. The correction receipt pins the updated
+wrapper and confirms every other source-manifest entry is unchanged. The
+earlier wrapper's graph `--all-targets` failure is retained; inherited graph
+unit tests require the full production telemetry API and are outside this
+standalone crate's integration gate. [pcc:unverified]
 
 - [Graph CLI and operator API](graph/README.md): four-arm comparison on an
   admitted fixed-curve capture, plus forward and transpose tape products.

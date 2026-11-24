@@ -1,0 +1,57 @@
+   Compiling m31-graph-compare v0.1.0 (/workspace/scratch/5e8abb017b93/crypto-build/research/m31_integrated_build_20261123/graph)
+error[E0432]: unresolved imports `jv_bitops::Kind`, `jv_bitops::Phase`
+   --> cryptanalysis/large_prime_filter.rs:481:25
+    |
+481 |         use jv_bitops::{Kind, Phase};
+    |                         ^^^^  ^^^^^ no `Phase` in `jv_bitops`
+    |                         |
+    |                         no `Kind` in `jv_bitops`
+    |
+    = help: consider importing this enum instead:
+            crate::large_prime_filter::trace::Phase
+
+error[E0425]: cannot find function `enable` in module `jv_bitops`
+   --> cryptanalysis/large_prime_filter.rs:482:20
+    |
+482 |         jv_bitops::enable(true);
+    |                    ^^^^^^ not found in `jv_bitops`
+
+error[E0425]: cannot find function `claim` in module `jv_bitops`
+   --> cryptanalysis/large_prime_filter.rs:483:20
+    |
+483 |         jv_bitops::claim();
+    |                    ^^^^^ not found in `jv_bitops`
+
+error[E0425]: cannot find function `set_moduli` in module `jv_bitops`
+   --> cryptanalysis/large_prime_filter.rs:484:20
+    |
+484 |         jv_bitops::set_moduli(103, P);
+    |                    ^^^^^^^^^^ not found in `jv_bitops`
+
+error[E0425]: cannot find function `snapshot_other` in module `jv_bitops`
+   --> cryptanalysis/large_prime_filter.rs:486:39
+    |
+486 |         let other_before = jv_bitops::snapshot_other();
+    |                                       ^^^^^^^^^^^^^^ not found in `jv_bitops`
+
+error[E0425]: cannot find function `enter` in module `jv_bitops`
+   --> cryptanalysis/large_prime_filter.rs:488:37
+    |
+488 |             let _phase = jv_bitops::enter(Phase::LinearAlgebra);
+    |                                     ^^^^^ not found in `jv_bitops`
+
+error[E0425]: cannot find function `snapshot_other` in module `jv_bitops`
+   --> cryptanalysis/large_prime_filter.rs:510:31
+    |
+510 |         assert_eq!(jv_bitops::snapshot_other(), other_before);
+    |                               ^^^^^^^^^^^^^^ not found in `jv_bitops`
+
+error[E0599]: no method named `since` found for array `[u64; 4]` in the current scope
+   --> cryptanalysis/large_prime_filter.rs:502:39
+    |
+502 |         let t = jv_bitops::snapshot().since(&before);
+    |                                       ^^^^^ method not found in `[u64; 4]`
+
+Some errors have detailed explanations: E0425, E0432, E0599.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `m31-graph-compare` (lib test) due to 8 previous errors

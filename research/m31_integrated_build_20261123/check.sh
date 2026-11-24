@@ -29,8 +29,9 @@ if [[ ${OFFLINE:-0} == 1 ]]; then offline_args+=(--offline); fi
 overall=0
 run_gate() {
     local name=$1 manifest=$2 gate_status
+    shift 2
     local command=("$cargo_bin" test "${offline_args[@]}" --locked --release
-        --manifest-path "$manifest" --all-targets -j1 -- --test-threads=1)
+        --manifest-path "$manifest" "$@" -j1 -- --test-threads=1)
     printf '%q ' timeout "$gate_seconds" "${command[@]}" > "$output_dir/$name.command"
     printf '\n' >> "$output_dir/$name.command"
     timeout "$gate_seconds" "${command[@]}" > "$output_dir/$name.log" 2>&1
@@ -41,8 +42,10 @@ run_gate() {
 }
 
 # A failed gate is retained; later planned components still run.
-run_gate graph research/m31_integrated_build_20261123/graph/Cargo.toml
-run_gate structured research/m31_integrated_build_20261123/structured/Cargo.toml
-run_gate rr5 research/prime31_four_summand_20261122/native/Cargo.toml
+# The standalone graph crate qualifies its integration target; inherited root
+# unit tests require the production telemetry interface from the full crate.
+run_gate graph research/m31_integrated_build_20261123/graph/Cargo.toml --test graph_suite
+run_gate structured research/m31_integrated_build_20261123/structured/Cargo.toml --all-targets
+run_gate rr5 research/prime31_four_summand_20261122/native/Cargo.toml --all-targets
 printf '%s\n' "$overall" > "$output_dir/overall.exit"
 exit "$overall"

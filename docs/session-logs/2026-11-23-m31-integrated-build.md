@@ -51,3 +51,63 @@ Root-wide qualification remains open: the bounded compiler check reports E0425 i
 ### Errors
 
 The managed Cargo wrapper selected an empty cache, so installed direct executables were used. Tracked sparse dependencies were hydrated. The first hydrated root build lost its execution handle with no terminal status; the cached test retry and focused compiler check each returned 124 at their caps. A wider diagnostic refused two sparse unrelated binary targets. Rustfmt is unavailable. Final diff-check reports raw-log EOF blank lines plus the tested Cargo manifest's final blank line, retained byte-for-byte. The source Git tree c99a645334fe9357825d2de2b099e01837142403 exactly matches the published tree, including six symlinks and both new lockfiles. [pcc:unverified]
+
+## 2026-11-24T04:06Z - Aggregate wrapper compatibility correction
+
+### What was done
+
+The final graph `--all-targets` compatibility invocation returned 101: inherited
+production unit tests require the complete `jv_bitops` interface, whereas this
+standalone comparator supplies only the hooks its production imports use.
+The qualified graph gate is its dedicated `--test graph_suite` integration
+target. The aggregate wrapper had incorrectly selected all targets instead.
+The original failed invocation and terminal output will be retained separately.
+[pcc:unverified]
+
+### Decisions made
+
+Correct only the wrapper's per-component target selection. Keep the graph
+integration gate and the structured/RR5 all-targets gates exactly as qualified;
+execute the corrected wrapper end to end. Preserve all original claim-bound
+reports, source manifests and logs; add a separate wrapper receipt.
+
+### Open threads
+
+Run the corrected wrapper, register its evidence and publish a follow-up commit
+to PR #5120. Keep the ready state and existing no-merge/no-paid-compute holds.
+
+### Errors
+
+The wrapper was only syntax-checked before publication. Its incorrect graph
+selection was found during final command compatibility verification.
+
+## 2026-11-24T04:12Z - Corrected aggregate wrapper completed
+
+### What was done
+
+Executed the corrected wrapper with locked offline release builds, one job/test
+thread and 180-second per-component caps. All three exits and overall exit are
+zero; graph 7, structured 13 and RR5 50 tests repeat the original 70. Registered
+PCC-20261124-9f9ff4 against a separate receipt and read-only CI observation.
+Original verification/report/PCC subjects remain unchanged. [pcc:unverified]
+
+### Decisions made
+
+Publish the narrow wrapper target-selection correction and both failed/successful
+invocations. The source receipt explicitly records base42cbb and the wrapper's
+working-tree hash; all other original source-manifest entries are unchanged.
+Use the newest canonical Nov24 journal for this final follow-up. Preserve prior
+journals, existing holds and the ready/unmerged PR state.
+
+### Open threads
+
+Whole-repository compiler/CI qualification, signed PCC and admitted scientific
+panels remain separate dependencies. Verify the follow-up remote tree and PR.
+
+### Errors
+
+Automatic Round123/124 CI stopped at source-precondition assertions before
+compilation. Independent read-only inspection confirms both scripts, exact
+inputs and workflows are byte-identical to baseceba74bb. No baseline workflow
+or scientific benchmark was dispatched. Temporary untracked Cargo-cache links
+were removed after the final wrapper execution. [pcc:unverified]
