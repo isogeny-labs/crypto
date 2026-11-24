@@ -78,6 +78,20 @@ labelled `Fi`, one must construct them with the claimed centered selector
 and charge that target-dependent selection, extraction and verification.
 The degree-four identity by itself supplies none of those labels.
 
+For the specific strategy of drawing independent uniform known scalars
+`k mod n` and retaining `kG` only when `x(kG-U)` lies in a fixed centered
+selector of `B` liftable abscissae, the acceptance probability is exactly
+`2B/n` when the translated set contains no identity point. Translation
+is a bijection and each selected abscissa has two rational points.
+Collecting `L` **distinct** labelled points by this rejection strategy
+therefore takes an expected
+`n * sum_{j=0}^{L-1} 1/(2B-j)` scalar draws. At `L=B` this is
+`n*(H_(2B)-H_B)`, of order `n`, before relation extraction. This bound
+applies to uniform rejection sampling into a fixed selector; it does not
+rule out a different, proved way to construct labels and compact
+membership together. It shows why the independently labelled escape
+route needs an explicit construction-cost account.
+
 If `U` is recomputed from each public query to keep `D=O`, the translated
 point list also changes with that query. Any proposal to share a factor
 base across those lists must give an exact transfer map and charge its
