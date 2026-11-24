@@ -1,0 +1,14 @@
+Command:
+python3 tools/pcc/pcc.py lint-prose summation_split/m31_native/README.md summation_split/m31_native/REPORT.md summation_split/m31_native/HANDOFF.md
+
+Observed exit: 1.
+Observed findings, transcribed from the command tool output:
+summation_split/m31_native/README.md: line 102: 'speedup' with no [pcc:ID] citation and no [pcc:unverified] tag
+summation_split/m31_native/REPORT.md: line 131: 'speedups' with no [pcc:ID] citation and no [pcc:unverified] tag
+lint-prose: 2 finding(s)
+
+Both matches are in negative disclaimers saying no new performance claim
+is established. They are still open literal lint findings. No passing
+report-lint result is asserted, and no verifier rule was changed to hide them.
+REPORT.md is already hash-pinned in the unsigned producer claims and remains
+byte-identical to the attested source commit. The draft remains unmerged.

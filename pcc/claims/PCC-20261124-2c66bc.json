@@ -1,0 +1,51 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-24T04:13:48Z",
+ "id": "PCC-20261124-2c66bc",
+ "kind": "statement",
+ "producer": {
+  "commit": "c418251c7a442cd7360986f7711daa3820395e7c",
+  "model": "GPT-6-Astra-Pro",
+  "session": "m31-projective-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "summation_split/m31_native/multiplicity.md",
+    "sha256": "075cb855eddac17540b9f1713dd72e4367f704f190074bbe9df238c4cd1c5fcb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "summation_split/m31_native/REPORT.md",
+    "sha256": "0ea017b245352acd142a28a46c6a091790d332c15cb4c34515d268842660d620"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "summation_split/m31_native/src/multiplicity.rs",
+    "sha256": "90a17e795ff6abede0205ae11071cd6607756aa801f27f99824a9f34ddc29748"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "summation_split/m31_native/src/systems.rs",
+    "sha256": "75d78abfad65358ef0e29d46dbf92ad43717a45fffd9c6f1ebcb2e206c9be619"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "summation_split/m31_native/evidence/QUALIFICATION.json",
+    "sha256": "4041f49377a9dfb126b43107cc4234d06ec6c4992c14d2b73efdf07dad707ed3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "PR5087; p=2147483647; E:y^2=x^3-3x+21; projective fibers and exceptional infinity retained; pure-sector and zero-ordinate branches excluded from derivative implication",
+ "statement": "Written Frobenius-pairing derivation: under the stated mixed-sector and nonzero-ordinate hypotheses, rational specialized Semaev roots have even multiplicity, and every coordinate partial vanishes at a complete mixed rational zero. The exact sector indicator activates derivative equations only on those branches. The chart quotient decomposition does not supply a global solving-degree bound. This is an unsigned mathematical interpretation with local finite checks, not a Lean theorem, priority claim, general ECDLP gain or signed validation."
+}

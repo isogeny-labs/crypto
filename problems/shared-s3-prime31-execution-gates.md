@@ -186,3 +186,10 @@ admission under its finite budget; execute and independently replay every
 required configuration, retaining all censored cases. No local replacement
 control plane, undeclared smaller field, permission bypass or unmeasured
 speedup closes this access gap.
+
+The native component is published at c418251c7a442cd7360986f7711daa3820395e7c.
+Its two bounded full-root build attempts stopped in compilation before tests.
+The older branch's PCC ledger is internally append-only but is not yet a
+prefix-preserving extension of current main; normal ledger/journal integration
+remains a merge gate. No old entries or evidence were rewritten. See the
+component HANDOFF.md and retained ledger receipts. [pcc:unverified]
