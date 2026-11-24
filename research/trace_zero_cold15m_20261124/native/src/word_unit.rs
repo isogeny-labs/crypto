@@ -149,3 +149,54 @@ fn degree_alone_never_selects_a_specialized_modulus() {
         }
     }
 }
+
+#[test]
+fn repeated_denominator_runs_and_exceptional_points_preserve_every_residual() {
+    let c = fixture(5);
+    let f = WordField::new(&c);
+    let mut points = Vec::new();
+    for x in 1..32u32 {
+        for y in 0..32u32 {
+            let p = BinaryPoint::Affine {
+                x: F2mElement::from_biguint(&x.into(), 5),
+                y: F2mElement::from_biguint(&y.into(), 5),
+            };
+            if c.is_on_curve(&p) {
+                points.push(p);
+            }
+        }
+    }
+    let p = points[0].clone();
+    let q = points
+        .iter()
+        .find(|q| match (&p, q) {
+            (BinaryPoint::Affine { x: a, .. }, BinaryPoint::Affine { x: b, .. }) => a != b,
+            _ => false,
+        })
+        .unwrap()
+        .clone();
+    let np = point_neg(&p);
+    let batch = vec![
+        p.clone(),
+        p.clone(),
+        np.clone(),
+        BinaryPoint::Infinity,
+        p.clone(),
+        q.clone(),
+        np.clone(),
+        q.clone(),
+        q.clone(),
+        BinaryPoint::Infinity,
+    ];
+    for target in [p, q, np, BinaryPoint::Infinity] {
+        for size in [1, 2, 3, 5, 10] {
+            for part in batch.chunks(size) {
+                let expected: Vec<_> = part
+                    .iter()
+                    .map(|p| WordPoint::from_point(&point_add(&c, &target, &point_neg(p))))
+                    .collect();
+                assert_eq!(f.residuals(&c, &target, part), expected);
+            }
+        }
+    }
+}

@@ -831,7 +831,12 @@ pub fn decompose_trace_zero_linearized(
             let BinaryPoint::Affine { y: known, .. } = &base[first] else {
                 unreachable!()
             };
-            fy == known || *fy == known.add(fx)
+            fy == known
+                || if let Some(f) = &compact {
+                    words(fy) == f.add(words(known), words(fx))
+                } else {
+                    *fy == known.add(fx)
+                }
         } else {
             false
         };

@@ -1808,14 +1808,74 @@ pub(crate) fn mul_mod131(a: &[u64; 3], b: &[u64; 3]) -> Option<[u64; 3]> {
     None
 }
 
+/// Runtime selection for compact callers that retain a private dispatch bit.
+pub(crate) fn compact_mod131_hw_available() -> bool {
+    #[cfg(target_arch = "x86_64")]
+    {
+        has_hw_clmul()
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        false
+    }
+}
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "pclmulqdq")]
-unsafe fn mul_mod131_hw(a: &[u64; 3], b: &[u64; 3]) -> [u64; 3] {
-    // Compatible target features allow the fixed-size multiply to inline;
-    // its intermediate words need not cross the general reduction ABI.
-    let mut p = [0u64; 6];
-    mul_words_hw(a, b, &mut p);
-    reduce_mod131_product(p)
+pub(crate) unsafe fn mul_mod131_hw(a: &[u64; 3], b: &[u64; 3]) -> [u64; 3] {
+    use std::arch::x86_64::*;
+    let av = _mm_loadu_si128(a.as_ptr().cast());
+    let bv = _mm_loadu_si128(b.as_ptr().cast());
+    let a2 = _mm_cvtsi64_si128(a[2] as i64);
+    let b2 = _mm_cvtsi64_si128(b[2] as i64);
+    let p0 = _mm_clmulepi64_si128::<0>(av, bv);
+    let p1 = _mm_clmulepi64_si128::<0x11>(av, bv);
+    let p2 = _mm_clmulepi64_si128::<0>(a2, b2);
+    let m01 = _mm_xor_si128(
+        _mm_clmulepi64_si128::<0>(
+            _mm_xor_si128(av, _mm_shuffle_epi32::<0x4e>(av)),
+            _mm_xor_si128(bv, _mm_shuffle_epi32::<0x4e>(bv)),
+        ),
+        _mm_xor_si128(p0, p1),
+    );
+    let m02 = _mm_xor_si128(
+        _mm_clmulepi64_si128::<0>(_mm_xor_si128(av, a2), _mm_xor_si128(bv, b2)),
+        _mm_xor_si128(p0, p2),
+    );
+    let m12 = _mm_xor_si128(
+        _mm_clmulepi64_si128::<0>(
+            _mm_xor_si128(_mm_srli_si128::<8>(av), a2),
+            _mm_xor_si128(_mm_srli_si128::<8>(bv), b2),
+        ),
+        _mm_xor_si128(p1, p2),
+    );
+    let low = _mm_xor_si128(p0, _mm_slli_si128::<8>(m01));
+    let mid = _mm_xor_si128(
+        _mm_xor_si128(_mm_srli_si128::<8>(m01), _mm_xor_si128(m02, p1)),
+        _mm_slli_si128::<8>(m12),
+    );
+    let high = _mm_xor_si128(_mm_srli_si128::<8>(m12), p2);
+    // Canonical inputs have product degree<=260. Shift the complete high
+    // part down131 bits, then multiply by the exact sparse modulus tail.
+    let carry = _mm_or_si128(_mm_srli_si128::<8>(mid), _mm_slli_si128::<8>(high));
+    let shifted = _mm_or_si128(_mm_srli_epi64::<3>(mid), _mm_slli_epi64::<61>(carry));
+    let tail = _mm_cvtsi64_si128(0x2007);
+    let q0 = _mm_clmulepi64_si128::<0>(shifted, tail);
+    let q1 = _mm_clmulepi64_si128::<1>(shifted, tail);
+    let q2 = _mm_clmulepi64_si128::<0>(_mm_srli_epi64::<3>(high), tail);
+    let last = _mm_xor_si128(
+        _mm_and_si128(mid, _mm_cvtsi64_si128(7)),
+        _mm_xor_si128(_mm_srli_si128::<8>(q1), q2),
+    );
+    let folded = _mm_clmulepi64_si128::<0>(_mm_srli_epi64::<3>(last), tail);
+    let result = _mm_xor_si128(
+        _mm_xor_si128(low, q0),
+        _mm_xor_si128(_mm_slli_si128::<8>(q1), folded),
+    );
+    [
+        _mm_cvtsi128_si64(result) as u64,
+        _mm_cvtsi128_si64(_mm_srli_si128::<8>(result)) as u64,
+        (_mm_cvtsi128_si64(last) as u64) & 7,
+    ]
 }
 
 /// Canonical131-bit squaring needs only two64-bit carryless squares. The
@@ -1832,7 +1892,7 @@ pub(crate) fn square_mod131(a: &[u64; 3]) -> Option<[u64; 3]> {
 }
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "pclmulqdq")]
-unsafe fn square_mod131_hw(a: &[u64; 3]) -> [u64; 3] {
+pub(crate) unsafe fn square_mod131_hw(a: &[u64; 3]) -> [u64; 3] {
     use std::arch::x86_64::*;
     let v = _mm_loadu_si128(a.as_ptr().cast());
     let p0 = _mm_clmulepi64_si128::<0>(v, v);

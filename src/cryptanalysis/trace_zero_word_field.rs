@@ -3,7 +3,7 @@
 //! reductions reuse the production word kernels; exact maps are prepared once.
 use crate::binary_ecc::{
     curve::{point_add, point_neg},
-    f2m::{mul_mod131, mul_words_into, reduce_words, spread32, square_mod131, CompactLinearMaps},
+    f2m::{compact_mod131_hw_available, mul_words_into, reduce_words, spread32, CompactLinearMaps},
     operation_tally, BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly,
 };
 pub type Element = [u64; 3];
@@ -44,6 +44,7 @@ pub struct WordField {
     trace_mask: Element,
     linear_maps: CompactLinearMaps,
     reduction: u8,
+    hardware131: bool,
     tail: Element,
 }
 impl WordField {
@@ -73,6 +74,7 @@ impl WordField {
             trace_mask,
             linear_maps,
             reduction,
+            hardware131: reduction == 131 && compact_mod131_hw_available(),
             tail,
         }
     }
@@ -81,25 +83,25 @@ impl WordField {
         operation_tally::tick(self.m, "add");
         [a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2]]
     }
-    #[inline]
+    #[inline(always)]
     pub fn mul(&self, a: Element, b: Element) -> Element {
         operation_tally::tick(self.m, "mul");
-        if self.reduction == 131 {
-            if let Some(value) = mul_mod131(&a, &b) {
-                return value;
-            }
+        #[cfg(target_arch = "x86_64")]
+        if self.hardware131 {
+            // SAFETY: private bit set only after full-modulus and ISA checks.
+            return unsafe { crate::binary_ecc::f2m::mul_mod131_hw(&a, &b) };
         }
         let mut out = [0u64; 7];
         mul_words_into(&a[..self.nw], &b[..self.nw], &mut out);
         self.reduce(out)
     }
-    #[inline]
+    #[inline(always)]
     pub fn square(&self, a: Element) -> Element {
         operation_tally::tick(self.m, "square");
-        if self.reduction == 131 {
-            if let Some(value) = square_mod131(&a) {
-                return value;
-            }
+        #[cfg(target_arch = "x86_64")]
+        if self.hardware131 {
+            // SAFETY: the same private full-modulus/ISA dispatch guarantee.
+            return unsafe { crate::binary_ecc::f2m::square_mod131_hw(&a) };
         }
         let mut out = [0u64; 7];
         for (i, &w) in a[..self.nw].iter().enumerate() {
@@ -232,8 +234,22 @@ impl WordField {
             match WordPoint::from_point(p) {
                 WordPoint::Affine { x, y } if x != tx => {
                     let den = self.add(tx, x);
-                    ordinary.push((i, product, den, self.add(ty, self.add(y, x))));
-                    product = self.mul(product, den);
+                    // Consecutive equal abscissas have the same nonzero
+                    // denominator. Keep each ordinate/index but invert it once.
+                    let prefix = if let Some((_, prefix, previous_den, _)) = ordinary.last() {
+                        if *previous_den == den {
+                            *prefix
+                        } else {
+                            let prefix = product;
+                            product = self.mul(product, den);
+                            prefix
+                        }
+                    } else {
+                        let prefix = product;
+                        product = self.mul(product, den);
+                        prefix
+                    };
+                    ordinary.push((i, prefix, den, self.add(ty, self.add(y, x))));
                 }
                 _ => out[i] = WordPoint::from_point(&point_add(c, target, &point_neg(p))),
             }
@@ -242,9 +258,14 @@ impl WordField {
             return out;
         }
         let mut inverse = self.inv(product).unwrap();
+        let mut previous_den = [0; 3];
+        let mut inv = [0; 3];
         for (i, prefix, den, num) in ordinary.into_iter().rev() {
-            let inv = self.mul(inverse, prefix);
-            inverse = self.mul(inverse, den);
+            if den != previous_den {
+                inv = self.mul(inverse, prefix);
+                inverse = self.mul(inverse, den);
+                previous_den = den;
+            }
             let lambda = self.mul(num, inv);
             let x = self.add(self.add(self.square(lambda), lambda), den);
             let y = self.add(self.add(self.mul(lambda, self.add(tx, x)), x), ty);
