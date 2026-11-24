@@ -84,6 +84,8 @@ pub struct Template {
     multiples: Vec<(usize, Mono)>,
     columns: Vec<Mono>,
     leading: Vec<Mono>,
+    input_leading: Option<Vec<Mono>>,
+    enumerated_rows: usize,
     limits: Limits,
 }
 pub struct Applied {
@@ -115,6 +117,67 @@ fn shift(a: &Mono, b: &Mono, degree: usize) -> Result<Mono, String> {
         return Err("template degree cap".into());
     }
     Ok(result)
+}
+
+fn enumerate_monomials(
+    slots: usize,
+    degree: usize,
+    prefix: &mut Mono,
+    visit: &mut impl FnMut(&Mono) -> Result<(), String>,
+) -> Result<(), String> {
+    if slots == 1 {
+        prefix.push(degree);
+        let result = visit(prefix);
+        prefix.pop();
+        return result;
+    }
+    for e in 0..=degree {
+        prefix.push(e);
+        enumerate_monomials(slots - 1, degree - e, prefix, visit)?;
+        prefix.pop();
+    }
+    Ok(())
+}
+
+fn rref(matrix: &mut [Vec<u64>], columns: usize, p: u64, work: &mut Work) -> Vec<usize> {
+    let rows = matrix.len();
+    let mut pivots = Vec::new();
+    for c in 0..columns {
+        let r = pivots.len();
+        let Some(next) = (r..rows).find(|i| matrix[*i][c] != 0) else {
+            continue;
+        };
+        matrix.swap(r, next);
+        let inverse = work.inverse(matrix[r][c], p);
+        if inverse != 1 {
+            for value in &mut matrix[r][c..] {
+                if *value != 0 {
+                    *value = work.mul(*value, inverse, p);
+                }
+            }
+        }
+        let pivot = matrix[r].clone();
+        for (i, row) in matrix.iter_mut().enumerate() {
+            if i == r || row[c] == 0 {
+                continue;
+            }
+            let factor = row[c];
+            for j in c..pivot.len() {
+                if pivot[j] == 0 {
+                    continue;
+                }
+                let product = work.mul(factor, pivot[j], p);
+                row[j] = if row[j] >= product {
+                    row[j] - product
+                } else {
+                    p - (product - row[j])
+                };
+                work.coefficient_updates += 1;
+            }
+        }
+        pivots.push(c);
+    }
+    pivots
 }
 fn canonical(
     input: &[Poly],
@@ -219,6 +282,98 @@ impl Template {
             return Err("empty template".into());
         }
         let multiples: Vec<_> = multiples.into_iter().collect();
+        let mut leading: Vec<_> = witness
+            .iter()
+            .map(|r| lead(&r.poly).expect("checked nonempty").clone())
+            .collect();
+        leading.sort_by(|a, b| order(b, a));
+        let count = multiples.len();
+        Self::compile(&original, (n, p), multiples, leading, limits, None, count)
+    }
+
+    /// Bounded Macaulay support pruned only by principal syzygies. The supplied
+    /// development basis provides a leading-ideal fingerprint, never online
+    /// coefficients. Every online output still requires the full exact check.
+    pub fn principal_syzygy(
+        input: &[Poly],
+        development_basis: &[Poly],
+        n: usize,
+        p: u64,
+        degree: usize,
+        limits: Limits,
+    ) -> Result<Self, String> {
+        let original = canonical(input, n, p, limits)?;
+        let expected = canonical(development_basis, n, p, limits)?;
+        if degree > limits.degree
+            || original.iter().any(|f| f.is_empty())
+            || expected.iter().any(|f| f.is_empty())
+        {
+            return Err("principal template degree/zero generator".into());
+        }
+        let input_leading: Vec<_> = original.iter().map(|f| lead(f).unwrap().clone()).collect();
+        let mut multiples = Vec::new();
+        let mut enumerated = 0usize;
+        for (i, lm) in input_leading.iter().enumerate() {
+            let input_degree = lm.iter().sum::<usize>();
+            if input_degree > degree {
+                return Err("generator exceeds degree bound".into());
+            }
+            for d in 0..=degree - input_degree {
+                enumerate_monomials(n, d, &mut Vec::new(), &mut |m| {
+                    enumerated += 1;
+                    if enumerated > 100_000 {
+                        return Err("monomial enumeration cap".into());
+                    }
+                    if !input_leading[..i].iter().any(|prior| divides(prior, m)) {
+                        multiples.push((i, m.clone()));
+                        if multiples.len() > limits.rows {
+                            return Err(format!(
+                                "principal row cap: kept {} after enumerating {}",
+                                multiples.len(),
+                                enumerated
+                            ));
+                        }
+                    }
+                    Ok(())
+                })?;
+            }
+        }
+        let mut leading: Vec<_> = expected
+            .iter()
+            .map(|f| lead(f).unwrap().clone())
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect();
+        leading = leading
+            .iter()
+            .filter(|m| !leading.iter().any(|other| other != *m && divides(other, m)))
+            .cloned()
+            .collect();
+        leading.sort_by(|a, b| order(b, a));
+        Self::compile(
+            &original,
+            (n, p),
+            multiples,
+            leading,
+            limits,
+            Some(input_leading),
+            enumerated,
+        )
+    }
+
+    fn compile(
+        original: &[algebra::Poly],
+        shape: (usize, u64),
+        multiples: Vec<(usize, Mono)>,
+        leading: Vec<Mono>,
+        limits: Limits,
+        input_leading: Option<Vec<Mono>>,
+        enumerated_rows: usize,
+    ) -> Result<Self, String> {
+        let (n, p) = shape;
+        if multiples.is_empty() || multiples.len() > limits.rows {
+            return Err("compiled row budget".into());
+        }
         let mut columns = BTreeSet::new();
         for (i, multiplier) in &multiples {
             for m in original[*i].keys() {
@@ -242,11 +397,6 @@ impl Template {
         }
         let mut columns: Vec<_> = columns.into_iter().collect();
         columns.sort_by(|a, b| order(b, a));
-        let mut leading: Vec<_> = witness
-            .iter()
-            .map(|r| lead(&r.poly).expect("checked nonempty").clone())
-            .collect();
-        leading.sort_by(|a, b| order(b, a));
         Ok(Self {
             p,
             n,
@@ -257,6 +407,8 @@ impl Template {
             multiples,
             columns,
             leading,
+            input_leading,
+            enumerated_rows,
             limits,
         })
     }
@@ -265,6 +417,26 @@ impl Template {
     }
     pub fn columns(&self) -> usize {
         self.columns.len()
+    }
+    pub fn enumerated_rows(&self) -> usize {
+        self.enumerated_rows
+    }
+
+    fn matrix(&self, original: &[algebra::Poly]) -> Result<Vec<Vec<u64>>, String> {
+        let (rows, columns) = (self.rows(), self.columns());
+        let mut matrix = vec![vec![0; columns + rows]; rows];
+        for (r, (i, multiplier)) in self.multiples.iter().enumerate() {
+            for (m, c) in &original[*i] {
+                let m = shift(m, multiplier, self.limits.degree)?;
+                let col = self
+                    .columns
+                    .binary_search_by(|a| order(&m, a))
+                    .map_err(|_| "compiled column mismatch")?;
+                matrix[r][col] = *c;
+            }
+            matrix[r][columns + r] = 1;
+        }
+        Ok(matrix)
     }
 
     /// Complete-basis construction with a mandatory exact check. No solver or
@@ -281,56 +453,23 @@ impl Template {
         {
             return Err(Refusal::new("input support mismatch", work));
         }
-        let (rows, columns, p) = (self.rows(), self.columns(), self.p);
-        let mut matrix = vec![vec![0; columns + rows]; rows];
-        for (r, (i, multiplier)) in self.multiples.iter().enumerate() {
-            for (m, c) in &original[*i] {
-                let m =
-                    shift(m, multiplier, self.limits.degree).map_err(|e| Refusal::new(e, work))?;
-                let col = self
-                    .columns
-                    .binary_search_by(|a| order(&m, a))
-                    .map_err(|_| Refusal::new("compiled column mismatch", work))?;
-                matrix[r][col] = *c;
+        if let Some(expected) = &self.input_leading {
+            if original
+                .iter()
+                .map(|f| lead(f).cloned())
+                .collect::<Option<Vec<_>>>()
+                .as_ref()
+                != Some(expected)
+            {
+                return Err(Refusal::new(
+                    "principal template input leading monomial changed",
+                    work,
+                ));
             }
-            matrix[r][columns + r] = 1;
         }
-        let mut pivots = Vec::new();
-        for c in 0..columns {
-            let r = pivots.len();
-            let Some(next) = (r..rows).find(|i| matrix[*i][c] != 0) else {
-                continue;
-            };
-            matrix.swap(r, next);
-            let inverse = work.inverse(matrix[r][c], p);
-            if inverse != 1 {
-                for value in &mut matrix[r][c..] {
-                    if *value != 0 {
-                        *value = work.mul(*value, inverse, p);
-                    }
-                }
-            }
-            let pivot = matrix[r].clone();
-            for (i, row) in matrix.iter_mut().enumerate() {
-                if i == r || row[c] == 0 {
-                    continue;
-                }
-                let factor = row[c];
-                for j in c..columns + rows {
-                    if pivot[j] == 0 {
-                        continue;
-                    }
-                    let product = work.mul(factor, pivot[j], p);
-                    row[j] = if row[j] >= product {
-                        row[j] - product
-                    } else {
-                        p - (product - row[j])
-                    };
-                    work.coefficient_updates += 1;
-                }
-            }
-            pivots.push(c);
-        }
+        let (columns, p) = (self.columns(), self.p);
+        let mut matrix = self.matrix(&original).map_err(|e| Refusal::new(e, work))?;
+        let pivots = rref(&mut matrix, columns, p, &mut work);
         let minimal: Vec<_> = (0..pivots.len())
             .filter(|i| {
                 !(0..pivots.len()).any(|j| {
@@ -565,5 +704,101 @@ mod tests {
         assert!(Template::from_witness(&family(2), 2, 101, &witness, Limits::default()).is_err());
         witness[0].proof = Proof::from([((0, vec![usize::MAX, usize::MAX]), 1)]);
         assert!(Template::from_witness(&family(2), 2, 101, &witness, Limits::default()).is_err());
+    }
+    #[test]
+    fn principal_pruning_preserves_bounded_row_spaces() {
+        let samples = vec![
+            family(2),
+            family(0),
+            vec![
+                vec![(vec![0, 0], 2)],
+                vec![(vec![2, 0], 1), (vec![0, 1], 1)],
+            ],
+            vec![
+                vec![(vec![2, 0, 0], 1), (vec![0, 0, 0], 1)],
+                vec![(vec![0, 2, 0], 1), (vec![1, 0, 0], 1)],
+                vec![(vec![0, 0, 1], 1), (vec![0, 1, 0], 100)],
+            ],
+        ];
+        let mut pruned_any = false;
+        for input in samples {
+            let n = input[0][0].0.len();
+            for degree in 2..=4 {
+                let original = canonical(&input, n, 101, Limits::default()).unwrap();
+                let expected = vec![vec![(vec![0; n], 1)]];
+                let pruned = Template::principal_syzygy(
+                    &input,
+                    &expected,
+                    n,
+                    101,
+                    degree,
+                    Limits::default(),
+                )
+                .unwrap();
+                let mut all = Vec::new();
+                for (i, f) in original.iter().enumerate() {
+                    let input_degree = lead(f).unwrap().iter().sum::<usize>();
+                    for d in 0..=degree - input_degree {
+                        enumerate_monomials(n, d, &mut Vec::new(), &mut |m| {
+                            all.push((i, m.clone()));
+                            Ok(())
+                        })
+                        .unwrap();
+                    }
+                }
+                assert_eq!(pruned.enumerated_rows(), all.len());
+                pruned_any |= pruned.rows() < all.len();
+                let count = all.len();
+                let full = Template::compile(
+                    &original,
+                    (n, 101),
+                    all,
+                    vec![vec![0; n]],
+                    Limits::default(),
+                    None,
+                    count,
+                )
+                .unwrap();
+                assert_eq!(pruned.columns, full.columns);
+                let space = |t: &Template| {
+                    let mut matrix = t.matrix(&original).unwrap();
+                    let rank = rref(&mut matrix, t.columns(), 101, &mut Work::default()).len();
+                    matrix
+                        .into_iter()
+                        .take(rank)
+                        .map(|row| row[..t.columns()].to_vec())
+                        .collect::<Vec<_>>()
+                };
+                assert_eq!(space(&pruned), space(&full));
+            }
+        }
+        assert!(pruned_any);
+    }
+    #[test]
+    fn principal_template_accepts_certified_ideals_and_refuses_changed_input_lead() {
+        let reference = Template::learn(&family(2), 2, 101, Limits::default())
+            .unwrap()
+            .apply(&family(2))
+            .unwrap();
+        let t =
+            Template::principal_syzygy(&family(2), &reference.basis, 2, 101, 3, Limits::default())
+                .unwrap();
+        assert!(t.rows() < t.enumerated_rows());
+        for a in [0, 2, 3] {
+            let expected = Template::learn(&family(a), 2, 101, Limits::default())
+                .unwrap()
+                .apply(&family(a))
+                .unwrap();
+            let actual = t.apply(&family(a)).unwrap();
+            assert!(
+                same_ideal(&actual.basis, &expected.basis, 2, 101, Limits::default())
+                    .unwrap()
+                    .0
+            );
+        }
+        let f = vec![vec![(vec![2], 1), (vec![1], 1)]];
+        let t = Template::principal_syzygy(&f, &f, 1, 101, 3, Limits::default()).unwrap();
+        let error = t.apply(&[vec![(vec![1], 1)]]).err().unwrap();
+        assert!(error.reason.contains("input leading"));
     }
 }

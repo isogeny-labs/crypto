@@ -10,6 +10,14 @@ publish = false
 name = "nagao_template"
 path = "../../../../src/cryptanalysis/jv_nagao_template.rs"
 
+[[bin]]
+name = "nagao-template-probe"
+path = "src/main.rs"
+
+[[bin]]
+name = "nagao-koszul-probe"
+path = "src/koszul.rs"
+
 [dependencies]
 certified-relations = { path = "../../../../crates/certified-relations", features = ["count-field-ops"] }
 serde = { version = "1", features = ["derive"] }
