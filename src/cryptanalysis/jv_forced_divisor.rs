@@ -211,6 +211,9 @@ impl Family {
     pub fn modulus(&self) -> u64 {
         self.p
     }
+    pub fn curve_polynomial(&self) -> &[E2] {
+        &self.h
+    }
     fn coordinates(&self, z: &[u64]) -> Result<(), &'static str> {
         if z.len() != N || z.iter().any(|&x| x >= self.p) {
             Err("eight canonical Fp coordinates required")
@@ -435,6 +438,108 @@ impl Family {
         }
         Ok(FunctionSupport { small, quadratic })
     }
+
+    /// Exact three-small/three-quadratic principal support. The supplied
+    /// factors split the quartic remaining after the small roots in S; all
+    /// factors, ordinates, units and original identities are rechecked here.
+    /// This returns principal support, not a composite edge or rank claim.
+    pub fn materialize_three(
+        &self,
+        f: &Fq,
+        function: &CandidateFunction,
+        roots: &[u64],
+        factors: &[Vec<u64>],
+    ) -> Result<FunctionSupport, &'static str> {
+        if roots.len() != 3
+            || roots.iter().any(|&x| x >= self.p)
+            || roots.windows(2).any(|w| w[0] >= w[1])
+            || factors.len() != 2
+            || factors
+                .iter()
+                .any(|u| u.len() != 3 || u[2] != 1 || u.iter().any(|&x| x >= self.p))
+        {
+            return Err("three canonical small roots and two monic quadratic factors required");
+        }
+        let z = self.recover_parameters(f, &function.a, &function.c)?;
+        let check = self.instantiate(f, &z)?;
+        if function.a != check.a
+            || function.c != check.c
+            || function.norm != check.norm
+            || function.quotient != check.quotient
+        {
+            return Err("candidate replay mismatch");
+        }
+        let peval = |a: &[E2], x: u64| {
+            a.iter()
+                .rev()
+                .fold(E2::ZERO, |v, c| f.add(&f.scale(&v, x), c))
+        };
+        let mut tail = check.quotient.clone();
+        let mut product = self.u.clone();
+        let mut small = Vec::new();
+        for &x in roots {
+            let denominator = peval(&check.c, x);
+            if denominator == E2::ZERO {
+                return Err("C vanishes on small support");
+            }
+            let y = f.neg(&f.mul(&peval(&check.a, x), &f.inv(&denominator)));
+            if y == E2::ZERO || f.sq(&y) != peval(&self.h, x) {
+                return Err("original small ordinate");
+            }
+            let linear = vec![f.neg(&f.from_fp(x)), E2::ONE];
+            let (quotient, remainder) = divide(f, &tail, &linear);
+            if !remainder.is_empty() {
+                return Err("small root exact division");
+            }
+            tail = quotient;
+            product = mul(f, &product, &linear);
+            small.push((x, y));
+        }
+        let mut factors = factors.to_vec();
+        factors.sort();
+        if factors[0] == factors[1] {
+            return Err("distinct quadratic factors required");
+        }
+        let mut quadratic = vec![Div {
+            u: self.u.clone(),
+            v: self.v.clone(),
+        }];
+        for factor in factors {
+            let u: Vec<_> = factor.iter().map(|&x| f.from_fp(x)).collect();
+            if u == self.u {
+                return Err("quadratic factor repeats forced divisor");
+            }
+            let disc = (factor[1] * factor[1] + 4 * self.p - (4 * factor[0]) % self.p) % self.p;
+            if disc == 0 || pow_mod(disc, (self.p - 1) / 2, self.p) != self.p - 1 {
+                return Err("irreducible quadratic tail required");
+            }
+            let (quotient, remainder) = divide(f, &tail, &u);
+            if !remainder.is_empty() {
+                return Err("quadratic factor exact division");
+            }
+            tail = quotient;
+            product = mul(f, &product, &u);
+            let c = check.c[0];
+            let denominator = f.add(&f.sub(&f.sq(&c), &f.mul(&u[1], &c)), &u[0]);
+            if denominator == E2::ZERO {
+                return Err("C is not invertible on remaining divisor");
+            }
+            let inverse = f.inv(&denominator);
+            let inverse_c = vec![f.mul(&f.sub(&c, &u[1]), &inverse), f.neg(&inverse)];
+            let (_, a_mod) = divide(f, &check.a, &u);
+            let (_, v) = divide(f, &mul(f, &a_mod, &inverse_c), &u);
+            let v: Vec<_> = v.iter().map(|x| f.neg(x)).collect();
+            let (_, remainder) = divide(f, &sub(f, &self.h, &mul(f, &v, &v)), &u);
+            if !remainder.is_empty() {
+                return Err("remaining original Mumford identity");
+            }
+            quadratic.push(Div { u, v });
+        }
+        if tail.len() != 1 || tail[0] == E2::ZERO || mul(f, &product, &tail) != check.norm {
+            return Err("complete support factorization");
+        }
+        Ok(FunctionSupport { small, quadratic })
+    }
 }
 
 #[cfg(test)]
@@ -448,6 +553,91 @@ mod tests {
         let h = add(&f, &mul(&f, &v, &v), &mul(&f, &u, &w));
         let family = Family::new(&f, &h, &u, &v).unwrap();
         (f, family)
+    }
+    #[test]
+    fn planted_three_quadratic_support_replays_and_tampering_is_refused() {
+        let f = Fq::new(11);
+        let u = vec![E2::ONE, E2::ZERO, E2::ONE];
+        let roots = vec![1, 2, 3];
+        let factors = vec![vec![1, 1, 1], vec![2, 2, 1]];
+        let mut s = vec![f.neg(&E2::ONE)];
+        for &x in &roots {
+            s = mul(&f, &s, &[f.neg(&f.from_fp(x)), E2::ONE]);
+        }
+        for factor in &factors {
+            s = mul(
+                &f,
+                &s,
+                &factor.iter().map(|&x| f.from_fp(x)).collect::<Vec<_>>(),
+            );
+        }
+        let norm = mul(&f, &u, &s);
+        let a0 = (0..11)
+            .flat_map(|a| (0..11).map(move |b| E2([a, b])))
+            .find(|a| f.sq(a) == norm[0])
+            .unwrap();
+        let a1 = f.mul(&norm[1], &f.inv(&f.scale(&a0, 2)));
+        let a = (1..11)
+            .map(|c| vec![a0, a1, f.from_fp(c)])
+            .find(|a| {
+                roots.iter().all(|&x| {
+                    a.iter()
+                        .rev()
+                        .fold(E2::ZERO, |v, c| f.add(&f.scale(&v, x), c))
+                        != E2::ZERO
+                })
+            })
+            .unwrap();
+        let (h, remainder) = divide(
+            &f,
+            &sub(&f, &mul(&f, &a, &a), &norm),
+            &[E2::ZERO, E2::ZERO, E2::ONE],
+        );
+        assert!(remainder.is_empty());
+        let (_, v) = divide(&f, &mul(&f, &a, &[E2::ZERO, E2::ONE]), &u);
+        let g = Family::new(&f, &h, &u, &v).unwrap();
+        let z = g.recover_parameters(&f, &a, &[E2::ZERO, E2::ONE]).unwrap();
+        let value = g.instantiate(&f, &z).unwrap();
+        let support = g.materialize_three(&f, &value, &roots, &factors).unwrap();
+        assert_eq!(support.small.len(), 3);
+        assert_eq!(support.quadratic.len(), 3);
+        let jac = crate::cryptanalysis::jv_cover::Hyp {
+            f: &f,
+            h: h.clone(),
+            g: 3,
+        };
+        let mut sum = jac.identity();
+        for (x, y) in &support.small {
+            sum = jac.add(
+                &sum,
+                &Div {
+                    u: vec![f.neg(&f.from_fp(*x)), E2::ONE],
+                    v: vec![*y],
+                },
+            );
+        }
+        for q in &support.quadratic {
+            sum = jac.add(&sum, q);
+        }
+        assert!(jac.is_identity(&sum));
+        assert!(g.materialize(&f, &value, &roots).is_err());
+        let mut bad = value.clone();
+        bad.norm[0] = f.add(&bad.norm[0], &E2::ONE);
+        assert!(g.materialize_three(&f, &bad, &roots, &factors).is_err());
+        assert!(g
+            .materialize_three(&f, &value, &[1, 2, 4], &factors)
+            .is_err());
+        assert!(g
+            .materialize_three(
+                &f,
+                &value,
+                &roots,
+                &[factors[0].clone(), factors[0].clone()]
+            )
+            .is_err());
+        assert!(g
+            .materialize_three(&f, &value, &roots, &[vec![1, 0, 1], factors[1].clone()])
+            .is_err());
     }
     #[test]
     fn compiled_quadrics_match_direct_norm_division() {
