@@ -25,8 +25,15 @@ def fixture(directory, *, filtered=False, target=17, incomplete=False, mode_targ
         save(result,{'schema':'e2e-relation-measurement/v1','config':compare.expected_config(plan,7,mode),'status':'complete','target':{'a':1,'b':2,'point':[actual_target,1]},'useful_relations':1,'relation_counts':{'nonzero_b':1},'source_sha256_at_start':'m','accounting_sha256_at_start':'a'})
         missing=incomplete and mode=='walk'
         row={'seed':7,'mode':mode,'status':'timeout' if missing else 'exited', 'exit_code':-9 if missing else 0, 'result_status':None if missing else 'complete', 'target':None if missing else {'a':1,'b':2,'point':[actual_target,1]},'whole_process_wall_ns':20,'relation_counts':None if missing else {'nonzero_b':1},'useful_relations':None if missing else 1,'result_sha256':digest(result),'checkpoint_sha256':None,'stdout_sha256':digest(directory/f'{name}.stdout'),'stderr_sha256':digest(directory/f'{name}.stderr')}
+        if missing:
+            row['independent_audit']={'status':'not_attempted','wall_ns':None,'result_sha256':None,'stdout_sha256':None,'stderr_sha256':None,'exit_code':None}
+        else:
+            audit=directory/f'{name}.audit.json'
+            save(audit,{'status':'verified','record_sha256':digest(result),'audit_source_sha256':'audit'})
+            for suffix in ('audit.stdout','audit.stderr'): (directory/f'{name}.{suffix}').write_bytes(b'')
+            row['independent_audit']={'status':'verified','wall_ns':5,'result_sha256':digest(audit),'stdout_sha256':digest(directory/f'{name}.audit.stdout'),'stderr_sha256':digest(directory/f'{name}.audit.stderr'),'exit_code':0}
         rows.append(row); save(directory/f'{name}.receipt.json',row)
-    summary={'plan_sha256':digest(directory/'plan.json'),'measure_source_unchanged':True,'accounting_source_unchanged':True,'measure_sha256_at_start':'m','measure_sha256_at_end':'m','measure_sha256':'m','accounting_sha256_at_start':'a','accounting_sha256_at_end':'a','panel_sha256':'p','platform':'host','resource_metadata_at_start':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'resource_metadata_at_end':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'runs':rows}
+    summary={'plan_sha256':digest(directory/'plan.json'),'measure_source_unchanged':True,'accounting_source_unchanged':True,'audit_source_unchanged':True,'audit_sha256_at_start':'audit','audit_sha256_at_end':'audit','measure_sha256_at_start':'m','measure_sha256_at_end':'m','measure_sha256':'m','accounting_sha256_at_start':'a','accounting_sha256_at_end':'a','panel_sha256':'p','platform':'host','resource_metadata_at_start':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'resource_metadata_at_end':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'runs':rows}
     save(directory/'summary.json',summary)
 
 
@@ -39,6 +46,8 @@ class ComparisonTest(unittest.TestCase):
             self.assertEqual(result['resource_metadata_status'],'metadata_match_only')
             self.assertIsNone(result['per_mode']['walk']['left']['peak_rss_native_max']['observed_value'])
             self.assertEqual(result['per_mode']['walk']['left']['whole_process_wall_ns'],20)
+            self.assertEqual(result['per_mode']['walk']['left']['observed_child_and_audit_wall_ns'],25)
+            self.assertEqual(result['per_mode']['walk']['left']['independently_verified_runs'],1)
             self.assertEqual(result['per_mode']['walk']['left']['candidates']['unknown_attempts'],1)
             self.assertEqual(result['right_filter']['--modulus'],'2')
             (b/'seed-7-walk.result.json').write_text('{}')
@@ -94,6 +103,7 @@ class ComparisonTest(unittest.TestCase):
             result['config']['block_size']=999; save(result_path,result)
             summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
             row=summary['runs'][0]; row['result_sha256']=digest(result_path)
+            audit_path=b/'seed-7-independent.audit.json'; audit=json.loads(audit_path.read_text()); audit['record_sha256']=digest(result_path); save(audit_path,audit); row['independent_audit']['result_sha256']=digest(audit_path)
             save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
             with self.assertRaisesRegex(ValueError,'result does not match receipt or sources'): compare.compare(a,b)
 
@@ -125,6 +135,36 @@ class ComparisonTest(unittest.TestCase):
             self.assertFalse(result['matching_checks_pass'])
             summary['resource_metadata_at_end']=summary['resource_metadata_at_start'].copy(); summary['resource_metadata_at_end']['cpu_model']=None; save(summary_path,summary)
             self.assertEqual(compare.compare(a,b)['resource_metadata_status'],'incomplete')
+
+    def test_unsupported_audit_is_not_counted_as_verified(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=summary['runs'][0]
+            row['independent_audit']={'status':'unsupported','wall_ns':None,'result_sha256':None,'stdout_sha256':None,'stderr_sha256':None,'exit_code':None}
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            result=compare.compare(a,b)
+            self.assertFalse(result['matching_checks_pass'])
+            self.assertIn('some independent audits not verified',result['mismatch_or_unknown'])
+            self.assertEqual(result['per_mode']['independent']['right']['audit_wall_unknown_runs'],1)
+            self.assertEqual(result['per_mode']['independent']['right']['independently_verified_runs'],0)
+
+    def test_audit_receipt_must_have_nonnegative_cost_and_logs(self):
+        for change in ('negative_wall','missing_log'):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as d:
+                a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+                summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+                row=summary['runs'][0]
+                if change=='negative_wall': row['independent_audit']['wall_ns']=-1
+                else: row['independent_audit']['stdout_sha256']=None
+                save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+                with self.assertRaisesRegex(ValueError,'incomplete audit process receipt'): compare.compare(a,b)
+
+    def test_changed_audit_artifact_is_rejected(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            (b/'seed-7-walk.audit.json').write_text('{}')
+            with self.assertRaisesRegex(ValueError,'audit artifact hash mismatch'): compare.compare(a,b)
 
     def test_ambiguous_arguments_rejected(self):
         with self.assertRaises(ValueError): compare.flags(['--p','101','--p','103'])

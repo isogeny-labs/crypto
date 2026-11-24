@@ -74,7 +74,8 @@ def load(directory):
     if (not summary['measure_source_unchanged'] or not summary['accounting_source_unchanged'] or
         summary['measure_sha256_at_start'] != summary['measure_sha256_at_end'] or
         summary['measure_sha256_at_end'] != summary['measure_sha256'] or
-        summary['accounting_sha256_at_start'] != summary['accounting_sha256_at_end']):
+        summary['accounting_sha256_at_start'] != summary['accounting_sha256_at_end'] or
+        not summary['audit_source_unchanged'] or summary['audit_sha256_at_start'] != summary['audit_sha256_at_end']):
         raise ValueError(f'source changed during panel: {directory}')
     expected = {(seed, mode) for seed in plan['seeds'] for mode in MODES}
     rows = {}
@@ -95,6 +96,33 @@ def load(directory):
                 raise ValueError(f'artifact hash mismatch: {path}')
         if row['result_status'] is None and any(row.get(key) is not None for key in ('target','useful_relations','relation_counts')):
             raise ValueError(f'unfinished attempt claims a result: {directory} {key}')
+        audit=row.get('independent_audit')
+        if not isinstance(audit,dict):
+            raise ValueError(f'missing independent audit status: {directory} {key}')
+        audit_status=audit.get('status')
+        if audit_status not in ('verified','invalid_or_error','timeout','launch_error','unsupported','not_attempted'):
+            raise ValueError(f'unknown independent audit status: {directory} {key}')
+        if row['result_status']=='complete' and audit_status=='not_attempted':
+            raise ValueError(f'completed result was not audited: {directory} {key}')
+        if row['result_status']!='complete' and audit_status!='not_attempted':
+            raise ValueError(f'audit not expected for incomplete result: {directory} {key}')
+        if audit_status in ('unsupported','not_attempted'):
+            if any(audit.get(field) is not None for field in ('wall_ns','result_sha256','stdout_sha256','stderr_sha256','exit_code')):
+                raise ValueError(f'inconsistent unrun audit: {directory} {key}')
+        elif (type(audit.get('wall_ns')) is not int or audit['wall_ns']<0 or
+              audit.get('stdout_sha256') is None or audit.get('stderr_sha256') is None):
+            raise ValueError(f'incomplete audit process receipt: {directory} {key}')
+        for suffix, digest_key in (('audit.json','result_sha256'),('audit.stdout','stdout_sha256'),('audit.stderr','stderr_sha256')):
+            expected_audit_hash=audit.get(digest_key); path=directory / f'{name}.{suffix}'
+            if expected_audit_hash is not None and (not path.is_file() or sha(path)!=expected_audit_hash):
+                raise ValueError(f'audit artifact hash mismatch: {path}')
+        if audit.get('status')=='verified':
+            if audit.get('exit_code')!=0 or audit.get('result_sha256') is None:
+                raise ValueError(f'inconsistent audit status: {directory} {key}')
+            audit_report=json.loads((directory / f'{name}.audit.json').read_text())
+            if (audit_report.get('status')!='verified' or audit_report.get('record_sha256')!=row['result_sha256'] or
+                audit_report.get('audit_source_sha256')!=summary['audit_sha256_at_start']):
+                raise ValueError(f'audit does not match result or source: {directory} {key}')
         if row['result_status'] is not None:
             if row['status'] != 'exited' or row.get('exit_code') != 0 or row['result_sha256'] is None:
                 raise ValueError(f'inconsistent completed result: {directory} {key}')
@@ -144,6 +172,10 @@ def outcome_totals(rows, mode):
             'useful_runs':sum(row['result_status']=='complete' and (row['useful_relations'] or 0)>0 for row in selected),
             'nonzero_b_runs':sum(row['relation_counts'] is not None and row['relation_counts']['nonzero_b']>0 for row in selected),
             'nonzero_b_unknown_runs':sum(row['relation_counts'] is None for row in selected),
+            'independently_verified_runs':sum(row['independent_audit']['status']=='verified' for row in selected),
+            'audit_wall_ns_sum':(sum(row['independent_audit']['wall_ns'] for row in selected if type(row['independent_audit']['wall_ns']) is int) if any(type(row['independent_audit']['wall_ns']) is int for row in selected) else None),
+            'observed_child_and_audit_wall_ns':sum(row['whole_process_wall_ns']+(row['independent_audit']['wall_ns'] or 0) for row in selected),
+            'audit_wall_unknown_runs':sum(row['independent_audit']['wall_ns'] is None for row in selected),
             'whole_process_wall_ns':sum(row['whole_process_wall_ns'] for row in selected),
             'driver_cpu_ns_sum':total_observation('cpu_ns',sum),
             'peak_rss_native_max':total_observation('peak_rss_native',max),
@@ -161,7 +193,7 @@ def compare(left_dir, right_dir):
     if nonfilter_left != nonfilter_right: reasons.append('non-filter arguments differ')
     if lp['seeds'] != rp['seeds']: reasons.append('seed sequences differ')
     if lp['timeout_seconds'] != rp['timeout_seconds']: reasons.append('per-attempt timeouts differ')
-    for key in ('measure_sha256_at_start', 'accounting_sha256_at_start', 'panel_sha256'):
+    for key in ('measure_sha256_at_start', 'accounting_sha256_at_start', 'audit_sha256_at_start', 'panel_sha256'):
         if ls[key] != rs[key]: reasons.append(f'{key} differs')
     if ls['platform'] != rs['platform']: reasons.append('platform strings differ')
     resource_values=[ls.get('resource_metadata_at_start'),ls.get('resource_metadata_at_end'),rs.get('resource_metadata_at_start'),rs.get('resource_metadata_at_end')]
@@ -189,9 +221,11 @@ def compare(left_dir, right_dir):
                       'left_wall_ns':left['whole_process_wall_ns'], 'right_wall_ns':right['whole_process_wall_ns'],
                       'left_nonzero_b':None if left['relation_counts'] is None else left['relation_counts']['nonzero_b'],
                       'right_nonzero_b':None if right['relation_counts'] is None else right['relation_counts']['nonzero_b'],
-                      'left_useful':left['useful_relations'], 'right_useful':right['useful_relations']})
+                      'left_useful':left['useful_relations'], 'right_useful':right['useful_relations'],
+                      'left_audit_status':left['independent_audit']['status'],'right_audit_status':right['independent_audit']['status']})
     if any(pair['target_match'] is None for pair in pairs): reasons.append('some targets unavailable')
     if any(pair['left_status'] != 'complete' or pair['right_status'] != 'complete' for pair in pairs): reasons.append('some attempts incomplete or invalid')
+    if any(pair['left_audit_status'] != 'verified' or pair['right_audit_status'] != 'verified' for pair in pairs): reasons.append('some independent audits not verified')
     return {'schema':'relation-panel-comparison/v1', 'left_plan_sha256':ls['plan_sha256'],
             'right_plan_sha256':rs['plan_sha256'], 'left_filter':{k:v for k,v in la.items() if k in FILTER_FLAGS},
             'right_filter':{k:v for k,v in ra.items() if k in FILTER_FLAGS}, 'matching_checks_pass':not reasons,

@@ -79,12 +79,46 @@ def mode_summary(receipts, mode):
         'verification_failed_runs': sum(r['result_status'] == 'verification_failed' for r in rows),
         'failed_or_incomplete': sum(r['result_status'] != 'complete' for r in rows),
         'total_process_wall_ns': sum(r['whole_process_wall_ns'] for r in rows),
+        'observed_child_and_audit_wall_ns':sum(r['whole_process_wall_ns']+(r.get('independent_audit',{}).get('wall_ns') or 0) for r in rows),
+        'independent_audit_wall_ns': coverage_sum(rows, 'independent_audit', 'wall_ns'),
+        'independently_verified_runs': sum(r.get('independent_audit',{}).get('status')=='verified' for r in rows),
         'driver_cpu_ns': coverage_sum(rows, 'observed_total', 'cpu_ns'),
         'peak_rss_native': coverage_max(rows, 'observed_total', 'peak_rss_native'),
         'phase_wall_ns': {name: coverage_sum(rows, 'observed_timings', name) for name in PHASES},
         'candidate_counts': {name: coverage_sum(rows, 'candidate_counts', name) for name in CANDIDATE_COUNTS},
         'generation_operations': {name: coverage_sum(rows, 'generation_operations', name) for name in GENERATION_OPERATIONS},
     }
+
+
+def audit_result(out, name, result, data, timeout):
+    """Run the bounded independent verifier separately; preserve all outcomes."""
+    curve=data.get('curve',{})
+    if any(type(curve.get(key)) is not int or curve[key] >= 2**32 for key in ('p','n')):
+        return {'status':'unsupported','wall_ns':None,'result_sha256':None,'stdout_sha256':None,'stderr_sha256':None,'exit_code':None}
+    report=out/(name+'.audit.json'); stdout_path=out/(name+'.audit.stdout'); stderr_path=out/(name+'.audit.stderr')
+    cmd=[sys.executable,str(HERE/'audit_record.py'),str(result.resolve()),'--output',str(report.resolve())]
+    started=time.perf_counter_ns()
+    with stdout_path.open('xb') as stdout, stderr_path.open('xb') as stderr:
+        try:
+            proc=subprocess.Popen(cmd,stdout=stdout,stderr=stderr,start_new_session=True)
+            try: proc.wait(timeout=timeout); status='exited'
+            except subprocess.TimeoutExpired:
+                try: os.killpg(proc.pid,signal.SIGKILL)
+                except ProcessLookupError: pass
+                proc.wait(); status='timeout'
+            rc=proc.returncode
+        except OSError as exc:
+            stderr.write(str(exc).encode()); status='launch_error'; rc=None
+    elapsed=time.perf_counter_ns()-started
+    report_data=None
+    if report.exists():
+        try: report_data=json.loads(report.read_text())
+        except (OSError,ValueError): pass
+    if status=='exited' and rc==0 and isinstance(report_data,dict) and report_data.get('status')=='verified' and report_data.get('record_sha256')==digest(result) and report_data.get('audit_source_sha256')==digest(HERE/'audit_record.py'):
+        status='verified'
+    elif status=='exited': status='invalid_or_error'
+    return {'status':status,'wall_ns':elapsed,'result_sha256':digest(report) if report.exists() else None,
+            'stdout_sha256':digest(stdout_path),'stderr_sha256':digest(stderr_path),'exit_code':rc}
 
 
 def main():
@@ -102,6 +136,7 @@ def main():
     resource_at_start=resource_metadata()
     source_before=digest(HERE/'measure.py')
     accounting_before=digest(HERE/'accounting.py')
+    audit_before=digest(HERE/'audit_record.py')
     for seed in seeds:
         for mode in MODES:
             name=f'seed-{seed}-{mode}'; result=out/(name+'.result.json'); checkpoint=out/(name+'.checkpoint.json')
@@ -137,7 +172,8 @@ def main():
                 except (OSError,ValueError):
                     pass
             observed=data if outcome is not None else snapshot
-            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':digest(stdout_path),'stderr_sha256':digest(stderr_path),'whole_process_wall_ns':elapsed,'result_status':outcome,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'observed_total':observed.get('total') if observed is not None else None,'generation_operations':observed.get('generation_operations') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'target':data.get('target') if outcome is not None else None}
+            independent_audit=audit_result(out,name,result,data,timeout) if outcome=='complete' else {'status':'not_attempted','wall_ns':None,'result_sha256':None,'stdout_sha256':None,'stderr_sha256':None,'exit_code':None}
+            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':digest(stdout_path),'stderr_sha256':digest(stderr_path),'whole_process_wall_ns':elapsed,'result_status':outcome,'independent_audit':independent_audit,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'observed_total':observed.get('total') if observed is not None else None,'generation_operations':observed.get('generation_operations') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'target':data.get('target') if outcome is not None else None}
             (out/(name+'.receipt.json')).write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
             receipts.append(receipt)
     pairing={}
@@ -145,7 +181,7 @@ def main():
         targets=[r['target'] for r in receipts if r['seed']==seed]
         pairing[str(seed)] = None if any(t is None for t in targets) else all(t==targets[0] for t in targets)
     source_after=digest(HERE/'measure.py')
-    summary={'resource_metadata_at_start':resource_at_start,'resource_metadata_at_end':resource_metadata(),'target_pairing_by_seed':pairing,'measure_sha256_at_start':source_before,'measure_sha256_at_end':source_after,'measure_source_unchanged':source_before==source_after,'accounting_sha256_at_start':accounting_before,'accounting_sha256_at_end':digest(HERE/'accounting.py'),'accounting_source_unchanged':accounting_before==digest(HERE/'accounting.py'),'plan_sha256':digest(out/'plan.json'),'measure_sha256':digest(HERE/'measure.py'),'panel_sha256':digest(Path(__file__)),'platform':platform.platform(),'python':sys.version,'runs':receipts,'per_mode':{mode:mode_summary(receipts,mode) for mode in MODES}}
+    summary={'audit_sha256_at_start':audit_before,'audit_sha256_at_end':digest(HERE/'audit_record.py'),'audit_source_unchanged':audit_before==digest(HERE/'audit_record.py'),'resource_metadata_at_start':resource_at_start,'resource_metadata_at_end':resource_metadata(),'target_pairing_by_seed':pairing,'measure_sha256_at_start':source_before,'measure_sha256_at_end':source_after,'measure_source_unchanged':source_before==source_after,'accounting_sha256_at_start':accounting_before,'accounting_sha256_at_end':digest(HERE/'accounting.py'),'accounting_source_unchanged':accounting_before==digest(HERE/'accounting.py'),'plan_sha256':digest(out/'plan.json'),'measure_sha256':digest(HERE/'measure.py'),'panel_sha256':digest(Path(__file__)),'platform':platform.platform(),'python':sys.version,'runs':receipts,'per_mode':{mode:mode_summary(receipts,mode) for mode in MODES}}
     (out/'summary.json').write_text(json.dumps(summary,indent=2,sort_keys=True)+'\n')
     print(json.dumps(summary['per_mode'],sort_keys=True))
 

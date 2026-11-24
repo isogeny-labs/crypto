@@ -185,6 +185,8 @@ class MeasurementTest(unittest.TestCase):
             self.assertTrue(summary['accounting_source_unchanged'])
             for mode in ('independent','walk','two-group'):
                 self.assertEqual(summary['per_mode'][mode]['completed'],1)
+                self.assertEqual(summary['per_mode'][mode]['independently_verified_runs'],1)
+                self.assertEqual(summary['per_mode'][mode]['independent_audit_wall_ns']['unknown_attempts'],0)
                 self.assertEqual(summary['per_mode'][mode]['attempts'],1)
                 self.assertEqual(summary['per_mode'][mode]['driver_cpu_ns']['observed_attempts'],1)
                 self.assertGreater(summary['per_mode'][mode]['driver_cpu_ns']['observed_sum'],0)
@@ -257,6 +259,20 @@ else: raise AssertionError('failure was not injected')
             self.assertTrue(all(row['target_match'] for row in result['pairs']))
             summary=json.loads((outputs[1]/'summary.json').read_text())
             self.assertGreater(sum(row['candidate_counts']['filtered'] for row in summary['runs']),0)
+
+    def test_independent_audit_fails_closed(self):
+        spec=importlib.util.spec_from_file_location('panel',HERE/'panel.py')
+        panel=importlib.util.module_from_spec(spec); spec.loader.exec_module(panel)
+        with tempfile.TemporaryDirectory() as d:
+            out=pathlib.Path(d); record=out/'record.json'; record.write_text('{}')
+            invalid=panel.audit_result(out,'invalid',record,{'curve':{'p':101,'n':101}},5)
+            self.assertEqual(invalid['status'],'invalid_or_error')
+            self.assertEqual(invalid['exit_code'],1)
+            self.assertIsNotNone(invalid['result_sha256'])
+            unsupported=panel.audit_result(out,'unsupported',record,{'curve':{'p':4294967311,'n':101}},5)
+            self.assertEqual(unsupported['status'],'unsupported')
+            self.assertIsNone(unsupported['wall_ns'])
+            self.assertFalse((out/'unsupported.audit.json').exists())
 
     def test_panel_records_launch_failure(self):
         with tempfile.TemporaryDirectory() as d:
