@@ -253,6 +253,45 @@ falsifier is fewer than 677 distinct liftable abscissae, or a matched
 completed solver run whose charged work is no lower than its same-base
 control. Neither has been measured here.
 
+### Projecting one bit per secant slot preserves the top degree
+
+The earlier `PencilElimination.two_selectors_iff` theorem removes one
+Boolean bit from each slot exactly: a residual `d+l*u=0` with `u` Boolean
+becomes `d*(d+l)=0`. This reduces the variable count from `2k+3` to
+`2k+1`. The projected equations have quartic residuals. Their canonical
+highest-form ideal, with `n=2k-2` remaining Boolean bits, is
+
+`I=(m^2, x*z, (x^2-alpha*m*x)^2, (z^2-beta*m*z)^2, b_1^2,...,b_n^2)`
+
+for nonzero quadratic leading coefficients and either sign in each slot;
+`alpha` and `beta` are their nonzero normalized reciprocals. This follows
+by taking the leading forms of the *actual projected generators*:
+the removed bit enters its original ordinate residual only linearly,
+below its quadratic leading form. This derivation concerns the specified
+generator presentation, not an arbitrary elimination ideal.
+
+In the quotient by `I`, `m^2=x*z=0` and
+`x^4=2*alpha*m*x^3`, `z^4=2*beta*m*z^3`. Hence every core monomial of
+degree five vanishes. Boolean squares then make every homogeneous
+monomial of degree `n+5` vanish. Conversely, `m*x^3*product(b_i)`
+survives in degree `n+4`: after setting `z=0`, the two-variable relations
+have Groebner basis `m^2, x^4-2*alpha*m*x^3` with leading monomials
+`m^2, x^4`, and the Boolean square relations leave the squarefree bit
+product. The projected first-vanishing degree is therefore **`n+5 =
+2k+3`**, the same as the all-bit system, while using two fewer variables.
+This algebraic deduction has not been added to the Lean proof project.
+An independent SymPy finite-field Groebner check over M31 found four
+surviving monomials at degree `n+4` and none at `n+5` for `n=0,2`.
+These sampled checks corroborate the general argument; they do not
+establish its hypotheses for a concrete eight-bit selector.
+
+For the conditional eight-bit M31 capacity case, projection leaves
+14 bits and three core variables: 17 variables at canonical degree 19.
+This is a presentation-level result. The quartic residuals, affine
+solving degree, rational roots and charged relation work still need a
+matched M31 execution before selecting this encoding over the all-bit
+or dense systems.
+
 ## Existing presentations and the next falsifier
 
 The balanced S4/S3 eight-leaf presentation and the S4-to-two-S3 auxiliary
