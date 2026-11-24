@@ -256,6 +256,30 @@ orders `2,4,8`, a nonzero order-16 sum, and
 does not itself force the order-16 sum to vanish; it does not
 establish nonvanishing at P-192. [pcc:unverified]
 
+## Polylogarithmic isogeny-output boundary
+
+[Robert's efficient isogeny representation](https://eprint.iacr.org/2022/1068.pdf)
+allows polylogarithmic *online evaluation* of an `N`-isogeny after
+constructing the representation. With a rational kernel generator,
+the stated construction costs `Õ(√N log q)` field operations. This
+distinction matters for a cold comparison, but an even sharper
+boundary applies to the present sign: an isogeny output can forget
+the marked generator altogether. [pcc:unverified]
+
+On P-192, `f=1-π`, where `π` is Frobenius, is a separable isogeny of
+degree `#E(F_p)=r` with kernel exactly `E(F_p)`. It already has the
+compact evaluation formula `f(R)=R-π(R)`, and `f(G)=f(Q)=O`.
+Even its translation-normalized local jets do not distinguish
+kernel markings. For any homomorphism `f` and `P∈ker(f)`,
+`f(P+X)=f(X)` as a formal identity near the origin. Hence the
+local expansion of `f` at every kernel point, using the parameter
+translated from the origin, is identical; here its first
+differential is `1` because `dπ=0`. The theorem's map evaluation,
+and these intrinsic jets of this map, cannot evaluate the ray sign.
+Inspecting a generator-dependent *representation* or adding a
+separate oriented kernel statistic is a different operation and
+needs its own point-only algorithm and cold cost. [pcc:unverified]
+
 ## Forty-two-coordinate pair-pattern gate
 
 Fix `k ≤ 42` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192
