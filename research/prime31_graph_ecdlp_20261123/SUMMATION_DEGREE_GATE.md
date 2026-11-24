@@ -120,17 +120,26 @@ not explain that stop. All these observations remain censored stage data.
 ## Curve-specific symmetry screen
 
 The direct factorization of `x^3 + ax + b` over `F_p` is irreducible on
-both repository curves:
+both repository curves and on the explicit degree-three isogeny codomain
+of B677:
 
 | Curve | `a` | `b` | `j mod p` | Rational nonidentity 2-torsion |
 | --- | ---: | ---: | ---: | --- |
 | B677/RR5 | 847514846 | 2087444724 | 2145262698 | absent |
+| B677 degree-three codomain | 323891735 | 1985248359 | 336047232 | absent |
 | Registered graph curve | -3 | 21 | 1390704497 | absent |
 
-Both discriminants are nonzero. Neither `j` is zero or 1728. The rational
-2-torsion symmetry used in the cited symmetrized construction therefore
-does not apply directly to either curve. This says nothing about extension
-field torsion or selector-specific structure.
+All three discriminants are nonzero, and none of the listed `j` values is
+zero or 1728. The rational 2-torsion symmetry used in the cited
+symmetrized construction therefore does not apply directly to these
+models. The explicit codomain is the curve in
+`research/prime31_ic_20261115/native/PRIME31_3ISOGENY_CM_TRANSFER_20261118.md`.
+For a transported non-2-torsion target, its four-summand locus in the
+codomain's ordinary abscissae has the same degree-eight fourth-coordinate
+fiber by the geometric argument above. Thus the isogeny alone does not
+lower this intrinsic degree; it could still change the cost of a different
+presentation or a selector-specific computation. This says nothing about
+extension-field torsion or other maps.
 
 Reproduction: with Python FLINT, factor
 `nmod_poly([b,a,0,1], 2147483647)` for each row; compute
