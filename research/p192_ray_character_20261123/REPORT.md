@@ -314,6 +314,22 @@ additional scalar Legendre weight `χ_r(d)`. The identity supplies a
 precise structured-offset formulation, but neither an exact sign
 evaluator nor a certified useful bias. [pcc:unverified]
 
+There is nevertheless a deterministic **average over all public
+known-point offsets**. Let `S={x([a]G):1≤a<r}`, of size `n/2`, and
+let `ρ(c)=n⁻¹Σ_{P≠O}t(P)χ_p(x(P)-c)`. The single-offset second
+moment above gives `Σ_{c∈F_p}ρ(c)²=2p/n`. All summands are
+nonnegative, so a uniform public `a` satisfies
+
+`E_a[ρ(x([a]G))²] = (2/n)Σ_{c∈S}ρ(c)² ≤ 4p/n²`.
+
+At the illustrative cold threshold `g` defined above, Markov's
+inequality bounds the fraction of public `a` with `|ρ(x([a]G))|≥g`
+by `4p/(n²g²)<2^-107` for P-192; 80-digit PARI/GP gives a
+base-two logarithm near `-107.165`. This screens a *uniformly sampled
+known multiple* even though its offsets are structured. It does not
+exclude a deliberately selected `a`, and it does not certify the
+correlation sign of any selected feature. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
