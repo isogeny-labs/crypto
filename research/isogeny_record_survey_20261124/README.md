@@ -112,9 +112,9 @@ is eligible for promotion to the standard-curve expanded-map scoreboard.
   explicit `not_run` statuses, rather than invented maxima or passing rows.
 
 PDF page numbers start at one. The PDFs and extracted copyrighted text are not
-redistributed. Hashes identify the bytes inspected; they do not prove the
-mathematics. Search and KB hits were discovery aids; source text was checked
-before classification. This bounded search is not a completeness proof.
+redistributed. Hashes identify the bytes inspected. Mathematical validity requires separate
+checking. Search and KB hits were discovery aids; source text was checked
+before classification. This bounded search does not establish a complete census.
 
 The next computational milestone remains a reproducible attempt above the
 P-192 degree-10,453 reference, followed by independent replay, while preserving
