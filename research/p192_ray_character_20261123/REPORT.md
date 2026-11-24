@@ -164,9 +164,9 @@ degree. This degree bound does not imply a running-time bound for a
 compact high-degree function and does not cover combinations of
 features or a biased rather than exact predictor. [pcc:unverified]
 
-## Forty-one-coordinate combination gate
+## Forty-two-coordinate combination gate
 
-Fix `k ≤ 41` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192
+Fix `k ≤ 42` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192
 isogenous endpoint, and let the feature vector consist of the field
 quadratic characters of `x(R)-cᵢ`. An arbitrary function of these `k`
 signs, including a rule for zero values, **cannot equal the scalar
@@ -182,7 +182,7 @@ The product of their underlying rational functions has degree at most
 have disjoint two-point odd-valuation zero supports; their inverse
 `[7]` supports are disjoint 98-point sets. If `b` is nonempty, its
 support has at least 98 points, while the `a` support has at most
-`2k ≤ 82`, so they cannot cancel. If `b` is empty, the nonempty `a`
+`2k ≤ 84`, so they cannot cancel. If `b` is empty, the nonempty `a`
 support remains. The endpoint has no rational 2-torsion, and `[7]`
 is separable, giving the stated support sizes. [pcc:unverified]
 
@@ -195,31 +195,53 @@ for every pair of `k`-bit patterns, at least
 
 `[r-1-4k - (4^k-1)(200k√p+1+4k)] / 4^k`
 
-points realizing that pair at `R` and `[7]R`. This is positive for
-every `k ≤ 41`; at `k=41`, set `A=(4^41-1)·8200` and
-`B=(4^41-1)·165`. The exact integer checks are `7^((r-1)/2)=1
-(mod r)`, `C=r-165-B>0`, and `C²>A²p`. Since the target sign is
-unchanged by `[7]`, an exact rule would have to give the same output
-on *every* pair of nonzero feature patterns, hence be constant on
-`U`. Both target signs still occur on `U`, a contradiction. This
-excludes exact classifiers with at most 41 distinct endpoint
-coordinate signs. It does not bound their possible bias, or
-combinations of 42 or more signs or different rational features.
-[pcc:unverified]
+points realizing that pair at `R` and `[7]R`. This degree-only bound
+proves positivity through `k=41`. A branch-point count sharpens it.
+For each nontrivial product function `f`, let `s` be the number of
+geometric points where its valuation is odd. All poles of the
+individual factors have even order, and the possible odd support is
+among their zeros, so `s ≤ D=2|a|+98|b|`. The smooth quadratic
+cover `z²=f` of the endpoint elliptic curve has genus `1+s/2` by
+Riemann–Hurwitz. Comparing the Hasse–Weil bounds for this cover and
+the endpoint gives a complete field-character sum of absolute value
+at most `(s+4)√p`; omitting the identity costs at most one more.
+The character at the even-order pole above the identity contributes
+`+1` or `-1`, so this statement also covers that pole. Removing the
+other at most `4k` exceptional rational points adds at most `4k`.
+
+Across all `4^k−1` nontrivial products, the sum of their degree
+upper bounds is exactly `50k·4^k`: each of the `k` first-coordinate
+features is selected in half the products and contributes degree two,
+while each `[7]` feature contributes degree 98. Expanding a fixed
+pair-pattern indicator therefore gives at least
+
+`[r-1-4k - (50k·4^k+4(4^k-1))√p - (4^k-1)(1+4k)] / 4^k`
+
+rational points realizing that pair. This is positive for every
+`k ≤ 42`; at `k=42`, the exact checks below verify the inequality.
+Since the target sign is unchanged by `[7]`, an exact rule would have
+to give the same output on *every* pair of nonzero feature patterns,
+hence be constant away from the exceptions. Both target signs still
+occur there, a contradiction. This excludes exact classifiers with
+at most 42 distinct endpoint coordinate signs. It does not bound
+their possible bias, or combinations of 43 or more signs or other
+rational features. [pcc:unverified]
 
 The three arithmetic checks above can be replayed in PARI/GP:
 
 ```gp
 p = 6277101735386680763835789423207666416083908700390324961279;
 r = 6277101735386680763835789423176059013767194773182842284081;
-k = 41; A = (4^k-1)*8200; B = (4^k-1)*165; C = r-165-B;
+k = 42; A = 50*k*4^k + 4*(4^k-1);
+B = (4^k-1)*(1+4*k); C = r-1-4*k-B;
 print(lift(Mod(7,r)^((r-1)/2)) == 1);
 print(C > 0);
 print(C^2 > A^2*p);
 ```
 
 Each output is `1`. This checks the numeric gate and quadratic-residue
-claim, not the divisor or character-sum derivation. [pcc:unverified]
+claim, not the divisor, genus, or character-sum derivation.
+[pcc:unverified]
 
 ## Random-offset correlation gate
 
