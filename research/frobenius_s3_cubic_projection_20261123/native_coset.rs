@@ -11,6 +11,7 @@ mod upstream {
     include!(env!("S3_FIELD_KERNEL"));
 }
 use upstream::{Gf2, IrreduciblePoly};
+mod charted_resultant;
 mod higher_degree;
 mod native_recovery;
 
@@ -98,8 +99,13 @@ impl Coset {
         };
         let basis = difference.free;
         assert_eq!(basis.len(), k as usize);
+        Self::with_geometry(f, basis, shift)
+    }
+
+    fn with_geometry(f: Gf2, basis: Vec<u64>, shift: u64) -> Self {
+        let k = basis.len() as u32;
         let squares = basis.iter().map(|&v| f.sqr(v)).collect();
-        let field_as = BinaryMap::new(powers.map(|v| f.sqr(v) ^ v));
+        let field_as = BinaryMap::new((0..f.n).map(|i| f.sqr(1 << i) ^ (1 << i)));
         let subfield_as = BinaryMap::new(basis.iter().map(|&v| f.sqr(v) ^ v));
         Self {
             f,
@@ -525,6 +531,9 @@ fn main() {
     match std::env::args().nth(1).as_deref() {
         Some("recovery") => return native_recovery::run(),
         Some("higher-degree") => return higher_degree::run(),
+        Some("charted") => {
+            return charted_resultant::run(std::env::args_os().nth(2).map(Into::into))
+        }
         _ => {}
     }
     let trials = std::env::args()

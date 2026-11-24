@@ -72,14 +72,14 @@ fn resultant_step(f: &Gf2, previous: &[u64], x: u64) -> Polynomial {
     out
 }
 
-fn evaluation(f: &Gf2, polynomial: &[u64], t: u64) -> u64 {
+pub(super) fn evaluation(f: &Gf2, polynomial: &[u64], t: u64) -> u64 {
     polynomial
         .iter()
         .rev()
         .fold(0, |acc, &coefficient| f.mul(acc, t) ^ coefficient)
 }
 
-fn polynomial<'a>(
+pub(super) fn polynomial<'a>(
     f: &Gf2,
     values: &[u64],
     key: &[u8],
@@ -244,7 +244,7 @@ fn higher_basis_lead(values: &[u64], width: usize) -> Option<usize> {
     None
 }
 
-fn signed_sum(c: &Coset, points: &[Point]) -> BTreeSet<Option<Point>> {
+pub(super) fn signed_sum(c: &Coset, points: &[Point]) -> BTreeSet<Option<Point>> {
     let mut sums = BTreeSet::from([None]);
     for &point in points {
         let mut next = BTreeSet::new();

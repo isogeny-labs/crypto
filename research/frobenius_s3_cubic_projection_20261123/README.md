@@ -282,7 +282,26 @@ For each selected target, the verifier obtains the exact Boolean coefficients by
 | 12 | 4 | 16 | 12 |
 | 12 | 5 | 20 | 20 |
 
-The measured solution counts are nonpowers of two, so an affine linear system in the original variables cannot describe these fibers. For the four 20-variable instances, three Boolean nonsolutions satisfy every quadratic that vanishes on the true points, one witness per target. The fourth instance instead has a cubic minimal leading term in degree reverse lexicographic order, certified by evaluating consecutive monomials on its 300 points. Its leading monomial has mask 917504. Therefore each 20-variable instance needs a basis of degree at least three in those variables and that order. The direct systems solve in degree at most \(w+1\) for \(w\) Boolean variables because this cap permits every variable product of every multilinear row. Combining these bounds rules out a tenfold drop for a single exact solution-ideal basis on these panels in the original variables and fixed order. It leaves the question open for larger baselines and different representations. Per-branch linear solves would need separate accounting for reconstruction of the full ideal. [pcc:unverified]
+The measured solution counts are nonpowers of two, so an affine linear system in the original variables cannot describe these fibers. For the four 20-variable instances, three Boolean nonsolutions satisfy every quadratic that vanishes on the true points, one witness per target. The fourth instance instead has a cubic minimal leading term in degree reverse lexicographic order, certified by evaluating consecutive monomials on its 300 points. Its leading monomial has mask 917504. Therefore each 20-variable instance needs a basis of degree at least three in those variables and that order. The direct systems solve in degree at most \(w+1\) for \(w\) Boolean variables because this cap permits every variable product of every multilinear row. Combining these bounds rules out a tenfold drop for a single exact solution-ideal basis on these panels in the original variables and fixed order. [pcc:unverified]
+
+### Charted resultant with a quadratic basis
+
+An auxiliary-variable formulation reaches degree two on all four of the certified degree-20 baselines. It constructs an exact Boolean graph over the original 20 variables. The construction and the complete solution reconstruction are included in the degree accounting. The original-coordinate basis obstruction above still applies if one eliminates the auxiliary variables symbolically. [pcc:unverified]
+
+For a five-summand target, lift the 16 factor coset abscissae to the curve over the quadratic extension of the coefficient field. Each lift exists there because its defining Artin–Schreier equation has coefficients in the original field. Enumerate the signed sums of unordered three-abscissa prefixes and subtract each signed sum from a fixed lift of the target. For a finite residual apply the sum–product S3 linearization and recover the two roots in the base coset. All field products, inversions, and point operations on this branch use scalar values. The binary equations for extracting the remaining pair on a fixed branch are affine linear. Verify the signs at the residual and restore the prefix permutations. An identity residual contributes the entire affine chart with equal suffix abscissae. This also handles cancellation through infinity. [pcc:unverified]
+
+The resulting charts are disjoint. An unordered suffix pair with distinct abscissae gives an affine line with one orientation bit. A suffix pair with equal abscissae gives a point, unless the identity-residual chart already contains it. Parallel affine charts can be merged without splitting them into point lists: the disjoint union of \(b+V\) and \(c+V\) is \(b+(V+\langle b+c\rangle)\). The verifier normalizes the bases and repeats these mergers. [pcc:unverified]
+
+Use a selector \(z_i\) for every chart except chart zero, and one variable per local axis. Chart zero is active when all explicit selectors are zero. Emit zero products between variables owned by different charts, the within-chart gates \(z_i r_{ij}+r_{ij}\), and all auxiliary Boolean square equations. Add one affine equation per original coordinate expressing it as a function of the selectors and local axes. In a degree-compatible order with the original variables ahead of the auxiliaries, the leading terms are the original-coordinate variables, the forbidden and gated products, and the auxiliary squares. The surviving squarefree monomials consist of the empty monomial, each explicit selector, and nonempty products within one chart's axes. Their count is \(\sum_i 2^{\dim V_i}\), the exact number of graph points. The leading terms therefore generate the initial ideal, and the emitted degree-two rows form a Gröbner basis. Reconstruction evaluates the linear coordinate graph on each chart. [pcc:unverified]
+
+| Target | Reconstructed points | Charts after merging | Auxiliary variables | Sparse basis rows | Direct lower bound → charted degree |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 13 | 1,460 | 283 | 910 | 414,096 | ≥20 → 2 |
+| 24 | 300 | 81 | 227 | 25,829 | ≥20 → 2 |
+| 34 | 350 | 91 | 259 | 33,606 | ≥20 → 2 |
+| 82 | 1,236 | 263 | 815 | 332,192 | ≥20 → 2 |
+
+The independent direct-resultant computation confirms all four complete solution sets over the original variables. Each candidate run visits 5,984 distinct signed-prefix sums counted within their prefix groups and solves 5,093–5,232 distinct intermediate systems. A separate parser verifies the emitted leading terms, their standard-monomial counts, and the sparse row counts. With a disk export, candidate construction and reconstruction take 5–28 ms on this machine, excluding the independent reference and parser. The tenfold bound is a solving-degree result for the lifted presentation. Its cost includes the signed-prefix search and tens to hundreds of thousands of sparse basis rows. [pcc:unverified]
 
 ## Reproduction
 
@@ -409,5 +428,15 @@ bash research/frobenius_s3_cubic_projection_20261123/run_native_coset.sh higher-
 ~~~
 
 The witness records are in [higher-degree.jsonl](higher-degree.jsonl).
+
+Run the charted resultant with a directory for the emitted bases, then verify their leading terms.
+
+~~~sh
+mkdir -p /tmp/s3-charted-bases
+bash research/frobenius_s3_cubic_projection_20261123/run_native_coset.sh charted /tmp/s3-charted-bases > /tmp/s3-charted.jsonl
+python3 research/frobenius_s3_cubic_projection_20261123/verify_chart_export.py /tmp/s3-charted.jsonl /tmp/s3-charted-bases
+~~~
+
+The chart construction, export, and reconstruction records are in [charted-resultant.jsonl](charted-resultant.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
