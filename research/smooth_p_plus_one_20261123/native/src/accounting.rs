@@ -1,6 +1,8 @@
 //! Development-only cold-recovery accounting on the two public toy fixtures.
 //! No timer or partial counter in this module is an admitted benchmark result.
 
+mod replay;
+
 use super::*;
 use prime31_four_summand::relation_adapter::{RelationAdapter, SignedRelation};
 use std::io::{BufRead, BufReader, Read, Write};
@@ -739,6 +741,15 @@ pub(super) fn dispatch(
     start: Instant,
 ) -> Option<Result<(), String>> {
     let first = args.first()?;
+    if first == "replay-account" {
+        return Some((|| {
+            if args.len() != 2 {
+                return Err("replay-account needs exactly one recorded JSONL path".into());
+            }
+            let result = replay::file(curve, depth, Path::new(&args[1]))?;
+            emit(&mut std::io::stdout().lock(), &result)
+        })());
+    }
     let (is_suite, seed) = if let Some(seed) = first.strip_prefix("account-suite=") {
         (true, seed)
     } else if let Some(seed) = first.strip_prefix("account=") {
