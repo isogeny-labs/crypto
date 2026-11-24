@@ -1,6 +1,8 @@
 //! Scoped exact-source template/root adapter controls and matched-cost harness.
-//! No scientific saved-case mode is enabled until its own protocol is frozen.
+//! Execute saved-case modes only with a separately frozen protocol.
 pub use crypto_lib::cryptanalysis;
+#[path = "../research/extension_ic_graph_20261115/template-cost-20261124/worker.rs"]
+mod cost_worker;
 #[path = "../src/cryptanalysis/jv_nagao_template.rs"]
 #[allow(dead_code)]
 mod jv_nagao_template;
@@ -15,7 +17,10 @@ mod nagao_unit;
 mod nagao_unit_elimination;
 
 fn main() {
-    eprintln!("source qualification only; no saved-case worker mode registered");
+    if let Err(error) = cost_worker::main() {
+        eprintln!("{error}");
+        std::process::exit(1);
+    }
 }
 
 #[cfg(test)]
