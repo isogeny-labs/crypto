@@ -19,7 +19,7 @@ const RESOURCES: F4ResourceLimits = F4ResourceLimits {
     max_matrix_entries: 2_000_000,
 };
 
-fn public_input(base: &Base) -> (Curve, Vec<(u64, u64)>) {
+pub(super) fn public_input(base: &Base) -> (Curve, Vec<(u64, u64)>) {
     let e = base.curve;
     (
         Curve {

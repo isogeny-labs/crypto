@@ -1,5 +1,7 @@
 //! Native, bounded development solver for the regular four-summand chart.
 #[cfg(feature = "production-controls")]
+mod accounting;
+#[cfg(feature = "production-controls")]
 mod oriented;
 mod polynomial;
 #[cfg(feature = "production-controls")]
@@ -760,6 +762,8 @@ fn recover(
 }
 
 fn main() -> Result<(), String> {
+    #[cfg(feature = "production-controls")]
+    let started = Instant::now();
     let argv: Vec<_> = std::env::args().skip(1).collect();
     let [prime, depth, solver, modes @ ..] = argv.as_slice() else {
         return Err(
@@ -776,6 +780,10 @@ fn main() -> Result<(), String> {
     }
     if ((curve.p + 1) >> depth) < 4 {
         return Err("depth leaves no regular fiber for the fixture generator".into());
+    }
+    #[cfg(feature = "production-controls")]
+    if let Some(result) = accounting::dispatch(curve, depth, Path::new(solver), modes, started) {
+        return result;
     }
     assert_eq!(curve.multiply(curve.n, curve.g), None);
     assert_eq!(curve.multiply(curve.n, curve.q), None);
