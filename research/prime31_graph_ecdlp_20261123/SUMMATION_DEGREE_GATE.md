@@ -511,9 +511,17 @@ identities**
 Thus appending these two curve equations leaves the full affine ideal
 unchanged, including its multiplicities and finite signed witnesses.
 The displayed certificates have total degree at most four after their
-leading terms cancel; they do not assert degree-three Macaulay
-derivability. The original inverse-pair and infinity branches still
-need the existing chart treatment.
+leading terms cancel. In fact, degree four is the first Macaulay degree
+at which the two cubics can be derived from the original generator
+list. Every original generator has degree two, and the original
+highest-form ideal is `(m^2,x*z,m*x,m*z,b_i^2)`. Its degree-three
+quotient retains `x^3` and `z^3` as independent classes. A degree-three
+Macaulay combination of the original generators has cubic leading form
+inside that ideal, whereas the added equations have leading forms
+`-x^3` and `-z^3`. The degree-four certificates above give the matching
+upper bound. This is a statement about generator acquisition degree,
+not the completed F4 solving degree. The original inverse-pair and
+infinity branches still need the existing chart treatment.
 
 For `k` Boolean bits in each linear-offset slot, the augmented
 generators' canonical highest-form ideal is
@@ -530,7 +538,8 @@ fourth-coordinate degree. The unaugmented linear presentation retains
 the infinite canonical degree stated above.
 
 `verify_linear_secant_top.py` checks both ideal-membership identities,
-mutual highest-form ideal membership, a surviving top-degree monomial,
+mutual highest-form ideal membership, independence of the two cubic
+classes from the original top ideal, a surviving top-degree monomial,
 and the core Hilbert sequence over M31 for all four sign branches of
 one fixed public B677 target. This independently replays the
 [PR discussion's construction](https://github.com/isogeny-labs/crypto/pull/5097#issuecomment-7147311122).
