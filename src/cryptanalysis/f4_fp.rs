@@ -1698,13 +1698,18 @@ impl FrozenStep {
     /// The step's symbolic preprocessing for the current terms, or `None`
     /// when some element has a term the frozen copy lacks.
     fn rebuild(&self, terms: &[Vec<u128>]) -> Option<Symbolic> {
+        // An element's term positions within its frozen terms, found the
+        // first time the walk reaches it: an element the walk never reaches
+        // adds no row, so its terms need not fit.
         let top = self.support.last().map_or(0, |(i, _)| i + 1);
-        let mut pos: Vec<Vec<u32>> = vec![Vec::new(); top];
-        for (i, frozen) in &self.support {
-            pos[*i] = subsequence_positions(frozen, terms.get(*i)?)?;
-        }
-        let map = |i: usize, fcols: &[u32]| -> Vec<u32> {
-            pos[i].iter().map(|&k| fcols[k as usize]).collect()
+        let mut pos: Vec<Option<Vec<u32>>> = vec![None; top];
+        let map = |i: usize, fcols: &[u32], pos: &mut Vec<Option<Vec<u32>>>| -> Option<Vec<u32>> {
+            if pos[i].is_none() {
+                let k = self.support.binary_search_by_key(&i, |(j, _)| *j).ok()?;
+                pos[i] = Some(subsequence_positions(&self.support[k].1, terms.get(i)?)?);
+            }
+            let p = pos[i].as_ref()?;
+            Some(p.iter().map(|&k| fcols[k as usize]).collect())
         };
         let nc = self.cols.len();
         let mut reached = vec![false; nc];
@@ -1712,7 +1717,7 @@ impl FrozenStep {
         let mut stack: Vec<u32> = Vec::new();
         let mut rows: Vec<Vec<u32>> = Vec::with_capacity(self.seeds.len() + self.reducers.len());
         for (i, fc) in &self.seeds {
-            let rc = map(*i, fc);
+            let rc = map(*i, fc, &mut pos)?;
             done[rc[0] as usize] = true;
             for &c in &rc {
                 if !reached[c as usize] {
@@ -1734,7 +1739,7 @@ impl FrozenStep {
                 continue;
             }
             let (i, _, fc) = &self.reducers[r as usize];
-            let rc = map(*i, fc);
+            let rc = map(*i, fc, &mut pos)?;
             for &x in &rc {
                 if !reached[x as usize] {
                     reached[x as usize] = true;
