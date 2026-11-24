@@ -332,6 +332,24 @@ The interval does not bound how many of those offsets can lie in one
 256-element subset-sum family. The 80-full-split condition above
 remains the local construction gate.
 
+There is a rigorous baseline for **uniform random coefficients**, with
+`h0` fixed. Choose `t0,w_1,...,w_8` independently and uniformly from
+M31 and set `T_u=t0+sum(w_i*u_i)` for each of the 256 bit vectors `u`.
+For distinct `u,v`, the coefficient rows `(1,u)` and `(1,v)` are
+linearly independent over M31, so `T_u,T_v` are independent uniform
+offsets. If `X` counts labels whose quartic has four distinct rational
+roots and `delta=N4/p`, pairwise independence gives
+`E[X]=256*delta` and `Var(X)=256*delta*(1-delta)`. The global interval
+above yields `E[X]<=10.674034` and `Var(X)<=10.229589`. Cantelli's
+one-sided variance inequality then bounds
+
+`Pr[X>=80] <= 10.229589/(10.229589+(80-10.674034)^2) < 0.002124`.
+
+Covering 677 distinct abscissae requires `X>=80`, even if some labels
+collide. This bound applies to the specified random-coefficient draw.
+Adaptive selection, deterministic designs, construction work and
+completed relation-solving yield remain open.
+
 This is a two-summand secant theorem. A four-summand B677 relation
 would need a sound composition with target, sign, distinct-index and
 root-extraction semantics. Before a lower-total-work claim, a concrete
