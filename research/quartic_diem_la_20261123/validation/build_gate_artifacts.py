@@ -125,11 +125,15 @@ def main():
 
     # bootstrap intervals: producer (4000 MC) vs the exact bootstrap law (validator)
     ci = []
+    nz = rec["bootstrap_noise_pooled_ci_400x4000"]
     for m in ap:
         a, b = ap[m]["pooled"]["ci95"], rp[m]["pooled"]["ci95_exact"]
+        lo_r, hi_r = nz[m]["lo_range"], nz[m]["hi_range"]
         ci.append({"metric": m, "producer_pooled_ci95": a, "validator_exact_pooled_ci95": b,
-                   "max_rel_endpoint_diff": max(abs(a[i] - b[i]) / abs(b[i]) for i in (0, 1))})
-    ci_ok = max(c["max_rel_endpoint_diff"] for c in ci) < 0.03
+                   "validator_mc_noise_lo_range": lo_r, "validator_mc_noise_hi_range": hi_r,
+                   "producer_inside_noise_range": lo_r[0] <= a[0] <= lo_r[1] and hi_r[0] <= a[1] <= hi_r[1],
+                   "max_rel_endpoint_diff_vs_exact": max(abs(a[i] - b[i]) / abs(b[i]) for i in (0, 1))})
+    ci_ok = all(c["producer_inside_noise_range"] for c in ci)
     certs_ok = (certs["summary"]["curves_all_ok"] == certs["summary"]["curves"] == 20
                 and certs["summary"]["rows_cert_ok"] == certs["summary"]["rows_checked"] == 80)
     integ = rec["integrity"]
