@@ -29,3 +29,8 @@ solver backend or scaling campaign is scheduled. The next scientific task is
 the separately versioned guarded two-leaf compiler/identity qualification,
 then public root extraction and the decisive actual shared-base rank test.
 [pcc:unverified]
+
+Proposal/report localb5422221e66c0d5daebf0ac336eb3bbe99a4f48c published as b18a9f1f20e50f990b0cee66ba9a8ab07118955b; tree6412ae15d5417f2457363f0cf28cefd216eeb774 equals local.
+All14 proposal subject blobs match exact Git hashes. This is source custody,
+not mathematical qualification; no decoder/root job ran. HANDOFF.json records
+the concrete next operation and incomplete recovery bridge. [pcc:unverified]
