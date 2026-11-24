@@ -130,9 +130,15 @@ Count selector construction, Groebner work, roots, signs, group replays,
 graph elimination, linear algebra, target recovery, and failed queries.
 If the larger signed witness family does not produce useful rank at a lower
 cold cost than direct rows and matched negation-map rho, it does not advance
-the end-to-end boundary. Only after this gate should gain-aware DSU,
-two-core filtering, low-stretch forest, MST, matching/DM, and block
-Wiedemann be evaluated on the actual partial stream.
+the end-to-end boundary. Only after this gate should graph filters and
+linear algebra be evaluated on the actual partial stream. Start with the
+existing exact gain-aware DSU, singleton peeling, BFS witness paths, and
+pivot filter. The repository's `research/lp_graph_algorithms_20261123/README.md`
+found its low-stretch heuristic longer than BFS on its measured LP streams
+and MST slightly sparser but much slower; neither result transfers
+automatically to Prime31. Compare those choices, matching/DM, and block
+Wiedemann on the same source rows only when their graph and matrix sizes
+warrant them.
 
 ### First registered-curve control, 2026-11-23
 
