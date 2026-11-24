@@ -277,6 +277,51 @@ abscissae therefore requires **at least 80 completely split,
 squarefree quartic fibers** among its selected offsets. This is
 a necessary condition; repeated abscissae across offsets raise it.
 
+### Global split-fiber count for every quadratic graph
+
+The offset function `tau=y-h0(x)` is a degree-four map from the B677
+elliptic curve to the projective line: its only pole is `4*O`, since
+`h0` has nonzero quadratic leading coefficient. Its geometric
+monodromy is `S4`. To see indecomposability, a hypothetical `2*2`
+factorization has an intermediate curve of genus zero or one by
+Riemann--Hurwitz. A degree-two map to a genus-one intermediate is
+unramified and cannot pull back a pole to the single point `O`.
+For a genus-zero intermediate, its relevant fiber must be `2*O`;
+after a Mobius change of coordinate, its degree-two function lies in
+`L(2*O)=span(1,x)`, so any composition lies in `F_p(x)`. But `tau`
+contains `y`. Thus the cover is indecomposable and its geometric
+monodromy is primitive. Inertia at the unique pole is a four-cycle;
+among primitive subgroups of `S4`, only `S4` contains a four-cycle.
+The arithmetic monodromy is consequently also `S4`.
+
+Let `Y` be the smooth projective Galois closure. Riemann--Hurwitz for
+`tau` gives total ramification eight, with three at infinity and five
+at finite branch values; all ramification is tame since `p>4`. For
+each finite branch permutation `sigma`, write `index(sigma)` for four
+minus its number of cycles. The Galois-cover contribution
+`24*(1-1/ord(sigma))` is at most
+`12*index(sigma)`. The finite contributions total at most 60;
+infinity contributes 18. Riemann--Hurwitz for the 24-sheeted Galois
+cover gives `genus(Y)<=16`. There are at most five finite branch values.
+
+Write `N4` for the number of **finite, squarefree, four-root** offsets
+over M31. Each such offset contributes 24 rational points to `Y`;
+other unramified offsets contribute zero. The at most six branch
+values, including infinity, contribute between zero and 144 points
+in total. The Hasse--Weil curve bound therefore gives
+
+`abs(N4-(p+1)/24) <= (4/3)*sqrt(p)+6`,
+
+or conservatively `89,416,692 <= N4 <= 89,540,279` for M31. This is
+a global count of about `p/24` full-split offsets for **every**
+nondegenerate quadratic `h0`; it is a deduction from monodromy and
+point counting, not an enumeration of two billion offsets. The
+function-field Chebotarev framework is also described by
+[Andrade, Bary-Soroker and Rudnick, Appendix A](https://www.math.tau.ac.il/~rudnick/papers/andrade%20bary%20soroker%20rudnick.pdf).
+The interval does not bound how many of those offsets can lie in one
+256-element subset-sum family. The 80-full-split condition above
+remains the local construction gate.
+
 This is a two-summand secant theorem. A four-summand B677 relation
 would need a sound composition with target, sign, distinct-index and
 root-extraction semantics. Before a lower-total-work claim, a concrete
