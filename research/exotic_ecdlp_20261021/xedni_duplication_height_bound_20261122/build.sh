@@ -14,4 +14,5 @@ lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" -o "$1/IntegerBridge.olea
 lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" -o "$1/RationalBridge.olean" "$1/RationalBridge.lean"' sh "$HERE"
 lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" -o "$1/OutputBridge.olean" "$1/OutputBridge.lean"' sh "$HERE"
 lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" -o "$1/UpperBridge.olean" "$1/UpperBridge.lean"' sh "$HERE"
-lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" "$1/HeightBridge.lean"' sh "$HERE"
+lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" -o "$1/HeightBridge.olean" "$1/HeightBridge.lean"' sh "$HERE"
+lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" "$1/TorsionBridge.lean"' sh "$HERE"

@@ -59,15 +59,18 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 | Point-level lower logarithmic defect | `point_lower_height_defect` in `HeightBridge.lean`, using Mathlib's `Rat.logHeight₁_eq_log_max` and the canonical output lower bound | Lean checked for every nonsingular affine point whose double is affine: `4·h(x(P))−h(x(2P))≤53 log 2` |
 | Homogeneous and canonical output upper bound | `homogeneous_upper`, `canonical_output_upper`, and `point_canonical_output_upper` in `UpperBridge.lean` | Lean checked: the raw forms and reduced output coordinates satisfy the `2¹⁸M⁴` bound for every nonsingular affine point whose double is affine |
 | Point-level upper and absolute defect | `point_upper_height_defect` and `point_affine_abs_height_defect` in `HeightBridge.lean` | Lean checked for every nonsingular affine point whose double is affine: `h(x(2P))−4h(x(P))≤18 log 2` and `|h(x(2P))−4h(x(P))|≤53 log 2` |
+| Rational root and two-torsion exclusion | `no_integer_cubic_root`, `no_rational_cubic_root`, and `no_affine_two_torsion` in `TorsionBridge.lean` | Lean checked: the cubic has no root modulo 3 after the monic rational-root reduction, so every nonsingular affine rational point doubles to an affine point |
+| All-point duplication defect | `all_point_abs_height_defect` in `TorsionBridge.lean` | Lean checked for every rational point on the fixed curve, including the identity: `|h(2P)−4h(P)|≤53 log 2` |
 | Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
-| Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Affine-double height comparison Lean checked; the double-to-identity case remains open |
+| Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | All-point duplication defect Lean checked; explicit bridge to the canonical-height limit remains open |
 
-The polynomial, divisibility, global archimedean, point-level affine defect,
-and numerical Lean declarations use only standard foundations in their
-`#print axioms` output. The packet is **partially formalized**: the
-double-to-identity case and the resulting all-point uniform bound remain Lean
-obligations. The defining cubic has no rational root; a formal proof of that
-fact would discharge the exceptional affine case.
+The polynomial, divisibility, global archimedean, all-point defect, and
+numerical Lean declarations use only standard foundations in their
+`#print axioms` output. The packet is **partially formalized** until the
+all-point defect is connected to the separate canonical-height limit packet.
+The defining cubic's rational-root exclusion is formalized using Mathlib's
+[integral root theorem](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/RingTheory/Polynomial/RationalRoot.lean)
+and a three-residue certificate.
 The canonical-limit packet already proves quadraticity for integer multiples.
 Mordell–Weil generation and rational-to-finite reduction remain separate
 obligations for a complete fixed-curve exclusion theorem.
