@@ -57,13 +57,15 @@ class EvenCurve(Curve):
 
 
 class SubfieldCoset:
-    def __init__(self, k):
-        self.field = GF(2*k)
+    def __init__(self, k, extension=2):
+        self.field = GF(extension * k)
         self.k = k
         f = self.field
-        relative_trace = BinaryMap(f.pow(1 << i, 1 << k) ^ (1 << i) for i in range(2*k))
-        self.basis = relative_trace.free
-        self.shift = relative_trace.solve(1)
+        frobenius_difference = [f.pow(1 << i, 1 << k) ^ (1 << i) for i in range(f.n)]
+        fixed_field = BinaryMap(frobenius_difference)
+        self.basis = fixed_field.free
+        self.shift = (fixed_field.solve(1) if extension == 2 else
+                      next(1 << i for i, value in enumerate(frobenius_difference) if value))
         assert self.shift is not None and len(self.basis) == k
         self.shift_square = f.sq(self.shift)
 

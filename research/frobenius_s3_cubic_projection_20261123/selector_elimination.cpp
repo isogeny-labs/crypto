@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     unsigned k, right, degree, closure, neq, time_limit, check_count;
     Word witness;
     if (!(std::cin >> k >> right >> degree >> closure >> neq >> witness >> time_limit >> check_count) ||
-        (!k && !right) || k >= 128 || right >= 64 || right >= 128 - k || degree < 2 || degree > 4 || closure > 1) {
+        (!k && !right) || k >= 128 || right >= 64 || right >= 128 - k || degree < 2 || degree > 5 || closure > 1) {
         return 1;
     }
     auto start = Clock::now();

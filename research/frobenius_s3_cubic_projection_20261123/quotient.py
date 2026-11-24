@@ -151,11 +151,11 @@ def first_fall(rows, width):
     return None
 
 
-def measures(binary, rows, points, k, left):
+def measures(binary, rows, points, k, left, *, max_degree=4):
     width = k + left
     basis = point_basis(points, width)
     hits, caps = {}, []
-    for d in range(5):
+    for d in range(max_degree + 1):
         missing = [(i, row) for i, (degree, row) in enumerate(basis) if i not in hits and degree <= d]
         if not missing:
             continue

@@ -251,6 +251,16 @@ All four methods recover the same challenge scalars in both seeded runs at 14, 1
 
 The times include setup and verification. The split projection reduces setup from approximately 1.9 ms to 0.8 ms within the compressed arm. An independent baby-step giant-step check takes about 7–11 microseconds on the supplied 991-order subgroup challenges, including its baby table. The result establishes a faster complete relation-based recovery on these toys. The largest subgroup and generic baseline remain relevant to any scaling claim for this curve family. [pcc:unverified]
 
+## Solving-degree ceiling for the direct coset S3 baseline
+
+The constant-size sum–product fiber also bounds the solving degree of the direct equations. Work in the Boolean quotient and use a degree-compatible monomial order. Write the input in the variables \(x=u_1\) and \(s=u_1+u_2\), with \(p=x^2+sx\). The binary coordinates of the direct input are the affine linear sum–product equations with this substitution, and they have degree at most two. If the linear sum–product equations are inconsistent, a binary combination of the input already gives 1. Otherwise row reduction eliminates \(p\) and gives affine equations in \(s\) alone. These equations are binary combinations of the direct input. Their affine slice of sums has dimension \(d\le2\), because it is a projection of an affine fiber with at most four points. [pcc:unverified]
+
+Use \(d\) free Boolean coordinates for that affine slice. Its \(2^d\) point indicators \(\chi\) have degree at most two. For each sum \(s_\chi\), the row \(\chi F_j(x,s_\chi)\) can be derived by multiplying the original input by \(\chi\) and reducing the affine selector equations. This costs degree at most four. At the fixed sum, \(F_j(x,s_\chi)\) is affine linear in \(x\). For any polynomial \(g\) of degree at most three that vanishes on the solutions, \(g(x,s_\chi)\) belongs to this affine ideal, including when the fiber is empty. Linear substitution expresses it as a combination of the affine equations with product degrees at most three. After multiplying by the point indicator, these products have degree at most five. Adding them over the affine slice gives \(g\) modulo the affine selector equations, again with products of degree at most five. Thus \(g\) lies in the degree-five multiplication closure. [pcc:unverified]
+
+There are at most eight oriented solutions, since every sum–product candidate gives at most two roots. The standard monomial set of their Boolean point ideal has size at most eight and is closed under divisibility. A squarefree minimal leading monomial of degree four or greater would require at least 15 distinct proper divisors in that set. Hence the reduced basis has degree at most three, including the possible square relations of degree two before passing to the Boolean quotient. The closure argument gives solving degree at most five for the direct coset S3 presentation. In particular, a tenfold reduction in solving degree from this baseline is impossible for a nontrivial satisfiable instance with positive solving degree. [pcc:unverified]
+
+An exact membership check on 56 toy instances across seven quadratic and cubic geometries gives direct solving degree at most three. Every nonempty tested fiber has reduced basis degree at most two. The bound and the certificates concern solving degree. They are separate from the earlier measured exponent for pair extraction and the wall-clock gain in native recovery. [pcc:unverified]
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
@@ -360,5 +370,13 @@ bash research/frobenius_s3_cubic_projection_20261123/run_native_coset.sh recover
 ~~~
 
 The native records are in [native-coset.jsonl](native-coset.jsonl) and [native-recovery.jsonl](native-recovery.jsonl).
+
+Replay the coset solving-degree baselines with the C++ ranker built above.
+
+~~~sh
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/coset_degree.py --ranker /tmp/s3-selector-elimination
+~~~
+
+The solving-degree records are in [coset-degrees.jsonl](coset-degrees.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
