@@ -208,6 +208,9 @@ impl Family {
     pub fn polynomials(&self) -> &[Poly] {
         &self.equations
     }
+    pub fn modulus(&self) -> u64 {
+        self.p
+    }
     fn coordinates(&self, z: &[u64]) -> Result<(), &'static str> {
         if z.len() != N || z.iter().any(|&x| x >= self.p) {
             Err("eight canonical Fp coordinates required")
