@@ -303,3 +303,44 @@ The root gate did not reach tests; the final receipt is a timeout, not a
 compiler diagnosis. The PDF's initial font substitution and split command
 block were corrected through embedded fonts and unbroken code-block layout.
 Prose lint's negative-claim findings were explicitly tagged, not suppressed.
+
+## 19:54 PST — Full source and evidence published; review handoff
+
+### What was done
+
+Published source/evidence commit 14944192f77d95c2c43193038320e1815dc3f513
+to PR #5119. Remote tree 46533aaf69505fcc76bbaa171e5b1692414aae7e
+exactly matches the local committed tree, and all 160 intended changed paths
+are present. Report/PDF, native implementation, failed and successful records,
+claims and blocked card are included. Final PDF visual review covers all six
+pages; all 11 claim subjects still match. Artifact/size checks and the 1851-entry
+ledger prefix check pass locally; prose lint is clean at its stated scope.
+These are producer-observed checks, not signed scientific verification.
+[pcc:unverified]
+
+### Decisions made
+
+Close publication with this handoff-only checkpoint, then mark the PR ready
+for review and enable normal auto-merge under the repository's required
+checks. Do not edit scientific bytes or create repeated polling commits.
+Keep the complete extraction/total-cost goal and the blocked comparison card
+open; retain the full-root timeout and unsigned standing in the PR body.
+
+### Open threads
+
+Observe final ready-state required CI and review; no manual gate bypass.
+The blocked card requires an integrated solver, frozen shared-budget panel,
+canonical fixture binding and execution admission. Native backlog validation
+was unavailable, so the card does not claim that validator passed.
+
+### Errors
+
+The first local artifact audit used default policy because its tracked config
+was not materialized in this sparse checkout; hydrating the existing config
+made the audit pass without any policy or exemption change. That sparse
+refresh also removed newly committed out-of-profile study files from disk;
+the explicit study/card/journal paths were added to the sparse profile and
+restored from their exact committed blobs. No evidence was lost or changed.
+Full whitespace diagnostics flag original recorder output and generated
+SVG/PDF whitespace; those bytes are preserved. Source and prose checks are
+clean separately. No scientific or constructor test was rerun in publication.
