@@ -4,13 +4,15 @@ set -o noclobber
 cd /workspace/crypto
 export TRACE_STUDY="$(cd -- "$(dirname -- "$0")/.." && pwd)"
 trace_binary="$TRACE_STUDY/bin/elimination"
-export TRACE_BASELINE_EXE="$PWD/$TRACE_STUDY/bin/baseline" TRACE_INCUMBENT_EXE="$PWD/$TRACE_STUDY/bin/incumbent"
+export TRACE_BASELINE_EXE="$TRACE_STUDY/bin/baseline" TRACE_INCUMBENT_EXE="$TRACE_STUDY/bin/incumbent"
 export VALGRIND=/workspace/scratch/profile-tools/root/usr/bin/valgrind VALGRIND_LIB=/workspace/scratch/profile-tools/root/usr/libexec/valgrind RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1
+test -x "$TRACE_BASELINE_EXE"
+test -x "$TRACE_INCUMBENT_EXE"
 trace_start=$(cat "$TRACE_STUDY/start.epoch")
 trace_remaining=$((600-$(date -u +%s)+trace_start))
-taskset -c 0 bash -c 'ulimit -v 2097152; exec timeout "$1" "$2" calibrate "$3" "$4"' trace-cal "$trace_remaining" "$trace_binary" research/trace_zero_projected_20261115/inputs /workspace/scratch/cold15m-candidate3-corrected-calibration > "$TRACE_STUDY/calibration.json" 2> "$TRACE_STUDY/calibration.stderr"
+taskset -c 0 bash -c 'ulimit -v 2097152; exec timeout "$1" "$2" calibrate "$3" "$4"' trace-cal "$trace_remaining" "$trace_binary" research/trace_zero_projected_20261115/inputs /workspace/scratch/cold15m-candidate3-v3-calibration > "$TRACE_STUDY/calibration.json" 2> "$TRACE_STUDY/calibration.stderr"
 trace_remaining=$((600-$(date -u +%s)+trace_start))
-taskset -c 0 bash -c 'ulimit -v 2097152; exec timeout "$1" "$2" pilot "$3" "$4"' trace-pilot "$trace_remaining" "$trace_binary" research/trace_zero_projected_20261115/inputs /workspace/scratch/cold15m-candidate3-corrected-pilot > "$TRACE_STUDY/preflight.json" 2> "$TRACE_STUDY/preflight.stderr"
+taskset -c 0 bash -c 'ulimit -v 2097152; exec timeout "$1" "$2" pilot "$3" "$4"' trace-pilot "$trace_remaining" "$trace_binary" research/trace_zero_projected_20261115/inputs /workspace/scratch/cold15m-candidate3-v3-pilot > "$TRACE_STUDY/preflight.json" 2> "$TRACE_STUDY/preflight.stderr"
 python3 - <<'PY'
 from pathlib import Path
 import os,json,hashlib,time

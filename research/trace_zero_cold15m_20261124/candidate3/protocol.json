@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "TZ15M-20261124-register-denominator",
-  "version": 2,
+  "version": 3,
   "created": "2026-11-24",
   "repository": "crypto",
   "study_dir": "research/trace_zero_cold15m_20261124/candidate3",
@@ -525,6 +525,15 @@
       "reason": "Copied runner named prior candidate2 output directory and failed before any child because its calibration directories already existed. Preserve failed record and overwritten metadata bytes; restore originals.",
       "changes": [
         "Derive study directory from script location, forbid output clobbering, use unique corrected scratch namespace and original candidate3 start epoch/600second deadline. No new counter child or primary data existed before correction."
+      ]
+    },
+    {
+      "id": "validate-absolute-executable-paths",
+      "filed": "2026-11-24",
+      "filed_before_affected_data": true,
+      "reason": "Derived absolute study path was still prefixed with PWD for controls; exec failed before any child.",
+      "changes": [
+        "Use absolute executable paths directly, test executable presence before any output redirection, retain failed bytes/record and original600second deadline; new v3 scratch namespace."
       ]
     }
   ],
