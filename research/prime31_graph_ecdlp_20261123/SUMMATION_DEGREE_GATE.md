@@ -435,7 +435,26 @@ price useful relations. A cubic coordinate has three generic point
 preimages, so a lower membership degree alone is not a four-summand
 relation-cost argument.
 
-Combining this support with the target-centered degree-four `S4`
+There is also a direct **canonical top-ideal obstruction** for using
+these linear graphs in the existing two-summand secant presentation.
+Put `h_u(x)=a*x+b+t0+sum(w_i*u_i)` in the five generators recorded in
+`research/prime_factor_base_degree_20261031/pencil_search_20261101/reports/REPORT.md`,
+with each sign branch fixed. Their highest homogeneous forms generate
+
+`(m^2, x*z-r*m^2, m*x, m*z, u_i^2, v_i^2)`
+
+and hence the same ideal as
+`(m^2, x*z, m*x, m*z, u_i^2, v_i^2)`. Setting
+`m=z=u_i=v_i=0` maps its quotient onto `F_p[x]`. Therefore `x^d`
+survives for **every** `d`: this canonical highest-form ideal has no
+finite first-vanishing homogeneous degree. The quadratic-graph law
+`2k+3` relies on the nonzero `x^2` and `z^2` terms and cannot be
+carried over by replacing the graph with a linear one. This is an
+exact statement about the displayed generators' leading-form ideal;
+elimination consequences, a different grading or an affine Groebner
+run can behave differently and need their own completed cost test.
+
+Combining the quadratic-offset support with the target-centered degree-four `S4`
 presentation has a separate rank gate. As proved in
 `research/prime31_target_centering_20261123/DEGREE_RANK_GATE.md`, four-sum
 rows on a fixed centered base have incidence matrix `M` with
