@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T01:55:12Z",
+ "id": "PCC-20261124-8c50c8",
+ "kind": "statement",
+ "producer": {
+  "commit": "345ec56c03861ff31f811b702973857816260ba1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/check-query-guards.sh",
+    "sha256": "3c7173cfe5a17f83adcda92f69be3835e25ddc7437854651da9f339ee357cb66"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/query-guards-v1/before.sha256",
+    "sha256": "48a6249314bf4af2978357a6592b6b7a22cffe662a8aa9e47ee30bee3179f863"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/query-guards-v1/unchanged.stdout",
+    "sha256": "0f005d45b5720e6828b0148e213990eab726fad623f910d94e7973d28c05bc1d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/query-guards-v1/collision.stderr",
+    "sha256": "f6b56ac53bd278786ffb88f02f8fefddbf90ee94d1fe887cba91be54a434edeb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/query-guards-v1/missing.stderr",
+    "sha256": "19bc91d79d04489d4467440f85844c2f9e604666587c2ece663851a3be984d9e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/query-guards-v1/collision-cost.json",
+    "sha256": "03dbd2dcb3de19e0f17cbae9744a3eacab32564882eaa9a74e1d5c53b5d5d553"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/query-guards-v1/missing-cost.json",
+    "sha256": "75bef97300cda7747805b70a39114f9292321f530b36e49608df3a1f0be0e79c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "entry-only output and argument guards of the frozen three-row query worker",
+ "statement": "Using the same qualified native binary, an existing U output rejects at the query output guard and a missing U argument list rejects at argument validation, both with exit one. All three prior arm outputs, the classification result and binary retain their exact bytes. No query arm, point collection or arithmetic stage reran; guard diagnostics and exact invocation source are retained."
+}
