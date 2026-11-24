@@ -57,6 +57,14 @@ For each of the six subspaces at these sizes, the verifier also finds a rational
 
 For the two 47-bit subspaces, increasing the multiplier degree to four gives block dimensions 281, 281, and 283. The unrestricted dimension is 13,253, which equals \(\sum_{j=0}^4(5-j)\binom{23}{j}\), the scalar-multiple span of \(\alpha_0,\ldots,\alpha_4\). The fourth telescoping image adds \(u^4s\), so these five values are independent at every nonzero sum. The same span argument now gives pointwise rank five. Each subspace again has a rational target and a nonzero sum passing all five checks with inconsistent augmented rank. An exact projection using only target-independent trace multipliers of this form therefore requires multiplier degree at least five on these geometries. [pcc:unverified]
 
+## Affine charts and mixed-coordinate elimination
+
+Let a selector chart \(C\subset U\) have codimension \(r\). Extend its free Boolean coordinates by affine functions on \(U\). A degree-\(d\) multiplier on \(C\), multiplied by the indicator of \(C\), extends by zero to a global multiplier of degree at most \(d+r\). This also applies if the unknown \(x\) is restricted at each nonzero \(s\) to a complement of \(\langle s\rangle\), since \(x\mapsto x^2+sx\) has the same image on that complement. Thus a chart containing a published quartic false positive cannot reject it using only trace multipliers with \(d+r\le4\). [pcc:unverified]
+
+The mixed-coordinate experiment uses the full Boolean equations in \(x,s\) at the two 47-bit witness targets. It first takes the degree-capped Macaulay rows and then optionally closes their span under multiplication by a single variable whenever the input row has degree below the cap. Both operations use the Boolean field equations to reduce powers. To test whether the row space separates a witness, the verifier keeps each monomial involving \(x\) as a separate column and evaluates only the pure selector terms at that witness. A row with zero \(x\)-part and nonzero evaluation separates the witness. The small built-in control has a witness separated only after closure. [pcc:unverified]
+
+Degree-three closure completed in both 46-variable systems. Its selector-only subspace has dimension 25 and equals the span of \(f_2\), \(f_1\), and \(s_i f_1\), where \(f_j(s)=\operatorname{Tr}(\alpha_j(s)p(s))\) for \(j=1,2\). This equality was checked by taking the rank of the union of the computed and independently generated rows. Both witnesses survive. The degree-two trace multipliers already put the same 25 rows in the degree-four Macaulay selector span, whose computed dimension is 25. Hence the mixed-coordinate products give no additional selector rows there. The complete degree-four Macaulay spans leave both witnesses alive, including after setting \(s_0=1\) and \(x_0=0\) in their symmetry charts. Both degree-four closure pilots reached the time cap, so they leave the full degree-four closure question open. [pcc:unverified]
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
@@ -75,4 +83,15 @@ c++ -std=c++20 -O3 -mpclmul research/frobenius_s3_cubic_projection_20261123/exte
 SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/unrestricted.py 47 --ranker /tmp/s3-extension-rank-fast --degree 4
 ```
 
-The records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
+Reproduce the witness checks as follows. The degree-four runs need time to insert all their Macaulay rows. The `--closure` switch includes the bounded multiplication closure.
+
+```sh
+c++ -std=c++20 -O3 research/frobenius_s3_cubic_projection_20261123/selector_elimination.cpp -o /tmp/s3-selector-elimination
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/selector_elimination.py --ranker /tmp/s3-selector-elimination --degree 3 --closure
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/selector_elimination.py --ranker /tmp/s3-selector-elimination --degree 4
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/selector_elimination.py --ranker /tmp/s3-selector-elimination --degree 4 --chart
+```
+
+The elimination records are in [selector-closure-d3.jsonl](selector-closure-d3.jsonl), [selector-macaulay-d4.jsonl](selector-macaulay-d4.jsonl), and [selector-chart-d4.jsonl](selector-chart-d4.jsonl).
+
+The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
