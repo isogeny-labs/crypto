@@ -204,6 +204,38 @@ lead in the shared research atlas already flagged this eigenfunction
 route; the kernel-degree calculation makes one of its degree
 obligations explicit. [pcc:unverified]
 
+## Elliptic Gauss-sum order and phase gate
+
+Berghoff's [elliptic Gauss sum](https://arxiv.org/html/1707.08075)
+for an order-`n` character `χₙ` of `F_r^×` uses
+`Tₙ(P)=Σ_{a=1}^{r-1} χₙ(a)y([a]P)` when `n` is even.
+For P-192, `r-1=16m` with `m` odd. Pairing the terms indexed by
+`a` and `-a` gives
+
+`χₙ(a)y([a]P)+χₙ(-a)y([-a]P)
+ = χₙ(a)(1-χₙ(-1))y([a]P)`.
+
+If `16∤n`, then `χₙ(-1)=1`, so **the entire even-order sum is
+identically zero** for every marking. This includes orders 2, 4,
+and 8 when they divide `r-1`. The first even order not forced to
+cancel is 16: an exact-order-16 character has `χ₁₆(-1)=-1`.
+This parity test does not establish that `T₁₆(P)` is nonzero.
+[pcc:unverified]
+
+When the marked sums are nonzero, reindexing gives
+`T₁₆([d]P)=χ₁₆(d)⁻¹T₁₆(P)`. Since `χ₁₆⁸=χ_r`, the eighth power of
+`T₁₆(Q)/T₁₆(G)` would equal the requested scalar sign. Directly
+forming either sum has `r-1≈2^192` terms. Berghoff's
+[universal modular formula](https://arxiv.org/html/1707.08610)
+instead evaluates `Tₙ(P)^n` from unmarked modular data. That power,
+and the paper's ratios `T_χ(P)^j/T_{χ^j}(P)` when defined, are
+unchanged by replacing `P` with `[d]P`: their character multipliers
+cancel. This is an instance of the diamond-invariant fiber closure
+already recorded as `H-MOD-e9d87e` in the shared atlas. The formula
+does not select the marked 16th-root phase. A useful evaluator would
+have to compute that phase from `P` with nonvanishing and a fully
+charged cost below the reference. [pcc:unverified]
+
 ## Forty-two-coordinate pair-pattern gate
 
 Fix `k ≤ 42` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192
