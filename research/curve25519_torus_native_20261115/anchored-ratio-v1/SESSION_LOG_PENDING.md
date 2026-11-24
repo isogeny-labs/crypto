@@ -58,3 +58,68 @@ multi-file patch failed on a protocol context; unchanged tests/Clippy were
 inadvertently repeated once before confirming no partial patch took effect.
 Both repeat logs preserved, then actual source repair checked. No primary
 call/cap/fixture tuning occurred. [pcc:unverified]
+
+## 2026-11-24T04:09:11.086778+00:00 — Fixed anchored-ratio control complete
+
+### What was done (commands, files, features)
+Source df88c2152d published38faab5cefee before immutable qualifierb42720a3,
+118inputs/fivecompiled/binary metadata and actual transport0/nativecollision1/
+wrappercollision1. Sole600second/2GiB call exit0/42records,4groups complete.
+Toy12targets match208direct roots. Actual five selected query cases return
+four checked339-value roots with original numeric labels, q213156431/K20633.
+Synthetic tree/zero-tag/informative matrices distinguish useful closure.
+Native data claim0a02aa pins9subjects. [pcc:PCC-20261124-0a02aa]
+
+### Decisions made (and why)
+Preserve source/control outputs without rerun. ALL and FIRST counts remain
+partial; FIRST pays full old-list admission. No q-element ratio list is
+built, but numeric indexing has14600babies and old-column selection stays
+linear. New raw archive49256B/36members round-trips under actual policy.
+Prepare report/PDF and source-linked cost/next scope. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Inspect report and publish results on samePR5071, verify actual head/gates,
+resume sameCI checker. Next research is a structured useful-closure selector
+with complete cold costs and primary3SUM-indexing review, not larger caps.
+
+### Errors (what went wrong, how it was handled)
+No primary group failure, cap change or source edit after qualification.
+Tenrefusals/95toy auxiliary mutations/fourroot mutations/wrongtarget and
+wrongtags reject. Numeric giant iterations are hidden by old API: retain
+bound14600, never call it actual operation count. Fixed controls use
+constructor-produced unmodified contexts; broader native soundness/API
+mutation hardening remains separate. Prior CI/store blockers unchanged.
+[pcc:unverified]
+
+## 2026-11-24T04:14:26.708579+00:00 — Report inspected and publication checks complete
+
+### What was done (commands, files, features)
+Both final two-page165348B PDF pages and editable pipeline inspected; final
+nooverfull. Report claimPCC-20261124-d66df2 pins10subjects, native0a02aa9subjects; all19
+match. Source118/compiled5/fiveold+onenew archive and binary pre/post match.
+Ledger1861 preserves1859publishedprefix, lessons1039/0errors, all24published
+pending journal prefixes retained. No new scientific source or primary run.
+[pcc:unverified]
+
+### Decisions made (and why)
+Publish samePR5071, then actual-head snapshot and same checker resume.
+Report exact API counters and selected/domain scope, not total field/timing
+or useful-target yield. New archives49256/10604bytes are actual-policy
+preflight subjects; prior selected140084byte payload stays pending.
+[pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Commit/push full source-qualified results/report, verify Git subjects and
+current gates. Next exponent-relevant work is structured old-set closure
+selection with cold setup/update/index accounting and primary literature.
+
+### Errors (what went wrong, how it was handled)
+Initial report overfull retained as source/log, then plain source-context
+wording corrected. A local report draft claim was created after prose lint
+flagged the word solves citing unsigned data. Before publication, backed up
+the full unpublished ledger and exact draft claim/registration/cost text,
+removed ONLY its last unpublished registration/file, changed solves to
+handles, and issued the replacement through maintained claim tooling. Native
+claim0a02aa, its registration, and every published1859event prefix stayed
+byte-identical; no rechain or frozen/raw/source change. Scoped prose now0.
+[pcc:unverified]
