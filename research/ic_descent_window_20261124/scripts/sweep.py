@@ -10,7 +10,7 @@ import json, os, subprocess, sys, pathlib
 IC, OUT, ROUNDS = sys.argv[1], pathlib.Path(sys.argv[2]), int(sys.argv[3])
 HERE = pathlib.Path(__file__).resolve().parent.parent
 CRYPTO = pathlib.Path('/home/user/crypto')
-P3, P2 = HERE / 'params/k0n41-w-norho.json', None
+P3, P2 = HERE / 'params/icv1-f2m41-tm2308219-7f48b14a-w-norho.json', None
 ARMS = [('unset', None, P3), ('w16', '16', P3), ('w32', '32', P3), ('w64', '64', P3), ('w128', '128', P3),
         ('w207', '207', P3), ('w414', '414', P3), ('w828', '828', P3), ('d3', 'd3', P3), ('full', '0', P3),
 ]  # m2 (descent_summands = 2) dropped after the smoke round: 2 of 32 targets exhausted max_trials

@@ -1,4 +1,4 @@
-# The m = 3 descent window on the k0n41 gate rung
+# The m = 3 descent window on the icv1-f2m41-tm2308219-7f48b14a gate rung
 
 2026-11-24. A stage measurement on the `ic` end-to-end gate rung
 `docs/ic/params/k0n41-subgroup-wide.json`, made to explain why the gate has
@@ -10,7 +10,7 @@ freezing a new reference. Every number is a producer measurement,
 
 Since #4899, the `m = 3` descent walk scans a cyclic third-summand window
 (`45e447d9ba`) whose length is read from `collection_window`, falling back to
-`⌈|F|/3⌉`. The k0n41 rung sets `collection_window: 207` (|F|/32, tuned for
+`⌈|F|/3⌉`. The icv1-f2m41-tm2308219-7f48b14a rung sets `collection_window: 207` (|F|/32, tuned for
 aimed collection) and descends with `m = 3`, so its descent scans 207 of the
 6,560 base points a trial. v6 froze the full scan. Is that window a
 regression in descent cost, an improvement, or neither, and where is the
@@ -21,7 +21,7 @@ optimum? [pcc:unverified]
 - **What is timed.** The descent (the `solve` stage) only: the sum of the 32
   targets' own `elapsed_seconds`, which is the gate's
   `ic_descent_seconds_total`. Select, collect and logs run in every arm and
-  are identical; ρ is off (`baseline.rho: false`, `params/k0n41-w-norho.json`,
+  are identical; ρ is off (`baseline.rho: false`, `params/icv1-f2m41-tm2308219-7f48b14a-w-norho.json`,
   otherwise the rung's file byte for byte). [pcc:unverified]
 - **Arms.** One binary, `main` at `dae5b3dc9e` plus `KIC_DESCENT_WINDOW`
   (this PR): `w16`, `w32`, `w64`, `w128`, `w207`, `unset`, `w414`, `w828`,

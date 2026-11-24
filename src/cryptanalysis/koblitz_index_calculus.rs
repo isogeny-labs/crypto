@@ -14327,7 +14327,10 @@ impl FastRhoWalk<'_> {
                 self.lambda_neg[best_k as usize],
             )
         } else {
-            (FastPoint::affine(best_x, y), self.lambda_pos[best_k as usize])
+            (
+                FastPoint::affine(best_x, y),
+                self.lambda_pos[best_k as usize],
+            )
         };
         FastRhoState {
             point,

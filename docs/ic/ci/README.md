@@ -24,10 +24,10 @@ from 2026-11-22 (runs #2513 to #2520). No rung file changed.
 | `docs/ic/params/k0n41-subgroup-wide.json` | descent trials 346 → 2,908 | `45e447d9ba`: the `m = 3` descent walk scans a cyclic window read from `collection_window`; this rung sets 207 and descends with `m = 3` |
 | `docs/ic/params/k0n53-subgroup-wide.json` | unchanged | it descends with `descent_summands: 2` |
 
-The k0n41 change was measured before freezing
+The icv1-f2m41-tm2308219-7f48b14a change was measured before freezing
 ([`research/ic_descent_window_20261124/`](../../../research/ic_descent_window_20261124/README.md)).
 `KIC_DESCENT_WINDOW=0`, a same-binary control that restores the full scan,
-reproduces v6's k0n41 counters exactly. Against it the windowed descent is
+reproduces v6's icv1-f2m41-tm2308219-7f48b14a counters exactly. Against it the windowed descent is
 **2.70× faster** (paired per round 2.17–3.38, five isolated rounds, 32/32
 verified with the same logarithms in every run), and windows from 207 to 828
 are one flat optimum. By `AGENTS.md` §3 this is **engineering**: the
