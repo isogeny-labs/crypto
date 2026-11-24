@@ -51,3 +51,11 @@ Claims: PCC-20261124-695364 (actual collection), PCC-20261124-dbb2dd (fresh fixe
 transfer/exception replay), PCC-20261124-2b81de (original wrapper costs), and
 PCC-20261124-655ae2 (profiling/prefix/incidence inspection). All are
 producer-unverified. [pcc:unverified]
+
+Canonical-main merge bookkeeping is recorded in
+[evidence/merge-v1](evidence/merge-v1/receipt.json). Initial fork-detection
+outputs remain in local-checks; passing successor checks are in local-checks-v2.
+Old registration envelopes are archived, unchanged claim bodies are mapped
+to the canonical prefix, and both Git parents are retained. No science reran
+for this metadata integration. Later publication/check receipts are outside
+the sealed scientific-record inventory in RECORDS.json.
