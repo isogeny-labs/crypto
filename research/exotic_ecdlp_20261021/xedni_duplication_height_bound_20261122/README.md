@@ -56,15 +56,15 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 | Global real and homogeneous archimedean lower bound | `global_univariate_lower` and `global_homogeneous_lower` in `Global.lean` | Lean checked for all real inputs, including both outer tails and `B=0` |
 | Primitive integer input and a common divisor of both forms | `integer_homogeneous_lower` and `reduced_forms_lower` in `IntegerBridge.lean` | Lean checked: if `gcd(A,B)=1`, `d>0`, `F=d f`, and `G=d g`, then `max(|A|,|B|)^4 ≤ 1024·8038359040000·max(|f|,|g|)` |
 | Canonical reduced output pair | `canonical_output_lower` and `point_canonical_output_lower` in `OutputBridge.lean` | Lean checked: the same lower bound holds with `f=q.num`, `g=q.den`, `q=F(A,B)/G(A,B)`; the point theorem discharges both primitive-input and nonzero-denominator hypotheses |
+| Point-level lower logarithmic defect | `point_lower_height_defect` in `HeightBridge.lean`, using Mathlib's `Rat.logHeight₁_eq_log_max` and the canonical output lower bound | Lean checked for every nonsingular affine point whose double is affine: `4·h(x(P))−h(x(2P))≤53 log 2` |
 | Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
 | Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Mathematical derivation; integer-coordinate height comparison in Lean remains open |
 
-The polynomial, divisibility, global archimedean and numerical Lean declarations
-use only standard foundations in their `#print axioms` output. The packet is
-**partially formalized** until `Rat.logHeight₁_eq_log_max` is applied to the
-canonical output pair and the matching upper height inequality is combined
-with it. The resulting uniform doubling defect remains a point-level Lean
-obligation.
+The polynomial, divisibility, global archimedean, point-level lower defect,
+and numerical Lean declarations use only standard foundations in their
+`#print axioms` output. The packet is **partially formalized**: the matching
+point-level upper defect, the identity double case, and the combined uniform
+absolute defect remain Lean obligations.
 The canonical-limit packet already proves quadraticity for integer multiples.
 Mordell–Weil generation and rational-to-finite reduction remain separate
 obligations for a complete fixed-curve exclusion theorem.
