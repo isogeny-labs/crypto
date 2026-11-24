@@ -858,6 +858,40 @@ This says nothing about even-order subgroups, arbitrary selected
 EDS index sets, or a biased rather than exact feature.
 [pcc:unverified]
 
+### Even-order cosets: an index-parity obstruction
+
+For an even-order subgroup `H` of size `m` and index `t=n/m`,
+the same normalizer identity cancels its `φ(P)` factor. If `h`
+generates `H` in `F_r^×/{±1}`, multiplying the odd representatives
+of any coset `C` by `h` permutes them, with a product of
+representative signs equal to `h^m∈{±1} (mod r)`. Since
+`p≡3 (mod 4)`, the exact character transformation is
+
+`B_C([h]P)/B_C(P)=h^m` (interpreting the residue as `±1`).
+
+Choose a primitive scalar `g` modulo `r` and `h=g^t` modulo `±1`.
+Then `h^m=g^n=-1`, while `χ_r(h)=(-1)^t`. If **`t` is even**,
+the coset product flips sign under `[h]` but the target ray sign
+does not. This excludes exact equality for *every* even-order
+subgroup coset of even index, independently of the curve
+coordinates or the chosen coset. If `t` is odd, this necessary
+transformation matches and further checks are required.
+[pcc:unverified]
+
+The [`even_coset_parity_control.sage`](even_coset_parity_control.sage)
+replay checks an order-97 curve. At `(m,t)=(4,12)` the product
+ratio is `-1` and the ray ratio is `+1`; at `(16,3)` both are
+`-1`. For P-192, the remaining even-order, odd-index subgroups
+must have `8|m`. The local ray-character note has explicit
+counterexamples for `m=8,40,19112,95560`. The smallest larger
+size in the recorded factorization is
+`m=8·9564682313913860059195669≈2^85.984`; its direct cold
+base-and-target formula already contains `2m≈2^86.984` EDS
+factors before recurrence work. This factor count is not a
+running-time bound on a compressed product, and these larger
+odd-index subgroups remain untested for exactness.
+[pcc:unverified]
+
 ### Second division-polynomial jet: a compact exactness screen
 
 The first derivative of `ψ_r` at `x(P)` was screened in the local
