@@ -499,6 +499,40 @@ modulo-four parity and the displayed derivative congruence at all
 sign convention; it does not measure or solve the P-192 modular
 sum. [pcc:unverified]
 
+### Kernel derivative is an existing EDS feature
+
+The derivative character is not a fresh bias candidate. Let `φ(P)`
+be the perfectly periodic EDS normalizer of
+[Lauter–Stange, Theorem 3.1](https://arxiv.org/html/0803.0728v2),
+with the rank-one composition identity
+`φ([j]P)=φ(P)^(j²)ψ_j(P)`. The printed exponent `j²-1` in that
+paper's Eq. (4) is inconsistent at `j=1`; the corrected identity
+used here passes the control checks below. As
+`[m+1]P=[-m]P` and `φ(-P)=-φ(P)`, the derivative formula above
+gives the field identity
+
+`F′(x(P)) ψ_2(P) φ(P)^r = -1`.
+
+Since `p≡3 (mod 4)` and `r` is odd, taking field quadratic
+characters yields
+
+`χ_p(F′(x(P))) = -χ_p(φ(P)/ψ_2(P)) = -χ_p(ψ_{r+2}(P))`.
+
+The second equality follows by comparing `[r+2]P=[2]P` in the
+same composition identity: `ψ_{r+2}(P)=φ(P)^(-r(r+4))ψ_2(P)`,
+whose exponent is odd. Normalizing at `G` cancels the minus sign,
+so the kernel-derivative feature and the already screened
+`ψ_{r+2}` feature are *identical on every nonzero P-192 marking*.
+This transfers any valid bias evidence for one to the other; it
+does not establish a nonzero bias. The independent
+[`derivative_normalizer_control.sage`](derivative_normalizer_control.sage)
+replay checks the field identity, both character equalities, and
+the direct kernel derivative on all 48 distinct `x`-classes of an
+order-97 control. It checks the field and character equalities at
+eight P-192 markings. The proof uses the composition identities;
+the finite checks validate their implementation and sign convention.
+[pcc:unverified]
+
 There is nevertheless a deterministic **average over all public
 known-point offsets**. Let `S={x([a]G):1≤a<r}`, of size `n/2`, and
 let `ρ(c)=n⁻¹Σ_{P≠O}t(P)χ_p(x(P)-c)`. The single-offset second
