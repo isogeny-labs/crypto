@@ -10,6 +10,11 @@ narrower question those sweeps did not: does the paper's Algorithm 1, with the
 §3.4 auxiliary-isogeny factor base at the paper's own density condition,
 actually collect relations, reach a rank, and recover a scalar?
 
+The earlier NIST-curve pilot (`research/pkm_nist_pm1_20261122`) ran the Kummer
+and Dickson-torus towers at composed degree ≤ 4. Neither is the §3.4
+construction: no `E'`, no smooth `H`, no Vélu chain, no `χ`. The runs below
+are the construction the paper defines.
+
 ## 1. What the paper defines
 
 [Petit–Kosters–Messeng, PKC 2016](https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf)
