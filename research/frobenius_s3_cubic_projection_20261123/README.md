@@ -182,6 +182,40 @@ The direct group join, the batch resultant join, and the compiled quadratic join
 
 The join totals include factor-base and orbit setup, fixed compilation where used, target generation, unsuccessful searches, sign recovery, modular row reduction, back substitution, descent, and verification. The generic measurement is an independent baby-step giant-step search on the supplied challenge, including its baby-table build. The compiled join's search phase takes 4.01 s and 3.68 s, compared with 4.68 s and 3.96 s for the direct join. The fixed setup offsets that gain in the complete run on both factors. These measurements leave the asymptotic decomposition question open. [pcc:unverified]
 
+## Sum–product linearization in a quadratic extension
+
+Let \(K=\mathbb F_{q^2}\), \(q=2^k\), and take the factor-base abscissae in \(a+\mathbb F_q\) with \(a\notin\mathbb F_q\). For \(x_1=a+u_1\), \(x_2=a+u_2\), put \(s=u_1+u_2\) and \(p=u_1u_2\). The original product is \(z=a^2+as+p\). For a finite target abscissa \(t\) on an ordinary binary curve with coefficient \(b_E\ne0\), S3 is
+
+\[
+z^2+tz+t^2s^2+b_E=0.
+\]
+
+After substitution this equation is affine linear over \(\mathbb F_2\) in the \(2k\) binary coordinates of \(s,p\). The number of solutions is at most four, uniformly in the target. To see this, write \(a^2=Aa+B\) with \(A\ne0\) and \(t=b+ca\), with \(A,B,b,c\in\mathbb F_q\). The \(a\)-coordinate of the S3 equation has nonconstant part
+
+\[
+A(1+c^2)s^2+(b+Ac)s+cp.
+\]
+
+If \(c=0\), this gives at most two values of \(s\). For each value the constant-coordinate equation is monic quadratic in \(p\). If \(c\notin\{0,1\}\), solve the \(a\)-coordinate equation for \(p\) and substitute into the constant coordinate. The \(p^2\) term supplies a nonzero coefficient of \(s^4\), and the other terms have degree at most two. If \(c=1\), the substitution makes \(p\) affine linear in \(s\) with slope \(b+A\). The surviving coefficient of \(s^2\) is \(b^2+(b+A)^2=A^2\ne0\). These bounds hold for the affine system because the constant terms do not affect the stated leading coefficients. [pcc:unverified]
+
+Solve the binary linear system, enumerate its at most four solutions, and recover \(u_1,u_2\) from \(U^2+sU+p=0\) in \(\mathbb F_q\). With \(s\) fixed this is another binary linear system. Rational lifting and a constant number of signed group checks give every verified pair. For a given field representation the per-target decomposition uses polynomial work in \(k\), replacing enumeration over \(2^k\) candidates. The sliced three-summand join uses \(B_0\operatorname{poly}(k)\) work with \(B_0\) abscissae in the rational factor base, by fixing each signed third point. The direct complement-lookup implementation uses \(\Theta(B_0^2)\) checks when all thirds and all signed left points are included. A fixed bound on the number of two-coordinate candidates is what changes the enumeration exponent in this comparison. [pcc:unverified]
+
+Exhaustive controls over \(\mathbb F_{2^6}\) and \(\mathbb F_{2^{10}}\) agree with independent S3 pair enumeration for every field abscissa and with direct signed group sums for every represented point. The sampled controls at field degrees 14, 22, and 34 verify planted pairs and check that the candidate bound holds. The signed three-summand comparison includes 12 planted targets at each of field degrees 10, 14, and 22. The 10-bit run uses every signed third, and the other runs use a bounded panel of signed thirds. [pcc:unverified]
+
+| Field degree | Verified triples in both arms | Direct pair checks | Linear parameter candidates |
+| ---: | ---: | ---: | ---: |
+| 10 | 286 | 23,232 | 1,296 |
+| 14 | 145 | 23,316 | 384 |
+| 22 | 218 | 431,664 | 432 |
+
+### Obstruction in the prime-degree Frobenius bases
+
+For the earlier prime-degree geometries, put \(W=\operatorname{span}_{\mathbb F_2}\{uv:u,v\in U\}\). Then \(W=\ker\operatorname{Tr}\). To see this, extend scalars to \(\mathbb F_{2^k}\). The tensor product with the coefficient field \(\mathbb F_{2^n}\) is a field because \(\gcd(n,k)=1\). Products of nonzero Frobenius eigenvectors are nonzero and add their weights modulo \(n\). The eigenweights of \(U\) are one of the two size-\(k\) doubling orbits \(Q\). The set \(Q+Q\) is stable under doubling and excludes zero because \(-Q\) is the other orbit. Cauchy–Davenport gives \(|Q+Q|\ge 2k-1>k\) for the geometries here, so the sumset includes both nonzero orbits. The product span is therefore \(n-1\) dimensional, and trace isotropy identifies it with the trace-zero space. The verifier reproduces these dimensions by direct binary rank in both factors at all five tested prime degrees. [pcc:unverified]
+
+Replacing \(p=u_1u_2\) by \(p\in W\) leaves every sum \(s\in U\) alive at each nonzero trace-compatible rational target on the toy curve. Since the shift is 1, the original product \(z=1+s+p\) has trace one. The equation \(z^2+tz=t^2s^2+1\) has two roots because \(\operatorname{Tr}(s)=\operatorname{Tr}(1/t^2)=0\). They differ by \(t\), which has trace one. Exactly one root has trace one and yields \(p\in W\). The relaxed linear system thus has \(2^k\) solutions, one per sum, and the omitted product-membership condition still has to be enforced. This rules out the product-span relaxation as a bounded-candidate solver for these prime-degree geometries. [pcc:unverified]
+
+The quadratic-extension result changes the factor-base geometry. It gives a decomposition bound for composite field degrees. In the coset controls the relative trace of \(a\) is 1 and \(k\) is odd, so every factor-base point has absolute trace-one abscissa. The finite doubles on this even-degree toy curve have trace-zero abscissa by the same doubling criterion. Since the doubling subgroup has index two, every three-term sum in the coset controls lies outside it. A relation collector targeting an odd-order subgroup would need to account for this coset constraint. Relation rank and total ECDLP cost for this family remain open. [pcc:unverified]
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
@@ -273,5 +307,13 @@ SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_2026112
 ~~~
 
 The rank and recovery records are in [toy-recovery.jsonl](toy-recovery.jsonl).
+
+Replay the sum–product checks with Python and SymPy.
+
+~~~sh
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/product_linearization.py
+~~~
+
+The coset and prime-degree results are in [product-linearization.jsonl](product-linearization.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
