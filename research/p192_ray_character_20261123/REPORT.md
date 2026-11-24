@@ -455,6 +455,45 @@ correlation magnitude is only `|ρ(x([a]G))|≥2/n≈2^-191`, which is
 undetermined. This parity fact also precludes proving `S_a=0` for
 these offsets. [pcc:unverified]
 
+### Exact modulo-eight reduction for a known-point offset
+
+The same sum has a sharper arithmetic interpretation that avoids a
+large-bias premise but leaves a new evaluation problem. Put
+`m=(r-1)/2`, let `𝒳={x([j]G):1≤j≤m}`, and define the monic kernel
+polynomial `F(Z)=∏_{u∈𝒳}(Z-u)`. For `c=x([a]G)`, choose one scalar
+representative for each `x`-class and set
+`h_a=Σ_{x([j]G)≠c} χ_r(j)χ_p(x([j]G)-c)=-S_a/2`.
+There are `M=m-1` nonzero `±1` summands. Their product is
+
+`(-1)^((M-h_a)/2) = -χ_r(a)χ_p(F′(c))`.
+
+Indeed, the product of `χ_r(j)` over the `m` classes is
+`(-1)^(m/2)=1`, and `∏_{u∈𝒳,u≠c}(u-c)=-F′(c)` since `M` is odd
+and `χ_p(-1)=-1`. As `m` is divisible by eight on P-192,
+`S_a≡2 (mod 4)` and the identity simplifies to
+
+`χ_r(a)=χ_p(F′(c))·(-1)^((S_a+2)/4)`.
+
+Thus `S_a mod 8`, together with the derivative character,
+determines the desired sign exactly: residues `2` and `6` give
+opposite outputs. The derivative itself has the compact identity
+`F′(x(P))=ψ_{m+1}(P)/(ψ_2(P)ψ_m(P))`, obtained by telescoping
+`x(P)-x([j]P)=ψ_{j+1}(P)ψ_{j-1}(P)/ψ_j(P)^2` for `2≤j≤m`.
+Its EDS recurrence reaches these indices in logarithmic depth.
+The missing operation is a charged point-dependent evaluation of
+`S_a mod 8`; parity alone gives only `S_a mod 4`. Computing that
+residue by summing all `m-1` terms retains about `2^191` point
+indices. This identity is a reduction to a precise modular-sum
+problem, not a sub-reference evaluator. [pcc:unverified]
+
+The standalone [`mod8_control.sage`](mod8_control.sage) replay makes
+an exhaustive independent-coordinate check on
+`E/F_79: y²=x³+x+6`, `G=(19,66)`, `r=97`. It checked both the
+modulo-four parity and the displayed derivative congruence at all
+48 distinct marked `x`-classes. This control checks the algebraic
+sign convention; it does not measure or solve the P-192 modular
+sum. [pcc:unverified]
+
 There is nevertheless a deterministic **average over all public
 known-point offsets**. Let `S={x([a]G):1≤a<r}`, of size `n/2`, and
 let `ρ(c)=n⁻¹Σ_{P≠O}t(P)χ_p(x(P)-c)`. The single-offset second
