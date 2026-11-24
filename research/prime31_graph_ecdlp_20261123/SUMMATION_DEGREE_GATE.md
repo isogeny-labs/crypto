@@ -258,6 +258,25 @@ required summed count. This is a necessary construction-yield gate;
 it does not bound how many such high-root offsets exist or whether an
 eight-weight subset-sum family can select them.
 
+The three-root case is exceptional. A squarefree quartic over a field
+with three rational roots has a fourth rational root, so `N(t)=3`
+requires a repeated root of `q_t(x)=(h0(x)+t)^2-f(x)`. At such a root,
+`q_t=q_t'=0`; eliminating `t` gives
+`4*f(x)*h0'(x)^2-f'(x)^2=0`. For nonzero quadratic leading coefficient
+this is a degree-five polynomial in `x` over M31. Each of its roots
+with `h0'(x)!=0` determines one `t`. On B677,
+`f'(x)=3*x^2+847514846` has no M31 root: the Legendre symbol of
+`-847514846/3 = 1149150816 (mod p)` is `-1`. A repeated root
+therefore cannot occur at `h0'(x)=0`. Thus at most five offsets in the
+entire field can have a repeated root, and at most five can have
+`N(t)=3`. If an eight-bit selector had at most 79 four-root offsets,
+even giving five others three roots and every remaining offset two
+would yield only
+`4*79+3*5+2*(256-79-5)=675` root labels. Covering 677 distinct
+abscissae therefore requires **at least 80 completely split,
+squarefree quartic fibers** among its selected offsets. This is
+a necessary condition; repeated abscissae across offsets raise it.
+
 This is a two-summand secant theorem. A four-summand B677 relation
 would need a sound composition with target, sign, distinct-index and
 root-extraction semantics. Before a lower-total-work claim, a concrete
