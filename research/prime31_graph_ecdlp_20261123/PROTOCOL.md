@@ -332,6 +332,18 @@ hashes are in `evidence/rr5-b677-prerequisite-01/`. Earlier cap-only runs
 in that directory predate the final limit CLI and remain development
 receipts, outside the promoted comparison.
 
+Post-merge source qualification (2026-11-24): mainline formatting and
+Clippy annotations changed the whole-file hashes of `ic_boundary.rs`
+and `prime_fast.rs`, so the isolated F4 source build correctly refused
+its previous pins. After reviewing those diffs, `f4-source/build.rs`
+pins their current hashes. The copied `f4_fp.rs` also has an equivalent
+`rows % 64 != 0` to `!rows.is_multiple_of(64)` rewrite. With Rust 1.98,
+the focused planted 2+2 gate test and all 33 isolated library tests pass
+against the merged sources. This qualifies the current positive gate
+construction; the seven timed split receipts retain their original
+`5096df8283bd1a6991d1119ab23b58f2d535d98c` source identity and
+have not been rerun on the new closure.
+
 The branch split reduces the algebraic input size but has not produced a
 public-query row. Critical-pair batching moves the admission bottleneck;
 it does not yet reduce extraction cost enough to support an index-calculus

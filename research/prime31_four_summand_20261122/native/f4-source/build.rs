@@ -248,7 +248,7 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/ic_boundary.rs",
-            "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
+            "2ff113f98afb6aae1d2ccd247f5872dbed33396922f4c87f0151a6819354c56d",
             &[
                 Range {
                     start: "/// The field operations behind the group operations: modular\n",
@@ -299,7 +299,7 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/prime_fast.rs",
-            "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+            "0aaac6eaa73a9766cfe46e19f0cb26e125c7b4e2d1f5d8dc848865ab000dde6d",
             &[
                 Range {
                     start: "/// Largest field size the Montgomery layer supports (`p < 2^62` keeps\n",
