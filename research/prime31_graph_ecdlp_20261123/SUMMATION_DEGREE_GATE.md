@@ -421,9 +421,17 @@ fourth values of `tau_3(R-P1-P2-P3)` for each public target `R=G,Q`.
 then checks hashes of the sorted fourth-value sets. The generic
 fourth-coordinate fiber degree for this graph and either fixed target
 is therefore **27**, by the 27-value upper bound and one unramified
-specialization attaining it. This is a coordinate-degree certificate,
-not a completed solving-degree or relation-cost comparison; it leaves
-other linear graphs and restricted selectors open.
+specialization attaining it. Moreover, over the parameter space of
+linear slopes and three input offsets, the three input fibers form a
+generically finite 27-sheeted cover. On the locus with finite fourth
+points, the discriminant of their 27 coordinate values vanishes where
+two values collide. The displayed
+specialization has no equalities, so for each of the two fixed targets
+the fourth-coordinate degree is also 27 for a Zariski-open set of
+linear slopes and input offsets. The constant intercept merely shifts
+the offset parameter. This is a coordinate-degree statement; special
+slopes, restricted selectors, completed solving degree and relation
+cost remain open.
 
 The global three-root density is therefore approximately `1/6` for
 every fixed linear graph. A 256-label offset family covering 677
