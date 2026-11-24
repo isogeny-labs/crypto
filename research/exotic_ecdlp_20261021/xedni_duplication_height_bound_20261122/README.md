@@ -55,15 +55,16 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 | Finite-range archimedean lower bound on `[-128,128]` | `finite_archimedean_lower` in generated `Cells.lean`; generator agrees with `certificate.json` | All 91 cells and coverage Lean checked |
 | Global real and homogeneous archimedean lower bound | `global_univariate_lower` and `global_homogeneous_lower` in `Global.lean` | Lean checked for all real inputs, including both outer tails and `B=0` |
 | Primitive integer input and a common divisor of both forms | `integer_homogeneous_lower` and `reduced_forms_lower` in `IntegerBridge.lean` | Lean checked: if `gcd(A,B)=1`, `d>0`, `F=d f`, and `G=d g`, then `max(|A|,|B|)^4 ≤ 1024·8038359040000·max(|f|,|g|)` |
+| Canonical reduced output pair | `canonical_output_lower` in `OutputBridge.lean` | Lean checked for `gcd(A,B)=1` and `G(A,B)≠0`: the same lower bound holds with `f=q.num`, `g=q.den`, `q=F(A,B)/G(A,B)` |
 | Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
 | Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Mathematical derivation; integer-coordinate height comparison in Lean remains open |
 
 The polynomial, divisibility, global archimedean and numerical Lean declarations
 use only standard foundations in their `#print axioms` output. The packet is
-**partially formalized** until the output quotient `F/G` is reduced by its
-integer gcd and `Rat.logHeight₁_eq_log_max` is applied to the reduced pair.
-The upper height inequality and the resulting uniform doubling defect also
-need their point-level Lean bridge.
+**partially formalized** until the point-side nonidentity condition is used
+to show `G(A,B)≠0`, `Rat.logHeight₁_eq_log_max` is applied to the canonical
+output pair, and the matching upper height inequality is combined with it.
+The resulting uniform doubling defect remains a point-level Lean obligation.
 The canonical-limit packet already proves quadraticity for integer multiples.
 Mordell–Weil generation and rational-to-finite reduction remain separate
 obligations for a complete fixed-curve exclusion theorem.
