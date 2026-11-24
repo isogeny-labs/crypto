@@ -1179,7 +1179,8 @@ mod tests {
             for i in 0..80u64 {
                 let root = (31 + i * 7919) % p;
                 let leading = [1u64, 3, 7, p - 1][(i as usize) % 4];
-                let constant = field.sub(0, field.mul(leading, root));
+                let scaled = field.mul(leading, root);
+                let constant = field.sub(0, scaled);
                 assert_eq!(field.roots(&[constant, leading, 0]), vec![root]);
                 let r2 = (root + 1237) % p;
                 let sum = field.add(root, r2);
