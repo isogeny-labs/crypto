@@ -13,8 +13,11 @@ import sympy as sp
 
 P = 2**31 - 1
 m, x, z, ux0, ux1, uz0, uz1 = sp.symbols("m x z ux0 ux1 uz0 uz1")
-a, b, c, t0, w0, w1, rx, ry, curve_a = 3, 5, 7, 11, 13, 17, 19, 23, 29
+a, b, c, t0, w0, w1 = 3, 5, 7, 11, 13, 17
+curve_a, curve_b = 847514846, 2087444724
+rx, ry = 625037715, 2100627251  # Frozen public B677 generator.
 e, f = 1, -1
+assert (ry**2 - rx**3 - curve_a * rx - curve_b) % P == 0
 
 
 def top(poly, variables):
