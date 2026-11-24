@@ -56,24 +56,31 @@ end-to-end source replacement.
 ### Signed large-prime rank on the same frozen rows
 
 Let `L` be the signed coefficient block on the 168 Y7 large-prime
-columns, reduced modulo the curve's prime group order. For any chosen
-row family, the dimension of its space of LP-free linear combinations
-is exactly `row_count - rank(L)`; useful factor-base rank can be lower.
-Independent modular elimination of the frozen rows gives:
+columns and `F` the block on the 509 Dickson factor-base columns, reduced
+modulo the curve's prime group order. For any chosen row family, the
+dimension of its LP-free combination space is `row_count-rank(L)`.
+Independent Python elimination and a separate FLINT `nmod_mat.rank()`
+calculation agree on both `L` and `[F L]`:
 
-| Row family | Rows | Occupied LP columns | `rank(L)` | LP-free dimension |
-| --- | ---: | ---: | ---: | ---: |
-| 2 Dickson + 2 Y7 | 154 | 142 | 134 | 20 |
-| 3 Dickson + 1 Y7 | 294 | 138 | 138 | 156 |
-| Both families | 448 | 162 | 162 | 286 |
+| Row family | Rows | Occupied LP columns | `rank(L)` | `rank([F L])` | Projected FB rank |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 2 Dickson + 2 Y7 | 154 | 142 | 134 | 154 | 20 |
+| 3 Dickson + 1 Y7 | 294 | 138 | 138 | 294 | 156 |
+| Both families | 448 | 162 | 162 | 448 | 286 |
+
+The full-support rows are independent in every listed family. Thus the
+map from `ker(L^T)` to factor-base coefficients has kernel
+`ker([F L]^T)={0}` and is injective: the last column is **actual
+independent projected factor-base rank**, not just the LP-free upper
+bound. It remains separate from target-only span and scalar recovery.
 
 The 2+2 signed-edge graph has 142 vertices and nine connected
 components. Its ordinary cycle dimension is `154-142+9=21`, but one
 component is sign-unbalanced, so the modular LP kernel has dimension
-20. Adding the 2+2 rows after the 3+1 rows increases the combined
-LP-free dimension by `286-156=130`, even though 2+2 alone supplies at
-most 20. This measures a real cross-family graph effect, **not** 130
-new independent factor-base equations or a completed algebraic-source
+20. Adding the 2+2 rows after the 3+1 rows increases the independent
+projected factor-base rank by `286-156=130`, even though 2+2 alone
+supplies 20. This measures a real cross-family graph effect on the
+generic-source stream, **not** a completed algebraic-source or cold-cost
 gain. The 221 direct four-Dickson rows have no LP columns and are
 separate from this table.
 
