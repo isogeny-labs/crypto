@@ -112,11 +112,15 @@ Reading the table:
 * **Precomputation.** §3.5 predicts about `p^(1/m) = 2^t` curves tried.
   Measured 58, 132, 175, 641, 108 against 32, 64, 128, 256, 512 — same order,
   and the two outliers are in opposite directions.
-* **Solving degree.** The paper's Magma runs rise from `D = 5.00` at `n1 ≤ 7`
-  to 5.42, 5.42, 5.92, 6.44 at `n1 = 8, 9, 10, 11`. This tower-rewriting F4
-  stays at `D = 5` through `t = 9`. That is the only place these runs say
-  something the paper's own table does not: on this system presentation the
-  degree of regularity does not move over the range the paper measured.
+* **Solving degree.** The paper's Magma runs report `D_av` (largest step
+  degree) rising from 5.00 at `n1 ≤ 5` to 5.42, 5.47, 5.42, 5.92 at
+  `n1 = 6..9` and 6.44, 6.45 at 10, 11, with `D_av^corr` at 5.00 through
+  `n1 = 9` and 6.00 at 10, 11. Our `solving_degree_max` — the same "largest
+  step degree" notion — is 5 at every `m = 2` rung through `t = 9`, and 6 at
+  `m = 3, t = 4`. Read that as a difference in the ring we hand the engine
+  (the tower quotient with its rewriting, not a raw polynomial list in Magma),
+  not as evidence about the algorithm's asymptotic degree; one run per rung,
+  four different primes, and a different engine.
 * **Cost.** `s/ρ` is `2·10^4` to `4·10^7` — no speedup, and none is possible
   here. At `|V| = p^(1/2)` and `m = 2` the algorithm needs
   `m!·p/(deg L)^(m-1) = 2√p` targets, so its cost is `≈ 2√p · T` against rho's
@@ -126,7 +130,7 @@ Reading the table:
 
 ## 4. Independent verification
 
-`verify.py` re-derives the two things a reader should not take on trust.
+`verify.py` re-derives the three things a reader should not take on trust.
 
 1. **The construction (§3.4), from its definition.** For the pilot cell
    `p = 100003`, `t = 5`, the emitted `E': y² = x³ + 67190x + 45464`,
@@ -143,6 +147,9 @@ Reading the table:
    for all eight runs: `139, 2683, 9331, 9331, 60091, 203179, 2683` all match.
 3. Each run's own final check is a group-law test `[d]G == target` with counted
    scalar multiplications, not a comparison of two copies of the same number.
+
+Together: the map is the paper's map, the relations are the paper's relations,
+and the answer is checked against something the harness did not produce.
 
 ## 5. Where it stops
 
