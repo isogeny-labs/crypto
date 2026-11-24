@@ -175,6 +175,7 @@ impl Fp64 {
     /// Because `a <= p - 1` and `m <= 2^64 - 1`, `a + m·p <= 2^64·p - 1`,
     /// so `(a + m·p) >> 64 <= p - 1` without a final conditional subtract.
     #[inline(always)]
+    #[allow(clippy::wrong_self_convention)]
     fn from_mont_reduced(&self, a: u64) -> u64 {
         debug_assert!(a < self.p);
         let m = a.wrapping_mul(self.n_inv);

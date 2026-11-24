@@ -27,12 +27,6 @@ pub enum OracleKind {
     Semaev,
 }
 
-impl Default for OracleKind {
-    fn default() -> Self {
-        Self::Semaev
-    }
-}
-
 impl OracleKind {
     pub fn as_str(self) -> &'static str {
         match self {
@@ -129,7 +123,7 @@ fn pick_subfield_ab(p: u64, seed: u64) -> (u64, u64) {
         let a3 = a.wrapping_mul(a).wrapping_mul(a) % p;
         let b2 = b.wrapping_mul(b) % p;
         let disc = (4 * a3 + 27 * b2) % p;
-        if disc != 0 && a % p != 0 {
+        if disc != 0 && !a.is_multiple_of(p) {
             return (a % p, b % p);
         }
         a = (a + 1) % p;

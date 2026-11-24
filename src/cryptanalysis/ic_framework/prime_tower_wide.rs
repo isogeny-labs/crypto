@@ -27,7 +27,6 @@
 use std::collections::{HashMap, HashSet};
 
 use num_bigint::BigUint;
-use num_integer::Integer;
 use num_traits::{One, ToPrimitive, Zero};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -180,7 +179,7 @@ fn random_point_w<F: PrimeField>(
 ) -> WPoint<F::Elem> {
     let p = f.modulus();
     loop {
-        let x = f.from_biguint(&rand_below(&p, rng));
+        let x = f.from_biguint(&rand_below(p, rng));
         let r = e.rhs(f, x);
         cost.legendre_symbols += 1;
         if f.legendre(r) != 1 {
@@ -388,7 +387,7 @@ fn velu_map_w<F: PrimeField>(
     xi: F::Elem,
     tau: F::Elem,
 ) -> WPoint<F::Elem> {
-    let Some((x, y)) = pt else { return None };
+    let (x, y) = pt?;
     if x == xi {
         return None;
     }
@@ -411,7 +410,6 @@ fn finish_tower_wide<F: PrimeField>(
     ops: &mut GroupOps,
     mut cost: IsogenyTowerCost,
 ) -> Result<WideTower<F>, String> {
-    let two_t = BigUint::one() << t;
     let build_before = ops.adds + ops.doubles;
     // ⟨Q⟩ by successive additions.
     let mut multiples: Vec<WPoint<F::Elem>> = Vec::with_capacity(1usize << t.min(24));
@@ -524,9 +522,9 @@ pub fn isogeny_tower_wide<F: PrimeField>(
         return Err(format!("p is too small for t = {t}"));
     }
     if family == AuxFamily::Z2xZ8 && (&p % BigUint::from(4u32)) != BigUint::from(3u32) {
-        return Err(format!(
-            "p is not 3 mod 4: the X₁(2, 8) family needs −1 to be a non-residue"
-        ));
+        return Err(
+            "p is not 3 mod 4: the X₁(2, 8) family needs −1 to be a non-residue".to_string(),
+        );
     }
     let w4 = (BigUint::from(4u32) * &p).sqrt();
     let (lo, hi) = (p.clone() + BigUint::one() - &w4, p.clone() + BigUint::one() + &w4);

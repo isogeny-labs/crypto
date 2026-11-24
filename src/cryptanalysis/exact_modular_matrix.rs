@@ -217,7 +217,7 @@ impl ModMatrix32 {
         {
             return Err(MatrixError::InvalidLimits);
         }
-        if !(3..1u64 << 32).contains(&p) || p % 2 == 0 || !is_prime_u64(p) {
+        if !(3..1u64 << 32).contains(&p) || p.is_multiple_of(2) || !is_prime_u64(p) {
             return Err(MatrixError::InvalidModulus(p));
         }
         Ok(Self {

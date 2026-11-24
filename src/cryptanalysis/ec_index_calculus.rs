@@ -2949,11 +2949,11 @@ pub fn sparse_gaussian_eliminate_mod_n(
             if deg == 0 {
                 continue;
             }
-            if best.map_or(true, |(d, _, _)| deg < d) {
+            if best.is_none_or(|(d, _, _)| deg < d) {
                 let mut pick: Option<(usize, usize)> = None;
                 for &c in rows[r].keys() {
                     let cdeg = col_rows[c].len();
-                    if pick.map_or(true, |(d2, _)| cdeg < d2) {
+                    if pick.is_none_or(|(d2, _)| cdeg < d2) {
                         pick = Some((cdeg, c));
                     }
                 }

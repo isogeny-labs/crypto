@@ -400,7 +400,7 @@ pub fn evaluate_stream(
     } else {
         (None, None)
     };
-    let (n2, z2, src2, w2, ok2, bad2) = summarize_output(&mst_out, relations, modulus);
+    let (n2, z2, src2, w2, ok2, bad2) = summarize_output(mst_out, relations, modulus);
     let mst_filter = FilterSummary {
         report: attempt.report,
         mst_stats: Some(attempt.stats),

@@ -602,6 +602,7 @@ impl F2mElement {
         if k == 0 {
             return self.clone();
         }
+        #[cfg_attr(not(target_arch = "aarch64"), allow(unused_variables))]
         let m = self.m;
         #[cfg(target_arch = "aarch64")]
         if has_hw_clmul() {

@@ -3337,7 +3337,7 @@ mod tests {
             // or two in the attempt that certified.
             let failed = x.attempts - 1;
             assert!(
-                calls >= per_attempt * failed + 1 && calls <= per_attempt * x.attempts,
+                calls > per_attempt * failed && calls <= per_attempt * x.attempts,
                 "{label}: {calls} solves over {} attempts",
                 x.attempts
             );

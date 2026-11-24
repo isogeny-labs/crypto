@@ -12461,6 +12461,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
 /// an empty slot; the one key whose `+ 1` wraps (`u64::MAX`) has its own
 /// field.  Linear probing from a multiplicative hash; if the load would
 /// pass 7/8 (the caller's size hint was too small) the table doubles.
+#[allow(dead_code)]
 struct TwTable {
     slots: Vec<[u64; 5]>,
     special: Option<(u128, u64, u64)>,
@@ -12468,12 +12469,14 @@ struct TwTable {
 }
 
 /// What [`TwTable::entry`] found.
+#[allow(dead_code)]
 enum TwEntry<'a> {
     Vacant(TwVacant<'a>),
     Occupied((u128, u64, u64)),
 }
 
 /// An empty place in a [`TwTable`] for the key just looked up.
+#[allow(dead_code)]
 struct TwVacant<'a> {
     table: &'a mut TwTable,
     /// Slot index, or `usize::MAX` for the `u64::MAX` key's own field.
@@ -12481,6 +12484,7 @@ struct TwVacant<'a> {
     key: u64,
 }
 
+#[allow(dead_code)]
 impl TwVacant<'_> {
     fn insert(self, val: (u128, u64, u64)) {
         if self.idx == usize::MAX {
@@ -12498,6 +12502,7 @@ impl TwVacant<'_> {
     }
 }
 
+#[allow(dead_code)]
 impl TwTable {
     /// Room for `entries` keys at load at most 3/4.
     fn with_capacity(entries: usize) -> Self {

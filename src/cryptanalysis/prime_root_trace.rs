@@ -6,7 +6,6 @@
 //! Counters measure native field operations, including inverse exponentiation;
 //! primality validation, serialization, and certificate replay are excluded.
 #[cfg(test)]
-use std::collections::HashMap;
 
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
@@ -308,7 +307,7 @@ impl Engine<'_> {
         // Exact odd-prime identities. No field operations are performed, so
         // none should be added to the trace or field-work budget.
         let trivial = if value == 1 { Some(1) }
-            else if value == 2 { Some((p + 1) / 2) }
+            else if value == 2 { Some(p.div_ceil(2)) }
             else if value == p - 1 { Some(p - 1) }
             else if value == p - 2 { Some((p - 1) / 2) }
             else { None };
@@ -760,6 +759,7 @@ impl Engine<'_> {
         })?;
         Ok(acc)
     }
+#[allow(dead_code)]
 fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
         self.report.counters.observe(&event);
         if let Err(error) = (self.sink)(&event) {
@@ -775,6 +775,7 @@ fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
     /// Off-diagonal products are doubled with one field addition, while
     /// diagonals use the field-square operation. The independently checked
     /// Product event is identical to generic polynomial multiplication.
+    #[allow(dead_code)]
     fn square(&mut self, a: &[u64]) -> Work<Vec<u64>> {
         let mut product = if a.is_empty() {
             vec![]
@@ -808,6 +809,7 @@ fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
         Ok(product)
     }
 
+#[allow(dead_code)]
 fn div_general(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
         // Constant-unit division preserves the quotient without field work.
@@ -987,7 +989,7 @@ fn vinv(a: u64, p: u64) -> u64 {
     // The modulus is an odd prime bounded by 2^61-1.
     if r1 == 1 { return 1; }
     if r1 == p - 1 { return p - 1; }
-    if r1 == 2 { return (p + 1) / 2; }
+    if r1 == 2 { return p.div_ceil(2); }
     if r1 == p - 2 { return (p - 1) / 2; }
     let (mut t0, mut t1) = (0i64, 1i64);
     while r1 != 0 {
@@ -1899,6 +1901,7 @@ fn quartic_square(a: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
     quartic_reduce(t, c, p)
 }
 #[inline]
+#[allow(dead_code)]
 fn quartic_coordinates(a: &[u64]) -> [u64; 4] {
     [a.first().copied().unwrap_or(0), a.get(1).copied().unwrap_or(0),
      a.get(2).copied().unwrap_or(0), a.get(3).copied().unwrap_or(0)]
@@ -1984,6 +1987,7 @@ fn vpower_quartic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
     Ok(quartic_trim(accumulator))
 }
 #[inline]
+#[allow(dead_code)]
 fn vquartic_replay_mul(a: &[u64], b: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
     debug_assert_eq!(modulus.len(), 5);
     quartic_trim(quartic_mul(
@@ -1991,6 +1995,7 @@ fn vquartic_replay_mul(a: &[u64], b: &[u64], modulus: &[u64], p: u64) -> Vec<u64
         [modulus[0], modulus[1], modulus[2], modulus[3]], p))
 }
 #[inline]
+#[allow(dead_code)]
 fn vquartic_replay_square(a: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
     debug_assert_eq!(modulus.len(), 5);
     quartic_trim(quartic_square(
@@ -2748,6 +2753,7 @@ fn vproduct_barrett32(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
 
 
 #[inline]
+#[allow(dead_code)]
 fn monic_power_degree(poly: &[u64]) -> Option<usize> {
     if poly.len() < 2 || poly[0] != 0 || *poly.last()? != 1
         || poly[1..poly.len() - 1].iter().any(|&c| c != 0)
@@ -2758,6 +2764,7 @@ fn monic_power_degree(poly: &[u64]) -> Option<usize> {
 }
 
 #[inline]
+#[allow(dead_code)]
 fn vremainder(a: &[u64], m: &[u64], p: u64) -> Result<Vec<u64>, String> {
     if m.len() < 4 || m.last() != Some(&1) || (m[1] == 0 && m[2] == 0) {
         return Ok(vdiv(a, m, p)?.1);
@@ -2794,6 +2801,7 @@ fn vremainder(a: &[u64], m: &[u64], p: u64) -> Result<Vec<u64>, String> {
 /// Return k for the canonical monomial X^k (k>=1).
 /// Most dense polynomials fail the cheap first/last coefficient check.
 #[inline]
+#[allow(dead_code)]
 fn monic_x_shift(a: &[u64]) -> Option<usize> {
     if a.len() < 2 || a[0] != 0 || *a.last().unwrap() != 1 {
         return None;

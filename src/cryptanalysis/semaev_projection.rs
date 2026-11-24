@@ -1617,8 +1617,10 @@ impl PairProjection {
                         match key {
                             QuadraticRootKey::Base(root) => {
                                 stats.base_field_root_keys += 1;
-                                if !finite_witnesses.contains_key(&root) {
-                                    finite_witnesses.insert(root, (x1, x2));
+                                if let std::collections::hash_map::Entry::Vacant(slot) =
+                                    finite_witnesses.entry(root)
+                                {
+                                    slot.insert((x1, x2));
                                     let y_root = Self::root_y(&curve, x1, y1, x2, y2, d, inv, root);
                                     fast_finite_list.push((root, y_root, x1, x2));
                                 }

@@ -316,7 +316,7 @@ impl Fp<'_> {
                 return None;
             }
         };
-        let mut exponent = (p + 1) / 2;
+        let mut exponent = p.div_ceil(2);
         let mut base = (t, 1);
         let mut root = (1, 0);
         while exponent != 0 {
@@ -349,7 +349,7 @@ impl Fp<'_> {
     // Convert it to monic once so each subsequent remainder avoids a
     // full Fermat inversion of the leading coefficient. The zero set is
     // unchanged because the scaling factor is nonzero in F_p.
-    fn make_monic(&mut self, polynomial: &mut Vec<u64>) {
+    fn make_monic(&mut self, polynomial: &mut [u64]) {
         if polynomial.len() <= 1 || polynomial.last() == Some(&1) {
             return;
         }
