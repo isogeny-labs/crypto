@@ -145,9 +145,24 @@ All four methods produced identical signed triple sets. The three resultant arms
 | 7 | 282 | 560 | 0.160 s | 0.254 s | 0.486 s | 0.415 s |
 | 23 | 10 | 37 | 3.01 s | 9.62 s | 15.11 s | 3.92 s |
 
-Totals include shared factor-base setup once per factor, intermediate construction, failed searches, and pair recovery. The scan total also includes its image cache. The supplied target and third-summand panels are fixed across arms. At 23 bits, direct arithmetic takes 0.081 s per verified triple and batched GCD takes 0.106 s. This counts triples with distinct abscissae. Relation-matrix rank and complete ECDLP solve cost remain unmeasured. [pcc:unverified]
+Totals include shared factor-base setup once per factor, intermediate construction, failed searches, and pair recovery. The scan total also includes its image cache. The supplied target and third-summand panels are fixed across arms. At 23 bits, direct arithmetic takes 0.081 s per verified triple and batched GCD takes 0.106 s. This counts triples with distinct abscissae. [pcc:unverified]
 
 In a separate planted panel of eight intermediates per factor, the reduced 23-bit products become fully dense after combining four 200-term residuals. At 47 bits, each input has 1,822 terms and a reduced two-leaf product has 229,090 or 265,541 terms depending on the factor. The next schoolbook products would require over 52 billion coefficient pairs each. They were capped before multiplication. This measures the support of explicit product representations. A joint method that avoids forming the growing products remains open. [pcc:unverified]
+
+## Relation rank and complete toy solves
+
+The doubling subgroups at field degrees 7 and 23 have prime orders 71 and 4,196,903. To derive these orders, let \(a_0=2\), \(a_1=1\), and \(a_j=a_{j-1}-2a_{j-2}\), the Frobenius trace recurrence for this curve over \(\mathbb F_2\). The subgroup order is \((2^n+1-a_n)/2\). The verifier checks that a nonidentity generator has this order. On the subgroup, Frobenius acts by a scalar \(\mu\) satisfying \(\mu^2-\mu+2=0\) modulo the order. The verifier identifies the root by comparing the Frobenius image of the generator with its scalar multiple. [pcc:unverified]
+
+Choose one signed representative per Frobenius orbit of factor-base abscissae. A point equal to the \(j\)-th Frobenius image of a representative contributes \(\mu^j\) in its column, or \(-\mu^j\) for the opposite sign. This reduces 7 columns to 1 at 7 bits and 943 columns to 41 at 23 bits. The collection target is a random known multiple of the generator. For every verified triple, accumulate its signed weights, reduce the row over the prime order, and retain a pivot only if it raises rank. After triangular back substitution, search for a triple of the challenge shifted by another known multiple of the generator. Subtract the known shift from the triple's computed logarithm. The verifier checks the resulting scalar and every recovered representative against point multiplication. [pcc:unverified]
+
+The direct group join and the batch resultant join use the same deterministic offsets, signed thirds, and challenge for each factor. At 23 bits they attain rank 41 after 18 and 16 collection attempts, with 59 and 52 verified collection triples, respectively. Three attempts across the two factors have no triples. Each solve then succeeds on its first descent attempt. The 7-bit controls attain rank one and recover the challenge on each factor. [pcc:unverified]
+
+| Field degree | Factor \(g\) encoded as an integer | Independent rows | Verified collection triples | Direct-join total | Batch-join total | Generic search |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 23 | 2,787 | 41 | 59 | 4.89 s | 6.70 s | 0.30–0.33 s |
+| 23 | 3,189 | 41 | 52 | 4.41 s | 5.57 s | 0.25–0.27 s |
+
+The join totals include factor-base and orbit setup, target generation, unsuccessful searches, sign recovery, modular row reduction, back substitution, descent, and verification. The generic measurement is an independent baby-step giant-step search on the supplied challenge, including its baby-table build. The toy rank reduction is shared by both joins. The batched resultant method has higher complete solve cost on both 23-bit factors. These measurements leave the asymptotic decomposition question open. [pcc:unverified]
 
 ## Reproduction
 
@@ -222,5 +237,14 @@ SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_2026112
 ~~~
 
 The support results are in [batch-product-support.jsonl](batch-product-support.jsonl).
+
+Replay the end-to-end comparison. The batch comparison also needs python-flint.
+
+~~~sh
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/toy_solve.py 7 23 --method direct
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/toy_solve.py 7 23 --method batch
+~~~
+
+The rank and recovery records are in [toy-solves.jsonl](toy-solves.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
