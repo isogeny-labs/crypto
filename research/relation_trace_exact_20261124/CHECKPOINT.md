@@ -2,7 +2,7 @@
 
 PR5102 delivers a correctness-only diagnostic component. It does not achieve the original 15× relation-pipeline speedup. [pcc:unverified]
 
-Current branch: lane/relation-information-leads-20261123. Canonical integration base ceba74bb64854027c4dd16f00428bf676383bfdb. Producer code is SOURCE_415; native driver transport is SOURCE_419. Default 86 and field-counter 87 tests, maintained checker 14 regression, full 276-record fixed six-case replay and all five reindexed semantic refusal controls complete. REPORT.md/report.pdf, PROOF_MAP.json, POSTCALL_422.json, complete/partial archives and native indexes retain scope and all failures. All evidence is same-host, unsigned and unverified. [pcc:unverified]
+Current branch: lane/relation-information-leads-20261123. Canonical integration base 9ef955b17dc3b0eb1d1ac49985cf1cdb0dbf4598. Producer code is SOURCE_415; native driver transport is SOURCE_419. Default 86 and field-counter 87 tests, maintained checker 14 regression, full 276-record fixed six-case replay and all five reindexed semantic refusal controls complete. REPORT.md/report.pdf, PROOF_MAP.json, POSTCALL_422.json, complete/partial archives and native indexes retain scope and all failures. All evidence is same-host, unsigned and unverified. [pcc:unverified]
 
 No numerical processes remain running. Frozen workers: /workspace/relation-trace-exact-417 and-419; default/counter test workers 415/416 and checker423. Original raw complete cohort: /dev/shm/relation-degree-scan-419, with full byte-equal compressed copy committed here. Partial417 output remains /workspace/relation-degree-scan-417 and its separate archive. Mutable target419 may be rebuilt/cleaned; frozen workers, old root350 and all earlier evidence are preserved. [pcc:unverified]
 
