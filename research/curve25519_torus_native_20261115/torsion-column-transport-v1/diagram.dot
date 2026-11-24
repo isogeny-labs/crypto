@@ -1,0 +1,12 @@
+digraph transport {
+  graph [rankdir=LR,bgcolor="transparent",nodesep=0.18,ranksep=0.2,pad=0.04];
+  node [shape=box,style="rounded,filled",fillcolor="#edf4fa",color="#28658d",fontname="Helvetica",fontsize=10,margin="0.1,0.08"];
+  edge [color="#476377",arrowsize=0.6];
+  q [label="Public prime target Q\noriginal Spec, cap"];
+  fibres [label="Inverse8 + all8 torsion shifts\nraw sectors R0+T"];
+  roots [label="Unchanged pair roots per sector\noriginal raw/group replay"];
+  aliases [label="Complete cofactor/role aliases\nsigned physical columns"];
+  matrix [label="Public tags; fold known G/Q\nexact M and left kernel"];
+  gate [label="Require vTb != 0\nthen scalar group replay",fillcolor="#fff0d8",color="#a66b28"];
+  q -> fibres -> roots -> aliases -> matrix -> gate;
+}
