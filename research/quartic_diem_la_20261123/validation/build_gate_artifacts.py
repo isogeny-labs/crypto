@@ -195,6 +195,7 @@ def main():
             "dev_amendment_true_and_rule_followed": dev_ok,
             "analysis_json_byte_reproduced_by_frozen_script": repro_ok,
             "stress_trim_sge_charge_x100_w1": ex["stress_trim_sge_charge"]["x100_w1.0"],
+            "structural_counter_identities": struct_ok,
         },
         "errata": "validator-report.md, section Errata (E1-E5) and process findings (P1-P4)",
         "scripts": ["replay.sh", "compare_replay.py", "verify_certificates.py", "picarith.py",
@@ -253,7 +254,8 @@ def main():
         json.dump(man, f, indent=1)
     print(json.dumps({"replay_ok": replay_ok, "heads_ok": heads_ok, "ci_ok": ci_ok, "certs_ok": certs_ok,
                       "integ_ok": integ_ok, "dec_ok": dec_ok, "verd_ok": verd_ok, "bind_ok": bind_ok,
-                      "time_ok": time_ok, "dev_ok": dev_ok, "repro_ok": repro_ok, "status": status,
+                      "time_ok": time_ok, "dev_ok": dev_ok, "repro_ok": repro_ok, "struct_ok": struct_ok,
+                      "status": status,
                       "n_headline": len(head), "band": band,
                       "order_holds_across_band": man["rho_reference"]["order_holds_across_band"]}, indent=1))
 
