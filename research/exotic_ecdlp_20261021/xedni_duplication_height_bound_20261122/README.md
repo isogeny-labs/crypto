@@ -52,18 +52,21 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 | Quartic Bernstein coefficient lower-bound rule | `bernstein_quartic_lower` in `Bounds.lean` | Lean checked for arbitrary coefficients and `s∈[0,1]` |
 | Certificate cell 26 (`191/16≤A/B≤383/32`) | `interval_26_positive_F` in `Bounds.lean` | Lean checked with its exact rational coefficients |
 | Finite-range archimedean lower bound on `[-128,128]` | `finite_archimedean_lower` in generated `Cells.lean`; generator agrees with `certificate.json` | All 91 cells and coverage Lean checked |
-| Outer-range archimedean lower bound | Exact coefficient inequality in `Bounds.lean`; written triangle-inequality argument above | Numeric inequality Lean checked; real-polynomial tail bridge open |
+| Global real and homogeneous archimedean lower bound | `global_univariate_lower` and `global_homogeneous_lower` in `Global.lean` | Lean checked for all real inputs, including both outer tails and `B=0` |
 | Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
 | Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Mathematical derivation; full fixed-point Lean theorem open |
 
-The polynomial, divisibility, finite-range and numerical Lean declarations
+The polynomial, divisibility, global archimedean and numerical Lean declarations
 use only standard foundations in their `#print axioms` output. The packet is
-**partially formalized** until the outer-range inequality, homogeneous scaling
-and general duplication map are connected to the actual
+**partially formalized** until the homogeneous forms and general duplication map are connected to the actual
 `WeierstrassCurve.Affine.Point.naiveHeight`.
 The canonical-limit packet already proves quadraticity for integer multiples.
 Mordell–Weil generation and rational-to-finite reduction remain separate
 obligations for a complete fixed-curve exclusion theorem.
+
+## Literature and library check
+
+Jacobson, Koblitz, Silverman, Stein and Teske, [*Analysis of the Xedni Calculus Attack*](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf), §4 and Lemma 4.1, analyze a family of rational lifts under an explicit conditional height premise. The bound here applies to the one displayed rational curve and supplies its numerical comparison directly. Mathlib's [affine point doubling lemmas](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Point.lean) give the projective x-coordinate of `P+P` in both the finite and identity cases; they identify the next formal bridge from these forms to `naiveHeight`. The existing [canonical-limit packet](../xedni_canonical_height_limit_20261122/README.md) supplies the geometric tail and quadraticity once the explicit duplication defect is available.
 
 Replay from this directory:
 

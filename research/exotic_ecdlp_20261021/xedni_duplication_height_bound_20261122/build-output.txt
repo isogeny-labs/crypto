@@ -1138,3 +1138,31 @@ Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus fa
 
 Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
 'XedniDuplicationCells.finite_archimedean_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_duplication_height_bound_20261122/Global.lean:47:53: warning: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_duplication_height_bound_20261122/Global.lean:47:72: warning: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_duplication_height_bound_20261122/Global.lean:47:53: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_duplication_height_bound_20261122/Global.lean:47:72: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+Try this:
+  [apply] ring_nf
+
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_duplication_height_bound_20261122/Global.lean:74:36: warning: This simp argument is unused:
+  max_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [F_h, G_h, mul_zero, zero_pow (by norm_num : (4 : ℕ) ≠ 0), zero_pow (by norm_num : (2 : ℕ) ≠ 0),
+    zero_pow (by norm_num : (3 : ℕ) ≠ 0), sub_zero, add_zero, abs_zero, abs_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'XedniDuplicationGlobal.global_univariate_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+'XedniDuplicationGlobal.global_homogeneous_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
