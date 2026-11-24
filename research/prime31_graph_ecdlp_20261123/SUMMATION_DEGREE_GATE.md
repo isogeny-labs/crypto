@@ -258,6 +258,10 @@ required summed count. This is a necessary construction-yield gate;
 it does not bound how many such high-root offsets exist or whether an
 eight-weight subset-sum family can select them.
 
+An independent SageMath 10.10.rc0 replay of
+`EllipticCurve(GF(2147483647),[847514846,2087444724]).cardinality()`
+returned `2147446831`, confirming the group-order input to this count.
+
 The three-root case is exceptional. A squarefree quartic over a field
 with three rational roots has a fourth rational root, so `N(t)=3`
 requires a repeated root of `q_t(x)=(h0(x)+t)^2-f(x)`. At such a root,
@@ -303,6 +307,12 @@ minus its number of cycles. The Galois-cover contribution
 `12*index(sigma)`. The finite contributions total at most 60;
 infinity contributes 18. Riemann--Hurwitz for the 24-sheeted Galois
 cover gives `genus(Y)<=16`. There are at most five finite branch values.
+
+As a concrete branch check, for `h0=3*x^2+5*x` over M31, SymPy computed
+`disc_x((h0+t)^2-f(x))` of degree five in `t` with leading coefficient
+`6912` and `gcd(discriminant, derivative_t)=1` modulo `p`. This sample
+has five distinct finite branch values; the general bound does not
+assume that every quadratic graph does.
 
 Write `N4` for the number of **finite, squarefree, four-root** offsets
 over M31. Each such offset contributes 24 rational points to `Y`;
