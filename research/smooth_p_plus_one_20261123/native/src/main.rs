@@ -625,6 +625,7 @@ fn recover(
     scratch: &Scratch,
     method: Option<Method>,
     mut seed: u64,
+    max_draws: usize,
 ) {
     let base = Base::new(curve, depth);
     let pair_index = method.is_none().then(|| base.pair_index());
@@ -639,7 +640,7 @@ fn recover(
     let mut scalar = None;
     let mut used = 0;
     let mut oracle_calls = 0;
-    for attempt in 1..=30 {
+    for attempt in 1..=max_draws {
         let a = next_mask(&mut seed, curve.n);
         let b = next_mask(&mut seed, curve.n);
         let residual = curve.add(curve.multiply(a, curve.g), curve.multiply(b, curve.q));
@@ -690,6 +691,7 @@ fn recover(
         json!({
             "kind":"summary","mode":label,"seed":original_seed,"prime":curve.p,"depth":depth,
             "calls":oracle_calls,"selected":used,"base_rank":rows.pivots.len(),"scalar":scalar,
+            "base_size":base.unsigned.len(),"max_draws":max_draws,
         })
     );
 }
@@ -698,7 +700,7 @@ fn main() -> Result<(), String> {
     let argv: Vec<_> = std::env::args().skip(1).collect();
     let [prime, depth, solver, modes @ ..] = argv.as_slice() else {
         return Err(
-            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED] [distinct refined expanded quadratic]".into(),
+            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED [draws=1..256]] [distinct refined expanded quadratic]".into(),
         );
     };
     let curve = *FIXTURES
@@ -724,6 +726,19 @@ fn main() -> Result<(), String> {
         } else {
             (None, modes)
         };
+    let (max_draws, modes) =
+        if let Some(limit) = modes.first().and_then(|a| a.strip_prefix("draws=")) {
+            if recovery_seed.is_none() {
+                return Err("draws requires a recovery seed".into());
+            }
+            let limit: usize = limit.parse().map_err(|_| "invalid draw limit")?;
+            if !(1..=256).contains(&limit) {
+                return Err("draw limit outside 1..=256".into());
+            }
+            (limit, &modes[1..])
+        } else {
+            (30, modes)
+        };
     let modes: Vec<_> = if modes.is_empty() {
         vec![Mode::Distinct, Mode::Expanded, Mode::Quadratic]
             .into_iter()
@@ -742,9 +757,25 @@ fn main() -> Result<(), String> {
         return Err("refinement needs depth at least three".into());
     }
     if let Some(seed) = recovery_seed {
-        recover(curve, depth, Path::new(solver), &scratch, None, seed);
+        recover(
+            curve,
+            depth,
+            Path::new(solver),
+            &scratch,
+            None,
+            seed,
+            max_draws,
+        );
         for mode in modes {
-            recover(curve, depth, Path::new(solver), &scratch, Some(mode), seed);
+            recover(
+                curve,
+                depth,
+                Path::new(solver),
+                &scratch,
+                Some(mode),
+                seed,
+                max_draws,
+            );
         }
         return Ok(());
     }
@@ -799,7 +830,7 @@ fn main() -> Result<(), String> {
             );
             let record = match discovery.result {
                 Ok(recovered) if recovered == want => {
-                    json!({"status":"exact","relations":recovered.len()})
+                    json!({"status":"exact","relations":recovered.len(),"rows":recovered})
                 }
                 Ok(recovered) => {
                     return Err(format!(
