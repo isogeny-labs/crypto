@@ -389,6 +389,29 @@ supersedes the earlier `2^-43` numeric bound but still does not
 exclude a rho-sized *count* of candidate bundles. It says nothing
 about how to find or validate a qualifying one. [pcc:unverified]
 
+**Selecting a rule from labeled data has a separate cost.** Fix the
+41 offsets before calibration and a family of `M` bounded candidate
+rules. On `m` independent known-scalar samples, Hoeffding plus a
+union bound gives simultaneous correlation error at most `η`, with
+failure probability at most `δ`, when
+
+`m ≥ 2 ln(2M/δ)/η²`.
+
+This assumes every rule can reuse each labeled point at no extra
+feature cost. At `δ=0.005`, `η=g` (the illustrative cold threshold),
+and `C=384` addition equivalents per labeled point, the `2^41`
+parity rules on nonzero sign patterns require a sufficient sample
+allocation of about `2^88.940` points; `C m` is about `2^1.699`
+times the rho reference *before online work*. For all Boolean rules
+on the `2^41` nonzero patterns, `M=2^(2^41)` and this same uniform
+estimation procedure needs about `2^124.306` labeled points, with
+calibration cost about `2^37.066` times rho. Zero handling is fixed
+in advance in these counts. These are costs of this simultaneous
+confidence procedure, not sample-complexity lower bounds for every
+structured search or analytic bias proof. Estimation error `g` alone
+also does not certify a candidate whose true bias is merely `g`;
+that would require a margin or tighter calibration. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
