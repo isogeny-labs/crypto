@@ -620,13 +620,19 @@ Fix `c=x([a]G)` with `a≠0 (mod r)`, put `n=r-1`, and define
 For distinct `v,w≤L`, the zeros of
 `F_v(P)=x([v]P)-c` and `F_w(P)` are disjoint over the algebraic
 closure. Indeed, a common zero would give `[v]P=±[a]G` and
-`[w]P=±[a]G`, hence `v≡±w (mod r)`, impossible in this range.
+`[w]P=±[a]G`. Multiplying these equations by `w` and `v`
+respectively would make `[a]G`, of order `r`, annihilated by one
+of `w-v` or `w+v`. Both are nonzero with absolute value below `r`
+in this range, a contradiction.
 Each `F_v` has `2v²` simple zeros because `[v]` is separable and
 `[a]G` is not 2-torsion. All poles of `F_vF_w` have even order.
 The double cover `z²=F_vF_w` is therefore geometrically connected,
 branched at `2(v²+w²)` points, and has genus `1+v²+w²`.
-The Hasse–Weil bounds for that cover and `E`, with the identity
-removed from the character sum, give
+The only rational pole of `F_vF_w` is the identity: `E(F_p)` has
+prime order `r`, while `v,w<r`. At the identity the leading local
+term is `(vw)^-2 t^-4`, so the cover has two rational points above
+it. Thus its rational-point count is `#E(F_p)+1` plus the displayed
+correlation sum. Applying Hasse–Weil to the cover and `E` gives
 
 `|Σ_{k=1}^{n} f(vk)f(wk)|
  ≤ (2v²+2w²+4)√p+1` for `v≠w`.
@@ -661,6 +667,10 @@ assert L < r // 2 and upper == 1381400647107072664208175951477618981096884557292
 On the order-113 control `E/F_127:y²=x³+x+54` with
 `G=(72,116)`, direct enumeration at `L=5` checked the averaging
 identity for `a=1,2,3`, yielding `S_a=-2,34,-18` respectively.
+An independent enumeration of the off-diagonal sums for these
+three shifts gave `(-8,8,-4)`, `(28,-8,-4)`, and `(-4,-8,0)`
+for `(v,w)=(1,2),(2,3),(3,5)` respectively. Each matches the
+pole-adjusted cover count and the stated Hasse–Weil inequality.
 The P-192 upper bound is still **25.946 bits above** the nominal
 `2^150.582` cold bias gate, so it neither certifies a useful
 selected offset nor excludes one. It closes the fixed-shift
