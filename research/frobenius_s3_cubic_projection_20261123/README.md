@@ -96,6 +96,38 @@ At 23 bits the two planted targets have reduced basis degree two in the original
 
 For both Frobenius subspaces at 23, 47, 71, and 79 bits, the verifier also constructs independent quotient values from pairs of distinct rational factor-base abscissae. Their span is the entire trace-zero subspace. A fixed linear subspace for \(w\) that covers all these rational pairs must therefore retain \(n-1\) coordinates. [pcc:unverified]
 
+## Subspace resultant
+
+Let \(L_U(X)=\sum_{j=0}^k c_j X^{2^j}\) be the monic subspace polynomial with roots \(U\). In these Frobenius geometries its coefficients are the binary coefficients of \(g\), so \(c_0=c_k=1\). For fixed \(s\in U\setminus\{0\}\), define \(P_s(Y)=\sum_{i=0}^{k-1}d_i(s)Y^{2^i}\) by
+
+\[
+d_{k-1}=1,\qquad d_{i-1}=c_i+d_i s^{2^i}\quad(1\le i<k).
+\]
+
+The recurrence matches every coefficient of \(P_s(X^2+sX)\) with \(L_U(X)\) except that of \(X\). Evaluating at the nonzero \(s\) matches the last coefficient. The map \(x\mapsto x^2+sx\) on \(U\) has two-element fibers, so its image has \(2^{k-1}\) distinct points. These are exactly the roots of \(P_s\). The resultant is therefore
+
+\[
+\operatorname{Res}_X(L_U(X),X^2+sX+p(s))=P_s(p(s))^2 .
+\]
+
+The unsquared value is a division-free consistency check. At \(s=0\) the correct test is \(L_U(p(0))=0\), because squaring is a permutation of \(U\). The pointwise recurrence rejects both published 47-bit quartic witness sums. [pcc:unverified]
+
+For a fixed target, write \(p(S)\) as an affine linearized polynomial modulo \(L_U(S)\). In \(d_i\), each power of \(S\) has exponent \(\sum_{r=i+1}^{j-1}2^r\) for some \(j\le k\). Each \(p(S)^{2^i}\) reduces to at most \(k+1\) terms before multiplying. Only the terms with \(j=k\) can overrun \(2^k-1\), and their exponents are below \(2^k+2^{k-1}\). Replacing \(S^{2^k}\) by the lower terms of \(L_U\) therefore needs just one step per overrun. There are at most \(O(k^2)\) such overruns, and each contributes at most \(k\) terms. The other products contribute at most \(O(k^3)\) terms. Adding a scalar multiple of \(L_U(S)/S\), the indicator of zero on \(U\), sets the value at \(s=0\). This gives an exact polynomial with \(O(k^3)\) terms in the univariate power basis and ordinary degree below \(2^k\). [pcc:unverified]
+
+The monomials \(S^e\) with \(0\le e<2^k\) form a basis for \(K\)-valued functions on \(U\), and those with \(\operatorname{popcount}(e)\le d\) form a basis of the degree-\(d\) Boolean filtration over \(K\). Each \(S^{2^i}\) is linear on \(U\), and the independent powers with the required popcounts have the same count as the squarefree Boolean monomials. The scalar-coordinate span over \(\mathbb F_2\) is measured separately after expanding in Boolean coordinates. [pcc:unverified]
+
+| Field degree | Targets across both factors | Nonzero univariate terms per residual | Residual Boolean degree |
+| ---: | ---: | ---: | ---: |
+| 7 | 56 | 8 | 3 |
+| 23 | 8 | 200 | 11 |
+| 47 | 2 | 1,822 | 23 |
+| 71 | 2 | 5,034 | 35 |
+| 79 | 2 | 8,138 | 39 |
+
+At 23 bits the ordinary degree is 2,047 and the Boolean expansion contains 2,047 or 2,048 nonzero monomials. The span of its binary coordinate equations is zero through degree eight and has dimensions 11, 22, and 23 in degrees nine, ten, and eleven. Those are input-row degrees. The direct, quotient, and quadratically augmented systems have measured solving degree four on the four shared first-factor targets. [pcc:unverified]
+
+For 7 and 23 bits the independent rank-and-recovery check, pointwise recurrence, and dense polynomial GCD return the same solution sums. The dense GCD test records sparse construction, dense conversion, GCD, and isolation separately. It expands the polynomial to \(2^k\) coefficient slots at 23 bits. Scanning the recurrence also visits \(2^k\) sums. Both extraction methods have work that scales with \(2^k\). Sparse root isolation and three-summand joining remain open. [pcc:unverified]
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
@@ -143,5 +175,13 @@ The quadratic comparison and capped closure records are in [quadratic-multiples.
 The quotient results are in [quotient-degrees.jsonl](quotient-degrees.jsonl), [quotient-witnesses.jsonl](quotient-witnesses.jsonl), and [quotient-spans.jsonl](quotient-spans.jsonl).
 
 The elimination records are in [selector-closure-d3.jsonl](selector-closure-d3.jsonl), [selector-macaulay-d4.jsonl](selector-macaulay-d4.jsonl), and [selector-chart-d4.jsonl](selector-chart-d4.jsonl).
+
+Reproduce the sparse resultant with Python and SymPy. Add `--dense-gcd` with python-flint installed to check exact root isolation through 23 bits.
+
+```sh
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/subspace_resultant.py 7 23 47 71 79 --dense-gcd
+```
+
+The resultant results are in [subspace-resultant.jsonl](subspace-resultant.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
