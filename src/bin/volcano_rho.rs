@@ -329,9 +329,7 @@ impl Curve {
         Some((x3, f.sub(f.mul(l, f.sub(x1, x3)), y1)))
     }
     fn mul(&self, f: &Fp, p: Pt, k: u64) -> Pt {
-        let Some((px, py)) = p else {
-            return None;
-        };
+        let (px, py) = p?;
         if k == 0 {
             return None;
         }
@@ -722,6 +720,7 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
 ///   at `BATCH = 16`; `BATCH = 64` still ~3.6× worse.
 /// - `BATCH = 32` with `HashMap`: bit-exact iters, ~1.2× slower ns/op median
 ///   despite ~0.8% fewer retired instructions (working-set / cache effect).
+///
 /// `HashMap` + `BATCH = 16` stays on the measured frontier pending a
 /// cache-friendly shared DP representation that does not enlarge the
 /// per-walker working set.

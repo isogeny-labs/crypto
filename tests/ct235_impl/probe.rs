@@ -8,7 +8,7 @@ fn ct235_q73_cold_single_panel() {
     const MAX_OFFSETS:usize=60;
     let g:Ec=Some((2,37));
     let target:Ec=Some((19,37)); // only public Q73
-    for (_arm,&basis) in PANEL.iter().enumerate() {
+    for &basis in PANEL.iter() {
       for round in 0..4 {
         let mut bsgs_ns=0u128;
         let candidate_first=round==0 || round==3; // ABBA schedule

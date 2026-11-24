@@ -1862,11 +1862,13 @@ fn evaluator_forest_opt_in_reports_exact_useful_rank_and_atomic_refusal() {
 #[test]
 fn evaluator_forest_same_source_seeded_rank_identity() {
     use crypto_lib::cryptanalysis::large_prime_graph::eval::*;
-    let mut p = EvalParams::default();
-    p.compare_exact_forest = true;
-    p.forest_max_rows = 64;
-    p.filter_max_sources = 4096;
-    p.filter_max_small_weight = 4096;
+    let mut p = EvalParams {
+        compare_exact_forest: true,
+        forest_max_rows: 64,
+        filter_max_sources: 4096,
+        filter_max_small_weight: 4096,
+        ..EvalParams::default()
+    };
     p.partition_parts.clear();
     for seed in 1..=24u64 {
         let ell = [7u64, 101, 2_147_446_831][(seed as usize) % 3];
