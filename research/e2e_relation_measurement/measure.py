@@ -3,6 +3,7 @@
 import argparse, hashlib, json, math, os, platform, random, resource, time
 from pathlib import Path
 from sage.all import GF, EllipticCurve, PolynomialRing, prod, version, is_prime
+from accounting import count_witnesses
 
 
 def pt(P):
@@ -12,7 +13,7 @@ def pt(P):
 def run(args):
     start = time.perf_counter_ns(); cpu = time.process_time_ns()
     timings = {}
-    output = {'schema':'e2e-relation-measurement/v1', 'config':vars(args), 'status':'running', 'phase':'setup', 'timings':timings, 'source_sha256_at_start':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+    output = {'schema':'e2e-relation-measurement/v1', 'config':vars(args), 'status':'running', 'phase':'setup', 'timings':timings, 'source_sha256_at_start':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), 'accounting_sha256_at_start':hashlib.sha256(Path(__file__).with_name('accounting.py').read_bytes()).hexdigest()}
     def checkpoint():
         if args.checkpoint:
             path = Path(args.checkpoint)
@@ -102,7 +103,9 @@ def run(args):
                                 witnesses.append({'indices':[i,j+args.block_size],'signs':[su,sv],'A':a,'B':b,'scalar':w,'verified':w is not None and w*P==Q})
             return witnesses
         output['witnesses']=phase('relation_verification',verify)
-        output['status']='complete'; output['useful_relations']=sum(bool(w['verified']) for w in output['witnesses'])
+        output['relation_counts']=count_witnesses(output['witnesses'])
+        output['useful_relations']=output['relation_counts']['nonzero_b_verified']
+        output['status']='verification_failed' if output['relation_counts']['nonzero_b_verification_failed'] else 'complete'
     output['total']={'wall_ns':time.perf_counter_ns()-start,'cpu_ns':time.process_time_ns()-cpu,'peak_rss_native':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'peak_rss_note':'process lifetime; bytes on macOS, KiB on Linux'}
     output['environment']={'sage':version(),'python':platform.python_version(),'platform':platform.platform(),'source_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     output['phase']='finished'

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Independent affine arithmetic checks for the bounded driver."""
-import hashlib, json, pathlib, subprocess, tempfile, unittest
+import hashlib, importlib.util, json, pathlib, subprocess, tempfile, unittest
 
 HERE=pathlib.Path(__file__).resolve().parent
 P=(4,10); Q=(82,27); MOD=101; N=101
@@ -29,6 +29,13 @@ class MeasurementTest(unittest.TestCase):
             out=pathlib.Path(d)/'out.json'
             subprocess.run(['sage','-python',str(HERE/'measure.py'),'--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27','--mode',mode,'--seed','42','--block-size','4','--output',str(out),*extra],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             return json.loads(out.read_text())
+    def test_relation_count_classification(self):
+        spec=importlib.util.spec_from_file_location('accounting', HERE/'accounting.py')
+        module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        actual=module.count_witnesses([{'B':0,'verified':False},{'B':7,'verified':True},{'B':8,'verified':False}])
+        self.assertEqual(actual, {'total':3,'zero_b':1,'nonzero_b':2,'nonzero_b_verified':1,'nonzero_b_verification_failed':1})
+        with self.assertRaises(ValueError): module.count_witnesses([{'B':0,'verified':True}])
+
     def test_modes_and_replay(self):
         for mode in ('independent','walk','two-group'):
             with self.subTest(mode=mode):
@@ -52,6 +59,8 @@ class MeasurementTest(unittest.TestCase):
         r=self.run_case('independent',['--block-size','10'])
         self.assertEqual(len(r['roots']),3)
         self.assertGreater(r['useful_relations'],0)
+        self.assertEqual(r['relation_counts']['nonzero_b'],r['useful_relations'])
+        self.assertEqual(r['relation_counts']['nonzero_b_verification_failed'],0)
         accepted=[c for c in r['candidates'] if c['status']=='accepted']
         for w in r['witnesses']:
             u,v=(accepted[i] for i in w['indices']); su,sv=w['signs']
@@ -75,6 +84,7 @@ class MeasurementTest(unittest.TestCase):
             summary=json.loads((out/'summary.json').read_text())
             self.assertTrue(summary['target_pairing_by_seed']['42'])
             self.assertTrue(summary['measure_source_unchanged'])
+            self.assertTrue(summary['accounting_source_unchanged'])
             for mode in ('independent','walk','two-group'):
                 self.assertEqual(summary['per_mode'][mode]['completed'],1)
                 self.assertEqual(summary['per_mode'][mode]['attempts'],1)
@@ -84,10 +94,12 @@ class MeasurementTest(unittest.TestCase):
                 snapshot=json.loads(checkpoint.read_text())
                 self.assertEqual(snapshot['phase'],'finished')
                 self.assertEqual(snapshot['source_sha256_at_start'],summary['measure_sha256_at_start'])
+                self.assertEqual(snapshot['accounting_sha256_at_start'],summary['accounting_sha256_at_start'])
 
     def test_checkpoint_survives_solver_failure(self):
         program = r"""
-import argparse, importlib.util, sys
+import argparse, importlib.util, pathlib, sys
+sys.path.insert(0, str(pathlib.Path(sys.argv[1]).parent))
 spec=importlib.util.spec_from_file_location('measure', sys.argv[1])
 m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 original=m.PolynomialRing
