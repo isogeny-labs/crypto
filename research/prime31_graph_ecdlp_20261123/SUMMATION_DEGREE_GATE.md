@@ -197,6 +197,28 @@ well. This composition supplies no distinct lower-degree summation
 polynomial. A changed codomain selector or polynomial presentation may
 still change measured work and must carry its map and factor-base costs.
 
+## Single split-graph secant capacity at B677 scale
+
+The repository's
+`research/prime_factor_base_degree_20261031/SECANT_GRAPH.md` proves a
+presentation-specific homogeneous top-ideal degree `d+1` for a two-summand
+secant system built from one degree-`d` ordinate graph `y=h(x)`, when
+`h(x)^2-f(x)` is completely split and squarefree. That construction has
+exactly `2d` distinct base abscissae; its same-base dense presentation
+has top-ideal degree `2d+1`. These are **homogeneous presentation degrees**,
+not completed F4 solving degrees.
+
+To supply at least the frozen B677 base size from one such graph requires
+`2d >= 677`, hence `d >= 339` and, if such a completely split graph
+exists, secant top-ideal degree at least 340.
+The minimum full split has 678 abscissae, so it is not the exact B677
+selector without an additional restriction and a new degree proof. The
+reported `d=2` reduction from five to three therefore does not transfer
+to this 677-column workload as a low-degree single-graph system. This is
+a degree-and-support screen, not a lower bound on iterative solver work
+or on unions of graphs and Boolean-offset variants; those require their
+own exact support, source-cost and rank comparison.
+
 ## Existing presentations and the next falsifier
 
 The balanced S4/S3 eight-leaf presentation and the S4-to-two-S3 auxiliary
