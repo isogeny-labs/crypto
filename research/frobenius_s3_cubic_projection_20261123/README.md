@@ -214,7 +214,27 @@ For the earlier prime-degree geometries, put \(W=\operatorname{span}_{\mathbb F_
 
 Replacing \(p=u_1u_2\) by \(p\in W\) leaves every sum \(s\in U\) alive at each nonzero trace-compatible rational target on the toy curve. Since the shift is 1, the original product \(z=1+s+p\) has trace one. The equation \(z^2+tz=t^2s^2+1\) has two roots because \(\operatorname{Tr}(s)=\operatorname{Tr}(1/t^2)=0\). They differ by \(t\), which has trace one. Exactly one root has trace one and yields \(p\in W\). The relaxed linear system thus has \(2^k\) solutions, one per sum, and the omitted product-membership condition still has to be enforced. This rules out the product-span relaxation as a bounded-candidate solver for these prime-degree geometries. [pcc:unverified]
 
-The quadratic-extension result changes the factor-base geometry. It gives a decomposition bound for composite field degrees. In the coset controls the relative trace of \(a\) is 1 and \(k\) is odd, so every factor-base point has absolute trace-one abscissa. The finite doubles on this even-degree toy curve have trace-zero abscissa by the same doubling criterion. Since the doubling subgroup has index two, every three-term sum in the coset controls lies outside it. A relation collector targeting an odd-order subgroup would need to account for this coset constraint. Relation rank and total ECDLP cost for this family remain open. [pcc:unverified]
+The quadratic-extension result changes the factor-base geometry. It gives a decomposition bound for composite field degrees. In the coset controls the relative trace of \(a\) is 1 and \(k\) is odd, so every factor-base point has absolute trace-one abscissa. The finite doubles on this even-degree toy curve have trace-zero abscissa by the same doubling criterion. Since the doubling subgroup has index two, every three-term sum in the coset controls lies outside it. A relation collector targeting an odd-order subgroup would need to account for this coset constraint. The native experiment below measures relation rank. Total ECDLP cost for this family remains open. [pcc:unverified]
+
+## Native Rust comparison and larger extension degrees
+
+The four-candidate bound holds for any proper subfield \(F\subset K\) and shift \(a\in K\setminus F\). The nonconstant part of the equation is \(A s^2+D s+p^2+tp\), with \(A=a^2+t^2\) and \(D=ta\). If \(t\in F\), reduce modulo \(F\). Since \(A\notin F\), a scalar coordinate of the resulting equation gives at most two sums, and the equation in \(p\) gives at most two candidates for each sum. If \(t\notin F\), reduce modulo \(F+Ft\). A nonzero projected coefficient of \(s^2\) or \(s\) gives at most two sums. For each sum the map \(p\mapsto p^2+tp\) is injective on \(F\). [pcc:unverified]
+
+If both projected coefficients vanish, write \(A=A_0+A_1t\) and \(D=D_0+D_1t\). The \(t\)-coordinate expresses \(p\) as an affine quadratic in \(s\). If \(A_1\ne0\), the other coordinate has leading term \(A_1^2s^4\), giving at most four sums. If \(A_1=0\), then \(a+t\in F\). The condition \(ta\in F+Ft\) now implies \(a^2\in F+Fa\), so \(a\) has degree two over \(F\). The preceding quadratic-extension calculation gives the bound in this last case. This extends polynomial-time S3 extraction and the one-pass sliced join to cubic extensions and other proper-subfield cosets. [pcc:unverified]
+
+The native harness uses the pinned `Gf2` field kernel from `src/cryptanalysis/semaev_decomp.rs`. It builds three arms using identical field arithmetic: direct signed complement lookup with batched inversion, sum–product linearization with per-candidate recovery, and the same linearization with a fixed subfield Artin–Schreier map for recovery. The latter solves \((u/s)^2+u/s=p/s^2\) for nonzero \(s\). The harness checks all three signed triple sets on every trial. It also compares both S3 extractors with exhaustive algebraic pairs on every target at field degrees 6, 9, and 10. [pcc:unverified]
+
+Each seed supplies 24 uniform finite curve targets and 24 planted three-summand targets per geometry. Every signed third is included. A shared modular eliminator tracks cumulative rank of signed relation coefficients modulo the largest prime factor of the toy curve order. It stops processing rows at full column rank. The full-rank prefix charges factor-base and map setup, target and intermediate generation, unsuccessful searches, sign recovery, and rank reduction. This measures relation coefficient rank rather than discrete-log recovery. [pcc:unverified]
+
+| Uniform panel | Rank reached | First full-rank target | Direct time to full rank | Linearized time to full rank with cached recovery |
+| --- | ---: | ---: | ---: | ---: |
+| 22-bit quadratic, seed 11781661 | 1,058 / 1,058 | 5 | 0.817 s | 0.142 s |
+| 22-bit quadratic, seed 12675811 | 1,058 / 1,058 | 6 | 0.972 s | 0.131 s |
+| 18-bit cubic, either seed | 3 / 32 | — | — | — |
+
+At 22 bits, each full uniform panel performs about 107 million checks in the direct complement join. The linearized join examines 48,046 and 56,680 sum–product candidates and achieves the same full-rank prefixes as the direct join. At 18 bits the quadratic coset reaches rank 254 of 254 on both uniform panels. The cubic coset has 32 factor-base abscissae and reaches rank 3 of 32 on both. This matched field-degree comparison shows how a cheaper decomposition can still lose relation yield when the factor base shrinks. The modular rank reduction uses prime 991 at 22 bits, and full discrete-log recovery remains open for this geometry. [pcc:unverified]
+
+The JSON field "full_rank_prefix" records the number of targets and the elapsed work for the direct, linearized, and cached linearized arms, in that order. Its value is null when the panel does not reach full rank.
 
 ## Reproduction
 
@@ -315,5 +335,14 @@ SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_2026112
 ~~~
 
 The coset and prime-degree results are in [product-linearization.jsonl](product-linearization.jsonl).
+
+Run the native comparison with Rust and Python available. The shell runner extracts the pinned field kernel into a temporary build directory.
+
+~~~sh
+bash research/frobenius_s3_cubic_projection_20261123/run_native_coset.sh 24 11781661
+bash research/frobenius_s3_cubic_projection_20261123/run_native_coset.sh 24 12675811
+~~~
+
+The native workload and rank records are in [native-coset.jsonl](native-coset.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
