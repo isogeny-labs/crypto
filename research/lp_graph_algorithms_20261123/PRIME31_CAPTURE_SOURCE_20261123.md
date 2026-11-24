@@ -1,5 +1,13 @@
 # Ordinary Prime31 capture source and workload gap
 
+## Dated continuation: M31 B677 capture, 2026-11-24 UTC
+
+The bounded search below is a historical result. A different retained source was subsequently found in PR #5097 at `577d6c2c1c4a527604d965e6fb62c44df7902f36`: a ten-query, 645-row generic exhaustive-pair capture on this exact M31 curve. Native run 45309117216 at `3ba271b1f7100bdfd06eafbac8af283ec9d55094` replayed every equation and passed the 613 rows with at most two LP terms through the original admission and graph consumers. The source uses a 915,304-entry signed pair table, so the old h<=32 workload bound below does not describe this capture. [pcc:unverified]
+
+The [new frozen receipt](evidence/native-m31-capture-20261124/README.md), [protocol](M31_CAPTURE_REPLAY_20261124.md) and [report](reports/run-20261124T0200Z/REPORT.md) preserve this distinction. Unsigned data registration: PCC-20261124-fcc0a3. The generic/algebraic track distinction and original collector custody/cold-cost gaps remain open. No new collection or timing comparison was performed.
+
+## Historical bounded source search
+
 Status: source inspection and a derived uniform-query bound, not an executed collection. [pcc:unverified]
 
 ## Scope and source identity
