@@ -1,0 +1,116 @@
+{
+  "id": "IDC1hec732500b4efd748",
+  "independence": "producer evaluated; no independently signed formal pointer",
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "proof": null,
+  "schema": "identity.certificate/v1",
+  "seed": 2026112404,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": 2,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "A",
+                      "op": "var"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "eps",
+                          "op": "var"
+                        },
+                        {
+                          "args": {
+                            "args": "a",
+                            "op": "var"
+                          },
+                          "op": "neg"
+                        }
+                      ],
+                      "op": "add"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": "A",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": 2,
+                      "op": "const"
+                    },
+                    {
+                      "args": "a",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": "a",
+          "op": "var"
+        }
+      ],
+      "op": "mul"
+    },
+    "name": "original inverse torus real-coordinate denominator relation",
+    "rhs": {
+      "args": [
+        {
+          "args": "A",
+          "op": "var"
+        },
+        {
+          "args": "eps",
+          "op": "var"
+        },
+        {
+          "args": [
+            {
+              "args": 2,
+              "op": "const"
+            },
+            {
+              "args": "a",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "mul"
+    },
+    "source": "classical rearrangement of x=A(eps-a)/(2a); torsion-column-transport DERIVATION",
+    "variables": [
+      "a",
+      "A",
+      "eps"
+    ]
+  },
+  "value_digest": "d15de231de7d613d4a34c766a19901eb4e38e6a3017c6206c96647d59104722b"
+}
