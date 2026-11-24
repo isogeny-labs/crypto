@@ -63,3 +63,28 @@ render resolves it. No scientific failure inferred from document rendering.
 Current raw renderer whitespace stays preserved, not claimed clean. Prior
 KB/PDF access gaps retained. No frozen subject or old archive changed.
 [pcc:unverified]
+
+## 2026-11-24T00:57:12.629045+00:00 — Multiplier proposal published with exact subject readback
+
+### What was done (commands, files, features)
+Published b5422221e6 as b18a9f1f20e50f990b0cee66ba9a8ab07118955b, tree6412ae15d5417f2457363f0cf28cefd216eeb774 equals local. All14 proposal
+subject Git blobs match; native102/prior60subject hashes unchanged. Ledger1852
+retains1851prefix; lessons1019 verify0errors. Actual incremental artifact
+check selects no committed data. New raw renderer whitespace339bytes retained
+losslessly; whole historical PR whitespace remains NOT PASS. [pcc:unverified]
+
+### Decisions made (and why)
+Report this as a prospective operation with qualification and shared-base
+recovery gates, not a new fixed-base solver. Keep all original acceptance
+criteria and preserve all actual raw/history obligations. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Update same PR scope after prose lint and inspect final-head gates once;
+resume SAME CI-only checker. Next science is the separately versioned
+guarded two-leaf compiler/identity qualification, no scheduled campaign.
+[pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+No subject/tree mismatch. Existing raw artifact/history/signer dependencies
+remain open; no unchanged retries or baseline/policy workaround.
+[pcc:unverified]
