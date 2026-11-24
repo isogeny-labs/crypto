@@ -821,6 +821,43 @@ equality on all 48 order-97 markings and eight P-192 markings;
 on the order-97 curve, the normalized character at `d=2`
 already differs from `χ_r(2)`. [pcc:unverified]
 
+### Odd-order EDS coset products fail an exactness condition
+
+The local ray-character note screened several even-size index
+subgroups. An odd-size coset has a separate, cheap necessary
+condition. Let `H≤F_r^×/{±1}` have odd order `m>1`, let `C` be any
+coset of `H`, and choose the odd representative of each class.
+Set `B_C(P)=χ_p(∏_{j∈C}ψ_j(P))`. The normalizer identity gives
+`χ_p(ψ_j(P))=χ_p(φ([j]P))χ_p(φ(P))` for odd `j`.
+For any odd representative `h∈H`, multiplication by `h`
+permutes `C`, changing representative signs by a fixed
+`ε_C(h)∈{±1}`. Because `m` is odd and `h²-1` is even,
+
+`B_C([h]P)/B_C(P)=ε_C(h)χ_p(φ([h]P)/φ(P))`
+`=ε_C(h)χ_p(ψ_h(P))`.
+
+If a normalized `B_C` were the exact ray sign, this ratio would
+be the constant `χ_r(h)=1` for every `h` of odd order in the
+quotient. Thus a nonconstant `χ_p(ψ_h(P))` at even two markings
+rules out **every coset of every odd-order subgroup containing
+`h`**, without evaluating a coset product. [pcc:unverified]
+
+For P-192, the odd part of `n=(r-1)/2` has the four prime factors
+`5`, `2389`, `9564682313913860059195669`, and
+`3433859179316188682119986911`. The
+[`odd_coset_falsifier.sage`](odd_coset_falsifier.sage) replay
+chooses an odd representative `h_q` of order `q` in the quotient,
+checks the factorization and prime orders, and evaluates
+`χ_p(ψ_(h_q)([d]G))` for `d=1,2,3,5`. For `q=5` and `2389`,
+the signs at `d=1,2` are `(-1,+1)`; for the third factor,
+the signs at `d=1,5` are `(-1,+1)`; for the fourth,
+the signs at `d=1,2` are `(-1,+1)`. Every nontrivial odd-order
+subgroup contains one of these prime-order subgroups, so the
+specified exact coset-product family is excluded on P-192.
+This says nothing about even-order subgroups, arbitrary selected
+EDS index sets, or a biased rather than exact feature.
+[pcc:unverified]
+
 ### Second division-polynomial jet: a compact exactness screen
 
 The first derivative of `ψ_r` at `x(P)` was screened in the local
