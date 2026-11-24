@@ -782,6 +782,140 @@ fn forest_witness_materializes_small_payload_and_atomically_refuses_caps() {
     assert!(materialize_complete_relations(&index, &batch, &duplicate, 4, 4).is_none());
 }
 
+// Scalar algebra for the existing M31 curve: p = 2_147_483_647 is the
+// coordinate prime, while relations use ell = 2_147_446_831. These synthetic
+// coefficient fixtures are correctness controls, not curve-generated streams.
+const M31_SOURCE_ID_ELL: u64 = 2_147_446_831;
+
+fn m31_source_id_fixture() -> Vec<PartialRelation> {
+    vec![
+        PartialRelation {
+            id: u64::MAX,
+            small: vec![(0, 1)],
+            large: vec![(101, 1)],
+            rhs: 1,
+        },
+        PartialRelation {
+            id: 0,
+            small: vec![(0, 2)],
+            large: vec![(102, 2)],
+            rhs: 2,
+        },
+        PartialRelation {
+            id: 42,
+            small: vec![(0, 1)],
+            large: vec![(101, 3), (102, 4)],
+            rhs: 3,
+        },
+    ]
+}
+
+fn check_m31_nonmonotone_source_ids(lazy: bool) {
+    use crypto_lib::cryptanalysis::large_prime_filter::replay_complete_relation;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
+    let ell = M31_SOURCE_ID_ELL;
+    let partials = m31_source_id_fixture();
+    let index = LpIndex::build(&partials, ell).unwrap();
+    let batch = if lazy {
+        collect_witnesses_lazy(&index).unwrap()
+    } else {
+        collect_witnesses(&index).unwrap()
+    };
+    assert_eq!(batch.rank, 2);
+    assert_eq!(batch.witnesses.len(), 1);
+    assert_eq!(
+        batch.witnesses[0].sources,
+        vec![(0, ell - 3), (1, ell - 2), (2, 1)]
+    );
+    let before = batch.clone();
+    let out = materialize_complete_relations(&index, &batch, &partials, 1, 3)
+        .expect("valid witnesses must accept arbitrary unique original source IDs");
+    assert_eq!(out.len(), 1);
+    assert_eq!(
+        out[0].sources,
+        vec![(0, ell - 2), (42, 1), (u64::MAX, ell - 3)]
+    );
+    // Hand-derived oracle: -3*row0 - 2*row1 + row2.
+    assert_eq!(out[0].small, vec![(0, ell - 6)]);
+    assert_eq!(out[0].rhs, ell - 4);
+    assert_eq!(replay_complete_relation(&out[0], &partials, ell).unwrap(), out[0]);
+    assert_eq!(batch, before, "materialization must not rewrite index-based witnesses");
+}
+
+#[test]
+fn m31_nonmonotone_source_ids_eager_materialization() {
+    check_m31_nonmonotone_source_ids(false);
+}
+
+#[test]
+fn m31_nonmonotone_source_ids_lazy_materialization() {
+    check_m31_nonmonotone_source_ids(true);
+}
+
+#[test]
+fn m31_source_id_row_permutations_preserve_exact_relation() {
+    use crypto_lib::cryptanalysis::large_prime_filter::replay_complete_relation;
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
+    let ell = M31_SOURCE_ID_ELL;
+    let source = m31_source_id_fixture();
+    for order in [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]] {
+        let partials: Vec<_> = order.iter().map(|&i| source[i].clone()).collect();
+        let index = LpIndex::build(&partials, ell).unwrap();
+        for batch in [collect_witnesses(&index).unwrap(), collect_witnesses_lazy(&index).unwrap()] {
+            assert_eq!(batch.rank, 2);
+            assert_eq!(batch.witnesses.len(), 1);
+            let out = materialize_complete_relations(&index, &batch, &partials, 1, 3).unwrap();
+            assert_eq!(out.len(), 1);
+            let row = &out[0];
+            assert_eq!(row.sources.iter().map(|&(id, _)| id).collect::<Vec<_>>(), vec![0, 42, u64::MAX]);
+            let scale = row.sources[1].1;
+            assert!(scale > 0 && scale < ell);
+            let neg_multiple = |k: u64| (ell - (k * scale) % ell) % ell;
+            // Input order can change the basis and normalization. Compare
+            // the unique relation up to its nonzero coefficient on ID 42.
+            assert_eq!(row.sources, vec![(0, neg_multiple(2)), (42, scale), (u64::MAX, neg_multiple(3))]);
+            assert_eq!(row.small, vec![(0, neg_multiple(6))]);
+            assert_eq!(row.rhs, neg_multiple(4));
+            assert_eq!(replay_complete_relation(row, &partials, ell).unwrap(), *row);
+        }
+    }
+}
+
+#[test]
+fn m31_source_id_materialization_preserves_atomic_refusals() {
+    use crypto_lib::cryptanalysis::large_prime_graph::witness::*;
+    let ell = M31_SOURCE_ID_ELL;
+    let partials = m31_source_id_fixture();
+    let index = LpIndex::build(&partials, ell).unwrap();
+    for batch in [collect_witnesses(&index).unwrap(), collect_witnesses_lazy(&index).unwrap()] {
+        assert!(materialize_complete_relations(&index, &batch, &partials, 1, 3).is_some());
+        assert!(materialize_complete_relations(&index, &batch, &partials, 1, 2).is_none());
+        assert!(materialize_complete_relations(&index, &batch, &partials, 0, 3).is_none());
+        let mut mismatched = partials.clone();
+        mismatched[2].id = 43;
+        assert!(materialize_complete_relations(&index, &batch, &mismatched, 1, 3).is_none());
+        let mut tampered = batch.clone();
+        tampered.witnesses[0].sources[0].1 += 1;
+        assert!(!witness_cancels_lp(&index, &tampered.witnesses[0]));
+        assert!(materialize_complete_relations(&index, &tampered, &partials, 1, 3).is_none());
+        // A split duplicate witness term still cancels LPs, but is not a
+        // canonical certificate. Sorting must not merge it into acceptance.
+        let mut split = batch.clone();
+        split.witnesses[0].sources[0].1 -= 1;
+        split.witnesses[0].sources.insert(0, (0, 1));
+        assert!(witness_cancels_lp(&index, &split.witnesses[0]));
+        assert!(materialize_complete_relations(&index, &split, &partials, 1, 4).is_none());
+    }
+    let mut duplicate = partials.clone();
+    duplicate[2].id = duplicate[1].id;
+    // Rebuild both objects so the matching-order guard cannot mask a
+    // missing uniqueness check on original source IDs.
+    let duplicate_index = LpIndex::build(&duplicate, ell).unwrap();
+    for batch in [collect_witnesses(&duplicate_index).unwrap(), collect_witnesses_lazy(&duplicate_index).unwrap()] {
+        assert!(materialize_complete_relations(&duplicate_index, &batch, &duplicate, 1, 3).is_none());
+    }
+}
+
 #[test]
 fn forest_witness_materialization_randomized_original_replay() {
     use crypto_lib::cryptanalysis::large_prime_filter::replay_complete_relation;
