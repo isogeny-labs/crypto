@@ -26,6 +26,33 @@ validation from one deterministic panel. Its target row is independently
 replayed in `research/prime31_graph_ecdlp_20261123/PROTOCOL.md`; the
 algebraic RR5 source remains a separate incomplete experiment.
 
+### How much of B677 belongs to the 2+2 split
+
+The public support comprises 509 liftable Dickson abscissae and 168
+liftable Y7 abscissae. If exactly `k` of four distinct leaves come from
+the Dickson side, the exact uniform-query raw-witness expectation is
+`16*C(509,k)*C(168,4-k)/n`. The frozen generic-source receipt records
+the observed classes on its eleven deterministic queries:
+
+| Dickson leaves `k` | Expected per uniform query | Expected over 11 | Observed in receipt |
+| ---: | ---: | ---: | ---: |
+| 0 | 0.2386 | 2.62 | 3 |
+| 1 | 2.9437 | 32.38 | 35 |
+| 2 | 13.5128 | 148.64 | 154 |
+| 3 | 27.3492 | 300.84 | 294 |
+| 4 | 20.5933 | 226.53 | 221 |
+| Total | 64.6376 | 711.01 | 707 |
+
+The active 2-Dickson/2-Y7 algebraic branch covers the `k=2` class:
+20.905% of the full raw signed-tuple expectation and 154/707 rows in
+this generic-source receipt. These are reachability counts before RR5
+chart conditions, finite-field root lifting, failures, deduplication
+across queries and useful-rank tests. The close expected/observed class
+counts do not validate the uniform model statistically from one fixed
+panel. In particular, completion of the 2+2 positive control alone
+would not demonstrate extraction across the other four classes or an
+end-to-end source replacement.
+
 ## Cost within this materialized-pair design
 
 The source constructs `4*C(B,2)` signed pairs, then probes one complement
