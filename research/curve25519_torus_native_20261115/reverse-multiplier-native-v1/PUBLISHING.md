@@ -49,3 +49,11 @@ rows, two raw failed-render log lines and one raw test EOF. The CSV and final
 logs are already attestation-pinned and remain byte-equal. Lossless diagnostics
 and hashes are in development/WHITESPACE.json and its gzip. This is not a
 whole-diff whitespace pass. [pcc:unverified]
+
+Native/report publication completed: local e30fea95898eb1a3b386dfd355f29c7ed5dbb57e
+published as98162e6e8842384b8bde85025a302593cd031642, tree
+4abc844015240204c41530807b2349330a355648. Actual remote branch and whole tree
+match; all37native/report subjects match the published Git blobs. Same PR5071
+title/body now describes implemented public-input roots and geometric row
+accounting, with zero-finding body lint before submission. This is Git custody,
+not hosted-gate approval or signed scientific validation. [pcc:unverified]

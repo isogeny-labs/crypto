@@ -165,3 +165,33 @@ The metadata CSV default CRLF was discovered after attestation creation;
 preserve its bytes and disclose advisory instead of editing a pinned subject.
 Raw earlier logs and first source/render failures remain intact.
 [pcc:unverified]
+
+## 2026-11-24T01:49Z — Native results published and remote bytes read back
+
+### What was done (commands, files, features)
+Committed e30fea9589 and published through maintained helper as98162e6e88.
+Actual remote lane head and complete tree match; all37native/report subjects
+read back at that commit match. New full20224byte raw archive is in Git.
+Same PR5071 title/body now describes native public-input roots and geometric
+row accounting; exact body lint0 before structured update. [pcc:unverified]
+
+### Decisions made (and why)
+Keep original source and report hashes fixed. This final handoff commit adds
+publication metadata only; no new native call, source edit or source test.
+Require actual final-head gate/size/artifacts/review/history state before
+integration; no historical migrate result is carried forward. Continue the
+scientific goal through coherent-column/target-tag recovery in a new qualified
+component, separately from CI-only maintenance. [pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Read final-head checks/comments/reviews once, resume SAME checker about50min
+after publication, then unchanged4hour/max3policy. Pending Copilot request,
+canonical journal/history integration and older artifact/claim dependencies
+remain. NEXT.md gives the scientific acceptance gate; no successor experiment
+or paid job is scheduled by that checker.
+
+### Errors (what went wrong, how it was handled)
+No publication/tree/subject mismatch. Four older selected archives remain
+exact and untracked; their publication is not inferred from this new Git
+archive. No canonical conflict or unrelated CI baseline was patched.
+[pcc:unverified]
