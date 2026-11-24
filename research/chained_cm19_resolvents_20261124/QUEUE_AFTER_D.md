@@ -54,3 +54,5 @@ CI: Lean38 first>=04:02:53Z;CA1961>=04:47:25.517Z;
 Cap30/all attempts/events/four-hour unchanged cadence; no terminal polls,
 reruns, empty commits, waivers or feature-base auto-merge.
 [pcc:unverified]
+
+Delivery E: report bab639 and focused CI syntax 5ac3bb are prepared; see CURRENT_RESULT_E. Lean38 first review 97343f has two failed checks/one failed run, both log requests404, cause unknown; next unchanged >=08:03:14.928Z. Continue the next cryptanalysis component after ready5114. No original scientific rerun. [pcc:unverified]

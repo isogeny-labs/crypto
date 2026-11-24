@@ -50,3 +50,7 @@ Journal reconciliation preserves complete normalized blocks at maximum
 multiplicity, fresh main/AGENTS reviewed before append, exact staged blob
 diff inspected. No global transcript/secrets in checkpoints.
 [pcc:unverified]
+
+Latest delivery state: CURRENT_RESULT_E. Result27ffebdb whole57 files verified. Report bab639 (all three pages inspected) and native CI syntax5ac3bb; no local scientific rerun. Lean38 first97343f: two failed checks/one failed run; original log requests404 retained, cause unknown; next>=08:03:14.928Z. After publication/ready5114, immediately start separate cryptanalysis actual divisor/Cantor/pushforward correctness. [pcc:unverified]
+
+Final report correction 6c2c6b uses distinct REPORT_TAGGED.tex/PDF with explicit unsigned tags. Original bab639 source/PDF and every first lint finding remain unchanged. Corrected report and six own journal blocks have zero prose findings; three inherited full-journal findings remain open. [pcc:unverified]

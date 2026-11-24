@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Construct actual CM19 S4 sign/cubic resolvent equations and test natural chained Jacobian correspondences for transfer beyond the common elliptic factor, preserving any Prym/common-factor obstruction (Codex, started 2026-11-24, branch lane/chained-cm19-resolvents-20261124, PR #5114; follows #5110 47944308; source-only before fixed frozen qualification). [pcc:unverified]
+- [x] Construct the actual CM19 primitive quartic and pair-incidence Prym, identify its explicit genus-two Jacobian over F7 and prove the global retraction of the beta3 chain; source-bound report and focused native CI prepared (Codex, started 2026-11-24, branch lane/chained-cm19-resolvents-20261124, PR #5114; result 27ffebdb, data a6653a, written d80057/8b16d2; full divisor arithmetic continues in a separate cryptanalysis component, CI/feature-stack merge requirements pending). [pcc:unverified]
 
 - [x] Construct actual degree4 CM19 functions and complete local evaluation (Codex, completed 2026-11-24, branch lane/chained-cm19-fibres-20261124, PR #5103, ready ff41265d; E/F native and91 partial no-axiom Int leaves, report; original whole custody and CI/parent/ledger holds retained). [pcc:unverified]
 
