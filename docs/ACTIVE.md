@@ -11,7 +11,7 @@ follow-ups here; history belongs in the session log, not in this file.
 
 ## Current goal
 
-Achieve fewer than15,000,000 total simulated instructions per fixed ECC2K-130 cold relation query, preserving the complete charged boundary and exact outputs. (Owner,2026-11-24; branch lane/ecc2k-ic-half-trace-setup, PR #5070; owner confirmed total instructions per cold query.)
+Achieve fewer than10,000,000 total simulated instructions per unchanged fixed ECC2K-130 cold relation query, preserving the complete charged boundary and exact outputs, from the qualified14,688,697Ir implementation. (Owner,2026-11-24; branch lane/ecc2k-ic-half-trace-setup, PR #5070; total per-query unit.)
 
 Previous pinned goal, retained for ongoing lanes:
 
@@ -24,6 +24,7 @@ Develop and independently validate a Rust index-calculus method exploiting chain
 Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items
+- [ ] Achieve sub10M total cold instructions for the unchanged ECC2K-130 n131 d12 uniform index-calculus query; profile remaining setup/oracle, qualify exact semantics and run full matched controls (Codex, started 2026-11-24, branch lane/ecc2k-ic-half-trace-setup, PR #5070).
 - [x] Achieve fewer than15M total instructions for the same ECC2K-130 cold relation query:14,688,697Ir in five repeats,29.31% fewer than matched baseline;62 focused tests,195 native qualification rows,120 primary rows, all six controls and80 tuple replays pass (Codex, 2026-11-24, branch lane/ecc2k-ic-half-trace-setup, PR #5070; root/storage/historical/signed-admission gates remain open). [pcc:unverified]
 - [x] Reach fixed-baseline 50% goal for unchanged ECC2K-130 d12 uniform relation query:21,360,373 coldIr,51.48% below original44,023,404; simultaneous-control reduction51.50%, oracle23.62%;49 focused checks,120 matched primary rows and80 tuple replays (Codex, 2026-11-23, branch lane/ecc2k-ic-half-trace-setup, PR #5070; root/storage/historical-validator/signed-admission gates remain open). [pcc:unverified]
 - [ ] Pursue another 50x reduction from the frozen21,360,373Ir ECC2K-130 d12 uniform index-calculus cold-query baseline (target <=427,207Ir), preserving full charged workload and exact relation semantics; profile, derive and test candidates (Codex, started 2026-11-24, branch lane/ecc2k-ic-half-trace-setup, PR #5070; 50x remains future work at unchanged427,207Ir threshold; later15M rung measured14,688,697Ir,29.31% lower than its matched control;62 tests,120-row panel,80 tuple replays; all earlier regressions/global-S4 miss retained. PCC unverified).
