@@ -159,5 +159,16 @@
     "native_tests": 0,
     "random_experiments": 0,
     "impact_score": 3
+  },
+  "distinct_index_forest": {
+    "path": "distinct_index_forest/GATE.md",
+    "receipt": "distinct_index_forest/RECEIPT.json",
+    "parent_head": "37aef91d36376e9bf3b0ba8e58f62c09af5651be",
+    "scope": "post-match disjoint-index rank-only; not global discovery or additional restrictions",
+    "check_bound": "each index occurs <=2 per signed distinct-index bucket; forbidden edges <=4 min(m,n); implicit forest <=m+n-c+4 min(m,n) compatibility checks and O(m+n) space",
+    "standing": "written producer proof; pcc:unverified",
+    "native_tests": 0,
+    "random_experiments": 0,
+    "impact_score": 3
   }
 }
