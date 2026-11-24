@@ -104,7 +104,7 @@ def load(directory):
         if not isinstance(audit,dict):
             raise ValueError(f'missing independent audit status: {directory} {key}')
         audit_status=audit.get('status')
-        if audit_status not in ('verified','invalid_or_error','timeout','launch_error','unsupported','not_attempted'):
+        if audit_status not in ('verified','invalid_or_error','inconclusive_rng','timeout','launch_error','unsupported','not_attempted'):
             raise ValueError(f'unknown independent audit status: {directory} {key}')
         if row['result_status']=='complete' and audit_status=='not_attempted':
             raise ValueError(f'completed result was not audited: {directory} {key}')
@@ -120,11 +120,18 @@ def load(directory):
             expected_audit_hash=audit.get(digest_key); path=directory / f'{name}.{suffix}'
             if expected_audit_hash is not None and (not path.is_file() or sha(path)!=expected_audit_hash):
                 raise ValueError(f'audit artifact hash mismatch: {path}')
+        if audit.get('status')=='inconclusive_rng':
+            if audit.get('exit_code')!=2 or audit.get('result_sha256') is None:
+                raise ValueError(f'inconsistent inconclusive audit status: {directory} {key}')
+            audit_report=json.loads((directory / f'{name}.audit.json').read_text())
+            if (audit_report.get('status')!='inconclusive_rng' or audit_report.get('record_sha256')!=row['result_sha256'] or
+                audit_report.get('audit_source_sha256')!=summary['audit_sha256_at_start']):
+                raise ValueError(f'inconclusive audit does not match result or source: {directory} {key}')
         if audit.get('status')=='verified':
             if audit.get('exit_code')!=0 or audit.get('result_sha256') is None:
                 raise ValueError(f'inconsistent audit status: {directory} {key}')
             audit_report=json.loads((directory / f'{name}.audit.json').read_text())
-            if (audit_report.get('status')!='verified' or audit_report.get('record_sha256')!=row['result_sha256'] or
+            if (audit_report.get('status')!='verified' or audit_report.get('seed_replay',{}).get('status')!='verified' or audit_report.get('record_sha256')!=row['result_sha256'] or
                 audit_report.get('audit_source_sha256')!=summary['audit_sha256_at_start'] or
                 audit_report.get('top_form_regularity_verified')!=row.get('top_form_degree')):
                 raise ValueError(f'audit does not match result or source: {directory} {key}')

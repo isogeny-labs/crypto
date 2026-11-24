@@ -29,7 +29,7 @@ def fixture(directory, *, filtered=False, target=17, incomplete=False, mode_targ
             row['independent_audit']={'status':'not_attempted','wall_ns':None,'result_sha256':None,'stdout_sha256':None,'stderr_sha256':None,'exit_code':None}
         else:
             audit=directory/f'{name}.audit.json'
-            save(audit,{'status':'verified','record_sha256':digest(result),'audit_source_sha256':'audit'})
+            save(audit,{'status':'verified','seed_replay':{'status':'verified'},'record_sha256':digest(result),'audit_source_sha256':'audit'})
             for suffix in ('audit.stdout','audit.stderr'): (directory/f'{name}.{suffix}').write_bytes(b'')
             row['independent_audit']={'status':'verified','wall_ns':5,'result_sha256':digest(audit),'stdout_sha256':digest(directory/f'{name}.audit.stdout'),'stderr_sha256':digest(directory/f'{name}.audit.stderr'),'exit_code':0}
         row['protocol_observation']={'status':'not_requested','product_criterion':None,'chain_criterion':None,'overlong_lines':0}
@@ -136,6 +136,20 @@ class ComparisonTest(unittest.TestCase):
             self.assertFalse(result['matching_checks_pass'])
             summary['resource_metadata_at_end']=summary['resource_metadata_at_start'].copy(); summary['resource_metadata_at_end']['cpu_model']=None; save(summary_path,summary)
             self.assertEqual(compare.compare(a,b)['resource_metadata_status'],'incomplete')
+
+    def test_inconclusive_rng_audit_is_bound_and_not_verified(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text()); row=summary['runs'][0]
+            path=b/'seed-7-independent.audit.json'; report=json.loads(path.read_text()); report['status']='inconclusive_rng'; save(path,report)
+            row['independent_audit']['status']='inconclusive_rng'; row['independent_audit']['exit_code']=2; row['independent_audit']['result_sha256']=digest(path)
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            result=compare.compare(a,b)
+            self.assertFalse(result['matching_checks_pass'])
+            self.assertIn('some independent audits not verified',result['mismatch_or_unknown'])
+            report['status']='verified'; save(path,report); row['independent_audit']['result_sha256']=digest(path)
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'inconclusive audit does not match'): compare.compare(a,b)
 
     def test_unsupported_audit_is_not_counted_as_verified(self):
         with tempfile.TemporaryDirectory() as d:

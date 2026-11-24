@@ -152,7 +152,7 @@ def run(args):
         output['useful_relations']=output['relation_counts']['nonzero_b_verified']
         output['status']='verification_failed' if output['relation_counts']['nonzero_b_verification_failed'] else 'complete'
     output['total']={'wall_ns':time.perf_counter_ns()-start,'cpu_ns':time.process_time_ns()-cpu,'peak_rss_native':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'peak_rss_note':'process lifetime; bytes on macOS, KiB on Linux'}
-    output['environment']={'sage':version(),'python':platform.python_version(),'platform':platform.platform(),'source_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+    output['environment']={'sage':version(),'python':platform.python_version(),'python_implementation':platform.python_implementation(),'platform':platform.platform(),'source_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     output['phase']='finished'
     checkpoint()
     return output

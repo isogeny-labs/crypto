@@ -195,6 +195,20 @@ for block in range(1,9):
         self.assertEqual(r['relation_counts']['nonzero_b_verification_failed'],0)
         audited=audit_record.audit(r)
         self.assertEqual(audited['status'],'verified')
+        self.assertEqual(audited['seed_replay']['status'],'verified')
+        self.assertEqual(audited['seed_replay']['record_python'],r['environment']['python'])
+        self.assertEqual(audited['seed_replay']['record_python_implementation'],r['environment']['python_implementation'])
+        preserved=json.loads(json.dumps(r)); c=preserved['candidates'][0]
+        old_point=point(c['point']); c['a']=(c['a']+17)%N; c['b']=(c['b']-1)%N
+        self.assertEqual(add(mul(c['a'],P),mul(c['b'],Q)),old_point)
+        preserved['environment']['python']=audited['seed_replay']['audit_python']
+        with self.assertRaisesRegex(audit_record.Inconclusive,'seed replay mismatch'): audit_record.audit(preserved)
+        preserved['environment']['python']='different-version'
+        with self.assertRaises(audit_record.Inconclusive): audit_record.audit(preserved)
+        bad_ops=json.loads(json.dumps(r)); bad_ops['generation_operations']['point_addition_calls']+=1
+        with self.assertRaisesRegex(audit_record.Invalid,'generation operation counts mismatch'): audit_record.audit(bad_ops)
+        missing_ops=json.loads(json.dumps(r)); missing_ops.pop('generation_operations')
+        with self.assertRaisesRegex(audit_record.Inconclusive,'metadata is unavailable'): audit_record.audit(missing_ops)
         self.assertEqual(audited['nonzero_b'],r['relation_counts']['nonzero_b'])
         self.assertEqual(audited['top_form_regularity_verified'],11)
         with tempfile.TemporaryDirectory() as d:
@@ -203,9 +217,17 @@ for block in range(1,9):
             subprocess.run(['python3',str(HERE/'audit_record.py'),str(source),'--output',str(output)],check=True,stdout=subprocess.DEVNULL)
             receipt=json.loads(output.read_text())
             self.assertEqual(receipt['status'],'verified')
+            self.assertEqual(receipt['seed_replay']['status'],'verified')
             self.assertEqual(receipt['record_sha256'],hashlib.sha256(source.read_bytes()).hexdigest())
             self.assertGreater(receipt['audit_interval']['wall_ns'],0)
-            bad=json.loads(source.read_text()); bad['witnesses'][0]['scalar']=(bad['witnesses'][0]['scalar']+1)%N
+            mismatch=pathlib.Path(d)/'mismatch.json'; source.write_text(json.dumps(preserved))
+            proc=subprocess.run(['python3',str(HERE/'audit_record.py'),str(source),'--output',str(mismatch)],stdout=subprocess.DEVNULL)
+            self.assertEqual(proc.returncode,2)
+            self.assertEqual(json.loads(mismatch.read_text())['status'],'inconclusive_rng')
+            spec=importlib.util.spec_from_file_location('panel',HERE/'panel.py')
+            panel=importlib.util.module_from_spec(spec); spec.loader.exec_module(panel)
+            self.assertEqual(panel.audit_result(pathlib.Path(d),'version-mismatch',source,preserved,5)['status'],'inconclusive_rng')
+            bad=json.loads(json.dumps(r)); bad['witnesses'][0]['scalar']=(bad['witnesses'][0]['scalar']+1)%N
             source.write_text(json.dumps(bad)); invalid=pathlib.Path(d)/'invalid.json'
             proc=subprocess.run(['python3',str(HERE/'audit_record.py'),str(source),'--output',str(invalid)],stdout=subprocess.DEVNULL)
             self.assertEqual(proc.returncode,1)
@@ -393,6 +415,16 @@ else: raise AssertionError('failure was not injected')
                 self.assertIsNone(r['useful_relations'])
                 self.assertGreater(r['whole_process_wall_ns'],0)
                 self.assertTrue((out/('seed-42-'+r['mode']+'.receipt.json')).exists())
+
+    def test_seed_replay_covers_identity_retry_and_walk_restarts(self):
+        retried=self.run_case('independent',['--seed','87'])
+        self.assertGreater(retried['generation_operations']['target_draws'],1)
+        self.assertEqual(audit_record.audit(retried)['seed_replay']['status'],'verified')
+        walked=self.run_case('walk',['--walk-length','2'])
+        self.assertGreaterEqual(len(walked['generator']['walks']),4)
+        self.assertEqual(audit_record.audit(walked)['seed_replay']['status'],'verified')
+        altered=json.loads(json.dumps(walked)); altered['generator']['walks'][1]['step'][0]=(altered['generator']['walks'][1]['step'][0]+1)%N
+        with self.assertRaises(audit_record.Inconclusive): audit_record.audit(altered)
 
     def test_exhaustion_is_recorded(self):
         r=self.run_case('independent',['--max-candidates','1'])

@@ -116,8 +116,11 @@ def audit_result(out, name, result, data, timeout):
     if report.exists():
         try: report_data=json.loads(report.read_text())
         except (OSError,ValueError): pass
-    if status=='exited' and rc==0 and isinstance(report_data,dict) and report_data.get('status')=='verified' and report_data.get('record_sha256')==digest(result) and report_data.get('audit_source_sha256')==digest(HERE/'audit_record.py'):
+    bound=isinstance(report_data,dict) and report_data.get('record_sha256')==digest(result) and report_data.get('audit_source_sha256')==digest(HERE/'audit_record.py')
+    if status=='exited' and rc==0 and bound and report_data.get('status')=='verified' and report_data.get('seed_replay',{}).get('status')=='verified':
         status='verified'
+    elif status=='exited' and rc==2 and bound and report_data.get('status')=='inconclusive_rng':
+        status='inconclusive_rng'
     elif status=='exited': status='invalid_or_error'
     return {'status':status,'wall_ns':elapsed,'result_sha256':digest(report) if report.exists() else None,
             'stdout_sha256':digest(stdout_path),'stderr_sha256':digest(stderr_path),'exit_code':rc}

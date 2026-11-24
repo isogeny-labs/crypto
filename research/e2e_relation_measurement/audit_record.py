@@ -8,11 +8,17 @@ from collections import Counter
 import hashlib
 import json
 import math
+import platform
+import random
 import time
 from pathlib import Path
 
 
 class Invalid(ValueError):
+    pass
+
+
+class Inconclusive(Invalid):
     pass
 
 
@@ -115,6 +121,67 @@ def evaluate(poly,x,y,p):
     return sum(c*pow(x,i,p)*pow(y,j,p) for (i,j),c in poly.items()) % p
 
 
+def replay_seed(record,e,P,Q,n):
+    """Replay the recorded PRNG stream, with no cross-version assumption."""
+    config=record['config']; target=record['target']; trace=record['candidates']; mode=config['mode']
+    require(type(config['seed']) is int and mode in ('independent','walk','two-group'), 'invalid seed or generator mode')
+    recorded_version=record.get('environment',{}).get('python')
+    recorded_implementation=record.get('environment',{}).get('python_implementation')
+    runtime_version=platform.python_version()
+    runtime_implementation=platform.python_implementation()
+    def same(condition, what):
+        if not condition:
+            detail=(f'seed replay mismatch: {what}; recorded Python={recorded_implementation!r} {recorded_version!r}, '
+                    f'audit Python={runtime_implementation!r} {runtime_version!r}; producer RNG identity is not authenticated')
+            raise Inconclusive(detail)
+    rng=random.Random(config['seed'])
+    draw=lambda:rng.randrange(n)
+    if not isinstance(record.get('generation_operations'),dict) or not isinstance(record.get('generator'),dict):
+        raise Inconclusive('seed replay metadata is unavailable')
+    target_draws=record['generation_operations'].get('target_draws')
+    require(type(target_draws) is int and target_draws>0, 'invalid target draw count')
+    if target_draws>1000000: raise Inconclusive('target replay exceeds the auditor draw limit')
+    ar=br=None
+    for attempt in range(target_draws):
+        ar,br=draw(),draw()
+        point=e.add(e.mul(ar,P),e.mul(br,Q))
+        same((point is None)==(attempt<target_draws-1),'target stopping condition')
+    same((ar,br)==(target['a'],target['b']),'target coefficients')
+    aa=[]; bb=[]; walks=[]
+    if mode=='two-group':
+        group_size=config['group_size']
+        require(type(group_size) is int and group_size>0, 'invalid group size')
+        if group_size>1000000: raise Inconclusive('two-group replay exceeds the auditor group-size limit')
+        aa=[draw() for _ in range(group_size)]; bb=[draw() for _ in range(group_size)]
+    if mode=='walk':
+        walk_length=config['walk_length']
+        require(type(walk_length) is int and walk_length>0, 'invalid walk length')
+    for i,candidate in enumerate(trace):
+        if mode=='independent': a,b=draw(),draw()
+        elif mode=='walk':
+            if i % walk_length==0:
+                wa,wb=draw(),draw(); da,db=draw(),draw()
+                walks.append({'start':[wa,wb], 'step':[da,db], 'first_candidate':i})
+            a,b=wa,wb; wa=(wa+da)%n; wb=(wb+db)%n
+        else:
+            a,b=aa[rng.randrange(len(aa))],bb[rng.randrange(len(bb))]
+        same((a,b)==(candidate['a'],candidate['b']),f'candidate {i} coefficients')
+    same(record['generator']=={'walks':walks,'group_a':aa,'group_b':bb},'generator metadata')
+    candidates=len(trace)
+    if mode=='independent':
+        scalars=2*(target_draws+candidates); additions=target_draws+candidates
+    elif mode=='walk':
+        scalars=2*target_draws+4*len(walks); additions=target_draws+2*len(walks)+candidates
+    else:
+        scalars=2*target_draws+2*len(aa); additions=target_draws+candidates
+    require(record['generation_operations']=={'target_draws':target_draws,'scalar_multiplication_calls':scalars,'point_addition_calls':additions},'generation operation counts mismatch')
+    return {'status':'verified','generator':'Python random.Random.randrange',
+            'record_python':recorded_version,'audit_python':runtime_version,
+            'record_python_implementation':recorded_implementation,'audit_python_implementation':runtime_implementation,
+            'same_python_version':recorded_version==runtime_version,
+            'scope':'this recorded seed and stream; no general cross-version guarantee'}
+
+
 def audit(record):
     require(record.get('schema')=='e2e-relation-measurement/v1','unsupported schema')
     config=record['config']; curve=record['curve']; p=curve['p']; n=curve['n']
@@ -151,11 +218,12 @@ def audit(record):
         require(candidate['status']==reason,'candidate classification mismatch')
         if reason!='accepted': counted[reason]+=1
     require(record['counts']==counted,'candidate counts mismatch')
+    seed_replay=replay_seed(record,e,P,Q,n)
     require(counted['candidates']<=config['max_candidates'] and len(accepted)<=2*block,'candidate budget exceeded')
     status=record['status']
     if status=='candidate_budget_exhausted':
         require(len(accepted)<2*block and counted['candidates']==config['max_candidates'],'invalid exhaustion status')
-        return {'status':'verified_partial','candidates':len(trace),'accepted':len(accepted),'reason':'no complete system'}
+        return {'status':'verified_partial','candidates':len(trace),'accepted':len(accepted),'reason':'no complete system','seed_replay':seed_replay}
     require(status=='complete' and len(accepted)==2*block,'record is not a completed valid run')
     system=decode_terms(record['system'],p)
     require(system==expected_system(p,e.a,e.b,R[0],[v[2][0] for v in accepted[:block]],[v[2][0] for v in accepted[block:]]),'system coefficients mismatch')
@@ -206,7 +274,7 @@ def audit(record):
     require(actual==expected_witnesses,'missing signed witnesses for reported roots')
     counts={'total':len(actual),'zero_b':zero,'nonzero_b':nonzero,'nonzero_b_verified':verified,'nonzero_b_verification_failed':0}
     require(record['relation_counts']==counts and record['useful_relations']==verified,'relation counts mismatch')
-    return {'status':'verified','candidates':len(trace),'accepted':len(accepted),'reported_roots':len(roots),'signed_witnesses':len(actual),'nonzero_b':nonzero,'top_form_regularity_verified':regularity_verified}
+    return {'status':'verified','candidates':len(trace),'accepted':len(accepted),'reported_roots':len(roots),'signed_witnesses':len(actual),'nonzero_b':nonzero,'top_form_regularity_verified':regularity_verified,'seed_replay':seed_replay}
 
 
 def main():
@@ -214,15 +282,17 @@ def main():
     parser=argparse.ArgumentParser(); parser.add_argument('record'); parser.add_argument('--output',required=True)
     args=parser.parse_args(); path=Path(args.record); raw=path.read_bytes()
     result={'record_sha256':hashlib.sha256(raw).hexdigest(),'audit_source_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-            'limitations':['No root-completeness proof or independent solver execution.', 'No seed-stream regeneration, timing validation, resource verification, or record authentication.', 'Without a verified scalar, subgroup membership of Q in <P> is not independently certified.', 'Primality and curve arithmetic are checked only for primes below 2^32.']}
+            'limitations':['No root-completeness proof or independent solver execution.', 'No timing validation, resource verification, record authentication, or general cross-version RNG guarantee.', 'Without a verified scalar, subgroup membership of Q in <P> is not independently certified.', 'Primality and curve arithmetic are checked only for primes below 2^32.']}
     try:
         result.update(audit(json.loads(raw)))
+    except Inconclusive as exc:
+        result.update({'status':'inconclusive_rng','error':str(exc)})
     except (Invalid,KeyError,TypeError,ValueError,OverflowError) as exc:
         result.update({'status':'invalid','error':str(exc)})
     result['audit_interval']={'wall_ns':time.perf_counter_ns()-started,'cpu_ns':time.process_time_ns()-cpu,'scope':'from main entry through input read, hashing, and verification; excludes interpreter startup and receipt writing'}
     with Path(args.output).open('x') as out:
         json.dump(result,out,indent=2,sort_keys=True); out.write('\n')
     print(json.dumps({'status':result['status']}))
-    return 1 if result['status']=='invalid' else 0
+    return 1 if result['status']=='invalid' else 2 if result['status']=='inconclusive_rng' else 0
 
 if __name__=='__main__': raise SystemExit(main())
