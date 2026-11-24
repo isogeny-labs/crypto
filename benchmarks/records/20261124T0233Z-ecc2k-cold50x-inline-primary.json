@@ -1,12 +1,25 @@
 {
   "branch": "lane/ecc2k-ic-half-trace-setup",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-24T02:42:00+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_cold50x_20261124/inline/checks/run-primary.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-24T02:34:04+00:00",
+      "wall_s": 57.422
+    }
+  ],
   "commit": "bd865aacc0c2a2ec22ba42c3f631a33a4af89b71",
   "commit_dirty": true,
   "created_utc": "2026-11-24T02:33:55+00:00",
   "curve_uid": null,
-  "entries": [],
+  "entries": [
+    "benchmarks/20261124-ecc2k-inline-index"
+  ],
   "host": {
     "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
     "cpus_online": 5,
@@ -15,19 +28,97 @@
     "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
   },
   "id": "20261124T0233Z-ecc2k-cold50x-inline-primary",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 21346948.0,
+      "better": "lower",
+      "n": 5,
+      "name": "complete_cold_query_ir",
+      "note": "Frozen Rust summary; matched previous-best tree control.50x not met.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        20006773.0,
+        20006773.0
+      ],
+      "unit": "ir",
+      "value": 20006773.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "complete_oracle_ir",
+      "note": "Complete oracle; no native clock claim.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        12458426.0,
+        12458426.0
+      ],
+      "unit": "ir",
+      "value": 12458426.0
+    }
+  ],
   "problem": "ecc2k130-index-calculus-cold-query",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 141425,
+      "path": "research/trace_zero_cold50x_20261124/inline/rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/77/778f81bec1185985caea7ac37cd3c7bcc47833e984f9fc213f16e28741cbc10c",
+      "sha256": "778f81bec1185985caea7ac37cd3c7bcc47833e984f9fc213f16e28741cbc10c",
+      "uploaded": false
+    },
+    {
+      "bytes": 4068,
+      "path": "research/trace_zero_cold50x_20261124/inline/grid-audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/07/07b24dedae26f4a4b1937d1cd098e1facf338c08dbe5bf59738fd3e7c6b243d4",
+      "sha256": "07b24dedae26f4a4b1937d1cd098e1facf338c08dbe5bf59738fd3e7c6b243d4",
+      "uploaded": false
+    },
+    {
+      "bytes": 3520,
+      "path": "research/trace_zero_cold50x_20261124/inline/polynomial-replay.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ae/ae3bc7429484d776a95c2b7294f2a3201204550ebc5bb8af2c1cac0b07d6297d",
+      "sha256": "ae3bc7429484d776a95c2b7294f2a3201204550ebc5bb8af2c1cac0b07d6297d",
+      "uploaded": false
+    },
+    {
+      "bytes": 1028504,
+      "path": "research/trace_zero_cold50x_20261124/RAW-ALL.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/14/14cf69a1a91451e355a950803026220f309c89ec618d3fe3e5f38ccd60a62299",
+      "sha256": "14cf69a1a91451e355a950803026220f309c89ec618d3fe3e5f38ccd60a62299",
+      "uploaded": false
+    },
+    {
+      "bytes": 27314728,
+      "path": "research/trace_zero_cold50x_20261124/FROZEN-EXECUTABLES.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c3/c35f42e58c32de28fdbdbc5d9a2307eea5da32dad1186bb26eaa240a4a4e1f7a",
+      "sha256": "c35f42e58c32de28fdbdbc5d9a2307eea5da32dad1186bb26eaa240a4a4e1f7a",
+      "uploaded": false
+    },
+    {
+      "bytes": 1216675,
+      "path": "research/trace_zero_cold50x_20261124/archive-members.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/03/03648290607ae90e6e895153665bbb6737c3c149c8b953cba4d8a4c854a21b67",
+      "sha256": "03648290607ae90e6e895153665bbb6737c3c149c8b953cba4d8a4c854a21b67",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "benchmarks/20261124-ecc2k-inline-index/report.pdf",
+    "png": [
+      "benchmarks/20261124-ecc2k-inline-index/instructions.png"
+    ],
+    "svg": [
+      "benchmarks/20261124-ecc2k-inline-index/instructions.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "ecc2k-cold50x-inline-primary",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Complete frozen120-row inline index component gains6.28% whole and9.71% oracle against matched previous best, all six controls pass,80 tuples replay. Requested50x unmet. Complete raw/binaries include rejected prior panel and invalid pilots; unsigned local custody only.",
   "validation": null
 }

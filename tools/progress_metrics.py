@@ -1270,6 +1270,26 @@ def ecc2k_cold50(ref, since):
                          source=f"{path}@{commit}")
 
 
+def ecc2k_cold50x(ref, since):
+    """Copy stored fixed-query medians; no re-estimation or admission."""
+    path = "research/trace_zero_cold50x_20261124/inline/summary.json"
+    since_day = since + "T00:00:00Z" if len(since) == 10 else since
+    for date, commit, text in file_history(ref, path, since_day):
+        data = json.loads(text)
+        for degree in (83, 131):
+            for arm in ("baseline", "incumbent", "elimination"):
+                cell = data.get("cells", {}).get(f"scale-n{degree}-d12-uniform/{arm}")
+                if cell is None:
+                    continue
+                for phase, field in (("cold", "instructions"), ("setup", "setup_instructions"),
+                                     ("oracle", "oracle_instructions")):
+                    emit(f"ecc2k.cold50x.n{degree}.{arm}.{phase}_ir",
+                         cell["metrics"][field]["median"], date=date,
+                         problem="ecc2k130-ic-cold50x", unit="simulated instructions",
+                         better="lower", label="Stored d12 uniform median; PCC unverified",
+                         source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     fixed_lucas_conductor(a.ref, a.since)
@@ -1320,6 +1340,7 @@ def main():
     trace_complete_cost(a.ref, a.since)
     ecc2k_halftrace_setup(a.ref, a.since)
     ecc2k_cold50(a.ref, a.since)
+    ecc2k_cold50x(a.ref, a.since)
     relation_fusion_observations(a.ref, a.since)
     relation_fusion_repeated(a.ref, a.since)
     relation_fusion_root_dag(a.ref, a.since)

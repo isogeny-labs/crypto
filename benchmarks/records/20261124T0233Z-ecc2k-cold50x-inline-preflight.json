@@ -1,7 +1,20 @@
 {
   "branch": "lane/ecc2k-ic-half-trace-setup",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-24T02:40:02+00:00",
+  "commands": [
+    {
+      "argv": [
+        "timeout",
+        "600",
+        "bash",
+        "research/trace_zero_cold50x_20261124/inline/checks/run-preflight.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-24T02:33:29+00:00",
+      "wall_s": 11.662
+    }
+  ],
   "commit": "2e9a7b71fff2d41a4d3721dcf9c62eb649e7ae95",
   "commit_dirty": false,
   "created_utc": "2026-11-24T02:33:03+00:00",
@@ -15,19 +28,47 @@
     "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
   },
   "id": "20261124T0233Z-ecc2k-cold50x-inline-preflight",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "engineering_calls",
+      "note": "Fixed engineering calls for resource planning and positive/equivalence checks; no primary gain claim.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    }
+  ],
   "problem": "ecc2k130-index-calculus-cold-query",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 1776,
+      "path": "research/trace_zero_cold50x_20261124/inline/calibration.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/78/780eab29c19fa104905319e7328308e19b4d4f26cf8a3a302886ea09f956fd5e",
+      "sha256": "780eab29c19fa104905319e7328308e19b4d4f26cf8a3a302886ea09f956fd5e",
+      "uploaded": false
+    },
+    {
+      "bytes": 26539,
+      "path": "research/trace_zero_cold50x_20261124/inline/preflight.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b6/b64f36df8831a78a8e383add11e8758e4e5527324159b119e338a08b997cfc55",
+      "sha256": "b64f36df8831a78a8e383add11e8758e4e5527324159b119e338a08b997cfc55",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "research/trace_zero_cold50x_20261124/report.pdf",
     "png": [],
     "svg": []
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "ecc2k-cold50x-inline-preflight",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Three phase calibrations and16 engineering calls pass; full separately frozen primary reports actual effect,50x remains unmet.",
   "validation": null
 }

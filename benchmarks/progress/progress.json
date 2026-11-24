@@ -157,13 +157,13 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261124T0212Z-ecc2k-cold50x-current-profile",
+  "latest_record": "20261124T0233Z-ecc2k-cold50x-inline-primary",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
     "invalid": 9,
-    "measured": 322,
-    "open": 63
+    "measured": 325,
+    "open": 62
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -453,6 +453,104 @@
       ],
       "problem": "ecc2k130-index-calculus-cold-query",
       "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 21566178.0,
+      "latest": 20006773.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 7.2308,
+        "improvement_vs_previous_percent": 7.2308
+      },
+      "metric": "complete_cold_query_ir",
+      "points": [
+        {
+          "commit": "b6c4fc82f683",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261124T0227Z-ecc2k-cold50x-dense-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            21566178.0,
+            21566178.0
+          ],
+          "summary": "All120 rows retained; first index regresses and fails50x plus all no-regression guards. Complete separate arithmetic replay and original source identity retained.",
+          "value": 21566178.0
+        },
+        {
+          "commit": "bd865aacc0c2",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 7.2308,
+            "improvement_vs_previous_percent": 7.2308
+          },
+          "n": 5,
+          "record": "20261124T0233Z-ecc2k-cold50x-inline-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            20006773.0,
+            20006773.0
+          ],
+          "summary": "Complete frozen120-row inline index component gains6.28% whole and9.71% oracle against matched previous best, all six controls pass,80 tuples replay. Requested50x unmet. Complete raw/binaries include rejected prior panel and invalid pilots; unsigned local custody only.",
+          "value": 20006773.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 12458426.0,
+      "latest": 12458426.0,
+      "latest_derived": {},
+      "metric": "complete_oracle_ir",
+      "points": [
+        {
+          "commit": "bd865aacc0c2",
+          "date": "2026-11-24",
+          "derived": {},
+          "n": 5,
+          "record": "20261124T0233Z-ecc2k-cold50x-inline-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            12458426.0,
+            12458426.0
+          ],
+          "summary": "Complete frozen120-row inline index component gains6.28% whole and9.71% oracle against matched previous best, all six controls pass,80 tuples replay. Requested50x unmet. Complete raw/binaries include rejected prior panel and invalid pilots; unsigned local custody only.",
+          "value": 12458426.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "ir"
+    },
+    {
+      "better": "neutral",
+      "first": 16.0,
+      "latest": 16.0,
+      "latest_derived": {},
+      "metric": "engineering_calls",
+      "points": [
+        {
+          "commit": "2e9a7b71fff2",
+          "date": "2026-11-24",
+          "derived": {},
+          "n": 1,
+          "record": "20261124T0233Z-ecc2k-cold50x-inline-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Three phase calibrations and16 engineering calls pass; full separately frozen primary reports actual effect,50x remains unmet.",
+          "value": 16.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "count"
     },
     {
       "better": "higher",
