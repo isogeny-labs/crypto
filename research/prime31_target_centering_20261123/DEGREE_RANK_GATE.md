@@ -1,4 +1,4 @@
-# Target-centered Prime31 degree reduction: exact but rank-inert by itself
+# Target-centered Prime31 degree reduction: exact, with rank and label costs
 
 Date: 2026-11-23. Status: symbolic derivation and novelty screen; no
 completed solver comparison is claimed. This note concerns either of the
@@ -48,7 +48,7 @@ degree-two maps, not a claim about Groebner solving degree, restricted
 finite selectors, or higher-degree morphisms. Exceptional and ramified
 fibers can have fewer values.
 
-## Why fixed-target rows do not determine its scalar
+## Rank limit for an unlabelled fixed base
 
 Suppose a finite list of fixed translated points is `Fi=U+Zi`, and a
 collection of four-summand rows is used as `sum_j F_ij=R`. Let `M` be the
@@ -64,6 +64,19 @@ one fixed four-summand target, not a claim that coordinates or additional
 relation families contain no information. A known-log anchor, variable
 query coefficients, or other independent rows must break the gauge; their
 construction and total cost must be included in any proposed gain.
+
+This kernel argument treats the `Fi` logs as unknown. It does not apply
+to an independently **labelled** base whose point logs are already known:
+one verified row then determines the target log. That published
+single-relation route is the [Amadori-Pintore-Sala method](https://pure.tue.nl/ws/portalfiles/portal/91158650/609.pdf), already tested
+on the repository's Prime31 curve in
+`research/prime31_ic_20261115/native/APS_ONE_RELATION_PRIME31_RUST_20261116.md`.
+If instead the chosen `Zi` have known logs and `Fi=U+Zi`, the `Fi` labels
+contain the unknown `log(U)=r/4`; a centered four-point row merely says
+`sum log(Zi)=0` and still cancels `r`. To claim a benefit with independently
+labelled `Fi`, one must construct them with the claimed centered selector
+and charge that target-dependent selection, extraction and verification.
+The degree-four identity by itself supplies none of those labels.
 
 If `U` is recomputed from each public query to keep `D=O`, the translated
 point list also changes with that query. Any proposal to share a factor
