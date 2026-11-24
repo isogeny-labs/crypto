@@ -494,6 +494,50 @@ exact statement about the displayed generators' leading-form ideal;
 elimination consequences, a different grading or an affine Groebner
 run can behave differently and need their own completed cost test.
 
+### Redundant curve equations give a finite linear-graph top ideal
+
+The preceding obstruction concerns the original generator list. For a
+finite target `R=(r,s)`, write `f(X)=X^3+A_E*X+B_E` and
+`L(X)=m*(X-r)-s`. Let `g1=m^2-x-z-r` and
+`g2=x*z-r^2-r*m^2-A_E-2*m*s` be its chord equations, and let
+`q_x=sigma_x*h_u(x)-L(x)` and `q_z=sigma_z*h_v(z)-L(z)` be the two signed
+ordinate residuals. The chord identity gives the **polynomial
+identities**
+
+`h_u(x)^2-f(x)=q_x*(sigma_x*h_u(x)+L(x))+(x-r)*(x*g1+g2)`,
+
+`h_v(z)^2-f(z)=q_z*(sigma_z*h_v(z)+L(z))+(z-r)*(z*g1+g2)`.
+
+Thus appending these two curve equations leaves the full affine ideal
+unchanged, including its multiplicities and finite signed witnesses.
+The displayed certificates have total degree at most four after their
+leading terms cancel; they do not assert degree-three Macaulay
+derivability. The original inverse-pair and infinity branches still
+need the existing chart treatment.
+
+For `k` Boolean bits in each linear-offset slot, the augmented
+generators' canonical highest-form ideal is
+
+`(m^2, x*z, m*x, m*z, x^3, z^3, b_1^2,...,b_(2k)^2)`.
+
+Its core standard monomials are `1,m,x,z,x^2,z^2`, so its Hilbert
+series is `(1+3t+2t^2)*(1+t)^(2k)`, its top-quotient length is
+`6*2^(2k)`, and its first-vanishing degree is `2k+3`. At `k=8`
+these are 393,216 and 19; at `k=10` they are 6,291,456 and 23.
+The latter equal the all-bit quadratic-offset presentation's canonical
+invariants despite the linear map's different support and
+fourth-coordinate degree. The unaugmented linear presentation retains
+the infinite canonical degree stated above.
+
+`verify_linear_secant_top.py` checks both ideal-membership identities,
+mutual highest-form ideal membership, a surviving top-degree monomial,
+and the core Hilbert sequence over M31 for all four sign branches of
+one fixed public B677 target. This independently replays the
+[PR discussion's construction](https://github.com/isogeny-labs/crypto/pull/5097#issuecomment-7147311122).
+Neither the augmented presentation nor its degree gives a completed
+affine solving degree, an exact B677 linear selector, useful relation
+rank or a cold same-target cost comparison.
+
 ### Fourth-moment capacity refinement for uniform offsets
 
 The preceding pairwise-independence bounds are conservative. For either
