@@ -671,6 +671,17 @@ first proposed in the [PR discussion](https://github.com/isogeny-labs/crypto/pul
 | 10 | 1 | 21 | 23 | 3,670,016 |
 | 10 | 2 | 19 | 25 | 1,966,080 |
 
+The formula also gives an exact minimum **within this literal-product
+presentation family**. Write `m=max(j_x,j_z)` and `l=min(j_x,j_z)`.
+Its first-vanishing degree is
+`2k-m-l+2^(m+1)+1 >= 2k-2m+2^(m+1)+1`. For fixed `m`, equality
+requires `l=m`. The symmetric expression is `2k+3` at `m=0,1`, and
+its increment from `m` to `m+1` is `2^(m+1)-2`, positive thereafter.
+Consequently only `(j_x,j_z)=(0,0)` and `(1,1)` attain the minimum
+`2k+3` for `k>=1`. Projecting more bits cannot lower this canonical
+first-vanishing degree; another generator presentation or a completed
+affine computation is outside this conclusion.
+
 At either capacity, two-bit projection reduces the homogeneous quotient
 length by about 1.87 times relative to one-bit projection, while raising
 the first-vanishing degree by two. These are presentation invariants, not
