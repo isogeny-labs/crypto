@@ -68,6 +68,26 @@ the B677 algebraic selector's larger off-curve superset needs its own
 lifting and rejection account. Auxiliary-variable systems and
 non-squarefree selector schemes are outside this unit-equivalence claim.
 
+### B677 split-selector support before target equations
+
+The frozen B677 split circuit uses 1,024 Dickson abscissae, of which 509
+lift to rational curve points and 515 do not, plus 168 liftable Y7
+abscissae. Before imposing the public target equations, its 2+2
+factor split has `C(1024,2)*C(168,2) = 7,347,529,728` unordered
+root choices. Exactly `C(509,2)*C(168,2) = 1,813,624,008` of those
+choices use four liftable leaves, or 24.683% of the raw choices.
+The remaining 75.317% contain at least one off-curve Dickson root.
+
+This is a **support count**, not an F4 branch count or a measured solver
+slowdown. The four-leaf anti-Frobenius argument in
+`research/prime31_four_summand_20261122/scaling-b677/MATHEMATICS.md`
+excludes such roots from genuine relations when the target is nonidentity
+and outside the selector and all four abscissae are distinct. Its
+repository note remains unsigned; the saved split-circuit executions are
+resource-limited before root extraction. The count identifies algebraic
+work that the compact selector may have to eliminate, without asserting
+that any off-curve choice survives the target equations.
+
 ## Curve-specific symmetry screen
 
 The direct factorization of `x^3 + ax + b` over `F_p` is irreducible on
