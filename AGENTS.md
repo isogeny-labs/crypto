@@ -291,6 +291,24 @@ Change the index or ranking only against that measurement.
   editing; report scope expansion before editing outside reserved paths. Do
   not publish chat transcripts or secrets as task metadata.
 
+## Experiment seeds and paired A/B reproducibility
+
+Owner instruction, 2026-11-23. Apply
+[Experiment seeds and paired A/B reproducibility](docs/experiment-seeds.md),
+policy `isogeny-labs/experiment-seeds/v1`, to every new randomized experiment,
+measurement, search, simulation, training run and A/B comparison. Freeze a
+complete seed manifest before outcomes; pair public inputs and record every
+logical random stream. Preserve independently selected walk-seed designs,
+use fresh held-out validation seeds after tuning, retain failed trials, and
+check replay before calling a result reproducible.
+
+All agents, scheduled tasks and experiment handoffs must carry this requirement.
+Review and maintenance tasks audit seed/source/input/replay custody without
+expanding their scope. Existing stricter protocols, M31 requirements, native
+implementation rules, section 10 A/A/isolation/interleaving requirements,
+resource admission and publication/validation gates remain binding. Never
+invent seeds for old results or rewrite frozen evidence.
+
 ## Sabotage is assumed: proof-carrying claims
 
 Owner rule, 2026-11-04. Every producer, this session included, is assumed to
