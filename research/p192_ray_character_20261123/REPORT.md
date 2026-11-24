@@ -908,6 +908,40 @@ structured search or analytic bias proof. Estimation error `g` alone
 also does not certify a candidate whose true bias is merely `g`;
 that would require a margin or tighter calibration. [pcc:unverified]
 
+## Two-offset dense-resultant screen (2026-11-24)
+
+A second additive offset axis can generate a set of `m` distinct
+nonzero offsets from about `2√m` point sequences. This improves
+*offset generation* in the paired `y`-product construction, but it
+does not shrink a dense outer resultant. For center coordinate `Z`,
+its numerator is `F(Z)=∏_{t∈T} N(Z,x([t]P))`, where the
+paired-factor identity is
+`y(U+V)y(U-V)=N(x(U),x(V))/(x(V)-x(U))³` on
+`y²=x³+ax+b`.
+The coefficient of `Z³` in each factor is
+`x([t]P)³+a x([t]P)+b=y([t]P)²≠0`. Hence `deg F=3m` exactly,
+independent of how the `m` offsets were generated. [pcc:unverified]
+
+Under a 1 PiB cap for **just this dense numerator**, 24-byte field
+coefficients require `24(3m+1)≤2^50`, so `m≤15,637,498,706,147`.
+If each explicit center covers its own index and `±t` for these
+offsets, covering the P-192 half orbit requires at least
+`ceil(n/(2m+1))=100,353,353,393,388,160,663,642,046,417,198,120,892,062,696`
+centers, or `2^146.170` center point indices. This count excludes
+offset generation, coefficient construction, resultant scratch, and
+field arithmetic. It rules out the proposed **explicit-center,
+dense-numerator** variant under that memory cap. It is not a bound
+on recursive center compression, a factored or multivariate
+resultant, or a direct character-only evaluation. [pcc:unverified]
+
+[Bernstein, De Feo, Leroux, and Smith, §4.15](https://velusqrt.isogeny.org/velusqrt-20200616.pdf)
+give their fast product evaluation for `x` and stated extensions by
+fractional-linear maps or an isogeny followed by `x`. Those are even
+functions on the point; the signed half-orbit `y` product requires
+the separate paired identity above. The paper's result supplies the
+additive-index framework, not a signed evaluator with a smaller
+dense polynomial. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
