@@ -104,10 +104,82 @@ Reaching |B| ≈ (30p)^{1/3} ≈ 50 needs the sparse/dense split moved to `msolv
 (F4 over F_p, available at `/opt/homebrew/bin/msolve`), or a much larger budget
 with the degree bound raised.
 
+## msolve cross-check: the wall is the in-repo F4, not the system
+
+`IC_GB_DUMP=<dir> cargo run --release --example ic_semaev_gb -- k...` now
+writes the same four polynomials in msolve syntax (variables, characteristic,
+comma-separated equations) and skips the in-repo solve. Running msolve 0.11
+with `-t 4` on those exact files:
+
+| k | family | in-repo F4 | msolve | ideal degree (window) |
+|--:|--------|-----------:|-------:|----------------------:|
+| 8 | window | 10.4 s | 0.03 s | 1 |
+| 10 | window | — | 0.05 s | 1 |
+| 12 | window | timeout 120 s | 0.42 s | 13 |
+| 12 | pullback | timeout 120 s | 0.10 s | 1 |
+| 16 | window | timeout 120 s | 1.11 s | 13 |
+| 16 | pullback | timeout 120 s | 0.20 s | 1 |
+| 24 | window | — | 6.3 s | 19 |
+| 32 | window | — | 66 s | 49 |
+| 50 | window | — | timeout 180 s | (350 seen mid-run) |
+| 50 | pullback | — | timeout 180 s | (73 seen mid-run) |
+
+The k = 12/16 timeouts are an implementation wall in the repo's degree-bounded
+F4 (full Macaulay expansion to a degree bound), not a property of this system:
+msolve solves the identical polynomials in under a second. On msolve the wall
+moves to about k = 32 (66 s, ideal degree 49); k = 50 is still out of reach at
+180 s, with the membership degree dominating (the pullback basis reaches
+degree 73 against the window's 350 at the same k).
+
+Two cautions for anyone quoting this: the degree shown is the ideal degree of
+the msolve output; at k ≥ 12 msolve introduces an auxiliary variable `A`, so
+the numbers are not directly comparable to the F4 report's `degree_reached`.
+And every cell here is one planted target on one small curve, so the growth
+`1 → 13 → 19 → 49` over k = 8 → 32 is a scaling record, not an exponent.
+
 ## Next
 
-1. Move the |B| ≈ (30p)^{1/3} cell to msolve for the dense steps (the repo's F4
-   remains the reference implementation for cross-checks at small k).
+1. The |B| ≈ (30p)^{1/3} cell still needs a backend: msolve carries k = 32 in
+   66 s and neither backend reaches k = 50 in 180 s. Try a sparser
+   representation (the pullback basis is already cheaper at k = 50: degree 73
+   against 350) or a smaller prime where (30p)^{1/3} is reachable, then
+   separate the effect of |B| from the effect of p.
 2. Read the PKM paper before any further parametrized-base compute.
-3. Consider adding the calibration as a `#[test]` so the metric cannot silently
-   drift.
+3. The calibration is now `f4_fp::tests::solving_degree_tracks_the_semiregular_prediction`
+   (8/8 cells), so the metric cannot drift silently.
+
+## msolve port (L13, 2026-11-23)
+
+`scripts/ic_semaev_msolve.py` emits the same system (S₄ via the two-quadratic
+resultant, plus `h(x_i)` membership polynomials) in msolve's input format and
+times msolve's F4. p = 4099, y² = x³ + x + 1, 8 threads:
+
+| k (membership degree) | family | msolve wall | ideal degree | in-repo F4 |
+|---:|---|---:|---:|---|
+| 8 | window | 0.04 s | 1 | 1.9 s |
+| 12 | window | 0.62 s | 13 | **timed out at 120 s** |
+| 20 | window | 3.71 s | 13 | — |
+| 20 | pullback | 3.59 s | 13 | — |
+| 30 | window | 30.4 s | 49 | — |
+| 30 | pullback | 24.5 s | 37 | — |
+| 40 | window | 164.7 s | 85 | — |
+| 50 | window | **> 900 s (timeout)** | — | — |
+
+**What this establishes:** the dense in-repo F4 covers k ≤ ~10 at this prime;
+msolve covers k ≤ 40 in under three minutes, and the target cell
+|B| ≈ (30p)^{1/3} ≈ 50 is just beyond the 15-minute budget. The frontier is a
+factor ~4 in k, not an asymptotic change.
+
+**What it does not establish:** the k=30 window-vs-pullback difference
+(30.4 s vs 24.5 s) is *not* a controlled comparison — the two runs have
+different ideal degrees (49 vs 37) because each family uses its own
+decomposable target. Comparing solver cost across families requires matching
+the solution count, which is the next design step.
+
+Reproduce:
+
+```sh
+python3 scripts/ic_semaev_msolve.py 8 12 20 30
+```
+(add `40` or `50` for the long cells; each run prints k, family, actual base
+size, wall time, and msolve's reported ideal degree).
