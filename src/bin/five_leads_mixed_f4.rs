@@ -1,10 +1,77 @@
 //! F4 all-roots control for the published five-leads mixed-fiber systems.
 //! Builds Semaev S4 and three fiber equations symbolically over F_p.
 use crypto_lib::cryptanalysis::f4_fp::{solve, F4Options, Ordering, Poly, Verdict};
+use serde::Deserialize;
 use serde_json::json;
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::fs;
 use std::time::Duration;
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct FrozenF101Input {
+    p: u64,
+    n_vars: usize,
+    polynomials: Vec<Poly>,
+    degree_bound: u32,
+    budget_seconds: u64,
+}
+
+fn frozen_f101_input(raw: &[u8]) -> Result<(FrozenF101Input, u64, String), String> {
+    let digest = hex::encode(Sha256::digest(raw));
+    let target_x = match digest.as_str() {
+        "8045445aef2e8831dc8adf32ea17be90bb7ec6f0d8bc852d1dd53b83006a5351" => 83,
+        "b7f6e57a7049fcfd81692d5b02ff5f9f0f8b3cbdcfcd82d9a6373d155c364e28" => 8,
+        _ => return Err(format!("unrecognized frozen F101 input SHA-256: {digest}")),
+    };
+    let input: FrozenF101Input =
+        serde_json::from_slice(raw).map_err(|e| format!("invalid frozen F101 JSON: {e}"))?;
+    if input.p != 101
+        || input.n_vars != 3
+        || input.polynomials.len() != 4
+        || input.degree_bound != 16
+        || input.budget_seconds != 600
+        || input.polynomials.iter().any(|poly| {
+            poly.is_empty()
+                || poly
+                    .iter()
+                    .any(|(powers, coefficient)| powers.len() != 3 || *coefficient >= 101)
+        })
+    {
+        return Err("frozen F101 shape or settings changed".into());
+    }
+    Ok((input, target_x, digest))
+}
+
+fn run_frozen_f101(path: &str) -> Result<(), String> {
+    let raw = fs::read(path).map_err(|e| format!("cannot read frozen F101 input: {e}"))?;
+    let (input, target_x, digest) = frozen_f101_input(&raw)?;
+    let options = F4Options::new(Ordering::Grevlex, input.degree_bound)
+        .with_budget(Duration::from_secs(input.budget_seconds));
+    let report = solve(&input.polynomials, input.n_vars, input.p, &options);
+    let (status, mut roots) = match report.verdict {
+        Verdict::Solutions(roots) => ("solutions", roots),
+        Verdict::Inconsistent => ("inconsistent", Vec::new()),
+        Verdict::Undetermined => ("undetermined", Vec::new()),
+    };
+    roots.sort();
+    println!(
+        "{}",
+        json!({
+            "schema": "g33-frozen-f101-f4-output/v1",
+            "input_sha256": digest,
+            "target_x": target_x,
+            "status": status,
+            "roots": roots,
+            "field_ops": report.field_ops,
+            "f4_runs": report.f4_runs,
+            "degree_reached": report.degree_reached,
+            "timed_out": report.timed_out,
+        })
+    );
+    Ok(())
+}
 
 #[derive(Clone)]
 struct Q {
@@ -172,6 +239,18 @@ fn run(
     (receipt, roots)
 }
 fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.first().is_some_and(|arg| arg == "--frozen-f101-input") {
+        if args.len() != 2 {
+            eprintln!("usage: five_leads_mixed_f4 --frozen-f101-input INPUT.json");
+            std::process::exit(2);
+        }
+        if let Err(error) = run_frozen_f101(&args[1]) {
+            eprintln!("{error}");
+            std::process::exit(2);
+        }
+        return;
+    }
     if std::env::args().any(|arg| arg == "--dlp-cohort") {
         let input = fs::read_to_string(
             "research/five_leads_e2e_20261019/correctness/mixed-fiber-polynomial-dlp-v1.jsonl",
