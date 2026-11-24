@@ -197,6 +197,30 @@ def xspace_count(xset, xq):
                     n += 1
     return n
 
+def xspace_counts_fast(xset, xqs):
+    """Vectorised x-space counts for a list of target x-coordinates."""
+    import numpy as np
+    xs = np.array(xset, dtype=object)
+    out = {}
+    for xq in xqs:
+        total = 0
+        for a in xset:
+            for b in xset:
+                u, v = a, b
+                A1 = (u - v) * (u - v) % P
+                B1 = (-2 * (((u + v) * (u * v + A) + 2 * B) % P)) % P
+                C1 = (((u * v - A) % P) ** 2 - 4 * B * (u + v)) % P
+                c = xs
+                A2 = ((c - xq) % P) ** 2 % P
+                B2 = (-2 * (((c + xq) * (c * xq + A) + 2 * B) % P)) % P
+                C2 = (((c * xq - A) % P) ** 2 - 4 * B * (c + xq)) % P
+                ac = (A1 * C2 - A2 * C1) % P
+                ab = (A1 * B2 - A2 * B1) % P
+                bc = (B1 * C2 - B2 * C1) % P
+                total += int(np.count_nonzero((ac * ac - ab * bc) % P == 0))
+        out[xq] = total
+    return out
+
 def matched_targets_xspace(k, pool=120):
     """One target per family with the SAME x-space solution count."""
     sets = {}
@@ -260,6 +284,39 @@ def matched_targets(k):
     return sets, common
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "matchedxf":
+        k = int(sys.argv[2]) if len(sys.argv) > 2 else 40
+        aff = curve_affine(); by_x = {}
+        for q in aff: by_x.setdefault(q[0], q)
+        xs_all = sorted(by_x)
+        sets = {}
+        for fam in ("window", "pullback"):
+            if fam == "window":
+                xset = xs_all[:k]
+            else:
+                Tset, xset = set(), []
+                for x in (v for v in xs_all if v):
+                    Tset.add(x * x % P)
+                    pre = [y for y in xs_all if (y * y % P) in Tset]
+                    if len(pre) >= k:
+                        xset = pre[:k]; break
+            sets[fam] = xset
+        wpts = [by_x[x] for x in sets["window"]]
+        cand = []
+        for i in range(12):
+            for j in range(12):
+                t = eadd(wpts[i], wpts[j])
+                if t and t[0] not in cand: cand.append(t[0])
+        cand = cand[:16]
+        cw = xspace_counts_fast(sets["window"], cand)
+        cp = xspace_counts_fast(sets["pullback"], cand)
+        hit = [(c, xq) for xq, c in cw.items() if cp.get(xq) == c and c > 0]
+        print("common (count, xq):", hit[:5], flush=True)
+        if hit:
+            c, xq = hit[0]
+            for fam in ("window", "pullback"):
+                print(run(k, fam, force_xq=xq), flush=True)
+        sys.exit(0)
     if len(sys.argv) > 1 and sys.argv[1] == "matchedx":
         k = int(sys.argv[2]) if len(sys.argv) > 2 else 20
         sets, best = matched_targets_xspace(k)

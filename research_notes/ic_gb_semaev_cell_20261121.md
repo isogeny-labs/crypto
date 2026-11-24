@@ -218,3 +218,43 @@ python3 scripts/ic_semaev_msolve.py matchedx 20
 evaluations per candidate target; the same method applies but costs minutes per
 family). `matched` (tuple-count) mode is retained only to document why it is
 insufficient.
+
+## L5 — matched cell at k = 40 (2026-11-24)
+
+The |B| ~ (30p)^{1/3} cell is k = 40-50 at p = 4099. Using the vectorised
+x-space counter (`matchedxf`), one target was selected with the same x-space
+solution count for both families (xQ = 258, count 162), and msolve was run on
+that target for each base.
+
+| k=40, xQ=258 | x-space count | msolve ideal degree | wall |
+|---|---:|---:|---:|
+| window | 162 | 162 | 218.7 s |
+| pullback | 162 | 162 | 373.4 s |
+
+**Result: at matched solution count the pullback (parametrized) base is ~1.7x
+SLOWER to solve, not faster.** With L25's k=20 tie (3.32 vs 3.28 s at degree
+15), the pattern is: no advantage at k=20, a real disadvantage at k=40. This
+is the opposite of the "algebraic membership makes the system easier"
+hypothesis, at least for this construction and this solver.
+
+**Caveats, stated because they matter:**
+- One curve, one prime, one target, one run per cell. 1.7x is larger than the
+  ~1% noise at k=20 but is not a replicated effect.
+- The two bases differ in more than the membership polynomial: the pullback
+  x-values are spread across the whole field (they are ±sqrt(t)), while the
+  window values are small integers. That changes coefficient magnitudes and
+  may drive part of the 1.7x.
+- msolve's reported degree of the elimination polynomial differed between runs
+  (one pullback line reported 32768 / 14348907 intermediate degrees), which
+  suggests its internal path differed, not just the input size.
+
+**What would settle it:** replicate on >= 3 curves at k = 30 and 40 with the
+same matched-count protocol, and add a third arm (random negation-closed base
+of the same size) to separate "parametrized membership" from "values spread
+over the field".
+
+Reproduce:
+
+```sh
+python3 scripts/ic_semaev_msolve.py matchedxf 40
+```
