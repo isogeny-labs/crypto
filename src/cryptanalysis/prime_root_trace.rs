@@ -214,8 +214,8 @@ fn trim(mut v: Vec<u64>) -> Vec<u64> {
 /// Accelerated arithmetic for canonical public field elements emitted by
 /// the trace engine. Keep the general u128 fallback so event values remain
 /// identical even for noncanonical internal callers.
-#[inline]
 #[cfg_attr(not(test), allow(dead_code, reason = "used only by the test oracles"))]
+#[inline]
 fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
     match op {
         FieldOp::Add => {
