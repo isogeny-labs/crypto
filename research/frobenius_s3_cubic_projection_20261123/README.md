@@ -65,6 +65,27 @@ The mixed-coordinate experiment uses the full Boolean equations in \(x,s\) at th
 
 Degree-three closure completed in both 46-variable systems. Its selector-only subspace has dimension 25 and equals the span of \(f_2\), \(f_1\), and \(s_i f_1\), where \(f_j(s)=\operatorname{Tr}(\alpha_j(s)p(s))\) for \(j=1,2\). This equality was checked by taking the rank of the union of the computed and independently generated rows. Both witnesses survive. The degree-two trace multipliers already put the same 25 rows in the degree-four Macaulay selector span, whose computed dimension is 25. Hence the mixed-coordinate products give no additional selector rows there. The complete degree-four Macaulay spans leave both witnesses alive, including after setting \(s_0=1\) and \(x_0=0\) in their symmetry charts. Both degree-four closure pilots reached the time cap, so they leave the full degree-four closure question open. [pcc:unverified]
 
+## Quotient coordinates
+
+For nonzero \(s\), introduce \(w=p(s)/s^2\) in the trace-zero subspace of the coefficient field. Let \(H\) be the odd-degree half trace. The two constraints are
+
+\[
+s^2 w=p(s),\qquad sH(w)\in U.
+\]
+
+Both are bilinear in the two coordinate blocks apart from the affine right-hand side. They give an exact test for a nonzero sum. If \(x^2+sx=p(s)\), then \(w=(x/s)^2+x/s\), and \(sH(w)\) equals one of \(x,x+s\). Conversely \(H(w)^2+H(w)=w\), so the second constraint supplies a solution \(x=sH(w)\in U\) to the original equation. For a nonzero S3 target, \(p(0)\ne0\). Otherwise the original product at sum zero would be 1, and substituting into S3 would force the target abscissa to be zero. Thus the first quotient constraint excludes the zero sum. [pcc:unverified]
+
+The degree comparisons use the same target abscissae within each pair. They omit targets admitting the diagonal \(s=0\) in the original presentation. The original presentation retains two orientations for each admissible sum and the quotient presentation gives one point per sum. A linear-image rank test determines the nonzero sums before computing the reduced basis from those points. The verifier measures closure membership of that basis. [pcc:unverified]
+
+| Field degree | Targets | Original and quotient variables | First fall in both | Last fall in both | Solving degree in both | Columns at solving degree |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 7 | 28 | 6, 9 | 3 | 3 | 3 | 42, 130 |
+| 23 | 4 | 22, 33 | 3 | 4 | 4 | 9,109, 46,938 |
+
+At 23 bits the two planted targets have reduced basis degree two in the original presentation and one in the quotient presentation. The two refuted targets have basis degree zero in both. Degree-three closure of the quotient equations at the 47-bit witnesses still gives the same 25-dimensional selector space from the first two telescoping trace equations. Both witnesses survive. [pcc:unverified]
+
+For both Frobenius subspaces at 23, 47, 71, and 79 bits, the verifier also constructs independent quotient values from pairs of distinct rational factor-base abscissae. Their span is the entire trace-zero subspace. A fixed linear subspace for \(w\) that covers all these rational pairs must therefore retain \(n-1\) coordinates. [pcc:unverified]
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
@@ -91,6 +112,16 @@ SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_2026112
 SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/selector_elimination.py --ranker /tmp/s3-selector-elimination --degree 4
 SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/selector_elimination.py --ranker /tmp/s3-selector-elimination --degree 4 --chart
 ```
+
+The same ranker measures quotient-coordinate closure. Use a C++20 compiler with 128-bit integer support for the 69-variable witness checks.
+
+```sh
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/quotient.py degrees --ranker /tmp/s3-selector-elimination
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/quotient.py witnesses --ranker /tmp/s3-selector-elimination
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/quotient.py spans
+```
+
+The quotient results are in [quotient-degrees.jsonl](quotient-degrees.jsonl), [quotient-witnesses.jsonl](quotient-witnesses.jsonl), and [quotient-spans.jsonl](quotient-spans.jsonl).
 
 The elimination records are in [selector-closure-d3.jsonl](selector-closure-d3.jsonl), [selector-macaulay-d4.jsonl](selector-macaulay-d4.jsonl), and [selector-chart-d4.jsonl](selector-chart-d4.jsonl).
 

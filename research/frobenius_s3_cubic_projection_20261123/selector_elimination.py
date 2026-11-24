@@ -56,9 +56,10 @@ def normalized(field, basis, target):
 
 
 
-def run_ranker(binary, equations, k, degree, witness, limit, closure):
-    rows = [f'{k} {degree} {int(closure)} {len(equations)} {witness} {limit}']
-    rows.extend(' '.join(map(str, [len(row), *row])) for row in equations)
+def run_ranker(binary, equations, k, degree, witness, limit, closure, *, right=None, checks=()):
+    right = k if right is None else right
+    rows = [f'{k} {right} {degree} {int(closure)} {len(equations)} {witness} {limit} {len(checks)}']
+    rows.extend(' '.join(map(str, [len(row), *row])) for row in (*equations, *checks))
     result = subprocess.run([binary], input='\n'.join(rows) + '\n', text=True,
                             capture_output=True, check=True, timeout=limit + 60)
     return json.loads(result.stdout)
@@ -142,6 +143,7 @@ def main():
             width -= 1
         result = run_ranker(binary, rows, width, args.degree, witness, args.limit, args.closure)
         selector_rows = result.pop('selector_rows')
+        result.pop('members')
         if args.closure and args.degree == 3 and not args.chart and not result['timeout']:
             trace_rows, index = trace_consequence_span(field, basis, constant, linear)
             measured = [sum(1 << index[m] for m in row) for row in selector_rows]
