@@ -25,8 +25,8 @@ fn run() -> Result<(), String> {
         println!("{}", qualifier());
         return Ok(());
     }
-    if args.len() != 3 || args[1] != "--out" {
-        return Err("usage: --qualifier | --out FRESH_JSONL".into());
+    if args.len() != 3 || (args[1] != "--out" && args[1] != "--transport") {
+        return Err("usage: --qualifier | --out FRESH_JSONL | --transport FRESH_JSONL".into());
     }
     let file = OpenOptions::new()
         .write(true)
@@ -34,6 +34,11 @@ fn run() -> Result<(), String> {
         .open(&args[2])
         .map_err(|e| e.to_string())?;
     let mut out = BufWriter::new(file);
+    if args[1] == "--transport" {
+        writeln!(out,"{}",json!({"kind":"transport_only","raw_create_new_owner":"native worker","mathematical_controls_executed":false})).map_err(|e|e.to_string())?;
+        out.flush().map_err(|e| e.to_string())?;
+        return Ok(());
+    }
     writeln!(out,"{}",json!({"kind":"binary","sha256":hash(&fs::read(env::current_exe().map_err(|e|e.to_string())?).map_err(|e|e.to_string())?),"qualification":qualifier(),"scope":"producer fixed correctness; no independent signed standing"})).map_err(|e|e.to_string())?;
     let result = torus_reverse_multiplier::controls::run(&mut out);
     out.flush().map_err(|e| e.to_string())?;
