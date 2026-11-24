@@ -3,11 +3,13 @@
 import argparse
 import json
 from math import isqrt
+from pathlib import Path
 from random import Random
 from time import perf_counter
 
 from sympy import isprime, sqrt_mod
 
+from compiled_projection import Projection
 from profile import factors, geometry, span
 from three_summand_join import Curve, direct_join, negate, resultant_join
 
@@ -122,7 +124,7 @@ def baby_step(curve, generator, challenge, order):
     raise ValueError("Challenge is outside the toy subgroup")
 
 
-def solve(degree, g, method, max_attempts):
+def solve(degree, g, method, max_attempts, ranker=None):
     start = perf_counter()
     field, basis, _ = geometry(degree, g)
     curve = Curve(field)
@@ -140,10 +142,12 @@ def solve(degree, g, method, max_attempts):
     secret = rng.randrange(1, order)
     challenge = multiply(curve, generator, secret)
     thirds_per_trial = min(8, len(points)) if degree == 23 else len(points)
+    compiled = (Projection(field, basis, g, "unrestricted", 3), ranker) if method == "compiled" else None
     setup = perf_counter() - start
 
     search_seconds = row_seconds = solve_seconds = 0.0
     verified = collection_triples = empty = descent_attempts = 0
+    compiled_fallbacks = compiled_false_positives = 0
     trace = []
     result = None
     solved_logs = None
@@ -158,7 +162,10 @@ def solve(degree, g, method, max_attempts):
         if method == "direct":
             triples, _ = direct_join(curve, points, membership, jobs)
         else:
-            triples, _, _ = resultant_join(curve, basis, subspace, sums, [], by_x, jobs, "batch")
+            triples, _, metrics = resultant_join(curve, basis, subspace, sums, [], by_x, jobs,
+                                                 method, compiled)
+            compiled_fallbacks += metrics["compiled_fallbacks"]
+            compiled_false_positives += metrics["compiled_false_positives"]
         search_seconds += perf_counter() - started
         trace.append(dict(rank=len(system.pivots), triples=len(triples), collection=collecting))
         verified += len(triples)
@@ -200,6 +207,7 @@ def solve(degree, g, method, max_attempts):
         attempts=attempt, collection_attempts=attempt - descent_attempts, descent_attempts=descent_attempts,
         empty_attempts=empty, verified_triples=verified, collection_triples=collection_triples,
         rank=len(system.pivots), solved=result is not None, solution=result, attempts_trace=trace,
+        compiled_fallbacks=compiled_fallbacks, compiled_false_positives=compiled_false_positives,
         setup_seconds=setup, search_seconds=search_seconds, row_seconds=row_seconds,
         solve_seconds=solve_seconds, verification_seconds=verification_seconds,
         generic_seconds=generic_seconds,
@@ -209,9 +217,13 @@ def solve(degree, g, method, max_attempts):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("fields", nargs="+", type=int, choices=(7, 23))
-    parser.add_argument("--method", choices=("direct", "batch"), required=True)
+    parser.add_argument("--method", choices=("direct", "batch", "compiled"), required=True)
+    parser.add_argument("--ranker", type=Path)
     parser.add_argument("--max-attempts", type=int, choices=range(1, 513), default=128, metavar="COUNT")
     args = parser.parse_args()
+    if args.method == "compiled" and (args.ranker is None or args.fields != [23]):
+        parser.error("the compiled arm requires --ranker and the 23-bit field")
     for degree in args.fields:
         for factor in factors(degree):
-            print(json.dumps(solve(degree, factor, args.method, args.max_attempts)), flush=True)
+            ranker = args.ranker.resolve() if args.ranker else None
+            print(json.dumps(solve(degree, factor, args.method, args.max_attempts, ranker)), flush=True)

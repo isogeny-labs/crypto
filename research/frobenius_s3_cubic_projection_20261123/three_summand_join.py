@@ -6,6 +6,7 @@ from collections import defaultdict
 from random import Random
 from time import perf_counter
 
+from compiled_projection import extract_small_fiber
 from profile import factors, geometry, span
 from quotient import half_trace, linear_map
 from selector_elimination import normalized_rhs
@@ -131,13 +132,13 @@ def recover(curve, by_x, s, rhs):
     return by_x.get(left, ()), by_x.get(right, ())
 
 
-def resultant_join(curve, basis, subspace, sums, images, by_x, jobs, method):
+def resultant_join(curve, basis, subspace, sums, images, by_x, jobs, method, compiled=None):
     grouped = defaultdict(list)
     for intermediate, third in jobs:
         if intermediate is not None:
             grouped[intermediate[0]].append((intermediate, third))
     sum_solutions = selector_visits = lift_failures = empty_intermediates = 0
-    sparse_terms = dense_slots = internal_slots = 0
+    sparse_terms = dense_slots = internal_slots = fallbacks = false_positives = 0
     relations = set()
     assert all(curve.trace(t) and len(matches) <= 2 for t, matches in grouped.items())
     right_sides = {t: normalized_rhs(curve.field, basis, t) for t in grouped}
@@ -161,16 +162,31 @@ def resultant_join(curve, basis, subspace, sums, images, by_x, jobs, method):
             roots, terms, slots = sparse_gcd(curve, subspace, target, constant)
             sparse_terms += terms
             dense_slots += slots
+        elif method == "compiled":
+            plan, ranker = compiled
+            rows = plan.low_rows(plan.specialized(constant, linear), 2)
+            selectors, _ = extract_small_fiber(ranker, rows, len(basis), 3)
+            if selectors is None:
+                fallbacks += 1
+                roots, terms, slots = sparse_gcd(curve, subspace, target, constant)
+                sparse_terms += terms
+                dense_slots += slots
+            else:
+                roots = {sums[selector] for selector in selectors if selector}
         else:
             roots = root_sets[target]
-        root_sets[target] = roots
-        sum_solutions += len(roots)
-        empty_intermediates += not roots
+        verified_roots = set()
         for s in roots:
             weighted = curve.field.mul(target, curve.half(curve.field.sq(s)))
             rhs = constant ^ s ^ weighted
             if curve.trace(weighted):
                 rhs ^= target
+            if method == "compiled" and evaluate(
+                curve.field, image_coefficients(curve.field, subspace, s), rhs
+            ):
+                false_positives += 1
+                continue
+            verified_roots.add(s)
             left, right = recover(curve, by_x, s, rhs)
             if not left or not right:
                 lift_failures += 1
@@ -182,11 +198,15 @@ def resultant_join(curve, basis, subspace, sums, images, by_x, jobs, method):
                             relation = triple(p, q, third)
                             if relation:
                                 relations.add(relation)
+        root_sets[target] = verified_roots
+        sum_solutions += len(verified_roots)
+        empty_intermediates += not verified_roots
     return relations, root_sets, dict(
         distinct_intermediate_abscissae=len(grouped), empty_intermediate_abscissae=empty_intermediates,
         selector_visits=selector_visits, recovered_sums=sum_solutions, lift_failures=lift_failures,
         sparse_terms=sparse_terms, dense_coefficient_slots=dense_slots,
         internal_coefficient_slots=internal_slots,
+        compiled_fallbacks=fallbacks, compiled_false_positives=false_positives,
     )
 
 

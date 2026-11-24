@@ -67,7 +67,7 @@ The comparison uses four shared targets, a planted target with two distinct solu
 
 The direct and augmented systems have reduced basis degree zero on the 13 misses and degree two on the 13 hits. The selector-only system has reduced basis degree zero on the misses, degree one on the 11 singleton sums, and degree two on the two multiple-sum targets. For the online check, bounded closure either produces the constant 1 or yields an affine slice of at most eight assignments. Evaluation of the input quadratics validates the slice, then half trace recovers both orientations of every nonzero sum. The extraction code receives no root count or reference points, and the verifier compares its output with the independent rank-and-recovery reference. [pcc:unverified]
 
-On this bounded-closure benchmark, the original two-coordinate extraction takes 15.30 s over the 26 targets. The compiled extraction takes 2.56 s, including 1.85 s of fixed setup across the two factors, target specialization, closure, and recovery of the original orientations. Both totals include normalization and exclude the independent reference computation. This benchmark covers two-coordinate extraction. The complete toy solves below use the earlier resultant join. [pcc:unverified]
+On this bounded-closure benchmark, the original two-coordinate extraction takes 15.30 s over the 26 targets. The compiled extraction takes 2.56 s, including 1.85 s of fixed setup across the two factors, target specialization, closure, and recovery of the original orientations. Both totals include normalization and exclude the independent reference computation. The complete toy comparison below also runs the compiled method. [pcc:unverified]
 
 The degree reduction is for the specialized presentation at 23 bits. At 47 bits the unrestricted cubic multiplier span fails on rational targets even if all its projected equations are retained, so the quadratic subspace of that span also fails. [pcc:unverified]
 
@@ -173,14 +173,14 @@ The doubling subgroups at field degrees 7 and 23 have prime orders 71 and 4,196,
 
 Choose one signed representative per Frobenius orbit of factor-base abscissae. A point equal to the \(j\)-th Frobenius image of a representative contributes \(\mu^j\) in its column, or \(-\mu^j\) for the opposite sign. This reduces 7 columns to 1 at 7 bits and 943 columns to 41 at 23 bits. The collection target is a random known multiple of the generator. For every verified triple, accumulate its signed weights, reduce the row over the prime order, and retain a pivot only if it raises rank. After triangular back substitution, search for a triple of the challenge shifted by another known multiple of the generator. Subtract the known shift from the triple's computed logarithm. The verifier checks the resulting scalar and every recovered representative against point multiplication. [pcc:unverified]
 
-The direct group join and the batch resultant join use the same deterministic offsets, signed thirds, and challenge for each factor. At 23 bits they attain rank 41 after 18 and 16 collection attempts, with 59 and 52 verified collection triples, respectively. Three attempts across the two factors have no triples. Each solve then succeeds on its first descent attempt. The 7-bit controls attain rank one and recover the challenge on each factor. [pcc:unverified]
+The direct group join, the batch resultant join, and the compiled quadratic join use the same deterministic offsets, signed thirds, and challenge for each factor. At 23 bits they attain rank 41 after 18 and 16 collection attempts, with 59 and 52 verified collection triples, respectively. Three attempts across the two factors have no triples. Each solve then succeeds on its first descent attempt. The compiled join verifies every proposed selector with the exact pointwise resultant before sign recovery. It falls back to individual GCD extraction if bounded closure leaves more than eight affine candidates or times out. The measured runs have zero fallbacks and zero false positive selectors. The 7-bit direct and batch controls attain rank one and recover the challenge on each factor. [pcc:unverified]
 
-| Field degree | Factor \(g\) encoded as an integer | Independent rows | Verified collection triples | Direct-join total | Batch-join total | Generic search |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 23 | 2,787 | 41 | 59 | 4.89 s | 6.70 s | 0.30–0.33 s |
-| 23 | 3,189 | 41 | 52 | 4.41 s | 5.57 s | 0.25–0.27 s |
+| Field degree | Factor \(g\) encoded as an integer | Independent rows | Verified collection triples | Direct-join total | Batch-join total | Compiled-join total | Generic search |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 23 | 2,787 | 41 | 59 | 5.13 s | 6.51 s | 5.28 s | 0.32–0.33 s |
+| 23 | 3,189 | 41 | 52 | 4.38 s | 5.68 s | 5.02 s | 0.25–0.28 s |
 
-The join totals include factor-base and orbit setup, target generation, unsuccessful searches, sign recovery, modular row reduction, back substitution, descent, and verification. The generic measurement is an independent baby-step giant-step search on the supplied challenge, including its baby-table build. The toy rank reduction is shared by both joins. The batched resultant method has higher complete solve cost on both 23-bit factors. These measurements leave the asymptotic decomposition question open. [pcc:unverified]
+The join totals include factor-base and orbit setup, fixed compilation where used, target generation, unsuccessful searches, sign recovery, modular row reduction, back substitution, descent, and verification. The generic measurement is an independent baby-step giant-step search on the supplied challenge, including its baby-table build. The compiled join's search phase takes 4.01 s and 3.68 s, compared with 4.68 s and 3.96 s for the direct join. The fixed setup offsets that gain in the complete run on both factors. These measurements leave the asymptotic decomposition question open. [pcc:unverified]
 
 ## Reproduction
 
@@ -269,6 +269,7 @@ Replay the end-to-end comparison. The batch comparison also needs python-flint.
 ~~~sh
 SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/toy_solve.py 7 23 --method direct
 SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/toy_solve.py 7 23 --method batch
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/toy_solve.py 23 --method compiled --ranker /tmp/s3-selector-elimination
 ~~~
 
 The rank and recovery records are in [toy-recovery.jsonl](toy-recovery.jsonl).
