@@ -1,0 +1,30 @@
+{
+  "standing": "producer-unverified",
+  "scope": "isolated-driver-transport-only",
+  "cases": [
+    {
+      "case": "recorded pass",
+      "driver_exit": 0,
+      "preflight_exit": 0,
+      "pipeline_exit": 0,
+      "collector_sentinel_entered": true,
+      "checker_sentinel_entered": true,
+      "real_guard_executed": true,
+      "baseline_collector_checker_are_stubs": true
+    },
+    {
+      "case": "recorded drift",
+      "driver_exit": 1,
+      "preflight_exit": 1,
+      "pipeline_exit": 1,
+      "collector_sentinel_entered": false,
+      "checker_sentinel_entered": false,
+      "real_guard_executed": true,
+      "baseline_collector_checker_are_stubs": true
+    }
+  ],
+  "actual_collection_executed": false,
+  "curve_or_Jacobian_arithmetic_executed": false,
+  "provider_launch": false,
+  "admission_validated": false
+}
