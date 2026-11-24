@@ -266,6 +266,42 @@ queries with signed-row replay, occupied-LP rank, factor-base projection,
 target scalar recovery, and a cold same-target rho comparison. Graph
 algorithm choices become measurable only after that stream exists.
 
+### Generic signed four-sum end-to-end control on the B677 curve
+
+`native/mitm_four.rs` supplies a separate, point-keyed meet-in-the-middle
+relation source for the same B677 ordinary elliptic curve. It enumerates
+915,304 signed pairs from the fixed 677-point public support, then probes
+the complement of each pair for every public `R=aG+bQ`. The public target is
+`Q=(976979610,1228979761)`; the checker-side validation scalar is absent
+from the native solver. Every emitted four-point equation is checked by group
+arithmetic before entering the graph consumer. The consumer retains the
+4FB, 3FB+1LP and 2FB+2LP families, uses exact modular LP pivot elimination,
+then solves the projected factor-base and target equations. This is a generic
+source control, not RR5 algebraic extraction.
+
+The frozen 40-query cap run stopped after 11 queries when it recovered
+`d=987654321` and verified `dG=Q`. It emitted 707 distinct equations, of
+which 669 have at least two factor-base leaves. The five class counts by
+factor-base leaves 0 through 4 are `[3,35,154,294,221]`. LP rank is 162;
+507 projected rows have factor-base-plus-target rank 506. An independent
+Python group-law checker replayed all 11 public query labels and all 707
+signed equations from the stored receipt. Its separate FLINT RREF of the
+669 graph-eligible rows found augmented rank 668, zero contradictions and
+the target-only row `d=987654321`. The native LP plus projection ranks sum
+to the same 668. Source, receipt and verifier are in
+`evidence/mitm-b677-control-01/` and `verify_mitm_graph.py`.
+
+The run charged pair-table construction and 10,068,344 complement probes;
+the native operation counter reports 10,987,529 group additions and
+703,155,831 field multiplications overall. Cold wall time was 3,279 ms on
+this development host. The 10-query arm produced 645 equations but no
+target-only row and remains a censored arm. The one-query receipt predates
+the final source refactor and is a development record, not a source-bound
+benchmark. A same-target tuned negation-rho measurement and repeat timing
+are required for a comparative performance result. The algebraic RR5 B677
+arms above remain incomplete; this generic-source solve does not establish
+that their high witness count is extractable at useful cost.
+
 ## Prior work and claim boundary
 
 - Semaev, [*Summation polynomials and the discrete logarithm problem on
@@ -286,4 +322,6 @@ algorithm choices become measurable only after that stream exists.
   `docs/ic/graph-algorithms/README.md`. Graph processing alone cannot
   substitute for the missing ordinary-elliptic partial-relation source.
 
-No same-target scalar or performance claim is admitted by this screen.
+The uniform-residual screen and the separate generic signed four-sum control
+have distinct source and cost claims. Neither establishes an algebraic
+index-calculus advantage over matched rho.
