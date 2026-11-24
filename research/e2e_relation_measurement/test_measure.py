@@ -29,6 +29,22 @@ class MeasurementTest(unittest.TestCase):
             out=pathlib.Path(d)/'out.json'
             subprocess.run(['sage','-python',str(HERE/'measure.py'),'--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27','--mode',mode,'--seed','42','--block-size','4','--output',str(out),*extra],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             return json.loads(out.read_text())
+    def test_panel_partial_cost_coverage(self):
+        spec=importlib.util.spec_from_file_location('panel', HERE/'panel.py')
+        module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        records=[
+            {'mode':'walk','result_status':'complete','useful_relations':1,'relation_counts':{'nonzero_b':1},'whole_process_wall_ns':20,'candidate_counts':{'candidates':5,'identity':0,'filtered':1,'duplicate_x':0},'observed_timings':{'generation':{'wall_ns':3},'groebner_basis':{'wall_ns':7}}},
+            {'mode':'walk','result_status':None,'useful_relations':None,'relation_counts':None,'whole_process_wall_ns':50,'candidate_counts':{'candidates':9,'identity':1,'filtered':2,'duplicate_x':1},'observed_timings':{'generation':{'wall_ns':5}}},
+            {'mode':'walk','result_status':None,'useful_relations':None,'relation_counts':None,'whole_process_wall_ns':40,'candidate_counts':None,'observed_timings':None},
+        ]
+        summary=module.mode_summary(records,'walk')
+        self.assertEqual(summary['total_process_wall_ns'],110)
+        self.assertEqual(summary['candidate_counts']['candidates'],{'observed_attempts':2,'unknown_attempts':1,'observed_sum':14})
+        self.assertEqual(summary['phase_wall_ns']['generation'],{'observed_attempts':2,'unknown_attempts':1,'observed_sum':8})
+        self.assertEqual(summary['phase_wall_ns']['groebner_basis'],{'observed_attempts':1,'unknown_attempts':2,'observed_sum':7})
+        self.assertEqual(summary['phase_wall_ns']['root_extraction'],{'observed_attempts':0,'unknown_attempts':3,'observed_sum':None})
+        self.assertEqual(summary['nonzero_b_unknown_runs'],2)
+
     def test_relation_count_classification(self):
         spec=importlib.util.spec_from_file_location('accounting', HERE/'accounting.py')
         module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
@@ -88,6 +104,8 @@ class MeasurementTest(unittest.TestCase):
             for mode in ('independent','walk','two-group'):
                 self.assertEqual(summary['per_mode'][mode]['completed'],1)
                 self.assertEqual(summary['per_mode'][mode]['attempts'],1)
+                self.assertEqual(summary['per_mode'][mode]['phase_wall_ns']['generation']['observed_attempts'],1)
+                self.assertEqual(summary['per_mode'][mode]['candidate_counts']['candidates']['unknown_attempts'],0)
                 r=next(r for r in summary['runs'] if r['mode']==mode)
                 checkpoint=out/('seed-42-'+mode+'.checkpoint.json')
                 self.assertEqual(r['checkpoint_sha256'],hashlib.sha256(checkpoint.read_bytes()).hexdigest())
@@ -135,6 +153,9 @@ else: raise AssertionError('failure was not injected')
             subprocess.run(['python3',str(HERE/'panel.py'),'--plan',str(plan),'--out',str(out)],check=True,stdout=subprocess.DEVNULL)
             summary=json.loads((out/'summary.json').read_text())
             self.assertEqual(len(summary['runs']),3)
+            for mode in ('independent','walk','two-group'):
+                item=summary['per_mode'][mode]['phase_wall_ns']['groebner_basis']
+                self.assertEqual(item, {'observed_attempts':0,'unknown_attempts':1,'observed_sum':None})
             for r in summary['runs']:
                 self.assertEqual(r['status'],'timeout')
                 self.assertIsNone(r['useful_relations'])
