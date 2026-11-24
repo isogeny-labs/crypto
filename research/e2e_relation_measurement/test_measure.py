@@ -47,6 +47,14 @@ class MeasurementTest(unittest.TestCase):
             self.assertEqual(proc.stdout.count(end),1)
             trace=proc.stdout.split(begin,1)[1].split(end,1)[0]
             self.assertIn(b'product criterion:',trace)
+            with tempfile.TemporaryDirectory() as inner:
+                log=pathlib.Path(inner)/'stdout'; log.write_bytes(proc.stdout)
+                spec=importlib.util.spec_from_file_location('accounting',HERE/'accounting.py')
+                accounting=importlib.util.module_from_spec(spec); spec.loader.exec_module(accounting)
+                observation=accounting.singular_protocol_observation(log,True)
+                self.assertEqual(observation['status'],'captured')
+                self.assertGreaterEqual(observation['product_criterion'],0)
+                self.assertGreaterEqual(observation['chain_criterion'],0)
             self.assertGreater(record['useful_relations'],0)
             self.assertIsNone(record['metrics']['solving_degree'])
 
@@ -105,6 +113,27 @@ for block in range(1,9):
         self.assertEqual(summary['phase_wall_ns']['groebner_basis'],{'observed_attempts':1,'unknown_attempts':2,'observed_sum':7})
         self.assertEqual(summary['phase_wall_ns']['root_extraction'],{'observed_attempts':0,'unknown_attempts':3,'observed_sum':None})
         self.assertEqual(summary['nonzero_b_unknown_runs'],2)
+
+    def test_singular_protocol_parser_states(self):
+        spec=importlib.util.spec_from_file_location('accounting',HERE/'accounting.py')
+        accounting=importlib.util.module_from_spec(spec); spec.loader.exec_module(accounting)
+        begin=b'=== BEGIN GROEBNER BASIS PROTOCOL ===\n'; end=b'=== END GROEBNER BASIS PROTOCOL ===\n'
+        summary=b'product criterion:12 chain criterion:3\n'
+        with tempfile.TemporaryDirectory() as d:
+            path=pathlib.Path(d)/'stdout'
+            path.write_bytes(begin+b'[4294967295:2]2ss\n'+summary+end)
+            found=accounting.singular_protocol_observation(path,True)
+            self.assertEqual((found['status'],found['product_criterion'],found['chain_criterion']),('captured',12,3))
+            self.assertEqual(accounting.singular_protocol_observation(path,False)['status'],'not_requested')
+            path.write_bytes(begin+summary)
+            self.assertEqual(accounting.singular_protocol_observation(path,True)['status'],'incomplete')
+            path.write_bytes(begin+summary+summary+end)
+            self.assertEqual(accounting.singular_protocol_observation(path,True)['status'],'ambiguous')
+            path.write_bytes(begin+b'x'*100000+b'\n'+summary+end)
+            found=accounting.singular_protocol_observation(path,True)
+            self.assertEqual(found['status'],'captured'); self.assertEqual(found['overlong_lines'],1)
+            path.write_bytes(begin+b'new format\n'+end)
+            self.assertEqual(accounting.singular_protocol_observation(path,True)['status'],'unrecognized')
 
     def test_relation_count_classification(self):
         spec=importlib.util.spec_from_file_location('accounting', HERE/'accounting.py')
@@ -209,7 +238,7 @@ for block in range(1,9):
     def test_panel_pairs_targets(self):
         with tempfile.TemporaryDirectory() as d:
             plan=pathlib.Path(d)/'plan.json'; out=pathlib.Path(d)/'panel'
-            plan.write_text(json.dumps({'common_args':['--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27','--block-size','4'],'seeds':[42],'timeout_seconds':30}))
+            plan.write_text(json.dumps({'common_args':['--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27','--block-size','4','--solver-protocol'],'seeds':[42],'timeout_seconds':30}))
             subprocess.run(['python3',str(HERE/'panel.py'),'--plan',str(plan),'--out',str(out)],check=True,stdout=subprocess.DEVNULL)
             summary=json.loads((out/'summary.json').read_text())
             self.assertTrue(summary['target_pairing_by_seed']['42'])
@@ -225,6 +254,7 @@ for block in range(1,9):
             for mode in ('independent','walk','two-group'):
                 self.assertEqual(summary['per_mode'][mode]['completed'],1)
                 self.assertEqual(summary['per_mode'][mode]['independently_verified_runs'],1)
+                self.assertEqual(summary['per_mode'][mode]['singular_protocol_counters']['product_criterion']['unknown_attempts'],0)
                 self.assertEqual(summary['per_mode'][mode]['phase_wall_ns']['top_form_regularity']['observed_attempts'],1)
                 self.assertEqual(summary['per_mode'][mode]['independent_audit_wall_ns']['unknown_attempts'],0)
                 self.assertEqual(summary['per_mode'][mode]['attempts'],1)
@@ -237,6 +267,7 @@ for block in range(1,9):
                 self.assertEqual(summary['per_mode'][mode]['candidate_counts']['candidates']['unknown_attempts'],0)
                 self.assertEqual(summary['per_mode'][mode]['generation_operations']['point_addition_calls']['unknown_attempts'],0)
                 r=next(r for r in summary['runs'] if r['mode']==mode)
+                self.assertEqual(r['protocol_observation']['status'],'captured')
                 checkpoint=out/('seed-42-'+mode+'.checkpoint.json')
                 self.assertEqual(r['checkpoint_sha256'],hashlib.sha256(checkpoint.read_bytes()).hexdigest())
                 self.assertEqual(r['stdout_sha256'],hashlib.sha256((out/('seed-42-'+mode+'.stdout')).read_bytes()).hexdigest())

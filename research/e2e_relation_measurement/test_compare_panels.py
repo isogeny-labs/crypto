@@ -32,6 +32,7 @@ def fixture(directory, *, filtered=False, target=17, incomplete=False, mode_targ
             save(audit,{'status':'verified','record_sha256':digest(result),'audit_source_sha256':'audit'})
             for suffix in ('audit.stdout','audit.stderr'): (directory/f'{name}.{suffix}').write_bytes(b'')
             row['independent_audit']={'status':'verified','wall_ns':5,'result_sha256':digest(audit),'stdout_sha256':digest(directory/f'{name}.audit.stdout'),'stderr_sha256':digest(directory/f'{name}.audit.stderr'),'exit_code':0}
+        row['protocol_observation']={'status':'not_requested','product_criterion':None,'chain_criterion':None,'overlong_lines':0}
         rows.append(row); save(directory/f'{name}.receipt.json',row)
     summary={'plan_sha256':digest(directory/'plan.json'),'measure_source_unchanged':True,'accounting_source_unchanged':True,'audit_source_unchanged':True,'audit_sha256_at_start':'audit','audit_sha256_at_end':'audit','measure_sha256_at_start':'m','measure_sha256_at_end':'m','measure_sha256':'m','accounting_sha256_at_start':'a','accounting_sha256_at_end':'a','panel_sha256':'p','platform':'host','resource_metadata_at_start':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'resource_metadata_at_end':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'runs':rows}
     save(directory/'summary.json',summary)
@@ -148,6 +149,14 @@ class ComparisonTest(unittest.TestCase):
             self.assertIn('some independent audits not verified',result['mismatch_or_unknown'])
             self.assertEqual(result['per_mode']['independent']['right']['audit_wall_unknown_runs'],1)
             self.assertEqual(result['per_mode']['independent']['right']['independently_verified_runs'],0)
+
+    def test_protocol_observation_must_match_raw_stdout(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=summary['runs'][0]; row['protocol_observation']['product_criterion']=99
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'protocol observation mismatch'): compare.compare(a,b)
 
     def test_audit_receipt_must_have_nonnegative_cost_and_logs(self):
         for change in ('negative_wall','missing_log'):

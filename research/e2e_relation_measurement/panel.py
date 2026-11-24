@@ -2,6 +2,7 @@
 """Run a frozen matched panel, preserving every child outcome."""
 import argparse, hashlib, json, os, platform, resource, signal, subprocess, sys, time
 from pathlib import Path
+from accounting import singular_protocol_observation
 
 HERE=Path(__file__).resolve().parent
 MODES=('independent','walk','two-group')
@@ -87,6 +88,7 @@ def mode_summary(receipts, mode):
         'phase_wall_ns': {name: coverage_sum(rows, 'observed_timings', name) for name in PHASES},
         'candidate_counts': {name: coverage_sum(rows, 'candidate_counts', name) for name in CANDIDATE_COUNTS},
         'generation_operations': {name: coverage_sum(rows, 'generation_operations', name) for name in GENERATION_OPERATIONS},
+        'singular_protocol_counters': {name:coverage_sum(rows,'protocol_observation',name) for name in ('product_criterion','chain_criterion')},
     }
 
 
@@ -172,8 +174,10 @@ def main():
                 except (OSError,ValueError):
                     pass
             observed=data if outcome is not None else snapshot
+            protocol_requested=(observed.get('config',{}).get('solver_protocol',False) if observed is not None else '--solver-protocol' in common)
+            protocol_observation=singular_protocol_observation(stdout_path,protocol_requested)
             independent_audit=audit_result(out,name,result,data,timeout) if outcome=='complete' else {'status':'not_attempted','wall_ns':None,'result_sha256':None,'stdout_sha256':None,'stderr_sha256':None,'exit_code':None}
-            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':digest(stdout_path),'stderr_sha256':digest(stderr_path),'whole_process_wall_ns':elapsed,'result_status':outcome,'independent_audit':independent_audit,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'observed_total':observed.get('total') if observed is not None else None,'generation_operations':observed.get('generation_operations') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'top_form_degree':(observed.get('metrics') or {}).get('degree_of_regularity') if observed is not None else None,'target':data.get('target') if outcome is not None else None}
+            receipt={'seed':seed,'mode':mode,'argv':cmd,'status':status,'exit_code':rc,'stdout_sha256':digest(stdout_path),'stderr_sha256':digest(stderr_path),'whole_process_wall_ns':elapsed,'result_status':outcome,'protocol_observation':protocol_observation,'independent_audit':independent_audit,'result_sha256':digest(result) if result.exists() else None,'checkpoint_sha256':digest(checkpoint) if checkpoint.exists() else None,'parse_error':parse_error,'useful_relations':data.get('useful_relations') if outcome in ('complete','verification_failed') else None,'relation_counts':data.get('relation_counts') if outcome in ('complete','verification_failed') else None,'candidate_counts':observed.get('counts') if observed is not None else None,'observed_timings':observed.get('timings') if observed is not None else None,'observed_total':observed.get('total') if observed is not None else None,'generation_operations':observed.get('generation_operations') if observed is not None else None,'observation_source':('result' if outcome is not None else 'checkpoint' if snapshot is not None else None),'top_form_degree':(observed.get('metrics') or {}).get('degree_of_regularity') if observed is not None else None,'target':data.get('target') if outcome is not None else None}
             (out/(name+'.receipt.json')).write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
             receipts.append(receipt)
     pairing={}

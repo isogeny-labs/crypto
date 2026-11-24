@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from accounting import singular_protocol_observation
 
 MODES = ('independent', 'walk', 'two-group')
 FILTER_FLAGS = {'--x-min', '--x-max', '--modulus', '--residue'}
@@ -94,6 +95,9 @@ def load(directory):
             path = directory / f'{name}.{suffix}'
             if expected_hash is not None and (not path.is_file() or sha(path) != expected_hash):
                 raise ValueError(f'artifact hash mismatch: {path}')
+        expected_protocol=singular_protocol_observation(directory / f'{name}.stdout',expected_args['solver_protocol'])
+        if row.get('protocol_observation') != expected_protocol:
+            raise ValueError(f'protocol observation mismatch: {directory} {key}')
         if row['result_status'] is None and any(row.get(key) is not None for key in ('target','useful_relations','relation_counts')):
             raise ValueError(f'unfinished attempt claims a result: {directory} {key}')
         audit=row.get('independent_audit')
@@ -223,6 +227,7 @@ def compare(left_dir, right_dir):
                       'left_exit_status':left['status'], 'right_exit_status':right['status'],
                       'left_wall_ns':left['whole_process_wall_ns'], 'right_wall_ns':right['whole_process_wall_ns'],
                       'left_top_form_degree':left.get('top_form_degree'),'right_top_form_degree':right.get('top_form_degree'),
+                      'left_protocol':left.get('protocol_observation'),'right_protocol':right.get('protocol_observation'),
                       'left_nonzero_b':None if left['relation_counts'] is None else left['relation_counts']['nonzero_b'],
                       'right_nonzero_b':None if right['relation_counts'] is None else right['relation_counts']['nonzero_b'],
                       'left_useful':left['useful_relations'], 'right_useful':right['useful_relations'],
