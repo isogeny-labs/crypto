@@ -9,7 +9,11 @@ pub mod f2m;
 #[cfg(feature = "incumbent")]
 #[path = "../../../incumbent_f2m_snapshot.rs"]
 pub mod f2m;
+#[cfg(not(any(feature = "legacy-halftrace", feature = "incumbent")))]
 #[path = "../../../../../src/binary_ecc/operation_tally.rs"]
+pub mod operation_tally;
+#[cfg(any(feature = "legacy-halftrace", feature = "incumbent"))]
+#[path = "../../../baseline_operation_tally_snapshot.rs"]
 pub mod operation_tally;
 #[cfg(not(any(feature = "legacy-halftrace", feature = "incumbent")))]
 #[path = "../../../../../src/binary_ecc/trace_zero.rs"]

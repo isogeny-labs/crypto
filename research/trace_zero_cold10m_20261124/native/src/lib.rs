@@ -1,4 +1,7 @@
 #[cfg(test)]
+#[path = "../../../../src/binary_ecc/operation_tally.rs"]
+mod tally_unit_tests;
+#[cfg(test)]
 mod context_unit;
 #[cfg(test)]
 #[path = "../../../../src/binary_ecc/f2m.rs"]
