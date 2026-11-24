@@ -602,11 +602,70 @@ is about `2^178.352`, **27.770 bits above** the nominal
 `ng≈2^150.582` cold threshold. This upper bound therefore neither
 certifies useful bias nor excludes it at the required scale. The
 theorem is stated for `χ_p(x([d]G))`, not for a fixed shifted
-`χ_p(x([d]G)-c)`; applying it to `c=x([a]G)` would require a new
-argument. The older [Lange–Shparlinski](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/060B1D110572EACEB6EC6F41EC0AB1CA/S0008414X00018745a.pdf/div-class-title-certain-exponential-sums-and-random-walks-on-elliptic-curves-div.pdf)
+`χ_p(x([d]G)-c)`; the direct second-moment argument below supplies
+a bound for `c=x([a]G)`. The older [Lange–Shparlinski](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/060B1D110572EACEB6EC6F41EC0AB1CA/S0008414X00018745a.pdf/div-class-title-certain-exponential-sums-and-random-walks-on-elliptic-curves-div.pdf)
 result bounds *additive* field-character sums of `x([d]G)`, so it
 does not directly bound the multiplicative field character here.
 [pcc:unverified]
+
+### Explicit bound for every known-point shift
+
+The shifted sum admits a finite bound with no unspecified constant.
+Fix `c=x([a]G)` with `a≠0 (mod r)`, put `n=r-1`, and define
+`f(k)=χ_p(x([k]G)-c)`, with `χ_p(0)=0`. For any integer
+`1≤L<r/2`, average the same sum over multipliers `v=1,…,L`:
+
+`L·(-S_a)=Σ_{k=1}^{n} χ_r(k) Σ_{v=1}^{L} χ_r(v)f(vk)`.
+
+For distinct `v,w≤L`, the zeros of
+`F_v(P)=x([v]P)-c` and `F_w(P)` are disjoint over the algebraic
+closure. Indeed, a common zero would give `[v]P=±[a]G` and
+`[w]P=±[a]G`, hence `v≡±w (mod r)`, impossible in this range.
+Each `F_v` has `2v²` simple zeros because `[v]` is separable and
+`[a]G` is not 2-torsion. All poles of `F_vF_w` have even order.
+The double cover `z²=F_vF_w` is therefore geometrically connected,
+branched at `2(v²+w²)` points, and has genus `1+v²+w²`.
+The Hasse–Weil bounds for that cover and `E`, with the identity
+removed from the character sum, give
+
+`|Σ_{k=1}^{n} f(vk)f(wk)|
+ ≤ (2v²+2w²+4)√p+1` for `v≠w`.
+
+The diagonal sum is exactly `n-2`: the two zero terms are
+`vk=±a`. Cauchy–Schwarz now yields the explicit finite inequality
+
+`|S_a|² ≤ n B_L/L²`, where
+`B_L=L(n-2)+[4(L-1)Σ_{v=1}^L v²+4L(L-1)]√p+L(L-1)`.
+
+The bound holds **for every specified nonzero `a`** on P-192.
+Taking `L=3,097,207,368`, replacing `√p` by its integer ceiling,
+and rounding the resulting upper bound upward gives
+`|S_a|≤138140064710707266420817595147761898109688455729220990
+ <2^176.529`. The arithmetic can be checked without enumerating
+the multipliers:
+
+```python
+from math import isqrt
+p = 6277101735386680763835789423207666416083908700390324961279
+r = 6277101735386680763835789423176059013767194773182842284081
+n, L = r - 1, 3097207368
+q = isqrt(p) + 1
+sum_sq = L * (L + 1) * (2 * L + 1) // 6
+B = L * (n - 2) + (4 * (L - 1) * sum_sq + 4 * L * (L - 1)) * q + L * (L - 1)
+root = isqrt(n * B)
+root += root * root < n * B
+upper = (root + L - 1) // L
+assert L < r // 2 and upper == 138140064710707266420817595147761898109688455729220990
+```
+
+On the order-113 control `E/F_127:y²=x³+x+54` with
+`G=(72,116)`, direct enumeration at `L=5` checked the averaging
+identity for `a=1,2,3`, yielding `S_a=-2,34,-18` respectively.
+The P-192 upper bound is still **25.946 bits above** the nominal
+`2^150.582` cold bias gate, so it neither certifies a useful
+selected offset nor excludes one. It closes the fixed-shift
+applicability gap for this second-moment estimate, not the
+point-dependent evaluation goal. [pcc:unverified]
 
 There is a small exact bias floor for every known-point offset, but
 it does not approach this gate. Since `χ_r(-1)=1`, the summands for
