@@ -1,5 +1,7 @@
 //! Native, bounded development solver for the regular four-summand chart.
 mod polynomial;
+#[cfg(feature = "production-controls")]
+mod production;
 mod system;
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -457,6 +459,8 @@ fn run_solver(
 enum Method {
     Single(Mode),
     Refined,
+    #[cfg(feature = "production-controls")]
+    Cofactor,
 }
 
 impl Method {
@@ -464,6 +468,8 @@ impl Method {
         match self {
             Self::Single(mode) => format!("{mode:?}"),
             Self::Refined => "Refined".into(),
+            #[cfg(feature = "production-controls")]
+            Self::Cofactor => "ProductionCofactor".into(),
         }
     }
 
@@ -471,6 +477,9 @@ impl Method {
         match self {
             Self::Single(mode) => mode,
             Self::Refined => Mode::Distinct,
+            // The cofactor solver searches the full distinct-x RR5 chart.
+            #[cfg(feature = "production-controls")]
+            Self::Cofactor => Mode::Quadratic,
         }
     }
 }
@@ -481,6 +490,8 @@ fn mode(value: &str) -> Option<Method> {
         "refined" => Some(Method::Refined),
         "expanded" => Some(Method::Single(Mode::Expanded)),
         "quadratic" => Some(Method::Single(Mode::Quadratic)),
+        #[cfg(feature = "production-controls")]
+        "cofactor" => Some(Method::Cofactor),
         _ => None,
     }
 }
@@ -501,6 +512,10 @@ fn discover(
     budget: Duration,
 ) -> Discovery {
     let deadline = Instant::now() + budget;
+    #[cfg(feature = "production-controls")]
+    if method == Method::Cofactor {
+        return production::discover(base, target, deadline, budget);
+    }
     let mut outcome = Discovery {
         result: Err("oracle budget exhausted".into()),
         planned: 0,
@@ -700,7 +715,7 @@ fn main() -> Result<(), String> {
     let argv: Vec<_> = std::env::args().skip(1).collect();
     let [prime, depth, solver, modes @ ..] = argv.as_slice() else {
         return Err(
-            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED [draws=1..256]] [distinct refined expanded quadratic]".into(),
+            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED [draws=1..256]] [distinct refined expanded quadratic cofactor(feature)]".into(),
         );
     };
     let curve = *FIXTURES
