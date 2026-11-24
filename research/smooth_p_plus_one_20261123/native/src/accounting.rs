@@ -83,6 +83,7 @@ struct Run<'a> {
     seed: u64,
     draws: usize,
     base_lookup: bool,
+    full_output: bool,
 }
 
 impl Run<'_> {
@@ -103,7 +104,9 @@ impl Run<'_> {
     }
 
     fn version(self) -> u64 {
-        if self.base_lookup {
+        if self.full_output {
+            3
+        } else if self.base_lookup {
             2
         } else {
             1
@@ -138,6 +141,7 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
         seed,
         draws: max_draws,
         base_lookup,
+        full_output,
     } = spec;
     let mut ledger = Ledger::new(base_lookup);
     ledger.measure("input_validation", || {
@@ -167,6 +171,7 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
     let mut seen = BTreeSet::new();
     let (mut draws, mut queries, mut selected, mut incomplete, mut skipped) = (0, 0, 0, 0, 0);
     let (mut lookup_checks, mut base_hits) = (0, 0);
+    let mut oracle_rows_returned = 0;
     let mut fatal = None;
     for draw in 1..=max_draws {
         draws = draw;
@@ -229,6 +234,29 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
                 Err(error) => {
                     incomplete += 1;
                     json!({"status":"undetermined", "reason":error})
+                }
+                Ok(rows) if full_output => {
+                    oracle_rows_returned += rows.len();
+                    let mut consumed = vec![];
+                    for row in &rows {
+                        selected += 1;
+                        let accepted = ledger.measure("consume_relation", || {
+                            consume_labels(&mut consumer, row, a, b)
+                        });
+                        let receipt = match accepted {
+                            Ok(receipt) => json!(receipt),
+                            Err(error) => {
+                                fatal = Some(error.to_string());
+                                json!({"error":error})
+                            }
+                        };
+                        consumed.push(json!({"selected":row,"consumer":receipt}));
+                        if fatal.is_some() || consumer.scalar().is_some() {
+                            break;
+                        }
+                    }
+                    json!({"status":if fatal.is_some() {"consumer_error"} else {"complete_query"},
+                        "relations":rows.len(),"returned":rows,"consumed":consumed})
                 }
                 Ok(rows) => {
                     let row = rows.first().copied();
@@ -298,6 +326,12 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
             "oracle_scope":Run {base_lookup:false,..spec}.scope(),
             "lookup":"public affine point in the signed BTreeMap; its construction is included in base_setup"});
     }
+    if full_output {
+        let consumed = selected - base_hits;
+        summary["relation_policy"] = json!("all_until_recovery");
+        summary["full_output"] = json!({"oracle_rows_returned":oracle_rows_returned,
+            "oracle_rows_consumed":consumed,"oracle_rows_unconsumed":oracle_rows_returned-consumed});
+    }
     summary["wall"] = ledger.finish(start);
     emit(writer, &summary)?;
     if let Some(error) = fatal {
@@ -305,6 +339,33 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
     } else {
         Ok(summary)
     }
+}
+
+fn validate_rank_receipt(
+    receipt: &Value,
+    rank: u64,
+    order: u64,
+) -> Result<(u64, Option<u64>), String> {
+    let after = receipt["rank_after"].as_u64().ok_or("missing row rank")?;
+    let increment = match receipt["disposition"].as_str() {
+        Some("Independent") => 1,
+        Some("Dependent" | "Duplicate") => 0,
+        _ => return Err("invalid row disposition".into()),
+    };
+    if receipt["rank_before"] != rank || rank.checked_add(increment) != Some(after) {
+        return Err("broken row rank chain".into());
+    }
+    let scalar = if receipt["recovered_scalar"].is_null() {
+        None
+    } else {
+        Some(
+            receipt["recovered_scalar"]
+                .as_u64()
+                .filter(|k| *k < order)
+                .ok_or("invalid row scalar")?,
+        )
+    };
+    Ok((after, scalar))
 }
 
 fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<(), String> {
@@ -346,6 +407,14 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
     }
     let (mut queries, mut skipped, mut incomplete, mut selected, mut hits) =
         (0u64, 0u64, 0u64, 0u64, 0u64);
+    let (mut returned_count, mut rank) = (0u64, 0u64);
+    if spec.full_output {
+        if summary["relation_policy"] != "all_until_recovery" {
+            return Err("full-output policy mismatch".into());
+        }
+    } else if !summary["relation_policy"].is_null() || !summary["full_output"].is_null() {
+        return Err("unexpected full-output policy".into());
+    }
     for (i, record) in records[..records.len() - 1].iter().enumerate() {
         if record["kind"] != "account_attempt"
             || record["draw"] != i + 1
@@ -357,6 +426,10 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
         {
             return Err("child draw identity mismatch".into());
         }
+        if spec.full_output && record["rank_before"] != rank {
+            return Err("broken draw rank chain".into());
+        }
+        let mut row_scalar = None;
         match record["result"]["status"].as_str() {
             Some("base_relation") if spec.base_lookup => {
                 if record["result"]["selected"].as_array().map(Vec::len) != Some(1)
@@ -368,6 +441,13 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
                 }
                 hits += 1;
                 selected += 1;
+                if spec.full_output {
+                    (rank, row_scalar) = validate_rank_receipt(
+                        &record["result"]["consumer"],
+                        rank,
+                        spec.curve.n as u64,
+                    )?;
+                }
             }
             Some("skipped") => skipped += 1,
             Some("undetermined") => {
@@ -376,9 +456,53 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
             }
             Some("complete_query") => {
                 queries += 1;
-                selected += u64::from(!record["result"]["selected"].is_null());
+                if spec.full_output {
+                    let result = &record["result"];
+                    let returned: Vec<Relation> =
+                        serde_json::from_value(result["returned"].clone())
+                            .map_err(|_| "missing full ordered oracle output")?;
+                    let consumed = result["consumed"]
+                        .as_array()
+                        .ok_or("missing consumed prefix")?;
+                    if result["relations"] != returned.len()
+                        || returned.windows(2).any(|pair| pair[0] >= pair[1])
+                        || consumed.len() > returned.len()
+                        || (!returned.is_empty() && consumed.is_empty())
+                    {
+                        return Err("invalid full-output lengths or order".into());
+                    }
+                    for (j, receipt) in consumed.iter().enumerate() {
+                        if receipt["selected"] != json!(returned[j]) {
+                            return Err("consumed rows are not the returned prefix".into());
+                        }
+                        (rank, row_scalar) =
+                            validate_rank_receipt(&receipt["consumer"], rank, spec.curve.n as u64)?;
+                        if row_scalar.is_some() && j + 1 != consumed.len() {
+                            return Err("rows consumed after scalar recovery".into());
+                        }
+                    }
+                    if consumed.len() < returned.len() && row_scalar.is_none() {
+                        return Err("oracle rows discarded before recovery".into());
+                    }
+                    returned_count += returned.len() as u64;
+                    selected += consumed.len() as u64;
+                } else {
+                    selected += u64::from(!record["result"]["selected"].is_null());
+                }
             }
             _ => return Err("invalid draw status".into()),
+        }
+        if spec.full_output {
+            if record["rank_after"] != rank {
+                return Err("draw rank does not match row receipts".into());
+            }
+            if let Some(scalar) = row_scalar {
+                if i + 1 != draws as usize || !recovered || summary["scalar"] != scalar {
+                    return Err("row recovery does not match final outcome".into());
+                }
+            } else if recovered && i + 1 == draws as usize {
+                return Err("recovery has no final row receipt".into());
+            }
         }
     }
     if spec.base_lookup {
@@ -404,6 +528,17 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
     ] {
         if summary[key] != count {
             return Err(format!("child {key} count mismatch"));
+        }
+    }
+    if spec.full_output {
+        let consumed = selected - hits;
+        if summary["consumer_rank"] != rank
+            || summary["consumer_work"]["submitted"] != selected
+            || summary["full_output"]["oracle_rows_returned"] != returned_count
+            || summary["full_output"]["oracle_rows_consumed"] != consumed
+            || summary["full_output"]["oracle_rows_unconsumed"] != returned_count - consumed
+        {
+            return Err("full-output totals mismatch".into());
         }
     }
     let wall = &summary["wall"];
@@ -512,6 +647,7 @@ fn suite(spec: Run<'_>, labels: &[String], writer: &mut impl Write) -> Result<()
                 format!("draws={}", spec.draws),
             ])
             .args(spec.base_lookup.then_some("base-lookup"))
+            .args(spec.full_output.then_some("full-output"))
             .arg(label)
             .env("RAYON_NUM_THREADS", "1")
             .process_group(0)
@@ -629,6 +765,11 @@ pub(super) fn dispatch(
         } else {
             (false, labels)
         };
+        let (full_output, labels) = if labels.first().is_some_and(|label| label == "full-output") {
+            (true, &labels[1..])
+        } else {
+            (false, labels)
+        };
         if labels.is_empty() || labels.len() > if is_suite { 8 } else { 1 } {
             return Err(
                 "account needs exactly one explicit arm; account-suite needs one to eight".into(),
@@ -658,6 +799,7 @@ pub(super) fn dispatch(
             seed,
             draws,
             base_lookup,
+            full_output,
         };
         let stdout = std::io::stdout();
         let mut writer = stdout.lock();
@@ -683,6 +825,7 @@ mod tests {
             seed: 781815,
             draws: 30,
             base_lookup: false,
+            full_output: false,
         }
     }
 
@@ -692,6 +835,133 @@ mod tests {
             .filter(|s| !s.is_empty())
             .map(|s| serde_json::from_slice(s).unwrap())
             .collect()
+    }
+
+    #[test]
+    fn full_output_recovers_and_replays_the_consumed_prefix_with_the_old_reducer() {
+        for base_lookup in [false, true] {
+            let spec = Run {
+                full_output: true,
+                base_lookup,
+                ..spec()
+            };
+            let start = Instant::now();
+            let mut bytes = vec![];
+            let summary = run(spec, start, &mut bytes).unwrap();
+            let rows = records(&bytes);
+            validate_summary(spec, &rows, nanos(start.elapsed())).unwrap();
+            assert_eq!(summary["scalar"], 69);
+            assert!(summary["selected"].as_u64().unwrap() > summary["calls"].as_u64().unwrap());
+            // The historical reducer takes exactly four labels, so its separate
+            // comparison applies to the four-leaf-only run. Both policies above
+            // must pass the production consumer and parent checks.
+            if base_lookup {
+                continue;
+            }
+            let mut old = Recovery {
+                width: summary["base_size"].as_u64().unwrap() as usize,
+                order: 109,
+                pivots: BTreeMap::new(),
+            };
+            let mut old_scalar = None;
+            for row in &rows[..rows.len() - 1] {
+                assert_ne!(row["result"]["status"], "base_relation");
+                if let Some(consumed) = row["result"]["consumed"].as_array() {
+                    for item in consumed {
+                        old_scalar = old.insert(
+                            serde_json::from_value(item["selected"].clone()).unwrap(),
+                            row["a"].as_i64().unwrap(),
+                            row["b"].as_i64().unwrap(),
+                        );
+                    }
+                }
+            }
+            assert_eq!(old_scalar, Some(69));
+        }
+    }
+
+    #[test]
+    fn full_output_parent_rejects_lost_reordered_and_post_recovery_rows() {
+        let spec = Run {
+            full_output: true,
+            ..spec()
+        };
+        let start = Instant::now();
+        let mut bytes = vec![];
+        run(spec, start, &mut bytes).unwrap();
+        let rows = records(&bytes);
+        let total = nanos(start.elapsed());
+        for mutation in 0..7 {
+            let mut changed = rows.clone();
+            match mutation {
+                0 => {
+                    changed[0]["result"]["consumed"]
+                        .as_array_mut()
+                        .unwrap()
+                        .pop();
+                }
+                1 => {
+                    changed[0]["result"]["consumed"]
+                        .as_array_mut()
+                        .unwrap()
+                        .swap(0, 1);
+                }
+                2 => {
+                    changed[0]["result"]["returned"]
+                        .as_array_mut()
+                        .unwrap()
+                        .pop();
+                }
+                3 => {
+                    changed[0]["result"]["consumed"][0]["consumer"]["rank_after"] = json!(99);
+                }
+                4 => {
+                    changed.last_mut().unwrap()["full_output"]["oracle_rows_consumed"] = json!(0);
+                }
+                5 => {
+                    changed.last_mut().unwrap()["relation_policy"] = json!("first_row");
+                }
+                6 => {
+                    // A recovered receipt before another selected row is invalid.
+                    changed[0]["result"]["consumed"][0]["consumer"]["recovered_scalar"] = json!(69);
+                }
+                _ => unreachable!(),
+            }
+            assert!(
+                validate_summary(spec, &changed, total).is_err(),
+                "mutation {mutation}"
+            );
+        }
+        assert!(validate_summary(
+            Run {
+                full_output: false,
+                ..spec
+            },
+            &rows,
+            total
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn full_output_retains_unavailable_oracle_and_singleton_receipts() {
+        let spec = Run {
+            full_output: true,
+            base_lookup: true,
+            method: Some(Method::Refined),
+            draws: 4,
+            ..spec()
+        };
+        let start = Instant::now();
+        let mut bytes = vec![];
+        let summary = run(spec, start, &mut bytes).unwrap();
+        validate_summary(spec, &records(&bytes), nanos(start.elapsed())).unwrap();
+        assert_eq!(summary["status"], "incomplete");
+        assert_eq!(summary["incomplete_queries"], 1);
+        assert_eq!(summary["base_lookup"]["hits"], 3);
+        assert_eq!(summary["selected"], 3);
+        assert_eq!(summary["full_output"]["oracle_rows_returned"], 0);
+        assert_eq!(summary["full_output"]["oracle_rows_consumed"], 0);
     }
 
     #[test]
