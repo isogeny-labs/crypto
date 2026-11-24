@@ -6,7 +6,7 @@ use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::fs;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -45,17 +45,25 @@ fn frozen_f101_input(raw: &[u8]) -> Result<(FrozenF101Input, u64, String), Strin
 }
 
 fn run_frozen_f101(path: &str) -> Result<(), String> {
+    let read_start = Instant::now();
     let raw = fs::read(path).map_err(|e| format!("cannot read frozen F101 input: {e}"))?;
+    let input_read_ns = elapsed_ns(read_start);
+    let guard_start = Instant::now();
     let (input, target_x, digest) = frozen_f101_input(&raw)?;
+    let digest_guard_parse_ns = elapsed_ns(guard_start);
+    let options_start = Instant::now();
     let options = F4Options::new(Ordering::Grevlex, input.degree_bound)
         .with_budget(Duration::from_secs(input.budget_seconds));
+    let options_ns = elapsed_ns(options_start);
     let report = solve(&input.polynomials, input.n_vars, input.p, &options);
+    let sort_start = Instant::now();
     let (status, mut roots) = match report.verdict {
         Verdict::Solutions(roots) => ("solutions", roots),
         Verdict::Inconsistent => ("inconsistent", Vec::new()),
         Verdict::Undetermined => ("undetermined", Vec::new()),
     };
     roots.sort();
+    let root_sort_ns = elapsed_ns(sort_start);
     println!(
         "{}",
         json!({
@@ -68,9 +76,25 @@ fn run_frozen_f101(path: &str) -> Result<(), String> {
             "f4_runs": report.f4_runs,
             "degree_reached": report.degree_reached,
             "timed_out": report.timed_out,
+            "timing_ns": {
+                "input_read": input_read_ns,
+                "digest_guard_and_parse": digest_guard_parse_ns,
+                "options": options_ns,
+                "recursion_total": report.recursion_total_ns,
+                "f4_calls": report.f4_ns,
+                "root_selection": report.root_selection_ns,
+                "specialization": report.specialization_ns,
+                "recursion_traversal": report.recursion_traversal_ns,
+                "final_input_filter": report.final_filter_ns,
+                "root_sort": root_sort_ns,
+            },
         })
     );
     Ok(())
+}
+
+fn elapsed_ns(start: Instant) -> u64 {
+    start.elapsed().as_nanos().min(u64::MAX as u128) as u64
 }
 
 #[derive(Clone)]
