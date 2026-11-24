@@ -1,0 +1,121 @@
+{
+  "schema": "m31-main-advance-observation/v1",
+  "observed_at": "2026-11-24T04:13:28.991Z",
+  "standing": "Administrative observation; no signed or scientific verdict",
+  "base": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "source_head": "897a428a628a88730166272398f6ffb3d257585e",
+  "advanced_main": "9ef955b17dc3b0eb1d1ac49985cf1cdb0dbf4598",
+  "conflicts": [
+    "docs/ACTIVE.md",
+    "docs/session-logs/2026-11-24.md",
+    "pcc/ledger.jsonl"
+  ],
+  "common_ledger_entries": 1849,
+  "ledgers": [
+    {
+      "name": "base",
+      "commit": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+      "bytes": 1022465,
+      "sha256": "3bca85a575701783ff3c19cd80b4c53a915d50508239bf2965c766e324694e9d",
+      "entries": 1849,
+      "suffix": []
+    },
+    {
+      "name": "task",
+      "commit": "897a428a628a88730166272398f6ffb3d257585e",
+      "bytes": 1023273,
+      "sha256": "3b6a058a577a51c3297ef95b9e063a2a9f12617c43f1bbc532308969f9a1d009",
+      "entries": 1851,
+      "suffix": [
+        {
+          "at": "2026-11-24T03:53:50Z",
+          "body": {
+            "claim_id": "PCC-20261124-db5264",
+            "claim_sha256": "a1a3a98a54f7e91170aa21060dcbb32d665808c39159cd3cb7d970c83477a1de",
+            "path": "pcc/claims/PCC-20261124-db5264.json"
+          },
+          "hash": "f6453d99d34761e001d00b1d7a535996b9f5301e24f1d308645db272626150a6",
+          "prev": "5e5f0330857ee40ed2c6270d8149d7fda3198d4501fbab4c13a7e5140ecf5a0d",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1849,
+          "type": "claim"
+        },
+        {
+          "at": "2026-11-24T04:07:44Z",
+          "body": {
+            "claim_id": "PCC-20261124-9f9ff4",
+            "claim_sha256": "75ab27fd9ac17dd732f16870e17c940b9fb1aad3205d5c4a0fa8568aee4d5fdb",
+            "path": "pcc/claims/PCC-20261124-9f9ff4.json"
+          },
+          "hash": "fc971fd970f8b8d593dfd12b67ca57e758e075fc5109fe9816cfbaccc8f58d9a",
+          "prev": "f6453d99d34761e001d00b1d7a535996b9f5301e24f1d308645db272626150a6",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1850,
+          "type": "claim"
+        }
+      ]
+    },
+    {
+      "name": "main",
+      "commit": "9ef955b17dc3b0eb1d1ac49985cf1cdb0dbf4598",
+      "bytes": 1022869,
+      "sha256": "f77df841735c36ec0072e65f719014f75738fe73406e341728f457aef7c8bc5a",
+      "entries": 1850,
+      "suffix": [
+        {
+          "at": "2026-11-24T03:55:30Z",
+          "body": {
+            "claim_id": "PCC-20261124-e578cb",
+            "claim_sha256": "9da53eaeced81b5787d5376a9061cad65291d061ec60693df3ac635cbbf4e9d0",
+            "path": "pcc/claims/PCC-20261124-e578cb.json"
+          },
+          "hash": "54bfee3b0bfb4488cfc425dfae0cc99c4cece3abf74de05f76a4f801c6991925",
+          "prev": "5e5f0330857ee40ed2c6270d8149d7fda3198d4501fbab4c13a7e5140ecf5a0d",
+          "schema": "pcc.ledger-entry/v1",
+          "seq": 1849,
+          "type": "claim"
+        }
+      ]
+    }
+  ],
+  "main_changed_paths": [
+    "docs/ACTIVE.md",
+    "docs/lessons/entries/O-0f3c1de4b7b4.json",
+    "docs/lessons/entries/O-2af3299a7d98.json",
+    "docs/lessons/entries/T-b5a625cfe06a.json",
+    "docs/session-logs/2026-11-24.md",
+    "pcc/claims/PCC-20261124-e578cb.json",
+    "pcc/ledger.jsonl",
+    "problems/factor-base-shape-to-successful-work.md",
+    "research/trace_kernel_basis_20261124/PROOF.md",
+    "research/trace_kernel_basis_20261124/PROTOCOL.md",
+    "research/trace_kernel_basis_20261124/README.md",
+    "research/trace_kernel_basis_20261124/basis-selection.svg",
+    "research/trace_kernel_basis_20261124/evidence/COMMANDS.md",
+    "research/trace_kernel_basis_20261124/evidence/SHA256SUMS",
+    "research/trace_kernel_basis_20261124/evidence/clippy.stderr",
+    "research/trace_kernel_basis_20261124/evidence/clippy.stdout",
+    "research/trace_kernel_basis_20261124/evidence/development-status.json",
+    "research/trace_kernel_basis_20261124/evidence/fmt.stderr",
+    "research/trace_kernel_basis_20261124/evidence/fmt.stdout",
+    "research/trace_kernel_basis_20261124/evidence/prose-lint.stderr",
+    "research/trace_kernel_basis_20261124/evidence/prose-lint.stdout",
+    "research/trace_kernel_basis_20261124/evidence/publication.json",
+    "research/trace_kernel_basis_20261124/evidence/root-library-status.json",
+    "research/trace_kernel_basis_20261124/evidence/root-library.stderr",
+    "research/trace_kernel_basis_20261124/evidence/root-library.stdout",
+    "research/trace_kernel_basis_20261124/evidence/tests.stderr",
+    "research/trace_kernel_basis_20261124/evidence/tests.stdout",
+    "research/trace_kernel_basis_20261124/native/.gitignore",
+    "research/trace_kernel_basis_20261124/native/Cargo.lock",
+    "research/trace_kernel_basis_20261124/native/Cargo.toml",
+    "research/trace_kernel_basis_20261124/native/src/lib.rs",
+    "research/trace_kernel_basis_20261124/native/src/main.rs",
+    "research/trace_kernel_basis_20261124/report.pdf",
+    "research/trace_kernel_basis_20261124/report.typ"
+  ],
+  "source_closure_overlap": [],
+  "copilot_request": "https://github.com/isogeny-labs/crypto/pull/5120#issuecomment-7121811181",
+  "action": "No conflicted file changed; published ledgers and all claim/evidence bytes retained. No merge or rebase performed.",
+  "original_ledger_check_scope": "Earlier passing ledger receipts used base ceba74bb before main advanced; the new base-prefix check is separately retained and fails."
+}

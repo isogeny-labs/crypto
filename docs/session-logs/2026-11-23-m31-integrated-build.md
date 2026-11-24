@@ -111,3 +111,38 @@ compilation. Independent read-only inspection confirms both scripts, exact
 inputs and workflows are byte-identical to baseceba74bb. No baseline workflow
 or scientific benchmark was dispatched. Temporary untracked Cargo-cache links
 were removed after the final wrapper execution. [pcc:unverified]
+
+## 2026-11-24T04:14:04.037Z - Main advance and protected-ledger handoff
+
+### What was done
+
+Verified published source head897a428a and its exact local/remote tree. Main
+advanced to9ef955b17d through PR5121 while this work was published. A read-only
+merge preview reports conflicts only in ACTIVE, the Nov24 journal and the PCC
+ledger. Main changes no source closure used by the three M31 components. The
+new base-prefix ledger check returns1; its raw evidence is in main-advance-v1.
+One Copilot request was posted as issuecomment-7121811181 under standing AGENTS
+authorization. All previous source, report, claim and ledger bytes remain intact.
+[pcc:unverified]
+
+### Decisions made
+
+Keep the completed source PR ready and unmerged. Respect AGENTS Copilot-first
+and protected-row rules: no conflicted file is edited while its request is
+pending. Do not side-select, drop or silently rechain published ledger events.
+Preserve no-merge/no-paid-compute holds. Retain this nonconflicting handoff and
+read-only conflict observation; no additional scientific test is indicated.
+
+### Open threads
+
+Protected-ledger reconciliation and compatible-head CI remain pending. The
+existing root compiler gate and independent signed verification remain open.
+Review any Copilot resolution against both parents before treating it as done.
+
+### Errors
+
+Both published ledgers share1849 entries, then diverge: main registers e578cb;
+this task registers db5264 and9f9ff4. Neither full ledger is a prefix of the
+other. Prior passing ledger checks were againstceba74bb, before main advanced.
+No merge was attempted in the working tree and no protected content was changed.
+[pcc:unverified]
