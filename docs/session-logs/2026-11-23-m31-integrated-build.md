@@ -33,3 +33,21 @@ GitHub API created the tracking branch/commit/PR, and Git fetched those objects.
 One RR5 worker stopped at an automated content check after a source-pin audit;
 root inspected its partial diff and is continuing the bounded general API work.
 No experiment or third-party target was submitted.
+
+## 2026-11-24T03:55:50Z - Native components published and evidence registered
+
+### What was done
+
+Published the three requested source components in 709a68ad6367751e0d2b7362de22bca35cb3d631 on PR #5120. Graph gate 06 reports 7 tests plus 128 dense-oracle systems; structured final gate reports 10 unit and 3 CLI tests; RR5 all-targets reports 42 library and 8 example tests. Retained all failed attempts and exact commands, source hashes and independent review. Rendered and inspected the four-page report and editable SVG. Registered producer claim PCC-20261124-db5264 with unsigned attestations; no signed standing is claimed. [pcc:unverified]
+
+### Decisions made
+
+The graph coordinator's full admission moved into bounded children before the final gate; startup accounting is explicit. Native p and subgroup n remain distinct. Structured extraction is m=3 with an explicit infinity chart; RR5 owns the distinct-four chart. The generic resultant record IDC1hd6568d78855aef4c uses the identity format's fixed M61 and is auxiliary evaluated algebra, not an M31 instance or formal proof. Preserve no-merge/no-paid-compute holds and leave canonical performance panels unchanged. [pcc:unverified]
+
+### Open threads
+
+Root-wide qualification remains open: the bounded compiler check reports E0425 in unchanged prime_root_trace.rs, including powers, gcds, previous, r and g. Independent signed PCC and admitted same-capture/structured/B677 scientific panels remain separate dependencies. No background scientific job or comparison is running.
+
+### Errors
+
+The managed Cargo wrapper selected an empty cache, so installed direct executables were used. Tracked sparse dependencies were hydrated. The first hydrated root build lost its execution handle with no terminal status; the cached test retry and focused compiler check each returned 124 at their caps. A wider diagnostic refused two sparse unrelated binary targets. Rustfmt is unavailable. Final diff-check reports raw-log EOF blank lines plus the tested Cargo manifest's final blank line, retained byte-for-byte. The source Git tree c99a645334fe9357825d2de2b099e01837142403 exactly matches the published tree, including six symlinks and both new lockfiles. [pcc:unverified]

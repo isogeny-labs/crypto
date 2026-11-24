@@ -79,6 +79,11 @@ earlier attempts remain intact. These observations remain producer evidence
 until the repository's independent signed verification process supplies a
 verdict. [pcc:unverified]
 
+Source and retained evidence are published in commit
+`709a68ad6367751e0d2b7362de22bca35cb3d631`. Producer claim
+`PCC-20261124-db5264` binds the aggregate evidence and report; it has no signed
+verdict. The recorded PCC standing remains unverified. [pcc:unverified]
+
 Read [the implementation report](reports/REPORT.md), its
 [PDF](reports/m31-integrated-build.pdf), and the
 [independent review](evidence/INDEPENDENT_REVIEW.md). They separate exact
