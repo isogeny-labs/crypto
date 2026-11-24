@@ -1,0 +1,147 @@
+{
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "positive_query": [
+    1688097559,
+    1788262902
+  ],
+  "positive_witness_point_replay": true,
+  "source_closure": "split22-sources.sha256",
+  "audited_arms": [
+    {
+      "file": "split22-final-positive-m2m-p1-s8k.json",
+      "sha256": "ab2c7412eb65d7094f171588d9b2446279eb78579166f0f889cb020cdf11db8f",
+      "case": "positive",
+      "matrix_cap": 2000000,
+      "pair_batch": 1,
+      "monomial_cap": 8192,
+      "cold_wall_ms": 242,
+      "resource_limit": {
+        "limit": 8192,
+        "observed": 8202,
+        "overflowed": false,
+        "resource": "symbolic_monomials",
+        "stage": "basis_update"
+      },
+      "solutions_visited": 0,
+      "accepted_relations": 0
+    },
+    {
+      "file": "split22-final-positive-m2m-p4-s8k.json",
+      "sha256": "c9f05298102fafde808f60616c7e8f163add9c374c7e8c371f76a93256cba07c",
+      "case": "positive",
+      "matrix_cap": 2000000,
+      "pair_batch": 4,
+      "monomial_cap": 8192,
+      "cold_wall_ms": 126,
+      "resource_limit": {
+        "limit": 2000000,
+        "observed": 2006253,
+        "overflowed": false,
+        "resource": "matrix_entries",
+        "stage": "symbolic_workspace"
+      },
+      "solutions_visited": 0,
+      "accepted_relations": 0
+    },
+    {
+      "file": "split22-final-public-m2m-p1-s8k.json",
+      "sha256": "e21313198453c0d0bbc53199ff4faa10f04ce3ddcf82106b765369ef8c7c8a49",
+      "case": "public",
+      "matrix_cap": 2000000,
+      "pair_batch": 1,
+      "monomial_cap": 8192,
+      "cold_wall_ms": 241,
+      "resource_limit": {
+        "limit": 8192,
+        "observed": 8202,
+        "overflowed": false,
+        "resource": "symbolic_monomials",
+        "stage": "basis_update"
+      },
+      "solutions_visited": 0,
+      "accepted_relations": 0
+    },
+    {
+      "file": "split22-positive-m2m-p1-s16k.json",
+      "sha256": "6321ed7b3c89e6365542c2ca419872688bed3891cc049444558eff949e3e073f",
+      "case": "positive",
+      "matrix_cap": 2000000,
+      "pair_batch": 1,
+      "monomial_cap": 16384,
+      "cold_wall_ms": 567,
+      "resource_limit": {
+        "limit": 16384,
+        "observed": 16430,
+        "overflowed": false,
+        "resource": "symbolic_monomials",
+        "stage": "basis_update"
+      },
+      "solutions_visited": 0,
+      "accepted_relations": 0
+    },
+    {
+      "file": "split22-positive-m2m-p1-s32k.json",
+      "sha256": "cd58d025ecab23e20399443b5828e66b619039d90657ba8791ed2d1c27dc6348",
+      "case": "positive",
+      "matrix_cap": 2000000,
+      "pair_batch": 1,
+      "monomial_cap": 32768,
+      "cold_wall_ms": 3301,
+      "resource_limit": {
+        "limit": 32768,
+        "observed": 32819,
+        "overflowed": false,
+        "resource": "symbolic_monomials",
+        "stage": "basis_update"
+      },
+      "solutions_visited": 0,
+      "accepted_relations": 0
+    },
+    {
+      "file": "split22-positive-m2m-p1-s64k.json",
+      "sha256": "0e97c788fac3bdeb0cbb136e3186d691f5580d17660ff2bede3736dfcec409b7",
+      "case": "positive",
+      "matrix_cap": 2000000,
+      "pair_batch": 1,
+      "monomial_cap": 65536,
+      "cold_wall_ms": 5402,
+      "resource_limit": {
+        "limit": 2000000,
+        "observed": 2000794,
+        "overflowed": false,
+        "resource": "matrix_entries",
+        "stage": "symbolic_workspace"
+      },
+      "solutions_visited": 0,
+      "accepted_relations": 0
+    },
+    {
+      "file": "split22-positive-m8m-p1-s64k.json",
+      "sha256": "b84d83e1b0835b20deb7f31fc2b93612f653d0223122dfd5d374615322285d3e",
+      "case": "positive",
+      "matrix_cap": 8000000,
+      "pair_batch": 1,
+      "monomial_cap": 65536,
+      "cold_wall_ms": 13986,
+      "resource_limit": {
+        "limit": 65536,
+        "observed": 65540,
+        "overflowed": false,
+        "resource": "symbolic_monomials",
+        "stage": "basis_update"
+      },
+      "solutions_visited": 0,
+      "accepted_relations": 0
+    }
+  ],
+  "claim_boundary": "all arms incomplete; no unknown-query extraction or target solve"
+}

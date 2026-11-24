@@ -4,6 +4,7 @@ pub mod b677_fixture;
 pub mod extractor;
 pub mod relation_adapter;
 mod selector_circuit;
+mod split_selector;
 
 #[cfg(test)]
 mod independent_tests;

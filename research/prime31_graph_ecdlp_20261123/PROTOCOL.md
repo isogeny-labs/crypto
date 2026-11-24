@@ -289,6 +289,44 @@ split systems still exceed the resource cap or their fully charged cost
 cannot approach matched rho, the branch split is rejected. The certificate
 and source hash are in `evidence/rr5-b677-prerequisite-01/selector-split-gate.json`.
 
+### Bounded algebraic 2+2 split admission
+
+`split_selector.rs` implements the exact two-Dickson/two-Y7 branch using
+unknown monic quadratic factors `U_D` and `U_Y`. Four equations enforce
+`U=U_D U_Y` for the public RR5 quartic; separate modular circuits enforce
+`D mod U_D=0` and `Y mod U_Y=0`. The system has 61 variables, 62 input
+equations, and 250 input terms. A grader-side assignment for the frozen
+positive relation satisfies every equation, including all 18 quotient and
+remainder gates. The candidate API receives only the public query and
+fixture; signed roots and point sums remain checked after algebraic solving.
+
+`native/split_gate.rs` ran a frozen positive query and the separate public
+`Q` under a 30-second deadline. At two million matrix entries, 8,192
+symbolic monomials and one critical pair per step, both returned
+`ResourceLimit` at `basis_update` (observed 8,202 monomials), with zero
+visited solutions and zero extracted relations. Four pairs per step instead
+hit `symbolic_workspace` (2,006,253 versus two million matrix entries).
+Increasing the monomial cap to 16,384 and 32,768 with one pair advanced
+the positive run but stopped at observed 16,430 and 32,819 monomials.
+At 65,536 monomials, the positive arm hit the two-million matrix cap after
+5,402 ms; raising only that cap to eight million then hit 65,540 monomials
+after 13,986 ms. These are incomplete, source-bound attempts, not empty
+charts. `verify_split22_gate.py` independently replays the grader-side
+positive point equation and checks that every promoted arm retained its
+exact curve, fixture, limits, and incomplete status. The summary and source
+hashes are in `evidence/rr5-b677-prerequisite-01/`. Earlier cap-only runs
+in that directory predate the final limit CLI and remain development
+receipts, outside the promoted comparison.
+
+The branch split reduces the algebraic input size but has not produced a
+public-query row. Critical-pair batching moves the admission bottleneck;
+it does not yet reduce extraction cost enough to support an index-calculus
+advantage. The next falsifier is a source-exact pair-selection or symbolic
+closure strategy that completes the positive branch and at least one
+unplanted public query under a frozen resource budget, with every candidate
+relation independently replayed. Only then can graph rank and a cold
+same-target cost be measured for this algebraic source.
+
 ### Generic signed four-sum end-to-end control on the B677 curve
 
 `native/mitm_four.rs` supplies a separate, point-keyed meet-in-the-middle
