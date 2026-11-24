@@ -30,4 +30,17 @@ if [ "$PART" = 131101 ]; then
     --quartic-seeds 131101=$S \
     --qc 3.0 --max-h 1 --curves $N --seeds 2 --rho-cap 1 --threads 1 --out "$OUT/replay_131101.jsonl"
 fi
+if [ "$PART" = diag ]; then
+  # The curves of every fallback pair, with the binary's uncounted per-attempt rank
+  # diagnosis (--quartic-diag; lesson L-4c4c2ac6ef29), 1 thread.  Checked by diag_check.py:
+  # every committed field must be unchanged by the flag.
+  "$BIN" run --primes 16411,65537 --genera 2 --arms - --curve-seeds 16411=1,65537=1 \
+    --quartic --quartic-arms 2lp-sfb,2lp-sfb-sge --quartic-inhom 4 --quartic-sge 8,1.5,64 \
+    --quartic-seeds 16411=93/252/366,65537=156 --quartic-diag \
+    --qc 3.0 --max-h 1 --curves 5 --seeds 2 --rho-cap 1 --threads 1 --out "$OUT/diag_main.jsonl"
+  "$BIN" run --primes 131101 --genera 2 --arms - --curve-seeds 131101=1 \
+    --quartic --quartic-arms 2lp-sfb,2lp-sfb-sge --quartic-inhom 4 --quartic-sge 8,1.5,64 \
+    --quartic-seeds 131101=53/177/288 --quartic-diag \
+    --qc 3.0 --max-h 1 --curves 3 --seeds 2 --rho-cap 1 --threads 1 --out "$OUT/diag_131101.jsonl"
+fi
 echo REPLAY_DONE "$PART"
