@@ -295,6 +295,11 @@ top-quotient vector-space dimensions are `6*2^16=393,216` and
 M31 confirmed both core Hilbert sequences. These lengths concern the
 homogeneous highest-form ideals; they are not F4 row counts, allocated
 memory, solution counts or completed field-operation costs.
+Replay with SymPy: `python3 research/prime31_graph_ecdlp_20261123/verify_pencil_projection_top.py`.
+The script builds the actual two-bit-per-slot equations, checks the exact
+Boolean projection identities, compares both highest-form ideals and
+enumerates their standard monomials over M31. The `k=8` lengths follow
+from the general independent-bit factor in the displayed Hilbert series.
 
 For the conditional eight-bit M31 capacity case, projection leaves
 14 bits and three core variables: 17 variables at canonical degree 19.
