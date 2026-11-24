@@ -376,14 +376,13 @@ pub struct Projection {
 }
 /// Expand graph coefficients over integers and retain source IDs into the
 /// complete composite proofs. Never treat cancellation modulo2 or L as zero.
-pub fn project(
+pub fn project_integer(
     domain: &Domain<'_>,
     edges: &[CompositeEdge],
     witness: &Witness,
-    l: u64,
-) -> Result<Projection, &'static str> {
-    if !(3..1u64 << 63).contains(&l) || witness.len() > 4096 {
-        return Err("bounded projection modulus/witness required");
+) -> Result<Vec<(usize, i64)>, &'static str> {
+    if witness.len() > 4096 {
+        return Err("bounded projection witness required");
     }
     let mut small = BTreeMap::<usize, i64>::new();
     let mut large = BTreeMap::<Class, i64>::new();
@@ -411,6 +410,18 @@ pub fn project(
     }
     let integer_small: Vec<_> = small.into_iter().filter(|(_, c)| *c != 0).collect();
     domain.replay(&integer_small, &[])?;
+    Ok(integer_small)
+}
+pub fn project(
+    domain: &Domain<'_>,
+    edges: &[CompositeEdge],
+    witness: &Witness,
+    l: u64,
+) -> Result<Projection, &'static str> {
+    if !(3..1u64 << 63).contains(&l) {
+        return Err("bounded projection modulus required");
+    }
+    let integer_small = project_integer(domain, edges, witness)?;
     let modulo_small = integer_small
         .iter()
         .filter_map(|&(i, c)| {
