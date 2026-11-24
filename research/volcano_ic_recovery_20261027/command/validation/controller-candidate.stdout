@@ -1,0 +1,103 @@
+
+running 72 tests
+test campaign::tests::ambiguous_restore_and_fresh_are_separate_permanent_charges ... ok
+test cloud::campaign_cas_tests::campaign_commit_requires_new_revision_same_uid_and_exact_ledger ... ok
+test campaign::tests::policy_deadline_and_forged_history_reject ... ok
+test cloud::campaign_cas_tests::expired_campaign_retains_terminal_evidence_without_admitting_work ... ok
+test campaign::tests::eight_routes_share_balance_and_restart_does_not_refund ... ok
+test cloud::command_mode_tests::completion_selects_upload_only_for_command_mode ... ok
+test cloud::command_mode_tests::command_seal_binding_rejects_mismatch_and_unsafe_lists ... ok
+test cloud::command_mode_tests::computation_pvc_size_is_fixed_for_ecbench_and_bound_for_command_mode ... ok
+test cloud::computation_owner_tests::matching_annotation_cannot_hide_wrong_namespace_or_owner_transport ... ok
+test cloud::fieldref_default_tests::fresh_selector_defaults_preserve_resource_field_items ... ok
+test cloud::fieldref_default_tests::only_omitted_fieldref_api_version_defaults_to_v1 ... ok
+test cloud::fieldref_default_tests::fresh_api_roundtrip_preserves_exact_identity_comparison ... ok
+test cloud::owner_exit_collection_tests::owner_binding_is_not_closure_and_rejects_wrong_attempt_or_duplicate ... ok
+
+running 1 test
+test cloud::owner_exit_collection_tests::owner_capture_is_bounded_and_drains_without_unbounded_storage ... ok
+test cloud::tests::runtime_class_requires_all_fields_and_exact_container_runtime ... ok
+test contract::tests::command_pvc_gib_is_bounded_and_default_keeps_hash ... ok
+test contract::tests::command_request_accepts_the_documented_shape_and_example ... ok
+test contract::tests::command_request_rejects_invalid_shapes ... ok
+test contract::tests::diagnostic_transport_preserves_raw_bytes_and_separate_spec_bindings ... ok
+
+running 1 test
+test contract::tests::diagnostic_transport_retains_total_request_cap ... ok
+test contract::tests::ecbench_requests_reject_command_only_fields_and_keep_restore_bounds ... ok
+test contract::tests::expiry_never_supplies_a_fresh_budget ... ok
+test contract::tests::fresh_owner_requires_diagnostics_and_original_deadline ... ok
+test contract::tests::max_restores_bounds_depend_on_mode ... ok
+test contract::tests::memory_preserves_legacy_request_bytes_and_binds_explicit_eight_gib ... ok
+test contract::tests::recorded_ecbench_request_keeps_its_submitted_hash_and_bytes ... ok
+test contract::tests::request_hash_binds_source_spec_and_original_deadline ... ok
+test contract::tests::schema_command_bounds_match_native_contract ... ok
+test contract::tests::schema_memory_enum_matches_native_contract_and_is_optional ... ok
+test contract::tests::strict_contract_rejects_unknown_fields_and_unpinned_sources ... ok
+test cloud::owner_exit_collection_tests::owner_publication_preserves_exact_bytes_and_conflicts ... ok
+test model::tests::ambiguous_controller_ownership_is_not_a_lease_expiry ... ok
+test model::tests::command_completion_is_terminal_records_any_exit_and_skips_benchmark ... ok
+test model::tests::command_mode_admits_many_restores_within_its_budget ... ok
+test model::tests::expired_original_deadline_prevents_restore ... ok
+test model::tests::failed_measurement_cannot_spawn_a_second_epoch ... ok
+test model::tests::generation_cannot_move_between_runs_or_attempts ... ok
+test model::tests::incomplete_generation_keeps_prior_committed_progress ... ok
+test model::tests::legacy_checkpoint_state_without_intent_is_not_guessed ... ok
+test model::tests::missing_or_stopped_worker_is_not_a_fence ... ok
+test model::tests::periodic_checkpoints_survive_restart_on_both_sides_of_continue ... ok
+test model::tests::prune_targets_only_the_newest_committed_command_generation ... ok
+test model::tests::recorded_ecbench_state_round_trips_without_command_fields ... ok
+test model::tests::same_run_name_never_accepts_a_new_command_or_deadline ... ok
+test supervisor::absolute_binding_tests::delayed_schedule_does_not_rebase_absolute_reservation ... ok
+test io::tests::relative_atomic_file_has_a_durable_current_directory_parent ... ok
+test supervisor::command_mode_tests::argv0_and_listed_binaries_are_hash_verified ... ok
+test supervisor::command_mode_tests::command_launch_execs_argv_with_bound_environment ... ok
+test supervisor::command_mode_tests::command_completion_records_any_exit_but_ecbench_requires_zero ... ok
+test supervisor::command_mode_tests::ecbench_launch_argv_and_environment_are_unchanged ... ok
+test supervisor::command_mode_tests::manifest_runtime_bytes_are_unchanged_without_command_binaries ... ok
+test supervisor::command_mode_tests::command_perf_filter_denies_perf_and_reports_seccomp_filter_mode ... ok
+test supervisor::command_mode_tests::prune_is_never_executed_for_ecbench_requests ... ok
+test supervisor::command_mode_tests::prune_plan_keeps_exactly_the_latest_two_committed ... ok
+test supervisor::command_mode_tests::seal_hashes_outputs_and_logs_without_following_links ... ok
+test supervisor::cutoff_transport_tests::legacy_cutoff_is_unchanged_and_ambient_transport_rejected ... ok
+test supervisor::deadline::monotonic_tests::backwards_utc_never_extends_shared_admission_anchor ... ok
+test supervisor::deadline::monotonic_tests::fractional_admission_does_not_round_up_the_remaining_budget ... ok
+test supervisor::command_mode_tests::prune_generations_deletes_only_old_local_directories ... ok
+test supervisor::owner_observation::tests::duplicate_metadata_cannot_establish_a_binding ... ok
+test supervisor::owner_observation::tests::explicit_missing_reap_stays_partial_and_does_not_retry_payload ... ok
+test cloud::tests::checkpoint_readback_rejects_corruption_version_and_manifest_changes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 71 filtered out; finished in 0.04s
+
+test cloud::tests::checkpoint_readback_rejects_corruption_version_and_manifest_changes ... ok
+test supervisor::owner_observation::tests::session_reader_rejects_symlink_components_leaves_and_oversize ... ok
+test supervisor::owner_observation::tests::terminal_kill_observation_never_invents_reap_or_closure ... ok
+test supervisor::tests::changed_ids_capabilities_and_missing_nnp_are_rejected ... ok
+test supervisor::tests::completed_computation_wins_race_with_checkpoint_request ... ok
+test supervisor::tests::real_exited_child_requires_recapture_without_reaping_it ... ok
+test supervisor::tests::restored_group_zero_is_rejected_before_continue ... ok
+test supervisor::tests::running_and_traced_tasks_cannot_be_recapture_candidates ... ok
+test cloud::tests::memory_envelope_reaches_computation_and_fresh_l2_manifests ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 71 filtered out; finished in 0.06s
+
+test cloud::tests::memory_envelope_reaches_computation_and_fresh_l2_manifests ... ok
+test supervisor::owner_observation::tests::real_fake_exec_reap_and_checkpoint_race_share_owner ... FAILED
+test supervisor::deadline::tests::bounded_fake_commands_preserve_failure_signal_and_cutoff ... ok
+
+failures:
+
+---- supervisor::owner_observation::tests::real_fake_exec_reap_and_checkpoint_race_share_owner stdout ----
+
+thread 'supervisor::owner_observation::tests::real_fake_exec_reap_and_checkpoint_race_share_owner' (2059) panicked at src/owner_observation.rs:497:13:
+assertion `left == right` failed
+  left: Null
+ right: 2069
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    supervisor::owner_observation::tests::real_fake_exec_reap_and_checkpoint_race_share_owner
+
+test result: FAILED. 71 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+

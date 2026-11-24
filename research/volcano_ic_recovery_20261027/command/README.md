@@ -1,5 +1,8 @@
 # Exact-input command packaging
 
+[One-page report](REPORT.pdf) · [Editable flow](flow.svg) ·
+[Development receipt](validation/component.json) · [Raw public test/build records](validation/)
+
 This directory prepares the original collector for the controller's command
 mode. The public source instance, radius 12, 48 setup attempts, one-hour
 scientific deadline and table representation stay byte-identical to the
