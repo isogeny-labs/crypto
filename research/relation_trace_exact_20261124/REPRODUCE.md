@@ -95,3 +95,11 @@ relation_labels::{audit,replay}. They accept the existing Poly/Row types or a
 LabelSystem, respectively. See the module tests for certified-consequence,
 formal-label tautology, useful homogeneous connector, inconsistent-model,
 bounded-derivation and resource-censor controls.
+
+## Rebuild the visual report
+
+Run python3 render-figure.py and python3 render-report.py from this directory.
+These scripts only lay out recorded native values and prose. PDF generation
+uses Typst when available; the tested fallback uses the installed Pandoc,
+XeLaTeX and Inkscape. Initial missing-Typst and fallback font-wrapper warnings
+remain in raw/. Inspect every final PDF page after rebuilding.

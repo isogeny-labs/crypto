@@ -17,7 +17,9 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Extend existing certified-relations diagnostics with raw-versus-closed rank and original-ideal witnesses, plus a P/Q coefficient audit; correctness only, original speed goal unchanged (Codex, started 2026-11-24, branch lane/relation-information-leads-20261123; PR #5102).
+- [ ] Original 15× relation-pipeline goal remains open: recover coherent current-root qualification and pending 36-case integration, inventory strongest controls, then test prospectively declared joint closure-preserving pruning and full-boundary repeated performance; diagnostic component delivered in PR #5102, no measured speed gain (Codex, branch lane/relation-information-leads-20261123). [pcc:unverified]
+
+- [x] Extend existing certified-relations diagnostics with raw-versus-closed rank and original-ideal witnesses, plus a P/Q coefficient audit; correctness only, original speed goal unchanged (Codex, completed 2026-11-24, branch lane/relation-information-leads-20261123; PR #5102).
 
 - [x] Devise and document new relation leads: coefficient-information audit, certified degree-fall selection and overlapping line families; final reader405/PDF and two limited native identity checks, source-only Lean explicitly unverified; no measured gain (Codex, completed 2026-11-24, branch lane/relation-information-leads-20261123; PR #5102; follows merged #4989). [pcc:unverified]
 - [x] Classify minimal three-row split-tangent supports and test their necessary identities on frozen P-192 traces: complete U/V/W coverage and zero witnesses; conditional minimum of four added rows, native controls/report/PDF retained (Codex, completed frozen-data component 2026-11-24, branch lane/p192-three-row-circuits-20261124, PR #5112; actual individual-image collection remains unexecuted). [pcc:unverified]
