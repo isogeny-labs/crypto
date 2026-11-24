@@ -1,0 +1,64 @@
+   Compiling zmij v1.0.23
+   Compiling proc-macro2 v1.0.107
+   Compiling serde_json v1.0.151
+   Compiling version_check v0.9.5
+   Compiling unicode-ident v1.0.26
+   Compiling generic-array v0.14.7
+   Compiling quote v1.0.47
+   Compiling typenum v1.20.1
+   Compiling crossbeam-utils v0.8.23
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.190
+   Compiling crossbeam-epoch v0.9.21
+   Compiling zerocopy v0.8.60
+   Compiling syn v3.0.6
+   Compiling autocfg v1.5.1
+   Compiling serde v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling crossbeam-deque v0.8.8
+   Compiling getrandom v0.2.17
+   Compiling num-traits v0.2.19
+   Compiling serde_derive v1.0.229
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling rayon-core v1.13.0
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling ppv-lite86 v0.2.21
+   Compiling digest v0.10.7
+   Compiling rand_core v0.6.4
+   Compiling cpufeatures v0.2.17
+   Compiling sha2 v0.10.9
+   Compiling rand_chacha v0.3.1
+   Compiling either v1.18.0
+   Compiling rayon v1.12.0
+   Compiling rr5-original-f4-closure v0.1.0 (/workspace/scratch/cdbe94c88979/crypto/research/prime31_four_summand_20261122/native/f4-source)
+   Compiling num-integer v0.1.47
+   Compiling rand v0.8.8
+error: failed to run custom build command for `rr5-original-f4-closure v0.1.0 (/workspace/scratch/cdbe94c88979/crypto/research/prime31_four_summand_20261122/native/f4-source)`
+
+Caused by:
+  process didn't exit successfully: `/workspace/scratch/cdbe94c88979/rr5-target/release/build/rr5-original-f4-closure/84848781bd619b76/out/build_script_build` (exit status: 101)
+  --- stdout
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/f4_fp.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/f4_fp/reuse.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/f4_fp/pair_certificate.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/f4_fp/certified.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/challenge_ladder.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/glv_invariant_base.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/groebner_f4.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/ic_boundary.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/pq_groebner_f2.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/prime_fast.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/residual_walk.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/semaev_prime_poly.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/prime_hyperelliptic/ops.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/identity_certificate.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/hash/sha256.rs
+
+  --- stderr
+
+  thread 'main' (1239) panicked at f4-source/build.rs:23:44:
+  cannot read /workspace/scratch/cdbe94c88979/crypto/src/hash/sha256.rs: No such file or directory (os error 2)
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+warning: build failed, waiting for other jobs to finish...

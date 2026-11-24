@@ -1,0 +1,217 @@
+   Compiling crypto v0.1.0 (/workspace/scratch/cdbe94c88979/crypto)
+error[E0428]: the name `round73_mersenne_single_fold` is defined multiple times
+    --> src/cryptanalysis/prime_radical_root.rs:5410:1
+     |
+5098 | mod round73_mersenne_single_fold {
+     | -------------------------------- previous definition of the module `round73_mersenne_single_fold` here
+...
+5410 | mod round73_mersenne_single_fold {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `round73_mersenne_single_fold` redefined here
+     |
+     = note: `round73_mersenne_single_fold` must be defined only once in the type namespace of this module
+
+error[E0425]: cannot find value `powers` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2408:29
+     |
+2408 |                 let state = powers.get_mut(id).ok_or("missing power begin")?;
+     |                             ^^^^^^ not found in this scope
+     |
+note: similarly named function `vpower` defined here
+    --> src/cryptanalysis/prime_root_trace.rs:2105:1
+     |
+2105 | fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: a function with a similar name exists
+     |
+2408 -                 let state = powers.get_mut(id).ok_or("missing power begin")?;
+2408 +                 let state = vpower.get_mut(id).ok_or("missing power begin")?;
+     |
+
+error[E0425]: cannot find value `powers` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2443:29
+     |
+2443 |                 let state = powers.remove(id).ok_or("missing power begin")?;
+     |                             ^^^^^^ not found in this scope
+     |
+note: similarly named function `vpower` defined here
+    --> src/cryptanalysis/prime_root_trace.rs:2105:1
+     |
+2105 | fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: a function with a similar name exists
+     |
+2443 -                 let state = powers.remove(id).ok_or("missing power begin")?;
+2443 +                 let state = vpower.remove(id).ok_or("missing power begin")?;
+     |
+
+error[E0425]: cannot find value `gcds` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2520:30
+     |
+2520 |                 let (a, b) = gcds.remove(id).ok_or("missing gcd begin")?;
+     |                              ^^^^ not found in this scope
+
+error[E0425]: cannot find value `powers` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2608:21
+     |
+2608 |                 if !powers.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+     |                     ^^^^^^ not found in this scope
+     |
+note: similarly named function `vpower` defined here
+    --> src/cryptanalysis/prime_root_trace.rs:2105:1
+     |
+2105 | fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: a function with a similar name exists
+     |
+2608 -                 if !powers.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+2608 +                 if !vpower.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+     |
+
+error[E0425]: cannot find value `gcds` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2608:43
+     |
+2608 |                 if !powers.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+     |                                           ^^^^ not found in this scope
+
+error[E0425]: cannot find value `previous` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2696:25
+     |
+2696 |                         previous = Some(r);
+     |                         ^^^^^^^^
+     |
+help: you might have meant to introduce a new binding
+     |
+2696 |                         let previous = Some(r);
+     |                         +++
+
+error[E0425]: cannot find value `r` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2696:41
+     |
+2696 |                         previous = Some(r);
+     |                                         ^ not found in this scope
+     |
+note: function `crate::symmetric::kuznyechik::r` exists but is inaccessible
+    --> src/symmetric/kuznyechik.rs:93:1
+     |
+  93 | fn r(block: &mut [u8; 16]) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^ not accessible
+
+error[E0425]: cannot find value `r` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2697:61
+     |
+2697 |                         product = vproduct(&product, &[(p - r) % p, 1], p);
+     |                                                             ^ not found in this scope
+     |
+note: function `crate::symmetric::kuznyechik::r` exists but is inaccessible
+    --> src/symmetric/kuznyechik.rs:93:1
+     |
+  93 | fn r(block: &mut [u8; 16]) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^ not accessible
+
+error[E0425]: cannot find value `g` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2699:24
+     |
+2699 |                     if g != *linear_part || product != g {
+     |                        ^
+     |
+help: the binding `g` is available in a different scope in the same function
+    --> src/cryptanalysis/prime_root_trace.rs:2692:29
+     |
+2692 | ...   let g = if let Some(cached) = verified_linear_part.as_ref() { cached.clone() } else { vgcd(report.polynomial.clone(), trim(x...
+     |           ^
+note: these functions exist but are inaccessible
+    --> src/cryptanalysis/md5_differential.rs:54:1
+     |
+  54 | fn g(x: u32, y: u32, z: u32) -> u32 {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::g`: not accessible
+     |
+    ::: src/ecc/point.rs:1372:5
+     |
+1372 |     fn g() -> Point {
+     |     ^^^^^^^^^^^^^^^ `crate::ecc::point::tests::g`: not accessible
+     |
+    ::: src/hash/blake2b.rs:49:1
+     |
+  49 | fn g(v: &mut [u64; 16], a: usize, b: usize, c: usize, d: usize, x: u64, y: u64) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::blake2b::g`: not accessible
+     |
+    ::: src/hash/blake2s.rs:36:1
+     |
+  36 | fn g(v: &mut [u32; 16], a: usize, b: usize, c: usize, d: usize, x: u32, y: u32) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::blake2s::g`: not accessible
+     |
+    ::: src/hash/md4.rs:39:1
+     |
+  39 | fn g(x: u32, y: u32, z: u32) -> u32 {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::g`: not accessible
+     |
+    ::: src/symmetric/gost_magma.rs:83:1
+     |
+  83 | fn g(x: u32, k: u32) -> u32 {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::gost_magma::g`: not accessible
+     |
+    ::: src/symmetric/seed.rs:154:1
+     |
+ 154 | fn g(x: u32) -> u32 {
+     | ^^^^^^^^^^^^^^^^^^^ `crate::symmetric::seed::g`: not accessible
+     |
+    ::: src/symmetric/skipjack.rs:81:1
+     |
+  81 | fn g(cv: &[u8; 10], k: usize, w: u16) -> u16 {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::skipjack::g`: not accessible
+
+error[E0425]: cannot find value `g` in this scope
+    --> src/cryptanalysis/prime_root_trace.rs:2699:56
+     |
+2699 |                     if g != *linear_part || product != g {
+     |                                                        ^
+     |
+help: the binding `g` is available in a different scope in the same function
+    --> src/cryptanalysis/prime_root_trace.rs:2692:29
+     |
+2692 | ...   let g = if let Some(cached) = verified_linear_part.as_ref() { cached.clone() } else { vgcd(report.polynomial.clone(), trim(x...
+     |           ^
+note: these functions exist but are inaccessible
+    --> src/cryptanalysis/md5_differential.rs:54:1
+     |
+  54 | fn g(x: u32, y: u32, z: u32) -> u32 {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::cryptanalysis::md5_differential::g`: not accessible
+     |
+    ::: src/ecc/point.rs:1372:5
+     |
+1372 |     fn g() -> Point {
+     |     ^^^^^^^^^^^^^^^ `crate::ecc::point::tests::g`: not accessible
+     |
+    ::: src/hash/blake2b.rs:49:1
+     |
+  49 | fn g(v: &mut [u64; 16], a: usize, b: usize, c: usize, d: usize, x: u64, y: u64) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::blake2b::g`: not accessible
+     |
+    ::: src/hash/blake2s.rs:36:1
+     |
+  36 | fn g(v: &mut [u32; 16], a: usize, b: usize, c: usize, d: usize, x: u32, y: u32) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::blake2s::g`: not accessible
+     |
+    ::: src/hash/md4.rs:39:1
+     |
+  39 | fn g(x: u32, y: u32, z: u32) -> u32 {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::hash::md4::g`: not accessible
+     |
+    ::: src/symmetric/gost_magma.rs:83:1
+     |
+  83 | fn g(x: u32, k: u32) -> u32 {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::gost_magma::g`: not accessible
+     |
+    ::: src/symmetric/seed.rs:154:1
+     |
+ 154 | fn g(x: u32) -> u32 {
+     | ^^^^^^^^^^^^^^^^^^^ `crate::symmetric::seed::g`: not accessible
+     |
+    ::: src/symmetric/skipjack.rs:81:1
+     |
+  81 | fn g(cv: &[u8; 10], k: usize, w: u16) -> u16 {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::symmetric::skipjack::g`: not accessible
+
+Some errors have detailed explanations: E0425, E0428.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `crypto` (lib test) due to 11 previous errors

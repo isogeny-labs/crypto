@@ -27,3 +27,39 @@ Finish the exact published-source bundle qualification, required root-library ga
 
 ### Errors
 Initial native compilation stopped at a stale original-source checksum; re-extraction found the one test-only selected-range change and an unchanged selected Fp range. Sparse source hydration initially omitted src/hash/sha256.rs; the build inventory now includes src. Rust 1.100.0 uses a different Cargo build-directory layout, so source-manifest discovery supports both layouts. Read-only review caught and corrected omitted hash-map validation, misleading failure summaries, coupled evidence downloads, live Pod args/restart checks, and the results-bucket mismatch. CLI push authentication is unavailable; publication uses the existing GitHub connector. These are development/integration observations, not scientific extraction results. [pcc:unverified]
+
+## 2026-11-23 16:31 PST — RR5 payload qualification and concrete admission failures
+
+### What was done
+
+Published implementation 8aa70e211f9a42e9823e859b1c7197c8677dceca on PR #5099. The exact-source static bundle and 32 library, 19 native receipt-checker, 8 public-example, 57 mock runner and 67 mock artifact-custody tests returned success; actionlint and maintained shell contracts returned success. Retained raw development evidence and unsigned PCC-20261124-21920c. The final required root-library retry restored 64 tracked sparse inputs and still exited 101 with 11 compiler errors in root code identical to main. Preserved earlier PCC-20261124-daf86c and added PCC-20261124-eb40d0 for the final root failure and checkpoint diagnostic. [pcc:unverified]
+
+### Decisions made
+
+Complete and publish the execution-integration component with the failed root gate explicitly reported. Preserve all original proof subjects and source identities. In an isolated worktree, merge canonical main e1552f1e0942690228900cc86eb6b0c8b4de88c1 and append only the unchanged unpublished claim bodies through maintained PCC tooling; archive their old suffix and registration map. The separate final root/checkpoint claim follows that historical transfer checkpoint. Incoming source inventory remains byte-equal to the qualified bundle. [pcc:unverified]
+
+### Open threads
+
+Finish PR evidence publication and current-head CI/review. A docs/ACTIVE.md conflict was sent to Copilot under the standing rule; the conflicted file remains untouched while that request is pending. Registered B677 extraction remains unrun. The actual checkpoint gate has no configured AWS profile/upload token; full raw-results read authorization, finite remaining budget and live all-tenant capacity are also unestablished. No cloud build, image publication or scientific Job has been started. No unchanged transport retry or access expansion is authorized by this implementation. [pcc:unverified]
+
+### Errors
+
+Final root compilation reports duplicate round73_mersenne_single_fold and missing powers/gcds/previous/r/g bindings in unchanged prime_radical_root.rs and prime_root_trace.rs. The maintained checkpoint gate exits 1 with no available upload transport. The global benchmark gate is not established in the partial checkout because existing study inputs are absent and its generated progress is stale; this component adds no benchmark record. KB and Conductor remain unavailable. [pcc:unverified]
+
+## 2026-11-23 16:35 PST — RR5 shared task-list conflict resolved after Copilot wait
+
+### What was done
+
+Copilot received the documented merge request on PR #5099 and supplied no response or branch update during the remaining qualification work. Posted the fallback explanation, then resolved the sole docs/ACTIVE.md conflict by retaining every incoming main entry and updating only this task and its separate execution blocker. The pending merge keeps both published implementation 8aa70e2 and main e1552f1 as parents.
+
+### Decisions made
+
+Use a normal merge with expected-head publication, without rebasing or force-pushing. Mark the execution-integration component complete and retain the frozen extraction as blocked. Reviewed every inventoried input against the qualified bundle after the merge; no source mismatch was found. The maintained ledger check accepts the incoming prefix and hash chain; new claims remain unsigned. [pcc:unverified]
+
+### Open threads
+
+Publish the full evidence commit, mark PR #5099 ready, and inspect current-head CI and reviews. Keep merge controls active. The next scientific action still requires established checkpoint transport, full raw-results access, known remaining budget and live capacity.
+
+### Errors
+
+No Copilot response was observed before taking over. The unchanged root-library compiler failures and unavailable checkpoint transport remain recorded rather than patched around.

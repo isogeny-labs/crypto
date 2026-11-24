@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:31:19Z",
+ "id": "PCC-20261123-4d17d5",
+ "kind": "statement",
+ "producer": {
+  "commit": "d96c3718d5aa154b55924630d720414d09e464ff",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/TANGENT_TRACE_PROTOCOL.md",
+    "sha256": "680a2c923665406b0577ad32f7b135904ccf1f924e5562879cbadc371e44a28f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/tangent_traces.cpp",
+    "sha256": "8bdbf0e1630114bb86dbb46c03599aedfc202a384b3cf20196af2012f51201af"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/target_traces.cpp",
+    "sha256": "9f460a885ca5d6e62a5c5ae946d63dda8166b93e630fbe7a6a0d54b0a44910cf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/traces-v1/result.json",
+    "sha256": "83bc314ae804e647366d8055d5e72e236742377a1e8355c4794a554814a55988"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/traces-v1/target-result.json",
+    "sha256": "72256e10d614f1cd3e58f27d8045e4568b5208643fe6edd02de38d81e1f56ec9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/traces-v1/pre-call-manifest.sha256",
+    "sha256": "ffdfa4c2ab922c3d34e19972686c0fa4d3043c82506a050563a9484e1a1553ad"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-recorded-pool",
+ "statement": "Frozen traces-v1 exhausts all226 recorded tangents with exact double-root/product reconstruction and matching GMP/OpenSSL aggregate traces and discriminant Euler tests. Residuals:102 distinct rational splits,124 irreducible quadratics,0 repeats,0 affine-degree exceptions. Aggregate traces have0 collisions and0 old signed-base/O aliases;union rank6. Exact quotient-ring target encoder checks identity tangent closed divisor zero and reference encoder agreement;changed remainder rejects. No roots extracted or new curve points;producer unsigned;finite scope only."
+}

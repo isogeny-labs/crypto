@@ -1,2 +1,4 @@
 # A unified diff's blank context line is one literal space; preserve audit bytes.
 ic_boundary.rs.range-1.diff whitespace=-blank-at-eol
+# Preserve the exact PCC-pinned test stdout, including its final blank line.
+evidence/tests.stdout whitespace=-blank-at-eof
