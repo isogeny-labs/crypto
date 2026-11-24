@@ -179,6 +179,104 @@ pub struct System {
 }
 
 impl System {
+    /// Four-leaf composition of the existing oriented S3 pair identity.
+    /// Slots: x0..x3, y0,t0,w0, y2,t1,w1, outer slope, then tower wires.
+    #[cfg(feature = "production-controls")]
+    pub fn oriented(base: &crate::Base, target: Point, tower: bool) -> Self {
+        let curve = base.curve;
+        let mut names = [
+            "x0", "x1", "x2", "x3", "y0", "t0", "w0", "y2", "t1", "w1", "s",
+        ]
+        .map(str::to_owned)
+        .to_vec();
+        if tower {
+            for slot in 0..4 {
+                names.extend((1..base.depth).map(|j| format!("d{slot}_{j}")));
+            }
+        }
+        let vars: Vec<_> = (0..names.len())
+            .map(|i| Polynomial::variable(curve.p, names.len(), i))
+            .collect();
+        let c = |v| vars[0].constant(v);
+        let mut equations = vec![];
+        for (x, z, y, t, w) in [(0, 1, 4, 5, 6), (2, 3, 7, 8, 9)] {
+            let (x, z, y, t, w) = (&vars[x], &vars[z], &vars[y], &vars[t], &vars[w]);
+            equations
+                .push(&(&y.square() - &(&x.square() * x)) - &(&x.scale(curve.a) + &c(curve.b)));
+            equations.push(&(&(&t.square() - w) - x) - z);
+            equations.push(
+                &(&(&(y * t).scale(2) + &(&(z - x) * w)) - &x.square().scale(2))
+                    - &(&(x * z) + &c(curve.a)),
+            );
+        }
+        // The line through the two pair sums and -target. Its cubic x roots
+        // have sum s^2, which also enforces the tangent case of equal sums.
+        let slope = &vars[10];
+        equations.push(&(&(&slope.square() - &vars[6]) - &vars[9]) - &c(target.x));
+        for (x, y, t, w) in [(0, 4, 5, 6), (2, 7, 8, 9)] {
+            let sum_y = &(&vars[t] * &(&vars[x] - &vars[w])) - &vars[y];
+            equations.push(&(&sum_y - &(slope * &(&vars[w] - &c(target.x)))) + &c(target.y));
+        }
+        for slot in 0..4 {
+            if tower {
+                let mut previous = &vars[slot];
+                for level in 1..=base.depth {
+                    let next = if level == base.depth {
+                        c(base.terminal)
+                    } else {
+                        vars[11 + slot * (base.depth - 1) + level - 1].clone()
+                    };
+                    equations.push(&(&previous.square() - &c(2)) - &next);
+                    if level < base.depth {
+                        previous = &vars[11 + slot * (base.depth - 1) + level - 1];
+                    }
+                }
+            } else {
+                let member = base
+                    .unsigned
+                    .iter()
+                    .fold(c(1), |f, point| &f * &(&vars[slot] - &c(point.x)));
+                equations.push(member);
+            }
+        }
+        Self { names, equations }
+    }
+
+    #[cfg(feature = "production-controls")]
+    pub fn native_equations(&self) -> Vec<crypto_lib::cryptanalysis::f4_fp::Poly> {
+        use crypto_lib::cryptanalysis::f4_fp::{normalise, Ordering};
+        self.equations
+            .iter()
+            .map(|poly| {
+                let terms: Vec<_> = poly
+                    .terms
+                    .iter()
+                    .map(|(e, c)| (e.iter().map(|v| u32::from(*v)).collect(), *c as u64))
+                    .collect();
+                normalise(&terms, poly.p as u64, Ordering::Grevlex)
+            })
+            .collect()
+    }
+
+    #[cfg(all(test, feature = "production-controls"))]
+    pub fn satisfied(&self, assignment: &[i64]) -> bool {
+        assignment.len() == self.names.len()
+            && self.equations.iter().all(|f| f.evaluate(assignment) == 0)
+    }
+
+    #[cfg(all(test, feature = "production-controls"))]
+    pub fn fix_leaf_x(&mut self, xs: [i64; 4]) {
+        let sample = &self.equations[0];
+        self.equations.extend(
+            xs.iter()
+                .enumerate()
+                .map(|(i, x)| {
+                    &Polynomial::variable(sample.p, sample.width, i) - &sample.constant(*x)
+                })
+                .collect::<Vec<_>>(),
+        );
+    }
+
     pub fn at_cutoff(curve: Fixture, target: Point, levels: usize, expected: [i64; 4]) -> Self {
         assert!(levels <= 4);
         let mut names = vec![];

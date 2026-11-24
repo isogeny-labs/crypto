@@ -1,4 +1,6 @@
 //! Native, bounded development solver for the regular four-summand chart.
+#[cfg(feature = "production-controls")]
+mod oriented;
 mod polynomial;
 #[cfg(feature = "production-controls")]
 mod production;
@@ -482,6 +484,8 @@ enum Method {
     Cofactor,
     #[cfg(feature = "production-controls")]
     CofactorMsolve,
+    #[cfg(feature = "production-controls")]
+    Oriented(bool),
 }
 
 impl Method {
@@ -493,6 +497,13 @@ impl Method {
             Self::Cofactor => "ProductionCofactor".into(),
             #[cfg(feature = "production-controls")]
             Self::CofactorMsolve => "ProductionCofactorMsolve".into(),
+            #[cfg(feature = "production-controls")]
+            Self::Oriented(tower) => if tower {
+                "OrientedTower"
+            } else {
+                "OrientedDense"
+            }
+            .into(),
         }
     }
 
@@ -502,7 +513,7 @@ impl Method {
             Self::Refined => Mode::Distinct,
             // The cofactor solver searches the full distinct-x RR5 chart.
             #[cfg(feature = "production-controls")]
-            Self::Cofactor | Self::CofactorMsolve => Mode::Quadratic,
+            Self::Cofactor | Self::CofactorMsolve | Self::Oriented(_) => Mode::Quadratic,
         }
     }
 }
@@ -517,6 +528,10 @@ fn mode(value: &str) -> Option<Method> {
         "cofactor" => Some(Method::Cofactor),
         #[cfg(feature = "production-controls")]
         "cofactor-msolve" => Some(Method::CofactorMsolve),
+        #[cfg(feature = "production-controls")]
+        "oriented-dense" => Some(Method::Oriented(false)),
+        #[cfg(feature = "production-controls")]
+        "oriented-tower" => Some(Method::Oriented(true)),
         _ => None,
     }
 }
@@ -537,6 +552,10 @@ fn discover(
     budget: Duration,
 ) -> Discovery {
     let deadline = Instant::now() + budget;
+    #[cfg(feature = "production-controls")]
+    if let Method::Oriented(tower) = method {
+        return oriented::discover(base, target, tower, deadline);
+    }
     #[cfg(feature = "production-controls")]
     if method == Method::Cofactor {
         return production::discover(base, target, deadline, budget);
