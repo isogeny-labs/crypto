@@ -16,10 +16,10 @@
 
   | row | step | off | on |
   |:--|:--|:--|:--|
-  | k0n53 | stream push | 14.1 | 12.7 |
-  | k0n53 | whole build | 47.8 | 46.6 |
-  | k0n61 | stream push | 15.6 | 14.7 |
-  | k0n61 | whole build | 51.7 | 48.8 |
+  | icv1-f2m53-tm56619371-dac20a85 | stream push | 14.1 | 12.7 |
+  | icv1-f2m53-tm56619371-dac20a85 | whole build | 47.8 | 46.6 |
+  | icv1-f2m61-t158598901-ab42b6c5 | stream push | 15.6 | 14.7 |
+  | icv1-f2m61-t158598901-ab42b6c5 | whole build | 51.7 | 48.8 |
 
   - Build wall times overlapped between the arms.
   - Certificates and counts were identical in all 12 processes.
