@@ -626,6 +626,59 @@ solving degree, rational roots and charged relation work still need a
 matched M31 execution before selecting this encoding over the all-bit
 or dense systems.
 
+### More than one projected Boolean bit
+
+The one-bit calculation extends to the **literal product** that
+eliminates `j_x` Boolean bits from the first quadratic secant slot and
+`j_z` from the second, with `0<=j_x,j_z<=k`. Each projected product
+vanishes exactly when at least one eliminated Boolean assignment makes
+its original ordinate residual vanish. This preserves the existence of
+a Boolean lift pointwise; repeated subset sums may give repeated factors
+in the literal product. Deduplicating those factors would define a
+different presentation and needs a separate top-degree calculation.
+
+Put `n=2k-j_x-j_z`, `A=2^(j_x+1)` and `B=2^(j_z+1)`. For nonzero
+quadratic leading coefficients, the canonical highest-form ideal of
+this specified presentation is
+
+`(m^2, x*z, x^A-2^(j_x)*alpha*m*x^(A-1),
+  z^B-2^(j_z)*beta*m*z^(B-1), b_1^2,...,b_n^2)`,
+
+where `alpha,beta` are the signed inverse leading coefficients. The
+ordinate products have top forms `(x^2-alpha*m*x)^(2^(j_x))` and
+`(z^2-beta*m*z)^(2^(j_z))`; reducing their binomial expansions modulo
+`m^2` gives the displayed generators. In lex order `x>z>m`, the core
+leading monomials are `m^2,x*z,x^A,z^B`; their S-pairs reduce to zero.
+The core standard monomials are `m^e` times `1`, `x^i` for `1<=i<A`,
+or `z^i` for `1<=i<B`, with `e` in `{0,1}`. The independent Boolean
+squares therefore give Hilbert series
+
+`(1+t)^(n+1)*(1+sum_(i=1)^(A-1)t^i+sum_(i=1)^(B-1)t^i)`,
+
+top-quotient length `2*(A+B-1)*2^n`, and first-vanishing degree
+`n+max(A,B)+1`. An independent SymPy M31 check of the core leading
+monomials passed for `(j_x,j_z)=(0,0),(0,1),(1,1),(1,2),(2,2),
+(2,3),(3,3)`; the formulas follow from the displayed algebra, not
+from those finite checks alone. This generalizes the one-bit result
+first proposed in the [PR discussion](https://github.com/isogeny-labs/crypto/pull/5097#issuecomment-7146126668).
+
+| Bits per slot `k` | Projected per slot `j` | Variables | First-vanishing degree | Top-quotient length |
+| ---: | ---: | ---: | ---: | ---: |
+| 8 | 0 | 19 | 19 | 393,216 |
+| 8 | 1 | 17 | 19 | 229,376 |
+| 8 | 2 | 15 | 21 | 122,880 |
+| 10 | 0 | 23 | 23 | 6,291,456 |
+| 10 | 1 | 21 | 23 | 3,670,016 |
+| 10 | 2 | 19 | 25 | 1,966,080 |
+
+At either capacity, two-bit projection reduces the homogeneous quotient
+length by about 1.87 times relative to one-bit projection, while raising
+the first-vanishing degree by two. These are presentation invariants, not
+completed affine solving degrees, F4 sizes or relation-finding costs.
+The eight-bit selector still lacks a 677-abscissa construction; the
+ten-bit selector has a support-existence bound but lacks an exact B677
+restriction and a completed same-target cost result.
+
 ## Existing presentations and the next falsifier
 
 The balanced S4/S3 eight-leaf presentation and the S4-to-two-S3 auxiliary
