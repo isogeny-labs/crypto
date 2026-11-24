@@ -1,0 +1,98 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T02:25:27Z",
+ "id": "PCC-20261124-8b98c4",
+ "kind": "theorem",
+ "producer": {
+  "commit": "093ce372fe7e39075c7a805c1cb45e4cd2bfd516",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "a80685837710280fee5c6eeb97951f543dff4030de8ee82b5542789cdf097fcd",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/lean/Arithmetic.lean",
+   "theorem": "TorsionColumn.actual_inverse8_bezout"
+  },
+  {
+   "decl_sha256": "a86b4c4e15424985dfb7a3796ffccb905ce56ace1e3c7877e8818c2358450aee",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/lean/Arithmetic.lean",
+   "theorem": "TorsionColumn.toy_inverse8_bezout"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/PROTOCOL.md",
+    "sha256": "f53d3eb525fe519d04a2982b78038dc3184f18d896674d3524bc055abd19597f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/PROOF_MAP.md",
+    "sha256": "c8fc5d7d7f8bd21781047451a0ec258380987a570c68f77808c83551da9ec673"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/DECLARATION_BINDINGS.json",
+    "sha256": "4e13f4d31b2fb34de3986f3209ac6c293b9d896024bf2e95a31e23fda13c78ab"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/lean/Arithmetic.lean",
+    "sha256": "5a5454b0bd2857051306c8661e251a59049388efa66f2db8b1f7670313b72a90"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/lean/Assembly.lean",
+    "sha256": "7c501694e06f7df67389589bf9fd2194b31aac24e2879df65d6fa2375c9068a9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/lean/lakefile.toml",
+    "sha256": "5185997e1ce61b4dbee56585e84ab070b68a2c5ae69676c3adb4028df0599bef"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/lean/lake-manifest.json",
+    "sha256": "337a6ca44db264bf0e6c360d0a93b5d5e4fa9f883df94492a82fc2efc1eedafb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/lean/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/lean-gate/research_curve25519_torus_native_20261115_torsion-column-transport-v1_lean/audit.log",
+    "sha256": "93fc3460ed218d2bb73826bbfa3cdcc61f77269976fed65fa63b4cdc553a0a3b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/torsion-column-transport-v1/lean-gate/research_curve25519_torus_native_20261115_torsion-column-transport-v1_lean/build.log",
+    "sha256": "fb833ea1f055d3f8f500b4c2d72d5069051d86a74f3540ba8422f3a1540b68b1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Focused project gate2named/0failing/0trusted, numeric endpoints no axioms. Anonymous abstract homomorphism assemblies only; no native curve/group/map/kernel-cardinality or rank/cost theorem. Producer unsigned until signed standing.",
+ "statement": "Two concrete Nat inverse-eight Bezout instance obligations for the RFC7748 subgroup order and fixed toy13."
+}
