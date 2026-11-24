@@ -129,26 +129,31 @@ labels into one point-dependent evaluation. [pcc:unverified]
 
 A separate candidate applies a rational horizontal isogeny chain
 `φ:E → E′`, then returns the field quadratic character of
-`x(φ(P)) - c` as the ray sign. If its degrees are `ℓ₁,…,ℓₖ`, the
-pullback rational function has map degree `D = 2∏ℓᵢ`. For any *single*
-rational function whose field quadratic character equals the scalar's
-Legendre symbol at every nonidentity P-192 point, a character-sum
-argument gives `D > 2^92`: since `(2/r)=+1`, the character of
-`h=(f∘[2])/f` is `+1` on the nonidentity points, while the
-[Perret bound](https://inspirehep.net/files/e5d2251413a4ea90899d95c2354cc66a)
-gives `r-2 ≤ 2 deg(h)√p ≤ 10D√p`. The needed integer check is
-`(r-2)^2 > 100·2^184·p`. The bound applies because `h` is not a
-geometric square: otherwise the odd-valuation support of `f` would be
-fixed under inverse `[2]`, which quadruples its size. Empty support
-would make `f` a constant times a square over `F_p(E)` (the rational
-degree-zero divisor class group has odd order), contradicting the
-balanced scalar signs. [pcc:unverified]
+`x(φ(P)) - c` as the ray sign. The earlier pullback degree calculation
+`D = 2 deg(φ) > 2^92` supplied only a necessary chain-length gate.
+There is a stronger conclusion: **no chain length makes this one
+endpoint coordinate character exact on all nonidentity P-192 points.**
+[pcc:unverified]
 
-Consequently `∏ℓᵢ > 2^91` is necessary for that endpoint character:
-at least 25 degree-13 maps, 27 degree-11 maps, or 40 degree-5 maps.
-These thresholds exclude shorter chains in this specific model. They do
-not establish exactness or low evaluation cost for longer chains, and do
-not cover combinations of endpoint features. [pcc:unverified]
+Indeed, `#E(F_p)=#E′(F_p)=r` is prime. If `φ` is nonzero on rational
+points, its restriction is a bijection. An exact endpoint sign would
+therefore make the degree-two function `f′(R)=x(R)-c` an exact scalar
+quadratic character, up to a fixed sign, on every nonidentity point of
+`E′(F_p)`. Since `(2/r)=+1`, the field character of
+`h′=(f′∘[2])/f′` would be `+1` there. The
+[Perret bound](https://inspirehep.net/files/e5d2251413a4ea90899d95c2354cc66a)
+gives `r-2 ≤ 2 deg(h′)√p ≤ 20√p`, impossible for P-192:
+`(r-2)^2 > 400p`. The bound applies because `h′` is not a geometric
+square: the odd-valuation support of `f′` is nonempty (there is no
+rational 2-torsion on the odd-order endpoint curve), and inverse `[2]`
+would quadruple its size if `h′` were square. If `φ` is zero on rational
+points, its output is constant there and cannot give balanced scalar
+signs. [pcc:unverified]
+
+This excludes exactness only for one endpoint function `x-c` followed
+by one field quadratic character. It does not rule out combinations of
+features, other endpoint functions of sufficiently high degree, or a
+biased rather than exact predictor. [pcc:unverified]
 
 ## Reproduction and checks
 
