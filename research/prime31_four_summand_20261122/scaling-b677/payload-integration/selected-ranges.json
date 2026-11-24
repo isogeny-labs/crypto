@@ -1,0 +1,666 @@
+{
+  "schema": "rr5.selection-provenance-audit/v1",
+  "old_commit": "307c514f39a8602d4ba1c5c0821a4c410159615d",
+  "current_commit": "3dd555c5d9b54c5bc0f3507eb6a917a5cf64e1f6",
+  "build_script_path": "research/prime31_four_summand_20261122/native/f4-source/build.rs",
+  "workspace_build_sha256": "70275e5c0c778cdf205358937705a09535e60dcea75c9f1a2c36414f53a6b792",
+  "old_build_sha256": "e1b30a91dcafeb8589d421548683d7b0ebce5f8ca5f4aec1450457561c1a8b8e",
+  "current_build_sha256": "e1b30a91dcafeb8589d421548683d7b0ebce5f8ca5f4aec1450457561c1a8b8e",
+  "selection_definitions_equal_old": true,
+  "selection_definitions_equal_current": true,
+  "selected_file_count": 9,
+  "selected_range_count": 18,
+  "all_selected_byte_identical": false,
+  "all_old_wholes_match_pins": false,
+  "all_workspace_wholes_match_current": false,
+  "all_producer_selections_match_historical_manifest": true,
+  "historical_manifest_path": "research/prime31_four_summand_20261122/scaling-b677/evidence/build-02/source-manifest.json",
+  "historical_manifest_sha256": "fc9e89ef5ac4b9d898ab503a3432cef338f9177999e382d5c068b4753da66eb8",
+  "pinned_ic_reference_recovery": {
+    "source_commit": "624d3f3112529a80d68590dce9ab32fc463e4a19",
+    "path": "src/cryptanalysis/ic_boundary.rs",
+    "whole_sha256": "ee70c40d611bea2a86e782e8513d6e18be49ca575e1159a42512afb18dc346ce",
+    "whole_bytes": 999509,
+    "matches_expected_pin": true,
+    "selected_sha256": "5102a5633c36b96097c34d15e72abbfb441fc669053d14b8e8ebaec3fc4af450",
+    "selected_matches_producer": true,
+    "ranges": [
+      {
+        "scope": "complete FieldOps and GroupOps types and implementations",
+        "start_anchor": "/// The field operations behind the group operations: modular\n",
+        "end_anchor": "/// Nanoseconds per native unit, measured on the host for the instance at\n",
+        "byte_start_inclusive": 8302,
+        "byte_end_exclusive": 11284,
+        "bytes": 2982,
+        "sha256": "6c0fb3e89c1a346b194ace4d6004be9c0fdcf50687e60759f28ca3ded6df05ca"
+      },
+      {
+        "scope": "actual map hasher, all word modular arithmetic, RowStatus, IncrementalGauss, SiblingPair, and complete CountedGroup trait",
+        "start_anchor": "// \u2500\u2500 A fast hasher for point keys",
+        "end_anchor": "fn mix(v: u64) -> u64 {",
+        "byte_start_inclusive": 42828,
+        "byte_end_exclusive": 77718,
+        "bytes": 34890,
+        "sha256": "cf654b900b55ca692389191c12e761f19bc43722b157d3f23905894a9459d5fc"
+      },
+      {
+        "scope": "actual pick_word architecture dispatch",
+        "start_anchor": "/// `a` when `first`, else `b`, as one `cmov` where the target has one.  A\n",
+        "end_anchor": "#[inline]\nfn negmod(a: u64, m: u64) -> u64 {",
+        "byte_start_inclusive": 89175,
+        "byte_end_exclusive": 90214,
+        "bytes": 1039,
+        "sha256": "9e6eb6328c35c807e8d8187802f8f0b1d516954babfd40f127eb2f23ddbd4d8e"
+      },
+      {
+        "scope": "CubicClasses type and complete inherent implementation required by PrimeCurve's automorphism method; no rho class implementation",
+        "start_anchor": "pub struct CubicClasses {",
+        "end_anchor": "impl RhoClasses<PrimeCurve> for CubicClasses {",
+        "byte_start_inclusive": 95208,
+        "byte_end_exclusive": 97403,
+        "bytes": 2195,
+        "sha256": "34280bffedef9100183714ba18da3143d1e70df0573d253a1acff612ceb609d1"
+      },
+      {
+        "scope": "complete PrimePoint, PrimeCurve, CountedFp, Jacobi helper, and full CountedGroup implementation including native walk overrides",
+        "start_anchor": "// \u2500\u2500 Prime-field curves on one word",
+        "end_anchor": "/// A prime-field instance: curve, prime-order subgroup, generator.\n",
+        "byte_start_inclusive": 245934,
+        "byte_end_exclusive": 277999,
+        "bytes": 32065,
+        "sha256": "863271d3a95be39112929b52f7de8c7c6955085246d2267969879e3483aa4d2f"
+      },
+      {
+        "scope": "complete unchanged architecture-specific prefetch helper used by OpenCoefMap",
+        "start_anchor": "#[inline(always)]\n#[allow(unused_unsafe)]\nfn prefetch_cache_line<T>(lines: &[T], index: usize) {\n",
+        "end_anchor": "struct GuardLineSet {\n",
+        "byte_start_inclusive": 358460,
+        "byte_end_exclusive": 359034,
+        "bytes": 574,
+        "sha256": "61962b897e0b1dd481635f62e917406c43240a6a578c78b80a6be54a62c38ea0"
+      }
+    ]
+  },
+  "files": [
+    {
+      "path": "src/cryptanalysis/challenge_ladder.rs",
+      "generated": "challenge_prime.rs",
+      "pinned_whole_sha256": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
+      "old_whole_sha256": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
+      "current_whole_sha256": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
+      "workspace_whole_sha256": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
+      "old_whole_bytes": 13529,
+      "current_whole_bytes": 13529,
+      "old_matches_pin": true,
+      "workspace_matches_current": true,
+      "whole_file_byte_identical": true,
+      "ranges": [
+        {
+          "index": 0,
+          "old": {
+            "scope": "mulm, powm, and actual challenge_ladder deterministic primality test",
+            "start_anchor": "/// `a\u00b7b mod m`.\n",
+            "end_anchor": "/// Square root mod an odd prime by Tonelli\u2013Shanks; `None` for a\n",
+            "byte_start_inclusive": 1401,
+            "byte_end_exclusive": 2500,
+            "bytes": 1099,
+            "sha256": "3637225cf7a90d3b44a070a1f16fb5efdef7274eb5d2ee2d1778fcd4db7efc98"
+          },
+          "current": {
+            "scope": "mulm, powm, and actual challenge_ladder deterministic primality test",
+            "start_anchor": "/// `a\u00b7b mod m`.\n",
+            "end_anchor": "/// Square root mod an odd prime by Tonelli\u2013Shanks; `None` for a\n",
+            "byte_start_inclusive": 1401,
+            "byte_end_exclusive": 2500,
+            "bytes": 1099,
+            "sha256": "3637225cf7a90d3b44a070a1f16fb5efdef7274eb5d2ee2d1778fcd4db7efc98"
+          },
+          "byte_identical": true
+        }
+      ],
+      "selected_old_sha256": "3637225cf7a90d3b44a070a1f16fb5efdef7274eb5d2ee2d1778fcd4db7efc98",
+      "selected_current_sha256": "3637225cf7a90d3b44a070a1f16fb5efdef7274eb5d2ee2d1778fcd4db7efc98",
+      "selected_bytes": 1099,
+      "selected_byte_identical": true,
+      "producer_selection_matches_historical_manifest": true
+    },
+    {
+      "path": "src/cryptanalysis/glv_invariant_base.rs",
+      "generated": "glv_roots.rs",
+      "pinned_whole_sha256": "32c38ce6d7207030b50696b36e109fc7acebda7ba3ee518c7083e3fb08722336",
+      "old_whole_sha256": "32c38ce6d7207030b50696b36e109fc7acebda7ba3ee518c7083e3fb08722336",
+      "current_whole_sha256": "32c38ce6d7207030b50696b36e109fc7acebda7ba3ee518c7083e3fb08722336",
+      "workspace_whole_sha256": "32c38ce6d7207030b50696b36e109fc7acebda7ba3ee518c7083e3fb08722336",
+      "old_whole_bytes": 74256,
+      "current_whole_bytes": 74256,
+      "old_matches_pin": true,
+      "workspace_matches_current": true,
+      "whole_file_byte_identical": true,
+      "ranges": [
+        {
+          "index": 0,
+          "old": {
+            "scope": "mulm, addm, subm, and negm",
+            "start_anchor": "/// `a\u00b7b mod m` without overflow, `m < 2^63`.\n",
+            "end_anchor": "/// The multiplicative order of `lambda` modulo the prime `r`, by\n",
+            "byte_start_inclusive": 5604,
+            "byte_end_exclusive": 5974,
+            "bytes": 370,
+            "sha256": "ef3b6ba8fbc8cc9115eb0b9addf540faee952188f1ac2e34fa8afd238e73a1ba"
+          },
+          "current": {
+            "scope": "mulm, addm, subm, and negm",
+            "start_anchor": "/// `a\u00b7b mod m` without overflow, `m < 2^63`.\n",
+            "end_anchor": "/// The multiplicative order of `lambda` modulo the prime `r`, by\n",
+            "byte_start_inclusive": 5604,
+            "byte_end_exclusive": 5974,
+            "bytes": 370,
+            "sha256": "ef3b6ba8fbc8cc9115eb0b9addf540faee952188f1ac2e34fa8afd238e73a1ba"
+          },
+          "byte_identical": true
+        },
+        {
+          "index": 1,
+          "old": {
+            "scope": "complete polynomial helpers and exact rational-root extraction, including the actual deadline-aware randomized split",
+            "start_anchor": "/// Coefficients low to high, no trailing zeros.\n",
+            "end_anchor": "// \u2500\u2500 Degree-2 CM endomorphisms by V\u00e9lu (type C)",
+            "byte_start_inclusive": 39122,
+            "byte_end_exclusive": 44821,
+            "bytes": 5699,
+            "sha256": "9f290ad35bd805a22af32e596ec5d69fccb84c2d33487532a2812eb040379c21"
+          },
+          "current": {
+            "scope": "complete polynomial helpers and exact rational-root extraction, including the actual deadline-aware randomized split",
+            "start_anchor": "/// Coefficients low to high, no trailing zeros.\n",
+            "end_anchor": "// \u2500\u2500 Degree-2 CM endomorphisms by V\u00e9lu (type C)",
+            "byte_start_inclusive": 39122,
+            "byte_end_exclusive": 44821,
+            "bytes": 5699,
+            "sha256": "9f290ad35bd805a22af32e596ec5d69fccb84c2d33487532a2812eb040379c21"
+          },
+          "byte_identical": true
+        }
+      ],
+      "selected_old_sha256": "1d755812916dd0fdf488bc486e9611fbe029e48c365e0629c56dbe831faca19a",
+      "selected_current_sha256": "1d755812916dd0fdf488bc486e9611fbe029e48c365e0629c56dbe831faca19a",
+      "selected_bytes": 6069,
+      "selected_byte_identical": true,
+      "producer_selection_matches_historical_manifest": true
+    },
+    {
+      "path": "src/cryptanalysis/groebner_f4.rs",
+      "generated": "monomial_order.rs",
+      "pinned_whole_sha256": "36b0bc3232df109b08feb246b0ff97d132397470a6897c84ac63500d5005974f",
+      "old_whole_sha256": "36b0bc3232df109b08feb246b0ff97d132397470a6897c84ac63500d5005974f",
+      "current_whole_sha256": "36b0bc3232df109b08feb246b0ff97d132397470a6897c84ac63500d5005974f",
+      "workspace_whole_sha256": "36b0bc3232df109b08feb246b0ff97d132397470a6897c84ac63500d5005974f",
+      "old_whole_bytes": 21200,
+      "current_whole_bytes": 21200,
+      "old_matches_pin": true,
+      "workspace_matches_current": true,
+      "whole_file_byte_identical": true,
+      "ranges": [
+        {
+          "index": 0,
+          "old": {
+            "scope": "actual Ordering enum and cmp_monomial",
+            "start_anchor": "// \u2500\u2500 Monomial ordering",
+            "end_anchor": "/// Leading monomial of `f` under `ord`, as `(exponent, coefficient)`.\n",
+            "byte_start_inclusive": 2922,
+            "byte_end_exclusive": 4508,
+            "bytes": 1586,
+            "sha256": "6e778a51bac23df95521897998c2094fb07e046364ac5a13a8317952c0ce56f5"
+          },
+          "current": {
+            "scope": "actual Ordering enum and cmp_monomial",
+            "start_anchor": "// \u2500\u2500 Monomial ordering",
+            "end_anchor": "/// Leading monomial of `f` under `ord`, as `(exponent, coefficient)`.\n",
+            "byte_start_inclusive": 2922,
+            "byte_end_exclusive": 4508,
+            "bytes": 1586,
+            "sha256": "6e778a51bac23df95521897998c2094fb07e046364ac5a13a8317952c0ce56f5"
+          },
+          "byte_identical": true
+        }
+      ],
+      "selected_old_sha256": "6e778a51bac23df95521897998c2094fb07e046364ac5a13a8317952c0ce56f5",
+      "selected_current_sha256": "6e778a51bac23df95521897998c2094fb07e046364ac5a13a8317952c0ce56f5",
+      "selected_bytes": 1586,
+      "selected_byte_identical": true,
+      "producer_selection_matches_historical_manifest": true
+    },
+    {
+      "path": "src/cryptanalysis/ic_boundary.rs",
+      "generated": "ic_boundary.rs",
+      "pinned_whole_sha256": "ee70c40d611bea2a86e782e8513d6e18be49ca575e1159a42512afb18dc346ce",
+      "old_whole_sha256": "86963eab84b584b987362c7d9ba183c45d7fefc6207eb792a743670997f21bbd",
+      "current_whole_sha256": "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
+      "workspace_whole_sha256": "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
+      "old_whole_bytes": 999562,
+      "current_whole_bytes": 1000016,
+      "old_matches_pin": false,
+      "workspace_matches_current": true,
+      "whole_file_byte_identical": false,
+      "ranges": [
+        {
+          "index": 0,
+          "old": {
+            "scope": "complete FieldOps and GroupOps types and implementations",
+            "start_anchor": "/// The field operations behind the group operations: modular\n",
+            "end_anchor": "/// Nanoseconds per native unit, measured on the host for the instance at\n",
+            "byte_start_inclusive": 8302,
+            "byte_end_exclusive": 11284,
+            "bytes": 2982,
+            "sha256": "6c0fb3e89c1a346b194ace4d6004be9c0fdcf50687e60759f28ca3ded6df05ca"
+          },
+          "current": {
+            "scope": "complete FieldOps and GroupOps types and implementations",
+            "start_anchor": "/// The field operations behind the group operations: modular\n",
+            "end_anchor": "/// Nanoseconds per native unit, measured on the host for the instance at\n",
+            "byte_start_inclusive": 8302,
+            "byte_end_exclusive": 11284,
+            "bytes": 2982,
+            "sha256": "6c0fb3e89c1a346b194ace4d6004be9c0fdcf50687e60759f28ca3ded6df05ca"
+          },
+          "byte_identical": true
+        },
+        {
+          "index": 1,
+          "old": {
+            "scope": "actual map hasher, all word modular arithmetic, RowStatus, IncrementalGauss, SiblingPair, and complete CountedGroup trait",
+            "start_anchor": "// \u2500\u2500 A fast hasher for point keys",
+            "end_anchor": "fn mix(v: u64) -> u64 {",
+            "byte_start_inclusive": 42828,
+            "byte_end_exclusive": 77718,
+            "bytes": 34890,
+            "sha256": "cf654b900b55ca692389191c12e761f19bc43722b157d3f23905894a9459d5fc"
+          },
+          "current": {
+            "scope": "actual map hasher, all word modular arithmetic, RowStatus, IncrementalGauss, SiblingPair, and complete CountedGroup trait",
+            "start_anchor": "// \u2500\u2500 A fast hasher for point keys",
+            "end_anchor": "fn mix(v: u64) -> u64 {",
+            "byte_start_inclusive": 42828,
+            "byte_end_exclusive": 78191,
+            "bytes": 35363,
+            "sha256": "dfddca8d826b072b868153b8e67af24fd645f9b9bb9b951e18b48e3e8b32b5cc"
+          },
+          "byte_identical": false
+        },
+        {
+          "index": 2,
+          "old": {
+            "scope": "actual pick_word architecture dispatch",
+            "start_anchor": "/// `a` when `first`, else `b`, as one `cmov` where the target has one.  A\n",
+            "end_anchor": "#[inline]\nfn negmod(a: u64, m: u64) -> u64 {",
+            "byte_start_inclusive": 89175,
+            "byte_end_exclusive": 90214,
+            "bytes": 1039,
+            "sha256": "9e6eb6328c35c807e8d8187802f8f0b1d516954babfd40f127eb2f23ddbd4d8e"
+          },
+          "current": {
+            "scope": "actual pick_word architecture dispatch",
+            "start_anchor": "/// `a` when `first`, else `b`, as one `cmov` where the target has one.  A\n",
+            "end_anchor": "#[inline]\nfn negmod(a: u64, m: u64) -> u64 {",
+            "byte_start_inclusive": 89648,
+            "byte_end_exclusive": 90687,
+            "bytes": 1039,
+            "sha256": "9e6eb6328c35c807e8d8187802f8f0b1d516954babfd40f127eb2f23ddbd4d8e"
+          },
+          "byte_identical": true
+        },
+        {
+          "index": 3,
+          "old": {
+            "scope": "CubicClasses type and complete inherent implementation required by PrimeCurve's automorphism method; no rho class implementation",
+            "start_anchor": "pub struct CubicClasses {",
+            "end_anchor": "impl RhoClasses<PrimeCurve> for CubicClasses {",
+            "byte_start_inclusive": 95208,
+            "byte_end_exclusive": 97403,
+            "bytes": 2195,
+            "sha256": "34280bffedef9100183714ba18da3143d1e70df0573d253a1acff612ceb609d1"
+          },
+          "current": {
+            "scope": "CubicClasses type and complete inherent implementation required by PrimeCurve's automorphism method; no rho class implementation",
+            "start_anchor": "pub struct CubicClasses {",
+            "end_anchor": "impl RhoClasses<PrimeCurve> for CubicClasses {",
+            "byte_start_inclusive": 95681,
+            "byte_end_exclusive": 97876,
+            "bytes": 2195,
+            "sha256": "34280bffedef9100183714ba18da3143d1e70df0573d253a1acff612ceb609d1"
+          },
+          "byte_identical": true
+        },
+        {
+          "index": 4,
+          "old": {
+            "scope": "complete PrimePoint, PrimeCurve, CountedFp, Jacobi helper, and full CountedGroup implementation including native walk overrides",
+            "start_anchor": "// \u2500\u2500 Prime-field curves on one word",
+            "end_anchor": "/// A prime-field instance: curve, prime-order subgroup, generator.\n",
+            "byte_start_inclusive": 245934,
+            "byte_end_exclusive": 277999,
+            "bytes": 32065,
+            "sha256": "863271d3a95be39112929b52f7de8c7c6955085246d2267969879e3483aa4d2f"
+          },
+          "current": {
+            "scope": "complete PrimePoint, PrimeCurve, CountedFp, Jacobi helper, and full CountedGroup implementation including native walk overrides",
+            "start_anchor": "// \u2500\u2500 Prime-field curves on one word",
+            "end_anchor": "/// A prime-field instance: curve, prime-order subgroup, generator.\n",
+            "byte_start_inclusive": 246407,
+            "byte_end_exclusive": 278472,
+            "bytes": 32065,
+            "sha256": "863271d3a95be39112929b52f7de8c7c6955085246d2267969879e3483aa4d2f"
+          },
+          "byte_identical": true
+        },
+        {
+          "index": 5,
+          "old": {
+            "scope": "complete unchanged architecture-specific prefetch helper used by OpenCoefMap",
+            "start_anchor": "#[inline(always)]\n#[allow(unused_unsafe)]\nfn prefetch_cache_line<T>(lines: &[T], index: usize) {\n",
+            "end_anchor": "struct GuardLineSet {\n",
+            "byte_start_inclusive": 358513,
+            "byte_end_exclusive": 359087,
+            "bytes": 574,
+            "sha256": "61962b897e0b1dd481635f62e917406c43240a6a578c78b80a6be54a62c38ea0"
+          },
+          "current": {
+            "scope": "complete unchanged architecture-specific prefetch helper used by OpenCoefMap",
+            "start_anchor": "#[inline(always)]\n#[allow(unused_unsafe)]\nfn prefetch_cache_line<T>(lines: &[T], index: usize) {\n",
+            "end_anchor": "struct GuardLineSet {\n",
+            "byte_start_inclusive": 358986,
+            "byte_end_exclusive": 359560,
+            "bytes": 574,
+            "sha256": "61962b897e0b1dd481635f62e917406c43240a6a578c78b80a6be54a62c38ea0"
+          },
+          "byte_identical": true
+        }
+      ],
+      "selected_old_sha256": "5102a5633c36b96097c34d15e72abbfb441fc669053d14b8e8ebaec3fc4af450",
+      "selected_current_sha256": "7d08dfae90c782cd3d93c71600420b88ce4d87ff8a5751646328a38e3202f44a",
+      "selected_bytes": 74218,
+      "selected_byte_identical": false,
+      "producer_selection_matches_historical_manifest": true
+    },
+    {
+      "path": "src/cryptanalysis/pq_groebner_f2.rs",
+      "generated": "mask_type.rs",
+      "pinned_whole_sha256": "2d014644853e7815a58fb34c29177dd4894b08588d59ad64dffa904bffd35056",
+      "old_whole_sha256": "2d014644853e7815a58fb34c29177dd4894b08588d59ad64dffa904bffd35056",
+      "current_whole_sha256": "2d014644853e7815a58fb34c29177dd4894b08588d59ad64dffa904bffd35056",
+      "workspace_whole_sha256": "2d014644853e7815a58fb34c29177dd4894b08588d59ad64dffa904bffd35056",
+      "old_whole_bytes": 82853,
+      "current_whole_bytes": 82853,
+      "old_matches_pin": true,
+      "workspace_matches_current": true,
+      "whole_file_byte_identical": true,
+      "ranges": [
+        {
+          "index": 0,
+          "old": {
+            "scope": "actual Mask aliases and MASK_BITS for the unmodified fx_hash module; no Boolean solver",
+            "start_anchor": "/// The bitmask a monomial is stored in: 64 bits, or 128 under the\n",
+            "end_anchor": "/// The one-bit mask of variable `k`.\n",
+            "byte_start_inclusive": 3688,
+            "byte_end_exclusive": 4139,
+            "bytes": 451,
+            "sha256": "85080af458c63076067d5b066b82a3befc3c37e021763c74c2026adc63c7c8c6"
+          },
+          "current": {
+            "scope": "actual Mask aliases and MASK_BITS for the unmodified fx_hash module; no Boolean solver",
+            "start_anchor": "/// The bitmask a monomial is stored in: 64 bits, or 128 under the\n",
+            "end_anchor": "/// The one-bit mask of variable `k`.\n",
+            "byte_start_inclusive": 3688,
+            "byte_end_exclusive": 4139,
+            "bytes": 451,
+            "sha256": "85080af458c63076067d5b066b82a3befc3c37e021763c74c2026adc63c7c8c6"
+          },
+          "byte_identical": true
+        }
+      ],
+      "selected_old_sha256": "85080af458c63076067d5b066b82a3befc3c37e021763c74c2026adc63c7c8c6",
+      "selected_current_sha256": "85080af458c63076067d5b066b82a3befc3c37e021763c74c2026adc63c7c8c6",
+      "selected_bytes": 451,
+      "selected_byte_identical": true,
+      "producer_selection_matches_historical_manifest": true
+    },
+    {
+      "path": "src/cryptanalysis/prime_fast.rs",
+      "generated": "prime_fast.rs",
+      "pinned_whole_sha256": "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+      "old_whole_sha256": "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+      "current_whole_sha256": "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+      "workspace_whole_sha256": "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+      "old_whole_bytes": 191725,
+      "current_whole_bytes": 191725,
+      "old_matches_pin": true,
+      "workspace_matches_current": true,
+      "whole_file_byte_identical": true,
+      "ranges": [
+        {
+          "index": 0,
+          "old": {
+            "scope": "complete actual Montgomery arithmetic, points, scratch types, and FastCurve constructors; existing impl opening retained",
+            "start_anchor": "/// Largest field size the Montgomery layer supports (`p < 2^62` keeps\n",
+            "end_anchor": "    /// Adopt a crate [`CurveParams`] whose `p` and `n` fit in 62 bits.\n",
+            "byte_start_inclusive": 2962,
+            "byte_end_exclusive": 17971,
+            "bytes": 15009,
+            "sha256": "139099aa0da1de21027c5abb78cc98dde5e529fd6aa99dc00dd93e021131a72b"
+          },
+          "current": {
+            "scope": "complete actual Montgomery arithmetic, points, scratch types, and FastCurve constructors; existing impl opening retained",
+            "start_anchor": "/// Largest field size the Montgomery layer supports (`p < 2^62` keeps\n",
+            "end_anchor": "    /// Adopt a crate [`CurveParams`] whose `p` and `n` fit in 62 bits.\n",
+            "byte_start_inclusive": 2962,
+            "byte_end_exclusive": 17971,
+            "bytes": 15009,
+            "sha256": "139099aa0da1de21027c5abb78cc98dde5e529fd6aa99dc00dd93e021131a72b"
+          },
+          "byte_identical": true
+        },
+        {
+          "index": 1,
+          "old": {
+            "scope": "actual scalar_field, point, and canonical methods; unused from_params adapter omitted",
+            "start_anchor": "    /// Group-order field context (Montgomery mod `n`) for the linear\n",
+            "end_anchor": "    pub fn to_textbook(&self, p: Option<Pt>) -> Point {",
+            "byte_start_inclusive": 18440,
+            "byte_end_exclusive": 18860,
+            "bytes": 420,
+            "sha256": "869f09859458b60197b30f59ed5ab9ee36bd61faedf5e491e016054cca7b2bfe"
+          },
+          "current": {
+            "scope": "actual scalar_field, point, and canonical methods; unused from_params adapter omitted",
+            "start_anchor": "    /// Group-order field context (Montgomery mod `n`) for the linear\n",
+            "end_anchor": "    pub fn to_textbook(&self, p: Option<Pt>) -> Point {",
+            "byte_start_inclusive": 18440,
+            "byte_end_exclusive": 18860,
+            "bytes": 420,
+            "sha256": "869f09859458b60197b30f59ed5ab9ee36bd61faedf5e491e016054cca7b2bfe"
+          },
+          "byte_identical": true
+        },
+        {
+          "index": 2,
+          "old": {
+            "scope": "all remaining FastCurve arithmetic methods including batched additions and existing impl closing brace; unused textbook conversion adapters omitted",
+            "start_anchor": "    pub fn is_on_curve(&self, p: Pt) -> bool {\n",
+            "end_anchor": "fn biguint_to_u64(v: &BigUint) -> Option<u64> {",
+            "byte_start_inclusive": 19656,
+            "byte_end_exclusive": 29769,
+            "bytes": 10113,
+            "sha256": "4eb89ea2b27a2cc36e33025afb8d54a6681f0d1d480a830caa14034200655394"
+          },
+          "current": {
+            "scope": "all remaining FastCurve arithmetic methods including batched additions and existing impl closing brace; unused textbook conversion adapters omitted",
+            "start_anchor": "    pub fn is_on_curve(&self, p: Pt) -> bool {\n",
+            "end_anchor": "fn biguint_to_u64(v: &BigUint) -> Option<u64> {",
+            "byte_start_inclusive": 19656,
+            "byte_end_exclusive": 29769,
+            "bytes": 10113,
+            "sha256": "4eb89ea2b27a2cc36e33025afb8d54a6681f0d1d480a830caa14034200655394"
+          },
+          "byte_identical": true
+        }
+      ],
+      "selected_old_sha256": "4f72c21c5ae39b0b426d4bc2aa2d13642055e89ad492ef93e5d0df419963c769",
+      "selected_current_sha256": "4f72c21c5ae39b0b426d4bc2aa2d13642055e89ad492ef93e5d0df419963c769",
+      "selected_bytes": 25542,
+      "selected_byte_identical": true,
+      "producer_selection_matches_historical_manifest": true
+    },
+    {
+      "path": "src/cryptanalysis/residual_walk.rs",
+      "generated": "residual_arithmetic.rs",
+      "pinned_whole_sha256": "4e54e030cebfc873f9288e25c83153841724d1cc0d8c79417288aa9e74f507c9",
+      "old_whole_sha256": "4e54e030cebfc873f9288e25c83153841724d1cc0d8c79417288aa9e74f507c9",
+      "current_whole_sha256": "4e54e030cebfc873f9288e25c83153841724d1cc0d8c79417288aa9e74f507c9",
+      "workspace_whole_sha256": "4e54e030cebfc873f9288e25c83153841724d1cc0d8c79417288aa9e74f507c9",
+      "old_whole_bytes": 139432,
+      "current_whole_bytes": 139432,
+      "old_matches_pin": true,
+      "workspace_matches_current": true,
+      "whole_file_byte_identical": true,
+      "ranges": [
+        {
+          "index": 0,
+          "old": {
+            "scope": "actual modular arithmetic, pow_mod/inv_mod with unchanged counting hooks, square root, and residual_walk primality test",
+            "start_anchor": "// \u2500\u2500 u64 modular arithmetic",
+            "end_anchor": "fn isqrt(n: u64) -> u64 {",
+            "byte_start_inclusive": 5416,
+            "byte_end_exclusive": 11818,
+            "bytes": 6402,
+            "sha256": "49bcb68e58998ae67ae56477f86302824eaef5ee3c485eba6d61d7be3fc03f9e"
+          },
+          "current": {
+            "scope": "actual modular arithmetic, pow_mod/inv_mod with unchanged counting hooks, square root, and residual_walk primality test",
+            "start_anchor": "// \u2500\u2500 u64 modular arithmetic",
+            "end_anchor": "fn isqrt(n: u64) -> u64 {",
+            "byte_start_inclusive": 5416,
+            "byte_end_exclusive": 11818,
+            "bytes": 6402,
+            "sha256": "49bcb68e58998ae67ae56477f86302824eaef5ee3c485eba6d61d7be3fc03f9e"
+          },
+          "byte_identical": true
+        }
+      ],
+      "selected_old_sha256": "49bcb68e58998ae67ae56477f86302824eaef5ee3c485eba6d61d7be3fc03f9e",
+      "selected_current_sha256": "49bcb68e58998ae67ae56477f86302824eaef5ee3c485eba6d61d7be3fc03f9e",
+      "selected_bytes": 6402,
+      "selected_byte_identical": true,
+      "producer_selection_matches_historical_manifest": true
+    },
+    {
+      "path": "src/cryptanalysis/semaev_prime_poly.rs",
+      "generated": "semaev_fp.rs",
+      "pinned_whole_sha256": "c8249ba825c946dbdb37fa5d6762f8f32d15320344693443e8af0d52f122784a",
+      "old_whole_sha256": "c8249ba825c946dbdb37fa5d6762f8f32d15320344693443e8af0d52f122784a",
+      "current_whole_sha256": "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b",
+      "workspace_whole_sha256": "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b",
+      "old_whole_bytes": 25450,
+      "current_whole_bytes": 35275,
+      "old_matches_pin": true,
+      "workspace_matches_current": true,
+      "whole_file_byte_identical": false,
+      "ranges": [
+        {
+          "index": 0,
+          "old": {
+            "scope": "complete production Fp type and inherent arithmetic implementation",
+            "start_anchor": "/// `F_p` arithmetic for `p < 2^62`.\n",
+            "end_anchor": "/// The curve `y\u00b2 = x\u00b3 + ax + b` over `F_p`, coefficients reduced.\n",
+            "byte_start_inclusive": 1618,
+            "byte_end_exclusive": 3026,
+            "bytes": 1408,
+            "sha256": "c0e28396b7d714b2f0e29a93f2d3c1e1f95090b793541cc930e7f881e01a70e8"
+          },
+          "current": {
+            "scope": "complete production Fp type and inherent arithmetic implementation",
+            "start_anchor": "/// `F_p` arithmetic for `p < 2^62`.\n",
+            "end_anchor": "/// The curve `y\u00b2 = x\u00b3 + ax + b` over `F_p`, coefficients reduced.\n",
+            "byte_start_inclusive": 1618,
+            "byte_end_exclusive": 3026,
+            "bytes": 1408,
+            "sha256": "c0e28396b7d714b2f0e29a93f2d3c1e1f95090b793541cc930e7f881e01a70e8"
+          },
+          "byte_identical": true
+        }
+      ],
+      "selected_old_sha256": "c0e28396b7d714b2f0e29a93f2d3c1e1f95090b793541cc930e7f881e01a70e8",
+      "selected_current_sha256": "c0e28396b7d714b2f0e29a93f2d3c1e1f95090b793541cc930e7f881e01a70e8",
+      "selected_bytes": 1408,
+      "selected_byte_identical": true,
+      "producer_selection_matches_historical_manifest": true
+    },
+    {
+      "path": "src/prime_hyperelliptic/ops.rs",
+      "generated": "hyperelliptic_ops.rs",
+      "pinned_whole_sha256": "668c2ea7804578fe09b8b3dc2dd905b1564be5ebbf0f5e6571d785fa7ad842f4",
+      "old_whole_sha256": "668c2ea7804578fe09b8b3dc2dd905b1564be5ebbf0f5e6571d785fa7ad842f4",
+      "current_whole_sha256": "668c2ea7804578fe09b8b3dc2dd905b1564be5ebbf0f5e6571d785fa7ad842f4",
+      "workspace_whole_sha256": null,
+      "old_whole_bytes": 18601,
+      "current_whole_bytes": 18601,
+      "old_matches_pin": true,
+      "workspace_matches_current": null,
+      "whole_file_byte_identical": true,
+      "ranges": [
+        {
+          "index": 0,
+          "old": {
+            "scope": "actual counter types, tally operations, sort cost, and exponentiation charging used by jv_bitops",
+            "start_anchor": "use std::cell::Cell;\n",
+            "end_anchor": "/// Words a hash of a divisor absorbs: one per 64-bit limb of each\n",
+            "byte_start_inclusive": 3893,
+            "byte_end_exclusive": 12055,
+            "bytes": 8162,
+            "sha256": "49975e6af38d06ae8dc1139daa99786a75d7ebdafd98dd89db53f8bf9c4abaab"
+          },
+          "current": {
+            "scope": "actual counter types, tally operations, sort cost, and exponentiation charging used by jv_bitops",
+            "start_anchor": "use std::cell::Cell;\n",
+            "end_anchor": "/// Words a hash of a divisor absorbs: one per 64-bit limb of each\n",
+            "byte_start_inclusive": 3893,
+            "byte_end_exclusive": 12055,
+            "bytes": 8162,
+            "sha256": "49975e6af38d06ae8dc1139daa99786a75d7ebdafd98dd89db53f8bf9c4abaab"
+          },
+          "byte_identical": true
+        },
+        {
+          "index": 1,
+          "old": {
+            "scope": "remaining actual tally snapshots and phase guards; unused divisor_hash_words and legacy tests omitted",
+            "start_anchor": "/// Everything this thread has tallied, by phase.\n",
+            "end_anchor": "#[cfg(test)]\nmod tests {",
+            "byte_start_inclusive": 12448,
+            "byte_end_exclusive": 13626,
+            "bytes": 1178,
+            "sha256": "534f212a87c236c2ce0547773ad7121ee303a16f092b4c15e4e4d627405a82db"
+          },
+          "current": {
+            "scope": "remaining actual tally snapshots and phase guards; unused divisor_hash_words and legacy tests omitted",
+            "start_anchor": "/// Everything this thread has tallied, by phase.\n",
+            "end_anchor": "#[cfg(test)]\nmod tests {",
+            "byte_start_inclusive": 12448,
+            "byte_end_exclusive": 13626,
+            "bytes": 1178,
+            "sha256": "534f212a87c236c2ce0547773ad7121ee303a16f092b4c15e4e4d627405a82db"
+          },
+          "byte_identical": true
+        }
+      ],
+      "selected_old_sha256": "3bb1f742467c586d882b5158a520e28ceb9acc50e096cd62039f87bb4fad8f44",
+      "selected_current_sha256": "3bb1f742467c586d882b5158a520e28ceb9acc50e096cd62039f87bb4fad8f44",
+      "selected_bytes": 9340,
+      "selected_byte_identical": true,
+      "producer_selection_matches_historical_manifest": true
+    }
+  ],
+  "limits": [
+    "Source-byte audit only; no Rust compilation or research execution performed.",
+    "This is not a dependency-closure audit for unpinned whole-file imports."
+  ]
+}

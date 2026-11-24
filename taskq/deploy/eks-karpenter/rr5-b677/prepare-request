@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[[ $# == 5 ]] || { echo 'usage: prepare-request IMAGE.json REVISION JOB_NAME INSTANCE SECONDS' >&2; exit 2; }
+image=$1 revision=$2 job=$3 instance=$4 seconds=$5
+[[ "$revision" =~ ^[a-f0-9]{40}$ && "$job" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ && ${#job} -le 55 ]]
+[[ "$instance" =~ ^[a-z][a-z0-9-]*\.[a-z0-9]+$ ]]
+[[ "$seconds" =~ ^[1-9][0-9]{2,3}$ && "$seconds" -ge 300 && "$seconds" -le 1800 ]]
+jq -es --arg revision "$revision" '
+  length==1 and (.[0] | .schema=="rr5.b677.image/v1" and .source_revision==$revision
+  and (.image_uri|test("^104186811093\\.dkr\\.ecr\\.us-east-2\\.amazonaws\\.com/isolab/tasks@sha256:[a-f0-9]{64}$"))
+  and (.protocol_sha256|test("^[a-f0-9]{64}$"))
+  and (.build_info_sha256|test("^[a-f0-9]{64}$")))
+' "$image" >/dev/null
+jq -n --slurpfile image "$image" --arg revision "$revision" --arg job "$job" \
+  --arg instance "$instance" --argjson seconds "$seconds" '
+  {schema:"isolab.eks.command-request/v1",
+   job:{job_name:$job,image:$image[0].image_uri,
+     command:["/opt/isolab/rr5-b677/run",$revision,$image[0].protocol_sha256],
+     cpu:2,memory:"2Gi",seconds:$seconds,wait_seconds:$seconds,
+     isolation_profile:"standard",instance_type:$instance,retries:0},
+   provenance:{harness:"github-actions",source_revision:$revision,
+     study:"prime31_four_summand_20261122/scaling-b677",protocol_sha256:$image[0].protocol_sha256,
+     note:"Fixed correctness gate; 1 scientific worker, 2 reserved CPUs, 180s scientific outer cap; no L2 or speed claim."}}
+'

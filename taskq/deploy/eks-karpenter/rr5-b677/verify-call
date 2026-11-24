@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Check a single fixed query receipt. Cryptographic replay is the unchanged Rust
+# checker; jq only validates transport, protocol and completion metadata.
+set -euo pipefail
+[[ $# == 3 ]] || { echo 'usage: verify-call CALL_DIR CASE PRESENTATION' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+out=$1 case_name=$2 presentation=$3
+[[ "$case_name" =~ ^(positive|h0|w0)$ && "$presentation" =~ ^(structured|cofactor)$ ]]
+[[ "$case_name" == positive || "$presentation" == structured ]]
+[[ $(cat "$out/producer.exit") == 0 ]]
+[[ $(grep -c '^B677_INPUT ' "$out/producer.stdout") == 1 ]]
+[[ $(grep -c '^B677_RESULT ' "$out/producer.stdout") == 1 ]]
+[[ $(grep -c '^B677_ERROR ' "$out/producer.stdout" || true) == 0 ]]
+# Each call lives in a new directory. Refuse accidental replacement on replay.
+set -o noclobber
+sed -n 's/^B677_INPUT //p' "$out/producer.stdout" | jq -sc 'if length==1 then .[0] else error("expected one JSON input") end' > "$out/input.json"
+sed -n 's/^B677_RESULT //p' "$out/producer.stdout" | jq -sc 'if length==1 then .[0] else error("expected one JSON result") end' > "$out/result.json"
+jq -e --arg case_name "$case_name" --arg presentation "$presentation" '
+  .schema=="prime31-rr5-b677-input/v1" and .case==$case_name and .presentation==$presentation
+  and .curve=={p:2147483647,a:847514846,b:2087444724,n:2147446831,g:[625037715,2100627251]}
+  and (.public_base|length)==677 and (.public_target|type)=="array"
+  and .public_target_on_curve==true and .supported_target_chart==true
+  and .candidate_received_expected_row==false and .candidate_received_target_scalar==false
+  and .candidate_received_factor_base_logs==false and .test_oracle_tuple_evaluations==0
+  and .limits=={max_degree:10,seconds:30,max_polynomial_terms:20000,max_assignments:4096}
+  and .resource_limits=={max_pairs:20000,max_symbolic_monomials:8192,max_matrix_entries:2000000}
+  and .fixture_certificate.hybrid_points==677
+  and .fixture_certificate.y7_csv_sha256=="fc484615394ee423190747d05001cea526580fb0df0279fbcf789ab6cafc0c46"
+  and (if $case_name=="h0" then .public_target==[18,221278090] and .control_expected_row==null
+       elif $case_name=="w0" then .public_target==[101000006,1077058598] and .control_expected_row==null
+       else (.control_expected_row.terms|length)==4 end)
+' "$out/input.json" >/dev/null
+jq -e --slurpfile input "$out/input.json" '
+  .schema=="prime31-rr5-b677-result/v1"
+  and .case==$input[0].case and .presentation==$input[0].presentation
+  and .complete_gate_passed==true and .gate_failures==[]
+  and .authentic_public_rhs=={a:0,b:1}
+  and (.candidate.status=="Complete" or .candidate.status=="Empty")
+  and ((.candidate.status=="Empty")==((.candidate.relations|length)==0))
+  and (.candidate.relations|length)<=4096
+  and all(.candidate.relations[]; (.terms|length)==4
+    and ([.terms[][0]]|unique|length)==4
+    and all(.terms[]; length==2 and (.[0]|type)=="number" and .[0]>=0 and .[0]<677
+      and (.[0]|floor)==.[0] and (.[1]==1 or .[1]==-1)))
+  and .candidate.diagnostics.base_size==677
+  and (.candidate.diagnostics.assignments_extracted|type)=="number"
+  and .candidate.diagnostics.assignments_extracted>=0
+  and .candidate.diagnostics.assignments_extracted<=4096
+  and (.candidate.diagnostics.assignments_extracted|floor)==.candidate.diagnostics.assignments_extracted
+  and .candidate.diagnostics.rejected_assignments==0
+  and .candidate.diagnostics.forbidden_branch_attempts==0
+  and .candidate.diagnostics.forbidden_domain_evaluations==0
+  and .candidate.diagnostics.forbidden_fallbacks_refused==0
+  and .candidate.traversal.complete==true and .candidate.traversal.timed_out==false
+  and (.candidate.traversal.solving_degree|type)=="number"
+  and .candidate.traversal.solving_degree>=0 and .candidate.traversal.solving_degree<=10
+  and (.candidate.traversal.solving_degree|floor)==.candidate.traversal.solving_degree
+  and .candidate.traversal.trace_stopped==false and .candidate.traversal.stopped_early==false
+  and .candidate.traversal.resource_limit==null
+  and .candidate.traversal.full_field_branches==0 and .candidate.traversal.domain_evaluations==0
+  and (if .case=="positive" then .candidate.status=="Complete"
+    and .expected_control_row_present==true
+    and any(.candidate.relations[]; .terms==$input[0].control_expected_row.terms)
+    else .expected_control_row_present==null end)
+' "$out/result.json" >/dev/null
+jq -n --slurpfile input "$out/input.json" --slurpfile result "$out/result.json" '
+  {base:$input[0].public_base,target_q:$input[0].public_target,
+   relations:[$result[0].candidate.relations[]|{terms:.terms,a:0,b:1}],
+   stop_when_target_determined:false,emit_dual_certificate:true}
+' > "$out/public-receipt.json"
+set +e
+"$here/rr5-b677-receipt-check" "$out/public-receipt.json" > "$out/checker.stdout" 2> "$out/checker.stderr"
+checker_status=$?
+set -e
+printf '%s\n' "$checker_status" > "$out/checker.exit"
+[[ "$checker_status" == 0 ]]
+jq -sc 'if length==1 then .[0] else error("expected one checker JSON value") end' "$out/checker.stdout" > "$out/checker.json"
+jq -e --slurpfile result "$out/result.json" '
+  .p==2147483647 and .n==2147446831 and .base_size==677
+  and .submitted_rows==($result[0].candidate.relations|length)
+  and .authenticated_rows==.submitted_rows and .unchecked_tail_rows==0
+  and .stop_when_target_determined==false and .emit_dual_certificate==true
+  and .independent_augmented_rank==$result[0].adapter_rank
+  and .recovered==$result[0].recovered_scalar
+  and (if .recovered==null then .scalar_replay_passed==false else .scalar_replay_passed==true end)
+' "$out/checker.json" >/dev/null
