@@ -6,7 +6,7 @@
 //! and inconsistent ideals. A learned leading ideal alone is not a certificate.
 use certified_relations::{self as algebra, Mono, Proof, Row};
 use serde::Serialize;
-use std::{cmp::Ordering, collections::BTreeSet};
+use std::{cmp::Ordering, collections::BTreeSet, time::Instant};
 
 /// Same representation as `f4_fp::Poly`; accepts its values without conversion.
 pub type Poly = Vec<(Vec<u32>, u64)>;
@@ -139,10 +139,19 @@ fn enumerate_monomials(
     Ok(())
 }
 
-fn rref(matrix: &mut [Vec<u64>], columns: usize, p: u64, work: &mut Work) -> Vec<usize> {
+fn rref(
+    matrix: &mut [Vec<u64>],
+    columns: usize,
+    p: u64,
+    work: &mut Work,
+    deadline: Option<Instant>,
+) -> Result<Vec<usize>, String> {
     let rows = matrix.len();
     let mut pivots = Vec::new();
     for c in 0..columns {
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return Err("template deadline reached".into());
+        }
         let r = pivots.len();
         let Some(next) = (r..rows).find(|i| matrix[*i][c] != 0) else {
             continue;
@@ -177,7 +186,7 @@ fn rref(matrix: &mut [Vec<u64>], columns: usize, p: u64, work: &mut Work) -> Vec
         }
         pivots.push(c);
     }
-    pivots
+    Ok(pivots)
 }
 fn canonical(
     input: &[Poly],
@@ -431,6 +440,19 @@ impl Template {
     pub fn enumerated_rows(&self) -> usize {
         self.enumerated_rows
     }
+    pub fn variables(&self) -> usize {
+        self.n
+    }
+    pub fn modulus(&self) -> u64 {
+        self.p
+    }
+    pub fn matrix_degree(&self) -> u32 {
+        self.columns
+            .iter()
+            .map(|m| m.iter().sum::<usize>() as u32)
+            .max()
+            .unwrap_or(0)
+    }
 
     fn matrix(&self, original: &[algebra::Poly]) -> Result<Vec<Vec<u64>>, String> {
         let (rows, columns) = (self.rows(), self.columns());
@@ -452,7 +474,21 @@ impl Template {
     /// Complete-basis construction with a mandatory exact check. No solver or
     /// root fallback is hidden here; Err carries all attempted elimination work.
     pub fn apply(&self, input: &[Poly]) -> Result<Applied, Refusal> {
+        self.apply_until(input, None)
+    }
+
+    /// Cooperative residual deadline. Checks occur before allocation, at every
+    /// elimination pivot, and around the existing exact checker. The caller's
+    /// outer process limit remains the hard bound, including checker internals.
+    pub fn apply_until(
+        &self,
+        input: &[Poly],
+        deadline: Option<Instant>,
+    ) -> Result<Applied, Refusal> {
         let mut work = Work::default();
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return Err(Refusal::new("template deadline reached", work));
+        }
         let original =
             canonical(input, self.n, self.p, self.limits).map_err(|e| Refusal::new(e, work))?;
         if original.len() != self.support.len()
@@ -479,7 +515,11 @@ impl Template {
         }
         let (columns, p) = (self.columns(), self.p);
         let mut matrix = self.matrix(&original).map_err(|e| Refusal::new(e, work))?;
-        let pivots = rref(&mut matrix, columns, p, &mut work);
+        let pivots = rref(&mut matrix, columns, p, &mut work, deadline)
+            .map_err(|e| Refusal::new(e, work))?;
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return Err(Refusal::new("template deadline reached", work));
+        }
         let minimal: Vec<_> = (0..pivots.len())
             .filter(|i| {
                 !(0..pivots.len()).any(|j| {
@@ -522,6 +562,9 @@ impl Template {
                 "online membership/input/S-pair certificate",
                 work,
             ));
+        }
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return Err(Refusal::new("template deadline reached", work));
         }
         let basis = certificates
             .iter()
@@ -772,7 +815,9 @@ mod tests {
                 assert_eq!(pruned.columns, full.columns);
                 let space = |t: &Template| {
                     let mut matrix = t.matrix(&original).unwrap();
-                    let rank = rref(&mut matrix, t.columns(), 101, &mut Work::default()).len();
+                    let rank = rref(&mut matrix, t.columns(), 101, &mut Work::default(), None)
+                        .unwrap()
+                        .len();
                     matrix
                         .into_iter()
                         .take(rank)
@@ -818,5 +863,14 @@ mod tests {
         assert!(error.contains("required minimal leading degree 7 exceeds bound 6"));
         let template = Template::principal_syzygy(&f, &f, 1, 101, 7, Limits::default()).unwrap();
         assert!(template.apply(&f).is_ok());
+    }
+    #[test]
+    fn expired_deadline_refuses_before_elimination() {
+        let t = Template::learn(&family(2), 2, 101, Limits::default()).unwrap();
+        let deadline = Instant::now() - std::time::Duration::from_secs(1);
+        let error = t.apply_until(&family(3), Some(deadline)).err().unwrap();
+        assert!(error.reason.contains("deadline"));
+        assert_eq!(error.attempted.modular_products, 0);
+        assert!(t.apply_until(&family(3), None).is_ok());
     }
 }

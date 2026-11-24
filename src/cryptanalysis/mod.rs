@@ -452,6 +452,7 @@ pub mod wide_groebner;
 pub mod wide_sixsum;
 pub mod jv_action_operator;
 pub mod jv_nagao_template;
+pub mod jv_nagao_template_solver;
 pub mod zero_dim_la;
 
 pub use aut_folded_rho::{
