@@ -1,0 +1,65 @@
+{
+  "schema": "curve25519.owner-ci-diagnosis/v1",
+  "owner_pr": 39,
+  "head": "36840e8fb83a4d56282d14cd0975821391586f86",
+  "state": "OPEN",
+  "draft": false,
+  "merge_state": "UNSTABLE",
+  "auto_merge": null,
+  "checks": [
+    {
+      "id": 138198278952,
+      "name": "build-and-audit",
+      "head_sha": "36840e8fb83a4d56282d14cd0975821391586f86",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-11-24T03:36:42Z",
+      "completed_at": "2026-11-24T03:36:44Z",
+      "html_url": "https://github.com/aburan28/crypto-lean/actions/runs/45320709269/job/138198278952"
+    },
+    {
+      "id": 138198278651,
+      "name": "selftest",
+      "head_sha": "36840e8fb83a4d56282d14cd0975821391586f86",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-11-24T03:36:42Z",
+      "completed_at": "2026-11-24T03:36:44Z",
+      "html_url": "https://github.com/aburan28/crypto-lean/actions/runs/45320709269/job/138198278651"
+    }
+  ],
+  "annotations": {
+    "OWNER_ANNOTATIONS_138198278651.json": [
+      {
+        "path": ".github",
+        "blob_href": "https://github.com/aburan28/crypto-lean/blob/36840e8fb83a4d56282d14cd0975821391586f86/.github",
+        "start_line": 1,
+        "start_column": null,
+        "end_line": 1,
+        "end_column": null,
+        "annotation_level": "failure",
+        "title": "",
+        "message": "The job was not started because your account is locked due to a billing issue.",
+        "raw_details": ""
+      }
+    ],
+    "OWNER_ANNOTATIONS_138198278952.json": [
+      {
+        "path": ".github",
+        "blob_href": "https://github.com/aburan28/crypto-lean/blob/36840e8fb83a4d56282d14cd0975821391586f86/.github",
+        "start_line": 1,
+        "start_column": null,
+        "end_line": 1,
+        "end_column": null,
+        "annotation_level": "failure",
+        "title": "",
+        "message": "The job was not started because your account is locked due to a billing issue.",
+        "raw_details": ""
+      }
+    ]
+  },
+  "diagnosis": "Both current-head jobs not started: account locked due to billing, per actual check annotations. Job log endpoints returned404 BlobNotFound; no job execution or proof failure inferred.",
+  "hosted_source_execution_established": false,
+  "retry_requested": false,
+  "local_proof_evidence_separate": true
+}
