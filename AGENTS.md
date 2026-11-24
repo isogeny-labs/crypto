@@ -37,6 +37,10 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+In a custom sparse checkout, a dated journal may need `git add --sparse` even
+after it is tracked. Stage that file explicitly and inspect its staged diff
+before committing or pushing (adopted lesson `L-d5062ba05212`).
+
 ## Goal: what to work on next
 
 Sessions should never need a prompt to find their work. `docs/ACTIVE.md`
