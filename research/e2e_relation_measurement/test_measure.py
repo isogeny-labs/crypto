@@ -204,6 +204,25 @@ else: raise AssertionError('failure was not injected')
             self.assertNotIn('groebner_basis',r['timings'])
             self.assertIsNone(r['metrics']['solving_degree'])
 
+    def test_distinct_filter_panels_pair(self):
+        with tempfile.TemporaryDirectory() as d:
+            directory=pathlib.Path(d)
+            common=['--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27','--block-size','4']
+            outputs=[]
+            for name,extra in (('all',[]),('interval',['--x-max','70'])):
+                plan=directory/(name+'.json'); out=directory/name
+                plan.write_text(json.dumps({'common_args':common+extra,'seeds':[42],'timeout_seconds':30}))
+                subprocess.run(['python3',str(HERE/'panel.py'),'--plan',str(plan),'--out',str(out)],check=True,stdout=subprocess.DEVNULL)
+                outputs.append(out)
+            spec=importlib.util.spec_from_file_location('compare_panels', HERE/'compare_panels.py')
+            compare=importlib.util.module_from_spec(spec); spec.loader.exec_module(compare)
+            result=compare.compare(*outputs)
+            self.assertTrue(result['matching_checks_pass'],result['mismatch_or_unknown'])
+            self.assertEqual(len(result['pairs']),3)
+            self.assertTrue(all(row['target_match'] for row in result['pairs']))
+            summary=json.loads((outputs[1]/'summary.json').read_text())
+            self.assertGreater(sum(row['candidate_counts']['filtered'] for row in summary['runs']),0)
+
     def test_panel_preserves_timeout(self):
         with tempfile.TemporaryDirectory() as d:
             plan=pathlib.Path(d)/'plan.json'; out=pathlib.Path(d)/'panel'

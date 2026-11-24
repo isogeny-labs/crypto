@@ -36,6 +36,8 @@ class ComparisonTest(unittest.TestCase):
             a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b,filtered=True)
             result=compare.compare(a,b)
             self.assertTrue(result['matching_checks_pass']); self.assertEqual(len(result['pairs']),3)
+            self.assertEqual(result['per_mode']['walk']['left']['whole_process_wall_ns'],20)
+            self.assertEqual(result['per_mode']['walk']['left']['candidates']['unknown_attempts'],1)
             self.assertEqual(result['right_filter']['--modulus'],'2')
             (b/'seed-7-walk.result.json').write_text('{}')
             with self.assertRaisesRegex(ValueError,'artifact hash mismatch'): compare.compare(a,b)
@@ -45,8 +47,24 @@ class ComparisonTest(unittest.TestCase):
             result=compare.compare(a,b)
             self.assertFalse(result['matching_checks_pass'])
             self.assertIn('some targets unavailable',result['mismatch_or_unknown'])
+            self.assertEqual(result['per_mode']['walk']['right']['nonzero_b_unknown_runs'],1)
+            self.assertEqual(result['per_mode']['walk']['right']['whole_process_wall_ns'],20)
             self.assertIn('some attempts incomplete or invalid',result['mismatch_or_unknown'])
             self.assertTrue(any('target differs' in reason for reason in result['mismatch_or_unknown']))
+    def test_checkpoint_counts_checked_before_aggregation(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b,incomplete=True)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=next(row for row in summary['runs'] if row['mode']=='walk')
+            checkpoint=b/'seed-7-walk.checkpoint.json'
+            save(checkpoint,{'schema':'e2e-relation-measurement/v1','config':{'seed':7,'mode':'walk'},'counts':{'candidates':9},'source_sha256_at_start':'m','accounting_sha256_at_start':'a'})
+            row['observation_source']='checkpoint'; row['checkpoint_sha256']=digest(checkpoint); row['candidate_counts']={'candidates':9}
+            save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
+            result=compare.compare(a,b)
+            self.assertEqual(result['per_mode']['walk']['right']['candidates']['observed_sum'],9)
+            row['candidate_counts']={'candidates':99}; save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'checkpoint does not match receipt'): compare.compare(a,b)
+
     def test_modes_must_share_target_within_each_panel(self):
         with tempfile.TemporaryDirectory() as d:
             a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'

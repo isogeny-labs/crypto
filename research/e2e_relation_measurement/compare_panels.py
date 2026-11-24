@@ -71,13 +71,47 @@ def load(directory):
                 result.get('config',{}).get('seed') != key[0] or result.get('config',{}).get('mode') != key[1] or
                 result.get('status') != row['result_status'] or result.get('target') != row['target'] or
                 result.get('useful_relations') != row['useful_relations'] or result.get('relation_counts') != row['relation_counts'] or
+                result.get('counts') != row.get('candidate_counts') or
                 result.get('source_sha256_at_start') != summary['measure_sha256_at_start'] or
                 result.get('accounting_sha256_at_start') != summary['accounting_sha256_at_start']):
                 raise ValueError(f'result does not match receipt or sources: {directory} {key}')
+        if row.get('observation_source') == 'checkpoint':
+            if row['checkpoint_sha256'] is None:
+                raise ValueError(f'missing observed checkpoint: {directory} {key}')
+            snapshot=json.loads((directory / f'{name}.checkpoint.json').read_text())
+            if (snapshot.get('schema') != 'e2e-relation-measurement/v1' or
+                snapshot.get('config',{}).get('seed') != key[0] or snapshot.get('config',{}).get('mode') != key[1] or
+                snapshot.get('counts') != row.get('candidate_counts') or
+                snapshot.get('source_sha256_at_start') != summary['measure_sha256_at_start'] or
+                snapshot.get('accounting_sha256_at_start') != summary['accounting_sha256_at_start']):
+                raise ValueError(f'checkpoint does not match receipt or sources: {directory} {key}')
+        elif row.get('observation_source') == 'result':
+            if row['result_status'] is None:
+                raise ValueError(f'missing observed result: {directory} {key}')
+        elif row.get('observation_source') is None:
+            if row.get('candidate_counts') is not None:
+                raise ValueError(f'candidate counts lack an observation source: {directory} {key}')
+        else:
+            raise ValueError(f'unknown observation source: {directory} {key}')
         rows[key] = row
     if set(rows) != expected:
         raise ValueError(f'missing attempts: {directory}')
     return plan, summary, rows
+
+
+def outcome_totals(rows, mode):
+    selected=[row for (_, row_mode), row in rows.items() if row_mode == mode]
+    candidate_values=[row.get('candidate_counts') for row in selected]
+    def counter(name):
+        values=[value[name] for value in candidate_values if isinstance(value,dict) and type(value.get(name)) is int and value[name] >= 0]
+        return {'observed_attempts':len(values), 'unknown_attempts':len(selected)-len(values), 'observed_sum':sum(values) if values else None}
+    return {'attempts':len(selected), 'complete':sum(row['result_status']=='complete' for row in selected),
+            'useful_runs':sum(row['result_status']=='complete' and (row['useful_relations'] or 0)>0 for row in selected),
+            'nonzero_b_runs':sum(row['relation_counts'] is not None and row['relation_counts']['nonzero_b']>0 for row in selected),
+            'nonzero_b_unknown_runs':sum(row['relation_counts'] is None for row in selected),
+            'whole_process_wall_ns':sum(row['whole_process_wall_ns'] for row in selected),
+            'candidates':counter('candidates'), 'filtered':counter('filtered'),
+            'identity':counter('identity'), 'duplicate_x':counter('duplicate_x')}
 
 
 def compare(left_dir, right_dir):
@@ -116,6 +150,7 @@ def compare(left_dir, right_dir):
             'right_plan_sha256':rs['plan_sha256'], 'left_filter':{k:v for k,v in la.items() if k in FILTER_FLAGS},
             'right_filter':{k:v for k,v in ra.items() if k in FILTER_FLAGS}, 'matching_checks_pass':not reasons,
             'mismatch_or_unknown':reasons, 'pairs':pairs,
+            'per_mode':{mode:{'left':outcome_totals(lr,mode),'right':outcome_totals(rr,mode)} for mode in MODES},
             'limits':['Same platform string does not establish equal hardware, isolation or resource envelopes.',
                       'Equal per-attempt limits do not establish equal realized total cost.',
                       'These records do not include a matched single-target reference.']}
