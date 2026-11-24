@@ -330,6 +330,18 @@ known multiple* even though its offsets are structured. It does not
 exclude a deliberately selected `a`, and it does not certify the
 correlation sign of any selected feature. [pcc:unverified]
 
+For `B` uniform public-multiple draws, the union bound makes the
+probability of finding even one offset above that cold threshold at
+most `B·4p/(n²g²)`. Taking the optimistic `B≤R` (one
+group-addition equivalent per drawn and perfectly checked candidate)
+gives less than `2^-11` probability; the computed base-two log of
+`R·4p/(n²g²)` is about `-11.339`. If qualifying offsets exist, the
+expected waiting time under independent uniform draws exceeds
+`2^107` candidates, before actual point generation or correlation
+checks. This screens uniform random search in the specified feature
+and cost model;
+structured selection of `a` remains open. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
