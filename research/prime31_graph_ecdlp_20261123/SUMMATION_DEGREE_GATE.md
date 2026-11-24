@@ -242,6 +242,22 @@ capacity; it supplies no 677-column M31 construction, rational-root
 yield, or same-base comparison. The F17 eight-column fixture cannot be
 scaled by replacing field coefficients in its proof.
 
+There is also an exact average-yield identity on the B677 curve. Fix
+any quadratic `h0` and let `N(t)` count rational roots of
+`(h0(x)+t)^2=f(x)` for `t` in M31. Each affine curve point `(x,y)`
+corresponds to exactly one counted pair `(t,x)`, namely
+`t=y-h0(x)`. Thus `sum_t N(t)=#E(F_p)-1=2,147,446,830`, and the mean
+over all `p=2,147,483,647` offsets is approximately `0.999982856`
+roots. For a selected eight-bit family of 256 distinct offsets to
+cover 677 distinct abscissae, its summed root count must be at least
+677, or at least `677/256=2.64453125` roots per selected offset.
+Because each `N(t)<=4`, at least 83 of those 256 offsets must have
+three or four roots: otherwise their combined maximum is
+`2*256+2*82=676`. Duplicate abscissae across offsets only raise the
+required summed count. This is a necessary construction-yield gate;
+it does not bound how many such high-root offsets exist or whether an
+eight-weight subset-sum family can select them.
+
 This is a two-summand secant theorem. A four-summand B677 relation
 would need a sound composition with target, sign, distinct-index and
 root-extraction semantics. Before a lower-total-work claim, a concrete
