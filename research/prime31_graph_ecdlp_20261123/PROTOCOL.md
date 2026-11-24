@@ -89,6 +89,44 @@ implementation uses x-keyed sign variants and must be measured separately.
 An improvement requires a source with conditional yield, per-probe cost,
 or projected-rank behavior outside this model, with exact group replay.
 
+### Cold setup and probe floor for the fixed pair-table model
+
+The same uniform model gives an asymptotic cost gate. Let `L` count
+stored signed pair entries **with multiplicity**, and let `M` count a fixed
+schedule of probes of the form `x(R-D_j)` across uniform public queries
+`R`. The offsets `D_j` and the table are chosen independently of those
+queries. For any fixed nonidentity table point and probe offset, at most
+two group elements `R` have the matching abscissa. By linearity of
+expectation, the number `C` of entry-probe matches therefore obeys
+`E[C] <= 2*L*M/n`, even when probes from one query and table entries are
+dependent. For full point keys the factor two becomes one. Rejected
+signs, repeated rows and rank deficiency can only reduce the useful
+row count.
+
+If `r` independent rows are required with success probability at least
+`eta`, then `C>=r` on success and hence `M>=eta*r*n/(2*L)` for the
+abscissa-keyed table. Charging `c_s>0` per materialized entry and
+`c_p>0` per probe gives the conditional cold-work floor
+
+`W >= c_s*L+c_p*M >= 2*sqrt(c_s*c_p*eta*r*n/2)`.
+
+For a full-rank factor-base collection with `r=Theta(B)` and
+`B=Theta(n^alpha)`, fixed positive `eta,c_s,c_p` give
+`Omega(n^((1+alpha)/2))` entry/probe work. Thus a growing base does not
+gain an asymptotic exponent over the `Theta(sqrt(n))` generic rho scale
+in this **fixed-table, uniform-query** model. This is a counting bound
+on an algorithm family, not a measured group-addition bound or a result
+about adaptive probes, structured algebraic extraction, reuse across
+targets, or an early target-only dependency.
+
+At the frozen B677 size, `L=915,304` signed entries. Setting the
+optimistic expected match count to `r=B=677` requires at least
+`ceil(B*n/(2*L))=794,175` abscissa probes, or 1,709,479 entry/probe
+units including setup. This expectation threshold alone does not give a
+success probability, and these mixed units cannot be compared directly
+with the receipt's charged group additions. The observed source also
+rejects candidates and pays for replay and rank.
+
 ## Algebraic partial producer to qualify next
 
 The repository's RR5 public four-summand extractor is a specific candidate
