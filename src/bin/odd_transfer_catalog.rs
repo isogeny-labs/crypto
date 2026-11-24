@@ -1340,6 +1340,7 @@ fn odd_transfer_catalog(
 
         let graph_map = &graph_maps[&map_uid];
         let family;
+        #[allow(clippy::needless_late_init)]
         let map_status;
         let mut named_subgroups = Vec::new();
         let mut failures = Vec::new();
