@@ -149,7 +149,9 @@ Reading the table:
    earlier NIST pilot is a symmetry count, not a density measurement.
 2. **The answer.** The harness plants `k = 1 + seed mod (r − 1)`. `verify.py`
    recomputes that formula outside the harness and compares it with `recovered`
-   for all eight runs: `139, 2683, 9331, 9331, 60091, 203179, 2683` all match.
+   for every run that recovered a scalar — seven of the eight result files; the
+   eighth is the strict-certificate run of §5. Values
+   `139, 2683, 2683, 9331, 9331, 60091, 203179` all match.
 3. Each run's own final check is a group-law test `[d]G == target` with counted
    scalar multiplications, not a comparison of two copies of the same number.
 
