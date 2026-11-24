@@ -1,0 +1,15 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=12, color="#52738c", fillcolor="#edf3f8", margin="0.15"];
+  edge [color="#52738c", arrowsize=0.7];
+  h2 [label="Dense H2: exact but 712.57x traced partial products\nConsumed rejection-cost study", fillcolor="#fbece8", color="#b54a3b"];
+  h5 [label="H5: field-equation prefilter\nExisting univariate filter already present\nFree entire root phase: <=1.3871x partial-pair ceiling"];
+  h3 [label="H3: stop collection at nullity k>1\nMust retain complete kernel\nk<=8: first possible recorded batch B153600\nObserved stop B155648; CPU saving unknown"];
+  h6 [label="H6: force an existing graph divisor Q=(U,V)\nA=UT-CV; A²-C²H=U*S\nSeven quadratic conditions / eight Fp coordinates\nCheap rational family and graph yield unproved",fillcolor="#e6f4ef",color="#007f73"];
+  pilot [label="Next: exact Rust constructor + planted function replay\nCheck geometry, then freeze a finite fiber/cost pilot\nNo relation-finding call registered by this review"];
+  h2 -> h5;
+  h2 -> h3;
+  h5 -> h6 [label="cost review",fontsize=10];
+  h3 -> h6 [label="graph feedback",fontsize=10];
+  h6 -> pilot;
+}
