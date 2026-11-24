@@ -320,6 +320,34 @@ This extends only the **exactness exclusion**. It does not bound
 the bias of an 87-feature rule, nor exclude other point functions or
 a compact high-degree evaluator. [pcc:unverified]
 
+## Nonsquare-action bias gate
+
+The P-192 scalar `3` is a quadratic nonresidue modulo `r`.
+For any bounded point feature `F:E(F_p)\{O}→[-1,1]`, define its
+full-group correlation with the desired sign by
+
+`ρ_F = (r-1)^(-1) Σ_{d=1}^{r-1} χ_r(d)F([d]G)`.
+
+Reindexing the same sum by `d↦3d` gives the exact identity
+
+`2ρ_F = (r-1)^(-1) Σ_{d=1}^{r-1} χ_r(d)(F([d]G)-F([3d]G))`.
+
+Consequently a feature invariant under `[3]` has **zero bias**,
+including any statistic that sees only the unanchored orbit pair
+exchanged by `[3]`. More quantitatively, if `F(P)≠F([3]P)` at no
+more than `E_3` nonidentity points, then
+`|ρ_F|≤E_3/(r-1)`, since each summand difference has magnitude at
+most two. This holds for exact and weak-bias proposals; it makes
+no assumption about the arithmetic form of `F`. [pcc:unverified]
+
+At the illustrative specified-feature cold threshold
+`g≈2^-41.418` below, a necessary condition is
+`E_3>(r-1)g≈2^150.582` points. This is only a symmetry falsifier:
+a feature that changes on many points can still have zero
+correlation. A PARI/GP check of `kronecker(3,r)` returns `-1` and
+of `log((r-1)g)/log(2)` returns `150.582374349494...` using the
+same `C=384` model. [pcc:unverified]
+
 ## Random-offset correlation gate
 
 Exactness is stronger than useful bias, so a separate average-case
