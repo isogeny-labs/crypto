@@ -10,9 +10,12 @@ on:
       - examples/lp_graph_eval.rs
       - research/lp_graph_algorithms_20261123/native_gain_dsu/**
       - research/prime31_ic_20261115/native/examples/prime31_lp_group_admission.rs
+      - research/prime31_ic_20261115/native/examples/prime31_b677_capture.rs
       - research/prime31_ic_20261115/native/lib.rs
       - research/prime31_ic_20261115/native/Cargo.toml
       - research/prime31_ic_20261115/native/Cargo.lock
+      - research/prime31_four_summand_20261122/native/b677_fixture.rs
+      - research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv
       - src/cryptanalysis/f4_fp_tower.rs
       - src/cryptanalysis/sig_fp_tower.rs
       - .github/workflows/graph-ic-gain-dsu-native.yml
@@ -117,6 +120,26 @@ jobs:
           cat "$PRIME31_QUALIFICATION_ARTIFACT_DIR/qualification.stdout"
           cat "$PRIME31_QUALIFICATION_ARTIFACT_DIR/qualification.stderr" >&2
           exit "$qualification_status"
+      - name: Replay frozen M31 capture with original native consumers
+        # Analysis of retained results only. The exact producer source and
+        # capture are archived; the collector is never compiled or invoked.
+        shell: bash
+        env:
+          CARGO_BUILD_JOBS: "1"
+          RUST_TEST_THREADS: "1"
+          RAYON_NUM_THREADS: "1"
+          PRIME31_QUALIFICATION_ARTIFACT_DIR: ${{ runner.temp }}/prime31-group-admission-qualification
+          M31_CAPTURE_REPLAY_ARTIFACT_DIR: ${{ runner.temp }}/prime31-group-admission-qualification/m31-retained-capture
+        run: |
+          mkdir -p "$M31_CAPTURE_REPLAY_ARTIFACT_DIR"
+          ulimit -v 4194304
+          set +e
+          timeout --signal=TERM --kill-after=5s 300s bash research/lp_graph_algorithms_20261123/native_gain_dsu/replay_m31_capture.sh >"$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.stdout" 2>"$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.stderr"
+          replay_status=$?
+          printf '%s\n' "$replay_status" >"$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.exit"
+          cat "$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.stdout"
+          cat "$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.stderr" >&2
+          exit "$replay_status"
       - name: Retain native qualification evidence on success or failure
         if: always()
         uses: actions/upload-artifact@v4
