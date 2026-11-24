@@ -27,7 +27,7 @@ def witness_coefficients(basis, value):
     return mask
 
 
-def normalized(field, basis, target):
+def normalized_rhs(field, basis, target):
     def half(value):
         result = value
         for _ in range((field.n - 1) // 2):
@@ -40,6 +40,11 @@ def normalized(field, basis, target):
     for u in basis:
         w = field.mul(target, half(field.sq(u)))
         p_linear.append(w ^ (target if field.tr(w) else 0) ^ u)
+    return const, p_linear
+
+
+def normalized(field, basis, target):
+    const, p_linear = normalized_rhs(field, basis, target)
     k = len(basis)
     words = [(0, const)]
     for i, u in enumerate(basis):

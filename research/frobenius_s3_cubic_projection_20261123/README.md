@@ -69,11 +69,11 @@ The closure verifier tracks the span of rows whose variable products have alread
 
 ## Quadratic field multiples
 
-Write (F=x^2+sx+p(s)), where (p) is affine. Over Boolean coordinates, field squaring is linear. Consequently both (sF=sx^2+s^2x+sp(s)) and (xF=x^3+sx^2+xp(s)) are quadratic, using (x^3=xcdot x^2). Their binary coordinates belong to (V_3(F)), since each is a linear combination of products of coordinates of (F) by variables. They preserve the solution set and can be generated directly as quadratics. If (G) is the system obtained by adjoining these coordinates, then (V_D(G)=V_D(F)) for (Dge3): every input row of (G) lies in (V_D(F)), which is already closed under the permitted products. The construction can still change (V_2). [pcc:unverified]
+Write \(F=x^2+sx+p(s)\), where \(p\) is affine. Over Boolean coordinates, field squaring is linear. Consequently both \(sF=sx^2+s^2x+sp(s)\) and \(xF=x^3+sx^2+xp(s)\) are quadratic, using \(x^3=x\cdot x^2\). Their binary coordinates belong to \(V_3(F)\), since each is a linear combination of products of coordinates of \(F\) by variables. They preserve the solution set and can be generated directly as quadratics. If \(G\) is the system obtained by adjoining these coordinates, then \(V_D(G)=V_D(F)\) for \(D\ge3\) because every input row of \(G\) lies in \(V_D(F)\), which is already closed under the permitted products. The construction can still change \(V_2\). [pcc:unverified]
 
-For the telescoping multiplier (alpha_r) with (rge2), the term with (j=0) has a factor (s). Multiply (sF) by the remaining (r-1) Frobenius-linear factors. The other terms in (alpha_r) have degree at most (r-1). This derives (operatorname{Tr}(alpha_r p)) in (V_{r+1}(F)) and saves one degree relative to the raw bound (r+2) for these consequences. The left-kernel coverage still depends on the multiplier family. [pcc:unverified]
+For the telescoping multiplier \(\alpha_r\) with \(r\ge2\), the term with \(j=0\) has a factor \(s\). Multiply \(sF\) by the remaining \(r-1\) Frobenius-linear factors. The other terms in \(\alpha_r\) have degree at most \(r-1\). This derives \(\operatorname{Tr}(\alpha_r p)\) in \(V_{r+1}(F)\) and saves one degree relative to the raw bound \(r+2\) for these consequences. The left-kernel coverage still depends on the multiplier family. [pcc:unverified]
 
-On the same 28 seven-bit targets used for the quotient comparison, adjoining both multiples lowers the last fall degree and solving degree from three to two in all 28 cases. The first fall degree also drops from three to two. The mixed-coordinate column count at the solving degree drops from 42 to 22. With (sF) alone the solving degree drops on 21 targets. On the four 23-bit targets, the solving degree and last fall degree remain four, as implied by the (V_D) equality. This establishes a degree reduction on the seven-bit panel. A reduction at larger field sizes or in the decomposition exponent remains open. [pcc:unverified]
+On the same 28 seven-bit targets used for the quotient comparison, adjoining both multiples lowers the last fall degree and solving degree from three to two in all 28 cases. The first fall degree also drops from three to two. The mixed-coordinate column count at the solving degree drops from 42 to 22. With \(sF\) alone the solving degree drops on 21 targets. On the four 23-bit targets, the solving degree and last fall degree remain four, as implied by the \(V_D\) equality. This establishes a degree reduction on the seven-bit panel. A reduction at larger field sizes or in the decomposition exponent remains open. [pcc:unverified]
 
 ## Quotient coordinates
 
@@ -126,7 +126,24 @@ The monomials \(S^e\) with \(0\le e<2^k\) form a basis for \(K\)-valued function
 
 At 23 bits the ordinary degree is 2,047 and the Boolean expansion contains 2,047 or 2,048 nonzero monomials. The span of its binary coordinate equations is zero through degree eight and has dimensions 11, 22, and 23 in degrees nine, ten, and eleven. Those are input-row degrees. The direct, quotient, and quadratically augmented systems have measured solving degree four on the four shared first-factor targets. [pcc:unverified]
 
-For 7 and 23 bits the independent rank-and-recovery check, pointwise recurrence, and dense polynomial GCD return the same solution sums. The dense GCD test records sparse construction, dense conversion, GCD, and isolation separately. It expands the polynomial to \(2^k\) coefficient slots at 23 bits. Scanning the recurrence also visits \(2^k\) sums. Both extraction methods have work that scales with \(2^k\). Sparse root isolation and three-summand joining remain open. [pcc:unverified]
+For 7 and 23 bits the independent rank-and-recovery check, pointwise recurrence, and dense polynomial GCD return the same solution sums. The dense GCD test records sparse construction, dense conversion, GCD, and isolation separately. It expands the polynomial to \(2^k\) coefficient slots at 23 bits. Scanning the recurrence also visits \(2^k\) sums. Both extraction methods have work that scales with \(2^k\). Sparse root isolation remains open. [pcc:unverified]
+
+## Three-summand join by fixing the third point
+
+Take signed factor-base points with abscissae in \(1+U\) and a target point \(R\) on the toy curve. For each allowed third point \(C\), compute \(W=R-C\) and solve the two-coordinate equation at \(x(W)\). The normalized unknown \(x\) is the first abscissa translated by 1. For every recovered nonzero selector sum, the half trace gives the two orientations of the same pair of abscissae. Look up their rational lifts and check \(P+Q=W\) for each possible signing. Record each unordered signed triple once per target with three distinct abscissae. An identity intermediate can only give a cancelling pair, which repeats an abscissa. [pcc:unverified]
+
+All factor-base points lie in \(2E(K)\), so both solvers reject targets outside that subgroup up front. Membership for a finite point \(W=(t,y)\) is equivalent to \(\operatorname{Tr}(t)=1\). Doubling gives \(t=\lambda^2+\lambda+1\), hence the forward implication. For the converse, take a solution \(\lambda\) to this equation, let \(u^2=y+(\lambda+1)t\), and set \(v=(\lambda+u)u\). The curve equation at \(W\) gives \(u^4+tu^2+1=0\), so \(u\ne0\) and \((u,v)\) lies on the curve. Its double is \(W\). The two solvers share this gate and the intermediate-point calculations. The reference enumerates one signed pair point and computes its complement by group arithmetic with batched inversion. [pcc:unverified]
+
+The image coefficients depend on the sum \(s\) alone and can be cached across targets. A fixed \(R\) and an intermediate abscissa \(t\) allow at most two different third points because \(W\) has at most two signs and \(C=R-W\) is unique for each. With \(B\) factor-base abscissae and all \(2B\) thirds allowed, an eligible target has between \(B\) and \(2B\) nonidentity intermediate abscissae. The cached recurrence must therefore visit \(\Theta(B2^k)\) selectors per target in this sliced join. The GCD arm constructs a sparse residual for each distinct intermediate abscissa, then materializes its dense coefficient array and isolates the common roots. This analysis concerns the sliced algorithm. A join that processes the intermediates together remains open. [pcc:unverified]
+
+All three methods produced identical signed triple sets on the measured panels. At 7 bits the panel exhausts the finite targets and signed thirds for each subspace, and independently checks the 142 subgroup rejections by group arithmetic. At 23 bits it uses eight signed thirds per subspace and five targets, one planted and four shared with the two-coordinate comparison. Of the 80 intermediate abscissae, 47 give no selector root. The GCD arm constructs 200 nonzero terms and materializes 2,048 coefficient slots per intermediate. [pcc:unverified]
+
+| Field degree | Targets across both factors | Verified signed triples | Direct group join | Cached recurrence | Sparse build with dense GCD |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 7 | 282 | 560 | 0.152 s | 0.248 s | 0.442 s |
+| 23 | 10 | 37 | 2.94 s | 10.24 s | 15.45 s |
+
+Totals include shared factor-base setup once per factor, intermediate construction, failed searches, and pair recovery. The scan total also includes its image cache. The supplied target and third-summand panels are fixed across arms. At 23 bits, this comes to about 0.079 s, 0.277 s, and 0.418 s per verified triple, respectively. This counts triples with distinct abscissae, without measuring their effect on relation-matrix rank or running a complete ECDLP solve. [pcc:unverified]
 
 ## Reproduction
 
@@ -183,5 +200,13 @@ SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_2026112
 ```
 
 The resultant results are in [subspace-resultant.jsonl](subspace-resultant.jsonl).
+
+Run the three-summand comparison with the same dependencies.
+
+~~~sh
+SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_20261123/three_summand_join.py 7 23 --dense-gcd
+~~~
+
+The join results are in [three-summand-join.jsonl](three-summand-join.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
