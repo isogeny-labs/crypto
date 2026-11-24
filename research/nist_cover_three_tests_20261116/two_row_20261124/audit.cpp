@@ -34,7 +34,7 @@ Point scaled(Point q,int n) {
     while(n--) result=plus(result,q);
     return result;
 }
-std::string ssl_query(SSL& ssl,const Point& a,const Point& b0,int coefficient,int sign) {
+std::string ssl_query(audit::SSL& ssl,const Point& a,const Point& b0,int coefficient,int sign) {
     auto x=ssl.make(a),y=ssl.make(b0),result=ssl.make({});
     if(coefficient==2) require(EC_POINT_dbl(ssl.group.get(),x.get(),x.get(),ssl.context.get())==1,"SSL query double");
     else require(coefficient==1,"bounded query coefficient");
@@ -59,7 +59,7 @@ int run(int argc,char** argv) {
     require(std::string(argv[4])!=argv[5],"distinct output paths");
     const auto data=read_json(argv[1]),tangents=read_json(argv[2]),prior=read_json(argv[3]);
     std::vector<Point> base,images,symbols(1);
-    SSL ssl;
+    audit::SSL ssl;
     for(const auto& item:data.at("projected_base").arr) {
         const auto q=read_point(item);
         require(!q.zero&&on_curve(q)&&q.y<=p-q.y,"canonical old symbol");
