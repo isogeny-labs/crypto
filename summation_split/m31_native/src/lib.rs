@@ -13,5 +13,7 @@ pub mod systems;
 pub mod f4;
 #[cfg(test)]
 mod system_certificate_tests;
+#[cfg(test)]
+mod projection_tests;
 pub use quotient::{Error, Poly, Polynomial, Ring};
 

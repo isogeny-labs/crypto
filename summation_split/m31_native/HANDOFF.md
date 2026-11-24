@@ -1,4 +1,33 @@
-# Published component and remaining gates
+# Current continuation: checked native projection
+
+The 2026-11-24 continuation adds exact geometric projection from the checked
+native basis on the fixed four-point M31 section. The first frozen attempt
+passed 40 library and five CLI tests. The existing unique m3/case0 geometric
+sequential fixture returns exactly `{(0,0)}`, matching the signed-point
+oracle. Extraction uses six normal-form queries, 29 leading-term iterations
+and 28 polynomial subtractions at degree at most two. See
+[the projection report](projection_20261124/REPORT.md),
+[structured receipt](projection_20261124/evidence/QUALIFICATION.json),
+[proof](projection_20261124/PROOF.md) and
+[integration state](projection_20261124/evidence/INTEGRATION.md).
+The new records are `PCC-20261124-3de82e` (data) and
+`PCC-20261124-0c52ec` (interpretive), both with unverified standing.
+[pcc:unverified]
+
+`solve-one` now exposes an explicit bounded native pipeline for the four
+arms and both witness modes, retaining explicit-Fp2 relations. It is built
+and its adapter/serialization are unit-tested; no extra coupled scientific
+instance was launched through the CLI. The next admitted execution remains
+the full 50-per-configuration projected-output gate and matched cost panel.
+Authenticated shared admission and checkpoint custody remain unavailable.
+Keep the existing PR draft; the broader comparison is unfinished.
+
+The remainder of this file preserves the earlier handoff as historical
+context. Its statements about absent native projection and 29-test counts
+describe the earlier source commit and are superseded by the supplement
+above. Earlier frozen evidence and source-pinned reports remain unchanged.
+
+## Earlier publication and gates
 
 Source/evidence commit:
 `c418251c7a442cd7360986f7711daa3820395e7c` on existing draft PR #5087.

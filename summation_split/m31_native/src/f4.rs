@@ -14,7 +14,9 @@
 //!
 //! A complete result means the pair queue was exhausted. A resource limit
 //! returns an explicitly incomplete result, never an empty solution set.
-//! This module computes a basis, not roots or signed point decompositions.
+//! `compute` produces a basis. The `projection` submodule separately checks
+//! that basis and extracts its complete parameter support on the prescribed
+//! four-point section; it does not recover signed point decompositions.
 //! Diagnostics distinguish raw product degree from degree after NF_J and are
 //! construction counters, not timing, RSS, or a general solving-degree bound.
 //!
@@ -28,6 +30,8 @@ use crate::quotient::{Error, Poly, Ring};
 use crate::M31;
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
+
+pub mod projection;
 
 type Monomial = Vec<u64>;
 type Pair = (u64, usize, usize);
@@ -556,11 +560,21 @@ impl OrdinaryOracle {
         Ok(())
     }
 
-    fn remainder(&mut self, mut p: Poly, basis: &[Poly]) -> Result<Poly, Error> {
+    fn remainder(&mut self, p: Poly, basis: &[Poly]) -> Result<Poly, Error> {
+        self.remainder_measured(p, basis, None)
+    }
+
+    // Projection uses this same ordinary division, with its own leading-term
+    // iteration meter. The existing verifier path supplies no meter and keeps
+    // its original arithmetic and reduction-count semantics.
+    fn remainder_measured(&mut self, mut p: Poly, basis: &[Poly],
+                          mut meter: Option<&mut projection::DivisionMeter>) -> Result<Poly, Error> {
+        if let Some(meter) = meter.as_deref_mut() { meter.observe_degree(p.degree())?; }
         if p.degree() > self.limits.max_degree { return Err(Error::Limit("ordinary verification degree")); }
         bound(p.terms.len(), self.limits.max_nonzeros, "ordinary verification terms")?;
         let mut rem = Poly::zero(p.variables);
         while let Some((m, c)) = self.lm(&p) {
+            if let Some(meter) = meter.as_deref_mut() { meter.start_iteration(degree(&m)?)?; }
             let mut divisor = None;
             for g in basis {
                 if let Some((gm, gc)) = self.lm(g) {
@@ -576,6 +590,7 @@ impl OrdinaryOracle {
                 rem.terms.insert(m, c);
                 bound(rem.terms.len(), self.limits.max_nonzeros, "ordinary verification terms")?;
             }
+            if let Some(meter) = meter.as_deref_mut() { meter.observe_degree(p.degree())?; }
         }
         Ok(rem)
     }
@@ -856,8 +871,21 @@ mod tests {
         let verifier_limits = Limits { max_pairs: 10_000, max_steps: 10_000,
             max_reductions: 1_000_000, max_basis: 128, max_degree: 12,
             ..limits };
-        let verification = verify(&ring, &equations, &result, verifier_limits).unwrap();
-        eprintln!("one_m3_ordinary_verification={verification:?}");
-        assert_eq!(verification.status, VerificationStatus::Verified);
+        let projection = projection::verify_and_project(
+            &ring, &equations, &result, model.parameters, verifier_limits,
+            projection::ProjectionLimits::default(),
+        ).unwrap();
+        eprintln!("one_m3_ordinary_verification={:?}", projection.verification);
+        eprintln!("one_m3_checked_projection status={:?} metrics={:?}",
+            projection.status, projection.metrics);
+        assert_eq!(projection.status, projection::ProjectionStatus::Complete);
+        assert_eq!(projection.verification.as_ref().unwrap().status, VerificationStatus::Verified);
+        let solution = projection.solution().expect("completed projection must carry all points");
+        assert_eq!(solution.points(), &systems::expected_projection(&plane).unwrap());
+        assert_eq!(projection.metrics.section_queries_completed, 2);
+        assert_eq!(projection.metrics.indicator_queries_completed, 4);
+        assert_eq!(projection.metrics.queries_completed, 6);
+        assert!(projection.metrics.max_degree <= 2);
+        eprintln!("one_m3_projected_points={:?}", solution.points());
     }
 }

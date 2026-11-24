@@ -1,5 +1,6 @@
-//! Native preparation and exact projected-output checking. This CLI never
-//! submits a benchmark or silently starts msolve.
+//! Native preparation, bounded single-instance solving and exact projection.
+//! Scientific campaign admission is external; no batch is started implicitly.
+mod solve_command;
 use m31_projective_preclosure::multiplicity;
 use m31_projective_preclosure::quotient::{field_add,field_mul,field_pow,field_sub};
 use m31_projective_preclosure::systems::{self,Arm,WitnessMode};
@@ -141,16 +142,17 @@ fn check_projection(args:&[String])->Result<(),String> {
     println!("M31 m={m} case={case}: exact projected set matches ({})",point_string(&observed));
     Ok(())
 }
-fn run()->Result<(),String> {
+fn run()->Result<i32,String> {
     let args=env::args().collect::<Vec<_>>();
     match args.get(1).map(String::as_str) {
-        Some("prepare")=>prepare(&args[2..]),
-        Some("check-projection")=>check_projection(&args[2..]),
-        Some("multiplicity-gate")=>{if args.len()!=2{return Err("multiplicity-gate accepts no options".into());}println!("{}",multiplicity::run_multiplicity_gate()?.json());Ok(())},
-        _=>Err("Usage: m31-projective-preclosure prepare --out NEW_DIR [--cases 50] [--max-summands 4] [--mode fp2|geometric]\n       m31-projective-preclosure check-projection --summands 3 --case 0 --basis REDUCED_BASIS\n       m31-projective-preclosure multiplicity-gate\nThis program does not launch a scientific benchmark.".into()),
+        Some("prepare")=>prepare(&args[2..]).map(|_|0),
+        Some("check-projection")=>check_projection(&args[2..]).map(|_|0),
+        Some("solve-one")=>solve_command::run(&args[2..]),
+        Some("multiplicity-gate")=>{if args.len()!=2{return Err("multiplicity-gate accepts no options".into());}println!("{}",multiplicity::run_multiplicity_gate()?.json());Ok(0)},
+        _=>Err("Usage: m31-projective-preclosure prepare --out NEW_DIR [--cases 50] [--max-summands 4] [--mode fp2|geometric]\n       m31-projective-preclosure check-projection --summands 3 --case 0 --basis REDUCED_BASIS\n       m31-projective-preclosure solve-one --out NEW_DIR --summands 3 --case 0 --arm preclosed_sequential --mode geometric\n       m31-projective-preclosure multiplicity-gate\nsolve-one uses the fixed development budget; scientific campaign admission remains external.".into()),
     }
 }
-fn main(){if let Err(error)=run(){eprintln!("{error}");process::exit(1);}}
+fn main(){match run(){Ok(0)=>{},Ok(code)=>process::exit(code),Err(error)=>{eprintln!("{error}");process::exit(1);}}}
 
 #[cfg(test)]
 mod tests {
