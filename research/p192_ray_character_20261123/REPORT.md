@@ -280,6 +280,14 @@ sampling procedure, not a lower bound on all certification methods;
 using the calibration data to choose the classifier would require
 additional selection control. [pcc:unverified]
 
+Substituting this cold threshold for `ε` in the random-offset bound
+above gives a fraction below `2^-67` for `k=41` uniform offset tuples
+that could clear this *specified* cold sampling gate. With
+`g=sqrt(4*384*log(200)/sqrt(Pi*r/4))`, PARI/GP at 80-digit
+precision gives `log₂[(2^42/(r-1))/(g-164/(r-1))²] ≈ -67.165`.
+This is a numerical consequence of the assumed trial cost, not a
+restriction on deliberately selected offsets. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
