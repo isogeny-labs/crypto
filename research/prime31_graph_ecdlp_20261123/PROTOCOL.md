@@ -363,6 +363,33 @@ Maximum independent set and spectral partitioning have no measured benefit
 on this stream yet, so neither is promoted into the native pipeline.
 `graph-order-comparison.json` records the source receipt hash and all arms.
 
+### All-base necessity control for the generic source
+
+`all_base_control.py` independently replays the same frozen signed equations
+and treats all 677 support points as factor-base columns, with no LP graph.
+At ten queries, its 645 rows have augmented rank 645 and no target-only row.
+At eleven queries, its 707 rows have augmented rank 672 and the target-only
+row `d=987654321`, verified as `dG=Q`. The 509-base/168-LP graph consumer
+uses only 669 of those rows and has augmented rank 668. Thus the LP graph
+was **not necessary** for this generic-source target solve. The graph-order
+comparison above measures a valid projection component, but cannot be used
+as evidence that graph processing enabled the recovered scalar. The exact
+source hash and both all-base ranks are in `evidence/mitm-b677-control-01/
+all-base-control.json`.
+
+For every fixed support of 677 distinct abscissae, each signed four-point
+tuple sums to a fixed group element. A uniform `R=aG+bQ` equals that sum
+with probability `1/n`, so the expected signed witness count is exactly
+`16*C(677,4)/n = 64.6376197055` per query on this curve, independent of
+the support geometry or any graph partition. A graph algorithm can change
+duplicate handling, extraction cost, and useful rank on a finite stream;
+it cannot increase this generic source's expected witness count solely by
+rearranging the same 677 points. Consequently, MIS or spectral support
+selection requires a measured rank or cost gain on a held-out public-query
+panel, with selection work charged, before it becomes a candidate pipeline
+component. The algebraic RR5 source remains the route to test for a
+non-generic relation advantage.
+
 ## Prior work and claim boundary
 
 - Semaev, [*Summation polynomials and the discrete logarithm problem on
