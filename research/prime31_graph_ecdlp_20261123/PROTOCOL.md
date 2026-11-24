@@ -266,6 +266,29 @@ queries with signed-row replay, occupied-LP rank, factor-base projection,
 target scalar recovery, and a cold same-target rho comparison. Graph
 algorithm choices become measurable only after that stream exists.
 
+### Exact selector-separator prerequisite
+
+`selector_split_gate.py` reconstructs the public degree-1024 Dickson
+selector `D(X)` and degree-168 Y7 selector `Y(X)` from the frozen fixture.
+FLINT computes `gcd(D,Y)=1` over this field. For the grader-side positive
+quartic `U`, it independently checks `U=U_D*U_Y`, where `U_D=gcd(U,D)` and
+`U_Y=gcd(U,Y)` have degrees two and two. This is a structural certificate,
+not an extraction of an unknown public-query relation.
+
+The coprime factorization gives an exact branch decomposition for any
+squarefree quartic with `U | D*Y`: its Dickson and Y7 factors have degrees
+`(4,0)`, `(3,1)`, `(2,2)`, `(1,3)`, or `(0,4)`. The first three can feed the
+existing direct/one-LP/two-LP graph consumer. The current 122-variable
+selector circuit multiplies the two branches in one final modular gate;
+the branch split is a sound way to test a smaller algebraic system before
+increasing the combined F4 matrix cap again. The next implementation gate
+must construct and solve each relevant branch from the public query alone,
+without receiving the grader's factorization, then check every signed row
+and charge branch setup, algebraic solving, graph work and failures. If the
+split systems still exceed the resource cap or their fully charged cost
+cannot approach matched rho, the branch split is rejected. The certificate
+and source hash are in `evidence/rr5-b677-prerequisite-01/selector-split-gate.json`.
+
 ### Generic signed four-sum end-to-end control on the B677 curve
 
 `native/mitm_four.rs` supplies a separate, point-keyed meet-in-the-middle
