@@ -11,6 +11,7 @@ mod upstream {
     include!(env!("S3_FIELD_KERNEL"));
 }
 use upstream::{Gf2, IrreduciblePoly};
+mod higher_degree;
 mod native_recovery;
 
 fn span(basis: &[u64]) -> Vec<u64> {
@@ -521,9 +522,10 @@ fn benchmark(n: u32, k: u32, polynomial: u64, trials: usize, panel: u64) {
 }
 
 fn main() {
-    if std::env::args().nth(1).as_deref() == Some("recovery") {
-        native_recovery::run();
-        return;
+    match std::env::args().nth(1).as_deref() {
+        Some("recovery") => return native_recovery::run(),
+        Some("higher-degree") => return higher_degree::run(),
+        _ => {}
     }
     let trials = std::env::args()
         .nth(1)

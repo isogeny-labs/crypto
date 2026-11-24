@@ -261,6 +261,29 @@ There are at most eight oriented solutions, since every sum–product candidate 
 
 An exact membership check on 56 toy instances across seven quadratic and cubic geometries gives direct solving degree at most three. Every nonempty tested fiber has reduced basis degree at most two. The bound and the certificates concern solving degree. They are separate from the earlier measured exponent for pair extraction and the wall-clock gain in native recovery. [pcc:unverified]
 
+## Higher-summand degree certificates
+
+The native probe constructs the direct higher Semaev polynomials by iterating a homogeneous quadratic resultant. For fixed abscissa \(u\) and remaining variable \(X\), the quadratic in the intermediate \(T\) has coefficients \(A=u^2+X^2\), \(B=uX\), \(C=u^2X^2+1\). For a previous polynomial \(P(T)\) of prescribed homogeneous degree \(d\), set \(Z=AT\) and reduce \(A^dP(Z/A)\) modulo \(Z^2+BZ+AC\). If the remainder is \(UZ+V\), the new polynomial is
+
+\[
+  \frac{V^2+BUV+ACU^2}{A^d}.
+\]
+
+The division is exact in the polynomial ring before any evaluation. Keeping the prescribed degree on rows with zero leading coefficient accounts for roots at infinity in the next step. Controls compare the first resultant with S3 on every small coset pair and check reversed input order and signed group sums, including repeated abscissae. [pcc:unverified]
+
+For each selected target, the verifier obtains the exact Boolean coefficients by a Möbius transform of the direct evaluation table. For every candidate degree \(D\), let \(H_D\) be the binary span of the coefficient words of degree at least \(D\). Any binary linear combination of input coordinates of degree below \(D\) is a functional annihilating \(H_D\). A point with nonzero evaluation in \(H_D\) satisfies every such combination. This certifies solving degree at least \(D\) under bounded multiplication closure, even allowing degree-based linear row preprocessing of the direct input. [pcc:unverified]
+
+| Field degree | Summands | Boolean variables | Certified direct solving-degree lower bounds |
+| ---: | ---: | ---: | ---: |
+| 9 | 3 | 9 | 5–6 |
+| 9 | 4 | 12 | 11–12 |
+| 9 | 5 | 15 | 15 |
+| 9 | 6 | 18 | 18 |
+| 12 | 4 | 16 | 12 |
+| 12 | 5 | 20 | 20 |
+
+The measured solution counts are nonpowers of two, so an affine linear system in the original variables cannot describe these fibers. For the four 20-variable instances, three Boolean nonsolutions satisfy every quadratic that vanishes on the true points, one witness per target. The fourth instance instead has a cubic minimal leading term in degree reverse lexicographic order, certified by evaluating consecutive monomials on its 300 points. Its leading monomial has mask 917504. Therefore each 20-variable instance needs a basis of degree at least three in those variables and that order. The direct systems solve in degree at most \(w+1\) for \(w\) Boolean variables because this cap permits every variable product of every multilinear row. Combining these bounds rules out a tenfold drop for a single exact solution-ideal basis on these panels in the original variables and fixed order. It leaves the question open for larger baselines and different representations. Per-branch linear solves would need separate accounting for reconstruction of the full ideal. [pcc:unverified]
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.
@@ -378,5 +401,13 @@ SYMPY_GROUND_TYPES=python python3 research/frobenius_s3_cubic_projection_2026112
 ~~~
 
 The solving-degree records are in [coset-degrees.jsonl](coset-degrees.jsonl).
+
+Replay the native higher-summand certificates.
+
+~~~sh
+bash research/frobenius_s3_cubic_projection_20261123/run_native_coset.sh higher-degree
+~~~
+
+The witness records are in [higher-degree.jsonl](higher-degree.jsonl).
 
 The multiplier records are in [cubic-ranks.jsonl](cubic-ranks.jsonl), [quadratic-ranks.jsonl](quadratic-ranks.jsonl), [unrestricted-ranks.jsonl](unrestricted-ranks.jsonl), and [unrestricted-quartic-ranks.jsonl](unrestricted-quartic-ranks.jsonl). The unrestricted verifier checks direct binary-coordinate ranks at 7 and 23 bits, and compares logarithm-table arithmetic against polynomial arithmetic for the extension blocks through 47 bits. The last-fall conventions and references used for the broader experiments are recorded in the [LFD research note](../lfd_lower_bound_20261111/NOTE.md), including the relationship between last fall degree, reduced basis degree, and solving degree under a degree-compatible term order. [Caminata and Gorla](https://arxiv.org/abs/2112.05579)
