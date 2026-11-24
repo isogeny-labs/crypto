@@ -43,4 +43,13 @@ if [ "$PART" = diag ]; then
     --quartic-seeds 131101=53/177/288 --quartic-diag \
     --qc 3.0 --max-h 1 --curves 3 --seeds 2 --rho-cap 1 --threads 1 --out "$OUT/diag_131101.jsonl"
 fi
+if [ "$PART" = diagdev ]; then
+  # The development pairs named by the PROTOCOL.md section-4 amendment, at the picked
+  # setting (8,1.5,64), flags of dev/run_dev.sh plus --quartic-diag, 1 thread; compared
+  # with dev/dev_W8_F1.5_E64.jsonl by diag_check.py.
+  "$BIN" run --primes 4093,8191,32771 --genera 2 --arms - --curve-seeds 4093=1,8191=1,32771=1 \
+    --quartic --quartic-arms 2lp-sfb,2lp-sfb-sge --quartic-inhom 4 --quartic-sge 8,1.5,64 \
+    --quartic-seeds 4093=89,8191=106,32771=217 --quartic-diag \
+    --qc 3.0 --max-h 1 --curves 5 --seeds 2 --rho-cap 1 --threads 1 --out "$OUT/diag_dev.jsonl"
+fi
 echo REPLAY_DONE "$PART"
