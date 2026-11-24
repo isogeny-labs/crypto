@@ -48,6 +48,11 @@ def check(E, G, p, r, scalars, direct_roots=False,
         P = d * G
         psi = division_values(E, P)
         phi = (psi(p - 1) / psi(p - 1 + r)) ** root_exponent
+        ward_c = psi(r - 1) * psi(2) / psi(r - 2)
+        ward_e = psi(r + 1) / ward_c
+        assert ward_c == phi ** (-2 * r)
+        assert ward_e == phi ** (-r * r)
+        assert kronecker(ZZ(ward_e / psi(2)), p) == kronecker(ZZ(phi / psi(2)), p)
         if d == 1 and expected_base_character is not None:
             assert kronecker(ZZ(phi), p) == expected_base_character
         derivative = psi(m + 1) / (psi(2) * psi(m))

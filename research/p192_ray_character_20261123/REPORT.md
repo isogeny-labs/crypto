@@ -797,6 +797,30 @@ eight P-192 markings. The proof uses the composition identities;
 the finite checks validate their implementation and sign convention.
 [pcc:unverified]
 
+### Ward's second constant is the same screened character
+
+The square Ward constant `c(P)` leaves a possible-looking sign in
+its companion `e(P)`. With `W_j=ψ_j(P)`, write
+`c=W_(r-1)W_2/W_(r-2)` and `e=W_(r+1)/c`. The corrected
+[Lauter–Stange normalizer identity](https://arxiv.org/html/0803.0728v2)
+above, together with `φ(-P)=-φ(P)`, gives the exact field identities
+
+`c(P)=φ(P)^(-2r)` and `e(P)=φ(P)^(-r²)`.
+
+For example, substitute `[r-1]P=-P`, `[r-2]P=-[2]P`, and
+`[r+1]P=P` into `W_j=φ([j]P)/φ(P)^(j²)`.
+Since `r` is odd, `χ_p(e(P))=χ_p(φ(P))`. The sign-symmetric
+candidate `χ_p(e(P)/(2y(P)))` is therefore **identical** to
+`χ_p(φ(P)/ψ_2(P))`, and by the preceding section to the
+kernel-derivative character up to its fixed minus sign. It is
+an alternate expression for an already screened feature, not
+a new way to select the marked sign. The
+[`derivative_normalizer_control.sage`](derivative_normalizer_control.sage)
+replay checks both Ward field identities and their character
+equality on all 48 order-97 markings and eight P-192 markings;
+on the order-97 curve, the normalized character at `d=2`
+already differs from `χ_r(2)`. [pcc:unverified]
+
 ### Second division-polynomial jet: a compact exactness screen
 
 The first derivative of `ψ_r` at `x(P)` was screened in the local
