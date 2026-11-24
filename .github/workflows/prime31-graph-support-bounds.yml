@@ -1,10 +1,11 @@
-name: Prime31 graph support probability bounds
+name: Prime31 graph mathematical bounds
 
 on:
   pull_request:
     paths:
       - .github/workflows/prime31-graph-support-bounds.yml
       - research/prime31_graph_ecdlp_20261123/verify_offset_support_bounds.py
+      - research/prime31_graph_ecdlp_20261123/verify_pencil_projection_top.py
       - research/prime31_graph_ecdlp_20261123/SUMMATION_DEGREE_GATE.md
   push:
     branches:
@@ -12,6 +13,7 @@ on:
     paths:
       - .github/workflows/prime31-graph-support-bounds.yml
       - research/prime31_graph_ecdlp_20261123/verify_offset_support_bounds.py
+      - research/prime31_graph_ecdlp_20261123/verify_pencil_projection_top.py
       - research/prime31_graph_ecdlp_20261123/SUMMATION_DEGREE_GATE.md
   workflow_dispatch:
 
@@ -28,3 +30,7 @@ jobs:
           persist-credentials: false
       - name: Replay exact rational bounds and exhaustive F17 identities
         run: python3 research/prime31_graph_ecdlp_20261123/verify_offset_support_bounds.py
+      - name: Install pinned symbolic algebra dependency
+        run: python3 -m pip install --disable-pip-version-check sympy==1.14.0
+      - name: Replay M31 projected secant top ideals
+        run: python3 research/prime31_graph_ecdlp_20261123/verify_pencil_projection_top.py

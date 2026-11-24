@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Independent finite-field check of the Boolean secant top-ideal claim.
+"""Independent finite-field checks of Boolean secant top-ideal claims.
 
-This checks a complete two-bit-per-slot presentation and its exact one-bit
-projection over M31. The accompanying note gives the proof for arbitrary k.
+This checks a complete two-bit-per-slot presentation, its exact one-bit
+projection and the bounded multi-bit core law over M31. The accompanying
+note gives the proof for arbitrary k.
 Requires SymPy; no curve-point search or discrete-log computation occurs.
 """
 
-from itertools import combinations_with_replacement
+from itertools import combinations_with_replacement, product
 
 import sympy as sp
 
@@ -39,12 +40,12 @@ def same_ideal(generators, expected, variables):
     assert all(expected_gb.reduce(g)[1] == 0 for g in generators)
 
 
-def core_hilbert(generators):
+def core_hilbert(generators, through=5, order="grevlex"):
     variables = (m, x, z)
-    gb = sp.groebner(generators, *variables, order="grevlex", modulus=P)
-    leads = [tuple(int(power) for power in g.LM(order="grevlex").exponents) for g in gb.polys]
+    gb = sp.groebner(generators, *variables, order=order, modulus=P)
+    leads = [tuple(int(power) for power in g.LM(order=order).exponents) for g in gb.polys]
     counts = []
-    for degree in range(6):
+    for degree in range(through + 1):
         standard = 0
         for indices in combinations_with_replacement(range(3), degree):
             powers = tuple(indices.count(i) for i in range(3))
@@ -90,6 +91,32 @@ assert core_hilbert(core_all) == [1, 3, 2, 0, 0, 0]
 assert core_hilbert(core_projected) == [1, 3, 4, 4, 2, 0]
 assert sum(core_hilbert(core_all)) * 2**16 == 393216
 assert sum(core_hilbert(core_projected)) * 2**14 == 229376
+
+base_dx = e * (a * x**2 + b * x + c + t0) - m * (x - rx) + ry
+base_dz = f * (a * z**2 + b * z + c + t0) - m * (z - rx) + ry
+for v, sign, residual in ((x, e, base_dx), (z, f, base_dz)):
+    projected = sp.prod(
+        residual + sign * (w0 * u0 + w1 * u1)
+        for u0, u1 in product((0, 1), repeat=2)
+    )
+    expected = (sign * a * v**2 - m * v) ** 4
+    assert sp.Poly(top(projected, (m, x, z)) - expected, m, x, z, modulus=P).is_zero
+
+for jx, jz in ((0, 0), (0, 1), (1, 1), (1, 2), (2, 2), (2, 3), (3, 3)):
+    power_x, power_z = 2 ** (jx + 1), 2 ** (jz + 1)
+    core = [m**2, x * z,
+            (x**2 - alpha * m * x) ** (2**jx),
+            (z**2 - beta * m * z) ** (2**jz)]
+    gb = sp.groebner(core, x, z, m, order="lex", modulus=P)
+    leads = {tuple(g.LM(order="lex").exponents) for g in gb.polys}
+    assert leads == {(0, 0, 2), (1, 1, 0),
+                     (power_x, 0, 0), (0, power_z, 0)}
+    counts = core_hilbert(core, through=max(power_x, power_z) + 1, order="lex")
+    assert sum(counts) == 2 * (power_x + power_z - 1)
+    assert counts[max(power_x, power_z)] > 0
+    assert counts[max(power_x, power_z) + 1] == 0
+
 print("M31 projected-top verification: PASS")
 print("all-bit core Hilbert: [1, 3, 2]; k=8 top quotient length: 393216")
 print("projected core Hilbert: [1, 3, 4, 4, 2]; k=8 top quotient length: 229376")
+print("multi-bit core leading ideals, lengths and top degrees: PASS")
