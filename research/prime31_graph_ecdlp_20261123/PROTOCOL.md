@@ -402,6 +402,19 @@ the final source refactor and is a development record, not a source-bound
 benchmark. The algebraic RR5 B677 arms above remain incomplete; this generic-source solve does not establish
 that their high witness count is extractable at useful cost.
 
+The same full-cost receipt records 336 ms for pair-table construction,
+3,006 ms summed over the 11 relation-source calls, and 13 ms for their
+combined graph elimination and replay stage. These sum to 3,355 ms;
+12 ms of the 3,367 ms cold wall interval is unallocated by those
+millisecond-resolution fields. Table plus source occupy 99.26% of the
+reported interval. Holding the observed source, setup and stopping point
+fixed, even replacing the recorded graph-and-replay stage with zero work
+would change this interval by at most `3367/(3367-13)=1.00388` times.
+This is a conditional phase budget for the generic pair-table source,
+not an upper bound on a different algebraic relation source or a
+separately instrumented graph implementation. It makes faster relation
+production the first cost gate for this architecture.
+
 `native/rho_control.rs` supplies an **independent unfolded** 16-jump Brent
 rho control on exactly the same curve, generator, public `Q`, and native
 `Arithmetic` backend. It uses no solver-side validation scalar and charges
