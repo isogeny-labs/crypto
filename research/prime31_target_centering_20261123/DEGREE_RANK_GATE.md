@@ -91,6 +91,33 @@ cardinality bound, not a prediction of Groebner cost. A selector that
 chooses one signed point per old abscissa has a different count and must
 retain the sign constraint explicitly.
 
+## A natural rank breaker returns to ordinary target descent
+
+Keep a fixed centered support of `B` abscissae `zi=x(Zi)` and let
+`U=[4^(-1)]R`. A three-point relation among the corresponding shifted
+points has the exact form
+
+`(U+Z1)+(U+Z2)+(U+Z3)=R  <=>  Z1+Z2+Z3=U`.
+
+This is the standard three-summand target query, represented by
+`S4(z1,z2,z3,x(U))=0` and followed by rational point/sign replay. Its
+coefficient sum is three, so it breaks the additive shift symmetry of
+the four-point rows. A known-log anchor is still needed to set the
+absolute discrete-log scale; with such an anchor, the centered
+four-point rows are target-independent precomputation and the
+three-point row is ordinary target descent.
+
+For a fixed `B`-abscissa support independent of uniformly sampled `U`,
+the exact expected number of distinct-index signed three-point tuples
+equal to `U` is `8*C(B,3)/n`, by linearity of expectation. At `B=677`
+and the B677 group order this is `0.1918030258` per uniform query. This
+is a raw-witness expectation, not a completed extraction probability or
+useful-rank estimate. The centered four-point zero-sum rows are fixed
+when this `Z` support is fixed, so their number must not be inferred from
+a uniform-target expectation. These counts show why the target-bearing
+row cannot be treated as free when comparing the degree-four equation
+with the original four-summand target presentation.
+
 ## Falsifier for a useful variant
 
 Before treating target centering as an M31 relation-finding advance,
