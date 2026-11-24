@@ -139,3 +139,23 @@ only its first sorted relation, so full-output consumption is the next common
 policy to qualify before a strongest-reference claim. The prior historical
 source snapshot, protocols, controls and manifests are unchanged. No cloud job
 or canonical export validation is represented as completed.
+
+## Common full-output continuation
+
+Source 77c465a6d1 passes 30 feature tests and six default tests and builds.
+The initial feature run's one false singleton-arrival assertion and exact
+source/log are retained; the correction changes only that test expectation.
+Claims PCC-20261124-63f792 and b2543e remain unverified. [pcc:unverified]
+
+The [new control](FULL_OUTPUT_RESULT.md) records four suites and twelve valid
+recoveries. Both first-row histories match all 54 earlier attempt records.
+Full-output Direct/Refined/cofactor use 2/7/5 calls without lookup and 1/4/1
+with lookup. Every submitted row is charged and its receipt retained, including
+dependent rows. Unused suffixes are retained after recovery, with their prior
+generation already charged. No timing ratio or new map is inferred. [pcc:unverified]
+
+Next qualify the larger workload with this strengthened Direct reference, then
+registered execution and admitted costs. Existing complete-chart/output and
+canonical-export access limitations remain open. At the 23:40 UTC check-in,
+the source identity head da258b6de6 had gate jobs in progress and several draft
+jobs skipped; that is not a current-head CI pass.

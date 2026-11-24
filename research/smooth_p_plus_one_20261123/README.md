@@ -26,11 +26,18 @@ consumer to fresh-process recovery. All three F127 arms recover with reconciled
 intervals; five cofactor target-in-base refusals remain retained. This is local
 software qualification, without a timing ratio. [pcc:unverified]
 
-The latest [common-lookup report](BASE_LOOKUP_RESULT.md)
+The [common-lookup report](BASE_LOOKUP_RESULT.md)
 ([PDF](BASE_LOOKUP_RESULT.pdf)) applies the same signed-base lookup to every
 arm. All three F127 arms recover with four four-leaf calls each; the original
 policy retains all five cofactor refusals and matches its recorded history.
 This is a recovery-policy coverage result, with no cost ratio. [pcc:unverified]
+
+The latest [full-output report](FULL_OUTPUT_RESULT.md)
+([PDF](FULL_OUTPUT_RESULT.pdf)) consumes every returned relation until recovery,
+charging each replay and rank update. All twelve policy/arm controls recover;
+with shared lookup, Direct/cofactor each use one four-leaf call plus two
+singleton rows, while Refined uses four calls plus three singleton rows.
+Both earlier first-row histories remain unchanged. [pcc:unverified]
 
 - [Initial rank argument](REPORT.md) ([PDF](REPORT.pdf)): collapsed and distinct-image charts.
 - [Initial native controls](NATIVE.md) ([PDF](NATIVE.pdf)): original encodings and retained failures.
@@ -42,6 +49,7 @@ This is a recovery-policy coverage result, with no cost ratio. [pcc:unverified]
 - [Oriented-chain protocol](ORIENTED_CHAIN.md) and [reproduction](ORIENTED_REPRODUCE.md).
 - [Cold-accounting protocol](COLD_ACCOUNTING.md) and [reproduction](COLD_ACCOUNTING_REPRODUCE.md).
 - [Common-lookup protocol](BASE_LOOKUP.md) and [reproduction](BASE_LOOKUP_REPRODUCE.md).
+- [Full-output protocol](FULL_OUTPUT.md) and [reproduction](FULL_OUTPUT_REPRODUCE.md).
 - [Native source](native/src/main.rs) and [evidence](evidence/).
 
 The original reports and manifests retain their historical revision scope.

@@ -48,6 +48,11 @@ the requested end-to-end cost conclusion.
   All three F127 arms recover with four four-leaf calls each; the original
   histories and five refusals remain intact. This extends the recovery policy,
   not the unsupported four-leaf chart. [pcc:unverified]
+- **Common full-output component:** the [new policy control](../research/smooth_p_plus_one_20261123/FULL_OUTPUT_RESULT.md)
+  preserves every returned row and consumes the ordered prefix through recovery.
+  All twelve F127 arms recover; with lookup, Direct/cofactor use one oracle call
+  plus two singleton rows each, and Refined uses four calls plus three singletons.
+  This strengthens the reference and charges every rank update. [pcc:unverified]
 - **Missing capability:** a complete degree-32 full-base comparison,
   successful full-base oriented-S3 output, qualified counters or timing for
   every phase, an exact-source registered EKS image, and independent replay.
@@ -72,7 +77,9 @@ the requested end-to-end cost conclusion.
   production rank/linear algebra and final replay on the F127 control. [pcc:unverified]
 - [x] Qualify common one-term target-in-base handling at the recovery-policy
   layer, preserving the original four-leaf refusals. [pcc:unverified]
-- [ ] Qualify full-output relation consumption equally across arms, then
+- [x] Qualify full-output relation consumption equally across arms with retained
+  prefixes, rank histories and original first-row controls. [pcc:unverified]
+- [ ] Qualify larger full-output controls with the strengthened reference, then
   complete a matched, equal-scope recovery comparison with admitted costs.
 - [ ] Publish and build the exact workload revision through the supported
   EKS route, obtain budget/isolation admission, and retain raw evidence and
@@ -84,11 +91,11 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Consume every emitted relation under an explicit common policy, charging all
-replay, duplicate handling and exact rank work. The current first-row policy
-discards other complete oracle outputs and is not a strongest-reference claim.
-Keep both first-row/lookup controls and their source identities frozen. Then
-extend qualification to the larger supported workload and registered EKS build.
+Qualify the larger supported workload under the newly implemented common
+full-output policy and its strengthened Direct reference, using a separate
+finite protocol with unchanged solver caps and explicit incomplete outcomes.
+Keep every first-row/lookup/full-output control and source identity frozen.
+Then extend qualification to the registered EKS build and admitted comparison.
 Degree-32 cofactor and full-base oriented completeness remain open under fixed
 budgets; the common lookup does not implement the missing target-in-base
 four-leaf chart. Do not raise historical caps or replace incomplete records.
@@ -128,3 +135,9 @@ suites recover in all six arms and retain all prior failures/history. Four-leaf
 query counts fall under the shared policy; no total-cost ratio or new map is
 claimed. Full-output relation consumption remains the next baseline obligation.
 [pcc:unverified]
+
+2026-11-24, full-output continuation: that policy is now locally qualified in
+four F127 suites. All twelve arms recover, every returned set/consumed prefix
+is retained, and both earlier first-row histories match. The reference now
+uses all rows with the same stop policy; larger workloads and admitted complete
+costs remain open. [pcc:unverified]
