@@ -337,6 +337,19 @@ additional scalar Legendre weight `χ_r(d)`. The identity supplies a
 precise structured-offset formulation, but neither an exact sign
 evaluator nor a certified useful bias. [pcc:unverified]
 
+[Bhakta (2026), Theorem 1.2](https://www.cambridge.org/core/journals/canadian-mathematical-bulletin/article/character-sums-of-division-polynomials-twisted-by-multiplicative-functions/764B21F1A92391D7D2F1D19917B1B8BD)
+also does not evaluate this candidate. Its twisted sum has one EDS
+character `χ_p(ψ_d(G))`, while the candidate below has a *fixed-shift
+pair*; its Dirichlet character is fixed as the field size varies,
+whereas the scalar Legendre character here has modulus `r≈p`, and
+the implied constant may depend on that character. Even a formal
+substitution into the theorem's power term
+`p^(1/12)(2r)^(5/6)` is about `2^176.833` at P-192, before its
+logarithms and unspecified constant. That is `2^26.251` times the
+nominal `2^150.582` magnitude gate below. This hypothetical upper
+bound would not decide whether a selected shift reaches the gate,
+even if the theorem's hypotheses matched. [pcc:unverified]
+
 In particular, define the complete *scalar-weighted fixed-shift*
 sum
 
