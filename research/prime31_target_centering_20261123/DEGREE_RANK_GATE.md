@@ -54,13 +54,33 @@ base across those lists must give an exact transfer map and charge its
 work. Simply counting the degree-four equation against the fixed-base
 degree-eight equation omits that transfer and the rank defect above.
 
+## Selector growth when the original base is retained
+
+Suppose the original selector is a set of `B` liftable abscissae and
+implicitly admits both signs. Let `A` be its `2B` affine curve points,
+so `A=-A`, and assume `U` is not in `A`. In the centered coordinates the
+exact allowed abscissae form `x(A-U)`. Two distinct original points `P,Q`
+produce the same centered abscissa precisely when `P+Q=2U`. If `c` is the
+number of such unordered pairs in `A`, the centered selector has exactly
+`2B-c` distinct abscissae. In particular, without these special pairs its
+degree as a square-free univariate selector is `2B`, not `B`.
+
+On either prime-order M31 group, a proper nonempty `A` cannot be invariant
+under `P -> 2U-P` when `U != O`: combined with `A=-A`, that would make `A`
+invariant under translation by the nonzero point `2U`, and hence equal to
+the whole prime-order group. Thus `c<B` for a proper base: even maximal
+pairing cannot preserve the original `B`-value selector size. This is a
+cardinality bound, not a prediction of Groebner cost. A selector that
+chooses one signed point per old abscissa has a different count and must
+retain the sign constraint explicitly.
+
 ## Falsifier for a useful variant
 
 Before treating target centering as an M31 relation-finding advance,
 exhibit one fixed or exactly transferable factor base and completed rows
 whose combined coefficient matrix determines the target scalar after
 independent replay. Compare *completed* solving degree, useful rank,
-failed calls, transfer, and cold single-target cost with the unshifted
+failed calls, selector size, transfer, and cold single-target cost with the unshifted
 presentation and the same-target generic control. A reduced polynomial
 degree alone does not pass this gate. A fixed-field result also cannot
 establish an asymptotic exponent without a family and cost proof.
