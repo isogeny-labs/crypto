@@ -1048,6 +1048,43 @@ fn trace_tables(irreducible: &IrreduciblePoly) -> Arc<TraceTables> {
         .clone()
 }
 
+/// Shared exact maps for the compact trace-zero workspace. Construction still
+/// occurs on first use and is charged; the workspace does not rebuild the same
+/// byte-combination table in a second layout.
+pub(crate) struct CompactLinearMaps {
+    tables: Arc<TraceTables>,
+}
+impl CompactLinearMaps {
+    pub(crate) fn new(irreducible: &IrreduciblePoly) -> Self {
+        assert!(irreducible.degree <= 192 && irreducible.degree % 2 == 1);
+        Self {
+            tables: trace_tables(irreducible),
+        }
+    }
+    pub(crate) fn trace_mask(&self) -> [u64; 3] {
+        let mut mask = [0; 3];
+        mask[..self.tables.nw].copy_from_slice(&self.tables.trace_mask);
+        mask
+    }
+    #[inline]
+    pub(crate) fn half(&self, a: [u64; 3]) -> [u64; 3] {
+        let t = &self.tables;
+        let mut out = [0; 3];
+        for byte in 0..t.n_bytes {
+            let value = ((a[byte / 8] >> (8 * (byte % 8))) & 255) as usize;
+            let at = (byte * 256 + value) * t.nw;
+            out[0] ^= t.half_trace[at];
+            if t.nw >= 2 {
+                out[1] ^= t.half_trace[at + 1];
+            }
+            if t.nw == 3 {
+                out[2] ^= t.half_trace[at + 2];
+            }
+        }
+        out
+    }
+}
+
 // ── Internal helpers (unreduced bit-vector arithmetic) ────────────
 
 /// XOR two bit-vectors (different lengths allowed; result is

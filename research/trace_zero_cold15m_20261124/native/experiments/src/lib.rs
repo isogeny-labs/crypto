@@ -50,6 +50,34 @@ pub struct Case {
     pub truth_witness: Option<Vec<usize>>,
 }
 
+/// Same required wire fields and types as Case, borrowing ordinary JSON
+/// strings. serde rejects escaped borrowed strings; the caller retains the
+/// owned Case decoder as the exact fallback for that accepted syntax.
+#[derive(Deserialize)]
+#[allow(dead_code)]
+pub struct BorrowedCase<'a> {
+    pub id: &'a str,
+    pub n: u32,
+    pub dimension: usize,
+    pub kind: &'a str,
+    pub seed: u64,
+    #[serde(borrow)]
+    pub base: Vec<Option<[&'a str; 2]>>,
+    #[serde(borrow)]
+    pub target: Option<[&'a str; 2]>,
+    pub truth: bool,
+    pub truth_witness: Option<Vec<usize>>,
+}
+pub fn unwire_borrowed(p: &Option<[&str; 2]>, n: u32) -> BinaryPoint {
+    match p {
+        None => BinaryPoint::Infinity,
+        Some([x, y]) => BinaryPoint::Affine {
+            x: F2mElement::from_hex(x, n),
+            y: F2mElement::from_hex(y, n),
+        },
+    }
+}
+
 pub fn subspace_base(c: &BinaryCurve, d: usize) -> Vec<BinaryPoint> {
     let v = TraceZeroVariety::new(c).unwrap();
     let basis = window(c, d);

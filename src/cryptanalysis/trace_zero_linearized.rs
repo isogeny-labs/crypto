@@ -238,7 +238,7 @@ impl AdjointMap {
     }
 }
 
-/// Four-bit combination tables for the first sixteen projected equations.
+/// Byte combination tables for the first sixteen projected equations.
 /// Four 16-bit coefficient rows share each word; RHS bits remain separate.
 /// This evaluates the existing F2-linear maps, without changing their order.
 struct PackedRowMap {
@@ -253,14 +253,14 @@ impl PackedRowMap {
             return None;
         }
         let rows = equations.len().min(16);
-        let groups = (n as usize).div_ceil(4);
-        let mut coefficients = vec![[0; 4]; groups * 16];
-        let mut rhs_table = vec![0u16; groups * 16];
+        let groups = (n as usize).div_ceil(8);
+        let mut coefficients = vec![[0; 4]; groups * 256];
+        let mut rhs_table = vec![0u16; groups * 256];
         for group in 0..groups {
-            let mut basis = [[0u64; 4]; 4];
-            let mut rhs_basis = [0u16; 4];
-            for b in 0..4 {
-                let bit = group * 4 + b;
+            let mut basis = [[0u64; 4]; 8];
+            let mut rhs_basis = [0u16; 8];
+            for b in 0..8 {
+                let bit = group * 8 + b;
                 if bit >= n as usize {
                     continue;
                 }
@@ -272,12 +272,12 @@ impl PackedRowMap {
                     rhs_basis[b] |= (((rhs[row][bit / 64] >> (bit % 64)) & 1) as u16) << row;
                 }
             }
-            for value in 1usize..16 {
-                let prev = group * 16 + (value & (value - 1));
+            for value in 1usize..256 {
+                let prev = group * 256 + (value & (value - 1));
                 let b = value.trailing_zeros() as usize;
-                coefficients[group * 16 + value] =
+                coefficients[group * 256 + value] =
                     std::array::from_fn(|i| coefficients[prev][i] ^ basis[b][i]);
-                rhs_table[group * 16 + value] = rhs_table[prev] ^ rhs_basis[b];
+                rhs_table[group * 256 + value] = rhs_table[prev] ^ rhs_basis[b];
             }
         }
         Some(Self {
@@ -289,15 +289,20 @@ impl PackedRowMap {
     fn evaluate(&self, z: WordMask, target: WordMask) -> ([u64; 4], u16) {
         let mut coefficients = [0; 4];
         let mut rhs = 0;
-        for (group, table) in self.coefficients.chunks_exact(16).enumerate() {
-            let shift = (group % 16) * 4;
-            let zi = ((z[group / 16] >> shift) & 15) as usize;
-            let ti = ((target[group / 16] >> shift) & 15) as usize;
-            let c = table[zi];
-            for i in 0..4 {
-                coefficients[i] ^= c[i];
+        // Extract each field word once; only the last word may have fewer
+        // than eight byte tables. No dynamic field-word index per byte.
+        for (word, tables) in self.coefficients.chunks(8 * 256).enumerate() {
+            let mut zi = z[word];
+            let mut ti = target[word];
+            for (byte, table) in tables.chunks_exact(256).enumerate() {
+                let c = table[(zi & 255) as usize];
+                for i in 0..4 {
+                    coefficients[i] ^= c[i];
+                }
+                rhs ^= self.rhs[(word * 8 + byte) * 256 + (ti & 255) as usize];
+                zi >>= 8;
+                ti >>= 8;
             }
-            rhs ^= self.rhs[group * 16 + ti];
         }
         (coefficients, rhs)
     }
@@ -1224,7 +1229,7 @@ mod tests {
                 let rhs: Vec<_> = (0..21).map(|_| [draw(), draw(), draw()]).collect();
                 let map = PackedRowMap::new(&equations, &rhs, n).unwrap();
                 assert_eq!(map.rows, 16);
-                assert_eq!(map.coefficients.len(), (n as usize).div_ceil(4) * 16);
+                assert_eq!(map.coefficients.len(), (n as usize).div_ceil(8) * 256);
                 let mut pairs = vec![([0; 3], [0; 3])];
                 for bit in 0..n as usize {
                     let mut e = [0; 3];

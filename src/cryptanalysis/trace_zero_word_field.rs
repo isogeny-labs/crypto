@@ -3,7 +3,7 @@
 //! reductions reuse the production word kernels; exact maps are prepared once.
 use crate::binary_ecc::{
     curve::{point_add, point_neg},
-    f2m::{mul_mod131, mul_words_into, reduce_words, spread32},
+    f2m::{mul_mod131, mul_words_into, reduce_words, spread32, CompactLinearMaps},
     operation_tally, BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly,
 };
 pub type Element = [u64; 3];
@@ -42,8 +42,7 @@ pub struct WordField {
     nw: usize,
     irr: IrreduciblePoly,
     trace_mask: Element,
-    half: Vec<Element>,
-    nbytes: usize,
+    linear_maps: CompactLinearMaps,
     reduction: u8,
     tail: Element,
 }
@@ -53,16 +52,8 @@ impl WordField {
             c.m <= 192 && c.m >= 3 && c.m % 2 == 1 && c.a.is_zero() && c.b == F2mElement::one(c.m)
         );
         let n = c.m as usize;
-        let mut trace_mask = [0; 3];
-        let mut halves = Vec::new();
-        for bit in 0..n {
-            let e = F2mElement::from_bit_positions(&[bit as u32], c.m);
-            if e.trace(&c.irreducible) != 0 {
-                trace_mask[bit / 64] |= 1u64 << (bit % 64);
-            }
-            halves.push(element(&e.half_trace(&c.irreducible).unwrap()));
-        }
-        let nbytes = n.div_ceil(8);
+        let linear_maps = CompactLinearMaps::new(&c.irreducible);
+        let trace_mask = linear_maps.trace_mask();
         let mut tail = [0; 3];
         for &t in &c.irreducible.low_terms {
             tail[t as usize / 64] |= 1u64 << (t % 64);
@@ -75,26 +66,12 @@ impl WordField {
         } else {
             0
         };
-        let mut half = vec![[0; 3]; nbytes * 256];
-        for byte in 0..nbytes {
-            for value in 1..256usize {
-                let bit = value.trailing_zeros() as usize;
-                let prev = half[byte * 256 + (value & (value - 1))];
-                let column = halves.get(byte * 8 + bit).copied().unwrap_or([0; 3]);
-                half[byte * 256 + value] = [
-                    prev[0] ^ column[0],
-                    prev[1] ^ column[1],
-                    prev[2] ^ column[2],
-                ];
-            }
-        }
         Self {
             m: c.m,
             nw: n.div_ceil(64),
             irr: c.irreducible.clone(),
             trace_mask,
-            half,
-            nbytes,
+            linear_maps,
             reduction,
             tail,
         }
@@ -214,15 +191,7 @@ impl WordField {
     }
     #[inline]
     pub fn half(&self, a: Element) -> Element {
-        let mut out = [0; 3];
-        for byte in 0..self.nbytes {
-            let value = ((a[byte / 8] >> (8 * (byte % 8))) & 255) as usize;
-            let h = self.half[byte * 256 + value];
-            out[0] ^= h[0];
-            out[1] ^= h[1];
-            out[2] ^= h[2];
-        }
-        out
+        self.linear_maps.half(a)
     }
     pub fn admit(&self, p: &BinaryPoint) -> bool {
         let BinaryPoint::Affine { x, y } = p else {

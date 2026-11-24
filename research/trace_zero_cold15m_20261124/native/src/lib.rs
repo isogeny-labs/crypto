@@ -83,6 +83,37 @@ fn dump(phase: &'static [u8]) {
     }
 }
 pub fn execute(case: &Case, arm: &str) -> Value {
+    execute_input(case.n, case.truth, arm, |n| {
+        (
+            case.base.iter().map(|p| unwire(p, n)).collect(),
+            unwire(&case.target, n),
+        )
+    })
+}
+pub fn execute_wire_json(bytes: &[u8], arm: &str) -> Result<Value, serde_json::Error> {
+    if !cfg!(any(feature = "legacy-halftrace", feature = "incumbent")) {
+        if let Ok(case) = serde_json::from_slice::<trace_zero_experiments::BorrowedCase<'_>>(bytes)
+        {
+            return Ok(execute_input(case.n, case.truth, arm, |n| {
+                (
+                    case.base
+                        .iter()
+                        .map(|p| trace_zero_experiments::unwire_borrowed(p, n))
+                        .collect(),
+                    trace_zero_experiments::unwire_borrowed(&case.target, n),
+                )
+            }));
+        }
+    }
+    let case: Case = serde_json::from_slice(bytes)?;
+    Ok(execute(&case, arm))
+}
+fn execute_input(
+    n: u32,
+    truth: bool,
+    arm: &str,
+    decode: impl FnOnce(u32) -> (Vec<BinaryPoint>, BinaryPoint),
+) -> Value {
     assert!(!(cfg!(feature = "legacy-halftrace") && cfg!(feature = "incumbent")));
     let expected = if cfg!(feature = "legacy-halftrace") {
         arm.starts_with("baseline")
@@ -91,18 +122,20 @@ pub fn execute(case: &Case, arm: &str) -> Value {
     } else {
         arm == "elimination"
     };
-    assert!(expected, "arm must match the exact frozen field source variant");
+    assert!(
+        expected,
+        "arm must match the exact frozen field source variant"
+    );
     let tally = std::env::var_os("TRACE_DISABLE_TALLY")
         .is_none()
         .then(OperationTally::begin);
     let before = ops_snapshot();
-    let c = trace_zero_leads::fixture(case.n);
+    let c = trace_zero_leads::fixture(n);
     let v = TraceZeroVariety::new(&c).unwrap();
     if arm.contains("eager") {
         v.prepare_symbolic_models();
     }
-    let b: Vec<_> = case.base.iter().map(|p| unwire(p, c.m)).collect();
-    let target = unwire(&case.target, c.m);
+    let (b, target) = decode(c.m);
     let setup = tally.map(OperationTally::finish).unwrap_or_default();
     let tally = std::env::var_os("TRACE_DISABLE_TALLY")
         .is_none()
@@ -132,11 +165,80 @@ pub fn execute(case: &Case, arm: &str) -> Value {
                 == target
     });
     let valid = match r.disposition {
-        Disposition::Found => case.truth && replay,
-        Disposition::Refuted => !case.truth,
+        Disposition::Found => truth && replay,
+        Disposition::Refuted => !truth,
         Disposition::Inconclusive => true,
     };
     let work = tally.map(OperationTally::finish).unwrap_or_default();
     let group = ops_snapshot().since(&before);
     json!({"outcome":format!("{:?}",r.disposition),"valid":valid,"replay":replay,"indices":r.indices,"points":points.as_ref().map(|ps|ps.iter().map(wire).collect::<Vec<_>>()),"models":r.models,"patterns_attempted":r.patterns_attempted,"patterns_refuted":r.patterns_refuted,"reason":r.reason,"common":common,"projected":projected,"setup_field":setup,"oracle_and_wrapper_replay_field":work,"group":group})
+}
+
+#[cfg(test)]
+mod wire_tests {
+    use super::*;
+    const INPUT: &str = r#"{"id":"ordinary","n":5,"dimension":1,"kind":"negative","seed":1,"base":[["1","1"]],"target":null,"truth":false,"truth_witness":null}"#;
+    fn arm() -> &'static str {
+        if cfg!(feature = "legacy-halftrace") {
+            "baseline"
+        } else if cfg!(feature = "incumbent") {
+            "incumbent"
+        } else {
+            "elimination"
+        }
+    }
+    fn same(bytes: &[u8]) {
+        let old: Case = serde_json::from_slice(bytes).unwrap();
+        let a = execute(&old, arm());
+        let b = execute_wire_json(bytes, arm()).unwrap();
+        for key in [
+            "outcome",
+            "valid",
+            "replay",
+            "indices",
+            "points",
+            "models",
+            "patterns_attempted",
+            "patterns_refuted",
+            "reason",
+            "common",
+            "projected",
+            "group",
+        ] {
+            assert_eq!(a[key], b[key], "{key}");
+        }
+    }
+    #[test]
+    fn borrowed_ordinary_wire_matches_owned_decoder_and_original_checks() {
+        let borrowed: trace_zero_experiments::BorrowedCase<'_> =
+            serde_json::from_str(INPUT).unwrap();
+        assert_eq!(borrowed.base[0].unwrap(), ["1", "1"]);
+        same(INPUT.as_bytes());
+        same(INPUT.replace("[[\"1\",\"1\"]]", "[]").as_bytes());
+    }
+    #[test]
+    fn escaped_coordinates_and_metadata_retain_owned_fallback() {
+        for text in [
+            INPUT.replace("ordinary", r"ord\u0069nary"),
+            INPUT.replace("[\"1\",\"1\"]", r#"["\u0031","1"]"#),
+        ] {
+            assert!(
+                serde_json::from_str::<trace_zero_experiments::BorrowedCase<'_>>(&text).is_err()
+            );
+            same(text.as_bytes());
+        }
+    }
+    #[test]
+    fn borrowed_wire_keeps_required_metadata_types_and_complete_json_validation() {
+        for bad in [
+            INPUT.replace("\"id\":\"ordinary\",", ""),
+            INPUT.replace("\"dimension\":1", "\"dimension\":\"1\""),
+            INPUT.replace("\"seed\":1", "\"seed\":-1"),
+            INPUT.replace("\"truth\":false", "\"truth\":null"),
+            format!("{INPUT} trailing"),
+        ] {
+            assert!(serde_json::from_str::<Case>(&bad).is_err());
+            assert!(execute_wire_json(bad.as_bytes(), arm()).is_err());
+        }
+    }
 }

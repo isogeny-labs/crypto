@@ -184,8 +184,18 @@ fn summarize(rows: &[Value]) -> Value {
                 "complete algebraic relation oracle",
             ),
             ("instructions", "baseline", "baseline-aa", "A/A"),
-            ("instructions", "incumbent", "elimination", "incremental cold query"),
-            ("oracle_instructions", "incumbent", "elimination", "incremental complete oracle"),
+            (
+                "instructions",
+                "incumbent",
+                "elimination",
+                "incremental cold query",
+            ),
+            (
+                "oracle_instructions",
+                "incumbent",
+                "elimination",
+                "incremental complete oracle",
+            ),
         ] {
             let a = cells[&format!("{id}/{left}")]["metrics"][metric]["median"]
                 .as_u64()
@@ -213,8 +223,8 @@ fn main() {
         return;
     }
     if a[0] == "one" {
-        let c: Case = serde_json::from_slice(&fs::read(&a[1]).unwrap()).unwrap();
-        let r = trace_zero_halftrace::execute(&c, &a[2]);
+        let bytes = fs::read(&a[1]).unwrap();
+        let r = trace_zero_halftrace::execute_wire_json(&bytes, &a[2]).unwrap();
         assert_eq!(r["valid"], true);
         println!("{}", r);
         return;
