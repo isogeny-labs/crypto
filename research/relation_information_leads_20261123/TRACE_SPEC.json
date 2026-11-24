@@ -1,0 +1,38 @@
+{
+  "schema": "relation-degree-trace-proposal/v1",
+  "status": "specification only; no tracer implemented or run",
+  "scalar_domains": {
+    "polynomial_trace": "originalcoordinatefieldFp",
+    "relation_labels": "certifiedsubgrouporderell, neverassumedp"
+  },
+  "record_fields": [
+    "inputhash",
+    "candidatehash",
+    "ring",
+    "termorder",
+    "degreecapD",
+    "space_mode_W_raw_or_V_closed",
+    "monomialorder",
+    "initialandclosedrows_columns_nonzeros",
+    "exactrankwithreplaywitness",
+    "originalgeneratorcertificate",
+    "max_degree_hi_times_fi",
+    "actualsolver_event_degrees",
+    "peakmatrixsizes",
+    "resourcecensor_or_failure",
+    "operationcounts",
+    "certificatebytes"
+  ],
+  "quantities_kept_separate": [
+    "rawmatrixrank",
+    "closedspacerank",
+    "actualalgorithmpeakdegree",
+    "formal_lazard_solvingdegree",
+    "firstfalldegree",
+    "degreeofregularity_definition",
+    "intrinsichomogeneousidealregularity"
+  ],
+  "unknown_values": "null, no inferencefromsmallbasisorcertificate",
+  "selection": "certifyoriginalidealmembership, calculateclosedspacemarginalgain, retaincensored/zero-gainrecords, chargeallselection/certificatework",
+  "performance_admission": false
+}
