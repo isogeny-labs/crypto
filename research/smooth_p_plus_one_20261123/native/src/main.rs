@@ -336,10 +336,18 @@ fn extract(
         return Err("unsupported RUR scaling".into());
     }
     let data = &parametrization[1];
+    let eliminant = coefficients(&data[0])?;
+    let dimension = block[2].as_u64().ok_or("missing quotient dimension")?;
+    if eliminant.len().checked_sub(1).map(|n| n as u64) != Some(dimension) {
+        return Err(format!(
+            "nonseparating RUR: eliminant degree {} differs from quotient dimension {dimension}",
+            eliminant.len().saturating_sub(1)
+        ));
+    }
     let denominator = coefficients(&data[1])?;
     let numerators = &data[2];
     let mut result = BTreeSet::new();
-    for root in field_roots(coefficients(&data[0])?, p)? {
+    for root in field_roots(eliminant, p)? {
         let scaled = evaluate(&denominator, root, p);
         if scaled == 0 {
             return Err("zero RUR denominator".into());
@@ -414,6 +422,7 @@ fn run_solver(
     input: &str,
     deadline: Instant,
     scratch: &Scratch,
+    extra_args: &[&str],
 ) -> Result<String, String> {
     if Instant::now() >= deadline {
         return Err("oracle budget exhausted".into());
@@ -435,6 +444,7 @@ fn run_solver(
         .arg("-o")
         .arg(&output_path)
         .args(["-t", "1"])
+        .args(extra_args)
         .stdout(Stdio::null())
         .stderr(stderr)
         .spawn()
@@ -444,7 +454,16 @@ fn run_solver(
             if !status.success() {
                 return Err(format!("solver exit {status}"));
             }
-            return fs::read_to_string(output_path).map_err(|error| error.to_string());
+            let output = fs::read_to_string(output_path).map_err(|error| error.to_string())?;
+            if output.trim().is_empty() && extra_args == ["-c", "0"] {
+                let message = fs::read_to_string(&stderr_path).unwrap_or_default();
+                if message.contains("=====> Computation failed <=====")
+                    && message.contains("Try to add a random linear form with a new variable")
+                {
+                    return Err("nonseparating staircase (msolve -c 0)".into());
+                }
+            }
+            return Ok(output);
         }
         if Instant::now() >= deadline {
             let _ = child.kill();
@@ -559,7 +578,7 @@ fn discover(
             "variables":variables,"equations":equations,"terms":terms,"degree":degree,
             "fine_images":chart.map(|chart| chart.images),
         }));
-        let result = run_solver(solver, &system.render(base.curve.p), deadline, scratch)
+        let result = run_solver(solver, &system.render(base.curve.p), deadline, scratch, &[])
             .and_then(|raw| extract(&raw, base, target, method.encoding()));
         let rows = match result {
             Ok(rows) => rows,

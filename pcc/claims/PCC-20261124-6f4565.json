@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T21:39:02Z",
+ "id": "PCC-20261124-6f4565",
+ "kind": "statement",
+ "producer": {
+  "commit": "b67f9770de7c11e89435535fff9246ed3c423871",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-cofactor-msolve-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/cofactor_diagnostic_v1/f127_d4.jsonl",
+    "sha256": "c1bf8577f837c8ef84a8c4ca52476ac7bedce92e16f1dcd11ac34a8e3e245798"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/cofactor_diagnostic_v1/f127_d4.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/cofactor_msolve_v1/f127_d4.stderr",
+    "sha256": "07b9f1a5072e16c7f8b53559ebc19296c928165bed846e9d229c8a0980528a66"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-cofactor-msolve",
+ "statement": "The separately frozen F127 diagnostic reproduced a full-set mismatch: its second query returned eight of ten reference rows. The retained msolve output reports quotient dimension 10 and a degree-nine eliminant after adding a random linear form. The original invocation returned seven rows. These local records establish that a finite RUR result alone is insufficient for this adapter completeness contract; the differing partial outputs and all failures remain retained."
+}

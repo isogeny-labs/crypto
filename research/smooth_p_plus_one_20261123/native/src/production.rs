@@ -77,7 +77,7 @@ fn render(prepared: &PreparedCofactor) -> String {
         })
         .collect();
     format!(
-        "{}\n{}\n{}\n",
+        "{},A\n{}\n{}",
         names.join(","),
         prepared.prime,
         polynomials.join(",\n")
@@ -120,26 +120,67 @@ pub(super) fn discover_msolve(
             return outcome;
         }
     };
-    let input = render(&prepared);
+    let input_prefix = render(&prepared);
     let mut record = json!({
         "backend":"production_equations_msolve",
+        "format_version":2,
         "scope":"full_distinct_x_target_disjoint_rr5",
         "prepared":prepared,
-        "input":input,
+        "input_prefix":input_prefix,
+        "solver_variables":prepared.variables+1,
+        "solver_equations":prepared.equations.len()+1,
+        "solver_args":["-t","1","-c","0"],
+        "form_limit":16,
+        "rur_capture_limit_bytes":262_144,
+        "attempts":[],
         "accounting":"local_correctness_only",
     });
-    let rows = match super::run_solver(solver, &input, deadline, scratch) {
-        Ok(raw) => {
-            record["rur_bytes"] = json!(raw.len());
-            if raw.len() <= 262_144 {
-                record["rur"] = json!(raw);
-            } else {
-                record["rur_capture"] = json!("omitted_over_262144_bytes");
-            }
-            super::extract(&raw, base, target, super::Mode::Quadratic)
+    let mut rows = Err("separating-form allowance exhausted".to_string());
+    let mut captured_bytes = 0;
+    // The fixed target-independent family is A=t0+j*a1+j^2*a0.
+    // Preparation and every attempted form share the caller's one deadline.
+    for j in 0..16i64 {
+        if Instant::now() >= deadline {
+            break;
         }
-        Err(error) => Err(error),
-    };
+        let p = base.curve.p;
+        let linear = format!(
+            "1*A+{}*t0+{}*a1+{}*a0",
+            p - 1,
+            (-j).rem_euclid(p),
+            (-j * j).rem_euclid(p)
+        );
+        let input = format!("{input_prefix},\n{linear}\n");
+        let mut attempt = json!({"form":j,"linear_equation":linear});
+        let candidate = match super::run_solver(solver, &input, deadline, scratch, &["-c", "0"]) {
+            Ok(raw) => {
+                attempt["rur_bytes"] = json!(raw.len());
+                if captured_bytes + raw.len() <= 262_144 {
+                    captured_bytes += raw.len();
+                    attempt["rur"] = json!(raw);
+                } else {
+                    attempt["rur_capture"] = json!("omitted_query_capture_cap");
+                }
+                super::extract(&raw, base, target, super::Mode::Quadratic)
+            }
+            Err(error) => Err(error),
+        };
+        let another_form = candidate.as_ref().err().is_some_and(|error| {
+            error.starts_with("nonseparating RUR:")
+                || error == "nonseparating staircase (msolve -c 0)"
+        });
+        attempt["status"] = json!(if candidate.is_ok() {
+            "complete"
+        } else {
+            "incomplete"
+        });
+        attempt["reason"] = json!(candidate.as_ref().err());
+        record["attempts"].as_array_mut().unwrap().push(attempt);
+        rows = candidate;
+        if !another_form {
+            break;
+        }
+    }
     record["matched_regular_rows"] = json!(rows.as_ref().ok().map(|rows| rows
         .iter()
         .filter(|row| base.separated(row))
@@ -313,6 +354,64 @@ mod tests {
         native.status = Status::Complete;
         native.diagnostics.forbidden_domain_evaluations = 1;
         assert!(accepted_rows(&base, target, &native).is_err());
+    }
+
+    #[test]
+    fn only_known_separation_failures_advance_the_form() {
+        use std::os::unix::fs::PermissionsExt;
+        let (base, target, _) = fixture();
+        let scratch = Scratch::new().unwrap();
+        let solver = scratch.0.join("fake-msolve");
+        std::fs::write(&solver, r#"#!/bin/sh
+if [ ! -f "$0.called" ]; then
+  : > "$0.called"
+  : > "$4"
+  printf '%s\n' '=====> Computation failed <=====' 'Try to add a random linear form with a new variable' >&2
+  exit 0
+fi
+exit 9
+"#).unwrap();
+        std::fs::set_permissions(&solver, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let budget = Duration::from_secs(3);
+        let result = discover_msolve(
+            &base,
+            target,
+            &solver,
+            &scratch,
+            Instant::now() + budget,
+            budget,
+        );
+        assert!(result.result.unwrap_err().starts_with("solver exit"));
+        assert_eq!(result.completed, 0);
+        let attempts = result.systems[0]["attempts"].as_array().unwrap();
+        assert_eq!(attempts.len(), 2);
+        assert_eq!(
+            attempts[0]["reason"],
+            "nonseparating staircase (msolve -c 0)"
+        );
+    }
+
+    #[test]
+    fn retained_partial_rur_is_rejected_before_signed_extraction() {
+        let record: serde_json::Value = serde_json::from_str(
+            include_str!("../../evidence/cofactor_diagnostic_v1/f127_d4.jsonl")
+                .lines()
+                .nth(1)
+                .unwrap(),
+        )
+        .unwrap();
+        let base = Base::new(FIXTURES[0], 4);
+        let error = crate::extract(
+            record["systems"][0]["rur"].as_str().unwrap(),
+            &base,
+            Point { x: 116, y: 69 },
+            crate::Mode::Quadratic,
+        )
+        .unwrap_err();
+        assert_eq!(
+            error,
+            "nonseparating RUR: eliminant degree 9 differs from quotient dimension 10"
+        );
     }
 
     #[test]
