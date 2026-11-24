@@ -37,7 +37,7 @@ After committing the image sources, from the repository root:
 bash research/volcano_ic_recovery_20261027/command/prepare-context.sh /absolute/new/public-context
 ```
 
-The helper exports only the enumerated public files from `git archive HEAD`,
+The helper exports only the enumerated public files with `git show HEAD:<path>`,
 rejects changed frozen inputs/source or changed packaging, requires a new
 directory outside the checkout, and records the actual source revision. It
 does not read a private journal, credential file or process environment into

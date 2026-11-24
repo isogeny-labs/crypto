@@ -17,7 +17,10 @@ git diff --quiet HEAD -- "${sources[@]}" || { echo 'image sources differ from co
 for path in "${sources[@]}"; do git cat-file -e "HEAD:$path" || { echo 'image sources must be committed first' >&2; exit 65; }; done
 mkdir -- "$output"
 mkdir -- "$output/repo"
-git archive HEAD -- "${sources[@]}" | tar -x -C "$output/repo"
+for path in "${sources[@]}"; do
+  mkdir -p -- "$output/repo/$(dirname -- "$path")"
+  git show "HEAD:$path" > "$output/repo/$path"
+done
 git show "HEAD:$pilot/command/launch.sh" > "$output/launch.sh"
 git show "HEAD:$pilot/command/Dockerfile" > "$output/Dockerfile"
 git rev-parse HEAD > "$output/SOURCE_REVISION"
