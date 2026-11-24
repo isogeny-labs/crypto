@@ -121,9 +121,13 @@ Seven source-bound 2+2 receipts (positive and public-query cases) were
 committed in `5096df8283bd1a6991d1119ab23b58f2d535d98c`; all report
 `ResourceLimit` before root extraction. The independent receipt verifier
 now checks all 14 manifest hashes against that exact commit and reports
-current-head drift. At the 2026-11-24 mainline merge, the drift is the
+current-head drift. At the 2026-11-24 mainline merge, this comprised the
 verifier amendment itself, an equivalent remainder-test rewrite in
 `f4_fp.rs`, and formatting/dead-code annotations in `ic_boundary.rs`.
+The subsequent reviewed source-pin update adds `f4-source/build.rs` to
+the current-drift list. That build also pins the changed `prime_fast.rs`,
+which is outside the receipt's 14-file manifest; all 33 isolated library
+tests pass on this post-merge closure.
 The saved timings belong to the recorded source commit; they have not been
 rerun at the merged PR head. The planted-assignment unit test passes one
 known positive gate assignment, which is a construction check rather than
