@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Instrument seeded relation generation and end-to-end solver costs (Codex, started 2026-11-23, branch codex/e2e-relation-measurement-20261123).
+- [ ] Instrument seeded relation generation and end-to-end solver costs (Codex, started 2026-11-23, branch codex/e2e-relation-measurement-20261123, PR #5105).
 - [x] Prepare the fixed split-tangent collector, separate map/row checker, complete closed-rank witnesses and admitted driver; strict builds and synthetic controls pass,actual new-point collection remains unexecuted (Codex, started 2026-11-23, completed component 2026-11-24, branch lane/p192-tangent-collector-preparation-20261123; PR #5101, follows merged PR #5093). [pcc:unverified]
 - [x] Pursue five recorded-pool P-192 hypotheses with exhaustive canonical/signed searches, tangent residual traces and closed-divisor target checks;102 split residual quadratics retained as the next fixed collection input (Codex, completed static component 2026-11-23, branch lane/p192-recorded-pool-hypotheses-20261123, PR #5093; actual new collection proposed, original full goal remains open). [pcc:unverified]
 - [x] Parallelize APS point-batch collection and independent relation workers with a bounded queue and verified recovery (Codex, started 2026-11-23, branch codex/aps-queued-workers-20261123, PR #5092; isolated library check and one/four-worker public-fixture runs passed 2026-11-23)
