@@ -221,6 +221,48 @@ print(C^2 > A^2*p);
 Each output is `1`. This checks the numeric gate and quadratic-residue
 claim, not the divisor or character-sum derivation. [pcc:unverified]
 
+## Random-offset correlation gate
+
+Exactness is stronger than useful bias, so a separate average-case
+calculation screens uniformly sampled offsets. Let `n=r-1`, let
+`t(P)` be the scalar quadratic character, and independently sample
+`c₁,…,cₖ` uniformly from `F_p`, allowing repeats. Write
+`zᵢ(P)=χ_p(x(P)-cᵢ)` and, for a nonempty subset `S`, define
+`C_S=n⁻¹ Σ_{P≠O} t(P)∏_{i∈S}zᵢ(P)`. If `|S|=s`, then
+
+`E_c[C_S²] = (2/n)[(1-1/p)^s - (-1/p)^s]`.
+
+To obtain this identity, expand the square. For `x(P)=x(Q)`, the
+offset average of one character product is `1-1/p` and the signed
+sum over such ordered pairs is `2n`, because `t(-P)=t(P)`.
+For distinct x-coordinates, the offset average is `-1/p`, and the
+signed pair sum is `-2n` since `Σ_P t(P)=0`. Independent offsets
+raise the two averages to the `s`-th power. [pcc:unverified]
+
+For **any** classifier `F:{-1,0,1}^k→{-1,+1}` selected after seeing
+the offsets, let `ρ_F=n⁻¹Σ_{P≠O}t(P)F(z(P))`. Fourier expansion of
+the restriction of `F` to `{±1}^k`, Parseval, and Cauchy–Schwarz give
+
+`|ρ_F| ≤ [Σ_{S≠∅}C_S²]^(1/2) + 4k/n`.
+
+The correction allows at most `2k` points where some `zᵢ(P)=0`;
+the multilinear Fourier extension and `F` differ by at most two
+there. Summing the exact moments gives
+
+`E_c[Σ_{S≠∅}C_S²] = (2/n)[(2-1/p)^k-(1-1/p)^k] ≤ 2^(k+1)/n`.
+
+Thus, for `ε>4k/n`, Markov's inequality bounds the fraction of
+uniform offset tuples admitting *any* such classifier with
+`|ρ_F|≥ε` by `2^(k+1)/[n(ε-4k/n)²]`. At `k=41` and the
+illustrative `ε=2^-42`, this upper bound is below `2^-65`, by exact
+rational arithmetic. With `r` from the GP block above, the check is
+`n=r-1; k=41; e=1/2^42; print(e>4*k/n &&
+(2^(k+1)/n)/(e-4*k/n)^2<1/2^65)`, which returns `1`.
+This average-case statement does not exclude a
+deliberately structured offset tuple or a feature family other than
+coordinate quadratic signs. It also supplies no online evaluation
+method. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
