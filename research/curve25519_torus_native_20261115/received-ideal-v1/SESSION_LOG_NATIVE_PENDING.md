@@ -101,3 +101,29 @@ A private print attempted UTF8 decode of Git diagnostic bytes and failed only
 after the complete raw bytes had already been gzipped and metadata written;
 read effects first, corrected display handling without repeating mutations.
 No scientific result or frozen subject changed. [pcc:unverified]
+
+## 2026-11-24T00:34:14.588928+00:00 — Received-ideal report publication readback
+
+### What was done (commands, files, features)
+Published localbb21b2ef85 through the unchanged lane helper as
+599c7c7c7cfc6651707f95b568a2775d9bdd68ce; treee917467b0d19af5903ace9f9345b7116326a4868 is equal. Report/PDF/inspection/identity/checks exact Git
+blobs match. HANDOFF.json records the component and unexecuted successor.
+[pcc:unverified]
+
+### Decisions made (and why)
+Preserve selected raw locally and leave genuine store receipt pending. Keep
+both shared journal histories untouched while integration is pending; this
+entry remains reviewable for canonical append with all block multiplicities.
+No change to qualified source, native/Lean subjects, criteria or signer state.
+[pcc:unverified]
+
+### Open threads (unfinished, pick up next time)
+Update PR scope after prose lint and inspect actual final-head CI/review once.
+Resume the SAME CI-only checker; scientific successor is not scheduled there.
+Target-dependent discovery and original full accounting remain open.
+[pcc:unverified]
+
+### Errors (what went wrong, how it was handled)
+No publication mismatch. Whole whitespace advisories and separate inherited
+issuer Clippy findings remain disclosed; no failed check promoted to pass.
+[pcc:unverified]
