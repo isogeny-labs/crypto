@@ -8,4 +8,5 @@ python3 "$HERE/generate_lean_cells.py" --check
 cd "$PINNED"
 lake env lean -R "$HERE" -o "$HERE/Bounds.olean" "$HERE/Bounds.lean"
 lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" -o "$1/Cells.olean" "$1/Cells.lean"' sh "$HERE"
-lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" "$1/Global.lean"' sh "$HERE"
+lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" -o "$1/Global.olean" "$1/Global.lean"' sh "$HERE"
+lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" "$1/PointBridge.lean"' sh "$HERE"

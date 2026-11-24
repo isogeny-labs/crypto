@@ -47,26 +47,27 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 
 | Result | Evidence | Status |
 | --- | --- | --- |
-| Forms match fixed-curve doubling | `check_sage.py`, 30 signed multiples with the checked launcher | Independent finite replay; general point identity not yet in Lean |
+| Forms match fixed-curve doubling | `naiveHeight_double_ne` and `naiveHeight_double_eq` in `PointBridge.lean`; `check_sage.py` replays 30 signed multiples | Lean checked for all nonsingular affine points, including doubling to the identity; finite replay agrees |
 | Homogeneous Bézout identity, coefficient and tail inequalities | `Bounds.lean`, pinned build and `#print axioms` | Lean checked |
 | Quartic Bernstein coefficient lower-bound rule | `bernstein_quartic_lower` in `Bounds.lean` | Lean checked for arbitrary coefficients and `s∈[0,1]` |
 | Certificate cell 26 (`191/16≤A/B≤383/32`) | `interval_26_positive_F` in `Bounds.lean` | Lean checked with its exact rational coefficients |
 | Finite-range archimedean lower bound on `[-128,128]` | `finite_archimedean_lower` in generated `Cells.lean`; generator agrees with `certificate.json` | All 91 cells and coverage Lean checked |
 | Global real and homogeneous archimedean lower bound | `global_univariate_lower` and `global_homogeneous_lower` in `Global.lean` | Lean checked for all real inputs, including both outer tails and `B=0` |
 | Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
-| Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Mathematical derivation; full fixed-point Lean theorem open |
+| Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Mathematical derivation; integer-coordinate height comparison in Lean remains open |
 
 The polynomial, divisibility, global archimedean and numerical Lean declarations
 use only standard foundations in their `#print axioms` output. The packet is
-**partially formalized** until the homogeneous forms and general duplication map are connected to the actual
-`WeierstrassCurve.Affine.Point.naiveHeight`.
+**partially formalized** until the rational coordinate in `PointBridge.lean`
+is reduced to coprime integers and its height is bounded using the
+homogeneous forms and resultant divisibility theorem.
 The canonical-limit packet already proves quadraticity for integer multiples.
 Mordell–Weil generation and rational-to-finite reduction remain separate
 obligations for a complete fixed-curve exclusion theorem.
 
 ## Literature and library check
 
-Jacobson, Koblitz, Silverman, Stein and Teske, [*Analysis of the Xedni Calculus Attack*](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf), §4 and Lemma 4.1, analyze a family of rational lifts under an explicit conditional height premise. The bound here applies to the one displayed rational curve and supplies its numerical comparison directly. Mathlib's [affine point doubling lemmas](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Point.lean) give the projective x-coordinate of `P+P` in both the finite and identity cases; they identify the next formal bridge from these forms to `naiveHeight`. The existing [canonical-limit packet](../xedni_canonical_height_limit_20261122/README.md) supplies the geometric tail and quadraticity once the explicit duplication defect is available.
+Jacobson, Koblitz, Silverman, Stein and Teske, [*Analysis of the Xedni Calculus Attack*](https://pages.cpsc.ucalgary.ca/~jacobs/PDF/xedni.pdf), §4 and Lemma 4.1, analyze a family of rational lifts under an explicit conditional height premise. The bound here applies to the one displayed rational curve and supplies its numerical comparison directly. Mathlib's [affine point doubling lemmas](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Point.lean) and [naive-height definition](https://github.com/leanprover-community/mathlib4/blob/021c46bdd042f67b538b9f9871d556a93713a9a9/Mathlib/NumberTheory/Height/EllipticCurve.lean) supply the formal point-coordinate and height bridge. The existing [canonical-limit packet](../xedni_canonical_height_limit_20261122/README.md) supplies the geometric tail and quadraticity once the explicit duplication defect is available.
 
 Replay from this directory:
 
