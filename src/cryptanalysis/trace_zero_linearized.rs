@@ -33,6 +33,93 @@ pub struct TraceZeroLinearizedReport {
 
 type WordMask = [u64; 3];
 
+/// Direct addressing for small polynomial-coordinate windows, with the general
+/// ordered dictionary retained for arbitrary factor bases. Both expose keys in
+/// exactly the original lexicographic order and retain every supplied index.
+enum BaseIndex {
+    Dense(Vec<Vec<usize>>),
+    Tree(BTreeMap<WordMask, Vec<usize>>),
+}
+enum BaseEntry<'a> {
+    Dense(&'a mut Vec<usize>),
+    Tree(std::collections::btree_map::Entry<'a, WordMask, Vec<usize>>),
+}
+impl BaseIndex {
+    fn new(base: &[BinaryPoint]) -> Self {
+        if base.len() >= 64 {
+            let maximum = base.iter().try_fold(0u64, |maximum, p| {
+                let BinaryPoint::Affine { x, .. } = p else {
+                    return None;
+                };
+                let bits = x.raw_bits();
+                let low = bits.first().copied().unwrap_or(0);
+                (low < 65536 && bits.iter().skip(1).all(|&w| w == 0)).then_some(maximum.max(low))
+            });
+            if let Some(maximum) = maximum {
+                let slots = (maximum as usize + 1).next_power_of_two();
+                // Bound empty-bucket storage as well as the coordinate width.
+                if slots <= base.len().saturating_mul(4) {
+                    return Self::Dense(vec![Vec::new(); slots]);
+                }
+            }
+        }
+        Self::Tree(BTreeMap::new())
+    }
+    #[inline]
+    fn entry(&mut self, key: WordMask) -> BaseEntry<'_> {
+        match self {
+            Self::Dense(buckets) => {
+                debug_assert_eq!((key[0], key[1]), (0, 0));
+                BaseEntry::Dense(&mut buckets[key[2] as usize])
+            }
+            Self::Tree(tree) => BaseEntry::Tree(tree.entry(key)),
+        }
+    }
+    #[inline]
+    fn get(&self, key: &WordMask) -> Option<&Vec<usize>> {
+        match self {
+            Self::Dense(buckets) => {
+                if key[0] != 0 || key[1] != 0 || key[2] >= buckets.len() as u64 {
+                    return None;
+                }
+                let ids = &buckets[key[2] as usize];
+                (!ids.is_empty()).then_some(ids)
+            }
+            Self::Tree(tree) => tree.get(key),
+        }
+    }
+    fn keys(&self) -> Vec<WordMask> {
+        match self {
+            Self::Dense(buckets) => buckets
+                .iter()
+                .enumerate()
+                .filter(|(_, ids)| !ids.is_empty())
+                .map(|(x, _)| [0, 0, x as u64])
+                .collect(),
+            Self::Tree(tree) => tree.keys().copied().collect(),
+        }
+    }
+}
+impl BaseEntry<'_> {
+    #[inline]
+    fn first(&self) -> Option<usize> {
+        match self {
+            Self::Dense(ids) => ids.first().copied(),
+            Self::Tree(std::collections::btree_map::Entry::Occupied(entry)) => {
+                entry.get().first().copied()
+            }
+            Self::Tree(std::collections::btree_map::Entry::Vacant(_)) => None,
+        }
+    }
+    #[inline]
+    fn push(self, i: usize) {
+        match self {
+            Self::Dense(ids) => ids.push(i),
+            Self::Tree(entry) => entry.or_default().push(i),
+        }
+    }
+}
+
 fn words(x: &F2mElement) -> WordMask {
     let mut a = [0; 3];
     a[..x.raw_bits().len()].copy_from_slice(x.raw_bits());
@@ -668,7 +755,7 @@ pub fn decompose_trace_zero_linearized(
     }
     let c = v.curve();
     let compact = (c.m >= 31 && base.len() >= 64).then(|| WordField::new(c));
-    let mut by_x: BTreeMap<WordMask, Vec<usize>> = BTreeMap::new();
+    let mut by_x = BaseIndex::new(base);
     for (i, p) in base.iter().enumerate() {
         let BinaryPoint::Affine { x: fx, y: fy } = p else {
             out.relation.reason = Some("invalid linearized target/base");
@@ -682,9 +769,8 @@ pub fn decompose_trace_zero_linearized(
         // Hold one entry search across admission instead of finding the
         // same key again for insertion. No entry is inserted until admitted.
         let entry = by_x.entry(x);
-        let known_sign = if let std::collections::btree_map::Entry::Occupied(known) = &entry {
-            let ids = known.get();
-            let BinaryPoint::Affine { y: known, .. } = &base[ids[0]] else {
+        let known_sign = if let Some(first) = entry.first() {
+            let BinaryPoint::Affine { y: known, .. } = &base[first] else {
                 unreachable!()
             };
             fy == known || *fy == known.add(fx)
@@ -702,9 +788,9 @@ pub fn decompose_trace_zero_linearized(
             out.relation.reason = Some("invalid linearized target/base");
             return out;
         }
-        entry.or_default().push(i);
+        entry.push(i);
     }
-    let xs = word_basis(by_x.keys().map(|w| [w[2], w[1], w[0]]), c.m);
+    let xs = word_basis(by_x.keys().into_iter().map(|w| [w[2], w[1], w[0]]), c.m);
     let products: Vec<_> = xs
         .iter()
         .enumerate()
@@ -915,6 +1001,73 @@ pub fn decompose_trace_zero_linearized(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn direct_index_preserves_tree_keys_duplicates_and_first_indices() {
+        let base: Vec<_> = (0..256u32)
+            .map(|i| BinaryPoint::Affine {
+                x: F2mElement::from_biguint(&((i * 73) % 127).into(), 131),
+                y: F2mElement::zero(131),
+            })
+            .collect();
+        let mut dense = BaseIndex::new(&base);
+        assert!(matches!(dense, BaseIndex::Dense(_)));
+        let mut tree = BaseIndex::Tree(BTreeMap::new());
+        for (i, p) in base.iter().enumerate() {
+            let BinaryPoint::Affine { x, .. } = p else {
+                unreachable!()
+            };
+            let key = x_key(x);
+            let a = dense.entry(key);
+            let b = tree.entry(key);
+            assert_eq!(a.first(), b.first());
+            a.push(i);
+            b.push(i);
+        }
+        assert_eq!(dense.keys(), tree.keys());
+        for x in 0..257u64 {
+            assert_eq!(dense.get(&[0, 0, x]), tree.get(&[0, 0, x]));
+        }
+        for key in [[0, 1, 0], [1, 0, 0], [0, 0, u64::MAX]] {
+            assert_eq!(dense.get(&key), tree.get(&key));
+        }
+    }
+
+    #[test]
+    fn direct_index_bounds_storage_and_falls_back_for_other_shapes() {
+        let point = |x: u64| BinaryPoint::Affine {
+            x: F2mElement::from_biguint(&x.into(), 131),
+            y: F2mElement::zero(131),
+        };
+        assert!(matches!(
+            BaseIndex::new(&vec![point(1); 63]),
+            BaseIndex::Tree(_)
+        ));
+        assert!(matches!(
+            BaseIndex::new(&vec![point(65536); 64]),
+            BaseIndex::Tree(_)
+        ));
+        assert!(matches!(
+            BaseIndex::new(&vec![point(65535); 64]),
+            BaseIndex::Tree(_)
+        ));
+        assert!(matches!(
+            BaseIndex::new(&vec![BinaryPoint::Infinity; 64]),
+            BaseIndex::Tree(_)
+        ));
+        let high = BinaryPoint::Affine {
+            x: F2mElement::from_bit_positions(&[64], 131),
+            y: F2mElement::zero(131),
+        };
+        assert!(matches!(
+            BaseIndex::new(&vec![high; 64]),
+            BaseIndex::Tree(_)
+        ));
+        let BaseIndex::Dense(buckets) = BaseIndex::new(&vec![point(255); 64]) else {
+            panic!("exact storage boundary should qualify")
+        };
+        assert_eq!(buckets.len(), 256);
+    }
 
     fn adjoint_curve(n: u32) -> BinaryCurve {
         BinaryCurve {
