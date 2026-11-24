@@ -244,29 +244,29 @@ Each output is `1`. This checks the numeric gate and quadratic-residue
 claim, not the divisor, genus, or character-sum derivation.
 [pcc:unverified]
 
-## Eighty-two-coordinate invariant-rule gate
+## Eighty-seven-coordinate invariant-rule gate
 
 The preceding argument requires *every* pair of feature patterns to
-occur. Exact classification has a weaker necessary condition: if `7`
+occur. Exact classification has a weaker necessary condition: since `2`
 is a square modulo `r`, any exact rule `F` must satisfy
-`F(z(R))=F(z([7]R))` wherever all features are nonzero, while its
+`F(z(R))=F(z([2]R))` wherever all features are nonzero, while its
 mean over all nonidentity points must be zero. Applying the same
 character-sum estimates directly to these two requirements excludes
-**up to 82 distinct coordinate signs** on one P-192 endpoint.
+**up to 87 distinct coordinate signs** on one P-192 endpoint.
 [pcc:unverified]
 
 The geometric nonsquare check remains valid beyond 42 features.
 For `c∈F_p`, the two geometric points with x-coordinate `c` are
-not 2-torsion because `#E(F_p)=r` is odd. Each has 49 inverse images
-under `[7]`. If an inverse image `P` has `x(P)∈F_p`, then Frobenius
-sends `P` to `±P`, with the same sign as at `[7]P`. There is at most
-one such inverse image for each of the two points: `7∤r`, and `7`
-also does not divide the quadratic-twist order `2p+2-r` (its residue
-is `3 mod 7`). Thus at least 96 of the 98 zeros of
-`x([7]P)-c` have x-coordinate outside `F_p`. Zeros of any product
-of `x(P)-cᵢ` with rational offsets all have x-coordinate in `F_p`;
-the 98-zero supports for distinct `[7]` offsets are disjoint.
-Consequently a product using at least one `[7]` feature has an
+not 2-torsion because `#E(F_p)=r` is odd. Each has four inverse images
+under `[2]`. If an inverse image `P` has `x(P)∈F_p`, then Frobenius
+sends `P` to `±P`, with the same sign as at `[2]P`. There is at most
+one such inverse image for each of the two points: both `r` and the
+quadratic-twist order `2p+2-r` are odd. Thus at least six of the
+eight zeros of `x([2]P)-c` have x-coordinate outside `F_p`.
+Zeros of any product of `x(P)-cᵢ` with rational offsets all have
+x-coordinate in `F_p`;
+the eight-zero supports for distinct `[2]` offsets are disjoint.
+Consequently a product using at least one `[2]` feature has an
 uncancelled odd valuation. A nonempty product using only first-point
 features is nonsquare by disjointness. [pcc:unverified]
 
@@ -280,38 +280,44 @@ one-point feature sum on `U` by
 
 `B₁=(2k+4)√p+1+4k`,
 
-and every nonconstant product of a feature at `R` and one at
-`[7]R` by
-
-`B₂=(100k+4)√p+1+4k`.
+and every nonconstant product of selected features at `R` and
+`[2]R` by `(2|S|+8|T|+4)√p+1+4k`, where `S,T` are the
+selected subsets. [pcc:unverified]
 
 If `F(z(R))` were the exact scalar sign, its sum on `U` would have
 absolute value at most `4k`, since the full scalar-sign sum is zero.
-Also `F(z(R))F(z([7]R))=1` at every point of `U`. The Fourier
-expansions and the two bounds therefore require simultaneously
+Also `F(z(R))F(z([2]R))=1` at every point of `U`. Set
+`A=Σ_S|f_S|≤2^(k/2)` and
+`D=Σ_S|S||f_S|≤2^(k/2-1)√(k(k+1))` by
+Parseval and the exact count `Σ_S|S|²=2^(k-2)k(k+1)`.
+Summing the degree-dependent pair bound with weights
+`|f_S f_T|` costs at most `10AD+4A²` times `√p`, plus
+`(1+4k)A²`. The two necessary inequalities become
 
-`|μ|N≤4k+B₁·2^(k/2)` and `N(1-μ²)≤B₂·2^k`.
+`|μ|N≤4k+B₁·2^(k/2)` and
+`N(1-μ²)≤[(5√(k(k+1))+4)√p+1+4k]·2^k`.
 
 Both are necessary regardless of how `F` was chosen. For an exact
 integer check, set `L=r-1-4k`, `q=ceil(√p)`,
-`H=ceil(√(2^k))`, `b₁=(2k+4)q+1+4k`,
-`b₂=(100k+4)q+1+4k`, and `a=4k+b₁H`. The inequalities
+`H=ceil(√(2^k))`, `K=ceil(√(k(k+1)))`,
+`b₁=(2k+4)q+1+4k`, `b₂=(5K+4)q+1+4k`,
+and `a=4k+b₁H`. The inequalities
 `a<L` and `L²-a²>L·b₂·2^k` contradict those two necessary
-conditions. This PARI/GP replay returns `1` for every `1≤k≤82`;
-the same sufficient inequality fails at `k=83`:
+conditions. This PARI/GP replay returns `1` for every `1≤k≤87`;
+the same sufficient inequality fails at `k=88`:
 
 ```gp
 p = 6277101735386680763835789423207666416083908700390324961279;
 r = 6277101735386680763835789423176059013767194773182842284081;
 q = sqrtint(p)+1; ok = 1;
-print((2*p+2-r)%7 == 3);
-print(lift(Mod(7,r)^((r-1)/2)) == 1);
-for(k=1,82,L=r-1-4*k;H=sqrtint(2^k-1)+1;b1=(2*k+4)*q+1+4*k;b2=(100*k+4)*q+1+4*k;a=4*k+b1*H;if(!(a<L && L^2-a^2>L*b2*2^k),ok=0));
+print((2*p+2-r)%2 == 1);
+print(lift(Mod(2,r)^((r-1)/2)) == 1);
+for(k=1,87,L=r-1-4*k;H=sqrtint(2^k-1)+1;K=sqrtint(k*(k+1)-1)+1;b1=(2*k+4)*q+1+4*k;b2=(5*K+4)*q+1+4*k;a=4*k+b1*H;if(!(a<L && L^2-a^2>L*b2*2^k),ok=0));
 print(ok);
 ```
 
 This extends only the **exactness exclusion**. It does not bound
-the bias of an 82-feature rule, nor exclude other point functions or
+the bias of an 87-feature rule, nor exclude other point functions or
 a compact high-degree evaluator. [pcc:unverified]
 
 ## Random-offset correlation gate
