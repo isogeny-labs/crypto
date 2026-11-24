@@ -3275,7 +3275,13 @@ pub fn run_rho_policy(inst: &Instance, seed: u64, walk: RhoWalk, policy: WalkPol
             .copied()
             .unwrap_or(0)
             .max(rr.steps),
-        compares: rr.work_native.values().sum(),
+        // Only the window's and Brent's compares: `work_native` also holds
+        // the jump-selection tallies (and a `counted:` marker) since ic_boundary
+        // 3783ff5346f, which this field never meant to sum.
+        compares: [super::ic_boundary::WINDOW_WORD_OPS, super::ic_boundary::BRENT_WORD_OPS]
+            .iter()
+            .filter_map(|k| rr.work_native.get(*k))
+            .sum(),
         steps: rr.steps,
         wall_ns: rr.wall_ns,
     }
@@ -3337,7 +3343,7 @@ mod tests {
             // or two in the attempt that certified.
             let failed = x.attempts - 1;
             assert!(
-                calls >= per_attempt * failed + 1 && calls <= per_attempt * x.attempts,
+                calls > per_attempt * failed && calls <= per_attempt * x.attempts,
                 "{label}: {calls} solves over {} attempts",
                 x.attempts
             );

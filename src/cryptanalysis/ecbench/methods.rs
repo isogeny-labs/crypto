@@ -86,7 +86,7 @@ use crate::cryptanalysis::ic_framework::fiber::{
 };
 use crate::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
-    CyclotomicBase, DescentAlgebraicOracle, FrobeniusKSumOracle, FrobeniusMitmOracle, GlvOrbitBase,
+    CyclotomicBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase,
     KSumOracle, KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase,
     PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, ResidualSweepOracle, RootfindSubtractOracle,
     SubtractOracle, WSumOracle, WWalkOracle,
@@ -9143,9 +9143,6 @@ fn solve_ic_binary(
         }
         "mitm-fiber" => Box::new(FiberMitmOracle::new(ms)),
         "mitm-frobenius-fiber" => Box::new(FiberFrobeniusMitmOracle::new(ms, inst)),
-        "ksum" => Box::new(KSumOracle::new(ms)),
-        "ksum-frobenius" => Box::new(FrobeniusKSumOracle::new(ms, inst)),
-        "wwalk" => Box::new(WWalkOracle::new()),
         "rootfind-mitm" => Box::new(RootfindMitmOracle::new(ms)),
         "rootfind-pairs" => Box::new(RootfindPairsOracle::new(ms)),
         "descent-algebraic" => Box::new(DescentAlgebraicOracle::new(

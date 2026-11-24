@@ -215,6 +215,7 @@ fn trim(mut v: Vec<u64>) -> Vec<u64> {
 /// the trace engine. Keep the general u128 fallback so event values remain
 /// identical even for noncanonical internal callers.
 #[inline]
+#[cfg_attr(not(test), allow(dead_code, reason = "used only by the test oracles"))]
 fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
     match op {
         FieldOp::Add => {
@@ -302,7 +303,7 @@ impl Engine<'_> {
         // Exact odd-prime identities. No field operations are performed, so
         // none should be added to the trace or field-work budget.
         let trivial = if value == 1 { Some(1) }
-            else if value == 2 { Some((p + 1) / 2) }
+            else if value == 2 { Some(p.div_ceil(2)) }
             else if value == p - 1 { Some(p - 1) }
             else if value == p - 2 { Some((p - 1) / 2) }
             else { None };
@@ -921,6 +922,7 @@ fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
         Ok(product)
     }
 
+#[allow(dead_code, reason = "lane helper kept with its restored source; no caller yet")]
 fn div_general(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
         // Constant-unit division preserves the quotient without field work.
@@ -1105,7 +1107,7 @@ fn vinv(a: u64, p: u64) -> u64 {
     // The modulus is an odd prime bounded by 2^61-1.
     if r1 == 1 { return 1; }
     if r1 == p - 1 { return p - 1; }
-    if r1 == 2 { return (p + 1) / 2; }
+    if r1 == 2 { return p.div_ceil(2); }
     if r1 == p - 2 { return (p - 1) / 2; }
     let (mut t0, mut t1) = (0i64, 1i64);
     while r1 != 0 {
@@ -2041,6 +2043,7 @@ fn quartic_square(a: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
     quartic_reduce(t, c, p)
 }
 #[inline]
+#[cfg_attr(not(test), allow(dead_code, reason = "used only by the test oracles"))]
 fn quartic_coordinates(a: &[u64]) -> [u64; 4] {
     [a.first().copied().unwrap_or(0), a.get(1).copied().unwrap_or(0),
      a.get(2).copied().unwrap_or(0), a.get(3).copied().unwrap_or(0)]
@@ -2126,6 +2129,7 @@ fn vpower_quartic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
     Ok(quartic_trim(accumulator))
 }
 #[inline]
+#[cfg_attr(not(test), allow(dead_code, reason = "used only by the test oracles"))]
 fn vquartic_replay_mul(a: &[u64], b: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
     debug_assert_eq!(modulus.len(), 5);
     quartic_trim(quartic_mul(
@@ -2133,6 +2137,7 @@ fn vquartic_replay_mul(a: &[u64], b: &[u64], modulus: &[u64], p: u64) -> Vec<u64
         [modulus[0], modulus[1], modulus[2], modulus[3]], p))
 }
 #[inline]
+#[cfg_attr(not(test), allow(dead_code, reason = "used only by the test oracles"))]
 fn vquartic_replay_square(a: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
     debug_assert_eq!(modulus.len(), 5);
     quartic_trim(quartic_square(
@@ -2973,6 +2978,7 @@ fn vremainder(a: &[u64], m: &[u64], p: u64) -> Result<Vec<u64>, String> {
 /// Return k for the canonical monomial X^k (k>=1).
 /// Most dense polynomials fail the cheap first/last coefficient check.
 #[inline]
+#[allow(dead_code, reason = "lane helper kept with its restored source; no caller yet")]
 fn monic_x_shift(a: &[u64]) -> Option<usize> {
     if a.len() < 2 || a[0] != 0 || *a.last().unwrap() != 1 {
         return None;
@@ -3370,7 +3376,7 @@ mod tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };
@@ -4752,7 +4758,7 @@ mod restored_source_78_tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };
@@ -5127,7 +5133,7 @@ mod restored_source_85_tests {
             for degree in 1..=MAX_DEGREE {
                 for seed in 0..64u64 {
                     let mut f: Vec<_> = (0..=degree)
-                        .map(|j| ((seed * 127 + j as u64 * 71) % p)).collect();
+                        .map(|j| (seed * 127 + j as u64 * 71) % p).collect();
                     if f[degree] == 0 { f[degree] = 1; }
                     for j in (1..degree).step_by(3) { f[j] = 0; }
                     assert_eq!(vsquare(&f, p), vproduct(&f, &f, p),
@@ -5390,7 +5396,7 @@ mod restored_source_85_tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };
@@ -6099,7 +6105,7 @@ mod restored_source_86_tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };
@@ -6783,7 +6789,7 @@ mod restored_source_87_tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };
@@ -7472,7 +7478,7 @@ mod restored_source_88_tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };
@@ -7961,7 +7967,7 @@ mod restored_source_124_tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value_cached(&op, a, b, p, 0)
+                        field_value_cached(op, a, b, p, 0)
                     } else {
                         old(op, a, b, p)
                     };

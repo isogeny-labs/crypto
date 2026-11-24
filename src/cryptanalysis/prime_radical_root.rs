@@ -201,7 +201,7 @@ impl Fp {
         // The formulas hold in every supported odd prime field.
         if r1 == 1 { return 1; }
         if r1 == self.p - 1 { return self.p - 1; }
-        if r1 == 2 { return (self.p + 1) / 2; }
+        if r1 == 2 { return self.p.div_ceil(2); }
         if r1 == self.p - 2 { return (self.p - 1) / 2; }
         // Narrow Euclidean remainders for 32-bit prime fields. A u32
         // quotient/remainder needs no 64-bit div; keep i64 Bezout
@@ -595,6 +595,7 @@ pub(crate) fn rpow<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
 /// Per-field precomputation (non-cube, Sylow generator) is done once in `new`.
 pub(crate) struct Cube<R: Ring> {
     pub r: R,
+    #[cfg_attr(not(test), allow(dead_code, reason = "read by the test-only root_before_skip_digit"))]
     n: u128,
     // Reuse the 3-coprime cofactor instead of dividing u128 group orders
     // on each AMM root query. Computed once during field initialization.
@@ -613,6 +614,7 @@ pub(crate) struct Cube<R: Ring> {
     // Cache repeated AMM digit corrections for all roots in this field.
     w_squared: R::E,
     c_inv_squared: R::E,
+    #[cfg_attr(not(test), allow(dead_code, reason = "read by the test-only root_before_skip_digit"))]
     p3s: u128,
 }
 impl<R: Ring> Cube<R> {
@@ -1609,7 +1611,7 @@ impl RadicalRootCtx {
         // Noncanonical multiples of p remain polynomial zeros.
         while n > 0 {
             let x = f[n - 1];
-            if x == 0 || (x >= fp.p && x % fp.p == 0) {
+            if x == 0 || (x >= fp.p && x.is_multiple_of(fp.p)) {
                 n -= 1;
             } else {
                 break;
@@ -1620,7 +1622,7 @@ impl RadicalRootCtx {
         }
         let mut c = [0u64; 5];
         if n <= 2 {
-            while n > 0 && f[n - 1] % fp.p == 0 {
+            while n > 0 && f[n - 1].is_multiple_of(fp.p) {
                 n -= 1;
             }
             for j in 0..n {

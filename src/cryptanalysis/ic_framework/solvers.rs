@@ -222,7 +222,7 @@ pub struct F4F2 {
 
 // Preserve the former unit-value constructor API while each owned solver
 // retains its actual per-run skeleton/trace state.
-#[allow(non_upper_case_globals)]
+#[allow(non_upper_case_globals, clippy::declare_interior_mutable_const)]
 pub const F4F2: F4F2 = F4F2 {
     skeleton: std::sync::Mutex::new(None),
     trace: std::sync::Mutex::new(None),
@@ -482,9 +482,10 @@ impl SystemSolver for F4F2 {
 /// reducer/free-column split disabled.
 #[derive(Default)]
 pub struct F4F2FullWidth {
+    #[allow(dead_code, reason = "solve/accepts build a fresh F4F2 per call (main's body)")]
     inner: F4F2,
 }
-#[allow(non_upper_case_globals)]
+#[allow(non_upper_case_globals, clippy::declare_interior_mutable_const)]
 pub const F4F2FullWidth: F4F2FullWidth = F4F2FullWidth { inner: F4F2 };
 
 impl SystemSolver for F4F2FullWidth {

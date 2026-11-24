@@ -2443,7 +2443,6 @@ pub(crate) fn table_counted(mut counters: BTreeMap<String, u64>) -> BTreeMap<Str
 /// Test `R − P ∈ F` for every signed base point: no table, `|F|` group
 /// operations a target, and the honest baseline every table oracle is
 /// an improvement on.
-#[derive(Default)]
 pub struct SubtractOracle;
 
 impl<G: CountedGroup> DecompositionOracle<G> for SubtractOracle {
