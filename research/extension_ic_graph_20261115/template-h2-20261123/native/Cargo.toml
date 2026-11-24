@@ -22,6 +22,10 @@ path = "src/koszul.rs"
 name = "nagao-saved-shape"
 path = "src/shape.rs"
 
+[[bin]]
+name = "nagao-degree7-probe"
+path = "src/degree7.rs"
+
 [dependencies]
 certified-relations = { path = "../../../../crates/certified-relations", features = ["count-field-ops"] }
 serde = { version = "1", features = ["derive"] }

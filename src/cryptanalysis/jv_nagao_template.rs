@@ -310,6 +310,28 @@ impl Template {
         {
             return Err("principal template degree/zero generator".into());
         }
+        let mut leading: Vec<_> = expected
+            .iter()
+            .map(|f| lead(f).unwrap().clone())
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect();
+        leading = leading
+            .iter()
+            .filter(|m| !leading.iter().any(|other| other != *m && divides(other, m)))
+            .cloned()
+            .collect();
+        leading.sort_by(|a, b| order(b, a));
+        let required = leading
+            .iter()
+            .map(|m| m.iter().sum::<usize>())
+            .max()
+            .unwrap_or(0);
+        if required > degree {
+            return Err(format!(
+                "required minimal leading degree {required} exceeds bound {degree}"
+            ));
+        }
         let input_leading: Vec<_> = original.iter().map(|f| lead(f).unwrap().clone()).collect();
         let mut multiples = Vec::new();
         let mut enumerated = 0usize;
@@ -338,18 +360,6 @@ impl Template {
                 })?;
             }
         }
-        let mut leading: Vec<_> = expected
-            .iter()
-            .map(|f| lead(f).unwrap().clone())
-            .collect::<BTreeSet<_>>()
-            .into_iter()
-            .collect();
-        leading = leading
-            .iter()
-            .filter(|m| !leading.iter().any(|other| other != *m && divides(other, m)))
-            .cloned()
-            .collect();
-        leading.sort_by(|a, b| order(b, a));
         Self::compile(
             &original,
             (n, p),
@@ -800,5 +810,13 @@ mod tests {
         let t = Template::principal_syzygy(&f, &f, 1, 101, 3, Limits::default()).unwrap();
         let error = t.apply(&[vec![(vec![1], 1)]]).err().unwrap();
         assert!(error.reason.contains("input leading"));
+    }
+    #[test]
+    fn insufficient_required_degree_refuses_before_building_rows() {
+        let f = vec![vec![(vec![7], 1), (vec![0], 1)]];
+        let error = Template::principal_syzygy(&f, &f, 1, 101, 6, Limits::default()).unwrap_err();
+        assert!(error.contains("required minimal leading degree 7 exceeds bound 6"));
+        let template = Template::principal_syzygy(&f, &f, 1, 101, 7, Limits::default()).unwrap();
+        assert!(template.apply(&f).is_ok());
     }
 }
