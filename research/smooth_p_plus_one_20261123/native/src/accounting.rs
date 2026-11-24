@@ -25,14 +25,18 @@ const CHILD_LIMIT: Duration = Duration::from_secs(120);
 struct Ledger(BTreeMap<&'static str, u64>);
 
 impl Ledger {
-    fn new() -> Self {
-        Self(
+    fn new(base_lookup: bool) -> Self {
+        let mut phases = Self(
             PHASES
                 .into_iter()
                 .chain(["record_emission"])
                 .map(|key| (key, 0))
                 .collect(),
-        )
+        );
+        if base_lookup {
+            phases.0.insert("base_lookup", 0);
+        }
+        phases
     }
 
     fn measure<T>(&mut self, key: &'static str, work: impl FnOnce() -> T) -> T {
@@ -78,6 +82,7 @@ struct Run<'a> {
     method: Option<Method>,
     seed: u64,
     draws: usize,
+    base_lookup: bool,
 }
 
 impl Run<'_> {
@@ -86,12 +91,42 @@ impl Run<'_> {
     }
 
     fn scope(self) -> &'static str {
-        if self.method.is_some_and(|m| m.encoding() == Mode::Distinct) {
-            "four_distinct_coarse_images_target_disjoint"
-        } else {
-            "four_distinct_x_target_disjoint"
+        match (
+            self.base_lookup,
+            self.method.is_some_and(|m| m.encoding() == Mode::Distinct),
+        ) {
+            (true, true) => "signed_base_singletons_or_four_distinct_coarse_images_target_disjoint",
+            (true, false) => "signed_base_singletons_or_four_distinct_x_target_disjoint",
+            (false, true) => "four_distinct_coarse_images_target_disjoint",
+            (false, false) => "four_distinct_x_target_disjoint",
         }
     }
+
+    fn version(self) -> u64 {
+        if self.base_lookup {
+            2
+        } else {
+            1
+        }
+    }
+}
+
+fn consume_labels(
+    consumer: &mut RelationAdapter,
+    labels: &[i32],
+    a: i64,
+    b: i64,
+) -> Result<
+    prime31_four_summand::relation_adapter::RelationReceipt,
+    prime31_four_summand::relation_adapter::AdapterError,
+> {
+    let relation = SignedRelation {
+        terms: labels
+            .iter()
+            .map(|&label| (label.unsigned_abs() as usize - 1, i64::from(label.signum())))
+            .collect(),
+    };
+    consumer.accept(&relation, a as u64, b as u64)
 }
 
 fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, String> {
@@ -102,8 +137,9 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
         method,
         seed,
         draws: max_draws,
+        base_lookup,
     } = spec;
-    let mut ledger = Ledger::new();
+    let mut ledger = Ledger::new(base_lookup);
     ledger.measure("input_validation", || {
         if curve.multiply(curve.n, curve.g).is_some() || curve.multiply(curve.n, curve.q).is_some()
         {
@@ -130,6 +166,7 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
     let mut rng = seed;
     let mut seen = BTreeSet::new();
     let (mut draws, mut queries, mut selected, mut incomplete, mut skipped) = (0, 0, 0, 0, 0);
+    let (mut lookup_checks, mut base_hits) = (0, 0);
     let mut fatal = None;
     for draw in 1..=max_draws {
         draws = draw;
@@ -142,9 +179,32 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
         let rank_before = consumer.rank();
         let mut systems = vec![];
         let mut charts = None;
+        let base_label = if base_lookup && fresh && residual.is_some() {
+            lookup_checks += 1;
+            ledger.measure("base_lookup", || {
+                base.signed.get(&residual.unwrap()).copied()
+            })
+        } else {
+            None
+        };
         let result = if residual.is_none() || !fresh {
             skipped += 1;
             json!({"status":"skipped", "reason":if residual.is_none() {"identity"} else {"duplicate_target"}})
+        } else if let Some(label) = base_label {
+            base_hits += 1;
+            selected += 1;
+            let accepted = ledger.measure("consume_relation", || {
+                consume_labels(&mut consumer, &[label], a, b)
+            });
+            let receipt = match accepted {
+                Ok(receipt) => json!(receipt),
+                Err(error) => {
+                    fatal = Some(error.to_string());
+                    json!({"error":error})
+                }
+            };
+            json!({"status":if fatal.is_some() {"consumer_error"} else {"base_relation"},
+                "relations":1,"selected":[label],"consumer":receipt})
         } else {
             queries += 1;
             let target = residual.unwrap();
@@ -175,18 +235,7 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
                     let receipt = if let Some(row) = row {
                         selected += 1;
                         let accepted = ledger.measure("consume_relation", || {
-                            let relation = SignedRelation {
-                                terms: row
-                                    .into_iter()
-                                    .map(|label| {
-                                        (
-                                            label.unsigned_abs() as usize - 1,
-                                            i64::from(label.signum()),
-                                        )
-                                    })
-                                    .collect(),
-                            };
-                            consumer.accept(&relation, a as u64, b as u64)
+                            consume_labels(&mut consumer, &row, a, b)
                         });
                         match accepted {
                             Ok(receipt) => json!(receipt),
@@ -207,7 +256,7 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
             emit(
                 writer,
                 &json!({
-                    "kind":"account_attempt", "format_version":1, "mode":spec.label(), "seed":seed,
+                    "kind":"account_attempt", "format_version":spec.version(), "mode":spec.label(), "seed":seed,
                     "prime":curve.p, "depth":depth, "draw":draw, "a":a, "b":b,
                     "target":residual.map(|p| [p.x,p.y]), "result":result, "systems":systems,
                     "chart_counts":charts, "rank_before":rank_before, "rank_after":consumer.rank(),
@@ -230,7 +279,7 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
     // Prepare summary metadata BEFORE closing the child interval. Only its final
     // timing-value insertion, serialization and teardown are left to the parent.
     let mut summary = json!({
-        "kind":"account_summary", "format_version":1, "mode":spec.label(), "seed":seed,
+        "kind":"account_summary", "format_version":spec.version(), "mode":spec.label(), "seed":seed,
         "prime":curve.p, "depth":depth, "scope":spec.scope(),
         "status":if fatal.is_some() {"error"} else if scalar.is_some() {"recovered"} else {"incomplete"},
         "error":fatal, "draws":draws, "max_draws":max_draws, "calls":queries,
@@ -244,6 +293,11 @@ fn run(spec: Run<'_>, start: Instant, writer: &mut impl Write) -> Result<Value, 
         "accounting":"local_development_only", "query_budget_ms":3000,
         "consumer_interval":"canonicalization, equality replay, dedup, rank, linear algebra and consumer scalar replay",
     });
+    if base_lookup {
+        summary["base_lookup"] = json!({"checks":lookup_checks,"hits":base_hits,
+            "oracle_scope":Run {base_lookup:false,..spec}.scope(),
+            "lookup":"public affine point in the signed BTreeMap; its construction is included in base_setup"});
+    }
     summary["wall"] = ledger.finish(start);
     emit(writer, &summary)?;
     if let Some(error) = fatal {
@@ -262,7 +316,7 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
         return Err("expected exactly one final child summary".into());
     }
     let summary = summaries[0];
-    if summary["format_version"] != 1
+    if summary["format_version"] != spec.version()
         || summary["mode"] != spec.label()
         || summary["prime"] != spec.curve.p
         || summary["depth"] != spec.depth
@@ -290,7 +344,8 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
     {
         return Err("missing or extra draw records".into());
     }
-    let (mut queries, mut skipped, mut incomplete, mut selected) = (0u64, 0u64, 0u64, 0u64);
+    let (mut queries, mut skipped, mut incomplete, mut selected, mut hits) =
+        (0u64, 0u64, 0u64, 0u64, 0u64);
     for (i, record) in records[..records.len() - 1].iter().enumerate() {
         if record["kind"] != "account_attempt"
             || record["draw"] != i + 1
@@ -298,10 +353,22 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
             || record["seed"] != spec.seed
             || record["prime"] != spec.curve.p
             || record["depth"] != spec.depth
+            || record["format_version"] != spec.version()
         {
             return Err("child draw identity mismatch".into());
         }
         match record["result"]["status"].as_str() {
+            Some("base_relation") if spec.base_lookup => {
+                if record["result"]["selected"].as_array().map(Vec::len) != Some(1)
+                    || record["result"]["relations"] != 1
+                    || !record["systems"].as_array().is_some_and(Vec::is_empty)
+                    || !record["chart_counts"].is_null()
+                {
+                    return Err("invalid singleton receipt".into());
+                }
+                hits += 1;
+                selected += 1;
+            }
             Some("skipped") => skipped += 1,
             Some("undetermined") => {
                 queries += 1;
@@ -313,6 +380,21 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
             }
             _ => return Err("invalid draw status".into()),
         }
+    }
+    if spec.base_lookup {
+        if summary["base_lookup"]["hits"] != hits
+            || summary["base_lookup"]["checks"] != hits + queries
+            || summary["base_lookup"]["oracle_scope"]
+                != (Run {
+                    base_lookup: false,
+                    ..spec
+                })
+                .scope()
+        {
+            return Err("base-lookup accounting mismatch".into());
+        }
+    } else if !summary["base_lookup"].is_null() {
+        return Err("unexpected base-lookup policy".into());
     }
     for (key, count) in [
         ("calls", queries),
@@ -331,7 +413,8 @@ fn validate_summary(spec: Run<'_>, records: &[Value], parent_ns: u64) -> Result<
     let phases = wall["phase_ns"]
         .as_object()
         .ok_or("missing child phase ledger")?;
-    if phases.len() != PHASES.len() + 1
+    if phases.len() != PHASES.len() + 1 + usize::from(spec.base_lookup)
+        || (spec.base_lookup && !phases.contains_key("base_lookup"))
         || PHASES
             .into_iter()
             .chain(["record_emission"])
@@ -427,8 +510,9 @@ fn suite(spec: Run<'_>, labels: &[String], writer: &mut impl Write) -> Result<()
             .args([
                 format!("account={}", spec.seed),
                 format!("draws={}", spec.draws),
-                label.clone(),
             ])
+            .args(spec.base_lookup.then_some("base-lookup"))
+            .arg(label)
             .env("RAYON_NUM_THREADS", "1")
             .process_group(0)
             .stdin(Stdio::null())
@@ -496,7 +580,7 @@ fn suite(spec: Run<'_>, labels: &[String], writer: &mut impl Write) -> Result<()
         };
         emit(
             writer,
-            &json!({"kind":"account_process_receipt", "format_version":1,
+            &json!({"kind":"account_process_receipt", "format_version":spec.version(),
                 "mode":child_spec.label(), "prime":spec.curve.p, "depth":spec.depth, "seed":spec.seed,
                 "exit_code":status.code(), "receipt_valid":valid.is_ok(), "error":valid.as_ref().err(),
                 "spawn_through_exit_ns":parent_ns, "deadline_seconds":CHILD_LIMIT.as_secs(),
@@ -540,6 +624,11 @@ pub(super) fn dispatch(
         if !(1..=256).contains(&draws) {
             return Err("draw limit outside 1..=256".into());
         }
+        let (base_lookup, labels) = if labels.first().is_some_and(|label| label == "base-lookup") {
+            (true, &labels[1..])
+        } else {
+            (false, labels)
+        };
         if labels.is_empty() || labels.len() > if is_suite { 8 } else { 1 } {
             return Err(
                 "account needs exactly one explicit arm; account-suite needs one to eight".into(),
@@ -568,6 +657,7 @@ pub(super) fn dispatch(
             method: mode(&labels[0]),
             seed,
             draws,
+            base_lookup,
         };
         let stdout = std::io::stdout();
         let mut writer = stdout.lock();
@@ -592,6 +682,7 @@ mod tests {
             method: None,
             seed: 781815,
             draws: 30,
+            base_lookup: false,
         }
     }
 
@@ -601,6 +692,127 @@ mod tests {
             .filter(|s| !s.is_empty())
             .map(|s| serde_json::from_slice(s).unwrap())
             .collect()
+    }
+
+    #[test]
+    fn singleton_labels_replay_both_signs_on_both_public_curves() {
+        for fixture in FIXTURES {
+            let base = Base::new(fixture, 4);
+            for (&point, &label) in &base.signed {
+                let (curve, points) = production::public_input(&base);
+                let mut consumer =
+                    RelationAdapter::new(curve, points, Some((point.x as u64, point.y as u64)))
+                        .unwrap();
+                assert_eq!(
+                    consume_labels(&mut consumer, &[label], 0, 1)
+                        .unwrap()
+                        .rank_after,
+                    1
+                );
+                assert!(consume_labels(&mut consumer, &[-label], 0, 1).is_err());
+                assert!(consume_labels(&mut consumer, &[label], 1, 1).is_err());
+            }
+        }
+    }
+
+    #[test]
+    fn fixed_prefix_handles_all_five_previously_unsupported_targets() {
+        let spec = spec();
+        let base = Base::new(spec.curve, spec.depth);
+        let (curve, points) = production::public_input(&base);
+        let mut consumer = RelationAdapter::new(
+            curve,
+            points,
+            Some((spec.curve.q.x as u64, spec.curve.q.y as u64)),
+        )
+        .unwrap();
+        let mut rng = spec.seed;
+        let mut hits = vec![];
+        for draw in 1..=12 {
+            let a = next_mask(&mut rng, spec.curve.n);
+            let b = next_mask(&mut rng, spec.curve.n);
+            let target = spec
+                .curve
+                .add(
+                    spec.curve.multiply(a, spec.curve.g),
+                    spec.curve.multiply(b, spec.curve.q),
+                )
+                .unwrap();
+            if let Some(&label) = base.signed.get(&target) {
+                consume_labels(&mut consumer, &[label], a, b).unwrap();
+                hits.push(draw);
+            }
+        }
+        assert_eq!(hits, vec![2, 3, 4, 8, 11]);
+        assert_eq!(consumer.work().submitted, 5);
+        assert_eq!(consumer.work().rejected, 0);
+    }
+
+    #[test]
+    fn lookup_hits_bypass_failed_oracle_but_misses_remain_undetermined() {
+        let spec = Run {
+            base_lookup: true,
+            method: Some(Method::Refined),
+            draws: 4,
+            ..spec()
+        };
+        let start = Instant::now();
+        let mut bytes = vec![];
+        let summary = run(spec, start, &mut bytes).unwrap();
+        let rows = records(&bytes);
+        validate_summary(spec, &rows, nanos(start.elapsed())).unwrap();
+        assert_eq!(summary["base_lookup"]["checks"], 4);
+        assert_eq!(summary["base_lookup"]["hits"], 3);
+        assert_eq!(summary["calls"], 1);
+        assert_eq!(summary["incomplete_queries"], 1);
+        assert_eq!(summary["selected"], 3);
+        assert_eq!(summary["consumer_work"]["submitted"], 3);
+        assert_eq!(summary["status"], "incomplete");
+        assert_eq!(rows[0]["result"]["status"], "undetermined");
+        for row in &rows[1..4] {
+            assert_eq!(row["result"]["selected"].as_array().unwrap().len(), 1);
+        }
+    }
+
+    #[test]
+    fn lookup_policy_and_counts_cannot_be_mislabelled_as_four_leaf_accounting() {
+        let spec = Run {
+            base_lookup: true,
+            ..spec()
+        };
+        let start = Instant::now();
+        let mut bytes = vec![];
+        let summary = run(spec, start, &mut bytes).unwrap();
+        let rows = records(&bytes);
+        let total = nanos(start.elapsed());
+        validate_summary(spec, &rows, total).unwrap();
+        assert_eq!(summary["scalar"], 69);
+        assert!(summary["base_lookup"]["hits"].as_u64().unwrap() > 0);
+        assert!(validate_summary(
+            Run {
+                base_lookup: false,
+                ..spec
+            },
+            &rows,
+            total
+        )
+        .is_err());
+        let mut wrong = rows.clone();
+        wrong.last_mut().unwrap()["base_lookup"]["hits"] = json!(0);
+        assert!(validate_summary(spec, &wrong, total).is_err());
+        wrong = rows.clone();
+        wrong.last_mut().unwrap()["wall"]["phase_ns"]
+            .as_object_mut()
+            .unwrap()
+            .remove("base_lookup");
+        assert!(validate_summary(spec, &wrong, total).is_err());
+        wrong = rows.clone();
+        let hit = wrong
+            .iter_mut()
+            .find(|r| r["result"]["status"] == "base_relation")
+            .unwrap();
+        hit["result"]["selected"] = json!([1, 2, 3, 4]);
+        assert!(validate_summary(spec, &wrong, total).is_err());
     }
 
     #[test]
