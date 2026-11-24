@@ -1,7 +1,17 @@
 {
   "branch": "claude/hyperelliptic-index-calculus-td1fdn",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-24T07:42:07+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/quartic_diem_la_20261123/run_all.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-24T07:19:22+00:00",
+      "wall_s": 1181.693
+    }
+  ],
   "commit": "4faca82a6f0605980de777c8e081dd356969fea1",
   "commit_dirty": true,
   "created_utc": "2026-11-24T07:19:01+00:00",
@@ -17,19 +27,76 @@
     "platform": "Linux-6.18.44-fc-v819-x86_64-with-glibc2.39"
   },
   "id": "20261124T0719Z-quartic-diem-la",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 40,
+      "name": "paired_gae1_sge_over_sfb_pooled",
+      "note": "paired GAE_1 2lp-sfb-sge/2lp-sfb, equal weight per prime, cluster boot95",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.34009051047614247,
+        0.4056869768510189
+      ],
+      "unit": "ratio",
+      "value": 0.37143894684049666
+    },
+    {
+      "baseline": 7.7472,
+      "better": "lower",
+      "n": 10,
+      "name": "ic_over_ideal_rho_gae1_p131101_sge",
+      "note": "ideal negation rho sqrt(pi r/4); baseline = 2lp-sfb same instances",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        2.0226,
+        3.8009
+      ],
+      "unit": "ratio",
+      "value": 2.7797
+    }
+  ],
   "problem": "ic:quartic-diem-2lp-la",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 125829,
+      "path": "research/quartic_diem_la_20261123/raw/run.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/29/292aa63ef35317df3904ccc460811bcc77987aa42dbc90c9e76b97ac3512a9ed",
+      "sha256": "292aa63ef35317df3904ccc460811bcc77987aa42dbc90c9e76b97ac3512a9ed",
+      "uploaded": false
+    },
+    {
+      "bytes": 44193,
+      "path": "research/quartic_diem_la_20261123/raw/run131101.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/82/82cf2fdcd3500fd2566754cba6bd817baa69386aeaf9085399afc31a289e3c42",
+      "sha256": "82cf2fdcd3500fd2566754cba6bd817baa69386aeaf9085399afc31a289e3c42",
+      "uploaded": false
+    },
+    {
+      "bytes": 22471,
+      "path": "research/quartic_diem_la_20261123/analysis.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/aa/aa8fade57ee2efc2083a93d600a06ccc2eda8403bb0f9b81e9922d9d1f7dd70b",
+      "sha256": "aa8fade57ee2efc2083a93d600a06ccc2eda8403bb0f9b81e9922d9d1f7dd70b",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/quartic_diem_la_20261123/reports/run-20261124T0719Z/report.pdf",
+    "png": [
+      "research/quartic_diem_la_20261123/fig_la.png"
+    ],
+    "svg": [
+      "research/quartic_diem_la_20261123/fig_la.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "quartic-diem-la",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "IMPROVEMENT (frozen rule): SGE+coordinate Wiedemann cuts quartic Diem 2LP GAE_1 to 0.371x [0.340,0.406] of 2lp-sfb; IC/rho at 131101 w=1 7.75 -> 2.78 [pcc:unverified]",
   "validation": null
 }
