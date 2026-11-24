@@ -58,15 +58,24 @@ in the polynomial ring. They have the same quotient algebra and reduced
 Groebner basis for a fixed monomial order. This is a finite-product-ring
 deduction, not a new summation-polynomial construction.
 
-A lower-degree representative `C_R` could still change the work of a
-particular F4 presentation; equality of ideals does not make generator
-choice free. The candidate must be built from public selector and target
+The same ideal conclusion holds for any finite system
+`C_1=...=C_t=0` in these **four original abscissa variables** with the
+same common zero set on `S^4`. At each factor of `A`, its generated ideal
+is zero if all `C_j` vanish and is the whole field otherwise. It therefore
+equals the ideal generated there by `F_R`, factor by factor. This extends
+the finite-selector obstruction to multi-equation presentations without
+auxiliary variables; it does not say their generators cost the same to
+process.
+
+A lower-degree representative or multi-equation presentation could still
+change the work of a particular F4 run; equality of ideals does not make
+generator choice free. The candidate must be built from public selector and target
 data without first enumerating its accepted tuples, preserve the same
 distinct-index and rational-point semantics, and finish an equal-input
 cost comparison. The statement applies to the **actual** liftable base;
 the B677 algebraic selector's larger off-curve superset needs its own
 lifting and rejection account. Auxiliary-variable systems and
-non-squarefree selector schemes are outside this unit-equivalence claim.
+non-squarefree selector schemes are outside this ideal-equivalence claim.
 
 ### B677 split-selector support before target equations
 
