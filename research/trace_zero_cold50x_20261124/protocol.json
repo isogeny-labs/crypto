@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "TZ50X-20261124-dense-index",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-24",
   "repository": "crypto",
   "study_dir": "research/trace_zero_cold50x_20261124",
@@ -10,7 +10,7 @@
     {
       "id": "dense-index",
       "text": "Finite full-cost comparison of unchanged fixed relation query; goal is50x, not assumed.",
-      "class": "comparative_statistical",
+      "class": "comparative",
       "decided_by": [
         "cold",
         "oracle",
@@ -25,7 +25,7 @@
       "description": "Frozen previously best numeric modules, common harness",
       "instrument": {
         "repo": "crypto",
-        "commit": "7aa3c43c5e23d24b386c15b83759a8924900a9af",
+        "commit": "d8080d726cd8e043cb6c35cc1f4bfab89def7ec5",
         "build": [
           [
             "cargo",
@@ -39,7 +39,7 @@
             "legacy-halftrace"
           ]
         ],
-        "binary_sha256": "7fc8e8e8334d8af2f9ee13acd1eb5757081e5f6d1b66dabef65c5f6e6a3b77af",
+        "binary_sha256": "5c23a917555c108d17ff850680acb7fcc4bf5796abfa1dcb3fd43792b0f80042",
         "threads": 1,
         "flags": {
           "profile.release.debug": "line-tables-only",
@@ -49,7 +49,7 @@
           "RAYON_NUM_THREADS": "1",
           "OMP_NUM_THREADS": "1",
           "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include",
-          "CARGO_TARGET_DIR": "/workspace/crypto/research/trace_zero_halftrace_elimination_20261123/native/target"
+          "CARGO_TARGET_DIR": "/workspace/scratch/cold50x-isolated-target"
         }
       }
     },
@@ -59,7 +59,7 @@
       "description": "Frozen previously best numeric modules, common harness",
       "instrument": {
         "repo": "crypto",
-        "commit": "7aa3c43c5e23d24b386c15b83759a8924900a9af",
+        "commit": "d8080d726cd8e043cb6c35cc1f4bfab89def7ec5",
         "build": [
           [
             "cargo",
@@ -73,7 +73,7 @@
             "incumbent"
           ]
         ],
-        "binary_sha256": "df77a976e2c4f40799e4828a886cb94292d1bb00c0075fc4910411ba814f24a0",
+        "binary_sha256": "f2adb3c87f403972a9a39bd07672b1dc27a9ce1e8f6d74a1b74f56567cfa5d1a",
         "threads": 1,
         "flags": {
           "profile.release.debug": "line-tables-only",
@@ -83,7 +83,7 @@
           "RAYON_NUM_THREADS": "1",
           "OMP_NUM_THREADS": "1",
           "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include",
-          "CARGO_TARGET_DIR": "/workspace/crypto/research/trace_zero_halftrace_elimination_20261123/native/target"
+          "CARGO_TARGET_DIR": "/workspace/scratch/cold50x-isolated-target"
         }
       }
     },
@@ -93,7 +93,7 @@
       "description": "Same numeric modules plus bounded direct-address dictionary, common harness",
       "instrument": {
         "repo": "crypto",
-        "commit": "7aa3c43c5e23d24b386c15b83759a8924900a9af",
+        "commit": "d8080d726cd8e043cb6c35cc1f4bfab89def7ec5",
         "build": [
           [
             "cargo",
@@ -115,7 +115,7 @@
           "RAYON_NUM_THREADS": "1",
           "OMP_NUM_THREADS": "1",
           "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include",
-          "CARGO_TARGET_DIR": "/workspace/crypto/research/trace_zero_halftrace_elimination_20261123/native/target"
+          "CARGO_TARGET_DIR": "/workspace/scratch/cold50x-isolated-target"
         }
       }
     },
@@ -125,7 +125,7 @@
       "description": "Frozen previously best numeric modules, common harness",
       "instrument": {
         "repo": "crypto",
-        "commit": "7aa3c43c5e23d24b386c15b83759a8924900a9af",
+        "commit": "d8080d726cd8e043cb6c35cc1f4bfab89def7ec5",
         "build": [
           [
             "cargo",
@@ -139,7 +139,7 @@
             "legacy-halftrace"
           ]
         ],
-        "binary_sha256": "7fc8e8e8334d8af2f9ee13acd1eb5757081e5f6d1b66dabef65c5f6e6a3b77af",
+        "binary_sha256": "5c23a917555c108d17ff850680acb7fcc4bf5796abfa1dcb3fd43792b0f80042",
         "threads": 1,
         "flags": {
           "profile.release.debug": "line-tables-only",
@@ -149,7 +149,7 @@
           "RAYON_NUM_THREADS": "1",
           "OMP_NUM_THREADS": "1",
           "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include",
-          "CARGO_TARGET_DIR": "/workspace/crypto/research/trace_zero_halftrace_elimination_20261123/native/target"
+          "CARGO_TARGET_DIR": "/workspace/scratch/cold50x-isolated-target"
         }
       },
       "same_instrument_as": "baseline"
@@ -473,11 +473,11 @@
       "sha256": "2fa1b6653fb57f56615b5bfa37988c4c3d59ee32462edd9f7093954198fe2770"
     },
     "inputs": [
-      "rows.jsonl"
+      "v2-rows.jsonl"
     ],
     "outputs": [
-      "summary.json",
-      "export.json"
+      "v2-summary.json",
+      "v2-export.json"
     ],
     "blinded": false,
     "frozen_before_data": true
@@ -509,7 +509,17 @@
       "claim": "One Entry search retains the same key and original check/insert order. No mathematical relation-finding or system-size change; no novelty claim."
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "correct-stale-control-cache",
+      "filed": "2026-11-24",
+      "filed_before_affected_data": true,
+      "reason": "Reject initial stale-control pilot comparisons; no primary data yet.",
+      "changes": [
+        "Use separate Cargo target and fresh control binaries, requalify195 rows, retain original600second deadline and every invalid first output."
+      ]
+    }
+  ],
   "freeze": {
     "status": "draft",
     "protocol_sha256": null,
@@ -542,11 +552,12 @@
     "goal_absolute_original_baseline_ir": 21360373,
     "goal_candidate_ceiling_ir": 427207,
     "source_inventory": "checks/source-inputs.json",
-    "binary_inventory": "checks/binary-identities.json",
+    "binary_inventory": "checks/binary-identities-v2.json",
     "audit_source_sha256": "cd34bc6a84db30114643d10311720ebc3dad9cb4e1f1d98430cbb098b30a9127",
     "profile_protocol": "profile.protocol.json",
     "profile_export": "profile.export.json",
     "equivalence_rows": 195,
-    "external_comparison_gap": "No external-fastest, full-DLP or native-runtime claim."
+    "external_comparison_gap": "No external-fastest, full-DLP or native-runtime claim.",
+    "equivalence": "isolated-equivalence.jsonl"
   }
 }
