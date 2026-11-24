@@ -236,6 +236,26 @@ does not select the marked 16th-root phase. A useful evaluator would
 have to compute that phase from `P` with nonvanishing and a fully
 charged cost below the reference. [pcc:unverified]
 
+There is a further P-192 Frobenius check. Since `p≡-1 (mod 16)`,
+`μ₁₆` lies in `F_{p²}`, and Frobenius inverts every `16`th root of
+unity. All point coordinates in the sum lie in `F_p`, so
+`T₁₆(P)^p=T_{χ₁₆⁻¹}(P)`. Its norm
+`T₁₆(P)^(p+1)` is consequently a curve-level value: replacing
+`P` by `[d]P` multiplies the sum by `χ₁₆(d)⁻¹`, whose norm is one.
+More sharply, if `T₁₆(P)≠0`, all 16 roots
+`ζ₁₆^j T₁₆(P)` of its 16th power have **the same norm**, because
+`ζ₁₆^(p+1)=1`. Even the 16th power together with the norm cannot
+select the marked phase. [pcc:unverified]
+
+An exact finite-field control uses
+`E/F₁₂₇: y²=x³+x+54`, `#E(F₁₂₇)=113`,
+`P=(72,116)`, and primitive root `3 (mod 113)`.
+With `ζ₁₆∈F_{127²}`, direct enumeration gives zero sums for
+orders `2,4,8`, a nonzero order-16 sum, and
+`T₁₆(P)^127=T_{χ₁₆⁻¹}(P)`. This establishes that the parity gate
+does not itself force the order-16 sum to vanish; it does not
+establish nonvanishing at P-192. [pcc:unverified]
+
 ## Forty-two-coordinate pair-pattern gate
 
 Fix `k ≤ 42` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192
