@@ -164,6 +164,46 @@ degree. This degree bound does not imply a running-time bound for a
 compact high-degree function and does not cover combinations of
 features or a biased rather than exact predictor. [pcc:unverified]
 
+## Diamond eigenfunction degree gate
+
+A direct level-structure proposal asks for a nonzero rational function
+`u` satisfying `u(E,[a]P)=χ_r(a)u(E,P)` so that the ratio at `Q`
+and `G` returns `χ_r(d)`. On the **coarse** modular curves, the
+diamond deck group of `X₁(r)→X₀(r)` is
+`D=(Z/rZ)^×/{±1}`, as stated in the
+[modular-curve treatment of diamond operators](https://mathe2.uni-bayreuth.de/stoll/papers/DKSS-arXiv-v2.pdf).
+Since P-192 has `r≡1 (mod 4)`, `χ_r(-1)=1` and the scalar
+character descends to a nontrivial character of `D`. Its kernel `H`
+has order `|H|=(r-1)/4=N≈2^190`. [pcc:unverified]
+
+If `u` transforms by this character, every element of `H` fixes
+`u`. It therefore descends to a rational function `v` on the
+intermediate curve `X_H=X₁(r)/H`. The degree of the finite map
+`X₁(r)→X_H` is `|H|`. The character's nontriviality makes `u`
+nonconstant, so
+
+`deg(u:X₁(r)→P¹)=|H|·deg(v:X_H→P¹)≥(r-1)/4`.
+
+This is an exact degree gate for a *single rational diamond
+eigenfunction*, valid in characteristic `p` because `p∤r`; it
+does not require transferring a characteristic-zero gonality bound.
+It does **not** make the same claim about arithmetic-circuit size or
+evaluation time: a high-degree function might have a compact
+formula, and a biased feature need not be an eigenfunction.
+[pcc:unverified]
+
+The recent [Gezer–Çolak–Bizim modular factorization](https://arxiv.org/abs/2610.37191)
+is stated for a fixed torsion level over a number field, without a
+uniform evaluation-cost bound as the level grows to P-192's `r`.
+Its `X₀(r)` norm is invariant under diamond operators; for this
+fixed prime-order curve, every nonzero `Q` generates the same
+subgroup as `G`, so that norm has identical input on both markings.
+The paper does not supply a compact evaluator of a quadratic
+`X₁(r)` eigenfunction at P-192. The earlier level-structure torsor
+lead in the shared research atlas already flagged this eigenfunction
+route; the kernel-degree calculation makes one of its degree
+obligations explicit. [pcc:unverified]
+
 ## Forty-two-coordinate pair-pattern gate
 
 Fix `k ≤ 42` distinct offsets `c₁,…,cₖ ∈ F_p` on one P-192
