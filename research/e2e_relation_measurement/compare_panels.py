@@ -71,7 +71,7 @@ def load(directory):
                 result.get('config',{}).get('seed') != key[0] or result.get('config',{}).get('mode') != key[1] or
                 result.get('status') != row['result_status'] or result.get('target') != row['target'] or
                 result.get('useful_relations') != row['useful_relations'] or result.get('relation_counts') != row['relation_counts'] or
-                result.get('counts') != row.get('candidate_counts') or
+                result.get('counts') != row.get('candidate_counts') or result.get('total') != row.get('observed_total') or
                 result.get('source_sha256_at_start') != summary['measure_sha256_at_start'] or
                 result.get('accounting_sha256_at_start') != summary['accounting_sha256_at_start']):
                 raise ValueError(f'result does not match receipt or sources: {directory} {key}')
@@ -81,7 +81,7 @@ def load(directory):
             snapshot=json.loads((directory / f'{name}.checkpoint.json').read_text())
             if (snapshot.get('schema') != 'e2e-relation-measurement/v1' or
                 snapshot.get('config',{}).get('seed') != key[0] or snapshot.get('config',{}).get('mode') != key[1] or
-                snapshot.get('counts') != row.get('candidate_counts') or
+                snapshot.get('counts') != row.get('candidate_counts') or snapshot.get('total') != row.get('observed_total') or
                 snapshot.get('source_sha256_at_start') != summary['measure_sha256_at_start'] or
                 snapshot.get('accounting_sha256_at_start') != summary['accounting_sha256_at_start']):
                 raise ValueError(f'checkpoint does not match receipt or sources: {directory} {key}')
@@ -105,11 +105,16 @@ def outcome_totals(rows, mode):
     def counter(name):
         values=[value[name] for value in candidate_values if isinstance(value,dict) and type(value.get(name)) is int and value[name] >= 0]
         return {'observed_attempts':len(values), 'unknown_attempts':len(selected)-len(values), 'observed_sum':sum(values) if values else None}
+    def total_observation(name, aggregate):
+        values=[row['observed_total'][name] for row in selected if isinstance(row.get('observed_total'),dict) and type(row['observed_total'].get(name)) is int and row['observed_total'][name] >= 0]
+        return {'observed_attempts':len(values),'unknown_attempts':len(selected)-len(values),'observed_value':aggregate(values) if values else None}
     return {'attempts':len(selected), 'complete':sum(row['result_status']=='complete' for row in selected),
             'useful_runs':sum(row['result_status']=='complete' and (row['useful_relations'] or 0)>0 for row in selected),
             'nonzero_b_runs':sum(row['relation_counts'] is not None and row['relation_counts']['nonzero_b']>0 for row in selected),
             'nonzero_b_unknown_runs':sum(row['relation_counts'] is None for row in selected),
             'whole_process_wall_ns':sum(row['whole_process_wall_ns'] for row in selected),
+            'driver_cpu_ns_sum':total_observation('cpu_ns',sum),
+            'peak_rss_native_max':total_observation('peak_rss_native',max),
             'candidates':counter('candidates'), 'filtered':counter('filtered'),
             'identity':counter('identity'), 'duplicate_x':counter('duplicate_x')}
 
@@ -127,6 +132,15 @@ def compare(left_dir, right_dir):
     for key in ('measure_sha256_at_start', 'accounting_sha256_at_start', 'panel_sha256'):
         if ls[key] != rs[key]: reasons.append(f'{key} differs')
     if ls['platform'] != rs['platform']: reasons.append('platform strings differ')
+    resource_values=[ls.get('resource_metadata_at_start'),ls.get('resource_metadata_at_end'),rs.get('resource_metadata_at_start'),rs.get('resource_metadata_at_end')]
+    if any(not isinstance(value,dict) for value in resource_values):
+        resource_status='unavailable'; reasons.append('resource metadata unavailable')
+    elif any(not value.get('cpu_model') or not value.get('logical_cpus') or not value.get('parent_limits') or value.get('rss_native_unit') not in ('bytes','KiB') or not isinstance(value.get('thread_environment'),dict) for value in resource_values):
+        resource_status='incomplete'; reasons.append('resource metadata incomplete')
+    elif not all(value==resource_values[0] for value in resource_values[1:]):
+        resource_status='different'; reasons.append('recorded resource metadata differs')
+    else:
+        resource_status='metadata_match_only'
     for side, plan, rows in (('left',lp,lr),('right',rp,rr)):
         for seed in plan['seeds']:
             targets=[rows[(seed,mode)]['target'] for mode in MODES]
@@ -149,7 +163,7 @@ def compare(left_dir, right_dir):
     return {'schema':'relation-panel-comparison/v1', 'left_plan_sha256':ls['plan_sha256'],
             'right_plan_sha256':rs['plan_sha256'], 'left_filter':{k:v for k,v in la.items() if k in FILTER_FLAGS},
             'right_filter':{k:v for k,v in ra.items() if k in FILTER_FLAGS}, 'matching_checks_pass':not reasons,
-            'mismatch_or_unknown':reasons, 'pairs':pairs,
+            'mismatch_or_unknown':reasons, 'resource_metadata_status':resource_status, 'pairs':pairs,
             'per_mode':{mode:{'left':outcome_totals(lr,mode),'right':outcome_totals(rr,mode)} for mode in MODES},
             'limits':['Same platform string does not establish equal hardware, isolation or resource envelopes.',
                       'Equal per-attempt limits do not establish equal realized total cost.',

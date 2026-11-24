@@ -26,7 +26,7 @@ def fixture(directory, *, filtered=False, target=17, incomplete=False, mode_targ
         missing=incomplete and mode=='walk'
         row={'seed':7,'mode':mode,'status':'timeout' if missing else 'exited', 'exit_code':-9 if missing else 0, 'result_status':None if missing else 'complete', 'target':None if missing else {'a':1,'b':2,'point':[actual_target,1]},'whole_process_wall_ns':20,'relation_counts':None if missing else {'nonzero_b':1},'useful_relations':None if missing else 1,'result_sha256':digest(result),'checkpoint_sha256':None,'stdout_sha256':digest(directory/f'{name}.stdout'),'stderr_sha256':digest(directory/f'{name}.stderr')}
         rows.append(row); save(directory/f'{name}.receipt.json',row)
-    summary={'plan_sha256':digest(directory/'plan.json'),'measure_source_unchanged':True,'accounting_source_unchanged':True,'measure_sha256_at_start':'m','accounting_sha256_at_start':'a','panel_sha256':'p','platform':'host','runs':rows}
+    summary={'plan_sha256':digest(directory/'plan.json'),'measure_source_unchanged':True,'accounting_source_unchanged':True,'measure_sha256_at_start':'m','accounting_sha256_at_start':'a','panel_sha256':'p','platform':'host','resource_metadata_at_start':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'resource_metadata_at_end':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'runs':rows}
     save(directory/'summary.json',summary)
 
 
@@ -36,6 +36,8 @@ class ComparisonTest(unittest.TestCase):
             a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b,filtered=True)
             result=compare.compare(a,b)
             self.assertTrue(result['matching_checks_pass']); self.assertEqual(len(result['pairs']),3)
+            self.assertEqual(result['resource_metadata_status'],'metadata_match_only')
+            self.assertIsNone(result['per_mode']['walk']['left']['peak_rss_native_max']['observed_value'])
             self.assertEqual(result['per_mode']['walk']['left']['whole_process_wall_ns'],20)
             self.assertEqual(result['per_mode']['walk']['left']['candidates']['unknown_attempts'],1)
             self.assertEqual(result['right_filter']['--modulus'],'2')
@@ -80,6 +82,27 @@ class ComparisonTest(unittest.TestCase):
             row=summary['runs'][0]; row['target']={'a':9,'b':9,'point':[9,9]}
             save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
             with self.assertRaisesRegex(ValueError,'result does not match receipt'): compare.compare(a,b)
+
+    def test_resource_observation_cannot_be_relabelled(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=summary['runs'][0]; row['observed_total']={'cpu_ns':1,'peak_rss_native':1}
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'result does not match receipt'): compare.compare(a,b)
+
+    def test_resource_metadata_disagreement_and_absence(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            summary['resource_metadata_at_end']['machine']='other'; save(summary_path,summary)
+            self.assertEqual(compare.compare(a,b)['resource_metadata_status'],'different')
+            del summary['resource_metadata_at_end']; save(summary_path,summary)
+            result=compare.compare(a,b)
+            self.assertEqual(result['resource_metadata_status'],'unavailable')
+            self.assertFalse(result['matching_checks_pass'])
+            summary['resource_metadata_at_end']=summary['resource_metadata_at_start'].copy(); summary['resource_metadata_at_end']['cpu_model']=None; save(summary_path,summary)
+            self.assertEqual(compare.compare(a,b)['resource_metadata_status'],'incomplete')
 
     def test_ambiguous_arguments_rejected(self):
         with self.assertRaises(ValueError): compare.flags(['--p','101','--p','103'])
