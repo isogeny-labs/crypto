@@ -1,7 +1,18 @@
 {
   "branch": "lane/ecc2k-ic-half-trace-setup",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_cold50x_20261124/checks/run-primary-v2.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-24T02:27:48+00:00",
+      "wall_s": 58.907
+    }
+  ],
   "commit": "b6c4fc82f6838a36b354e3274980e6755718eea5",
   "commit_dirty": true,
   "created_utc": "2026-11-24T02:27:41+00:00",
@@ -15,9 +26,47 @@
     "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
   },
   "id": "20261124T0227Z-ecc2k-cold50x-dense-primary",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "complete_cold_query_ir",
+      "note": "Fixed n131 uniform; rejected regression, not50x. Complete median from frozen Rust summary.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        21566178.0,
+        21566178.0
+      ],
+      "unit": "ir",
+      "value": 21566178.0
+    }
+  ],
   "problem": "ecc2k130-index-calculus-cold-query",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 141430,
+      "path": "research/trace_zero_cold50x_20261124/v2-rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d9/d97817eaa91e66333f84c14091586b7572fc91c383bfadecaf14a1a67b84d1ec",
+      "sha256": "d97817eaa91e66333f84c14091586b7572fc91c383bfadecaf14a1a67b84d1ec",
+      "uploaded": false
+    },
+    {
+      "bytes": 4133,
+      "path": "research/trace_zero_cold50x_20261124/v2-grid-audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/30/30735177e7b74c7e949ca3ad82b4a27daba154435380bdcd264a97f8ff5f8c5b",
+      "sha256": "30735177e7b74c7e949ca3ad82b4a27daba154435380bdcd264a97f8ff5f8c5b",
+      "uploaded": false
+    },
+    {
+      "bytes": 3516,
+      "path": "research/trace_zero_cold50x_20261124/v2-polynomial-replay.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8e/8e6ada91789084e10b5e520ccec6b6d462382d2b134d43277b7cfedb45d12668",
+      "sha256": "8e6ada91789084e10b5e520ccec6b6d462382d2b134d43277b7cfedb45d12668",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,

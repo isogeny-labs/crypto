@@ -157,13 +157,13 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261123T2351Z-ecc2k-cold50-primary",
+  "latest_record": "20261124T0212Z-ecc2k-cold50x-current-profile",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
-    "invalid": 8,
-    "measured": 321,
-    "open": 62
+    "invalid": 9,
+    "measured": 322,
+    "open": 63
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -427,6 +427,32 @@
       ],
       "problem": "dlpwai:static-dh-p224-shape",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 21360464.0,
+      "latest": 21360464.0,
+      "latest_derived": {},
+      "metric": "complete_cold_profile_ir",
+      "points": [
+        {
+          "commit": "e65dc230265e",
+          "date": "2026-11-24",
+          "derived": {},
+          "n": 2,
+          "record": "20261124T0212Z-ecc2k-cold50x-current-profile",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            21360464.0,
+            21360464.0
+          ],
+          "summary": "Descriptive fixed query profile only; both Ir21360464. Persistent local envelope, complete raw retained, unsigned.",
+          "value": 21360464.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "ir"
     },
     {
       "better": "higher",

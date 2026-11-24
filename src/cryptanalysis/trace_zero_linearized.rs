@@ -37,11 +37,45 @@ type WordMask = [u64; 3];
 /// ordered dictionary retained for arbitrary factor bases. Both expose keys in
 /// exactly the original lexicographic order and retain every supplied index.
 enum BaseIndex {
-    Dense(Vec<Vec<usize>>),
+    Dense(Vec<IndexBucket>),
     Tree(BTreeMap<WordMask, Vec<usize>>),
 }
+#[derive(Clone)]
+enum IndexBucket {
+    Inline { len: usize, ids: [usize; 2] },
+    Spill(Vec<usize>),
+}
+impl IndexBucket {
+    const EMPTY: Self = Self::Inline {
+        len: 0,
+        ids: [0; 2],
+    };
+    #[inline]
+    fn as_slice(&self) -> &[usize] {
+        match self {
+            Self::Inline { len, ids } => &ids[..*len],
+            Self::Spill(ids) => ids,
+        }
+    }
+    #[inline]
+    fn push(&mut self, i: usize) {
+        match self {
+            Self::Inline { len, ids } if *len < 2 => {
+                ids[*len] = i;
+                *len += 1;
+            }
+            Self::Inline { ids, .. } => {
+                let mut out = Vec::with_capacity(4);
+                out.extend_from_slice(ids);
+                out.push(i);
+                *self = Self::Spill(out);
+            }
+            Self::Spill(ids) => ids.push(i),
+        }
+    }
+}
 enum BaseEntry<'a> {
-    Dense(&'a mut Vec<usize>),
+    Dense(&'a mut IndexBucket),
     Tree(std::collections::btree_map::Entry<'a, WordMask, Vec<usize>>),
 }
 impl BaseIndex {
@@ -58,8 +92,8 @@ impl BaseIndex {
             if let Some(maximum) = maximum {
                 let slots = (maximum as usize + 1).next_power_of_two();
                 // Bound empty-bucket storage as well as the coordinate width.
-                if slots <= base.len().saturating_mul(4) {
-                    return Self::Dense(vec![Vec::new(); slots]);
+                if slots <= base.len().saturating_mul(8) {
+                    return Self::Dense(vec![IndexBucket::EMPTY; slots]);
                 }
             }
         }
@@ -76,16 +110,16 @@ impl BaseIndex {
         }
     }
     #[inline]
-    fn get(&self, key: &WordMask) -> Option<&Vec<usize>> {
+    fn get(&self, key: &WordMask) -> Option<&[usize]> {
         match self {
             Self::Dense(buckets) => {
                 if key[0] != 0 || key[1] != 0 || key[2] >= buckets.len() as u64 {
                     return None;
                 }
-                let ids = &buckets[key[2] as usize];
+                let ids = buckets[key[2] as usize].as_slice();
                 (!ids.is_empty()).then_some(ids)
             }
-            Self::Tree(tree) => tree.get(key),
+            Self::Tree(tree) => tree.get(key).map(Vec::as_slice),
         }
     }
     fn keys(&self) -> Vec<WordMask> {
@@ -93,7 +127,7 @@ impl BaseIndex {
             Self::Dense(buckets) => buckets
                 .iter()
                 .enumerate()
-                .filter(|(_, ids)| !ids.is_empty())
+                .filter(|(_, ids)| !ids.as_slice().is_empty())
                 .map(|(x, _)| [0, 0, x as u64])
                 .collect(),
             Self::Tree(tree) => tree.keys().copied().collect(),
@@ -104,7 +138,7 @@ impl BaseEntry<'_> {
     #[inline]
     fn first(&self) -> Option<usize> {
         match self {
-            Self::Dense(ids) => ids.first().copied(),
+            Self::Dense(ids) => ids.as_slice().first().copied(),
             Self::Tree(std::collections::btree_map::Entry::Occupied(entry)) => {
                 entry.get().first().copied()
             }
@@ -1067,6 +1101,27 @@ mod tests {
             panic!("exact storage boundary should qualify")
         };
         assert_eq!(buckets.len(), 256);
+        // Actual d12 trace-zero windows reach polynomial degree12, with about
+        // 2000 admitted signed points, and therefore need8192 direct slots.
+        let BaseIndex::Dense(buckets) = BaseIndex::new(&vec![point(0x1ffc); 1994]) else {
+            panic!("actual d12 occupancy must select direct addressing")
+        };
+        assert_eq!(buckets.len(), 8192);
+    }
+
+    #[test]
+    fn direct_index_two_common_signs_stay_inline_and_extra_indices_spill_in_order() {
+        let mut bucket = IndexBucket::EMPTY;
+        for i in [7, 1] {
+            bucket.push(i);
+        }
+        assert!(matches!(bucket, IndexBucket::Inline { len: 2, .. }));
+        assert_eq!(bucket.as_slice(), &[7, 1]);
+        for i in [7, 4, 2] {
+            bucket.push(i);
+        }
+        assert!(matches!(bucket, IndexBucket::Spill(_)));
+        assert_eq!(bucket.as_slice(), &[7, 1, 7, 4, 2]);
     }
 
     fn adjoint_curve(n: u32) -> BinaryCurve {
