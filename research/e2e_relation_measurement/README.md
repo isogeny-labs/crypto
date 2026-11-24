@@ -54,3 +54,16 @@ Add `--solver-protocol` to the driver or the panel plan's common arguments to re
 The driver emits `=== BEGIN GROEBNER BASIS PROTOCOL ===` and `=== END GROEBNER BASIS PROTOCOL ===` around the basis call, flushing C and Python stdout at the boundaries. The end marker means the call returned or raised; consult the process exit and result status to establish completion. A killed process can leave the trace without an end marker. Root extraction is outside these markers.
 
 The [Singular option manual](https://www.singular.uni-kl.de/Manual/latest/sing_324.htm) describes the `std` protocol: bracketed `[m:n]` values concern an internal representation change, and a separate numeric token describes a current leading-term degree. The [Sage libSingular documentation](https://sagemath.gitlab.io/documentation/html/en/reference/libs/sage/libs/singular/option.html) notes that degree interpretation depends on the command and ordering. The stream may be incomplete or contain other output; do not extract a regularity or solving-degree claim from a maximum number in the stream.
+
+### Compare saved filter panels
+
+After producing two panels with the same seed sequence and common non-filter arguments, compare their saved artifacts without running another solve:
+
+```sh
+python3 research/e2e_relation_measurement/compare_panels.py /path/to/panel-a /path/to/panel-b --output /tmp/filter-comparison.json
+python3 research/e2e_relation_measurement/test_compare_panels.py
+```
+
+The comparator checks plan and artifact hashes, each receipt against its result, source identity, explicit non-filter arguments, seed order, timeout, platform string, and target values. It lists each paired outcome and whole-process wall time, including missing or failed attempts. A missing target, incomplete run or mismatch makes `matching_checks_pass` false. Explicit argument spellings must match even if omitted and explicit defaults would be mathematically equivalent; ambiguous arguments are rejected. The result file must not already exist.
+
+These checks establish only the stated record-level matches. Equal timeout limits are **not** equal realized cost, and a matching platform string does not establish matching hardware, load, resource isolation or timing boundaries. The comparison does not include a single-target rho measurement, authenticate the files' origin, or infer a speedup. Frozen resource envelopes, verification evidence and complete single-target intervals are still required for a cost claim.

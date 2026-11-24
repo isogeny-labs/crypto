@@ -75,3 +75,11 @@ Add explicit counters around point-addition and scalar-multiplication API calls 
 The three focused tests passed (20.405 seconds): all three generation strategies matched independently derived API-call count formulas, the paired panel retained the counters, and the one-candidate cap was charged. The counters include target draws and generation setup, and exclude subgroup validation, scalar-multiplication internals, polynomial solving and relation verification. Run the full suite next.
 
 The complete local correctness suite passed (11 tests, 32.786 seconds). The new counters provide exact instrumented API-call counts for the generation phase, not field-level operations or whole-solver work. Full solver telemetry and the matched complete-cost comparison are still outstanding.
+
+## 2026-11-23 — saved-panel comparison
+
+One panel accepts only one filter configuration. Add a read-only comparison of saved panel summaries that verifies plans, source identity, seeds, modes and target pairing before displaying paired outcome and whole-process wall data. Equal timeout budgets are not equal realized costs; platform strings cannot establish identical hardware or load. Missing attempts and failed verification must remain explicit. This comparison does not run a solver or establish a rho result.
+
+The saved-panel comparator and tests are in place. Four synthetic tests passed (0.015 seconds), covering paired targets, missing/incomplete outcomes, changed artifacts, duplicate arguments, and a receipt relabelled inconsistently with its hashed result. A real local correctness panel passed comparison with itself (1 test, 6.558 seconds). This confirms the comparator reads produced artifacts; it does not establish a filtered performance advantage or equal realized budgets. Resource envelopes and the single-target reference remain absent.
+
+An additional adversarial fixture showed that matching targets across two panels is insufficient if their modes disagree within each panel. The comparator now rejects that case; all five comparator tests passed (0.020 seconds).

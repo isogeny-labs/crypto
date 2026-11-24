@@ -148,6 +148,9 @@ class MeasurementTest(unittest.TestCase):
             subprocess.run(['python3',str(HERE/'panel.py'),'--plan',str(plan),'--out',str(out)],check=True,stdout=subprocess.DEVNULL)
             summary=json.loads((out/'summary.json').read_text())
             self.assertTrue(summary['target_pairing_by_seed']['42'])
+            spec=importlib.util.spec_from_file_location('compare_panels', HERE/'compare_panels.py')
+            compare=importlib.util.module_from_spec(spec); spec.loader.exec_module(compare)
+            self.assertTrue(compare.compare(out,out)['matching_checks_pass'])
             self.assertTrue(summary['measure_source_unchanged'])
             self.assertTrue(summary['accounting_source_unchanged'])
             for mode in ('independent','walk','two-group'):
