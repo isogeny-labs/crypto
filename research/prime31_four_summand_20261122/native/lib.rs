@@ -3,10 +3,14 @@
 pub mod b677_fixture;
 pub mod extractor;
 pub mod relation_adapter;
+pub mod query_pipeline;
 mod selector_circuit;
 
 #[cfg(test)]
 mod independent_tests;
+
+#[cfg(test)]
+mod streaming_tests;
 
 // Run the new production guard tests through their public API while leaving
 // unrelated historical dependency unit-test modules disabled. The build script
