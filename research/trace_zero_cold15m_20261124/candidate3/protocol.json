@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "TZ15M-20261124-register-denominator",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-24",
   "repository": "crypto",
   "study_dir": "research/trace_zero_cold15m_20261124/candidate3",
@@ -517,7 +517,17 @@
       "claim": "One Entry search retains the same key and original check/insert order. No mathematical relation-finding or system-size change; no novelty claim."
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "derive-run-directory-before-data",
+      "filed": "2026-11-24",
+      "filed_before_affected_data": true,
+      "reason": "Copied runner named prior candidate2 output directory and failed before any child because its calibration directories already existed. Preserve failed record and overwritten metadata bytes; restore originals.",
+      "changes": [
+        "Derive study directory from script location, forbid output clobbering, use unique corrected scratch namespace and original candidate3 start epoch/600second deadline. No new counter child or primary data existed before correction."
+      ]
+    }
+  ],
   "freeze": {
     "status": "draft",
     "protocol_sha256": null,
