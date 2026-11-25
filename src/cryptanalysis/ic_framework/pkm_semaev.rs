@@ -4258,6 +4258,12 @@ mod tests {
         assert_eq!(fb.columns, 3);
         let mut o = oracle(&inst, &fb, 3, 3, "m=3,mode=chain,engine=f4,descent=1,trace=0,degree=12");
         assert!(o.prefer_grid_extraction(), "this test must bypass the public crossover");
+        let independent: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../research/pkm_nonenum_decomp_20261125/f97_independent_census.json"
+        ))
+        .expect("independent F97 point and scalar census");
+        let verdicts = independent["verdicts"].as_array().expect("100 census verdicts");
+        assert_eq!(verdicts.len(), 100);
 
         let mut exact = HashSet::new();
         for &p in &fb.points {
@@ -4271,6 +4277,7 @@ mod tests {
                 }
             }
         }
+        assert_eq!(exact.len(), 28, "independently enumerated F97 three-sum count");
 
         let ring = o.prepared.as_ref().expect("prepared Kummer tower").ring.clone();
         let mut targets = 0usize;
@@ -4313,6 +4320,17 @@ mod tests {
                     lift_abscissae(curve, &fb, &mut GroupOps::default(), xs, target).is_some()
                 });
                 let expected = exact.contains(&curve.key(&target));
+                let independent_expected = verdicts
+                    .iter()
+                    .find(|row| {
+                        row["point"][0].as_u64() == Some(target.x)
+                            && row["point"][1].as_u64() == Some(target.y)
+                    })
+                    .expect("target in independent F97 census")["direct_three_sum"]
+                    .as_bool()
+                    .expect("census verdict");
+                assert_eq!(expected, independent_expected,
+                           "Rust and independent F97 census at {target:?}");
                 assert_eq!(grid_hit, expected, "independent point census vs grid at {target:?}");
                 assert_eq!(basis_hit, expected, "F4 basis descent vs point census at {target:?}");
             }
