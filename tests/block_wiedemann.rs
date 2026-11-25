@@ -243,3 +243,30 @@ fn rejects_bad_input() {
         BwError::BadParams
     );
 }
+
+#[test]
+fn parallel_path_is_identical_to_serial() {
+    let mut rng = Rng(0xb10c);
+    for &p in &PRIMES {
+        for &(m, n) in &[(1, 1), (2, 4), (4, 4), (8, 8)] {
+            for dead in [1usize, 3] {
+                let a = random_matrix(&mut rng, 120, 5, dead, p);
+                let params = BwParams {
+                    m,
+                    n,
+                    seed: 7,
+                    extra: 8,
+                };
+                let serial = kernel_vector(&a, p, params);
+                for threads in [1usize, 2, 4] {
+                    let pool = rayon::ThreadPoolBuilder::new()
+                        .num_threads(threads)
+                        .build()
+                        .unwrap();
+                    let par = pool.install(|| kernel_vector_parallel(&a, p, params));
+                    assert_eq!(serial, par, "p={p} m={m} n={n} threads={threads}");
+                }
+            }
+        }
+    }
+}
