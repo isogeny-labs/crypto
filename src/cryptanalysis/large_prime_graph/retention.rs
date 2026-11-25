@@ -402,7 +402,7 @@ pub mod fp_toy {
         }
         let mut d = 2u64;
         while d * d <= n {
-            if n % d == 0 {
+            if n.is_multiple_of(d) {
                 return false;
             }
             d += if d == 2 { 1 } else { 2 };
@@ -414,7 +414,7 @@ pub mod fp_toy {
         let mut f = Vec::new();
         let mut d = 2u64;
         while d * d <= n {
-            while n % d == 0 {
+            while n.is_multiple_of(d) {
                 f.push(d);
                 n /= d;
             }
@@ -492,7 +492,7 @@ pub mod fp_toy {
             let mut small = Vec::new();
             for (j, &q) in fb.iter().enumerate() {
                 let mut e = 0u64;
-                while c % q == 0 {
+                while c.is_multiple_of(q) {
                     c /= q;
                     e += 1;
                 }
@@ -510,7 +510,7 @@ pub mod fp_toy {
                     .iter()
                     .skip_while(|&&q| q <= smooth_bound)
                     .take_while(|&&q| q * q <= c)
-                    .find(|&&q| c % q == 0)
+                    .find(|&&q| c.is_multiple_of(q))
                 {
                     Some(&a) if c / a < lp_bound && is_prime(c / a) => vec![(a, 1), (c / a, 1)],
                     _ => continue,

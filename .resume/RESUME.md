@@ -1,19 +1,3 @@
-# Resume: crypto @ claude/index-calculus-research-d00sf7 (PR #5186) — LP retention policies
-
-## Goal
-User (2026-11-25): continue workspace#144's F_p index-calculus triage and integrate it with the Rust codebase.
-Port T3 (which partials to keep under a row budget) to `large_prime_graph::retention`, score by exact GainDsu rank.
-
-## Spec
-research/lp_retention_20261125/PROTOCOL.md (frozen at ad47caef3 before data). Wrapper crate
-research/lp_retention_20261125/native (run.sh: 41+6 tests). Runner: examples/lp_retention_eval.rs.
-
-## State
-Code + tests committed and pushed (ad47caef3). Root-crate build of lp_graph_collect in progress (needed for REAL stream).
-
-## Next
-Run FP0-2 (+relabel), SYN (+relabel), REAL if the root builds; Python cross-check (H2) on FP0 dumps; analysis, report, PDF.
-
 # Resume: crypto @ claude/humbert-next-leads-20261120 (PR #4848) — crossover at q < 2^17 + rho audit
 
 ## Goal

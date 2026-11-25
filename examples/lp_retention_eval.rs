@@ -34,6 +34,9 @@ use crypto_lib::cryptanalysis::large_prime_graph::retention::{
 use serde::Serialize;
 use std::io::BufRead;
 
+/// One stream to score: (seed, pool, complete relations, rows of arity > 2, replayed count).
+type Batch = (u64, Vec<PartialRelation>, usize, usize, Option<usize>);
+
 #[derive(Serialize)]
 struct Repeat {
     seed: u64,
@@ -128,7 +131,7 @@ fn main() {
     let params: serde_json::Value;
     let mut dumped = Vec::new();
     let dump = get("--dump", "");
-    let mut batches: Vec<(u64, Vec<PartialRelation>, usize, usize, Option<usize>)> = Vec::new();
+    let mut batches: Vec<Batch> = Vec::new();
     match source.as_str() {
         "fp" => {
             let p = match get("--p", "").as_str() {

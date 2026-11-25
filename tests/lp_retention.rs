@@ -164,7 +164,7 @@ fn fp_toy_collects_replays_and_ranks() {
     let p = fp_toy::Instance::next_prime(1 << 31);
     assert_eq!(p, 2_147_483_659);
     let inst = fp_toy::Instance::new(p, 1001);
-    assert!(fp_toy::is_prime(inst.ell) && (p - 1) % inst.ell == 0);
+    assert!(fp_toy::is_prime(inst.ell) && (p - 1).is_multiple_of(inst.ell));
     let col = fp_toy::collect(&inst, 4096, 65536, 20_000, 0);
     assert!(col.partials.len() > 3000 && col.complete > 1000);
     assert_eq!(fp_toy::replay(&col), Ok(col.partials.len()));
