@@ -150,12 +150,43 @@ pub(super) fn run() {
         assert_eq!(indexed, direct);
         assert_eq!(indexed, signed);
         assert_ne!(top, 0, "the direct degree-24 certificate must be nonzero");
+        let multisets: BTreeSet<_> = indexed
+            .iter()
+            .map(|&word| {
+                let mut key = [0u8; 6];
+                for (i, index) in key.iter_mut().enumerate() {
+                    *index = ((word >> (K * i)) & (SIZE - 1)) as u8;
+                }
+                key.sort_unstable();
+                key
+            })
+            .collect();
+        let signed_witnesses: usize = multisets
+            .iter()
+            .map(|key| {
+                (0..64)
+                    .filter(|mask| {
+                        let sum = key.iter().enumerate().fold(None, |sum, (i, &index)| {
+                            let point = base[index as usize];
+                            let point = if mask >> i & 1 == 0 {
+                                point
+                            } else {
+                                neg(c.f, point)
+                            };
+                            group_add(c, sum, Some(point))
+                        });
+                        sum == Some(target)
+                    })
+                    .count()
+            })
+            .sum();
         println!(
-            "{{\"seed\":{seed},\"kind\":\"{kind}\",\"summands\":6,\"width\":24,\"direct_degree_lower_bound\":24,\"structured_degree_cap\":2,\"target\":{},\"target_x\":{},\"target_y\":{},\"roots\":{},\"pair_charts\":{pair_charts},\"prefix_sums\":{prefix_sums},\"auxiliary_variables\":{auxiliaries},\"basis_rows\":{basis_rows},\"quadratic_rows\":{},\"direct_multisets\":{evaluations},\"indexed_total_seconds\":{indexed_seconds},\"direct_total_seconds\":{direct_seconds},\"top_coefficient\":{top}}}",
+            "{{\"seed\":{seed},\"kind\":\"{kind}\",\"summands\":6,\"width\":24,\"direct_degree_lower_bound\":24,\"structured_degree_cap\":2,\"target\":{},\"target_x\":{},\"target_y\":{},\"roots\":{},\"distinct_abscissa_multisets\":{},\"signed_witnesses\":{signed_witnesses},\"pair_charts\":{pair_charts},\"prefix_sums\":{prefix_sums},\"auxiliary_variables\":{auxiliaries},\"basis_rows\":{basis_rows},\"quadratic_rows\":{},\"direct_multisets\":{evaluations},\"indexed_total_seconds\":{indexed_seconds},\"direct_total_seconds\":{direct_seconds},\"top_coefficient\":{top}}}",
             target.0,
             target.0,
             target.1,
             indexed.len(),
+            multisets.len(),
             if indexed.is_empty() { 0 } else { basis_rows - auxiliaries - 24 },
         );
     }
