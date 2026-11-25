@@ -157,13 +157,13 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261123T1558Z-ecc2k-adjoint-primary",
+  "latest_record": "20261125T0508Z-pqc-strassen",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
-    "censored": 19,
+    "censored": 20,
     "invalid": 8,
-    "measured": 312,
-    "open": 63
+    "measured": 313,
+    "open": 62
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -34256,6 +34256,422 @@
       ],
       "problem": "kernel:m4gb_gf_p_addmul",
       "unit": "wall_s"
+    },
+    {
+      "better": "higher",
+      "first": 1.2245,
+      "latest": 1.2245,
+      "latest_derived": {},
+      "metric": "mayo-36x24x12-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0278,
+            1.3324
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.2245
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.667,
+      "latest": 1.667,
+      "latest_derived": {},
+      "metric": "mayo-36x36x36-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2445,
+            2.1729
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.667
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.035,
+      "latest": 1.035,
+      "latest_derived": {},
+      "metric": "mayo-n36-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9098,
+            1.3552
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.035
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 3.573,
+      "latest": 3.573,
+      "latest_derived": {},
+      "metric": "mayo-n512-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.9195,
+            3.935
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 3.573
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.3428,
+      "latest": 2.3428,
+      "latest_derived": {},
+      "metric": "mceliece-36x24x12-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.4696,
+            3.9156
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 2.3428
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 4.512,
+      "latest": 4.512,
+      "latest_derived": {},
+      "metric": "mceliece-36x36x36-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.1417,
+            6.3606
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 4.512
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.54,
+      "latest": 0.54,
+      "latest_derived": {},
+      "metric": "mceliece-n36-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.3902,
+            0.6264
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 0.54
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.3061,
+      "latest": 0.3061,
+      "latest_derived": {},
+      "metric": "mceliece-n512-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.1821,
+            0.7217
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 0.3061
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.7744,
+      "latest": 1.7744,
+      "latest_derived": {},
+      "metric": "qr-uov-36x24x12-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2303,
+            2.2062
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.7744
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.4768,
+      "latest": 1.4768,
+      "latest_derived": {},
+      "metric": "qr-uov-36x36x36-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2432,
+            2.2295
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.4768
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.6826,
+      "latest": 1.6826,
+      "latest_derived": {},
+      "metric": "qr-uov-n36-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7715,
+            2.2588
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.6826
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.4968,
+      "latest": 1.4968,
+      "latest_derived": {},
+      "metric": "qr-uov-n512-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2568,
+            2.2032
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.4968
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.972,
+      "latest": 0.972,
+      "latest_derived": {},
+      "metric": "uov-36x24x12-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4917,
+            1.5965
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 0.972
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0448,
+      "latest": 1.0448,
+      "latest_derived": {},
+      "metric": "uov-36x36x36-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.65,
+            1.4089
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.0448
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.1852,
+      "latest": 1.1852,
+      "latest_derived": {},
+      "metric": "uov-n36-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.062,
+            1.2733
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.1852
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 3.8592,
+      "latest": 3.8592,
+      "latest_derived": {},
+      "metric": "uov-n512-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.3659,
+            13.4347
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 3.8592
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
     },
     {
       "better": "higher",

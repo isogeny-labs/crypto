@@ -108,7 +108,7 @@ def plot_regression(reg, d: Path):
                edgecolor="white", linewidth=1)
         ax.errorbar(xs, ys, yerr=err, fmt="none", ecolor=INK2, elinewidth=0.8, capsize=1.5)
     ax.axhline(1.0, color=INK2, linewidth=1, linestyle="--")
-    ax.text(len(shapes) - 0.5, 1.02, "parity", color=INK2, ha="right", va="bottom", fontsize=8)
+    ax.text(-0.5, 1.05, "parity", color=INK2, ha="left", va="bottom", fontsize=8)
     ax.set_xticks(range(len(shapes)), [s.replace("x", "×") for s in shapes])
     ax.set_xlabel("product shape r×k×c (shapes the schemes use)")
     ax.set_ylabel("old loop time / new time  (higher = faster)")
@@ -124,14 +124,15 @@ def plot_regression(reg, d: Path):
 
 def plot_crossover(xo, d: Path):
     ns = sorted({n for (_, n, _) in xo})
-    fig, ax = plt.subplots(figsize=(7.5, 3.8), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(7.5, 4.2), layout="constrained")
     for f in FIELDS:
         ys = [xo[(f, n, 32)]["rel"] for n in ns]
         ax.plot(ns, ys, color=COLORS[f], marker=MARKERS[f], markersize=5, linewidth=2,
                 label=f"{f} ({SCHEME[f]})")
         ax.fill_between(ns, [xo[(f, n, 32)]["lo"] for n in ns], [xo[(f, n, 32)]["hi"] for n in ns],
                         color=COLORS[f], alpha=0.12, linewidth=0)
-        ax.annotate(f, (ns[-1], ys[-1]), xytext=(6, 0), textcoords="offset points",
+        dy = {"GF(16)": 5, "GF(256)": -5}.get(f, 0)
+        ax.annotate(f, (ns[-1], ys[-1]), xytext=(6, dy), textcoords="offset points",
                     va="center", fontsize=8, color=INK)
     ax.axhline(1.0, color=INK2, linewidth=1, linestyle="--")
     ax.axvline(36, color=GRID, linewidth=1)
@@ -139,10 +140,10 @@ def plot_crossover(xo, d: Path):
     ax.set_xscale("log", base=2)
     ax.set_yscale("log", base=2)
     ax.set_xticks(ns, [str(n) for n in ns])
-    yt = [0.25, 0.5, 1, 2, 4]
+    yt = [0.25, 0.5, 1, 2, 4, 8]
     ax.set_yticks(yt, [f"{y:g}" for y in yt])
     ax.minorticks_off()
-    ax.set_ylim(0.2, 4)
+    ax.set_ylim(0.15, 10)
     ax.set_xlim(ns[0] * 0.9, ns[-1] * 1.45)
     ax.set_xlabel("n (square n×n · n×n product)")
     ax.set_ylabel("Strassen time / schoolbook time  (< 1 = Strassen faster)")
@@ -150,7 +151,7 @@ def plot_crossover(xo, d: Path):
                  fontsize=9, color=INK, loc="left")
     ax.yaxis.grid(True, color=GRID, linewidth=0.6)
     ax.set_axisbelow(True)
-    ax.legend(frameon=False, ncol=4, fontsize=8, loc="upper left")
+    fig.legend(frameon=False, ncol=4, fontsize=8, loc="outside lower center")
     save(fig, d, "crossover")
     return fig
 
