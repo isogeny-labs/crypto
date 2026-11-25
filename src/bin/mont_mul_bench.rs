@@ -32,6 +32,8 @@ const ARMS: &[&str] = &[
     "sqr_bingcd",
     "sqr_wnaf4",
     "sqr_wnaf5",
+    "tuned",
+    "tuned_wnaf",
 ];
 const BASELINE: &str = "pad9_cios";
 const AA: &str = "pad9_cios#aa";
@@ -417,7 +419,7 @@ mod analyze {
             for (ai, a) in arms.iter().enumerate() {
                 if let Some(b) = bars.iter().find(|b| &b.0 == f && &b.2 == a) {
                     let x = gx + bw * ai as f64;
-                    write!(s, "<rect x='{x:.1}' y='{:.1}' width='{:.1}' height='{:.1}' fill='{}'><title>{a} {f}: {:.3}× [{:.3}, {:.3}]</title></rect>", y(b.3), bw * 0.9, y(0.0) - y(b.3), COLORS[ai % 8], b.3, b.4, b.5).unwrap();
+                    write!(s, "<rect x='{x:.1}' y='{:.1}' width='{:.1}' height='{:.1}' fill='{}'><title>{a} {f}: {:.3}× [{:.3}, {:.3}]</title></rect>", y(b.3), bw * 0.9, y(0.0) - y(b.3), COLORS[ai % 11], b.3, b.4, b.5).unwrap();
                     let cx = x + bw * 0.45;
                     write!(
                         s,
@@ -431,8 +433,8 @@ mod analyze {
             write!(s, "<text x='{tx:.1}' y='{y1:.1}' text-anchor='middle'>{f}</text><text x='{tx:.1}' y='{y2:.1}' text-anchor='middle' fill='#555'>{limbs} limbs</text>", tx = ml + gw * (fi as f64 + 0.5), y1 = h - mb + 18.0, y2 = h - mb + 33.0).unwrap();
         }
         for (ai, a) in arms.iter().enumerate() {
-            let lx = ml + (ai as f64) * 118.0;
-            write!(s, "<rect x='{lx}' y='{}' width='12' height='12' fill='{}'/><text x='{}' y='{}'>{a}</text>", h - 30.0, COLORS[ai % 8], lx + 16.0, h - 20.0).unwrap();
+            let lx = ml + (ai as f64) * 96.0;
+            write!(s, "<rect x='{lx}' y='{}' width='12' height='12' fill='{}'/><text x='{}' y='{}'>{a}</text>", h - 30.0, COLORS[ai % 11], lx + 16.0, h - 20.0).unwrap();
         }
         s.push_str("</svg>\n");
         s
@@ -483,7 +485,7 @@ mod analyze {
         )
         .unwrap();
         for (i, (op, pts)) in lines.iter().enumerate() {
-            let c = COLORS[(i + 1) % 8];
+            let c = COLORS[(i + 1) % 11];
             let d: Vec<String> = pts
                 .iter()
                 .map(|(l, v)| format!("{:.1},{:.1}", x(*l), y(*v)))

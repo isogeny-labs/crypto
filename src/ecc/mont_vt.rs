@@ -533,8 +533,34 @@ impl MulKernel for KaratsubaKernel {
     }
 }
 
+/// Width-tuned kernel from the 2026-11-25 ablation (`docs/notes/
+/// mont-mul-kernels-20261125/`, local Xeon, single core): the separated
+/// schoolbook + SOS product beat CIOS by 2–5% at `N ≤ 5` and lost 7–24% at
+/// `N ≥ 6`; dedicated squaring beat CIOS `a·a` by 3–13% at `N ≥ 4` and lost
+/// 12% at `N = 3`.  `N` is a constant, so the choice compiles away.
+pub(crate) struct TunedKernel;
+
+impl MulKernel for TunedKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        if N <= 5 {
+            ctx.redc(Mont::<N>::mul_wide(a, b))
+        } else {
+            ctx.mul(a, b)
+        }
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        if N >= 4 {
+            ctx.sqr(a)
+        } else {
+            ctx.mul(a, a)
+        }
+    }
+}
+
 /// The kernel [`Point::scalar_mul`](super::point::Point::scalar_mul) uses.
-pub(crate) type ProdKernel = SqrKernel;
+pub(crate) type ProdKernel = TunedKernel;
 
 /// A Jacobian point `(X : Y : Z)` in Montgomery form, `Z ≠ 0` not assumed.
 #[derive(Clone, Copy)]

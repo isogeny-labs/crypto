@@ -17,7 +17,9 @@
 //! This is O(log k) point operations.
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
-use super::mont_vt::{CiosKernel, KaratsubaKernel, Mont, MulKernel, ProdKernel, SqrKernel};
+use super::mont_vt::{
+    CiosKernel, KaratsubaKernel, Mont, MulKernel, ProdKernel, SqrKernel, TunedKernel,
+};
 use num_bigint::BigUint;
 
 /// Fixed-width Montgomery Jacobian ladder for an odd multi-word modulus.
@@ -117,8 +119,11 @@ fn mont_dispatch<K: MulKernel>(
 /// * `pad9_cios` — the pre-change production path: CIOS for products and
 ///   squares, 5..8-limb moduli padded to 9 limbs.
 /// * `cios` — CIOS, exact limb width.
-/// * `sqr` — CIOS products, dedicated Montgomery squaring, exact width
-///   (the production path after this change).
+/// * `sqr` — CIOS products, dedicated Montgomery squaring, exact width.
+/// * `tuned` — the width-tuned kernel (`TunedKernel`), exact width: the
+///   production `scalar_mul` path after this change.
+/// * `tuned_wnaf` — `tuned` with width-4 (≤ 3 limbs) / width-5 NAF and the
+///   binary-GCD inverse: the production `scalar_mul_vartime` path.
 /// * `karatsuba` — one-level Karatsuba products + squaring, exact width.
 /// * `sqr_bingcd` — `sqr` with the final `Z⁻¹` by the fixed-width binary
 ///   extended GCD instead of the Fermat power.
@@ -143,6 +148,15 @@ pub fn scalar_mul_arm(arm: &str, p: &Point, k: &BigUint, a: &FieldElement) -> Op
         "sqr_bingcd" => mont_dispatch::<SqrKernel>(x, y, k, a, Binary, true, false),
         "sqr_wnaf4" => mont_dispatch::<SqrKernel>(x, y, k, a, Wnaf(4), true, false),
         "sqr_wnaf5" => mont_dispatch::<SqrKernel>(x, y, k, a, Wnaf(5), true, false),
+        "tuned" => mont_dispatch::<TunedKernel>(x, y, k, a, Binary, false, false),
+        "tuned_wnaf" => {
+            let w = if x.modulus.bits().div_ceil(64) <= 3 {
+                4
+            } else {
+                5
+            };
+            mont_dispatch::<TunedKernel>(x, y, k, a, Wnaf(w), true, false)
+        }
         _ => None,
     }
 }
@@ -1998,7 +2012,9 @@ mod mont_kernel_arms {
         BigUint::from(1u8) << e
     }
 
-    const ARMS: [&str; 7] = [
+    const ARMS: [&str; 9] = [
+        "tuned",
+        "tuned_wnaf",
         "pad9_cios",
         "cios",
         "sqr",
