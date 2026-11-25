@@ -323,7 +323,7 @@ impl Expr {
             for (old, &new) in old_to_new.iter().enumerate() {
                 new_exp[new] = old_exp[old];
             }
-            out.terms.insert(new_exp, *coefficient);
+            out.terms.insert(new_exp, coefficient);
         }
         out
     }
