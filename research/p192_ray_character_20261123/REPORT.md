@@ -1262,6 +1262,56 @@ counterexamples cannot by themselves exclude the remaining
 large odd extensions; a separate exactness argument is still
 needed. [pcc:unverified]
 
+For the first large P-192 subgroup, exactness has a sharper
+**single-action criterion**. The scalar `2` has order
+`N=n/2` in `K=F_r^×/{±1}` (the checked order and prime-factor
+certificate are above). Since `m=|H|` is even and `t=n/m` is
+odd, `|<2>∩H|=gcd(N,m)=m/2`; hence `2H` generates the entire
+quotient `K/H` of order `t`. Also `χ_r(2)=+1`. The established
+subgroup transformation gives
+`A_H([h]P)/A_H(P)=χ_r(h)` for every `h∈H`. Therefore
+
+`A_H(P)/A_H(G)=χ_r(d)` for every `P=[d]G`
+`if and only if A_H([2]P)=A_H(P)` for every nonzero `P`.
+
+The forward implication is immediate; for the reverse,
+`H` together with `2` generates `K`, so their two transformation
+rules determine the normalized character on every class.
+This replaces the target-label comparison with a doubling
+invariance identity; it does **not** reduce the number of
+representatives needed for a direct exhaustive check.
+[pcc:unverified]
+
+The identity has an `x`-only norm form. Let
+`f(x)=x³+ax+b`, `f′(x)=3x²+a`, and define the sextic
+
+`D₂(x)=12x f(x) f′(x)-f′(x)³-8f(x)²`
+`=x⁶+5ax⁴+20bx³-5a²x²-4abx-a³-8b²`.
+
+The duplication formula gives
+`y([2]R)/y(R)=D₂(x(R))/(8f(x(R))²)` for every nonzero
+`r`-torsion point `R`. No numerator or denominator vanishes
+on the prime-order rational group. Because `m` is even,
+the denominator product has quadratic character `+1`.
+With `M_H(P;T)=∏_(j∈H)(T-x([j]P))`, monic of degree `m`,
+
+`A_H([2]P)/A_H(P)`
+`=χ_p(∏_(j∈H)D₂(x([j]P)))`
+`=χ_p(Res_T(M_H(P;T),D₂(T)))`.
+
+Thus the first large coset is exact precisely when this
+resultant is a square in `F_p` at every nonzero marking.
+The [`doubling_norm_control.py`](doubling_norm_control.py)
+replay checks the pointwise duplication formula, norm identity,
+and exactness equivalence on all 48 signed classes of two
+order-97 curves over `F_79`, where `2H` generates `K/H`.
+One curve has no mismatches; the other has 32, including the
+base marking as a doubling witness. This is a symbolic
+falsification target, not a P-192 certificate or an efficient
+resultant algorithm. A dense `M_H` alone would require
+`24(m+1)≈2^90.569` bytes at 24 bytes per coefficient.
+[pcc:unverified]
+
 For triage only, an artificial null model assigns independent
 uniform signs to the `n=(r-1)/2` base-point `y`-coordinates.
 The `t=n/m` coset products then have independent signs;
