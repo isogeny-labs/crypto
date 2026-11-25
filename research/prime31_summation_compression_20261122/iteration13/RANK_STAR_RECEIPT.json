@@ -1,0 +1,85 @@
+{
+  "schema": "prime31-rank-star-coefficient-receipt.v1",
+  "date": "2026-11-23",
+  "status": "producer-mathematics-only; pcc-unverified",
+  "pr": 5064,
+  "frozen_note_commit": "fdf14ed115b97c9b0855ed13524d0d6c57f4d843",
+  "frozen_note_blob": "b5b00271ed34ece5a48573b89c7406ee1d70bedf",
+  "prior_head": "c428c527d39a55f11b14ad57d8dbc614db69959c",
+  "prior_main_log_blob": "63dda03a8c9eefdc0fa9e94b5516cea0627eec82",
+  "source": "RANK_STAR_CONTRACTION.md",
+  "arithmetic_oracle": "rank_star_abstract_oracle.js",
+  "execution": "ECMAScript coordinator tool, same logic as preserved oracle; console.log replaces tool text emission, not separately run from a local file",
+  "first_attempt": "SyntaxError: Unexpected token '!' (invalid TypeScript-style non-null assertion in ECMAScript); no checks ran. Removed assertion and reran.",
+  "parameters": {
+    "p": 2147483647,
+    "n": 2147446831,
+    "B": 31
+  },
+  "checks": {
+    "small_signed_multiset_B": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "norm2": [
+      2,
+      8,
+      18,
+      32,
+      50,
+      72
+    ],
+    "norm4": [
+      2,
+      16,
+      66,
+      192,
+      450,
+      912
+    ],
+    "two_vector_classes": [
+      0,
+      4,
+      24,
+      80,
+      200,
+      420
+    ],
+    "four_vector_classes": [
+      1,
+      4,
+      9,
+      16,
+      25,
+      36
+    ],
+    "abstract_rank_cases": 1701,
+    "cartesian_rows": 27216,
+    "star_rows": 10752,
+    "rank_failures": 0,
+    "method": "star is literal subset; compare modular ranks over F101 for dimensions 1..7, lengths 0..8, three duplicate/tail patterns; exact span follows from inclusion and equal rank. Not elliptic-curve samples.",
+    "prime31_counts": {
+      "K2": 1922,
+      "K4": 616962,
+      "K": 618884,
+      "classes_two": 307520,
+      "classes_four": 961,
+      "necessary_queries_at_90pct_rank_zero_start": 96810,
+      "necessary_independent_nonidentity_queries": 96814,
+      "bonferroni_denominator": "9903010943848674724059987000",
+      "upper_numerator_at_96813": "276291848448394845327870280464",
+      "lower_numerator_at_96814": "276294701808939002338301094720",
+      "proof": "Compare upper and lower exact integer bounds against 279/10; monotonicity."
+    }
+  },
+  "native_workers": 0,
+  "native_rust_executions": 0,
+  "cryptographic_benchmarks": 0,
+  "independent_signatures": 0,
+  "space": "bounded read returned user input required in noninteractive mode; no mutation or replay",
+  "journal": "main log blob 1998524 characters, pre-existing literal merge conflict markers; did not overwrite; separate dated handoff"
+}

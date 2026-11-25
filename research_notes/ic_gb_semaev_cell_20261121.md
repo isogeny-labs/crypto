@@ -104,10 +104,157 @@ Reaching |B| ≈ (30p)^{1/3} ≈ 50 needs the sparse/dense split moved to `msolv
 (F4 over F_p, available at `/opt/homebrew/bin/msolve`), or a much larger budget
 with the degree bound raised.
 
+## msolve cross-check: the wall is the in-repo F4, not the system
+
+`IC_GB_DUMP=<dir> cargo run --release --example ic_semaev_gb -- k...` now
+writes the same four polynomials in msolve syntax (variables, characteristic,
+comma-separated equations) and skips the in-repo solve. Running msolve 0.11
+with `-t 4` on those exact files:
+
+| k | family | in-repo F4 | msolve | ideal degree (window) |
+|--:|--------|-----------:|-------:|----------------------:|
+| 8 | window | 10.4 s | 0.03 s | 1 |
+| 10 | window | — | 0.05 s | 1 |
+| 12 | window | timeout 120 s | 0.42 s | 13 |
+| 12 | pullback | timeout 120 s | 0.10 s | 1 |
+| 16 | window | timeout 120 s | 1.11 s | 13 |
+| 16 | pullback | timeout 120 s | 0.20 s | 1 |
+| 24 | window | — | 6.3 s | 19 |
+| 32 | window | — | 66 s | 49 |
+| 50 | window | — | timeout 180 s | (350 seen mid-run) |
+| 50 | pullback | — | timeout 180 s | (73 seen mid-run) |
+
+The k = 12/16 timeouts are an implementation wall in the repo's degree-bounded
+F4 (full Macaulay expansion to a degree bound), not a property of this system:
+msolve solves the identical polynomials in under a second. On msolve the wall
+moves to about k = 32 (66 s, ideal degree 49); k = 50 is still out of reach at
+180 s, with the membership degree dominating (the pullback basis reaches
+degree 73 against the window's 350 at the same k).
+
+Two cautions for anyone quoting this: the degree shown is the ideal degree of
+the msolve output; at k ≥ 12 msolve introduces an auxiliary variable `A`, so
+the numbers are not directly comparable to the F4 report's `degree_reached`.
+And every cell here is one planted target on one small curve, so the growth
+`1 → 13 → 19 → 49` over k = 8 → 32 is a scaling record, not an exponent.
+
 ## Next
 
-1. Move the |B| ≈ (30p)^{1/3} cell to msolve for the dense steps (the repo's F4
-   remains the reference implementation for cross-checks at small k).
+1. The |B| ≈ (30p)^{1/3} cell still needs a backend: msolve carries k = 32 in
+   66 s and neither backend reaches k = 50 in 180 s. Try a sparser
+   representation (the pullback basis is already cheaper at k = 50: degree 73
+   against 350) or a smaller prime where (30p)^{1/3} is reachable, then
+   separate the effect of |B| from the effect of p.
 2. Read the PKM paper before any further parametrized-base compute.
-3. Consider adding the calibration as a `#[test]` so the metric cannot silently
-   drift.
+3. The calibration is now `f4_fp::tests::solving_degree_tracks_the_semiregular_prediction`
+   (8/8 cells), so the metric cannot drift silently.
+
+## msolve port (L13, 2026-11-23)
+
+`scripts/ic_semaev_msolve.py` emits the same system (S₄ via the two-quadratic
+resultant, plus `h(x_i)` membership polynomials) in msolve's input format and
+times msolve's F4. p = 4099, y² = x³ + x + 1, 8 threads:
+
+| k (membership degree) | family | msolve wall | ideal degree | in-repo F4 |
+|---:|---|---:|---:|---|
+| 8 | window | 0.04 s | 1 | 1.9 s |
+| 12 | window | 0.62 s | 13 | **timed out at 120 s** |
+| 20 | window | 3.71 s | 13 | — |
+| 20 | pullback | 3.59 s | 13 | — |
+| 30 | window | 30.4 s | 49 | — |
+| 30 | pullback | 24.5 s | 37 | — |
+| 40 | window | 164.7 s | 85 | — |
+| 50 | window | **> 900 s (timeout)** | — | — |
+
+**What this establishes:** the dense in-repo F4 covers k ≤ ~10 at this prime;
+msolve covers k ≤ 40 in under three minutes, and the target cell
+|B| ≈ (30p)^{1/3} ≈ 50 is just beyond the 15-minute budget. The frontier is a
+factor ~4 in k, not an asymptotic change.
+
+**What it does not establish:** the k=30 window-vs-pullback difference
+(30.4 s vs 24.5 s) is *not* a controlled comparison — the two runs have
+different ideal degrees (49 vs 37) because each family uses its own
+decomposable target. Comparing solver cost across families requires matching
+the solution count, which is the next design step.
+
+Reproduce:
+
+```sh
+python3 scripts/ic_semaev_msolve.py 8 12 20 30
+```
+(add `40` or `50` for the long cells; each run prints k, family, actual base
+size, wall time, and msolve's reported ideal degree).
+
+## L25 — matched-solution-count comparison (2026-11-24)
+
+The earlier k=30 window/pullback timings (30.4 s vs 24.5 s) were not a
+controlled comparison: the two runs had different msolve ideal degrees (49 vs
+37), because each family used its own first decomposable target.
+
+**Fix:** select one target x-coordinate with the same **x-space solution
+count** — the number of ordered base x-triples satisfying S4 = 0 — and run both
+families on that same target. Matching the *point*-tuple count is not enough:
+matching ordered triple counts (3 vs 3) still gave ideal degrees 42 vs 45,
+because each x-value carries two signs.
+
+At k = 20, p = 4099, target xQ = 1402, x-space count = 15:
+
+| family | x-space count | msolve ideal degree | wall |
+|---|---:|---:|---:|
+| window | 15 | 15 | 3.32 s |
+| pullback | 15 | 15 | 3.28 s |
+
+**Result:** at matched solution count the two bases cost the same within 1%.
+The apparent pullback advantage at k=30 was an artifact of comparing different
+solution sets. This closes the "parametrized membership is cheaper to solve"
+hypothesis at matched degree for k = 20, and explains the earlier k=30 numbers.
+
+Reproduce:
+
+```sh
+python3 scripts/ic_semaev_msolve.py matchedx 20
+```
+
+**Not done:** k = 30 matched-cell (the x-space count search is ~27k polynomial
+evaluations per candidate target; the same method applies but costs minutes per
+family). `matched` (tuple-count) mode is retained only to document why it is
+insufficient.
+
+## L5 — matched cell at k = 40 (2026-11-24)
+
+The |B| ~ (30p)^{1/3} cell is k = 40-50 at p = 4099. Using the vectorised
+x-space counter (`matchedxf`), one target was selected with the same x-space
+solution count for both families (xQ = 258, count 162), and msolve was run on
+that target for each base.
+
+| k=40, xQ=258 | x-space count | msolve ideal degree | wall |
+|---|---:|---:|---:|
+| window | 162 | 162 | 218.7 s |
+| pullback | 162 | 162 | 373.4 s |
+
+**Result: at matched solution count the pullback (parametrized) base is ~1.7x
+SLOWER to solve, not faster.** With L25's k=20 tie (3.32 vs 3.28 s at degree
+15), the pattern is: no advantage at k=20, a real disadvantage at k=40. This
+is the opposite of the "algebraic membership makes the system easier"
+hypothesis, at least for this construction and this solver.
+
+**Caveats, stated because they matter:**
+- One curve, one prime, one target, one run per cell. 1.7x is larger than the
+  ~1% noise at k=20 but is not a replicated effect.
+- The two bases differ in more than the membership polynomial: the pullback
+  x-values are spread across the whole field (they are ±sqrt(t)), while the
+  window values are small integers. That changes coefficient magnitudes and
+  may drive part of the 1.7x.
+- msolve's reported degree of the elimination polynomial differed between runs
+  (one pullback line reported 32768 / 14348907 intermediate degrees), which
+  suggests its internal path differed, not just the input size.
+
+**What would settle it:** replicate on >= 3 curves at k = 30 and 40 with the
+same matched-count protocol, and add a third arm (random negation-closed base
+of the same size) to separate "parametrized membership" from "values spread
+over the field".
+
+Reproduce:
+
+```sh
+python3 scripts/ic_semaev_msolve.py matchedxf 40
+```
