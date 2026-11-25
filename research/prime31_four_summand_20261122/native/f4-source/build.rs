@@ -466,6 +466,10 @@ fn main() {
             "quadratic quartic-modular membership circuit and independent dense-selector controls",
         ),
         (
+            "research/prime31_four_summand_20261122/native/selector_sectors.rs",
+            "additive five coprime-selector quadratic systems and M31 construction controls; no solver calls",
+        ),
+        (
             "research/prime31_four_summand_20261122/native/b677_gate.rs",
             "fixed bounded extraction driver with independent signed replay and authentic-RHS adapter",
         ),
