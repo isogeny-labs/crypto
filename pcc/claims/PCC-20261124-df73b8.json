@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T01:22:21Z",
+ "id": "PCC-20261124-df73b8",
+ "kind": "statement",
+ "producer": {
+  "commit": "50253a4c3c1f4a13a3c4fa0465504851f9393af0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/result.json",
+    "sha256": "62e86b62c84d518209654787ef8f2c936b589b723b775f3c99e2732667b2f31a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/audit.cpp",
+    "sha256": "a3132cbe4835ae3f52c3d33def97f0fae88fd3c88e8b3589522344f6466794c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/PROTOCOL.md",
+    "sha256": "a38fba3d79fea8dedda04a2a09ffa1d6c64ce0598ba898f1a408cc6f89571483"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/check.sh",
+    "sha256": "d2c18306e0671567f82fd2e90a30662662d589488b6009145c081faffe0685be"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/cancellation.identity.json",
+    "sha256": "8efd495fd992649995e34cd2ea84d58af1ed94756dc21118dc6e531afd5d0a90"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/pre-call-manifest.sha256",
+    "sha256": "02c28217cc97c514374d8cb638092091ba9f4dd506259dbdbcaf24a1df3e9fd6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/cost.json",
+    "sha256": "5138e261234e28ca5a18cb69c95f4f38bb79846cadc6e157de350b68c0434792"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/build-cost.json",
+    "sha256": "cef087ad4a763dc3580d5555a869c254141033504500c85fd0a35d1ff89b80e5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "frozen P192 split-tangent necessary identities; no new points or target relations",
+ "statement": "For the pinned 102 split tangent traces, native GMP and OpenSSL streams and grouped/sorted joins agree on all 10302 AA and 20604 AB necessary-identity queries, with zero witnesses and zero one-row premise witnesses. Eleven native controls pass; strict build and worker exit zero; collision and unknown CLI reject. Under the written two-point support classification this excludes two-row elimination of all outside-base columns for this finite batch. This is producer-unverified and does not establish signed mathematical verification, new target principality, individual residual images, larger-row closure or a performance claim."
+}
