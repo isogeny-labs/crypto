@@ -1352,6 +1352,27 @@ field state and one coset traversal. This avoids constructing
 degree of `D₂` alone supplies no sublinear orbit evaluator.
 [pcc:unverified]
 
+Factoring this sextic does not split the P-192 norm. In fact,
+`D₂` is irreducible over `F_p` whenever `p≡3 (mod 4)` and
+`#E(F_p)≡1 (mod 4)`. Write `F` for Frobenius on `E[4]` and
+`t=p+1-#E(F_p)`. Then `t≡p≡3 (mod 4)`, so Cayley–Hamilton
+gives `F³=2F−I` and `F⁶=I` on `E[4]`. Modulo 2 its characteristic
+polynomial is `X²+X+1`; hence neither `F` nor `F²` fixes a
+nonzero 2-torsion point. If `T` has exact order 4, none of
+`F(T),F²(T),F³(T)` equals `±T`: the first two would fix
+`2T` modulo 2, and the third would make `F(2T)` equal `2T`
+or zero. Thus Frobenius cycles all six `x`-coordinates of
+exact-order-4 points, proving irreducibility of `D₂`.
+
+For a root `α∈F_(p⁶)`, the norm sign can be rewritten as
+`χ_(p⁶)(M_H(P;α))`. This changes the field of evaluation but
+does not evaluate the degree-`m` orbit polynomial. The
+[`doubling_sextic_factor_gate.gp`](doubling_sextic_factor_gate.gp)
+replay confirms irreducibility for P-192 and five finite
+controls. Those controls include both exact and inexact
+coset-sign cases, so irreducibility cannot certify exactness.
+[pcc:unverified]
+
 The finite controls also rule out two shortcuts from CM data
 alone. The same replay fixes `p=223`, `r=241`, and `m=24`:
 `y²=x³+8x+7` is exact on all 120 signed classes, while
