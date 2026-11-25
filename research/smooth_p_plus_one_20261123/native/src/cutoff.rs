@@ -2,13 +2,13 @@
 //! This module does not collect relations or call an algebraic solver.
 use super::*;
 
-fn root_polynomial(roots: &[i64], p: i64) -> Vec<i64> {
+pub(super) fn root_polynomial(roots: &[i64], p: i64) -> Vec<i64> {
     roots
         .iter()
         .fold(vec![1], |q, x| polynomial::product(&q, &[-x, 1], p))
 }
 
-fn images(base: &Base, xs: [i64; 4]) -> [i64; 4] {
+pub(super) fn images(base: &Base, xs: [i64; 4]) -> [i64; 4] {
     let mut result = xs.map(|x| dickson(x, base.depth - 3, base.curve.p));
     result.sort_unstable();
     result
@@ -63,7 +63,7 @@ pub(super) fn qualified_catalog(base: &Base) -> Result<Vec<Refinement>, String> 
     Ok(catalog(base.curve.p, &pools(base)))
 }
 
-fn tuples(n: usize) -> impl Iterator<Item = [usize; 4]> {
+pub(super) fn tuples(n: usize) -> impl Iterator<Item = [usize; 4]> {
     (0..n).flat_map(move |a| {
         (a + 1..n)
             .flat_map(move |b| (b + 1..n).flat_map(move |c| (c + 1..n).map(move |d| [a, b, c, d])))
@@ -93,7 +93,7 @@ fn catalog_check(base: &Base, charts: &[Refinement]) -> Result<Vec<usize>, Strin
     Ok(counts)
 }
 
-fn row_reduce(matrix: &mut [Vec<i64>], columns: usize, p: i64) -> Vec<usize> {
+pub(super) fn row_reduce(matrix: &mut [Vec<i64>], columns: usize, p: i64) -> Vec<usize> {
     let mut pivots = vec![];
     for column in 0..columns {
         let row = pivots.len();
@@ -120,7 +120,11 @@ fn row_reduce(matrix: &mut [Vec<i64>], columns: usize, p: i64) -> Vec<usize> {
 }
 
 /// Fit the unique normalized RR5 function from the signed points, without logs.
-fn parameters(curve: Fixture, target: Point, leaves: [Point; 4]) -> Result<[i64; 3], String> {
+pub(super) fn parameters(
+    curve: Fixture,
+    target: Point,
+    leaves: [Point; 4],
+) -> Result<[i64; 3], String> {
     let mut matrix: Vec<_> = leaves
         .iter()
         .map(|point| {

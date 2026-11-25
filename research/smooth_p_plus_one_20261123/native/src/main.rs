@@ -2,6 +2,7 @@
 #[cfg(feature = "production-controls")]
 mod accounting;
 mod cutoff;
+mod factorwise;
 mod full_cutoff;
 #[cfg(feature = "production-controls")]
 mod oriented;
@@ -793,6 +794,10 @@ fn main() -> Result<(), String> {
     }
     if modes == ["partition-audit"] {
         println!("{}", cutoff::audit(curve, depth)?);
+        return Ok(());
+    }
+    if modes == ["factorwise-audit"] {
+        println!("{}", factorwise::audit(curve, depth)?);
         return Ok(());
     }
     #[cfg(feature = "production-controls")]

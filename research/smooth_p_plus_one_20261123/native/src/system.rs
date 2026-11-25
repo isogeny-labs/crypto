@@ -178,6 +178,72 @@ pub struct System {
 }
 
 impl System {
+    /// Monic factors of the separate fine fibers, coupled to the RR5 quartic.
+    /// Four factor coefficients precede a0,a1,t0. No solver is called here.
+    pub fn factorwise(
+        curve: Fixture,
+        target: Point,
+        levels: usize,
+        images: [i64; 4],
+    ) -> Result<Self, String> {
+        if !(1..=2).contains(&levels)
+            || !images.windows(2).all(|w| w[0] <= w[1])
+            || images.iter().any(|b| !(0..curve.p).contains(b))
+        {
+            return Err(
+                "factorwise constructor requires sorted canonical images and levels 1..=2".into(),
+            );
+        }
+        let mut multiplicities = BTreeMap::<i64, usize>::new();
+        for b in images {
+            *multiplicities.entry(b).or_default() += 1;
+        }
+        let degree = 1usize << levels;
+        if multiplicities.values().any(|m| *m > degree) {
+            return Err("factor multiplicity exceeds its fiber degree".into());
+        }
+        let names = (0..4)
+            .map(|i| format!("q{i}"))
+            .chain(["a0", "a1", "t0"].map(str::to_owned))
+            .collect::<Vec<_>>();
+        let vars = (0..7)
+            .map(|i| Polynomial::variable(curve.p, 7, i))
+            .collect::<Vec<_>>();
+        let constant = |v| vars[0].constant(v);
+        let mut phi = vec![0, 1];
+        for _ in 0..levels {
+            phi = crate::polynomial::product(&phi, &phi, curve.p);
+            phi[0] = (phi[0] - 2).rem_euclid(curve.p);
+        }
+        let mut offset = 0;
+        let mut product = vec![constant(1)];
+        let mut equations = vec![];
+        for (b, m) in multiplicities {
+            let mut factor = vars[offset..offset + m].to_vec();
+            factor.push(constant(1));
+            let mut remainder = phi.iter().map(|c| constant(*c)).collect::<Vec<_>>();
+            remainder[0] = &remainder[0] - &constant(b);
+            for shift in (0..=degree - m).rev() {
+                let leading = remainder[shift + m].clone();
+                for j in 0..=m {
+                    remainder[shift + j] = &remainder[shift + j] - &(&leading * &factor[j]);
+                }
+            }
+            equations.extend_from_slice(&remainder[..m]);
+            let mut next = vec![constant(0); product.len() + m];
+            for (i, a) in product.iter().enumerate() {
+                for (j, b) in factor.iter().enumerate() {
+                    next[i + j] = &next[i + j] + &(a * b);
+                }
+            }
+            product = next;
+            offset += m;
+        }
+        let norm = quartic(curve, target, &vars[4], &vars[5], &vars[6]);
+        equations.extend(norm.iter().zip(&product).map(|(a, b)| a - b));
+        Ok(Self { names, equations })
+    }
+
     /// Four-leaf composition of the existing oriented S3 pair identity.
     /// Slots: x0..x3, y0,t0,w0, y2,t1,w1, outer slope, then tower wires.
     #[cfg(feature = "production-controls")]
@@ -483,6 +549,59 @@ pub fn numeric_quartic(curve: Fixture, target: Point, alpha: i64, beta: i64, t: 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn factorwise_remainders_match_values_at_roots_for_each_partition_shape() {
+        for curve in crate::FIXTURES {
+            for (levels, images) in [
+                (1, [10, 11, 12, 13]),
+                (1, [10, 10, 11, 11]),
+                (2, [10, 10, 11, 12]),
+                (2, [10, 10, 10, 11]),
+                (2, [10, 10, 10, 10]),
+                (2, [10, 11, 12, 13]),
+                (2, [10, 10, 11, 11]),
+            ] {
+                let roots = [2, 3, 5, 7];
+                let mut pools = BTreeMap::<i64, Vec<i64>>::new();
+                for (b, x) in images.into_iter().zip(roots) {
+                    pools.entry(b).or_default().push(x);
+                }
+                let mut assignment = vec![];
+                for xs in pools.values() {
+                    let factor = crate::cutoff::root_polynomial(xs, curve.p);
+                    assignment.extend(&factor[..xs.len()]);
+                }
+                assignment.extend([3, 5, 7]);
+                let system = System::factorwise(curve, curve.q, levels, images).unwrap();
+                let mut offset = 0;
+                for (b, xs) in pools {
+                    let values = system.equations[offset..offset + xs.len()]
+                        .iter()
+                        .map(|eq| eq.evaluate(&assignment))
+                        .collect::<Vec<_>>();
+                    for x in &xs {
+                        assert_eq!(
+                            crate::polynomial::evaluate(&values, *x, curve.p),
+                            (crate::dickson(*x, levels, curve.p) - b).rem_euclid(curve.p)
+                        );
+                    }
+                    offset += xs.len();
+                }
+                let expected = crate::cutoff::root_polynomial(&roots, curve.p);
+                let actual = numeric_quartic(curve, curve.q, 3, 5, 7);
+                for i in 0..4 {
+                    assert_eq!(
+                        system.equations[4 + i].evaluate(&assignment),
+                        (actual[i] - expected[i]).rem_euclid(curve.p)
+                    );
+                }
+                assert_eq!(system.metrics().0, 7);
+                assert_eq!(system.metrics().1, 8);
+                assert!(system.metrics().3 <= 4);
+            }
+        }
+    }
 
     #[test]
     fn quadratic_control_is_quadratic() {
