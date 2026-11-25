@@ -125,6 +125,33 @@ before table construction or lookup. This is a counting gate for this
 enumerative interface; it does not constrain algebraic aggregation of many
 labels into one point-dependent evaluation. [pcc:unverified]
 
+## Generic-group sign-bit boundary
+
+Apply [Shoup's generic-group collision method](https://www.shoup.net/papers/dlbounds1.pdf)
+to this one bit. With `G,Q=[d]G` and uniform nonzero `d`, every
+point created by generic group operations has a formal label
+`(a+bd)G`. Among `t` distinct formal labels, each pair can
+collide for at most one `d`. Outside the at most `binom(t,2)`
+exceptional scalars, the encoding transcript carries no
+information about `χ_r(d)`. Since that bit is balanced,
+
+`Pr[correct] ≤ 1/2 + binom(t,2)/(r-1)`.
+
+For a **fixed** label cap and success probability at least 99%,
+this inequality requires
+`t(t-1) ≥ ceil(49(r-1)/50)`. At the recorded P-192 order,
+the least integer is
+`t=78,431,879,364,700,595,886,224,713,519≈2^95.9854`,
+about `1.117` times the report's expected rho-work number
+`R=sqrt(πr/4)≈2^95.8257`. Cold generic preprocessing labels
+count in `t`. This **fixed-budget generic-model** comparison
+does not establish an expected-work lower bound with the same
+constant, and it does not cover coordinate arithmetic, CM
+invariants, or algebraic aggregation. Under the stated fixed
+budget and success rule, a sub-reference result would need
+information from such non-generic structure.
+[pcc:unverified]
+
 ## Single endpoint character gate
 
 A separate candidate applies a rational horizontal isogeny chain
