@@ -22,7 +22,7 @@ use std::time::{Duration, Instant};
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, Ordering, Poly};
 use crypto_lib::cryptanalysis::ic_framework::subgroup_semaev::{
-    primitive_root_of_unity, semaev_eval, symmetrise,
+    primitive_root_of_unity, symmetrise,
 };
 
 const P: u64 = 1_048_573;
@@ -856,9 +856,9 @@ fn run_selftest() -> Result<(), String> {
     for d in [7, 9, 19] {
         let roots = roots_of_unity(P, d)?;
         let triples = all_root_triples(&roots);
-        for w in triples {
-            for arm in [Arm::Direct, Arm::Quotient] {
-                let built = build_system(main, arm, d, GX, SEED ^ d)?;
+        for arm in [Arm::Direct, Arm::Quotient] {
+            let built = build_system(main, arm, d, GX, SEED ^ d)?;
+            for &w in &triples {
                 let values = planted_values(arm, d, w, P);
                 if !built.exprs[1..].iter().all(|f| f.eval(&values, P) == 0) {
                     return Err(format!(
@@ -867,8 +867,8 @@ fn run_selftest() -> Result<(), String> {
                     ));
                 }
             }
-            main_triples += 1;
         }
+        main_triples += triples.len();
         let planted = planted_targets(main, d)?;
         if planted.len() < 4 {
             return Err(format!(
