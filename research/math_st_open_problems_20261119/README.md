@@ -17,6 +17,7 @@ files named, not pcc-certified claims.
 | A3, P5.2/Q025 | Kill. (A)–(C) proved on paper; Q025 is closed in the generic model with an endomorphism oracle. (A) and (B) also proved in Lean 4 (crypto-lean `MathStClosures`); (C) paper only. | `A3_P5.2_Q025.pdf` |
 | P3.3 | Upstream's "pure-power penalty" is the counting bound ($N_{\ell^e}\approx p/12$); only Q099 (KLPT vs. optimum) stays open. Medians recomputed natively in Rust (`p33_native/`, identical); norms not regenerated. | `P3.3_counting_check.md` |
 | A4, P3.3/Q099 | Measured. Basic KLPT on all 105 matched ideals, ℓ∈{2,3}, 1050 runs, every output verified exactly: median $\log_p\ell^e$ 3.73–4.01, against the exact optimum ≈ $p/12$. The ratio grows like $p^{2.6}$. Prediction H4 ([3.0, 3.7]) was missed slightly high; no lead. | `a4_klpt/REPORT.pdf` |
+| A5 (Q099 follow-up) | Measured, paired with A4. KLPT with CVP strong approximation: the median $\log_p\ell^e$ drops 0.36–0.46 on every band. 28-bit medians are 3.28/3.31 and the ratio grows like $p^{2.2}$. H5 met at 28 bits and on the slope; the drop is under range on 1 of 6 bands [pcc:unverified]. | `a5_klpt_cvp/REPORT.pdf` |
 
 ### Status of the remaining items (2026-11-23)
 
@@ -26,7 +27,7 @@ files named, not pcc-certified claims.
 | Lean, A1 upper bound $R\le L+O(\log n)$ | not attempted: no proof exists on paper | a proof first |
 | Lean, A3 (C) | not attempted | a generic-group-model framework in crypto-lean |
 | P3.3 native medians | done (`p33_native/`) | none |
-| P3.3/Q099: KLPT vs. the counting optimum | done (A4, `a4_klpt/`) | none; a KLPT variant with CVP in strong approximation (norm ≈ $p^3$) is the obvious next arm |
+| P3.3/Q099: KLPT vs. the counting optimum | done (A4, `a4_klpt/`) | none; the CVP variant was then measured as A5 |
 | P1.6/Q018: sampler sensitivity of the 317/100,000 count | not started | native Rust canonical heights and a height-pairing regulator over $\mathbb Q$ for the $p=17$ lifts, plus 2–3 samplers; several days of work |
 | research-kb receipt | blocked | the research-kb MCP server was not connected in this session |
 
