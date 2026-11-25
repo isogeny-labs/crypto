@@ -10,6 +10,7 @@ import shutil
 import statistics
 import subprocess
 import tempfile
+import time
 
 EXTRA = ["runner_arch", "build_id", "measurement_mode", "baseline_version",
          "baseline_samples", "baseline_state", "throughput_deviation_pct",
@@ -153,9 +154,14 @@ def perf_values(path):
 def run_measured(binary, run_command, timeout, row):
     row.update(runner_arch=platform.machine(), build_id=fingerprint(binary),
                measurement_mode="plain", perf_status="unavailable")
+    def timed(args):
+        start = time.perf_counter()
+        result = run_command(args, timeout)
+        return result, time.perf_counter() - start
+
     perf = shutil.which("perf")
     if not perf:
-        return run_command([str(binary)], timeout)
+        return timed([str(binary)])
     with tempfile.TemporaryDirectory() as directory:
         path = Path(directory) / "stat"
         prefix = [perf, "stat", "-x", ";", "--no-big-num", "-e",
@@ -167,11 +173,11 @@ def run_measured(binary, run_command, timeout, row):
         except (OSError, subprocess.TimeoutExpired):
             available = False
         if not available:
-            return run_command([str(binary)], timeout)
+            return timed([str(binary)])
         row["measurement_mode"] = "perf-stat"
         path.unlink(missing_ok=True)
-        outcome = run_command(prefix + [str(binary)], timeout)
+        outcome, seconds = timed(prefix + [str(binary)])
         values = perf_values(path) if path.exists() else {}
         row.update(values)
         row["perf_status"] = "available" if len(values) == len(EVENTS) else "partial"
-        return outcome
+        return outcome, seconds
