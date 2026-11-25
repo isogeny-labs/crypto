@@ -13,7 +13,7 @@ Q = 9564682313913860059195669
 M = 8 * Q
 N = (R - 1) // 2
 T = N // M
-SEARCH_LIMIT = 100_000
+SEARCH_LIMIT = 1_000_000
 PI = Decimal("3.14159265358979323846264338327950288419716939937510")
 
 
@@ -33,6 +33,7 @@ assert pow(h, M, R) == R - 1
 assert all(pow(h, M // prime, R) not in (1, R - 1) for prime in (2, Q))
 
 best = None
+best_field_formula = None
 residue = 1
 for exponent in range(1, SEARCH_LIMIT + 1):
     residue = residue * h % R
@@ -43,13 +44,35 @@ for exponent in range(1, SEARCH_LIMIT + 1):
     candidate = (doubles + additions, exponent, scalar, doubles, additions)
     if best is None or candidate < best:
         best = candidate
+    multiplications = 3 * doubles + 11 * additions
+    squarings = 5 * (doubles + additions)
+    field_candidate = (
+        multiplications + squarings,
+        exponent,
+        scalar,
+        doubles,
+        additions,
+        multiplications,
+        squarings,
+    )
+    if best_field_formula is None or field_candidate < best_field_formula:
+        best_field_formula = field_candidate
 
 assert best == (
-    231,
-    45273,
-    1658197927360780859070010465224078895503129499163741689,
-    180,
-    51,
+    228,
+    391601,
+    125650396604550144886539610233302508351526245526126689,
+    176,
+    52,
+)
+assert best_field_formula == (
+    2208,
+    501103,
+    1532352030193730998546656319735419511606275446908673728612,
+    190,
+    43,
+    1043,
+    1165,
 )
 operations, exponent, scalar, doubles, additions = best
 assert pow(scalar, M, R) == R - 1
@@ -67,3 +90,11 @@ print(f"generator_exponent={exponent} scalar={scalar}")
 print(f"doubles={doubles} additions={additions} operations={operations}")
 print(f"cold_point_operations={cold_point_operations}")
 print(f"rho_ratio={ratio:.12f} full_per_factor_allowance={per_factor_allowance:.12f}")
+_, field_exponent, field_scalar, field_doubles, field_additions, field_m, field_s = best_field_formula
+assert pow(field_scalar, M, R) == R - 1
+assert all(pow(field_scalar, M // prime, R) not in (1, R - 1) for prime in (2, Q))
+print(
+    f"field_formula_generator_exponent={field_exponent} scalar={field_scalar} "
+    f"doubles={field_doubles} additions={field_additions} "
+    f"per_factor={field_m + 2}M+{field_s}S"
+)

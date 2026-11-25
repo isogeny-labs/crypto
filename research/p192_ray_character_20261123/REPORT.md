@@ -1043,14 +1043,14 @@ has no exactness certificate or measured direct cost.
 A reproducible *point-operation* estimate sharpens the illustrative
 `C=384` line. The arithmetic-only
 [`direct_coset_cost.py`](direct_coset_cost.py) searches the first
-100,000 powers of a certified quotient generator `h=3^t` for
+1,000,000 powers of a certified quotient generator `h=3^t` for
 `t=n/m`, retaining powers coprime to `m`. Its best signed-digit
-representative is `u=min(h^45273,-h^45273) mod r`, with 181
-digits and weight 52. Iterating `[u]` on a point uses 180
-doublings and 51 additions per next factor in the binary
-nonadjacent form, or 231 group operations under an optimistic
-unit-cost count. Two cold traversals cost `2(m-1)·231`, about
-`0.5035R≈2^94.836` such operations. Since the raw `u^j`
+representative is `u=min(h^391601,-h^391601) mod r`, with 177
+digits and weight 53. Iterating `[u]` on a point uses 176
+doublings and 52 additions per next factor in the binary
+nonadjacent form, or 228 group operations under an optimistic
+unit-cost count. Two cold traversals cost `2(m-1)·228`, about
+`0.49694R≈2^94.817` such operations. Since the raw `u^j`
 indices represent the same quotient coset as the positive
 indices, their product differs only by a fixed sign independent
 of the input marking; that sign cancels in the base/target
@@ -1081,8 +1081,13 @@ loop using those primitives could avoid that normalization.
 Its documented P-192 `a=-3` formulas price a doubling at
 `3M+5S` and a full addition at `11M+5S`, where `M,S` are
 field multiplication and squaring. The selected signed-digit
-step therefore has a formula count of `1101M+1155S`, plus
-`2M` per factor to accumulate `YZ` into a product. These
+step therefore has a formula count of `1100M+1140S`. A separate
+winner when treating `M` and `S` as equal unit costs has exponent
+`501103`, 190 doublings, 43 additions, and `1043M+1165S`.
+Accumulating `YZ` adds `2M` per factor, giving `1045M+1165S`
+for this second step. Neither formula is a measured wall-time
+ranking because the relative costs of `M` and `S` depend on
+the backend. These
 counts omit field additions and subtractions, scalar-digit
 handling, exceptional branches, and the final field-character
 operation. The existing `scalar_mul_wnaf` wrapper itself still
@@ -1310,6 +1315,11 @@ base marking as a doubling witness. This is a symbolic
 falsification target, not a P-192 certificate or an efficient
 resultant algorithm. A dense `M_H` alone would require
 `24(m+1)≈2^90.569` bytes at 24 bytes per coefficient.
+The sextic is `ψ₄/(4y)`, so the same resultant sign can instead
+be streamed as a product of `D₂(x([j]P))` using constant-size
+field state and one coset traversal. This avoids constructing
+`M_H` but still visits all `m≈2^85.984` factors; the fixed
+degree of `D₂` alone supplies no sublinear orbit evaluator.
 [pcc:unverified]
 
 The finite controls also rule out two shortcuts from CM data
