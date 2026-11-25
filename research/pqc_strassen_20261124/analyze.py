@@ -210,8 +210,10 @@ def main():
     lines += ["", *textwrap.wrap(
         "Reading: the speedups at the schemes' own sizes come from the shared i-l-j loop (and, for "
         "McEliece, from leaving the i-j-k loop), not from Strassen. Strassen at cutoff 32 only "
-        "engages on UOV's 36x36 products; over GF(2) bytes it is always slower, so McEliece never "
-        "recurses. Unvalidated timing on a shared host; not a validation-gate result.", 95)]
+        "engages on UOV's 36x36 products. Over GF(2) bytes it takes longer at 7 of 9 sizes (n=64 and "
+        "128 at parity within noise), so McEliece never recurses. Noise floor: cells with cutoff >= n "
+        "run the schoolbook loop on both sides and still range 0.73-1.69, so effects inside that band "
+        "are unresolved. Unvalidated timing on a shared host; not a validation-gate result.", 95)]
     with PdfPages(d / "REPORT.pdf", metadata={"Title": "PQC Strassen timing, 2026-11-24",
                                               "CreationDate": None, "ModDate": None}) as pdf:
         text_page(pdf, lines, "PQC dense matrix products: Strassen path timing (2026-11-24)")

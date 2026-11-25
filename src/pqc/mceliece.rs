@@ -404,8 +404,10 @@ fn mat_identity(n: usize) -> BinMat {
 /// GF(2) with entries stored as 0/1 bytes, for [`super::strassen`].
 /// `SKIP_ZERO` is off: the scrambler `S` is secret, and the previous loop
 /// had no data-dependent branch. `CUTOFF` is `usize::MAX`: the schoolbook
-/// loop vectorises to byte-wise AND/XOR, and Strassen measured 1.8–2.5×
-/// slower at every size from 36 to 512, so this field never recurses.
+/// loop vectorises to byte-wise AND/XOR, and Strassen took longer at 7 of
+/// the 9 sizes from 36 to 512 (up to 5.2× at cutoff 32, the other two at
+/// parity within noise; bench.record `20261125T0508Z-pqc-strassen`), so
+/// this field never recurses.
 struct Gf2;
 impl Ring for Gf2 {
     type Elt = u8;

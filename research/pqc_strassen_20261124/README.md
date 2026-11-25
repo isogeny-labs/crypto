@@ -55,8 +55,13 @@ Reading:
   leaving its i-j-k loop. It does not come from Strassen recursion, which at cutoff 32 only engages on UOV's
   36x36 products.
 - UOV at 36x36x36 is at parity within the batch range.
-- Over GF(2) bytes Strassen takes longer at every size measured, which is why McEliece sets
+- Over GF(2) bytes Strassen at cutoff 32 takes longer at 7 of the 9 sizes (up to 5.2x). n = 64 (0.88)
+  and n = 128 (0.99) are at parity within the noise floor below. This is why McEliece sets
   `CUTOFF = usize::MAX`.
+- Noise floor: where the cutoff is at least n (cutoff 64 at n = 36, 48 and 64), `mul_with_cutoff`
+  runs the schoolbook loop. Those cells time identical code against itself, and they range from
+  0.73 to 1.69. Effects inside that band are not resolved by this run. That includes UOV at
+  36x36x36 (1.04), MAYO at n = 36 (1.04) and UOV at n = 36 (1.19).
 - For the byte fields Strassen pays off only well above toy sizes.
 - These values agree in direction with the standalone run quoted in the PR's first version. Single cells
   differ, consistent with the host load.

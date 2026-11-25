@@ -18,19 +18,18 @@
 //! Field arithmetic comes in through the [`Ring`] trait, so each scheme's
 //! `mul` is monomorphised and inlined exactly as in the loops this replaced.
 //!
-//! # Measured (release, Apple M-series, 2026-11-24)
-//! Time of Strassen with cutoff 32 divided by the schoolbook loop, square
-//! n×n (lower is better):
-//!
-//! | n   | GF(2) bytes | GF(16) | GF(256) | F_31^3 |
-//! |-----|-------------|--------|---------|--------|
-//! | 36  | 1.78        | 0.93   | 0.89    | 1.00   |
-//! | 128 | 1.82        | 0.84   | 0.62    | 0.82   |
-//! | 256 | 2.48        | 0.46   | 0.42    | 0.70   |
-//! | 512 | 2.52        | 0.29   | 0.34    | 0.62   |
+//! # Measured
+//! bench.record `20261125T0508Z-pqc-strassen` (harness and raw data in
+//! `research/pqc_strassen_20261124/`; release, one thread, shared macOS
+//! host under load, so indicative only). At n = 512, Strassen with cutoff
+//! 32 took 0.28 (GF(16)), 0.26 (GF(256)) and 0.67 (F_31^3) of the
+//! schoolbook time, and 3.27 times it over GF(2) bytes. Below n ≈ 64 the
+//! ratios sit inside that run's noise floor: identical code paths timed
+//! against each other ranged 0.73–1.69.
 //!
 //! Over GF(2) stored as one bit per byte, the schoolbook loop is a
-//! vectorised AND/XOR and Strassen never pays, so that field sets
+//! vectorised AND/XOR and Strassen took longer at 7 of the 9 sizes
+//! measured (the other two at parity within noise), so that field sets
 //! [`Ring::CUTOFF`] to `usize::MAX`. With the toy parameters in this crate
 //! the largest product dimension is 36 (UOV), so only UOV's 36×36 products
 //! reach one level of recursion; the rest run the schoolbook loop.
