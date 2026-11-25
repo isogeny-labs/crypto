@@ -48,6 +48,22 @@ remain charged.
 | H-YIELD-POOL | a larger jump pool reduces collision clustering enough to raise independent rank per generated child | pool 256 beats pool 64 on held-out rank/child and rank/second, with duplicate and zero-row rates no worse | fresh k = 28 and 32 paired blocks | unconfirmed; counted-cost evidence only |
 | H-YIELD-FILTER | a cheap point-only prefilter can enrich rank-contributing collisions | held-out rank/second improves over a matched-random filter with the same acceptance rate | train-only predicate freeze, matched random negative control | queued; no predicate selected before the profile |
 
+## Profile attempts
+
+The first host-capability probe is preserved at
+`profiles/probe-macos/probe.json`. It found neither supported CPU sampling nor
+Callgrind on the arm64 macOS host. This is an unsupported profiling environment,
+not evidence for or against H-GEN-HOT. The in-progress local release build was
+stopped after that determination because it could not produce the preregistered
+profile on this host.
+
+The Linux fallback uses the repository's measured-child Callgrind mechanism on
+two executions from the already frozen k = 28 session plan. Sequence 242 is the
+pool-256 arm and sequence 243 is the pool-64 arm; both are workload 0, measured
+round 1, and algorithm seed `5769128089488788324`. Each profiled child must
+match its unprofiled child on the recovered scalar and deterministic work and
+counter fields before its instruction profile is interpreted.
+
 ## Prior-art receipt
 
 Research-kb was current at revision

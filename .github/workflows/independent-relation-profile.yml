@@ -1,0 +1,105 @@
+name: Independent relation collector profile
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - .github/workflows/independent-relation-profile.yml
+      - research/independent_relation_throughput_20261124/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: independent-relation-profile-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  callgrind:
+    if: github.event.pull_request.head.ref == 'codex/independent-relations-per-second'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            scripts
+            Cargo.toml
+            Cargo.lock
+      - name: Materialize exact build and profile inputs
+        run: |
+          scripts/sparse-checkout.sh apply --profile minimal \
+            --path research/ecbench_phased_panel_20261117 \
+            --path research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k28-local.json
+      - name: Install profiler and Rust toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends valgrind
+          valgrind --version
+          rustup update stable --no-self-update
+          rustc +stable -Vv
+      - name: Build exact ecbench binary
+        env:
+          CARGO_BUILD_JOBS: '2'
+          CARGO_PROFILE_RELEASE_DEBUG: line-tables-only
+        run: cargo +stable build --locked --release --bin ecbench
+      - name: Profile matched pool-64 and pool-256 executions
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/independent-relation-profile"
+          spec=research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k28-local.json
+          mkdir -p "$out"
+          {
+            git rev-parse HEAD
+            git status --short
+            rustc +stable -Vv
+            cargo +stable -V
+            valgrind --version
+            uname -a
+            lscpu
+            sha256sum target/release/ecbench "$spec"
+          } > "$out/PROVENANCE.txt"
+
+          for item in p256:242 p64:243; do
+            arm=${item%%:*}
+            seq=${item##*:}
+            dir="$out/$arm"
+            mkdir -p "$dir"
+            target/release/ecbench profile-input --spec "$spec" --seq "$seq" > "$dir/input.json"
+            target/release/ecbench exec < "$dir/input.json" > "$dir/unprofiled-child.json"
+            ECBENCH_CALLGRIND_SOLVE=1 timeout 600s valgrind \
+              --tool=callgrind --cache-sim=no --branch-sim=no \
+              --callgrind-out-file="$dir/callgrind.out" \
+              target/release/ecbench exec < "$dir/input.json" \
+              > "$dir/profiled-child.json" 2> "$dir/callgrind.log"
+            target/release/ecbench callgrind-ir --prefix "$dir/callgrind.out" > "$dir/solve-ir.json"
+            callgrind_annotate --inclusive=yes --tree=both --threshold=0.1 \
+              "$dir/callgrind.out" > "$dir/annotate-inclusive.txt"
+            jq -e '.error == null and .report.exhausted == false and .report.recovered != null' \
+              "$dir/unprofiled-child.json" "$dir/profiled-child.json" > /dev/null
+            jq -S '{error,workload_id,method_id,report:{recovered:.report.recovered,
+              exhausted:.report.exhausted,work:.report.work,counters:.report.counters}}' \
+              "$dir/unprofiled-child.json" > "$dir/unprofiled-semantic.json"
+            jq -S '{error,workload_id,method_id,report:{recovered:.report.recovered,
+              exhausted:.report.exhausted,work:.report.work,counters:.report.counters}}' \
+              "$dir/profiled-child.json" > "$dir/profiled-semantic.json"
+            cmp "$dir/unprofiled-semantic.json" "$dir/profiled-semantic.json"
+            sha256sum "$dir"/* > "$dir/SHA256SUMS"
+          done
+
+          jq -n \
+            --arg p64 "$(jq -r .solve_ir "$out/p64/solve-ir.json")" \
+            --arg p256 "$(jq -r .solve_ir "$out/p256/solve-ir.json")" \
+            '{schema:"independent-relation-profile/v1", unit:"callgrind.Ir",
+              p64_solve_ir:($p64|tonumber), p256_solve_ir:($p256|tonumber)}' \
+            > "$out/SUMMARY.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: ${{ !cancelled() }}
+        with:
+          name: independent-relation-profile-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/independent-relation-profile
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
