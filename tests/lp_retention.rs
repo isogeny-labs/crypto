@@ -1,192 +1,190 @@
-//! Tests for `large_prime_graph::retention` (port of workspace#144 T3).
+//! Tests for `large_prime_graph::retention` (online admission under a cap).
 
-use crypto_lib::cryptanalysis::large_prime_filter::PartialRelation;
-use crypto_lib::cryptanalysis::large_prime_graph::eval::{synthetic_stream, SyntheticParams};
-use crypto_lib::cryptanalysis::large_prime_graph::retention::{
-    compare_policies, cycle_count, fp_toy, retain, split_by_arity, useful_rank, RetentionError,
-    RetentionPolicy,
+use crypto_lib::cryptanalysis::large_prime_filter::{
+    replay_complete_relation, CompleteRelation, PartialRelation,
 };
-use crypto_lib::cryptanalysis::large_prime_graph::{dense_rank, LpIndex};
+use crypto_lib::cryptanalysis::large_prime_graph::eval::{synthetic_stream, SyntheticParams};
+use crypto_lib::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+use crypto_lib::cryptanalysis::large_prime_graph::retention::{
+    simulate_admission, AdmissionRule, IncrementalRank, StreamRow,
+};
 
-fn pool(seed: u64, rows: usize, lp: u64, unit: bool, modulus: u64) -> Vec<PartialRelation> {
+#[path = "../examples/lp_retention_support/fp_toy.rs"]
+#[allow(dead_code)]
+mod fp_toy;
+
+const RULES: [AdmissionRule; 6] = [
+    AdmissionRule::All,
+    AdmissionRule::CompleteOnly,
+    AdmissionRule::FirstCome,
+    AdmissionRule::SinglesOnly,
+    AdmissionRule::MaxLp(400),
+    AdmissionRule::SeenLp,
+];
+
+fn stream(seed: u64, rows: usize, fb: u32, ell: u64) -> Vec<StreamRow> {
     let p = SyntheticParams {
         seed,
         rows,
-        lp_columns: lp,
-        arity_weights: vec![0, 3, 5],
-        unit_coefficients: unit,
+        lp_columns: 600,
+        fb_columns: fb,
+        fb_terms: 3,
+        arity_weights: vec![1, 4, 8],
         ..SyntheticParams::default()
     };
-    split_by_arity(&synthetic_stream(&p, modulus), modulus)
-        .unwrap()
-        .0
+    synthetic_stream(&p, ell)
+        .into_iter()
+        .enumerate()
+        .map(|(i, relation)| StreamRow {
+            draw: i as u64 + 1,
+            relation,
+        })
+        .collect()
 }
 
-/// Rows whose LP coefficients cancel mod ℓ are complete, not partials.
-#[test]
-fn cancelling_rows_split_as_complete() {
-    let mk = |large: Vec<(u64, u64)>| PartialRelation {
-        id: 0,
-        small: vec![],
-        large,
-        rhs: 0,
-    };
-    let rels = vec![
-        mk(vec![(5, 1), (5, 2)]),
-        mk(vec![(5, 1), (5, 1)]),
-        mk(vec![(5, 1), (7, 1)]),
-        mk(vec![]),
-    ];
-    let (partials, complete, wide) = split_by_arity(&rels, 3).unwrap();
-    assert_eq!((partials.len(), complete.len(), wide), (2, 2, 0));
+fn canonical<K: Ord + Copy>(v: &[(K, u64)], p: u64) -> Vec<(K, u64)> {
+    let mut m = std::collections::BTreeMap::<K, u64>::new();
+    for &(c, a) in v {
+        let e = m.entry(c).or_default();
+        *e = (*e + a % p) % p;
+    }
+    m.into_iter().filter(|&(_, a)| a != 0).collect()
 }
 
-/// Every policy's GainDsu left nullity equals the dense-rank count, on 120
-/// random batches over four prime fields, unit and random coefficients.
+/// The incremental rank equals the repository's exact sparse audit.
 #[test]
-fn useful_rank_matches_dense_rank_for_every_policy() {
+fn incremental_rank_matches_projected_rank_audit() {
+    for &ell in &[7u64, 101, 1_000_003] {
+        for seed in 0..20u64 {
+            let rows: Vec<CompleteRelation> = stream(seed, 40 + seed as usize, 24, ell)
+                .into_iter()
+                .map(|r| CompleteRelation {
+                    small: canonical(&r.relation.small, ell),
+                    rhs: 0,
+                    sources: vec![],
+                })
+                .collect();
+            let mut inc = IncrementalRank::new(24, ell).unwrap();
+            for r in &rows {
+                inc.add(&r.small).unwrap();
+            }
+            let audit = audit_projected_rank(&rows, ell).unwrap();
+            assert_eq!(inc.rank(), audit.useful_small_rank, "ell={ell} seed={seed}");
+        }
+    }
+}
+
+/// Every harvested combination cancels its large primes and replays, through
+/// `replay_complete_relation`, to exactly the row the simulator added.
+#[test]
+fn harvested_relations_replay_exactly() {
     let mut checked = 0;
-    for &ell in &[3u64, 7, 101, 1_000_003] {
-        for seed in 0..15u64 {
-            for unit in [false, true] {
-                let rels = pool(seed, 60 + 7 * seed as usize, 40, unit, ell);
-                let budget = rels.len() / 3 + seed as usize % 5;
-                for policy in RetentionPolicy::ALL {
-                    let kept = retain(&rels, ell, budget, policy, seed).unwrap();
-                    let snap = useful_rank(&rels, ell, &kept).unwrap();
-                    let subset: Vec<_> = kept.iter().map(|&i| rels[i].clone()).collect();
-                    let idx = LpIndex::build(&subset, ell).unwrap();
-                    let dense = dense_rank(&idx.rows, idx.num_columns(), ell).unwrap();
-                    assert_eq!(
-                        snap.rank, dense,
-                        "ell={ell} seed={seed} unit={unit} {policy:?}"
-                    );
-                    assert_eq!(snap.left_nullity, kept.len() - dense);
-                    let b1 = cycle_count(&rels, ell, &kept).unwrap();
-                    assert!(snap.left_nullity <= b1, "useful rank above the cycle count");
+    for &ell in &[101u64, 1_000_003] {
+        for seed in 0..10u64 {
+            let s = stream(seed, 800, 40, ell);
+            let inputs: Vec<PartialRelation> = s.iter().map(|r| r.relation.clone()).collect();
+            for rule in [
+                AdmissionRule::All,
+                AdmissionRule::FirstCome,
+                AdmissionRule::SeenLp,
+            ] {
+                let out =
+                    simulate_admission(&s, 40, ell, rule, Some(300), usize::MAX, true).unwrap();
+                assert!(out.harvested_relations > 0);
+                for h in &out.harvested {
+                    let proposed = CompleteRelation {
+                        small: vec![],
+                        rhs: 0,
+                        sources: h.sources.clone(),
+                    };
+                    let replayed = replay_complete_relation(&proposed, &inputs, ell)
+                        .expect("cancels and replays");
+                    assert_eq!(canonical(&replayed.small, ell), h.small);
+                    assert_eq!(replayed.rhs % ell, h.rhs);
                     checked += 1;
                 }
             }
         }
     }
-    assert_eq!(checked, 4 * 15 * 2 * RetentionPolicy::ALL.len());
+    assert!(checked > 1000, "checked {checked}");
 }
 
+/// `All` is never below any rule and every rule is never below
+/// `CompleteOnly`, at every draw; caps and rule semantics hold.
 #[test]
-fn budget_is_exact_sorted_distinct_and_deterministic() {
+fn ordering_guarantee_and_rule_semantics() {
     let ell = 1_000_003;
-    let rels = pool(3, 500, 300, false, ell);
-    for policy in RetentionPolicy::ALL {
-        for budget in [0, 1, 137, 499, 500, 10_000] {
-            let a = retain(&rels, ell, budget, policy, 9).unwrap();
-            assert_eq!(a.len(), budget.min(rels.len()));
-            assert!(a.windows(2).all(|w| w[0] < w[1]));
-            assert_eq!(a, retain(&rels, ell, budget, policy, 9).unwrap());
+    let rank_at = |trace: &[(u64, usize)], d: u64| {
+        trace
+            .iter()
+            .take_while(|&&(x, _)| x <= d)
+            .last()
+            .map_or(0, |t| t.1)
+    };
+    for seed in 0..12u64 {
+        let s = stream(seed, 1200, 50, ell);
+        let run =
+            |rule, cap| simulate_admission(&s, 50, ell, rule, cap, usize::MAX, false).unwrap();
+        let all = run(AdmissionRule::All, None);
+        let none = run(AdmissionRule::CompleteOnly, None);
+        assert_eq!(none.stored_partials, 0);
+        for cap in [Some(10), Some(100), Some(100_000)] {
+            for rule in RULES {
+                let o = run(rule, cap);
+                let capped = !matches!(rule, AdmissionRule::All | AdmissionRule::CompleteOnly);
+                if let (Some(c), true) = (cap, capped) {
+                    assert!(o.stored_partials <= c);
+                }
+                for d in (1..=1200).step_by(37) {
+                    let (a, r, n) = (
+                        rank_at(&all.trace, d),
+                        rank_at(&o.trace, d),
+                        rank_at(&none.trace, d),
+                    );
+                    assert!(
+                        a >= r && r >= n,
+                        "seed={seed} {rule:?} cap={cap:?} draw={d}: {a} {r} {n}"
+                    );
+                }
+            }
         }
+        // FirstCome with a cap above the stream stores every partial; SinglesOnly only singles.
+        let fc = run(AdmissionRule::FirstCome, Some(100_000));
+        assert_eq!(fc.stored_partials, all.stored_partials);
+        let singles = s
+            .iter()
+            .filter(|r| canonical(&r.relation.large, ell).len() == 1)
+            .count();
+        assert_eq!(
+            run(AdmissionRule::SinglesOnly, None).stored_partials,
+            singles
+        );
     }
-    // The seed matters for the seeded policies only.
-    let r1 = retain(&rels, ell, 100, RetentionPolicy::Random, 1).unwrap();
-    let r2 = retain(&rels, ell, 100, RetentionPolicy::Random, 2).unwrap();
-    assert_ne!(r1, r2);
-    let d1 = retain(&rels, ell, 100, RetentionPolicy::Degree, 1).unwrap();
-    assert_eq!(
-        d1,
-        retain(&rels, ell, 100, RetentionPolicy::Degree, 2).unwrap()
-    );
 }
 
+/// Stopping at the target reports the first draw whose rank reached it.
 #[test]
-fn complete_and_wide_rows_are_refused() {
-    let ell = 101;
-    let mk = |large: Vec<(u64, u64)>| PartialRelation {
-        id: 0,
-        small: vec![],
-        large,
-        rhs: 0,
-    };
-    let e = retain(
-        &[mk(vec![(5, 1)]), mk(vec![])],
-        ell,
-        1,
-        RetentionPolicy::Degree,
-        0,
-    );
-    assert_eq!(
-        e,
-        Err(RetentionError::UnsupportedArity { row: 1, arity: 0 })
-    );
-    let e = retain(
-        &[mk(vec![(5, 1), (7, 1), (9, 1)])],
-        ell,
-        1,
-        RetentionPolicy::Degree,
-        0,
-    );
-    assert_eq!(
-        e,
-        Err(RetentionError::UnsupportedArity { row: 0, arity: 3 })
-    );
-}
-
-/// Hand-checked graph: triangle a-b-c (odd, unit coefficients: unbalanced, so
-/// it pins the component and contributes no relation by itself), plus a
-/// square d-e-f-g (even: balanced, one relation), plus two singletons on h.
-#[test]
-fn hand_graph_counts() {
+fn draws_to_target_is_first_crossing() {
     let ell = 1_000_003;
-    let mk = |id, large: Vec<u64>| PartialRelation {
-        id,
-        small: vec![],
-        large: large.into_iter().map(|q| (q, 1)).collect(),
-        rhs: 0,
-    };
-    let rels = vec![
-        mk(0, vec![1, 2]),
-        mk(1, vec![2, 3]),
-        mk(2, vec![3, 1]),
-        mk(3, vec![4, 5]),
-        mk(4, vec![5, 6]),
-        mk(5, vec![6, 7]),
-        mk(6, vec![7, 4]),
-        mk(7, vec![8]),
-        mk(8, vec![8]),
-    ];
-    let all: Vec<usize> = (0..rels.len()).collect();
-    let snap = useful_rank(&rels, ell, &all).unwrap();
-    // rank: triangle 3, square 3, h 1  -> 7; left nullity 9 - 7 = 2
-    assert_eq!((snap.rank, snap.left_nullity), (7, 2));
-    // b1 = E - V + C = 9 - (8 + virtual) + 3 = 3: the odd triangle counts topologically.
-    assert_eq!(cycle_count(&rels, ell, &all).unwrap(), 3);
+    let s = stream(4, 2000, 30, ell);
+    let full =
+        simulate_admission(&s, 30, ell, AdmissionRule::All, None, usize::MAX, false).unwrap();
+    let t = full.final_rank;
+    let stop = simulate_admission(&s, 30, ell, AdmissionRule::All, None, t, false).unwrap();
+    let first = full.trace.iter().find(|&&(_, r)| r >= t).unwrap().0;
+    assert_eq!(stop.draws_to_target, Some(first));
+    assert_eq!(stop.final_rank, t);
 }
 
 #[test]
-fn fp_toy_collects_replays_and_ranks() {
+fn fp_toy_collects_and_replays() {
     let p = fp_toy::Instance::next_prime(1 << 31);
     assert_eq!(p, 2_147_483_659);
     let inst = fp_toy::Instance::new(p, 1001);
     assert!(fp_toy::is_prime(inst.ell) && (p - 1).is_multiple_of(inst.ell));
-    let col = fp_toy::collect(&inst, 4096, 65536, 20_000, 0);
-    assert!(col.partials.len() > 3000 && col.complete > 1000);
-    assert_eq!(fp_toy::replay(&col), Ok(col.partials.len()));
-    // A tampered relation must fail replay.
-    let mut bad = col.clone();
-    bad.exponents[0] += 1;
-    assert_eq!(fp_toy::replay(&bad), Err(0));
-    let n = col.partials.len();
-    let out = compare_policies(&col.partials, inst.ell, n / 4, &RetentionPolicy::ALL, 0).unwrap();
-    assert!(out
-        .iter()
-        .all(|o| o.kept == n / 4 && o.rank.left_nullity <= o.cycle_count));
-}
-
-/// SinglesThenSpectral keeps every one-LP row before any two-LP row.
-#[test]
-fn singles_then_spectral_takes_singletons_first() {
-    let ell = 1_000_003;
-    let rels = pool(5, 400, 200, false, ell);
-    let idx = LpIndex::build(&rels, ell).unwrap();
-    let singles = idx.rows.iter().filter(|r| r.len() == 1).count();
-    assert!(singles > 20 && singles < rels.len());
-    let kept = retain(&rels, ell, singles, RetentionPolicy::SinglesThenSpectral, 0).unwrap();
-    assert!(kept.iter().all(|&i| idx.rows[i].len() == 1));
+    let mut col = fp_toy::collect(&inst, 1024, 65536, 20_000, 0);
+    assert!(col.stream.len() > 1000);
+    assert_eq!(fp_toy::replay(&col), Ok(col.stream.len()));
+    col.exponents[3] += 1;
+    assert_eq!(fp_toy::replay(&col), Err(3));
 }

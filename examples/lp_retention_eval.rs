@@ -1,59 +1,41 @@
-//! Compare partial-relation retention policies under a row budget, scored by
-//! exact GainDsu useful rank (`large_prime_graph::retention`).
+//! Online admission of partial relations under a memory cap
+//! (`large_prime_graph::retention`): for each rule and cap, the draw at which
+//! the useful factor-base rank first reaches its target.
 //!
 //! ```text
-//! # F_p* toy pools (workspace#144 T3 sizes): p = nextprime(2^31 + 11e6·i)
+//! # F_p* toy: p = nextprime(2^31 + 11e6·i), B, L, up to --draws draws per seed
 //! cargo run --release --example lp_retention_eval -- --source fp --p-index 0 \
-//!     --repeats 5 --draws 150000 --smooth 4096 --lp 65536 \
-//!     --budgets 0.25,0.1,0.05,0.02,0.01 [--relabel] [--dump pool.json] --out fp0.json
-//! # the module's synthetic stream (LP arity weights 0:1:2), modulus 2^61−1
-//! cargo run --release --example lp_retention_eval -- --source synthetic \
-//!     --rows 40000 --arity 0,6,12 [--unit] [--relabel] --repeats 5 --out syn.json
-//! # a captured stream, e.g. from `lp_graph_collect --relations out.jsonl`
+//!     --repeats 5 --smooth 1024 --lp 65536 --draws 400000 --caps 0.25,1,4 --out fp0.json
+//! # a captured stream (`lp_graph_collect --relations out.jsonl`); draw = line number
 //! cargo run --release --example lp_retention_eval -- --source relations \
-//!     --relations out.jsonl --modulus 65557 --repeats 5 --out real.json
+//!     --relations out.jsonl --modulus 65557 --caps 0.25,1,4 --out real.json
 //! ```
 //!
-//! The pool is the rows of canonical LP arity 1 or 2 (`split_by_arity`):
-//! complete relations are counted and kept out, rows of arity above 2 are
-//! counted and dropped (the exact DSU oracle covers arity ≤ 2).
-//!
-//! `--relabel` replaces every LP identity by a fixed bijective 64-bit mix of
-//! itself before retention. The graph, and so every rank, is unchanged;
-//! only the order that `smallest_lp` reads is destroyed. It stands for streams
-//! whose LP identities carry no size information (curve point labels).
-//!
-//! Repeat `r` uses seed `1000·i + r` (`i` = `--p-index`, else 0) for
-//! collection and for the seeded policies.
+//! Caps are multiples of the factor-base size (the relation-matrix width).
+//! Target: `fp` uses the factor-base size; `relations` uses the useful rank
+//! `all` reaches on the whole stream. `MaxLp` rules (`--max-lp`, default L/4
+//! and L/16 for `fp`) are run for `fp` only: on curves an LP identity is a
+//! point label, not a size.
 
 use crypto_lib::cryptanalysis::large_prime_filter::PartialRelation;
-use crypto_lib::cryptanalysis::large_prime_graph::eval::{synthetic_stream, SyntheticParams};
 use crypto_lib::cryptanalysis::large_prime_graph::retention::{
-    compare_policies, fp_toy, split_by_arity, RetentionOutcome, RetentionPolicy,
+    simulate_admission, AdmissionOutcome, AdmissionRule, StreamRow,
 };
 use serde::Serialize;
 use std::io::BufRead;
 
-/// One stream to score: (seed, pool, complete relations, rows of arity > 2, replayed count).
-type Batch = (u64, Vec<PartialRelation>, usize, usize, Option<usize>);
+#[path = "lp_retention_support/fp_toy.rs"]
+mod fp_toy;
 
 #[derive(Serialize)]
-struct Repeat {
+struct Run {
     seed: u64,
-    pool: usize,
-    complete: usize,
-    dropped_wide: usize,
+    rows: usize,
+    draws_available: u64,
+    fb_columns: usize,
+    target: usize,
     replayed: Option<usize>,
-    /// Useful rank of the whole pool (no budget).
-    full: RetentionOutcome,
-    /// One entry per budget fraction, each with every policy.
-    budgets: Vec<BudgetRow>,
-}
-
-#[derive(Serialize)]
-struct BudgetRow {
-    fraction: f64,
-    outcomes: Vec<RetentionOutcome>,
+    outcomes: Vec<AdmissionOutcome>,
 }
 
 #[derive(Serialize)]
@@ -61,50 +43,47 @@ struct Report {
     schema: &'static str,
     source: String,
     modulus: u64,
-    relabel: bool,
+    cap_multiples: Vec<f64>,
     params: serde_json::Value,
-    repeats: Vec<Repeat>,
-}
-
-/// Bijective on u64 (each step is invertible), so distinct LP identities stay distinct.
-fn mix64(mut z: u64) -> u64 {
-    z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-    z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-    z ^ (z >> 31)
-}
-
-fn relabel(pool: &mut [PartialRelation]) {
-    for r in pool {
-        for t in &mut r.large {
-            t.0 = mix64(t.0);
-        }
-    }
+    runs: Vec<Run>,
 }
 
 fn evaluate(
-    pool: &[PartialRelation],
-    modulus: u64,
-    fractions: &[f64],
-    seed: u64,
-) -> (RetentionOutcome, Vec<BudgetRow>) {
-    let full = compare_policies(pool, modulus, pool.len(), &[RetentionPolicy::Random], seed)
-        .expect("full pool")
-        .remove(0);
-    let budgets = fractions
+    stream: &[StreamRow],
+    fb: usize,
+    ell: u64,
+    target: usize,
+    caps: &[f64],
+    max_lp: &[u64],
+) -> Vec<AdmissionOutcome> {
+    let run = |rule, cap| {
+        simulate_admission(stream, fb, ell, rule, cap, target, false).expect("simulate")
+    };
+    let mut out = vec![
+        run(AdmissionRule::All, None),
+        run(AdmissionRule::CompleteOnly, None),
+    ];
+    for &m in caps {
+        let cap = ((fb as f64) * m).round().max(1.0) as usize;
+        let mut rules = vec![
+            AdmissionRule::FirstCome,
+            AdmissionRule::SinglesOnly,
+            AdmissionRule::SeenLp,
+        ];
+        rules.extend(max_lp.iter().map(|&b| AdmissionRule::MaxLp(b)));
+        for rule in rules {
+            out.push(run(rule, Some(cap)));
+        }
+    }
+    out
+}
+
+fn summary(outcomes: &[AdmissionOutcome]) -> String {
+    outcomes
         .iter()
-        .map(|&fraction| BudgetRow {
-            fraction,
-            outcomes: compare_policies(
-                pool,
-                modulus,
-                (pool.len() as f64 * fraction) as usize,
-                &RetentionPolicy::ALL,
-                seed,
-            )
-            .expect("compare"),
-        })
-        .collect();
-    (full, budgets)
+        .map(|o| format!("{}@{:?}={:?}", o.rule.name(), o.cap, o.draws_to_target))
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 fn main() {
@@ -117,72 +96,51 @@ fn main() {
             .unwrap_or_else(|| default.to_string())
     };
     let source = get("--source", "fp");
-    let repeats: u64 = get("--repeats", "5").parse().expect("--repeats");
-    let fractions: Vec<f64> = get("--budgets", "0.25,0.1,0.05,0.02,0.01")
+    let caps: Vec<f64> = get("--caps", "0.25,1,4")
         .split(',')
-        .map(|x| x.parse().expect("--budgets"))
+        .map(|x| x.parse().expect("--caps"))
         .collect();
-    let p_index: u64 = get("--p-index", "0").parse().expect("--p-index");
-    let do_relabel = args.iter().any(|a| a == "--relabel");
-    let base = 1000 * p_index;
-
-    // Each source yields (pool, complete, wide, replayed) for repeat r.
-    let modulus: u64;
-    let params: serde_json::Value;
-    let mut dumped = Vec::new();
-    let dump = get("--dump", "");
-    let mut batches: Vec<Batch> = Vec::new();
+    let repeats: u64 = get("--repeats", "5").parse().expect("--repeats");
+    let mut runs = Vec::new();
+    let (modulus, params);
     match source.as_str() {
         "fp" => {
-            let p = match get("--p", "").as_str() {
-                "" => fp_toy::Instance::next_prime((1u64 << 31) + 11_000_000 * p_index),
-                s => s.parse().expect("--p"),
-            };
-            let inst = fp_toy::Instance::new(p, get("--g-min", "1001").parse().expect("--g-min"));
-            let smooth: u64 = get("--smooth", "4096").parse().unwrap();
+            let i: u64 = get("--p-index", "0").parse().unwrap();
+            let p = fp_toy::Instance::next_prime((1u64 << 31) + 11_000_000 * i);
+            let inst = fp_toy::Instance::new(p, 1001);
+            let smooth: u64 = get("--smooth", "1024").parse().unwrap();
             let lp: u64 = get("--lp", "65536").parse().unwrap();
-            let draws: usize = get("--draws", "150000").parse().unwrap();
+            let draws: u64 = get("--draws", "400000").parse().unwrap();
+            let max_lp: Vec<u64> = match get("--max-lp", "").as_str() {
+                "" => vec![lp / 4, lp / 16],
+                s => s.split(',').map(|x| x.parse().unwrap()).collect(),
+            };
             modulus = inst.ell;
-            params = serde_json::json!({"instance": inst, "smooth_bound": smooth, "lp_bound": lp, "draws": draws});
+            params = serde_json::json!({
+                "instance": inst, "smooth_bound": smooth, "lp_bound": lp,
+                "draws": draws, "max_lp": max_lp
+            });
             for r in 0..repeats {
-                let seed = base + r;
+                let seed = 1000 * i + r;
                 let col = fp_toy::collect(&inst, smooth, lp, draws, seed);
                 let replayed =
-                    fp_toy::replay(&col).unwrap_or_else(|i| panic!("replay failed at row {i}"));
-                let (pool, _, wide) = split_by_arity(&col.partials, modulus).expect("split");
-                batches.push((seed, pool, col.complete, wide, Some(replayed)));
-                if !dump.is_empty() {
-                    dumped.push(col);
-                }
-            }
-        }
-        "synthetic" => {
-            modulus = get("--modulus", &((1u64 << 61) - 1).to_string())
-                .parse()
-                .unwrap();
-            let arity: Vec<u64> = get("--arity", "0,6,12")
-                .split(',')
-                .map(|x| x.parse().unwrap())
-                .collect();
-            let rows: usize = get("--rows", "40000").parse().unwrap();
-            let lp_columns: u64 = get("--lp-columns", &(2 * rows as u64 / 3).to_string())
-                .parse()
-                .unwrap();
-            let unit = args.iter().any(|a| a == "--unit");
-            params = serde_json::json!({"rows": rows, "lp_columns": lp_columns, "arity_weights": arity, "unit": unit});
-            for r in 0..repeats {
-                let seed = base + r + 7;
-                let sp = SyntheticParams {
+                    fp_toy::replay(&col).unwrap_or_else(|j| panic!("replay failed at row {j}"));
+                let fb = col.factor_base.len();
+                let outcomes = evaluate(&col.stream, fb, modulus, fb, &caps, &max_lp);
+                eprintln!(
+                    "fp p={p} seed={seed} rows={} | {}",
+                    col.stream.len(),
+                    summary(&outcomes)
+                );
+                runs.push(Run {
                     seed,
-                    rows,
-                    lp_columns,
-                    arity_weights: arity.clone(),
-                    unit_coefficients: unit,
-                    ..SyntheticParams::default()
-                };
-                let (pool, complete, wide) =
-                    split_by_arity(&synthetic_stream(&sp, modulus), modulus).expect("split");
-                batches.push((seed, pool, complete.len(), wide, None));
+                    rows: col.stream.len(),
+                    draws_available: draws,
+                    fb_columns: fb,
+                    target: fb,
+                    replayed: Some(replayed),
+                    outcomes,
+                });
             }
         }
         "relations" => {
@@ -191,58 +149,61 @@ fn main() {
                 .expect("--modulus (the relation prime ℓ)");
             let path = get("--relations", "");
             let f = std::io::BufReader::new(std::fs::File::open(&path).expect("--relations"));
-            let rels: Vec<PartialRelation> = f
+            let stream: Vec<StreamRow> = f
                 .lines()
-                .map(|l| serde_json::from_str(&l.unwrap()).expect("PartialRelation JSON line"))
+                .enumerate()
+                .map(|(i, l)| StreamRow {
+                    draw: i as u64 + 1,
+                    relation: serde_json::from_str::<PartialRelation>(&l.unwrap())
+                        .expect("PartialRelation JSON line"),
+                })
                 .collect();
-            params = serde_json::json!({"relations": path, "rows": rels.len()});
-            let (pool, complete, wide) = split_by_arity(&rels, modulus).expect("split");
-            // One fixed stream: repeats vary only the seeded policies.
-            for r in 0..repeats {
-                batches.push((base + r, pool.clone(), complete.len(), wide, None));
-            }
+            let fb = stream
+                .iter()
+                .flat_map(|r| r.relation.small.iter().map(|&(c, _)| c as usize + 1))
+                .max()
+                .unwrap_or(0);
+            let full = simulate_admission(
+                &stream,
+                fb,
+                modulus,
+                AdmissionRule::All,
+                None,
+                usize::MAX,
+                false,
+            )
+            .expect("full pass");
+            let target = full.final_rank;
+            params = serde_json::json!({
+                "relations": path, "rows": stream.len(), "fb_columns": fb,
+                "target_from_full_stream": target
+            });
+            // One fixed stream in collection order; the rules are deterministic.
+            let outcomes = evaluate(&stream, fb, modulus, target, &caps, &[]);
+            eprintln!(
+                "relations rows={} fb={fb} target={target} | {}",
+                stream.len(),
+                summary(&outcomes)
+            );
+            runs.push(Run {
+                seed: 0,
+                rows: stream.len(),
+                draws_available: stream.len() as u64,
+                fb_columns: fb,
+                target,
+                replayed: None,
+                outcomes,
+            });
         }
-        other => panic!("--source must be fp, synthetic or relations, not {other}"),
-    }
-    if !dump.is_empty() {
-        std::fs::write(&dump, serde_json::to_string(&dumped).unwrap()).expect("--dump");
-    }
-
-    let mut out = Vec::new();
-    for (seed, mut pool, complete, wide, replayed) in batches {
-        if do_relabel {
-            relabel(&mut pool);
-        }
-        let (full, budgets) = evaluate(&pool, modulus, &fractions, seed);
-        let line: Vec<String> = budgets[0]
-            .outcomes
-            .iter()
-            .map(|o| format!("{}={}", o.policy.name(), o.rank.left_nullity))
-            .collect();
-        eprintln!(
-            "{source} seed {seed} pool {} full {} | at {}: {}",
-            pool.len(),
-            full.rank.left_nullity,
-            budgets[0].fraction,
-            line.join(" ")
-        );
-        out.push(Repeat {
-            seed,
-            pool: pool.len(),
-            complete,
-            dropped_wide: wide,
-            replayed,
-            full,
-            budgets,
-        });
+        other => panic!("--source must be fp or relations, not {other}"),
     }
     let report = Report {
-        schema: "lp-retention-eval/v1",
+        schema: "lp-admission-eval/v1",
         source,
         modulus,
-        relabel: do_relabel,
+        cap_multiples: caps,
         params,
-        repeats: out,
+        runs,
     };
     let json = serde_json::to_string_pretty(&report).unwrap() + "\n";
     match get("--out", "").as_str() {
