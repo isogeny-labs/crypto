@@ -1373,6 +1373,23 @@ controls. Those controls include both exact and inexact
 coset-sign cases, so irreducibility cannot certify exactness.
 [pcc:unverified]
 
+Maximal CM order is also insufficient to decide this sign.
+The [`maximal_cm_exact_control.gp`](maximal_cm_exact_control.gp)
+replay fixes `p=107`, `r=97`, `m=16`, and subgroup generator
+`5³ mod 97`. The two curves `y²=x³+6x+15` and
+`y²=x³+7x+6` have the same trace `11` and fundamental
+discriminant `-307`, so both have maximal endomorphism order.
+Their `j`-invariants are `99` and `9`, respectively. On all
+48 signed markings, the first curve has zero normalized
+coset-sign mismatches and the second has 32. The replay
+also retains the separate `F_271` fundamental-discriminant
+control with 72 mismatches among 120 signed markings.
+A preliminary three-representative screen falsely labeled
+the second `F_107` curve exact because it reoriented the
+index set for each coset; the fixed-index full-class replay
+corrects that result. These finite controls do not decide
+the P-192 coset. [pcc:unverified]
+
 The finite controls also rule out two shortcuts from CM data
 alone. The same replay fixes `p=223`, `r=241`, and `m=24`:
 `y²=x³+8x+7` is exact on all 120 signed classes, while
