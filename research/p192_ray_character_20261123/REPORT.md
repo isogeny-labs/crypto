@@ -1403,6 +1403,19 @@ index set for each coset; the fixed-index full-class replay
 corrects that result. These finite controls do not decide
 the P-192 coset. [pcc:unverified]
 
+The independent [`maximal_cm_class_scan.py`](maximal_cm_class_scan.py)
+enumerates all nonsingular short-Weierstrass models over
+`F_107` with order 97. It finds 159 models, 53 at each of
+`j=9,51,99`. Every `j=99` model is exact for this order-16
+product; no `j=9` or `j=51` model is exact. The inexact
+normalized mismatch count at `j=9` is 16 or 32 depending
+on the chosen base generator. PARI/GP independently checks
+one model at each `j` and `h(-307)=3`. Thus exactness varies
+across the three CM classes sharing the same fundamental
+discriminant; it is stable under the tested isomorphism
+models. This does not supply a class invariant that decides
+the P-192 case. [pcc:unverified]
+
 The finite controls also rule out two shortcuts from CM data
 alone. The same replay fixes `p=223`, `r=241`, and `m=24`:
 `y²=x³+8x+7` is exact on all 120 signed classes, while

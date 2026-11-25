@@ -1,4 +1,4 @@
-\\ Exhaustive marked-sign replay on three maximal-CM prime-order curves.
+\\ Exhaustive marked-sign replay on the three F_107 CM classes and one F_271 control.
 \\ Run: gp -q research/p192_ray_character_20261123/maximal_cm_exact_control.gp
 
 oddrep(v,r)=if(v%2,v,r-v);
@@ -35,4 +35,7 @@ run_case(label,p,a,b,r,g,m,gx,gy,want_mismatches)=
 
 run_case("exact",107,6,15,97,5,16,2,79,0);
 run_case("matched-inexact",107,7,6,97,5,16,1,96,32);
+run_case("third-class-inexact",107,105,53,97,5,16,0,69,16);
 run_case("inexact",271,7,3,241,7,24,1,108,72);
+if(qfbclassno(-307)!=3,error("unexpected CM class number"));
+print("D=-307 class_number=3");
