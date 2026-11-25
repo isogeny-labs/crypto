@@ -106,7 +106,7 @@ use std::time::Instant;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use rand::rngs::StdRng;
-use rand::{Rng, SeedableRng};
+use rand::{Rng, RngCore, SeedableRng};
 use serde::{Deserialize, Serialize};
 
 use crate::binary_ecc::{BinaryCurve, BinaryPoint, IrreduciblePoly};
@@ -12973,6 +12973,49 @@ impl<E: Copy> SibWalk<E> {
     }
 }
 
+/// Fill `out` with a uniform ordered `m`-subset of a supported power-of-two
+/// range, consuming fixed-width chunks from each random word and rejecting
+/// repeats.  Returns `false` without changing `out` when the compact bitset or
+/// the packed-word path does not support the requested range.
+///
+/// For uniform random words, the non-overlapping chunks are independent and
+/// uniform on `0..n`.  Conditioning each next chunk on not having appeared
+/// earlier therefore gives the uniform law on ordered distinct `m`-tuples.
+#[inline]
+fn packed_power_of_two_subset<R: RngCore + ?Sized>(
+    rng: &mut R,
+    n: usize,
+    m: usize,
+    out: &mut Vec<usize>,
+) -> bool {
+    if n < 2 || n > 256 || !n.is_power_of_two() || m > n || m > 16 {
+        return false;
+    }
+    let bits = n.trailing_zeros() as usize;
+    let chunks_per_word = 64 / bits;
+    let mask = n - 1;
+    let mut seen = [0u64; 4];
+    let mut word = 0u64;
+    let mut chunks_left = 0usize;
+    out.clear();
+    while out.len() < m {
+        if chunks_left == 0 {
+            word = rng.next_u64();
+            chunks_left = chunks_per_word;
+        }
+        let h = word as usize & mask;
+        word >>= bits;
+        chunks_left -= 1;
+        let bit = 1u64 << (h & 63);
+        let slot = &mut seen[h >> 6];
+        if *slot & bit == 0 {
+            *slot |= bit;
+            out.push(h);
+        }
+    }
+    true
+}
+
 /// Solve the last unknown of `Σ_j c_j·x_j = rhs (mod r)` (rows are
 /// `[c_0, .., c_{n−1}, rhs]`, `r` prime) by Gauss–Jordan; `None` if the last
 /// unknown is not determined or the system is inconsistent.
@@ -13725,15 +13768,18 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             std::mem::swap(&mut sw.s_tm2, &mut sw.s_tm1);
             std::mem::swap(&mut sw.s_tm1, &mut sw.cur);
         }
-        // A fresh uniform m-subset (partial Fisher-Yates) from the
-        // point-independent stream.
+        // A fresh uniform ordered m-subset from the point-independent stream.
+        // Active power-of-two pools use packed fixed-width draws and a small
+        // duplicate bitset; retain partial Fisher-Yates for every other pool.
         let n = sw.idx.len();
-        for i in 0..m {
-            let j = rng.gen_range(i..n);
-            sw.idx.swap(i, j);
+        if !packed_power_of_two_subset(rng, n, m, &mut sw.cur) {
+            for i in 0..m {
+                let j = rng.gen_range(i..n);
+                sw.idx.swap(i, j);
+            }
+            sw.cur.clear();
+            sw.cur.extend_from_slice(&sw.idx[..m]);
         }
-        sw.cur.clear();
-        sw.cur.extend_from_slice(&sw.idx[..m]);
         sw.h_t = sw.cur[0];
         let _parent_idx = sw.parents.len();
         sw.parents.push(sw.parent);
@@ -19514,6 +19560,49 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn packed_sibling_subsets_are_deterministic_distinct_and_bounded() {
+        use rand::SeedableRng;
+
+        for n in [64usize, 128, 256] {
+            for seed in 0..256u64 {
+                let mut left_rng = rand::rngs::StdRng::seed_from_u64(seed);
+                let mut right_rng = rand::rngs::StdRng::seed_from_u64(seed);
+                let mut left = Vec::new();
+                let mut right = Vec::new();
+                assert!(super::packed_power_of_two_subset(
+                    &mut left_rng,
+                    n,
+                    8,
+                    &mut left
+                ));
+                assert!(super::packed_power_of_two_subset(
+                    &mut right_rng,
+                    n,
+                    8,
+                    &mut right
+                ));
+                assert_eq!(left, right);
+                assert_eq!(left.len(), 8);
+                assert!(left.iter().all(|&h| h < n));
+                let mut distinct = left.clone();
+                distinct.sort_unstable();
+                distinct.dedup();
+                assert_eq!(distinct.len(), left.len());
+            }
+        }
+
+        let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+        let mut untouched = vec![9, 8, 7];
+        assert!(!super::packed_power_of_two_subset(
+            &mut rng,
+            63,
+            8,
+            &mut untouched
+        ));
+        assert_eq!(untouched, [9, 8, 7]);
     }
 
     #[test]

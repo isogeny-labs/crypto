@@ -46,9 +46,9 @@ remain charged.
 | H-GEN-SIB | sibling generation from one batched inversion | lower counted work and, after implementation repair, lower wall per independent rank | profile pool 64 and 256 on the same curve/seed, then paired A/B | active; existing wall result is negative |
 | H-GEN-HOT | per-parent subset selection or key/reference bookkeeping dominates the sibling wall regression | one named software path accounts for at least 20% of samples or instructions unique to the sibling arm | matched CPU sampling and Callgrind profiles | active diagnostic |
 | H-GEN-CACHE | cache each parent's seed-coefficient residues and pre-plan minus coefficients once | at least 5% fewer solve instructions in both frozen pool arms with identical semantic controls | source-exact Callgrind replay of sequences 242/243 | rejected: 3.17% / 3.54% instruction reductions miss the 5% gate |
-| H-GEN-SAMPLE | packed fixed-width draws plus duplicate rejection replace shrinking-range Fisher-Yates work for power-of-two pools | at least 5% fewer solve instructions in both pool 64 and 256 with rank and semantic controls intact | source-exact three-pool profile, then paired wall/rank only on a pass | baseline queued under `SAMPLER_PROTOCOL.md` |
+| H-GEN-SAMPLE | packed fixed-width draws plus duplicate rejection replace shrinking-range Fisher-Yates work for power-of-two pools | at least 5% fewer solve instructions in both pool 64 and 256 with rank and semantic controls intact | source-exact three-pool profile, then paired wall/rank only on a pass | unchanged-source baseline accepted; candidate profile queued |
 | H-YIELD-POOL | a larger jump pool reduces collision clustering enough to raise independent rank per generated child | pool 256 beats pool 64 on rank/child and rank/second, with duplicate and zero-row rates no worse | frozen k = 28 and 32 Stage 1 panels, 240 verified runs per arm and size | rejected at the primary metric: fewer children, but lower point-estimate rank/second |
-| H-YIELD-P128 | pool 128 retains some child-count gain without pool 256's full setup cost | fewer second points and inserts than pool 64 and fewer solve instructions, at the same full rank | one matched three-pool Callgrind discriminator, then a multi-target panel only on a pass | baseline queued under `SAMPLER_PROTOCOL.md` |
+| H-YIELD-P128 | pool 128 retains some child-count gain without pool 256's full setup cost | fewer second points and inserts than pool 64 and fewer solve instructions, at the same full rank | one matched three-pool Callgrind discriminator, then a multi-target panel only on a pass | passed one-workload discriminator; larger paired panel required |
 | H-YIELD-LINEAR | accept `(a,b)` when a fixed linear coordinate `u*a + v*b` passes a cheap predicate | conditioning biases the residual scalar `a + d*b` toward relation-bearing points | Lean equivalence and exact fibre cardinality for the nonparallel case | disproved structurally unless `u*d-v=0`, which encodes the unknown `d` |
 | H-YIELD-FILTER | a cheap nonlinear point-aware prefilter can enrich rank-contributing collisions | held-out rank/second improves over a matched-random filter with the same acceptance rate | train-only predicate freeze, matched random negative control | queued; fixed linear coefficient filters are now closed by H-YIELD-LINEAR |
 
@@ -100,6 +100,33 @@ This is not a rank-collapse or correctness failure. The write-once artifact is
 under `profiles/cache-run-45697281271/`; GitHub artifact `15062663186` reported
 archive digest
 `sha256:ed13f71a89369bfc1b68b2758919db7c5d00047053b682de7b4c9a0b94d8eef4`.
+
+## Packed-sampler baseline and pool-128 decision
+
+Workflow run `45707517171` is the accepted unchanged-source baseline for
+`SAMPLER_PROTOCOL.md`, pinned to commit
+`8b7eded2e2de00e3af5d67e7338799f10722e047`, spec
+`ECS1h89a67963d8ae`, and workload `W636dac909917`. The profiled and
+unprofiled semantic projections are byte-identical in all three arms. Every arm
+recovered scalar `24622491`, reached rank 3 from three rows, and recorded zero
+dependent rows. All per-arm hashes in the downloaded artifact were
+independently recomputed. [pcc:unverified]
+
+Pool 128 passes its frozen one-workload discriminator against pool 64. Solve
+instructions fell from 4,363,387 to 3,609,963 (17.267%); sibling second points
+fell from 2,652 to 1,982 (25.264%); and table insert attempts fell from 5,355
+to 3,968 (25.901%). Pool 256 was the negative boundary control and used
+6,569,285 solve instructions, 4,563 second points, and 9,128 insert attempts.
+This pass admits pool 128 to a larger paired wall/rank panel; a single public
+workload does not establish a general rank/second improvement.
+[pcc:unverified]
+
+The write-once baseline is under
+`profiles/sampler-baseline-run-45707517171/`. GitHub artifact `15069106210`
+reported archive digest
+`sha256:f3cb399fe9e9d87a119b4de1d7be2be43d05f7c179af42cb1c3816e02498e2f8`.
+The packed-sampler candidate is tested as an exact child of the baseline commit
+so an unrelated synchronization of PR #5175 with `main` cannot enter the A/B.
 
 ## Pool-size yield decision
 

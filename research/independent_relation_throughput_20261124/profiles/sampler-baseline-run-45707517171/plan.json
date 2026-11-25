@@ -1,0 +1,111 @@
+{
+  "arms": [
+    {
+      "method": {
+        "entry": "ic_framework::run_pipeline",
+        "family": "ic",
+        "id": "ic.pipeline",
+        "method_id": "ECM1hee8989960573",
+        "method_sha256": "ee898996057380602b4b28218e27876f5ea747aaf9f3f658ff6716a6461627b7",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "linalg": "incremental-gauss",
+          "max_trials": "100000000",
+          "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=64",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "tw2cj-lazy-sib8-p64",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "entry": "ic_framework::run_pipeline",
+        "family": "ic",
+        "id": "ic.pipeline",
+        "method_id": "ECM1h4d15a13a83ac",
+        "method_sha256": "4d15a13a83ac2cf71622b979fbe2170c8c4cd4424632f4a67030d9f0bd37b083",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "linalg": "incremental-gauss",
+          "max_trials": "100000000",
+          "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=128",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "tw2cj-lazy-sib8-p128",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "entry": "ic_framework::run_pipeline",
+        "family": "ic",
+        "id": "ic.pipeline",
+        "method_id": "ECM1h07ba4fa44384",
+        "method_sha256": "07ba4fa44384d8de4ee605e2a41753cf529ef1bf3554c26414d734a0970cbd79",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "linalg": "incremental-gauss",
+          "max_trials": "100000000",
+          "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=256",
+          "solver": "",
+          "solver_budget_seconds": "0",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "tw2cj-lazy-sib8-p256",
+      "role": "candidate"
+    }
+  ],
+  "executions": 3,
+  "spec_id": "ECS1h89a67963d8ae",
+  "spec_sha256": "89a67963d8ae491e1ae3833e776afac6ca3b11a6c3afdcee29f32e6b6c80c604",
+  "workloads": [
+    {
+      "curve": {
+        "automorphisms_available": 2,
+        "cofactor": 8,
+        "construction": "PrimeCurve { p: 268434581, a: 178687587, b: 13872414 } (explicit)",
+        "curve_uid": null,
+        "ec1": null,
+        "family": "prime",
+        "field_bits": 28,
+        "field_degree": null,
+        "generator": [
+          "0x5555561",
+          "0x73c8d38"
+        ],
+        "group_order": 268464472,
+        "icv1": "ICV1:fp-268434581:-29890:268464472:47011785:unk:unk:r:9a501a3efa7d",
+        "r": 33558059,
+        "registered": true,
+        "slug": "icv1-fp28-tm29890-9a501a3e"
+      },
+      "curve_spec": {
+        "a": 178687587,
+        "b": 13872414,
+        "group_order": 268464472,
+        "gx": 89478497,
+        "gy": 121408824,
+        "kind": "prime_explicit",
+        "p": 268434581,
+        "r": 33558059
+      },
+      "planted": null,
+      "target": [
+        "0xec43ad0",
+        "0xadb0621"
+      ],
+      "target_counter": 3,
+      "target_index": 0,
+      "target_law": "hash_to_subgroup_v1",
+      "target_seed": 20261228,
+      "workload_id": "W636dac909917",
+      "workload_sha256": "636dac909917a9936e4ee79af7eb49d06834be3db23cfd697b0b19fb7a8f7091"
+    }
+  ]
+}
