@@ -66,6 +66,18 @@ matched-rho reference, or `VALIDATION.json` exists.
 [Study](../research/curve25519_symmetric_remainder_20261125/),
 [PDF](20261125-curve25519-symmetric-remainder/report.pdf). [pcc:unverified]
 
+The [25 November Curve25519 selective-quotient qualification](20261125-curve25519-selective-quotient/)
+retains 72 counted native-Rust rows over six frozen cut policies at `d=19`.
+The primary last-two-nonlinear-square policy lowers maximum productive degree
+from 5 to 4 on 8/8 random targets, but its paired B/D geometric mean is
+`1.3292420766`, descriptive 95% interval
+`[1.3292409735, 1.3292431924]`, against the frozen upper target `<0.75`; peak
+RSS reaches 2.2876 times D. Scaling and `m=4` were not opened. It remains
+outside the admitted table because no independent replay, validator report,
+matched-rho reference, or `VALIDATION.json` exists.
+[Study](../research/curve25519_selective_quotient_20261125/),
+[PDF](20261125-curve25519-selective-quotient/report.pdf). [pcc:unverified]
+
 The [17 November native Rust identity component study](20261117-native-identity/) has checked pipeline full-paid paired medians1.306792/1.286039/1.254269 and work medians3.242510/3.067128/2.907275 at n3/4/6,25mainblocks each,AMD EPYC9V74 localL0. Ordinary95 controls reject n4/n6; prospective simultaneous screens pass. The unsigned synthetic polynomial-kernel result remains outside the admitted table; no15x claim. [Study](../research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md),[PDF](20261117-native-identity/results-report.pdf). [pcc:unverified]
 
 The [29 October synthetic generator-study planning record](20261029-generator-preflight/)
