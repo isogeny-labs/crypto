@@ -485,6 +485,7 @@ impl SecpJacobian {
         }
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn to_textbook(&self, p: &BigUint) -> Point {
         if self.is_identity() {
             return Point::Infinity;
@@ -600,11 +601,21 @@ fn glv_decompose_secp(k: &BigUint) -> ([u64; 4], bool, [u64; 4], bool) {
     let c = CONSTS.get_or_init(|| {
         let n = SECP_N.to_biguint();
         let n_int = BigInt::from(n.clone());
-        let a1 = BigInt::from(BigUint::parse_bytes(b"3086d221a7d46bcde86c90e49284eb15", 16).unwrap());
-        let b1 = -BigInt::from(BigUint::parse_bytes(b"e4437ed6010e88286f547fa90abfe4c3", 16).unwrap());
-        let a2 = BigInt::from(BigUint::parse_bytes(b"0114ca50f7a8e2f3f657c1108d9d44cfd8", 16).unwrap());
+        let a1 =
+            BigInt::from(BigUint::parse_bytes(b"3086d221a7d46bcde86c90e49284eb15", 16).unwrap());
+        let b1 =
+            -BigInt::from(BigUint::parse_bytes(b"e4437ed6010e88286f547fa90abfe4c3", 16).unwrap());
+        let a2 =
+            BigInt::from(BigUint::parse_bytes(b"0114ca50f7a8e2f3f657c1108d9d44cfd8", 16).unwrap());
         let b2 = a1.clone();
-        GlvConsts { n, n_int, a1, b1, a2, b2 }
+        GlvConsts {
+            n,
+            n_int,
+            a1,
+            b1,
+            a2,
+            b2,
+        }
     });
 
     let k_red = BigInt::from(k % &c.n);
