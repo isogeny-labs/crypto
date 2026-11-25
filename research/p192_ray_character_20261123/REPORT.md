@@ -1026,6 +1026,27 @@ cosets of all four odd-index subgroup orders through 95,560.
 The first larger size, about `2^85.984`, remains untested.
 [pcc:unverified]
 
+A separate finite control shows that this exactness condition is
+achievable for a **proper** scalar subgroup. On
+`E/F_223: y²=x³+8x+7`, with prime group order `r=241`, the
+order-24 subgroup of `F_r^×/{±1}` has odd index five. The
+[`y_coset_small_control.sage`](y_coset_small_control.sage) replay
+checks all 120 marked classes and finds
+`A_H([d]G)/A_H(G)=χ_241(d)` in every case. This is an
+exhaustive finite identity for that curve, not a transfer
+theorem for P-192. [pcc:unverified]
+
+The same replay exhausts paired index grids for this subgroup.
+There is no disjoint 2-by-2 grid `I±J⊂H`; consequently a
+larger grid with at least two centers and two offsets is also
+absent. With one center, at most four offsets give disjoint
+paired classes, covering eight of the 24 classes and leaving
+16 direct factors. The corresponding base-and-target point
+list has `2(1+4+16)=42` entries versus 48 direct entries.
+Thus this positive sign control supplies no useful grid
+compression. Its finite combinatorics do not exclude a grid
+for a different subgroup. [pcc:unverified]
+
 ### Second division-polynomial jet: a compact exactness screen
 
 The first derivative of `ψ_r` at `x(P)` was screened in the local
