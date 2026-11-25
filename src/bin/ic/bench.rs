@@ -34,7 +34,7 @@ use crypto_lib::cryptanalysis::ic_boundary::{
 use crypto_lib::cryptanalysis::ic_framework::genroot::GenRootOracle;
 use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
-use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
+use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::{PkmSemaevOracle, PrimeIntervalBase};
 use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, ChainedXOracle, CmMultiplierBase,
@@ -732,6 +732,7 @@ fn run_prime(
     let fb_name = spec.factor_base.as_str();
     let or_name = spec.oracle.as_str();
     let abscissa = PrimeAbscissaBase { instance: inst };
+    let interval = PrimeIntervalBase { instance: inst };
     let orbit = GlvOrbitBase { instance: inst };
     let archive = PrimeArchiveBase { instance: inst };
     let known_log = KnownLogBase;
@@ -742,6 +743,7 @@ fn run_prime(
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
         "archive" => &archive,
         "prime-abscissa" => &abscissa,
+        "prime-interval" => &interval,
         "glv-orbit" => &orbit,
         "known-log" => &known_log,
         "cm-multiplier" => &multiplier,
@@ -750,7 +752,7 @@ fn run_prime(
         "prime-isogeny" => &isogeny,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit, known-log, cm-multiplier, hashed-affine, prime-kummer or prime-isogeny"
+                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, prime-interval, glv-orbit, known-log, cm-multiplier, hashed-affine, prime-kummer or prime-isogeny"
             ))
         }
     };
