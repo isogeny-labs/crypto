@@ -36,6 +36,12 @@ Combined charged GAE: 16,651,120,237 interval / 5,069,800,769 candidate.
 Raw relations are 1.021x higher for the candidate; target trials are 1.053x
 higher for the candidate. The component gate passed on all three instances.
 
+The wall and child-CPU timings are descriptive, not quiet-load-qualified.
+An independent Cargo/rustc build was observed running on the shared host
+during the timed invocations. The charged GAE counts and verified relation
+records remain component evidence; the timing ratios require a fresh
+serialized replay after competing compilation ends.
+
 Stores:
 
 - `degree32_source_pinned_equal18.jsonl` (20261185)
