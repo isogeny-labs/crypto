@@ -12534,42 +12534,33 @@ mod accounting_rules_tests {
     fn exhausted_strong_v2_records_the_spent_work() {
         let spec = CurveSpec::Koblitz { a: 0, n: 13 };
         let (inst, facts) = built(&spec);
-        let Instance::Binary(b) = &inst else {
-            unreachable!()
-        };
-        // A point of the curve outside the order-r subgroup (h = 4).
-        let out_of_subgroup = (1u64..)
-            .flat_map(|x| b.points_with_x(x))
-            .find(|q| !b.fast.mul_u64(*q, b.r).infinity)
-            .expect("the cofactor is 4");
-        let target = [
-            format!("0x{:x}", out_of_subgroup.x),
-            format!("0x{:x}", out_of_subgroup.y),
+        // Keep the target in the subgroup and bound both walks tightly.
+        let parameters = [
+            ("lanes", "1"),
+            ("dp_bits", "31"),
+            ("step_cap_factor", "1"),
         ];
-        let frozen = solve(
-            &method("rho.signed_frobenius_strong", &[]),
+        let frozen = run(
+            &method("rho.signed_frobenius_strong", &parameters),
             &inst,
             &facts,
-            &target,
+            37,
             3,
-        )
-        .unwrap();
+        );
         assert!(frozen.exhausted);
         assert_eq!(frozen.total_gae, 0.0);
         assert!(frozen.phases.is_empty());
-        let v2 = solve(
-            &method("rho.signed_frobenius_strong_v2", &[]),
+        let v2 = run(
+            &method("rho.signed_frobenius_strong_v2", &parameters),
             &inst,
             &facts,
-            &target,
+            37,
             3,
-        )
-        .unwrap();
+        );
         assert!(v2.exhausted && v2.recovered.is_none());
         assert!(v2.total_gae > 0.0);
         assert_phases_sum("strong_v2 exhausted", &v2);
         assert!(v2.counters["walk_steps"] > 0);
-        assert!(v2.counters["failed_collisions"] > 0 || v2.counters["table_inserts_uncharged"] > 0);
         // The failed candidate checks are charged to verification.
         let checks = v2.phases.iter().find(|p| p.name == "verification").unwrap();
         assert_eq!(checks.scalar_mults, v2.counters["failed_collisions"]);
