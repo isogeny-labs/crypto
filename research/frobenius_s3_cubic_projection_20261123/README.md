@@ -372,6 +372,20 @@ Each arm rebuilds its own solver data for one target. Both timings include the f
 
 Run `RUSTC=rustc research/frobenius_s3_cubic_projection_20261123/run_m31_charted.sh larger-six 11781661 planted` or replace `planted` with `unplanted`. Set `S3_BASIS_DIR` to an existing directory to include basis export. The raw nine-repetition records are in [m31-larger-six.jsonl](m31-larger-six.jsonl).
 
+#### Multi-target relation yield and basis processing
+
+The continuation uses seeds 11781661 through 11781676, with one planted and one unplanted target per seed. Each target runs in a fresh process with the 16-abscissa base rebuilt and charged. Both arms recover the complete ordered output and agree with independent signed group arithmetic. Every planted target has 720 ordered roots, one distinct signed relation row, and the same 258,864-row basis shape. Each miss has no row and a constant refutation. All 32 direct inputs have a nonzero degree-24 Boolean coefficient. [pcc:unverified]
+
+| Fixed M31 panel | Targets | Distinct signed rows | Incidence rank mod p | Structured search and export | Direct resultant | Structured basis check |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Planted | 16 | 16 | 16 | 1.257 s | 22.191 s | 4.918 s |
+| Unplanted | 16 | 0 | 0 | 1.013 s | 22.543 s | 0.001 s |
+| Combined | 32 | 16 | 16 | 2.270 s | 44.733 s | 4.919 s |
+
+The 16 planted incidence vectors have full rank in the 16 factor-base columns over the fixed field prime. Target equations differ, so this rank is a structural measurement of the signed base coefficients, not a complete ECDLP relation-matrix rank. The search-and-export wall ratio is 19.71×. Adding the independent basis parser and the small incidence rank calculation gives 7.19 s for the structured path and a 6.22× ratio against the direct resultant time. This additional parser cost audits the emitted basis. Gröbner matrix elimination and a complete ECDLP solve remain unmeasured. The 16 nonempty basis exports occupy about 40 MiB together. [pcc:unverified]
+
+The [multi-target runner](m31_multi_target.py) and [raw records](m31-multi-target.jsonl) reproduce the panel, with [aggregate measurements](m31-multi-summary.jsonl) from the separate basis-check pass. The runner accepts the compiled `m31_larger` binary, an output directory for the basis files, and a record path.
+
 ## Reproduction
 
 Run from the repository root with Python and SymPy installed.

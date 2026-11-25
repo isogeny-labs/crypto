@@ -161,32 +161,36 @@ pub(super) fn run() {
                 key
             })
             .collect();
-        let signed_witnesses: usize = multisets
-            .iter()
-            .map(|key| {
-                (0..64)
-                    .filter(|mask| {
-                        let sum = key.iter().enumerate().fold(None, |sum, (i, &index)| {
-                            let point = base[index as usize];
-                            let point = if mask >> i & 1 == 0 {
-                                point
-                            } else {
-                                neg(c.f, point)
-                            };
-                            group_add(c, sum, Some(point))
-                        });
-                        sum == Some(target)
-                    })
-                    .count()
-            })
-            .sum();
+        let mut relation_rows = BTreeSet::new();
+        for key in &multisets {
+            for mask in 0..64 {
+                let sum = key.iter().enumerate().fold(None, |sum, (i, &index)| {
+                    let point = base[index as usize];
+                    let point = if mask >> i & 1 == 0 {
+                        point
+                    } else {
+                        neg(c.f, point)
+                    };
+                    group_add(c, sum, Some(point))
+                });
+                if sum == Some(target) {
+                    let mut row = [0i32; SIZE];
+                    for (i, &index) in key.iter().enumerate() {
+                        row[index as usize] += if mask >> i & 1 == 0 { 1 } else { -1 };
+                    }
+                    relation_rows.insert(row);
+                }
+            }
+        }
+        let signed_witnesses = relation_rows.len();
         println!(
-            "{{\"seed\":{seed},\"kind\":\"{kind}\",\"summands\":6,\"width\":24,\"direct_degree_lower_bound\":24,\"structured_degree_cap\":2,\"target\":{},\"target_x\":{},\"target_y\":{},\"roots\":{},\"distinct_abscissa_multisets\":{},\"signed_witnesses\":{signed_witnesses},\"pair_charts\":{pair_charts},\"prefix_sums\":{prefix_sums},\"auxiliary_variables\":{auxiliaries},\"basis_rows\":{basis_rows},\"quadratic_rows\":{},\"direct_multisets\":{evaluations},\"indexed_total_seconds\":{indexed_seconds},\"direct_total_seconds\":{direct_seconds},\"top_coefficient\":{top}}}",
+            "{{\"seed\":{seed},\"kind\":\"{kind}\",\"summands\":6,\"width\":24,\"direct_degree_lower_bound\":24,\"structured_degree_cap\":2,\"target\":{},\"target_x\":{},\"target_y\":{},\"roots\":{},\"distinct_abscissa_multisets\":{},\"signed_witnesses\":{signed_witnesses},\"relation_rows\":{:?},\"pair_charts\":{pair_charts},\"prefix_sums\":{prefix_sums},\"auxiliary_variables\":{auxiliaries},\"basis_rows\":{basis_rows},\"quadratic_rows\":{},\"direct_multisets\":{evaluations},\"indexed_total_seconds\":{indexed_seconds},\"direct_total_seconds\":{direct_seconds},\"top_coefficient\":{top}}}",
             target.0,
             target.0,
             target.1,
             indexed.len(),
             multisets.len(),
+            relation_rows.iter().collect::<Vec<_>>(),
             if indexed.is_empty() { 0 } else { basis_rows - auxiliaries - 24 },
         );
     }
