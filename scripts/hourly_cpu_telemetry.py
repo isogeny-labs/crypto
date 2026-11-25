@@ -42,7 +42,7 @@ def fingerprint(binary):
 
 
 def cohort(row):
-    values = [str(row.get(k) or "") for k in KEY]
+    values = ["" if row.get(k) is None else str(row[k]) for k in KEY]
     if not all(values):
         return None
     return hashlib.sha256(json.dumps(values).encode()).hexdigest()
