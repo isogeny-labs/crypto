@@ -1,4 +1,43 @@
-# First shared lead ECbench smoke
+# Shared lead ECbench results
+
+## Current K1-17 paired panel
+
+The v2 `paired-k1-17.json` spec was frozen in commit `cd235d6a6b5` before
+execution (SHA-256
+`4c8b8510fab79cea67a2a92f1dd8e4bd4462824be41046c6636efc26c2058caa`).
+ECbench was built from this branch's source with Rust 1.99.1 in the development
+profile and `--no-default-features`; binary SHA-256
+`899238f36ca1c9e4797b6d4f64089724c3d56c5939121ff1aeecce70f243f5ff`.
+The executable's session metadata does not embed a Git commit, so the build
+command and binary hash are the local provenance record. This is
+`[pcc:unverified]` local integration evidence.
+
+The plan admitted 16 executions across two canonical K1-17 public workloads,
+`W408c022d3e16` and `W5cb35f78ac66`, with two cold rounds per arm and
+alternating order. The reference rho, root-finding IC, charged two-large-prime
+IC, and rho A/A control all returned the same recovered scalar within each
+workload (`33413` and `36008`, respectively). All 16 outer target checks
+passed. The sealed session `ECBS1h5e9c13637dc3` is in
+`runs/panel-k1-17-20261125T2303Z/`; its `records.jsonl` SHA-256 is
+`f4902940c4c783e3e7b0b619fc2aec615dca244b0ed3b2a739b88c7d5329b3ca`.
+
+All four `ic.large_prime_v2` records have
+`verification_performed=true`, `verified_fast=true`, and
+`verified_independent=true`. Their `target_recovery_check` online phase is
+nonzero in every record (127,416 to 161,542 ns), with no zero-phase reason.
+This resolves the missing final online check for the charged v2 path on both
+workloads. `ecbench verify --replay-all` reproduced 16/16 records identically,
+regraded the session, and reported zero problems. The saved audit receipt is
+`audit-paired-k1-17.json` at SHA-256
+`e6eb8e60949e008f334f5f128519a0c86706d362cd028f68e2fb805a84249ff8`.
+
+The panel uses L0 isolation. Large-prime native work remains unpriced, and
+the method configurations differ from earlier lead experiments. These rows
+establish a working shared end-to-end benchmark and accounting check, not a
+speedup or parity claim. The replay was local with the same binary; a separate
+host and independent implementation remain scientific promotion gates.
+
+## Historical first n=11 smoke
 
 Local integration check at `2026-11-25T22:30Z`; these observations are
 `[pcc:unverified]` until the repository's independent standing gate accepts
