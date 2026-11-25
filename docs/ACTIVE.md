@@ -476,3 +476,5 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 - [ ] #5131 split-projection certificate: output-sized q_S membership plus verified hits; 256 integer model comparisons; different #5087 M31 diagnostic, no faster query or native qualification. [pcc:unverified]
 - [ ] #5131 shape-projection certificate: claimed-support-only separator plus interpolation; 262144 deterministic containment comparisons, 42598 scalar-only false accepts, zero shape errors; no discovery or native claim. [pcc:unverified]
 - [ ] #5131 chord-slope gcd gate: exact squarefree signed generic split selector, quartic tangent guard and identity/target exceptions; four symbolic expansions passed; linear-D construction remains charged. [pcc:unverified]
+
+- [ ] #5131 signed-slope batch moments: exact Laurent/Hermite diagnostic, 13 symbolic identities + 13 support checks; relaxed coset control matches 905 positive and reciprocal moments but selector degrees 0/906. Actual-Dickson exact miss predicate remains open. [pcc:unverified]
