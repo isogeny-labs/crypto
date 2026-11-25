@@ -130,7 +130,7 @@ pub(super) fn discover_msolve(
         "solver_variables":prepared.variables+1,
         "solver_equations":prepared.equations.len()+1,
         "solver_args":["-t","1","-c","0"],
-        "form_limit":16,
+        "form_limit":16,"fixed_form_policy":"canonical_semantic_v1",
         "rur_capture_limit_bytes":262_144,
         "attempts":[],
         "accounting":"local_correctness_only",
@@ -144,12 +144,7 @@ pub(super) fn discover_msolve(
             break;
         }
         let p = base.curve.p;
-        let linear = format!(
-            "1*A+{}*t0+{}*a1+{}*a0",
-            p - 1,
-            (-j).rem_euclid(p),
-            (-j * j).rem_euclid(p)
-        );
+        let linear = super::semantic::fixed_form(p, j);
         let input = format!("{input_prefix},\n{linear}\n");
         let mut attempt = json!({"form":j,"linear_equation":linear});
         let candidate = match super::run_solver(solver, &input, deadline, scratch, &["-c", "0"]) {
@@ -161,7 +156,9 @@ pub(super) fn discover_msolve(
                 } else {
                     attempt["rur_capture"] = json!("omitted_query_capture_cap");
                 }
-                super::extract(&raw, base, target, super::Mode::Quadratic)
+                let checked = super::semantic::check(&input, &raw, deadline);
+                attempt["semantic_check"] = json!(&checked);
+                checked.and_then(|_| super::extract(&raw, base, target, super::Mode::Quadratic))
             }
             Err(error) => Err(error),
         };
@@ -389,6 +386,55 @@ exit 9
             attempts[0]["reason"],
             "nonseparating staircase (msolve -c 0)"
         );
+    }
+
+    #[test]
+    fn canonical_form_and_semantic_rejection_are_recorded_before_extraction() {
+        use std::os::unix::fs::PermissionsExt;
+        let record: serde_json::Value =
+            include_str!("../../evidence/liftable_fibers_v1/f127_d4.jsonl")
+                .lines()
+                .map(|line| serde_json::from_str::<serde_json::Value>(line).unwrap())
+                .find(|r| r["mode"] == "ProductionCofactorMsolve" && r["target"] == json!([41, 95]))
+                .unwrap();
+        let raw = record["systems"][0]["attempts"][0]["rur"].as_str().unwrap();
+        let base = Base::new(FIXTURES[0], 4);
+        for (output, rejected) in [("[-1]:", false), (raw, true)] {
+            let scratch = Scratch::new().unwrap();
+            let solver = scratch.0.join("fixed-output-solver");
+            std::fs::write(&solver,format!("#!/bin/sh\n[ \"$(tail -n 1 \"$2\")\" = '1*A+126*t0' ] || exit 92\ncat > \"$4\" <<'FIXED_RUR'\n{output}\nFIXED_RUR\n")).unwrap();
+            std::fs::set_permissions(&solver, std::fs::Permissions::from_mode(0o700)).unwrap();
+            let budget = Duration::from_secs(3);
+            let outcome = discover_msolve(
+                &base,
+                Point { x: 41, y: 95 },
+                &solver,
+                &scratch,
+                Instant::now() + budget,
+                budget,
+            );
+            let attempts = outcome.systems[0]["attempts"].as_array().unwrap();
+            assert_eq!(attempts.len(), 1);
+            assert_eq!(attempts[0]["linear_equation"], "1*A+126*t0");
+            assert_eq!(attempts[0]["rur"].as_str().unwrap().trim(), output.trim());
+            if rejected {
+                assert_eq!(outcome.completed, 0);
+                assert_eq!(
+                    outcome.result.unwrap_err(),
+                    "semantic RUR: equation 1 has nonzero remainder"
+                );
+                assert_eq!(
+                    attempts[0]["semantic_check"]["Err"],
+                    "semantic RUR: equation 1 has nonzero remainder"
+                );
+            } else {
+                assert!(outcome.result.unwrap().is_empty());
+                assert_eq!(
+                    attempts[0]["semantic_check"]["Ok"]["status"],
+                    "solver_empty_unchecked"
+                );
+            }
+        }
     }
 
     #[test]

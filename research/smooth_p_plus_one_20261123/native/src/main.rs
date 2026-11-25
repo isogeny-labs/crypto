@@ -3,6 +3,7 @@
 mod accounting;
 mod cutoff;
 mod factorwise;
+#[path = "full_cutoff_current.rs"]
 mod full_cutoff;
 mod liftable;
 #[cfg(feature = "production-controls")]
@@ -11,6 +12,7 @@ mod polynomial;
 #[cfg(feature = "production-controls")]
 #[path = "production_current.rs"]
 mod production;
+mod semantic;
 mod system;
 
 use std::collections::{BTreeMap, BTreeSet};
