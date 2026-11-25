@@ -110,6 +110,25 @@ outgoing form powers, two taper levels and a nested child whose older packet
 keeps its creation precision.  They are bounded exact controls, not a proof of
 the asymptotic induction.
 
+The finite counting and pair-split formulas are independently executable in
+`crates/hashed-ecdl-tensor/src/bin/curve25519-subex-gate.rs`.  It uses exact
+integers for both the existing order-131203 miniature and Curve25519's 253-bit
+prime subgroup; its unit controls include the exact Curve25519 power-of-two
+optimum.  The standalone crate keeps this gate independent of unrelated root
+library build failures on the sparse research branch.
+
+The exact finite output puts the scale in one place:
+
+| group | order bits | best power-of-two `B` | pair-split work bits, before LA | ceil(work / sqrt(r)) |
+| --- | ---: | ---: | ---: | ---: |
+| order-131203 miniature | 18 | `2^5` | 13 | 15 |
+| Curve25519 prime subgroup | 253 | `2^84` | 170 | 8,796,093,022,208 |
+
+The full-size probe at `B=2^16` has an exact fixed-arity target-attempt lower
+bound of 220 bits.  This is a coverage bound, while the 170-bit pair-split row
+is the stated uniform-occupancy cost surrogate.  Both remain far above the
+253-bit group's square-root scale before charging linear algebra.
+
 ## New target
 
 The next acceptance gate is a **source-bound active-call cost certificate**,
