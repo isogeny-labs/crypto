@@ -1,0 +1,28 @@
+default(parisize,268435456);
+default(parisizemax,536870912);
+checksub(d) = {
+  my(L,F,B,P,R,V,g,T);
+  L=select(f->polsturm(f)==d,concat([],polsubcyclo(917,d)));
+  if(#L!=1,error("real subfield is not unique")); F=L[1];
+  print("BEGIN degree=",d,"; polynomial=",F);
+  B=bnfinit(F,1);
+  if(B.sign!=[d,0],error("signature"));
+  P=idealprimedec(B,263)[1];
+  if(idealnorm(B,P)!=263,error("prime is not degree1"));
+  R=bnrinit(B,[1,vector(d,j,1)],0);
+  V=bnrisprincipal(R,P,5);
+  print("provisional_ordinary_class_number=",B.no,"; provisional_narrow_class_number=",R.no,"; narrow_vector=",V[1]);
+  if(V[1]!=0*V[1],print("nonzero_vector_requires_certification");return());
+  g=nfbasistoalg(B,nffactorback(B,V[2]));
+  if(idealhnf(B,g)!=idealhnf(B,P),error("principal ideal equality"));
+  if(nfeltnorm(B,g)!=263,error("generator norm"));
+  T=charpoly(g);
+  if(denominator(T)!=1 || pollead(T)!=1,error("nonintegral characteristic polynomial"));
+  if(polsturm(T,[-oo,0])!=0,error("generator is not totally positive"));
+  print("generator=",lift(g));
+  print("generator_charpoly=",T);
+  print("exact_ideal_equality=pass; norm=263; nonpositive_conjugates=0; degree=",d);
+};
+if(type(Degrees)!="t_VEC",Degrees=[13,26,10,5,2]);
+iferr(for(j=1,#Degrees,checksub(Degrees[j])),E,print("PARI_ERROR=",E);quit(2));
+quit;

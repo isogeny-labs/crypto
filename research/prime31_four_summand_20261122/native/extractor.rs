@@ -352,11 +352,32 @@ pub fn extract_hybrid677(
     )
 }
 
+/// Exact 2-Dickson/2-Y7 branch of the coprime B677 selector.
+/// The branch is built solely from public selector polynomials and query.
+pub fn extract_hybrid677_split_22(
+    base: &Hybrid677,
+    q: Point,
+    limits: Limits,
+    resource_limits: F4ResourceLimits,
+    pair_batch: usize,
+) -> ResultRow {
+    assert!(pair_batch > 0);
+    extract_internal(
+        prime31_algebraic_ic::PRIME31,
+        base.points(),
+        q,
+        limits,
+        Presentation::HybridSplit22(base, pair_batch),
+        Some(resource_limits),
+    )
+}
+
 #[derive(Clone, Copy)]
 enum Presentation<'a> {
     Automatic,
     Cofactor,
     Hybrid(&'a Hybrid677),
+    HybridSplit22(&'a Hybrid677, usize),
 }
 
 fn extract_internal(
@@ -369,9 +390,16 @@ fn extract_internal(
 ) -> ResultRow {
     let use_product = matches!(presentation, Presentation::Cofactor)
         || matches!(presentation, Presentation::Automatic) && (5..=8).contains(&base.len());
-    let structured = matches!(presentation, Presentation::Hybrid(_));
+    let structured = matches!(
+        presentation,
+        Presentation::Hybrid(_) | Presentation::HybridSplit22(_, _)
+    );
     let variables = if structured {
-        crate::selector_circuit::VARIABLES
+        if matches!(presentation, Presentation::HybridSplit22(_, _)) {
+            crate::split_selector::VARIABLES
+        } else {
+            crate::selector_circuit::VARIABLES
+        }
     } else if use_product {
         base.len().saturating_sub(1).max(3)
     } else {
@@ -388,7 +416,9 @@ fn extract_internal(
         relations: vec![],
         diagnostics: Diagnostics {
             base_size: base.len(),
-            presentation: if structured {
+            presentation: if matches!(presentation, Presentation::HybridSplit22(_, _)) {
+                "structured_split_2_2".into()
+            } else if structured {
                 "structured_quartic_circuit".into()
             } else if use_product {
                 "quotient_product".into()
@@ -458,6 +488,8 @@ fn extract_internal(
     let built = if let Presentation::Hybrid(fixture) = presentation {
         crate::selector_circuit::build(&mut b, e, target, fixture)
             .map(|circuit| (circuit.u, circuit.constraints))
+    } else if let Presentation::HybridSplit22(fixture, _) = presentation {
+        crate::split_selector::build(&mut b, e, target, fixture)
     } else {
         public_polynomials(&mut b, e, target, &xs).and_then(|(u, h)| {
             let equations = if use_product {
@@ -501,6 +533,9 @@ fn extract_internal(
         .max()
         .unwrap_or(0);
     let mut opts = F4Options::new(ordering, limits.max_degree);
+    if let Presentation::HybridSplit22(_, pair_batch) = presentation {
+        opts.max_pairs_per_step = Some(pair_batch);
+    }
     opts.deadline = Some(deadline);
     opts.resource_limits = resource_limits;
     let mut assignments = Vec::new();
