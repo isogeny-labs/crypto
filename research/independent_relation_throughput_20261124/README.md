@@ -45,7 +45,7 @@ remain charged.
 | H-GEN-STRIDE | fixed or relation-renewed affine stride | fewer generation operations without rank loss | existing rounds 29/30 | rejected: dependent clusters or 2.6x probe inflation |
 | H-GEN-SIB | sibling generation from one batched inversion | lower counted work and, after implementation repair, lower wall per independent rank | profile pool 64 and 256 on the same curve/seed, then paired A/B | active; existing wall result is negative |
 | H-GEN-HOT | per-parent subset selection or key/reference bookkeeping dominates the sibling wall regression | one named software path accounts for at least 20% of samples or instructions unique to the sibling arm | matched CPU sampling and Callgrind profiles | active diagnostic |
-| H-GEN-CACHE | cache each parent's seed-coefficient residues and pre-plan minus coefficients once | at least 5% fewer solve instructions in both frozen pool arms with identical semantic controls | source-exact Callgrind replay of sequences 242/243 | active; candidate frozen in `CACHE_PROTOCOL.md` |
+| H-GEN-CACHE | cache each parent's seed-coefficient residues and pre-plan minus coefficients once | at least 5% fewer solve instructions in both frozen pool arms with identical semantic controls | source-exact Callgrind replay of sequences 242/243 | rejected: 3.17% / 3.54% instruction reductions miss the 5% gate |
 | H-YIELD-POOL | a larger jump pool reduces collision clustering enough to raise independent rank per generated child | pool 256 beats pool 64 on rank/child and rank/second, with duplicate and zero-row rates no worse | frozen k = 28 and 32 Stage 1 panels, 240 verified runs per arm and size | rejected at the primary metric: fewer children, but lower point-estimate rank/second |
 | H-YIELD-LINEAR | accept `(a,b)` when a fixed linear coordinate `u*a + v*b` passes a cheap predicate | conditioning biases the residual scalar `a + d*b` toward relation-bearing points | Lean equivalence and exact fibre cardinality for the nonparallel case | disproved structurally unless `u*d-v=0`, which encodes the unknown `d` |
 | H-YIELD-FILTER | a cheap nonlinear point-aware prefilter can enrich rank-contributing collisions | held-out rank/second improves over a matched-random filter with the same acceptance rate | train-only predicate freeze, matched random negative control | queued; fixed linear coefficient filters are now closed by H-YIELD-LINEAR |
@@ -78,6 +78,26 @@ nearly unchanged, and pool 256's excess comes primarily from doing more parent
 expansions on this matched target rather than a distinct pool-256-only hotspot.
 This one matched execution is diagnostic evidence, not the held-out pool-size
 decision. [pcc:unverified]
+
+## Parent-residue cache decision
+
+Workflow run `45697281271` tested the source candidate frozen in
+`CACHE_PROTOCOL.md`. Its profiled and unprofiled outputs were byte-identical on
+the frozen semantic projection in both arms. Both retained recovered scalar
+`24622491`, rank 3 from three rows, and zero dependent rows. Pool 64 used
+5,045,748 solve instructions, a 3.1684% reduction from the frozen 5,210,850
+baseline. Pool 256 used 7,604,279, a 3.5363% reduction from 7,883,046.
+[pcc:unverified]
+
+The candidate therefore fails the preregistered requirement of at least 5% in
+both arms and is rejected before wall/rank measurement. The exact failure mode
+is insufficient hot-path coverage: caching the parent residues removes some
+repeated modular reductions without changing relation semantics, but the saved
+work is too small a share of solve cost. The source change has been removed.
+This is not a rank-collapse or correctness failure. The write-once artifact is
+under `profiles/cache-run-45697281271/`; GitHub artifact `15062663186` reported
+archive digest
+`sha256:ed13f71a89369bfc1b68b2758919db7c5d00047053b682de7b4c9a0b94d8eef4`.
 
 ## Pool-size yield decision
 
@@ -153,7 +173,8 @@ explicitly outside the Lean scope.
 ## Artifacts
 
 - `PROFILE_PROTOCOL.md`: diagnostic profile frozen before collection.
-- `CACHE_PROTOCOL.md`: source-exact parent-residue cache discriminator.
+- `CACHE_PROTOCOL.md`: source-exact parent-residue cache discriminator and its
+  now-closed rejection gate.
 - `profiles/`: new, write-once profile outputs.
 - A separately frozen `experiment.protocol/v1` record will govern the paired
   wall/rank comparison after the profile identifies one implementation change.
