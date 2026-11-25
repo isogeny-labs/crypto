@@ -358,8 +358,8 @@ mod tests {
         assert_eq!(product.div_rem(&f), (g.clone(), Poly(Vec::new())));
         assert_eq!(product.div_rem(&g), (f.clone(), Poly(Vec::new())));
         assert_eq!(
-            Poly::gcd(product.clone(), product.derivative()).degree(),
-            None
+            Poly::gcd(product.clone(), product.derivative()),
+            Poly::one()
         );
         let repeated = f.mul(&f).mul(&g);
         assert_eq!(
