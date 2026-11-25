@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:58:01Z",
+ "id": "PCC-20261123-7c5b09",
+ "kind": "statement",
+ "producer": {
+  "commit": "34d87901a39e7be3e56175c6d85ee37b5d57f1a2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/run-admitted.sh",
+    "sha256": "f1803605fd8b1dbf6dd5ecdb2f19f448b78706a23eb1d703f28b418e1b450498"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/evidence/driver-guards-v1/result.json",
+    "sha256": "361483709424a91a086d6471159b5bdb9487a13d811756f680402727b06b6d8d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/IDENTITY_PROTOCOL.md",
+    "sha256": "61c7c94250beaa053bef31fbc416527e53696f93c4ea0fc8145dde66544e6277"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/identity.cpp",
+    "sha256": "0513f9b6185307f1d0af7749ec4ac0c108200d633eab9d7e3eac788f791dc632"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/evidence/identity-v1/quadratic.identity.json",
+    "sha256": "eb88023f4632d479fbe90a967915f1956c43f636532590e51971b54c33792e26"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/evidence/identity-v1/pre-call-manifest.sha256",
+    "sha256": "dce5466e78293327bd3db807b2a57ad5abe8fa6fc0e2c64367392115d2e289c7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-split-tangent-preparation",
+ "statement": "Prepared admitted driver is syntax-checked only on its production path. Two negative entry controls reject unknown mode and missing envelope before output-directory creation or pipeline entry. The driver explicitly requires external admission;the flag/file do not grant it. Generic residual quadratic expansion record is produced by the existing native evaluated issuer with32 issuer-derived points over2^61-1 and changed-constant rejection;it is not formal or independently signed geometry. No actual point collection or production pipeline executed."
+}
