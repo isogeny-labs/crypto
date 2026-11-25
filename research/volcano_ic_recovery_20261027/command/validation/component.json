@@ -1,0 +1,122 @@
+{
+  "schema": "volcano.ic.command-source-component/v1",
+  "observed_utc": "2026-11-24T04:41:56.458Z",
+  "standing": "producer development evidence; no independent signed certification",
+  "source_revision": "e0f26ec5928266b25edb0a795d9099e18dce8519",
+  "remote_publication": {
+    "html_url": "https://github.com/isogeny-labs/crypto/commit/e0f26ec5928266b25edb0a795d9099e18dce8519",
+    "sha": "e0f26ec5928266b25edb0a795d9099e18dce8519",
+    "tree": "230c5ef6f8943791c5a26472f75dfcd4ab469f66",
+    "api_readback_timing": "post-build; source push completed before local build"
+  },
+  "frozen_collector_source_manifest_sha256": "ff0c1804287eb3f281bbe2908d6ba149f2b33013f4abd6ecfaa2ff8f96c8e162",
+  "memory": {
+    "previous_source_choices": [
+      "4Gi",
+      "8Gi"
+    ],
+    "source_choices": [
+      "4Gi",
+      "8Gi",
+      "14Gi"
+    ],
+    "default": "4Gi",
+    "frozen_table_payload_bytes": 9566497092,
+    "application_cap_bytes": 12884901888,
+    "requested_memory": "14Gi",
+    "controller_deployed": false,
+    "live_memory_fit_measured": false
+  },
+  "controller_tests": {
+    "candidate": {
+      "passed": 71,
+      "failed": 1,
+      "full_suite_passed": false
+    },
+    "base": {
+      "revision": "9ef955b17dc3b0eb1d1ac49985cf1cdb0dbf4598",
+      "passed": 71,
+      "failed": 1,
+      "full_suite_passed": false
+    },
+    "same_failure": "supervisor::owner_observation::tests::real_fake_exec_reap_and_checkpoint_race_share_owner",
+    "contract_tests_passed": 15,
+    "cloud_top_level_tests_passed": 3,
+    "full_root_library_suite_run": false,
+    "unchanged_owner_source_sha256": "88ea2cf74b7a972de60c5e143f2f41f593e216fa46149441844c63f5764efb0c"
+  },
+  "local_image": {
+    "id": "sha256:5841e9fd55f005068f449f6cfed4f7c28adc4f84994bf0555c8de6323dd44fe8",
+    "architecture": "amd64",
+    "os": "linux",
+    "bytes": 81516636,
+    "configuration_id_is_not_registry_manifest_digest": true,
+    "registry_manifest_digest": null,
+    "published_to_registry": false,
+    "build_network": "none",
+    "build_base": "gcc@sha256:5e927c284bf55a7dc796262e311a0703344f62f41f5621eb56843111b1d37e15",
+    "runtime_base": "debian@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc",
+    "binary_sha256": {
+      "bin/runner": "a2f3f30b07d97114ac4b089804560bb14e75757ddb64f1a0ac1094370c180662",
+      "bin/verify": "d6743762f0a8d9b9a108776ae69e2a1ca30908afd8fff9bfaa50f873644052de"
+    },
+    "wrapper_sha256": "09d160d58903edaaae2ab3305343cff90b41030104693e1602f19758df30d769",
+    "compiler_record": "image-compiler.txt"
+  },
+  "image_control": {
+    "container": {
+      "id": "56938eeae04fe8da77c02325236131963fa742b4710ecfa02778a0c30857b8cb",
+      "image": "sha256:5841e9fd55f005068f449f6cfed4f7c28adc4f84994bf0555c8de6323dd44fe8",
+      "user": "1000:1000",
+      "state": "exited",
+      "exit_code": 0,
+      "oom_killed": false,
+      "network": "none",
+      "memory_limit_bytes": 536870912
+    },
+    "fixture": "small known-answer development control; not original full-width source run",
+    "replay": {
+      "factor_base_logs_checked": 12,
+      "independent_rank": 12,
+      "independently_checked_relations": 12,
+      "instance_id": "development-positive-control-only",
+      "method": "separate affine/Euclidean arithmetic and fresh batch Gaussian elimination",
+      "original_full_graph_requirement_complete": false,
+      "parameter_primality_proved_by_this_checker": false,
+      "passed": true,
+      "setup_trials": 12,
+      "target_equations_checked": 1,
+      "timing_or_counter_validation": false
+    },
+    "private_journal_retained_locally": true
+  },
+  "wrapper_controls": {
+    "schema": "volcano.ic.command-development/v1",
+    "plan_payload_bytes": 9566497092,
+    "full_width_table_allocated": false,
+    "negative_controls": 5,
+    "passed": true,
+    "image_built": false,
+    "live_criu_qualified": false
+  },
+  "access": {
+    "utc": "2026-11-24T04:24:18.274097+00:00",
+    "operation": "sts:GetCallerIdentity",
+    "expected_account": "104186811093",
+    "other_aws_operations": false,
+    "ok": false,
+    "error_code": "InvalidClientTokenId",
+    "error": "An error occurred (InvalidClientTokenId) when calling the GetCallerIdentity operation (reached max retries: 0): The security token included in the request is invalid.",
+    "credentials_persisted": false,
+    "cloud_launch_attempted": false
+  },
+  "remaining": [
+    "Working authorized lab identity and current budget balance",
+    "Source checkpoint at the launch revision",
+    "Published tested payload and recovery-runtime images with registry digests",
+    "Live collector-specific CRIU/EBS worker-loss continuation qualification"
+  ],
+  "prior_private_archives": "Not present on the current replacement filesystem; no permanent-loss claim or restored-archive claim",
+  "research_clock_or_speed_claim": false,
+  "original_full_width_table_allocated": false
+}
