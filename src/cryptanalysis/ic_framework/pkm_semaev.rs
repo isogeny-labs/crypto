@@ -4179,7 +4179,7 @@ mod tests {
         let curve = &inst.curve;
         let fb = base(&inst, 3);
         assert_eq!(fb.columns, 3);
-        let o = oracle(&inst, &fb, 3, 3, "m=3,mode=chain,engine=f4,descent=1,trace=0,degree=12");
+        let mut o = oracle(&inst, &fb, 3, 3, "m=3,mode=chain,engine=f4,descent=1,trace=0,degree=12");
         assert!(o.prefer_grid_extraction(), "this test must bypass the public crossover");
 
         let mut exact = HashSet::new();
@@ -4195,7 +4195,7 @@ mod tests {
             }
         }
 
-        let prep = o.prepared.as_ref().expect("prepared Kummer tower");
+        let ring = o.prepared.as_ref().expect("prepared Kummer tower").ring.clone();
         let mut targets = 0usize;
         let mut descents = 0usize;
         let mut cancellation_targets = 0usize;
@@ -4204,7 +4204,7 @@ mod tests {
             let sys = o.specialise_branch(None, x, None);
             let rep = f4_tower(
                 &sys,
-                &prep.ring,
+                &ring,
                 &TowerF4Options::new(12)
                     .with_budget(Duration::from_secs(2))
                     .with_max_nnz(1_000_000),
@@ -4215,7 +4215,7 @@ mod tests {
                 Vec::new()
             } else {
                 descents += 1;
-                o.extract_solutions_from_basis(curve, None, &prep.ring,
+                o.extract_solutions_from_basis(curve, None, &ring,
                                                &rep.basis, &[], x, None).0
             };
             let grid_xs = o.grid(curve, x, false).0;
