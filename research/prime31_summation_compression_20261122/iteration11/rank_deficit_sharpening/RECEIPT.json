@@ -1,0 +1,38 @@
+{
+  "schema": "prime31-rank-deficit-refinement-v1",
+  "parent_head": "83f781114f09fd2d1b31c34e17a91a93a7766c03",
+  "p": 2147483647,
+  "r": 2147446831,
+  "B": 31,
+  "source_blobs": {
+    "state": "2ffcb2b25dfc829d11cc2c99cc36534f391ddc57",
+    "active": "6738270b13a36f078174cfa6337f4420397feb11",
+    "journal": "fee3531241451fcfe7ad7a111cbd55e21251ca99",
+    "prior_rank": "2d7246876834c203ba01149ebe22403bbdc850f6",
+    "historical_census_gate": "5bbbbb76276b11d806194147a698c4719dd5f7c0",
+    "pair_path": "85afd829c4f96bbbb35abef9be65e0e63c15c81d"
+  },
+  "conditional": {
+    "deficit_one": 64960,
+    "sharp_deficits": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      31
+    ],
+    "expected_queries_upper": 228773.93,
+    "query_cap_95": 453000,
+    "query_cap_99": 560000
+  },
+  "certificate": "python3 research/prime31_summation_compression_20261122/iteration11/rank_deficit_sharpening/CHECK.py",
+  "proof_scope": "written producer counting and geometric tail bound under archived injectivity, no new curve computation",
+  "random_experiments": 0,
+  "native_tests": 0,
+  "paid_compute": 0,
+  "native_workers": 0,
+  "seed_manifest": "not applicable; deterministic combinatorial arithmetic",
+  "pcc": "unverified",
+  "impact_score": 3
+}
