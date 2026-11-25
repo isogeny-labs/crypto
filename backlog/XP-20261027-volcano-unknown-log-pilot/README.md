@@ -22,6 +22,16 @@ CRIU-qualified. These gaps prevent marking this card ready; its null checkpoint
 fields are deliberate and must not be replaced by fictitious paths/flags.
 The existing ecbench-only GitHub workflow cannot run the standalone collector.
 
+November 24 source component: [command packaging and development evidence](../../research/volcano_ic_recovery_20261027/command/README.md)
+now supplies the concrete image-local paths in this card and explicit 14Gi
+source admission. The launcher gets its output directory and CRIU marker only
+from the trusted supervisor; this card is not ready for an ordinary executor.
+The local image is not registry-published, no updated runtime is deployed and
+the current STS check returns InvalidClientTokenId. The proposed 64Gi recovery
+PVC is capacity accounting for up to three memory images, not an allocation.
+Earlier private archives are not present on the replacement filesystem; their
+recovery remains open alongside live collector qualification. [pcc:unverified]
+
 The radius-12 table has 244,140,625 entries per side and a checked static payload
 of 9,566,497,092 bytes, excluding overhead. Request four CPUs and 14 GiB worker
 memory on the intended c8a.2xlarge; the application table cap is 12 GiB. The

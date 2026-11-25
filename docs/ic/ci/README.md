@@ -13,7 +13,35 @@ speed: nothing on this page is a stage number.
 | `docs/ic/params/k0n41-subgroup-wide.json` | subgroup, 6560 points, 80 columns | 41 | 39.0 | 32 | 67 → 83 | 2,770,944 → 2,287,616 | 726 → 346 | 0.316 s → 0.258 s | 8.34 → 10.28 | yes |
 | `docs/ic/params/k0n53-subgroup-wide.json` | subgroup, 30528 points, 288 columns | 53 | 44.3 | 32 | 147 → 334 | 31,694,848 → 16,064,512 | 7,803,621 → 2,057,777 | 1.775 s → 1.013 s | 15.60 → 27.28 | yes |
 
-**`ic-e2e-reference-v6.json`** is what the workflow gates against. It
+**`ic-e2e-reference-v7.json`** is what the workflow gates against. It
+supersedes v6 because #4899 changed two defaults that the v6 rungs exercise,
+and landed without a new reference, so the gate failed on every `main` push
+from 2026-11-22 (runs #2513 to #2520). No rung file changed.
+
+| rung | v6 → v7 counters | why |
+|:--|:--|:--|
+| `docs/ic/params/k0n31.json` | relations 78 → 100, summands scanned 277,760 → 185,344, collection trials 128 → 256, descent trials 52 → 62 | `ad0e60cdba`: with `collection_window` unset, the walked `m = 3` collection scans a `⌈|F|/3⌉` window; this rung leaves it unset |
+| `docs/ic/params/k0n41-subgroup-wide.json` | descent trials 346 → 2,908 | `45e447d9ba`: the `m = 3` descent walk scans a cyclic window read from `collection_window`; this rung sets 207 and descends with `m = 3` |
+| `docs/ic/params/k0n53-subgroup-wide.json` | unchanged | it descends with `descent_summands: 2` |
+
+The icv1-f2m41-tm2308219-7f48b14a change was measured before freezing
+([`research/ic_descent_window_20261124/`](../../../research/ic_descent_window_20261124/README.md)).
+`KIC_DESCENT_WINDOW=0`, a same-binary control that restores the full scan,
+reproduces v6's icv1-f2m41-tm2308219-7f48b14a counters exactly. Against it the windowed descent is
+**2.70× faster** (paired per round 2.17–3.38, five isolated rounds, 32/32
+verified with the same logarithms in every run), and windows from 207 to 828
+are one flat optimum. By `AGENTS.md` §3 this is **engineering**: the
+same method and logarithms, fewer summands scanned a decomposition.
+
+The descent reading `collection_window` couples two stages with different
+cost shapes. It lands on the optimum here; a rung that sets
+`collection_window` far below |F|/32 would push the descent onto the steep
+side of that curve (w ≤ 64 costs 1.6–5.5× the optimum on this rung).
+
+v7 is frozen on a 4-vCPU AVX-512 dev host from a clean tree; `frozen_from`
+records the commit, the `ic` binary hash and the host.
+
+**`ic-e2e-reference-v6.json`** was the reference before v7. It
 supersedes v5 because the degree-41 and degree-53 rungs now use **wider
 factor bases** — 6000 and 30000 requested points (6560 and 30528
 materialised) against 4759 and 15000 — with the collection window scaled

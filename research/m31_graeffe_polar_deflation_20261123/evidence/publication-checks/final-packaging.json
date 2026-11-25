@@ -1,0 +1,39 @@
+{
+  "earlier_observed_diagnostics": {
+    "administrative_prose_findings": 1,
+    "proof_status_extra_blank_line_at_eof": true,
+    "local_commit_created_after_diagnostics": "fa57c4065b",
+    "source": "orchestration output; original diagnostics were not separately captured to files"
+  },
+  "corrected_files": [
+    "research/m31_graeffe_polar_deflation_20261123/PUBLICATION_CHECKS.md",
+    "research/m31_graeffe_polar_deflation_20261123/PROOF_STATUS.md"
+  ],
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "lint-prose",
+        "research/m31_graeffe_polar_deflation_20261123/PUBLICATION_CHECKS.md",
+        "research/m31_graeffe_polar_deflation_20261123/PROOF_STATUS.md"
+      ],
+      "exit_code": 0,
+      "stdout": "lint-prose: 0 finding(s)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "research/m31_graeffe_polar_deflation_20261123/PUBLICATION_CHECKS.md",
+        "research/m31_graeffe_polar_deflation_20261123/PROOF_STATUS.md"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}
