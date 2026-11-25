@@ -1096,6 +1096,35 @@ expects an affine base, so this is a **backend feasibility and
 cost-formula audit**, not a benchmark of a ready evaluator.
 [pcc:unverified]
 
+The [`p192_coset_orbit`](../../src/bin/p192_coset_orbit.rs)
+binary now implements the bounded full-Jacobian width-5
+prefix loop and accumulates the projective `YZ` product. It
+checks `Q=[7]G` with the independent textbook BigUint point
+arithmetic, checks the public step scalar's subgroup order,
+checks each prefix's final point against textbook scalar
+multiplication, and compares the 16-factor projective product
+sign with an affine y product. All of these checks passed at
+16 and 10,000 factors. It does **not** traverse the full
+`m≈2^85.984` coset or establish the proposed sign's exactness.
+[pcc:unverified]
+
+On one Apple M4 Pro/macOS 27.2 host, six separate 10,000-factor
+base-and-`[7]G` target runs measured a median of `147.808`
+process-CPU full-Jacobian-add times per orbit factor
+(range `143.578–152.405`); the corresponding wall median was
+`148.537` (range `135.707–161.293`). Each same-process
+reference arm executed `4,060,000` full Jacobian additions;
+the pair evaluated 20,000 factors. The exact raw times,
+source/binary hashes, host, and commands are in
+[`PREFIX_MEASUREMENTS.txt`](PREFIX_MEASUREMENTS.txt). Setup
+was timed separately and is retained there. Dividing the
+median CPU ratio by the `458.811` per-factor reference
+allowance gives a **derived conditional** `0.322` ratio if
+the measured component cost persisted across the full
+coset. That is neither a full-run timing nor a matched rho
+search: the reference is a full-add microbenchmark, and the
+P-192 exactness condition is unresolved. [pcc:unverified]
+
 For the first large P-192 subgroup size beyond 95,560,
 `m=8·9564682313913860059195669≈2^85.984`, a **hypothetical**
 additive paired-index grid with `h=6,185,364,116,659` offsets,
