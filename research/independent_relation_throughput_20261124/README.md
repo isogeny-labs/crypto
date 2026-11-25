@@ -7,6 +7,12 @@ targets and an A/A control, and requires exact rank 3 with zero dependent rows
 on every measured execution before wall time is interpreted. No panel result
 has been recorded yet. [pcc:unverified]
 
+Producer attempt `45723097479` compiled the frozen source and expanded all 384
+planned executions, then stopped before measurement because the workflow tested
+the `executions` array as an integer. The retry changes only that assertion to
+test the array length. It does not change the frozen protocol, spec, analyzer,
+source, arms, seeds, or thresholds. [pcc:unverified]
+
 Status: active controlled study. Measurements and conclusions remain
 `[pcc:unverified]` until the repository validation and replay gates are complete.
 

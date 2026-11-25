@@ -55,7 +55,7 @@ jobs:
           cargo build --release --bin ecbench
           target/release/ecbench plan --spec "$study/p128-panel-spec.json" --doc > "$RUNNER_TEMP/plan.json"
           test "$(jq '.workloads | length' "$RUNNER_TEMP/plan.json")" -eq 16
-          test "$(jq '.executions' "$RUNNER_TEMP/plan.json")" -eq 384
+          test "$(jq '.executions | length' "$RUNNER_TEMP/plan.json")" -eq 384
       - name: Run, replay, and decide
         shell: bash
         run: |
