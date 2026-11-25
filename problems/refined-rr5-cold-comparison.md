@@ -75,6 +75,12 @@ the requested end-to-end cost conclusion.
   every phase, an exact-source registered EKS image, and independent replay.
   Local diagnostic intervals now include cold setup and linear algebra, but
   admitted comparable prices and measured peak memory remain absent.
+- **Factorwise local algebra:** the [new finite audit](../research/smooth_p_plus_one_20261123/FACTORWISE_RESULT.md)
+  retains every admissible binding and gives rank seven at all 17,606 checked
+  bindings. Separate monic divisibility removes the previous tangent defect
+  on those points. The guarded coverage/local proof remains handwritten and
+  unsigned; no new solver call or global radical conclusion is included.
+  [pcc:unverified]
 - **Limits:** deadline completion and smaller individual systems are not a
   measured total-cost advantage. The Direct control uses generic decomposition
   and additional relation charts. The absence of an admitted comparison gives
@@ -114,14 +120,14 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Investigate factorwise divisibility inside each fine-image fiber as an
-alternative to the repeated-root pushforward equality. First establish its
-rational-point coverage and local algebra against the frozen multiset catalog;
-then qualify it under a separately frozen panel with unchanged whole-answer
-checks. The current F127 chart [7,7,82,82] refuses all sixteen fixed forms,
-and the degree-32 union exhausts its shared deadline after only 26–28 of119
-charts. Preserve both failure types and the existing conservative RUR guard.
-No causal proof or cheaper encoding has been established by those messages.
+Integrate the finitely qualified factorwise presentation into the bounded
+full-catalog extractor, then run a separately frozen panel with the existing
+targets, deadline, form policy and whole-answer checks. The written local
+argument and finite rank restoration cover admissible relation points;
+excluded algebraic points and fixed-form completion remain open. Preserve
+the earlier F127 [7,7,82,82] refusal and degree-32 shared-deadline failures,
+and keep the conservative RUR guard. No complete extraction or cheaper
+whole-call encoding has yet been established by the tangent audit.
 Price the sum of all branch construction/elimination/output work before a
 cold comparison; the first-collision study already shows that a smaller
 individual system can increase total work.

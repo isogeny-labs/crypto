@@ -260,3 +260,30 @@ Three more raw files are selected by the same artifact policy:
 Together with the prior two larger-control files, five raw files await actual
 upload/replay. The earlier supported workflow's HTTP403 remains the last
 observed store-access result; no upload of these new files is claimed.
+
+## Factorwise finite witness and Jacobian controls
+
+Source `3747e09eae`, before-call identity `d0e5cc767b`: 42 feature tests,
+15 default tests and the release build pass. Three one-shot finite audits
+exit zero with empty stderr; all 15 before-call files remain unchanged.
+Every one of the 17,606 admissible signed bindings satisfies the new equations
+with fiber rank four, RR5 rank three and total rank seven. All chart, exclusion
+and old-rank counts match the prior catalog audit. Claims PCC-20261125-d46228,
+de166a and 5bc001 remain unsigned. [pcc:unverified]
+
+The [report](FACTORWISE_RESULT.md) distinguishes the local written argument,
+actual-equation finite audit and outstanding formalization from solver output.
+No algebraic solver, recovery, EKS job or timing comparison was run. The
+auditor shares catalog/interpolation/rank source. New raw audit records are
+7,328 / 4,057 / 24,213 bytes; the five earlier artifact-selected files remain
+the publication dependency. Existing source controls were run once; no earlier
+scientific panel was repeated.
+
+At the next normal-cadence read, identity head `d0e5cc767b` has three
+successful checks,21 skipped,one failed migration and one still in progress.
+[Artifact run45524444152](https://github.com/isogeny-labs/crypto/actions/runs/45524444152),
+job138904288926, reports HeadObject HTTP403 for all five pending content
+hashes at01:16 UTC and exits2 before upload/replay. This is now observed for
+both older larger-control files and the three full-cutoff-extraction files.
+It establishes neither absent keys nor a particular permission diagnosis.
+No manual retry was issued and final-result-head CI is not claimed passed.

@@ -55,12 +55,19 @@ admissible signed RR5 witness. At degree 32 the catalog has 119 systems;
 finite point/equation checks. The extraction results below extend that audit;
 total branch costs remain open. [pcc:unverified]
 
-The latest [full-cutoff extraction report](FULL_CUTOFF_EXTRACT_RESULT.md)
+The [full-cutoff extraction report](FULL_CUTOFF_EXTRACT_RESULT.md)
 ([PDF](FULL_CUTOFF_EXTRACT_RESULT.pdf)) records 7/13 complete full-domain
 answers versus 8/13 for the unchanged cofactor comparator. The F127 two-image
 chart refuses all sixteen forms on one target; both arms remain incomplete
 on all five degree-32 targets. All completed sets match Direct, and failed
 prefixes stay unaccepted. This is local output qualification. [pcc:unverified]
+
+The latest [factorwise-fiber report](FACTORWISE_RESULT.md)
+([PDF](FACTORWISE_RESULT.pdf)) checks a separate monic divisor for each fine
+fiber. All 17,606 admissible bindings have full column rank in the new
+eight-equation, seven-variable system, including the previous two-image rank
+defects. The guarded coverage and local tangent argument are written out;
+formalization and solver extraction remain open. [pcc:unverified]
 
 - [Initial rank argument](REPORT.md) ([PDF](REPORT.pdf)): collapsed and distinct-image charts.
 - [Initial native controls](NATIVE.md) ([PDF](NATIVE.pdf)): original encodings and retained failures.
@@ -76,6 +83,7 @@ prefixes stay unaccepted. This is local output qualification. [pcc:unverified]
 - [Larger-control/replay protocol](LARGER_FULL_OUTPUT.md) and [reproduction](LARGER_FULL_OUTPUT_REPRODUCE.md).
 - [Full-cutoff protocol](FULL_CUTOFF.md) and [reproduction](FULL_CUTOFF_REPRODUCE.md).
 - [Full-cutoff extraction protocol](FULL_CUTOFF_EXTRACT.md) and [reproduction](FULL_CUTOFF_EXTRACT_REPRODUCE.md).
+- [Factorwise argument/audit protocol](FACTORWISE.md) and [reproduction](FACTORWISE_REPRODUCE.md).
 - [Native source](native/src/main.rs) and [evidence](evidence/).
 
 The original reports and manifests retain their historical revision scope.

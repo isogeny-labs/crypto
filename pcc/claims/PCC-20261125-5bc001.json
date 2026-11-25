@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-25T01:17:16Z",
+ "id": "PCC-20261125-5bc001",
+ "kind": "statement",
+ "producer": {
+  "commit": "d0e5cc767be035f24cd2c76d9f9b0bae5398e129",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/factorwise_v1/f127_d4.jsonl",
+    "sha256": "c2e889c25d24fd66e0c9ae4967bc04feb7375a62c1df9258eb547e9eeac0cf28"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/factorwise_v1/f8191_d4.jsonl",
+    "sha256": "2ce343d482805333a6ce796ecedf32042b47739ec5bb86105aaf3f09dfc87cb0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/factorwise_v1/f8191_d5.jsonl",
+    "sha256": "4add376d08f3e31724b0cb4cc115cf895464d915dfb64540020c6b04452f3f4e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/factorwise_v1/catalog_reconciliation.json",
+    "sha256": "b2e047851e0661be542161249377aada696e15aa26b12baa766d2489612dfebe"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/factorwise_v1/precall_identity.json",
+    "sha256": "dd6cf51f569e20600395eff9e30563f6237363a54d508ab014827c31f1b14064"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/factorwise_v1/postcall_identity.json",
+    "sha256": "09fb662b9f72a902985f6c9547f787bf101218277d884f8f13a36195e6fd250f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-factorwise",
+ "statement": "Three one-shot finite audits cover the same 17,606 admissible RR5 sign bindings as the frozen catalog audit: 1,038 / 560 / 16,008 for F127 depth4 and F8191 depth4/depth5. Every new factorwise equation system is satisfied with fiber rank4, RR5 rank3 and total rank7. Original rank-two counts 12/16/1,104 and all chart/exclusion counts reconcile exactly. All audits exit zero with empty stderr, unchanged precall files and no solver call. This is producer-local finite qualification, not extraction, a formal proof or cost measurement."
+}
