@@ -2760,7 +2760,8 @@ fn sort_charge(m: usize) -> u64 {
 /// singular choice).  Counted: one addition per entry for the column
 /// weights, one per row for the anchor test and the length, [`sort_charge`]
 /// for the ordering, and one addition per entry of every row examined.
-/// Returns the kept rows in original order.
+/// Returns the kept rows in original order. If the anchors alone exceed
+/// `keep`, returns all anchors.
 fn select_rows(rows: &[Row], ncols: usize, ct: u32, keep: usize, nat: &mut Nat) -> Vec<Row> {
     if rows.len() <= keep {
         return rows.to_vec();
@@ -3216,50 +3217,36 @@ mod tests {
     #[test]
     fn coord_square_and_row_selection() {
         let r = 1_000_000_007u64;
-        let mut g = StdRng::seed_from_u64(17);
         let n = 30usize;
-        // x random; rows random sparse plus a diagonal (nonsingular)
-        let x: Vec<u64> = (0..n).map(|_| g.gen_range(0..r)).collect();
-        let mut rows: Vec<Row> = Vec::new();
-        for i in 0..n + 12 {
-            let mut t: Vec<(u32, u64)> = vec![((i % n) as u32, g.gen_range(1..r))];
-            for c in 0..n as u32 {
-                if c as usize != i % n && g.gen_range(0..6) == 0 {
-                    t.push((c, if g.gen_bool(0.5) { 1 } else { g.gen_range(2..r) }));
-                }
+        let x: Vec<u64> = (1..=n as u64).collect();
+        let mut rows: Vec<Row> = Vec::with_capacity(n + 12);
+        // The first n rows form a nonsingular triangular system and have nonzero RHS.
+        for i in 0..n {
+            let mut t = Vec::new();
+            let mut b = x[i];
+            if i > 0 {
+                t.push(((i - 1) as u32, 1));
+                b = addm(b, x[i - 1], r);
             }
-            t.sort_unstable_by_key(|e| e.0);
-            let b = t.iter().fold(0u64, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r));
+            t.push((i as u32, 1));
             rows.push((t, b));
+        }
+        for i in 0..12 {
+            rows.push((vec![(i as u32, x[i + 1]), ((i + 1) as u32, r - x[i])], 0));
         }
         let ct = (n - 1) as u32;
         let mut nat = Nat::default();
         let sq = select_rows(&rows, n, ct, n, &mut nat);
-        assert_eq!(sq.len(), n);
+        assert_eq!(sq, rows[..n]);
         assert!(nat.add > 0);
-        // every anchor (nonzero rhs or a t entry) kept when they fit
-        let anchors = rows.iter().filter(|(t, b)| *b != 0 || t.last().is_some_and(|e| e.0 == ct)).count();
-        if anchors <= n {
-            for row in &rows {
-                if row.1 != 0 || row.0.last().is_some_and(|e| e.0 == ct) {
-                    assert!(sq.contains(row));
-                }
-            }
-        }
-        let mut w = vec![0usize; n];
-        for (t, _) in &sq {
-            for &(c, _) in t {
-                w[c as usize] += 1;
-            }
-        }
-        assert!(w.iter().all(|&k| k > 0), "a column lost all its rows");
         let mut sp = QLaSplit::default();
-        // the chosen square system holds x; Wiedemann finds x[ct] unless singular
-        if let Some(v) = coord_square_split(&sq, n, ct as usize, r, &mut sp) {
-            assert_eq!(v, x[ct as usize]);
-        }
+        assert_eq!(
+            coord_square_split(&sq, n, ct as usize, r, &mut sp),
+            Some(x[ct as usize])
+        );
         assert!(sp.spmv.add > 0 && sp.bm.mul > 0);
         assert_eq!(coord_square_split(&sq[1..], n, 0, r, &mut sp), None);
+        assert_eq!(select_rows(&rows, n, ct, n - 1, &mut nat), sq);
     }
 
     /// `2lp-sfb-sge` against `2lp-sfb` on the same instances and seeds: the

@@ -984,7 +984,7 @@ fn find_roots_fp_u64_stack(coeffs: &[FieldElement], p_big: &BigUint) -> Option<V
 
     let mut f = StackPoly {
         c: [0; 9],
-        len: coeffs.len(),
+        len: coeffs.len().max(1),
     };
     for (idx, fe) in coeffs.iter().enumerate() {
         let v = if fe.value.is_zero() {
