@@ -20,8 +20,8 @@ permissions:
   issues: write
 
 concurrency:
-  group: hourly-koblitz-relation-finding
-  cancel-in-progress: true
+  group: ${{ github.event_name == 'pull_request' && format('hourly-koblitz-telemetry-pr-{0}', github.event.pull_request.number) || 'hourly-koblitz-relation-finding' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   telemetry-tests:
@@ -92,7 +92,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
       - name: Commit and push new CSV and baseline on hourly-runs
-        if: always()
+        if: ${{ !cancelled() && (steps.benchmark.outcome == 'success' || steps.benchmark.outcome == 'failure') }}
         shell: bash
         run: |
           if [ -f results/hourly_log.csv ]; then
