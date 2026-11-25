@@ -40,6 +40,7 @@ pub mod block_wiedemann;
 pub mod eval;
 pub mod witness;
 pub mod projected_rank;
+pub mod retention;
 
 // ---------------------------------------------------------------------------
 // Field helpers (uncounted; the evaluator times phases instead)

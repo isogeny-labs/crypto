@@ -1,0 +1,31 @@
+[package]
+name = "crypto"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# Source-exact wrapper for large_prime_graph::retention, same approach as
+# research/lp_graph_algorithms_20261123/native_gain_dsu: run.sh symlinks the
+# unmodified production modules, so this builds independently of unrelated
+# root-crate breakage. It does not qualify the production root crate.
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[lib]
+name = "crypto_lib"
+path = "src/lib.rs"
+
+[[test]]
+name = "lp_retention"
+path = "../../../tests/lp_retention.rs"
+
+[[test]]
+name = "large_prime_graph"
+path = "../../../tests/large_prime_graph.rs"
+
+[[example]]
+name = "lp_retention_eval"
+path = "../../../examples/lp_retention_eval.rs"
