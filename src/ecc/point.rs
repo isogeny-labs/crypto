@@ -17,7 +17,7 @@
 //! This is O(log k) point operations.
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
-use super::mont_vt::{Jac, Mont};
+use super::mont_vt::{CiosKernel, KaratsubaKernel, Mont, MulKernel, ProdKernel, SqrKernel};
 use num_bigint::BigUint;
 
 /// Fixed-width Montgomery Jacobian ladder for an odd multi-word modulus.
@@ -31,39 +31,208 @@ fn mont_scalar_mul_vt<const N: usize>(
     if std::env::var("IC_MONT_VT").as_deref() == Ok("0") {
         return None;
     }
+    mont_ladder_arm::<N, ProdKernel>(x, y, k, a, MontLadder::Binary, false)
+}
+
+/// The scalar-multiplication algorithm of a [`mont_ladder_arm`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum MontLadder {
+    Binary,
+    Wnaf(usize),
+}
+
+/// `k·(x, y)` on [`Mont<N>`] with the multiplication kernel `K`, the ladder
+/// `ladder`, and the final `Z⁻¹` by Fermat (`euclid = false`, the
+/// `FieldElement::inv` power, valid for every odd modulus) or by the
+/// fixed-width binary extended GCD ([`Mont::inv_bingcd`], prime moduli).
+fn mont_ladder_arm<const N: usize, K: MulKernel>(
+    x: &FieldElement,
+    y: &FieldElement,
+    k: &BigUint,
+    a: &FieldElement,
+    ladder: MontLadder,
+    euclid: bool,
+) -> Option<Point> {
     let ctx = Mont::<N>::new(&x.modulus)?;
     let xm = ctx.enter(&x.value)?;
     let ym = ctx.enter(&y.value)?;
     let am = ctx.enter(&a.value)?;
-    let mut acc: Option<Jac<N>> = None;
-    for i in (0..k.bits()).rev() {
-        if let Some(j) = &acc {
-            acc = ctx.double(j, &am);
-        }
-        if k.bit(i) {
-            acc = match &acc {
-                None => Some(Jac {
-                    x: xm,
-                    y: ym,
-                    z: ctx.one(),
-                }),
-                Some(j) => ctx.add_affine(j, &xm, &ym, &am),
-            };
-        }
-    }
+    let acc = match ladder {
+        MontLadder::Binary => ctx.ladder_binary::<K>(&xm, &ym, &am, k),
+        MontLadder::Wnaf(w) => match ctx.ladder_wnaf::<K>(&xm, &ym, &am, k, w) {
+            Some(acc) => acc,
+            None => ctx.ladder_binary::<K>(&xm, &ym, &am, k),
+        },
+    };
     let Some(j) = acc else {
         return Some(Point::Infinity);
     };
-    // Z^(p−2) in Montgomery form (same Fermat inverse FieldElement::inv uses).
-    let zi = ctx.pow(&j.z, &(&x.modulus - 2u32));
-    let zi2 = ctx.mul(&zi, &zi);
-    let zi3 = ctx.mul(&zi2, &zi);
-    let xa = ctx.leave(&ctx.mul(&j.x, &zi2));
-    let ya = ctx.leave(&ctx.mul(&j.y, &zi3));
+    let zi = if euclid {
+        ctx.inv_bingcd(&j.z)
+            .unwrap_or_else(|| ctx.pow_k::<K>(&j.z, &(&x.modulus - 2u32)))
+    } else {
+        // Z^(p−2) in Montgomery form (same Fermat inverse FieldElement::inv uses).
+        ctx.pow_k::<K>(&j.z, &(&x.modulus - 2u32))
+    };
+    let zi2 = K::sqr(&ctx, &zi);
+    let zi3 = K::mul(&ctx, &zi2, &zi);
+    let xa = ctx.leave(&K::mul(&ctx, &j.x, &zi2));
+    let ya = ctx.leave(&K::mul(&ctx, &j.y, &zi3));
     Some(Point::Affine {
         x: FieldElement::new(xa, x.modulus.clone()),
         y: FieldElement::new(ya, y.modulus.clone()),
     })
+}
+
+/// Dispatch a [`mont_ladder_arm`] on the limb count of `p`: exact widths
+/// 2..=9, or (`pad9`) the pre-2026-11-25 dispatch that ran every 5..8-limb
+/// modulus at 9 limbs.
+fn mont_dispatch<K: MulKernel>(
+    x: &FieldElement,
+    y: &FieldElement,
+    k: &BigUint,
+    a: &FieldElement,
+    ladder: MontLadder,
+    euclid: bool,
+    pad9: bool,
+) -> Option<Point> {
+    let limbs = x.modulus.bits().div_ceil(64);
+    match (limbs, pad9) {
+        (2, _) => mont_ladder_arm::<2, K>(x, y, k, a, ladder, euclid),
+        (3, _) => mont_ladder_arm::<3, K>(x, y, k, a, ladder, euclid),
+        (4, _) => mont_ladder_arm::<4, K>(x, y, k, a, ladder, euclid),
+        (5..=9, true) | (9, false) => mont_ladder_arm::<9, K>(x, y, k, a, ladder, euclid),
+        (5, false) => mont_ladder_arm::<5, K>(x, y, k, a, ladder, euclid),
+        (6, false) => mont_ladder_arm::<6, K>(x, y, k, a, ladder, euclid),
+        (7, false) => mont_ladder_arm::<7, K>(x, y, k, a, ladder, euclid),
+        (8, false) => mont_ladder_arm::<8, K>(x, y, k, a, ladder, euclid),
+        _ => None,
+    }
+}
+
+/// The scalar-multiplication arms of the 2026-11-25 multiplication
+/// ablation (`src/bin/mont_mul_bench.rs`).  Benchmark and test use only.
+///
+/// * `biguint` — the `num-bigint` Jacobian ladder (`IC_MONT_VT=0`).
+/// * `pad9_cios` — the pre-change production path: CIOS for products and
+///   squares, 5..8-limb moduli padded to 9 limbs.
+/// * `cios` — CIOS, exact limb width.
+/// * `sqr` — CIOS products, dedicated Montgomery squaring, exact width
+///   (the production path after this change).
+/// * `karatsuba` — one-level Karatsuba products + squaring, exact width.
+/// * `sqr_bingcd` — `sqr` with the final `Z⁻¹` by the fixed-width binary
+///   extended GCD instead of the Fermat power.
+/// * `sqr_wnaf4`, `sqr_wnaf5` — `sqr_bingcd` with a width-4/5 NAF ladder
+///   (table by the isomorphism trick and one batch inversion).
+///
+/// Every arm returns the same point over a prime field; `None` for an
+/// unknown arm or a modulus no arm covers.
+#[doc(hidden)]
+pub fn scalar_mul_arm(arm: &str, p: &Point, k: &BigUint, a: &FieldElement) -> Option<Point> {
+    let (x, y) = match p {
+        Point::Infinity => return Some(Point::Infinity),
+        Point::Affine { x, y } => (x, y),
+    };
+    use MontLadder::*;
+    match arm {
+        "biguint" => Some(biguint_scalar_mul(x, y, k, a)),
+        "pad9_cios" => mont_dispatch::<CiosKernel>(x, y, k, a, Binary, false, true),
+        "cios" => mont_dispatch::<CiosKernel>(x, y, k, a, Binary, false, false),
+        "sqr" => mont_dispatch::<SqrKernel>(x, y, k, a, Binary, false, false),
+        "karatsuba" => mont_dispatch::<KaratsubaKernel>(x, y, k, a, Binary, false, false),
+        "sqr_bingcd" => mont_dispatch::<SqrKernel>(x, y, k, a, Binary, true, false),
+        "sqr_wnaf4" => mont_dispatch::<SqrKernel>(x, y, k, a, Wnaf(4), true, false),
+        "sqr_wnaf5" => mont_dispatch::<SqrKernel>(x, y, k, a, Wnaf(5), true, false),
+        _ => None,
+    }
+}
+
+/// Field-kernel latency probe for the multiplication ablation: runs
+/// `iters` dependent operations `acc ← op(acc, b)` mod `p` and returns
+/// nanoseconds per operation and the final residue (so the work cannot be
+/// elided).  `op` is `cios_mul`, `cios_sqr` (CIOS `a·a`), `sqr`
+/// (dedicated squaring), `karatsuba_mul`, `sos_mul` (schoolbook product
+/// then separate reduction), `inv_bingcd` / `inv_fermat` (one inversion),
+/// or `biguint_mul` (`num-bigint` `a·b mod p`).  Benchmark use only; `None` for an unknown op or width.
+#[doc(hidden)]
+pub fn field_kernel_probe(
+    op: &str,
+    p: &BigUint,
+    a: &BigUint,
+    b: &BigUint,
+    iters: u64,
+) -> Option<(f64, BigUint)> {
+    fn run<const N: usize>(
+        op: &str,
+        p: &BigUint,
+        a: &BigUint,
+        b: &BigUint,
+        iters: u64,
+    ) -> Option<(f64, BigUint)> {
+        let ctx = Mont::<N>::new(p)?;
+        let mut acc = ctx.enter(a)?;
+        let bm = ctx.enter(b)?;
+        let t0 = std::time::Instant::now();
+        match op {
+            "cios_mul" => (0..iters).for_each(|_| acc = ctx.mul(std::hint::black_box(&acc), &bm)),
+            "cios_sqr" => (0..iters).for_each(|_| acc = ctx.mul(std::hint::black_box(&acc), &acc)),
+            "sqr" => (0..iters).for_each(|_| acc = ctx.sqr(std::hint::black_box(&acc))),
+            "karatsuba_mul" => {
+                (0..iters).for_each(|_| acc = ctx.mul_karatsuba(std::hint::black_box(&acc), &bm))
+            }
+            "sos_mul" => (0..iters)
+                .for_each(|_| acc = ctx.redc(Mont::<N>::mul_wide(std::hint::black_box(&acc), &bm))),
+            "inv_bingcd" => (0..iters)
+                .for_each(|_| acc = ctx.inv_bingcd(std::hint::black_box(&acc)).unwrap_or(bm)),
+            "inv_fermat" => {
+                let e = p - 2u32;
+                (0..iters)
+                    .for_each(|_| acc = ctx.pow_k::<SqrKernel>(std::hint::black_box(&acc), &e))
+            }
+            _ => return None,
+        }
+        let ns = t0.elapsed().as_nanos() as f64 / iters as f64;
+        Some((ns, ctx.leave(&acc)))
+    }
+    if op == "biguint_mul" {
+        let mut acc = a.clone();
+        let t0 = std::time::Instant::now();
+        for _ in 0..iters {
+            acc = (std::hint::black_box(&acc) * b) % p;
+        }
+        return Some((t0.elapsed().as_nanos() as f64 / iters as f64, acc));
+    }
+    match p.bits().div_ceil(64) {
+        2 => run::<2>(op, p, a, b, iters),
+        3 => run::<3>(op, p, a, b, iters),
+        4 => run::<4>(op, p, a, b, iters),
+        5 => run::<5>(op, p, a, b, iters),
+        6 => run::<6>(op, p, a, b, iters),
+        7 => run::<7>(op, p, a, b, iters),
+        8 => run::<8>(op, p, a, b, iters),
+        9 => run::<9>(op, p, a, b, iters),
+        _ => None,
+    }
+}
+
+/// The `num-bigint` Jacobian double-and-add of [`Point::scalar_mul`].
+fn biguint_scalar_mul(x: &FieldElement, y: &FieldElement, k: &BigUint, a: &FieldElement) -> Point {
+    let mut acc: Option<Jacobian> = None;
+    for i in (0..k.bits()).rev() {
+        if let Some(j) = &acc {
+            acc = j.double(a);
+        }
+        if k.bit(i) {
+            acc = match &acc {
+                None => Some(Jacobian::from_affine(x, y)),
+                Some(j) => j.add_affine(x, y, a),
+            };
+        }
+    }
+    match acc {
+        None => Point::Infinity,
+        Some(j) => j.to_affine(),
+    }
 }
 
 /// A point on a Weierstrass curve, either the identity (point at infinity)
@@ -208,9 +377,15 @@ impl Point {
     ///
     /// When `p` fits a word the same Jacobian ladder runs on word
     /// arithmetic and inverts once at the end with the word Euclid of
-    /// [`FieldElement::inv_vartime`]; otherwise this is `scalar_mul`
-    /// itself, whose one constant-time inversion is a small part of a
-    /// multi-word ladder.  For the set-up multiplications of the
+    /// [`FieldElement::inv_vartime`].  On P-256 and secp256k1 this is
+    /// `scalar_mul`'s specialised ladder.  On another multi-word `p` the
+    /// fixed-width Montgomery path runs a width-4 (≤ 3 limbs) or width-5
+    /// NAF with its odd multiples made affine through the curve
+    /// isomorphism scaled by `Z(2P)` and one batch inversion, and inverts
+    /// by the fixed-width binary extended GCD (falling back to the Fermat
+    /// power where that finds no inverse, as `inv_vartime` does); where
+    /// the table meets the identity or a non-unit it keeps `scalar_mul`'s
+    /// binary ladder.  For the set-up multiplications of the
     /// cryptanalysis walks and searches (walker starts, subgroup
     /// projections, verification of a recovered log).
     pub fn scalar_mul_vartime(&self, k: &BigUint, a: &FieldElement) -> Point {
@@ -252,7 +427,7 @@ impl Point {
                 }
             }
         }
-        self.scalar_mul(k, a)
+        self.scalar_mul_impl(k, a, true)
     }
 
     /// `k·self + l·other` in **variable time**, for public points and
@@ -425,6 +600,14 @@ impl Point {
     /// including its identity and `2P = O` cases, because the two agree
     /// wherever the affine formulas are defined.
     pub fn scalar_mul(&self, k: &BigUint, a: &FieldElement) -> Point {
+        self.scalar_mul_impl(k, a, false)
+    }
+
+    /// [`scalar_mul`](Self::scalar_mul), or with `prime_vartime` the
+    /// multi-word Montgomery path of
+    /// [`scalar_mul_vartime`](Self::scalar_mul_vartime): width-`w` NAF
+    /// and binary-GCD inversion, exact over a prime field.
+    fn scalar_mul_impl(&self, k: &BigUint, a: &FieldElement, prime_vartime: bool) -> Point {
         let (x, y) = match self {
             Point::Infinity => return Point::Infinity,
             Point::Affine { x, y } => (x, y),
@@ -453,33 +636,31 @@ impl Point {
         // Fixed-width Montgomery Jacobian (mont_vt): fills the gap between
         // the single-word path and the specialised P-256/secp ladders.
         // Opt out with `IC_MONT_VT=0` for A/B against the BigUint ladder.
+        // Exact limb widths (5..8 limbs no longer pad to 9; 2026-11-25).
         let limbs = x.modulus.bits().div_ceil(64);
+        if prime_vartime && limbs >= 2 && std::env::var("IC_MONT_VT").as_deref() != Ok("0") {
+            let w = if limbs <= 3 { 4 } else { 5 };
+            if let Some(pt) =
+                mont_dispatch::<ProdKernel>(x, y, k, a, MontLadder::Wnaf(w), true, false)
+            {
+                return pt;
+            }
+        }
         let mont = match limbs {
             2 => mont_scalar_mul_vt::<2>(x, y, k, a),
             3 => mont_scalar_mul_vt::<3>(x, y, k, a),
             4 => mont_scalar_mul_vt::<4>(x, y, k, a),
-            5..=9 => mont_scalar_mul_vt::<9>(x, y, k, a),
+            5 => mont_scalar_mul_vt::<5>(x, y, k, a),
+            6 => mont_scalar_mul_vt::<6>(x, y, k, a),
+            7 => mont_scalar_mul_vt::<7>(x, y, k, a),
+            8 => mont_scalar_mul_vt::<8>(x, y, k, a),
+            9 => mont_scalar_mul_vt::<9>(x, y, k, a),
             _ => None,
         };
         if let Some(pt) = mont {
             return pt;
         }
-        let mut acc: Option<Jacobian> = None;
-        for i in (0..k.bits()).rev() {
-            if let Some(j) = &acc {
-                acc = j.double(a);
-            }
-            if k.bit(i) {
-                acc = match &acc {
-                    None => Some(Jacobian::from_affine(x, y)),
-                    Some(j) => j.add_affine(x, y, a),
-                };
-            }
-        }
-        match acc {
-            None => Point::Infinity,
-            Some(j) => j.to_affine(),
-        }
+        biguint_scalar_mul(x, y, k, a)
     }
 
     /// Scalar multiplication kP using the Montgomery ladder, processing
@@ -1801,6 +1982,108 @@ mod vartime_differential {
                     g.linear_dlog_vartime(&t, bound, &a),
                     linear_dlog_reference(&g, &t, bound, &a),
                     "p={p} g={g:?} t={t:?} bound={bound}"
+                );
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod mont_kernel_arms {
+    use super::*;
+    use num_bigint::RandBigInt;
+    use rand::{rngs::StdRng, SeedableRng};
+
+    fn two(e: u32) -> BigUint {
+        BigUint::from(1u8) << e
+    }
+
+    const ARMS: [&str; 7] = [
+        "pad9_cios",
+        "cios",
+        "sqr",
+        "karatsuba",
+        "sqr_bingcd",
+        "sqr_wnaf4",
+        "sqr_wnaf5",
+    ];
+
+    /// Every ablation arm and the production `scalar_mul` return the
+    /// `num-bigint` ladder's point on primes of 2..=9 limbs, for edge and
+    /// random scalars and random curves through a random point.
+    #[test]
+    fn arms_match_biguint_ladder() {
+        let primes = [
+            two(127) - 1u32,
+            two(192) - two(64) - 1u32,
+            two(255) - 19u32,
+            two(320) - 197u32,
+            two(384) - two(128) - two(96) + two(32) - 1u32,
+            two(448) - two(224) - 1u32,
+            two(512) - 569u32,
+            two(521) - 1u32,
+        ];
+        let mut rng = StdRng::seed_from_u64(0x6172_6d73);
+        for p in &primes {
+            assert!(
+                crate::ecc::endo_generic_chain_set::is_probable_prime(p),
+                "{p}"
+            );
+            let a = FieldElement::new(rng.gen_biguint_below(p), p.clone());
+            let base = Point::Affine {
+                x: FieldElement::new(rng.gen_biguint_below(p), p.clone()),
+                y: FieldElement::new(rng.gen_biguint_below(p), p.clone()),
+            };
+            let mut ks: Vec<BigUint> = (0u32..20).map(BigUint::from).collect();
+            ks.push(p - 1u32);
+            ks.push(two(p.bits() as u32) - 1u32);
+            for _ in 0..6 {
+                ks.push(rng.gen_biguint(p.bits()));
+            }
+            for k in &ks {
+                let want = biguint_scalar_mul(
+                    match &base {
+                        Point::Affine { x, .. } => x,
+                        _ => unreachable!(),
+                    },
+                    match &base {
+                        Point::Affine { y, .. } => y,
+                        _ => unreachable!(),
+                    },
+                    k,
+                    &a,
+                );
+                assert_eq!(base.scalar_mul(k, &a), want, "production p={p} k={k}");
+                assert_eq!(base.scalar_mul_vartime(k, &a), want, "vartime p={p} k={k}");
+                for arm in ARMS {
+                    assert_eq!(
+                        scalar_mul_arm(arm, &base, k, &a).unwrap(),
+                        want,
+                        "{arm} p={p} k={k}"
+                    );
+                }
+            }
+        }
+    }
+
+    /// A 2-torsion base (`y = 0`): the wNAF table's `2P` is the identity,
+    /// so wNAF declines and the binary ladder answers; every arm agrees.
+    #[test]
+    fn arms_handle_two_torsion() {
+        let p = two(255) - 19u32;
+        let base = Point::Affine {
+            x: FieldElement::new(BigUint::from(5u8), p.clone()),
+            y: FieldElement::new(BigUint::from(0u8), p.clone()),
+        };
+        let a = FieldElement::new(BigUint::from(7u8), p.clone());
+        for k in 0u32..12 {
+            let k = BigUint::from(k);
+            let want = scalar_mul_arm("biguint", &base, &k, &a).unwrap();
+            for arm in ARMS {
+                assert_eq!(
+                    scalar_mul_arm(arm, &base, &k, &a).unwrap(),
+                    want,
+                    "{arm} k={k}"
                 );
             }
         }
