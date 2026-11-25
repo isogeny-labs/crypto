@@ -17,7 +17,7 @@ digraph attack_graph {
   "ALG-SPARSE-LINEAR-ALGEBRA" [label="ALG-SPARSE-LINEAR-ALGEBRA\nalgorithm", fillcolor="#eef2f5", color="#526575"];
   "ALG-WD-GAUDRY-2000" [label="ALG-WD-GAUDRY-2000\nconditional · impact 9", fillcolor="#fde2e2", color="#526575"];
   "ALG-WD-MMT-EG-COST" [label="ALG-WD-MMT-EG-COST\nconditional · impact 3", fillcolor="#fde2e2", color="#526575"];
-  "ALG-WD-THERIAULT-2003" [label="ALG-WD-THERIAULT-2003\nproved_external_unread · impact 5", fillcolor="#eef2f5", color="#526575"];
+  "ALG-WD-THERIAULT-2003" [label="ALG-WD-THERIAULT-2003\nconditional · impact 5", fillcolor="#fde2e2", color="#526575"];
   "ALG-XT-COPPERSMITH-F2N" [label="ALG-XT-COPPERSMITH-F2N\nconditional · impact 0", fillcolor="#fde2e2", color="#526575"];
   "ALG-XT-EXTNFS" [label="ALG-XT-EXTNFS\nconditional · impact 2", fillcolor="#fde2e2", color="#526575"];
   "ALG-XT-MSS-NORM-UPPER-BOUND" [label="ALG-XT-MSS-NORM-UPPER-BOUND\nconditional · impact 0", fillcolor="#fde2e2", color="#526575"];
@@ -55,6 +55,7 @@ digraph attack_graph {
   "CLAIM-PA-SS-IMPLIES-FS" [label="CLAIM-PA-SS-IMPLIES-FS\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-PA-SUBGROUP-AMBIENT" [label="CLAIM-PA-SUBGROUP-AMBIENT\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-PA-ZK-IMPLIES-SOUND" [label="CLAIM-PA-ZK-IMPLIES-SOUND\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
+  "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES" [label="CLAIM-RP-ANY-FIRST-CYCLE-CLOSES\nrefuted · impact 0\nformal: kernel_checked", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-SHOUP-ALL-ALGORITHMS" [label="CLAIM-SHOUP-ALL-ALGORITHMS\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-SP-SEMAEV15-DFF-ALWAYS-4" [label="CLAIM-SP-SEMAEV15-DFF-ALWAYS-4\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-SP-SEMAEV15-FFDA-T2" [label="CLAIM-SP-SEMAEV15-FFDA-T2\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
@@ -425,4 +426,6 @@ digraph attack_graph {
   "CEX-IC-STOPPING-CENSORSHIP" -> "CLAIM-IC-SUCCESS-ONLY-UNBIASED" [label="refutes", color="#a33a3a", penwidth=2];
   "CEX-IC-SURPLUS-RIGHT-RANK" [fillcolor="#dff4e5", color="#257942"];
   "CEX-IC-SURPLUS-RIGHT-RANK" -> "CLAIM-IC-ROW-SURPLUS-FULL-RIGHT-RANK" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-RP-ODD-CYCLE-NO-CLOSURE" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-RP-ODD-CYCLE-NO-CLOSURE" -> "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES" [label="refutes", color="#a33a3a", penwidth=2];
 }
