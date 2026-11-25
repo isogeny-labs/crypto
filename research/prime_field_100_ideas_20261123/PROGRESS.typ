@@ -440,3 +440,17 @@ Unsigned claims `PCC-20261125-f05501`, `PCC-20261125-cf3bcc`, and `PCC-20261125-
 )
 
 The item matrices still contain 100 rows with primary labels 3 bounded original mechanisms, 32 partial controls, 16 literal-premise screens and 49 missing runnable EC constructions or matching inputs. The goal and draft PR remain open.
+
+== Complete bounded target solve and natural EC relations
+
+Three more public `E(F_p)` runs are preserved under unsigned execution claims `PCC-20261125-d8d145`, `PCC-20261125-a735ef`, and `PCC-20261125-921c05`. They remain `[pcc:unverified]`.
+
+#table(
+  columns: (auto, 1fr),
+  table.header([Item], [Observation and limit]),
+  [24], [A #link("EC_S4_PIPELINE_024_PROTOCOL.md")[frozen S4 relation pipeline] on one public prime-order `E/F_1009` target built 17 independent exact rows, solved all 16 base logs and `log_G(Q)=906`, and passed an independent accepted-row replay. Same-target Floyd rho also checked 906. The relation arm charged 415 ms CPU/692 ms wall and 458,752 candidate-sum additions; rho used 23 iterations and 70 initial/walk additions, reporting 1 ms wall at timer resolution. This one fixed instance favors rho in counted work; timing does not support a stable ratio or scaling claim.],
+  [39], [A #link("EC_GRAPH_SOLVER_V2_PROTOCOL.md")[matched active-column graph filter] rechecked 57 EC witnesses. For the two-component base matrix, grouping reduced elimination from 192 to 108 multiply/add operations and 212 to 106 pivot scans. In the one-component matrix the matched arms were identical. Graph setup and target-column coupling prevent a full-cost or full-solve conclusion; no spectral clustering ran.],
+  [75/76/84], [A #link("WS68_NATURAL_PARTIAL.post-call.json")[natural partial collector] made 512 `aG+bQ` probes, collecting 17 full, 68 one-large and 67 two-large rows. Exact elimination produced 136 complete rows, while full-only made 17. Both arms reached base/augmented ranks 8/9 and checked validation scalar 701; an independent verifier rechecked all 169 source identities. Extra partial rows supplied no rank gain here, and graph-cycle filtering and block Lanczos remain unrun.],
+)
+
+The item audit still has 100 rows with 3 bounded original mechanisms, 32 partial controls, 16 literal-premise screens and 49 missing runnable EC constructions or inputs. The #24 same-target run is complete only for its fixed small public curve. The broader 100-item goal and draft PR remain open.

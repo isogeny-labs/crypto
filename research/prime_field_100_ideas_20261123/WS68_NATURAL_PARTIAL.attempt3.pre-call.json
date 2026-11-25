@@ -1,0 +1,10 @@
+{
+  "record_type":"immutable_pre_call_amendment",
+  "parent_pre_call":"WS68_NATURAL_PARTIAL.pre-call.json",
+  "prior_amendment":"WS68_NATURAL_PARTIAL.attempt2.pre-call.json",
+  "conductor_tasks":["T-58","T-67"],
+  "attempt2":{"source":"WS68_NATURAL_PARTIAL.attempt2.rs","source_sha256":"d72684fc48e19206e21c053b8e04ce7366c181852ed8973fb5aff9e851a1abd4","stderr":"WS68_NATURAL_PARTIAL.attempt2.stderr","stderr_sha256":"1616418258d510c6ef2418c471f820d60dd86d9a500543b840ecc74cc6d134bb","compile_exit_code":1,"run_executed":false},
+  "correction":"The compiler could not prove a Combined value remains available after moving it into a pivot slot. Clone the value for the pivot. No collector input, base, policy, cap, cost boundary or expected outcome changed.",
+  "attempt3":{"source":"WS68_NATURAL_PARTIAL.rs","source_sha256":"5bd4087a48786cba614b4c71867fc4c7560925940fc9051a5586226941e3f49b","qualifier":"WS68_NATURAL_PARTIAL.qualifier.rs","qualifier_sha256":"5bd4087a48786cba614b4c71867fc4c7560925940fc9051a5586226941e3f49b","compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_NATURAL_PARTIAL","WS68_NATURAL_PARTIAL.qualifier.rs","-o","WS68_NATURAL_PARTIAL.bin"]},
+  "admission":"same bounded user-authorized local bypass; both prior compile failures preserved; no earlier execution"
+}
