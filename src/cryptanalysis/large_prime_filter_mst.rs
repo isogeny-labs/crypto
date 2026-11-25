@@ -1,7 +1,27 @@
 //! MST-based large-prime elimination with original-input replay witnesses.
 //! A tree of coefficient-normalized row differences eliminates one column.
 //! Prim's algorithm minimizes the sum of actual sparse edge-row weights.
+//!
+//! [`MstStrategy::OverlapSensitive`] computes the same tree without evaluating
+//! every pair: for two normalized rows whose supports are disjoint apart from
+//! the eliminated column, the difference's key is additive in per-row counts,
+//! so only overlapping pairs need an explicit sparse difference.
 use super::*;
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
+
+/// How [`filter_large_primes_mst_with`] finds each column's spanning tree.
+/// Both strategies return identical relations, witnesses and legacy stats.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum MstStrategy {
+    /// Evaluate all `k(k-1)/2` normalized row differences (original Prim).
+    #[default]
+    Exhaustive,
+    /// Implicit keys for support-disjoint pairs, explicit sparse differences
+    /// for overlapping pairs only. A column whose pairwise cap condition
+    /// fails (some disjoint pair could be infeasible) uses `Exhaustive`.
+    OverlapSensitive,
+}
 
 #[derive(Clone, Copy, Debug)]
 pub struct MstLimits {
@@ -34,6 +54,33 @@ pub struct MstStats {
     pub input_nonzeros: usize,
     pub output_nonzeros: usize,
     pub budget_refusals: usize,
+    /// Overlap-sensitive strategy only: sparse differences actually formed
+    /// for overlapping pairs (selected implicit edges are counted apart).
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub explicit_edge_evaluations: usize,
+    /// Overlap-sensitive strategy only: selected edges whose key was known
+    /// implicitly and whose row was materialized after selection.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub implicit_selected_edges: usize,
+    /// Overlap-sensitive strategy only: overlapping row pairs found.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub overlapping_pairs: usize,
+    /// Overlap-sensitive strategy only: trees that failed the cap
+    /// condition and ran the exhaustive Prim instead.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub exhaustive_fallback_trees: usize,
+    /// Overlap-sensitive strategy only: trees whose implicit key prediction
+    /// failed (must stay zero; the tree is then recomputed exhaustively).
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub implicit_key_mismatches: usize,
+    /// Overlap-sensitive strategy only: sparse differences formed by the
+    /// exhaustive Prim in fallback trees (included in `edge_evaluations`).
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub fallback_edge_evaluations: usize,
+}
+
+fn is_zero(v: &usize) -> bool {
+    *v == 0
 }
 
 #[derive(Clone, Debug)]
@@ -96,6 +143,8 @@ impl Edge {
 /// cancellation constraints; disconnected feasible graphs refuse atomically.
 fn tree_rows(
     normalized: &[WorkRow],
+    column: u64,
+    strategy: MstStrategy,
     options: &LargePrimeFilterOptions,
     limits: &MstLimits,
     stats: &mut MstStats,
@@ -114,6 +163,34 @@ fn tree_rows(
         stats.budget_refusals += 1;
         return None;
     }
+    if strategy == MstStrategy::OverlapSensitive && k > 1 {
+        match overlap_tree_rows(normalized, column, options, limits, stats) {
+            Ok(rows) => {
+                stats.edge_evaluations += needed;
+                stats.trees += 1;
+                stats.selected_edges += rows.len();
+                return Some(rows);
+            }
+            Err(defect) => {
+                stats.exhaustive_fallback_trees += 1;
+                stats.implicit_key_mismatches += usize::from(defect);
+                let before = stats.edge_evaluations;
+                let rows = exhaustive_tree_rows(normalized, options, limits, stats);
+                stats.fallback_edge_evaluations += stats.edge_evaluations - before;
+                return rows;
+            }
+        }
+    }
+    exhaustive_tree_rows(normalized, options, limits, stats)
+}
+
+fn exhaustive_tree_rows(
+    normalized: &[WorkRow],
+    options: &LargePrimeFilterOptions,
+    limits: &MstLimits,
+    stats: &mut MstStats,
+) -> Option<Vec<WorkRow>> {
+    let k = normalized.len();
     let mut visited = vec![false; k];
     let mut best: Vec<Option<Edge>> = (0..k).map(|_| None).collect();
     let mut result = Vec::with_capacity(k - 1);
@@ -159,10 +236,194 @@ fn tree_rows(
     Some(result)
 }
 
+type EdgeKey = (usize, usize, usize, usize);
+type VertexKey = (usize, usize, usize);
+
+fn top_two_sum(values: impl Iterator<Item = usize>) -> usize {
+    let (mut a, mut b) = (0usize, 0usize);
+    for v in values {
+        if v > a {
+            b = a;
+            a = v;
+        } else if v > b {
+            b = v;
+        }
+    }
+    a.saturating_add(b)
+}
+
+/// Exact Prim on the same complete feasible graph as `tree_rows`, without
+/// forming the sparse difference of a support-disjoint pair.
+///
+/// Let `r_v` be normalized so the eliminated column has coefficient one, with
+/// `w_v` small plus other-large terms and `q_v` source terms. If `r_v`, `r_u`
+/// share no small column, no other large column and no source id, `r_v - r_u`
+/// has no cancellation and its edge key is `K(v,u) = (w_v+w_u, q_v+q_u, v, u)`.
+/// Two facts make the search exact:
+///
+/// 1. Subadditivity: for any pair the difference's support lies in the union,
+///    so its key is at most `K(v,u)` (same `(v,u)` tail). Under the cap
+///    condition (the two largest rows fit together in every cap) every pair,
+///    disjoint or not, is feasible, so the feasible graph is complete.
+///    A shared key merges two terms into one, so an overlapping pair's key
+///    is strictly below `K(v,u)` in its first two components.
+/// 2. Let `m` be the visited vertex minimal in `(w, q, index)`. For unvisited
+///    `u` disjoint from `m`, `K(m,u)` beats `K(v,u)` for every other visited
+///    disjoint `v`; for `u` overlapping `m`, the explicit edge `(m,u)` is
+///    strictly below `K(m,u) <= K(v,u)`, so no implicit edge is `u`'s best.
+/// 3. Over unvisited `u`, `K(m,u)` is minimized by the first `u` in
+///    `(w, q, index)` order; if that `u` overlaps `m`, the explicit `(m,u)`
+///    edge is strictly smaller, so comparing against `K(m,u)` is harmless.
+///
+/// Hence each step selects the smaller of the best explicit (overlapping)
+/// edge and `K(m,u)` for the first unvisited `u` in `(w, q, index)` order.
+/// Ties, edge order and the selected rows are the exhaustive Prim's.
+/// Returns `Err` (the caller runs the exhaustive Prim) when the cap
+/// condition fails, or `Err(true)` if a materialized implicit row disagrees
+/// with its predicted key, which would be a defect in this proof.
+fn overlap_tree_rows(
+    normalized: &[WorkRow],
+    column: u64,
+    options: &LargePrimeFilterOptions,
+    limits: &MstLimits,
+    stats: &mut MstStats,
+) -> Result<Vec<WorkRow>, bool> {
+    let k = normalized.len();
+    let p = options.modulus;
+    if normalized.iter().any(|r| r.coefficient(column) != 1) {
+        return Err(false);
+    }
+    let small: Vec<usize> = normalized.iter().map(|r| r.small.len()).collect();
+    let src: Vec<usize> = normalized.iter().map(|r| r.sources.len()).collect();
+    let weight: Vec<usize> = normalized
+        .iter()
+        .map(|r| r.small.len() + r.large.len() - 1)
+        .collect();
+    if top_two_sum(small.iter().copied()) > options.max_small_weight
+        || top_two_sum(src.iter().copied()) > options.max_sources
+        || top_two_sum((0..k).map(|v| weight[v] + src[v])) > limits.max_active_coefficients
+    {
+        return Err(false);
+    }
+    // Overlap graph from an inverted index over the three key spaces.
+    let mut index = BTreeMap::<(u8, u64), Vec<usize>>::new();
+    for (v, r) in normalized.iter().enumerate() {
+        for &(i, _) in &r.small {
+            index.entry((0, u64::from(i))).or_default().push(v);
+        }
+        for &(i, _) in r.large.iter().filter(|x| x.0 != column) {
+            index.entry((1, i)).or_default().push(v);
+        }
+        for &(i, _) in &r.sources {
+            index.entry((2, i)).or_default().push(v);
+        }
+    }
+    let mut ov: Vec<Vec<usize>> = vec![Vec::new(); k];
+    for list in index.values() {
+        for (a, &x) in list.iter().enumerate() {
+            for &y in &list[a + 1..] {
+                ov[x].push(y);
+                ov[y].push(x);
+            }
+        }
+    }
+    for list in &mut ov {
+        list.sort_unstable();
+        list.dedup();
+    }
+    let overlapping_pairs = ov.iter().map(Vec::len).sum::<usize>() / 2;
+    let ord = |v: usize| -> VertexKey { (weight[v], src[v], v) };
+
+    let mut visited = vec![false; k];
+    let mut unvisited: BTreeSet<VertexKey> = (0..k).map(ord).collect();
+    let mut explicit: Vec<Option<(EdgeKey, WorkRow)>> = (0..k).map(|_| None).collect();
+    let mut heap = BinaryHeap::<Reverse<(EdgeKey, usize)>>::new();
+    let mut m = 0usize;
+    let (mut explicit_evaluations, mut implicit_selected) = (0usize, 0usize);
+    let mut result = Vec::with_capacity(k - 1);
+    let mut next = 0usize;
+    for step in 0..k {
+        if step > 0 {
+            while let Some(&Reverse((key, u))) = heap.peek() {
+                if visited[u] || explicit[u].as_ref().map(|e| e.0) != Some(key) {
+                    heap.pop();
+                } else {
+                    break;
+                }
+            }
+            let from_explicit = heap.peek().map(|&Reverse(x)| x);
+            // No overlap test needed: if `u` overlaps `m`, the live explicit
+            // edge `(m,u)` already has a strictly smaller key (fact 2).
+            let from_implicit = unvisited
+                .iter()
+                .next()
+                .map(|&(wu, su, u)| ((weight[m] + wu, src[m] + su, m, u), u));
+            let ((key, u), is_explicit) = match (from_explicit, from_implicit) {
+                (Some(e), Some(i)) if e < i => (e, true),
+                (Some(e), None) => (e, true),
+                (_, Some(i)) => (i, false),
+                // Unreachable: under the cap condition the graph is complete.
+                (None, None) => {
+                    stats.explicit_edge_evaluations += explicit_evaluations;
+                    return Err(true);
+                }
+            };
+            let row = if is_explicit {
+                explicit[u].take().expect("live heap entry").1
+            } else {
+                let row = normalized[key.2].axpy(p - 1, &normalized[u], p);
+                if (row.small.len() + row.large.len(), row.sources.len()) != (key.0, key.1) {
+                    stats.explicit_edge_evaluations += explicit_evaluations;
+                    return Err(true);
+                }
+                implicit_selected += 1;
+                row
+            };
+            result.push(row);
+            next = u;
+        }
+        let w = next;
+        visited[w] = true;
+        unvisited.remove(&ord(w));
+        if ord(w) < ord(m) {
+            m = w;
+        }
+        for &u in &ov[w] {
+            if visited[u] {
+                continue;
+            }
+            explicit_evaluations += 1;
+            let row = normalized[w].axpy(p - 1, &normalized[u], p);
+            debug_assert!(fits(&row, options) && atoms(&row) <= limits.max_active_coefficients);
+            let key = (row.small.len() + row.large.len(), row.sources.len(), w, u);
+            if explicit[u].as_ref().is_none_or(|old| key < old.0) {
+                heap.push(Reverse((key, u)));
+                explicit[u] = Some((key, row));
+            }
+        }
+    }
+    stats.explicit_edge_evaluations += explicit_evaluations;
+    stats.implicit_selected_edges += implicit_selected;
+    stats.overlapping_pairs += overlapping_pairs;
+    Ok(result)
+}
+
 pub fn filter_large_primes_mst(
     relations: Vec<PartialRelation>,
     options: &LargePrimeFilterOptions,
     limits: &MstLimits,
+) -> Result<MstAttempt, LargePrimeFilterError> {
+    filter_large_primes_mst_with(relations, options, limits, MstStrategy::Exhaustive)
+}
+
+/// [`filter_large_primes_mst`] with an explicit tree strategy. The budget
+/// check still charges `k(k-1)/2` logical edges per column, so refusals,
+/// relations, witnesses and the legacy stats agree across strategies.
+pub fn filter_large_primes_mst_with(
+    relations: Vec<PartialRelation>,
+    options: &LargePrimeFilterOptions,
+    limits: &MstLimits,
+    strategy: MstStrategy,
 ) -> Result<MstAttempt, LargePrimeFilterError> {
     let p = options.modulus;
     if !(3..1u64 << 63).contains(&p) || p.is_multiple_of(2) {
@@ -173,7 +434,14 @@ pub fn filter_large_primes_mst(
         ..Default::default()
     };
     let mut stats = MstStats::default();
-    let output = eliminate(relations, options, limits, &mut report, &mut stats)?;
+    let output = eliminate(
+        relations,
+        options,
+        limits,
+        strategy,
+        &mut report,
+        &mut stats,
+    )?;
     Ok(MstAttempt {
         relations: output,
         report,
@@ -185,6 +453,7 @@ fn eliminate(
     mut relations: Vec<PartialRelation>,
     options: &LargePrimeFilterOptions,
     limits: &MstLimits,
+    strategy: MstStrategy,
     report: &mut LargePrimeFilterReport,
     stats: &mut MstStats,
 ) -> Result<Option<Vec<CompleteRelation>>, LargePrimeFilterError> {
@@ -294,7 +563,7 @@ fn eliminate(
             normalized.push(scale_row(&rows[i], inverse, p));
             stats.normalized_rows += 1;
         }
-        let Some(edges) = tree_rows(&normalized, options, limits, stats) else {
+        let Some(edges) = tree_rows(&normalized, j, strategy, options, limits, stats) else {
             report.rejected_fill += 1;
             return Ok(None);
         };
