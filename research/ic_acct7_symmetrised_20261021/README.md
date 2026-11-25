@@ -76,7 +76,7 @@ byte-identical. The first pricing is in this file's git history.
 
 ## Result (section A): pass
 
-Session `sessions/n17-symmetrised/` (`ECBS1h6fd757ff9d9f`): `K_1 / F_{2^17}`,
+Session `sessions/n17-symmetrised/` (`ECBS1h6fd757ff9d9f`): `icv1-f2m17-tm101-00378d4e`,
 4 public targets, 2 rounds + 1 warm-up, `ecbench run --cpus 1`.
 
 - `ecbench verify --replay 2`: `audit OK: 24 records, 24 verified, 2 replays reproduced, 0 problems`

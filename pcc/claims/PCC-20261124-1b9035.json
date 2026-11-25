@@ -1,0 +1,79 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T01:49:54Z",
+ "id": "PCC-20261124-1b9035",
+ "kind": "statement",
+ "producer": {
+  "commit": "345ec56c03861ff31f811b702973857816260ba1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/u.json",
+    "sha256": "42295f48504230119fd09b1d3826430eb57101a5a0ca31a7949610f1215e93cc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/v.json",
+    "sha256": "9f21a6a61a2098f6c5e00ee6728ca28d3ac5e9db33f9145782e602e0e5b7a1fd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/w.json",
+    "sha256": "3744f2506c853c7710f6ae616cd376db8289c7fc0a5efe0fad90054ef5d0b2c9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/templates/result.json",
+    "sha256": "a9755370ae2f864f4168bda12bfd7b80c826704efb9e854e103daacf0dbea4bb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/audit.cpp",
+    "sha256": "512b3fa105acfe678f9567a0e315a1ad863585e4a5cdab41c7354bacdb4d6034"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/PROTOCOL.md",
+    "sha256": "b906f256cdbd11b3a8e96efdabe8817df1f0b2e23b1372f004998dd699e67a23"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/check.sh",
+    "sha256": "4d05da548cd8d2f28912cdf8cd4a9c5529b638620ebdcd835ebf4653715ebfe4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/input-pins.sha256",
+    "sha256": "12d7cac15e93a020124b669ec5d448e009adcfdcb1fdfd28066327237feb03bf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/result.json",
+    "sha256": "62e86b62c84d518209654787ef8f2c936b589b723b775f3c99e2732667b2f31a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "necessary three-row identities on the exact frozen 102 P192 split tangents; no new quartic support",
+ "statement": "All three frozen arms finish under their original caps: U checks 686800 queries, V and W 2060400 each, with zero witnesses. Each arm agrees pointwise and by full-stream SHA256 between GMP and OpenSSL, complete grouped/sorted joins agree, ten controls pass and the selected indices match the pinned parent. The strict build, structural worker and all arms exit zero; existing-output collision and unknown-mode calls reject. Together with the recorded two-row premise and complete support classification this derives no three-row closure for this fixed batch, hence any extra old-base relation needs at least four selected tangent rows. No new residual root, quartic point, target principal relation or production collector call is asserted; no independent signed verdict or performance claim."
+}
