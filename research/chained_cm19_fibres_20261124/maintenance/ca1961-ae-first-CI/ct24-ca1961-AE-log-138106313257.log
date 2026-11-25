@@ -1,0 +1,215 @@
+﻿2026-11-23T23:56:27.1795871Z Current runner version: '2.338.2'
+2026-11-23T23:56:27.1821100Z ##[group]Runner Image Provisioner
+2026-11-23T23:56:27.1822227Z Hosted Compute Agent
+2026-11-23T23:56:27.1822887Z Version: 20261111.635
+2026-11-23T23:56:27.1823638Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-23T23:56:27.1824416Z Build Date: 2026-11-11T01:49:01Z
+2026-11-23T23:56:27.1825131Z Worker ID: {0f2c43c9-7ccf-43fc-9606-b847721ae477}
+2026-11-23T23:56:27.1825940Z Region: centralus
+2026-11-23T23:56:27.1826554Z Cloud: Azure
+2026-11-23T23:56:27.1827150Z ##[endgroup]
+2026-11-23T23:56:27.1828762Z ##[group]Operating System
+2026-11-23T23:56:27.1829515Z Ubuntu
+2026-11-23T23:56:27.1830176Z 24.04.5
+2026-11-23T23:56:27.1830760Z LTS
+2026-11-23T23:56:27.1831807Z ##[endgroup]
+2026-11-23T23:56:27.1832481Z ##[group]Runner Image
+2026-11-23T23:56:27.1833132Z Image: ubuntu-24.04
+2026-11-23T23:56:27.1833789Z Version: 20261116.376.1
+2026-11-23T23:56:27.1835181Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.376/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-23T23:56:27.1836865Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.376
+2026-11-23T23:56:27.1837864Z ##[endgroup]
+2026-11-23T23:56:27.1839127Z ##[group]GITHUB_TOKEN Permissions
+2026-11-23T23:56:27.1841872Z Contents: read
+2026-11-23T23:56:27.1842784Z Metadata: read
+2026-11-23T23:56:27.1843378Z ##[endgroup]
+2026-11-23T23:56:27.1845668Z Secret source: Actions
+2026-11-23T23:56:27.1846719Z Cache mode: write
+2026-11-23T23:56:27.1847706Z Prepare workflow directory
+2026-11-23T23:56:27.2197345Z Prepare all required actions
+2026-11-23T23:56:27.2250122Z Getting action download info
+2026-11-23T23:56:27.4911143Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-23T23:56:27.6843298Z Download action repository 'actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0' (SHA:6d4fd22b20465ccc0f7354476588e8df7c9ca0e0)
+2026-11-23T23:56:27.8794211Z Complete job name: PCC unit controls and shared-code parity
+2026-11-23T23:56:27.9766270Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-11-23T23:56:27.9767485Z with:
+2026-11-23T23:56:27.9768003Z   fetch-depth: 1
+2026-11-23T23:56:27.9768530Z   filter: blob:none
+2026-11-23T23:56:27.9769079Z   sparse-checkout-cone-mode: false
+2026-11-23T23:56:27.9772590Z   sparse-checkout: /docs/shared-code.lock.json
+/.claude/hooks/benchrec-hook.sh
+/docs/SABOTAGE_RESISTANCE.md
+/docs/benchmark-records.md
+/docs/curve-identities.md
+/docs/research-wip-policy.json
+/docs/research-wip.md
+/scripts/kb_usage_report.py
+/scripts/test_kb_usage_report.py
+/tools/artifacts/artifacts.py
+/tools/benchrec.py
+/tools/check_lab_parity.py
+/tools/check_skills_parity.py
+/tools/curve_identity.py
+/tools/pcc/pcc.py
+/tools/pcc/test_pcc.py
+/tools/research_wip.py
+/tools/test_benchrec.py
+
+2026-11-23T23:56:27.9775999Z   repository: isogeny-labs/cryptanalysis
+2026-11-23T23:56:27.9780334Z   token: ***
+2026-11-23T23:56:27.9780844Z   ssh-strict: true
+2026-11-23T23:56:27.9781612Z   ssh-user: git
+2026-11-23T23:56:27.9782192Z   persist-credentials: true
+2026-11-23T23:56:27.9782766Z   clean: true
+2026-11-23T23:56:27.9783252Z   fetch-tags: false
+2026-11-23T23:56:27.9783783Z   show-progress: true
+2026-11-23T23:56:27.9784298Z   lfs: false
+2026-11-23T23:56:27.9784767Z   submodules: false
+2026-11-23T23:56:27.9785288Z   set-safe-directory: true
+2026-11-23T23:56:27.9785849Z   allow-unsafe-pr-checkout: false
+2026-11-23T23:56:27.9786773Z ##[endgroup]
+2026-11-23T23:56:28.2593618Z Syncing repository: isogeny-labs/cryptanalysis
+2026-11-23T23:56:28.2596947Z ##[group]Getting Git version info
+2026-11-23T23:56:28.2598425Z Working directory is '/home/runner/work/cryptanalysis/cryptanalysis'
+2026-11-23T23:56:28.2600427Z [command]/usr/bin/git version
+2026-11-23T23:56:28.2717610Z git version 2.56.1
+2026-11-23T23:56:28.2746945Z ##[endgroup]
+2026-11-23T23:56:28.2766949Z Temporarily overriding HOME='/home/runner/work/_temp/e8fae751-e4be-41a3-ac96-fa5ac6fab0a2' before making global git config changes
+2026-11-23T23:56:28.2769311Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-23T23:56:28.2776525Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/cryptanalysis/cryptanalysis
+2026-11-23T23:56:28.2865627Z Deleting the contents of '/home/runner/work/cryptanalysis/cryptanalysis'
+2026-11-23T23:56:28.2874291Z ##[group]Determining repository object format
+2026-11-23T23:56:28.2878030Z ##[endgroup]
+2026-11-23T23:56:28.2880443Z ##[group]Initializing the repository
+2026-11-23T23:56:28.2883185Z [command]/usr/bin/git init /home/runner/work/cryptanalysis/cryptanalysis
+2026-11-23T23:56:28.3009854Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-23T23:56:28.3011788Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-23T23:56:28.3013348Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-23T23:56:28.3014225Z hint: call:
+2026-11-23T23:56:28.3015123Z hint:
+2026-11-23T23:56:28.3015899Z hint: 	git config --global init.defaultBranch <name>
+2026-11-23T23:56:28.3016636Z hint:
+2026-11-23T23:56:28.3017730Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-23T23:56:28.3019560Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-23T23:56:28.3021066Z hint:
+2026-11-23T23:56:28.3022026Z hint: 	git branch -m <name>
+2026-11-23T23:56:28.3022608Z hint:
+2026-11-23T23:56:28.3023437Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-23T23:56:28.3025604Z Initialized empty Git repository in /home/runner/work/cryptanalysis/cryptanalysis/.git/
+2026-11-23T23:56:28.3034771Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/cryptanalysis
+2026-11-23T23:56:28.3095464Z ##[endgroup]
+2026-11-23T23:56:28.3097053Z ##[group]Disabling automatic garbage collection
+2026-11-23T23:56:28.3098354Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-23T23:56:28.3145059Z ##[endgroup]
+2026-11-23T23:56:28.3146852Z ##[group]Setting up auth
+2026-11-23T23:56:28.3147763Z Removing SSH command configuration
+2026-11-23T23:56:28.3152088Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-23T23:56:28.3207340Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-23T23:56:28.3633110Z Removing HTTP extra header
+2026-11-23T23:56:28.3640208Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-23T23:56:28.3694978Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-23T23:56:28.3951444Z Removing includeIf entries pointing to credentials config files
+2026-11-23T23:56:28.3952851Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-23T23:56:28.3999481Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-23T23:56:28.4288595Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-23T23:56:28.4342091Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git.path /home/runner/work/_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config
+2026-11-23T23:56:28.4393183Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config
+2026-11-23T23:56:28.4444002Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config
+2026-11-23T23:56:28.4492191Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config
+2026-11-23T23:56:28.4535242Z ##[endgroup]
+2026-11-23T23:56:28.4542266Z ##[group]Fetching the repository
+2026-11-23T23:56:28.4543921Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +203c588a4a4b0129409db76293fc50c0a01861eb:refs/remotes/pull/1961/merge
+2026-11-23T23:56:29.0742047Z From https://github.com/isogeny-labs/cryptanalysis
+2026-11-23T23:56:29.0745096Z  * [new ref]         203c588a4a4b0129409db76293fc50c0a01861eb -> pull/1961/merge
+2026-11-23T23:56:29.0749565Z ##[endgroup]
+2026-11-23T23:56:29.0750905Z ##[group]Determining the checkout info
+2026-11-23T23:56:29.0753222Z ##[endgroup]
+2026-11-23T23:56:29.0754720Z ##[group]Setting up sparse checkout
+2026-11-23T23:56:29.0755945Z [command]/usr/bin/git config core.sparseCheckout true
+2026-11-23T23:56:29.0804095Z [command]/usr/bin/git rev-parse --git-path info/sparse-checkout
+2026-11-23T23:56:29.0840740Z .git/info/sparse-checkout
+2026-11-23T23:56:29.0852195Z ##[endgroup]
+2026-11-23T23:56:29.0854624Z ##[group]Checking out the ref
+2026-11-23T23:56:29.0858400Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/1961/merge
+2026-11-23T23:56:29.9637069Z Note: switching to 'refs/remotes/pull/1961/merge'.
+2026-11-23T23:56:29.9637533Z 
+2026-11-23T23:56:29.9638016Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-23T23:56:29.9638654Z changes and commit them, and you can discard any commits you make in this
+2026-11-23T23:56:29.9639271Z state without impacting any branches by switching back to a branch.
+2026-11-23T23:56:29.9639652Z 
+2026-11-23T23:56:29.9639891Z If you want to create a new branch to retain commits you create, you may
+2026-11-23T23:56:29.9640908Z do so (now or later) by using -c with the switch command. Example:
+2026-11-23T23:56:29.9641663Z 
+2026-11-23T23:56:29.9641811Z   git switch -c <new-branch-name>
+2026-11-23T23:56:29.9642053Z 
+2026-11-23T23:56:29.9642208Z Or undo this operation with:
+2026-11-23T23:56:29.9642414Z 
+2026-11-23T23:56:29.9642533Z   git switch -
+2026-11-23T23:56:29.9642692Z 
+2026-11-23T23:56:29.9643017Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-23T23:56:29.9643422Z 
+2026-11-23T23:56:29.9643878Z HEAD is now at 203c588 Merge ae67853ede5b0f35e13b4d34d67b1c3b524943d3 into 5005bedbe4fd4f1a43456918dd255fd2cbc4a5d1
+2026-11-23T23:56:29.9668787Z ##[endgroup]
+2026-11-23T23:56:29.9729789Z [command]/usr/bin/git log -1 --format=%H
+2026-11-23T23:56:29.9768689Z 203c588a4a4b0129409db76293fc50c0a01861eb
+2026-11-23T23:56:30.0142817Z ##[group]Run actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+2026-11-23T23:56:30.0143284Z with:
+2026-11-23T23:56:30.0143497Z   python-version: 3.13
+2026-11-23T23:56:30.0143754Z   check-latest: false
+2026-11-23T23:56:30.0146492Z   token: ***
+2026-11-23T23:56:30.0146838Z   mirror: https://raw.githubusercontent.com/actions/python-versions/main
+2026-11-23T23:56:30.0147251Z   update-environment: true
+2026-11-23T23:56:30.0147506Z   allow-prereleases: false
+2026-11-23T23:56:30.0147762Z   freethreaded: false
+2026-11-23T23:56:30.0147983Z ##[endgroup]
+2026-11-23T23:56:30.1333757Z ##[group]Installed versions
+2026-11-23T23:56:30.1423829Z Successfully set up CPython (3.13.18)
+2026-11-23T23:56:30.1424802Z ##[endgroup]
+2026-11-23T23:56:30.1588129Z ##[group]Run python3 tools/check_lab_parity.py --repo cryptanalysis
+2026-11-23T23:56:30.1589001Z [36;1mpython3 tools/check_lab_parity.py --repo cryptanalysis[0m
+2026-11-23T23:56:30.1636043Z shell: /usr/bin/bash -e {0}
+2026-11-23T23:56:30.1636495Z env:
+2026-11-23T23:56:30.1636909Z   pythonLocation: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-23T23:56:30.1637624Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib/pkgconfig
+2026-11-23T23:56:30.1638560Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-23T23:56:30.1639180Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-23T23:56:30.1639803Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.13.18/x64
+2026-11-23T23:56:30.1640423Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.13.18/x64/lib
+2026-11-23T23:56:30.1640957Z ##[endgroup]
+2026-11-23T23:56:30.2627766Z lab-parity: tools/pcc/pcc.py: sha256 5673d442694d… != lock a4e5ce5076e2… (owner: crypto)
+2026-11-23T23:56:30.2629206Z lab-parity: tools/pcc/test_pcc.py: sha256 d880932ee5c5… != lock 0dec048df881… (owner: crypto)
+2026-11-23T23:56:30.2629969Z lab-parity: 2 problem(s) for cryptanalysis
+2026-11-23T23:56:30.2706617Z ##[error]Process completed with exit code 1.
+2026-11-23T23:56:30.2864278Z Post job cleanup.
+2026-11-23T23:56:30.3792542Z [command]/usr/bin/git version
+2026-11-23T23:56:30.3842435Z git version 2.56.1
+2026-11-23T23:56:30.3886707Z Temporarily overriding HOME='/home/runner/work/_temp/16d57997-94f4-490f-877e-7f2ed2a9767c' before making global git config changes
+2026-11-23T23:56:30.3888115Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-23T23:56:30.3894184Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/cryptanalysis/cryptanalysis
+2026-11-23T23:56:30.3936376Z Removing SSH command configuration
+2026-11-23T23:56:30.3945147Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-23T23:56:30.3990324Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-23T23:56:30.4585580Z Removing HTTP extra header
+2026-11-23T23:56:30.4600101Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-23T23:56:30.4656582Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-23T23:56:30.5140547Z Removing includeIf entries pointing to credentials config files
+2026-11-23T23:56:30.5147669Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-23T23:56:30.5192960Z includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git.path
+2026-11-23T23:56:30.5193855Z includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git/worktrees/*.path
+2026-11-23T23:56:30.5194802Z includeif.gitdir:/github/workspace/.git.path
+2026-11-23T23:56:30.5195514Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-23T23:56:30.5203285Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git.path
+2026-11-23T23:56:30.5239722Z /home/runner/work/_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config
+2026-11-23T23:56:30.5249759Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-e15ca5f9\-30b5\-4215\-834c\-1de377936af3\.config
+2026-11-23T23:56:30.5300343Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git/worktrees/*.path
+2026-11-23T23:56:30.5336567Z /home/runner/work/_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config
+2026-11-23T23:56:30.5346472Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-e15ca5f9\-30b5\-4215\-834c\-1de377936af3\.config
+2026-11-23T23:56:30.5392920Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-23T23:56:30.5427539Z /github/runner_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config
+2026-11-23T23:56:30.5435724Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-e15ca5f9\-30b5\-4215\-834c\-1de377936af3\.config
+2026-11-23T23:56:30.5485972Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-23T23:56:30.5522364Z /github/runner_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config
+2026-11-23T23:56:30.5530617Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-e15ca5f9\-30b5\-4215\-834c\-1de377936af3\.config
+2026-11-23T23:56:30.5593692Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-23T23:56:30.6096365Z Removing credentials config '/home/runner/work/_temp/git-credentials-e15ca5f9-30b5-4215-834c-1de377936af3.config'
+2026-11-23T23:56:30.6267273Z Cleaning up orphan processes
