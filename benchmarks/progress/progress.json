@@ -157,12 +157,12 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261121T0437Z-jv-cover-f4-round4-confirm",
+  "latest_record": "20261125T2239Z-trace2e-k1-23",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
     "invalid": 8,
-    "measured": 322,
+    "measured": 327,
     "open": 53
   },
   "repo": "crypto",
@@ -30149,6 +30149,306 @@
       ],
       "problem": "ic:split-prime-p2-twist-coset-toy",
       "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 0.9997,
+      "latest": 0.9998,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.01,
+        "improvement_vs_previous_percent": 0.01
+      },
+      "metric": "ratio_explicit_over_trace2e",
+      "points": [
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-17",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K1-17: native binary-subspace select=trace2e (D=6) costs 0.824 [0.801, 0.848] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9997
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 0.03,
+            "improvement_vs_previous_percent": 0.03
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K0-19: native binary-subspace select=trace2e (D=7) costs 0.763 [0.680, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.0
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.01,
+            "improvement_vs_previous_percent": -0.04
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K1-19: native binary-subspace select=trace2e (D=7) costs 0.765 [0.684, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9996
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.0,
+            "improvement_vs_previous_percent": 0.01
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K0-23: native binary-subspace select=trace2e (D=8) costs 0.679 [0.600, 0.769] of binary-subspace D=7 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9997
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 0.01,
+            "improvement_vs_previous_percent": 0.01
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9998
+        }
+      ],
+      "problem": "ic:trace2e-builder",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.2132,
+      "latest": 1.2606,
+      "latest_derived": {
+        "improvement_vs_first_percent": 3.907,
+        "improvement_vs_previous_percent": -14.4079
+      },
+      "metric": "ratio_subspace_over_trace2e",
+      "points": [
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-17",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1792,
+            1.2484
+          ],
+          "summary": "K1-17: native binary-subspace select=trace2e (D=6) costs 0.824 [0.801, 0.848] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.2132
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 7.9871,
+            "improvement_vs_previous_percent": 7.9871
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1669,
+            1.4706
+          ],
+          "summary": "K0-19: native binary-subspace select=trace2e (D=7) costs 0.763 [0.680, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.3101
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 7.6904,
+            "improvement_vs_previous_percent": -0.2748
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1669,
+            1.462
+          ],
+          "summary": "K1-19: native binary-subspace select=trace2e (D=7) costs 0.765 [0.684, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.3065
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 21.398,
+            "improvement_vs_previous_percent": 12.7287
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.3004,
+            1.6667
+          ],
+          "summary": "K0-23: native binary-subspace select=trace2e (D=8) costs 0.679 [0.600, 0.769] of binary-subspace D=7 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.4728
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 3.907,
+            "improvement_vs_previous_percent": -14.4079
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1682,
+            1.3605
+          ],
+          "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.2606
+        }
+      ],
+      "problem": "ic:trace2e-builder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 10.467,
+      "latest": 12.984,
+      "latest_derived": {
+        "improvement_vs_first_percent": -24.047,
+        "improvement_vs_previous_percent": 10.9892,
+        "value_over_reference": 31.286747
+      },
+      "metric": "s_trace2e",
+      "points": [
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.041908
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-17",
+          "reference": 2.076,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K1-17: native binary-subspace select=trace2e (D=6) costs 0.824 [0.801, 0.848] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 10.467
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -26.3113,
+            "improvement_vs_previous_percent": -26.3113,
+            "value_over_reference": 17.304974
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-19",
+          "reference": 0.764,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K0-19: native binary-subspace select=trace2e (D=7) costs 0.763 [0.680, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 13.221
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -8.2354,
+            "improvement_vs_previous_percent": 14.3106,
+            "value_over_reference": 20.560799
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-19",
+          "reference": 0.551,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K1-19: native binary-subspace select=trace2e (D=7) costs 0.765 [0.684, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 11.329
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -39.3618,
+            "improvement_vs_previous_percent": -28.7581,
+            "value_over_reference": 35.928571
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-23",
+          "reference": 0.406,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K0-23: native binary-subspace select=trace2e (D=8) costs 0.679 [0.600, 0.769] of binary-subspace D=7 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 14.587
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -24.047,
+            "improvement_vs_previous_percent": 10.9892,
+            "value_over_reference": 31.286747
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-23",
+          "reference": 0.415,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 12.984
+        }
+      ],
+      "problem": "ic:trace2e-builder",
+      "unit": "S"
     },
     {
       "better": "lower",
