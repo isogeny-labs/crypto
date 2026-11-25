@@ -91,6 +91,21 @@ The independent-curve/full-rank/target-descent/cold same-target rho panel
 remains open for a replacement solver. The `p+1` norm-one/Dickson map is a
 separate construction and requires a separate witness implementation.
 
+## Next candidate to qualify
+
+`src/cryptanalysis/ic_framework/pkm_semaev.rs` already builds the actual
+quadratic Kummer tower, calls native tower F4, and implements basis-root
+extraction followed by a checked point lift. A focused differential control
+should force that algebraic extractor on the `m=3,t=3` Kummer system and
+compare its complete output with independent enumeration before timing.
+Currently the `|V|^m <= 512` threshold selects a grid at `t=3`, so a normal
+small-case success does not test basis-root extraction. The candidate also
+constructs an `O(B)` base list and rank map during preparation; these costs
+must be charged and the no-grid decomposition rule made explicit in a
+prospective protocol amendment. No `O(B^m)` grid result may be used as a
+candidate witness. A mismatch on the first differential control or a
+resource cap at the next height rejects this backend before a wide run.
+
 Sources checked (KB): `source:13c233fff93bab742d135ed6c12bb7b6`
 (`crypto:research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md`) for
 the previously measured tower systems, and `source:362976dae6e255e22be8c13a8c7a2e2f`
