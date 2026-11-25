@@ -166,3 +166,40 @@ Summary per bit band with median and IQR. Report, graph and PDF.
 
 **Stop.** All 105 instances × 2 values of $\ell$ done, or a correctness
 control fails (fix, rerun, record).
+
+## A5. KLPT with CVP strong approximation, paired with A4 (2026-11-24)
+
+Written before any A5 code exists. A4's code and results stay frozen.
+
+**Question.** A4's step (d) reduces $(c',d')$ modulo $N$, so $p(c'^2+d'^2)$
+can reach about $pN^4$. Its measured $e_1$ part was $\log_p\ell^{e_1}\approx
+3.06$–$3.24$ (A4 summary). The solutions $(c',d')$ form a translate of a
+rank-2 lattice of determinant $N^3$, $\lambda(C,D)+N\cdot\{(x,y):Cx+Dy\equiv0
+\bmod N\}$. Taking its points closest to the origin (CVP on a Gauss-reduced
+basis, then enumerating in increasing norm) needs only
+$\ell^{e_1}\gtrsim pN^3$. How much of the gap to the counting optimum does
+that recover on the same instances?
+
+**Hypothesis H5 (paired prediction).** Same 105 rows, ℓ∈{2,3}, same seeds as
+A4. Per bit band, the median of $\log_p\ell^{e}$ drops relative to A4 by
+between 0.40 and 0.65, the size of $\log_p N$ (A4: 0.52–0.56). So the 28-bit
+medians land in $[3.05,3.35]$, and the KLPT/optimum ratio grows like
+$p^{2.0\text{–}2.3}$.
+
+**Falsifiers.**
+- A drop below 0.30 in any band means the CVP step is not effective: a bug or
+  an analysis gap. Investigate before reporting.
+- A drop above 0.80 is unexplained by the $N^4\to N^3$ change. Investigate
+  that too.
+
+**Method.** Copy A4 into `a5_klpt_cvp/`. Change only step (d) and the
+$e_1$ rule: least $e_1$ with $\ell^{e_1}\ge pN^3$, with the same bump
+policy. Candidates are lattice points in increasing norm with
+$p(c'^2+d'^2)\le\ell^{e_1}$. Steps (a)–(c), (e), the controls and the seeds
+are unchanged.
+
+**Controls.** All of A4's exact output controls, on every run. Control 1 is
+rerun as well. A paired table per instance: same $N$ and same $\gamma$ as A4
+where the random stream allows. Any difference in N is reported.
+
+**Stop.** All 1050 runs done, or a control fails (fix, rerun, record).

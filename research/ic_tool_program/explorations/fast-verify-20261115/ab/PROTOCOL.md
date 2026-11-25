@@ -31,8 +31,8 @@ by Fermat's little theorem over `F2mElement`, a multi-word element.
 - **Control:** `KIC_FAST_VERIFY=0` restores the generic route.
 - **Exploration** ([`../explore/`](../explore/), one process an arm, three
   repetitions each):
-  - verify fell 5.65–6.05 → 3.16–3.34 ms at k0n53 and 6.74–7.46 →
-    4.15–4.38 ms at k0n61;
+  - verify fell 5.65–6.05 → 3.16–3.34 ms at icv1-f2m53-tm56619371-dac20a85 and 6.74–7.46 →
+    4.15–4.38 ms at icv1-f2m61-t158598901-ab42b6c5;
   - 160 and 172 counted and answer fields were identical.
 
 ## Arms: one binary, three labels
@@ -47,7 +47,7 @@ by Fermat's little theorem over `F2mElement`, a multi-word element.
 
 ## Workload, schedule, metrics and statistics
 
-- **Rows:** `M1-T01` at `k0n53` and `k0n61`.
+- **Rows:** `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` and `icv1-f2m61-t158598901-ab42b6c5`.
 - **Isolation:** `isolated_bench --cpus 2` with `RAYON_NUM_THREADS=1`.
 - **Schedule:** **24 rounds**, cycled over the six orders of `a q f` (four
   cycles).
@@ -76,8 +76,8 @@ Medians `a / f`:
 
 | row | verify | set-up |
 |:--|:--|:--|
-| k0n53 | [1.4, 2.2] | [1.00, 1.03] |
-| k0n61 | [1.3, 2.0] | [1.00, 1.01] |
+| icv1-f2m53-tm56619371-dac20a85 | [1.4, 2.2] | [1.00, 1.03] |
+| icv1-f2m61-t158598901-ab42b6c5 | [1.3, 2.0] | [1.00, 1.01] |
 
 ## Identity
 
