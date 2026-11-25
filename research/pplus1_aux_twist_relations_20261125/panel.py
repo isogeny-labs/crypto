@@ -160,6 +160,7 @@ def rank(rows: list[list[int]]) -> int:
 
 
 def rho(curve: Curve, gen: Point, target: Point, seed: int) -> dict:
+    before = curve.ops
     rng = random.Random(seed)
     a, b = rng.randrange(R), rng.randrange(R)
     start = curve.add(curve.mul(a, gen), curve.mul(b, target))
@@ -173,13 +174,14 @@ def rho(curve: Curve, gen: Point, target: Point, seed: int) -> dict:
         return curve.add(q, q), 2 * aa % R, 2 * bb % R
     slow = step((start, a, b))
     fast = step(step((start, a, b)))
-    before = curve.ops
     for i in range(1, 10 * R + 1):
         if slow[0] == fast[0]:
             den = (slow[2] - fast[2]) % R
             if den:
                 k = (fast[1] - slow[1]) * pow(den, -1, R) % R
-                return {"steps": i, "ops": curve.ops - before, "valid": curve.mul(k, gen) == target}
+                ops = curve.ops - before
+                valid = curve.mul(k, gen) == target
+                return {"steps": i, "ops": ops, "k": k, "valid": valid}
             return {"steps": i, "ops": curve.ops - before, "valid": False, "degenerate": True}
         slow = step(slow)
         fast = step(step(fast))
@@ -237,9 +239,10 @@ def main(out: Path) -> None:
     for name, fiber in fibers.items():
         wall0, cpu0, op0 = time.perf_counter(), time.process_time(), e.ops
         fb, selected = signed_base(e, fiber)
-        record = {"fiber_size": len(set(fiber)), "target_lift_x_count": len(lifts(e, fiber)),
+        record = {"fiber_x": sorted(set(fiber)), "fiber_size": len(set(fiber)),
+                  "target_lift_x_count": len(lifts(e, fiber)),
                   "selected_x": selected, "columns": len(selected), "signed_points": len(fb),
-                  "setup": setup[name]}
+                  "base_points": fb, "setup": setup[name]}
         if len(fb) < 4:
             record.update({"status": "censored_before_relation_search", "reason": "underfilled target base"})
         else:
@@ -248,6 +251,7 @@ def main(out: Path) -> None:
                 for j, y in enumerate(fb):
                     pairs[e.add(x, y)].append((i, j))
             rows, rhs, hits, all_hits, stopping = [], [], 0, 0, None
+            relation_records = []
             for qi, (a, b) in enumerate(stream, 1):
                 q = e.add(e.mul(a, gen), e.mul(b, target))
                 for i, j in pairs.get(q, []):
@@ -256,6 +260,9 @@ def main(out: Path) -> None:
                     row[1 + i // 2] = (row[1 + i // 2] - (1 if i % 2 == 0 else -1)) % R
                     row[1 + j // 2] = (row[1 + j // 2] - (1 if j % 2 == 0 else -1)) % R
                     rows.append(row); rhs.append(-a % R); all_hits += 1
+                    relation_records.append({"query": qi, "a": a, "b": b,
+                                             "point_indices": [i, j],
+                                             "row": row.copy(), "rhs": -a % R})
                 if pairs.get(q):
                     hits += 1
                 if rank(rows) == 3:
@@ -264,24 +271,30 @@ def main(out: Path) -> None:
             record.update({"status": "full_rank" if stopping else "censored_at_query_cap",
                            "queries": stopping or QUERIES, "hit_queries": hits,
                            "verified_rows": all_hits, "coefficient_rank": rank(rows),
-                           "unique_rows": len(set(zip(map(tuple, rows), rhs)))})
+                           "unique_rows": len(set(zip(map(tuple, rows), rhs))),
+                           "relations": relation_records,
+                           "query_group_ops": e.ops - op0,
+                           "query_wall_s": time.perf_counter() - wall0,
+                           "query_cpu_s": time.process_time() - cpu0})
             # Independently validate the scalar equation for every row.
+            validation_before = e.ops
             scalar_of = {e.mul(k, gen): k for k in range(R)}
             logs = [scalar_of[fb[0]], scalar_of[fb[2]]]
             assert all((row[0] * TARGET_K + row[1] * logs[0] +
                         row[2] * logs[1] - value) % R == 0
                        for row, value in zip(rows, rhs))
-        record.update({"target_group_ops": e.ops - op0,
-                       "wall_s": time.perf_counter() - wall0,
-                       "cpu_s": time.process_time() - cpu0,
-                       "cold_wall_s": setup[name]["wall_s"] + time.perf_counter() - wall0,
-                       "cold_cpu_s": setup[name]["cpu_s"] + time.process_time() - cpu0})
+            record["validation_group_ops"] = e.ops - validation_before
+        record.update({"target_group_ops": record.get("query_group_ops", e.ops - op0),
+                       "wall_s": record.get("query_wall_s", time.perf_counter() - wall0),
+                       "cpu_s": record.get("query_cpu_s", time.process_time() - cpu0)})
+        record["cold_wall_s"] = setup[name]["wall_s"] + record["wall_s"]
+        record["cold_cpu_s"] = setup[name]["cpu_s"] + record["cpu_s"]
         results[name] = record
     rho_results = [rho(e, gen, target, SEED + i) for i in range(16)]
     result = {"protocol": "PROTOCOL.md", "p": P, "curve": [1, 26], "r": R,
               "generator": gen, "target": target, "known_answer_validation": TARGET_K,
               "twist_nonsquare": d, "twist_shift": shift,
-              "stream_seed": SEED, "stream_queries": QUERIES,
+              "stream_seed": SEED, "stream_queries": stream,
               "arms": results, "plain_rho": rho_results,
               "total_wall_s": time.perf_counter() - started,
               "total_cpu_s": time.process_time() - cpu,
