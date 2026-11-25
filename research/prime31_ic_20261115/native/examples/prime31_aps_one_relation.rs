@@ -2147,7 +2147,8 @@ fn algebraic_queued_factorized(
                         }
                         Err(error)=>{
                             cells.push(json!({"id":id,"rows":[begin,end],
-                                "status":"error","error":error}));
+                                "status":"error","error":error,
+                                "rows_started":null,"s3_pairs":null}));
                             failure=Some(error);
                         }
                     }
@@ -2175,8 +2176,11 @@ fn algebraic_queued_factorized(
     total.s3_sqrt=prepared.s3_sqrt;
     let mut reports=Vec::with_capacity(workers);
     let mut all_cells=Vec::with_capacity(sent);
+    let mut errors=Vec::new();
     for (worker,wall_ns,additions,stats,solution,cells,failure) in work{
-        if let Some(error)=failure{return Err(error);}
+        if let Some(error)=failure{
+            errors.push(json!({"worker":worker,"error":error}));
+        }
         if let Some(candidate)=solution{
             if selected.as_ref().is_none_or(|old|candidate.indices<old.indices){
                 selected=Some(candidate);
@@ -2195,12 +2199,14 @@ fn algebraic_queued_factorized(
     }
     let cancelled=all_cells.iter().filter(|cell|cell["status"].as_str()
         .is_some_and(|status|status.starts_with("cancelled"))).count();
+    let failed=all_cells.iter().filter(|cell|cell["status"]=="error").count();
     let queue=json!({"capacity_cells":capacity,"chunk_rows":chunk_rows,
         "generated_cells":sent,"admitted_cells":sent,"queued_cells":sent,
         "dequeued_cells":all_cells.len(),"cancelled_cells":cancelled,
-        "completed_or_witness_cells":sent-cancelled,"never_started_cells":0,
-        "cells":all_cells});
-    Ok((selected,total,reports,queue))
+        "failed_cells":failed,"completed_or_witness_cells":sent-cancelled-failed,
+        "never_started_cells":0,"errors":errors,
+        "work_accounting_complete":errors.is_empty(),"cells":all_cells});
+    Ok((if errors.is_empty(){selected}else{None},total,reports,queue))
 }
 
 // Development parity gate on the first public Q of the archived 48-Q panel.

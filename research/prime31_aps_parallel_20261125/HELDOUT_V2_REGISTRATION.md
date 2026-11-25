@@ -35,12 +35,10 @@ records, every HMAC-derived seed and schedule rotation, artifact digests,
 and disjointness from development and V1 public Q. This verifies input
 registration only [pcc:unverified]; no APS or rho solve used a V2 Q.
 
-The source and runner still need per-case seed injection, per-logical-lane
-restart streams, isolated four-physical-core placement, a fixed memory
-ceiling, per-call peak RSS, A/A controls, and a prospectively fixed paired
-analysis before any V2 solve is launched. The existing 48 development Q
-remain the pilot and tuning population. Freeze rho settings, source and
-binary hashes, host, arm rotation, budgets, and analysis digest before
-admitting the V2 panel. Keep every timeout, failure, cancelled cell, and
-worker report; do not replace a held-out case. These registered inputs
-make no timing or crossover claim.
+The native single-target entry points now accept the V2 seed streams. The
+Linux runner, admission template, and analysis are specified in
+`HELDOUT_V2_RUNBOOK.md`. A same-host A/A control, reviewed host isolation,
+binary hash and actual resource admission remain outstanding. The existing
+48 development Q remain the pilot population. Keep every timeout, failure,
+cancelled cell and worker report; do not replace a held-out case. These
+registered inputs make no timing or crossover claim.
