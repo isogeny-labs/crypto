@@ -401,7 +401,7 @@ fn run() -> Result<(), String> {
 <line x1="90" y1="430" x2="835" y2="430" stroke="#333"/>
 <line x1="90" y1="85" x2="90" y2="430" stroke="#333"/>
 <line x1="90" y1="{threshold:.1}" x2="835" y2="{threshold:.1}" stroke="#2a9d8f" stroke-width="2" stroke-dasharray="8 6"/>
-<text x="830" y="{threshold_label:.1}" text-anchor="end" font-family="sans-serif" font-size="14" fill="#16766c">primary B ceiling 0.75</text>
+<text x="830" y="102" text-anchor="end" font-family="sans-serif" font-size="14" fill="#16766c">primary B ceiling 0.75</text>
 {marks}
 <text x="450" y="500" text-anchor="middle" font-family="sans-serif" font-size="16">cut policy</text>
 <text x="25" y="260" transform="rotate(-90 25 260)" text-anchor="middle" font-family="sans-serif" font-size="16">candidate / D field_ops</text>
@@ -409,7 +409,6 @@ fn run() -> Result<(), String> {
 </svg>
 "##,
         threshold = y(0.75),
-        threshold_label = y(0.75) - 8.0,
     );
     std::fs::write(Path::new(&out).join("figure.svg"), svg)
         .map_err(|e| format!("write svg: {e}"))?;
