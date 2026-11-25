@@ -1,7 +1,7 @@
 {
   "schema": "ecbench.spec/v1",
   "label": "lead e2e paired K1-17 panel: root-finding and charged double-large-prime IC",
-  "description": "Two public same-target workloads, one cold round each, strong signed-Frobenius rho and A/A control. Correctness and accounting panel; L0 native work is unpriced.",
+  "description": "Two public same-target workloads, two cold rounds each, strong signed-Frobenius rho and A/A control. Correctness and accounting panel; L0 native work is unpriced.",
   "field_profile": "semaev-groebner-f2m17-v1",
   "workloads": {
     "curves": [{"kind": "koblitz", "a": 1, "n": 17}],
@@ -27,7 +27,7 @@
     {"name": "rho-aa", "role": "control", "method": {"id": "rho.signed_frobenius_strong"}}
   ],
   "measurement": {
-    "rounds": 1,
+    "rounds": 2,
     "warmup": 0,
     "order": "alternate",
     "seed": 2026112502,
