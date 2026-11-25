@@ -927,6 +927,8 @@ pub struct PkmSemaevOracle {
     inherit: bool,
     /// Algebraic tower/quotient root descent instead of `O(|V|^m)` `grid()` fallback.
     descent: bool,
+    /// Disable the small-domain grid crossover for a measured basis-descent arm.
+    force_descent: bool,
     /// One learned trace per branch system (one entry without guessing).
     traces: Vec<Option<Arc<F4Trace>>>,
     /// Learning cost and shape counters, reported as setup native work.
@@ -982,6 +984,7 @@ impl PkmSemaevOracle {
             trace: false,
             inherit: true,
             descent: true,
+            force_descent: false,
             traces: Vec::new(),
             trace_setup: BTreeMap::new(),
             lifts: false,
@@ -1266,6 +1269,14 @@ impl PkmSemaevOracle {
             1 => true,
             o => return Err(format!("pkm-semaev: descent is 0 or 1, not {o}")),
         };
+        self.force_descent = match params.u64_or("force_descent", 0)? {
+            0 => false,
+            1 => true,
+            o => return Err(format!("pkm-semaev: force_descent is 0 or 1, not {o}")),
+        };
+        if self.force_descent && (self.engine != PkmEngine::F4 || !self.descent) {
+            return Err("pkm-semaev: force_descent=1 needs engine=f4 and descent=1".into());
+        }
         let lifts = params.u64_or("lifts", 0)?;
         if lifts > 2 {
             return Err(format!("pkm-semaev: lifts is 0, 1 or 2, not {lifts}"));
@@ -1589,6 +1600,9 @@ impl PkmSemaevOracle {
     /// Prefer legacy `grid()` extraction over basis-root descent.
     /// `grid()` only implements `m ≤ 3`, so larger `m` always stays on descent.
     fn prefer_grid_extraction(&self) -> bool {
+        if self.force_descent {
+            return false;
+        }
         if self.m > 3 {
             return false;
         }
@@ -3546,7 +3560,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             ),
         };
         format!(
-            "Semaev S_(m+1) over F_p with each x_i on {} (PKM), m = {}, t = {}, mode {}, engine {}",
+            "Semaev S_(m+1) over F_p with each x_i on {} (PKM), m = {}, t = {}, mode {}, engine {}, extraction {}",
             tower,
             self.m,
             self.t,
@@ -3554,6 +3568,11 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 .get("mode")
                 .unwrap_or(if self.m >= 3 { "chain" } else { "full" }),
             params.get("engine").unwrap_or("f4"),
+            if params.get("force_descent") == Some("1") {
+                "forced-basis-descent"
+            } else {
+                "adaptive"
+            },
         )
     }
 
@@ -3580,6 +3599,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             (
                 "crosscheck",
                 "1 to grid-check every F4 refutation (diagnostic, not charged)",
+            ),
+            (
+                "force_descent",
+                "1 to bypass the small-domain grid crossover and extract F4 basis roots; requires engine=f4,descent=1",
             ),
             (
                 "bits",
@@ -4605,6 +4628,47 @@ mod tests {
         assert_eq!(targets, 100);
         assert_eq!(cancellation_targets, fb.points.len());
         assert!(descents > 0, "basis extraction must run on a consistent system");
+    }
+
+    #[test]
+    fn forced_kummer_m3_descent_uses_public_oracle_path() {
+        let inst = PrimeInstance {
+            name: "pkm-kummer-forced-f97".into(),
+            curve: PrimeCurve { p: 97, a: 3, b: 15 },
+            group_order: 101,
+            r: 101,
+            cofactor: 1,
+            generator: (4, 24),
+            representation: None,
+        };
+        let fb = base(&inst, 3);
+        let target = sum(&inst.curve, &fb, &[0, 0, 0]);
+        let mut o = oracle(
+            &inst,
+            &fb,
+            3,
+            3,
+            "m=3,mode=chain,engine=f4,descent=1,force_descent=1,trace=0,degree=12",
+        );
+        assert!(!o.prefer_grid_extraction());
+        assert!(o.use_descent_extraction());
+        let indices = o
+            .decompose(
+                &ctx(&inst),
+                &fb,
+                &mut GroupOps::default(),
+                &mut OracleCounters::default(),
+                target,
+            )
+            .expect("forced basis descent must recover a planted relation");
+        assert_eq!(sum(&inst.curve, &fb, &indices), target);
+        assert_eq!(
+            o.relation_counters()
+                .get("pkm_descent_deferred_to_grid")
+                .copied()
+                .unwrap_or(0),
+            0
+        );
     }
 
     /// F4 on a membership form against the grid and the exact set of
