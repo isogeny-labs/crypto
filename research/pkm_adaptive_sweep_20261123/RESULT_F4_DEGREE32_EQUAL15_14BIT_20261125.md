@@ -57,6 +57,22 @@ the two runs. The candidate's `ns/op` was 3.44 and 3.02. So the 32× operation
 saving reaches GAE as 1.4–10× per system depending on the measured price, and
 part of the pair-to-pair spread in the ratio is calibration, not algorithm.
 
+## Independent corroboration at 14 bits
+
+The peer panel (`PROTOCOL_F4_DEGREE32_14BIT_SINGLE_CURVE_20261125.md`, control
+`prime-interval:t=5,lo=1`, binary `1ae5170f…`, target seed 20261301) passed on
+the same curve with the same candidate seed: combined charged GAE **0.3152**
+(pairs 0.3070 / 0.3245), 360/376 relations over 14,044/14,290 trials. Store
+`degree32_14bit_single_curve_20261301_cap900.jsonl`
+(SHA-256 `b56bedf47740662ced9e5bb8d7618cabefc4fc93e9582271e4f7b30245dfd2d4`).
+
+So at 14 bits, two different control constructions (`prime-abscissa:below=32`
+and `prime-interval:t=5,lo=1`), two different binaries and two different
+target seeds agree at 0.26 and 0.32. That is the strongest form of the 14-bit
+statement available: the lead is not an artifact of how the equal-size control
+is built. The two panels remain unpooled because their binaries and controls
+differ.
+
 ## Claim boundary
 
 Does not establish: instance replication at 14 bits (the rung has one roster
