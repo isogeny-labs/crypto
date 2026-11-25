@@ -22,6 +22,7 @@
 //! | [`RetentionPolicy::Degree`] | largest sum of LP-column degrees over the full batch |
 //! | [`RetentionPolicy::Spectral`] | largest sum of leading-eigenvector weights of the multigraph (power iteration on `A + I`) |
 //! | [`RetentionPolicy::CoreThenRandom`] | rows inside the 2-core ([`super::core_numbers`]) first, seeded order, then the rest |
+//! | [`RetentionPolicy::SinglesThenSpectral`] | rows with one LP first, then two-LP rows; spectral order within each (exploratory, added after `research/lp_retention_20261125`'s frozen run showed that `SmallestLp`'s product key already ranks every one-LP row first) |
 //!
 //! Ties are broken by row position, so every policy is deterministic for a
 //! fixed batch and seed. Nothing here claims a speedup of a complete solve.
@@ -38,15 +39,26 @@ pub enum RetentionPolicy {
     Degree,
     Spectral,
     CoreThenRandom,
+    SinglesThenSpectral,
 }
 
 impl RetentionPolicy {
-    pub const ALL: [RetentionPolicy; 5] = [
+    /// The five policies of the frozen protocol in `research/lp_retention_20261125`.
+    pub const FROZEN: [RetentionPolicy; 5] = [
         RetentionPolicy::Random,
         RetentionPolicy::SmallestLp,
         RetentionPolicy::Degree,
         RetentionPolicy::Spectral,
         RetentionPolicy::CoreThenRandom,
+    ];
+
+    pub const ALL: [RetentionPolicy; 6] = [
+        RetentionPolicy::Random,
+        RetentionPolicy::SmallestLp,
+        RetentionPolicy::Degree,
+        RetentionPolicy::Spectral,
+        RetentionPolicy::CoreThenRandom,
+        RetentionPolicy::SinglesThenSpectral,
     ];
 
     pub fn name(self) -> &'static str {
@@ -56,6 +68,7 @@ impl RetentionPolicy {
             RetentionPolicy::Degree => "degree",
             RetentionPolicy::Spectral => "spectral",
             RetentionPolicy::CoreThenRandom => "core_then_random",
+            RetentionPolicy::SinglesThenSpectral => "singles_then_spectral",
         }
     }
 }
@@ -228,6 +241,14 @@ pub fn retain(
             let w = g.eigenvector(200);
             let score: Vec<f64> = (0..n).map(|i| g.lp_ends(i).map(|v| w[v]).sum()).collect();
             order.sort_by(|&a, &b| score[b].total_cmp(&score[a]).then(a.cmp(&b)));
+        }
+        RetentionPolicy::SinglesThenSpectral => {
+            let w = g.eigenvector(200);
+            let score: Vec<f64> = (0..n).map(|i| g.lp_ends(i).map(|v| w[v]).sum()).collect();
+            let arity = |i: usize| g.lp_ends(i).count();
+            order.sort_by(|&a, &b| {
+                arity(a).cmp(&arity(b)).then(score[b].total_cmp(&score[a])).then(a.cmp(&b))
+            });
         }
         RetentionPolicy::CoreThenRandom => {
             let core = core_numbers(&adjacency(g.vertices, &g.edges));

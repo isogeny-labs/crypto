@@ -64,3 +64,27 @@ run INVALID.
 Exact counts of a component: no timing, no benchmark row, no leaderboard change, no ECDLP speed
 claim. All of it is development-scale local work, seconds to minutes on one core, so no isolab
 submission is needed (CLAUDE.md: keep local development checks local).
+
+## Addendum A: confirmation of `singles_then_spectral` (frozen 2026-11-25, before its confirmation data)
+
+**Why it exists.** The frozen run falsified H4: relabelled `smallest_lp` did not tie `random`. Its
+product key ranks every one-LP row before any two-LP row, whatever the labels. An exploratory sixth
+policy, `singles_then_spectral` (one-LP rows first, spectral order within each arity), was added
+after seeing those results. On the same data it beat every frozen policy on every stream and budget
+(`results_explore/`). Those numbers are post hoc and do not count as evidence for it.
+
+**H7 (confirmation on fresh instances).**
+- Streams:
+  - FP3, FP4, FP5: `--source fp --p-index 3,4,5`, new primes and seeds.
+  - FP3r, FP4r, FP5r: the same pools relabelled.
+  - SYN2 and SYN2r: `--source synthetic --p-index 1`, seeds 1007..1011.
+- Same budgets and statistic as above.
+- Claims:
+  - (a) On every relabelled stream (FPr, SYN2r) and every budget, `singles_then_spectral` beats
+    `smallest_lp`, `degree` and `spectral`.
+  - (b) On the unrelabelled FP streams it is not worse than `smallest_lp` (lower bound ≥ 0.99) at
+    every budget.
+- Failing either claim on any fresh stream rejects the policy as a default.
+
+REAL (H6), if the root crate builds, is scored with all six policies. It counts toward H7 (a) as the
+one stream whose LP identities are genuine curve labels.

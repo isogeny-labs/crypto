@@ -54,7 +54,7 @@ fn useful_rank_matches_dense_rank_for_every_policy() {
             }
         }
     }
-    assert_eq!(checked, 4 * 15 * 2 * 5);
+    assert_eq!(checked, 4 * 15 * 2 * RetentionPolicy::ALL.len());
 }
 
 #[test]
@@ -128,4 +128,16 @@ fn fp_toy_collects_replays_and_ranks() {
     let n = col.partials.len();
     let out = compare_policies(&col.partials, inst.ell, n / 4, &RetentionPolicy::ALL, 0).unwrap();
     assert!(out.iter().all(|o| o.kept == n / 4 && o.rank.left_nullity <= o.cycle_count));
+}
+
+/// SinglesThenSpectral keeps every one-LP row before any two-LP row.
+#[test]
+fn singles_then_spectral_takes_singletons_first() {
+    let ell = 1_000_003;
+    let rels = pool(5, 400, 200, false, ell);
+    let idx = LpIndex::build(&rels, ell).unwrap();
+    let singles = idx.rows.iter().filter(|r| r.len() == 1).count();
+    assert!(singles > 20 && singles < rels.len());
+    let kept = retain(&rels, ell, singles, RetentionPolicy::SinglesThenSpectral, 0).unwrap();
+    assert!(kept.iter().all(|&i| idx.rows[i].len() == 1));
 }
