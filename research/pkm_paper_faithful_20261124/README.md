@@ -231,7 +231,20 @@ measured ceiling of ~14. `m` is therefore not the lever; the smoothness bound
 no `B > 2` run exists anywhere (the paper included), is the remaining gap
 between this record and any statement about 2^32 or 2^96 degrees.
 
-## 8. Files
+## 8. The smoothness bound moves the other way (`B_LADDER.md`)
+
+At a fixed composed degree (`p = 1000003`, `S ≈ 1000 ≈ p^{1/2}`, `m = 2`), the
+generic F4 does not finish one `B = 2` system in 300 s, while the same degree
+built from `3·3·11·11` is decided in ~1.3 s and one from `7·11·13` in 8.2 s —
+a U-shape with its optimum around `B = 7–11`. The variable count falls exactly
+as `log_B` predicts (20 → 14 → 12 → 8 → 8 → 6), and the auxiliary-curve search
+gets cheaper at the same time (2 561 curves at `B = 2`, 57 at `7·11·13`).
+Extrapolated to P-192 at `m = 2`, `B = 11` still needs `n0 ≈ 28` levels and
+56 tower variables against a measured ceiling of ~14, so this narrows the gap
+by a factor of ~3.5 and roughly two orders of magnitude in solver time; it
+does not close it.
+
+## 9. Files
 * `run.sh` — the exact commands, in order.
 * `results/*.json` — the raw `ic bench` output, one file per row above
   (`r16t8_fullrank.json` is the strict-certificate run of §5).
@@ -239,5 +252,9 @@ between this record and any statement about 2^32 or 2^96 degrees.
 * `m_sweep.py` — the §6 table from `results/m*_p12t*.json`.
 * `CHAIN_DIAGNOSTIC.md` — §7, the solver-boundary probe and its raw rows
   (`chain_diag.jsonl`, `results/diag_*.json`).
+* `B_LADDER.md` — §8, the smoothness-bound ladder (`b_ladder.jsonl`).
+* `examples/pkm_mixed_chain_f4.rs` — the driver for §8 (builds the
+  `pkm_smooth_tower` mixed-degree chain and its relation system, hands it to
+  `f4_fp`).
 * `pilot_iso.json` — the `pkm_tower_pilot` row that emitted `E'`, `#E'` and
   `V` for the §4 construction check.
