@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Contract checks for the hourly relation-yield telemetry parser."""
 import unittest
+from pathlib import Path
+import tempfile
+from hourly_cpu_telemetry import compare_cpu, append_row, read_history, perf_values
 
 from hourly_relation_finding import compare, percent_change, verified_metrics
 
@@ -68,6 +71,49 @@ class TelemetryTests(unittest.TestCase):
     def test_zero_baseline(self):
         self.assertEqual(percent_change(0, 0), 0.0)
         self.assertEqual(percent_change(1, 0), float("inf"))
+
+
+class CPUCohortTests(unittest.TestCase):
+    def row(self, i, cpu="CPU A", build="build-a", rate=10):
+        return dict(host_cpu=cpu, runner_arch="x86_64", build_id=build,
+                    measurement_mode="plain", curve_n=23, curve_a=0,
+                    factor_base_hash="frozen", natural_trials=256,
+                    natural_relations=163, planted_count=64, planted_verified=64,
+                    unsat_count=64, unsat_hits=0, relations_per_sec=rate,
+                    wall_seconds=163/rate, status="success", anomaly="",
+                    run_url=f"run-{i}")
+
+    def test_provisional_and_isolation(self):
+        history = [self.row(i) for i in range(9)]
+        history += [self.row(i+20, cpu="CPU B") for i in range(12)]
+        history += [self.row(i+40, build="build-b") for i in range(12)]
+        history += [history[0].copy()]
+        row = self.row(100, rate=50)
+        store = {}
+        self.assertEqual(compare_cpu(row, history, store), [])
+        self.assertEqual(row["baseline_samples"], 9)
+        self.assertEqual(row["baseline_state"], "provisional")
+
+    def test_freeze_and_threshold(self):
+        history = [self.row(i) for i in range(10)]
+        row, store = self.row(100), {}
+        self.assertEqual(compare_cpu(row, history, store), [])
+        version = row["baseline_version"]
+        self.assertEqual(row["baseline_samples"], 10)
+        row = self.row(101, rate=14)
+        self.assertEqual(len(compare_cpu(row, history + [self.row(200, rate=100)], store)), 2)
+        self.assertEqual(row["baseline_version"], version)
+        self.assertEqual(row["throughput_deviation_pct"], 40)
+
+    def test_legacy_csv_and_unavailable_counters(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "log.csv"
+            append_row(path, ["old"], {"old": "line1\nline2"})
+            append_row(path, ["old", "new"], {"old": "next", "new": "cpu"})
+            self.assertEqual(read_history(path),
+                             [{"old": "line1\nline2", "new": ""}, {"old": "next", "new": "cpu"}])
+            path.write_text("123;;cycles;1\n<not supported>;;instructions;0\n")
+            self.assertEqual(perf_values(path), {"cycles": 123.0})
 
 
 if __name__ == "__main__":
