@@ -35,6 +35,7 @@
 //! sizes, no constant-time guarantees, no key compression (real MAYO
 //! seeds most of the key material from SHAKE).
 
+use super::strassen::{self, Ring};
 use crate::hash::sha3::shake256;
 use crate::utils::random::random_bytes;
 
@@ -85,20 +86,26 @@ fn zero_matrix(r: usize, c: usize) -> Matrix {
     vec![vec![0u8; c]; r]
 }
 
-fn mat_mul(a: &Matrix, b: &Matrix) -> Matrix {
-    let (r, k, c) = (a.len(), b.len(), b[0].len());
-    let mut out = zero_matrix(r, c);
-    for i in 0..r {
-        for l in 0..k {
-            if a[i][l] == 0 {
-                continue;
-            }
-            for j in 0..c {
-                out[i][j] ^= gf_mul(a[i][l], b[l][j]);
-            }
-        }
+/// GF(16) for [`super::strassen`].
+struct Gf16;
+impl Ring for Gf16 {
+    type Elt = u8;
+    const ZERO: u8 = 0;
+    const SKIP_ZERO: bool = true;
+    fn add(a: u8, b: u8) -> u8 {
+        a ^ b
     }
-    out
+    fn sub(a: u8, b: u8) -> u8 {
+        a ^ b
+    }
+    fn mul(a: u8, b: u8) -> u8 {
+        gf_mul(a, b)
+    }
+}
+
+/// Schoolbook below `strassen::STRASSEN_CUTOFF`, Strassen above it.
+fn mat_mul(a: &Matrix, b: &Matrix) -> Matrix {
+    strassen::mul::<Gf16>(a, b)
 }
 
 fn mat_vec(a: &Matrix, x: &[u8]) -> Vec<u8> {
@@ -472,6 +479,17 @@ pub fn mayo_verify(pk: &MayoPublicKey, msg: &[u8], sig: &MayoSignature) -> bool 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn strassen_matches_schoolbook_gf16() {
+        strassen::tests::assert_strassen_matches_naive::<Gf16>(|x| (x & 0x0f) as u8);
+    }
+
+    #[test]
+    #[ignore = "timing report; run with --release --ignored --nocapture"]
+    fn strassen_crossover_gf16() {
+        strassen::tests::crossover_report::<Gf16>("GF(16)", |x| (x & 0x0f) as u8);
+    }
 
     #[test]
     fn gf16_inverses() {
