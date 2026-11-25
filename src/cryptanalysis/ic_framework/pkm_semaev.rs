@@ -4160,6 +4160,91 @@ mod tests {
         assert!(n["pkm_system_fp_mults_uncharged"] > 0);
     }
 
+    /// Exercise the algebraic basis extractor at t=3 directly. The public
+    /// oracle intentionally uses its grid crossover at this size, so a normal
+    /// decompose() differential test would not exercise basis root descent.
+    /// The complete 100-point affine census includes all six base targets,
+    /// which also have witnesses of the form (P, -P, R).
+    #[test]
+    fn kummer_m3_basis_descent_complete_small_curve_census() {
+        let inst = PrimeInstance {
+            name: "pkm-kummer-census-f97".into(),
+            curve: PrimeCurve { p: 97, a: 3, b: 15 },
+            group_order: 101,
+            r: 101,
+            cofactor: 1,
+            generator: (4, 24),
+            representation: None,
+        };
+        let curve = &inst.curve;
+        let fb = base(&inst, 3);
+        assert_eq!(fb.columns, 3);
+        let o = oracle(&inst, &fb, 3, 3, "m=3,mode=chain,engine=f4,descent=1,trace=0,degree=12");
+        assert!(o.prefer_grid_extraction(), "this test must bypass the public crossover");
+
+        let mut exact = HashSet::new();
+        for &p in &fb.points {
+            for &q in &fb.points {
+                for &r in &fb.points {
+                    let target = curve.add(&mut GroupOps::default(),
+                                           curve.add(&mut GroupOps::default(), p, q), r);
+                    if !target.infinity {
+                        exact.insert(curve.key(&target));
+                    }
+                }
+            }
+        }
+
+        let prep = o.prepared.as_ref().expect("prepared Kummer tower");
+        let mut targets = 0usize;
+        let mut descents = 0usize;
+        let mut cancellation_targets = 0usize;
+        for x in 0..curve.p {
+            let Some(y) = curve.sqrt(curve.rhs(x)) else { continue };
+            let sys = o.specialise_branch(None, x, None);
+            let rep = f4_tower(
+                &sys,
+                &prep.ring,
+                &TowerF4Options::new(12)
+                    .with_budget(Duration::from_secs(2))
+                    .with_max_nnz(1_000_000),
+            );
+            assert!(!rep.timed_out && !rep.oversize && rep.pairs_above_bound == 0,
+                    "F4 censored at target x={x}: {rep:?}");
+            let basis_xs = if rep.inconsistent {
+                Vec::new()
+            } else {
+                descents += 1;
+                o.extract_solutions_from_basis(curve, None, &prep.ring,
+                                               &rep.basis, &[], x, None).0
+            };
+            let grid_xs = o.grid(curve, x, false).0;
+            for target in [PrimePoint::affine(x, y), PrimePoint::affine(x, (curve.p - y) % curve.p)] {
+                if y == 0 && target.y != y { continue; }
+                targets += 1;
+                if fb.x_index.contains_key(&x) {
+                    cancellation_targets += 1;
+                    let p = fb.points[0];
+                    let cancelled = curve.add(&mut GroupOps::default(), p, curve.neg(p));
+                    assert!(cancelled.infinity);
+                    assert_eq!(curve.add(&mut GroupOps::default(), cancelled, target), target);
+                }
+                let basis_hit = basis_xs.iter().any(|xs| {
+                    lift_abscissae(curve, &fb, &mut GroupOps::default(), xs, target).is_some()
+                });
+                let grid_hit = grid_xs.iter().any(|xs| {
+                    lift_abscissae(curve, &fb, &mut GroupOps::default(), xs, target).is_some()
+                });
+                let expected = exact.contains(&curve.key(&target));
+                assert_eq!(grid_hit, expected, "independent point census vs grid at {target:?}");
+                assert_eq!(basis_hit, expected, "F4 basis descent vs point census at {target:?}");
+            }
+        }
+        assert_eq!(targets, 100);
+        assert_eq!(cancellation_targets, fb.points.len());
+        assert!(descents > 0, "basis extraction must run on a consistent system");
+    }
+
     /// F4 on a membership form against the grid and the exact set of
     /// decomposable points, on random and planted targets, `m = 2`.
     fn agrees_with_grid(
