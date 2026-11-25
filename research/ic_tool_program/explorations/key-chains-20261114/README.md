@@ -23,8 +23,8 @@
   key from 3.89 to 3.48 ns at n = 61 in isolation
   ([`microbench/lr.rs`](microbench/lr.rs)).
 - **A/B:** 42 rounds, same binary, a same-session A/A. Collection one/split:
-  - k0n53: 1.020 [1.006, 1.034] against an A/A up to 1.030;
-  - k0n61: 1.019 [1.004, 1.035] against an A/A up to 1.009;
+  - icv1-f2m53-tm56619371-dac20a85: 1.020 [1.006, 1.034] against an A/A up to 1.030;
+  - icv1-f2m61-t158598901-ab42b6c5: 1.019 [1.004, 1.035] against an A/A up to 1.009;
   - not established at either size;
   - set-up 1.029 and 1.016, also not established;
   - zero identity mismatches.

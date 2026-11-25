@@ -2,7 +2,7 @@
 
 ## Where the work goes (baseline, HEAD a53cc497, measured before any change)
 
-koblitz_f4_kernel_bench (degree-3 Macaulay, public-synthetic K_0/F_2^31 dim-16 cell):
+koblitz_f4_kernel_bench (degree-3 Macaulay, public-synthetic icv1-f2m31-tm90707-c95f16f5 dim-16 cell):
 - x system: 1023 x 4369, rank 1022, rref word_ops 4,335,210 (gf2_elim kernel; the bench's
   "rref_kernel" label says active_suffix but rref_f2_counted routes 128x256+ to gf2_elim).
 - sym system: 992 x 3872, rank 992, word_ops 3,628,128.
@@ -82,8 +82,8 @@ Deterministic cost (callgrind Ir, RAYON_NUM_THREADS=1, 1 repeat, same binary N v
 | x: macaulay_profile (build + rref) | 71,106,632 | 54,390,687 | 1.31x |
 | x: rref_f2_counted | 32,923,892 | 32,921,834 | 1.00 |
 | sym: macaulay_profile | 59,984,560 | 46,893,654 | 1.28x |
-| stage --rung 5 (K_1/2^23) program total | 2,171,029,245 | 2,167,381,102 | -0.17% |
-| stage --rung 2 (K_0/2^13) program total | 547,600,028 | 544,836,987 | -0.50% |
+| stage --rung 5 (icv1-f2m23-tm5197-1f85e9e1) program total | 2,171,029,245 | 2,167,381,102 | -0.17% |
+| stage --rung 2 (icv1-f2m13-t181-515ee569) program total | 547,600,028 | 544,836,987 | -0.50% |
 Inside the new x build, parity_rows_with_mask is 16.5M Ir (the per-term colex rank loop and the
 parity toggles), the rest is the column sort and packing.
 

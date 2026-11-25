@@ -1,0 +1,12 @@
+[package]
+name = "pqc-strassen-harness"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Stand-alone: not a member of any workspace above it.
+[workspace]
+
+[profile.release]
+debug = false
+strip = false
