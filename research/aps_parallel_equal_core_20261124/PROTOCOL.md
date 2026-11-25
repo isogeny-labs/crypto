@@ -31,6 +31,14 @@ an aggregate APS floor of 78.10, 62.28 and 54.38 ms at N=2,4,8. These are
 derived bounds, not predictions; the rho arm must receive the same cores.
 The existing rho `lanes` field counts batched walks, not CPU cores.
 
+`python3 research/aps_parallel_equal_core_20261124/analyze_baseline.py`
+recomputes these totals from the committed JSON, checks every arm's case
+sum against its published summary, and emits the raw-file SHA-256 plus the
+idealized bounds. In a sparse checkout, pipe `git show
+origin/main:research/prime31_ic_20261115/native/APS_RHO_FOLD_SENSITIVITY_48Q_EXACT_CI_20261116.json`
+to the script with `-` as its input argument. This script reads receipts;
+it is neither a solver nor a replay of point arithmetic.
+
 Sources checked (KB, revision `750797a540fb4c38837c67b12df84d5b`,
 refreshed 2026-11-25T03:19:48Z):
 `source:91b6bbe9fb73267bbeb5d7c97f493b26` (`crypto:docs/ecbench/README.md`)
