@@ -1,0 +1,44 @@
+{
+  "recorded": "2026-11-23T20:49:11.966713+00:00",
+  "ordinary_command": [
+    "rustup",
+    "run",
+    "1.99.1",
+    "rustfmt",
+    "--edition",
+    "2021",
+    "--config",
+    "skip_children=true",
+    "main_b.rs",
+    "cm_b.rs"
+  ],
+  "exit": 0,
+  "stdout_bytes": 0,
+  "stderr_bytes": 0,
+  "before": [
+    {
+      "path": "main_b.rs",
+      "bytes": 10640,
+      "sha256": "ffad796fb02a835ba4bf8652dfb5548b56d3dd40fab82f6e5abf008b05172b84"
+    },
+    {
+      "path": "cm_b.rs",
+      "bytes": 3287,
+      "sha256": "e2fc8a5f5b4d8c24d081b0ec844387745f8d42fdd39a0c1bce3183aa47998abb"
+    }
+  ],
+  "after": [
+    {
+      "path": "main_b.rs",
+      "bytes": 10640,
+      "sha256": "ffad796fb02a835ba4bf8652dfb5548b56d3dd40fab82f6e5abf008b05172b84"
+    },
+    {
+      "path": "cm_b.rs",
+      "bytes": 3287,
+      "sha256": "e2fc8a5f5b4d8c24d081b0ec844387745f8d42fdd39a0c1bce3183aa47998abb"
+    }
+  ],
+  "only_new_B_sources_touched": true,
+  "strict_or_scientific_B_call_run": false
+}
