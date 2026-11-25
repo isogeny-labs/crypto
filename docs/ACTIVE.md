@@ -472,3 +472,4 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 - [ ] Audit and pursue the conditional tensor-contraction and alternative-parameter routes toward an explicit subexponential prime-field ECDLP algorithm (Codex, started 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4704; objective remains open until an end-to-end algorithm and proof are supplied)
 
 - [ ] #5131 follow-up: #5157 fixed-panel 1D-1 shim diagnostic paired median four-query ratio 15.12x (21/21 timing blocks); different M31 curve, linear-D miss scan, no all-output or cold-solver qualification. Read-only audit; no duplicate #5157/#5128 execution. [pcc:unverified]
+- [ ] #5131 local unique-sign-edge gate: clean sign-flip edge per coordinate suffices for arbitrary complete first-witness rank; B677 mean clean-edge fraction capacity <=1.5471%, no census or faster extractor. [pcc:unverified]
