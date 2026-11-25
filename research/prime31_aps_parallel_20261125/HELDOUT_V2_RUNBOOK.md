@@ -10,8 +10,10 @@ SHA-256 pins for this prepared implementation:
 | File | Digest |
 | --- | --- |
 | `prime31_aps_one_relation.rs` | `255c29f710a65d006c935a9a3586862db3f9e00f0eb261a6d1d227024774eb87` |
-| `run_heldout_v2.py` | `00f142d698950f12d57268993d90109bc318eff82787f2286867ddb06d31b937` |
+| `run_heldout_v2.py` | `56d4a07baa4aa0ebb39510c476adb4985b951b776ee8eb2ffce74a9552c2d70d` |
 | `analyze_heldout_v2.py` | `543b2ca3f62c45aa6061785b6c15d17b70b191b382a1fa4f4b7bfd86d4de22eb` |
+| `run_aa_control_v2.py` | `0f5cc01051ce9e552edf5b6807c5914a5075682713bd03dc73d057da29cb6df4` |
+| `check_aa_control_v2.py` | `533770fc170c3ea02d21648e9000699843193f237b06266b204cac287d7f8ff7` |
 
 ## Frozen comparison
 
@@ -46,23 +48,37 @@ SHA-256 pins for this prepared implementation:
 
 ## Admission and execution
 
-`heldout_v2_admission.template.json` has `admitted: false`. Fill a separate
-admission record with the exact binary path/hash, source commit, compiler
+`heldout_v2_admission.template.json` has `admitted: false`. First fill an
+immutable `AA_ADMISSION.json` with the exact binary path/hash, source commit, compiler
 flags, four Linux CPU IDs, dedicated-host evidence path/hash and same-host A/A
-control evidence path/hash. Record controls before setting `admitted: true`.
+control evidence path/hash left blank. On the selected host, run
+`run_aa_control_v2.py` with this file while admission remains false.
+It runs five A/A rounds for each of the three arms on archived development Q0,
+using the five case-0 V2 seed streams but no V2 public target. Within each
+round the arm order goes forward for A and backward for B. Review the
+`check_aa_control_v2.py` wall/CPU noise report and isolation evidence, then
+hash the raw A/A JSONL into a separate immutable `V2_ADMISSION.json` with
+`admitted: true`. Preserve the original `AA_ADMISSION.json` for the A/A checker.
+A/A repeats check timing
+noise and semantic stability; they do not count as independent solver
+replicates.
 The runner validates these fields and the seed-manifest digest before any
 solver invocation. A/A and isolation evidence must be reviewed by the
 operator; the runner checks their existence and hashes, not their scientific
 adequacy. Resource use needs explicit authorization for the chosen host.
 
 ```sh
-python3 run_heldout_v2.py --admission ADMISSION.json --output V2_RAW.jsonl
-python3 run_heldout_v2.py --admission ADMISSION.json --output V2_RAW.jsonl --execute
-python3 run_heldout_v2.py --admission ADMISSION.json --output V2_RAW.jsonl --execute --resume
-python3 analyze_heldout_v2.py --admission ADMISSION.json --records V2_RAW.jsonl
+python3 run_aa_control_v2.py --admission AA_ADMISSION.json --output AA_RAW.jsonl
+python3 run_aa_control_v2.py --admission AA_ADMISSION.json --output AA_RAW.jsonl --execute
+python3 check_aa_control_v2.py --admission AA_ADMISSION.json --records AA_RAW.jsonl
+python3 run_heldout_v2.py --admission V2_ADMISSION.json --output V2_RAW.jsonl
+python3 run_heldout_v2.py --admission V2_ADMISSION.json --output V2_RAW.jsonl --execute
+python3 run_heldout_v2.py --admission V2_ADMISSION.json --output V2_RAW.jsonl --execute --resume
+python3 analyze_heldout_v2.py --admission V2_ADMISSION.json --records V2_RAW.jsonl
 ```
 
-The first command is a preflight only. `--execute` starts the 720 calls. The
+The commands without `--execute` are preflight only. The heldout `--execute`
+starts the 720 calls after admission. The
 runner fsyncs a start event before each child and its outcome after the child.
 On `--resume`, it checks the exact manifest/admission/schedule prefix. An
 orphan start is recorded as interrupted and charged as a censored call; it is

@@ -45,15 +45,17 @@ def physical_core(cpu):
             (base / "core_id").read_text().strip())
 
 
-def preflight(admission, manifest):
+def preflight(admission, manifest, require_aa=True):
     if sys.platform != "linux":
         raise RuntimeError("held-out runner requires Linux for affinity and wait4 RSS")
-    if admission.get("admitted") is not True:
+    if require_aa and admission.get("admitted") is not True:
         raise RuntimeError("admission must explicitly be true")
     if admission.get("study") != manifest["study"]:
         raise RuntimeError("study mismatch")
     if admission.get("manifest_sha256") != MANIFEST_SHA256:
         raise RuntimeError("manifest hash mismatch")
+    if not admission.get("source_commit") or not admission.get("compiler_and_flags"):
+        raise RuntimeError("source commit and compiler flags must be recorded")
     binary = Path(admission["binary_path"]).resolve()
     if sha256(binary) != admission["binary_sha256"]:
         raise RuntimeError("binary hash mismatch")
@@ -72,7 +74,7 @@ def preflight(admission, manifest):
     if sha256(admission["dedicated_host_evidence_path"]) != admission[
             "dedicated_host_evidence_sha256"]:
         raise RuntimeError("dedicated-host evidence hash mismatch")
-    if sha256(admission["aa_control_evidence_path"]) != admission[
+    if require_aa and sha256(admission["aa_control_evidence_path"]) != admission[
             "aa_control_evidence_sha256"]:
         raise RuntimeError("same-host A/A control evidence hash mismatch")
     if admission.get("timeout_seconds") != 30:
