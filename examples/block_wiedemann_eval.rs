@@ -6,6 +6,7 @@
 //! ```text
 //! cargo run --release --example block_wiedemann_eval -- \
 //!     [--dim 2000] [--weight 6] [--dead 4] [--seed 1] [--blocks 1,2,4,8,16] \
+//!     [--threads T] \
 //!     [--input matrix.json]
 //! ```
 //!
@@ -14,7 +15,7 @@
 //! `--dead` rows are zero (so the matrix is singular). Modulus `2^61 − 1`.
 
 use crypto_lib::cryptanalysis::large_prime_graph::block_wiedemann::{
-    kernel_vector, BwParams, SparseMatrix,
+    kernel_vector, kernel_vector_parallel, BwParams, SparseMatrix,
 };
 use std::time::Instant;
 
@@ -62,6 +63,15 @@ fn main() {
             SparseMatrix::new(dim, rows, p).unwrap()
         }
     };
+    // `--threads 0` (default) runs the serial path; `--threads t` runs
+    // `kernel_vector_parallel` on a dedicated pool of `t` threads.
+    let threads: usize = get("--threads", "0").parse().unwrap();
+    let pool = (threads > 0).then(|| {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .unwrap()
+    });
     for b in get("--blocks", "1,2,4,8,16")
         .split(',')
         .map(|x| x.parse::<usize>().unwrap())
@@ -71,16 +81,17 @@ fn main() {
         let mut seeds = 0;
         for seed in 0..8 {
             seeds += 1;
-            if let Ok((w, stats)) = kernel_vector(
-                &a,
-                p,
-                BwParams {
-                    m: b,
-                    n: b,
-                    seed,
-                    extra: 8,
-                },
-            ) {
+            let params = BwParams {
+                m: b,
+                n: b,
+                seed,
+                extra: 8,
+            };
+            let attempt = match &pool {
+                Some(pool) => pool.install(|| kernel_vector_parallel(&a, p, params)),
+                None => kernel_vector(&a, p, params),
+            };
+            if let Ok((w, stats)) = attempt {
                 out = Some((w, stats));
                 break;
             }
@@ -97,13 +108,13 @@ fn main() {
                         "projection_mults": s.projection_mults, "generator_mults": s.generator_mults,
                         "sequence_length": s.sequence_length, "generator_degree": s.generator_degree,
                         "candidates_tried": s.candidates_tried, "kernel_power": s.kernel_power,
-                        "seeds": seeds, "wall_ns": ns, "verified": true
+                        "seeds": seeds, "threads": threads, "wall_ns": ns, "verified": true
                     })
                 );
             }
             None => println!(
                 "{}",
-                serde_json::json!({"b": b, "seeds": seeds, "wall_ns": ns, "verified": false})
+                serde_json::json!({"b": b, "seeds": seeds, "threads": threads, "wall_ns": ns, "verified": false})
             ),
         }
     }
