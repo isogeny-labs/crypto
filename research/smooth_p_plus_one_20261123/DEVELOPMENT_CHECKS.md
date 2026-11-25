@@ -182,3 +182,18 @@ execution, not independently implemented or signed validation. Its work lies
 outside the recorded recovery intervals. No admitted cost ratio or new cloud
 job is represented. Next investigate full-coverage cutoff partitions and their
 total branch work, with the registered payload/admission still open.
+
+### Artifact migration pending
+
+The final artifact-policy check flags the two larger raw JSONL files
+(`f8191_d4.jsonl`, 157,366 bytes; `f8191_d5.jsonl`, 410,585 bytes) for the
+repository store. Local `artifacts.py push` cannot start because the AWS CLI is
+absent; it performs no upload and writes no manifest. The repository-wide
+`status` command also stops on an unrelated omitted historical manifest's
+Git-filter read. No shared policy, gate or data hash is changed.
+
+The documented same-repository `artifact-autofix` workflow is the alternate
+publication route: it runs the trusted base tool, uploads changed data, replays
+the remote bytes and commits manifests/removals. Keep the PR draft pending that
+migration; do not represent remote storage or the artifact gate as passed until
+the actual result is read back. This does not change any scientific outcome.

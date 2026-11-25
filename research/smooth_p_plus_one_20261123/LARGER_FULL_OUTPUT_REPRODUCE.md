@@ -42,6 +42,7 @@ rejections as well as passes. No retry or 30-draw extension is part of this plan
 Recorded-data checks:
 
 ```sh
+python3 tools/artifacts/artifacts.py pull research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1
 sha256sum -c research/smooth_p_plus_one_20261123/evidence/LARGER_FULL_OUTPUT_SHA256SUMS
 jq 'select(.kind=="account_summary" or .kind=="account_process_receipt")' \
   research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/f8191_d5.jsonl
@@ -52,3 +53,8 @@ Full-set comparison includes unconsumed suffixes; consumer replay includes
 every submitted row. Incomplete oracle calls remain missing outputs even when
 their records pass replay. The existing fixture/reference/consumer code is
 shared, so this is not independently implemented or signed validation.
+
+The two larger JSONL files are selected by the repository artifact policy;
+publication uses its normal migration workflow. Read [development checks](DEVELOPMENT_CHECKS.md#artifact-migration-pending)
+for the current upload status. Hydrate the exact manifest bytes before replay
+once manifests are published; local availability alone does not prove upload.
