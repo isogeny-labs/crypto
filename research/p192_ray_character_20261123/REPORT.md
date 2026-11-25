@@ -1108,6 +1108,19 @@ sign with an affine y product. All of these checks passed at
 `m≈2^85.984` coset or establish the proposed sign's exactness.
 [pcc:unverified]
 
+The binary also accepts a public target as two hexadecimal
+coordinates after the factor count. It checks that the point
+lies on P-192 and has order dividing `r`, then runs the same
+bounded prefix and independent endpoint/product checks. The
+[`TARGET_INPUT_VALIDATION.txt`](TARGET_INPUT_VALIDATION.txt)
+record pins the updated source and binary hashes: external
+coordinates for `[7]G` reproduce the built-in 16-factor
+ratio, an independently constructed `[11]G` passes, and an
+off-curve input is rejected. The earlier 10,000-factor timing
+record retains its original source hash; this input path was
+not used for those measurements. A prefix ratio is not yet
+the proposed full-coset scalar sign. [pcc:unverified]
+
 On one Apple M4 Pro/macOS 27.2 host, six separate 10,000-factor
 base-and-`[7]G` target runs measured a median of `147.808`
 process-CPU full-Jacobian-add times per orbit factor

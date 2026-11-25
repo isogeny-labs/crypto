@@ -1,0 +1,23 @@
+P-192 bounded coset-prefix public-point input validation
+UTC: 2026-11-25T22:23:28Z
+Host: Apple M4 Pro, arm64, macOS 27.2
+Rust: rustc 1.99.1 (58cf8f9c3 2026-10-13)
+Source SHA-256: 5b2bfff6f2f9e6f7c6963b00a129b5db9c611e6f548520fab21508a702d1f943
+Binary SHA-256: a1f7bce20d0ab179ae986898d16ac1f2a2580a9b0b446f1588116e7930c529c8
+Build: RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc CARGO_TARGET_DIR=/Volumes/SSD990-2/crypto/target rustup run 1.99.1 cargo run --release --no-default-features --bin p192_coset_orbit -- 16
+
+Built-in Q=[7]G: prefix_ratio=-1; validation=point_and_projective_sign_prefix_passed.
+External Q=[7]G coordinates (hex):
+  x=8da75a1f75ddcd7660f923243060edce5de37f007011fcfd
+  y=57cb5fcf6860b35418240db8fdb3c01dd4b702f96409ffb5
+  command: p192_coset_orbit 16 8da75a1f75ddcd7660f923243060edce5de37f007011fcfd 57cb5fcf6860b35418240db8fdb3c01dd4b702f96409ffb5
+  prefix_ratio=-1; target_scalar=unknown; validation=point_and_projective_sign_prefix_passed.
+External Q=[11]G coordinates independently computed by affine additions (hex):
+  x=1c995995eb76324f1844f7164d22b652280940370628a2aa
+  y=ef1765ce37e9eb73029f556400fa77bdb34cb8611aaa9c04
+  command: p192_coset_orbit 16 1c995995eb76324f1844f7164d22b652280940370628a2aa ef1765ce37e9eb73029f556400fa77bdb34cb8611aaa9c04
+  prefix_ratio=-1; target_scalar=unknown; validation=point_and_projective_sign_prefix_passed.
+Off-curve Q=(0,0): process exit 101 with `target is not on P-192`.
+
+All runs use 16 factors. The output is a prefix product character and is not an exact scalar-character evaluation for arbitrary Q. The historical 10,000-factor timing record in PREFIX_MEASUREMENTS.txt pins an earlier source/binary hash; it was not rerun or rewritten for this input-only change.
+Identity control: external Q=G, count=1, prefix_ratio=+1, validation=point_and_projective_sign_prefix_passed.

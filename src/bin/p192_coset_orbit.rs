@@ -1,7 +1,7 @@
 //! Bounded P-192 prefix evaluation for the oriented y-coset proposal.
 //! This does not establish exactness of the full coset character.
 //!
-//! Run: cargo run --release --no-default-features --bin p192_coset_orbit -- 1000
+//! Run: cargo run --release --no-default-features --bin p192_coset_orbit -- 1000 [Qx_hex Qy_hex]
 
 use crypto_lib::ecc::endo_generic_point::{
     scalar_mul_wnaf, textbook_mul, wnaf_digits, Affine, Curve, Jacobian, TableMode,
@@ -26,7 +26,7 @@ fn decimal(s: &str) -> BigUint {
 }
 
 fn hex(s: &str) -> BigUint {
-    BigUint::parse_bytes(s.as_bytes(), 16).expect("hex constant")
+    BigUint::parse_bytes(s.strip_prefix("0x").unwrap_or(s).as_bytes(), 16).expect("hex integer")
 }
 
 fn cpu_now() -> Duration {
@@ -124,8 +124,13 @@ fn verify(
 }
 
 fn main() {
-    let count = std::env::args()
-        .nth(1)
+    let args: Vec<String> = std::env::args().collect();
+    assert!(
+        args.len() == 1 || args.len() == 2 || args.len() == 4,
+        "usage: p192_coset_orbit [count [Qx_hex Qy_hex]]"
+    );
+    let count = args
+        .get(1)
         .map_or(1000, |s| s.parse().expect("positive count"));
     assert!((1..=100_000).contains(&count));
     let setup_wall = Instant::now();
@@ -144,17 +149,28 @@ fn main() {
     let curve = Curve::<4>::new(&prime, &(&prime - BigUint::from(3u8)), &hex(B)).unwrap();
     let generator = curve.affine(&hex(GX), &hex(GY)).unwrap();
     assert!(curve.is_on_curve(&generator));
-    let q = curve
-        .to_affine(&scalar_mul_wnaf(
-            &curve,
-            &generator,
-            &BigUint::from(7u8),
-            WIDTH,
-            TableMode::Jacobian,
-        ))
-        .unwrap();
-    let expected_q = textbook_mul(&curve, &generator, &BigUint::from(7u8)).unwrap();
-    assert_eq!(curve.affine_to_biguint(&q), expected_q);
+    let (q, target_scalar) = if args.len() == 4 {
+        let q = curve.affine(&hex(&args[2]), &hex(&args[3])).unwrap();
+        assert!(curve.is_on_curve(&q), "target is not on P-192");
+        assert!(
+            textbook_mul(&curve, &q, &order).is_none(),
+            "target is not in the order-r subgroup"
+        );
+        (q, "unknown")
+    } else {
+        let q = curve
+            .to_affine(&scalar_mul_wnaf(
+                &curve,
+                &generator,
+                &BigUint::from(7u8),
+                WIDTH,
+                TableMode::Jacobian,
+            ))
+            .unwrap();
+        let expected_q = textbook_mul(&curve, &generator, &BigUint::from(7u8)).unwrap();
+        assert_eq!(curve.affine_to_biguint(&q), expected_q);
+        (q, "7")
+    };
     let digits = wnaf_digits(&scalar, WIDTH);
     let setup_wall_elapsed = setup_wall.elapsed();
     let setup_cpu_elapsed = cpu_now() - setup_cpu;
@@ -195,9 +211,11 @@ fn main() {
     let add_cpu_elapsed = cpu_now() - add_cpu;
 
     println!(
-        "count={} target_scalar=7 width={} step_scalar={} prefix_ratio={}",
-        count, WIDTH, STEP, prefix_ratio
+        "count={} target_scalar={} width={} step_scalar={} prefix_ratio={}",
+        count, target_scalar, WIDTH, STEP, prefix_ratio
     );
+    let (qx, qy) = curve.affine_to_biguint(&q);
+    println!("target_x_hex={qx:x} target_y_hex={qy:x}");
     println!(
         "setup_wall_ns={} setup_cpu_ns={}",
         setup_wall_elapsed.as_nanos(),
