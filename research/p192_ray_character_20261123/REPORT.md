@@ -933,7 +933,7 @@ on the full marked orbit. This rules out using the theorem's
 were found. A proposed evaluator must retain extra oriented
 data and charge its construction and evaluation. [pcc:unverified]
 
-### Oriented coset direct cost and conditional grid
+### The oriented y product is an even-order EDS coset product
 
 The paired-`y` identity in the two-offset screen below retains
 orientation that the `x`-multiset discards: the signs needed to
@@ -945,11 +945,38 @@ index, `A_C([h]P)=-A_C(P)` under a subgroup generator `h`:
 the representative-sign product is `h^m=-1 (mod r)` and
 `χ_p(-1)=-1`. This necessary transformation is the same as
 the ray sign, but does not establish equality outside the
-subgroup orbit. The `y` candidate is distinct from the odd-EDS
-product `B_C` screened above. An exact division-polynomial
-identity, `ψ_(2j)(P)=2y([j]P)ψ_j(P)^4`, also identifies each
-`y`-factor character with `χ_p(ψ_(2j)(P)/2)`; it does not
-compress the product. [pcc:unverified]
+subgroup orbit. [pcc:unverified]
+
+In fact, this `y` feature is **exactly an even-order EDS coset
+character**. Let `j` run over the fixed representatives in `C` and
+put `k_j=r-2j`. Each `k_j` is odd, and its class modulo `±1` runs
+once through the doubled coset `2C`. The division-polynomial
+identity `ψ_(2j)(P)=2y([j]P)ψ_j(P)^4` gives
+`χ_p(y([j]P))=χ_p(ψ_(2j)(P)/2)`. The periodic normalizer
+identity above, together with `[k_j]P=-[2j]P` and
+`φ(-P)=-φ(P)`, gives
+
+`ψ_(k_j)(P)=-φ(P)^((2j)^2-k_j^2)ψ_(2j)(P)`.
+
+The exponent is odd because `r` and `k_j` are odd and `2j` is
+even. Thus each factor differs in quadratic character by the
+same `χ_p(-φ(P)/2)`. Since `m` is even, this factor cancels in
+the product, leaving the exact identity
+
+`A_C(P)=B_(2C)(P)=χ_p(∏_(k∈2C, k odd)ψ_k(P))`.
+
+This holds at every nonzero `r`-torsion marking under the stated
+normalizer identity; it does not depend on a P-192 exactness
+assumption. The odd-order EDS exclusion above does not apply to
+this even-order coset. The index-parity obstruction does apply,
+and the surviving odd-index cosets still require a curve-specific
+exactness test. Direct `y` evaluation remains a different
+computational representation, so its cost must be measured on
+its own. The [`y_coset_small_control.sage`](y_coset_small_control.sage)
+replay checks this equality at three markings on each of two
+order-241 curves. [pcc:unverified]
+
+### Oriented coset direct cost and conditional grid
 
 The direct `y`-coset evaluation deserves a cold cost gate before
 requiring a paired grid. At the first remaining size,

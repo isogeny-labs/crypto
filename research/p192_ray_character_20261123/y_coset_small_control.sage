@@ -23,12 +23,27 @@ def class_rep(value):
 
 classes = {class_rep(pow(subgroup_generator, j, r)) for j in range(m)}
 assert len(classes) == m
+odd_doubled_reps = sorted(r - 2 * scalar for scalar in classes)
+assert len(odd_doubled_reps) == m
+assert all(scalar % 2 for scalar in odd_doubled_reps)
+assert {class_rep(scalar) for scalar in odd_doubled_reps} == {
+    class_rep(2 * scalar) for scalar in classes
+}
 
 
 def y_sign(point, p):
     product = GF(p)(1)
     for scalar in classes:
         product *= (scalar * point)[1]
+    assert product != 0
+    return int(kronecker(ZZ(product), p))
+
+
+def doubled_eds_sign(point, p):
+    product = GF(p)(1)
+    x = point[0]
+    for scalar in odd_doubled_reps:
+        product *= point.curve().division_polynomial(scalar, x=x)
     assert product != 0
     return int(kronecker(ZZ(product), p))
 
@@ -42,6 +57,9 @@ for p, a, b, gx, gy, expected_bad_cosets in controls:
     assert curve.order() == r
     base = curve(gx, gy)
     assert base.order() == r
+    for scalar in (1, 3, 7):
+        point = scalar * base
+        assert y_sign(point, p) == doubled_eds_sign(point, p), (p, scalar)
     base_sign = y_sign(base, p)
     bad = {
         scalar
@@ -59,7 +77,8 @@ for p, a, b, gx, gy, expected_bad_cosets in controls:
     assert len(bad) == m * len(bad_cosets), (p, len(bad))
     print(
         f"p={p} r={r} m={m} checked_classes={half} "
-        f"mismatches={len(bad)} bad_cosets={sorted(bad_cosets)}"
+        f"mismatches={len(bad)} bad_cosets={sorted(bad_cosets)} "
+        "y_eds_equal_at=[1,3,7]"
     )
 
 
