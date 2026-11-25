@@ -25,8 +25,21 @@ fn rank(mut matrix: Vec<Vec<i64>>, columns: usize, p: i64) -> usize {
 }
 
 pub(super) fn audit(curve: Fixture, depth: usize) -> Result<Value, String> {
+    audit_using(curve, depth, false)
+}
+
+pub(super) fn audit_liftable(curve: Fixture, depth: usize) -> Result<Value, String> {
+    audit_using(curve, depth, true)
+}
+
+fn audit_using(curve: Fixture, depth: usize, liftable: bool) -> Result<Value, String> {
     let base = Base::new(curve, depth);
     let charts = cutoff::qualified_catalog(&base)?;
+    let fibers = if liftable {
+        Some(liftable::fibers(&base)?)
+    } else {
+        None
+    };
     let indexed = charts
         .iter()
         .enumerate()
@@ -82,7 +95,10 @@ pub(super) fn audit(curve: Fixture, depth: usize) -> Result<Value, String> {
             }
             let mut assignment = factors.clone();
             assignment.extend(theta);
-            let system = System::factorwise(curve, target, levels, key)?;
+            let system = match &fibers {
+                Some(fibers) => System::fiber_factors(curve, target, key, fibers)?,
+                None => System::factorwise(curve, target, levels, key)?,
+            };
             if !system.satisfied(&assignment) {
                 return Err("factorwise equations reject a valid relation witness".into());
             }
@@ -148,7 +164,7 @@ pub(super) fn audit(curve: Fixture, depth: usize) -> Result<Value, String> {
             })
         })
         .collect::<Vec<_>>();
-    Ok(json!({
+    let mut result = json!({
         "type":"factorwise_fiber_audit","format":1,"prime":curve.p,"depth":depth,
         "base_size":base.unsigned.len(),"catalog_charts":charts.len(),"levels":levels,
         "unsigned_tuples":counts.iter().sum::<usize>(),"signed_bindings":16*counts.iter().sum::<usize>(),
@@ -158,7 +174,17 @@ pub(super) fn audit(curve: Fixture, depth: usize) -> Result<Value, String> {
         "required_fiber_rank":4,"required_rr5_rank":3,"required_full_rank":7,
         "charts":records,"solver_calls":0,
         "scope":"finite witness and actual-equation Jacobian check; no relation collection or cost measurement"
-    }))
+    });
+    if let Some(fibers) = fibers {
+        result["type"] = json!("liftable_fiber_audit");
+        result["fibers"] =
+            json!(fibers.iter().map(|(b, polynomial)| json!({
+            "image":b,"polynomial":polynomial,
+            "roots":base.unsigned.iter().filter(|point| dickson(point.x, levels, curve.p) == *b)
+                .map(|point| point.x).collect::<Vec<_>>()
+        })).collect::<Vec<_>>());
+    }
+    Ok(result)
 }
 
 #[cfg(test)]

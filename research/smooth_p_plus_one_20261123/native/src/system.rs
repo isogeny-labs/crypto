@@ -194,13 +194,47 @@ impl System {
                 "factorwise constructor requires sorted canonical images and levels 1..=2".into(),
             );
         }
+        let mut phi = vec![0, 1];
+        for _ in 0..levels {
+            phi = crate::polynomial::product(&phi, &phi, curve.p);
+            phi[0] = (phi[0] - 2).rem_euclid(curve.p);
+        }
+        let fibers = images
+            .into_iter()
+            .map(|b| {
+                let mut fiber = phi.clone();
+                fiber[0] = (fiber[0] - b).rem_euclid(curve.p);
+                (b, fiber)
+            })
+            .collect();
+        Self::fiber_factors(curve, target, images, &fibers)
+    }
+
+    /// Shared monic-divisor equations for explicit small fiber polynomials.
+    pub fn fiber_factors(
+        curve: Fixture,
+        target: Point,
+        images: [i64; 4],
+        fibers: &BTreeMap<i64, Vec<i64>>,
+    ) -> Result<Self, String> {
+        if !images.windows(2).all(|w| w[0] <= w[1])
+            || images.iter().any(|b| !(0..curve.p).contains(b))
+        {
+            return Err("fiber factors require sorted canonical images".into());
+        }
         let mut multiplicities = BTreeMap::<i64, usize>::new();
         for b in images {
             *multiplicities.entry(b).or_default() += 1;
         }
-        let degree = 1usize << levels;
-        if multiplicities.values().any(|m| *m > degree) {
-            return Err("factor multiplicity exceeds its fiber degree".into());
+        for (b, m) in &multiplicities {
+            let fiber = fibers.get(b).ok_or("missing fiber polynomial")?;
+            if !(2..=5).contains(&fiber.len())
+                || fiber.last() != Some(&1)
+                || fiber.iter().any(|c| !(0..curve.p).contains(c))
+                || *m >= fiber.len()
+            {
+                return Err("invalid small monic fiber or excess multiplicity".into());
+            }
         }
         let names = (0..4)
             .map(|i| format!("q{i}"))
@@ -210,19 +244,15 @@ impl System {
             .map(|i| Polynomial::variable(curve.p, 7, i))
             .collect::<Vec<_>>();
         let constant = |v| vars[0].constant(v);
-        let mut phi = vec![0, 1];
-        for _ in 0..levels {
-            phi = crate::polynomial::product(&phi, &phi, curve.p);
-            phi[0] = (phi[0] - 2).rem_euclid(curve.p);
-        }
         let mut offset = 0;
         let mut product = vec![constant(1)];
         let mut equations = vec![];
         for (b, m) in multiplicities {
             let mut factor = vars[offset..offset + m].to_vec();
             factor.push(constant(1));
-            let mut remainder = phi.iter().map(|c| constant(*c)).collect::<Vec<_>>();
-            remainder[0] = &remainder[0] - &constant(b);
+            let fiber = &fibers[&b];
+            let degree = fiber.len() - 1;
+            let mut remainder = fiber.iter().map(|c| constant(*c)).collect::<Vec<_>>();
             for shift in (0..=degree - m).rev() {
                 let leading = remainder[shift + m].clone();
                 for j in 0..=m {
@@ -549,6 +579,50 @@ pub fn numeric_quartic(curve: Fixture, target: Point, alpha: i64, beta: i64, t: 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn liftable_remainders_reject_an_extra_full_map_root() {
+        let curve = crate::FIXTURES[0];
+        let base = crate::Base::new(curve, 4);
+        let fibers = crate::liftable::fibers(&base).unwrap();
+        let (xs, images) = crate::cutoff::tuples(base.unsigned.len())
+            .find_map(|tuple| {
+                let mut xs = tuple.map(|i| base.unsigned[i].x);
+                for slot in 0..4 {
+                    let b = crate::dickson(xs[slot], 1, curve.p);
+                    if let Some(extra) = (0..curve.p).find(|x| {
+                        crate::dickson(*x, 1, curve.p) == b
+                            && !base.unsigned.iter().any(|point| point.x == *x)
+                    }) {
+                        xs[slot] = extra;
+                        return Some((xs, crate::cutoff::images(&base, xs)));
+                    }
+                }
+                None
+            })
+            .expect("fixture has a nonliftable root in an occupied fiber");
+        let mut pools = BTreeMap::<i64, Vec<i64>>::new();
+        for x in xs {
+            pools
+                .entry(crate::dickson(x, 1, curve.p))
+                .or_default()
+                .push(x);
+        }
+        let mut assignment = vec![];
+        for roots in pools.values() {
+            let q = crate::cutoff::root_polynomial(roots, curve.p);
+            assignment.extend_from_slice(&q[..roots.len()]);
+        }
+        assignment.extend([0, 0, 0]);
+        let old = System::factorwise(curve, curve.q, 1, images).unwrap();
+        let new = System::fiber_factors(curve, curve.q, images, &fibers).unwrap();
+        assert!(old.equations[..4]
+            .iter()
+            .all(|q| q.evaluate(&assignment) == 0));
+        assert!(new.equations[..4]
+            .iter()
+            .any(|q| q.evaluate(&assignment) != 0));
+    }
 
     #[test]
     fn factorwise_remainders_match_values_at_roots_for_each_partition_shape() {

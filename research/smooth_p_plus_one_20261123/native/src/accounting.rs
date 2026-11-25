@@ -802,6 +802,11 @@ pub(super) fn dispatch(
                     "factorwise-cutoff is currently a fixed-panel qualification interface".into(),
                 );
             }
+            if method == Some(Method::LiftableCutoff) {
+                return Err(
+                    "liftable-cutoff is currently a fixed-panel qualification interface".into(),
+                );
+            }
             if label != "direct" && method.is_none() {
                 return Err("unknown accounting arm".into());
             }

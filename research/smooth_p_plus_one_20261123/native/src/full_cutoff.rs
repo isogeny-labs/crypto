@@ -8,6 +8,7 @@ const CAPTURE_BYTES: usize = 262_144;
 enum Presentation {
     Pushforward,
     Factorwise,
+    Liftable,
 }
 
 fn retain(record: &mut Value, key: &str, raw: &str, captured: &mut usize) -> Result<(), String> {
@@ -58,6 +59,23 @@ pub(super) fn discover_factorwise(
     )
 }
 
+pub(super) fn discover_liftable(
+    base: &Base,
+    target: Point,
+    solver: &Path,
+    scratch: &Scratch,
+    deadline: Instant,
+) -> Discovery {
+    discover_using(
+        base,
+        target,
+        solver,
+        scratch,
+        deadline,
+        Presentation::Liftable,
+    )
+}
+
 fn discover_using(
     base: &Base,
     target: Point,
@@ -83,6 +101,17 @@ fn discover_using(
         }
     };
     outcome.planned = charts.len();
+    let fibers = if matches!(presentation, Presentation::Liftable) {
+        match liftable::fibers(base) {
+            Ok(fibers) => Some(fibers),
+            Err(error) => {
+                outcome.result = Err(error);
+                return outcome;
+            }
+        }
+    } else {
+        None
+    };
     let (mut union, mut captured) = (BTreeSet::new(), 0);
     for (index, chart) in charts.iter().enumerate() {
         if Instant::now() >= deadline {
@@ -101,6 +130,20 @@ fn discover_using(
                     }
                 }
             }
+            Presentation::Liftable => {
+                match System::fiber_factors(
+                    base.curve,
+                    target,
+                    chart.images,
+                    fibers.as_ref().unwrap(),
+                ) {
+                    Ok(system) => system,
+                    Err(error) => {
+                        outcome.result = Err(error);
+                        return outcome;
+                    }
+                }
+            }
         };
         let (variables, equations, terms, degree) = system.metrics();
         let mut record = json!({
@@ -111,6 +154,9 @@ fn discover_using(
         });
         if matches!(presentation, Presentation::Factorwise) {
             record["presentation"] = json!("factorwise");
+        }
+        if matches!(presentation, Presentation::Liftable) {
+            record["presentation"] = json!("liftable");
         }
         let result = (|| -> Result<BTreeSet<Relation>, String> {
             if terms > 20_000 {
@@ -202,6 +248,45 @@ mod tests {
         fs::write(&path, format!("#!/bin/sh\n{body}\n")).unwrap();
         fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
         path
+    }
+
+    #[test]
+    fn liftable_dispatch_keeps_whole_catalog_and_expired_budget_contract() {
+        let base = Base::new(FIXTURES[0], 4);
+        let scratch = Scratch::new().unwrap();
+        let solver = stub(&scratch,
+            "IFS= read -r first < \"$2\"\n[ \"$first\" = 'q0,q1,q2,q3,a0,a1,t0,A' ] || exit 91\nprintf '[-1]:' > \"$4\"");
+        let result = super::super::discover(
+            &base,
+            base.curve.q,
+            Method::LiftableCutoff,
+            &solver,
+            &scratch,
+            Duration::from_secs(3),
+        );
+        assert!(result.result.unwrap().is_empty());
+        assert_eq!(
+            result.completed,
+            cutoff::qualified_catalog(&base).unwrap().len()
+        );
+        for record in result.systems {
+            assert_eq!(record["presentation"], "liftable");
+            assert_eq!(record["variables"], 8);
+            assert_eq!(record["equations"], 9);
+            assert_eq!(record["attempts"].as_array().unwrap().len(), 1);
+        }
+        let expired = discover_liftable(
+            &base,
+            base.curve.q,
+            Path::new("/missing"),
+            &scratch,
+            Instant::now(),
+        );
+        assert!(expired.result.is_err());
+        assert_eq!(expired.completed, 0);
+        assert!(expired.systems.is_empty());
+        assert_eq!(mode("liftable-cutoff"), Some(Method::LiftableCutoff));
+        assert_eq!(Method::LiftableCutoff.encoding(), Mode::Quadratic);
     }
 
     #[test]

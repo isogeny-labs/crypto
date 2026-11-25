@@ -4,6 +4,7 @@ mod accounting;
 mod cutoff;
 mod factorwise;
 mod full_cutoff;
+mod liftable;
 #[cfg(feature = "production-controls")]
 mod oriented;
 mod polynomial;
@@ -488,6 +489,7 @@ enum Method {
     Refined,
     FullCutoff,
     FactorwiseCutoff,
+    LiftableCutoff,
     #[cfg(feature = "production-controls")]
     Cofactor,
     #[cfg(feature = "production-controls")]
@@ -503,6 +505,7 @@ impl Method {
             Self::Refined => "Refined".into(),
             Self::FullCutoff => "FullCutoff".into(),
             Self::FactorwiseCutoff => "FactorwiseCutoff".into(),
+            Self::LiftableCutoff => "LiftableCutoff".into(),
             #[cfg(feature = "production-controls")]
             Self::Cofactor => "ProductionCofactor".into(),
             #[cfg(feature = "production-controls")]
@@ -521,7 +524,7 @@ impl Method {
         match self {
             Self::Single(mode) => mode,
             Self::Refined => Mode::Distinct,
-            Self::FullCutoff | Self::FactorwiseCutoff => Mode::Quadratic,
+            Self::FullCutoff | Self::FactorwiseCutoff | Self::LiftableCutoff => Mode::Quadratic,
             // The cofactor solver searches the full distinct-x RR5 chart.
             #[cfg(feature = "production-controls")]
             Self::Cofactor | Self::CofactorMsolve | Self::Oriented(_) => Mode::Quadratic,
@@ -535,6 +538,7 @@ fn mode(value: &str) -> Option<Method> {
         "refined" => Some(Method::Refined),
         "full-cutoff" => Some(Method::FullCutoff),
         "factorwise-cutoff" => Some(Method::FactorwiseCutoff),
+        "liftable-cutoff" => Some(Method::LiftableCutoff),
         "expanded" => Some(Method::Single(Mode::Expanded)),
         "quadratic" => Some(Method::Single(Mode::Quadratic)),
         #[cfg(feature = "production-controls")]
@@ -570,6 +574,9 @@ fn discover(
     }
     if method == Method::FactorwiseCutoff {
         return full_cutoff::discover_factorwise(base, target, solver, scratch, deadline);
+    }
+    if method == Method::LiftableCutoff {
+        return full_cutoff::discover_liftable(base, target, solver, scratch, deadline);
     }
     #[cfg(feature = "production-controls")]
     if let Method::Oriented(tower) = method {
@@ -806,6 +813,10 @@ fn main() -> Result<(), String> {
         println!("{}", factorwise::audit(curve, depth)?);
         return Ok(());
     }
+    if modes == ["liftable-audit"] {
+        println!("{}", factorwise::audit_liftable(curve, depth)?);
+        return Ok(());
+    }
     #[cfg(feature = "production-controls")]
     if let Some(result) = accounting::dispatch(curve, depth, Path::new(solver), modes, started) {
         return result;
@@ -857,6 +868,9 @@ fn main() -> Result<(), String> {
     }
     if modes.contains(&Method::FactorwiseCutoff) && recovery_seed.is_some() {
         return Err("factorwise-cutoff is currently a fixed-panel qualification interface".into());
+    }
+    if modes.contains(&Method::LiftableCutoff) && recovery_seed.is_some() {
+        return Err("liftable-cutoff is currently a fixed-panel qualification interface".into());
     }
     if let Some(seed) = recovery_seed {
         recover(
