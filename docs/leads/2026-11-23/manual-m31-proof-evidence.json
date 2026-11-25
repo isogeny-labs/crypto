@@ -1,0 +1,105 @@
+{
+  "scope": "Public proof-evidence review for daily sweep / weekly plan; no new build, experiment, or repository mutation",
+  "snapshot_heads": {
+    "lfd53": "0be977fe0cba427a49ac26573089b7d9481b2822",
+    "lfd54": "b16197de032d39a0b7c44427b3d71c47b8eb803b",
+    "lfd55": "ca76c8f72bf4d8faea10c2933e5ca30acb817acf"
+  },
+  "groups": [
+    {
+      "id": "binary_semaev_splitting",
+      "title": "Binary Semaev splitting: literature result and matched-audit work",
+      "prs": [
+        54,
+        55
+      ],
+      "links": [
+        "https://github.com/isogeny-labs/lfd-summation-systems/pull/54",
+        "https://github.com/isogeny-labs/lfd-summation-systems/pull/55"
+      ],
+      "exact_statement": "For k=F_(2^n), nonsingular y^2+xy=x^3+a*x^2+b, and ell-dimensional F2-subspace V, compare S4(x1,x2,x3,r)=0 on V^3 with S3(x1,x2,u)=S3(u,x3,r)=0 for u in k. If A(T)=S3(x1,x2,T) and B(T)=S3(T,x3,r) both have degree two and deg gcd(A,B)<=1, Res(A,B)=0 iff there is a unique common root u in k.",
+      "essential_hypotheses": [
+        "Binary extension field and Boolean coordinate descent.",
+        "Leading coefficient conditions x1!=x2 and x3!=r.",
+        "The gcd-degree hypothesis excludes quadratic gcds; exceptional degree drops, roots only in extensions, infinity, point recovery and sum verification remain separate."
+      ],
+      "evidence": {
+        "kind": "Literature benchmark plus written algebraic proof, explicitly not kernel checked",
+        "reported_literature_cell": {
+          "n": 23,
+          "m": 3,
+          "ell": 6,
+          "category": "with solutions",
+          "original_GB_seconds": 3888.7,
+          "split_GB_seconds": 168.12,
+          "original_memory_MB": 6656.13,
+          "split_memory_MB": 794.3,
+          "original_Boolean_variables": 18,
+          "split_Boolean_variables": 41,
+          "original_reported_degree_of_regularity": 7,
+          "split_reported_degree_of_regularity": 4,
+          "implementation": "Magma V2.18-9 GroebnerBasis",
+          "provenance": "Huang Chapter5 Table5.1 as transcribed and cited by the public note; the external table was not re-audited in this bounded sweep"
+        },
+        "source_url": "https://github.com/isogeny-labs/lfd-summation-systems/blob/b16197de032d39a0b7c44427b3d71c47b8eb803b/docs/proofs/semaev-splitting-cost.md",
+        "source_blob": "8fab215d3b08a5e117862d34ccfa277d5add5fbf",
+        "lfd54_CI_snapshot": "6 successes; Lean build and axiom audit still in progress. The PR changes no Lean source, so repository Lean CI would not kernel-check the new written splitting lemma.",
+        "lfd55_snapshot": "Frozen head ca76c8f changes only one tracking line in docs/ACTIVE.md; commit tree06139bbd320f660e2ba0159c8d193468389c65a4. The protocol path returns404 at that head. Live filename enumeration later showed eight source/evidence paths, indicating head movement; those later bytes were not attributed to ca76.",
+        "lfd55_CI_snapshot": "5 successes, 1 failure, 2 cancelled checks at ca76. No passing Lean check or completed matched benchmark is established by that snapshot."
+      },
+      "missing_obligations": [
+        "Bind later PR55 source, protocol and correctness receipts to its actual later head before crediting results.",
+        "Audit exceptional-locus and rational-point recovery correspondence.",
+        "A new M31 comparison needs ordinary prime-field input formulations and matched native execution; this binary literature result is not M31 evidence.",
+        "No new LFD or solving-degree bound, per-instance guarantee, asymptotic separation, or independently reproduced end-to-end improvement is supplied."
+      ]
+    },
+    {
+      "id": "ecc2k130_jacobian_necessary_conditions",
+      "title": "ECC2K-130 Weil factor: bounded Jacobian necessary-condition checks",
+      "prs": [
+        53
+      ],
+      "links": [
+        "https://github.com/isogeny-labs/lfd-summation-systems/pull/53"
+      ],
+      "exact_statement": "For E/F2: y^2+xy=x^3+1 and W=Res_(F_(2^131)/F2)E ~ E x A with dim A=130, define virtual curve counts C_k=2^k+1-p_k from the roots of P_A and closed-place counts a_d=(1/d) sum_(e|d) mu(d/e) C_e. If A is F2-isogenous to a genus130 Jacobian, these must be nonnegative integers.",
+      "evidence": {
+        "kind": "Exact-integer computation reported by author; source and retained correction log inspected; no new independent replay",
+        "checked_ranges": {
+          "point_counts": "k=1..1599",
+          "closed_places": "d=1..400"
+        },
+        "reported_values": {
+          "C1": 2,
+          "C2": 2,
+          "C3": 14,
+          "C4": 18,
+          "minimum_point_count": 2,
+          "minimum_closed_place_count": 0
+        },
+        "cross_check": "Newton power sums versus the structural formula p_k=-s_k^E if 131 does not divide k, and 130*s_k^E otherwise.",
+        "source_url": "https://github.com/isogeny-labs/lfd-summation-systems/blob/0be977fe0cba427a49ac26573089b7d9481b2822/experiments/ecc2k130-weil-factor/jacobian_tests.py",
+        "source_blob": "48533416b42792aecb2e465897eaa8e057b68800",
+        "note_url": "https://github.com/isogeny-labs/lfd-summation-systems/blob/0be977fe0cba427a49ac26573089b7d9481b2822/docs/ecc2k130-weil-factor-A.md",
+        "note_blob": "34c5e2f6f6153d6020c3e9fc4c063526dc52c862",
+        "correction_log_url": "https://github.com/isogeny-labs/lfd-summation-systems/blob/0be977fe0cba427a49ac26573089b7d9481b2822/docs/session-logs/2026-11-24.md",
+        "correction": "Author records an initial Newton-loop off-by-one error producing spurious negative counts; corrected by the structural cross-check.",
+        "CI_snapshot": "All8 check contexts successful, including existing repository Lean build/axiom audit. No Lean theorem for the new Jacobian-count computation is introduced by this PR."
+      },
+      "report_wording": "No negative point counts were reported for k=1..1599 and no negative/nonintegral closed-place counts for d=1..400. These necessary checks leave Jacobian existence unresolved.",
+      "missing_obligations": [
+        "Do not generalize the finite program to 'all computable zeta obstructions' without an additional argument.",
+        "Construct or exclude a matching Jacobian/polarization; verify any candidate CM-type or cyclic-cover comparison and reconcile cited genus bounds using their exact hypotheses.",
+        "An explicit efficiently computable DLP-preserving transfer and complete solving cost are absent.",
+        "This is historical binary ECC2K evidence, not M31 evidence or a prime-field LFD growth proof."
+      ]
+    }
+  ],
+  "global_limits": [
+    "This bounded review does not establish an E6 certificate or an unconditional general/linear LFD-growth theorem.",
+    "No new Lean or arithmetic execution was run.",
+    "M31 governs new requested field-dependent experiments; these historical binary source statements retain their original fields."
+  ],
+  "audit_impact": "Impact score: 3/10 — Clarified exact proof and evidence scope, caught an evolving-head mismatch, and prevented literature/finite checks from being counted as new M31 or general LFD results."
+}
