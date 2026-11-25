@@ -46,8 +46,9 @@ remain charged.
 | H-GEN-SIB | sibling generation from one batched inversion | lower counted work and, after implementation repair, lower wall per independent rank | profile pool 64 and 256 on the same curve/seed, then paired A/B | active; existing wall result is negative |
 | H-GEN-HOT | per-parent subset selection or key/reference bookkeeping dominates the sibling wall regression | one named software path accounts for at least 20% of samples or instructions unique to the sibling arm | matched CPU sampling and Callgrind profiles | active diagnostic |
 | H-GEN-CACHE | cache each parent's seed-coefficient residues and pre-plan minus coefficients once | at least 5% fewer solve instructions in both frozen pool arms with identical semantic controls | source-exact Callgrind replay of sequences 242/243 | active; candidate frozen in `CACHE_PROTOCOL.md` |
-| H-YIELD-POOL | a larger jump pool reduces collision clustering enough to raise independent rank per generated child | pool 256 beats pool 64 on held-out rank/child and rank/second, with duplicate and zero-row rates no worse | fresh k = 28 and 32 paired blocks | unconfirmed; counted-cost evidence only |
-| H-YIELD-FILTER | a cheap point-only prefilter can enrich rank-contributing collisions | held-out rank/second improves over a matched-random filter with the same acceptance rate | train-only predicate freeze, matched random negative control | queued; no predicate selected before the profile |
+| H-YIELD-POOL | a larger jump pool reduces collision clustering enough to raise independent rank per generated child | pool 256 beats pool 64 on rank/child and rank/second, with duplicate and zero-row rates no worse | frozen k = 28 and 32 Stage 1 panels, 240 verified runs per arm and size | rejected at the primary metric: fewer children, but lower point-estimate rank/second |
+| H-YIELD-LINEAR | accept `(a,b)` when a fixed linear coordinate `u*a + v*b` passes a cheap predicate | conditioning biases the residual scalar `a + d*b` toward relation-bearing points | Lean equivalence and exact fibre cardinality for the nonparallel case | disproved structurally unless `u*d-v=0`, which encodes the unknown `d` |
+| H-YIELD-FILTER | a cheap nonlinear point-aware prefilter can enrich rank-contributing collisions | held-out rank/second improves over a matched-random filter with the same acceptance rate | train-only predicate freeze, matched random negative control | queued; fixed linear coefficient filters are now closed by H-YIELD-LINEAR |
 
 ## Profile attempts
 
@@ -78,6 +79,30 @@ expansions on this matched target rather than a distinct pool-256-only hotspot.
 This one matched execution is diagnostic evidence, not the held-out pool-size
 decision. [pcc:unverified]
 
+## Pool-size yield decision
+
+The already frozen Stage 1 panels provide a controlled discriminator for
+H-YIELD-POOL: both pool arms used the same 240 verified workloads at each field
+size and reached the same required rank. Relative to pool 64, pool 256 used
+0.94078 times as many sibling second points and 0.93445 times as many table
+insert attempts at k = 28; at k = 32 the corresponding ratios were 0.94065 and
+0.93437. Thus the larger pool did reduce generated-child cost per full-rank
+result by about six percent. [pcc:unverified]
+
+That component gain did not survive the primary metric. Dividing each arm's
+paired wall ratio by the common plain-walk denominator gives pool-256 / pool-64
+wall ratios of 1.00173 at k = 28 and 1.01235 at k = 32. Because every admitted
+run reached the same rank, the corresponding verified-rank/second ratios are
+0.99828 and 0.98780. These point estimates do not establish a statistically
+resolved regression, but they fail the preregistered directional requirement
+that pool 256 improve rank/second at both sizes. H-YIELD-POOL is therefore
+rejected as an end-to-end mechanism; its exact failure mode is that the roughly
+six-percent child-count reduction is consumed by the larger pool's setup and
+bookkeeping overhead. The source records are the `tw2cj-lazy` versus
+`tw2cj-lazy-sib8-p64` and `tw2cj-lazy-sib8-p256` comparisons under
+`research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/{k28,k32}`.
+[pcc:unverified]
+
 ## Prior-art receipt
 
 Research-kb was current at revision
@@ -101,12 +126,29 @@ not measurements.
 
 ## Lean gate
 
-Lean work begins only after the empirical decision. A winning sampling mechanism
-may justify a structural proof that coefficient tracking preserves the group
-invariant and that its admitted transformation cannot collapse the intended row
-space. A rejected bias mechanism may justify an obstruction such as
-permutation-invariance of full-cycle density. Benchmark ratios and static timing
-arithmetic are explicitly outside the Lean scope.
+The fixed-linear-filter conjecture has been discharged structurally in
+`crypto-lean` PR #43 (merged as `4b4c7adaa6c8936d2109a49ceee287e7d4e17e78`).
+For a field `F`, hidden scalar `d`, and fixed filter coordinate
+`u*a + v*b`, `linearFilterResidualEquiv` proves that
+
+`(a,b) -> (u*a + v*b, a + d*b)`
+
+is an equivalence whenever `u*d-v != 0`. `linear_filtered_set_card` then
+factors the exact cardinality of arbitrary predicates on the filter and
+residual coordinates, while `linear_filtered_fiber_card` proves that fixing
+one admitted filter value leaves exactly one coefficient pair for every
+accepted residual scalar. Hence a fixed nonparallel linear coefficient filter
+cannot enrich relation density. The excluded parallel direction is proportional
+to the residual itself and therefore requires the unknown `d`; it is not an
+implementable selector for the search. The module and aggregate `CryptoLean`
+target compile under the pinned Lean 4.35.0 environment; the declarations use
+only Mathlib's standard `propext`, `Classical.choice`, and `Quot.sound` axioms.
+
+This proof is an algebraic obstruction, not benchmark arithmetic. A winning
+nonlinear point-aware mechanism would still require a structural proof that its
+coefficient tracking preserves the group invariant and does not collapse the
+intended row space. Benchmark ratios and static timing arithmetic remain
+explicitly outside the Lean scope.
 
 ## Artifacts
 
