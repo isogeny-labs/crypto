@@ -1,0 +1,76 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=18mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,graphicx,booktabs,amsmath,amssymb}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\begin{document}
+{\Large\bfseries Separate native audit of actual C7 divisor certificates}\par
+23 November 2026 \quad Same-session separate implementation [pcc:unverified]
+
+\textbf{Outcome.} All 16 frozen conic cells and all 32 printed rank
+witnesses verify with separately written native arithmetic. Every sign
+$-1$ cell has common-divisor degree three; every sign $+1$ cell has
+degree zero. The complete positive and negative cohorts remain intact.
+
+\begin{center}
+\includegraphics[width=\linewidth,height=40mm,keepaspectratio]{audit.pdf}
+\end{center}
+
+\begin{center}
+\begin{tabular}{lrp{79mm}}
+\toprule
+Object & Complete count & Separate check\\
+\midrule
+Actual geometric $E_7[3]$ &9& Nonsingular curve, order three, Frobenius,
+and a basis spanning all nine supplied points\\
+Conic pairs &16& Complete fibre/jet vanishing and nonzero $5\times5$ minors\\
+Printed rank witnesses &32& Bareiss original-row minors and every supplied
+full-row nullvector, with independent free-coordinate basis\\
+Opposite algebra norms &64& Determinants of multiplication operators,
+including the complete origin jet\\
+Mutation/restoration cells &16& Actual conic, determinant and nullvector
+changes reject; pristine witnesses verify again\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Geometry and proof coefficients.} All conditions hold in the
+whole degree-two/three fibre algebras, with the actual C7 quartic and
+forward target equations. The degree-three fibre also respects the
+actual $R$ action. All conics and decisions respect Frobenius.
+For the written actual basis $\beta=B N/3$, the separate exact
+$\mathbb Z[\omega]$ implementation verifies
+\[
+ N^\dagger G N=9H,\quad NT_-=3I,\quad T_-^\dagger H T_-=G,
+ \quad \det H=1,\quad HH^{-1}=I.
+\]
+Actual $H$ and $T_-$ entry mutations reject and restore. The reduced
+kernel, quotient descent and Koszul divisor argument remain stated
+standard geometric dependencies; the audit checks their finite
+witnesses and coefficient identities.
+
+\textbf{Qualification and custody.} Frozen source \texttt{76c0def}
+had all 21 complete locked input/readbacks before first calls. All seven
+strict phases exit zero, guards unchanged: Rust 1.99.1, warnings denied,
+overflow/debug assertions, one worker, 120 seconds / 2 GiB per phase.
+No repair or candidate conic/H search replay. Full stdout is 5458 bytes,
+SHA256 \texttt{4dbf8f39\ldots{}de1fd346}; all 38 small originals are
+retained. The original whole 4829280-byte ELF
+\texttt{dbb60cf9\ldots{}d4fdf181} remains in RAM pending approved custody.
+
+\textbf{Scope and next step.} This is a separate implementation by the
+same session, not a separately signed expert verdict or generic Lean
+theorem. Data29284d, interpretation b37559. Next: fixed actual $E[4]$
+and Weil pairing, then mixed $S$/Rosati-adjoint chains through the proved
+geometric $\beta$ bridge. That task is prospective and has not run.
+The frozen main-ledger fork still blocks merge; existing custody,
+formal, target/divisor and quantitative cost requirements remain.
+
+\href{https://github.com/isogeny-labs/crypto/tree/76c0defa39d4c394bf6f2ee0d1409560cc836d20/research/chained_cm19_certificate_audit_20261123}{Frozen verifier/protocol};
+\href{https://github.com/isogeny-labs/crypto/tree/6ac7338ac51d1339558281fdd45f0357987ffa09/research/chained_cm19_certificate_audit_20261123}{complete native result and next lead}.
+Primary dependencies: Milne AV I.8 Remark8.12;
+\href{https://stacks.math.columbia.edu/tag/062D}{Stacks062D}.
+KB/Conductor unavailable; no novelty clearance. [pcc:unverified]
+\end{document}

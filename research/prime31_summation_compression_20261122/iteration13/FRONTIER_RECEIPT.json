@@ -1,0 +1,59 @@
+{
+  "schema": "prime31-enumerative-ksum-frontier.v1",
+  "date": "2026-11-23",
+  "status": "producer-mathematics-only; pcc-unverified",
+  "main_source_sha": "da7777094392d3ccd37db78dcfc761c32e7e7813",
+  "tracking_commit": "5dc24d56e14fe48f52994e1c5227b510a04c3424",
+  "tracking_pr": "https://github.com/isogeny-labs/crypto/pull/5064",
+  "note": {
+    "path": "research/prime31_summation_compression_20261122/iteration13/EXPLICIT_KSUM_FRONTIER.md",
+    "git_blob_sha": "f039100b13acf888dc33c0214c02b71612c06706"
+  },
+  "prior_git_blobs": {
+    "iteration8_semiring": "20f9428434bf228c75de404bdb8c4fde4f7b3675",
+    "iteration9_pair_spectrum": "e2348e91dc08141a663c5adb9798b6ca8f09424e",
+    "iteration10_review": "0e295d7d5e6ef1d84f59c1889ae81d6cbcaa7fb9",
+    "iteration10_leaf_norm": "953b48e251bdbd6fce9b7748cd4b05c5d60afb7c"
+  },
+  "literature": [
+    "https://arxiv.org/abs/1504.01175",
+    "https://drops.dagstuhl.de/storage/00lipics/lipics-vol374-icalp2026/html/LIPIcs.ICALP.2026.78/LIPIcs.ICALP.2026.78.html"
+  ],
+  "parameters": {
+    "p": 2147483647,
+    "subgroup_order": 2147446831,
+    "base_size": 31,
+    "nonidentity_x_support_upper_bound": 309442,
+    "nonidentity_target_count": 2147446830
+  },
+  "calculations": {
+    "signed_unordered_tuple_counts": {
+      "k2": 1953,
+      "k3": 41664,
+      "k4": 677040
+    },
+    "probability_nonempty_max": 0.0002881952611604358,
+    "probability_empty_min": 0.9997118047388396,
+    "first_positive_mean_queries_lower_bound": 3469.869684787456,
+    "minimum_work_exponents_single-row-model": {
+      "k2": "3/4 at beta 1/4",
+      "k3": "3/5 at beta 1/5",
+      "k4": "4/7 at beta 1/7"
+    },
+    "validation_methods": [
+      "symbolic exponent case split with saturation beta=1/4",
+      "100000-point independent numeric beta grid",
+      "binomial multiplicative coefficient calculation"
+    ]
+  },
+  "provenance": {
+    "native_agents": 0,
+    "native_rust_compilations": 0,
+    "cryptographic_executions": 0,
+    "performance_runs": 0,
+    "independent_signers": 0,
+    "kb": "Unavailable: no MCP actions; no local repository wrapper",
+    "publication": "New math-only note; never production solver"
+  },
+  "next_step": "Exact source-specific Otilde(D) setup and sublinear-D all-miss S3 query; independent source-frozen validation and canonical signed useful-rank replay."
+}
