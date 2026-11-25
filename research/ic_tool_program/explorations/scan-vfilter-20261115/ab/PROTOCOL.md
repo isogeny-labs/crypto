@@ -7,7 +7,7 @@ optimizing the index calculus.
 
 A probe of current main (`a95274095f`; outputs in
 [`../microbench/`](../microbench/)) prices collection at 197 of 310 ms of
-set-up at k0n53 and 1,075 of 1,281 ms at k0n61. The filter stage is the
+set-up at icv1-f2m53-tm56619371-dac20a85 and 1,075 of 1,281 ms at icv1-f2m61-t158598901-ab42b6c5. The filter stage is the
 largest part of a scanned summand: 5.30 and 5.72 ns, of 14.4 and 14.9.
 
 A filter probe costs about 2.3 ns even when the filter sits in L1
@@ -44,7 +44,7 @@ twice (once to prefetch, once to test), counts a probe, and branches.
 
 The same as the key-chains A/B
 ([`../../key-chains-20261114/ab/PROTOCOL.md`](../../key-chains-20261114/ab/PROTOCOL.md)):
-- **Rows:** `M1-T01` at `k0n53` and `k0n61`.
+- **Rows:** `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` and `icv1-f2m61-t158598901-ab42b6c5`.
 - **Isolation:** `isolated_bench --cpus 2` with `RAYON_NUM_THREADS=1`.
 - **Schedule:** 42 rounds cycled over the six orders of `a q v`.
 - **Metrics:** per-process medians of build, collect and set-up.
@@ -70,8 +70,8 @@ Medians `a / v`:
 
 | row | collect | build | set-up |
 |:--|:--|:--|:--|
-| k0n53 | [1.01, 1.07] | [0.98, 1.02] | [1.00, 1.05] |
-| k0n61 | [1.01, 1.07] | [0.98, 1.02] | [1.01, 1.06] |
+| icv1-f2m53-tm56619371-dac20a85 | [1.01, 1.07] | [0.98, 1.02] | [1.00, 1.05] |
+| icv1-f2m61-t158598901-ab42b6c5 | [1.01, 1.07] | [0.98, 1.02] | [1.01, 1.06] |
 
 ## Identity
 

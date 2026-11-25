@@ -61,9 +61,7 @@ fn reduce_i64(mut a: i64, mut b: i64, mut c: i64) -> (i64, i64, i64) {
             b = -b;
             continue;
         }
-        if a == c && b < 0 {
-            b = -b;
-        } else if a == -b {
+        if (a == c && b < 0) || a == -b {
             b = -b;
         }
         break;
@@ -602,7 +600,7 @@ fn isqrt_u64(n: u64) -> u64 {
     if n == 0 {
         return 0;
     }
-    let mut x = 1u64 << (((64 - n.leading_zeros() as u32) + 1) / 2);
+    let mut x = 1u64 << (64 - n.leading_zeros()).div_ceil(2);
     if x == 0 {
         x = 1;
     }
