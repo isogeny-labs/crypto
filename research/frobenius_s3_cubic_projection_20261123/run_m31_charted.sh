@@ -14,6 +14,7 @@ det_start = src.index('/// Sylvester resultant of')
 det_end = src.index('/// A dense polynomial in', det_start)
 Path(sys.argv[2]).write_text(src[start:end] + '}\n' + src[det_start:det_end])
 PY
+binary=${S3_OUTPUT_BIN:-$build_dir/m31_charted}
 S3_PRIME_FIELD="$build_dir/field.rs" "${RUSTC:-rustc}" --edition 2021 -O \
-    "$study_dir/m31_charted.rs" -o "$build_dir/m31_charted"
-"$build_dir/m31_charted" "$@"
+    "$study_dir/m31_charted.rs" -o "$binary"
+"$binary" "$@"

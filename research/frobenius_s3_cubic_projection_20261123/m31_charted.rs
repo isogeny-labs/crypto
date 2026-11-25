@@ -80,10 +80,35 @@ fn add(f: Fp, a: &[u64], b: &[u64]) -> Poly {
 }
 
 fn scale(f: Fp, a: &[u64], factor: u64) -> Poly {
-    a.iter().map(|&x| f.mul(x, factor)).collect()
+    debug_assert_eq!(f.p, P);
+    a.iter().map(|&x| m31_mul(x, factor)).collect()
+}
+
+#[inline]
+fn m31_mul(a: u64, b: u64) -> u64 {
+    let product = a * b;
+    let folded = (product & P) + (product >> 31);
+    if folded >= P {
+        folded - P
+    } else {
+        folded
+    }
+}
+
+#[inline]
+fn m31_reduce(value: u128) -> u64 {
+    let first = (value & P as u128) + (value >> 31);
+    let second = (first & P as u128) + (first >> 31);
+    let reduced = second as u64;
+    if reduced >= P {
+        reduced - P
+    } else {
+        reduced
+    }
 }
 
 fn mul(f: Fp, a: &[u64], b: &[u64]) -> Poly {
+    debug_assert_eq!(f.p, P);
     // Every coefficient of this fixed M31 panel sums fewer than 64 products
     // of 31-bit residues, so one u128 accumulator fits without reduction.
     let mut sums = vec![0u128; a.len() + b.len() - 1];
@@ -92,13 +117,12 @@ fn mul(f: Fp, a: &[u64], b: &[u64]) -> Poly {
             sums[i + j] += x as u128 * y as u128;
         }
     }
-    sums.into_iter()
-        .map(|value| (value % f.p as u128) as u64)
-        .collect()
+    sums.into_iter().map(m31_reduce).collect()
 }
 
 fn evaluate(f: Fp, a: &[u64], x: u64) -> u64 {
-    a.iter().rev().fold(0, |acc, &v| f.add(f.mul(acc, x), v))
+    debug_assert_eq!(f.p, P);
+    a.iter().rev().fold(0, |acc, &v| f.add(m31_mul(acc, x), v))
 }
 
 fn coefficients(c: Curve, x: u64) -> [Poly; 3] {
