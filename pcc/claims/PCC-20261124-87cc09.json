@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:19:36Z",
+ "id": "PCC-20261124-87cc09",
+ "kind": "statement",
+ "producer": {
+  "commit": "7f1099ea972d6f471b88f9ff1fd0dddeea4dbc3b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/AGGREGATE_PROTOCOL.md",
+    "sha256": "bf68635713e623ec29571dd8edf1e9e3af9de79cf0865eb89166b2f747f1e9cf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/aggregate.cpp",
+    "sha256": "91c18838ec95efd3abe7c0d952bdf4ccc324245a539692b7a8adae47e5694aec"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/evidence/aggregate-v1/result.json",
+    "sha256": "ab795f10e543d45f33978d546ee833f02224823899456c64452374738a948910"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/evidence/aggregate-v1/pre-call-manifest.sha256",
+    "sha256": "ace0a212518e61abbd542b972b31657e2f56fbc89ec6dd374ecaa4b3bd1ac60c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-whole-residual-trace-audit",
+ "statement": "Aggregate-v1 strictly compiles and executes with exit0 on recorded traces only. Canonicalizing226 residual traces yields226 distinct new nonzero columns,disjoint from225 old columns. All226 added rows have checked private-column witnesses. OpenSSL/direct-GMP elliptic sums agree on232 rows and two independent dense rank paths give full rank232,new-column rank226,closed rank6,gain0,deficiency219. Three corruptions reject. This rejects whole-residual trace aggregation on the frozen family,not individual-image multirow closure. No new curve points or fresh target-principality checks. Producer unsigned."
+}

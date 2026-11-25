@@ -1,0 +1,15 @@
+digraph support_classification {
+  graph [rankdir=TB,bgcolor="white",fontname="Helvetica",fontsize=16,label="Fixed support catalog: exhaustive minimal three-row classification",labelloc=t,nodesep=0.25,ranksep=0.35];
+  node [shape=box,style="rounded,filled",fillcolor="#EDF2F7",color="#41556B",fontname="Helvetica",fontsize=12];
+  edge [color="#52677B",arrowsize=0.7];
+  all [label="12 sign-normalized vectors on <=3 new columns\n220 unordered triples"];
+  pair [label="30 contain a proportional pair\nExcluded by prior two-row premise",fillcolor="#EEEEEE"];
+  full [label="150 have full rank\nNo three-row dependency",fillcolor="#EEEEEE"];
+  core [label="40 minimal dependencies\nExact kernels and modular ranks agree",fillcolor="#DDEFE5"];
+  u [label="U: 16 cases\n|c| = (1,1,1)\nOld term lies in A+A"];
+  v [label="V: 12 cases\n|c| = (2,1,1)\nOld term lies in 2A"];
+  w [label="W: 12 cases\n|c| = (1,2,2)\nOld term lies in 2A"];
+  {rank=same;pair;full;core;}
+  {rank=same;u;v;w;}
+  all -> pair;all -> full;all -> core;core -> u;core -> v;core -> w;
+}
