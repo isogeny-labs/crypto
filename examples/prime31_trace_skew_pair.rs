@@ -41,14 +41,8 @@ fn scaled_add(f: Fp, a: Jet, k: u64, b: Jet) -> Jet {
 fn step(f: Fp, s: u64, t: u64, before: Jet, current: Jet) -> Jet {
     Jet::new(
         f.sub(f.mul(s, current.v), f.mul(t, before.v)),
-        f.sub(
-            f.add(current.v, f.mul(s, current.ds)),
-            f.mul(t, before.ds),
-        ),
-        f.sub(
-            f.mul(s, current.dt),
-            f.add(before.v, f.mul(t, before.dt)),
-        ),
+        f.sub(f.add(current.v, f.mul(s, current.ds)), f.mul(t, before.ds)),
+        f.sub(f.mul(s, current.dt), f.add(before.v, f.mul(t, before.dt))),
     )
 }
 
@@ -98,6 +92,7 @@ fn polynomial_from_roots(f: Fp, roots: &[u64]) -> Vec<u64> {
 }
 
 /// Horner evaluation of h'(x) without factorials.
+#[allow(dead_code)]
 fn derivative_horner(f: Fp, h: &[u64], x: u64) -> u64 {
     let mut value = 0u64;
     for i in (1..h.len()).rev() {
@@ -110,6 +105,7 @@ fn jacobian(f: Fp, a: Jet, k: Jet) -> u64 {
     f.sub(f.mul(a.ds, k.dt), f.mul(a.dt, k.ds))
 }
 
+#[allow(dead_code)]
 fn point_image(xs: &[u64], p: u64) -> BTreeSet<(u64, u64)> {
     let mut result = BTreeSet::new();
     for (i, &x) in xs.iter().enumerate() {
@@ -130,10 +126,7 @@ fn prime31_factor_base() -> Vec<u64> {
     let f = Fp::new(P31);
     let mut roots = Vec::new();
     for x in 0..1000 {
-        let rhs = f.add(
-            f.add(f.mul(f.mul(x, x), x), f.mul(A31, x)),
-            B31,
-        );
+        let rhs = f.add(f.add(f.mul(f.mul(x, x), x), f.mul(A31, x)), B31);
         if rhs == 0 || f.pow(rhs, (P31 - 1) / 2) == 1 {
             roots.push(x);
         }
@@ -175,8 +168,15 @@ fn main() {
     }
     let rhs = f.add(f.add(f.mul(f.mul(GX, GX), GX), f.mul(A31, GX)), B31);
     assert_eq!(f.mul(GY, GY), rhs);
-    println!("Prime31 p={P31} B={} unordered-pairs={} radical-Jacobians={} S3-parity=pass", roots.len(), valid, valid);
-    println!("Exact membership/polynomial stage only; NO Rust cost advantage or DLP recovery claim.");
+    println!(
+        "Prime31 p={P31} B={} unordered-pairs={} radical-Jacobians={} S3-parity=pass",
+        roots.len(),
+        valid,
+        valid
+    );
+    println!(
+        "Exact membership/polynomial stage only; NO Rust cost advantage or DLP recovery claim."
+    );
 }
 
 #[cfg(test)]

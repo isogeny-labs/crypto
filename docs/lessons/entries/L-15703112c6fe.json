@@ -1,0 +1,14 @@
+{
+  "action": "check the basis before accepting the arithmetic: IPS needs 0/1 Boolean variables and zero-restrictions; in multiplicative/Fourier bases degree and size decouple (Tseitin: linear degree, small +-1-basis size), so flag the size figure as unsupported",
+  "created": "2026-11-25T18:38:28Z",
+  "evidence": [
+    "research/degree_slope_two_block_20261124/REDTEAM.md F2; research/chain_sd_bounds_20261115/REPORT.md Theorem 1"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "a desk note converts a polynomial-calculus degree bound into a size/cost bound via Impagliazzo-Pudlak-Sgall for a tower, Kummer, roots-of-unity or other group-algebra (character) presentation",
+  "why": "THEORY_ATTEMPT cited IPS as 'plausible because NF monomials are multilinear'; the tower NF basis is F_p[(Z/2^t)^m], a character basis"
+}
