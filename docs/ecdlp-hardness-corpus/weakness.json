@@ -2,17 +2,17 @@
   "schema": "ecdlp.weakness-analysis/v1",
   "corpus_version": "2026-11-18",
   "counts": {
-    "nodes": 654,
+    "nodes": 659,
     "status_inflation": 13,
     "model_scope_leaps": 12,
-    "contagious_sources": 24,
-    "hidden_assumption_clusters": 19,
+    "contagious_sources": 25,
+    "hidden_assumption_clusters": 20,
     "unwired_dependences": 11,
     "route_closures_on_weak_support": 15,
-    "live_obstructions": 57,
+    "live_obstructions": 58,
     "author_flagged": 14,
-    "attack_queue": 272,
-    "hygiene_queue": 122
+    "attack_queue": 273,
+    "hygiene_queue": 124
   },
   "status_inflation": [
     {
@@ -1054,6 +1054,42 @@
       ]
     },
     {
+      "source": "S-IC-CYCLE-CLOSURE-FORMAL-2026",
+      "title": "Two-summand cycle closure: exact incidence-algebra boundary",
+      "verification": "repository_read",
+      "refuted": [
+        "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES"
+      ],
+      "refuted_fraction": 0.167,
+      "exposed": [
+        {
+          "id": "GAP-RP-CYCLE-CLOSURE-LAW",
+          "status": "open",
+          "impact": 1
+        },
+        {
+          "id": "CEX-RP-ODD-CYCLE-NO-CLOSURE",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-IC-SIGNLESS-INCIDENCE-RANK",
+          "status": "proved_external",
+          "impact": 0
+        },
+        {
+          "id": "THM-RP-BALANCED-CYCLE-CONTROLS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-RP-CYCLE-TARGET-PROJECTION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        }
+      ]
+    },
+    {
       "source": "S-IC-YIELD-RANK-FORMAL-2026",
       "title": "Yield visibility, censorship and kernel-mode formal boundary checks",
       "verification": "repository_read",
@@ -1425,6 +1461,19 @@
     },
     {
       "nodes": [
+        "CEX-PA-BATCH-ADAPTIVE",
+        "THM-IC-UNUSED-COLUMN-RIGHT-KERNEL",
+        "CEX-IC-SURPLUS-RIGHT-RANK",
+        "THM-RP-CYCLE-TARGET-PROJECTION"
+      ],
+      "texts": [
+        "Field coefficients"
+      ],
+      "established_users": [],
+      "total_impact": 1
+    },
+    {
+      "nodes": [
         "DEF-EMBEDDING-DEGREE",
         "RED-ISOGENY-DLP-TRANSPORT",
         "THM-XT-BK-WEIL-SUFFICES"
@@ -1439,6 +1488,23 @@
         "RED-ISOGENY-DLP-TRANSPORT"
       ],
       "total_impact": 17
+    },
+    {
+      "nodes": [
+        "ATTACK-GHS-WEIL-DESCENT",
+        "THM-WD-HESS-THM12-GENUS",
+        "THM-IC-SIGNLESS-INCIDENCE-RANK"
+      ],
+      "texts": [
+        "Characteristic two",
+        "Field characteristic is not two"
+      ],
+      "established_users": [
+        "ATTACK-GHS-WEIL-DESCENT",
+        "THM-WD-HESS-THM12-GENUS",
+        "THM-IC-SIGNLESS-INCIDENCE-RANK"
+      ],
+      "total_impact": 8
     },
     {
       "nodes": [
@@ -1529,18 +1595,6 @@
       "texts": [
         "COND-PF-HKPYY-COMPLEXITY's assumptions",
         "COND-PF-HKPYY-COMPLEXITY"
-      ],
-      "established_users": [],
-      "total_impact": 1
-    },
-    {
-      "nodes": [
-        "CEX-PA-BATCH-ADAPTIVE",
-        "THM-IC-UNUSED-COLUMN-RIGHT-KERNEL",
-        "CEX-IC-SURPLUS-RIGHT-RANK"
-      ],
-      "texts": [
-        "Field coefficients"
       ],
       "established_users": [],
       "total_impact": 1
@@ -1933,7 +1987,7 @@
           "status": "heuristic"
         }
       ],
-      "statement": "No base size, table fold or target generator inside the pair-table two-summand family reaches rho at any size that matters."
+      "statement": "Under the declared counting-yield and rho(K)=K/2 stopping-law specialization, no base size, table fold or target generator inside the pair-table two-summand family reaches rho at any size that matters."
     }
   ],
   "live_obstructions": [
@@ -2506,6 +2560,16 @@
       "to_status": "conditional",
       "impact": 1,
       "statement": "Both source and target groups must be priced under their best known attacks."
+    },
+    {
+      "edge": "ICYRF-E-016",
+      "relation": "qualifies",
+      "from": "THM-IC-SIGNLESS-INCIDENCE-RANK",
+      "from_status": "proved_external",
+      "to": "GAP-RP-CYCLE-CLOSURE-LAW",
+      "to_status": "open",
+      "impact": 1,
+      "statement": "Over an odd scalar field the relevant incidence circuits are balanced; an arbitrary first cycle is insufficient."
     }
   ],
   "author_flagged": [
@@ -2975,6 +3039,20 @@
       "cost": "exact small-field census",
       "action": "exhaust small fields of a scaling family; compare the formula's prediction with exact counts and report the ratio with its trend",
       "score": 1.268
+    },
+    {
+      "id": "ALG-WD-THERIAULT-2003",
+      "label": "Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2)))",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "impact": 5,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.45,
+      "cost": "discharge conditions",
+      "action": "attack the weakest condition first; each condition is its own node",
+      "score": 1.263
     },
     {
       "id": "ATTACK-MOV-PAIRING",
@@ -4070,17 +4148,17 @@
     },
     {
       "id": "GAP-RP-CYCLE-CLOSURE-LAW",
-      "label": "Two-summand relation-graph first-cycle law",
+      "label": "Two-summand useful balanced-circuit stopping law",
       "status": "open",
       "model": "classical_unrestricted",
       "impact": 1,
       "inflates": 0,
-      "contagion": 1,
+      "contagion": 2,
       "obstructed": 0,
       "breakability": 0.35,
       "cost": "open obligation",
       "action": "prove or refute",
-      "score": 0.595
+      "score": 0.633
     },
     {
       "id": "GAP-SP-BOUNDED-ROOT-SUMPOLY",
@@ -5078,7 +5156,7 @@
     },
     {
       "id": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-      "label": "Two-summand pair-table IC family costs ~0.75 r^(1/6) in S units: no crossover with rho",
+      "label": "Conditional two-summand pair-table family law; r^(1/6) at rho(K)=K/2",
       "status": "conditional",
       "model": "curve_family_restricted",
       "impact": 0,
@@ -6507,20 +6585,6 @@
       "score": 2.527
     },
     {
-      "id": "ALG-WD-THERIAULT-2003",
-      "label": "Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2)))",
-      "status": "proved_external_unread",
-      "model": "algebraic_coordinate",
-      "impact": 5,
-      "inflates": 0,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.9,
-      "cost": "read",
-      "action": "read the primary text; confirm statement, hypotheses and the exact quantifiers the corpus uses",
-      "score": 2.527
-    },
-    {
       "id": "THM-WD-MOMOSE-CHAO",
       "label": "Momose-Chao: classes of curves with weak Weil restrictions",
       "status": "proved_external_unread",
@@ -7823,6 +7887,20 @@
       "score": 0.702
     },
     {
+      "id": "CEX-RP-ODD-CYCLE-NO-CLOSURE",
+      "label": "Triangle and self-pair loop need not close unsigned elimination over F3 (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
       "id": "CEX-SUBFIELD-FACTOR-BASE",
       "label": "Subfield curve, odd n: every sum of x in F_q factor-base points lies in E(F_q), at most 2q + 1 points (Lean)",
       "status": "proved_internal_unreviewed",
@@ -7937,6 +8015,34 @@
     {
       "id": "THM-PA-PAIRING-DECIDES-DDH",
       "label": "A nondegenerate pairing decides DDH with one evaluation (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-RP-BALANCED-CYCLE-CONTROLS",
+      "label": "Square and parallel-edge circuits give unsigned row dependencies over F3 (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-RP-CYCLE-TARGET-PROJECTION",
+      "label": "A row dependency recovers the target only with nonzero target projection (Lean)",
       "status": "proved_internal_unreviewed",
       "model": "mathematical",
       "impact": 0,
