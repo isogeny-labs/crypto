@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:10:21Z",
+ "id": "PCC-20261124-65be87",
+ "kind": "statement",
+ "producer": {
+  "commit": "46ee1ae335abcff18065f686a64883105b602863",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/RESULTS.json",
+    "sha256": "aff447210eb4a0a456a49818a455d6fb69cade56111fa907aeedb6bbc83d1d8b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/COST_INDEX.json",
+    "sha256": "a8398103c418e9a65b23f1a04249fa2064052e58e16a627e1aa7d2692166f9c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/RECORDS.json",
+    "sha256": "d20280e4fa55119d28825eb8dbdec0ab8ed7bca596347268e146ff7822529f38"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "metadata projection, cost index and path-bound raw-record integrity of the actual local collection",
+ "statement": "RESULTS.json projects the existing native result and checker fields without new curve/group/rank arithmetic. COST_INDEX.json indexes retained process clocks and identifies nested totals and unpriced scopes. RECORDS.json binds the path-bound raw sources, inputs, results, controls and clocks by SHA256 while distinguishing generated local-only executable files. No independent signature or complete original map-synthesis cost is inferred."
+}

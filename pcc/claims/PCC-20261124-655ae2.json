@@ -1,0 +1,107 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:02:22Z",
+ "id": "PCC-20261124-655ae2",
+ "kind": "statement",
+ "producer": {
+  "commit": "46ee1ae335abcff18065f686a64883105b602863",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/instrumented-v1/result.json",
+    "sha256": "9aa993711b3d47acfc3214129c943c6ba9e01aeceed08bc6607ed260d90f1986"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/instrumented-v1/checker-result.json",
+    "sha256": "077bd8cbc68a6481bc29997962a13e8c324c0455cff1496fdbffbe0b1836a9b4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/instrumented-v1/mathematical-prefix.json",
+    "sha256": "4c6b519d1083178d85084e8cd3df3b2a502dbe8de2a3bcb04b04c1d18f106e04"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/inspection-v1/result.json",
+    "sha256": "cbb058ad98baffefed4ece6426137851dface7b4387400e811b6d7e74775a5fc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/instrumented_collector.cpp",
+    "sha256": "4b7d38ef5ec1be8fbc8fa3ca397016019b9fda78fe1f29072b4b499c89e3e371"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/inspect.cpp",
+    "sha256": "9784676bd7ad072339a7f5216e40ae85cf98b06dcb21824d9553fdb06d082891"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/INSTRUMENTATION_PROTOCOL.md",
+    "sha256": "9d4c368dfb5e472cdb62988b7b071024157defca754aab463ec25a911e98858f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/INSPECTION_PROTOCOL.md",
+    "sha256": "6ea86015f2d303ddd3a2887167c793babddf9dbacff004548334496512fd821c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/instrumented-v1/collector-cost.json",
+    "sha256": "52cdb99675c3ddc93b0d305d5ad665d31d515380789f4cd7f97ca6d33d99ec1c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/instrumented-v1/build-cost.json",
+    "sha256": "b83a464d8c6c312eba9caf6db96c9922f78812f7cd29dbd01002c0265730eb69"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/instrumented-v1/checker-cost.json",
+    "sha256": "09025fcd0374c6ce4e5e271c1d9318c5bf365fcc7543660237f59e8e7f506ac8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/inspection-v1/cost.json",
+    "sha256": "2445ee46105a5e8d4e065b6b6494b101d93e4a35ab5f9cdfa445e9e6357f690b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/inspection-v1/build-cost.json",
+    "sha256": "a153fc1a865df0cce3b81d17f9c300c531d2be183431795bbf78c7899a5f595e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "local instrumented repeat, mathematical-output equality, and separate private-column inspection",
+ "statement": "The instrumented collector and unchanged separate checker exit zero, with exact original mathematical-output prefix equality through closure. A separate row-scan/sort incidence checker derives and matches all204 private new-column certificates, two per each102 added row, with zero new support on six baseline rows; four incidence mutations reject. Nonnegative phase clocks sum to the native33327379-microsecond interval. Target principality accounts for28615824 microseconds in this diagnostic call. All supplemental process clocks are retained and are additional work, not a speedup or full original-synthesis cost. These producer-unverified results do not supply an independent signed verdict."
+}

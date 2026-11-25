@@ -309,11 +309,11 @@ useful boundary: native hash/canonicalization work is large enough to control
 the multi-target order, but there is no price-independent win.
 
 The current folded-pair construction profile localizes the Koblitz setup
-bottleneck. At k0n53, streaming plus sort/fill consumes 26.70 of 34.58
-ns/pair (77.2%); at k0n61 it consumes 26.73 of 35.48 ns/pair (75.4%). A
+bottleneck. At icv1-f2m53-tm56619371-dac20a85, streaming plus sort/fill consumes 26.70 of 34.58
+ns/pair (77.2%); at icv1-f2m61-t158598901-ab42b6c5 it consumes 26.73 of 35.48 ns/pair (75.4%). A
 paired layout A/B found the current Top filter slower to build than the frozen
-Low filter: Top/Low is 1.104 [1.070, 1.143] at k0n53 and 1.142 [1.098,
-1.165] at k0n61, with zero identity mismatches. To preserve benchmark
+Low filter: Top/Low is 1.104 [1.070, 1.143] at icv1-f2m53-tm56619371-dac20a85 and 1.142 [1.098,
+1.165] at icv1-f2m61-t158598901-ab42b6c5, with zero identity mismatches. To preserve benchmark
 identity, the old `ic.koblitz_descent` and `ic.koblitz_batched` IDs stay on
 Low; explicit `_v2` IDs name Top. This prevents a default change from
 silently mutating historical measurements.

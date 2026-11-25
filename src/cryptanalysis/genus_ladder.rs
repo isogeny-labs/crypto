@@ -2199,7 +2199,9 @@ pub fn run_ic_ext_bounded(
             let (rng0, nat0) = (rng.clone(), w_nat);
             let t = wiedemann_coord(&red, rcc, rct as usize, r, &mut rng, true, &mut w_nat);
             if let Some(path) = dump {
-                export_core(&path, &red, rcc, rct, r, rng0, w_nat, nat0, t, ext.unit_t, h_inv, inst);
+                export_core(
+                    &path, &red, rcc, rct, r, rng0, w_nat, nat0, t, ext.unit_t, h_inv, inst,
+                );
             }
             match t.map(to_log) {
                 Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
@@ -2304,8 +2306,7 @@ fn export_core(
             idx.swap(i, j);
         }
     }
-    let rows: Vec<serde_json::Value> =
-        red.iter().map(|(e, c)| serde_json::json!([e, c])).collect();
+    let rows: Vec<serde_json::Value> = red.iter().map(|(e, c)| serde_json::json!([e, c])).collect();
     let line = serde_json::json!({
         "p": inst.p, "g": inst.genus, "r": r, "h": inst.h, "t_secret": inst.t_secret,
         "ncols": ncols, "ct": ct, "unit_t": unit_t, "h_inv": h_inv,
@@ -2313,7 +2314,11 @@ fn export_core(
         "wied_mul": after.mul - before.mul, "wied_add": after.add - before.add,
         "coord_out": t,
     });
-    let mut f = std::fs::OpenOptions::new().create(true).append(true).open(path).expect("export");
+    let mut f = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)
+        .expect("export");
     writeln!(f, "{line}").expect("export write");
 }
 
@@ -3327,7 +3332,11 @@ mod tests {
             let calls = la_test_hook::CALLS.with(|c| c.get());
             let work = la_test_hook::WORK.with(|w| w.get());
             assert!(x.certified, "{label}");
-            assert_eq!(x.recovered.unwrap() % inst.r, inst.t_secret % inst.r, "{label}");
+            assert_eq!(
+                x.recovered.unwrap() % inst.r,
+                inst.t_secret % inst.r,
+                "{label}"
+            );
             assert!(x.attempts >= 2, "{label}: the first attempt must fail");
             if per_attempt == 2 {
                 assert!(x.la_fallbacks >= 1, "{label}");
@@ -3337,14 +3346,18 @@ mod tests {
             // or two in the attempt that certified.
             let failed = x.attempts - 1;
             assert!(
-                calls >= per_attempt * failed + 1 && calls <= per_attempt * x.attempts,
+                calls > per_attempt * failed && calls <= per_attempt * x.attempts,
                 "{label}: {calls} solves over {} attempts",
                 x.attempts
             );
             // The tally is the work performed, counted once.
             assert_eq!(x.la_wied, work, "{label}");
             let parts = [x.la_graph, x.la_peel, x.la_sel, x.la_sge, x.la_wied];
-            assert_eq!(x.la.mul, parts.iter().map(|n| n.mul).sum::<u64>(), "{label}");
+            assert_eq!(
+                x.la.mul,
+                parts.iter().map(|n| n.mul).sum::<u64>(),
+                "{label}"
+            );
         }
     }
 

@@ -1,0 +1,11 @@
+digraph pipeline {
+  graph [rankdir=LR, bgcolor="transparent", pad=0.1, nodesep=0.15, ranksep=0.18];
+  node [shape=box, style="rounded,filled", fillcolor="#e8edf3", color="#536b82", fontname="Helvetica", fontsize=12, margin=0.08];
+  edge [color="#536b82", arrowsize=0.6];
+  input [label="Frozen\ntangents"];
+  roots [label="Residual roots\nFull coordinates"];
+  target [label="Target KM\nSection classes"];
+  maps [label="Separate maps\nSigned images"];
+  closure [label="Rows and\nclosure witnesses"];
+  input -> roots -> target -> maps -> closure;
+}

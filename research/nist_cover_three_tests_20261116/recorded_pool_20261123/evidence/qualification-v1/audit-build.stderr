@@ -1,0 +1,52 @@
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp: In function ‘audit::Point audit::plus(const Point&, const Point&)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:22:5: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   22 |     if(x.zero)return y;if(y.zero)return x;
+      |     ^~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:22:24: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   22 |     if(x.zero)return y;if(y.zero)return x;
+      |                        ^~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp: In function ‘std::string audit::key(const Point&)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:33:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   33 |     for(size_t i=0;i<count;++i)out[25-count+i]=char(bytes[i]);return out;
+      |     ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:33:63: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   33 |     for(size_t i=0;i<count;++i)out[25-count+i]=char(bytes[i]);return out;
+      |                                                               ^~~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp: In function ‘std::pair<std::set<std::array<int, 4> >, std::set<std::array<int, 4> > > audit::sorted_join(const std::vector<Item>&)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:68:9: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   68 |         for(size_t a=i;a<e;++a)for(size_t c=a+1;c<e;++c){pairs.insert(pair_relation(direct[a].second,direct[c].second));bounded(pairs,quads);}i=e;}
+      |         ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:68:143: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   68 |         for(size_t a=i;a<e;++a)for(size_t c=a+1;c<e;++c){pairs.insert(pair_relation(direct[a].second,direct[c].second));bounded(pairs,quads);}i=e;}
+      |                                                                                                                                               ^
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:72:9: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   72 |         for(size_t a=i;a<ie;++a)for(size_t c=j;c<je;++c){quads.insert(quartet(direct[a].second,complements[c].second));bounded(pairs,quads);}i=ie;j=je;}
+      |         ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:72:142: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   72 |         for(size_t a=i;a<ie;++a)for(size_t c=j;c<je;++c){quads.insert(quartet(direct[a].second,complements[c].second));bounded(pairs,quads);}i=ie;j=je;}
+      |                                                                                                                                              ^
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp: In function ‘std::map<std::array<int, 4>, audit::Section> audit::canonical(const std::vector<CP>&, const std::vector<Term>&, size_t&, size_t&)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:98:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   98 |         if(rest.size()!=1||support.size()!=4)continue;Quad q{};std::copy(support.begin(),support.end(),q.begin());std::sort(q.begin(),q.end());Poly expanded{f.back()};for(int index:q)expanded=product(expanded,{mod(-roots.at(index)),1});require(expanded==f,"complete section product reconstruction");require(out.emplace(q,Section{l,f}).second,"unique canonical line");}
+      |         ^~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:98:55: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   98 |         if(rest.size()!=1||support.size()!=4)continue;Quad q{};std::copy(support.begin(),support.end(),q.begin());std::sort(q.begin(),q.end());Poly expanded{f.back()};for(int index:q)expanded=product(expanded,{mod(-roots.at(index)),1});require(expanded==f,"complete section product reconstruction");require(out.emplace(q,Section{l,f}).second,"unique canonical line");}
+      |                                                       ^~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp: In function ‘int audit::run(int, char**)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:115:172: error: invalid operands of types ‘int’ and ‘std::nullptr_t’ to binary ‘operator!=’
+  115 |         require(EC_POINT_add(ssl.group.get(),sum.get(),ss[i].get(),ss[j].get(),ssl.context.get())==1,"SSL pair addition");require(EC_POINT_copy(complement.get(),sum.get())!=nullptr&&EC_POINT_invert(ssl.group.get(),complement.get(),ssl.context.get())==1&&EC_POINT_add(ssl.group.get(),complement.get(),sk.get(),complement.get(),ssl.context.get())==1,"SSL complement");
+      |                                                                                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp: In lambda function:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:120:197: error: possibly dangling reference to a temporary [-Werror=dangling-reference]
+  120 |     auto row_for=[&](const std::vector<int>& positive,const std::vector<int>& negative_indices){Row row(base.size());for(auto side:{std::make_pair(&positive,1),std::make_pair(&negative_indices,-1)})for(int i:*side.first){auto image=projection.at(size_t(i));if(image[0]>=0)row[size_t(image[0])]+=side.second*image[1];}require(row_sum(row,base).zero,"audited elliptic row sum");return row;};
+      |                                                                                                                                                                                                     ^
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:120:147: note: the temporary was destroyed at the end of the full expression ‘std::make_pair<const vector<int>*, int>((& positive), 1)’
+  120 |     auto row_for=[&](const std::vector<int>& positive,const std::vector<int>& negative_indices){Row row(base.size());for(auto side:{std::make_pair(&positive,1),std::make_pair(&negative_indices,-1)})for(int i:*side.first){auto image=projection.at(size_t(i));if(image[0]>=0)row[size_t(image[0])]+=side.second*image[1];}require(row_sum(row,base).zero,"audited elliptic row sum");return row;};
+      |                                                                                                                                     ~~~~~~~~~~~~~~^~~~~~~~~~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:120:197: error: possibly dangling reference to a temporary [-Werror=dangling-reference]
+  120 |     auto row_for=[&](const std::vector<int>& positive,const std::vector<int>& negative_indices){Row row(base.size());for(auto side:{std::make_pair(&positive,1),std::make_pair(&negative_indices,-1)})for(int i:*side.first){auto image=projection.at(size_t(i));if(image[0]>=0)row[size_t(image[0])]+=side.second*image[1];}require(row_sum(row,base).zero,"audited elliptic row sum");return row;};
+      |                                                                                                                                                                                                     ^
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/qualification-v1/source/audit.cpp:120:175: note: the temporary was destroyed at the end of the full expression ‘std::make_pair<const vector<int>*, int>((& negative_indices), -1)’
+  120 |     auto row_for=[&](const std::vector<int>& positive,const std::vector<int>& negative_indices){Row row(base.size());for(auto side:{std::make_pair(&positive,1),std::make_pair(&negative_indices,-1)})for(int i:*side.first){auto image=projection.at(size_t(i));if(image[0]>=0)row[size_t(image[0])]+=side.second*image[1];}require(row_sum(row,base).zero,"audited elliptic row sum");return row;};
+      |                                                                                                                                                                 ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+cc1plus: all warnings being treated as errors

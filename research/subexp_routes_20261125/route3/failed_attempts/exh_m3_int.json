@@ -1,0 +1,276 @@
+{
+  "all_verified": false,
+  "calibration": {
+    "ns_per_add": 131.30625,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 78.17792,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": null,
+    "ns_per_legendre": null,
+    "ns_per_lookup": 0.0,
+    "ns_per_row_op": 2.74365234375,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": null,
+    "ns_per_word_xor": 0.8289642333984375,
+    "pinned_units": []
+  },
+  "calibration_pins": {
+    "measured": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_word_xor"
+    ],
+    "pinned": []
+  },
+  "configurations_run": 1,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 0.001897792,
+  "instance": "icv1-fp13-tm13-9e2d11f6",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=5,degree=8,engine=exhaustive,lo=0,m=3,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.667 | 3 | 2 | 2 | — | — | 70.051 | — | gave up |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": null,
+  "rho_reference_candidates": [],
+  "rho_reference_plain": null,
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 4931.789233185777,
+          "group_ops": {
+            "adds": 244,
+            "doubles": 356,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 2,
+            "pkm_grid_fp_mults_uncharged": 153696,
+            "relations": 2,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 3,
+            "solver_ops": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 3,
+            "trials": 3,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 2
+          },
+          "wall_ns": 631541,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 2,
+            "walk_modr_adds": 4
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 3, t = 5, mode chain, engine exhaustive",
+        "gae_before_solver": 600.0,
+        "hit_rate": 0.6666666666666666,
+        "name": "pkm-semaev",
+        "relations_found": 2,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 1016959
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 3,
+          "degree_over_bound": null,
+          "extra": {},
+          "gae": 4331.789233185777,
+          "name": "tower-exhaustive",
+          "ns_per_op": null,
+          "op_unit": "F_p multiplications (grid)",
+          "ops": 0,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 0,
+          "solving_degree_mean": null,
+          "solving_degree_sum": 0,
+          "wall_ns": 568791
+        },
+        "summands": 3,
+        "system": {
+          "degrees": [
+            4,
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 17,
+          "n_vars": 16,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 3
+      },
+      "exhausted": true,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 28375,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=5,degree=8,engine=exhaustive,lo=0,m=3,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 0.20895062830215622,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 2,
+            "repeated_column_rows": 0,
+            "row_ops": 10,
+            "rows": 2,
+            "single_column_rows": 0,
+            "two_column_rows": 0
+          },
+          "wall_ns": 8625,
+          "work_native": {
+            "column_part_inserts": 2,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 84,
+            "pivot_inversion_steps": 52,
+            "row_build_modr_adds": 8,
+            "row_build_modr_muls": 4,
+            "row_build_words": 110,
+            "row_key_mixes": 6
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 2,
+        "rows": 2,
+        "work": 10,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": null,
+      "rho_s": null,
+      "s": 70.05085631363421,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 3,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "5",
+          "degree": "8",
+          "engine": "exhaustive",
+          "lo": "0",
+          "m": "3",
+          "mode": "chain"
+        },
+        "seed": 20261185,
+        "solver": null,
+        "solver_budget_seconds": 60,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 4931.998183814079,
+      "verified": false,
+      "verify": {
+        "gae": 0.0,
+        "group_ops": {
+          "adds": 0,
+          "doubles": 0,
+          "scalar_mults": 0
+        },
+        "native": {},
+        "wall_ns": 0
+      },
+      "wall_seconds": 0.001741084
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "7524d2d807209df0765b18715553a98794a691f4eaa07e5b69788683770d3a4f",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "incomplete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}

@@ -28,3 +28,19 @@
   container; the survey read `research/` directly.
 - The #4931 merge landed before the addendum push; this PR carries the
   addendum.
+
+## 21:05Z: degree-lever direction published
+
+### What was done
+- The parallel workflow (three directions, each with a red-team review) finished. Published the degree-lever direction: `examples/rootfind_degree_lever_20261123.rs` and `research/rootfind_degree_lever_20261123/` (README, PROTOCOL, raw, analysis, report.pdf, figure, the worker's own SESSION_LOG.md).
+- A fix-up pass applied the red-team review: a G0-failure box (62/72 preregistered, relaxed post hoc to d_F plus closed dims), A/A reworded as uninformative, the "wrong sign" hedged as one integer step, the window-base sentence fixed, and the source-hash gap and host-load censoring recorded.
+
+### Decisions made
+- Negative result `[pcc:unverified]`: the symmetrised frame does not lower the d_F slope at m=3 over n=9–18. Its Macaulay matrix is smaller by a shrinking constant only. No leaderboard or benchmarks row.
+
+### Open threads
+- The G1 selftest output was not saved (no binary survives); rerun after a build.
+- The other two directions (matched F4 gate, genus 2–3 sibling) are being corrected per their red-team reviews, then published as separate PRs.
+
+### Errors
+- G0 failed as preregistered (see the README). There was no cargo build because the disk was at about 750 MB.

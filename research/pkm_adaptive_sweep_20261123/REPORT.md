@@ -118,3 +118,42 @@ Both 32-repeat panels use the `ic bench` deterministic planted-log stream on one
 After the seed-8 failure, `PROTOCOL_F4_SCALE13_ALT_20261123.md` froze an ascending size-only search of ordinary t=4 seeds 9..31 on the *same* 13-bit instance. Seed 9 had ten abscissae; seed 10 was the next exact nine-abscissa match. Its 32 verified pairs yielded 250 candidate versus 233 interval relations over 7,307 versus 7,954 target trials. Candidate/interval charged GAE was 0.65220, wall 0.66458 and child CPU 0.52818, so this **adaptive screen passed**. It is not independent confirmation because the field and scalar stream were reused after observing seed 8. Raw store `scale13_alt.jsonl` SHA-256: `7a0392a26caaacd463a9e52734efa27cbff43658d24d7595c1b3658f7e1301cd`.
 
 The interval's external wall on *identical command, instance and scalar stream* had already changed from 38.61 seconds in the seed-8 pair to 69.93 seconds in the seed-10 screen. `PROTOCOL_F4_SCALE13_REVERSE_20261123.md` therefore froze a candidate-first, interval-second repeat. All 32 rows again verified; candidate/interval charged GAE was 0.25160, wall 0.25399 and child CPU 0.84076. Its raw store `scale13_reverse.jsonl` SHA-256 is `150d7a280fc68fc4f0b1ad5de3498c9b8da7acd1c457f486c7e259af85e9ee36`. The interval took 121.65 seconds and 2.718B charged GAE on this repeat, while the earlier identical interval runs took 38.61/69.93 seconds and 0.864/1.537B GAE. Candidate wall across the seed-8/seed-10/reverse runs was 46.92/46.47/30.90 seconds, with different maps for seed 8 and seed 10. This large within-workload timing drift makes the relative charged-cost estimate unstable. Seed 10 remains an adaptive component screen hit requiring an independent fixed-instance replication under controlled load; it is not a demonstrated transfer trend. The repeated reverse-order win does not repair the reused-curve selection or the unstable calibration.
+
+## Seed-10 fresh-instance replication
+
+`PROTOCOL_F4_SCALE13_NEW_INSTANCE_20261123.md` first fixed CLI seed 20261124. The candidate had 11 lifting abscissae, while valid power-of-two interval bases below 8, 16 and 32 had 2, 6 and 15; the protocol stopped without timing. Its append-only store `scale13_new_instance.jsonl` SHA-256 is `987cf48390a3cda9f2a8c5f4bd3b26fdff7acfd8685cc3022cf34f7c9f818985`.
+
+Before further inspection, `PROTOCOL_F4_SCALE13_INSTANCE_SWEEP_20261123.md` froze an ascending size-only instance search from CLI seeds 20261125 through 20261140. The first exact match was seed 20261127, instance `icv1-fp13-tm43-d65e6f58`: seed-10 degree-16 isogeny and below-16 interval each had six lifting abscissae. The mirrored order was interval, candidate, candidate, interval. Both interval calls completed and verified all 32 scalars. Both candidate calls stopped incomplete on the same row, repeat index 27 / internal spec seed 21354708: each exhausted all 1,000 target trials, found six relations for that row and did not recover its scalar. The other 31 candidate rows verified. The complete baseline calls used 12,360 trials and found 179 relations; each candidate call used 12,753 trials and found 177 relations including the censored row. The robust independent-instance gate therefore **failed**; incomplete candidate cost cannot be presented as a successful ratio. Baseline wall also drifted from 65.31 to 142.07 seconds, consistent with the prior timing-instability warning. Raw store SHA-256: `a4364155a1f75d42e9d30afcc4d1078624af294caf60d8cb6135107f2233c5d4`.
+
+This is direct evidence for why the adaptive seed-10 result does not transfer automatically: its relation extraction completed on one selected 13-bit instance but censored reproducibly on a fresh size-matched 13-bit instance under the same cap. A larger trial cap could test eventual completion, but would be a new amended workload and must charge the failed 1,000-trial attempts. The current frozen replication does not support promoting seed 10 beyond an instance-specific screen hit.
+
+## Degree-32 map breakthrough at the component gate
+
+`PROTOCOL_F4_DEGREE32_20261123.md` changed the map family to ordinary t5: **five degree-2 Vélu steps composed to degree 32**. On a new 13-bit instance `icv1-fp13-tm125-b06ea196`, a size-only ascending auxiliary search selected seed 5 as the first exact match to `prime-abscissa:below=32`; both bases had 17 lifting abscissae. All 16 paired scalar recoveries verified. Candidate/interval charged GAE was **0.15348**, external wall **0.15470**, child CPU **0.26681**. The candidate found 181 relations in 2,027 target trials versus 200 in 2,039 for the interval: relation probability per trial was 0.910×, but useful relations per charged GAE improved **5.897×**. The candidate used 7.963B F4 multiply-adds versus 256.970B. This adaptive component screen passed. Raw store `degree32.jsonl` SHA-256: `c4465f0fbcc42a82639a717d42d96a0705e036eef34078599f4e1da3b3e33aba`.
+
+`PROTOCOL_F4_DEGREE32_REPLICATION_20261123.md` froze a fresh-instance mirrored replication for seed 5. The first instance window, CLI seeds 20261129..20261140, contained no exact size match and stopped before timing; store `degree32_replication.jsonl` SHA-256 `43cef01461e50b2bb3cef875b4071772ff6192cd3849ad30deb968a4d476828f`. `AMENDMENT_F4_DEGREE32_REPLICATION_EXTEND_20261123.md` extended only the size-search window. The first exact match was CLI seed 20261149, instance `icv1-fp13-t19-0d05ae31`, with 16 lifting abscissae in each base. The frozen order was interval, candidate, candidate, interval. All four 16-row invocations completed and verified corresponding scalars.
+
+| Fresh-instance mirrored metric | Pair 1 | Pair 2 | Combined |
+|:--|--:|--:|--:|
+| Candidate / interval charged GAE | **0.13043** | **0.23833** | **0.17119** |
+| Candidate / interval external wall | **0.13112** | **0.23335** | 0.17025 derived from summed wall |
+| Candidate / interval child CPU | **0.36388** | **0.34706** | 0.35517 derived from summed CPU |
+| Baseline / candidate F4 multiply-adds | 394.733B / 10.405B | 394.733B / 10.405B | 789.466B / 20.810B |
+
+Across both mirrored calls, the candidate found 344 relations in 5,326 target trials versus 392 in 6,310 for the interval. Relation probability per trial improved **1.0397×** and useful relations per charged GAE improved **5.126×**. Both pairwise gates and the combined gate passed. Raw store `degree32_replication_extend.jsonl` SHA-256: `49f996274ec2e67f6efc87047888abf9176a127530ce4632f54a97e3aab3f70b`.
+
+This is the first result in this continuation that survives a fresh-instance, opposite-order replication with the same low/high-degree construction and equal factor-base size. It establishes a **repeated small-instance PKM relation-extraction component lead** for the five-low-map / degree-32 construction. It still sits far above the counted same-target rho context: candidate median `s_over_rho` was about 174,753 and 197,388 in the two replication calls. The executable is hash-pinned but not yet source-commit-pinned. Full relation collection, linear algebra, descent, cold rho crossover, s59, P-192 and NIST p±1 remain separate unpassed gates. The result must not be promoted to an end-to-end or wide-curve speedup.
+
+## Original-workload source replay, 2026-11-25
+
+The retained `ic` from source commit `a5503f4bb66ac3aa4eac3125fba01534d2574096`
+has SHA-256 `c98e290c7c7d5aee30ed70e1c9aa19726e830854b09ae15921f02b09c648de2d`.
+Under `PROTOCOL_F4_DEGREE32_ORIGINAL_SOURCE_REPLAY_20261125.md`, the original
+`degree32` seed 20261128 changed from equal 17/17 to 17/18 abscissae; the
+selected `degree32_replication_extend` seed 20261149 changed from equal 16/16
+to 16/18. The instance IDs still matched within each pair. Both separate
+replay stores ended at the size gate without a qualifying timed call. Their
+SHA-256 values are `e02cf71f4256c2eca6f8e904b152c6178f25b7ac26fe8c1259607703e7a77c8b`
+and `60e91f1cfbbc5c0064a207d280ae4cae86324ff6320df62a1a77d75cd1a7136a`.
+This is a source-reproducibility mismatch, not a candidate/control speed ratio.
+Neither replay has a measured `s_over_rho`: both stopped before the F4 calls.
