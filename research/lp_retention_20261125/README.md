@@ -1,107 +1,159 @@
-# Which partial relations to keep under a row budget
+# Which partial relations to store under a memory cap
 
-Date 2026-11-25. Draft PR #5186. Port of experiment T3 of isogeny-labs/workspace#144 into
-`large_prime_graph`. [pcc:unverified]
+Date 2026-11-25. Draft PR #5186. Started as a port of experiment T3 of isogeny-labs/workspace#144.
+[pcc:unverified]
 
-**Standing:** exact component counts on toy, synthetic and one real ECDLP stream, with source-exact
-tests. Not a speed claim, not a benchmark row, no leaderboard change. Each count is the exact
-`GainDsu` left nullity of the kept rows over F_ℓ, i.e. the number of independent combinations that
-cancel every large prime.
+**Standing:** exact component counts on an F_p* toy and four real `ecbench_large_prime`
+binary-curve streams, with source-exact tests. Not a speed claim, not a benchmark row, no
+leaderboard change. "Draws" are collection trials; their cost is not priced here.
 
-## Code
+## Question and design (v2, the current design)
+
+A collector cannot always store every partial relation. If it must decide **on arrival** which
+partials to keep under a memory cap, which rule gets to a full relation matrix soonest?
+
+- Complete relations are always kept.
+- Stored partials enter `ForestWitnessExtractor`, and every closed cycle is harvested at once as a
+  combined relation.
+- **Score:** the draw at which the exact rank over F_ℓ of the factor-base block of kept and
+  harvested rows first reaches the target, the full useful rank. A secondary score uses 90% of that
+  rank, because full rank waits on the rarest factor-base prime.
+
+The protocol, `PROTOCOL_v2.md`, was frozen at 2bffd4df4 before any v2 data.
 
 | piece | where |
 | --- | --- |
-| Six policies, `split_by_arity`, exact scoring, coefficient-blind cycle count, F_p* toy collector with replay | `src/cryptanalysis/large_prime_graph/retention.rs` |
-| Evaluator: `--source fp\|synthetic\|relations`, budget sweep, `--relabel` | `examples/lp_retention_eval.rs` |
-| Tests (7) | `tests/lp_retention.rs` |
-| Source-exact wrapper crate (symlinks the unmodified production modules) | `native/` (`bash native/run.sh`) |
+| `AdmissionRule`, `simulate_admission`, `IncrementalRank` | `src/cryptanalysis/large_prime_graph/retention.rs` |
+| Evaluator (`--source fp\|relations`, `--caps`) | `examples/lp_retention_eval.rs` |
+| F_p* toy collector with replay (not in the library) | `examples/lp_retention_support/fp_toy.rs` |
+| Tests (5) | `tests/lp_retention.rs` |
+| Source-exact wrapper crate | `native/` (`bash native/run.sh`) |
 
-The six policies are `random`, `smallest_lp`, `degree`, `spectral`, `core_then_random` and the
-exploratory `singles_then_spectral`.
+The tests check four things:
+- the incremental rank equals the repo's `projected_rank::audit_projected_rank` (60 batches over
+  F_7, F_101 and F_1000003);
+- every harvested combination replays through `large_prime_filter::replay_complete_relation` to
+  the same row (over 1,000 checked);
+- `all` ≥ every rule ≥ `complete_only` in useful rank at every draw, which is a theorem: a
+  subgraph's cycle space lies in the graph's;
+- caps, rule semantics, and F_p* replay with a tamper check.
 
-`bash native/run.sh` passed:
-- **41/41** existing `tests/large_prime_graph.rs` tests;
-- **7/7** new tests, including `GainDsu` left nullity equal to dense Gaussian rank for every policy
-  on 120 random batches over F_3, F_7, F_101 and F_1000003, unit and random coefficients.
-
-The root crate also builds at this branch: `cargo build --release --example lp_graph_collect`,
-15 min 42 s on the session VM.
+Results with `bash native/run.sh`: **41/41** existing `large_prime_graph` tests and **5/5** new
+ones pass. `clippy -D warnings` is clean on the library, both tests and the example.
 
 ## Results
 
-The protocol, `PROTOCOL.md`, was frozen before any data. Addendum A was frozen before its
-confirmation data. Intervals are 95% bootstrap over 5 repeats.
+Each cell is draws to the target divided by draws with every partial admitted (`all`); lower is
+better. FP cells are means over 10 seeds with 95% bootstrap intervals in `RESULTS_V2.md`.
 
-| hypothesis | outcome |
-| --- | --- |
-| **H1** F_p*: `smallest_lp` beats `degree`/`spectral` at budget 0.25 | **supported.** smallest/degree = 1.32, smallest/spectral = 1.30 on FP0–2, every lower bound > 1.29. This independently reproduces workspace#144's Python figure (degree/smallest = 0.757, i.e. 1.32) on fresh Rust-collected pools. |
-| **H2** cross-implementation | **PASS.** workspace#144's Python `counts()` on the Rust FP0 pools gives U = Rust left nullity and b1 = Rust cycle count on 5/5 pools. All 174,672 relations replay by modular exponentiation in Python (`crosscheck_h2.py`, `results/h2_crosscheck.json`). |
-| **H3** H1 at every budget 0.25…0.01 | **holds at every budget.** The gap grows as the budget shrinks: smallest/degree from 1.32 to 14.5 on FP0. |
-| **H4** relabelled labels: `smallest_lp` ties `random` | **falsified.** It stays 1.54× random (FPr) and 2.67× (SYNr). Cause: the product-of-identities key ranks every one-LP row (one hash, about 2^63) ahead of every two-LP row (about 2^126), whatever the labels. On FP, singletons-first is ×1.54 over random and true size order adds only ×1.15 on top. |
-| **H5** synthetic stream | `smallest_lp` leads at 0.25: /degree 1.17, /spectral 1.10, /random 3.30. |
-| **H6** real ECDLP stream (binary n = 20, `ecbench_large_prime`, 59,864 partials, 228 LP columns, ℓ = 65557) | Every policy is within **1.5%** of random at budgets 0.25 and 0.10. At smaller budgets they separate (ratio to random at 0.01: smallest 1.54, degree 1.50, spectral 1.48). |
-| **H7** (Addendum A) `singles_then_spectral` on fresh instances | **REJECTED as a default.** On FP3–5r and SYN2r it beats `smallest_lp`, `degree` and `spectral` at every budget (worst case 1.177 [1.155, 1.202]), and on plain FP3–5 it is ≥ `smallest_lp` (worst 1.006). On REAL, `degree` beats it at 0.25 (0.1%) and 0.10 (1.5%). |
+**F_p\* toy** (p ≈ 2^31, B = 1024, |FB| = 172, L = 65536; primes FP6, FP7, FP8):
 
-The FP0, SYN and REAL rows are drawn in `figure.svg` / `report.pdf`. Full tables are in
-`RESULTS_TABLES.md`.
+| | cap 2×\|FB\| | cap 5×\|FB\| | cap 10×\|FB\| |
+| --- | --- | --- | --- |
+| complete relations only | 1.85 / 1.65 / 2.09 | (same) | (same) |
+| `first_come` | 1.84 / 1.65 / 1.94 | 1.60 / 1.63 / 1.91 | 1.28 / 1.27 / 1.48 |
+| `max_lp` ≤ L/16 | **1.61 / 1.57 / 1.73** | **1.25 / 1.36 / 1.25** | 1.21 / 1.29 / 1.25 |
+| `max_lp` ≤ L/4 | 1.81 / 1.65 / 1.92 | 1.51 / 1.44 / 1.59 | **1.10 / 1.13 / 1.00** |
+| `singles_only` | 1.82 / 1.65 / 1.92 | 1.72 / 1.51 / 1.79 | 1.18 / 1.25 / 1.27 |
+| `seen_lp` | 1.84 / 1.65 / 1.92 | 1.58 / 1.55 / 1.79 | 1.20 / 1.25 / 1.11 |
 
-The relabel internal check passed. Relabelling left `degree`, `spectral`, `core_then_random` and
-`random` counts identical on every stream and budget. Re-running with six policies reproduced the
-frozen five exactly, so the runs are deterministic.
+**Real ECDLP streams** (`ecbench_large_prime`, binary curves; one stream each, collection order;
+the target is the useful rank `all` reaches on the whole stream):
+
+| stream (\|FB\|; `all` reaches target at draw) | complete only | `first_come` @10× | `seen_lp` @10× | `singles_only` @5× | `singles_only` @10× |
+| --- | --: | --: | --: | --: | --: |
+| n = 20, seed 20261123 (14; 404) | 23.4 | 13.2 | 13.2 | 15.5 | **3.3** |
+| n = 20, seed 1 (18; 264) | 18.6 | 11.5 | 11.5 | 11.5 | **3.6** |
+| n = 20, seed 2 (12; 190) | 97.2 | 72.8 | 72.8 | 8.0 | **5.6** |
+| n = 24, seed 20261123 (33; 1214) | 32.9 | 32.9 | 32.9 | 15.9 | 32.9 at 5×, **15.9** at 10× |
+
+(For n = 24 the caps are 66, 165 and 330 rows. `singles_only` helps only at 10×, and those are the
+15.9 figures.)
+
+Decisions under the frozen rules (full lists in `RESULTS_V2.md`, `results_v2/verdict.json`):
+
+- **B1 holds.** Partials matter on every FP prime, for both scores. Admitting all partials reaches
+  full rank 1.65–2.09× sooner than complete relations alone, and 90% rank 1.54–1.56× sooner. On the
+  real streams the factor is 18.6–97×.
+- **B2.** With a binding cap on F_p*, the rule that beats `first_come` on all three primes is a
+  **tighter large-prime bound**:
+  - `max_lp ≤ L/16` at 2× and 5×;
+  - `max_lp ≤ L/4` at 10×.
+  - `singles_only` and `seen_lp` do not separate from `first_come` on the primary score.
+  - When the cap stops binding (10×, 90% target), `first_come` equals `all`, and every filtering
+    rule is worse than `first_come`, because it discards partials for nothing.
+  - The predicted "every rule within 5% of complete-only at 2×" **failed**: `max_lp ≤ L/16` already
+    helps there.
+- **B3 failed badly.** I predicted every rule within 10% of `all` on the real streams. Instead,
+  `first_come` and `seen_lp` stay close to complete-only, and **`singles_only` is 3–6× from `all`**
+  on n = 20 at 10×.
+  - The cause: about 90% of real rows are two-large-prime rows over only 228 large-prime columns
+    (965 for n = 24). Filling a small cap with them closes few cycles, while one-large-prime rows
+    pin components and pair up quickly.
+  - This reverses the v1 conclusion that "retention barely matters on the real stream". That was
+    an artifact of the v1 metric.
 
 ## What this means
 
-1. **In F_p\* and on Zipf-like synthetic streams, the textbook rule wins, but mostly for a reason
-   other than size.**
-   - Keeping one-LP rows first carries most of the effect.
-   - On those streams, singletons first with spectral order inside each arity group is the best
-     policy found, label-free, and confirmed on fresh instances.
-   - Centrality alone (degree, spectral: the ideas II.B.5 and V.C.3 from the workspace#144 list) is
-     23–24% below the textbook rule at 0.25 and far below at small budgets.
-2. **On the one real ECDLP stream measured here, retention barely matters until the budget is
-   small.**
-   - That stream is extremely over-determined (59,864 rows on 228 columns).
-   - The best a policy can do is about budget − 228, and at large budgets the winner is whichever
-     policy keeps the fewest distinct columns, which is degree.
-3. **No universal default.** A follow-up needs real streams where LP columns are not scarce: larger
-   n, more large primes, the Koblitz orbit graph, the JV two-LP collector. Only those would show
-   whether the singletons-first effect carries over to curves.
+- The right admission rule depends on whether the cap binds and what an LP identity means:
+  - For F_p*, where identities are sizes, the classic knob wins: lower the large-prime bound to fit
+    memory.
+  - On these ECDLP streams, where identities are point labels and size carries no information,
+    storing only one-large-prime partials is the effective rule.
+  - When memory is ample, store everything.
+- None of the graph-centrality ideas from the workspace#144 list helps here. `seen_lp` is their
+  only online version, and it never beat `first_come` on the primary score.
+- Limits:
+  - Only four real streams, each a single collection order.
+  - Draws are not priced: on curves a draw is a point-decomposition attempt.
+  - Eviction is not modelled.
+  - Factor bases are toy-sized (12–172).
+
+## v1 (superseded)
+
+v1 (protocol `PROTOCOL.md`; code at commit 17da67991; results in `results/`, `results_explore/`,
+`results_confirm/`; scripts `analyze.py`, `confirm_h7.py`, `crosscheck_h2.py`) ranked **offline**
+selections of a fixed fraction of the partials by LP left nullity. Its exact counts are correct,
+including H2: workspace#144's Python agrees on 5/5 pools and 174,672 relations replay. Its design
+answered the wrong question:
+
+- the metric saturated above the factor-base size (14,738 combinations where the solver needed
+  rank 14);
+- `degree` and `spectral` need the whole batch in memory, which contradicts a memory budget;
+- its "singles first" headline is ordinary large-prime arithmetic.
+
+The v1 numbers should not be cited as evidence about which partials to keep. The v1 figure and PDF
+were replaced by the v2 ones.
 
 ## Deviations and errors
 
-- Twice an evaluator was run as `… 2>&1 | grep -m1` / `| head`. The pipe closed early, the process
-  died of SIGPIPE before writing its JSON, and the run was repeated without the pipe. Same binary
-  (sha256 in `results_confirm/binary.sha256`), deterministic output.
-- `crosscheck_h2.py` first applied an extra condition of mine (b1 should differ by the number of
-  squared large primes) and printed MISMATCH. Both conventions count a square as one cycle, so b1
-  was equal, which is the frozen criterion. The script now applies the frozen criterion. The counts
-  are unchanged.
-- The wrapper runs only the integration-test targets. The existing `native_gain_dsu` metering shim
-  is older than `large_prime_filter`'s own `cfg(test)` unit tests, which call newer `jv_bitops`
-  functions. That is unrelated to this change.
-- S3 resume checkpoint: no upload credential in this session. The pushed branch is the durable copy,
-  as in earlier sessions.
-- Sources checked: the research-kb MCP failed to connect (proxy 502). The fallback was the in-repo
-  `research/lp_graph_algorithms_20261123/` notes (GainDsu, frame-matroid rank; Zaslavsky 1989/1991;
-  Diem 2006 as cited there) and workspace#144.
+- **v1 runs.** Two runs were killed by SIGPIPE from `| grep -m1` / `| head` and rerun. The H2
+  script first applied an extra, wrong condition of mine, with unchanged counts.
+- **v2 calibration** used the held-out prime `--p-index 9`, not reported. It surfaced an identical
+  draw count for B = 512 and B = 1024 on one seed. I traced it in Python: the stream recomputes
+  exactly, and three further seeds differ. It was a coincidence, not a bug.
+- **Wrapper scope.** The wrapper runs only integration targets, because the old `native_gain_dsu`
+  metering shim predates `large_prime_filter`'s `cfg(test)` unit tests.
+- **Infrastructure.** No S3 checkpoint credential in this session. research-kb unreachable (proxy
+  502); the sources checked were `research/lp_graph_algorithms_20261123/` and workspace#144.
 
 ## Reproduce
 
 ```sh
-bash native/run.sh                                     # tests + evaluator build
-B=$CARGO_TARGET_DIR/release/examples/lp_retention_eval  # or native/target/release/...
-for i in 0 1 2; do $B --source fp --p-index $i --out results/fp$i.json
-                   $B --source fp --p-index $i --relabel --out results/fp${i}r.json; done
-$B --source synthetic --out results/syn.json; $B --source synthetic --relabel --out results/synr.json
-python3 analyze.py
-# Addendum A: --p-index 3,4,5 and synthetic --p-index 1 into results_confirm/; then
-cargo build --release --example lp_graph_collect   # root crate
-target/release/examples/lp_graph_collect --n 20 --seed 20261123 --small 5 --envelope 9 --summands 4 \
-    --large-primes 2 --trials 60000 --graph filter --relations real_n20.jsonl --out eval.json
-$B --source relations --relations real_n20.jsonl --modulus 65557 --out results_confirm/real.json
-python3 confirm_h7.py && python3 make_report.py
+bash native/run.sh                                  # tests + evaluator build
+B=$CARGO_TARGET_DIR/release/examples/lp_retention_eval
+for i in 6 7 8; do $B --source fp --p-index $i --repeats 10 --smooth 1024 --lp 65536 \
+                      --draws 400000 --caps 2,5,10 --out results_v2/fp$i.json; done
+cargo build --release --example lp_graph_collect     # root crate
+C=target/release/examples/lp_graph_collect
+$C --n 20 --seed 20261123 --small 5 --envelope 9 --summands 4 --large-primes 2 --trials 60000 \
+   --graph filter --relations n20a.jsonl --out /dev/null   # also --seed 1, 2
+$C --n 24 --seed 20261123 --small 6 --envelope 11 --summands 4 --large-primes 2 --trials 120000 \
+   --graph filter --relations n24.jsonl --out /dev/null
+$B --source relations --relations n20a.jsonl --modulus 65557 --caps 2,5,10 --out results_v2/real20a.json
+#  ℓ: seed 1 → 262553, seed 2 → 65599, n = 24 → 2096401
+python3 analyze_v2.py && python3 make_report.py
 ```
 
-Stream hash: `real_n20.jsonl` sha256 `caf7c3e7…296b` (`results_confirm/real_n20.jsonl.sha256`).
-The stream itself is not committed (60,000 lines); the command above regenerates it.
+Stream hashes are in `results_v2/real_streams.sha256`, binary hashes in `results_v2/*.sha256`. The
+streams themselves (5–11 MB each) are not committed; the commands above regenerate them.
