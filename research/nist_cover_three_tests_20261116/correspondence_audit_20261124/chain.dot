@@ -1,0 +1,14 @@
+digraph replay {
+  graph [rankdir=LR, bgcolor="white", pad=0.1, nodesep=0.18, ranksep=0.25];
+  node [shape=box, fontname="Helvetica", fontsize=10, margin=0.08];
+  edge [fontname="Helvetica", fontsize=9];
+  p [label="Frozen P\nincluding O, -2G"];
+  pull [label="Separate pullback D"];
+  forward [label="Forward algebra\nrank-nine binding"];
+  trans [label="Transpose fibers\nand Frobenius traces"];
+  ref [label="Three reference fibers\nraw degrees 8,8,8"];
+  sub [label="Subtract deg(u) R\ncompare with 3D"];
+  norm [label="Actual elliptic norm\ncompare with 6P"];
+  p -> pull -> forward -> trans -> sub -> norm;
+  ref -> sub;
+}

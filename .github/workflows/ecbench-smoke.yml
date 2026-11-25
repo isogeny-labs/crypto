@@ -106,7 +106,13 @@ jobs:
           specs=(docs/ecbench/specs/smoke-*.json docs/ecbench/specs/claim-*.json)
           test "${#specs[@]}" -gt 0 || { echo '::error::no smoke specs found'; exit 1; }
           for s in "${specs[@]}"; do
-            ./target/release/ecbench plan --spec "$s" --json > /dev/null || { echo "::error file=$s::spec does not validate"; exit 1; }
+            # Pre-policy specs (frozen list) expand as replay does; all others
+            # must pass the strict new-run plan, so a new unpinned spec fails.
+            mode=()
+            if grep -qxF "$(basename "$s")" docs/ecbench/specs/historical-unpinned.txt; then
+              mode=(--replay)
+            fi
+            ./target/release/ecbench plan --spec "$s" --json "${mode[@]}" > /dev/null || { echo "::error file=$s::spec does not validate"; exit 1; }
           done
           ./target/release/ecbench plan \
             --spec docs/ecbench/specs/panel-phase1-k0-23.json --json > /dev/null

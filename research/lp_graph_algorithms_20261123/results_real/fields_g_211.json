@@ -1,0 +1,241 @@
+{
+  "collector": {
+    "base": 102,
+    "family": "gaudry",
+    "lp_full_relations": 24,
+    "n": 9389927,
+    "p": 211,
+    "recovered_scalar": 5113201,
+    "relations_independent": 23,
+    "residuals": 1125,
+    "small_base": 22,
+    "solved": true
+  },
+  "eval": {
+    "arity_histogram": {
+      "1": 1,
+      "2": 27,
+      "3": 68
+    },
+    "cores": {
+      "incidence_two_core_columns": 56,
+      "incidence_two_core_rows": 91,
+      "lp_graph_max_core": 2,
+      "lp_graph_two_core_vertices": 7,
+      "ns": 21752
+    },
+    "incidences": 259,
+    "label": "gaudry p=211 seed=1 small=22",
+    "lp_columns": 72,
+    "matching": {
+      "dm": {
+        "fine_blocks": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "over_columns": 50,
+        "over_rows": 75,
+        "structural_left_nullity_lower_bound": 25,
+        "structural_rank": 71,
+        "under_columns": 2,
+        "under_rows": 1,
+        "well_size": 20
+      },
+      "dm_ns": 14986,
+      "fine_block_count": 20,
+      "hopcroft_karp_ns": 11582,
+      "largest_fine_block": 1,
+      "phases": 2,
+      "structural_rank": 71
+    },
+    "modulus": 9389927,
+    "mst_filter": {
+      "max_row_weight": 9,
+      "mst_stats": {
+        "budget_refusals": 0,
+        "edge_evaluations": 505,
+        "infeasible_edge_candidates": 0,
+        "input_nonzeros": 382,
+        "largest_active_coefficients": 373,
+        "largest_column_degree": 26,
+        "normalized_rows": 162,
+        "output_nonzeros": 156,
+        "selected_edges": 112,
+        "trees": 50
+      },
+      "ns": 428291,
+      "refused": false,
+      "replay_failures": 0,
+      "replayed": 25,
+      "report": {
+        "complete_relations": 25,
+        "core_large_vertices": 50,
+        "core_relations": 75,
+        "cycles_closed": 25,
+        "duplicate_relations": 0,
+        "input_large_vertices": 72,
+        "input_relations": 96,
+        "merges": 112,
+        "peeled_relations": 21,
+        "pivots": 50,
+        "rejected_fill": 0
+      },
+      "residual_columns": 22,
+      "residual_nonzeros": 156,
+      "source_terms": 165
+    },
+    "partitions": [
+      {
+        "block_connectivity_minus_one": 22,
+        "fm": {
+          "connectivity_minus_one": 16,
+          "cut_nets": 16,
+          "fm_moves": 10,
+          "fm_passes": 2,
+          "part_sizes": [
+            10,
+            15
+          ],
+          "parts": 2
+        },
+        "fm_connectivity_minus_one": 16,
+        "fm_ns": 31489,
+        "parts": 2
+      },
+      {
+        "block_connectivity_minus_one": 52,
+        "fm": {
+          "connectivity_minus_one": 40,
+          "cut_nets": 18,
+          "fm_moves": 22,
+          "fm_passes": 7,
+          "part_sizes": [
+            3,
+            7,
+            5,
+            10
+          ],
+          "parts": 4
+        },
+        "fm_connectivity_minus_one": 40,
+        "fm_ns": 66489,
+        "parts": 4
+      },
+      {
+        "block_connectivity_minus_one": 102,
+        "fm": {
+          "connectivity_minus_one": 56,
+          "cut_nets": 20,
+          "fm_moves": 29,
+          "fm_passes": 15,
+          "part_sizes": [
+            0,
+            3,
+            1,
+            6,
+            0,
+            5,
+            3,
+            7
+          ],
+          "parts": 8
+        },
+        "fm_connectivity_minus_one": 56,
+        "fm_ns": 132742,
+        "parts": 8
+      }
+    ],
+    "pivot_filter": {
+      "max_row_weight": 14,
+      "mst_stats": null,
+      "ns": 181055,
+      "refused": false,
+      "replay_failures": 0,
+      "replayed": 25,
+      "report": {
+        "complete_relations": 25,
+        "core_large_vertices": 50,
+        "core_relations": 75,
+        "cycles_closed": 25,
+        "duplicate_relations": 0,
+        "input_large_vertices": 72,
+        "input_relations": 96,
+        "merges": 157,
+        "peeled_relations": 21,
+        "pivots": 50,
+        "rejected_fill": 0
+      },
+      "residual_columns": 22,
+      "residual_nonzeros": 216,
+      "source_terms": 160
+    },
+    "rank": {
+      "dense_matches": true,
+      "dense_rank": 22,
+      "exact_for_stream": false,
+      "gain_dsu": {
+        "balanced_cycles": 0,
+        "components": 51,
+        "left_nullity": 6,
+        "rank": 22,
+        "rows": 28,
+        "singletons": 1,
+        "unbalanced_cycles": 6,
+        "unflagged_components": 50,
+        "unions": 21,
+        "vertices": 72,
+        "zero_rows": 0
+      },
+      "gain_dsu_ns": 3520,
+      "matching_rank": 22,
+      "structural_lower_bound": 22,
+      "two_entry_rows": 28
+    },
+    "residual_elimination": {
+      "clique_work": 2504,
+      "edges": 200,
+      "fill_edges": 6,
+      "truncated": false,
+      "vertices": 22,
+      "width": 17
+    },
+    "residual_elimination_ns": 111847,
+    "residual_rows_skipped_for_width": 0,
+    "rows": 96,
+    "schema": "lp-graph-eval/v1",
+    "trees": {
+      "bfs": {
+        "cycles": 6,
+        "max_length": 2,
+        "total_length": 12
+      },
+      "bfs_ns": 9339,
+      "edges": 27,
+      "low_stretch": {
+        "cycles": 6,
+        "max_length": 2,
+        "total_length": 12
+      },
+      "low_stretch_ns": 9089,
+      "vertices": 72
+    }
+  }
+}
