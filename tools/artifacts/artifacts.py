@@ -41,6 +41,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unicodedata
 import urllib.error
 import urllib.request
@@ -451,7 +452,15 @@ class Remote:
             finally:
                 tmp.unlink(missing_ok=True)
         argv = self.put_multipart_args(digest, src) if size > SINGLE_PUT_MAX else self.put_args(digest, src)
-        p = self._run(argv)
+        for attempt in range(3):
+            p = self._run(argv)
+            if (single_s3_put and p.returncode != 0 and attempt < 2 and
+                    ("ConditionalRequestConflict" in p.stderr or "(409)" in p.stderr)):
+                # S3 may race another conditional writer. Retry the same
+                # write-once request; never fall back to an unconditional PUT.
+                time.sleep(0.25 * (attempt + 1))
+                continue
+            break
         if p.returncode != 0:
             if single_s3_put and ("PreconditionFailed" in p.stderr or "(412)" in p.stderr):
                 # HEAD may still be forbidden. Read and hash the exact key;

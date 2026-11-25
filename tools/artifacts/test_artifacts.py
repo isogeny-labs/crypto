@@ -906,6 +906,24 @@ class S3Argv(unittest.TestCase):
             self.r.put(self.d, Path("f"), artifacts.SINGLE_PUT_MAX + 1)
         run.assert_called_once()
 
+    def test_conditional_write_conflict_retries_write_once(self):
+        forbidden = subprocess.CompletedProcess([], 1, "", "(403) Forbidden")
+        conflict = subprocess.CompletedProcess([], 1, "", "ConditionalRequestConflict (409)")
+        want = base64.b64encode(bytes.fromhex(self.d)).decode()
+        written = subprocess.CompletedProcess([], 0, json.dumps({"ChecksumSHA256": want}), "")
+        with mock.patch.object(self.r, "_run", side_effect=[forbidden, conflict, written]) as run, \
+             mock.patch.object(artifacts.time, "sleep") as sleep:
+            self.assertTrue(self.r.put(self.d, Path("f"), 1))
+        self.assertEqual(run.call_count, 3)
+        self.assertEqual(run.call_args_list[1].args, run.call_args_list[2].args)
+        sleep.assert_called_once()
+        with mock.patch.object(self.r, "_run", side_effect=[forbidden, conflict, conflict, conflict]) as run, \
+             mock.patch.object(artifacts.time, "sleep") as sleep, \
+             mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+            self.r.put(self.d, Path("f"), 1)
+        self.assertEqual(run.call_count, 4)
+        self.assertEqual(sleep.call_count, 2)
+
     def test_rejects_non_digest(self):
         with self.assertRaises(SystemExit):
             artifacts.object_key("../../etc/passwd")
