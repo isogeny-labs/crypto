@@ -22,6 +22,7 @@ use std::thread;
 use std::sync::atomic::{AtomicUsize,Ordering as AtomicOrdering};
 use std::sync::atomic::{AtomicBool,AtomicU64};
 use std::sync::Mutex;
+use std::sync::mpsc::sync_channel;
 use std::io::Read;
 
 fn process_cpu_ns()->Result<u128,String>{
@@ -58,6 +59,14 @@ struct Stats {
     matched_x: u64,
     signed_candidates: u64,
     unusable_beta: u64,
+}
+fn add_stats(total:&mut Stats,part:&Stats){
+    total.pair_s3+=part.pair_s3;
+    total.s3_sqrt+=part.s3_sqrt;
+    total.batch_inversions+=part.batch_inversions;
+    total.matched_x+=part.matched_x;
+    total.signed_candidates+=part.signed_candidates;
+    total.unusable_beta+=part.unusable_beta;
 }
 struct Solution {
     log: u64,
@@ -1756,6 +1765,36 @@ struct PackedXIndex {
     mask:usize,
     shift:u32
 }
+struct ParallelS3Preparation {
+    packed:PackedXIndex,
+    left_y:Vec<u64>,
+    right_y:Vec<u64>,
+    s3_sqrt:u64,
+}
+fn rational_ordinates(points:&[Labelled],use_public_y:bool,
+    stats:&mut Stats)->Result<Vec<u64>,String>{
+    let mut out=Vec::with_capacity(points.len());
+    for point in points{
+        let rhs=rhs_from_x::<true>(point.pt.0);
+        let y=if use_public_y {point.pt.1}else{
+            sqrtp_mode::<true>(rhs)
+                .ok_or("factorized S3: public x has no rational fibre")?
+        };
+        if y>=P || mulp_mersenne(y,y)!=rhs{
+            return Err("factorized S3: invalid rational ordinate".into());
+        }
+        out.push(y);
+        if !use_public_y{stats.s3_sqrt+=1;}
+    }
+    Ok(out)
+}
+fn prepare_parallel_s3(parts:&[Vec<Labelled>;3])->Result<ParallelS3Preparation,String>{
+    let packed=PackedXIndex::from_source(&parts[2])?;
+    let mut stats=Stats::default();
+    let left_y=rational_ordinates(&parts[0],false,&mut stats)?;
+    let right_y=rational_ordinates(&parts[1],false,&mut stats)?;
+    Ok(ParallelS3Preparation{packed,left_y,right_y,s3_sqrt:stats.s3_sqrt})
+}
 impl PackedXIndex {
     fn bucket(&self,x:u64)->usize {
         ((x.wrapping_mul(0x9e37_79b9_7f4a_7c15))>>(64-self.shift)) as usize
@@ -1851,19 +1890,25 @@ fn algebraic_mode_factorized_chord<const LINEAR:bool>(
     compact:bool,packed:bool,use_public_y:bool
 )->Result<(Option<Solution>,Stats),String>{
     algebraic_mode_factorized_chord_rows::<LINEAR>(
-        parts,q,ar,compact,packed,use_public_y,0..parts[0].len(),None)
+        parts,q,ar,compact,packed,use_public_y,0..parts[0].len(),None,None)
 }
 fn algebraic_mode_factorized_chord_rows<const LINEAR:bool>(
     parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,
     compact:bool,packed:bool,use_public_y:bool,rows:std::ops::Range<usize>,
-    best_row:Option<&AtomicUsize>
+    best_row:Option<&AtomicUsize>,prepared:Option<&ParallelS3Preparation>
 )->Result<(Option<Solution>,Stats),String>{
     if rows.start>rows.end || rows.end>parts[0].len(){
         return Err("factorized S3: invalid left-row range".into());
     }
     if compact && packed {return Err("APS index: choose only one mode".into());}
+    if prepared.is_some() && (!packed || compact || use_public_y){
+        return Err("parallel S3 preparation requires packed rational fibres".into());
+    }
     let lookup=(!compact && !packed).then(||reverse_index(&parts[2]));
-    let packed_lookup=if packed{Some(PackedXIndex::from_source(&parts[2])?)}else{None};
+    let owned_packed=if packed && prepared.is_none(){
+        Some(PackedXIndex::from_source(&parts[2])?)
+    }else{None};
+    let packed_lookup=prepared.map(|p|&p.packed).or(owned_packed.as_ref());
     let compact_lookup=if compact{
         let mut map=HashMap::with_capacity(parts[2].len());
         for (k,pt) in parts[2].iter().enumerate(){
@@ -1874,27 +1919,16 @@ fn algebraic_mode_factorized_chord_rows<const LINEAR:bool>(
         Some(map)
     }else{None};
     let mut stats=Stats::default();
-    let mut fibres:[Vec<u64>;2]=std::array::from_fn(|j|
-        Vec::with_capacity(parts[j].len()));
-    for j in 0..2 {
-        let points=if j==0 {&parts[j][rows.clone()]} else {&parts[j]};
-        for point in points {
-            // For either sign of a rational ordinate, the unordered
-            // two-root S3 fibre is exactly the same. Always verify y^2.
-            let rhs=rhs_from_x::<true>(point.pt.0);
-            let y=if use_public_y {
-                point.pt.1
-            }else{
-                sqrtp_mode::<true>(rhs)
-                    .ok_or("factorized S3: public x has no rational fibre")?
-            };
-            if y>=P || mulp_mersenne(y,y)!=rhs {
-                return Err("factorized S3: invalid rational ordinate".into());
-            }
-            fibres[j].push(y);
-            if !use_public_y {stats.s3_sqrt+=1;}
-        }
-    }
+    let owned_fibres=if prepared.is_none(){
+        Some([
+            rational_ordinates(&parts[0][rows.clone()],use_public_y,&mut stats)?,
+            rational_ordinates(&parts[1],use_public_y,&mut stats)?
+        ])
+    }else{None};
+    let left_y:&[u64]=if let Some(p)=prepared{&p.left_y[rows.clone()]}
+        else{&owned_fibres.as_ref().unwrap()[0]};
+    let right_y:&[u64]=if let Some(p)=prepared{&p.right_y}
+        else{&owned_fibres.as_ref().unwrap()[1]};
     // The public partition sizes do not change during a solver call.
     // Reuse the three S3 batch-inversion scratch arrays across each left x;
     // this changes allocation lifetime, not field operations or source order.
@@ -1934,10 +1968,10 @@ fn algebraic_mode_factorized_chord_rows<const LINEAR:bool>(
         if total_inverse!=1 {
             return Err("factorized S3: batch inversion invariant".into());
         }
-        let u=fibres[0][i-rows.start];
+        let u=left_y[i-rows.start];
         for (j,right) in parts[1].iter().enumerate(){
             let z=right.pt.0;
-            let v=fibres[1][j];
+            let v=right_y[j];
             let sum_x=addp(x,z);
             let plus=addp(u,v);
             let minus=subp(u,v);
@@ -1999,6 +2033,7 @@ fn algebraic_parallel_factorized(
     if workers==0 || workers>parts[0].len() || workers>128 {
         return Err("parallel APS requires 1..=128 workers, no more than left rows".into());
     }
+    let prepared=prepare_parallel_s3(parts)?;
     let best_row=AtomicUsize::new(usize::MAX);
     let work=thread::scope(|scope| {
         let mut handles=Vec::with_capacity(workers);
@@ -2006,11 +2041,12 @@ fn algebraic_parallel_factorized(
             let begin=parts[0].len()*worker/workers;
             let end=parts[0].len()*(worker+1)/workers;
             let best_row=&best_row;
+            let prepared=&prepared;
             handles.push(scope.spawn(move || {
                 let started=Instant::now();
                 let mut ar=Arithmetic::default();
                 let result=algebraic_mode_factorized_chord_rows::<false>(
-                    parts,q,&mut ar,false,true,false,begin..end,Some(best_row));
+                    parts,q,&mut ar,false,true,false,begin..end,Some(best_row),Some(prepared));
                 (worker,begin,end,started.elapsed().as_nanos(),ar.counts.group_additions,result)
             }));
         }
@@ -2019,6 +2055,7 @@ fn algebraic_parallel_factorized(
     })?;
     let mut selected:Option<Solution>=None;
     let mut total=Stats::default();
+    total.s3_sqrt=prepared.s3_sqrt;
     let mut reports=Vec::with_capacity(workers);
     for (worker,begin,end,wall_ns,verification_additions,result) in work {
         let (solution,stats)=result?;
@@ -2041,14 +2078,129 @@ fn algebraic_parallel_factorized(
             "verification_group_additions":verification_additions,
             "worker_wall_ns":wall_ns,"found_witness":found_witness
         }));
-        total.pair_s3+=stats.pair_s3;
-        total.s3_sqrt+=stats.s3_sqrt;
-        total.batch_inversions+=stats.batch_inversions;
-        total.matched_x+=stats.matched_x;
-        total.signed_candidates+=stats.signed_candidates;
-        total.unusable_beta+=stats.unusable_beta;
+        add_stats(&mut total,&stats);
     }
     Ok((selected,total,reports))
+}
+
+// A bounded producer queue of disjoint left-row cells. The public source and
+// immutable S3 preparation are complete before the cells are admitted. Every
+// admitted cell is drained and recorded, including cells cancelled by a
+// verified earlier witness.
+fn algebraic_queued_factorized(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),workers:usize,chunk_rows:usize
+)->Result<(Option<Solution>,Stats,Vec<serde_json::Value>,serde_json::Value),String>{
+    if workers==0 || workers>128 || workers>parts[0].len() ||
+        chunk_rows==0 || chunk_rows>parts[0].len(){
+        return Err("queued APS worker or chunk admission".into());
+    }
+    let prepared=prepare_parallel_s3(parts)?;
+    let best_row=AtomicUsize::new(usize::MAX);
+    let capacity=workers*2;
+    let (sender,receiver)=sync_channel::<(usize,usize,usize)>(capacity);
+    let receiver=Mutex::new(receiver);
+    let (sent,work)=thread::scope(|scope|->Result<_,String>{
+        let mut handles=Vec::with_capacity(workers);
+        for worker in 0..workers{
+            let receiver=&receiver;
+            let prepared=&prepared;
+            let best_row=&best_row;
+            handles.push(scope.spawn(move ||->Result<_,String>{
+                let started=Instant::now();
+                let mut ar=Arithmetic::default();
+                let mut total=Stats::default();
+                let mut selected:Option<Solution>=None;
+                let mut cells=Vec::new();
+                let mut failure:Option<String>=None;
+                loop{
+                    let next=receiver.lock().map_err(|e|e.to_string())?
+                        .recv().ok();
+                    let Some((id,begin,end))=next else{break};
+                    if let Some(error)=&failure{
+                        cells.push(json!({"id":id,"rows":[begin,end],
+                            "status":"cancelled_after_worker_error","error":error,
+                            "rows_started":0,"s3_pairs":0}));
+                        continue;
+                    }
+                    match algebraic_mode_factorized_chord_rows::<false>(
+                        parts,q,&mut ar,false,true,false,begin..end,
+                        Some(best_row),Some(prepared)){
+                        Ok((solution,stats))=>{
+                            let rows_started=stats.pair_s3/parts[1].len() as u64;
+                            let status=if solution.is_some(){"witness"}
+                                else if rows_started==0{"cancelled_unstarted"}
+                                else if rows_started<(end-begin) as u64{"cancelled_partial"}
+                                else{"completed"};
+                            cells.push(json!({"id":id,"rows":[begin,end],
+                                "status":status,"rows_started":rows_started,
+                                "s3_pairs":stats.pair_s3,
+                                "s3_sqrts":stats.s3_sqrt,
+                                "batch_inversions":stats.batch_inversions,
+                                "matched_x":stats.matched_x,
+                                "signed_candidates":stats.signed_candidates}));
+                            if let Some(candidate)=solution{
+                                if selected.as_ref().is_none_or(|old|candidate.indices<old.indices){
+                                    selected=Some(candidate);
+                                }
+                            }
+                            add_stats(&mut total,&stats);
+                        }
+                        Err(error)=>{
+                            cells.push(json!({"id":id,"rows":[begin,end],
+                                "status":"error","error":error}));
+                            failure=Some(error);
+                        }
+                    }
+                }
+                Ok((worker,started.elapsed().as_nanos(),
+                    ar.counts.group_additions,total,selected,cells,failure))
+            }));
+        }
+        let mut sent=0usize;
+        for begin in (0..parts[0].len()).step_by(chunk_rows){
+            let end=(begin+chunk_rows).min(parts[0].len());
+            sender.send((sent,begin,end))
+                .map_err(|_|"queued APS workers disconnected".to_string())?;
+            sent+=1;
+        }
+        drop(sender);
+        let mut work=Vec::with_capacity(workers);
+        for handle in handles{
+            work.push(handle.join().map_err(|_|"queued APS worker panicked".to_string())??);
+        }
+        Ok((sent,work))
+    })?;
+    let mut selected:Option<Solution>=None;
+    let mut total=Stats::default();
+    total.s3_sqrt=prepared.s3_sqrt;
+    let mut reports=Vec::with_capacity(workers);
+    let mut all_cells=Vec::with_capacity(sent);
+    for (worker,wall_ns,additions,stats,solution,cells,failure) in work{
+        if let Some(error)=failure{return Err(error);}
+        if let Some(candidate)=solution{
+            if selected.as_ref().is_none_or(|old|candidate.indices<old.indices){
+                selected=Some(candidate);
+            }
+        }
+        add_stats(&mut total,&stats);
+        reports.push(json!({"worker":worker,"worker_wall_ns":wall_ns,
+            "verification_group_additions":additions,"s3_pairs":stats.pair_s3,
+            "s3_sqrts":stats.s3_sqrt,"cells_received":cells.len()}));
+        all_cells.extend(cells);
+    }
+    all_cells.sort_by_key(|cell|cell["id"].as_u64().unwrap());
+    if all_cells.len()!=sent || all_cells.iter().enumerate().any(|(id,cell)|
+        cell["id"].as_u64()!=Some(id as u64)){
+        return Err("queued APS cell accounting mismatch".into());
+    }
+    let cancelled=all_cells.iter().filter(|cell|cell["status"].as_str()
+        .is_some_and(|status|status.starts_with("cancelled"))).count();
+    let queue=json!({"capacity_cells":capacity,"chunk_rows":chunk_rows,
+        "generated_cells":sent,"admitted_cells":sent,"queued_cells":sent,
+        "dequeued_cells":all_cells.len(),"cancelled_cells":cancelled,
+        "completed_or_witness_cells":sent-cancelled,"never_started_cells":0,
+        "cells":all_cells});
+    Ok((selected,total,reports,queue))
 }
 
 // Development parity gate on the first public Q of the archived 48-Q panel.
@@ -2093,7 +2245,8 @@ fn parallel_row_fixture(workers:usize)->Result<serde_json::Value,String>{
 }
 
 // Cold APS arm without the serial parity traversal inside its clock.
-fn parallel_row_cold_case(q:(u64,u64),workers:usize)->Result<serde_json::Value,String>{
+fn parallel_row_cold_case(q:(u64,u64),workers:usize,queued:bool)
+    ->Result<serde_json::Value,String>{
     const PROFILE:[usize;3]=[384,384,16_384];
     let cold=Instant::now();
     let cpu_start=process_cpu_ns()?;
@@ -2104,19 +2257,29 @@ fn parallel_row_cold_case(q:(u64,u64),workers:usize)->Result<serde_json::Value,S
     }
     let (parts,identities,duplicates)=source_walk_profile_jac_joint(
         q,SEED,&mut source_ar,PROFILE)?;
-    let (solution,stats,worker_reports)=algebraic_parallel_factorized(&parts,q,workers)?;
+    let (solution,stats,worker_reports,queue)=if queued{
+        let (solution,stats,reports,queue)=algebraic_queued_factorized(
+            &parts,q,workers,16)?;
+        (solution,stats,reports,queue)
+    }else{
+        let (solution,stats,reports)=algebraic_parallel_factorized(&parts,q,workers)?;
+        (solution,stats,reports,json!(null))
+    };
     let cpu_ns=process_cpu_ns()?.checked_sub(cpu_start)
         .ok_or("process CPU clock went backwards")?;
     Ok(json!({
-        "standing":"[pcc:unverified]","method":"parallel APS factorized S3",
+        "standing":"[pcc:unverified]",
+        "method":if queued{"queued APS factorized S3"}else{"parallel APS factorized S3"},
         "p":P,"n":N,"public_Q":q,"seed":format!("{SEED:016x}"),
         "profile":PROFILE,"workers":workers,"rejected_identity":identities,
         "rejected_duplicate_x":duplicates,
         "source_group_additions":source_ar.counts.group_additions,
         "parallel_s3_pairs_including_speculation":stats.pair_s3,
+        "shared_preparation_s3_sqrts":stats.s3_sqrt,
         "solution":json_solution(&solution),
         "complete_target_scalar_recovered":solution.is_some(),
         "known_answer_in_solver":false,"worker_reports":worker_reports,
+        "queue":queue,
         "cold_wall_ns":cold.elapsed().as_nanos(),"process_cpu_ns":cpu_ns
     }))
 }
@@ -2134,6 +2297,51 @@ mod parallel_row_tests {
             assert!(report["parallel_s3_pairs_including_speculation"]
                 .as_u64().unwrap()>=report["serial_s3_pairs"].as_u64().unwrap());
         }
+    }
+
+    #[test]
+    fn bounded_queue_matches_serial_and_accounts_for_every_cell(){
+        let q=(578_200_132,373_493_797);
+        let mut source_ar=Arithmetic::default();
+        let (parts,_,_)=source_walk_profile_jac_joint(
+            q,SEED,&mut source_ar,[384,384,16_384]).unwrap();
+        let mut serial_ar=Arithmetic::default();
+        let (serial,_)=algebraic_mode_factorized_chord::<false>(
+            &parts,q,&mut serial_ar,false,true,false).unwrap();
+        for workers in [1,4]{
+            let (queued,stats,reports,queue)=algebraic_queued_factorized(
+                &parts,q,workers,16).unwrap();
+            assert_eq!(json_solution(&serial),json_solution(&queued));
+            assert_eq!(queue["generated_cells"],24);
+            assert_eq!(queue["dequeued_cells"],24);
+            assert_eq!(queue["capacity_cells"],workers*2);
+            assert_eq!(stats.pair_s3,reports.iter().map(|r|
+                r["s3_pairs"].as_u64().unwrap()).sum::<u64>());
+            assert_eq!(stats.s3_sqrt,768);
+        }
+    }
+
+    #[test]
+    fn bounded_queue_covers_every_row_without_a_witness(){
+        let q=(578_200_132,373_493_797);
+        let mut source_ar=Arithmetic::default();
+        let (parts,_,_)=source_walk_profile_jac_joint(
+            q,SEED,&mut source_ar,[4,4,8]).unwrap();
+        let mut serial_ar=Arithmetic::default();
+        let (serial,serial_stats)=algebraic_mode_factorized_chord::<false>(
+            &parts,q,&mut serial_ar,false,true,false).unwrap();
+        assert!(serial.is_none());
+        assert_eq!(serial_stats.pair_s3,16);
+        let (queued,stats,_,queue)=algebraic_queued_factorized(
+            &parts,q,4,2).unwrap();
+        assert!(queued.is_none());
+        assert_eq!(stats.pair_s3,serial_stats.pair_s3);
+        assert_eq!(queue["generated_cells"],2);
+        assert_eq!(queue["dequeued_cells"],2);
+        assert_eq!(queue["cancelled_cells"],0);
+        assert_eq!(queue["completed_or_witness_cells"],2);
+        assert_eq!(queue["cells"][0]["rows"],json!([0,2]));
+        assert_eq!(queue["cells"][1]["rows"],json!([2,4]));
     }
 }
 
@@ -3166,8 +3374,13 @@ fn neg_rho_parallel_cold(q:(u64,u64),seed:u64,workers:usize,lanes:usize,
                 let mut short_cycles=0u64;
                 let mut restarts=0u64;
                 let mut rejected_identity=0u64;
-                loop{
-                    if stop.load(AtomicOrdering::Acquire){break;}
+                let mut found_solution=false;
+                let mut stopped_by_peer=false;
+                'walk: loop{
+                    if stop.load(AtomicOrdering::Acquire){
+                        stopped_by_peer=true;
+                        break;
+                    }
                     let prior=reserved_steps.fetch_add(lanes as u64,AtomicOrdering::AcqRel);
                     if prior+lanes as u64>step_cap{
                         reserved_steps.fetch_sub(lanes as u64,AtomicOrdering::AcqRel);
@@ -3217,8 +3430,9 @@ fn neg_rho_parallel_cold(q:(u64,u64),seed:u64,workers:usize,lanes:usize,
                                 let k=muln(subn(a0,v.a),pown(db,N-2,N));
                                 if arithmetic.scalar(PRIME31,k,Some(PRIME31.g))==Some(q){
                                     *answer.lock().map_err(|e|e.to_string())?=Some(k);
+                                    found_solution=true;
                                     stop.store(true,AtomicOrdering::Release);
-                                    break;
+                                    break 'walk;
                                 }
                             }
                             unusable+=1;
@@ -3235,7 +3449,10 @@ fn neg_rho_parallel_cold(q:(u64,u64),seed:u64,workers:usize,lanes:usize,
                     "unusable_collisions":unusable,"short_cycles":short_cycles,
                     "restarts":restarts,"rejected_identity":rejected_identity,
                     "worker_wall_ns":started.elapsed().as_nanos(),
-                    "stopped_after_solution":stop.load(AtomicOrdering::Acquire)}))
+                    "found_solution":found_solution,
+                    "stop_reason":if found_solution{"verified_collision"}
+                        else if stopped_by_peer{"peer_solution"}
+                        else{"step_cap"}}))
             }));
         }
         handles.into_iter().map(|h|h.join()
@@ -3250,7 +3467,8 @@ fn neg_rho_parallel_cold(q:(u64,u64),seed:u64,workers:usize,lanes:usize,
     Ok(json!({"standing":"[pcc:unverified]","method":"parallel shared-DP rho",
         "public_Q":q,"p":P,"n":N,"seed":format!("{seed:016x}"),
         "workers":workers,"lanes_per_worker":lanes,"dp_bits":dp_bits,
-        "jump_count_per_worker":64,"fold_negation":fold,"step_cap":step_cap,
+        "shared_jump_count":64,"total_initial_lanes":workers*lanes,
+        "fold_negation":fold,"step_cap":step_cap,
         "walk_steps":steps,"distinguished_records":records,
         "complete_target_scalar_recovered":log.is_some(),"log":log,
         "known_answer_in_solver":false,"worker_reports":reports,
@@ -4332,7 +4550,9 @@ fn linear_chord_roots_equal_square_denominator_and_s3(){
 
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
-    if args.len()==2 && args[0]=="--parallel-aps-cold-panel" {
+    if args.len()==2 &&
+        (args[0]=="--parallel-aps-cold-panel" || args[0]=="--queued-aps-cold-panel") {
+        let queued=args[0]=="--queued-aps-cold-panel";
         let workers=args[1].parse::<usize>()
             .map_err(|_|"parallel APS worker count must be an integer".to_string())?;
         let mut input=String::new();
@@ -4342,13 +4562,15 @@ fn main()->Result<(),String> {
             return Err("parallel APS cold panel requires 1..=1024 public targets".into());
         }
         let cases:Vec<_>=targets.into_iter().enumerate().map(|(index,q)|{
-            match parallel_row_cold_case((q[0],q[1]),workers){
+            match parallel_row_cold_case((q[0],q[1]),workers,queued){
                 Ok(report)=>json!({"case":index,"report":report}),
                 Err(error)=>json!({"case":index,"public_Q":q,"error":error})
             }
         }).collect();
         println!("{}",serde_json::to_string_pretty(&json!({
-            "standing":"[pcc:unverified]","kind":"development cold APS arm",
+            "standing":"[pcc:unverified]",
+            "kind":if queued{"development queued cold APS arm"}
+                else{"development cold APS arm"},
             "workers":workers,"cases":cases
         })).map_err(|e|e.to_string())?);
         return Ok(());

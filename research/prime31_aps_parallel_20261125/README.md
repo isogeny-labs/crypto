@@ -89,3 +89,46 @@ machine reported 14 physical cores and 48 GiB RAM. No CPU isolation or
 per-call peak resident memory measurement was in place. A held-out panel,
 frozen tuning and budgets, resource isolation, and independent full-cold
 replay are required for the four-core crossover decision.
+
+## Bounded 31-bit row queue
+
+The `--queued-aps-cold-panel 4` arm completes the same public point source,
+builds the packed third-list index and rational ordinates once, then admits
+24 disjoint 16-row cells to a bounded channel of capacity eight cells.
+Four consumers borrow the immutable source and preparation, process every
+dequeued cell, and record its row range, started rows, S3 pairs, and terminal
+state. A checked witness stops later row computations; the remaining
+admitted cells are drained and recorded as cancelled. The cold clock includes
+source generation, shared preparation, producer blocking, worker startup,
+draining, cancellation, joining, and final verification.
+
+The queue fixture test checked serial witness parity at one and four workers.
+A separate small-profile negative control checked all rows and pair work
+when no witness appears. All 27 release example tests passed. The committed
+`DEVELOPMENT_QUEUED_APS4.json` and two static/queue A/B/B/A development
+repeats retain 48 public targets each. `verify_queued_panel.py` checks all
+24 cell identities and states per target, pair accounting, exact serial
+witness equality, caller-only scalar, and coefficient congruence. The two
+queue repeats evaluated 1,743,744 and 1,806,336 S3 pairs; the two static
+shared-preparation repeats evaluated 2,606,976 and 2,629,248. Their summed
+wall/CPU milliseconds were 95.730/153.550 and 94.220/154.049 for queue,
+versus 116.085/185.295 and 110.299/180.351 for static assignment. The
+static arms are checked by `verify_static_shared_panel.py`.
+
+The later six-arm queue/unfolded-rho/folded-rho/folded-rho/unfolded-rho/queue
+development sequence preserved every arm as `DEVELOPMENT_QR_*.json`.
+All six arms completed 48/48 checked public answers. Queue wall totals
+were 117.185 and 97.556 ms, unfolded rho 102.736 and 107.306 ms, and
+folded rho 92.152 and 98.630 ms. Queue process CPU totals were 159.662
+and 149.655 ms, versus 231.599 and 227.834 ms for folded rho. These
+unisolated readings use the archived development Q and are not an admitted
+held-out crossover [pcc:unverified]. The queue builder's source and the
+downstream search are sequential phases in this version; the bounded queue
+starts after the complete point source is generated.
+
+The queue/static development binary SHA-256 was
+`daf0a0be6ddcae89082cd136792b6bfc71fc5e53087dca72ff5c4f9f9b489777`.
+The subsequent source also makes rho worker stop reasons explicit and adds
+the no-witness queue coverage test. Run a fresh source-hashed pilot before
+using the new binary for timing. Peak resident memory and core isolation
+remain required for the held-out comparison.
