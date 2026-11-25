@@ -693,7 +693,7 @@ unsafe fn probe_block_simd(
     keys: &HashSet<u64, impl BuildHasher>,
 ) -> u64 {
     use std::arch::x86_64::*;
-    debug_assert!(bloom.cheap && block.len() % 8 == 0);
+    debug_assert!(bloom.cheap && block.len().is_multiple_of(8));
     let c = _mm512_set1_epi64(0x9E37_79B9_7F4A_7C15u64 as i64);
     let m63 = _mm512_set1_epi64(63);
     let mask = _mm512_set1_epi64(bloom.mask as i64);
@@ -987,9 +987,7 @@ fn main() {
                 "ns_per_probe": t * 1e9 / probes,
                 "false_positive_rate": fpr,
             }));
-            if bpk == 8 {
-                chosen = Some(bloom);
-            } else if chosen.is_none() && bpk == 16 {
+            if bpk == 8 || (chosen.is_none() && bpk == 16) {
                 chosen = Some(bloom);
             }
         }

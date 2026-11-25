@@ -175,6 +175,7 @@ impl Fp64 {
     /// Because `a <= p - 1` and `m <= 2^64 - 1`, `a + m·p <= 2^64·p - 1`,
     /// so `(a + m·p) >> 64 <= p - 1` without a final conditional subtract.
     #[inline(always)]
+    #[allow(clippy::wrong_self_convention)]
     fn from_mont_reduced(&self, a: u64) -> u64 {
         debug_assert!(a < self.p);
         let m = a.wrapping_mul(self.n_inv);
@@ -1186,13 +1187,7 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
             }
             continue;
         }
-        pt_buf.resize(
-            jac_buf.len(),
-            Pt {
-                x: 0,
-                y: 0,
-            },
-        );
+        pt_buf.resize(jac_buf.len(), Pt { x: 0, y: 0 });
         curve.jac_to_affine_many(&jac_buf, &mut pt_buf, &mut z_buf, &mut inv_scratch);
         for (i, &pt) in pt_buf.iter().enumerate() {
             let (u, v) = uv_buf[i];
