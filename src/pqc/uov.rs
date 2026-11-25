@@ -32,6 +32,7 @@
 //! balanced OV — but the parameter sizes are far below any security
 //! level.  Educational implementation: no constant-time guarantees.
 
+use super::strassen::{self, Ring};
 use crate::hash::sha3::shake256;
 use crate::utils::random::random_bytes;
 
@@ -82,20 +83,26 @@ fn zero_matrix(rows: usize, cols: usize) -> Matrix {
     vec![vec![0u8; cols]; rows]
 }
 
-fn mat_mul(a: &Matrix, b: &Matrix) -> Matrix {
-    let (r, k, c) = (a.len(), b.len(), b[0].len());
-    let mut out = zero_matrix(r, c);
-    for i in 0..r {
-        for l in 0..k {
-            if a[i][l] == 0 {
-                continue;
-            }
-            for j in 0..c {
-                out[i][j] ^= gf_mul(a[i][l], b[l][j]);
-            }
-        }
+/// GF(256) for [`super::strassen`].
+struct Gf256;
+impl Ring for Gf256 {
+    type Elt = u8;
+    const ZERO: u8 = 0;
+    const SKIP_ZERO: bool = true;
+    fn add(a: u8, b: u8) -> u8 {
+        a ^ b
     }
-    out
+    fn sub(a: u8, b: u8) -> u8 {
+        a ^ b
+    }
+    fn mul(a: u8, b: u8) -> u8 {
+        gf_mul(a, b)
+    }
+}
+
+/// Schoolbook below `strassen::STRASSEN_CUTOFF`, Strassen above it.
+fn mat_mul(a: &Matrix, b: &Matrix) -> Matrix {
+    strassen::mul::<Gf256>(a, b)
 }
 
 fn transpose(a: &Matrix) -> Matrix {
@@ -316,6 +323,17 @@ pub fn uov_verify(pk: &UovPublicKey, msg: &[u8], sig: &[u8]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn strassen_matches_schoolbook_gf256() {
+        strassen::tests::assert_strassen_matches_naive::<Gf256>(|x| x as u8);
+    }
+
+    #[test]
+    #[ignore = "timing report; run with --release --ignored --nocapture"]
+    fn strassen_crossover_gf256() {
+        strassen::tests::crossover_report::<Gf256>("GF(256)", |x| x as u8);
+    }
 
     #[test]
     fn gf256_field_axioms() {

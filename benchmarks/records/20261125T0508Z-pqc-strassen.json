@@ -1,0 +1,346 @@
+{
+  "branch": "claude/pqc-strassen-20261124",
+  "closed_utc": "2026-11-25T05:40:40+00:00",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "run",
+        "-q",
+        "--release",
+        "--manifest-path",
+        "research/pqc_strassen_20261124/harness/Cargo.toml",
+        "--",
+        "regression",
+        "research/pqc_strassen_20261124/regression.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-25T05:28:32+00:00",
+      "wall_s": 31.776
+    },
+    {
+      "argv": [
+        "cargo",
+        "run",
+        "-q",
+        "--release",
+        "--manifest-path",
+        "research/pqc_strassen_20261124/harness/Cargo.toml",
+        "--",
+        "crossover",
+        "research/pqc_strassen_20261124/crossover.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-25T05:29:05+00:00",
+      "wall_s": 609.308
+    }
+  ],
+  "commit": "323ff37018541ec21eb872329d20138f078a7f47",
+  "commit_dirty": false,
+  "created_utc": "2026-11-25T05:08:08+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261124-pqc-strassen"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "none: shared macOS host (Apple silicon), one thread, no core pinning, other sessions may be building",
+    "platform": "macOS-27.2-arm64-arm-64bit"
+  },
+  "id": "20261125T0508Z-pqc-strassen",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "mceliece-36x36x36-old-over-new",
+      "note": "GF(2): old loop median / new strassen::mul median (cutoff none), 36x36x36, 3000 calls x 5 batches",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.1417,
+        6.3606
+      ],
+      "unit": "ratio",
+      "value": 4.512
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "mceliece-36x24x12-old-over-new",
+      "note": "GF(2): old loop median / new strassen::mul median (cutoff none), 36x24x12, 3000 calls x 5 batches",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.4696,
+        3.9156
+      ],
+      "unit": "ratio",
+      "value": 2.3428
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "mayo-36x36x36-old-over-new",
+      "note": "GF(16): old loop median / new strassen::mul median (cutoff 32), 36x36x36, 3000 calls x 5 batches",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2445,
+        2.1729
+      ],
+      "unit": "ratio",
+      "value": 1.667
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "mayo-36x24x12-old-over-new",
+      "note": "GF(16): old loop median / new strassen::mul median (cutoff 32), 36x24x12, 3000 calls x 5 batches",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0278,
+        1.3324
+      ],
+      "unit": "ratio",
+      "value": 1.2245
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "uov-36x36x36-old-over-new",
+      "note": "GF(256): old loop median / new strassen::mul median (cutoff 32), 36x36x36, 3000 calls x 5 batches",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.65,
+        1.4089
+      ],
+      "unit": "ratio",
+      "value": 1.0448
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "uov-36x24x12-old-over-new",
+      "note": "GF(256): old loop median / new strassen::mul median (cutoff 32), 36x24x12, 3000 calls x 5 batches",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4917,
+        1.5965
+      ],
+      "unit": "ratio",
+      "value": 0.972
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "qr-uov-36x36x36-old-over-new",
+      "note": "F_31^3: old loop median / new strassen::mul median (cutoff 32), 36x36x36, 3000 calls x 5 batches",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2432,
+        2.2295
+      ],
+      "unit": "ratio",
+      "value": 1.4768
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "qr-uov-36x24x12-old-over-new",
+      "note": "F_31^3: old loop median / new strassen::mul median (cutoff 32), 36x24x12, 3000 calls x 5 batches",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2303,
+        2.2062
+      ],
+      "unit": "ratio",
+      "value": 1.7744
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "mceliece-n36-schoolbook-over-strassen32",
+      "note": "GF(2): schoolbook median / Strassen (cutoff 32) median, square n=36",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.3902,
+        0.6264
+      ],
+      "unit": "ratio",
+      "value": 0.54
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "mceliece-n512-schoolbook-over-strassen32",
+      "note": "GF(2): schoolbook median / Strassen (cutoff 32) median, square n=512",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1821,
+        0.7217
+      ],
+      "unit": "ratio",
+      "value": 0.3061
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "mayo-n36-schoolbook-over-strassen32",
+      "note": "GF(16): schoolbook median / Strassen (cutoff 32) median, square n=36",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9098,
+        1.3552
+      ],
+      "unit": "ratio",
+      "value": 1.035
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "mayo-n512-schoolbook-over-strassen32",
+      "note": "GF(16): schoolbook median / Strassen (cutoff 32) median, square n=512",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.9195,
+        3.935
+      ],
+      "unit": "ratio",
+      "value": 3.573
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "uov-n36-schoolbook-over-strassen32",
+      "note": "GF(256): schoolbook median / Strassen (cutoff 32) median, square n=36",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.062,
+        1.2733
+      ],
+      "unit": "ratio",
+      "value": 1.1852
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "uov-n512-schoolbook-over-strassen32",
+      "note": "GF(256): schoolbook median / Strassen (cutoff 32) median, square n=512",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.3659,
+        13.4347
+      ],
+      "unit": "ratio",
+      "value": 3.8592
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "qr-uov-n36-schoolbook-over-strassen32",
+      "note": "F_31^3: schoolbook median / Strassen (cutoff 32) median, square n=36",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7715,
+        2.2588
+      ],
+      "unit": "ratio",
+      "value": 1.6826
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "qr-uov-n512-schoolbook-over-strassen32",
+      "note": "F_31^3: schoolbook median / Strassen (cutoff 32) median, square n=512",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2568,
+        2.2032
+      ],
+      "unit": "ratio",
+      "value": 1.4968
+    }
+  ],
+  "problem": "kernel:pqc_dense_matmul",
+  "raw": [
+    {
+      "bytes": 9969,
+      "path": "research/pqc_strassen_20261124/regression.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bd/bd308a8cf06a3124bd66e4664e19346cd107bcb83193a094cd8e54c42aabd6a0",
+      "sha256": "bd308a8cf06a3124bd66e4664e19346cd107bcb83193a094cd8e54c42aabd6a0",
+      "uploaded": false
+    },
+    {
+      "bytes": 29971,
+      "path": "research/pqc_strassen_20261124/crossover.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/16/1604365871e40f2b03e62348da4f9ae6a22bd47c698109efb6016c5c5b7b3cf3",
+      "sha256": "1604365871e40f2b03e62348da4f9ae6a22bd47c698109efb6016c5c5b7b3cf3",
+      "uploaded": false
+    },
+    {
+      "bytes": 1260,
+      "path": "research/pqc_strassen_20261124/regression.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/16/167b61f867143c36c8e3ae932cd6073ce44d678ab18a25423567b0608fc5ebfc",
+      "sha256": "167b61f867143c36c8e3ae932cd6073ce44d678ab18a25423567b0608fc5ebfc",
+      "uploaded": false
+    },
+    {
+      "bytes": 2584,
+      "path": "research/pqc_strassen_20261124/crossover.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/792e4bce8e548bba6ed51fb9cb335e1f13ae0c5d0e339bb21ab4668d825736c2",
+      "sha256": "792e4bce8e548bba6ed51fb9cb335e1f13ae0c5d0e339bb21ab4668d825736c2",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261124-pqc-strassen/REPORT.pdf",
+    "png": [
+      "benchmarks/20261124-pqc-strassen/regression.png",
+      "benchmarks/20261124-pqc-strassen/crossover.png"
+    ],
+    "svg": [
+      "benchmarks/20261124-pqc-strassen/regression.svg",
+      "benchmarks/20261124-pqc-strassen/crossover.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "pqc-strassen",
+  "status": "measured",
+  "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+  "validation": null
+}
