@@ -45,7 +45,7 @@ jobs:
           CARGO_BUILD_JOBS: '2'
           CARGO_PROFILE_RELEASE_DEBUG: line-tables-only
         run: cargo +stable build --locked --release --bin ecbench
-      - name: Profile matched pool-64 and pool-256 executions
+      - name: Profile matched pool-64, pool-128, and pool-256 executions
         run: |
           set -euo pipefail
           out="$RUNNER_TEMP/independent-relation-profile"
