@@ -142,10 +142,11 @@
    "id": "S-WD-THERIAULT-2003",
    "title": "Index calculus attack for hyperelliptic curves of small genus",
    "kind": "primary_publication",
-   "verification": "secondary_only",
+   "verification": "primary_read",
    "citation": "Nicolas Theriault, ASIACRYPT 2003, LNCS 2894, pp. 75-92.",
    "url": "https://doi.org/10.1007/978-3-540-40061-5_5",
-   "notes": "Paywalled. Bound and exponent table reported by Gaudry-Thome-Theriault-Diem 2007 Section 1 and its comparison table (read)."
+   "sha256": "3048be18dd347b51421ab723165f87de2af1ac108445e11ea8647105c0eb6a33",
+   "notes": "Publisher PDF (18 pages) recovered and read on 2026-11-14: definitions, algorithm, Definition 7, Proposition 2 and Sections 5.3-5.10. The printed Theorem 1 finite lower bound has an exact small countermodel recorded in the session audit; that does not by itself refute the Theorem 3 asymptotic runtime exponent."
   },
   {
    "id": "S-WD-GTTD-2007",
@@ -1425,12 +1426,13 @@
    "id": "ALG-WD-THERIAULT-2003",
    "label": "Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2)))",
    "kind": "algorithmic_upper_bound",
-   "status": "proved_external_unread",
+   "status": "conditional",
    "model": "algebraic_coordinate",
-   "statement": "Reducing the factor base and adding a single large prime variation solves the DLP in genus-g hyperelliptic Jacobians in Õ(q^(2 - 2/(g + 1/2))) = Õ(q^(2 - 4/(2g + 1))), e.g. q^(10/7) for g = 3, beating rho for g >= 3.",
-   "scope": "Fixed genus. Reported by GTTD as 'the previous best bound'; whether the original analysis is fully rigorous was not checked here.",
+   "statement": "Theriault's single-large-prime analysis states an Õ(q^(2 - 2/(g + 1/2))) = Õ(q^(2 - 4/(2g + 1))) DLP runtime for fixed-genus hyperelliptic Jacobians, e.g. q^(10/7) for g=3. A primary-source audit found an exact finite counterexample to the printed Theorem 1 collision lower bound, while not refuting the Theorem 3 asymptotic exponent.",
+   "scope": "Fixed genus g>=3. Retained as conditional pending a repaired collision lemma and a checked implication from that repair through the runtime balance; the finite constant counterexample is not an exponent refutation.",
    "assumptions": [
-    "Fixed genus g >= 3"
+    "Fixed genus g >= 3",
+    "A repaired collision expectation bound sufficient for the stated runtime balance"
    ],
    "source_refs": [
     "S-WD-THERIAULT-2003",
@@ -1443,7 +1445,8 @@
    ],
    "source_locations": [
     "GTTD 2007, Section 1 (after Theorem 1) and the large-prime exponent table",
-    "Theriault 2003, ASIACRYPT, LNCS 2894"
+    "Theriault 2003, ASIACRYPT, LNCS 2894, Definition 7, Proposition 2, Theorems 1 and 3, Sections 5.3-5.10",
+    "docs/session-logs/2026-11-14.md, original-source counter audit"
    ],
    "formula": "Õ(q^(2-4/(2g+1)))",
    "evidence_class": "theorem"

@@ -147,7 +147,7 @@ digraph ecdlp_claims {
     "THM-RP-KOBLITZ-CYCLIC-WINDOW" [label="THM-RP-KOBLITZ-CYCLIC-WINDOW\nCyclic-cover window for the n=131 trace-zero factor: genus >= 394 (conditional), modular carrier genus 378,708,949", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CEX-RP-COMMON-KERNEL-WITNESSES" [label="CEX-RP-COMMON-KERNEL-WITNESSES\nBoolean kernel not multiplicative under gauge; exterior/code witness has a nonzero passive-axis coefficient (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THM-RP-FF-HANDBOOK" [label="THM-RP-FF-HANDBOOK\nFinite-field handbook facts (cyclic multiplicative group, Frobenius, trace/norm surjectivity) in Lean", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
-    "COND-RP-TWO-SUMMAND-FAMILY-LAW" [label="COND-RP-TWO-SUMMAND-FAMILY-LAW\nTwo-summand pair-table IC family costs ~0.75 r^(1/6) in S units: no crossover with rho\nops(F) = F^2/(4t) + c #E/(2kF);  S_family ~ 0.75 r^(1/6)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "COND-RP-TWO-SUMMAND-FAMILY-LAW" [label="COND-RP-TWO-SUMMAND-FAMILY-LAW\nConditional two-summand pair-table family law; r^(1/6) at rho(K)=K/2\nops(F)=F^2/(4t)+2c#E rho(F/(2k))/F^2; at rho(K)=K/2, S_family~0.75 r^(1/6)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THM-RP-SUBSPACE-PRODUCT-BOUND" [label="THM-RP-SUBSPACE-PRODUCT-BOUND\nField Kneser/Vosper product bound: dim V^(2) >= 2l-1, equality only for progressions (A-FB1)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THM-RP-AUTOMORPHISM-ORBIT-FOLD" [label="THM-RP-AUTOMORPHISM-ORBIT-FOLD\nAutomorphism-orbit factor bases: psi(G) = [lambda]G with per-instance checks (A-FB3)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THM-RP-TRACE-ZERO-DOUBLING" [label="THM-RP-TRACE-ZERO-DOUBLING\nTrace-zero bases lie in 2E and double the yield at the same degree (A-FB4)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
@@ -348,6 +348,11 @@ digraph ecdlp_claims {
     "THM-IC-UNUSED-COLUMN-RIGHT-KERNEL" [label="THM-IC-UNUSED-COLUMN-RIGHT-KERNEL\nAn unused relation column gives a nonzero right-kernel vector (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "CLAIM-IC-ROW-SURPLUS-FULL-RIGHT-RANK" [label="CLAIM-IC-ROW-SURPLUS-FULL-RIGHT-RANK\n'More rows than columns implies reusable full-column rank'\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "CEX-IC-SURPLUS-RIGHT-RANK" [label="CEX-IC-SURPLUS-RIGHT-RANK\nRow surplus with nonzero left and right kernels (Lean countermodel)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-IC-SIGNLESS-INCIDENCE-RANK" [label="THM-IC-SIGNLESS-INCIDENCE-RANK\nUnsigned relation incidence has the even-cycle matroid over odd scalar fields", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES" [label="CLAIM-RP-ANY-FIRST-CYCLE-CLOSES\n'Any first graph cycle closes two-summand elimination over an odd scalar field'\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
+    "CEX-RP-ODD-CYCLE-NO-CLOSURE" [label="CEX-RP-ODD-CYCLE-NO-CLOSURE\nTriangle and self-pair loop need not close unsigned elimination over F3 (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-RP-BALANCED-CYCLE-CONTROLS" [label="THM-RP-BALANCED-CYCLE-CONTROLS\nSquare and parallel-edge circuits give unsigned row dependencies over F3 (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "THM-RP-CYCLE-TARGET-PROJECTION" [label="THM-RP-CYCLE-TARGET-PROJECTION\nA row dependency recovers the target only with nonzero target projection (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -669,7 +674,7 @@ digraph ecdlp_claims {
     "GAP-IC-TERMINAL-RANK-LAW" [label="GAP-IC-TERMINAL-RANK-LAW\nTerminal reusable-rank probability law", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-IC-KERNEL-MODE-SCOPE" [label="GAP-IC-KERNEL-MODE-SCOPE\nRoute-by-route kernel-mode scope", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
     "GAP-IC-YIELD-RANK-COMPOSITION" [label="GAP-IC-YIELD-RANK-COMPOSITION\nYield-to-terminal-rank composition", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
-    "GAP-RP-CYCLE-CLOSURE-LAW" [label="GAP-RP-CYCLE-CLOSURE-LAW\nTwo-summand relation-graph first-cycle law", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
+    "GAP-RP-CYCLE-CLOSURE-LAW" [label="GAP-RP-CYCLE-CLOSURE-LAW\nTwo-summand useful balanced-circuit stopping law", fillcolor="#fff1b8", color="#9a6700", style="rounded,filled,dashed"];
   }
   "ASM-CLASSICAL-ECDLP" -> "PROB-ECDLP" [label="defines", color="#66788a", style="solid"];
   "PROB-CDH" -> "PROB-ECDLP" [label="reduces_to", color="#66788a", style="solid"];
@@ -1744,4 +1749,8 @@ digraph ecdlp_claims {
   "CEX-IC-SURPLUS-RIGHT-RANK" -> "HEUR-RELATION-RANK" [label="qualifies", color="#66788a", style="dashed"];
   "CEX-IC-SURPLUS-RIGHT-RANK" -> "GAP-IC-KERNEL-MODE-SCOPE" [label="qualifies", color="#66788a", style="dashed"];
   "GAP-RP-CYCLE-CLOSURE-LAW" -> "COND-RP-TWO-SUMMAND-FAMILY-LAW" [label="conditions", color="#66788a", style="solid"];
+  "CEX-RP-ODD-CYCLE-NO-CLOSURE" -> "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES" [label="refutes", color="#a33a3a", style="solid"];
+  "THM-IC-SIGNLESS-INCIDENCE-RANK" -> "GAP-RP-CYCLE-CLOSURE-LAW" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-RP-BALANCED-CYCLE-CONTROLS" -> "GAP-RP-CYCLE-CLOSURE-LAW" [label="qualifies", color="#66788a", style="dashed"];
+  "THM-RP-CYCLE-TARGET-PROJECTION" -> "GAP-RP-CYCLE-CLOSURE-LAW" [label="qualifies", color="#66788a", style="dashed"];
 }
