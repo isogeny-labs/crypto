@@ -372,6 +372,17 @@ Each arm rebuilds its own solver data for one target. Both timings include the f
 
 Run `RUSTC=rustc research/frobenius_s3_cubic_projection_20261123/run_m31_charted.sh larger-six 11781661 planted` or replace `planted` with `unplanted`. Set `S3_BASIS_DIR` to an existing directory to include basis export. The raw nine-repetition records are in [m31-larger-six.jsonl](m31-larger-six.jsonl).
 
+#### Successive resultant arithmetic
+
+The fixed M31 reference now caches the quadratic coefficient polynomials and powers for each appended base abscissa and formal input degree. Its polynomial multiply accumulates each output coefficient in a bounded `u128` before reducing modulo the M31 prime. The recurrence still carries the prescribed formal degree through specializations and performs the same exact division. The six-summand runner enables the step cache by default; `S3_DISABLE_RESULTANT_STEP_CACHE=1` selects the uncached control. These changes affect the direct resultant evaluation, not the randomized `genroot` fiber step. [pcc:unverified]
+
+| Same seed 11781661, nine paired fresh-process runs | Ordered roots | Previous direct median | Updated direct median | Median paired ratio |
+| --- | ---: | ---: | ---: | ---: |
+| Planted | 720 | 1.278 s | 0.945 s | 1.33× |
+| Unplanted | 0 | 1.255 s | 0.926 s | 1.36× |
+
+The matched runner checks every non-timing JSON field, including the degree-24 coefficient and distinct signed relation rows. The five-summand runner also reproduces all six frozen rows outside timing fields, including the Sylvester controls. The previous binary is commit `41f17111e90b`; the updated binary uses this change. Both timings charge factor-base setup and complete direct target evaluation. The [benchmark runner](bench_m31_resultant.py) accepts the two compiled binaries and writes the [raw observations](m31-resultant-optimized.jsonl). The earlier larger-six and multi-target tables retain their original measured baselines; their direct times should not be used as the updated implementation's cost. No Gröbner or complete ECDLP cost was measured here. [pcc:unverified]
+
 #### Multi-target relation yield and basis processing
 
 The continuation uses seeds 11781661 through 11781676, with one planted and one unplanted target per seed. Each target runs in a fresh process with the 16-abscissa base rebuilt and charged. Both arms recover the complete ordered output and agree with independent signed group arithmetic. Every planted target has 720 ordered roots, one distinct signed relation row, and the same 258,864-row basis shape. Each miss has no row and a constant refutation. All 32 direct inputs have a nonzero degree-24 Boolean coefficient. [pcc:unverified]

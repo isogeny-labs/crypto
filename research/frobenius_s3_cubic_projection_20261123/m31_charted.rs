@@ -12,8 +12,8 @@ mod upstream {
 use upstream::{resultant_formal, Curve, Fp};
 #[cfg(feature = "native-f4")]
 mod m31_f4_bench;
-mod m31_single_target;
 mod m31_larger;
+mod m31_single_target;
 
 const P: u64 = 2_147_483_647;
 const A: u64 = 847_514_846;
@@ -84,13 +84,17 @@ fn scale(f: Fp, a: &[u64], factor: u64) -> Poly {
 }
 
 fn mul(f: Fp, a: &[u64], b: &[u64]) -> Poly {
-    let mut out = vec![0; a.len() + b.len() - 1];
+    // Every coefficient of this fixed M31 panel sums fewer than 64 products
+    // of 31-bit residues, so one u128 accumulator fits without reduction.
+    let mut sums = vec![0u128; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate().filter(|&(_, x)| *x != 0) {
         for (j, &y) in b.iter().enumerate().filter(|&(_, y)| *y != 0) {
-            out[i + j] = f.add(out[i + j], f.mul(x, y));
+            sums[i + j] += x as u128 * y as u128;
         }
     }
-    out
+    sums.into_iter()
+        .map(|value| (value % f.p as u128) as u64)
+        .collect()
 }
 
 fn evaluate(f: Fp, a: &[u64], x: u64) -> u64 {
@@ -116,28 +120,58 @@ fn coefficients(c: Curve, x: u64) -> [Poly; 3] {
     ]
 }
 
+struct ResultantStep {
+    minus_b: Poly,
+    minus_ac: Poly,
+    ac: Poly,
+    powers: Vec<Poly>,
+}
+
+impl ResultantStep {
+    fn new(c: Curve, x: u64, degree: usize) -> Self {
+        let f = c.f;
+        let [a, b, constant] = coefficients(c, x);
+        let ac = mul(f, &a, &constant);
+        let minus_b = scale(f, &b, P - 1);
+        let minus_ac = scale(f, &ac, P - 1);
+        let mut powers = vec![vec![1]];
+        for _ in 0..degree {
+            powers.push(mul(f, powers.last().unwrap(), &a));
+        }
+        Self {
+            minus_b,
+            minus_ac,
+            ac,
+            powers,
+        }
+    }
+}
+
 fn resultant(c: Curve, previous: &[u64], x: u64) -> Poly {
-    let f = c.f;
+    let step = ResultantStep::new(c, x, previous.len() - 1);
+    resultant_with_step(c.f, previous, &step)
+}
+
+fn resultant_with_step(f: Fp, previous: &[u64], step: &ResultantStep) -> Poly {
     let d = previous.len() - 1;
-    let [a, b, constant] = coefficients(c, x);
-    let ac = mul(f, &a, &constant);
-    let minus_b = scale(f, &b, P - 1);
-    let minus_ac = scale(f, &ac, P - 1);
     let mut u = vec![0];
     let mut v = vec![previous[d]];
-    let mut a_power = vec![1];
-    for &term in previous[..d].iter().rev() {
-        a_power = mul(f, &a_power, &a);
+    for (i, &term) in previous[..d].iter().rev().enumerate() {
         (u, v) = (
-            add(f, &v, &mul(f, &minus_b, &u)),
-            add(f, &scale(f, &a_power, term), &mul(f, &minus_ac, &u)),
+            add(f, &v, &mul(f, &step.minus_b, &u)),
+            add(
+                f,
+                &scale(f, &step.powers[i + 1], term),
+                &mul(f, &step.minus_ac, &u),
+            ),
         );
     }
     let mut norm = add(
         f,
-        &add(f, &mul(f, &v, &v), &mul(f, &minus_b, &mul(f, &u, &v))),
-        &mul(f, &ac, &mul(f, &u, &u)),
+        &add(f, &mul(f, &v, &v), &mul(f, &step.minus_b, &mul(f, &u, &v))),
+        &mul(f, &step.ac, &mul(f, &u, &u)),
     );
+    let a_power = step.powers.last().unwrap();
     let degree = a_power.len() - 1;
     assert_eq!(a_power[degree], 1);
     let mut out = vec![0; 2 * d + 1];

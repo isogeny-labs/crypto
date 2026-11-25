@@ -16,13 +16,48 @@ fn multiplicity(key: &[u8; 6]) -> u64 {
     720 / denominator
 }
 
-fn direct_six(c: Curve, base: &[Point], target: Point) -> (BTreeSet<usize>, u64, usize) {
+fn cached_polynomial<'a>(
+    c: Curve,
+    base: &[Point],
+    key: &[u8],
+    cache: &'a mut HashMap<Vec<u8>, Poly>,
+    steps: &mut HashMap<(u8, usize), ResultantStep>,
+) -> &'a [u64] {
+    if !cache.contains_key(key) {
+        let (&last, prefix) = key.split_last().unwrap();
+        let row = if prefix.is_empty() {
+            vec![c.f.neg(base[last as usize].0), 1]
+        } else {
+            let previous = cached_polynomial(c, base, prefix, cache, steps).to_vec();
+            let degree = previous.len() - 1;
+            let step = steps
+                .entry((last, degree))
+                .or_insert_with(|| ResultantStep::new(c, base[last as usize].0, degree));
+            resultant_with_step(c.f, &previous, step)
+        };
+        cache.insert(key.to_vec(), row);
+    }
+    &cache[key]
+}
+
+fn direct_six(
+    c: Curve,
+    base: &[Point],
+    target: Point,
+    cached_steps: bool,
+) -> (BTreeSet<usize>, u64, usize) {
     let mut cache = HashMap::new();
+    let mut steps = HashMap::new();
     let mut roots = BTreeSet::new();
     let mut top = 0;
     let mut evaluations = 0;
     m31_single_target::multisets::<6>(|key| {
-        let value = evaluate(c.f, polynomial(c, base, key, &mut cache), target.0);
+        let row = if cached_steps {
+            cached_polynomial(c, base, key, &mut cache, &mut steps)
+        } else {
+            polynomial(c, base, key, &mut cache)
+        };
+        let value = evaluate(c.f, row, target.0);
         evaluations += 1;
         if value == 0 {
             m31_single_target::ordered_labels(key, &mut roots);
@@ -110,6 +145,7 @@ pub(super) fn run() {
     let base = factor_base(c);
     let base_seconds = started.elapsed().as_secs_f64();
     let output_dir = std::env::var_os("S3_BASIS_DIR").map(PathBuf::from);
+    let cached_steps = std::env::var_os("S3_DISABLE_RESULTANT_STEP_CACHE").is_none();
     let kind = std::env::args().nth(3);
     let kinds = match kind.as_deref() {
         Some("planted") => &["planted"][..],
@@ -131,7 +167,7 @@ pub(super) fn run() {
         let direct_seconds;
         if direct_first {
             let started = Instant::now();
-            (direct, top, evaluations) = direct_six(c, &base, target);
+            (direct, top, evaluations) = direct_six(c, &base, target, cached_steps);
             direct_seconds = started.elapsed().as_secs_f64() + base_seconds;
             let started = Instant::now();
             (indexed, pair_charts, prefix_sums, auxiliaries, basis_rows) =
@@ -143,7 +179,7 @@ pub(super) fn run() {
                 indexed_six(c, &base, target, output);
             indexed_seconds = started.elapsed().as_secs_f64() + base_seconds;
             let started = Instant::now();
-            (direct, top, evaluations) = direct_six(c, &base, target);
+            (direct, top, evaluations) = direct_six(c, &base, target, cached_steps);
             direct_seconds = started.elapsed().as_secs_f64() + base_seconds;
         }
         let signed = m31_single_target::signed_group_solve::<4>(c, &base, target);
