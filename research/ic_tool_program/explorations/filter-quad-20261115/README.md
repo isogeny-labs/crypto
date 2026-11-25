@@ -11,15 +11,15 @@
 
   | row | step | one extra bit | two extra bits |
   |:--|:--|:--|:--|
-  | k0n53 | admitted rate | 0.61% | 0.14% |
-  | k0n53 | admitted | 1.68 | 0.91 |
-  | k0n53 | filter | 7.67 | 8.43 |
-  | k0n61 | admitted rate | 0.42% | 0.10% |
-  | k0n61 | admitted | 1.13 | 0.67 |
-  | k0n61 | filter | 8.17 | 8.80 |
+  | icv1-f2m53-tm56619371-dac20a85 | admitted rate | 0.61% | 0.14% |
+  | icv1-f2m53-tm56619371-dac20a85 | admitted | 1.68 | 0.91 |
+  | icv1-f2m53-tm56619371-dac20a85 | filter | 7.67 | 8.43 |
+  | icv1-f2m61-t158598901-ab42b6c5 | admitted rate | 0.42% | 0.10% |
+  | icv1-f2m61-t158598901-ab42b6c5 | admitted | 1.13 | 0.67 |
+  | icv1-f2m61-t158598901-ab42b6c5 | filter | 8.17 | 8.80 |
 
-  Collect overlapped between the arms at both sizes: k0n53 154–211 ms
-  against 151–189 ms, and k0n61 817–992 ms against 833–914 ms.
+  Collect overlapped between the arms at both sizes: icv1-f2m53-tm56619371-dac20a85 154–211 ms
+  against 151–189 ms, and icv1-f2m61-t158598901-ab42b6c5 817–992 ms against 833–914 ms.
 - **Reading:**
   - The wider filter's probe misses cost about what the fewer false
     positives save: −0.5 to −0.8 cycles admitted against +0.6 to +0.8
