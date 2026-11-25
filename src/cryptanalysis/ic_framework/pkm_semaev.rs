@@ -1292,9 +1292,12 @@ impl PkmSemaevOracle {
         if self.mode == PkmMode::Chain && self.m < 3 {
             self.mode = PkmMode::Full; // m = 2: S₃ alone, no free unknown
         }
-        if matches!(self.engine, PkmEngine::ResGcd | PkmEngine::Scan) && self.m != 2 {
+        if self.engine == PkmEngine::Scan && self.m != 2 {
+            return Err(format!("pkm-semaev: engine=scan takes m = 2, not {}", self.m));
+        }
+        if self.engine == PkmEngine::ResGcd && !(2..=3).contains(&self.m) {
             return Err(format!(
-                "pkm-semaev: engine=resgcd/scan take m = 2, not {}",
+                "pkm-semaev: engine=resgcd takes m = 2 or 3, not {}",
                 self.m
             ));
         }
@@ -2383,6 +2386,9 @@ impl PkmSemaevOracle {
     /// refutation; otherwise the roots are read off `V` (`|V| · deg G`
     /// products) and the pairs among them tested.
     fn resgcd(&mut self, curve: &PrimeCurve, x_r: u64) -> (Vec<Vec<u64>>, u64) {
+        if self.m == 3 {
+            return self.resgcd_m3(curve, x_r);
+        }
         let p = curve.p;
         let (a, b) = self.s3_coefficients(curve);
         let v = self.prepared.as_ref().expect("prepared").v.clone();
@@ -2449,6 +2455,143 @@ impl PkmSemaevOracle {
                 }
             }
         }
+        (out, mults)
+    }
+
+    /// `F_V = ∏_{v ∈ V}(X − v)`, built once and charged as setup.
+    fn resgcd_fv(&mut self, p: u64) -> Vec<u64> {
+        if self.resgcd_fv.is_none() {
+            let v = self.prepared.as_ref().expect("prepared").v.clone();
+            let mut setup = 0u64;
+            let leaves: Vec<Vec<u64>> = v.iter().map(|&x| vec![subm(0, x, p), 1]).collect();
+            let fv = ug_product_tree(leaves, p, &mut setup);
+            self.bump("pkm_resgcd_setup_fp_mults", setup);
+            self.resgcd_fv = Some(fv);
+        }
+        self.resgcd_fv.clone().expect("built")
+    }
+
+    /// `engine=resgcd` at `m = 3`: every unordered `(x_1, x_2, x_3) ∈ V³`
+    /// with `S₄(x_1, x_2, x_3, x_R) = 0`, as `grid()` returns them (sorted
+    /// by index, `x_3` the largest), and the multiplications spent.
+    ///
+    /// For each `w ∈ V` (the largest-index summand), `S₄(Y, X, w, x_R) =
+    /// Res_U(S₃(Y, X, U), S₃(w, x_R, U))` has degree ≤ 4 in `X` for fixed
+    /// `Y`, so `R_w(X) = ∏_{v ∈ V} S₄(v, X, w, x_R)` (degree ≤ 4|V|) is
+    /// built by the product tree and `gcd(R_w, F_V)` gives every `x ∈ V`
+    /// that pairs with some `y ∈ V` against `w`. By the symmetry of `S₄`
+    /// both members of a pair are among its roots, which are read off `V`
+    /// and tested pairwise. `|V|` such eliminations per target.
+    fn resgcd_m3(&mut self, curve: &PrimeCurve, x_r: u64) -> (Vec<Vec<u64>>, u64) {
+        let p = curve.p;
+        let (a, b) = self.s3_coefficients(curve);
+        let fv = self.resgcd_fv(p);
+        let v = self.prepared.as_ref().expect("prepared").v.clone();
+        let mut mults = 0u64;
+        let (mut tree, mut gcdm, mut nontrivial) = (0u64, 0u64, 0u64);
+        // Numeric S₃(x1, x2, U) coefficients (α, β, γ) of U², U, 1.
+        let s3c = |x1: u64, x2: u64, mults: &mut u64| -> (u64, u64, u64) {
+            *mults += 6;
+            let d = subm(x1, x2, p);
+            let s = addm(x1, x2, p);
+            let pr = mulm(x1, x2, p);
+            let al = mulm(d, d, p);
+            let be = mulm(p - 2, addm(mulm(s, addm(pr, a, p), p), mulm(2, b, p), p), p);
+            let q = subm(pr, a, p);
+            let ga = subm(mulm(q, q, p), mulm(mulm(4, b, p), s, p), p);
+            (al, be, ga)
+        };
+        // S₃(v, X, U) as polynomials in X (degree ≤ 2) for each U-power,
+        // target-independent given v: α(X) = (v − X)², β(X) = −2((v + X)(vX + a) + 2b),
+        // γ(X) = (vX − a)² − 4b(v + X).
+        let two_b = mulm(2, b, p);
+        let four_b = mulm(4, b, p);
+        let sym: Vec<[Vec<u64>; 3]> = v
+            .iter()
+            .map(|&y| {
+                let al = vec![mulm(y, y, p), subm(0, mulm(2, y, p), p), 1];
+                // (v + X)(vX + a) = a v + (v² + a) X + v X²
+                let inner = [
+                    addm(mulm(a, y, p), two_b, p),
+                    addm(mulm(y, y, p), a, p),
+                    y,
+                ];
+                let be: Vec<u64> = inner.iter().map(|&c| mulm(p - 2, c, p)).collect();
+                // (vX − a)² − 4b(v + X) = a² − 4bv + (−2av − 4b) X + v² X²
+                let ga = vec![
+                    subm(mulm(a, a, p), mulm(four_b, y, p), p),
+                    subm(0, addm(mulm(mulm(2, a, p), y, p), four_b, p), p),
+                    mulm(y, y, p),
+                ];
+                [al, be, ga]
+            })
+            .collect();
+        mults += 12 * v.len() as u64; // target-independent; charged per call for simplicity
+        let lin = |x: &[u64], c: u64, y: &[u64], d: u64, mults: &mut u64| -> Vec<u64> {
+            // c·x − d·y, coefficientwise
+            *mults += (x.len() + y.len()) as u64;
+            (0..x.len().max(y.len()))
+                .map(|i| subm(mulm(c, *x.get(i).unwrap_or(&0), p), mulm(d, *y.get(i).unwrap_or(&0), p), p))
+                .collect()
+        };
+        let mut found: Vec<(usize, usize, usize)> = Vec::new();
+        for k in 0..v.len() {
+            let (al2, be2, ga2) = s3c(v[k], x_r, &mut mults);
+            // Res_U(αU²+βU+γ, α₂U²+β₂U+γ₂) = (αγ₂−α₂γ)² − (αβ₂−α₂β)(βγ₂−β₂γ)
+            let t0 = mults;
+            let leaves: Vec<Vec<u64>> = sym
+                .iter()
+                .map(|[al, be, ga]| {
+                    let ag = lin(al, ga2, ga, al2, &mut mults);
+                    let ab = lin(al, be2, be, al2, &mut mults);
+                    let bg = lin(be, ga2, ga, be2, &mut mults);
+                    let sq = ug_school(&ag, &ag, p, &mut mults);
+                    let pr = ug_school(&ab, &bg, p, &mut mults);
+                    let mut l: Vec<u64> = (0..sq.len().max(pr.len()))
+                        .map(|i| subm(*sq.get(i).unwrap_or(&0), *pr.get(i).unwrap_or(&0), p))
+                        .collect();
+                    ug_trim(&mut l);
+                    l
+                })
+                .collect();
+            let r = if leaves.iter().any(|l| l.is_empty()) {
+                Vec::new() // a leaf vanishes identically: R ≡ 0, every v is a root
+            } else {
+                ug_product_tree(leaves, p, &mut mults)
+            };
+            let t1 = mults;
+            tree += t1 - t0;
+            let g = ug_gcd_monic(fv.clone(), r, p, &mut mults);
+            gcdm += mults - t1;
+            if g.len() <= 1 {
+                continue;
+            }
+            nontrivial += 1;
+            let idx: Vec<usize> = (0..=k)
+                .filter(|&i| {
+                    mults += g.len() as u64 - 1;
+                    g.iter().rev().fold(0u64, |acc, &c| addm(mulm(acc, v[i], p), c, p)) == 0
+                })
+                .collect();
+            for (s, &i) in idx.iter().enumerate() {
+                for &j in &idx[s..] {
+                    let (al, be, ga) = s3c(v[i], v[j], &mut mults);
+                    mults += 8;
+                    let ag = subm(mulm(al, ga2, p), mulm(al2, ga, p), p);
+                    let ab = subm(mulm(al, be2, p), mulm(al2, be, p), p);
+                    let bg = subm(mulm(be, ga2, p), mulm(be2, ga, p), p);
+                    if subm(mulm(ag, ag, p), mulm(ab, bg, p), p) == 0 {
+                        found.push((i, j, k));
+                    }
+                }
+            }
+        }
+        self.bump("pkm_resgcd_tree_fp_mults", tree);
+        self.bump("pkm_resgcd_gcd_fp_mults", gcdm);
+        self.bump("pkm_resgcd_nontrivial_gcd", nontrivial);
+        // grid() order: i, then j, then k ascending.
+        found.sort_unstable();
+        let out = found.into_iter().map(|(i, j, k)| vec![v[i], v[j], v[k]]).collect();
         (out, mults)
     }
 
@@ -5120,6 +5263,7 @@ mod tests {
         let mut chain = prep(&format!("m=3,mode=chain,crosscheck=1{extra}"));
         let mut full = prep(&format!("m=3,mode=full,crosscheck=1{extra}"));
         let mut grid = prep("m=3,engine=exhaustive");
+        let mut resgcd = prep("m=3,engine=resgcd,crosscheck=1");
         let mut rng = StdRng::seed_from_u64(31);
         let g = inst.generator_point();
         let mut hits = 0;
@@ -5154,6 +5298,7 @@ mod tests {
             let (a, b, c) = (run(&mut chain), run(&mut full), run(&mut grid));
             assert_eq!(a, c, "{label}: chain F4 against the grid, target {k}");
             assert_eq!(b, c, "{label}: full F4 against the grid, target {k}");
+            assert_eq!(run(&mut resgcd), c, "{label}: resgcd against the grid, target {k}");
             assert_eq!(
                 c,
                 decomposable.contains(&curve.key(&target)),
@@ -5162,6 +5307,13 @@ mod tests {
             hits += usize::from(c);
         }
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
+        let n = resgcd.relation_counters();
+        assert!(n["pkm_crosscheck_systems"] > 0, "{label}: resgcd m=3 crosschecked");
+        assert_eq!(
+            n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
+            0,
+            "{label}: resgcd m=3 solution sets equal the grid's"
+        );
         for o in [&chain, &full] {
             let n = o.relation_counters();
             assert_eq!(
