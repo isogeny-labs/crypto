@@ -19,6 +19,7 @@ files named, not pcc-certified claims.
 | A4, P3.3/Q099 | Measured. Basic KLPT on all 105 matched ideals, ℓ∈{2,3}, 1050 runs, every output verified exactly: median $\log_p\ell^e$ 3.73–4.01, against the exact optimum ≈ $p/12$. The ratio grows like $p^{2.6}$. Prediction H4 ([3.0, 3.7]) was missed slightly high; no lead. | `a4_klpt/REPORT.pdf` |
 | A5 (Q099 follow-up) | Measured, paired with A4. KLPT with CVP strong approximation: the median $\log_p\ell^e$ drops 0.36–0.46 on every band. 28-bit medians are 3.28/3.31 and the ratio grows like $p^{2.2}$. H5 met at 28 bits and on the slope; the drop is under range on 1 of 6 bands [pcc:unverified]. | `a5_klpt_cvp/REPORT.pdf` |
 | A6 (A5 follow-up) | Measured. Headroom κ∈{2,4,8,16} in the e₁ rule makes the norm larger in every band; the best rule is A5's (κ=1). The bumps that headroom removes cost less than paying for them in advance on every run [pcc:unverified]. | `a6_klpt_kappa/REPORT.pdf` |
+| A7, P1.6/Q018 | Kill met. Xedni p=17 Experiment A, 100,000 runs under each of three explicit samplers, every run certified dependent or independent (0 undecided): dependent rates 0.250%, 1.859% and 0.068%, a 27× spread with disjoint Wilson intervals; none matches the published 0.317%. The published count is specific to its sampler, so Q018 is unanswerable as posed [pcc:unverified]. | `a7_xedni_q018/REPORT.pdf` |
 
 ### Status of the remaining items (2026-11-23)
 
@@ -29,7 +30,7 @@ files named, not pcc-certified claims.
 | Lean, A3 (C) | not attempted | a generic-group-model framework in crypto-lean |
 | P3.3 native medians | done (`p33_native/`) | none |
 | P3.3/Q099: KLPT vs. the counting optimum | done (A4, `a4_klpt/`) | none; the CVP variant was then measured as A5 |
-| P1.6/Q018: sampler sensitivity of the 317/100,000 count | not started | native Rust canonical heights and a height-pairing regulator over $\mathbb Q$ for the $p=17$ lifts, plus 2–3 samplers; several days of work |
+| P1.6/Q018: sampler sensitivity of the 317/100,000 count | done (A7, `a7_xedni_q018/`) | none |
 | research-kb receipt | blocked | the research-kb MCP server was not connected in this session |
 
 None of these is an index-calculus improvement; each closes one non-generic
