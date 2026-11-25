@@ -3280,7 +3280,13 @@ pub fn run_rho_policy(inst: &Instance, seed: u64, walk: RhoWalk, policy: WalkPol
             .copied()
             .unwrap_or(0)
             .max(rr.steps),
-        compares: rr.work_native.values().sum(),
+        compares: [
+            super::ic_boundary::WINDOW_WORD_OPS,
+            super::ic_boundary::BRENT_WORD_OPS,
+        ]
+        .into_iter()
+        .filter_map(|counter| rr.work_native.get(counter).copied())
+        .sum(),
         steps: rr.steps,
         wall_ns: rr.wall_ns,
     }

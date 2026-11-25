@@ -24151,9 +24151,9 @@ mod wwalk_table_tests {
 
     /// `sib=m,pool=M` (sibling points): the recovered log equals the true
     /// one with one and two seeds, verified and lazy; the field operations
-    /// of the walk equal the formula (per parent `m` inversions, `2m + 1`
-    /// multiplications, `2m` squarings, less one multiplication and one
-    /// squaring per skipped known-copy minus child); a pair is one group
+    /// of the walk include a batch inversion per parent, one slope
+    /// multiplication and squaring per emitted sibling, and one eager
+    /// ordinate lift per sibling. A pair is one group
     /// addition and a second point is the priced native counter; and with
     /// `sib` off the build, its ledgers and its counters are the walk's.
     #[test]
@@ -24221,8 +24221,10 @@ mod wwalk_table_tests {
                             // expansion (was `m` serial inversions).
                             assert_eq!(f.invs, parents);
                             let batch_muls = 3 * (m as u64 - 1) * parents;
-                            assert_eq!(f.muls, (2 * m as u64 + 1) * parents - skipped + batch_muls);
-                            assert_eq!(f.sqrs, 2 * m as u64 * parents - skipped);
+                            let siblings = pairs + second;
+                            assert_eq!(t.sib_lifts, siblings);
+                            assert_eq!(f.muls, 2 * siblings + batch_muls);
+                            assert_eq!(f.sqrs, siblings);
                             assert!(skipped <= 2 * parents);
                         }
                         assert_eq!(t.walk_ops.adds, pairs + degenerate);
