@@ -17,6 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 - [ ] Add a Strassen path for the dense matrix products in the toy PQC schemes (MAYO, UOV, QR-UOV, McEliece) with a shared schoolbook loop and per-field cutoff (claude, 2026-11-24, branch claude/pqc-strassen-20261124, PR #5172; pqc tests pass; timings in bench.record 20261125T0508Z-pqc-strassen, unvalidated, loaded host)
+- [x] math-st A5: KLPT with CVP strong approximation (target about p^3) on the same 105 matched ideals, paired with A4 (Claude Code, started 2026-11-24, branch claude/math-st-a5-klpt-cvp, PR #5143; 1050 runs verified, paired drop 0.36-0.46 in log_p, 28-bit medians 3.28/3.31, ratio ~p^2.2)
 - [x] Large-prime graph evaluator on real Joux-Vitse two-large-prime streams (jv_sieve two-lp collector, `proof.inputs`), alongside the binary-curve streams of #5029 (Claude Code, started 2026-11-25, branch claude/lp-graph-jv-streams-20261125)
 - [x] Specify the same-target, equal-core APS versus rho crossover protocol and accounting gate (Codex, 2026-11-24, branch codex/aps-equal-core-protocol-20261124, PR #5176; draft protocol and archived-baseline analyzer published; implementation and measured comparison remain open)
 - [x] Publish the 100-item prime-field index-calculus assessment (Codex, completed 2026-11-24, branch codex/primefield-100-ideas-20261124, PR #5161)
