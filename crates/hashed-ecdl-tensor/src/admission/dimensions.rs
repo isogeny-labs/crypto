@@ -31,6 +31,8 @@ pub struct NodeDimensionAudit {
     pub packet_length: BigUint,
     /// Tile period 2^(i+1).
     pub tiles: BigUint,
+    /// Interaction distance D=L/2^i in the source mode and precision bounds.
+    pub interaction_distance: BigUint,
     /// K*2^(i+1), bounding modes of each weight before zero filtering.
     pub modes_per_weight_bound: BigUint,
     /// K*2^(i+1)*(p_t-1), bounding all weight-loop iterations, including discards.
@@ -39,6 +41,28 @@ pub struct NodeDimensionAudit {
     pub column_modpow_calls_bound: BigUint,
     /// Upper bound on row coefficient calls across all weight candidates.
     pub row_coefficient_calls_bound: BigUint,
+    /// A rigorous base-two exponent E such that the number of admissible mode
+    /// tuples in one interpolation evaluation is at most 2^E.
+    ///
+    /// This uses the weighted generating function with at most
+    /// `modes_per_weight_bound` variables of every positive weight below the
+    /// precision.  The explicit elementary constant is intentionally loose.
+    pub mode_tuple_log2_bound: BigUint,
+    /// Base-two exponent bounding all radix-64 group-child invocations across
+    /// every active Hermite node and interpolation sample of this call.
+    pub active_call_child_invocations_log2_bound: BigUint,
+    /// Scalar/term slots sufficient for all new packet descriptions in one
+    /// group child, before allocator and integer-width pricing.
+    pub packet_description_slots_bound: BigUint,
+    /// Base-two exponent bounding the coefficient-choice leaves visited by one
+    /// packet-entry evaluation.  Local column sums and outgoing powers are
+    /// polynomial work outside this choice traversal.
+    pub packet_entry_choice_log2_bound: BigUint,
+    /// Smallest integer c with `precision*u <= c*edges*D`.
+    ///
+    /// A uniform constant bound on this value is the bridge from the finite
+    /// tuple exponent to the source's `O(M/sqrt(u))` exponent.
+    pub precision_md_over_u_coefficient: BigUint,
     /// Number I=M*(2L-1)+1 of interpolation samples at each active node.
     pub samples_per_node: BigUint,
     /// Exact number of nonzero grid nodes with valuation below u.
@@ -49,6 +73,35 @@ pub struct NodeDimensionAudit {
     /// These slots hold Element metadata, not live coefficient payloads. Extra
     /// allocator capacity and all inner allocations require separate accounting.
     pub retained_jet_vector_slots_lower_bound: BigUint,
+}
+
+fn ceil_sqrt(value: &BigUint) -> BigUint {
+    if value <= &BigUint::one() {
+        return value.clone();
+    }
+    let mut estimate = BigUint::one() << value.bits().div_ceil(2) as usize;
+    loop {
+        let next = (&estimate + value / &estimate) >> 1usize;
+        if next >= estimate {
+            break;
+        }
+        estimate = next;
+    }
+    if &estimate * &estimate < *value {
+        estimate + BigUint::one()
+    } else {
+        estimate
+    }
+}
+
+fn ceil_log2(value: &BigUint) -> u64 {
+    assert!(!value.is_zero());
+    let bits = value.bits();
+    if value == &(BigUint::one() << (bits - 1) as usize) {
+        bits - 1
+    } else {
+        bits
+    }
 }
 
 /// Compute exact dimension envelopes without building modes or Taylor data.
@@ -72,7 +125,9 @@ pub fn audit_node_dimensions(input: &NodeDimensions) -> Result<NodeDimensionAudi
         return Err(invalid("dimension packet capacity bound"));
     }
     let tiles = BigUint::one() << (input.coordinate as usize + 1);
+    let distance = &length >> input.coordinate as usize;
     let per_weight = &input.packets * &tiles;
+    debug_assert!(&per_weight * &distance <= BigUint::from(6u8) * &input.edges);
     let candidates = &per_weight * (&input.precision - BigUint::one());
     // For fixed b, each real column appears in exactly one tile. The coarse
     // L factor below also covers row calls, repeated independently per tile.
@@ -80,6 +135,28 @@ pub fn audit_node_dimensions(input: &NodeDimensions) -> Result<NodeDimensionAudi
     let samples = &input.edges * (BigUint::from(2u8) * &length - BigUint::one()) + BigUint::one();
     let tail = &length >> input.u as usize;
     let active_nodes = BigUint::from(2u8) * (&length - &tail);
+    // If at most n variables have each weight j, the weighted generating
+    // bound at x=exp(-theta), together with sum 1/h^2 <= 2, gives
+    // log_2(tuple_count) <= 5*sqrt(n*p).  The constant 5 also absorbs ceilings.
+    let tuple_log2 = BigUint::from(5u8) * ceil_sqrt(&(&per_weight * &input.precision));
+    // The source fixes radix r=64.
+    let active_child_log2 = &tuple_log2
+        + BigUint::from(ceil_log2(&active_nodes))
+        + BigUint::from(ceil_log2(&samples))
+        + BigUint::from(6u8);
+    // Across one group child, local matrices use at most K*L^2 entries.  Each
+    // retained mode contributes at most L incoming coefficients or L outgoing
+    // terms, plus metadata.  Counting every attempted mode in both directions
+    // is a safe representation-level envelope.
+    let description_slots = &input.packets
+        + &input.packets * &length * &length
+        + BigUint::from(2u8) * &candidates * (&length + BigUint::one());
+    // PacketTensor::entry has at most L rows and at most `candidates` incoming
+    // choices.  The constant/local choice adds one.
+    let entry_choice_log2 = &length * BigUint::from(ceil_log2(&(&candidates + BigUint::one())));
+    let md = &input.edges * &distance;
+    let precision_coefficient =
+        (&input.precision * BigUint::from(input.u) + &md - BigUint::one()) / md;
     let vector_slots = &active_nodes * &samples;
     let h =
         (BigUint::from(3u8) * &input.edges + BigUint::from(input.u - 1)) / BigUint::from(input.u);
@@ -89,10 +166,16 @@ pub fn audit_node_dimensions(input: &NodeDimensions) -> Result<NodeDimensionAudi
     Ok(NodeDimensionAudit {
         packet_length: length,
         tiles,
+        interaction_distance: distance,
         modes_per_weight_bound: per_weight,
         attempted_modes_bound: candidates,
         column_modpow_calls_bound: coefficient_calls.clone(),
         row_coefficient_calls_bound: coefficient_calls,
+        mode_tuple_log2_bound: tuple_log2,
+        active_call_child_invocations_log2_bound: active_child_log2,
+        packet_description_slots_bound: description_slots,
+        packet_entry_choice_log2_bound: entry_choice_log2,
+        precision_md_over_u_coefficient: precision_coefficient,
         samples_per_node: samples,
         active_nodes,
         retained_jet_coefficients: jets,

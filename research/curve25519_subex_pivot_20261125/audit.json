@@ -41,5 +41,30 @@
     },
     "claim_boundary": "bounded native controls and focused source audit; not a proof of D.1 or a practical Curve25519 attack"
   },
-  "next_gate": "source-bound active-call construction, precision, description, entry-work and branching induction with a depth-independent constant"
+  "active_call_certificate": {
+    "library_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
+    "native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-active-call-audit.rs",
+    "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
+    "test_result": {
+      "passed": 7,
+      "failed": 0
+    },
+    "derived_envelope": "with n=K*2^(i+1), K*L<=3M and D=L/2^i imply n*D<=6M; weighted tuple count is at most 2^(5*ceil(sqrt(n*p)))",
+    "conditional_consequence": "if p<=c*M*D/u uniformly, the local branching exponent is O(sqrt(c)*M/sqrt(u))",
+    "default_fixture": {
+      "M": 64,
+      "K": 8,
+      "a": 2,
+      "u": 2,
+      "i": 0,
+      "p": 128,
+      "mode_tuple_log2_bound": 230,
+      "active_call_child_invocations_log2_bound": 248,
+      "packet_description_slots_bound": 20456,
+      "packet_entry_choice_log2_bound": 44,
+      "precision_md_over_u_coefficient": 1
+    },
+    "claim_boundary": "finite dimension/work envelope conditional on supplied dimensions; actual child-history refinement and bit-operation induction remain open"
+  },
+  "next_gate": "bind packet-capacity and uniform precision premises to every actual child history, then compose packet-entry and ring/rational bit costs with a depth-independent constant"
 }

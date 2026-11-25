@@ -134,6 +134,81 @@ fn mode_envelopes_cover_native_zero_filtering_and_each_weight() {
 }
 
 #[test]
+fn weighted_tuple_exponent_covers_exact_small_enumerations() {
+    let mut meter = Meter::new(Limits::default());
+    for variables_per_weight in [2usize, 4, 6] {
+        for precision in 2usize..=7 {
+            let input = NodeDimensions {
+                edges: 64u8.into(),
+                packets: (variables_per_weight / 2).into(),
+                a: 1,
+                u: 1,
+                coordinate: 0,
+                precision: precision.into(),
+            };
+            let audit = audit_node_dimensions(&input).unwrap();
+            assert_eq!(audit.modes_per_weight_bound, variables_per_weight.into());
+            let modes: Vec<_> = (1..precision)
+                .flat_map(|weight| {
+                    (0..variables_per_weight).map(move |_| Mode {
+                        packet: 0,
+                        source: 1,
+                        target: 0,
+                        weight,
+                        rows: Vec::new(),
+                        columns: Vec::new(),
+                    })
+                })
+                .collect();
+            let mut beta = vec![0usize; modes.len()];
+            let mut usage = vec![0usize; 2];
+            let bounds = vec![precision - 1, 0];
+            let mut weight = 0usize;
+            let mut tuples = BigUint::one();
+            while next_tuple(
+                &mut beta,
+                &modes,
+                &mut usage,
+                &bounds,
+                &mut weight,
+                precision,
+                2,
+                &mut meter,
+            )
+            .unwrap()
+            {
+                tuples += BigUint::one();
+            }
+            let exponent = audit.mode_tuple_log2_bound.to_usize().unwrap();
+            assert!(tuples <= (BigUint::one() << exponent));
+        }
+    }
+}
+
+#[test]
+fn active_call_work_envelope_fixture_is_exact() {
+    let mut input = dimensions(64, 2, 2, 0, 128);
+    input.packets = 8u8.into();
+    let audit = audit_node_dimensions(&input).unwrap();
+    assert_eq!(audit.interaction_distance, 4u8.into());
+    assert_eq!(audit.modes_per_weight_bound, 16u8.into());
+    assert_eq!(audit.attempted_modes_bound, 2_032u16.into());
+    assert_eq!(audit.mode_tuple_log2_bound, 230u8.into());
+    assert_eq!(audit.active_call_child_invocations_log2_bound, 248u8.into());
+    assert_eq!(audit.packet_description_slots_bound, 20_456u16.into());
+    assert_eq!(audit.packet_entry_choice_log2_bound, 44u8.into());
+    assert_eq!(audit.precision_md_over_u_coefficient, BigUint::one());
+
+    input.precision = 129u8.into();
+    assert_eq!(
+        audit_node_dimensions(&input)
+            .unwrap()
+            .precision_md_over_u_coefficient,
+        2u8.into()
+    );
+}
+
+#[test]
 fn root_precision_envelope_covers_all_active_scales_and_native_increments() {
     // Actual source scales at astronomical sizes, without allocating a graph.
     for root_u in [1u64, 3, 8] {

@@ -155,6 +155,45 @@ growing-arity ECDLP reduction and an independently supported asymptotic
 subexponential result; failing it would identify the exact theorem repair
 needed.
 
+### Active-call certificate component
+
+The first finite component of that gate is now executable in
+`tensor-active-call-audit`.  For current edge count `M`, packet count `K`,
+packet length `L=2^a`, active valuation `i`, interaction distance
+`D=L/2^i`, retained levels `u` and precision `p`, it checks `KL<=3M` and
+certifies
+
+```text
+n = K*2^(i+1),             n*D <= 6M
+log2(number of mode tuples) <= 5*ceil(sqrt(n*p)).
+```
+
+The second inequality follows from the weighted generating function: for at
+most `n` variables of each positive weight, evaluation at `exp(-theta)` gives
+`ln N <= theta*p + 2n/theta`; choosing `theta=sqrt(n/p)` and converting to
+base two is below the stated integer constant.  Consequently, whenever the
+precision induction supplies `p <= c*M*D/u` for a fixed `c`, this finite bound
+is `O(sqrt(c)*M/sqrt(u))`, exactly the branching exponent required in D.4.7.
+
+The certificate also bounds all group-child invocations over the active nodes
+and interpolation samples, the new packet-description slots, and the
+coefficient-choice leaves of a packet entry.  The default exact fixture
+`M=64,K=8,a=u=2,i=0,p=128` reports:
+
+```text
+mode tuple log2 bound                  230
+whole-call group-child log2 bound      248
+packet description slots            20456
+packet-entry choice log2 bound          44
+ceil(p*u/(M*D))                          1
+```
+
+Seven native dimension/work controls pass, including exact enumeration of
+small weighted tuples.  This closes the local exponent algebra conditional on
+the packet-capacity and precision premises.  It does not yet bind those
+premises to every actual recursive child or price ring/rational bit
+operations.  Those history/refinement obligations remain the next gate.
+
 ## Primary references and local context
 
 - Akshima et al., pinned Bochum v0.2, Theorem 4:
