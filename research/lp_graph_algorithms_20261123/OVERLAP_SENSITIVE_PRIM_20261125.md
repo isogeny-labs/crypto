@@ -103,11 +103,24 @@ merges share source ids and the remaining large columns, so residual overlap
 stays even when small supports are disjoint. Fallback trees (cap condition
 failed) are a further floor.
 
+## Natural M31 stream (2026-11-25)
+
+On the authentic group-admitted M31 ten-query stream of PR #5076 (rebuilt
+from the frozen producer input; hashes match CI), the two strategies give
+identical relations, witnesses, report and legacy stats, with 0 replay
+failures. There is **no saving**: 1273 of 1328 pairs overlap, the
+strategy forms 1280 differences against 1328, and the MST stage runs
+about 1.13x *slower* (informational wall time). Every admitted row carries
+the target column `u32::MAX` (10 distinct coefficients), so rows of one LP
+column nearly always share it. Details: `evidence/m31-mst-strategies-20261125/`.
+
 ## Next step
 
-Run both strategies on the captured natural streams (`lp_graph_eval`,
-`SolveOptions::capture_relations`, and the M31 replay in #5076) with identical
-inputs, recording equality, `formed/logical`, overlap fraction and fallback
-rate per column, then time the MST stage only if `formed/logical` is well
-below 1 there. A source-id overlap is the main obstacle to more saving;
-whether a weaker key bound for source-only overlap preserves exactness is open.
+The exact key of any pair is computable without forming the difference:
+`key(v,u) = K(v,u) - (shared keys) - (shared keys whose normalized
+coefficients are equal)`, summed over small, other-large and source keys.
+On this stream the only shared key is usually the target column, so an
+inverted index over the few hot keys would give every pair's exact key in
+O(shared) work. Whether that is worth it depends on the hot-key structure.
+The whole MST stage on the 613-row stream takes about 3 ms; its share of a
+cold M31 solve has not been measured here.
