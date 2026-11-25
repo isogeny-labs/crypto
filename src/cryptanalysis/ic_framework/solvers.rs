@@ -101,10 +101,10 @@ use crate::cryptanalysis::m4gb_oracle::{
     run_m4gb, run_m4gb_persistent, select_binary, M4gbError, M4gbOptions, M4gbRun,
 };
 use crate::cryptanalysis::pq_f4_f2::{
-    groebner_basis_f4, groebner_basis_f4_full_width, solutions_from_reduced_basis, F4PairTrace,
-    F4Skeleton, SKELETON_DEFAULT_CAP_BYTES, TRACE_DEFAULT_CAP_BYTES,
-    groebner_basis_f4_skeleton, groebner_basis_f4_skeleton_full_width,
-    groebner_basis_f4_traced, groebner_basis_f4_traced_full_width,
+    groebner_basis_f4, groebner_basis_f4_full_width, groebner_basis_f4_skeleton,
+    groebner_basis_f4_skeleton_full_width, groebner_basis_f4_traced,
+    groebner_basis_f4_traced_full_width, solutions_from_reduced_basis, F4PairTrace, F4Skeleton,
+    SKELETON_DEFAULT_CAP_BYTES, TRACE_DEFAULT_CAP_BYTES,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,
@@ -222,7 +222,7 @@ pub struct F4F2 {
 
 // Preserve the former unit-value constructor API while each owned solver
 // retains its actual per-run skeleton/trace state.
-#[allow(non_upper_case_globals)]
+#[allow(non_upper_case_globals, clippy::declare_interior_mutable_const)]
 pub const F4F2: F4F2 = F4F2 {
     skeleton: std::sync::Mutex::new(None),
     trace: std::sync::Mutex::new(None),
@@ -298,7 +298,12 @@ impl SystemSolver for F4F2 {
             (None, Some(slot)) => {
                 let store = slot.get_or_insert_with(|| F4PairTrace::with_cap(trace_cap));
                 if full_width {
-                    groebner_basis_f4_traced_full_width(system.equations.clone(), system.n_vars, budget, store)
+                    groebner_basis_f4_traced_full_width(
+                        system.equations.clone(),
+                        system.n_vars,
+                        budget,
+                        store,
+                    )
                 } else {
                     groebner_basis_f4_traced(system.equations.clone(), system.n_vars, budget, store)
                 }
@@ -306,16 +311,28 @@ impl SystemSolver for F4F2 {
             (Some(slot), _) => {
                 let skeleton = slot.get_or_insert_with(|| F4Skeleton::with_cap(cap_bytes));
                 if full_width {
-                    groebner_basis_f4_skeleton_full_width(system.equations.clone(), system.n_vars, budget, skeleton)
+                    groebner_basis_f4_skeleton_full_width(
+                        system.equations.clone(),
+                        system.n_vars,
+                        budget,
+                        skeleton,
+                    )
                 } else {
-                    groebner_basis_f4_skeleton(system.equations.clone(), system.n_vars, budget, skeleton)
+                    groebner_basis_f4_skeleton(
+                        system.equations.clone(),
+                        system.n_vars,
+                        budget,
+                        skeleton,
+                    )
                 }
             }
-            (None, None) => if full_width {
-                groebner_basis_f4_full_width(system.equations.clone(), system.n_vars, budget)
-            } else {
-                groebner_basis_f4(system.equations.clone(), system.n_vars, budget)
-            },
+            (None, None) => {
+                if full_width {
+                    groebner_basis_f4_full_width(system.equations.clone(), system.n_vars, budget)
+                } else {
+                    groebner_basis_f4(system.equations.clone(), system.n_vars, budget)
+                }
+            }
         };
         drop(guard);
         drop(trace_guard);
@@ -482,9 +499,10 @@ impl SystemSolver for F4F2 {
 /// reducer/free-column split disabled.
 #[derive(Default)]
 pub struct F4F2FullWidth {
+    #[allow(dead_code)]
     inner: F4F2,
 }
-#[allow(non_upper_case_globals)]
+#[allow(non_upper_case_globals, clippy::declare_interior_mutable_const)]
 pub const F4F2FullWidth: F4F2FullWidth = F4F2FullWidth { inner: F4F2 };
 
 impl SystemSolver for F4F2FullWidth {
