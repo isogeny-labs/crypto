@@ -1,0 +1,63 @@
+{
+  "schema": "curve25519.quotient-layout-protocol/v1",
+  "study_id": "EXP-C25519-QLAYOUT-001",
+  "frozen_date": "2026-11-25",
+  "status": "frozen_before_layout_implementation_or_measurement",
+  "parent_revision": "41dd1c910e",
+  "language": "native Rust",
+  "javascript": false,
+  "curve": {
+    "k": 20,
+    "p": 1048573,
+    "r": 131203,
+    "a": 63700,
+    "b": 872826,
+    "generator": [349837, 122]
+  },
+  "system": {
+    "m": 3,
+    "d": 19,
+    "factor_base": "x = 349833 + 3*w, w in mu_19, distinct roots",
+    "relation": "symmetrized S4",
+    "membership": "q divides X^19 - 1",
+    "quotient_cuts": [2, 4],
+    "monomial_order": "ordinary grevlex; variable 0 largest"
+  },
+  "arms": {
+    "D": {"layout": ["e", "r0", "r1", "r2", "r3", "r4", "r5"], "role": "direct baseline"},
+    "T": {"layout": ["e", "r0", "r1", "r2", "r3", "r4", "r5", "h2", "h4"], "role": "trailing quotient reproduction"},
+    "F": {"layout": ["h2", "h4", "e", "r0", "r1", "r2", "r3", "r4", "r5"], "role": "primary"},
+    "E": {"layout": ["e", "h2", "h4", "r0", "r1", "r2", "r3", "r4", "r5"], "role": "block-after-e diagnostic"},
+    "I": {"layout": ["e", "r0", "r1", "h2", "r2", "r3", "h4", "r4", "r5"], "role": "local interleaving diagnostic"}
+  },
+  "engine": {
+    "name": "f4_fp",
+    "threads": 1,
+    "degree_ceiling": 24,
+    "per_system_cap_s": 300,
+    "primary_unit": "F_p multiply-adds in F4 elimination"
+  },
+  "targets": {
+    "random_seed": 2026112502,
+    "random_per_arm": 8,
+    "planted_per_arm": 4,
+    "paired": true,
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 2026112502
+  },
+  "qualification": {
+    "primary_arm": "F",
+    "minimum_completed_random_triples": 6,
+    "F_over_D_upper_95_lt": 0.75,
+    "F_over_T_upper_95_lt": 0.60,
+    "productive_degree_max": 4,
+    "productive_degree_minimum_pairs": 6,
+    "peak_rss_F_over_D_max_each_pair": 1.25,
+    "membership_build_F_over_D_max_each_pair": 1.25,
+    "permutation_build_overhead": 0,
+    "candidate_censoring_not_greater": true
+  },
+  "scaling_orders_gated": [7, 9, 21, 27, 57],
+  "stop_rule": "failure of any primary qualification condition closes F before scaling or m4",
+  "claim_boundary": "grevlex variable-layout stage diagnostic only; no total-work or subexponential ECDLP claim"
+}
