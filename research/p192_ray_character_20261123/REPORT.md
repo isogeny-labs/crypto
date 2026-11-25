@@ -1312,6 +1312,19 @@ resultant algorithm. A dense `M_H` alone would require
 `24(m+1)≈2^90.569` bytes at 24 bytes per coefficient.
 [pcc:unverified]
 
+The finite controls also rule out two shortcuts from CM data
+alone. The same replay fixes `p=223`, `r=241`, and `m=24`:
+`y²=x³+8x+7` is exact on all 120 signed classes, while
+`y²=x³+2x+48` has 48 exactness mismatches and a
+square-generator witness already at its base point. Both have
+trace `-17` and Frobenius discriminant `-603`, so these two
+values do not determine exactness. The fixed curve over
+`F_271` has 72 exactness mismatches and discriminant `-123`;
+because `-123` is fundamental, its endomorphism ring is
+maximal. Maximal CM order is therefore not a sufficient
+exactness condition either. These finite counterexamples do
+not determine the P-192 norm sign. [pcc:unverified]
+
 For triage only, an artificial null model assigns independent
 uniform signs to the `n=(r-1)/2` base-point `y`-coordinates.
 The `t=n/m` coset products then have independent signs;

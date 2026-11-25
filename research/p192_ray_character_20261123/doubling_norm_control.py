@@ -114,6 +114,47 @@ assert pow(2, small_half, small_r) == 1
 check_small_curve(0, 3, (1, 2), 0, indices)
 check_small_curve(1, 6, (1, 18), 32, indices)
 
+
+def check_order_241_curve(p, a, b, base, expected_exact, expected_action):
+    r, half, m, primitive = 241, 120, 24, 7
+    subgroup_generator = pow(primitive, half // m, r)
+    indices = sorted({min(pow(subgroup_generator, j, r),
+                          r - pow(subgroup_generator, j, r)) for j in range(m)})
+    square_generator = pow(primitive, 2, r)
+    assert len(indices) == m
+    assert pow(square_generator, m, r) not in (1, r - 1)
+    assert pow(square_generator, m * (half // m), r) in (1, r - 1)
+    assert multiply(r, base, p, a) is None
+    assert 1 + sum(
+        1 if (x**3 + a * x + b) % p == 0
+        else 2 if character(x**3 + a * x + b, p) == 1 else 0
+        for x in range(p)
+    ) == r
+    base_sign = y_product_sign(base, indices, p, a)
+    exact_mismatches = action_mismatches = 0
+    for scalar in range(1, half + 1):
+        point = multiply(scalar, base, p, a)
+        sign = y_product_sign(point, indices, p, a)
+        if sign * base_sign != character(scalar, r):
+            exact_mismatches += 1
+        if y_product_sign(multiply(square_generator, point, p, a), indices, p, a) != sign:
+            action_mismatches += 1
+    assert (exact_mismatches, action_mismatches) == (expected_exact, expected_action)
+    assert (exact_mismatches == 0) == (action_mismatches == 0)
+    j = 1728 * 4 * a**3 * pow((4 * a**3 + 27 * b**2) % p, -1, p) % p
+    trace = p + 1 - r
+    discriminant = trace * trace - 4 * p
+    print(
+        f"p={p} r={r} a={a} b={b} j={j} trace={trace} "
+        f"discriminant={discriminant} exact_mismatches={exact_mismatches} "
+        f"square_action_mismatches={action_mismatches}"
+    )
+
+
+check_order_241_curve(223, 8, 7, (0, 26), 0, 0)
+check_order_241_curve(223, 2, 48, (2, 196), 48, 48)
+check_order_241_curve(271, 7, 3, (1, 108), 72, 96)
+
 p192_r = 6277101735386680763835789423176059013767194773182842284081
 p192_half = (p192_r - 1) // 2
 p192_square_order = p192_half // 2
