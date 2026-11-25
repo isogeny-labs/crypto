@@ -2230,3 +2230,313 @@ fn augmented_basis_min_payload_exact_dense_oracle_and_exhaustive_optimum() {
         assert_eq!(weight, min_weight, "exhaustive minimum trial {trial}");
     }
 }
+
+// Overlap-sensitive Prim (`MstStrategy::OverlapSensitive`) must reproduce the
+// exhaustive Prim exactly: relations, source witnesses, refusals and every
+// legacy `MstStats` field. Only the new work counters may differ.
+fn legacy_mst_stats(
+    s: &crypto_lib::cryptanalysis::large_prime_filter::MstStats,
+) -> crypto_lib::cryptanalysis::large_prime_filter::MstStats {
+    let mut s = s.clone();
+    s.explicit_edge_evaluations = 0;
+    s.implicit_selected_edges = 0;
+    s.overlapping_pairs = 0;
+    s.exhaustive_fallback_trees = 0;
+    s.fallback_edge_evaluations = 0;
+    s.shared_key_pair_updates = 0;
+    assert_eq!(
+        s.implicit_key_mismatches, 0,
+        "implicit key prediction failed"
+    );
+    s
+}
+
+fn overlap_stream(
+    rng: &mut Rng,
+    rows: usize,
+    small_cols: u64,
+    small_per_row: u64,
+    lp_cols: u64,
+    max_arity: u64,
+    p: u64,
+) -> Vec<PartialRelation> {
+    (0..rows)
+        .map(|i| {
+            let arity = 1 + rng.below(max_arity);
+            PartialRelation {
+                id: i as u64,
+                small: (0..1 + rng.below(small_per_row))
+                    .map(|_| (rng.below(small_cols) as u32, 1 + rng.below(p - 1)))
+                    .collect(),
+                large: (0..arity)
+                    .map(|_| (7000 + rng.below(lp_cols), 1 + rng.below(p - 1)))
+                    .collect(),
+                rhs: rng.below(p),
+            }
+        })
+        .collect()
+}
+
+#[test]
+fn overlap_sensitive_prim_reproduces_exhaustive_prim_exactly() {
+    use crypto_lib::cryptanalysis::large_prime_filter::{
+        filter_large_primes_mst_with, replay_complete_relation, LargePrimeFilterOptions, MstLimits,
+        MstStrategy,
+    };
+    let mut rng = Rng(0x3c6e_f372_fe94_f82b);
+    let (mut cases, mut refused, mut fallbacks) = (0usize, 0usize, 0usize);
+    let (mut explicit, mut logical, mut implicit) = (0usize, 0usize, 0usize);
+    let (mut shared_formed, mut shared_fallbacks) = (0usize, 0usize);
+    // Per small-column density and hub flag: [explicit, logical, implicit, fallback trees, trees].
+    let mut by_density = [[[0usize; 5]; 2]; 5];
+    for trial in 0..1200 {
+        let p = [3u64, 7, 101, 1_000_003, 2_147_446_831, (1u64 << 61) - 1][trial % 6];
+        // From dense overlap (8 small columns) to nearly disjoint (1 << 20).
+        let small_cols = [4u64, 8, 64, 1024, 1 << 20][(trial / 6) % 5];
+        let rows = 2 + rng.below(60) as usize;
+        let lp_cols = 1 + rng.below(6);
+        let mut source = overlap_stream(&mut rng, rows, small_cols, 4, lp_cols, 3, p);
+        if trial % 3 == 1 {
+            // Hub: a light row shares one hot column with about half of the
+            // rows, so the visited minimum overlaps many unvisited rows and
+            // their best disjoint endpoints must be maintained incrementally.
+            let hot = u32::MAX - 1;
+            source[0].small = vec![(hot, 1)];
+            for r in source.iter_mut().skip(1) {
+                if rng.below(2) == 0 {
+                    r.small.push((hot, 1 + rng.below(p - 1)));
+                }
+            }
+        }
+        let tight = trial % 4 == 3;
+        let options = LargePrimeFilterOptions {
+            modulus: p,
+            max_small_weight: if tight {
+                3 + rng.below(10) as usize
+            } else {
+                4096
+            },
+            max_sources: if tight {
+                2 + rng.below(8) as usize
+            } else {
+                4096
+            },
+        };
+        let limits = MstLimits {
+            max_rows: 4096,
+            max_column_degree: 64,
+            max_edge_evaluations: if trial % 10 == 9 {
+                rng.below(400) as usize
+            } else {
+                1 << 20
+            },
+            max_active_coefficients: if trial % 8 == 5 {
+                20 + rng.below(200) as usize
+            } else {
+                1 << 20
+            },
+        };
+        let a = filter_large_primes_mst_with(
+            source.clone(),
+            &options,
+            &limits,
+            MstStrategy::Exhaustive,
+        )
+        .unwrap();
+        let b = filter_large_primes_mst_with(
+            source.clone(),
+            &options,
+            &limits,
+            MstStrategy::OverlapSensitive,
+        )
+        .unwrap();
+        let c =
+            filter_large_primes_mst_with(source.clone(), &options, &limits, MstStrategy::SharedKey)
+                .unwrap();
+        assert_eq!(
+            a.relations, c.relations,
+            "shared-key relations trial {trial}"
+        );
+        assert_eq!(a.report, c.report, "shared-key report trial {trial}");
+        assert_eq!(
+            legacy_mst_stats(&c.stats),
+            a.stats,
+            "shared-key stats trial {trial}"
+        );
+        if c.relations.is_some() {
+            // Only the selected rows are formed unless a tree was disconnected.
+            assert_eq!(c.stats.explicit_edge_evaluations, 0);
+            if c.stats.exhaustive_fallback_trees == 0 {
+                assert_eq!(c.stats.implicit_selected_edges, c.stats.selected_edges);
+            }
+        }
+        shared_formed += c.stats.implicit_selected_edges + c.stats.fallback_edge_evaluations;
+        shared_fallbacks += c.stats.exhaustive_fallback_trees;
+        assert_eq!(a.relations, b.relations, "relations trial {trial}");
+        assert_eq!(a.report, b.report, "report trial {trial}");
+        assert_eq!(
+            legacy_mst_stats(&b.stats),
+            a.stats,
+            "legacy stats trial {trial}"
+        );
+        assert_eq!(a.stats.explicit_edge_evaluations, 0);
+        match &b.relations {
+            Some(rows) => {
+                for r in rows {
+                    assert_eq!(&replay_complete_relation(r, &source, p).unwrap(), r);
+                }
+            }
+            None => refused += 1,
+        }
+        let cell = &mut by_density[(trial / 6) % 5][usize::from(trial % 3 == 1)];
+        // Every sparse difference formed: overlapping pairs, materialized
+        // implicit selections, and all pairs of fallback trees.
+        let formed = b.stats.explicit_edge_evaluations
+            + b.stats.implicit_selected_edges
+            + b.stats.fallback_edge_evaluations;
+        cell[0] += formed;
+        cell[1] += b.stats.edge_evaluations;
+        cell[2] += b.stats.implicit_selected_edges;
+        cell[3] += b.stats.exhaustive_fallback_trees;
+        cell[4] += b.stats.trees;
+        fallbacks += b.stats.exhaustive_fallback_trees;
+        explicit += formed;
+        implicit += b.stats.implicit_selected_edges;
+        logical += b.stats.edge_evaluations;
+        cases += 1;
+    }
+    eprintln!(
+        "overlap-sensitive Prim: {cases} streams, {refused} atomic refusals, {fallbacks} \
+         exhaustive fallback trees, {explicit} differences formed vs {logical} logical edges, \
+         {implicit} implicit selections"
+    );
+    for (d, cols) in [4u64, 8, 64, 1024, 1 << 20].iter().enumerate() {
+        for hub in 0..2 {
+            let c = by_density[d][hub];
+            eprintln!(
+                "  small_cols={cols:>7} hub={hub}: formed {:>6} / logical {:>6} edges, \
+                 implicit selections {:>5}, fallback trees {:>3} of {:>4}",
+                c[0], c[1], c[2], c[3], c[4]
+            );
+        }
+    }
+    eprintln!(
+        "shared-key Prim: {shared_formed} differences formed vs {logical} logical edges, \
+         {shared_fallbacks} disconnected-tree fallbacks"
+    );
+    assert!(shared_formed < explicit);
+    assert_eq!(cases, 1200);
+    // The suite must exercise refusals, fallbacks, both edge kinds and a saving.
+    assert!(refused > 0 && fallbacks > 0 && implicit > 0 && explicit > 0);
+    assert!(explicit < logical);
+}
+
+#[test]
+fn overlap_sensitive_prim_forms_no_difference_on_disjoint_rows() {
+    use crypto_lib::cryptanalysis::large_prime_filter::{
+        filter_large_primes_mst_with, LargePrimeFilterOptions, MstLimits, MstStrategy,
+    };
+    // One LP column, k rows with pairwise-disjoint small supports and
+    // varying weights (several ties): only the k-1 selected rows are formed.
+    let p = 2_147_446_831u64;
+    let k = 40usize;
+    let source: Vec<_> = (0..k)
+        .map(|i| PartialRelation {
+            id: i as u64,
+            small: (0..1 + (i * 7) % 5)
+                .map(|t| {
+                    (
+                        (10 * i + t) as u32,
+                        1 + (i as u64 * 31 + t as u64) % (p - 1),
+                    )
+                })
+                .collect(),
+            large: vec![(5, 1 + i as u64)],
+            rhs: i as u64,
+        })
+        .collect();
+    let options = LargePrimeFilterOptions {
+        modulus: p,
+        ..Default::default()
+    };
+    let limits = MstLimits::default();
+    let a =
+        filter_large_primes_mst_with(source.clone(), &options, &limits, MstStrategy::Exhaustive)
+            .unwrap();
+    let b = filter_large_primes_mst_with(source, &options, &limits, MstStrategy::OverlapSensitive)
+        .unwrap();
+    assert_eq!(a.relations, b.relations);
+    assert_eq!(legacy_mst_stats(&b.stats), a.stats);
+    assert_eq!(a.stats.edge_evaluations, k * (k - 1) / 2);
+    assert_eq!(b.stats.overlapping_pairs, 0);
+    assert_eq!(b.stats.explicit_edge_evaluations, 0);
+    assert_eq!(b.stats.implicit_selected_edges, k - 1);
+    assert_eq!(b.stats.exhaustive_fallback_trees, 0);
+
+    // A cap that one disjoint pair of the two heaviest rows would break
+    // fails the sufficient condition: the column runs the exhaustive Prim.
+    let tight = LargePrimeFilterOptions {
+        modulus: p,
+        max_small_weight: 9,
+        max_sources: 4096,
+    };
+    let source: Vec<_> = (0..4u64)
+        .map(|i| PartialRelation {
+            id: i,
+            small: (0..(2 + 2 * i as u32).min(5))
+                .map(|t| (100 * i as u32 + t, 1))
+                .collect(),
+            large: vec![(5, 1)],
+            rhs: 0,
+        })
+        .collect();
+    let a = filter_large_primes_mst_with(source.clone(), &tight, &limits, MstStrategy::Exhaustive)
+        .unwrap();
+    let b = filter_large_primes_mst_with(source, &tight, &limits, MstStrategy::OverlapSensitive)
+        .unwrap();
+    assert_eq!(a.relations, b.relations);
+    assert_eq!(legacy_mst_stats(&b.stats), a.stats);
+    assert_eq!(b.stats.exhaustive_fallback_trees, 1);
+}
+
+#[test]
+fn shared_key_prim_forms_only_selected_rows_when_every_row_shares_the_target() {
+    use crypto_lib::cryptanalysis::large_prime_filter::{
+        filter_large_primes_mst_with, LargePrimeFilterOptions, MstLimits, MstStrategy,
+    };
+    // M31 shape: every row carries the target column u32::MAX with one of a
+    // few coefficients, so every pair overlaps and the overlap-sensitive
+    // strategy must form nearly every difference.
+    let p = 2_147_446_831u64;
+    let k = 48usize;
+    let source: Vec<_> = (0..k)
+        .map(|i| PartialRelation {
+            id: i as u64,
+            small: vec![
+                ((3 * i) as u32, 1 + i as u64),
+                ((3 * i + 1) as u32, p - 1),
+                (u32::MAX, 41_837_151 + (i % 4) as u64),
+            ],
+            large: vec![(9, if i % 3 == 0 { 1 } else { p - 1 })],
+            rhs: i as u64,
+        })
+        .collect();
+    let options = LargePrimeFilterOptions {
+        modulus: p,
+        ..Default::default()
+    };
+    let limits = MstLimits::default();
+    let run = |s| filter_large_primes_mst_with(source.clone(), &options, &limits, s).unwrap();
+    let a = run(MstStrategy::Exhaustive);
+    let b = run(MstStrategy::OverlapSensitive);
+    let c = run(MstStrategy::SharedKey);
+    assert_eq!(a.relations, b.relations);
+    assert_eq!(a.relations, c.relations);
+    assert_eq!(legacy_mst_stats(&b.stats), a.stats);
+    assert_eq!(legacy_mst_stats(&c.stats), a.stats);
+    assert_eq!(a.stats.edge_evaluations, k * (k - 1) / 2);
+    assert_eq!(b.stats.overlapping_pairs, k * (k - 1) / 2);
+    assert_eq!(c.stats.explicit_edge_evaluations, 0);
+    assert_eq!(c.stats.implicit_selected_edges, k - 1);
+    assert_eq!(c.stats.exhaustive_fallback_trees, 0);
+}
