@@ -103,24 +103,55 @@ merges share source ids and the remaining large columns, so residual overlap
 stays even when small supports are disjoint. Fallback trees (cap condition
 failed) are a further floor.
 
+## Shared-key exact keys (`MstStrategy::SharedKey`)
+
+For normalized rows `r_v`, `r_u` and one key space (small columns, large
+columns, source ids) with supports `A`, `B`, the difference has
+`|A| + |B| - c - e` terms, where `c` counts shared keys and `e` counts shared
+keys with equal coefficients (they cancel; unequal ones merge into one
+term). The eliminated column is shared with coefficient one and cancels like
+any other equal key. So every pair's exact key `(small+large, sources, v, u)`
+and exact feasibility (small, sources and atom caps) follow from per-pair
+counts, which a sorted incidence list per key space fills in
+`sum over keys of (rows sharing it)^2 / 2` integer updates. Prim then runs
+on these keys exactly as the exhaustive Prim does, with no cap condition,
+and only the `k-1` selected rows are formed, each checked against its
+predicted counts (`implicit_key_mismatches`, tests require 0). A
+disconnected feasible graph falls back to the exhaustive Prim, which then
+refuses with its own stats.
+
+Synthetic suite (same 1200 streams): identical relations, report, legacy
+stats and refusals; 51,601 differences formed against 446,718 logical edges
+(0.12x), including 89 disconnected-tree fallbacks. 44/44 native tests pass.
+Seven of nine mutations make the tests fail; the two that survive do not
+change the result: dropping the per-edge atom cap (unreachable, since a
+difference has at most `atoms(r_v)+atoms(r_u)` terms and the persistent
+total of all rows is checked first; the exhaustive Prim's check is equally
+unreachable) and weakening the redundant key self-check.
+
 ## Natural M31 stream (2026-11-25)
 
 On the authentic group-admitted M31 ten-query stream of PR #5076 (rebuilt
-from the frozen producer input; hashes match CI), the two strategies give
+from the frozen producer input; hashes match CI), all three strategies give
 identical relations, witnesses, report and legacy stats, with 0 replay
-failures. There is **no saving**: 1273 of 1328 pairs overlap, the
-strategy forms 1280 differences against 1328, and the MST stage runs
-about 1.13x *slower* (informational wall time). Every admitted row carries
-the target column `u32::MAX` (10 distinct coefficients), so rows of one LP
-column nearly always share it. Details: `evidence/m31-mst-strategies-20261125/`.
+failures. Every admitted row carries the target column `u32::MAX` (10
+distinct coefficients), so 1273 of 1328 same-column pairs overlap.
+
+| arm | differences formed | MST-stage instructions | ratio |
+|---|---:|---:|---:|
+| exhaustive | 1328 | 29.43 M | 1.000 |
+| overlap-sensitive | 1280 | 32.75 M | 1.113 |
+| shared-key | 449 | 29.21 M | 0.992 |
+
+Shared-key removes 66 % of the differences but only 0.8 % of the stage's
+instructions: spanning-tree work is about 8 % of this stage, and the outer
+elimination loop (it rebuilds the column map and the row vector after every
+pivot, O(rows x pivots)) dominates. Details:
+`evidence/m31-mst-strategies-20261125/`.
 
 ## Next step
 
-The exact key of any pair is computable without forming the difference:
-`key(v,u) = K(v,u) - (shared keys) - (shared keys whose normalized
-coefficients are equal)`, summed over small, other-large and source keys.
-On this stream the only shared key is usually the target column, so an
-inverted index over the few hot keys would give every pair's exact key in
-O(shared) work. Whether that is worth it depends on the hot-key structure.
-The whole MST stage on the 613-row stream takes about 3 ms; its share of a
-cold M31 solve has not been measured here.
+On streams like M31 the remaining cost is in `eliminate`, not in the trees:
+maintaining the column incidence map incrementally across pivots, instead
+of rebuilding it and the row vector each time, is the change that can move
+this stage. Its share of a cold M31 solve has not been measured.

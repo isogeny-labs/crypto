@@ -11,7 +11,7 @@ use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
 /// How [`filter_large_primes_mst_with`] finds each column's spanning tree.
-/// Both strategies return identical relations, witnesses and legacy stats.
+/// All strategies return identical relations, witnesses and legacy stats.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum MstStrategy {
     /// Evaluate all `k(k-1)/2` normalized row differences (original Prim).
@@ -21,6 +21,11 @@ pub enum MstStrategy {
     /// for overlapping pairs only. A column whose pairwise cap condition
     /// fails (some disjoint pair could be infeasible) uses `Exhaustive`.
     OverlapSensitive,
+    /// Exact key and feasibility of every pair from shared-key counts
+    /// (shared keys, and shared keys with equal normalized coefficients),
+    /// with no sparse difference formed except the `k-1` selected rows. No
+    /// cap condition; a disconnected feasible graph uses `Exhaustive`.
+    SharedKey,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -77,6 +82,10 @@ pub struct MstStats {
     /// exhaustive Prim in fallback trees (included in `edge_evaluations`).
     #[serde(default, skip_serializing_if = "is_zero")]
     pub fallback_edge_evaluations: usize,
+    /// Shared-key strategy only: per-pair counter updates made while
+    /// building the shared-key tables (one per row pair per shared key).
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub shared_key_pair_updates: usize,
 }
 
 fn is_zero(v: &usize) -> bool {
@@ -163,8 +172,13 @@ fn tree_rows(
         stats.budget_refusals += 1;
         return None;
     }
-    if strategy == MstStrategy::OverlapSensitive && k > 1 {
-        match overlap_tree_rows(normalized, column, options, limits, stats) {
+    if strategy != MstStrategy::Exhaustive && k > 1 {
+        let fast = if strategy == MstStrategy::SharedKey {
+            shared_key_tree_rows(normalized, options, limits, stats)
+        } else {
+            overlap_tree_rows(normalized, column, options, limits, stats)
+        };
+        match fast {
             Ok(rows) => {
                 stats.edge_evaluations += needed;
                 stats.trees += 1;
@@ -405,6 +419,117 @@ fn overlap_tree_rows(
     stats.explicit_edge_evaluations += explicit_evaluations;
     stats.implicit_selected_edges += implicit_selected;
     stats.overlapping_pairs += overlapping_pairs;
+    Ok(result)
+}
+
+/// Exact Prim from shared-key counts. For normalized rows `r_v`, `r_u` and one
+/// key space (small columns, large columns, source ids) with supports `A`,
+/// `B`, the difference `r_v - r_u` has `|A| + |B| - c - e` terms, where `c` is
+/// the number of shared keys and `e` the number of shared keys whose
+/// coefficients are equal (they cancel; unequal ones merge into one term).
+/// The eliminated column is shared with coefficient one, so it cancels like
+/// any other equal key. This gives every pair's exact key
+/// `(small+large, sources, v, u)` and exact feasibility (small, sources and
+/// atom caps) without forming the difference, so the Prim below sees the
+/// same edges, keys and ties as the exhaustive one. Only the `k-1` selected
+/// rows are formed; each is checked against its predicted counts.
+/// `Err(false)`: disconnected feasible graph (exhaustive Prim refuses with its
+/// own stats); `Err(true)`: a prediction mismatch, a defect.
+fn shared_key_tree_rows(
+    normalized: &[WorkRow],
+    options: &LargePrimeFilterOptions,
+    limits: &MstLimits,
+    stats: &mut MstStats,
+) -> Result<Vec<WorkRow>, bool> {
+    let k = normalized.len();
+    let p = options.modulus;
+    // red[space][v*k+u] = shared + equal-coefficient shared keys, v < u.
+    let mut red = [vec![0u32; k * k], vec![0u32; k * k], vec![0u32; k * k]];
+    let mut updates = 0usize;
+    // Flat (key, row, coefficient) incidences per key space, sorted so that
+    // rows sharing a key are adjacent and appear in increasing row order.
+    let mut incidences: Vec<(u64, usize, u64)> = Vec::new();
+    for (space, table) in red.iter_mut().enumerate() {
+        incidences.clear();
+        for (v, r) in normalized.iter().enumerate() {
+            match space {
+                0 => incidences.extend(r.small.iter().map(|&(i, a)| (u64::from(i), v, a))),
+                1 => incidences.extend(r.large.iter().map(|&(i, a)| (i, v, a))),
+                _ => incidences.extend(r.sources.iter().map(|&(i, a)| (i, v, a))),
+            }
+        }
+        incidences.sort_unstable();
+        for group in incidences.chunk_by(|x, y| x.0 == y.0) {
+            for (x, &(_, v, a)) in group.iter().enumerate() {
+                for &(_, u, b) in &group[x + 1..] {
+                    // Each row holds a key once, so v < u within a group.
+                    table[v * k + u] += 1 + u32::from(a == b);
+                    updates += 1;
+                }
+            }
+        }
+    }
+    let len = |r: &WorkRow| [r.small.len(), r.large.len(), r.sources.len()];
+    let lens: Vec<[usize; 3]> = normalized.iter().map(len).collect();
+    // Exact (small, large, sources) term counts of r_v - r_u.
+    let counts = |v: usize, u: usize| -> [usize; 3] {
+        let (a, b) = (v.min(u), v.max(u));
+        std::array::from_fn(|s| lens[v][s] + lens[u][s] - red[s][a * k + b] as usize)
+    };
+    let feasible = |c: &[usize; 3]| {
+        c[0] <= options.max_small_weight
+            && c[2] <= options.max_sources
+            && c[0] + c[1] + c[2] <= limits.max_active_coefficients
+    };
+    let mut infeasible = 0usize;
+    for v in 0..k {
+        for u in v + 1..k {
+            infeasible += usize::from(!feasible(&counts(v, u)));
+        }
+    }
+    let mut visited = vec![false; k];
+    let mut best: Vec<Option<EdgeKey>> = vec![None; k];
+    let mut result = Vec::with_capacity(k - 1);
+    let mut v = 0usize;
+    for step in 0..k {
+        if step > 0 {
+            let Some((key, u)) = (0..k)
+                .filter(|&i| !visited[i])
+                .filter_map(|i| best[i].map(|e| (e, i)))
+                .min()
+            else {
+                stats.shared_key_pair_updates += updates;
+                return Err(false);
+            };
+            let row = normalized[key.2].axpy(p - 1, &normalized[u], p);
+            let c = counts(key.2, u);
+            if [row.small.len(), row.large.len(), row.sources.len()] != c
+                || (c[0] + c[1], c[2]) != (key.0, key.1)
+            {
+                stats.shared_key_pair_updates += updates;
+                return Err(true);
+            }
+            result.push(row);
+            v = u;
+        }
+        visited[v] = true;
+        for u in 0..k {
+            if visited[u] {
+                continue;
+            }
+            let c = counts(v, u);
+            if !feasible(&c) {
+                continue;
+            }
+            let key = (c[0] + c[1], c[2], v, u);
+            if best[u].is_none_or(|old| key < old) {
+                best[u] = Some(key);
+            }
+        }
+    }
+    stats.shared_key_pair_updates += updates;
+    stats.infeasible_edge_candidates += infeasible;
+    stats.implicit_selected_edges += k - 1;
     Ok(result)
 }
 

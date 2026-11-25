@@ -1,9 +1,10 @@
-//! Run the exhaustive and the overlap-sensitive MST large-prime filter on one
+//! Run the exhaustive, overlap-sensitive and shared-key MST large-prime filter on one
 //! frozen relation stream (JSONL of `PartialRelation`) with identical options,
 //! check that the outputs are identical and replay from the input, and print
 //! both arms' counters plus interleaved wall-clock samples as JSON.
 //!
 //! Usage: lp_mst_strategies --input FILE --modulus P [--label L] [--reps N]
+//!        [--time-only ARM]  (time one arm only, e.g. under callgrind)
 use crypto_lib::cryptanalysis::large_prime_filter::{
     filter_large_primes_mst_with, replay_complete_relation, LargePrimeFilterOptions, MstLimits,
     MstStrategy, PartialRelation,
@@ -22,6 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let modulus: u64 = args.get("--modulus").ok_or("--modulus required")?.parse()?;
     let label = args.get("--label").cloned().unwrap_or_default();
     let reps: usize = args.get("--reps").map_or(Ok(31), |s| s.parse())?;
+    let time_only = args.get("--time-only").cloned();
     let text = std::fs::read_to_string(input)?;
     let relations: Vec<PartialRelation> = text
         .lines()
@@ -38,33 +40,27 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         filter_large_primes_mst_with(relations.clone(), &options, &limits, s)
             .map_err(|e| format!("{e:?}"))
     };
-    let exhaustive = run(MstStrategy::Exhaustive)?;
-    let overlap = run(MstStrategy::OverlapSensitive)?;
-    let identical_relations = exhaustive.relations == overlap.relations;
-    let identical_report = exhaustive.report == overlap.report;
-    let mut legacy = overlap.stats.clone();
-    legacy.explicit_edge_evaluations = 0;
-    legacy.implicit_selected_edges = 0;
-    legacy.overlapping_pairs = 0;
-    legacy.exhaustive_fallback_trees = 0;
-    legacy.fallback_edge_evaluations = 0;
-    legacy.implicit_key_mismatches = 0;
-    let identical_legacy_stats = legacy == exhaustive.stats;
-    let mut replay_failures = 0usize;
-    let out = overlap.relations.as_deref().unwrap_or(&[]);
-    for r in out {
-        if replay_complete_relation(r, &relations, modulus).as_ref() != Some(r) {
-            replay_failures += 1;
-        }
-    }
-    // Interleaved timing (A B A B ...), the clone of the input inside each
-    // sample is common to both arms. Informational only.
-    let mut ns = [Vec::with_capacity(reps), Vec::with_capacity(reps)];
+    let strategies = [
+        ("exhaustive", MstStrategy::Exhaustive),
+        ("overlap_sensitive", MstStrategy::OverlapSensitive),
+        ("shared_key", MstStrategy::SharedKey),
+    ];
+    let attempts = strategies
+        .iter()
+        .map(|&(_, s)| run(s))
+        .collect::<Result<Vec<_>, _>>()?;
+    let exhaustive = &attempts[0];
+    let mut all_ok = true;
+    let mut arms = serde_json::Map::new();
+    // Interleaved timing (A B C A B C ...); the input clone inside each
+    // sample is common to every arm. Informational only.
+    let mut ns = vec![Vec::with_capacity(reps); strategies.len()];
     for _ in 0..reps {
-        for (i, s) in [MstStrategy::Exhaustive, MstStrategy::OverlapSensitive]
-            .into_iter()
-            .enumerate()
-        {
+        for (i, &(name, s)) in strategies.iter().enumerate() {
+            if time_only.as_deref().is_some_and(|o| o != name) {
+                ns[i].push(0);
+                continue;
+            }
             let t = Instant::now();
             let a = run(s)?;
             ns[i].push(t.elapsed().as_nanos() as u64);
@@ -74,34 +70,56 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for v in &mut ns {
         v.sort_unstable();
     }
-    let s = &overlap.stats;
-    let formed =
-        s.explicit_edge_evaluations + s.implicit_selected_edges + s.fallback_edge_evaluations;
+    for (i, (name, _)) in strategies.iter().enumerate() {
+        let a = &attempts[i];
+        let mut legacy = a.stats.clone();
+        legacy.explicit_edge_evaluations = 0;
+        legacy.implicit_selected_edges = 0;
+        legacy.overlapping_pairs = 0;
+        legacy.exhaustive_fallback_trees = 0;
+        legacy.fallback_edge_evaluations = 0;
+        legacy.implicit_key_mismatches = 0;
+        legacy.shared_key_pair_updates = 0;
+        let out = a.relations.as_deref().unwrap_or(&[]);
+        let replay_failures = out
+            .iter()
+            .filter(|r| replay_complete_relation(r, &relations, modulus).as_ref() != Some(*r))
+            .count();
+        let identical = a.relations == exhaustive.relations
+            && a.report == exhaustive.report
+            && legacy == exhaustive.stats;
+        all_ok &= identical && replay_failures == 0 && a.stats.implicit_key_mismatches == 0;
+        let s = &a.stats;
+        let formed = if i == 0 {
+            s.edge_evaluations
+        } else {
+            s.explicit_edge_evaluations + s.implicit_selected_edges + s.fallback_edge_evaluations
+        };
+        arms.insert(
+            name.to_string(),
+            serde_json::json!({
+                "identical_to_exhaustive": identical,
+                "refused": a.relations.is_none(),
+                "complete_relations": out.len(),
+                "replay_failures": replay_failures,
+                "differences_formed": formed,
+                "stats": a.stats,
+                "wall_ns_median": ns[i][reps / 2],
+                "wall_ns_min": ns[i][0],
+            }),
+        );
+    }
     let report = serde_json::json!({
-        "schema": "lp-mst-strategies/v1",
+        "schema": "lp-mst-strategies/v2",
         "label": label,
         "modulus": modulus,
         "rows": relations.len(),
-        "identical_relations": identical_relations,
-        "identical_report": identical_report,
-        "identical_legacy_stats": identical_legacy_stats,
-        "refused": overlap.relations.is_none(),
-        "complete_relations": out.len(),
-        "replay_failures": replay_failures,
-        "report": overlap.report,
-        "exhaustive_stats": exhaustive.stats,
-        "overlap_sensitive_stats": overlap.stats,
-        "differences_formed": {
-            "exhaustive": exhaustive.stats.edge_evaluations,
-            "overlap_sensitive": formed,
-        },
-        "wall_ns_median": { "exhaustive": ns[0][reps / 2], "overlap_sensitive": ns[1][reps / 2] },
-        "wall_ns_min": { "exhaustive": ns[0][0], "overlap_sensitive": ns[1][0] },
+        "report": exhaustive.report,
+        "arms": arms,
         "reps": reps,
     });
     println!("{}", serde_json::to_string_pretty(&report)?);
-    if !(identical_relations && identical_report && identical_legacy_stats && replay_failures == 0)
-    {
+    if !all_ok {
         return Err("strategies disagree or replay failed".into());
     }
     Ok(())
