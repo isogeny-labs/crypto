@@ -1477,6 +1477,46 @@ discriminant; it is stable under the tested isomorphism
 models. This does not supply a class invariant that decides
 the P-192 case. [pcc:unverified]
 
+### Small horizontal endpoints as compact sign candidates
+
+The matched CM-class control suggests testing the same small
+coset product **after** a rational horizontal isogeny. For a
+public isogeny `φ:E→E′` of degree coprime to `r`, the point-only
+feature is `A_8(φ(Q))/A_8(φ(G))`, using eight fixed scalar
+representatives on `E′`. Since `φ([d]G)=[d]φ(G)`, it can be
+evaluated from public `Q` without knowing `d`; the known-scalar
+controls below use `d` only to label their expected ray signs.
+The degree-5 map and eight scalar multiples make this a compact
+candidate, but its cold online cost was not benchmarked.
+[pcc:unverified]
+
+Sage constructs one rational degree-5, one degree-11, and two
+degree-13 isogenies from P-192. The degree-5 endpoint matched
+`χ_r(d)` at the seven selected markings `1,2,3,5,7,11,13`.
+The first disjoint doubling witness is already `d=2`:
+the normalized feature is `+1` at `[2]G` and `−1` at `[4]G`,
+while both scalar signs are `+1`. The product of the eight
+endpoint duplication-sextic values at `[2]φ(G)` has character
+`−1`, independently checking the failure of doubling invariance.
+The degree-11 endpoint fails at `d=2`, and both degree-13
+endpoints fail at `d=3`. Thus none of these four one-edge
+endpoints gives an exact eight-factor P-192 sign on every
+marking. [pcc:unverified]
+
+For the fixed degree-5 endpoint, a 1,024-scalar diagnostic
+(seed `20261127`) gave `520` agreements. A fresh 4,096-scalar
+uniform holdout (seed `20261128`) gave `2062` agreements,
+estimated correlation `0.00683594` and approximate 95% Wilson
+interval `[-0.02378,0.03744]`. Zero is compatible with this
+holdout; it gives no certified useful bias and cannot exclude
+a much smaller one. The first eight holdout rows also compute
+the feature directly from `φ([d]G)`, checking equality with
+the diagnostic `d·[h]φ(G)` route. The reproducible
+[`horizontal_m8_screen.sage`](horizontal_m8_screen.sage) and
+[`HORIZONTAL_M8_SCREEN.jsonl`](HORIZONTAL_M8_SCREEN.jsonl)
+retain the exact endpoint identifiers, marks, seeds, timings,
+and all 5,120 sampled scalar/sign pairs. [pcc:unverified]
+
 The finite controls also rule out two shortcuts from CM data
 alone. The same replay fixes `p=223`, `r=241`, and `m=24`:
 `y²=x³+8x+7` is exact on all 120 signed classes, while
