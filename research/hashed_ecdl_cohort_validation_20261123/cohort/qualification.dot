@@ -1,0 +1,13 @@
+digraph qualification {
+ graph [rankdir=TB,bgcolor="white",fontname="Helvetica",nodesep=0.25,ranksep=0.3];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4fb",color="#365b7d",fontname="Helvetica",fontsize=12];
+ edge [color="#365b7d",fontname="Helvetica",fontsize=10];
+ workers [label="Frozen solver variants\nCommon target-only worker"];
+ openssl [label="C/OpenSSL target decoding\nPrime-order / Hasse admission"];
+ headers [label="48 agreeing public headers\n12 archived + 36 additional\n8 distinct points per domain",fillcolor="#eaf4e8"];
+ controls [label="186 child controls passed\n144 headers + 6 invalid fixtures\n12 positives + 24 negatives"];
+ next [label="Pending: native export identity gate\n+ canonical metadata/schema controls\n+ prospective protocol freeze",style="rounded,dashed",fillcolor="#fff5df"];
+ main [label="Future solver cohort: 432 cells\n36 targets x 3 arms x 4 rounds",style="rounded,dashed",fillcolor="white"];
+ workers -> headers; openssl -> headers;
+ headers -> controls -> next -> main;
+}

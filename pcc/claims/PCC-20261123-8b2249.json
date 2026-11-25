@@ -1,0 +1,23 @@
+{
+ "claim_type": "literature",
+ "created_at": "2026-11-23T20:19:23Z",
+ "id": "PCC-20261123-8b2249",
+ "kind": "statement",
+ "producer": {
+  "commit": "f23014aadcb56d2d60494dcd551e1757fcfa32bf",
+  "model": "Codex",
+  "session": "cohort-validation-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/hashed_ecdl_cohort_validation_20261123/cohort/evidence/SEED-CONTRACT-SOURCE.json",
+    "sha256": "abe698b26344ff5c694e4befa185da841fa1815c569470e0f26022af1fe31aab"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/hashed_ecdl_cohort_validation_20261123/cohort",
+ "statement": "Source read of the captured canonical experiment_protocol.py shows seeds_table emits empty seed values for harness_drawn and lint_export skips protocol-derived seed-table comparison for that method. Therefore harness_drawn metadata/schema acceptance alone does not enforce the proposed fixed named target/seed mapping. The new native collector/auditor/export fixed-identity gate must remain explicit and independently tested; no checker execution or canonical acceptance is asserted by this source review."
+}

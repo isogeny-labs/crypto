@@ -1,0 +1,40 @@
+{
+  "schema": "crypto.factor-base-paired-input/v1",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831
+  },
+  "anchors": [{"x": 625037715, "y": 2100627251}],
+  "targets": [
+    {"x": 625037715, "y": 2100627251},
+    {"x": 625037715, "y": 46856396},
+    null,
+    {"x": 625037715, "y": 2100627251}
+  ],
+  "reference": {
+    "name": "public-permutation-reference",
+    "declared_points": 2,
+    "representation": "negation_closed_points",
+    "identity_policy": "exclude",
+    "points": [
+      {"x": 625037715, "y": 2100627251},
+      {"x": 625037715, "y": 46856396}
+    ]
+  },
+  "control": {
+    "name": "same-support-reversed",
+    "declared_points": 2,
+    "representation": "negation_closed_points",
+    "identity_policy": "exclude",
+    "points": [
+      {"x": 625037715, "y": 46856396},
+      {"x": 625037715, "y": 2100627251}
+    ]
+  },
+  "provenance": {
+    "source": "Deterministic public principal-M31 permutation regression; no random draws",
+    "seed": null
+  }
+}

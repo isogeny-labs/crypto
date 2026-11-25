@@ -1,0 +1,108 @@
+name: CM19 actual ramification and residual branch certificates
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - research/chained_cm19_ramification_20261124/**
+      - .github/workflows/chained-cm19-ramification.yml
+permissions:
+  contents: read
+jobs:
+  canonical-divisor-and-residual-branches:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.artifacts/config.json
+            /.gitattributes
+            /.gitignore
+            /AGENTS.md
+            /pcc/claims/PCC-20261124-2bf624.json
+            /pcc/claims/PCC-20261124-35bd99.json
+            /pcc/claims/PCC-20261124-58eb34.json
+            /pcc/claims/PCC-20261124-5e0a6f.json
+            /pcc/claims/PCC-20261124-604246.json
+            /pcc/claims/PCC-20261124-73fe27.json
+            /pcc/claims/PCC-20261124-7d58e4.json
+            /pcc/claims/PCC-20261124-9a6918.json
+            /pcc/claims/PCC-20261124-9b4968.json
+            /pcc/claims/PCC-20261124-b0036d.json
+            /pcc/claims/PCC-20261124-c06659.json
+            /pcc/claims/PCC-20261124-c95eab.json
+            /pcc/claims/PCC-20261124-ec4024.json
+            /pcc/claims/PCC-20261124-f005a4.json
+            /pcc/claims/PCC-20261124-f062d9.json
+            /pcc/keyring.json
+            /research/chained_cm19_fibres_20261124/ACTUAL_FUNCTIONS_PROOF_E.md
+            /research/chained_cm19_fibres_20261124/CURRENT_RESULT_I.md
+            /research/chained_cm19_fibres_20261124/FIRST_E_NATIVE_INVENTORY.json
+            /research/chained_cm19_fibres_20261124/FIRST_F_NATIVE_INVENTORY.json
+            /research/chained_cm19_fibres_20261124/FIRST_G_FORMAL_INVENTORY.json
+            /research/chained_cm19_fibres_20261124/FORMAL_COUNT_CORRECTION_G.md
+            /research/chained_cm19_fibres_20261124/LOCAL_EVALUATION_PROOF_F.md
+            /research/chained_cm19_fibres_20261124/NEXT_RAMIFICATION_H.md
+            /research/chained_cm19_fibres_20261124/WEIGHTED_FIBRE_S4_PROOF_H.md
+            /research/chained_cm19_fibres_20261124/first-C-native/weighted-fibres.stdout
+            /research/chained_cm19_fibres_20261124/first-E-native/actual-functions.stdout
+            /research/chained_cm19_fibres_20261124/first-F-native/polynomial-evaluation.stdout
+            /research/chained_cm19_fibres_20261124/maintenance/CURRENT_AGENTS_REVIEW_I.json
+            /research/chained_cm19_ramification_20261124/ACTUAL_RAMIFICATION_PROOF_B.md
+            /research/chained_cm19_ramification_20261124/BOOTSTRAP_A.json
+            /research/chained_cm19_ramification_20261124/CHECKPOINT_CLASSIFICATION_A.md
+            /research/chained_cm19_ramification_20261124/FIRST_A_LINT_NEGATIVE.json
+            /research/chained_cm19_ramification_20261124/FIRST_B_NATIVE_INVENTORY.json
+            /research/chained_cm19_ramification_20261124/FORMAT_PREPARATION_A.json
+            /research/chained_cm19_ramification_20261124/FORMAT_PREPARATION_B.json
+            /research/chained_cm19_ramification_20261124/FORMAT_PREPARATION_C.json
+            /research/chained_cm19_ramification_20261124/FORMAT_PREPARATION_C2.json
+            /research/chained_cm19_ramification_20261124/HARDWARE_CONTEXT_A.json
+            /research/chained_cm19_ramification_20261124/LEAD_AND_PROOF_PLAN_A.md
+            /research/chained_cm19_ramification_20261124/PRIMARY_SOURCES_A.md
+            /research/chained_cm19_ramification_20261124/PRIMARY_SOURCES_C.md
+            /research/chained_cm19_ramification_20261124/PROTOCOL_A.md
+            /research/chained_cm19_ramification_20261124/PROTOCOL_B.md
+            /research/chained_cm19_ramification_20261124/PROTOCOL_C.md
+            /research/chained_cm19_ramification_20261124/SOURCE_LOCK_A.json
+            /research/chained_cm19_ramification_20261124/SOURCE_LOCK_B.json
+            /research/chained_cm19_ramification_20261124/SOURCE_LOCK_C.json
+            /research/chained_cm19_ramification_20261124/ci_custody_metadata_E.py
+            /research/chained_cm19_ramification_20261124/custody_metadata_A.py
+            /research/chained_cm19_ramification_20261124/custody_metadata_B.py
+            /research/chained_cm19_ramification_20261124/custody_metadata_C.py
+            /research/chained_cm19_ramification_20261124/field_c.rs
+            /research/chained_cm19_ramification_20261124/first-A-native-lint-negative/POST_CALL_MANIFEST.json
+            /research/chained_cm19_ramification_20261124/first-A-native-lint-negative/clippy.stderr
+            /research/chained_cm19_ramification_20261124/first-B-native/canonical-ramification.stdout
+            /research/chained_cm19_ramification_20261124/main_a.rs
+            /research/chained_cm19_ramification_20261124/main_b.rs
+            /research/chained_cm19_ramification_20261124/main_c.rs
+            /research/chained_cm19_ramification_20261124/maintenance/CURRENT_AGENTS_REVIEW_RESULT_B.json
+            /research/chained_cm19_ramification_20261124/preformat-draft-A/main_a-second-draft.rs
+            /research/chained_cm19_ramification_20261124/preformat-draft-A/main_a.rs
+            /research/chained_cm19_ramification_20261124/preformat-draft-B/main_b.rs
+            /research/chained_cm19_ramification_20261124/preformat-draft-C/field_c.rs
+            /research/chained_cm19_ramification_20261124/preformat-draft-C/main_c-second-draft.rs
+            /research/chained_cm19_ramification_20261124/preformat-draft-C/main_c-third-draft.rs
+            /research/chained_cm19_ramification_20261124/preformat-draft-C/main_c.rs
+            /research/chained_cm19_ramification_20261124/run_ci_E.sh
+            /research/chained_cm19_ramification_20261124/run_first_A.sh
+            /research/chained_cm19_ramification_20261124/run_first_B.sh
+            /research/chained_cm19_ramification_20261124/run_first_C.sh
+      - name: Install exact native Rust toolchain with official rustup
+        shell: bash
+        run: rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+      - name: Verify frozen bytes and run bounded actual branch regression
+        shell: bash
+        run: bash research/chained_cm19_ramification_20261124/run_ci_E.sh "$RUNNER_TEMP/cm19-ramification-ci"
+      - name: Retain complete new CI original streams and binaries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cm19-ramification-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/cm19-ramification-ci
+          if-no-files-found: warn
+          retention-days: 14
