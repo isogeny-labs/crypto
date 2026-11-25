@@ -350,7 +350,7 @@ impl<const N: usize> Mont<N> {
     /// small `N` falls back to [`mul_wide`](Self::mul_wide).
     #[inline(always)]
     pub(crate) fn mul_wide_karatsuba(a: &[u64; N], b: &[u64; N]) -> [u64; WIDE] {
-        if N % 2 != 0 || N < 4 {
+        if !N.is_multiple_of(2) || N < 4 {
             return Self::mul_wide(a, b);
         }
         let h = N / 2;
@@ -582,12 +582,14 @@ impl<const N: usize> Mont<N> {
     /// `2P` as `Jacobian::double` of `point.rs` (dbl-2007-bl) on the
     /// production kernel: `None` when `Y = 0`.  (Kept for
     /// `src/bin/ecbench/isogeny_eval.rs`, which includes this file by path.)
+    #[allow(dead_code)] // used by src/bin/ecbench/isogeny_eval.rs (path include)
     pub(crate) fn double(&self, j: &Jac<N>, a: &[u64; N]) -> Option<Jac<N>> {
         self.double_k::<ProdKernel>(j, a)
     }
 
     /// `P + (x₂, y₂)` as `Jacobian::add_affine` (madd-2007-bl) on the
     /// production kernel.
+    #[allow(dead_code)] // used by src/bin/ecbench/isogeny_eval.rs (path include)
     pub(crate) fn add_affine(
         &self,
         j: &Jac<N>,
