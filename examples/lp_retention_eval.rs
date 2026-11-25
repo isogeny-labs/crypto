@@ -11,6 +11,9 @@
 //!     --relations out.jsonl --modulus 65557 --caps 0.25,1,4 --out real.json
 //! ```
 //!
+//! Each outcome records `draws_to_target` and `draws_to_90pct` (90% of the
+//! target rank); `--trace` also keeps the `(draw, rank)` trace.
+//!
 //! Caps are multiples of the factor-base size (the relation-matrix width).
 //! Target: `fp` uses the factor-base size; `relations` uses the useful rank
 //! `all` reaches on the whole stream. `MaxLp` rules (`--max-lp`, default L/4
@@ -35,7 +38,34 @@ struct Run {
     fb_columns: usize,
     target: usize,
     replayed: Option<usize>,
-    outcomes: Vec<AdmissionOutcome>,
+    outcomes: Vec<Outcome>,
+}
+
+/// An outcome plus its secondary score. Without `--trace` the per-rank trace
+/// is dropped after the 90% draw is read from it, which keeps result files
+/// small (under the repository's 64 KiB artifact-store threshold).
+#[derive(Serialize)]
+struct Outcome {
+    #[serde(flatten)]
+    outcome: AdmissionOutcome,
+    draws_to_90pct: Option<u64>,
+}
+
+fn compact(outcomes: Vec<AdmissionOutcome>, keep_trace: bool) -> Vec<Outcome> {
+    outcomes
+        .into_iter()
+        .map(|mut o| {
+            let t90 = (9 * o.target).div_ceil(10);
+            let draws_to_90pct = o.trace.iter().find(|&&(_, r)| r >= t90).map(|&(d, _)| d);
+            if !keep_trace {
+                o.trace.clear();
+            }
+            Outcome {
+                outcome: o,
+                draws_to_90pct,
+            }
+        })
+        .collect()
 }
 
 #[derive(Serialize)]
@@ -101,6 +131,7 @@ fn main() {
         .map(|x| x.parse().expect("--caps"))
         .collect();
     let repeats: u64 = get("--repeats", "5").parse().expect("--repeats");
+    let keep_trace = args.iter().any(|a| a == "--trace");
     let mut runs = Vec::new();
     let (modulus, params);
     match source.as_str() {
@@ -139,7 +170,7 @@ fn main() {
                     fb_columns: fb,
                     target: fb,
                     replayed: Some(replayed),
-                    outcomes,
+                    outcomes: compact(outcomes, keep_trace),
                 });
             }
         }
@@ -192,7 +223,7 @@ fn main() {
                 fb_columns: fb,
                 target,
                 replayed: None,
-                outcomes,
+                outcomes: compact(outcomes, keep_trace),
             });
         }
         other => panic!("--source must be fp or relations, not {other}"),
@@ -205,7 +236,7 @@ fn main() {
         params,
         runs,
     };
-    let json = serde_json::to_string_pretty(&report).unwrap() + "\n";
+    let json = serde_json::to_string(&report).unwrap() + "\n";
     match get("--out", "").as_str() {
         "" => print!("{json}"),
         path => std::fs::write(path, json).expect("--out"),

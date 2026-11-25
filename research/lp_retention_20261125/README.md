@@ -134,6 +134,12 @@ were replaced by the v2 ones.
   exactly, and three further seeds differ. It was a coincidence, not a bug.
 - **Wrapper scope.** The wrapper runs only integration targets, because the old `native_gain_dsu`
   metering shim predates `large_prime_filter`'s `cfg(test)` unit tests.
+- **Result format.** CI's `migrate` job, the artifact store, tried to move the original 2 MB FP
+  result files to S3 and was refused (403). I regenerated all v2 results with the evaluator's compact
+  output, which keeps `draws_to_target` and `draws_to_90pct` and drops the per-rank trace (pass
+  `--trace` to keep it). All 554 outcomes matched the earlier files field for field, and
+  `RESULTS_V2.md` and `verdict.json` regenerate byte-identically. Every file is under the 64 KiB
+  threshold.
 - **Infrastructure.** No S3 checkpoint credential in this session. research-kb unreachable (proxy
   502); the sources checked were `research/lp_graph_algorithms_20261123/` and workspace#144.
 

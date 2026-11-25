@@ -28,7 +28,7 @@ def scores(run):
     t90 = math.ceil(0.9 * run["target"])
     for o in run["outcomes"]:
         prim = o["draws_to_target"]
-        sec = next((d for d, r in o["trace"] if r >= t90), None)
+        sec = o["draws_to_90pct"] if "draws_to_90pct" in o else next((d for d, r in o["trace"] if r >= t90), None)
         out[(name(o), o["cap"])] = (prim or budget, sec or budget, prim is None)
     return out
 
