@@ -28,3 +28,20 @@ The new store is
 `ebb2550492f5c2dab621d0d4dff6dfed3a3057b4fd5c51cba2084f5e5512ee33`.
 The three selected curves remain 6, 13, and 36; no target or base was changed.
 The full-rank panel was not started while the explicit panel was unqualified.
+
+## Later host-reservation attempt, 15:27–15:33
+
+The user explicitly authorized stopping competing jobs. SIGTERM was sent to
+the observed process groups for an unrelated `cargo test`/`rustc` build,
+`network_e2e.py`/`msolve`, a P-192 Sage screen, a p61 parity probe, and an
+unrelated test run. The first groups exited, but new instances of the Cargo
+build, network solver, and Sage screen started from other active sessions
+within minutes. At 15:33 the process snapshot again contained Cargo/rustc,
+`network_e2e.py`, and two CPU-bound Sage screens; those groups were stopped.
+This recurrence prevented a stable quiet-host interval. No `ic` timing was
+started and the 98-row qualifying JSONL store was left byte-for-byte intact.
+Its SHA-256 remains
+`ebb2550492f5c2dab621d0d4dff6dfed3a3057b4fd5c51cba2084f5e5512ee33`.
+The full-rank successor remains at its three preflight records with no timed
+call. A later qualifying attempt needs a new pre-timing amendment and a fresh
+store because this retry already recorded a failed load check.

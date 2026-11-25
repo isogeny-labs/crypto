@@ -157,3 +157,24 @@ SHA-256 values are `e02cf71f4256c2eca6f8e904b152c6178f25b7ac26fe8c1259607703e7a7
 and `60e91f1cfbbc5c0064a207d280ae4cae86324ff6320df62a1a77d75cd1a7136a`.
 This is a source-reproducibility mismatch, not a candidate/control speed ratio.
 Neither replay has a measured `s_over_rho`: both stopped before the F4 calls.
+
+## Qualifying successors and host-load status, 2026-11-25
+
+The source-pinned explicit 14-bit successor selected three equal-size curves
+after a deterministic roster extension. Its first timed call was censored
+when another build started. The separately frozen quiet-retry store has 98
+selection, preflight, provenance and load-check records, **zero qualifying
+timed calls**, and SHA-256
+`ebb2550492f5c2dab621d0d4dff6dfed3a3057b4fd5c51cba2084f5e5512ee33`.
+The source-pinned full-rank successor has its header and two size-only
+preflights, **zero timed calls**, and SHA-256
+`ec96bd9f6868c84800eda3a596d5e6ad7603dee4c4c81ecdc8286d2669b259de`.
+Neither has a measured `s_over_rho` or a cold-rho crossover ratio.
+
+After explicit authorization to stop competing jobs, the observed Cargo,
+solver, Sage and test process groups were terminated. Other active sessions
+started new instances within minutes, so the host never supplied a stable
+quiet interval for the serialized runs. The detailed interruption and store
+custody are in the explicit panel's `SESSION_LOG_QUIET_RETRY_20261125.md`.
+Further timing requires a fresh pre-timing amendment and store under a
+reserved quiet host; the failed load check remains in the retry store.
