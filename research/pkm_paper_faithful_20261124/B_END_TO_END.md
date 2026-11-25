@@ -71,3 +71,12 @@ system and the same solver, so the comparison below is engine-for-engine.
   numbers as an end-to-end speed claim against the harness.
 * `B = 2` at `p = 2^18` was not completed. Its 38.1 s/target and 15 %
   undetermined rate are the measurement; the 5.5 h is arithmetic.
+
+## Wall-clock note
+
+The `p = 3907` table was taken on a quiet host. A repeat of the same three runs
+under concurrent load gave 53.8 s, 15.5 s and 20.4 s instead of 6.7 s, 2.0 s and
+3.4 s — the same rows, the same recovered scalars. Wall time on this host is
+load-sensitive by up to 8×; the `p = 2^18` pair was measured back to back and
+the 6× gap between `B = 11` and `B = 2` is larger than that swing, but the
+absolute minutes are not portable.
