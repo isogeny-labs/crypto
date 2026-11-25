@@ -1,8 +1,8 @@
-# Execution follow-up, two bounded passes
+# Parallel EC experiment follow-up
 
-Date: 2026-11-24. Scope: the [100 source proposals](IDEAS.md) and their [item-by-item assessment](README.md), with the owner's selected target `E(F_p)`. Three parallel workstreams examined items 1–34, 35–67, and 68–100. This report records actual checks and blockers separately from proposed experiments. No 100-way experiment was performed. The #24 bounded comparison has fixed curve, subgroup, targets, and checks; full-cost studies elsewhere need their own frozen workloads.
+Date: 2026-11-24. Scope: the [100 source proposals](IDEAS.md) and their [item-by-item assessment](README.md), with the owner's selected target `E(F_p)`. Three parallel workstreams examined items 1–34, 35–67, and 68–100. This report separates mathematical screens, historical records, three newly executed bounded EC checks, and proposals lacking an executable point-relation construction. No 100-way experiment was performed. Full-cost studies need separate frozen workloads.
 
-![Execution status diagram: mechanism counterexamples, existing baselines, and pending direct decomposition diagnostic.](PROGRESS.svg)
+![First-pass status diagram: mechanism counterexamples, existing baselines, and initial direct decomposition diagnostic.](PROGRESS.svg)
 
 ## Direct mathematical checks
 
@@ -73,15 +73,25 @@ Every numbered item remains in the [assessment ledger](README.md), with its stat
 
 ## Next controlled batch
 
-### Prepared native runs and admission status
+### Executed bounded native runs and admission status
 
-Following the request to execute experiments, three distinct public-EC checks were frozen in parallel. #24 has [PARI/GP source](S4_MATCHED_GP.gp) and a [matched report](S4_MATCHED_REPORT.md) for the `z=0` versus `z=320` comparison on `E/F_1009`. #35–39 have a [PARI/GP source](EC_GRAPH_RANK_GP.gp) and [protocol](EC_GRAPH_RANK_PROTOCOL.md) for same-support coefficient matrices with independently checked EC row identities. #75/#76/#84 have a [native Rust source](WS68_FILTER_REPLAY.rs) and [protocol](WS68_FILTER_PROTOCOL.md) for coefficient-aware partial-row closure, rank, target coverage, and a disjoint block on `E/F_17`. Each protocol identifies fixed inputs, control, expected checks, raw-output path, and interpretation boundary. **These three experiments have not been launched.** `[pcc:unverified]`
+Following the request to execute experiments, three distinct public-EC checks were frozen and launched in parallel. #24 uses [PARI/GP source and report](S4_MATCHED_REPORT.md) for `z=0` versus `z=320` on `E/F_1009`; #35–39 use a [same-support rank protocol](EC_GRAPH_RANK_PROTOCOL.md) with six checked point equations; #75/#76/#84 use a [native Rust filter protocol](WS68_FILTER_PROTOCOL.md) on `E/F_17`. The raw receipts, corrected source revisions, and independent verification artifacts are linked from those records. All results below are producer claims `[pcc:unverified]` pending the repository's signed verification process.
 
-The required `scripts/checkpoint.sh gate` was retried after the request to execute; its presigned S3 upload again returned HTTP 403. All three configured AWS profiles failed identity checks, and there is no ambient AWS identity. No supported checkpoint transport currently passes, so the repository's pre-run gate stopped the launch. The scripts are prepared, and the raw-output paths remain absent. The earlier exact support census remains the only #24 calculation from the first pass. `[pcc:unverified]`
+The required `scripts/checkpoint.sh gate` returned HTTP 403, and all three configured AWS profiles failed identity checks. After this was disclosed, the owner explicitly authorized these bounded local runs without the S3 checkpoint. Each protocol records that exception. The first GP attempts for #24 and #35–39 failed because multiline top-level input did not parse; their stdout, stderr, exit files and original sources are preserved. A separately amended V2 GP source for each kept the mathematical inputs and acceptance checks fixed, and the V2 stderr files are empty. The first Rust compile attempt failed on an inferred crate name containing a dot; the second added an explicit crate name without changing the source. These failed attempts remain part of the record.
 
-1. Restore valid checkpoint credentials, pass `scripts/checkpoint.sh gate`, then run the already frozen #24 comparison in the [1–34 workstream](WORKSTREAM_001_034.md). Preserve structural support, exact decompositions, independent rank, and arithmetic work as separate observations.
+| Item(s) | Bounded outcome | Interpretation limit |
+|---|---|---|
+| 24 | On the same prime-order `E/F_1009` and 16-point base, exact `S4` zero checks agreed with signed EC sums for all 4096 triples at each target. At `z=0`, 24 triples yielded 24 signed rows of rank 4/17; at `z=320`, 33 yielded 33 rows of rank 6/17. Support was 88/125 versus 125/125, while the pair-specialized Horner proxy was 16,320 versus 16,352 multiplications and 15,728 versus 16,320 additions. [Raw V2 output](S4_MATCHED_V2_STDOUT.txt) and a [distinct row/rank verifier](EC_S4_V2_INDEPENDENT.stdout.txt) agree on the emitted rows and ranks. | The 29.6% support reduction corresponded to only about 0.20% fewer proxy multiplications and 3.63% fewer proxy additions. Resultant construction and specialization, wall time, and full collection cost were not measured. The two target identities differ, so their yield and rank differences cannot be attributed to support alone. |
+| 35–39 | Two matrices with identical triangle support had ranks 3 and 2 modulo the EC subgroup order 1013. All six row equations held for the recorded EC points. [GP V2 output](EC_GRAPH_RANK_GP_V2.stdout.txt) and a [distinct native verifier](WS68_EC_GRAPH_V2_VERIFY.stdout) agree. | This falsifies support-only rank inference on these planted matrices; it does not measure a relation collector, topology-guided filter, or complete solve. |
+| 75/76/84 | A native exact control on `E/F_17` checked three partial EC point rows, coefficient-aware cancellation to one small row, source rank 3, small rank 3 only after two additional known rows, target log 12, and a disjoint block of rank 2. [Native stdout](WS68_FILTER_REPLAY.attempt2.stdout) and a separate read-only point/rank audit agree. | The rows and two unit equations are planted with known logs. This measures exactness and target coverage in a fixed control, not naturally collected relation yield, filter speed, or scale. |
+
+#### Independent readback
+
+The #24 [independent verifier](EC_S4_V2_INDEPENDENT.md) checked all 57 emitted point rows and recomputed both ranks; it did not independently enumerate `S4` zeros or support counts. Separate checks reproduced the six #35–39 point rows and the #75/#76/#84 fixed rows and hashes. None is a signed PCC verdict.
+
+1. Restore valid checkpoint credentials for subsequent experiments. For #24, freeze a comparison that separates target identity and resultant construction cost from coefficient support; the present two-target arithmetic proxy does not isolate those effects.
 2. Obtain one immutable set of independently checked EC full and partial relations for #75/#76/#84, including source-row witnesses and target column; then freeze a matched filter replay. Stop if source-row combinations or target-column recovery fail.
 3. Obtain time-ordered relation and descent traces, then freeze the #96/#97 policy panel against the best fixed controls. Include tuning, setup, rank, solve, and artifact budgets.
 4. Profile a current exact GPU end-to-end run before allocating #54/#55/#57 engineering, since the historical kernel and complete-solve records identify different boundaries.
 
-These two bounded passes are incomplete relative to experimental pursuit of all 100 proposals. Many descriptions need a defined EC point-relation mechanism before an executable experiment exists; their exact missing obligations are retained in the assessment ledger and the three workstream reports.
+These bounded passes are incomplete relative to experimental pursuit of all 100 proposals. Many descriptions need a defined EC point-relation mechanism before an executable experiment exists; their exact missing obligations are retained in the assessment ledger and the three workstream reports.
