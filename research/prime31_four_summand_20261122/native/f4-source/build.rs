@@ -248,7 +248,9 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/ic_boundary.rs",
-            "2ff113f98afb6aae1d2ccd247f5872dbed33396922f4c87f0151a6819354c56d",
+            // Whole-file refresh reviewed in PR5099 and rechecked for the
+            // additive sectors; see prime31_rr5_coprime_sectors_20261123/SOURCE_REVIEW.md.
+            "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
             &[
                 Range {
                     start: "/// The field operations behind the group operations: modular\n",
@@ -335,6 +337,8 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/semaev_prime_poly.rs",
+            // The selected Fp bytes are unchanged; the whole-file change was
+            // reviewed separately. Keep the exact-source guard mandatory.
             "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b",
             &[Range {
                 start: "/// `F_p` arithmetic for `p < 2^62`.\n",
@@ -453,6 +457,10 @@ fn main() {
         (
             "research/prime31_four_summand_20261122/native/selector_circuit.rs",
             "quadratic quartic-modular membership circuit and independent dense-selector controls",
+        ),
+        (
+            "research/prime31_four_summand_20261122/native/selector_sectors.rs",
+            "additive five coprime-selector quadratic systems and M31 construction controls; no solver calls",
         ),
         (
             "research/prime31_four_summand_20261122/native/b677_gate.rs",
