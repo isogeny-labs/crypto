@@ -797,6 +797,11 @@ pub(super) fn dispatch(
                     "full-cutoff is currently a fixed-panel qualification interface".into(),
                 );
             }
+            if method == Some(Method::FactorwiseCutoff) {
+                return Err(
+                    "factorwise-cutoff is currently a fixed-panel qualification interface".into(),
+                );
+            }
             if label != "direct" && method.is_none() {
                 return Err("unknown accounting arm".into());
             }

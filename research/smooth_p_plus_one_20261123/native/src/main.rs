@@ -487,6 +487,7 @@ enum Method {
     Single(Mode),
     Refined,
     FullCutoff,
+    FactorwiseCutoff,
     #[cfg(feature = "production-controls")]
     Cofactor,
     #[cfg(feature = "production-controls")]
@@ -501,6 +502,7 @@ impl Method {
             Self::Single(mode) => format!("{mode:?}"),
             Self::Refined => "Refined".into(),
             Self::FullCutoff => "FullCutoff".into(),
+            Self::FactorwiseCutoff => "FactorwiseCutoff".into(),
             #[cfg(feature = "production-controls")]
             Self::Cofactor => "ProductionCofactor".into(),
             #[cfg(feature = "production-controls")]
@@ -519,7 +521,7 @@ impl Method {
         match self {
             Self::Single(mode) => mode,
             Self::Refined => Mode::Distinct,
-            Self::FullCutoff => Mode::Quadratic,
+            Self::FullCutoff | Self::FactorwiseCutoff => Mode::Quadratic,
             // The cofactor solver searches the full distinct-x RR5 chart.
             #[cfg(feature = "production-controls")]
             Self::Cofactor | Self::CofactorMsolve | Self::Oriented(_) => Mode::Quadratic,
@@ -532,6 +534,7 @@ fn mode(value: &str) -> Option<Method> {
         "distinct" => Some(Method::Single(Mode::Distinct)),
         "refined" => Some(Method::Refined),
         "full-cutoff" => Some(Method::FullCutoff),
+        "factorwise-cutoff" => Some(Method::FactorwiseCutoff),
         "expanded" => Some(Method::Single(Mode::Expanded)),
         "quadratic" => Some(Method::Single(Mode::Quadratic)),
         #[cfg(feature = "production-controls")]
@@ -564,6 +567,9 @@ fn discover(
     let deadline = Instant::now() + budget;
     if method == Method::FullCutoff {
         return full_cutoff::discover(base, target, solver, scratch, deadline);
+    }
+    if method == Method::FactorwiseCutoff {
+        return full_cutoff::discover_factorwise(base, target, solver, scratch, deadline);
     }
     #[cfg(feature = "production-controls")]
     if let Method::Oriented(tower) = method {
@@ -778,7 +784,7 @@ fn main() -> Result<(), String> {
     let argv: Vec<_> = std::env::args().skip(1).collect();
     let [prime, depth, solver, modes @ ..] = argv.as_slice() else {
         return Err(
-            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED [draws=1..256]] [distinct refined full-cutoff expanded quadratic cofactor(feature) cofactor-msolve(feature)]".into(),
+            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED [draws=1..256]] [distinct refined full-cutoff factorwise-cutoff expanded quadratic cofactor(feature) cofactor-msolve(feature)]".into(),
         );
     };
     let curve = *FIXTURES
@@ -848,6 +854,9 @@ fn main() -> Result<(), String> {
     }
     if modes.contains(&Method::FullCutoff) && recovery_seed.is_some() {
         return Err("full-cutoff is currently a fixed-panel qualification interface".into());
+    }
+    if modes.contains(&Method::FactorwiseCutoff) && recovery_seed.is_some() {
+        return Err("factorwise-cutoff is currently a fixed-panel qualification interface".into());
     }
     if let Some(seed) = recovery_seed {
         recover(

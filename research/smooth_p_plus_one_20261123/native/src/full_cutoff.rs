@@ -4,6 +4,12 @@ use super::*;
 
 const CAPTURE_BYTES: usize = 262_144;
 
+#[derive(Clone, Copy)]
+enum Presentation {
+    Pushforward,
+    Factorwise,
+}
+
 fn retain(record: &mut Value, key: &str, raw: &str, captured: &mut usize) -> Result<(), String> {
     // Charge escaped JSON bytes so raw strings cannot silently exceed the spool
     // record size through escaping. A missing required capture stops this query.
@@ -24,6 +30,41 @@ pub(super) fn discover(
     solver: &Path,
     scratch: &Scratch,
     deadline: Instant,
+) -> Discovery {
+    discover_using(
+        base,
+        target,
+        solver,
+        scratch,
+        deadline,
+        Presentation::Pushforward,
+    )
+}
+
+pub(super) fn discover_factorwise(
+    base: &Base,
+    target: Point,
+    solver: &Path,
+    scratch: &Scratch,
+    deadline: Instant,
+) -> Discovery {
+    discover_using(
+        base,
+        target,
+        solver,
+        scratch,
+        deadline,
+        Presentation::Factorwise,
+    )
+}
+
+fn discover_using(
+    base: &Base,
+    target: Point,
+    solver: &Path,
+    scratch: &Scratch,
+    deadline: Instant,
+    presentation: Presentation,
 ) -> Discovery {
     let mut outcome = Discovery {
         result: Err("oracle budget exhausted".into()),
@@ -47,7 +88,20 @@ pub(super) fn discover(
         if Instant::now() >= deadline {
             return outcome;
         }
-        let system = System::at_cutoff(base.curve, target, base.depth - 3, chart.polynomial);
+        let system = match presentation {
+            Presentation::Pushforward => {
+                System::at_cutoff(base.curve, target, base.depth - 3, chart.polynomial)
+            }
+            Presentation::Factorwise => {
+                match System::factorwise(base.curve, target, base.depth - 3, chart.images) {
+                    Ok(system) => system,
+                    Err(error) => {
+                        outcome.result = Err(error);
+                        return outcome;
+                    }
+                }
+            }
+        };
         let (variables, equations, terms, degree) = system.metrics();
         let mut record = json!({
             "chart":index,"fine_images":chart.images,"coefficients":chart.polynomial,
@@ -55,6 +109,9 @@ pub(super) fn discover(
             "degree":degree,"solver_args":["-t","1","-c","0"],
             "form_limit":16,"query_capture_limit_bytes":CAPTURE_BYTES,"attempts":[],
         });
+        if matches!(presentation, Presentation::Factorwise) {
+            record["presentation"] = json!("factorwise");
+        }
         let result = (|| -> Result<BTreeSet<Relation>, String> {
             if terms > 20_000 {
                 return Err("full-cutoff construction term allowance exhausted".into());
@@ -145,6 +202,45 @@ mod tests {
         fs::write(&path, format!("#!/bin/sh\n{body}\n")).unwrap();
         fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
         path
+    }
+
+    #[test]
+    fn factorwise_dispatch_serializes_the_qualified_variables_and_visits_all_charts() {
+        let base = Base::new(FIXTURES[0], 4);
+        let scratch = Scratch::new().unwrap();
+        let solver = stub(&scratch,
+            "IFS= read -r first < \"$2\"\n[ \"$first\" = 'q0,q1,q2,q3,a0,a1,t0,A' ] || exit 91\nprintf '[-1]:' > \"$4\"");
+        let result = super::super::discover(
+            &base,
+            base.curve.q,
+            Method::FactorwiseCutoff,
+            &solver,
+            &scratch,
+            Duration::from_secs(3),
+        );
+        assert!(result.result.unwrap().is_empty());
+        assert_eq!(
+            result.completed,
+            cutoff::qualified_catalog(&base).unwrap().len()
+        );
+        for record in result.systems {
+            assert_eq!(record["presentation"], "factorwise");
+            assert_eq!(record["variables"], 8);
+            assert_eq!(record["equations"], 9);
+            assert_eq!(record["attempts"].as_array().unwrap().len(), 1);
+        }
+        let expired = discover_factorwise(
+            &base,
+            base.curve.q,
+            Path::new("/missing"),
+            &scratch,
+            Instant::now(),
+        );
+        assert!(expired.result.is_err());
+        assert_eq!(expired.completed, 0);
+        assert!(expired.systems.is_empty());
+        assert!(mode("factorwise-cutoff") == Some(Method::FactorwiseCutoff));
+        assert_eq!(Method::FactorwiseCutoff.encoding(), Mode::Quadratic);
     }
 
     #[test]
