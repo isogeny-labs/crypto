@@ -1515,6 +1515,59 @@ pub struct TraceStep {
     /// ([`FrozenStep`]); never serialized.
     #[serde(skip)]
     frozen: FrozenSlot,
+    /// Continuations recorded by replays that diverged at this step, keyed
+    /// by the leading monomials they found ([`TraceMode::RecordBranch`]);
+    /// never serialized.
+    #[serde(skip)]
+    branches: BranchSlot,
+}
+
+/// The branches recorded under one trace step: (the step's new leading
+/// monomials as a diverging replay found them, the continuation from the
+/// next step).  At most [`MAX_BRANCHES`] per step.
+#[derive(Default, Debug)]
+struct BranchSlot(std::sync::RwLock<Vec<(Vec<Vec<u32>>, std::sync::Arc<F4Trace>)>>);
+
+impl Clone for BranchSlot {
+    fn clone(&self) -> Self {
+        BranchSlot(std::sync::RwLock::new(self.0.read().unwrap().clone()))
+    }
+}
+
+const MAX_BRANCHES: usize = 8;
+
+/// `F4_FP_BRANCH=0` makes a diverged replay finish as a full run without
+/// following or recording a branch (the path before 2026-11-24).
+fn branch_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_BRANCH").as_deref() != Ok("0"))
+}
+
+static TRACE_GROWTH: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
+
+/// Whether replays may record new branches (default on).  A caller that
+/// replays one trace on many threads turns it off after a sequential
+/// warm-up, so the trace tree, and with it every run's counted cost, no
+/// longer depends on thread scheduling.
+pub fn set_trace_growth(on: bool) {
+    TRACE_GROWTH.store(on, AtomicOrdering::Relaxed);
+}
+
+/// See [`set_trace_growth`].
+pub fn trace_growth() -> bool {
+    TRACE_GROWTH.load(AtomicOrdering::Relaxed)
+}
+
+static BRANCH_FOLLOWS: AtomicU64 = AtomicU64::new(0);
+static BRANCH_RECORDS: AtomicU64 = AtomicU64::new(0);
+
+/// Diverged replays that continued on a recorded branch, and branches
+/// recorded, process-wide.
+pub fn branch_totals() -> (u64, u64) {
+    (
+        BRANCH_FOLLOWS.load(AtomicOrdering::Relaxed),
+        BRANCH_RECORDS.load(AtomicOrdering::Relaxed),
+    )
 }
 
 /// A step's frozen symbolic preprocessing, shared by the replays of one
@@ -1839,17 +1892,77 @@ fn inv_mod_u64(a: u64, p: u64) -> u64 {
 enum TraceMode<'a> {
     Off,
     Record(&'a mut F4Trace),
-    Replay(&'a F4Trace),
+    Replay(Cursor<'a>),
+    /// A replay that diverged at a step with no branch for what it found,
+    /// recording its continuation as one ([`BranchRec`]).
+    RecordBranch(Box<BranchRec<'a>>),
+}
+
+/// A trace node: the trace a replay started from, or a branch of it.
+#[derive(Clone)]
+enum Node<'a> {
+    Root(&'a F4Trace),
+    Branch(std::sync::Arc<F4Trace>),
+}
+
+impl Node<'_> {
+    fn get(&self) -> &F4Trace {
+        match self {
+            Node::Root(t) => t,
+            Node::Branch(t) => t,
+        }
+    }
+}
+
+/// Where a replay is: the node it follows, whose step `i` is the run's
+/// step `base + i`.
+#[derive(Clone)]
+struct Cursor<'a> {
+    node: Node<'a>,
+    base: usize,
+}
+
+/// A branch being recorded: the continuation from the run's step `base`,
+/// to be stored under step `at` of `parent` with the key `key` when the run
+/// ends cleanly.
+struct BranchRec<'a> {
+    trace: F4Trace,
+    parent: Node<'a>,
+    at: usize,
+    key: Vec<Vec<u32>>,
+}
+
+impl BranchRec<'_> {
+    fn commit(self) {
+        let mut w = self.parent.get().steps[self.at].branches.0.write().unwrap();
+        if w.len() < MAX_BRANCHES && !w.iter().any(|(k, _)| *k == self.key) {
+            w.push((self.key, std::sync::Arc::new(self.trace)));
+            BRANCH_RECORDS.fetch_add(1, AtomicOrdering::Relaxed);
+        }
+    }
 }
 
 impl TraceMode<'_> {
     /// The same mode for one more run, borrowing the trace again.
     fn reborrow(&mut self) -> TraceMode<'_> {
         match self {
-            TraceMode::Off => TraceMode::Off,
+            TraceMode::Off | TraceMode::RecordBranch(_) => TraceMode::Off,
             TraceMode::Record(t) => TraceMode::Record(t),
-            TraceMode::Replay(t) => TraceMode::Replay(t),
+            TraceMode::Replay(c) => TraceMode::Replay(c.clone()),
         }
+    }
+
+    /// The trace being recorded (a whole run or a branch).
+    fn rec_mut(&mut self) -> Option<&mut F4Trace> {
+        match self {
+            TraceMode::Record(t) => Some(t),
+            TraceMode::RecordBranch(b) => Some(&mut b.trace),
+            _ => None,
+        }
+    }
+
+    fn recording(&self) -> bool {
+        matches!(self, TraceMode::Record(_) | TraceMode::RecordBranch(_))
     }
 }
 
@@ -1890,7 +2003,16 @@ pub fn f4_replay(
     opts: &F4Options,
     trace: &F4Trace,
 ) -> F4Report {
-    f4_dispatch(input, n_vars, p, opts, TraceMode::Replay(trace))
+    f4_dispatch(
+        input,
+        n_vars,
+        p,
+        opts,
+        TraceMode::Replay(Cursor {
+            node: Node::Root(trace),
+            base: 0,
+        }),
+    )
 }
 
 fn arithmetic_mode() -> u8 {
@@ -5795,13 +5917,13 @@ fn f4_with_arithmetic(
             trace_monomials = input_lms_now.len();
             t.input_lms = input_lms_now;
         }
-        TraceMode::Replay(t) => {
+        TraceMode::Replay(c) => {
             // other input leading monomials: not this trace's shape, a full run
-            if t.input_lms != input_lms_now {
+            if c.node.get().input_lms != input_lms_now {
                 input_mismatch = true;
             }
         }
-        TraceMode::Off => {}
+        TraceMode::Off | TraceMode::RecordBranch(_) => {}
     }
     let mut replay_step = 0usize;
     let mut mismatch = false;
@@ -5933,8 +6055,9 @@ fn f4_with_arithmetic(
                 RUN_LOG.with(|l| l.borrow_mut().dropped_pairs += before - pairs.len());
             }
         }
-        if let TraceMode::Replay(t) = &trace {
-            if replay_step >= t.steps.len() {
+        if let TraceMode::Replay(c) = &trace {
+            let t = c.node.get();
+            if replay_step - c.base >= t.steps.len() {
                 // the recorded run's end: the recorded staircase, or the
                 // pairs still pending are processed as a full run
                 let lms: Vec<&[u32]> = basis
@@ -6077,14 +6200,14 @@ fn f4_with_arithmetic(
         let mut last_snap = Instant::now();
         let mut snaps = 0usize;
         // symbolic preprocessing
-        let recording = matches!(trace, TraceMode::Record(_));
+        let recording = trace.recording();
         let mut rows_poly: Vec<(usize, Vec<u32>)> = Vec::new(); // (basis index, multiplier)
         let mut seen: FxSet<(usize, Vec<u32>)> = FxSet::default();
         let d;
         let mut selected_len = 0usize;
-        if let TraceMode::Replay(t) = &trace {
+        if let TraceMode::Replay(c) = &trace {
             // the recorded useful rows of this step stand in for the pairs
-            let step = &t.steps[replay_step];
+            let step = &c.node.get().steps[replay_step - c.base];
             replay_step += 1;
             d = step.degree;
             degree_reached = degree_reached.max(d);
@@ -6173,7 +6296,9 @@ fn f4_with_arithmetic(
             // A replayed step rebuilds its matrix from frozen preprocessing
             // when the current terms fit the frozen ones ([`FrozenStep`]).
             let slot = match &trace {
-                TraceMode::Replay(t) if freeze_enabled() => Some(&t.steps[replay_step - 1].frozen),
+                TraceMode::Replay(c) if freeze_enabled() => {
+                    Some(&c.node.get().steps[replay_step - 1 - c.base].frozen)
+                }
                 _ => None,
             };
             let frozen = slot.and_then(|f| f.0.read().unwrap().clone());
@@ -6236,7 +6361,7 @@ fn f4_with_arithmetic(
                 .collect();
             // the reducer rows' multipliers are read back only by a recording
             // run (its trace); elsewhere they stay packed
-            if matches!(trace, TraceMode::Record(_)) {
+            if trace.recording() {
                 rows_poly.extend(extra.iter().map(|&(i, m)| (i, unpack(m, n_vars))));
             }
             // Small steps (most of them, and all of `solve`'s specialised
@@ -6436,7 +6561,7 @@ fn f4_with_arithmetic(
         // reduced rows before the echelon form, to find the contributors of
         // every new pivot
         let mut useful: Vec<bool> = Vec::new();
-        let recording = matches!(trace, TraceMode::Record(_));
+        let recording = trace.recording();
         let mut rec_rows: Vec<Vec<u64>> = Vec::new();
         let pivots: Option<(Vec<Vec<u64>>, Vec<usize>)> = if deferred {
             let fp32 = fp32.expect("deferred mode has narrow arithmetic");
@@ -6853,8 +6978,8 @@ fn f4_with_arithmetic(
         }
         let learned_now = !new_polys.is_empty();
         let learned_new = new_polys.len();
-        match &mut trace {
-            TraceMode::Record(t) => {
+        if let Some(t) = trace.rec_mut() {
+            {
                 if let Some(limits) = &opts.resource_limits {
                     // Count a step record even when it has no retained rows.
                     // This check precedes both contributor recovery and copies.
@@ -6888,6 +7013,7 @@ fn f4_with_arithmetic(
                 }
                 t.steps.push(TraceStep {
                     frozen: Default::default(),
+                    branches: Default::default(),
                     degree: d,
                     rows: retained
                         .iter()
@@ -6900,19 +7026,47 @@ fn f4_with_arithmetic(
                 let step = t.steps.last().unwrap();
                 trace_monomials += 1 + step.rows.len() + step.new_lms.len();
             }
-            TraceMode::Replay(t) => {
-                let expected = &t.steps[replay_step - 1].new_lms;
-                let found: Vec<&Vec<u32>> = new_polys.iter().map(|f| &f[0].0).collect();
-                if found.len() != expected.len() || found.iter().zip(expected).any(|(a, b)| *a != b)
-                {
-                    // the shapes diverged: keep what this step found (it is
-                    // in the ideal) and finish as a full run over the pairs
-                    // the basis has accumulated
+        } else if let TraceMode::Replay(c) = &trace {
+            let at = replay_step - 1 - c.base;
+            let expected = &c.node.get().steps[at].new_lms;
+            let found: Vec<&Vec<u32>> = new_polys.iter().map(|f| &f[0].0).collect();
+            if found.len() != expected.len() || found.iter().zip(expected).any(|(a, b)| *a != b) {
+                // The shapes diverged.  What this step found is in the ideal
+                // either way.  A branch recorded for these leading monomials
+                // is followed from the next step; without one, the run
+                // continues over the pairs the basis has accumulated and
+                // records that continuation as a new branch.
+                let key: Vec<Vec<u32>> = found.iter().map(|m| (*m).clone()).collect();
+                let next = if branch_enabled() {
+                    let slot = c.node.get().steps[at].branches.0.read().unwrap();
+                    match slot.iter().find(|(k, _)| *k == key) {
+                        Some((_, b)) => {
+                            BRANCH_FOLLOWS.fetch_add(1, AtomicOrdering::Relaxed);
+                            TraceMode::Replay(Cursor {
+                                node: Node::Branch(b.clone()),
+                                base: replay_step,
+                            })
+                        }
+                        None if slot.len() < MAX_BRANCHES && trace_growth() => {
+                            mismatch = true;
+                            TraceMode::RecordBranch(Box::new(BranchRec {
+                                trace: F4Trace::default(),
+                                parent: c.node.clone(),
+                                at,
+                                key,
+                            }))
+                        }
+                        None => {
+                            mismatch = true;
+                            TraceMode::Off
+                        }
+                    }
+                } else {
                     mismatch = true;
-                    trace = TraceMode::Off;
-                }
+                    TraceMode::Off
+                };
+                trace = next;
             }
-            TraceMode::Off => {}
         }
         for f in new_polys {
             basis_terms += f.len();
@@ -6968,7 +7122,7 @@ fn f4_with_arithmetic(
                 .collect();
             if let Some(count) = staircase_at_most(&lms, n_vars, bound) {
                 staircase_at_stop = Some(count);
-                if let TraceMode::Record(t) = &mut trace {
+                if let Some(t) = trace.rec_mut() {
                     t.stopped = true;
                 }
                 break;
@@ -7002,6 +7156,12 @@ fn f4_with_arithmetic(
     } else {
         (None, None, None, Vec::new())
     };
+    // a branch is kept only from a run that ended cleanly under its rule
+    if let TraceMode::RecordBranch(b) = trace {
+        if pairs_above_bound == 0 && !(opts.hilbert_expect.is_some() && hilbert_violated) {
+            b.commit();
+        }
+    }
     F4Report {
         basis: reduced,
         inconsistent: false,
@@ -11743,6 +11903,61 @@ mod packed_set_tests {
                     assert_eq!(first_alive_divisor(&lms, guard, m), want, "n={n} len={len}");
                 }
             }
+        }
+    }
+
+    #[test]
+    fn diverged_replays_record_and_follow_branches() {
+        let mut rng = Xs(0x0b5a_2c11_7e57_0001);
+        let (n, p) = (3usize, 31u64);
+        let monos = monomials_up_to(n, 2);
+        // dense quadrics, some with middle coefficients forced to zero:
+        // the input leading monomials stay, later steps can differ
+        let system = |rng: &mut Xs, zeros: &[usize]| -> Vec<Poly> {
+            (0..n)
+                .map(|k| {
+                    let f: Vec<_> = monos
+                        .iter()
+                        .enumerate()
+                        .map(|(i, m)| {
+                            let c = if k == 0 && i > 0 && zeros.contains(&i) {
+                                0
+                            } else {
+                                1 + rng.below(p - 1)
+                            };
+                            (m.clone(), c)
+                        })
+                        .filter(|(_, c)| *c != 0)
+                        .collect();
+                    normalise(&f, p, Ordering::Grevlex)
+                })
+                .collect()
+        };
+        let opts = F4Options::new(Ordering::Grevlex, 10);
+        let (_, trace) = f4_record(&system(&mut rng, &[]), n, p, &opts);
+        let mut followed = 0;
+        for t in 0..60 {
+            let zeros = [1 + t % 7, 2 + (t * 3) % 7];
+            let sys = system(&mut rng, &zeros);
+            let plain = f4(&sys, n, p, &opts);
+            let first = f4_replay(&sys, n, p, &opts, &trace);
+            if !first.trace_mismatch {
+                assert_eq!(first.basis, plain.basis, "system {t}");
+                continue;
+            }
+            if !trace_growth() {
+                continue; // another test turned recording off
+            }
+            // the same system again: the branch its first replay recorded
+            // (unless this step's branches are full) takes it to the end
+            let second = f4_replay(&sys, n, p, &opts, &trace);
+            if !second.trace_mismatch {
+                followed += 1;
+                assert_eq!(second.basis, plain.basis, "system {t}, on its branch");
+            }
+        }
+        if trace_growth() {
+            assert!(followed > 0, "no replay followed a branch");
         }
     }
 
