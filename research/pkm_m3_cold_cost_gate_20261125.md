@@ -29,6 +29,17 @@ CPU, peak RSS and calibrated counted work by stage. The control arms and
 rho receive the identical curve and target, with their own cold setup.
 Do not replace `A` by its expectation in a reported measurement.
 
+The basis extractor is a DFS over quadratic tower roots. Before a timed
+candidate row, instrument and retain its visited nodes, root-split branches,
+terminal leaves, and verified tuples separately from F4's elimination
+counts. Record the largest live basis/cache state and branch-copy work.
+The current extractor reports field multiplications but does not expose
+these DFS counts, so its existing output alone cannot establish that the
+high-degree search was pruned rather than enumerated in extraction. Report
+visited leaves against `B^3` and against the equal-size grid control; a
+small leaf ratio is supporting evidence only when total charged query work
+also falls. Include failed and censored queries in these totals.
+
 ## Pre-measurement scaling prediction and falsifier
 
 Conditionally assume `s=Theta(B)`, `n=Theta(B)`, independently distributed
