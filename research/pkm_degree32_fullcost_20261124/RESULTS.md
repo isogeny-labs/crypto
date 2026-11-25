@@ -27,3 +27,17 @@ Its terminal verdict correctly records `complete=false`,
 `component_gate=false`, and `cold_rho_crossover=false`. A follow-up must use a
 new protocol and store, a source-pinned executable, a controlled benchmark
 host, and an outer cap that admits the already observed interval runtime.
+
+## Source-pinned successor, 2026-11-25
+
+The original seed 20261149 is not equal-size under the retained source-pinned
+binary (16 interval versus 18 candidate abscissae). A new protocol instead
+uses previously selected seed 20261276, instance
+`icv1-fp13-tm137-9a89da76`, with the same source-pinned `ic` SHA-256
+`c98e290c7c7d5aee30ed70e1c9aa19726e830854b09ae15921f02b09c648de2d`.
+Fresh preflights in `source_pinned_fullrank_quiet_20261125.jsonl` passed at
+18/18 abscissae. Timed full-rank and matched-rho calls are waiting for the
+host's separate compilations and research benchmarks to exit. The preflight
+store's current SHA-256 is
+`ec96bd9f6868c84800eda3a596d5e6ad7603dee4c4c81ecdc8286d2669b259de`.
+No new full-cost ratio is claimed from this pending store.

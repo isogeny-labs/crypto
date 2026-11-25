@@ -68,7 +68,9 @@ def quiet(exclude=()):
         pid, cpu, comm, args = parts
         if int(pid) == os.getpid() or int(pid) in exclude:
             continue
-        if Path(comm).name in ("cargo", "rustc", "ic"):
+        research_cpu = (float(cpu) >= 25 and not args.startswith(("/System/", "/Applications/",
+                                                                  "/usr/", "/opt/homebrew/bin/ps ")))
+        if Path(comm).name in ("cargo", "rustc", "ic", "msolve") or research_cpu:
             heavy.append(line)
     return {"time": datetime.datetime.now().astimezone().isoformat(),
             "loadavg": list(os.getloadavg()), "logical_cpus": os.cpu_count(),

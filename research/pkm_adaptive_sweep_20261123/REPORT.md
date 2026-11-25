@@ -143,3 +143,16 @@ This is direct evidence for why the adaptive seed-10 result does not transfer au
 Across both mirrored calls, the candidate found 344 relations in 5,326 target trials versus 392 in 6,310 for the interval. Relation probability per trial improved **1.0397×** and useful relations per charged GAE improved **5.126×**. Both pairwise gates and the combined gate passed. Raw store `degree32_replication_extend.jsonl` SHA-256: `49f996274ec2e67f6efc87047888abf9176a127530ce4632f54a97e3aab3f70b`.
 
 This is the first result in this continuation that survives a fresh-instance, opposite-order replication with the same low/high-degree construction and equal factor-base size. It establishes a **repeated small-instance PKM relation-extraction component lead** for the five-low-map / degree-32 construction. It still sits far above the counted same-target rho context: candidate median `s_over_rho` was about 174,753 and 197,388 in the two replication calls. The executable is hash-pinned but not yet source-commit-pinned. Full relation collection, linear algebra, descent, cold rho crossover, s59, P-192 and NIST p±1 remain separate unpassed gates. The result must not be promoted to an end-to-end or wide-curve speedup.
+
+## Original-workload source replay, 2026-11-25
+
+The retained `ic` from source commit `a5503f4bb66ac3aa4eac3125fba01534d2574096`
+has SHA-256 `c98e290c7c7d5aee30ed70e1c9aa19726e830854b09ae15921f02b09c648de2d`.
+Under `PROTOCOL_F4_DEGREE32_ORIGINAL_SOURCE_REPLAY_20261125.md`, the original
+`degree32` seed 20261128 changed from equal 17/17 to 17/18 abscissae; the
+selected `degree32_replication_extend` seed 20261149 changed from equal 16/16
+to 16/18. The instance IDs still matched within each pair. Both separate
+replay stores ended at the size gate without a qualifying timed call. Their
+SHA-256 values are `e02cf71f4256c2eca6f8e904b152c6178f25b7ac26fe8c1259607703e7a77c8b`
+and `60e91f1cfbbc5c0064a207d280ae4cae86324ff6320df62a1a77d75cd1a7136a`.
+This is a source-reproducibility mismatch, not a candidate/control speed ratio.
