@@ -165,7 +165,7 @@ fn mod_mul(a: u128, b: u128, p: u128) -> u128 {
     (a * b) % p
 }
 fn mod_inv(a: u128, p: u128) -> Option<u128> {
-    if a % p == 0 {
+    if a.is_multiple_of(p) {
         return None;
     }
     // Binary extended gcd — `O(log p)` vs Fermat `O(log p)` multiplies with

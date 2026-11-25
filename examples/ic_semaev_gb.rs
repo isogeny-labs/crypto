@@ -16,7 +16,7 @@
 //! near-empty ideal (see the G30-004 status note). This is an instrument
 //! exercise on the real object, not a degree-of-regularity result.
 
-use crypto_lib::cryptanalysis::f4_fp::{f4, normalise, Ordering, Poly, F4Options};
+use crypto_lib::cryptanalysis::f4_fp::{f4, normalise, F4Options, Ordering, Poly};
 use std::collections::HashMap;
 use std::time::Duration;
 
@@ -124,7 +124,11 @@ fn eadd(p: u64, a: u64, l: (u64, u64), r: (u64, u64)) -> Option<(u64, u64)> {
         if (y1 + y2) % p == 0 {
             return None;
         }
-        mulmod(mulmod(3, mulmod(x1, x1, p), p) + a, modinv(2 * y1 % p, p), p)
+        mulmod(
+            mulmod(3, mulmod(x1, x1, p), p) + a,
+            modinv(2 * y1 % p, p),
+            p,
+        )
     } else {
         mulmod((y2 + p - y1) % p, modinv((x2 + p - x1) % p, p), p)
     };
@@ -201,8 +205,12 @@ fn main() {
                 if ux[i].0 == ux[j].0 || ux[j].0 == ux[k].0 {
                     continue;
                 }
-                let Some(s12) = eadd(p, a, ux[i], ux[j]) else { continue };
-                let Some(s123) = eadd(p, a, s12, ux[k]) else { continue };
+                let Some(s12) = eadd(p, a, ux[i], ux[j]) else {
+                    continue;
+                };
+                let Some(s123) = eadd(p, a, s12, ux[k]) else {
+                    continue;
+                };
                 let p4 = (s123.0, (p - s123.1) % p);
                 if p4.0 == ux[i].0 || p4.0 == ux[j].0 || p4.0 == ux[k].0 {
                     continue;
@@ -231,7 +239,8 @@ fn main() {
         v
     };
 
-    let ks: Vec<usize> = std::env::args().skip(1)
+    let ks: Vec<usize> = std::env::args()
+        .skip(1)
         .filter_map(|a| a.parse().ok())
         .collect();
     let ks = if ks.is_empty() { vec![6usize, 8] } else { ks };
@@ -251,13 +260,13 @@ fn main() {
         let px: Vec<u64> = (0..p).filter(|x| t.contains(&mulmod(*x, *x, p))).collect();
         // decomposable target from the window base (real points only)
         let wpts: Vec<(u64, u64)> = wx.iter().filter_map(|x| by_x.get(x).copied()).collect();
-        let mut target = None;
+        let mut _target = None;
         'outer: for i in 0..wpts.len() {
             for j in 0..wpts.len() {
                 for l in 0..wpts.len() {
                     if let Some(s12) = eadd(p, a, wpts[i], wpts[j]) {
                         if let Some(s123) = eadd(p, a, s12, wpts[l]) {
-                            target = Some(s123.0);
+                            _target = Some(s123.0);
                             break 'outer;
                         }
                     }
@@ -282,12 +291,14 @@ fn main() {
                 }
             }
             let xq = ft.unwrap_or(set[0]);
-            let mut polys = vec![to_poly(&s4(p, a, b, &bvar(0), &bvar(1), &bvar(2), &bconst(xq)), p)];
+            let mut polys = vec![to_poly(
+                &s4(p, a, b, &bvar(0), &bvar(1), &bvar(2), &bconst(xq)),
+                p,
+            )];
             for i in 0..3 {
                 polys.push(to_poly(&membership(set, p, i), p));
             }
-            let opts = F4Options::new(Ordering::Grevlex, 40)
-                .with_budget(Duration::from_secs(120));
+            let opts = F4Options::new(Ordering::Grevlex, 40).with_budget(Duration::from_secs(120));
             let rep = f4(&polys, 3, p, &opts);
             println!(
                 "k={k:2} {name:9} |xs|={:3} deg_h={:2} inconsistent={} solving_degree={:2} reached={:2} rows={} cols={} ms={:.1} above_bound={} timed_out={}",
