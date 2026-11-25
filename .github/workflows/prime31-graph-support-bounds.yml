@@ -1,0 +1,40 @@
+name: Prime31 graph mathematical bounds
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/prime31-graph-support-bounds.yml
+      - research/prime31_graph_ecdlp_20261123/verify_offset_support_bounds.py
+      - research/prime31_graph_ecdlp_20261123/verify_pencil_projection_top.py
+      - research/prime31_graph_ecdlp_20261123/verify_linear_secant_top.py
+      - research/prime31_graph_ecdlp_20261123/SUMMATION_DEGREE_GATE.md
+  push:
+    branches:
+      - research/prime31-ec-graph-20261123
+    paths:
+      - .github/workflows/prime31-graph-support-bounds.yml
+      - research/prime31_graph_ecdlp_20261123/verify_offset_support_bounds.py
+      - research/prime31_graph_ecdlp_20261123/verify_pencil_projection_top.py
+      - research/prime31_graph_ecdlp_20261123/verify_linear_secant_top.py
+      - research/prime31_graph_ecdlp_20261123/SUMMATION_DEGREE_GATE.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-support-bounds:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Replay exact rational bounds and exhaustive F17 identities
+        run: python3 research/prime31_graph_ecdlp_20261123/verify_offset_support_bounds.py
+      - name: Install pinned symbolic algebra dependency
+        run: python3 -m pip install --disable-pip-version-check sympy==1.14.0
+      - name: Replay M31 projected secant top ideals
+        run: python3 research/prime31_graph_ecdlp_20261123/verify_pencil_projection_top.py
+      - name: Replay M31 augmented linear secant top ideal
+        run: python3 research/prime31_graph_ecdlp_20261123/verify_linear_secant_top.py
