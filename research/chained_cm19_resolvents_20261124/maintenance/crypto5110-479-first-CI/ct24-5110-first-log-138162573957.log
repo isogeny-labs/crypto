@@ -1,0 +1,308 @@
+﻿2026-11-24T02:05:57.5550246Z Current runner version: '2.338.2'
+2026-11-24T02:05:57.5578779Z ##[group]Runner Image Provisioner
+2026-11-24T02:05:57.5580048Z Hosted Compute Agent
+2026-11-24T02:05:57.5580666Z Version: 20261111.635
+2026-11-24T02:05:57.5581411Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-24T02:05:57.5582157Z Build Date: 2026-11-11T01:49:01Z
+2026-11-24T02:05:57.5582932Z Worker ID: {335d44de-6ae3-41cd-8c4d-fc4f09cbc97b}
+2026-11-24T02:05:57.5583715Z Region: eastus
+2026-11-24T02:05:57.5584255Z Cloud: Azure
+2026-11-24T02:05:57.5584878Z ##[endgroup]
+2026-11-24T02:05:57.5586424Z ##[group]Operating System
+2026-11-24T02:05:57.5587202Z Ubuntu
+2026-11-24T02:05:57.5587778Z 24.04.5
+2026-11-24T02:05:57.5588279Z LTS
+2026-11-24T02:05:57.5588865Z ##[endgroup]
+2026-11-24T02:05:57.5589938Z ##[group]Runner Image
+2026-11-24T02:05:57.5590662Z Image: ubuntu-24.04
+2026-11-24T02:05:57.5591298Z Version: 20261116.376.1
+2026-11-24T02:05:57.5592651Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.376/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-24T02:05:57.5594208Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.376
+2026-11-24T02:05:57.5595266Z ##[endgroup]
+2026-11-24T02:05:57.5596392Z ##[group]GITHUB_TOKEN Permissions
+2026-11-24T02:05:57.5598433Z Contents: read
+2026-11-24T02:05:57.5599446Z Metadata: read
+2026-11-24T02:05:57.5600226Z ##[endgroup]
+2026-11-24T02:05:57.5602508Z Secret source: Actions
+2026-11-24T02:05:57.5603611Z Cache mode: write
+2026-11-24T02:05:57.5604330Z Prepare workflow directory
+2026-11-24T02:05:57.5946490Z Prepare all required actions
+2026-11-24T02:05:57.5996447Z Getting action download info
+2026-11-24T02:05:57.7531943Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-24T02:05:57.9840159Z Complete job name: parity
+2026-11-24T02:05:58.0812513Z ##[group]Run actions/checkout@v4
+2026-11-24T02:05:58.0813420Z with:
+2026-11-24T02:05:58.0813879Z   repository: isogeny-labs/crypto
+2026-11-24T02:05:58.0818228Z   token: ***
+2026-11-24T02:05:58.0818668Z   ssh-strict: true
+2026-11-24T02:05:58.0819573Z   ssh-user: git
+2026-11-24T02:05:58.0820060Z   persist-credentials: true
+2026-11-24T02:05:58.0820566Z   clean: true
+2026-11-24T02:05:58.0821018Z   sparse-checkout-cone-mode: true
+2026-11-24T02:05:58.0821551Z   fetch-depth: 1
+2026-11-24T02:05:58.0821988Z   fetch-tags: false
+2026-11-24T02:05:58.0822442Z   show-progress: true
+2026-11-24T02:05:58.0822899Z   lfs: false
+2026-11-24T02:05:58.0823326Z   submodules: false
+2026-11-24T02:05:58.0823788Z   set-safe-directory: true
+2026-11-24T02:05:58.0824307Z   allow-unsafe-pr-checkout: false
+2026-11-24T02:05:58.0825147Z ##[endgroup]
+2026-11-24T02:05:58.3501617Z Syncing repository: isogeny-labs/crypto
+2026-11-24T02:05:58.3504445Z ##[group]Getting Git version info
+2026-11-24T02:05:58.3505341Z Working directory is '/home/runner/work/crypto/crypto'
+2026-11-24T02:05:58.3507178Z [command]/usr/bin/git version
+2026-11-24T02:05:58.3571884Z git version 2.56.1
+2026-11-24T02:05:58.3597599Z ##[endgroup]
+2026-11-24T02:05:58.3615493Z Temporarily overriding HOME='/home/runner/work/_temp/1227e1ff-4eb8-4313-831f-7dd0cc76876f' before making global git config changes
+2026-11-24T02:05:58.3618332Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-24T02:05:58.3621828Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-24T02:05:58.3673482Z Deleting the contents of '/home/runner/work/crypto/crypto'
+2026-11-24T02:05:58.3677833Z ##[group]Initializing the repository
+2026-11-24T02:05:58.3682186Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+2026-11-24T02:05:58.3810192Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-24T02:05:58.3811769Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-24T02:05:58.3813105Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-24T02:05:58.3814173Z hint: call:
+2026-11-24T02:05:58.3814935Z hint:
+2026-11-24T02:05:58.3815543Z hint: 	git config --global init.defaultBranch <name>
+2026-11-24T02:05:58.3816865Z hint:
+2026-11-24T02:05:58.3818063Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-24T02:05:58.3820349Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-24T02:05:58.3821380Z hint:
+2026-11-24T02:05:58.3821881Z hint: 	git branch -m <name>
+2026-11-24T02:05:58.3822707Z hint:
+2026-11-24T02:05:58.3824090Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-24T02:05:58.3826139Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+2026-11-24T02:05:58.3834152Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/crypto
+2026-11-24T02:05:58.3897561Z ##[endgroup]
+2026-11-24T02:05:58.3899310Z ##[group]Disabling automatic garbage collection
+2026-11-24T02:05:58.3902256Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-24T02:05:58.3941892Z ##[endgroup]
+2026-11-24T02:05:58.3943149Z ##[group]Setting up auth
+2026-11-24T02:05:58.3951980Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-24T02:05:58.3997207Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-24T02:05:58.4415134Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-24T02:05:58.4467231Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-24T02:05:58.4723642Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-24T02:05:58.4769954Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-24T02:05:58.5018136Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-24T02:05:58.5067485Z ##[endgroup]
+2026-11-24T02:05:58.5068627Z ##[group]Fetching the repository
+2026-11-24T02:05:58.5080961Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ab8b2668fe34260ed255fc192fe0c3a4618ddf3a:refs/remotes/pull/5110/merge
+2026-11-24T02:06:51.0937841Z From https://github.com/isogeny-labs/crypto
+2026-11-24T02:06:51.0939531Z  * [new ref]               ab8b2668fe34260ed255fc192fe0c3a4618ddf3a -> pull/5110/merge
+2026-11-24T02:06:51.0943298Z ##[endgroup]
+2026-11-24T02:06:51.0944433Z ##[group]Determining the checkout info
+2026-11-24T02:06:51.0948100Z ##[endgroup]
+2026-11-24T02:06:51.0960684Z [command]/usr/bin/git sparse-checkout disable
+2026-11-24T02:06:51.1029168Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-24T02:06:51.1066950Z ##[group]Checking out the ref
+2026-11-24T02:06:51.1070775Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/5110/merge
+2026-11-24T02:06:52.8064597Z Updating files:   0% (3749/481022)
+2026-11-24T02:06:53.5203568Z Updating files:   1% (4811/481022)
+2026-11-24T02:06:53.6667709Z Updating files:   1% (8301/481022)
+2026-11-24T02:06:54.5199464Z Updating files:   2% (9621/481022)
+2026-11-24T02:06:55.2143256Z Updating files:   2% (11486/481022)
+2026-11-24T02:06:55.5200036Z Updating files:   3% (14431/481022)
+2026-11-24T02:06:55.6683503Z Updating files:   3% (18016/481022)
+2026-11-24T02:06:56.0290907Z Updating files:   4% (19241/481022)
+2026-11-24T02:06:56.3991415Z Updating files:   5% (24052/481022)
+2026-11-24T02:06:56.5199387Z Updating files:   6% (28862/481022)
+2026-11-24T02:06:56.6780573Z Updating files:   6% (30945/481022)
+2026-11-24T02:06:56.9947989Z Updating files:   7% (33672/481022)
+2026-11-24T02:06:57.3354709Z Updating files:   8% (38482/481022)
+2026-11-24T02:06:57.5199812Z Updating files:   9% (43292/481022)
+2026-11-24T02:06:57.6352404Z Updating files:   9% (46100/481022)
+2026-11-24T02:06:57.9169711Z Updating files:  10% (48103/481022)
+2026-11-24T02:06:58.2711457Z Updating files:  11% (52913/481022)
+2026-11-24T02:06:58.5199893Z Updating files:  12% (57723/481022)
+2026-11-24T02:06:58.6460919Z Updating files:  12% (60544/481022)
+2026-11-24T02:06:59.4468919Z Updating files:  13% (62533/481022)
+2026-11-24T02:06:59.5198864Z Updating files:  14% (67344/481022)
+2026-11-24T02:06:59.8442482Z Updating files:  14% (67939/481022)
+2026-11-24T02:07:00.5202231Z Updating files:  15% (72154/481022)
+2026-11-24T02:07:00.5423683Z Updating files:  15% (76733/481022)
+2026-11-24T02:07:00.8504179Z Updating files:  16% (76964/481022)
+2026-11-24T02:07:01.3190456Z Updating files:  17% (81774/481022)
+2026-11-24T02:07:01.5199526Z Updating files:  18% (86584/481022)
+2026-11-24T02:07:01.7318947Z Updating files:  18% (89072/481022)
+2026-11-24T02:07:02.0988572Z Updating files:  19% (91395/481022)
+2026-11-24T02:07:02.5041222Z Updating files:  20% (96205/481022)
+2026-11-24T02:07:02.5198621Z Updating files:  21% (101015/481022)
+2026-11-24T02:07:02.8145656Z Updating files:  21% (101257/481022)
+2026-11-24T02:07:03.1696684Z Updating files:  22% (105825/481022)
+2026-11-24T02:07:03.4608117Z Updating files:  23% (110636/481022)
+2026-11-24T02:07:03.5198152Z Updating files:  24% (115446/481022)
+2026-11-24T02:07:03.7177861Z Updating files:  24% (116246/481022)
+2026-11-24T02:07:04.0645884Z Updating files:  25% (120256/481022)
+2026-11-24T02:07:04.4604452Z Updating files:  26% (125066/481022)
+2026-11-24T02:07:04.5198842Z Updating files:  27% (129876/481022)
+2026-11-24T02:07:04.7945663Z Updating files:  27% (130807/481022)
+2026-11-24T02:07:05.3041689Z Updating files:  28% (134687/481022)
+2026-11-24T02:07:05.5199605Z Updating files:  29% (139497/481022)
+2026-11-24T02:07:05.6937015Z Updating files:  29% (142061/481022)
+2026-11-24T02:07:05.9843887Z Updating files:  30% (144307/481022)
+2026-11-24T02:07:06.2651250Z Updating files:  31% (149117/481022)
+2026-11-24T02:07:06.5231291Z Updating files:  32% (153928/481022)
+2026-11-24T02:07:06.7034225Z Updating files:  32% (156330/481022)
+2026-11-24T02:07:07.1037956Z Updating files:  33% (158738/481022)
+2026-11-24T02:07:07.3596644Z Updating files:  34% (163548/481022)
+2026-11-24T02:07:07.5199734Z Updating files:  35% (168358/481022)
+2026-11-24T02:07:07.6900184Z Updating files:  35% (170706/481022)
+2026-11-24T02:07:08.0693970Z Updating files:  36% (173168/481022)
+2026-11-24T02:07:08.3575312Z Updating files:  37% (177979/481022)
+2026-11-24T02:07:08.5198111Z Updating files:  38% (182789/481022)
+2026-11-24T02:07:08.6920527Z Updating files:  38% (185205/481022)
+2026-11-24T02:07:09.4303245Z Updating files:  39% (187599/481022)
+2026-11-24T02:07:09.5220209Z Updating files:  40% (192409/481022)
+2026-11-24T02:07:09.8391745Z Updating files:  40% (193321/481022)
+2026-11-24T02:07:10.1279366Z Updating files:  41% (197220/481022)
+2026-11-24T02:07:10.3998746Z Updating files:  42% (202030/481022)
+2026-11-24T02:07:10.5198510Z Updating files:  43% (206840/481022)
+2026-11-24T02:07:10.6603632Z Updating files:  43% (209186/481022)
+2026-11-24T02:07:10.9208038Z Updating files:  44% (211650/481022)
+2026-11-24T02:07:11.2243081Z Updating files:  45% (216460/481022)
+2026-11-24T02:07:11.5198477Z Updating files:  46% (221271/481022)
+2026-11-24T02:07:11.5276758Z Updating files:  46% (225987/481022)
+2026-11-24T02:07:11.8089470Z Updating files:  47% (226081/481022)
+2026-11-24T02:07:12.1583597Z Updating files:  48% (230891/481022)
+2026-11-24T02:07:12.5201195Z Updating files:  49% (235701/481022)
+2026-11-24T02:07:12.6732775Z Updating files:  49% (238380/481022)
+2026-11-24T02:07:12.9633135Z Updating files:  50% (240511/481022)
+2026-11-24T02:07:13.2005655Z Updating files:  51% (245322/481022)
+2026-11-24T02:07:13.5031882Z Updating files:  52% (250132/481022)
+2026-11-24T02:07:13.5197048Z Updating files:  53% (254942/481022)
+2026-11-24T02:07:13.7848989Z Updating files:  53% (255282/481022)
+2026-11-24T02:07:14.1050423Z Updating files:  54% (259752/481022)
+2026-11-24T02:07:14.4502868Z Updating files:  55% (264563/481022)
+2026-11-24T02:07:14.5198863Z Updating files:  56% (269373/481022)
+2026-11-24T02:07:14.7739359Z Updating files:  56% (270557/481022)
+2026-11-24T02:07:15.0743203Z Updating files:  57% (274183/481022)
+2026-11-24T02:07:15.3948840Z Updating files:  58% (278993/481022)
+2026-11-24T02:07:15.5197946Z Updating files:  59% (283803/481022)
+2026-11-24T02:07:15.7851953Z Updating files:  59% (285121/481022)
+2026-11-24T02:07:16.4802877Z Updating files:  60% (288614/481022)
+2026-11-24T02:07:16.5197147Z Updating files:  61% (293424/481022)
+2026-11-24T02:07:16.8116058Z Updating files:  61% (293997/481022)
+2026-11-24T02:07:17.1253457Z Updating files:  62% (298234/481022)
+2026-11-24T02:07:17.4180380Z Updating files:  63% (303044/481022)
+2026-11-24T02:07:17.5198502Z Updating files:  64% (307855/481022)
+2026-11-24T02:07:17.7086777Z Updating files:  64% (309787/481022)
+2026-11-24T02:07:17.9788590Z Updating files:  65% (312665/481022)
+2026-11-24T02:07:18.3504703Z Updating files:  66% (317475/481022)
+2026-11-24T02:07:18.5199830Z Updating files:  67% (322285/481022)
+2026-11-24T02:07:18.7772917Z Updating files:  67% (323723/481022)
+2026-11-24T02:07:19.3488718Z Updating files:  68% (327095/481022)
+2026-11-24T02:07:19.5198795Z Updating files:  69% (331906/481022)
+2026-11-24T02:07:19.7254564Z Updating files:  69% (334007/481022)
+2026-11-24T02:07:20.0028331Z Updating files:  70% (336716/481022)
+2026-11-24T02:07:20.3098628Z Updating files:  71% (341526/481022)
+2026-11-24T02:07:20.5198552Z Updating files:  72% (346336/481022)
+2026-11-24T02:07:20.6179765Z Updating files:  72% (349535/481022)
+2026-11-24T02:07:20.9179872Z Updating files:  73% (351147/481022)
+2026-11-24T02:07:21.1693770Z Updating files:  74% (355957/481022)
+2026-11-24T02:07:21.4235094Z Updating files:  75% (360767/481022)
+2026-11-24T02:07:21.5198367Z Updating files:  76% (365577/481022)
+2026-11-24T02:07:21.9487358Z Updating files:  76% (366994/481022)
+2026-11-24T02:07:22.3177957Z Updating files:  77% (370387/481022)
+2026-11-24T02:07:22.5202717Z Updating files:  78% (375198/481022)
+2026-11-24T02:07:22.6441709Z Updating files:  78% (378554/481022)
+2026-11-24T02:07:22.9670165Z Updating files:  79% (380008/481022)
+2026-11-24T02:07:23.2915833Z Updating files:  80% (384818/481022)
+2026-11-24T02:07:23.5199213Z Updating files:  81% (389628/481022)
+2026-11-24T02:07:23.6015851Z Updating files:  81% (393008/481022)
+2026-11-24T02:07:23.8420701Z Updating files:  82% (394439/481022)
+2026-11-24T02:07:24.1137223Z Updating files:  83% (399249/481022)
+2026-11-24T02:07:24.3812872Z Updating files:  84% (404059/481022)
+2026-11-24T02:07:24.5242725Z Updating files:  85% (408869/481022)
+2026-11-24T02:07:24.8482199Z Updating files:  85% (409611/481022)
+2026-11-24T02:07:25.1307924Z Updating files:  86% (413679/481022)
+2026-11-24T02:07:25.6260431Z Updating files:  87% (418490/481022)
+2026-11-24T02:07:25.7974998Z Updating files:  87% (422151/481022)
+2026-11-24T02:07:26.3721312Z Updating files:  88% (423300/481022)
+2026-11-24T02:07:26.5198736Z Updating files:  89% (428110/481022)
+2026-11-24T02:07:26.6147499Z Updating files:  89% (431242/481022)
+2026-11-24T02:07:27.1384583Z Updating files:  90% (432920/481022)
+2026-11-24T02:07:27.5198504Z Updating files:  91% (437731/481022)
+2026-11-24T02:07:27.5505984Z Updating files:  91% (442303/481022)
+2026-11-24T02:07:27.7841929Z Updating files:  92% (442541/481022)
+2026-11-24T02:07:28.1008263Z Updating files:  93% (447351/481022)
+2026-11-24T02:07:28.4558131Z Updating files:  94% (452161/481022)
+2026-11-24T02:07:28.5197928Z Updating files:  95% (456971/481022)
+2026-11-24T02:07:28.8722560Z Updating files:  95% (458052/481022)
+2026-11-24T02:07:29.1347010Z Updating files:  96% (461782/481022)
+2026-11-24T02:07:29.4187586Z Updating files:  97% (466592/481022)
+2026-11-24T02:07:29.5198612Z Updating files:  98% (471402/481022)
+2026-11-24T02:07:29.8115219Z Updating files:  98% (472561/481022)
+2026-11-24T02:07:30.3522447Z Updating files:  99% (476212/481022)
+2026-11-24T02:07:30.3523376Z Updating files: 100% (481022/481022)
+2026-11-24T02:07:30.3524918Z Updating files: 100% (481022/481022), done.
+2026-11-24T02:07:30.9581308Z Note: switching to 'refs/remotes/pull/5110/merge'.
+2026-11-24T02:07:30.9583294Z 
+2026-11-24T02:07:30.9584229Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-24T02:07:30.9585654Z changes and commit them, and you can discard any commits you make in this
+2026-11-24T02:07:30.9587062Z state without impacting any branches by switching back to a branch.
+2026-11-24T02:07:30.9587937Z 
+2026-11-24T02:07:30.9588550Z If you want to create a new branch to retain commits you create, you may
+2026-11-24T02:07:30.9590131Z do so (now or later) by using -c with the switch command. Example:
+2026-11-24T02:07:30.9590976Z 
+2026-11-24T02:07:30.9591419Z   git switch -c <new-branch-name>
+2026-11-24T02:07:30.9592021Z 
+2026-11-24T02:07:30.9592430Z Or undo this operation with:
+2026-11-24T02:07:30.9592924Z 
+2026-11-24T02:07:30.9593258Z   git switch -
+2026-11-24T02:07:30.9593677Z 
+2026-11-24T02:07:30.9594240Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-24T02:07:30.9594979Z 
+2026-11-24T02:07:30.9595773Z HEAD is now at ab8b2668fe Merge 479443085e5c0a8ac13d577e2386b5f2d368f5ac into ff41265de0ef081a5e6551e24934ffbe2bbe735d
+2026-11-24T02:07:30.9994412Z ##[endgroup]
+2026-11-24T02:07:31.0058270Z [command]/usr/bin/git log -1 --format=%H
+2026-11-24T02:07:31.0097527Z ab8b2668fe34260ed255fc192fe0c3a4618ddf3a
+2026-11-24T02:07:31.0719986Z ##[group]Run python3 tools/check_skills_parity.py
+2026-11-24T02:07:31.0720498Z [36;1mpython3 tools/check_skills_parity.py[0m
+2026-11-24T02:07:31.0744722Z shell: /usr/bin/bash -e {0}
+2026-11-24T02:07:31.0745001Z ##[endgroup]
+2026-11-24T02:07:31.1093086Z skills-parity: OK (0 skill(s) on both surfaces)
+2026-11-24T02:07:31.1177798Z ##[group]Run python3 tools/check_lab_parity.py --repo crypto
+2026-11-24T02:07:31.1178298Z [36;1mpython3 tools/check_lab_parity.py --repo crypto[0m
+2026-11-24T02:07:31.1198771Z shell: /usr/bin/bash -e {0}
+2026-11-24T02:07:31.1199437Z ##[endgroup]
+2026-11-24T02:07:31.1597341Z lab-parity: OK for crypto (21 file(s))
+2026-11-24T02:07:31.1689709Z ##[group]Run python3 tools/test_validate_validation_json.py
+2026-11-24T02:07:31.1690187Z [36;1mpython3 tools/test_validate_validation_json.py[0m
+2026-11-24T02:07:31.1710688Z shell: /usr/bin/bash -e {0}
+2026-11-24T02:07:31.1710950Z ##[endgroup]
+2026-11-24T02:07:31.4473510Z ....
+2026-11-24T02:07:31.4474038Z ----------------------------------------------------------------------
+2026-11-24T02:07:31.4474584Z Ran 4 tests in 0.177s
+2026-11-24T02:07:31.4474750Z 
+2026-11-24T02:07:31.4474840Z OK
+2026-11-24T02:07:31.4645993Z ##[group]Run python3 tools/test_result_switches.py
+2026-11-24T02:07:31.4646443Z [36;1mpython3 tools/test_result_switches.py[0m
+2026-11-24T02:07:31.4667344Z shell: /usr/bin/bash -e {0}
+2026-11-24T02:07:31.4667669Z ##[endgroup]
+2026-11-24T02:07:32.5085641Z ok   test_autolab_launch_functions_record_every_parsed_argument
+2026-11-24T02:07:32.5086754Z ok   test_credentials_are_never_recorded
+2026-11-24T02:07:32.5087528Z ok   test_every_autolab_environment_copy_is_followed_by_a_switch_record
+2026-11-24T02:07:32.5088898Z FAIL test_every_rust_env_switch_is_recorded_or_exempt: unrecorded environment switches: ['GENUS_LADDER_EXPORT_CORE', 'GOLDEN_PRINT']
+2026-11-24T02:07:32.5090582Z ok   test_ic_tool_program_records_carry_the_switches
+2026-11-24T02:07:32.5091199Z ok   test_record_captures_switches_not_noise
+2026-11-24T02:07:32.5091771Z ok   test_second_write_with_other_switches_is_kept_beside_the_first
+2026-11-24T02:07:32.5092312Z 6/7 passed
+2026-11-24T02:07:32.5203579Z ##[error]Process completed with exit code 1.
+2026-11-24T02:07:32.5356706Z Post job cleanup.
+2026-11-24T02:07:32.6295743Z [command]/usr/bin/git version
+2026-11-24T02:07:32.6345848Z git version 2.56.1
+2026-11-24T02:07:32.6393081Z Temporarily overriding HOME='/home/runner/work/_temp/8bee735b-8172-4ff3-aea9-81fa6557b9b2' before making global git config changes
+2026-11-24T02:07:32.6395086Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-24T02:07:32.6409795Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-24T02:07:32.6447069Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-24T02:07:32.6489656Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-24T02:07:32.7607848Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-24T02:07:32.7647748Z http.https://github.com/.extraheader
+2026-11-24T02:07:32.7658490Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-24T02:07:32.7707639Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-24T02:07:32.8765978Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-24T02:07:32.8817700Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-24T02:07:33.0085697Z Cleaning up orphan processes
+2026-11-24T02:07:33.0477831Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
