@@ -1,0 +1,26 @@
+[package]
+name = "m31-graeffe-polar-check"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+prime31-algebraic-ic = { path = "../../prime31_four_summand_20261122/native/original-native" }
+serde_json = "1"
+
+[[bin]]
+name = "m31-graeffe-polar-check"
+path = "main.rs"
+
+# Bounded development compilation; these settings are not a speed comparison.
+[profile.release]
+opt-level = 1
+debug = 0
+lto = false
+codegen-units = 64
+
+[profile.release.package.prime31-algebraic-ic]
+opt-level = 0
+codegen-units = 256

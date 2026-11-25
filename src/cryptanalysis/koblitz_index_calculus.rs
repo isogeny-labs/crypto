@@ -14321,7 +14321,10 @@ impl FastRhoWalk<'_> {
                 self.lambda_neg[best_k as usize],
             )
         } else {
-            (FastPoint::affine(best_x, y), self.lambda_pos[best_k as usize])
+            (
+                FastPoint::affine(best_x, y),
+                self.lambda_pos[best_k as usize],
+            )
         };
         FastRhoState {
             point,
@@ -16405,6 +16408,25 @@ fn walk_vfilter_enabled() -> bool {
     *ON.get_or_init(|| std::env::var("KIC_WALK_VFILTER").map_or(true, |v| v != "0"))
 }
 
+/// Experiment override for the `m = 3` descent walk's third-summand
+/// window (`KIC_DESCENT_WINDOW`): unset keeps the current rule (the
+/// collection window, else `⌈|F|/3⌉`); `0` or a value `≥ |F|` is the full
+/// scan; `d3` is `⌈|F|/3⌉` whatever the collection window is.
+fn descent_window_override() -> Option<DescentWindow> {
+    static W: std::sync::OnceLock<Option<DescentWindow>> = std::sync::OnceLock::new();
+    *W.get_or_init(|| match std::env::var("KIC_DESCENT_WINDOW").as_deref() {
+        Ok("d3") => Some(DescentWindow::Third),
+        Ok(v) => v.parse::<usize>().ok().map(DescentWindow::Fixed),
+        Err(_) => None,
+    })
+}
+
+#[derive(Clone, Copy, Debug)]
+enum DescentWindow {
+    Third,
+    Fixed(usize),
+}
+
 /// Whether the sparse relation system builds each row straight from
 /// its summands (`KIC_DIRECT_ROWS`, default on) instead of through a
 /// dense big-integer row.  Both give the same row; `0` restores the
@@ -18064,11 +18086,16 @@ impl<'a> IndividualLogSolver<'a> {
                 // scan (sorted witnesses, no triple re-find).
                 let pdp = if m == 3 {
                     let base_len = pair.points.len();
-                    let len = self
-                        .opts
-                        .collection_window
-                        .map(|w| w.max(1).min(base_len.max(1)))
-                        .unwrap_or_else(|| default_m3_window(base_len));
+                    let len = match descent_window_override() {
+                        Some(DescentWindow::Third) => default_m3_window(base_len),
+                        Some(DescentWindow::Fixed(0)) => base_len,
+                        Some(DescentWindow::Fixed(w)) => w.min(base_len.max(1)),
+                        None => self
+                            .opts
+                            .collection_window
+                            .map(|w| w.max(1).min(base_len.max(1)))
+                            .unwrap_or_else(|| default_m3_window(base_len)),
+                    };
                     let start = if base_len == 0 {
                         0
                     } else {

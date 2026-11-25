@@ -9441,6 +9441,19 @@ pub struct SolveReport {
     pub max_cols: usize,
     pub f4_runs: usize,
     pub ms: f64,
+    /// Wall nanoseconds from entry to return of the substitution recursion.
+    pub recursion_total_ns: u64,
+    /// Wall nanoseconds inside all `f4` calls in the substitution tree.
+    pub f4_ns: u64,
+    /// Wall nanoseconds selecting a variable and its roots from each basis.
+    pub root_selection_ns: u64,
+    /// Wall nanoseconds specializing and normalizing each recursive system.
+    pub specialization_ns: u64,
+    /// Recursion wall nanoseconds outside the three measured spans: traversal,
+    /// candidate assembly, checks, and dispatch overhead.
+    pub recursion_traversal_ns: u64,
+    /// Wall nanoseconds in the final check against the original input.
+    pub final_filter_ns: u64,
     pub timed_out: bool,
     /// `F_p` multiplications spent in row reduction, summed over the F4
     /// runs of the substitution tree.
@@ -9847,6 +9860,10 @@ fn solve_with_linear_roots(
     let mut top: Option<(u32, u32)> = None;
     let mut timed_out = false;
     let mut blocked = 0usize;
+    let mut f4_ns = 0u128;
+    let mut root_selection_ns = 0u128;
+    let mut specialization_ns = 0u128;
+    let recursion_start = Instant::now();
     let verdict = solve_rec(
         input,
         n_vars,
@@ -9859,7 +9876,13 @@ fn solve_with_linear_roots(
         &mut top,
         &mut timed_out,
         &mut blocked,
+        &mut f4_ns,
+        &mut root_selection_ns,
+        &mut specialization_ns,
     );
+    let recursion_ns = recursion_start.elapsed().as_nanos();
+    let measured_ns = f4_ns + root_selection_ns + specialization_ns;
+    assert!(measured_ns <= recursion_ns, "F4 stage timers overlap");
     let (solving_degree, degree_reached) = top.unwrap_or((0, 0));
     // Every run of the substitution tree may be a truncation (pairs above
     // the degree bound dropped, or a staircase stop), and a truncated basis
@@ -9870,6 +9893,7 @@ fn solve_with_linear_roots(
     // A refutation needs no check: `1` in a truncated basis is `1` in the
     // ideal.
     let mut candidates_rejected = 0usize;
+    let filter_start = Instant::now();
     let verdict = match verdict {
         Verdict::Solutions(sols) => {
             let kept: Vec<Vec<u64>> = sols
@@ -9890,6 +9914,7 @@ fn solve_with_linear_roots(
         }
         other => other,
     };
+    let final_filter_ns = filter_start.elapsed().as_nanos();
     SolveReport {
         verdict,
         solving_degree,
@@ -9898,6 +9923,12 @@ fn solve_with_linear_roots(
         max_cols,
         f4_runs: runs,
         ms: t0.elapsed().as_secs_f64() * 1e3,
+        recursion_total_ns: recursion_ns.min(u64::MAX as u128) as u64,
+        f4_ns: f4_ns.min(u64::MAX as u128) as u64,
+        root_selection_ns: root_selection_ns.min(u64::MAX as u128) as u64,
+        specialization_ns: specialization_ns.min(u64::MAX as u128) as u64,
+        recursion_traversal_ns: (recursion_ns - measured_ns).min(u64::MAX as u128) as u64,
+        final_filter_ns: final_filter_ns.min(u64::MAX as u128) as u64,
         timed_out,
         field_ops: field_ops_now() - ops0,
         blocked_steps: blocked,
@@ -9918,6 +9949,9 @@ fn solve_rec(
     top: &mut Option<(u32, u32)>,
     timed_out: &mut bool,
     blocked: &mut usize,
+    f4_ns: &mut u128,
+    root_selection_ns: &mut u128,
+    specialization_ns: &mut u128,
 ) -> Verdict {
     if n_vars == 0 {
         // constants only: consistent iff all zero
@@ -9928,7 +9962,9 @@ fn solve_rec(
             Verdict::Solutions(vec![vec![]])
         };
     }
+    let f4_start = Instant::now();
     let r = f4(input, n_vars, p, opts);
+    *f4_ns += f4_start.elapsed().as_nanos();
     *runs += 1;
     *max_rows = (*max_rows).max(r.max_rows);
     *max_cols = (*max_cols).max(r.max_cols);
@@ -9950,6 +9986,7 @@ fn solve_rec(
     // A forced linear value is valid even for a truncated basis: every
     // basis polynomial lies in the input ideal. Other constraints are
     // still checked by recursion and by solve's final exact input filter.
+    let root_selection_start = Instant::now();
     let mut best = if linear_roots {
         r.basis
             .iter()
@@ -9985,6 +10022,7 @@ fn solve_rec(
             (0, (0..p).collect())
         }
     };
+    *root_selection_ns += root_selection_start.elapsed().as_nanos();
     let mut sols: Vec<Vec<u64>> = Vec::new();
     for a in values {
         if let Some(d) = opts.deadline {
@@ -9993,12 +10031,14 @@ fn solve_rec(
                 return Verdict::Undetermined;
             }
         }
+        let specialization_start = Instant::now();
         let sub: Vec<Poly> = r
             .basis
             .iter()
             .map(|g| normalise_owned(specialise(g, var, a, p), p, opts.order))
             .filter(|g| !g.is_empty())
             .collect();
+        *specialization_ns += specialization_start.elapsed().as_nanos();
         match solve_rec(
             &sub,
             n_vars - 1,
@@ -10011,6 +10051,9 @@ fn solve_rec(
             top,
             timed_out,
             blocked,
+            f4_ns,
+            root_selection_ns,
+            specialization_ns,
         ) {
             Verdict::Inconsistent => {}
             Verdict::Undetermined => return Verdict::Undetermined,

@@ -1,0 +1,173 @@
+warning: struct `MaskHasher` is never constructed
+  --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_four_summand_20261122/native/f4-source/src/../../../../../src/cryptanalysis/fx_hash.rs:89:19
+   |
+89 | pub(crate) struct MaskHasher(u64);
+   |                   ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: type alias `MaskMap` is never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_four_summand_20261122/native/f4-source/src/../../../../../src/cryptanalysis/fx_hash.rs:128:17
+    |
+128 | pub(crate) type MaskMap<V> = HashMap<Mask, V, BuildHasherDefault<MaskHasher>>;
+    |                 ^^^^^^^
+
+warning: type alias `MaskSet` is never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_four_summand_20261122/native/f4-source/src/../../../../../src/cryptanalysis/fx_hash.rs:131:17
+    |
+131 | pub(crate) type MaskSet = HashSet<Mask, BuildHasherDefault<MaskHasher>>;
+    |                 ^^^^^^^
+
+warning: type alias `FastMap` is never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/ic_boundary.rs:101:17
+    |
+101 | pub(crate) type FastMap<V> = HashMap<u64, V, BuildHasherDefault<MixHasher>>;
+    |                 ^^^^^^^
+
+warning: function `fast_map` is never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/ic_boundary.rs:103:15
+    |
+103 | pub(crate) fn fast_map<V>(capacity: usize) -> FastMap<V> {
+    |               ^^^^^^^^
+
+warning: struct `OpenCoefMap` is never constructed
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/ic_boundary.rs:111:8
+    |
+111 | struct OpenCoefMap {
+    |        ^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/ic_boundary.rs:121:8
+    |
+120 | impl OpenCoefMap {
+    | ---------------- associated items in this implementation
+121 |     fn with_capacity(slots: usize) -> Self {
+    |        ^^^^^^^^^^^^^
+...
+135 |     fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+155 |     fn home(&self, key: u64) -> usize {
+    |        ^^^^
+...
+160 |     fn prefetch(&self, key: u64) {
+    |        ^^^^^^^^
+...
+165 |     fn len(&self) -> usize {
+    |        ^^^
+...
+171 |     fn insert_vacant(&mut self, key: u64, val: (u128, u64, u64)) -> Result<(), (u128, u64, u64)> {
+    |        ^^^^^^^^^^^^^
+...
+195 |     fn get(&self, key: u64) -> Option<(u128, u64, u64)> {
+    |        ^^^
+...
+212 |     fn grow(&mut self) {
+    |        ^^^^
+
+warning: struct `OpenRefMap` is never constructed
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/ic_boundary.rs:230:8
+    |
+230 | struct OpenRefMap {
+    |        ^^^^^^^^^^
+
+warning: associated items `with_capacity_bound`, `home`, `insert`, `grow`, and `get` are never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/ic_boundary.rs:241:8
+    |
+240 | impl OpenRefMap {
+    | --------------- associated items in this implementation
+241 |     fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+255 |     fn home(&self, key: u64) -> usize {
+    |        ^^^^
+...
+260 |     fn insert(&mut self, key: u64, val: (usize, usize, bool, u64)) {
+    |        ^^^^^^
+...
+285 |     fn grow(&mut self) {
+    |        ^^^^
+...
+302 |     fn get(&self, key: u64) -> Option<(usize, usize, bool, u64)> {
+    |        ^^^
+
+warning: function `powmod` is never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/ic_boundary.rs:398:4
+    |
+398 | fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
+    |    ^^^^^^
+
+warning: field `r` is never read
+    --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/ic_boundary.rs:1077:5
+     |
+1076 | pub struct CubicClasses {
+     |            ------------ field in this struct
+1077 |     r: u64,
+     |     ^
+
+warning: function `prefetch_cache_line` is never used
+    --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/ic_boundary.rs:2044:4
+     |
+2044 | fn prefetch_cache_line<T>(lines: &[T], index: usize) {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `add_mod` is never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/prime_fast.rs:394:4
+    |
+394 | fn add_mod(a: u64, b: u64, n: u64) -> u64 {
+    |    ^^^^^^^
+
+warning: function `neg_mod` is never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/prime_fast.rs:404:4
+    |
+404 | fn neg_mod(a: u64, n: u64) -> u64 {
+    |    ^^^^^^^
+
+warning: method `jac_to_affine_many` is never used
+   --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/prime_fast.rs:666:8
+    |
+462 | impl FastCurve {
+    | -------------- method in this implementation
+...
+666 |     fn jac_to_affine_many(
+    |        ^^^^^^^^^^^^^^^^^^
+
+warning: function `add_mod` is never used
+  --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/residual_arithmetic.rs:22:4
+   |
+22 | fn add_mod(a: u64, b: u64, p: u64) -> u64 {
+   |    ^^^^^^^
+
+warning: function `sub_mod` is never used
+  --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/residual_arithmetic.rs:29:4
+   |
+29 | fn sub_mod(a: u64, b: u64, p: u64) -> u64 {
+   |    ^^^^^^^
+
+warning: constant `SHOUP_MAX_MODULUS` is never used
+  --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/residual_arithmetic.rs:37:7
+   |
+37 | const SHOUP_MAX_MODULUS: u64 = 1 << 63;
+   |       ^^^^^^^^^^^^^^^^^
+
+warning: struct `FixedFactor` is never constructed
+  --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/residual_arithmetic.rs:48:8
+   |
+48 | struct FixedFactor {
+   |        ^^^^^^^^^^^
+
+warning: associated items `new` and `mul` are never used
+  --> /Volumes/SSD990-2/prime31-ec-graph-pr-20261123/research/prime31_graph_ecdlp_20261123/native/target/release/build/rr5-original-f4-closure-c174d7abaabf1e11/out/residual_arithmetic.rs:55:8
+   |
+53 | impl FixedFactor {
+   | ---------------- associated items in this implementation
+54 |     #[inline]
+55 |     fn new<const SHOUP: bool>(w: u64, n: u64) -> FixedFactor {
+   |        ^^^
+...
+70 |     fn mul<const SHOUP: bool>(self, x: u64, n: u64) -> u64 {
+   |        ^^^
+
+warning: `rr5-original-f4-closure` (lib) generated 20 warnings
+    Finished `release` profile [optimized] target(s) in 0.03s
+     Running `research/prime31_graph_ecdlp_20261123/native/target/release/prime31-graph-rr5-control wide2`
