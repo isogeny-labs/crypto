@@ -453,7 +453,7 @@ class Remote:
         argv = self.put_multipart_args(digest, src) if size > SINGLE_PUT_MAX else self.put_args(digest, src)
         p = self._run(argv)
         if p.returncode != 0:
-            if single_s3_put and "PreconditionFailed" in p.stderr:
+            if single_s3_put and ("PreconditionFailed" in p.stderr or "(412)" in p.stderr):
                 # HEAD may still be forbidden. Read and hash the exact key;
                 # never infer content identity from a 412 or object size.
                 with tempfile.TemporaryDirectory() as tmp:

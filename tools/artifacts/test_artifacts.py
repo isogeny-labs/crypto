@@ -881,16 +881,19 @@ class S3Argv(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / "source"
             source.write_bytes(b"x")
-            responses = [subprocess.CompletedProcess([], 1, "", "(403) Forbidden"),
-                         subprocess.CompletedProcess([], 1, "", "PreconditionFailed")]
-            with mock.patch.object(self.r, "_run", side_effect=responses), \
-                 mock.patch.object(self.r, "get", side_effect=lambda _digest, dest: dest.write_bytes(b"x")) as get:
-                self.assertFalse(self.r.put(self.d, source, 1))
-            get.assert_called_once()
-            with mock.patch.object(self.r, "_run", side_effect=responses), \
-                 mock.patch.object(self.r, "get", side_effect=lambda _digest, dest: dest.write_bytes(b"y")), \
-                 mock.patch("sys.stderr"), self.assertRaises(SystemExit):
-                self.r.put(self.d, source, 1)
+            for rejected in ("PreconditionFailed", "(412) Precondition Failed"):
+                responses = [subprocess.CompletedProcess([], 1, "", "(403) Forbidden"),
+                             subprocess.CompletedProcess([], 1, "", rejected)]
+                with self.subTest(rejected=rejected), \
+                     mock.patch.object(self.r, "_run", side_effect=responses), \
+                     mock.patch.object(self.r, "get", side_effect=lambda _digest, dest: dest.write_bytes(b"x")) as get:
+                    self.assertFalse(self.r.put(self.d, source, 1))
+                get.assert_called_once()
+                with self.subTest(rejected=rejected), \
+                     mock.patch.object(self.r, "_run", side_effect=responses), \
+                     mock.patch.object(self.r, "get", side_effect=lambda _digest, dest: dest.write_bytes(b"y")), \
+                     mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+                    self.r.put(self.d, source, 1)
 
     def test_ambiguous_head_put_denial_and_multipart_fail_closed(self):
         forbidden = subprocess.CompletedProcess([], 1, "", "(403) Forbidden")
