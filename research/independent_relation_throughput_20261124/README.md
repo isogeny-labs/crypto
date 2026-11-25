@@ -46,7 +46,9 @@ remain charged.
 | H-GEN-SIB | sibling generation from one batched inversion | lower counted work and, after implementation repair, lower wall per independent rank | profile pool 64 and 256 on the same curve/seed, then paired A/B | active; existing wall result is negative |
 | H-GEN-HOT | per-parent subset selection or key/reference bookkeeping dominates the sibling wall regression | one named software path accounts for at least 20% of samples or instructions unique to the sibling arm | matched CPU sampling and Callgrind profiles | active diagnostic |
 | H-GEN-CACHE | cache each parent's seed-coefficient residues and pre-plan minus coefficients once | at least 5% fewer solve instructions in both frozen pool arms with identical semantic controls | source-exact Callgrind replay of sequences 242/243 | rejected: 3.17% / 3.54% instruction reductions miss the 5% gate |
+| H-GEN-SAMPLE | packed fixed-width draws plus duplicate rejection replace shrinking-range Fisher-Yates work for power-of-two pools | at least 5% fewer solve instructions in both pool 64 and 256 with rank and semantic controls intact | source-exact three-pool profile, then paired wall/rank only on a pass | baseline queued under `SAMPLER_PROTOCOL.md` |
 | H-YIELD-POOL | a larger jump pool reduces collision clustering enough to raise independent rank per generated child | pool 256 beats pool 64 on rank/child and rank/second, with duplicate and zero-row rates no worse | frozen k = 28 and 32 Stage 1 panels, 240 verified runs per arm and size | rejected at the primary metric: fewer children, but lower point-estimate rank/second |
+| H-YIELD-P128 | pool 128 retains some child-count gain without pool 256's full setup cost | fewer second points and inserts than pool 64 and fewer solve instructions, at the same full rank | one matched three-pool Callgrind discriminator, then a multi-target panel only on a pass | baseline queued under `SAMPLER_PROTOCOL.md` |
 | H-YIELD-LINEAR | accept `(a,b)` when a fixed linear coordinate `u*a + v*b` passes a cheap predicate | conditioning biases the residual scalar `a + d*b` toward relation-bearing points | Lean equivalence and exact fibre cardinality for the nonparallel case | disproved structurally unless `u*d-v=0`, which encodes the unknown `d` |
 | H-YIELD-FILTER | a cheap nonlinear point-aware prefilter can enrich rank-contributing collisions | held-out rank/second improves over a matched-random filter with the same acceptance rate | train-only predicate freeze, matched random negative control | queued; fixed linear coefficient filters are now closed by H-YIELD-LINEAR |
 
@@ -175,6 +177,8 @@ explicitly outside the Lean scope.
 - `PROFILE_PROTOCOL.md`: diagnostic profile frozen before collection.
 - `CACHE_PROTOCOL.md`: source-exact parent-residue cache discriminator and its
   now-closed rejection gate.
+- `SAMPLER_PROTOCOL.md`: frozen packed-sampler and intermediate-pool gates.
+- `sampler-pool-spec.json`: one-workload matched p64/p128/p256 discriminator.
 - `profiles/`: new, write-once profile outputs.
 - A separately frozen `experiment.protocol/v1` record will govern the paired
   wall/rank comparison after the profile identifies one implementation change.

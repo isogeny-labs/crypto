@@ -32,7 +32,7 @@ jobs:
         run: |
           scripts/sparse-checkout.sh apply --profile minimal \
             --path research/ecbench_phased_panel_20261117 \
-            --path research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k28-local.json
+            --path research/independent_relation_throughput_20261124/sampler-pool-spec.json
       - name: Install profiler and Rust toolchain
         run: |
           sudo apt-get update -qq
@@ -49,7 +49,7 @@ jobs:
         run: |
           set -euo pipefail
           out="$RUNNER_TEMP/independent-relation-profile"
-          spec=research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k28-local.json
+          spec=research/independent_relation_throughput_20261124/sampler-pool-spec.json
           mkdir -p "$out"
           {
             git rev-parse HEAD
@@ -62,9 +62,21 @@ jobs:
             sha256sum target/release/ecbench "$spec"
           } > "$out/PROVENANCE.txt"
 
-          for item in p256:242 p64:243; do
-            arm=${item%%:*}
-            seq=${item##*:}
+          target/release/ecbench plan --spec "$spec" --json > "$out/plan.json"
+
+          for arm in p64 p128 p256; do
+            case "$arm" in
+              p64) name=tw2cj-lazy-sib8-p64 ;;
+              p128) name=tw2cj-lazy-sib8-p128 ;;
+              p256) name=tw2cj-lazy-sib8-p256 ;;
+            esac
+            seq=$(jq -r --arg name "$name" '
+              . as $plan
+              | ($plan.arms | map(.name) | index($name)) as $arm_index
+              | $plan.executions[]
+              | select(.arm == $arm_index and .workload == 0 and .warmup == false)
+              | .seq' "$out/plan.json")
+            test "$(printf '%s\n' "$seq" | wc -l | tr -d ' ')" = 1
             dir="$out/$arm"
             mkdir -p "$dir"
             target/release/ecbench profile-input --spec "$spec" --seq "$seq" > "$dir/input.json"
@@ -86,14 +98,30 @@ jobs:
               exhausted:.report.exhausted,work:.report.work,counters:.report.counters}}' \
               "$dir/profiled-child.json" > "$dir/profiled-semantic.json"
             cmp "$dir/unprofiled-semantic.json" "$dir/profiled-semantic.json"
+            jq --argjson solve_ir "$(jq -r .solve_ir "$dir/solve-ir.json")" '
+              (.report.phases[] | select(.name == "oracle_setup")) as $setup
+              | (.report.phases[] | select(.name == "relations")) as $relations
+              | {
+                  solve_ir: $solve_ir,
+                  recovered: .report.recovered,
+                  matrix_rank: .report.counters.matrix_rank,
+                  matrix_rows: .report.counters.matrix_rows,
+                  matrix_dependent: .report.counters.matrix_dependent,
+                  sibling_second_points: $setup.work_native.sibling_second_points,
+                  table_insert_attempts: $setup.work_native.table_insert_attempts,
+                  tw_sib_parents: $relations.native.tw_sib_parents,
+                  tw_steps_rank_three: $relations.native.tw_steps_rank_three,
+                  tw_zero_rows: $relations.native.tw_zero_rows,
+                  tw_collisions: $relations.native.tw_collisions
+                }' "$dir/profiled-child.json" > "$dir/arm-summary.json"
             sha256sum "$dir"/* > "$dir/SHA256SUMS"
           done
 
-          jq -n \
-            --arg p64 "$(jq -r .solve_ir "$out/p64/solve-ir.json")" \
-            --arg p256 "$(jq -r .solve_ir "$out/p256/solve-ir.json")" \
-            '{schema:"independent-relation-profile/v1", unit:"callgrind.Ir",
-              p64_solve_ir:($p64|tonumber), p256_solve_ir:($p256|tonumber)}' \
+          jq -n --slurpfile p64 "$out/p64/arm-summary.json" \
+            --slurpfile p128 "$out/p128/arm-summary.json" \
+            --slurpfile p256 "$out/p256/arm-summary.json" \
+            '{schema:"independent-relation-profile/v2", unit:"callgrind.Ir",
+              p64:$p64[0], p128:$p128[0], p256:$p256[0]}' \
             > "$out/SUMMARY.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: ${{ !cancelled() }}
