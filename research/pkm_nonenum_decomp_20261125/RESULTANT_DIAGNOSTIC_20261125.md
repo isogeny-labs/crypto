@@ -74,6 +74,19 @@ P-192, or a NIST field. The same argument does not rule out a lazy circuit,
 quotient-algebra, or other solver that avoids materializing `J`; any such
 solver needs its own frozen cost model and witness checks.
 
+For a conditional dense-output budget, `(4B+1)^2` coefficients at `t=16`
+would need about 512 GiB of raw 59-bit coefficient payload on the s59-minus
+`p-1` Kummer map, before polynomial metadata and arithmetic workspace.
+At `t=76` on P-224's available `p-1` map, the corresponding raw payload is
+about `2^160.8` bytes using 28 bytes per field element. These are
+representation-size extrapolations, not measurements or lower bounds for
+all compact solvers. The current implementation is rejected by its `t=4`
+cap regardless of those wide extrapolations. The s59-plus, P-192, P-256,
+and P-521 favorable sides use a separate `p+1` norm-one/Dickson map;
+this solver has no corresponding cost row for them. P-384's available
+`p+1` height fails the independent relation-density gate in
+`WIDE_M3_GATE.md`.
+
 The independent-curve/full-rank/target-descent/cold same-target rho panel
 remains open for a replacement solver. The `p+1` norm-one/Dickson map is a
 separate construction and requires a separate witness implementation.
