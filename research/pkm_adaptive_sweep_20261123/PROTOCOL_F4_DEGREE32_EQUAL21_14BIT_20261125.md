@@ -46,6 +46,16 @@ GAE, wall, CPU, peak memory, relation attempts, rank and linear algebra, and
 verified target scalar. This one-curve panel is a component comparison; it
 cannot promote the map under the two-size, three-curve cold-cost goal.
 
+The first attempted timed call stopped **before launching `ic`**: six
+competing high-CPU processes appeared in the 2026-11-25T13:47:21-08:00 load
+check. `equal21_timed.jsonl` retains a sanitized prelaunch-abort receipt;
+the full local process snapshot is preserved privately at
+`/Volumes/SSD990-2/.codex/tmp/pkm-equal21-aborted-20261125/raw-load-snapshot.jsonl`
+with SHA-256 `c2f7f513674951488ac59a746afddd2807a0b309533450ce2a71de7ddc32ade4`.
+It contains unrelated command arguments and is not for publication. The
+runner now records only PID, CPU and short process names, with a fresh
+load-check ID before every retry. This event contributes no timing row.
+
 Sources checked: `src/cryptanalysis/ic_framework/pkm_semaev.rs` defines the
 exact shifted 32-abscissa interval and matching bits oracle;
 `src/bin/ic/bench.rs` registers that base in the retained build. The prior
