@@ -14,6 +14,7 @@ SHA-256 pins for this prepared implementation:
 | `analyze_heldout_v2.py` | `543b2ca3f62c45aa6061785b6c15d17b70b191b382a1fa4f4b7bfd86d4de22eb` |
 | `run_aa_control_v2.py` | `0f5cc01051ce9e552edf5b6807c5914a5075682713bd03dc73d057da29cb6df4` |
 | `check_aa_control_v2.py` | `533770fc170c3ea02d21648e9000699843193f237b06266b204cac287d7f8ff7` |
+| `verify_heldout_v2_outcomes.sage` | `1d26177e5d63447006ff55d802c483f29b4451b181daf0a595255de00ee83982` |
 
 ## Frozen comparison
 
@@ -75,6 +76,7 @@ python3 run_heldout_v2.py --admission V2_ADMISSION.json --output V2_RAW.jsonl
 python3 run_heldout_v2.py --admission V2_ADMISSION.json --output V2_RAW.jsonl --execute
 python3 run_heldout_v2.py --admission V2_ADMISSION.json --output V2_RAW.jsonl --execute --resume
 python3 analyze_heldout_v2.py --admission V2_ADMISSION.json --records V2_RAW.jsonl
+sage -python verify_heldout_v2_outcomes.sage --admission V2_ADMISSION.json --records V2_RAW.jsonl
 ```
 
 The commands without `--execute` are preflight only. The heldout `--execute`
@@ -104,3 +106,8 @@ complete measurement, the script withholds that paired statistic. Report
 success rates and censored cases regardless. A positive interval here is
 evidence on prime31 under this budget, not an asymptotic or larger-curve
 claim. Independent replay and the repository validation gates remain separate.
+`verify_heldout_v2_outcomes.sage` is the independent arithmetic replay: it
+reads the preserved JSONL and caller answers, checks all 720 scheduled calls,
+recomputes each returned scalar on the curve, checks APS relation congruence
+and group identity, and reconciles the queue and rho worker totals. It is
+also required before any result is promoted.
