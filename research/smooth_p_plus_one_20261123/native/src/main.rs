@@ -2,6 +2,7 @@
 #[cfg(feature = "production-controls")]
 mod accounting;
 mod cutoff;
+mod full_cutoff;
 #[cfg(feature = "production-controls")]
 mod oriented;
 mod polynomial;
@@ -484,6 +485,7 @@ fn run_solver(
 enum Method {
     Single(Mode),
     Refined,
+    FullCutoff,
     #[cfg(feature = "production-controls")]
     Cofactor,
     #[cfg(feature = "production-controls")]
@@ -497,6 +499,7 @@ impl Method {
         match self {
             Self::Single(mode) => format!("{mode:?}"),
             Self::Refined => "Refined".into(),
+            Self::FullCutoff => "FullCutoff".into(),
             #[cfg(feature = "production-controls")]
             Self::Cofactor => "ProductionCofactor".into(),
             #[cfg(feature = "production-controls")]
@@ -515,6 +518,7 @@ impl Method {
         match self {
             Self::Single(mode) => mode,
             Self::Refined => Mode::Distinct,
+            Self::FullCutoff => Mode::Quadratic,
             // The cofactor solver searches the full distinct-x RR5 chart.
             #[cfg(feature = "production-controls")]
             Self::Cofactor | Self::CofactorMsolve | Self::Oriented(_) => Mode::Quadratic,
@@ -526,6 +530,7 @@ fn mode(value: &str) -> Option<Method> {
     match value {
         "distinct" => Some(Method::Single(Mode::Distinct)),
         "refined" => Some(Method::Refined),
+        "full-cutoff" => Some(Method::FullCutoff),
         "expanded" => Some(Method::Single(Mode::Expanded)),
         "quadratic" => Some(Method::Single(Mode::Quadratic)),
         #[cfg(feature = "production-controls")]
@@ -556,6 +561,9 @@ fn discover(
     budget: Duration,
 ) -> Discovery {
     let deadline = Instant::now() + budget;
+    if method == Method::FullCutoff {
+        return full_cutoff::discover(base, target, solver, scratch, deadline);
+    }
     #[cfg(feature = "production-controls")]
     if let Method::Oriented(tower) = method {
         return oriented::discover(base, target, tower, deadline);
@@ -769,7 +777,7 @@ fn main() -> Result<(), String> {
     let argv: Vec<_> = std::env::args().skip(1).collect();
     let [prime, depth, solver, modes @ ..] = argv.as_slice() else {
         return Err(
-            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED [draws=1..256]] [distinct refined expanded quadratic cofactor(feature) cofactor-msolve(feature)]".into(),
+            "usage: dickson-four-summand PRIME DEPTH MSOLVE [recover=SEED [draws=1..256]] [distinct refined full-cutoff expanded quadratic cofactor(feature) cofactor-msolve(feature)]".into(),
         );
     };
     let curve = *FIXTURES
@@ -832,6 +840,9 @@ fn main() -> Result<(), String> {
     }
     if depth < 3 && modes.contains(&Method::Refined) {
         return Err("refinement needs depth at least three".into());
+    }
+    if modes.contains(&Method::FullCutoff) && recovery_seed.is_some() {
+        return Err("full-cutoff is currently a fixed-panel qualification interface".into());
     }
     if let Some(seed) = recovery_seed {
         recover(

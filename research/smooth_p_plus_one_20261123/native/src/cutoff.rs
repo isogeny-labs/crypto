@@ -56,6 +56,13 @@ fn catalog(p: i64, capacities: &BTreeMap<i64, usize>) -> Vec<Refinement> {
     result
 }
 
+pub(super) fn qualified_catalog(base: &Base) -> Result<Vec<Refinement>, String> {
+    if ![(127, 4), (8191, 4), (8191, 5)].contains(&(base.curve.p, base.depth)) {
+        return Err("full cutoff is limited to its three qualified fixture/depth inputs".into());
+    }
+    Ok(catalog(base.curve.p, &pools(base)))
+}
+
 fn tuples(n: usize) -> impl Iterator<Item = [usize; 4]> {
     (0..n).flat_map(move |a| {
         (a + 1..n)

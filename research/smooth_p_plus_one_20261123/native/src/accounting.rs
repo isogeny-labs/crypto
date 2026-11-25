@@ -792,6 +792,11 @@ pub(super) fn dispatch(
                 return Err("duplicate accounting arm".into());
             }
             let method = mode(label);
+            if method == Some(Method::FullCutoff) {
+                return Err(
+                    "full-cutoff is currently a fixed-panel qualification interface".into(),
+                );
+            }
             if label != "direct" && method.is_none() {
                 return Err("unknown accounting arm".into());
             }
