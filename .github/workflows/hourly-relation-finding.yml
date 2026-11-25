@@ -7,17 +7,35 @@ on:
       - ".github/workflows/hourly-relation-finding.yml"
       - "results/hourly_triggers/**"
   workflow_dispatch:
+  pull_request:
+    branches: [hourly-runs]
+    paths:
+      - '.github/workflows/hourly-relation-finding.yml'
+      - 'scripts/hourly_cpu_telemetry.py'
+      - 'scripts/hourly_relation_finding.py'
+      - 'scripts/test_hourly_relation_finding.py'
 
 permissions:
   contents: write
   issues: write
 
 concurrency:
-  group: hourly-koblitz-relation-finding
-  cancel-in-progress: true
+  group: ${{ github.event_name == 'pull_request' && format('hourly-koblitz-telemetry-pr-{0}', github.event.pull_request.number) || 'hourly-koblitz-relation-finding' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  telemetry-tests:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+      - run: python3 scripts/test_hourly_relation_finding.py
   record:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 50
     env:
@@ -74,7 +92,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
       - name: Commit and push new CSV and baseline on hourly-runs
-        if: always()
+        if: ${{ !cancelled() && (steps.benchmark.outcome == 'success' || steps.benchmark.outcome == 'failure') }}
         shell: bash
         run: |
           if [ -f results/hourly_log.csv ]; then
@@ -89,6 +107,9 @@ jobs:
             if [ -f results/relation_baseline.json ]; then
               git add -f results/relation_baseline.json
             fi
+            if [ -f results/relation_cpu_baselines.json ]; then
+              git add -f results/relation_cpu_baselines.json
+            fi
             if ! git diff --cached --quiet; then
               git commit -m "data: append hourly n23 relation yield measurement"
               git push origin HEAD:hourly-runs
@@ -101,9 +122,11 @@ jobs:
         shell: bash
         run: |
           if [ -s results/hourly_alert.md ]; then
-            gh issue create --repo "$GITHUB_REPOSITORY" \
-              --title "[relation-monitor] n23 relation-yield failed or changed >20% (run $GITHUB_RUN_ID)" \
-              --body-file results/hourly_alert.md
+            title="[relation-monitor] n23 relation-yield failed or changed >20% (run $GITHUB_RUN_ID)"
+            existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state all --search "$GITHUB_RUN_ID in:title" --json title --jq '.[].title')
+            if ! grep -Fxq "$title" <<< "$existing"; then
+              gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file results/hourly_alert.md
+            fi
           fi
       - name: Surface a benchmark failure to CI
         if: steps.benchmark.outcome == 'failure'
