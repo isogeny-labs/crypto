@@ -64,7 +64,7 @@ const RCON: [u8; 11] = [
 /// runs eight iterations and uses bit-mask arithmetic instead of `if`
 /// branches on secret bits, so the runtime and memory access pattern do
 /// not depend on the operand values.
-fn gmul(mut a: u8, mut b: u8) -> u8 {
+pub(super) fn gmul(mut a: u8, mut b: u8) -> u8 {
     let mut p = 0u8;
     for _ in 0..8 {
         // p ^= a iff lsb(b) == 1   →  build a 0xFF/0x00 mask from that bit
@@ -95,7 +95,7 @@ fn gmul(mut a: u8, mut b: u8) -> u8 {
 // with AES-NI should call into the hardware path; we don't have one
 // here.
 
-fn sbox_ct(x: u8) -> u8 {
+pub(super) fn sbox_ct(x: u8) -> u8 {
     use subtle::{ConditionallySelectable, ConstantTimeEq};
     let mut result: u8 = 0;
     for i in 0u16..256 {
@@ -106,7 +106,7 @@ fn sbox_ct(x: u8) -> u8 {
     result
 }
 
-fn inv_sbox_ct(x: u8) -> u8 {
+pub(super) fn inv_sbox_ct(x: u8) -> u8 {
     use subtle::{ConditionallySelectable, ConstantTimeEq};
     let mut result: u8 = 0;
     for i in 0u16..256 {
