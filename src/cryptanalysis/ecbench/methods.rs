@@ -42,8 +42,8 @@ use crate::cryptanalysis::ecbench::fp3::{self as fp3, Fp3Group, Fp3Instance, K3P
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
 use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
-    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook,
-    build_negation_table, kangaroo, kangaroo_with, verify_candidate, GenericOutcome,
+    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, build_negation_table,
+    kangaroo, kangaroo_with, verify_candidate, GenericOutcome,
 };
 use crate::cryptanalysis::ecbench::hec;
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
@@ -86,16 +86,16 @@ use crate::cryptanalysis::ic_framework::fiber::{
 };
 use crate::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
-    CyclotomicBase, DescentAlgebraicOracle, FrobeniusKSumOracle, FrobeniusMitmOracle, GlvOrbitBase,
-    KSumOracle, KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase,
-    PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, ResidualSweepOracle, RootfindSubtractOracle,
-    SubtractOracle, WSumOracle, WWalkOracle,
+    CyclotomicBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KSumOracle,
+    KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase, PrimeBatchMitmOracle,
+    PrimeProjectedAbscissaBase, ResidualSweepOracle, RootfindSubtractOracle, SubtractOracle,
+    WSumOracle, WWalkOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
-use crate::cryptanalysis::ic_framework::semaev_projection_oracle::SemaevProjectionOracle;
 use crate::cryptanalysis::ic_framework::rootfind_floor::RootfindFloorOracle;
 use crate::cryptanalysis::ic_framework::rootfind_kmitm::RootfindKMitmOracle;
+use crate::cryptanalysis::ic_framework::semaev_projection_oracle::SemaevProjectionOracle;
 use crate::cryptanalysis::ic_framework::shared_rank::{
     run_shared_rank_targets, SharedRankSpec, SharedTargetSpec,
 };
@@ -148,13 +148,11 @@ pub struct MethodDecl {
     pub params: &'static [ParamDecl],
 }
 
-const GROWING_ARITY_PARAMS: &[ParamDecl] = &[
-    ParamDecl {
-        name: "bits",
-        default: Some("16"),
-        help: "prime-order curve bit size for prime_instance_for (12..=40)",
-    },
-];
+const GROWING_ARITY_PARAMS: &[ParamDecl] = &[ParamDecl {
+    name: "bits",
+    default: Some("16"),
+    help: "prime-order curve bit size for prime_instance_for (12..=40)",
+}];
 
 const AUX_TOWER_SOLVER_PARAMS: &[ParamDecl] = &[
     ParamDecl {
@@ -9143,9 +9141,6 @@ fn solve_ic_binary(
         }
         "mitm-fiber" => Box::new(FiberMitmOracle::new(ms)),
         "mitm-frobenius-fiber" => Box::new(FiberFrobeniusMitmOracle::new(ms, inst)),
-        "ksum" => Box::new(KSumOracle::new(ms)),
-        "ksum-frobenius" => Box::new(FrobeniusKSumOracle::new(ms, inst)),
-        "wwalk" => Box::new(WWalkOracle::new()),
         "rootfind-mitm" => Box::new(RootfindMitmOracle::new(ms)),
         "rootfind-pairs" => Box::new(RootfindPairsOracle::new(ms)),
         "descent-algebraic" => Box::new(DescentAlgebraicOracle::new(
@@ -12082,7 +12077,9 @@ mod accounting_rules_tests {
 
         let online = rep.online.expect("cached query has an online window");
         assert!(online.wall_ns > 0 && online.wall_ns < rep.solve_wall_ns);
-        assert!(online.start_event.contains("after the G-only negation baby table"));
+        assert!(online
+            .start_event
+            .contains("after the G-only negation baby table"));
         assert_eq!(
             online.phases_ns.values().sum::<u64>(),
             online.wall_ns,
@@ -14416,7 +14413,11 @@ mod curve25519_pair_dispatch_tests {
                 .curve
                 .mul(&mut scratch, prime.generator_point(), d as u64);
             let coords = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
-            let t = match bits { 20 => 7, 24 => 8, _ => 9 };
+            let t = match bits {
+                20 => 7,
+                24 => 8,
+                _ => 9,
+            };
             let fb_spec = format!("prime-isogeny:t={t},seed=1");
             let ic = resolve(&MethodSpec {
                 id: "ic.pipeline".into(),

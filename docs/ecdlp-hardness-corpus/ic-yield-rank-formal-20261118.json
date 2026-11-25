@@ -8,6 +8,25 @@
       "citation": "crypto repository, research/ic_yield_rank_frontier_20261118 and two Lean owner modules (2026-11-18)",
       "repository_path": "research/ic_yield_rank_frontier_20261118/PROOF_MAP.md",
       "notes": "Kernel-checked generic theorems/countermodels plus a synthetic-only fixed-population schema and an 11-claim kernel-mode source audit. No natural population or asymptotic law is claimed."
+    },
+    {
+      "id": "S-IC-CYCLE-CLOSURE-FORMAL-2026",
+      "title": "Two-summand cycle closure: exact incidence-algebra boundary",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "crypto repository, research/ic_cycle_closure_20261125 and IcNegative.CycleClosure (2026-11-25)",
+      "repository_path": "research/ic_cycle_closure_20261125/README.md",
+      "notes": "Kernel-checked finite countermodel and controls plus the exact target-projection bridge. The natural stopping-time distribution remains open."
+    },
+    {
+      "id": "S-GRAPH-ZASLAVSKY-1982",
+      "title": "Signed graphs",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Thomas Zaslavsky, Discrete Applied Mathematics 4 (1982), 47-74, Theorem 8B.1 and Corollary 8B.3.",
+      "url": "https://doi.org/10.1016/0166-218X(82)90033-6",
+      "sha256": "fa66ad267542e6b7cdbeef4706f7ca61d2f64fc8a478ed414d3428d4a3a12a4d",
+      "notes": "Primary PDF read at Section 8A-8B. Theorem 8B.1 identifies signed-incidence dependencies over rings where 2 is not a zero divisor; Corollary 8B.3 states the field kernel matroid and separates characteristic 2."
     }
   ],
   "nodes": [
@@ -158,16 +177,89 @@
       "formal": {"state": "kernel_checked", "artifacts": [{"path": "research/ecdlp_weakness_lean_20261104/lean/KernelModeCountermodels.lean", "decl": "KernelModeCountermodels.surplus_can_have_both_nonzero_kernels"}]}
     },
     {
+      "id": "THM-IC-SIGNLESS-INCIDENCE-RANK",
+      "label": "Unsigned relation incidence has the even-cycle matroid over odd scalar fields",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "For the unsigned edge-vertex incidence matrix over a field of characteristic not two, a connected bipartite component has rank |V|-1 and a connected non-bipartite component has rank |V|. Its left-nullity is therefore |E|-|V|+1 or |E|-|V| respectively; a lone even cycle is dependent and a lone odd cycle is independent.",
+      "scope": "Two-nonzero endpoint rows with unsigned +1 coefficients. Signed/folded rows require the corresponding balanced-cycle signature; characteristic two has the ordinary graphic matroid instead.",
+      "assumptions": ["Field characteristic is not two", "Rows are the declared signed or unsigned incidence representation"],
+      "source_refs": ["S-GRAPH-ZASLAVSKY-1982", "S-IC-CYCLE-CLOSURE-FORMAL-2026"],
+      "source_locations": ["Zaslavsky 1982, Theorem 8B.1 and Corollary 8B.3", "research/ic_cycle_closure_20261125/README.md"],
+      "tags": ["index-calculus", "relation-graph", "incidence", "rank"],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES",
+      "label": "'Any first graph cycle closes two-summand elimination over an odd scalar field'",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "mathematical",
+      "statement": "Overbroad bridge: the first graph-theoretic cycle in an unsigned two-summand relation graph always gives a nonzero left-kernel vector.",
+      "scope": "Refuted by a triangle over F_3. The valid replacement is a balanced/even-circuit condition plus a nonzero target projection.",
+      "assumptions": [],
+      "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"],
+      "tags": ["index-calculus", "relation-graph", "cycle", "counterexample"],
+      "evidence_class": "counterexample",
+      "formal": {"state": "kernel_checked", "artifacts": [{"path": "papers/ic-negative-results/lean/IcNegative/CycleClosure.lean", "decl": "IcNegative.CycleClosure.triangle_cycle_has_no_row_dependency"}]}
+    },
+    {
+      "id": "CEX-RP-ODD-CYCLE-NO-CLOSURE",
+      "label": "Triangle and self-pair loop need not close unsigned elimination over F3 (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "The three unsigned incidence rows of a triangle have only the zero left-kernel vector over F_3, although the graph already contains a cycle. A self-pair loop row has coefficient 2 and is likewise independent.",
+      "scope": "Finite implication countermodels. The triangle determinant and loop coefficient are 2, so both obstructions hold over every odd prime field; the Lean owner instantiates F_3.",
+      "assumptions": [],
+      "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026", "S-GRAPH-ZASLAVSKY-1982"],
+      "source_locations": ["IcNegative.CycleClosure.triangle_cycle_has_no_row_dependency", "IcNegative.CycleClosure.loop_has_no_row_dependency"],
+      "tags": ["index-calculus", "relation-graph", "lean", "counterexample"],
+      "evidence_class": "counterexample",
+      "formal": {"state": "kernel_checked", "artifacts": [{"path": "papers/ic-negative-results/lean/IcNegative/CycleClosure.lean", "decl": "IcNegative.CycleClosure.triangle_cycle_has_no_row_dependency"}, {"path": "papers/ic-negative-results/lean/IcNegative/CycleClosure.lean", "decl": "IcNegative.CycleClosure.loop_has_no_row_dependency"}]}
+    },
+    {
+      "id": "THM-RP-BALANCED-CYCLE-CONTROLS",
+      "label": "Square and parallel-edge circuits give unsigned row dependencies over F3 (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "Alternating weights cancel the unsigned incidence rows of a square, and opposite weights cancel two parallel rows. These are positive controls for an even simple cycle and a length-two multigraph cycle.",
+      "scope": "Finite F_3 controls, not a stopping-time law for a natural relation stream.",
+      "assumptions": [],
+      "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"],
+      "source_locations": ["IcNegative.CycleClosure.square_cycle_has_nonzero_row_dependency", "IcNegative.CycleClosure.parallel_edges_have_nonzero_row_dependency"],
+      "tags": ["index-calculus", "relation-graph", "lean", "cycle"],
+      "evidence_class": "theorem",
+      "formal": {"state": "kernel_checked", "artifacts": [{"path": "papers/ic-negative-results/lean/IcNegative/CycleClosure.lean", "decl": "IcNegative.CycleClosure.square_cycle_has_nonzero_row_dependency"}, {"path": "papers/ic-negative-results/lean/IcNegative/CycleClosure.lean", "decl": "IcNegative.CycleClosure.parallel_edges_have_nonzero_row_dependency"}]}
+    },
+    {
+      "id": "THM-RP-CYCLE-TARGET-PROJECTION",
+      "label": "A row dependency recovers the target only with nonzero target projection (Lean)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "statement": "After factor-base cancellation, a weighted scalar equation A+B*d=0 determines the target logarithm as d=-A/B when B is nonzero. If B=0, the graph dependency alone can be uninformative.",
+      "scope": "Exact field-algebra bridge. It does not establish the distribution or nonvanishing probability of B in a natural relation process.",
+      "assumptions": ["Field coefficients", "Nonzero weighted target coefficient for recovery"],
+      "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"],
+      "source_locations": ["IcNegative.CycleClosure.recover_target_of_projected_dependency", "IcNegative.CycleClosure.zero_target_projection_is_uninformative"],
+      "tags": ["index-calculus", "relation-graph", "target-projection", "lean"],
+      "evidence_class": "theorem",
+      "formal": {"state": "kernel_checked", "artifacts": [{"path": "papers/ic-negative-results/lean/IcNegative/CycleClosure.lean", "decl": "IcNegative.CycleClosure.recover_target_of_projected_dependency"}]}
+    },
+    {
       "id": "GAP-RP-CYCLE-CLOSURE-LAW",
-      "label": "Two-summand relation-graph first-cycle law",
+      "label": "Two-summand useful balanced-circuit stopping law",
       "kind": "open_obligation",
       "status": "open",
       "model": "classical_unrestricted",
-      "statement": "Prove or measure without stopping bias the law that the two-summand relation graph closes an eliminable cycle after about K/2 accepted edges under the route's exact vertex/edge process.",
-      "scope": "Graph-cycle elimination mode; distinct from left-kernel existence and reusable right/full-rank tables.",
-      "assumptions": ["Declared natural relation-graph ensemble", "Complete accepted/rejected edge population"],
-      "source_refs": ["S-RP-IC-BOUNDARY-LEDGER", "S-IC-YIELD-RANK-FORMAL-2026"],
-      "tags": ["index-calculus", "relation-graph", "cycle", "open"],
+      "statement": "For the route's exact signed multigraph process, prove or measure without stopping bias the accepted-edge stopping law rho(K) for the first balanced circuit whose weighted target coefficient is nonzero. Determine whether rho(K) is concentrated, its power-law exponent if any, and whether the former rho(K)=K/2 specialization is conservative.",
+      "scope": "The deterministic incidence algebra is closed: arbitrary first-cycle closure is false over odd scalar fields. What remains is the natural edge/sign ensemble, useful-circuit arrival, target projection and repeated-target exclusion; this is distinct from reusable right/full-rank tables.",
+      "assumptions": ["Declared natural signed-multigraph relation ensemble", "Complete accepted/rejected edge population", "Distinct target rows", "Odd scalar field"],
+      "source_refs": ["S-RP-IC-BOUNDARY-LEDGER", "S-IC-YIELD-RANK-FORMAL-2026", "S-IC-CYCLE-CLOSURE-FORMAL-2026", "S-GRAPH-ZASLAVSKY-1982"],
+      "tags": ["index-calculus", "relation-graph", "balanced-cycle", "stopping-time", "open"],
       "evidence_class": "open"
     }
   ],
@@ -185,6 +277,10 @@
     {"id": "ICYRF-E-011", "from": "CEX-IC-SURPLUS-RIGHT-RANK", "to": "CLAIM-IC-ROW-SURPLUS-FULL-RIGHT-RANK", "relation": "refutes", "statement": "A surplus-row matrix can have nonzero left and right kernels simultaneously.", "source_refs": ["S-IC-YIELD-RANK-FORMAL-2026"]},
     {"id": "ICYRF-E-012", "from": "CEX-IC-SURPLUS-RIGHT-RANK", "to": "HEUR-RELATION-RANK", "relation": "qualifies", "statement": "Row count alone does not discharge the reusable rank heuristic.", "source_refs": ["S-IC-YIELD-RANK-FORMAL-2026"]},
     {"id": "ICYRF-E-013", "from": "CEX-IC-SURPLUS-RIGHT-RANK", "to": "GAP-IC-KERNEL-MODE-SCOPE", "relation": "qualifies", "statement": "Left-kernel existence and right-kernel uniqueness are distinct obligations.", "source_refs": ["S-IC-YIELD-RANK-FORMAL-2026"]},
-    {"id": "ICYRF-E-014", "from": "GAP-RP-CYCLE-CLOSURE-LAW", "to": "COND-RP-TWO-SUMMAND-FAMILY-LAW", "relation": "conditions", "statement": "The family law uses first-cycle closure rather than a reusable full-rank table.", "source_refs": ["S-RP-IC-BOUNDARY-LEDGER", "S-IC-YIELD-RANK-FORMAL-2026"]}
+    {"id": "ICYRF-E-014", "from": "GAP-RP-CYCLE-CLOSURE-LAW", "to": "COND-RP-TWO-SUMMAND-FAMILY-LAW", "relation": "conditions", "statement": "The displayed r^(1/6) family law specializes the unresolved useful-circuit stopping law to rho(K)=K/2; it is not a reusable full-rank condition.", "source_refs": ["S-RP-IC-BOUNDARY-LEDGER", "S-IC-YIELD-RANK-FORMAL-2026", "S-IC-CYCLE-CLOSURE-FORMAL-2026"]},
+    {"id": "ICYRF-E-015", "from": "CEX-RP-ODD-CYCLE-NO-CLOSURE", "to": "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES", "relation": "refutes", "statement": "A triangle is a cycle but its unsigned incidence rows are independent over F_3.", "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"]},
+    {"id": "ICYRF-E-016", "from": "THM-IC-SIGNLESS-INCIDENCE-RANK", "to": "GAP-RP-CYCLE-CLOSURE-LAW", "relation": "qualifies", "statement": "Over an odd scalar field the relevant incidence circuits are balanced; an arbitrary first cycle is insufficient.", "source_refs": ["S-GRAPH-ZASLAVSKY-1982", "S-IC-CYCLE-CLOSURE-FORMAL-2026"]},
+    {"id": "ICYRF-E-017", "from": "THM-RP-BALANCED-CYCLE-CONTROLS", "to": "GAP-RP-CYCLE-CLOSURE-LAW", "relation": "qualifies", "statement": "Even and parallel-edge circuits are finite positive controls, but do not determine their natural arrival time.", "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"]},
+    {"id": "ICYRF-E-018", "from": "THM-RP-CYCLE-TARGET-PROJECTION", "to": "GAP-RP-CYCLE-CLOSURE-LAW", "relation": "qualifies", "statement": "A balanced incidence circuit closes target elimination only when its weighted target coefficient is nonzero.", "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"]}
   ]
 }

@@ -239,7 +239,7 @@ pricing:
   - Formula: priced = total_gae − C + w(U + n_C).
   - U: `cost.unpriced` without the byte counters, plus marker-gated `table_insert_attempts`,
     `sibling_second_points` and `sibling_lift_products`.
-  - C and n_C: `PRICED_NATIVE` at the pinned K_1/GF(2^23), K_1/GF(2^29) and K_0/GF(2^37) rows of
+  - C and n_C: `PRICED_NATIVE` at the pinned icv1-f2m23-tm5197-1f85e9e1, icv1-f2m29-tm40309-30c52b96 and icv1-f2m37-tm534059-32aad96b rows of
     `docs/ic/calibration.json`.
   - Ratio of sums over pairs keyed by (session, workload, round), with workloads as clusters.
   - Results:

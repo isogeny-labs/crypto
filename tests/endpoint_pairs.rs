@@ -48,6 +48,7 @@ impl Fixture {
         let doc = runner::PlanDoc {
             schema: "ecbench.plan/v1".into(),
             spec_id: plan.spec_id.clone(),
+            curve_policy: Default::default(),
             arms: plan.arms.clone(),
             workloads: plan.workloads.clone(),
             executions: plan.executions.clone(),
@@ -111,6 +112,9 @@ impl Fixture {
                 unpriced: vec!["fixture_only_uncharged".into()],
                 deterministic: true,
                 nondeterminism: vec![],
+                total_gae_store: None,
+                s_store: None,
+                cost_basis: None,
             },
             boundaries: record::Boundaries {
                 automorphisms_available: 2,
