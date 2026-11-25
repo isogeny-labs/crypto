@@ -15,13 +15,12 @@ but `PkmSemaevOracle::decompose` adaptively chooses an enumerative grid when
 the grid at `|V|^m=512` even with `descent=1`. The direct basis-extractor
 census tests the algebra but does not change this public route.
 
-Source commit `241b6968318` adds `force_descent=1`. It requires
-`engine=f4,descent=1`, disables the small-grid crossover, and records
-`forced-basis-descent` in the oracle description. The default remains the
-adaptive route. The native candidate at **all** panel heights `t=3,4,5`
+Upstream source commit `bde2241fe6f` adds `grid_crossover=0`, which disables
+the small-grid crossover while retaining `engine=f4,descent=1`. The default
+threshold remains 512. The native candidate at **all** panel heights `t=3,4,5`
 must use
 
-`pkm-semaev:m=3,mode=chain,engine=f4,descent=1,force_descent=1,trace=0,guess=0,degree=12,max_nnz=1000000`.
+`pkm-semaev:m=3,mode=chain,engine=f4,descent=1,grid_crossover=0,trace=0,guess=0,degree=12,max_nnz=1000000`.
 
 The runner must retain this exact spec in every raw candidate arm and reject
 any candidate row with `pkm_descent_deferred_to_grid > 0`. It must also
@@ -33,13 +32,16 @@ queries remain charged.
 
 ## Admission and replay
 
-Before timing, run both
+Before timing, run
 `kummer_m3_basis_descent_complete_small_curve_census` and
-`forced_kummer_m3_descent_uses_public_oracle_path` from the pinned source.
+`zero_grid_crossover_uses_public_basis_descent_path` plus upstream
+`descent_roots_match_ground_truth_at_m3` from the pinned source.
 The first compares every nonidentity target on `E/F_97` with independent
 three-point enumeration, including cancellation targets. The second checks
 the public route at the grid crossover and verifies a returned relation by
-the group law. A passing targeted test alone is not a census pass.
+the group law. The upstream test compares planted and random public-path
+targets with an independent enumerated set and the grid control. A passing
+targeted test alone is not a census pass.
 
 Capture source commit, pre-call test-executable SHA-256, toolchain, exact
 test names, process wall and CPU, peak RSS, exit status, stdout and stderr.
