@@ -579,6 +579,25 @@ impl<const N: usize> Mont<N> {
         a.iter().all(|&w| w == 0)
     }
 
+    /// `2P` as `Jacobian::double` of `point.rs` (dbl-2007-bl) on the
+    /// production kernel: `None` when `Y = 0`.  (Kept for
+    /// `src/bin/ecbench/isogeny_eval.rs`, which includes this file by path.)
+    pub(crate) fn double(&self, j: &Jac<N>, a: &[u64; N]) -> Option<Jac<N>> {
+        self.double_k::<ProdKernel>(j, a)
+    }
+
+    /// `P + (x₂, y₂)` as `Jacobian::add_affine` (madd-2007-bl) on the
+    /// production kernel.
+    pub(crate) fn add_affine(
+        &self,
+        j: &Jac<N>,
+        x2: &[u64; N],
+        y2: &[u64; N],
+        a: &[u64; N],
+    ) -> Option<Jac<N>> {
+        self.add_affine_k::<ProdKernel>(j, x2, y2, a)
+    }
+
     /// `2P` as `Jacobian::double` of `point.rs` (dbl-2007-bl) on the kernel
     /// `K` (squares go to `K::sqr`): `None` when `Y = 0`.
     #[inline(always)]
