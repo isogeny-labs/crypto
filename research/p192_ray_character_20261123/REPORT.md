@@ -1164,6 +1164,27 @@ classes. They form exactly three complete cosets of `H`
 cosets). Thus the required subgroup transformation holds,
 but full exactness depends on the curve. [pcc:unverified]
 
+Nested cosets give an exact transfer formula, but only in one
+direction. If `H_0⊂H_1` has odd index `q`, choose representatives
+`u` of `H_1/H_0`. Regrouping the oriented products gives a
+constant representative sign `σ∈{±1}` such that
+
+`A_(H_1)(P)=σ ∏_(u∈H_1/H_0) A_(H_0)([u]P)`.
+
+The constant cancels when normalizing by the value at `G`.
+Thus exactness of `A_(H_0)` implies exactness of `A_(H_1)`:
+each of the `q` ratios contributes `χ_r(d)` and `q` is odd.
+The converse fails. On the fixed order-241 curve over `F_223`,
+the order-8 subgroup has 40 mismatching marked classes, while
+its order-24 extension is exact on all 120. The matched curve
+over `F_271` has 40 order-8 and 72 order-24 mismatches. The
+[`y_coset_small_control.sage`](y_coset_small_control.sage) replay
+checks the normalized nested-product identity at all 120
+markings on both curves. Hence the four small P-192
+counterexamples cannot by themselves exclude the remaining
+large odd extensions; a separate exactness argument is still
+needed. [pcc:unverified]
+
 For triage only, an artificial null model assigns independent
 uniform signs to the `n=(r-1)/2` base-point `y`-coordinates.
 The `t=n/m` coset products then have independent signs;

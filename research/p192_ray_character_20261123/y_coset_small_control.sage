@@ -23,6 +23,16 @@ def class_rep(value):
 
 classes = {class_rep(pow(subgroup_generator, j, r)) for j in range(m)}
 assert len(classes) == m
+small_m = 8
+small_generator = pow(subgroup_generator, m // small_m, r)
+small_classes = {class_rep(pow(small_generator, j, r)) for j in range(small_m)}
+assert len(small_classes) == small_m
+extension_reps = [class_rep(pow(subgroup_generator, j, r)) for j in range(m // small_m)]
+assert {
+    class_rep(offset * scalar)
+    for offset in extension_reps
+    for scalar in small_classes
+} == classes
 odd_doubled_reps = sorted(r - 2 * scalar for scalar in classes)
 assert len(odd_doubled_reps) == m
 assert all(scalar % 2 for scalar in odd_doubled_reps)
@@ -31,9 +41,9 @@ assert {class_rep(scalar) for scalar in odd_doubled_reps} == {
 }
 
 
-def y_sign(point, p):
+def y_sign(point, p, indices=classes):
     product = GF(p)(1)
-    for scalar in classes:
+    for scalar in indices:
         product *= (scalar * point)[1]
     assert product != 0
     return int(kronecker(ZZ(product), p))
@@ -61,6 +71,21 @@ for p, a, b, gx, gy, expected_bad_cosets in controls:
         point = scalar * base
         assert y_sign(point, p) == doubled_eds_sign(point, p), (p, scalar)
     base_sign = y_sign(base, p)
+    small_base_sign = y_sign(base, p, small_classes)
+    small_bad = {
+        scalar
+        for scalar in range(1, half + 1)
+        if y_sign(scalar * base, p, small_classes) * small_base_sign
+        != int(kronecker(scalar, r))
+    }
+    assert len(small_bad) == 40, (p, len(small_bad))
+    extension_base = [y_sign(offset * base, p, small_classes) for offset in extension_reps]
+    for scalar in range(1, half + 1):
+        point = scalar * base
+        nested_ratio = 1
+        for offset, initial in zip(extension_reps, extension_base):
+            nested_ratio *= y_sign(offset * point, p, small_classes) * initial
+        assert nested_ratio == y_sign(point, p) * base_sign, (p, scalar)
     bad = {
         scalar
         for scalar in range(1, half + 1)
@@ -78,7 +103,8 @@ for p, a, b, gx, gy, expected_bad_cosets in controls:
     print(
         f"p={p} r={r} m={m} checked_classes={half} "
         f"mismatches={len(bad)} bad_cosets={sorted(bad_cosets)} "
-        "y_eds_equal_at=[1,3,7]"
+        f"small_m={small_m} small_mismatches={len(small_bad)} "
+        "nested_ratios_equal=120 y_eds_equal_at=[1,3,7]"
     )
 
 
