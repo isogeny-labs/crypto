@@ -1046,6 +1046,23 @@ general. Thus this is a conditional obstruction and a
 description of the missing estimate, not a P-192 exclusion.
 [pcc:unverified]
 
+The exact stability proof stops short at the proposed
+remainder size. Under a disjoint grid, let
+`s=|A|=|B|=2h=12,370,728,233,318` and
+`d=|Γ|=2m=153,034,917,022,621,760,947,130,704`.
+Then the pair-sum map is injective and
+`d-s²=2k=10,675,501,841,580≈0.863s`.
+[Cochrane–Yip–Yoo, Proposition 2.7](https://arxiv.org/html/2608.02568)
+therefore gives an auxiliary-polynomial factorization
+`Ψ_A=f_B^s R` with a residual `R` of that degree. Their
+Theorem 3.6 excludes only `d-|A+B|∈{0,1}` for `d>4`;
+here it recovers `k≥1`, already required by the proper
+subgroup. Remark 3.8 says the two-element gap is sharp in
+general. Neither the exact factorization nor that stability
+theorem excludes the stated `2k` gap; any extension would
+need to control a residual polynomial of size comparable to
+the grid side. [pcc:unverified]
+
 The [`y_coset_control.sage`](y_coset_control.sage) replay uses
 direct Sage point multiplication to check the normalized
 `A_H([d]G)/A_H(G)` at `d=1,2,3,5` for `m=8,40`.
