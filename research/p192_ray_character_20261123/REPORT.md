@@ -1019,7 +1019,15 @@ by `12(L^(1/5)+1)^3≈2^55.775`. Its explicit lower-size
 condition has log₂ scale about `49.944`, and its field-size
 condition about `107.381`, both below the corresponding P-192
 sizes. Since the resulting upper bound is much greater than
-two, it gives no finite 2-by-2 exclusion. [pcc:unverified]
+two, it gives no finite 2-by-2 exclusion. It also exceeds the
+hypothetical grid's `c=6,185,364,116,659≈2^42.492`
+centers by 13.283 bits, so it does not bound that full grid.
+Increasing the corollary's shift parameter does not rescue
+this specialization: at `k=3` its explicit lower-size
+condition has log₂ scale `89.763`, above `log₂L≈86.984`,
+and that condition increases with `k`. Only `k=1,2` of this
+corollary apply here. This does not screen other intersection
+bounds or source methods. [pcc:unverified]
 
 The [`y_coset_control.sage`](y_coset_control.sage) replay uses
 direct Sage point multiplication to check the normalized
