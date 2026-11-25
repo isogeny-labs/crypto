@@ -47,13 +47,20 @@ calls; the other five endpoints remain incomplete. Across retained/new inputs,
 queries retain missing outputs. The checker shares reference/consumer source.
 [pcc:unverified]
 
-The latest [full-cutoff report](FULL_CUTOFF_RESULT.md)
+The [full-cutoff report](FULL_CUTOFF_RESULT.md)
 ([PDF](FULL_CUTOFF_RESULT.pdf)) extends the catalog to every feasible fine-image
 multiset. Three public fixture audits check complete tuple coverage and every
 admissible signed RR5 witness. At degree 32 the catalog has 119 systems;
 1,104 of 16,008 checked bindings have effective Jacobian rank two. These are
-finite point/equation checks; solver integration and total branch costs are
-next. [pcc:unverified]
+finite point/equation checks. The extraction results below extend that audit;
+total branch costs remain open. [pcc:unverified]
+
+The latest [full-cutoff extraction report](FULL_CUTOFF_EXTRACT_RESULT.md)
+([PDF](FULL_CUTOFF_EXTRACT_RESULT.pdf)) records 7/13 complete full-domain
+answers versus 8/13 for the unchanged cofactor comparator. The F127 two-image
+chart refuses all sixteen forms on one target; both arms remain incomplete
+on all five degree-32 targets. All completed sets match Direct, and failed
+prefixes stay unaccepted. This is local output qualification. [pcc:unverified]
 
 - [Initial rank argument](REPORT.md) ([PDF](REPORT.pdf)): collapsed and distinct-image charts.
 - [Initial native controls](NATIVE.md) ([PDF](NATIVE.pdf)): original encodings and retained failures.
@@ -68,6 +75,7 @@ next. [pcc:unverified]
 - [Full-output protocol](FULL_OUTPUT.md) and [reproduction](FULL_OUTPUT_REPRODUCE.md).
 - [Larger-control/replay protocol](LARGER_FULL_OUTPUT.md) and [reproduction](LARGER_FULL_OUTPUT_REPRODUCE.md).
 - [Full-cutoff protocol](FULL_CUTOFF.md) and [reproduction](FULL_CUTOFF_REPRODUCE.md).
+- [Full-cutoff extraction protocol](FULL_CUTOFF_EXTRACT.md) and [reproduction](FULL_CUTOFF_EXTRACT_REPRODUCE.md).
 - [Native source](native/src/main.rs) and [evidence](evidence/).
 
 The original reports and manifests retain their historical revision scope.

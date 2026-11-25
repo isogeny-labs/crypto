@@ -65,6 +65,11 @@ the requested end-to-end cost conclusion.
   have effective rank two in two-image charts. This restores rational-point
   coverage at the catalog level; no solver was called and total cost remains
   unmeasured. [pcc:unverified]
+- **Complete-catalog extraction:** the [paired fixed-query controls](../research/smooth_p_plus_one_20261123/FULL_CUTOFF_EXTRACT_RESULT.md)
+  complete 7/13 full-cutoff answers versus 8/13 cofactor answers. One F127
+  two-image chart refuses all sixteen forms; all five degree-32 queries remain
+  incomplete for both methods. Accepted sets match Direct, with every failed
+  prefix preserved. This leaves the complete extraction gate open. [pcc:unverified]
 - **Missing capability:** a complete degree-32 full-base comparison,
   successful full-base oriented-S3 output, qualified counters or timing for
   every phase, an exact-source registered EKS image, and independent replay.
@@ -95,8 +100,10 @@ the requested end-to-end cost conclusion.
   retaining all five incomplete endpoints and 30 budget failures. [pcc:unverified]
 - [x] Derive and finitely qualify capacity-bounded cutoff multisets, including
   repeated-image coverage and local Jacobian ranks. [pcc:unverified]
-- [ ] Integrate the full catalog into the bounded extractor and complete a
-  matched, equal-scope recovery comparison with admitted costs.
+- [x] Integrate the full catalog into a bounded fixed-panel extractor and
+  retain its paired complete/incomplete output controls. [pcc:unverified]
+- [ ] Resolve the repeated-image refusal and degree-32 completion limits, then
+  complete matched equal-scope recovery with admitted costs.
 - [ ] Publish and build the exact workload revision through the supported
   EKS route, obtain budget/isolation admission, and retain raw evidence and
   independent replay. An available generic ecbench image alone is insufficient.
@@ -107,15 +114,17 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Integrate the qualified full fine-image catalog into the bounded extractor.
-Retain the whole-answer comparison with Direct on the shared distinct-abscissa,
-target-disjoint domain and incomplete status whenever any branch fails. Check
-how the two-image singular charts interact with the conservative RUR guard;
-the finite witness audit does not establish algebraic extraction completion.
-Price the sum of all branch construction/elimination/output work; the prior first-collision
-study shows that a smaller individual system need not reduce whole-call work.
-This is the next implementation and measurement question; the finite catalog
-qualification does not measure its solver cost.
+Investigate factorwise divisibility inside each fine-image fiber as an
+alternative to the repeated-root pushforward equality. First establish its
+rational-point coverage and local algebra against the frozen multiset catalog;
+then qualify it under a separately frozen panel with unchanged whole-answer
+checks. The current F127 chart [7,7,82,82] refuses all sixteen fixed forms,
+and the degree-32 union exhausts its shared deadline after only 26–28 of119
+charts. Preserve both failure types and the existing conservative RUR guard.
+No causal proof or cheaper encoding has been established by those messages.
+Price the sum of all branch construction/elimination/output work before a
+cold comparison; the first-collision study already shows that a smaller
+individual system can increase total work.
 Keep every first-row/lookup/full-output/larger control and identity frozen.
 Then extend qualification to the registered EKS build and admitted comparison.
 Degree-32 cofactor and full-base oriented completeness remain open under fixed

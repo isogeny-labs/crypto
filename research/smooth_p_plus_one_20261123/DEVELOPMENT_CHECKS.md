@@ -236,3 +236,27 @@ At the subsequent normal CI read, identity head `5f69c1ea75` has four successful
 job138882992159, again returns HTTP403 on both older content-addressed
 HeadObject requests before upload/replay. The final-head checks are not claimed
 passed, and no absent-key or specific permission diagnosis is inferred.
+
+## Full-catalog extractor controls
+
+The [paired report](FULL_CUTOFF_EXTRACT_RESULT.md) records source42728dba83,
+identityd181477253, 39 feature tests and12 default tests, a successful build,
+and all26 planned query records from three exit-zero panels. FullCutoff
+completes7/13 answers and the unchanged cofactor comparator8/13; accepted
+whole sets match the full Direct reference. All six candidate failures and
+five comparator failures remain explicit. Claims PCC-20261125-b0dd5b and
+1df51d are unsigned. [pcc:unverified]
+
+Evidence is in `evidence/full_cutoff_extract_v1`. Every pre-call hash stays
+unchanged, and no required prefix/RUR capture is omitted. The shared runner
+retains failed-child reasons but does not archive separate child stderr or
+partial timeout files. No timing ratio, scalar recovery or EKS execution is
+represented. Source-head CI has not been re-polled before its normal cadence.
+
+Three more raw files are selected by the same artifact policy:
+`full_cutoff_extract_v1/f127_d4.jsonl` (184,826 bytes),
+`full_cutoff_extract_v1/f8191_d4.jsonl` (125,408 bytes), and
+`full_cutoff_extract_v1/f8191_d5.jsonl` (314,431 bytes), all below `evidence/`.
+Together with the prior two larger-control files, five raw files await actual
+upload/replay. The earlier supported workflow's HTTP403 remains the last
+observed store-access result; no upload of these new files is claimed.
