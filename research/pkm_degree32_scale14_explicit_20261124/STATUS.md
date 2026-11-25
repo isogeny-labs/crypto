@@ -31,3 +31,20 @@ factor-base size. Keep the completed selection record immutable. A successor
 panel must freeze a source commit and build recipe first, regenerate explicit
 curve preflights under that executable, then select three equal-size curves in
 a new append-only store.
+
+## Source-pinned successor, 2026-11-25
+
+The retained `ic` from commit `a5503f4bb66ac3aa4eac3125fba01534d2574096`
+was screened against the frozen 16-curve roster in a new store. Only indices
+6 and 13 matched factor-base sizes. A pre-timing amendment extended the same
+deterministic enumeration; index 36 became the third match. Selected indices
+are 6 (17 abscissae), 13 (16), and 36 (19). The first index-6 control timing
+was terminated after unrelated Rust compilation began during the call; the
+attempt and process snapshot remain in the append-only store. There is no
+qualifying timed result yet. The store's current SHA-256 is
+`ddab40eb3660da1fd75f282ebf05e17d74d28ae181459ed972dcebd2239eea47`.
+The successor store has no measured `s_over_rho` yet.
+In-call load polling now censors any future competing process. The stored
+`amended_selection.last_screened_index=37` is an off-by-one metadata error;
+`selection-correction:1` records the actual last screened index, 36, without
+rewriting the raw store.

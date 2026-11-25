@@ -1,0 +1,130 @@
+
+== geom: does V-level structure survive the lift to E? ==
+   V-level: sums and products of the x-values themselves (V subset F_p)
+   E-level: sums of the points F (the group the join lives in)
+p      tower      t  |V|  |F|  |V+V|x  r_add   |V*V|   r_mul  AP3_z     |F+F|  |F+F|ctl E2/ctl
+1009   interval   4   16   18      31  0.242      97   0.758  57.54       139     152.3   1.14
+1009   interval   5   32   30      63  0.123     353   0.689  81.34       357     367.0   1.05
+1009   interval   6   64   72     127  0.126     841   0.834 108.96       927     912.3   0.93
+1009   kummer     4   16   14     129  1.008      16   0.125  -2.01        99      93.0   0.92
+1009   kummer     5   -- (cap or size)
+1009   kummer     6   -- (cap or size)
+1009   isogeny    4   16   12     129  1.008     132   1.031   1.96        69      71.7   1.05
+1009   isogeny    5   32   24     415  0.811     413   0.807   0.27       263     257.0   0.96
+1009   isogeny    6   64   54     906  0.898     887   0.880  -1.41       813     725.7   0.78
+12289  interval   4   16   12      31  0.242      97   0.758 119.67        73      73.0   1.00
+12289  interval   5   32   26      63  0.123     354   0.691 302.12       339     331.7   0.97
+12289  interval   6   64   58     127  0.062    1263   0.617 431.88      1555    1571.7   1.01
+12289  kummer     4   16   12     129  1.008      16   0.125  -0.33        73      73.0   1.00
+12289  kummer     5   32   30     513  1.002      32   0.062  -1.63       451     440.3   0.97
+12289  kummer     6   64   68    2049  1.000      64   0.031  -4.62      2149    2107.0   0.97
+12289  isogeny    4   16   20     135  1.055     136   1.062  -0.33       201     199.7   0.99
+12289  isogeny    5   32   30     512  1.000     520   1.016  -0.41       445     440.3   0.99
+12289  isogeny    6   64   64    1924  0.939    1918   0.937   2.74      1875    1898.3   1.02
+
+== join: hits per pass, ops per relation, probes for |V| relations ==
+p      tower      t   |V|   |F|   h/pass     pred   ops/rel      pred    tot/p     r
+1009   interval   3     8    12    0.142    0.143     168.4     168.2    1.335  1.00
+1009   interval   4    16    18    0.297    0.321     121.0     112.1    1.919  1.08
+1009   interval   5    32    30    0.968    0.892      62.0      67.3    1.967  0.92
+1009   interval   6    64    72    4.965    5.138      29.0      28.0    1.840  1.03
+1009   interval   7   128   124   15.060   15.239      16.5      16.3    2.089  1.01
+1009   kummer     4    16    14    0.220    0.194     127.3     144.1    2.018  0.88
+1009   isogeny    3     8     8    0.040    0.063     400.0     252.2    3.171  1.59
+1009   isogeny    4    16    12    0.158    0.143     152.4     168.2    2.416  0.91
+1009   isogeny    5    32    24    0.537    0.571      89.3      84.1    2.832  1.06
+1009   isogeny    6    64    54    2.805    2.890      38.5      37.4    2.442  1.03
+1009   isogeny    7   128   120   14.307   14.272      16.8      16.8    2.128  1.00
+12289  interval   5    32    26    0.040    0.054    1300.0     955.5    3.385  1.36
+12289  interval   6    64    58    0.268    0.271     433.6     428.3    2.258  1.01
+12289  interval   7   128   126    1.198    1.278     210.4     197.2    2.192  1.07
+12289  interval   8   256   250    5.018    5.032      99.7      99.4    2.076  1.00
+12289  kummer     5    32    30    0.065    0.072     923.1     828.1    2.404  1.11
+12289  kummer     6    64    68    0.330    0.372     412.1     365.3    2.146  1.13
+12289  kummer     7   128   134    1.515    1.446     176.9     185.4    1.843  0.95
+12289  kummer     8   256   250    4.790    5.032     104.4      99.4    2.174  1.05
+12289  isogeny    4    16    20    0.045    0.032     888.9    1242.1    1.157  0.72
+12289  isogeny    5    32    30    0.070    0.072     857.1     828.1    2.232  1.04
+12289  isogeny    6    64    64    0.375    0.330     341.3     388.2    1.778  0.88
+12289  isogeny    7   128   126    1.377    1.278     182.9     197.2    1.905  0.93
+12289  isogeny    8   256   260    5.487    5.442      94.8      95.5    1.974  0.99
+40961  interval   5    32    28    0.020    0.019    2800.0    2930.2    2.187  0.96
+40961  interval   6    64    54    0.072    0.071    1489.7    1519.4    2.328  0.98
+40961  interval   7   128   112    0.328    0.306     684.0     732.6    2.137  0.93
+40961  interval   8   256   212    1.090    1.096     389.0     387.0    2.431  1.01
+40961  kummer     5    32    34    0.022    0.028    3022.2    2413.1    2.361  1.25
+40961  kummer     6    64    56    0.080    0.076    1400.0    1465.1    2.187  0.96
+40961  kummer     7   128   132    0.448    0.425     589.9     621.6    1.844  0.95
+40961  kummer     8   256   244    1.433    1.451     340.7     336.3    2.129  1.01
+40961  isogeny    6    64    60    0.080    0.088    1500.0    1367.4    2.344  1.10
+40961  isogeny    7   128   132    0.490    0.425     538.8     621.6    1.684  0.87
+40961  isogeny    8   256   242    1.363    1.428     355.2     339.0    2.220  1.05
+  direct collection check (probe until |V| relations found):
+   p      tower   t   |V|   |F|    probes probes/p
+   1009   interval  3     8    12      1996    1.978
+   1009   interval  4    16    18      2064    2.046
+   1009   interval  5    32    30      2260    2.240
+   1009   kummer  4    16    14      2590    2.567
+   1009   isogeny  3     8     8      2482    2.461
+   1009   isogeny  4    16    12      2952    2.926
+   1009   isogeny  5    32    24      3312    3.282
+   12289  interval  3     8     6     42576    3.428
+   12289  interval  4    16    12     34960    2.815
+   12289  interval  5    32    26     35074    2.824
+   12289  kummer  3     8     6     40434    3.255
+   12289  kummer  4    16    12     38080    3.066
+   12289  kummer  5    32    30     26830    2.160
+   12289  isogeny  4    16    20     20320    1.636
+   12289  isogeny  5    32    30     25960    2.090
+  (a) kummer membership t=7 |V|=128: x^2^t test 0.19 us, hash 0.01 us, ratio 13.9x
+  (b) isogeny membership t=6 |V|=64: Velu 3.58 us, hash 0.02 us, ratio 186.7x (V == zero set of L-c: 1.000)
+  (c) sumset-table join vs enumerative join, IC totals for |V| relations (enumerative = |V|*2N/|F|, measured flat at ~2p):
+   p      t     |V|   |F|   hash_tot  table_tot  winner
+   1009   2       4     6       1345        245   table
+   1009   3       8    12       1345        190   table
+   1009   4      16    18       1794        271   table
+   1009   5      32    30       2153        537   table
+   1009   6      64    72       1794       2653    hash
+   1009   7     128   124       2083       7767    hash
+   1009   8     256   254       2034      32393    hash
+   12289  2       4     4      24842       6220   table
+   12289  3       8     6      33123       5541   table
+   12289  4      16    12      33123       2838   table
+   12289  5      32    26      30575       1527   table
+   12289  6      64    58      27412       2184   table
+   12289  7     128   126      25236       8201   table
+   12289  8     256   250      25438      31477    hash
+   40961  2       4     4      82046      20522   table
+   40961  3       8     8      82046      10292   table
+   40961  4      16    18      72930       4223   table
+   40961  5      32    28      93767       3755   table
+   40961  6      64    54      97240       3286   table
+   40961  7     128   112      93767       7165   table
+   40961  8     256   212      99074      23045   table
+   best total per prime: 1009->190 (t=3, |V|=8), 12289->1527 (t=5, |V|=32), 40961->3286 (t=6, |V|=64)
+   fitted exponent of the best join total, p = 1009..40961: 0.769 (asymptote 2/3)
+  wall |F|=54: sumset table 0.9 ms, one join pass 0.02 ms (ratio 53x)
+
+== caps: how large can |V| be, per tower ==
+  the isogeny tower needs 2^t | #E' for some E'/F_p; random curves give
+  P(2^t | #E') ~ 2^-t, so the aux-curve search costs ~2^t order counts:
+p       v2  p^1/2 draws t_built       |V|  curves(2^t) |V|/p^.5
+1009     4   31.8   600     8       256        86    8.06
+4099     1   64.0   600    10      1024        67   15.99
+12289   12  110.9   600    11      2048       600   18.47
+40961   13  202.4   240     8       256        80    1.26
+  measured: the built |V| = 2^t exceeds sqrt(p) by 1.3x-18x, and the search
+  cost is ~2^t curve-order computations: the build is Theta(|V|) group ops.
+
+  analytic 2-adic caps (Kummer needs 2^t | p-1; the supersingular
+  isogeny tower on y^2 = x^3 + x needs 2^t | p+1):
+  prime        bits  v2(p-1) bKummer  v2(p+1) bIsog_ss      max
+  P-192         192        1   0.005       64    0.333    0.333
+  P-224         224       96   0.429        1    0.004    0.429
+  P-256         256        1   0.004       96    0.375    0.375
+  P-384         384        1   0.003       32    0.083    0.083
+  P-521         521        1   0.002      521    1.000    1.000
+  secp256k1     256        1   0.004        4    0.016    0.016
+
+total wall 11.4 s
+wrote route2_results.json
