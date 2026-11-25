@@ -51,6 +51,10 @@ larger same-target panel, use an isolated host, price native work across the
 section 5a band, retain A/A and positive controls, and independently replay
 before it enters a leaderboard.
 
+The first local smoke and its accounting discrepancy are recorded in
+`RESULT.md`, with the raw session in `runs/smoke-20261125T2230Z/` and the
+full-replay receipt in `audit-smoke-n11.json`.
+
 ## Sources checked
 
 - `docs/ecbench/README.md`, sections 1, 3, 9 and 11: use its existing native
