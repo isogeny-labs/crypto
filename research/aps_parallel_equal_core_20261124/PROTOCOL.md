@@ -30,6 +30,12 @@ total. A perfect N-way split of only that phase, with zero overhead, gives
 an aggregate APS floor of 78.10, 62.28 and 54.38 ms at N=2,4,8. These are
 derived bounds, not predictions; the rho arm must receive the same cores.
 The existing rho `lanes` field counts batched walks, not CPU cores.
+The S3 fraction varies by target: the median case fraction is 48.75%.
+Under the same idealized S3-only split, APS would win 32, 40 and 43 of
+the 48 pairs at N=2,4,8 **against the archived serial rho**, versus 23
+actual serial APS wins. Those hypothetical pair counts are descriptive
+ceilings and do not answer the equal-core question, because rho would also
+receive N cores.
 
 `python3 research/aps_parallel_equal_core_20261124/analyze_baseline.py`
 recomputes these totals from the committed JSON, checks every arm's case

@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import statistics
 import sys
 from pathlib import Path
 
@@ -59,17 +60,39 @@ def analyze(raw: bytes) -> dict:
     aps_ns = totals[APS]
     rho_ns = totals[RHO]
     require(source_ns + search_ns <= aps_ns, "phase sums exceed cold total")
+    aps_case_ns = [int(case[APS]["cold_wall_ns"]) for case in cases]
+    rho_case_ns = [int(case[RHO]["cold_wall_ns"]) for case in cases]
+    search_case_ns = [
+        sum(int(row["s3_query_ns"]) for row in rows) for rows in attempts
+    ]
+    require(
+        all(search <= cold for search, cold in zip(search_case_ns, aps_case_ns)),
+        "case search exceeds cold total",
+    )
 
     ideal = []
     for cores in (2, 4, 8):
         # Only the recorded S3 phase is divided. Every other cost stays serial.
         lower_bound_ns = aps_ns - search_ns + search_ns / cores
+        case_bounds = [
+            cold - search + search / cores
+            for cold, search in zip(aps_case_ns, search_case_ns)
+        ]
         ideal.append(
             {
                 "cores": cores,
                 "ideal_aps_cold_ns": round(lower_bound_ns),
                 "maximum_aps_speedup": round(aps_ns / lower_bound_ns, 6),
                 "rho_speedup_ceiling_for_crossover": round(rho_ns / lower_bound_ns, 6),
+                "ideal_aps_paired_wins_vs_serial_rho": sum(
+                    aps < rho for aps, rho in zip(case_bounds, rho_case_ns)
+                ),
+                "median_case_ideal_aps_over_serial_rho": round(
+                    statistics.median(
+                        aps / rho for aps, rho in zip(case_bounds, rho_case_ns)
+                    ),
+                    6,
+                ),
             }
         )
 
@@ -83,6 +106,13 @@ def analyze(raw: bytes) -> dict:
         "aps_source_setup_ns": source_ns,
         "aps_s3_query_ns": search_ns,
         "aps_s3_fraction_of_cold": round(search_ns / aps_ns, 9),
+        "median_case_s3_fraction_of_cold": round(
+            statistics.median(search / cold for search, cold in zip(search_case_ns, aps_case_ns)),
+            9,
+        ),
+        "serial_aps_paired_wins_vs_rho": sum(
+            aps < rho for aps, rho in zip(aps_case_ns, rho_case_ns)
+        ),
         "serial_aps_over_rho_ratio": round(aps_ns / rho_ns, 9),
         "ideal_s3_only_parallel_bounds": ideal,
         "cpu_time_in_receipt": False,
