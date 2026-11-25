@@ -4,9 +4,9 @@ Date: 2026-11-24. Scope: the #link("IDEAS.md")[100 source proposals] and
 their #link("README.md")[item-by-item assessment], with the owner\'s
 selected target `E(F_p)`. Three parallel workstreams examined items
 1--34, 35--67, and 68--100. This report separates mathematical screens,
-historical records, three newly executed bounded EC checks, and
-proposals lacking an executable point-relation construction. No 100-way
-experiment was performed. Full-cost studies need separate frozen
+historical records, executed bounded EC checks, and proposals lacking an
+executable point-relation construction. The controls share scripts and do
+not constitute 100 independent experiments. Full-cost studies need separate frozen
 workloads.
 
 #box(image("PROGRESS.svg", alt: "First-pass status diagram: mechanism counterexamples, existing baselines, and initial direct decomposition diagnostic."))
@@ -379,3 +379,20 @@ all 100 proposals. Many descriptions need a defined EC point-relation
 mechanism before an executable experiment exists; their exact missing
 obligations are retained in the assessment ledger and the three
 workstream reports.
+
+== Resumed parallel local runs — 2026-11-24
+
+The owner reversed the earlier stop and the three `E(F_p)` workstreams resumed in parallel. The latest checkpoint gate stopped before upload because `.resume/RESUME.md` is absent in this sparse checkout; the earlier HTTP 403 remains a distinct failure. The user's prior explicit local bypass and renewed run instruction admit these bounded public-curve checks. Unsigned claims `PCC-20261125-ae7fe0`, `PCC-20261125-7814bd`, and `PCC-20261125-b190d1` pin the raw output by workstream; the results remain producer evidence `[pcc:unverified]`.
+
+#table(
+  columns: (auto, 1fr),
+  table.header([Items], [Executed control and limit]),
+  [6, 16, 21, 29], [A #link("EC_LEADS_001_034_PROTOCOL.md")[GP run] found that `x+1` loses 240 of 506 liftable abscissae on the fixed curve, checked a valid CM automorphism, and showed coordinate product/sum is not point addition. A four-block schedule selected on four targets had 31 held-out hits versus 27 for fixed block 1; no RL or full-cost claim.],
+  [27, 31], [A #link("EC_CLASSIFIER_001_034_PROTOCOL.md")[native held-out control] found 28 exact hits from a bit-feature nearest neighbor versus 31 for a simpler trained block choice. The threshold classifier had TP 5, FP 3, FN 4, TN 4; its false-negative cells contained 33 valid relation hits. No neural model was trained.],
+  [35, 36, 39, 40, 42, 45, 47], [The #link("EC_LEADS_35_47_PROTOCOL.md")[graph/oracle/tensor run] checked EC-row graph components, ideal oracle probabilities, exact row transforms and sparse tensor cut ranks. A #link("EC_LEADS_42_61_PROTOCOL.md")[separate guarded run] computed rational rank 1 versus rank 0 modulo 1013 for `[1013]`. No device, circuit or full solver was measured.],
+  [55, 61, 62], [The guarded run checked the INT8-to-INT32 worst-case dot cap of 33,025 terms and accepted all 57 original EC rows while rejecting all 57 one-coefficient changes. No GPU or private-witness proof was measured.],
+  [68, 75, 76, 77, 79, 80, 82, 83, 84, 88, 89, 93, 98, 100], [The earlier #link("WS68_FILTER_PROTOCOL.md")[filter control] and new #link("WS68_SUPPORT_RANK.stdout")[support/rank], #link("WS68_STRUCTURAL.stdout")[structural], and #link("WS68_WINDOW_CG.stdout")[window/CG] outputs checked small exact EC rows and representation failures. These mostly use planted relations, not a natural collector or performance run.],
+  [96], [The #link("WS68_BASE_POLICY.stdout")[unanchored first panel] preserved 24 cells censored at 512 trials because no known-log anchor pinned targets. The #link("WS68_BASE_POLICY_V2.stdout")[anchored correction] pinned and scalar-checked all 24 cells. Expansion beat the better fixed size in counted group additions on 0/8 targets and tied on one. Full setup, elimination, wall time and descent were not priced.],
+)
+
+Together with #24 above, executed controls touch 32 numbered proposals across shared scripts. #97 was not tested: the generated stream has no sieve intervals, interval action or interval cost. The #link("PROGRESS.md")[full report] links frozen sources, raw outputs, failures, hashes and the item-specific missing constructions for the other proposals. Compiled executables remain local with hashes in their post-call receipts after the artifact store returned HTTP 403 on earlier binary objects.

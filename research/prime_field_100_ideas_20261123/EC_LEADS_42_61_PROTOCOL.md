@@ -1,0 +1,17 @@
+# Guarded local controls for ideas 42, 55, 61 and 62
+
+Date: 2026-11-24, America/Los_Angeles. **Before invocation:** frozen and unrun. Conductor task `T-12271` reserves the template, immutable qualifier, protocol and raw outputs. Public synthetic E(F_p) only; no cloud use.
+
+The current `scripts/checkpoint.sh gate` fails because `.resume/RESUME.md` is missing; the earlier gate failure was a separately reported S3 HTTP 403. The user's explicit “Run locally with bypass” and renewed request to run E(F_p) leads admit this bounded local attempt only. It is not a passing S3 checkpoint. The immutable input is `S4_MATCHED_V2_STDOUT.txt`, SHA-256 `3accec218c07a2acd2fb433270fa8724db6aee57fef85d0e29e3eb3de16c1f7f`. The separately copied qualifier [`EC_LEADS_42_61_QUALIFIER.gp`](EC_LEADS_42_61_QUALIFIER.gp) has SHA-256 `02c524628ca80fc43751ed770d0f92da4efd8405628cddefbc068b7b8e2322d7`, identical to the template at freeze. GP 2.17.3 arm64.
+
+Predictions and controls:
+
+- **#42:** a one-entry matrix `[1013]` has rational rank 1 and rank 0 over `F_1013`. The script must actually compute and guard both. As a countercontrol, exact rational `1/2` reduces to `507` modulo 1013, so the earlier scalar example does not imply that exact rational reconstruction is impossible. This says nothing about HHL's precision/readout cost.
+- **#55:** with unsigned 8-bit products accumulated in signed 32-bit integers, the exact worst-case cap is 33025 terms. The script guards both sides of the overflow boundary. This is arithmetic only; no CUDA tensor core is used.
+- **#61–62:** parse all 57 emitted public EC rows (24 for `z=0`, 33 for `z=320`) and reconstruct `Σ a_jF_j−Q` directly from printed point coordinates. Every original row should equal the identity. Add one to its first nonzero factor-base coefficient and require all 57 changed rows to fail the same group check. This is an exact direct-verification baseline for a public relation, not a ZK proof or an untrusted-network benchmark. It does not resolve a private-witness requirement.
+
+Invoke once from repository root with `timeout 60 gp -q < research/prime_field_100_ideas_20261123/EC_LEADS_42_61_QUALIFIER.gp`. Preserve stdout, stderr and exit in the reserved files; require empty stderr, exit 0, all guards and the `complete_guarded_controls` sentinel. Do not automatically retry a parser or arithmetic failure. Output is expected below 10 KiB. No timing, energy, complete ECDLP or cloud cost claim is admitted.
+
+## Single local execution
+
+The qualifier was invoked once with unchanged source and input hashes. [Stdout](EC_LEADS_42_61.stdout.txt) SHA-256 `45b01421c47e408a52e9c68278b37b123932a2803f90d2055fb8ef7feab7cd70` reported the guarded rank mismatch `1` versus `0`, exact reduction `1/2 → 507` modulo 1013, safe dot length `33025` with boundary products `2147450625` and `2147515650`, and `57/57` original EC rows accepted versus `57/57` one-coefficient changes rejected. [Stderr](EC_LEADS_42_61.stderr.txt) has zero bytes (SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`), [exit](EC_LEADS_42_61.exit.txt) contains `0` (SHA-256 `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`), and the final sentinel is present. This qualifies the exact local controls stated above; it does not establish a quantum, GPU, privacy, distributed, or end-to-end EC discrete-log advantage. No signed repository proof-carrying verdict has been issued.
