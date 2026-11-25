@@ -7,7 +7,7 @@ optimizing the index calculus.
 
 Sub-step timers on current main (temporary, not committed) priced
 `RelationCollector` construction at 8–13 ms of collect-setup's 10–17 ms:
-- `FrobeniusFactorBase::shared_index_map` took 8.1 ms at k0n53, a
+- `FrobeniusFactorBase::shared_index_map` took 8.1 ms at icv1-f2m53-tm56619371-dac20a85, a
   `HashMap<(BigUint, BigUint), usize>` over every point;
 - `m_can_decompose` took 2.0 ms.
 
@@ -23,8 +23,8 @@ pair-table collection and descent never read it.
 - **Answers:** unchanged; nothing reads the map before its first use. The
   exploration ([`../explore/`](../explore/), 3 rounds an arm) had identical
   certificates and counts.
-- **Exploration figures (ms):** collect-setup 9.8–13.2 → 3.7–5.0 at k0n53
-  and 15.5–19.8 → 5.1–5.8 at k0n61; descent-setup 1.5–1.6 → 1.0–1.2 and
+- **Exploration figures (ms):** collect-setup 9.8–13.2 → 3.7–5.0 at icv1-f2m53-tm56619371-dac20a85
+  and 15.5–19.8 → 5.1–5.8 at icv1-f2m61-t158598901-ab42b6c5; descent-setup 1.5–1.6 → 1.0–1.2 and
   2.1 → 1.3–1.4.
 
 ## Arms: one binary, three labels
@@ -39,7 +39,7 @@ pair-table collection and descent never read it.
 
 ## Workload, schedule, metrics and statistics
 
-- **Rows:** `M1-T01` at `k0n53` and `k0n61`.
+- **Rows:** `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` and `icv1-f2m61-t158598901-ab42b6c5`.
 - **Isolation:** `isolated_bench --cpus 2` with `RAYON_NUM_THREADS=1`.
 - **Schedule:** **24 rounds**, cycled over the six orders of `a q l` (four
   cycles). The effect is large next to the A/A seen so far.
@@ -68,8 +68,8 @@ Medians `a / l`:
 
 | row | collect-setup | descent-setup | set-up |
 |:--|:--|:--|:--|
-| k0n53 | [2.0, 3.5] | [1.1, 1.8] | [1.00, 1.05] |
-| k0n61 | [2.5, 4.0] | [1.2, 1.9] | [1.00, 1.03] |
+| icv1-f2m53-tm56619371-dac20a85 | [2.0, 3.5] | [1.1, 1.8] | [1.00, 1.05] |
+| icv1-f2m61-t158598901-ab42b6c5 | [2.5, 4.0] | [1.2, 1.9] | [1.00, 1.03] |
 
 ## Identity
 

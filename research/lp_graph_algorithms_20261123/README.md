@@ -178,12 +178,135 @@ the gain needs the `b` products of a round to run in parallel (or a fast
 kernel search add `≈ N/b` products, the difference between the two product
 columns.
 
+## Real relation streams (Joux–Vitse two-large-prime collector)
+
+Added 2026-11-25. Source: `examples/jv_sieve_deferred_pair_compare` at
+`1dbc66c01`, fixture `--generate --p P --seed 1`, worker `--method two-lp
+--seed 1 --max-descent-residuals 262144` on the public fixture only. The
+relation batch is the collector's own `work.final_projection.inputs` (source
+relations plus at most 32 target descents), unchanged; the modulus is
+`work.l`. Run summary: `results_real/jv_two_lp_runs.json`; evaluator records:
+`results_real/jv_two_lp_p*.json`.
+
+| p | relations (full / 1LP / 2LP) | recovered | R | C | rank / left nullity (≤2-entry rows) | balanced / unbalanced | pivot out | MST out, Z vs pivot | L BFS / low-stretch |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 401 | 37 (4 / 12 / 21) | no (descent cap) | 69 | 40 | 35 / 30 | 0 / 2 | 30 | 30, −0.8 % | 7 / 7 |
+| 809 | 320 (41 / 123 / 156) | no (descent cap) | 352 | 99 | 99 / 251 | 37 / 37 | 253 | 253, −4.6 % | 525 / 475 |
+| 1201 | 1852 (208 / 685 / 959) | yes, matches fixture | 1854 | 156 | 156 / 1698 | 418 / 386 | 1698 | refused (degree 69) | 4101 / 4366 |
+| 1511 | 3046 (398 / 1089 / 1559) | yes, matches fixture | 3048 | 191 | 191 / 2857 | 700 / 669 | 2857 | refused (degree 65) | 6921 / 7231 |
+
+p = 101 produced no source relations and p = 211 only 5; neither was
+evaluated. Observations (single runs):
+
+1. **Exact DSU = pivot filter again.** At p = 1201 and 1511 every row has at
+   most two large primes, and the DSU left nullity equals the pivot filter's
+   output exactly (1698, 2857); dense rank agrees. At p = 401 and 809 a few
+   descent rows carry 3–4 large primes, outside the DSU domain, so the
+   filter's output is the comparison only on the ≤2-entry part.
+2. **About half the cycles are balanced**, as in the plain (±1) binary streams.
+3. **MST** helps a little where it runs (−0.8 %, −4.6 % residual nonzeros) and
+   refuses the two streams that solved (column degree above 64).
+4. **Low-stretch trees** win at p = 809 (−9.5 % cycle length) but lose at
+   1201 and 1511 (+6.5 %, +4.5 %): no consistent gain over BFS on real data.
+5. Residual matrices are small (N = 132–573). At the two solved sizes the
+   min-degree width is N − 17 and N − 16 (dense), and FM partitioning saves
+   0–5.3 % of the column-net volume against contiguous rows (k = 2, 4, 8).
+
+## Prime-field and Gaudry-cubic relation streams
+
+Added 2026-11-25. Both collectors gained an opt-in capture flag (default off;
+no counted work, no serialized output changes):
+`OrbitIcOptions::capture_relations` → `LogsReport::captured_relations` in
+`prime_orbit_index_calculus` (the rows handed to `solve_two_term_system`), and
+`GaudryOptions::capture_relations` → `GaudryReport::captured_relations` in
+`gaudry_cubic` (every relation offered to the large-prime eliminator, before
+reduction). `examples/lp_graph_collect_fields` runs either and evaluates the
+stream; records `results_real/fields_*.json` hold the collector's own report
+next to the evaluator's.
+
+**Prime-field automorphism-orbit IC** (single large prime; rows are the
+one- and two-term relations `x_o − e(γ)·x_{o₁}` with automorphism gains;
+`--seed 1`). The collector solves this gain graph itself, so its rank is an
+independent check of the gain-aware DSU:
+
+| curve | bits | orbits | rows | collector rank / DSU rank | pinned comps (collector / DSU) | solved columns | balanced share | duplicate rows | L BFS / low-stretch |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| generic (w=2) | 36 | 300 | 450 | 267 / 267 | 1 / 1 | 258 | 77.7 % | 26.4 % | 1278 / 1287 |
+| generic (w=2) | 40 | 2000 | 3000 | 1729 / 1729 | 1 / 1 | 1676 | 75.9 % | 27.1 % | 10747 / 12456 |
+| j = 0 (w=6) | 36 | 300 | 450 | 273 / 273 | 1 / 1 | 269 | 30.5 % | 9.8 % | 1484 / 1601 |
+| j = 0 (w=6) | 44 | 2000 | 3001 | 1839 / 1839 | 1 / 1 | 1819 | 30.5 % | 9.4 % | 12922 / 16197 |
+| j = 1728 (w=4) | 36 | 300 | 450 | 272 / 272 | 1 / 1 | 268 | 37.9 % | 12.4 % | 1630 / 1918 |
+| j = 1728 (w=4) | 44 | 2000 | 3000 | 1789 / 1789 | 2 / 2 | 1756 | 40.9 % | 13.4 % | 13409 / 17487 |
+
+(Also run at 28 bits with the one-target base of 8 orbits: agreement again.)
+Generic at 44 bits / 2000 orbits did not run: the collector's own large-prime
+table asked for 6.6 GB (`collect_large_prime_probe`), so 40 bits is used.
+
+1. **Two independent exact solvers agree** on every stream: collector rank =
+   DSU rank and collector "determined" components = DSU flagged components
+   [pcc:unverified]; the collector's solved columns all certified.
+2. **Balance follows the automorphism group**: about three quarters of all
+   cycles are balanced with gains `±1` (generic), about 31 % on `j = 0`
+   (`μ₆`) and about 40 % on `j = 1728` (`μ₄`); every stream above came from
+   one collection round.
+3. **Duplicate rows**: 26–27 % of the generic collector's rows (9–13 % on
+   `j = 0`, `j = 1728`) are exact repeats. The pivot filter removes them
+   (`pivot out = left nullity − duplicates` holds exactly on every stream);
+   each repeat still cost a probe.
+4. **Low-stretch trees lose** to BFS on every prime-field stream, by up to
+   30 % (`j = 1728`, 44 bits).
+
+**Gaudry IC on `E(F_{p³})`** (`run_gaudry_opts`, double large primes, small
+base `⌈|F|^{2/3}⌉`, `--seed 1`; p must be `≡ 1 (mod 3)`). Every run recovered
+the target's logarithm (`solved = true`):
+
+| p | residuals | relations captured | rows ≤2 LP entries | DSU nullity (≤2-entry rows) | pivot out | MST |
+| --- | --- | --- | --- | --- | --- | --- |
+| 211 | 1125 | 96 | 28 | 6 | 25 | 25, Z −28 % |
+| 409 | 2488 | 159 | 31 | 3 | 31 | 31, Z −18 % |
+| 1009 | 7543 | 437 | 54 | 4 | 64 | refused |
+| 1999 | 23327 | 1010 | 92 | 6 | 242 | refused |
+
+In this legacy path the eliminator treats every column `≥ small` as large,
+the target column `small` included, and the capture mirrors that split. Most
+rows therefore carry three "large" entries and fall outside the DSU's
+two-entry domain; the LP structure here is thin and dominated by the target
+column. MST helps where it runs and refuses from p = 1009 on (degree > 64).
+
+## Parallel block Wiedemann
+
+`kernel_vector_parallel` runs the `n` products of each Krylov round, the
+`m·n` projections and the σ-basis column eliminations on the rayon pool.
+Each parallel step reads only data fixed before it (the pivot column is
+copied), so kernel vectors and every count equal the serial path;
+`tests/block_wiedemann.rs::parallel_path_is_identical_to_serial` checks this
+over 3 primes, 4 block shapes and 1, 2, 4 threads, and the schedule below
+re-checked counts in every cell. `examples/block_wiedemann_eval --threads T`
+(4-core cloud VM, single runs, orientation only; `block_wiedemann/bw_par_*`):
+
+| N | b | serial | 2 threads | 4 threads |
+| --- | --- | --- | --- | --- |
+| 2000 | 1 | 0.57 s | 0.59 s | 0.61 s |
+| 2000 | 4 | 0.99 s | 0.67 s (1.48×) | 0.68 s (1.45×) |
+| 2000 | 16 | 3.15 s | 1.80 s (1.75×) | 1.29 s (2.45×) |
+| 8000 | 1 | 9.17 s | 9.61 s | 9.57 s |
+| 8000 | 2 | 11.03 s | 7.31 s (1.51×) | 8.61 s (1.28×) |
+| 8000 | 4 | 16.42 s | 10.39 s (1.58×) | 7.60 s (2.16×) |
+| 8000 | 16 | 49.97 s | 27.47 s (1.82×) | 17.48 s (2.86×) |
+
+The parallel gain grows with `b` (more independent products and columns per
+step), up to 2.86× on 4 threads. The fastest configuration at N = 8000 is now
+blocked (b = 2 on 2 threads, 7.31 s, or b = 4 on 4 threads, 7.60 s) and beats
+the scalar serial run (9.17 s) by about 1.2×; the quadratic σ-basis still
+bounds larger `b`, so a fast `Õ(N b^{ω−1})` generator remains the next lever.
+
 ## Next
 
-- Prime-field and Gaudry-cubic collectors through `--input` JSONL (only the
-  binary-curve collector exposes its stream so far).
-- A parallel block-Wiedemann product loop and a fast matrix generator before
-  any block-size speed claim.
+- A fast matrix generator for block Wiedemann (the quadratic σ-basis now
+  bounds the parallel gain), and a native benchmark run under the
+  repository's protocol before any speed claim.
+- The prime-field collector's duplicate rows (up to 27 %) and its 6.6 GB
+  large-prime table at 44 bits on generic curves are worth a look by its owner.
 - Any speed claim needs the repository's benchmark protocol (`ecbench`, bench
   records, validation gate) and complete cold solves.
 
