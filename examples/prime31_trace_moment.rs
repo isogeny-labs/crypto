@@ -32,11 +32,21 @@ fn power_sums_with_derivatives(f: Fp, elementary: &[u64], max_degree: usize) -> 
     assert!(m > 0 && (m as u64) < f.p);
     assert!(elementary.iter().all(|&x| x < f.p));
     let mut powers = Vec::with_capacity(max_degree + 1);
-    powers.push(Jet { value: (m as u64) % f.p, deriv: vec![0; m] });
+    powers.push(Jet {
+        value: (m as u64) % f.p,
+        deriv: vec![0; m],
+    });
     for degree in 1..=max_degree {
-        let mut jet = Jet { value: 0, deriv: vec![0; m] };
+        let mut jet = Jet {
+            value: 0,
+            deriv: vec![0; m],
+        };
         for i in 1..=m.min(degree.saturating_sub(1)) {
-            let coef = if i % 2 == 1 { elementary[i - 1] } else { f.neg(elementary[i - 1]) };
+            let coef = if i % 2 == 1 {
+                elementary[i - 1]
+            } else {
+                f.neg(elementary[i - 1])
+            };
             let dcoef = if i % 2 == 1 { 1 } else { f.neg(1) };
             let prev = &powers[degree - i];
             jet.value = f.add(jet.value, f.mul(coef, prev.value));
@@ -66,7 +76,10 @@ fn trace_moments(f: Fp, h: &[u64], elementary: &[u64]) -> Vec<Jet> {
     let powers = power_sums_with_derivatives(f, elementary, h.len() + m - 2);
     let mut out = Vec::with_capacity(m);
     for j in 0..m {
-        let mut jet = Jet { value: 0, deriv: vec![0; m] };
+        let mut jet = Jet {
+            value: 0,
+            deriv: vec![0; m],
+        };
         for (i, &coef) in h.iter().enumerate() {
             let p = &powers[j + i];
             jet.value = f.add(jet.value, f.mul(coef, p.value));
@@ -90,7 +103,10 @@ fn reduced_trace_moments(f: Fp, h: &[u64], es: &[u64]) -> Vec<Jet> {
     let m = es.len();
     let mut out = Vec::with_capacity(m);
     for j in 0..m {
-        let mut result = Jet { value: 0, deriv: vec![0; m] };
+        let mut result = Jet {
+            value: 0,
+            deriv: vec![0; m],
+        };
         for a in 0..=j {
             let coeff = if a == 0 {
                 1
@@ -185,7 +201,11 @@ fn actual_jacobian(f: Fp, jets: &[Jet]) -> u64 {
 /// (-1)^(m(m-1)/2) * prod_w multiplicity(w)! * prod_i h'(x_i).
 fn expected_jacobian(f: Fp, h: &[u64], xs: &[u64]) -> u64 {
     let m = xs.len();
-    let mut ans = if (m * (m - 1) / 2) % 2 == 0 { 1 } else { f.neg(1) };
+    let mut ans = if (m * (m - 1) / 2).is_multiple_of(2) {
+        1
+    } else {
+        f.neg(1)
+    };
     let mut counts = BTreeMap::new();
     for &x in xs {
         assert_eq!(evaluate(f, h, x), 0);
@@ -201,8 +221,12 @@ fn expected_jacobian(f: Fp, h: &[u64], xs: &[u64]) -> u64 {
 }
 
 fn enumerate_multisets(
-    f: Fp, roots: &[u64], m: usize, start: usize,
-    current: &mut Vec<u64>, results: &mut BTreeSet<Vec<u64>>,
+    f: Fp,
+    roots: &[u64],
+    m: usize,
+    start: usize,
+    current: &mut Vec<u64>,
+    results: &mut BTreeSet<Vec<u64>>,
     h: &[u64],
 ) {
     if current.len() == m {
@@ -255,9 +279,14 @@ fn main() {
     // m=2,3,4. Not a relation yield measurement on random targets.
     for m in 2..=4 {
         let roots = positive_images(f, &base[..8], m, &h);
-        println!("p={PRIME31}, B=32, m={m}, positive_unordered_tests={}, exact_jet_jacobian=pass", roots.len());
+        println!(
+            "p={PRIME31}, B=32, m={m}, positive_unordered_tests={}, exact_jet_jacobian=pass",
+            roots.len()
+        );
     }
-    println!("No Rust benchmark, F4 relation oracle, complete DLP or asymptotic improvement claimed.");
+    println!(
+        "No Rust benchmark, F4 relation oracle, complete DLP or asymptotic improvement claimed."
+    );
 }
 
 #[cfg(test)]

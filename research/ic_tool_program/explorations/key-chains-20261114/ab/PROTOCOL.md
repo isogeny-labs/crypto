@@ -32,7 +32,7 @@ optimizing the index calculus. Collection is about 80% of set-up at
 
 The same as the fold-pack A/B
 ([`../../fold-pack-20261114/ab/PROTOCOL.md`](../../fold-pack-20261114/ab/PROTOCOL.md)):
-- **Rows:** `M1-T01` at `k0n53` and `k0n61`.
+- **Rows:** `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` and `icv1-f2m61-t158598901-ab42b6c5`.
 - **Isolation:** `isolated_bench --cpus 2` with `RAYON_NUM_THREADS=1`.
 - **Schedule:** 42 rounds cycled over the six orders of `a q k`.
 - **Metrics:** per-process medians of build, collect and set-up.
@@ -58,8 +58,8 @@ Medians `a / k`:
 
 | row | collect | build | set-up |
 |:--|:--|:--|:--|
-| k0n53 | [1.00, 1.05] | [1.00, 1.03] | [1.00, 1.04] |
-| k0n61 | [1.00, 1.05] | [1.00, 1.03] | [1.00, 1.05] |
+| icv1-f2m53-tm56619371-dac20a85 | [1.00, 1.05] | [1.00, 1.03] | [1.00, 1.04] |
+| icv1-f2m61-t158598901-ab42b6c5 | [1.00, 1.05] | [1.00, 1.03] | [1.00, 1.05] |
 
 About 0.4 ns of a 15 ns scanned summand. This may not clear this host's
 A/A, about ±2–3%, and a null result is a likely outcome.

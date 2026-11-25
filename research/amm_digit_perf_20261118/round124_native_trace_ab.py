@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Standalone native Rust A/B for exact field_value function extracted from production."""
+import os
 from pathlib import Path
 import re
 import subprocess
 import tempfile
 
-SOURCE = Path("src/cryptanalysis/prime_root_trace.rs").read_text()
+# The A/B measures the source of the round that introduced the Barrett path;
+# CI pins it (ROUND124_SOURCE) to that commit. Default: the production file.
+SOURCE = Path(os.environ.get("ROUND124_SOURCE", "src/cryptanalysis/prime_root_trace.rs")).read_text()
 start = SOURCE.index("#[inline]\nfn field_value(")
 end = SOURCE.index("\nfn validate_input(", start)
 field_function = SOURCE[start:end]
