@@ -1402,7 +1402,7 @@ mod tests {
                 .filter_map(|(step, &cut)| cut.then_some(step))
                 .collect::<Vec<_>>()
         };
-        assert_eq!(steps(Arm::Direct), vec![]);
+        assert_eq!(steps(Arm::Direct), Vec::<usize>::new());
         assert_eq!(steps(Arm::Last), vec![4]);
         assert_eq!(steps(Arm::Balanced), vec![2, 4]);
         assert_eq!(steps(Arm::Nonlinear), vec![1, 2, 4]);
