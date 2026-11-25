@@ -1,42 +1,33 @@
 {
   "schema": "ecbench.spec/v1",
-  "label": "lead e2e paired panel: root-finding and charged double-large-prime IC",
-  "description": "Three public same-target workloads, two cold rounds each, strong signed-Frobenius rho and A/A control. Correctness and accounting panel; L0 native work is unpriced.",
+  "label": "lead e2e paired K1-17 panel: root-finding and charged double-large-prime IC",
+  "description": "Two public same-target workloads, one cold round each, strong signed-Frobenius rho and A/A control. Correctness and accounting panel; L0 native work is unpriced.",
+  "field_profile": "semaev-groebner-f2m17-v1",
   "workloads": {
-    "curves": [{
-      "kind": "binary_explicit",
-      "n": 11,
-      "modulus": 2323,
-      "a": 1,
-      "b": 1,
-      "group_order": 1982,
-      "r": 991,
-      "gx": 1193,
-      "gy": 1007
-    }],
-    "targets_per_curve": 3,
+    "curves": [{"kind": "koblitz", "a": 1, "n": 17}],
+    "targets_per_curve": 2,
     "target_seed": 2026112502,
     "target_kind": "public"
   },
   "arms": [
     {"name": "rho-strong", "role": "reference", "method": {"id": "rho.signed_frobenius_strong"}},
     {"name": "rootfind-m2", "role": "baseline", "method": {"id": "ic.pipeline", "params": {
-      "factor_base": "koblitz-standard-subspace:dimension=4",
+      "factor_base": "koblitz-standard-subspace:dimension=6",
       "oracle": "pdp3-koblitz:m=2,engine=rootfind-negfold",
-      "max_trials": "20000"
+      "max_trials": "200000"
     }}},
     {"name": "double-large-prime-v2", "role": "candidate", "method": {"id": "ic.large_prime_v2", "params": {
-      "small_dimension": "3",
-      "envelope_dimension": "4",
-      "summands": "n-1",
+      "small_dimension": "4",
+      "envelope_dimension": "6",
+      "summands": "2",
       "large_primes": "2",
-      "max_trials": "20000",
+      "max_trials": "200000",
       "max_states": "100000"
     }}},
     {"name": "rho-aa", "role": "control", "method": {"id": "rho.signed_frobenius_strong"}}
   ],
   "measurement": {
-    "rounds": 2,
+    "rounds": 1,
     "warmup": 0,
     "order": "alternate",
     "seed": 2026112502,
