@@ -91,6 +91,20 @@ matched-rho reference, or `VALIDATION.json` exists.
 [Study](../research/curve25519_quotient_layout_20261125/),
 [PDF](20261125-curve25519-quotient-layout/report.pdf). [pcc:unverified]
 
+The [25 November Curve25519 pair-trace 2+1 split screen](20261125-curve25519-pair-trace/)
+retains 24 counted native-Rust rows at the first frozen `d=7` gate, plus 16
+baseline-reproduction rows. The primary P arm combines an exact unordered-pair
+trace quotient with two quadratized S3 links. It lowers maximum productive
+degree from 5 to 4, but its paired P/D geometric mean is `2371.7222843`, with
+descriptive 95% interval `[2371.7202857, 2371.7238337]`, against the frozen
+upper target below `1.00`; peak RSS reaches 14.4512 times D. The raw split R
+is already 1,143.94 times D. The gated `d=9`, `d=19`, scaling, and `m=4`
+stages were not opened. It remains outside the admitted table because no
+independent replay, validator report, matched-rho reference, or
+`VALIDATION.json` exists.
+[Study](../research/curve25519_pair_trace_20261125/),
+[PDF](20261125-curve25519-pair-trace/report.pdf). [pcc:unverified]
+
 The [17 November native Rust identity component study](20261117-native-identity/) has checked pipeline full-paid paired medians1.306792/1.286039/1.254269 and work medians3.242510/3.067128/2.907275 at n3/4/6,25mainblocks each,AMD EPYC9V74 localL0. Ordinary95 controls reject n4/n6; prospective simultaneous screens pass. The unsigned synthetic polynomial-kernel result remains outside the admitted table; no15x claim. [Study](../research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md),[PDF](20261117-native-identity/results-report.pdf). [pcc:unverified]
 
 The [29 October synthetic generator-study planning record](20261029-generator-preflight/)
