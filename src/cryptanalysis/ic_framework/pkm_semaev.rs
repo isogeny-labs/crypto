@@ -803,6 +803,14 @@ pub enum PkmMode {
 pub enum PkmEngine {
     F4,
     Exhaustive,
+    /// `m = 2` univariate elimination: `R(X) = Res_Y(F_V(Y), S₃(Y, x_R, X))
+    /// = ∏_{v ∈ V} S₃(v, x_R, X)` by a Karatsuba product tree, then
+    /// `gcd(R, F_V)` by Euclid, `F_V = ∏_{v ∈ V}(X − v)` built once.
+    ResGcd,
+    /// `m = 2` per-element scan: for each `v ∈ V` solve the quadratic
+    /// `S₃(v, X, x_R) = 0` and test `X ∈ V` by hash lookup — `O(|V|)`
+    /// quadratic solves, the algebraic engines' `O~(|V|)` comparator.
+    Scan,
 }
 
 /// What a prepared run holds: the ring, the system split by powers of
@@ -899,6 +907,8 @@ pub struct PkmSemaevOracle {
     membership: Membership,
     mode: PkmMode,
     engine: PkmEngine,
+    /// `F_V = ∏_{v ∈ V}(X − v)` for `engine=resgcd`, built on first use.
+    resgcd_fv: Option<Vec<u64>>,
     max_degree: u32,
     max_nnz: Option<u64>,
     stop_staircase: Option<usize>,
@@ -961,6 +971,7 @@ impl PkmSemaevOracle {
             membership: Membership::Kummer,
             mode: PkmMode::Chain,
             engine: PkmEngine::F4,
+            resgcd_fv: None,
             max_degree: 12,
             max_nnz: None,
             stop_staircase: None,
@@ -1207,10 +1218,19 @@ impl PkmSemaevOracle {
         self.engine = match params.get("engine") {
             None | Some("f4") => PkmEngine::F4,
             Some("exhaustive") => PkmEngine::Exhaustive,
-            Some(o) => return Err(format!("pkm-semaev: engine is f4 or exhaustive, not {o}")),
+            Some("resgcd") => PkmEngine::ResGcd,
+            Some("scan") => PkmEngine::Scan,
+            Some(o) => {
+                return Err(format!(
+                    "pkm-semaev: engine is f4, exhaustive, resgcd or scan, not {o}"
+                ))
+            }
         };
-        if self.engine == PkmEngine::Exhaustive {
-            self.totals.solver = "tower-exhaustive".into();
+        match self.engine {
+            PkmEngine::Exhaustive => self.totals.solver = "tower-exhaustive".into(),
+            PkmEngine::ResGcd => self.totals.solver = "univariate-resultant-gcd".into(),
+            PkmEngine::Scan => self.totals.solver = "quadratic-scan".into(),
+            PkmEngine::F4 => {}
         }
         self.max_degree = params.u64_or("degree", 12)? as u32;
         self.max_nnz = params
@@ -1272,7 +1292,13 @@ impl PkmSemaevOracle {
         if self.mode == PkmMode::Chain && self.m < 3 {
             self.mode = PkmMode::Full; // m = 2: S₃ alone, no free unknown
         }
-        if self.engine == PkmEngine::Exhaustive || !self.descent || self.crosscheck {
+        if matches!(self.engine, PkmEngine::ResGcd | PkmEngine::Scan) && self.m != 2 {
+            return Err(format!(
+                "pkm-semaev: engine=resgcd/scan take m = 2, not {}",
+                self.m
+            ));
+        }
+        if self.engine != PkmEngine::F4 || !self.descent || self.crosscheck {
             if !(2..=3).contains(&self.m) {
                 return Err(format!(
                     "pkm-semaev: grid/crosscheck modes take m in 2..=3, not {}",
@@ -2188,6 +2214,269 @@ impl PkmSemaevOracle {
             }
             _ => unreachable!("read_params admits m ≤ 3"),
         }
+        (out, mults)
+    }
+}
+
+/// Counted univariate polynomial arithmetic over `F_p` (`p < 2^31`) for
+/// `engine=resgcd`. Coefficients low to high; every `F_p` multiplication is
+/// added to `*mults`; an inversion is charged `UG_INV_MULTS`, the module's
+/// convention for one `pow_mod(·, p − 2)` (see `solve_s3_for_middle`).
+const UG_INV_MULTS: u64 = 32;
+const UG_KARATSUBA_MIN: usize = 24;
+
+fn ug_trim(a: &mut Vec<u64>) {
+    while a.last() == Some(&0) {
+        a.pop();
+    }
+}
+
+fn ug_school(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    if a.is_empty() || b.is_empty() {
+        return Vec::new();
+    }
+    let mut out = vec![0u64; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        if x == 0 {
+            continue;
+        }
+        for (j, &y) in b.iter().enumerate() {
+            out[i + j] = addm(out[i + j], mulm(x, y, p), p);
+        }
+        *mults += b.len() as u64;
+    }
+    out
+}
+
+fn ug_karatsuba(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    let n = a.len().max(b.len());
+    if a.is_empty() || b.is_empty() {
+        return Vec::new();
+    }
+    if a.len().min(b.len()) < UG_KARATSUBA_MIN {
+        return ug_school(a, b, p, mults);
+    }
+    let h = n / 2;
+    let split = |x: &[u64]| -> (Vec<u64>, Vec<u64>) {
+        if x.len() <= h {
+            (x.to_vec(), Vec::new())
+        } else {
+            (x[..h].to_vec(), x[h..].to_vec())
+        }
+    };
+    let (a0, a1) = split(a);
+    let (b0, b1) = split(b);
+    let add = |x: &[u64], y: &[u64]| -> Vec<u64> {
+        let mut o = vec![0u64; x.len().max(y.len())];
+        for (i, v) in o.iter_mut().enumerate() {
+            *v = addm(*x.get(i).unwrap_or(&0), *y.get(i).unwrap_or(&0), p);
+        }
+        o
+    };
+    let z0 = ug_karatsuba(&a0, &b0, p, mults);
+    let z2 = ug_karatsuba(&a1, &b1, p, mults);
+    let z1 = ug_karatsuba(&add(&a0, &a1), &add(&b0, &b1), p, mults);
+    let mut out = vec![0u64; a.len() + b.len() - 1];
+    for (i, &c) in z0.iter().enumerate() {
+        out[i] = addm(out[i], c, p);
+    }
+    for (i, &c) in z2.iter().enumerate() {
+        out[i + 2 * h] = addm(out[i + 2 * h], c, p);
+    }
+    for (i, &c) in z1.iter().enumerate() {
+        let mid = subm(
+            subm(c, *z0.get(i).unwrap_or(&0), p),
+            *z2.get(i).unwrap_or(&0),
+            p,
+        );
+        out[i + h] = addm(out[i + h], mid, p);
+    }
+    let mut out = out;
+    ug_trim(&mut out);
+    out
+}
+
+/// Product of all `leaves` by a balanced tree of Karatsuba products.
+fn ug_product_tree(mut level: Vec<Vec<u64>>, p: u64, mults: &mut u64) -> Vec<u64> {
+    if level.is_empty() {
+        return vec![1];
+    }
+    while level.len() > 1 {
+        let mut next = Vec::with_capacity(level.len().div_ceil(2));
+        let mut it = level.into_iter();
+        while let Some(x) = it.next() {
+            match it.next() {
+                Some(y) => next.push(ug_karatsuba(&x, &y, p, mults)),
+                None => next.push(x),
+            }
+        }
+        level = next;
+    }
+    level.pop().expect("non-empty")
+}
+
+/// `a` scaled to leading coefficient 1 (one inversion, `deg a` products).
+fn ug_monic(a: &mut [u64], p: u64, mults: &mut u64) {
+    let Some(&lead) = a.last() else { return };
+    if lead == 1 {
+        return;
+    }
+    let inv = crate::cryptanalysis::residual_walk::pow_mod(lead, p - 2, p);
+    *mults += UG_INV_MULTS + (a.len() as u64 - 1);
+    let n = a.len();
+    for c in a[..n - 1].iter_mut() {
+        *c = mulm(*c, inv, p);
+    }
+    a[n - 1] = 1;
+}
+
+/// `a mod b` for monic non-constant `b`: classical division.
+fn ug_rem_monic(mut a: Vec<u64>, b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    let db = b.len() - 1;
+    ug_trim(&mut a);
+    while a.len() > db {
+        let top = a.len() - 1;
+        let q = a[top];
+        if q != 0 {
+            let shift = top - db;
+            for j in 0..db {
+                a[shift + j] = subm(a[shift + j], mulm(q, b[j], p), p);
+            }
+            *mults += db as u64;
+        }
+        a.pop();
+        ug_trim(&mut a);
+    }
+    a
+}
+
+/// Monic `gcd(a, b)` for monic `a` with `deg a ≥ 1`, by Euclid.
+fn ug_gcd_monic(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
+    let mut r0 = a;
+    let mut r1 = ug_rem_monic(b, &r0, p, mults);
+    while !r1.is_empty() {
+        ug_monic(&mut r1, p, mults);
+        if r1.len() == 1 {
+            return vec![1];
+        }
+        let r2 = ug_rem_monic(r0, &r1, p, mults);
+        r0 = r1;
+        r1 = r2;
+    }
+    r0
+}
+
+impl PkmSemaevOracle {
+    /// `engine=resgcd` (`m = 2`): every unordered `(x_1, x_2) ∈ V²` with
+    /// `S₃(x_1, x_2, x_R) = 0`, in `grid()` order, and the `F_p`
+    /// multiplications spent on this target.
+    ///
+    /// `R(X) = Res_Y(F_V(Y), S₃(Y, x_R, X)) = ∏_{v ∈ V} S₃(v, x_R, X)`
+    /// (`F_V` monic), so the `x_2 ∈ V` that pair with some `x_1 ∈ V` are
+    /// exactly the roots of `G = gcd(R, F_V)`; by the symmetry of `S₃`
+    /// every solution has both coordinates among them. `deg G = 0` is a
+    /// refutation; otherwise the roots are read off `V` (`|V| · deg G`
+    /// products) and the pairs among them tested.
+    fn resgcd(&mut self, curve: &PrimeCurve, x_r: u64) -> (Vec<Vec<u64>>, u64) {
+        let p = curve.p;
+        let (a, b) = self.s3_coefficients(curve);
+        let v = self.prepared.as_ref().expect("prepared").v.clone();
+        if self.resgcd_fv.is_none() {
+            let mut setup = 0u64;
+            let leaves: Vec<Vec<u64>> = v.iter().map(|&x| vec![subm(0, x, p), 1]).collect();
+            let fv = ug_product_tree(leaves, p, &mut setup);
+            self.bump("pkm_resgcd_setup_fp_mults", setup);
+            self.resgcd_fv = Some(fv);
+        }
+        let fv = self.resgcd_fv.clone().expect("built");
+        let mut mults = 0u64;
+        let s3c = |x1: u64, x2: u64, mults: &mut u64| -> (u64, u64, u64) {
+            *mults += 6;
+            let d = subm(x1, x2, p);
+            let s = addm(x1, x2, p);
+            let pr = mulm(x1, x2, p);
+            let al = mulm(d, d, p);
+            let be = mulm(p - 2, addm(mulm(s, addm(pr, a, p), p), mulm(2, b, p), p), p);
+            let q = subm(pr, a, p);
+            let ga = subm(mulm(q, q, p), mulm(mulm(4, b, p), s, p), p);
+            (al, be, ga)
+        };
+        let leaves: Vec<Vec<u64>> = v
+            .iter()
+            .map(|&x| {
+                let (al, be, ga) = s3c(x, x_r, &mut mults);
+                let mut l = vec![ga, be, al];
+                ug_trim(&mut l);
+                l
+            })
+            .collect();
+        let tree0 = mults;
+        let r = ug_product_tree(leaves, p, &mut mults);
+        let tree = mults - tree0;
+        let g = ug_gcd_monic(fv, r, p, &mut mults);
+        let gcd_mults = mults - tree0 - tree;
+        self.bump("pkm_resgcd_tree_fp_mults", tree);
+        self.bump("pkm_resgcd_gcd_fp_mults", gcd_mults);
+        let mut out = Vec::new();
+        if g.len() <= 1 {
+            return (out, mults);
+        }
+        self.bump("pkm_resgcd_nontrivial_gcd", 1);
+        let horner = |x: u64, mults: &mut u64| -> u64 {
+            *mults += g.len() as u64 - 1;
+            g.iter().rev().fold(0u64, |acc, &c| addm(mulm(acc, x, p), c, p))
+        };
+        let idx: Vec<usize> = (0..v.len())
+            .filter(|&i| horner(v[i], &mut mults) == 0)
+            .collect();
+        for (k, &i) in idx.iter().enumerate() {
+            let (al, be, ga) = s3c(v[i], x_r, &mut mults);
+            for &j in &idx[k..] {
+                mults += 2;
+                let x2 = v[j];
+                let val = addm(
+                    addm(mulm(mulm(al, x2, p), x2, p), mulm(be, x2, p), p),
+                    ga,
+                    p,
+                );
+                if val == 0 {
+                    out.push(vec![v[i], x2]);
+                }
+            }
+        }
+        (out, mults)
+    }
+
+    /// `engine=scan` (`m = 2`): for each `x_1 ∈ V`, the roots `X` of the
+    /// quadratic `S₃(x_1, X, x_R)` (one square root), kept when `X ∈ V`
+    /// with index at least `x_1`'s, in `grid()` order. Lookups are counted
+    /// separately (`pkm_scan_lookups`), not as multiplications.
+    fn scan(&mut self, curve: &PrimeCurve, x_r: u64) -> (Vec<Vec<u64>>, u64) {
+        let (a, b) = self.s3_coefficients(curve);
+        let prep = self.prepared.as_ref().expect("prepared");
+        let v = prep.v.clone();
+        let rank = prep.v_rank.clone();
+        let mut mults = 0u64;
+        let mut lookups = 0u64;
+        let mut out = Vec::new();
+        for i in 0..v.len() {
+            let roots = Self::solve_s3_for_middle(curve, a, b, v[i], x_r, &mut mults);
+            let mut js: Vec<usize> = Vec::new();
+            for x in roots {
+                lookups += 1;
+                if let Some(&j) = rank.get(&x) {
+                    let j = j as usize;
+                    if j >= i && !js.contains(&j) {
+                        js.push(j);
+                    }
+                }
+            }
+            js.sort_unstable();
+            for j in js {
+                out.push(vec![v[i], v[j]]);
+            }
+        }
+        self.bump("pkm_scan_lookups", lookups);
         (out, mults)
     }
 }
@@ -3618,6 +3907,51 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             }
         }
         let solutions = match self.engine {
+            PkmEngine::ResGcd | PkmEngine::Scan => {
+                let started = Instant::now();
+                let (sols, mults) = if self.engine == PkmEngine::ResGcd {
+                    self.resgcd(curve, x_r)
+                } else {
+                    self.scan(curve, x_r)
+                };
+                let wall_ns = started.elapsed().as_nanos() as u64;
+                if self.crosscheck {
+                    let (mut want, gm) = self.grid(curve, x_r, false);
+                    self.bump("pkm_crosscheck_fp_mults", gm);
+                    let mut got = sols.clone();
+                    for s in want.iter_mut().chain(got.iter_mut()) {
+                        s.sort_unstable();
+                    }
+                    want.sort();
+                    got.sort();
+                    if want != got {
+                        self.bump("pkm_crosscheck_disagreements", 1);
+                    }
+                    self.bump("pkm_crosscheck_systems", 1);
+                }
+                let unit = if self.engine == PkmEngine::ResGcd {
+                    "F_p multiplications (resultant-gcd)"
+                } else {
+                    "F_p multiplications (quadratic scan)"
+                };
+                let shape = self.shape.clone().unwrap_or_default();
+                // Unlike the grid, these multiplications are the solver's
+                // own count and are priced in the solver block, as F4's
+                // multiply-adds are.
+                let cost = SolverCost {
+                    ops: mults,
+                    op_unit: unit.into(),
+                    wall_ns,
+                    ..Default::default()
+                };
+                self.totals.op_unit = unit.into();
+                self.totals.absorb(&shape, Some(&cost), false);
+                if sols.is_empty() {
+                    return None;
+                }
+                self.bump("pkm_consistent_systems", 1);
+                sols
+            }
             PkmEngine::Exhaustive => {
                 let started = Instant::now();
                 let (sols, mults) = self.grid(curve, x_r, false);
@@ -4194,6 +4528,8 @@ mod tests {
         };
         let mut f4 = prep(&format!("m=2,crosscheck=1{extra}"));
         let mut grid = prep("m=2,engine=exhaustive");
+        let mut resgcd = prep("m=2,engine=resgcd,crosscheck=1");
+        let mut scan = prep("m=2,engine=scan,crosscheck=1");
         let mut rng = StdRng::seed_from_u64(29);
         let g = inst.generator_point();
         let mut hits = 0;
@@ -4226,6 +4562,8 @@ mod tests {
             };
             let (a, c) = (run(&mut f4), run(&mut grid));
             assert_eq!(a, c, "{label}: F4 against the grid, target {k}");
+            assert_eq!(run(&mut resgcd), c, "{label}: resgcd against the grid, target {k}");
+            assert_eq!(run(&mut scan), c, "{label}: scan against the grid, target {k}");
             assert_eq!(
                 c,
                 decomposable.contains(&curve.key(&target)),
@@ -4234,6 +4572,15 @@ mod tests {
             hits += usize::from(c);
         }
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
+        for (name, o) in [("resgcd", &resgcd), ("scan", &scan)] {
+            let n = o.relation_counters();
+            assert!(n["pkm_crosscheck_systems"] > 0, "{label}: {name} crosschecked");
+            assert_eq!(
+                n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
+                0,
+                "{label}: {name} solution sets equal the grid's"
+            );
+        }
         let n = f4.relation_counters();
         assert_eq!(
             n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
