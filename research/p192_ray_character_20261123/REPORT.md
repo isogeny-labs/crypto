@@ -1006,6 +1006,21 @@ This source therefore does not certify a P-192 exclusion of
 that grid. An explicit finite bound or a concrete index
 construction remains necessary. [pcc:unverified]
 
+A second explicit source does not close even the smallest
+paired-grid case. For the lifted subgroup `Γ=±H` of size
+`L=2m≈2^86.984`, a disjoint 2-by-2 grid would put two
+distinct values in an intersection of `Γ` with two nonzero,
+distinct additive shifts of `Γ`: take `x_a=i_a-j_1` for the
+two centers, and the shifts `2j_1` and `j_1-j_2`. The
+`k=2` specialization of
+[Vyugin–Shkredov, Corollary 1.2](https://www.mathnet.ru/links/38bb4daba4e7ddeb5ffe4d195be3adcf/sm7857_eng.pdf)
+applies at the P-192 parameters, but bounds that intersection
+by `12(L^(1/5)+1)^3≈2^55.775`. Its explicit lower-size
+condition has log₂ scale about `49.944`, and its field-size
+condition about `107.381`, both below the corresponding P-192
+sizes. Since the resulting upper bound is much greater than
+two, it gives no finite 2-by-2 exclusion. [pcc:unverified]
+
 The [`y_coset_control.sage`](y_coset_control.sage) replay uses
 direct Sage point multiplication to check the normalized
 `A_H([d]G)/A_H(G)` at `d=1,2,3,5` for `m=8,40`.
@@ -1046,6 +1061,23 @@ list has `2(1+4+16)=42` entries versus 48 direct entries.
 Thus this positive sign control supplies no useful grid
 compression. Its finite combinatorics do not exclude a grid
 for a different subgroup. [pcc:unverified]
+
+The subgroup transformation also gives an exact certificate
+count. Once the normalized `A_H([h]P)` relation is established
+for a generator `h` of `H`, equality with the ray sign on the
+whole marked orbit can be checked on one representative of
+each coset of `H` in `F_r^×/{±1}`. For the first remaining
+P-192 size `m=8·9564682313913860059195669`, that quotient
+has exactly
+`t=((r-1)/2)/m=41017447896931873807923243651895≈2^105.016`
+cosets. A base-normalized exhaustive certificate therefore
+needs `t-1` separate representative checks under this direct
+method. That count exceeds the numerical `2^95.826` cost
+reference by 9.190 bits before charging any per-representative
+computation. A shorter symbolic identity or another
+structural exactness test would be needed. This is a bound on
+that exhaustive certification method, not on evaluating a
+proved identity. [pcc:unverified]
 
 ### Second division-polynomial jet: a compact exactness screen
 
