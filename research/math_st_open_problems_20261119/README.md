@@ -18,6 +18,7 @@ files named, not pcc-certified claims.
 | P3.3 | Upstream's "pure-power penalty" is the counting bound ($N_{\ell^e}\approx p/12$); only Q099 (KLPT vs. optimum) stays open. Medians recomputed natively in Rust (`p33_native/`, identical); norms not regenerated. | `P3.3_counting_check.md` |
 | A4, P3.3/Q099 | Measured. Basic KLPT on all 105 matched ideals, ℓ∈{2,3}, 1050 runs, every output verified exactly: median $\log_p\ell^e$ 3.73–4.01, against the exact optimum ≈ $p/12$. The ratio grows like $p^{2.6}$. Prediction H4 ([3.0, 3.7]) was missed slightly high; no lead. | `a4_klpt/REPORT.pdf` |
 | A5 (Q099 follow-up) | Measured, paired with A4. KLPT with CVP strong approximation: the median $\log_p\ell^e$ drops 0.36–0.46 on every band. 28-bit medians are 3.28/3.31 and the ratio grows like $p^{2.2}$. H5 met at 28 bits and on the slope; the drop is under range on 1 of 6 bands [pcc:unverified]. | `a5_klpt_cvp/REPORT.pdf` |
+| A6 (A5 follow-up) | Measured. Headroom κ∈{2,4,8,16} in the e₁ rule makes the norm larger in every band; the best rule is A5's (κ=1). The bumps that headroom removes cost less than paying for them in advance on every run [pcc:unverified]. | `a6_klpt_kappa/REPORT.pdf` |
 
 ### Status of the remaining items (2026-11-23)
 
