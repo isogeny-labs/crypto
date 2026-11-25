@@ -17,14 +17,22 @@ SEARCH_LIMIT = 1_000_000
 PI = Decimal("3.14159265358979323846264338327950288419716939937510")
 
 
-def naf_cost(scalar):
-    """Return doublings and additions in a binary nonadjacent form chain."""
-    digits = []
+def wnaf_cost(scalar, width):
+    """Count a full Jacobian width-w NAF step, including its rebuilt table."""
+    assert 2 <= width <= 7
+    modulus = 1 << width
+    half = modulus >> 1
+    digits = weight = 0
     while scalar:
-        digit = 2 - scalar % 4 if scalar & 1 else 0
-        scalar = (scalar - digit) // 2
-        digits.append(digit)
-    return len(digits) - 1, sum(digit != 0 for digit in digits) - 1
+        digit = scalar & (modulus - 1) if scalar & 1 else 0
+        if digit >= half:
+            digit -= modulus
+        scalar = (scalar - digit) >> 1
+        digits += 1
+        weight += digit != 0
+    table_doubles = 1 if width > 2 else 0
+    table_additions = (1 << (width - 2)) - 1 if width > 2 else 0
+    return digits - 1 + table_doubles, weight - 1 + table_additions
 
 
 assert N % M == 0 and T % 2 == 1
@@ -32,7 +40,7 @@ h = pow(3, T, R)
 assert pow(h, M, R) == R - 1
 assert all(pow(h, M // prime, R) not in (1, R - 1) for prime in (2, Q))
 
-best = None
+best_by_width = {width: None for width in range(2, 8)}
 best_field_formula = None
 residue = 1
 for exponent in range(1, SEARCH_LIMIT + 1):
@@ -40,41 +48,48 @@ for exponent in range(1, SEARCH_LIMIT + 1):
     if gcd(exponent, M) != 1:
         continue
     scalar = min(residue, R - residue)
-    doubles, additions = naf_cost(scalar)
-    candidate = (doubles + additions, exponent, scalar, doubles, additions)
-    if best is None or candidate < best:
-        best = candidate
-    multiplications = 3 * doubles + 11 * additions
-    squarings = 5 * (doubles + additions)
-    field_candidate = (
-        multiplications + squarings,
-        exponent,
-        scalar,
-        doubles,
-        additions,
-        multiplications,
-        squarings,
-    )
-    if best_field_formula is None or field_candidate < best_field_formula:
-        best_field_formula = field_candidate
+    for width in best_by_width:
+        doubles, additions = wnaf_cost(scalar, width)
+        multiplications = 3 * doubles + 11 * additions + 2
+        squarings = 5 * (doubles + additions)
+        candidate = (
+            doubles + additions,
+            exponent,
+            scalar,
+            doubles,
+            additions,
+            multiplications,
+            squarings,
+        )
+        if best_by_width[width] is None or candidate < best_by_width[width]:
+            best_by_width[width] = candidate
+        field_candidate = (
+            multiplications + squarings,
+            exponent,
+            width,
+            scalar,
+            doubles,
+            additions,
+            multiplications,
+            squarings,
+        )
+        if best_field_formula is None or field_candidate < best_field_formula:
+            best_field_formula = field_candidate
 
-assert best == (
-    228,
-    391601,
-    125650396604550144886539610233302508351526245526126689,
-    176,
-    52,
+assert best_by_width[2][:5] == (
+    228, 391601, 125650396604550144886539610233302508351526245526126689, 176, 52
+)
+assert [best_by_width[width][0] for width in best_by_width] == [228, 213, 208, 203, 208, 221]
+best_width, best = min(best_by_width.items(), key=lambda item: (item[1], item[0]))
+assert best_width == 5
+assert best[:5] == (
+    203, 474203, 6716193708113405591269066791027723138604200469306871, 170, 33
 )
 assert best_field_formula == (
-    2208,
-    501103,
-    1532352030193730998546656319735419511606275446908673728612,
-    190,
-    43,
-    1043,
-    1165,
+    1890, 474203, 5, 6716193708113405591269066791027723138604200469306871,
+    170, 33, 875, 1015
 )
-operations, exponent, scalar, doubles, additions = best
+operations, exponent, scalar, doubles, additions, field_m, field_s = best
 assert pow(scalar, M, R) == R - 1
 assert all(pow(scalar, M // prime, R) not in (1, R - 1) for prime in (2, Q))
 
@@ -86,15 +101,9 @@ with localcontext() as context:
     per_factor_allowance = rho_reference / Decimal(2 * M)
 
 print(f"m={M} index={T} search_limit={SEARCH_LIMIT}")
-print(f"generator_exponent={exponent} scalar={scalar}")
-print(f"doubles={doubles} additions={additions} operations={operations}")
+print(f"generator_exponent={exponent} scalar={scalar} width={best_width}")
+print(f"doubles={doubles} additions={additions} operations={operations} field={field_m}M+{field_s}S")
+print(f"best_operations_by_width={[(w, row[0]) for w, row in best_by_width.items()]}")
 print(f"cold_point_operations={cold_point_operations}")
 print(f"rho_ratio={ratio:.12f} full_per_factor_allowance={per_factor_allowance:.12f}")
-_, field_exponent, field_scalar, field_doubles, field_additions, field_m, field_s = best_field_formula
-assert pow(field_scalar, M, R) == R - 1
-assert all(pow(field_scalar, M // prime, R) not in (1, R - 1) for prime in (2, Q))
-print(
-    f"field_formula_generator_exponent={field_exponent} scalar={field_scalar} "
-    f"doubles={field_doubles} additions={field_additions} "
-    f"per_factor={field_m + 2}M+{field_s}S"
-)
+print(f"equal_weight_field_formula={best_field_formula[0]}M/S units")

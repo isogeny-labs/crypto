@@ -1044,13 +1044,17 @@ A reproducible *point-operation* estimate sharpens the illustrative
 `C=384` line. The arithmetic-only
 [`direct_coset_cost.py`](direct_coset_cost.py) searches the first
 1,000,000 powers of a certified quotient generator `h=3^t` for
-`t=n/m`, retaining powers coprime to `m`. Its best signed-digit
-representative is `u=min(h^391601,-h^391601) mod r`, with 177
-digits and weight 53. Iterating `[u]` on a point uses 176
-doublings and 52 additions per next factor in the binary
-nonadjacent form, or 228 group operations under an optimistic
-unit-cost count. Two cold traversals cost `2(m-1)·228`, about
-`0.49694R≈2^94.817` such operations. Since the raw `u^j`
+`t=n/m`, retaining powers coprime to `m`, and prices all
+backend-supported width-`w` NAF values `2≤w≤7` with the
+odd-multiple table rebuilt for each changing orbit point.
+Its best candidate is `u=min(h^474203,-h^474203) mod r` at
+width 5. The step uses 169 main-loop doublings and 26 main-loop
+additions, plus one doubling and seven additions to build
+`P,3P,...,15P`: **170 doublings and 33 additions** in total.
+The checked minima by width are 228, 213, 208, 203, 208,
+and 221 group operations. Two cold width-5 traversals cost
+`2(m-1)·203≈0.44245R≈2^94.649` operations under the
+optimistic unit-cost count. Since the raw `u^j`
 indices represent the same quotient coset as the positive
 indices, their product differs only by a fixed sign independent
 of the input marking; that sign cancels in the base/target
@@ -1080,14 +1084,11 @@ provides full Jacobian addition and doubling; a direct orbit
 loop using those primitives could avoid that normalization.
 Its documented P-192 `a=-3` formulas price a doubling at
 `3M+5S` and a full addition at `11M+5S`, where `M,S` are
-field multiplication and squaring. The selected signed-digit
-step therefore has a formula count of `1100M+1140S`. A separate
-winner when treating `M` and `S` as equal unit costs has exponent
-`501103`, 190 doublings, 43 additions, and `1043M+1165S`.
-Accumulating `YZ` adds `2M` per factor, giving `1045M+1165S`
-for this second step. Neither formula is a measured wall-time
-ranking because the relative costs of `M` and `S` depend on
-the backend. These
+field multiplication and squaring. The width-5 step has a
+formula count of `873M+1015S`; accumulating `YZ` adds `2M`
+per factor, giving `875M+1015S`. This also minimizes `M+S`
+among the scanned generators and widths, but that equal-weight
+metric is not measured wall time. These
 counts omit field additions and subtractions, scalar-digit
 handling, exceptional branches, and the final field-character
 operation. The existing `scalar_mul_wnaf` wrapper itself still
@@ -1388,7 +1389,7 @@ a degree-13 edge costs `35M` on an affine first input and
 `90M+1S` on a later Jacobian input. The class-order check
 raises this specific chain path's per-point formula floor to
 `90000035M+1000000S`, before its kernel and map
-construction, versus `1045M+1165S` per direct scalar-orbit
+construction, versus `875M+1015S` per direct scalar-orbit
 step in the equal-weight candidate above. This is a formula
 comparison for that implementation, not a universal isogeny
 lower bound or a measured wall-time comparison. These gates
