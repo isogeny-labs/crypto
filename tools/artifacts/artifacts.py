@@ -315,6 +315,7 @@ def object_key(digest: str) -> str:
 
 
 class Remote:
+    HEAD_FORBIDDEN = object()
     def __init__(self, cfg: Config):
         self.cfg = cfg
         r = cfg.remote
@@ -383,7 +384,7 @@ class Remote:
         except FileNotFoundError:
             die(f"`{argv[0]}` not found; install the AWS CLI or set ARTIFACTS_AWS")
 
-    def head(self, digest: str) -> int | None:
+    def head(self, digest: str, *, allow_ambiguous_403: bool = False) -> int | None | object:
         """Size of the stored object, or None when absent."""
         if self.kind == "file":
             p = self.dir / object_key(digest)
@@ -410,13 +411,18 @@ class Remote:
             return int(meta["ContentLength"])
         if "Not Found" in p.stderr or "(404)" in p.stderr or "NoSuchKey" in p.stderr:
             return None
+        if allow_ambiguous_403 and ("403" in p.stderr or "AccessDenied" in p.stderr):
+            # This can mean either an absent key without ListBucket or denied
+            # access. Only an atomic conditional write may resolve it.
+            return self.HEAD_FORBIDDEN
         hint = " (S3 answers 403 for an absent key without s3:ListBucket)" if "403" in p.stderr else ""
         die(f"head-object {self.key(digest)}: {p.stderr.strip()}{hint}")
 
     def put(self, digest: str, src: Path, size: int) -> bool:
         """Store the object unless present. Returns True when bytes were sent."""
-        have = self.head(digest)
-        if have is not None:
+        single_s3_put = self.kind == "s3" and size <= SINGLE_PUT_MAX
+        have = self.head(digest, allow_ambiguous_403=single_s3_put)
+        if have is not None and have is not self.HEAD_FORBIDDEN:
             if have != size:
                 die(f"{self.key(digest)}: remote holds {have} bytes, expected {size}")
             return False
@@ -447,9 +453,15 @@ class Remote:
         argv = self.put_multipart_args(digest, src) if size > SINGLE_PUT_MAX else self.put_args(digest, src)
         p = self._run(argv)
         if p.returncode != 0:
-            if "PreconditionFailed" in p.stderr or "ConditionalRequestConflict" in p.stderr:
-                if self.head(digest) == size:  # a concurrent writer stored the same bytes
-                    return False
+            if single_s3_put and "PreconditionFailed" in p.stderr:
+                # HEAD may still be forbidden. Read and hash the exact key;
+                # never infer content identity from a 412 or object size.
+                with tempfile.TemporaryDirectory() as tmp:
+                    downloaded = Path(tmp) / "existing"
+                    self.get(digest, downloaded)
+                    if downloaded.stat().st_size != size or sha256_file(downloaded) != digest:
+                        die(f"{self.key(digest)}: existing object differs from expected bytes; refused")
+                return False
             die(f"upload {self.key(digest)}: {p.stderr.strip()}")
         if size <= SINGLE_PUT_MAX:
             want = base64.b64encode(bytes.fromhex(digest)).decode()

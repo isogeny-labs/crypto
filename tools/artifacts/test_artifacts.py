@@ -868,6 +868,41 @@ class S3Argv(unittest.TestCase):
         self.assertEqual(a[a.index("--checksum-sha256") + 1], base64.b64encode(bytes.fromhex(self.d)).decode())
         self.assertEqual(a[a.index("--bucket") + 1], "bucket")
 
+    def test_ambiguous_head_uses_conditional_put(self):
+        want = base64.b64encode(bytes.fromhex(self.d)).decode()
+        responses = [subprocess.CompletedProcess([], 1, "", "(403) Forbidden"),
+                     subprocess.CompletedProcess([], 0, json.dumps({"ChecksumSHA256": want}), "")]
+        with mock.patch.object(self.r, "_run", side_effect=responses) as run:
+            self.assertTrue(self.r.put(self.d, Path("f"), 1))
+        self.assertEqual(run.call_count, 2)
+        self.assertIn("--if-none-match", run.call_args_list[1].args[0])
+
+    def test_ambiguous_head_existing_key_requires_byte_verification(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source"
+            source.write_bytes(b"x")
+            responses = [subprocess.CompletedProcess([], 1, "", "(403) Forbidden"),
+                         subprocess.CompletedProcess([], 1, "", "PreconditionFailed")]
+            with mock.patch.object(self.r, "_run", side_effect=responses), \
+                 mock.patch.object(self.r, "get", side_effect=lambda _digest, dest: dest.write_bytes(b"x")) as get:
+                self.assertFalse(self.r.put(self.d, source, 1))
+            get.assert_called_once()
+            with mock.patch.object(self.r, "_run", side_effect=responses), \
+                 mock.patch.object(self.r, "get", side_effect=lambda _digest, dest: dest.write_bytes(b"y")), \
+                 mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+                self.r.put(self.d, source, 1)
+
+    def test_ambiguous_head_put_denial_and_multipart_fail_closed(self):
+        forbidden = subprocess.CompletedProcess([], 1, "", "(403) Forbidden")
+        with mock.patch.object(self.r, "_run", side_effect=[forbidden, forbidden]) as run, \
+             mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+            self.r.put(self.d, Path("f"), 1)
+        self.assertEqual(run.call_count, 2)
+        with mock.patch.object(self.r, "_run", return_value=forbidden) as run, \
+             mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+            self.r.put(self.d, Path("f"), artifacts.SINGLE_PUT_MAX + 1)
+        run.assert_called_once()
+
     def test_rejects_non_digest(self):
         with self.assertRaises(SystemExit):
             artifacts.object_key("../../etc/passwd")
