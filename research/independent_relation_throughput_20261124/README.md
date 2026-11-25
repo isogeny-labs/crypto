@@ -46,7 +46,7 @@ remain charged.
 | H-GEN-SIB | sibling generation from one batched inversion | lower counted work and, after implementation repair, lower wall per independent rank | profile pool 64 and 256 on the same curve/seed, then paired A/B | active; existing wall result is negative |
 | H-GEN-HOT | per-parent subset selection or key/reference bookkeeping dominates the sibling wall regression | one named software path accounts for at least 20% of samples or instructions unique to the sibling arm | matched CPU sampling and Callgrind profiles | active diagnostic |
 | H-GEN-CACHE | cache each parent's seed-coefficient residues and pre-plan minus coefficients once | at least 5% fewer solve instructions in both frozen pool arms with identical semantic controls | source-exact Callgrind replay of sequences 242/243 | rejected: 3.17% / 3.54% instruction reductions miss the 5% gate |
-| H-GEN-SAMPLE | packed fixed-width draws plus duplicate rejection replace shrinking-range Fisher-Yates work for power-of-two pools | at least 5% fewer solve instructions in both pool 64 and 256 with rank and semantic controls intact | source-exact three-pool profile, then paired wall/rank only on a pass | unchanged-source baseline accepted; candidate profile queued |
+| H-GEN-SAMPLE | packed fixed-width draws plus duplicate rejection replace shrinking-range Fisher-Yates work for power-of-two pools | at least 5% fewer solve instructions in both pool 64 and 256 with rank and semantic controls intact | source-exact three-pool profile, then paired wall/rank only on a pass | rejected: changed RNG trajectory regressed p64 by 55.78% despite an 8.75% p256 gain |
 | H-YIELD-POOL | a larger jump pool reduces collision clustering enough to raise independent rank per generated child | pool 256 beats pool 64 on rank/child and rank/second, with duplicate and zero-row rates no worse | frozen k = 28 and 32 Stage 1 panels, 240 verified runs per arm and size | rejected at the primary metric: fewer children, but lower point-estimate rank/second |
 | H-YIELD-P128 | pool 128 retains some child-count gain without pool 256's full setup cost | fewer second points and inserts than pool 64 and fewer solve instructions, at the same full rank | one matched three-pool Callgrind discriminator, then a multi-target panel only on a pass | passed one-workload discriminator; larger paired panel required |
 | H-YIELD-LINEAR | accept `(a,b)` when a fixed linear coordinate `u*a + v*b` passes a cheap predicate | conditioning biases the residual scalar `a + d*b` toward relation-bearing points | Lean equivalence and exact fibre cardinality for the nonparallel case | disproved structurally unless `u*d-v=0`, which encodes the unknown `d` |
@@ -127,6 +127,32 @@ reported archive digest
 `sha256:f3cb399fe9e9d87a119b4de1d7be2be43d05f7c179af42cb1c3816e02498e2f8`.
 The packed-sampler candidate is tested as an exact child of the baseline commit
 so an unrelated synchronization of PR #5175 with `main` cannot enter the A/B.
+
+Workflow run `45713894485` tested that exact-child candidate at commit
+`2fcef9ef67aefc2539cc6fccb79e8dbebfd74231`. All three profiled outputs
+matched their unprofiled semantic projections; every arm recovered scalar
+`24622491`, reached rank 3 from three rows, and recorded zero dependent rows.
+Pool 64 nevertheless increased from 4,363,387 to 6,797,296 solve instructions,
+a 55.780% regression, while expanding 284 more parents and taking 4,496 more
+steps to rank 3. Pool 256 decreased from 6,569,285 to 5,994,183 instructions,
+an 8.754% improvement, while expanding 54 fewer parents and taking 865 fewer
+steps. [pcc:unverified]
+
+H-GEN-SAMPLE therefore fails the preregistered requirement of at least 5%
+improvement in both p64 and p256 and is rejected before paired wall/rank
+measurement. The exact failure mode is not correctness or rank collapse: packed
+sampling preserves the ordered-subset law, but consumes the random stream
+differently, so the deterministic walk follows a different trajectory. That
+trajectory variance dominated the local generation saving and reversed sign
+between the two boundary arms. A future generation micro-optimization must
+either preserve the subset stream exactly or use a sufficiently large paired
+panel to estimate through trajectory variance; this candidate does neither at
+its frozen admission gate. The source change has been removed.
+
+The write-once candidate is under
+`profiles/sampler-candidate-run-45713894485/`. GitHub artifact `15070909657`
+reported archive digest
+`sha256:bb1633738d5daa3830974458895ab334318f75a3d667c652bd17eb9831445651`.
 
 ## Pool-size yield decision
 
