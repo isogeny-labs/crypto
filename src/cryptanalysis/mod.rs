@@ -379,6 +379,7 @@ pub mod pq_xl;
 pub mod prepared_control_archive;
 pub mod prepared_sat_control;
 pub mod preprocessing_rho;
+pub mod prime_factor_base_controls;
 pub mod prime_fast;
 pub mod prime_field_smt;
 pub mod prime_orbit_index_calculus;

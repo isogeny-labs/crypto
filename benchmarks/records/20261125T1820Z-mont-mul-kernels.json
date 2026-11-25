@@ -1,0 +1,394 @@
+{
+  "branch": "feat/lucid-cray-tckh5e",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099997745",
+        "--out",
+        "docs/notes/mont-mul-kernels-20261125/raw.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-25T18:20:23+00:00",
+      "wall_s": 75.974
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099997746",
+        "--out",
+        "docs/notes/mont-mul-kernels-20261125/raw_run2.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-25T18:35:26+00:00",
+      "wall_s": 78.836
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099997747",
+        "--out",
+        "docs/notes/mont-mul-kernels-20261125/raw_run3.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-25T18:49:26+00:00",
+      "wall_s": 75.669
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099997748",
+        "--out",
+        "docs/notes/mont-mul-kernels-20261125/raw_run4.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-25T20:34:08+00:00",
+      "wall_s": 79.906
+    }
+  ],
+  "commit": "f0271142f285ad8254c158053f4055f385cbc5de",
+  "commit_dirty": false,
+  "created_utc": "2026-11-25T18:20:18+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261125-mont-mul-kernels"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "local container, 4 vCPU shared VM, taskset -c 3, no PMU, freshly rebooted",
+    "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39"
+  },
+  "id": "20261125T1820Z-mont-mul-kernels",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p127_mersenne-scalar_mul-speedup",
+      "note": "run 4 (17c530427, final code); 2 limbs; pre-change pad9_cios median 24.0 us vs 24.1 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9868,
+        1.0077
+      ],
+      "unit": "ratio",
+      "value": 1.0046
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p127_mersenne-scalar_mul_vartime-speedup",
+      "note": "run 4 (17c530427, final code); 2 limbs; pre-change pad9_cios median 24.0 us vs 21.1 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1287,
+        1.1545
+      ],
+      "unit": "ratio",
+      "value": 1.1418
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p192_nist-scalar_mul-speedup",
+      "note": "run 4 (17c530427, final code); 3 limbs; pre-change pad9_cios median 57.9 us vs 59.1 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9858,
+        1.0103
+      ],
+      "unit": "ratio",
+      "value": 1.0016
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p192_nist-scalar_mul_vartime-speedup",
+      "note": "run 4 (17c530427, final code); 3 limbs; pre-change pad9_cios median 57.9 us vs 47.9 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.206,
+        1.2285
+      ],
+      "unit": "ratio",
+      "value": 1.2159
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p255_25519-scalar_mul-speedup",
+      "note": "run 4 (17c530427, final code); 4 limbs; pre-change pad9_cios median 100.0 us vs 99.5 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.001,
+        1.0106
+      ],
+      "unit": "ratio",
+      "value": 1.0062
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p255_25519-scalar_mul_vartime-speedup",
+      "note": "run 4 (17c530427, final code); 4 limbs; pre-change pad9_cios median 100.0 us vs 78.3 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2724,
+        1.2828
+      ],
+      "unit": "ratio",
+      "value": 1.2783
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p320_pmax-scalar_mul-speedup",
+      "note": "run 4 (17c530427, final code); 5 limbs; pre-change pad9_cios median 640.8 us vs 225.2 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.8323,
+        2.8596
+      ],
+      "unit": "ratio",
+      "value": 2.8492
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p320_pmax-scalar_mul_vartime-speedup",
+      "note": "run 4 (17c530427, final code); 5 limbs; pre-change pad9_cios median 640.8 us vs 175.8 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.6828,
+        3.7209
+      ],
+      "unit": "ratio",
+      "value": 3.7036
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p384_nist-scalar_mul-speedup",
+      "note": "run 4 (17c530427, final code); 6 limbs; pre-change pad9_cios median 782.3 us vs 398.8 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.9477,
+        1.9699
+      ],
+      "unit": "ratio",
+      "value": 1.9606
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p384_nist-scalar_mul_vartime-speedup",
+      "note": "run 4 (17c530427, final code); 6 limbs; pre-change pad9_cios median 782.3 us vs 300.7 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.5889,
+        2.6202
+      ],
+      "unit": "ratio",
+      "value": 2.5956
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p448_goldilocks-scalar_mul-speedup",
+      "note": "run 4 (17c530427, final code); 7 limbs; pre-change pad9_cios median 914.3 us vs 582.4 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.5603,
+        1.5739
+      ],
+      "unit": "ratio",
+      "value": 1.5685
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p448_goldilocks-scalar_mul_vartime-speedup",
+      "note": "run 4 (17c530427, final code); 7 limbs; pre-change pad9_cios median 914.3 us vs 427.0 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.1359,
+        2.1561
+      ],
+      "unit": "ratio",
+      "value": 2.1401
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p512_pmax-scalar_mul-speedup",
+      "note": "run 4 (17c530427, final code); 8 limbs; pre-change pad9_cios median 1035.3 us vs 819.9 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2449,
+        1.2707
+      ],
+      "unit": "ratio",
+      "value": 1.265
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p512_pmax-scalar_mul_vartime-speedup",
+      "note": "run 4 (17c530427, final code); 8 limbs; pre-change pad9_cios median 1035.3 us vs 597.3 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.723,
+        1.7652
+      ],
+      "unit": "ratio",
+      "value": 1.7463
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p521_mersenne-scalar_mul-speedup",
+      "note": "run 4 (17c530427, final code); 9 limbs; pre-change pad9_cios median 1041.3 us vs 957.7 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0877,
+        1.1014
+      ],
+      "unit": "ratio",
+      "value": 1.0962
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p521_mersenne-scalar_mul_vartime-speedup",
+      "note": "run 4 (17c530427, final code); 9 limbs; pre-change pad9_cios median 1041.3 us vs 681.8 us; median of 41 paired per-round ratios, 95% percentile bootstrap; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.5256,
+        1.543
+      ],
+      "unit": "ratio",
+      "value": 1.531
+    }
+  ],
+  "problem": "kernel:mont_vt_scalar_mul",
+  "raw": [
+    {
+      "bytes": 35269,
+      "path": "docs/notes/mont-mul-kernels-20261125/raw.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b8/b89f1fcbd7918e3e7d2d3fcc193dfb6bb2b916958f9e94650a6c2330c11816e7",
+      "sha256": "b89f1fcbd7918e3e7d2d3fcc193dfb6bb2b916958f9e94650a6c2330c11816e7",
+      "uploaded": false
+    },
+    {
+      "bytes": 41438,
+      "path": "docs/notes/mont-mul-kernels-20261125/raw_run2.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/de/deb7fbc589945598f3e48856cfb419cf17dfa82199a10578c6970297408e3e49",
+      "sha256": "deb7fbc589945598f3e48856cfb419cf17dfa82199a10578c6970297408e3e49",
+      "uploaded": false
+    },
+    {
+      "bytes": 41013,
+      "path": "docs/notes/mont-mul-kernels-20261125/raw_run3.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/54/549e3aed9e4427c4e9c9b948820c87919464957846efdcb35c67a49ea1c901ee",
+      "sha256": "549e3aed9e4427c4e9c9b948820c87919464957846efdcb35c67a49ea1c901ee",
+      "uploaded": false
+    },
+    {
+      "bytes": 41131,
+      "path": "docs/notes/mont-mul-kernels-20261125/raw_run4.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6e/6e53fd78ee2598fdd495b15a07014486469ddc2ac425218d93dd4c13b5b353cb",
+      "sha256": "6e53fd78ee2598fdd495b15a07014486469ddc2ac425218d93dd4c13b5b353cb",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "mont-mul-kernels",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}
