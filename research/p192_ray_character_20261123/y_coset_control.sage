@@ -1,7 +1,12 @@
 """Screen fixed P-192 y-coordinate coset products.
 
 Run: sage research/p192_ray_character_20261123/y_coset_control.sage
+Long check: sage -python -u research/p192_ray_character_20261123/y_coset_control.sage --order-95560
 """
+
+import sys
+
+from sage.all import EllipticCurve, GF, ZZ, kronecker
 
 
 p = 6277101735386680763835789423207666416083908700390324961279
@@ -83,6 +88,28 @@ def y_character_eds(P, reps):
         product = product * eds.psi(2 * j) % p
     # psi_(2j) = 2*y([j]P)*psi_j(P)^4; 2^len(reps) is a square.
     return int(kronecker(ZZ(product), p))
+
+
+if "--order-95560" in sys.argv:
+    m = 95560
+    t = n // m
+    assert t % 2 == 1
+    h = pow(3, t, r)
+    assert pow(h, m, r) == r - 1
+    reps = sorted({min(pow(h, j, r), r - pow(h, j, r)) for j in range(m)})
+    assert len(reps) == m
+    for P in (G, 3 * G):
+        eds = EDSWindow(P)
+        for j in reps[:8]:
+            assert eds.psi(2 * j) == int(2 * (j * P)[1]) * pow(eds.psi(j), 4, p) % p
+    base = y_character_eds(G, reps)
+    target = y_character_eds(3 * G, reps)
+    assert (base, target) == (-1, -1)
+    observed = base * target
+    expected = int(kronecker(3, r))
+    assert observed == 1 and expected == -1
+    print(f"m={m}, d=3: y-coset ratio={observed}, ray ratio={expected}")
+    sys.exit(0)
 
 
 for m in (8, 40):

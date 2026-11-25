@@ -989,12 +989,15 @@ window independently matches these low-order products and
 checks `ψ_(2j)=2y([j]P)ψ_j(P)^4` at selected large indices.
 At `m=19,112`, it computes `A_H(G)=-1` and
 `A_H([3]G)=-1`, giving normalized sign `+1` against
-`χ_r(3)=-1`. Every other coset is a scalar translate
+`χ_r(3)=-1`. The optional fixed order-95,560 replay
+checks selected large indices against direct point multiplication
+and obtains the same base sign, target sign, and mismatch.
+Every other coset is a scalar translate
 of `H`; changing its representatives only multiplies the
 `y`-product by a constant sign. Hence exactness for any coset
 would imply exactness for `H`, and these checks exclude all
-cosets of these three orders. They do not test order 95,560
-or the larger orders.
+cosets of all four odd-index subgroup orders through 95,560.
+The first larger size, about `2^85.984`, remains untested.
 [pcc:unverified]
 
 ### Second division-polynomial jet: a compact exactness screen
