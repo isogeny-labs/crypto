@@ -2245,7 +2245,7 @@ fn parallel_row_fixture(workers:usize)->Result<serde_json::Value,String>{
 }
 
 // Cold APS arm without the serial parity traversal inside its clock.
-fn parallel_row_cold_case(q:(u64,u64),workers:usize,queued:bool)
+fn parallel_row_cold_case(q:(u64,u64),workers:usize,queued:bool,seed:u64)
     ->Result<serde_json::Value,String>{
     const PROFILE:[usize;3]=[384,384,16_384];
     let cold=Instant::now();
@@ -2256,7 +2256,7 @@ fn parallel_row_cold_case(q:(u64,u64),workers:usize,queued:bool)
         return Err("parallel APS cold target is off curve".into());
     }
     let (parts,identities,duplicates)=source_walk_profile_jac_joint(
-        q,SEED,&mut source_ar,PROFILE)?;
+        q,seed,&mut source_ar,PROFILE)?;
     let (solution,stats,worker_reports,queue)=if queued{
         let (solution,stats,reports,queue)=algebraic_queued_factorized(
             &parts,q,workers,16)?;
@@ -2270,7 +2270,7 @@ fn parallel_row_cold_case(q:(u64,u64),workers:usize,queued:bool)
     Ok(json!({
         "standing":"[pcc:unverified]",
         "method":if queued{"queued APS factorized S3"}else{"parallel APS factorized S3"},
-        "p":P,"n":N,"public_Q":q,"seed":format!("{SEED:016x}"),
+        "p":P,"n":N,"public_Q":q,"seed":format!("{seed:016x}"),
         "profile":PROFILE,"workers":workers,"rejected_identity":identities,
         "rejected_duplicate_x":duplicates,
         "source_group_additions":source_ar.counts.group_additions,
@@ -3312,10 +3312,14 @@ fn neg_rho_cold_policy_jumps(q:(u64,u64),seed:u64,lanes:usize,dp_bits:u32,
 // lanes and share both the jump table and distinguished-point table.
 // The cap is global, and every worker is joined before the cold clock stops.
 fn neg_rho_parallel_cold(q:(u64,u64),seed:u64,workers:usize,lanes:usize,
-    dp_bits:u32,step_cap:u64,fold:bool)->Result<serde_json::Value,String>{
+    dp_bits:u32,step_cap:u64,fold:bool,restart_seeds:Option<&[u64]>)
+    ->Result<serde_json::Value,String>{
     if workers==0 || workers>128 || lanes==0 || lanes>128 ||
         dp_bits==0 || dp_bits>=20 || step_cap<(workers*lanes) as u64{
         return Err("parallel rho comparator admission".into());
+    }
+    if restart_seeds.is_some_and(|seeds|seeds.len()!=workers*lanes){
+        return Err("parallel rho needs one restart seed per logical lane".into());
     }
     let cold=Instant::now();
     let cpu_start=process_cpu_ns()?;
@@ -3366,6 +3370,8 @@ fn neg_rho_parallel_cold(q:(u64,u64),seed:u64,workers:usize,lanes:usize,
                 let mut arithmetic=Arithmetic::default();
                 let mut rng=seed^0x5245_5354_4152_5431^
                     ((worker as u64).wrapping_mul(0xd1b5_4a32_d192_ed03));
+                let mut lane_rngs=restart_seeds.map(|seeds|
+                    seeds[worker*lanes..(worker+1)*lanes].to_vec());
                 let mut states=initial[worker*lanes..(worker+1)*lanes].to_vec();
                 let mut steps=0u64;
                 let mut distinguished=0u64;
@@ -3409,7 +3415,8 @@ fn neg_rho_parallel_cold(q:(u64,u64),seed:u64,workers:usize,lanes:usize,
                         let old=states[i];
                         if fold && (v.pt.0==old.point.pt.0 || Some(v.pt.0)==old.prior_x){
                             short_cycles+=1;
-                            states[i].point=neg_rho_restart_policy(q,gq,&mut rng,fold)?;
+                            let stream=lane_rngs.as_mut().map_or(&mut rng,|states|&mut states[i]);
+                            states[i].point=neg_rho_restart_policy(q,gq,stream,fold)?;
                             states[i].prior_x=None;
                             restarts+=1;
                             continue;
@@ -3436,7 +3443,8 @@ fn neg_rho_parallel_cold(q:(u64,u64),seed:u64,workers:usize,lanes:usize,
                                 }
                             }
                             unusable+=1;
-                            states[i].point=neg_rho_restart_policy(q,gq,&mut rng,fold)?;
+                            let stream=lane_rngs.as_mut().map_or(&mut rng,|states|&mut states[i]);
+                            states[i].point=neg_rho_restart_policy(q,gq,stream,fold)?;
                             states[i].prior_x=None;
                             restarts+=1;
                         }else{
@@ -3469,6 +3477,7 @@ fn neg_rho_parallel_cold(q:(u64,u64),seed:u64,workers:usize,lanes:usize,
         "workers":workers,"lanes_per_worker":lanes,"dp_bits":dp_bits,
         "shared_jump_count":64,"total_initial_lanes":workers*lanes,
         "fold_negation":fold,"step_cap":step_cap,
+        "logical_lane_restart_seeds_explicit":restart_seeds.is_some(),
         "walk_steps":steps,"distinguished_records":records,
         "complete_target_scalar_recovered":log.is_some(),"log":log,
         "known_answer_in_solver":false,"worker_reports":reports,
@@ -3482,7 +3491,7 @@ fn parallel_rho_shared_table_recovers_public_fixture(){
     for fold in [false,true]{
         for workers in [1,4]{
             let report=neg_rho_parallel_cold(q,0x5248_4f5f_4352_3031,
-                workers,64/workers,5,2_000_000,fold).unwrap();
+                workers,64/workers,5,2_000_000,fold,None).unwrap();
             assert_eq!(report["complete_target_scalar_recovered"],true);
             assert_eq!(report["log"],1_744_856_327u64);
             let counted:u64=report["worker_reports"].as_array().unwrap().iter()
@@ -3491,6 +3500,14 @@ fn parallel_rho_shared_table_recovers_public_fixture(){
             assert!(counted<=2_000_000);
         }
     }
+    let restart_seeds:[u64;64]=std::array::from_fn(|lane|
+        0x7365_6564_5f6c_616eu64^(lane as u64));
+    let explicit=neg_rho_parallel_cold(q,0x5248_4f5f_4352_3031,
+        4,16,5,2_000_000,false,Some(&restart_seeds)).unwrap();
+    assert_eq!(explicit["log"],1_744_856_327u64);
+    assert_eq!(explicit["logical_lane_restart_seeds_explicit"],true);
+    assert!(explicit["worker_reports"].as_array().unwrap().iter()
+        .any(|row|row["found_solution"]==true));
 }
 fn rho_cold_match_panel()->Result<serde_json::Value,String>{
     const CASES:usize=24;
@@ -4550,6 +4567,63 @@ fn linear_chord_roots_equal_square_denominator_and_s3(){
 
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==2 && matches!(args[0].as_str(),
+        "--single-queued-aps"|"--single-static-aps"|
+        "--single-rho-folded"|"--single-rho-unfolded") {
+        let workers=args[1].parse::<usize>()
+            .map_err(|_|"single-run worker count must be an integer".to_string())?;
+        let mut input=String::new();
+        std::io::stdin().read_to_string(&mut input).map_err(|e|e.to_string())?;
+        let request:serde_json::Value=serde_json::from_str(&input)
+            .map_err(|e|e.to_string())?;
+        let object=request.as_object().ok_or("single-run input must be an object")?;
+        let allowed:&[&str]=if args[0].contains("aps"){
+            &["public_Q","aps_source_seed_hex"]
+        }else{
+            &["public_Q","rho_walk_seed_hex","rho_lane_restart_seed_hex"]
+        };
+        if object.len()!=allowed.len() ||
+            !object.keys().all(|key|allowed.contains(&key.as_str())){
+            return Err("single-run input has missing or unapproved fields".into());
+        }
+        let qv=request["public_Q"].as_array()
+            .ok_or("single-run input needs public_Q array")?;
+        if qv.len()!=2{return Err("single-run public_Q needs two coordinates".into());}
+        let q=(qv[0].as_u64().ok_or("invalid public_Q x")?,
+            qv[1].as_u64().ok_or("invalid public_Q y")?);
+        let parse_seed=|name:&str|->Result<u64,String>{
+            let raw=request[name].as_str().ok_or(format!("missing {name}"))?;
+            if raw.len()!=16 || !raw.bytes().all(|b|b.is_ascii_hexdigit()){
+                return Err(format!("{name} must be exact-width 64-bit hex"));
+            }
+            u64::from_str_radix(raw,16).map_err(|e|e.to_string())
+        };
+        let report=if args[0].contains("aps"){
+            let seed=parse_seed("aps_source_seed_hex")?;
+            parallel_row_cold_case(q,workers,args[0]=="--single-queued-aps",seed)?
+        }else{
+            if workers==0 || workers>64 || 64%workers!=0{
+                return Err("single rho needs a divisor of 64 workers".into());
+            }
+            let seed=parse_seed("rho_walk_seed_hex")?;
+            let lane_values=request["rho_lane_restart_seed_hex"].as_array()
+                .ok_or("single rho needs 64 logical-lane restart seeds")?;
+            if lane_values.len()!=64{return Err("single rho needs 64 lane seeds".into());}
+            let mut lane_seeds=Vec::with_capacity(64);
+            for item in lane_values{
+                let raw=item.as_str().ok_or("invalid rho lane seed")?;
+                if raw.len()!=16 || !raw.bytes().all(|b|b.is_ascii_hexdigit()){
+                    return Err("rho lane seed must be exact-width 64-bit hex".into());
+                }
+                lane_seeds.push(u64::from_str_radix(raw,16)
+                    .map_err(|e|e.to_string())?);
+            }
+            neg_rho_parallel_cold(q,seed,workers,64/workers,5,2_000_000,
+                args[0]=="--single-rho-folded",Some(&lane_seeds))?
+        };
+        println!("{}",serde_json::to_string(&report).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==2 &&
         (args[0]=="--parallel-aps-cold-panel" || args[0]=="--queued-aps-cold-panel") {
         let queued=args[0]=="--queued-aps-cold-panel";
@@ -4562,7 +4636,7 @@ fn main()->Result<(),String> {
             return Err("parallel APS cold panel requires 1..=1024 public targets".into());
         }
         let cases:Vec<_>=targets.into_iter().enumerate().map(|(index,q)|{
-            match parallel_row_cold_case((q[0],q[1]),workers,queued){
+            match parallel_row_cold_case((q[0],q[1]),workers,queued,SEED){
                 Ok(report)=>json!({"case":index,"report":report}),
                 Err(error)=>json!({"case":index,"public_Q":q,"error":error})
             }
@@ -4593,7 +4667,7 @@ fn main()->Result<(),String> {
             let seed=0x5248_4f5f_4352_3031u64^
                 (index as u64).wrapping_mul(0xd1b5_4a32_d192_ed03);
             match neg_rho_parallel_cold((q[0],q[1]),seed,workers,
-                64/workers,5,2_000_000,fold){
+                64/workers,5,2_000_000,fold,None){
                 Ok(report)=>json!({"case":index,"report":report}),
                 Err(error)=>json!({"case":index,"public_Q":q,"error":error})
             }
