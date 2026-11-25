@@ -5,15 +5,7 @@
 //! cargo run --release --example a3_s4_ladder -- 16 20261005
 //! cargo run --release --example a3_s4_ladder -- 20 20261005
 //! cargo run --release --example a3_s4_ladder -- 24 20261005
-//! # oracle: `s3` (default, S₃-anchored pair sweep) or `quartic`
-//! cargo run --release --example a3_s4_ladder -- 20 20261005 p256 quartic
-//! # factor-base size and linear-algebra engine (`dense` default, `sparse`)
-//! cargo run --release --example a3_s4_ladder -- 16 20261005 p256 s3 512 sparse
 //! ```
-//!
-//! Both oracles decide the *same* S₄ relation family; they differ only in
-//! how the third abscissa is found (quartic + Cantor–Zassenhaus versus an
-//! anchored S₃ quadratic per pair).  The report says which one ran.
 //!
 //! Relations decompose `R = aG + bQ` as a signed sum of **three**
 //! factor-base points via the S₄ quartic and Cantor–Zassenhaus root
@@ -26,8 +18,7 @@
 //! so FFD is inapplicable — recorded per the decomposition schema).
 
 use crypto_lib::cryptanalysis::ec_index_calculus::{
-    ec_index_calculus_dlp_s4_mitm_staged, ec_index_calculus_dlp_s4_s3_staged_with_la,
-    ec_index_calculus_dlp_s4_staged_with_la, pollard_rho_ecdlp, LaEngine,
+    ec_index_calculus_dlp_s4_staged, pollard_rho_ecdlp,
 };
 use crypto_lib::cryptanalysis::research_bench::bench_curves_a_minus_3;
 use crypto_lib::cryptanalysis::residual_walk::is_prime_u64;
@@ -46,21 +37,6 @@ fn main() {
         .and_then(|a| a.parse().ok())
         .unwrap_or(20261006);
     let class_filter: Option<String> = arguments.get(3).cloned();
-    let oracle: String = arguments.get(4).cloned().unwrap_or_else(|| "s3".into());
-    if oracle != "s3" && oracle != "quartic" && oracle != "mitm" {
-        eprintln!("oracle must be `s3`, `quartic` or `mitm`, got {oracle:?}");
-        std::process::exit(2);
-    }
-    let fb_size: usize = arguments.get(5).and_then(|a| a.parse().ok()).unwrap_or(120);
-    let la: String = arguments.get(6).cloned().unwrap_or_else(|| "dense".into());
-    let la_engine = match la.as_str() {
-        "dense" => LaEngine::Dense,
-        "sparse" => LaEngine::Sparse,
-        other => {
-            eprintln!("la must be `dense` or `sparse`, got {other:?}");
-            std::process::exit(2);
-        }
-    };
 
     let Some((_, curve)) = bench_curves_a_minus_3()
         .into_iter()
@@ -104,50 +80,27 @@ fn main() {
         _ => std::process::exit(2),
     };
 
+    let fb_size = 120;
     let extra = 8;
     let max_trials = 1_000_000;
     let max_relation_attempts = 64;
     let rho_steps = (1usize << ((bits / 2) + 8)).min(5_000_000);
 
     println!(
-        "curve={} p_bits≈{bits} n={} fb={fb_size} oracle={oracle} la={la} s4-trials={max_trials} attempts={max_relation_attempts} seed={target_seed}",
+        "curve={} p_bits≈{bits} n={} fb={fb_size} s4-trials={max_trials} attempts={max_relation_attempts} seed={target_seed}",
         curve.name, curve.n
     );
 
     let t0 = Instant::now();
-    let staged = if oracle == "mitm" {
-        ec_index_calculus_dlp_s4_mitm_staged(
-            &curve,
-            &g,
-            &q,
-            fb_size,
-            extra,
-            max_trials,
-            max_relation_attempts,
-        )
-    } else if oracle == "quartic" {
-        ec_index_calculus_dlp_s4_staged_with_la(
-            &curve,
-            &g,
-            &q,
-            fb_size,
-            extra,
-            max_trials,
-            max_relation_attempts,
-            la_engine,
-        )
-    } else {
-        ec_index_calculus_dlp_s4_s3_staged_with_la(
-            &curve,
-            &g,
-            &q,
-            fb_size,
-            extra,
-            max_trials,
-            max_relation_attempts,
-            la_engine,
-        )
-    };
+    let staged = ec_index_calculus_dlp_s4_staged(
+        &curve,
+        &g,
+        &q,
+        fb_size,
+        extra,
+        max_trials,
+        max_relation_attempts,
+    );
     let ic_ms = t0.elapsed().as_secs_f64() * 1e3;
     let (ic_recovered, stage) = match staged {
         Some((x, report)) => (Some(x), Some(report)),
@@ -163,18 +116,12 @@ fn main() {
         .unwrap_or(false);
 
     let t1 = Instant::now();
-    // `--no-rho` skips the ladder's own single-walk rho arm.  Paired rho
-    // timing now comes from the tuned `cryptanalysis` `ca solve --alg rho`
-    // implementation (see research/prime_36bit_20261122/run_rung.sh): this
-    // walk is a fixture sanity check, not a cost baseline.
-    let skip_rho = arguments.iter().any(|a| a == "--no-rho");
-    let (rho, rho_ms) = if skip_rho {
-        (None, None)
-    } else {
-        let r = pollard_rho_ecdlp(&curve, &g, &q, rho_steps);
-        (r, Some(t1.elapsed().as_secs_f64() * 1e3))
-    };
-    let rho_ok = rho.as_ref().map(|r| g.scalar_mul(r, &a_fe) == q);
+    let rho = pollard_rho_ecdlp(&curve, &g, &q, rho_steps);
+    let rho_ms = t1.elapsed().as_secs_f64() * 1e3;
+    let rho_ok = rho
+        .as_ref()
+        .map(|r| g.scalar_mul(r, &a_fe) == q)
+        .unwrap_or(false);
     let agree = match (&ic_recovered, &rho) {
         (Some(a), Some(b)) => a == b,
         _ => false,
@@ -193,11 +140,7 @@ fn main() {
             "decomposition": {
                 "m_summands": 3,
                 "system_degree": 4,
-                "oracle_class": match oracle.as_str() {
-                    "quartic" => "quartic_root_find_cantor_zassenhaus",
-                    "mitm" => "pair_sum_mitm",
-                    _ => "s3_anchor_pair_sweep",
-                },
+                "oracle_class": "quartic_root_find_cantor_zassenhaus",
                 "ffd": {"status": "inapplicable", "reason": "direct univariate quartic root finding; no Boolean/Gröbner system solved"},
                 "unknowns": fb_size,
             },
@@ -206,7 +149,6 @@ fn main() {
             "public_target_q": [q_x.to_string(), q_y.to_string()],
             "target_generation_ms_excluded": target_generation_ms,
             "fb_size": fb_size,
-            "la_engine": la_engine.name(),
             "extra_relations": extra,
             "max_trials_per_relation": max_trials,
             "max_relation_attempts": max_relation_attempts,
@@ -223,8 +165,7 @@ fn main() {
         })
     );
 
-    let rho_ok_required = rho_ok.unwrap_or(true);
-    if !ic_ok || !rho_ok_required || !(agree || skip_rho) {
+    if !ic_ok || !rho_ok || !agree {
         std::process::exit(1);
     }
 }

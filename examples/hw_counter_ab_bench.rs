@@ -21,9 +21,7 @@ use num_bigint::{BigUint, RandBigInt};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 use std::hint::black_box;
-#[cfg_attr(not(target_os = "macos"), allow(unused_imports))]
 use std::path::Path;
-#[cfg_attr(not(target_os = "macos"), allow(unused_imports))]
 use std::process::{Command, Stdio};
 use std::time::Instant;
 
@@ -120,7 +118,6 @@ mod macos_pmu {
     pub fn read_self_counters() -> (u64, u64) {
         (0, 0)
     }
-    #[allow(dead_code)]
     pub fn read_pid_counters(_pid: i32) -> Option<(u64, u64)> {
         None
     }
@@ -206,9 +203,7 @@ fn run_interleaved_ab<FA: FnMut(), FB: FnMut()>(
 
 fn bench_in_process_primitives_and_algebraic() {
     println!("==========================================================================================================");
-    println!(
-        "1. CORE OPTIMIZED PRIMITIVE HARDWARE COUNTERS (Apple Silicon PMU via RUSAGE_INFO_V4)"
-    );
+    println!("1. CORE OPTIMIZED PRIMITIVE HARDWARE COUNTERS (Apple Silicon PMU via RUSAGE_INFO_V4)");
     println!("==========================================================================================================");
 
     let mut x = P256FieldElement::from_canonical(&Uint([0x1234_5678_9abc_def1, 3, 5, 7]));
@@ -401,20 +396,13 @@ fn bench_in_process_primitives_and_algebraic() {
     println!("==========================================================================================================");
 
     for (name, (glv, g_cm)) in [
-        (
-            "CM D=-7 (deg-2 Velu psi = (1+sqrt(-7))/2, general a)",
-            cm_dm7_deg2_256(),
-        ),
-        (
-            "CM D=-8 (deg-2 Velu psi = sqrt(-2), a = -3)",
-            cm_dm8_deg2_256(),
-        ),
-        (
-            "CM D=-11 (deg-3 Velu psi = (1+sqrt(-11))/2, a = -3)",
-            cm_dm11_deg3_256(),
-        ),
+        ("CM D=-7 (deg-2 Velu psi = (1+sqrt(-7))/2, general a)", cm_dm7_deg2_256()),
+        ("CM D=-8 (deg-2 Velu psi = sqrt(-2), a = -3)", cm_dm8_deg2_256()),
+        ("CM D=-11 (deg-3 Velu psi = (1+sqrt(-11))/2, a = -3)", cm_dm11_deg3_256()),
     ] {
-        let cm_scalars: Vec<BigUint> = (0..32).map(|_| rng.gen_biguint_below(&glv.order)).collect();
+        let cm_scalars: Vec<BigUint> = (0..32)
+            .map(|_| rng.gen_biguint_below(&glv.order))
+            .collect();
         for k in &cm_scalars {
             assert_eq!(
                 jacobian_to_biguint(
@@ -601,15 +589,7 @@ fn bench_saved_baseline_vs_candidate_binaries() {
     let rounds = 5usize;
     println!(
         "{:<42} | {:>10} | {:>10} | {:>10} | {:>8} | {:>8} | {:>9} | {:>9} | {:<16}",
-        "Kernel",
-        "R0 med_ns",
-        "R1 med_ns",
-        "R3 med_ns",
-        "R1->R3",
-        "R0->R3",
-        "R0 M-inst",
-        "R3 M-inst",
-        "Fingerprint"
+        "Kernel", "R0 med_ns", "R1 med_ns", "R3 med_ns", "R1->R3", "R0->R3", "R0 M-inst", "R3 M-inst", "Fingerprint"
     );
     println!("{}", "-".repeat(150));
 

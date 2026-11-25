@@ -119,7 +119,6 @@ use crypto_lib::cryptanalysis::hky_fp_tower_fast::{self, FastOptions, QueueOrder
 use crypto_lib::cryptanalysis::hky_fp_tower_fast2::{self, Fast2Options};
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use crypto_lib::cryptanalysis::sig_fp_tower;
-use crypto_lib::ecc::curve::CurveParams;
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -127,11 +126,6 @@ use serde_json::{json, Value};
 
 #[path = "pkm_tower_wide/wide.rs"]
 mod wide;
-
-// `--instance`: the paper's normalized two-summand chain system
-// (research/hky_paper_runs_20261118).
-#[path = "pkm_tower_paper/paper.rs"]
-mod paper;
 
 /// Runs `$body` with `$f` bound to the backend `$b` at the prime `$p`
 /// (a `BigUint`).
@@ -171,14 +165,6 @@ macro_rules! with_backend {
             }
             Backend::Wide4 => {
                 let $f = Fp256::new(p_big);
-                $body
-            }
-            Backend::Wide6 => {
-                let $f = FpWide::<6>::new(p_big);
-                $body
-            }
-            Backend::Wide9 => {
-                let $f = FpWide::<9>::new(p_big);
                 $body
             }
             Backend::Auto => unreachable!(),
@@ -2176,7 +2162,7 @@ fn measure_hky(
                     "interreductions": st.interreductions,
                     "interreduce_muladds": st.interreduce_muladds,
                     "second_muladds": st.second_muladds, "products": st.products,
-                    "zero": st.zero, "reducers": st.reducers, "core_muladds": st.core_muladds, "zero_muladds": st.zero_muladds, "swept_batches": st.swept_batches, "verify_products": st.verify_products, "verify_nonzero": st.verify_nonzero, "verify_s": st.verify_s, "final_row_bytes": st.final_row_bytes, "sweep_bytes": st.sweep_bytes, "skip": st.skip_on, "queued_items": st.queued_items, "skipped_items": st.skipped_items, "covered_cols": st.covered_cols, "witness_muladds": st.witness_muladds, "witness_s": st.witness_s, "cover_hist": st.cover_hist, "rank_by_deg": st.rank_by_deg, "witness_seq_s": st.witness_seq_s, "witness_survivors": st.witness_survivors, "witness_rows": st.witness_rows, "coverable_items": st.coverable_items, "coverable_ops": st.coverable_ops, "ops_by_src": st.ops_by_src, "prods_by_src": st.prods_by_src,
+                    "zero": st.zero, "reducers": st.reducers,
                     "dense_rows": st.dense_rows, "sparse_rows": st.sparse_rows,
                     "stored_words": st.stored_words, "peak_words": st.peak_words,
                     "threads": st.threads, "simd": st.simd,
@@ -2264,7 +2250,7 @@ fn measure_hky(
             "interreduce": o.interreduce, "interreduce_min": o.interreduce_min,
             "interreduce_block": o.interreduce_block, "rebucket": o.rebucket,
             "par_second": o.par_second, "bitmap": o.bitmap, "fault": o.fault,
-            "deg_weight": o.deg_weight, "np_epochs": o.np_epochs, "sweep": o.sweep, "sweep_ratio": o.sweep_ratio, "sweep_tile_bytes": o.sweep_tile_bytes, "sweep_max_words": o.sweep_max_words, "verify_closed": o.verify_closed,
+            "deg_weight": o.deg_weight,
             "dense": [o.dense_num, o.dense_den], "stats": fast_stats});
     } else if fast {
         // Only rows of the fast instrument carry its options and timers.
@@ -2565,20 +2551,6 @@ fn measure_generic<F: PrimeField>(
 /// Dickson torus, the tower control and the null, `t` upward until a whole
 /// cell stops.
 fn run_wide(a: &Args, sink: &mut Sink) {
-    let curve_ab = if a.nist_curve {
-        let curve = match a.p_label.as_str() {
-            "P-192" | "p192" => CurveParams::p192(),
-            "P-224" | "p224" => CurveParams::p224(),
-            "P-256" | "p256" => CurveParams::p256(),
-            "P-384" | "p384" => CurveParams::p384(),
-            "P-521" | "p521" => CurveParams::p521(),
-            _ => panic!("--curve nist needs --p P-192, P-224, P-256, P-384 or P-521"),
-        };
-        assert_eq!(curve.p, a.p_big, "NIST curve and field prime differ");
-        Some((curve.a, curve.b))
-    } else {
-        None
-    };
     let wa = wide::WArgs {
         seed: a.seed,
         planted: a.planted,
@@ -2594,13 +2566,11 @@ fn run_wide(a: &Args, sink: &mut Sink) {
         targets: a.targets.clone(),
         verify: a.verify,
         label: a.p_label.clone(),
-        curve_ab,
     };
     for &kind in &a.kinds {
         let wk = match kind {
             Kind::Kummer => wide::WKind::Kummer,
             Kind::DicksonTorus => wide::WKind::DicksonTorus,
-            Kind::Isogeny => wide::WKind::Isogeny,
             other => panic!("the wide builder has no {} tower", other.name()),
         };
         for &m in &a.ms {
@@ -2706,19 +2676,16 @@ struct Args {
     /// the system a run without the flag gives it.
     targets: Option<Vec<usize>>,
     /// The prime as given (`--p` takes a decimal number or `P-192`,
-    /// `P-224`, `P-256`, `P-384`, `P-521`); `p` is it when it fits the `u64` builder
+    /// `P-224`, `P-256`); `p` is it when it fits the `u64` builder
     /// (`p < 2⁶³`), else 0.
     p_big: BigUint,
     /// The prime's label in rows (`--p` as given).
     p_label: String,
     /// `--engine generic` only: the backend.
     backend: Backend,
-    /// `--builder wide`: build the systems over the backend (kummer,
-    /// dickson-torus and isogeny kinds)
+    /// `--builder wide`: build the systems over the backend
     /// (`pkm_tower_wide`), Kummer and torus only; forced above `2⁶³`.
     wide: bool,
-    /// Select the named NIST curve instead of a random curve over its prime.
-    nist_curve: bool,
     /// `--verify`: wide builder only, the exhaustive and `BigUint` checks.
     verify: bool,
     /// `--engine hky` only: the closure degrees, and the limits of one
@@ -2770,7 +2737,7 @@ enum Engine {
 /// prime's size: `Fp32` below `2³²`, `Fp52` below `2⁵²` on a CPU with
 /// AVX-512 IFMA, `Fp64` below `2⁶³`, `FpP192` at
 /// NIST P-192, `FpWide<3>` to 192 bits, `Fp224` (`FpWide<4>` with a spare
-/// top bit) to 255 bits, `FpWide<4>` to 256 bits, then 6 or 9 limbs.
+/// top bit) to 255 bits, `FpWide<4>` above.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Backend {
     Auto,
@@ -2782,8 +2749,6 @@ enum Backend {
     P192,
     Fp224,
     Wide4,
-    Wide6,
-    Wide9,
 }
 
 fn nist(name: &str) -> Option<BigUint> {
@@ -2794,10 +2759,6 @@ fn nist(name: &str) -> Option<BigUint> {
         "P-256" | "p256" => {
             Some((&one << 256u32) - (&one << 224u32) + (&one << 192u32) + (&one << 96u32) - 1u32)
         }
-        "P-384" | "p384" => {
-            Some((&one << 384u32) - (&one << 128u32) - (&one << 96u32) + (&one << 32u32) - 1u32)
-        }
-        "P-521" | "p521" => Some((&one << 521u32) - 1u32),
         _ => None,
     }
 }
@@ -2873,14 +2834,8 @@ fn resolve_backend(b: Backend, p: &BigUint) -> Backend {
         Backend::Wide3
     } else if p < &((BigUint::from((1u64 << 63) - 1)) << 192u32) {
         Backend::Fp224
-    } else if bits <= 256 {
-        Backend::Wide4
-    } else if bits <= 384 {
-        Backend::Wide6
-    } else if bits <= 576 {
-        Backend::Wide9
     } else {
-        panic!("generic PKM backend supports primes through 576 bits")
+        Backend::Wide4
     }
 }
 
@@ -2937,7 +2892,6 @@ fn parse_args() -> Args {
         p_label: "786433".into(),
         backend: Backend::Auto,
         wide: false,
-        nist_curve: false,
         verify: false,
         hky_cmin: None,
         hky_cmax: 6,
@@ -3001,8 +2955,6 @@ fn parse_args() -> Args {
                     "p192" => Backend::P192,
                     "fp224" => Backend::Fp224,
                     "wide4" => Backend::Wide4,
-                    "wide6" => Backend::Wide6,
-                    "wide9" => Backend::Wide9,
                     other => panic!("unknown backend `{other}`"),
                 }
             }
@@ -3011,13 +2963,6 @@ fn parse_args() -> Args {
                     "wide" => true,
                     "u64" => false,
                     other => panic!("unknown builder `{other}`"),
-                }
-            }
-            "--curve" => {
-                a.nist_curve = match v.as_str() {
-                    "nist" => true,
-                    "random" => false,
-                    other => panic!("unknown curve selection `{other}`"),
                 }
             }
             "--kinds" => {
@@ -3125,29 +3070,6 @@ fn parse_args() -> Args {
             "--hky3-rebucket" => a.hky3.rebucket = v == "on",
             "--hky3-par-second" => a.hky3.par_second = v == "on",
             "--hky3-bitmap" => a.hky3.bitmap = v == "on",
-            "--hky3-np" => a.hky3.np_epochs = v == "on",
-            "--hky3-sweep" => a.hky3.sweep = v == "on",
-            "--hky3-verify-closed" => a.hky3.verify_closed = v == "on",
-            "--hky3-skip" => a.hky3.skip = v == "on",
-            "--hky3-skip-order" => a.hky3.skip_order = v.parse().expect("--hky3-skip-order"),
-            "--hky3-skip-witness" => {
-                a.hky3.skip_witness = match v.as_str() {
-                    "off" => 0,
-                    "leads" => 1,
-                    "span" | "on" => 2,
-                    o => o.parse().expect("--hky3-skip-witness off|leads|span"),
-                }
-            }
-            "--hky3-skip-witness-max" => {
-                a.hky3.skip_witness_max = v.parse().expect("--hky3-skip-witness-max")
-            }
-            "--hky3-sweep-ratio" => a.hky3.sweep_ratio = v.parse().expect("--hky3-sweep-ratio"),
-            "--hky3-sweep-tile-bytes" => {
-                a.hky3.sweep_tile_bytes = v.parse().expect("--hky3-sweep-tile-bytes")
-            }
-            "--hky3-sweep-max-words" => {
-                a.hky3.sweep_max_words = v.parse().expect("--hky3-sweep-max-words")
-            }
             "--hky3-deg-weight" => a.hky3.deg_weight = v.parse().expect("--hky3-deg-weight"),
             "--hky3-fault" => a.hky3.fault = v.parse().expect("--hky3-fault"),
             "--hky3-trace" => a.hky3.trace = Some(v.clone()),
@@ -3255,14 +3177,6 @@ fn parse_args() -> Args {
 /// A target curve over `F_p` on which at least `need` abscissae of `V`
 /// carry points.
 fn target_curve(p: u64, tower: &Tower, need: usize, rng: &mut StdRng) -> (PrimeCurve, Vec<u64>) {
-    let available = tower
-        .cover
-        .as_ref()
-        .map_or(tower.v.len(), |cv| cv.image(&tower.v, p).len());
-    assert!(
-        need <= available,
-        "target_curve requires {need} distinct base abscissae, but the tower has only {available}"
-    );
     loop {
         let a = rng.gen_range(0..p);
         let b = rng.gen_range(1..p);
@@ -3818,10 +3732,6 @@ fn main() {
         export_magma_rows(&files, &argv[j + 1]);
         return;
     }
-    if argv.iter().any(|x| x == "--instance") {
-        paper::run(&argv);
-        return;
-    }
     if let Some(i) = argv.iter().position(|x| x == "--aux-search") {
         aux_search(&argv[i + 1]);
         return;
@@ -4290,29 +4200,5 @@ mod tests {
         assert_eq!(eqs[0].terms.len(), 9);
         let sum = eqs[0].terms.values().fold(0u64, |a, &c| (a + c) % curve.p);
         assert_eq!(sum, 1_862_312_789);
-    }
-
-    #[test]
-    #[should_panic(
-        expected = "target_curve requires 5 distinct base abscissae, but the tower has only 4"
-    )]
-    fn target_curve_rejects_more_summands_than_base_points() {
-        let p = BB_PRIME;
-        let mut rng = StdRng::seed_from_u64(20261121);
-        let tower = kummer(p, 2, &mut rng);
-        target_curve(p, &tower, 5, &mut rng);
-    }
-
-    #[test]
-    #[should_panic(
-        expected = "target_curve requires 5 distinct base abscissae, but the tower has only 4"
-    )]
-    fn target_curve_rejects_cover_image_with_too_few_points() {
-        let p = BB_PRIME;
-        let mut rng = StdRng::seed_from_u64(20261122);
-        let mut tower = kummer(p, 3, &mut rng);
-        tower.cover = Some(CoverMap::draw(CoverKind::Square, p, &mut rng));
-        assert_eq!(tower.cover.as_ref().unwrap().image(&tower.v, p).len(), 4);
-        target_curve(p, &tower, 5, &mut rng);
     }
 }
