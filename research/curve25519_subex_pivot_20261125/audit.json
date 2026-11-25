@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-25",
+  "goal": "classical total expected r^o(1) ECDLP work for ordinary prime-field elliptic curves",
+  "fixed_arity_decision": "closed_for_total_subexponential_goal_under_uniform_target_coverage",
+  "counting_gate": {
+    "factor_base": "B",
+    "fixed_arity": "m",
+    "maximum_covered_residues": "sum_{j=0}^m B^j",
+    "attempts_for_theta_B_rows": "Omega(r/B^(m-1))",
+    "consequence_when_B_is_r_o_1": "r^(1-o(1)) target attempts"
+  },
+  "pair_image": {
+    "arity": 3,
+    "explicit_degree": "B^2",
+    "ordinary_total_before_linear_algebra": "Theta(B^2+r/B)",
+    "optimum": "B=Theta(r^(1/3)), work=Theta(r^(2/3))"
+  },
+  "growing_arity_child_transition": {
+    "source_commit": "42907c9e999cc00d6abe7a50bfc1023250edd1b9",
+    "source_sha256": "671642d7b53154d92344e8c4be0240f18929632ebcfdf73b07c3e9939b873860",
+    "scope": "D.4.6-D.4.7 mode factorization, packet description locality, retained creation precision and entry-cost envelope",
+    "outcome": "no_local_contradiction_found",
+    "native_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::coupled_controls -- --nocapture",
+    "native_result": {
+      "passed": 3,
+      "failed": 0
+    },
+    "claim_boundary": "bounded native controls and focused source audit; not a proof of D.1 or a practical Curve25519 attack"
+  },
+  "next_gate": "source-bound active-call construction, precision, description, entry-work and branching induction with a depth-independent constant"
+}

@@ -1,0 +1,149 @@
+# Curve25519 subexponential pivot
+
+Date: 2026-11-25.  This note closes the fixed-arity pair-image route for the
+stated **total expected** `r^o(1)` goal and records a focused audit of the
+growing-arity tensor recursion.  It does not claim a new ECDLP algorithm or an
+unconditional proof of the external contraction theorem.
+
+## Decision
+
+The operational pair-image result remains useful as a finite algebraic
+diagnostic, but an `o(d^2)` target-conditioned common-root routine is no longer
+the next exponent-moving target by itself.  Fixed arity fails before its
+per-target algebra is charged.
+
+Let `B` be the number of signed factor-base elements, let `m` be a fixed
+relation arity and let the prime subgroup have order `r`.  At most
+
+```text
+1 + B + ... + B^m
+```
+
+group elements have a decomposition of arity at most `m`.  A uniform target
+therefore succeeds with probability at most `O(B^m/r)`.  Producing `Theta(B)`
+rows needs at least
+
+```text
+Omega(r / B^(m-1))
+```
+
+target attempts, independently of the decomposition oracle's cost.  Total
+subexponential work also requires `B = r^o(1)` (the matrix has `Theta(B)`
+columns), so every fixed `m` gives `r^(1-o(1))` attempts.  Symmetry can change
+constant factors and polynomial powers of `B`; it cannot clear this counting
+gate.  The surviving routes must use growing arity or change the target
+distribution/factor-base correspondence in a way that invalidates the uniform
+coverage model.
+
+For the measured `m=3` split, the ordinary pair table gives the more concrete
+model
+
+```text
+setup + relation search = Theta(B^2) + Theta(r/B)
+```
+
+before linear algebra: `Theta(r/B^2)` targets and a `Theta(B)` scan per target.
+It is minimized at `B` of order `r^(1/3)`, for `Theta(r^(2/3))` work.  The exact
+squarefree degree-`B^2` pair image measured by
+`EXP-C25519-PAIRIMAGE-GATE-001` explains the setup term.  Fast special
+resultants can make construction quasi-linear in their degree, but emitting a
+degree-`B^2` polynomial still emits `Theta(B^2)` field coefficients.  Fast
+modular composition applied to the natural tensor quotient likewise sees
+dimension `Theta(B^2)`, not `Theta(B)`.
+
+These are upper-model and counting conclusions, not an unconditional lower
+bound for every coordinate-aware relation generator.  In particular, a
+nonuniform target generator with proved useful-row density would need its own
+analysis.
+
+## Focused D.4.6--7 child-call audit
+
+The growing-arity route already has the conditional prime-field rate
+
+```text
+2^O(b/m + m*b/sqrt(log b)),  m = Theta((log b)^(1/4)),
+```
+
+hence `2^O(b/(log b)^(1/4))`, provided the general Boolean tensor contraction
+theorem D.1 is correct and applies with uniform construction/entry costs.  This
+route covers fixed-cofactor prime-field curves, so it is the relevant
+asymptotic family for Curve25519's prime subgroup.  Its constants do not imply
+a practical attack at 255 bits.
+
+The source checked here is OpenAI/math commit
+`42907c9e999cc00d6abe7a50bfc1023250edd1b9`, file
+`build/quantitative-contraction.tex`, SHA-256
+`671642d7b53154d92344e8c4be0240f18929632ebcfdf73b07c3e9939b873860`.
+The local check covered the transition in D.4.6--7 from one mode tuple to its
+group children:
+
+1. A crossing mode has one target group and one source group.  Coefficient
+   extraction therefore separates over target-group row products, while its
+   substituted linear form uses only source-group column bits.
+2. Multiplying the group contractions reconstructs each retained mode
+   monomial exactly.  Terms of weight at least the working precision vanish
+   modulo `2^p`, so enumerating only lower-weight tuples is valid.
+3. A new packet entry is evaluated from at most `L` affine row factors plus
+   source-form powers.  With polynomially many terms per factor, the direct
+   coefficient traversal costs `exp(O(L log s))` time and polynomial space.
+   The source guard `L <= s^(1/1000)` places this inside the theorem's
+   `exp(O(s^(9/10)))` entry allowance.
+4. A new description contains packet-local data, the chosen mode tuple,
+   interpolation data and creation precision.  It contains no callback to a
+   parent evaluator.  Retained tensors use immutable creation-time
+   descriptions and canonical lifts, so entry routines do not compose with
+   recursion depth.
+
+No contradiction was found in this local transition.  The native
+`hashed-ecdl-tensor` controls were replayed with Rust only:
+
+```text
+cargo test --locked --release \
+  --manifest-path crates/hashed-ecdl-tensor/Cargo.toml \
+  --lib contraction::recursive::coupled_controls -- --nocapture
+
+3 passed; 0 failed
+```
+
+Those controls cover parallel/correlated ports, quadratic incoming modes,
+outgoing form powers, two taper levels and a nested child whose older packet
+keeps its creation precision.  They are bounded exact controls, not a proof of
+the asymptotic induction.
+
+## New target
+
+The next acceptance gate is a **source-bound active-call cost certificate**,
+not another fixed-arity solver tweak.  For every actually constructed child it
+must bind, in one induction:
+
+- the checked leaf, degree, packing and shrink guards;
+- inherited and creation precision, including rational intermediate widths;
+- old vertices, packet vertices, isolates, mode tuples and description bits;
+- construction work and the number/cost of packet-entry evaluations; and
+- the depth-first branching product through all active depths.
+
+The target theorem is a fixed-constant bound of the form
+
+```text
+total bit work <= (s + description_length)^C
+                  * 2^(C*s/sqrt(log s))
+```
+
+with `C` independent of the recursion depth and input instance.  A precise
+counterexample to one induction premise is equally decisive.  Passing this
+gate would retire the largest remaining conditional step between the existing
+growing-arity ECDLP reduction and an independently supported asymptotic
+subexponential result; failing it would identify the exact theorem repair
+needed.
+
+## Primary references and local context
+
+- Akshima et al., pinned Bochum v0.2, Theorem 4:
+  <https://github.com/bochum-crypto/subexponential-ecdl/blob/1ee44e562b1b9a50ea339f3b8f81112b5a24b96f/subexponential-ecdl.pdf>
+- OpenAI/math, pinned D.1/D.4 source:
+  <https://github.com/openai/math/blob/42907c9e999cc00d6abe7a50bfc1023250edd1b9/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/build/quantitative-contraction.tex>
+- Existing lead assessment:
+  `docs/leads/2026-11-17/subexponential-ecdlp-goal/REPORT.md`
+- Pair-image degree gate:
+  `research/curve25519_pair_image_gate_20261125/README.md`
+
