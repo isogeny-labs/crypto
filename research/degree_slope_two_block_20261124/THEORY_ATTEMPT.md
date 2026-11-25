@@ -189,3 +189,23 @@ CMAX=4 python3 reach.py 40961 1 6 ; CMAX=4 python3 reach.py 40961 0 7   # ~30 s
 `research/kummer_wave2_20261115/KM-POPCODE-STEPS/RESULTS.md`;
 `research/pkm_cost_rules_20261115/README.md` (via this session's synthesis).
 research-kb and the lead atlas: unavailable in this container.
+
+## Errata from the red-team (REDTEAM.md, 2026-11-25) [pcc:unverified]
+
+Verdict on "drop the degree-slope route as a near-horizon closure program":
+stands with caveat. Corrections to this note:
+- **F1 (target):** the target above is a refutation-degree bound, but at the
+  cost rule's optimum each attempt is a *satisfiable* solve with about B/m!
+  roots (rules.out: attempts = 1.0), so the rho-parity bar applies to those
+  solves. A proof of the stated target would not by itself close the lever. [pcc:unverified]
+  This strengthens "drop" for m >= 5.
+- **F2 (size-degree):** the Impagliazzo–Pudlák–Sgall trade-off assumes 0/1
+  variables; the tower is in a character basis. The 2^{0.0225N} figure is
+  withdrawn.
+- **F3 (m <= 4):** the claim that the cost rule excludes m <= 4 is wrong. Under
+  the repo's adopted bar 0.0417, an m=2 bound of slope t/4 (the conjecture
+  d_F(2,t) >= t/4 + 2.75 above) would close m = 4. m >= 5 is unaffected. F1 has
+  to be reconciled for m = 4 before this is scheduled.
+- The slope column is extrapolated: the margin at m = 8 is about 38%, not 13%.
+  The target covers one presentation only. Route (b) duplicates
+  chain_sd_bounds_20261115. P3 conflicts with g(5) in {18,19}.

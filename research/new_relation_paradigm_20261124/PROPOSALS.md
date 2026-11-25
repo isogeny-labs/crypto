@@ -309,3 +309,23 @@ consequence, plus the information value of closing a door cheaply.
 No proposal claims a cost gain, a tier, or a status change. The honest summary is that I did
 not find a new relation paradigm that survives the repository's own closures; I found three
 unmeasured doors and nine paper-killed families.
+
+## Errata from the red-team (REDTEAM.md, 2026-11-25) [pcc:unverified]
+
+- **NRP-3 ranking requalified.** On a Koblitz curve x -> x^2 on coordinates is
+  the Frobenius endomorphism tau, so sum a_i x^{2^i} maps act on <P> as known
+  Z[tau] scalars, already closed (ecdlp_subexp_ideas_20261110 §1.2). The
+  residual is the binary analogue of an open conjecture (A'). The
+  Weil-restriction repair loses Lang–Weil room over F_2. The "~50% provable"
+  estimate is unsupported; NRP-3 moves no tier.
+- **NRP-1 is a known null.** The subspace indicator reduces to degree-2
+  additive character sums; the Kohel–Shparlinski/Weil bound applies, matching
+  the measured null in coord_spectrum_20261110. The exponent upside was not
+  derived.
+- **Section 4 minimal-genus F_2-cover row relabelled:** cyclic covers are
+  proof-closed (cover_decomposition_gap_search_20261018 §4); the noncyclic
+  part is closed only heuristically (expected 2^-3870), and
+  problems/koblitz-modular-carrier-transfer.md is OPEN for noncyclic covers
+  and gluing/polarization. This is the one door left ajar.
+- **Isogeny-class lottery row:** the kill stands, but cite the completed
+  3.85e-5 invariance figure and KN-FIND-007, not the interim study header.
