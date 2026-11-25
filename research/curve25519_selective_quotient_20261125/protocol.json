@@ -1,0 +1,36 @@
+{
+  "schema": "curve25519.selective-quotient-protocol/v1",
+  "study_id": "EXP-C25519-SELCUT-001",
+  "frozen_date": "2026-11-25",
+  "status": "frozen_before_cut_implementation_or_selective_measurement",
+  "parent_revision": "a7145dc78b",
+  "language": "native Rust",
+  "javascript": false,
+  "curve": {"k": 20, "p": 1048573, "r": 131203, "a": 63700, "b": 872826, "generator": [349837, 122]},
+  "factor_base": {"form": "x = lo + g*w", "lo": 349833, "g": 3, "qualification_order": 19, "domain": "distinct roots only"},
+  "system": {"m": 3, "relation": "symmetrized S4", "membership": "q divides X^d - 1 via paired residue schedule"},
+  "arms": {
+    "D": {"policy": "none", "role": "baseline"},
+    "L": {"policy": "last nonlinear square", "role": "ablation"},
+    "B": {"policy": "last two nonlinear squares", "role": "primary"},
+    "N": {"policy": "all nonlinear squares", "role": "mechanism control"},
+    "U": {"policy": "all non-beneficial operations", "role": "negative control"},
+    "A": {"policy": "all operations", "role": "predecessor reproduction"}
+  },
+  "engine": {"name": "f4_fp", "order": "grevlex", "threads": 1, "degree_ceiling": 24, "per_system_cap_s": 300, "primary_unit": "F_p multiply-adds in F4 elimination"},
+  "targets": {"seed": 20261125, "random_per_arm": 8, "planted_per_arm": 4, "paired": true, "bootstrap_resamples": 10000, "bootstrap_seed": 20261125},
+  "qualification": {
+    "primary_arm": "B",
+    "minimum_completed_random_pairs": 6,
+    "paired_ratio_upper_95_lt": 0.75,
+    "productive_degree_max": 4,
+    "productive_degree_minimum_pairs": 6,
+    "peak_rss_ratio_max_each_pair": 1.25,
+    "membership_build_ops_ratio_max_each_pair": 1.25,
+    "candidate_censoring_not_greater": true,
+    "invalid_relations": 0
+  },
+  "scaling_orders_gated": [7, 9, 21, 27, 57],
+  "stop_rule": "failure of any primary qualification condition closes B before scaling or m4",
+  "claim_boundary": "stage diagnostic only; no total-work or subexponential ECDLP claim"
+}
