@@ -34,6 +34,8 @@ def command(args, seed, fb, oracle, preflight):
            "0" if preflight else "1", "--json"]
     if not preflight:
         cmd += ["--solver-budget-seconds", str(args.solver_budget)]
+        if args.linalg:
+            cmd += ["--linalg", args.linalg]
     return cmd
 
 
@@ -60,6 +62,8 @@ def main():
     ap.add_argument("--repeats", type=int, default=16)
     ap.add_argument("--max-trials", type=int, default=1000)
     ap.add_argument("--solver-budget", type=int, default=5)
+    ap.add_argument("--linalg", default=None,
+                    help="relation-matrix stage; e.g. incremental-gauss-full-rank-checked")
     ap.add_argument("--call-cap", type=int, default=900)
     ap.add_argument("--protocol", required=True)
     ap.add_argument("--store", type=Path, required=True)
