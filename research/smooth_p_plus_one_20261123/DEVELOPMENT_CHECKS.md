@@ -197,3 +197,12 @@ publication route: it runs the trusted base tool, uploads changed data, replays
 the remote bytes and commits manifests/removals. Keep the PR draft pending that
 migration; do not represent remote storage or the artifact gate as passed until
 the actual result is read back. This does not change any scientific outcome.
+
+The actual [migration run 45515847117](https://github.com/isogeny-labs/crypto/actions/runs/45515847117)
+at head 623ccfa87c failed in job 138874939285's upload/replay step. Both
+content-addressed HeadObject requests returned HTTP 403; the manifest/removal
+commit step was skipped. This response cannot distinguish denied access from
+an absent key without ListBucket permission. No successful upload, remote byte
+replay or object absence is asserted. The supported local and workflow routes
+have both been tried; store access or an approved replacement is an external
+dependency. No manual retry, exception label or policy change was made.
