@@ -426,3 +426,17 @@ Three additional local public-EC experiments were frozen and run in parallel. Th
 )
 
 The 100-row matrices now have 3 bounded original-mechanism executions, 32 partial controls, 16 literal-premise screens, and 49 entries lacking a runnable EC construction or matching input. No full same-target index-calculus pipeline has been completed in this batch; the goal and draft PR remain open.
+
+== Further EC controls
+
+Unsigned claims `PCC-20261125-f05501`, `PCC-20261125-cf3bcc`, and `PCC-20261125-31b457` pin further public-curve producer records. The #96 raw output is held as eight exact per-target shards with a matching full-stream SHA-256; all results remain `[pcc:unverified]`.
+
+#table(
+  columns: (auto, 1fr),
+  table.header([Item], [Observation and boundary]),
+  [6], [A #link("EC_AUTOMORPHISM_006_PROTOCOL.md")[finite order-three EC automorphism quotient] reconstructed the same 153 exact signed witnesses and full/projected ranks 12/4 as full enumeration. Candidate-sum additions fell 27,648 to 9,216, but target comparisons remained 13,824, orbit setup added 5 ms and collection wall times were 25 versus 24 ms with unequal validation work. The initial common automorphism search was outside the timer; this does not execute full `PGL_2`.],
+  [48], [A #link("EC_ANNEAL48_REPL_PROTOCOL.md")[two-curve annealing replication] had 74 versus 81 capped hits on `E/F_1009` and 46 versus 81 on `E/F_1019`, annealing versus uniform. EC evaluations were 1345 versus 1279 and 1528 versus 1279. Both targets were planted, and the second group order was composite.],
+  [96], [A #link("WS68_YIELD_BASE_CUSTODY.md")[yield-triggered B8-to-B16 policy] pinned all 24 arms on eight fixed streams, expanding five times. Counted group additions were 23,774 feedback versus 28,130 B8 and 16,519 B16. Feedback tied the better fixed choice on two targets and lost on six; the streams were already used in V2, and elimination and wall costs are unpriced.],
+)
+
+The item matrices still contain 100 rows with primary labels 3 bounded original mechanisms, 32 partial controls, 16 literal-premise screens and 49 missing runnable EC constructions or matching inputs. The goal and draft PR remain open.

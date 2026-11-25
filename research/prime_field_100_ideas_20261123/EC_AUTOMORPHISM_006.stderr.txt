@@ -1,0 +1,25 @@
+  ***   variable name expected: zeta=0;for(k=2,p-1,if(zeta==0&&Mod(k,p)^3==1,z
+  ***                           ^----------------------------------------------
+  ***   at top-level: ...f(lam==0&&ellmul(E,G,k)==phi(G),lam=k))
+  ***                                             ^--------------
+  ***   in function phi: if(P==[0],[0],[zeta*P[1],P[2]])
+  ***                                       ^------------
+  *** _*_: forbidden multiplication t_INTMOD * t_CLOSURE.
+  ***   at top-level: ...=0||(lam^3)%r!=1||lam==1,error("eigenvalue gua
+  ***                                             ^---------------------
+  ***   user error: eigenvalue guard
+  ***   at top-level: choose_orbits()
+  ***                 ^---------------
+  ***   in function choose_orbits: ...,#reps,if(P==reps[j]||P==
+  ***   phi(reps[j])||P==phi(
+  ***   ^---------------------
+  ***   in function phi: if(P==[0],[0],[zeta*P[1],P[2]])
+  ***                                       ^------------
+  *** _*_: forbidden multiplication t_INTMOD * t_CLOSURE.
+  ***   at top-level: baseline();quotient()
+  ***                 ^---------------------
+  ***   in function baseline: ...for(k=1,B,for(mask=0,7,Q=sum_for(i,j,k,mask);a
+  ***                                                     ^---------------------
+  ***   in function sum_for: ...(P1=if(mask%2,negfb[i],fb[i]),P2=if((mask\2)%2
+  ***                                                    ^---------------------
+  ***   incorrect type in _[_] OCcompo1 [not a vector] (t_POL).
