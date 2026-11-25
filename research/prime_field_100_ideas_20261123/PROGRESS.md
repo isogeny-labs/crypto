@@ -1,6 +1,6 @@
-# Execution follow-up, first bounded pass
+# Execution follow-up, two bounded passes
 
-Date: 2026-11-24. Scope: the [100 source proposals](IDEAS.md) and their [item-by-item assessment](README.md). Three parallel workstreams examined items 1–34, 35–67, and 68–100. Each item has a specific proof obligation or falsifiable next check in the assessment; this follow-up records what was actually checked beyond that assessment. No 100-way experiment or full ECDLP pipeline run was performed. The exact curve, subgroup, target, and hardware for future comparisons remain to be frozen separately.
+Date: 2026-11-24. Scope: the [100 source proposals](IDEAS.md) and their [item-by-item assessment](README.md), with the owner's selected target `E(F_p)`. Three parallel workstreams examined items 1–34, 35–67, and 68–100. This report records actual checks and blockers separately from proposed experiments. No 100-way experiment was performed. The #24 bounded comparison has fixed curve, subgroup, targets, and checks; full-cost studies elsewhere need their own frozen workloads.
 
 ![Execution status diagram: mechanism counterexamples, existing baselines, and pending direct decomposition diagnostic.](PROGRESS.svg)
 
@@ -51,15 +51,31 @@ Reproduce with `gp -q < S4_SUPPORT_GP.gp`; compare stdout byte-for-byte with `S4
 
 The last pair shows that a special-coordinate support reduction occurs even when the whole curve group is prime-order. All specialized resultants in this panel retain degree four in each free variable. This is a **structural component observation**: fewer nonzero coefficients need not imply lower elimination degree, lower decomposition time, more independent rows, or lower full solve cost. The 40-bit inventory result and this 1009-field panel have different curves and specializations. The original Rust example was attempted first but could not compile on this merged checkout because `research/ecbench_phased_panel_20261117/panel.json` was missing; the GP calculation supplies an independent bounded diagnostic, not a Rust performance comparison. An initial version of the GP script also had a multiline `for` parse error after printing support rows; the point-order block was rewritten as a function and the final raw output was regenerated without GP error lines.
 
+## Target-domain boundary for the requested EC scope
+
+The owner selected discrete logarithms in `E(F_p)` as the target for this pursuit. Many source proposals describe multiplicative smoothness in `F_p^×`; those screens are assessments of the attachment's literal premise, not EC point-relation results. For the #24 diagnostic curve over `F_1009`, the exact group count recorded in `S4_SUPPORT_GP.txt` is prime `1013`, while `|F_1009^×|=1008` and `gcd(1008,1013)=1`. Every group homomorphism between these two particular finite groups is therefore trivial, because its image order divides both group orders. A proposal using multiplicative relations needs a separate, explicit construction that yields checked point relations for this EC target. This arithmetic boundary is specific to the diagnostic curve and does not rule out other constructions on other curves. `[pcc:unverified]`
+
+## Second parallel pass: exact checks and execution boundaries
+
+Each of the [1–34](WORKSTREAM_001_034.md), [35–67](WORKSTREAM_35_67.md), and [68–100](WORKSTREAM_68_100.md) workstreams now has one item-specific outcome or missing construction per proposal. These are bounded producer analyses `[pcc:unverified]`; an item with a stated gate has not thereby been experimentally validated.
+
+| Workstream | New bounded result | Execution boundary |
+|---|---|---|
+| 1–34 | Derived exact gates for the direct EC translations, including trivial valuations on `F_p^×` (#1), the absence of exceptional divisors when blowing up a smooth point of `P¹` (#4), and the character-evaluation circularity on a prime-order EC subgroup (#11). A matched #24 protocol fixes the prime-order curve `y²=x³+x+14` over `F_1009`, on-curve `z=0` and `z=320`, one 16-coordinate factor base, and all 16³ ordered triples per target. | The required S3 checkpoint upload returned HTTP 403 with `InvalidAccessKeyId` on token and profile paths. The #24 decomposition/rank/cost comparison was not launched. |
+| 35–67 | The same triangle support gives rank 3 or 2 over `F_5` depending on coefficients (#35–39). The point `P=(0,425)` on the diagnostic EC doubles to `Q=(991,641)`, so a direct group check accepts `Q−2P=O` and rejects `Q−P=O` (#61–62). Abstract quantum and matrix checks specify missing exact EC output maps; historical A100 numbers remain tied to their source workloads. | No matching GPU or specialized hardware was available for a fresh device comparison. Scratch Python outputs were excluded under the repository's native-language rule; the displayed arithmetic is hand-checkable. |
+| 68–100 | A coefficient-aware three-row example cancels all large-prime columns while retaining source rank 3 and only one completed small row (#75–76); two additional independent small rows are needed to pin its target. The prior fixed-base sweep gives controls for #96, not an adaptive result. | Selected historical records lack locally accessible immutable partial relation rows, and the native filter test build stopped on missing sparse-checkout fixtures. The aggregate base-size CSV has no interval-order trace for #97. |
+
+The 35–67 and 68–100 small matrices are algebraic controls, not recorded EC relation streams. The #61–62 point identity is an EC group check; it does not establish a new collector. No new benchmark timing or full-cost comparison is claimed from this pass.
+
 ## Coverage of all 100 items
 
 Every numbered item remains in the [assessment ledger](README.md), with its stated decisive check. The three parallel workstreams refined those checks by range: 1–34 require a relation-preserving construction or a costed sieve comparison; 35–67 require exact modular output or an exactly checked relation predicate before hardware or learning cost can be compared; 68–100 require exact rank/coverage or a sound map from proposed representations to point relations. The five arithmetic counterexamples above close only their **literal premises**. The source-list, ledger, and this report together distinguish `screened`, `historical evidence inspected`, `diagnostic completed`, and `future experiment` statuses. No result is silently promoted by a screen.
 
 ## Next controlled batch
 
-1. Freeze a matched #24 elimination protocol on the prime-order `y²=x³+x+14` curve with `z=0` and ordinary `z` controls. Check exact decompositions, independent rows, and total cost; preserve the committed structural output as a distinct pre-comparison diagnostic.
-2. Freeze one immutable set of independently checked full and partial relations for #75/#76/#84, then replay existing and candidate filters on the same rows. Stop if source-row combinations or target-column recovery fail.
-3. Freeze the base-size and interval policy panel for #96/#97 against the best fixed controls in the same harness. Include explicit compute and artifact budgets before launching new runs.
+1. Restore valid checkpoint credentials, pass `scripts/checkpoint.sh gate`, then run the already frozen #24 comparison in the [1–34 workstream](WORKSTREAM_001_034.md). Preserve structural support, exact decompositions, independent rank, and arithmetic work as separate observations.
+2. Obtain one immutable set of independently checked EC full and partial relations for #75/#76/#84, including source-row witnesses and target column; then freeze a matched filter replay. Stop if source-row combinations or target-column recovery fail.
+3. Obtain time-ordered relation and descent traces, then freeze the #96/#97 policy panel against the best fixed controls. Include tuning, setup, rank, solve, and artifact budgets.
 4. Profile a current exact GPU end-to-end run before allocating #54/#55/#57 engineering, since the historical kernel and complete-solve records identify different boundaries.
 
-This first bounded pass is incomplete relative to experimental pursuit of all 100 proposals. Many descriptions need a defined mechanism before an executable experiment exists; their exact missing obligations are retained in the assessment ledger.
+These two bounded passes are incomplete relative to experimental pursuit of all 100 proposals. Many descriptions need a defined EC point-relation mechanism before an executable experiment exists; their exact missing obligations are retained in the assessment ledger and the three workstream reports.
