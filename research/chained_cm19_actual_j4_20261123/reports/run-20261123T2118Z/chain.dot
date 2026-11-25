@@ -1,0 +1,12 @@
+digraph Chain {
+ graph [rankdir=LR,bgcolor="white",ranksep=0.55,nodesep=0.45];
+ node [shape=box,style="rounded,filled",fillcolor="#e7f0f5",color="#26465c",fontname="DejaVu Sans",fontsize=13,margin="0.14,0.12"];
+ edge [color="#38536e",fontname="DejaVu Sans",fontsize=11];
+ e [label="Actual E7\noriginal subgroup"];
+ j0 [label="Jac(C7)\ngeometric beta basis"];
+ j1 [label="Jac(C7)\nmixed kernel (4,4,2,2)",fillcolor="#e0f2e7"];
+ j2 [label="Jac(C7)\n[4] of input",fillcolor="#e0f2e7"];
+ e -> j0 [label="phi0 pullback"];
+ j0 -> j1 [label="S, degree 64\nF7-defined; not 2-divisible"];
+ j1 -> j2 [label="R, degree 64\nRosati adjoint"];
+}
