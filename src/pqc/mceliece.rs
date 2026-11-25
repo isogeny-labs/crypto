@@ -37,6 +37,7 @@
 //! schoolbook O(n²) and the decoder uses a generic Frobenius-based square
 //! root.  For production, use the `classic-mceliece-rust` crate.
 
+use super::strassen::{self, Ring};
 use crate::utils::random::random_bytes_vec;
 use rand::Rng;
 
@@ -400,22 +401,34 @@ fn mat_identity(n: usize) -> BinMat {
     m
 }
 
-fn mat_mul(a: &BinMat, b: &BinMat) -> BinMat {
-    let r = a.len();
-    let inner = b.len();
-    let c = b[0].len();
-    assert_eq!(a[0].len(), inner);
-    let mut out = mat_zeros(r, c);
-    for i in 0..r {
-        for j in 0..c {
-            let mut sum: u8 = 0;
-            for k in 0..inner {
-                sum ^= a[i][k] & b[k][j];
-            }
-            out[i][j] = sum;
-        }
+/// GF(2) with entries stored as 0/1 bytes, for [`super::strassen`].
+/// `SKIP_ZERO` is off: the scrambler `S` is secret, and the previous loop
+/// had no data-dependent branch. `CUTOFF` is `usize::MAX`: the schoolbook
+/// loop vectorises to byte-wise AND/XOR, and Strassen took longer at 7 of
+/// the 9 sizes from 36 to 512 (up to 5.2× at cutoff 32, the other two at
+/// parity within noise; bench.record `20261125T0508Z-pqc-strassen`), so
+/// this field never recurses.
+struct Gf2;
+impl Ring for Gf2 {
+    type Elt = u8;
+    const ZERO: u8 = 0;
+    const SKIP_ZERO: bool = false;
+    const CUTOFF: usize = usize::MAX;
+    fn add(a: u8, b: u8) -> u8 {
+        a ^ b
     }
-    out
+    fn sub(a: u8, b: u8) -> u8 {
+        a ^ b
+    }
+    fn mul(a: u8, b: u8) -> u8 {
+        a & b
+    }
+}
+
+/// Shared schoolbook loop (see `Gf2::CUTOFF` for why no Strassen here).
+fn mat_mul(a: &BinMat, b: &BinMat) -> BinMat {
+    assert_eq!(a[0].len(), b.len());
+    strassen::mul::<Gf2>(a, b)
 }
 
 /// Solve in place: row-reduce `m` (rows × n with rows ≤ n) and track an
@@ -781,6 +794,17 @@ pub fn mceliece_decrypt(ct: &[u8], sk: &McEliecePrivateKey) -> Option<Vec<u8>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn strassen_matches_schoolbook_gf2() {
+        strassen::tests::assert_strassen_matches_naive::<Gf2>(|x| (x & 1) as u8);
+    }
+
+    #[test]
+    #[ignore = "timing report; run with --release --ignored --nocapture"]
+    fn strassen_crossover_gf2() {
+        strassen::tests::crossover_report::<Gf2>("GF(2) bytes", |x| (x & 1) as u8);
+    }
 
     // ── Field arithmetic ─────────────────────────────────────────────────────
 
