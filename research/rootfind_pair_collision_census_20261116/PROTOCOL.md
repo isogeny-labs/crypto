@@ -10,8 +10,8 @@ nonzero sum abscissa. Can later pairs with that same abscissa supply independent
 homogeneous relation rows after the signed Frobenius column fold?
 
 The three fixed public curve/base cells are `K_0` over `GF(2^13)` with standard
-subspace dimension 5, `K_0/GF(2^19)` with dimension 7, and
-`K_0/GF(2^23)` with dimension 8. They use the exact
+subspace dimension 5, `icv1-f2m19-t797-b6cf2467` with dimension 7, and
+`icv1-f2m23-t5197-69e76b73` with dimension 8. They use the exact
 `build_standard_subspace_factor_base` and `koblitz_factor_base` constructors,
 `ColumnFold::SignedFrobeniusOrbit`, and the curve constructor's largest-prime
 subgroup order `r`. The executable records the complete `ICV1` curve ID,
