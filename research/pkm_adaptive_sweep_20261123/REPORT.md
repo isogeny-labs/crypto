@@ -156,3 +156,4 @@ replay stores ended at the size gate without a qualifying timed call. Their
 SHA-256 values are `e02cf71f4256c2eca6f8e904b152c6178f25b7ac26fe8c1259607703e7a77c8b`
 and `60e91f1cfbbc5c0064a207d280ae4cae86324ff6320df62a1a77d75cd1a7136a`.
 This is a source-reproducibility mismatch, not a candidate/control speed ratio.
+Neither replay has a measured `s_over_rho`: both stopped before the F4 calls.

@@ -43,6 +43,7 @@ was terminated after unrelated Rust compilation began during the call; the
 attempt and process snapshot remain in the append-only store. There is no
 qualifying timed result yet. The store's current SHA-256 is
 `ddab40eb3660da1fd75f282ebf05e17d74d28ae181459ed972dcebd2239eea47`.
+The successor store has no measured `s_over_rho` yet.
 In-call load polling now censors any future competing process. The stored
 `amended_selection.last_screened_index=37` is an off-by-one metadata error;
 `selection-correction:1` records the actual last screened index, 36, without

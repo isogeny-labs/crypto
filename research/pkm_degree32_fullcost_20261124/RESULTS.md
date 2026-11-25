@@ -41,3 +41,8 @@ host's separate compilations and research benchmarks to exit. The preflight
 store's current SHA-256 is
 `ec96bd9f6868c84800eda3a596d5e6ad7603dee4c4c81ecdc8286d2669b259de`.
 No new full-cost ratio is claimed from this pending store.
+Its `s_over_rho` is therefore unmeasured. For context only, the earlier
+source-pinned seed-20261276 closed-pipeline panel reported median
+`s_over_rho` 1,939,933 for interval and 588,618 for candidate, as preserved in
+`research/pkm_adaptive_sweep_20261123/RESULT_F4_DEGREE32_E2E_13BIT_20261125.md`.
+Those are prior measurements, not quiet-load rerun results.
