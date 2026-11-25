@@ -93,6 +93,12 @@ def crossover_table(rows):
 def save(fig, d: Path, stem: str):
     fig.savefig(d / f"{stem}.svg", metadata={"Date": None})
     fig.savefig(d / f"{stem}.png", dpi=150)
+    # Palette PNG: keeps the render under the artifact store's 64 KiB data-file
+    # threshold (tools/artifacts/artifacts.py), so it stays in Git.
+    from PIL import Image
+    with Image.open(d / f"{stem}.png") as im:
+        q = im.convert("RGB").quantize(colors=128, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    q.save(d / f"{stem}.png", optimize=True)
 
 
 def plot_regression(reg, d: Path):
