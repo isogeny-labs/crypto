@@ -50,3 +50,42 @@ No process CPU-time or peak-memory data was recorded, and rho was not
 parallelized in this run. A source-frozen, isolated, equal-core panel under
 the [comparison protocol](../aps_parallel_equal_core_20261124/PROTOCOL.md)
 is still needed.
+
+## Four-core comparator development
+
+The same native example now has `--parallel-aps-cold-panel 4`,
+`--parallel-rho-panel 4` (folded), and
+`--parallel-rho-unfolded-panel 4`. Each command reads the public Q array
+from standard input. The APS cold arm includes source generation and worker
+joining; the rho cold arms share a 64-jump table, partition 64 initial lanes,
+and share a distinguished-point collision table. These arms record per-call
+process CPU and wall clocks. The initial `--parallel-row-panel` above remains
+a serial/parallel parity diagnostic and has different timing semantics.
+
+The preserved `DEVELOPMENT_ABBA_A1/R1/R2/A2.json` files are an unisolated
+APS/folded-rho/folded-rho/APS sequence on the 48 archived public targets.
+The two `DEVELOPMENT_SHARED_*_RHO4.json` files use the later shared-jump
+source law. `DEVELOPMENT_RHO4_PANEL.json` and
+`DEVELOPMENT_UNFOLDED_RHO4.json` preserve the earlier independent-jump
+development variants; they should not be pooled with the shared-source
+variants. All producer outputs are retained because their scheduling and
+wall times varied materially. `verify_abba.py` and `verify_rho_panel.py`
+check each completed log against the caller-only archive and check worker
+accounting; the solver inputs contain only public coordinates.
+
+On this unisolated host the APS/folded-rho/folded-rho/APS replay summed
+wall/CPU milliseconds of 181.243/169.547, 176.716/277.488,
+220.346/306.749, and 167.564/179.081. With shared jump/start source,
+the unfolded and folded rho controls respectively summed 138.872/194.330
+and 145.042/195.886 ms. These are development readings
+[pcc:unverified]. The shared-source unfolded and folded arms counted
+2,645,536 and 2,220,560 walk steps and passed 48/48 independent scalar
+checks. The raw run digests and exact totals are printed by the checkers.
+
+The shared-source binary SHA-256 was
+`283bb4cd8d8a9d190161f1eea7980ddb6a929fcca42b6ef0a4f1fd59e7a8d7c4`.
+It was built with Rust 1.99.1 for Apple aarch64 on Darwin 27.2.0; the
+machine reported 14 physical cores and 48 GiB RAM. No CPU isolation or
+per-call peak resident memory measurement was in place. A held-out panel,
+frozen tuning and budgets, resource isolation, and independent full-cold
+replay are required for the four-core crossover decision.
