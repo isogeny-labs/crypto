@@ -13,6 +13,7 @@ use upstream::{resultant_formal, Curve, Fp};
 #[cfg(feature = "native-f4")]
 mod m31_f4_bench;
 mod m31_single_target;
+mod m31_larger;
 
 const P: u64 = 2_147_483_647;
 const A: u64 = 847_514_846;
@@ -321,6 +322,7 @@ fn bits(word: usize, coordinate: usize) -> u64 {
 fn assemble(
     c: Curve,
     charts: &[Chart],
+    width: usize,
     mut output: Option<BufWriter<File>>,
 ) -> (BTreeSet<usize>, usize, usize) {
     if charts.is_empty() {
@@ -336,7 +338,7 @@ fn assemble(
     let mut roots = BTreeSet::new();
     let mut selectors = Vec::new();
     let mut axes = Vec::new();
-    let mut graph: Vec<_> = (0..WIDTH)
+    let mut graph: Vec<_> = (0..width)
         .map(|i| (bits(charts[0].origin, i), vec![]))
         .collect();
     for (j, chart) in charts.iter().enumerate() {
@@ -377,7 +379,7 @@ fn assemble(
         );
     }
     assert_eq!(owners.len(), nvars);
-    let mut rows = nvars + WIDTH;
+    let mut rows = nvars + width;
     for (a, &owner) in owners.iter().enumerate() {
         for (b, &other) in owners.iter().enumerate().skip(a + 1) {
             let gate = selectors[owner] == Some(a) && owner == other;
@@ -482,6 +484,13 @@ fn point_sum(c: Curve, base: &[Point], indices: &[usize]) -> Point {
 }
 
 fn main() {
+    if std::env::args_os()
+        .nth(1)
+        .is_some_and(|arg| arg == "larger-six")
+    {
+        m31_larger::run();
+        return;
+    }
     #[cfg(feature = "native-f4")]
     if std::env::args_os()
         .nth(1)
@@ -547,7 +556,7 @@ fn main() {
                 File::create(dir.join(format!("target-{}.basis.txt", target.0))).unwrap(),
             )
         });
-        let (roots, nvars, rows) = assemble(c, &charts, output);
+        let (roots, nvars, rows) = assemble(c, &charts, WIDTH, output);
         let reconstruction = started.elapsed().as_secs_f64();
         let started = Instant::now();
         let (reference, top) = direct(c, &base, target.0, &mut cache);

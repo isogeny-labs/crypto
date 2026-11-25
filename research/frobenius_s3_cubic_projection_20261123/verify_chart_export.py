@@ -51,7 +51,7 @@ def verify(record, directory):
                 assert i not in graph and len(set(terms)) == len(terms)
                 assert all(term == "1" or int(term[1:]) < width for term in terms)
                 graph.add(i)
-    assert graph == set(range(20))
+    assert graph == set(range(record.get("width", 20)))
     assert squares == set(range(width))
     assert products == record["quadratic_rows"]
     assert products + len(graph) + len(squares) == record["basis_rows"]

@@ -38,7 +38,7 @@ pub(super) fn target(c: Curve, base: &[Point], seed: u64, kind: &str, summands: 
     sum.expect("fixture generated a finite target")
 }
 
-fn multisets<const N: usize>(mut visit: impl FnMut(&[u8; N])) {
+pub(super) fn multisets<const N: usize>(mut visit: impl FnMut(&[u8; N])) {
     fn visit_tail<const N: usize>(
         state: &mut [u8; N],
         position: usize,
@@ -58,7 +58,7 @@ fn multisets<const N: usize>(mut visit: impl FnMut(&[u8; N])) {
     visit_tail(&mut [0; N], 0, 0, &mut visit);
 }
 
-fn ordered_labels(sorted: &[u8], output: &mut BTreeSet<usize>) {
+pub(super) fn ordered_labels(sorted: &[u8], output: &mut BTreeSet<usize>) {
     fn permutations(
         values: &[u8],
         used: u32,
@@ -156,7 +156,7 @@ pub(super) fn run() {
                 "direct_resultant" => direct_solve(c, &base, input),
                 "charted_resultant" => {
                     let (charts, _) = charted(c, &base, input);
-                    assemble(c, &charts, None).0
+                    assemble(c, &charts, WIDTH, None).0
                 }
                 "signed_group" => signed_group_solve::<3>(c, &base, input),
                 _ => unreachable!(),

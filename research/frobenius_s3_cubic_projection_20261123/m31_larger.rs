@@ -1,0 +1,162 @@
+//! Six-summand M31 panel, with complete outputs and setup-inclusive timings.
+use super::*;
+
+fn multiplicity(key: &[u8; 6]) -> u64 {
+    let mut denominator = 1;
+    let mut run = 1;
+    for i in 1..6 {
+        if key[i] == key[i - 1] {
+            run += 1;
+        } else {
+            denominator *= (1..=run).product::<u64>();
+            run = 1;
+        }
+    }
+    denominator *= (1..=run).product::<u64>();
+    720 / denominator
+}
+
+fn direct_six(c: Curve, base: &[Point], target: Point) -> (BTreeSet<usize>, u64, usize) {
+    let mut cache = HashMap::new();
+    let mut roots = BTreeSet::new();
+    let mut top = 0;
+    let mut evaluations = 0;
+    m31_single_target::multisets::<6>(|key| {
+        let value = evaluate(c.f, polynomial(c, base, key, &mut cache), target.0);
+        evaluations += 1;
+        if value == 0 {
+            m31_single_target::ordered_labels(key, &mut roots);
+        }
+        let weighted = c.f.mul(value, multiplicity(key));
+        if key.iter().map(|v| v.count_ones()).sum::<u32>() & 1 == 0 {
+            top = c.f.add(top, weighted);
+        } else {
+            top = c.f.sub(top, weighted);
+        }
+    });
+    (roots, top, evaluations)
+}
+
+fn indexed_six(
+    c: Curve,
+    base: &[Point],
+    target: Point,
+    output: Option<BufWriter<File>>,
+) -> (BTreeSet<usize>, usize, usize, usize, usize) {
+    let mut pair_index: HashMap<u64, Vec<[u8; 2]>> = HashMap::new();
+    let mut pair_charts = 0;
+    for i in 0..SIZE {
+        let row = coefficients(c, base[i].0);
+        for j in i..SIZE {
+            let data = row.each_ref().map(|poly| evaluate(c.f, poly, base[j].0));
+            pair_charts += 1;
+            for root in quadratic_roots(c.f, data).into_iter().flatten() {
+                pair_index.entry(root).or_default().push([i as u8, j as u8]);
+            }
+        }
+    }
+    let mut found = BTreeSet::new();
+    let mut prefix_sums = 0;
+    m31_single_target::multisets::<4>(|prefix| {
+        for sum in signed_sum(c, prefix.iter().map(|&i| base[i as usize])) {
+            prefix_sums += 1;
+            let residual = group_add(c, Some(target), sum.map(|point| neg(c.f, point)));
+            if let Some(residual) = residual {
+                if let Some(pairs) = pair_index.get(&residual.0) {
+                    for &[i, j] in pairs {
+                        if signed_sum(c, [base[i as usize], base[j as usize]])
+                            .contains(&Some(residual))
+                        {
+                            let mut key = prefix.to_vec();
+                            key.extend([i, j]);
+                            key.sort_unstable();
+                            found.insert(key);
+                        }
+                    }
+                }
+            } else {
+                for i in 0..SIZE {
+                    let mut key = prefix.to_vec();
+                    key.extend([i as u8, i as u8]);
+                    key.sort_unstable();
+                    found.insert(key);
+                }
+            }
+        }
+    });
+    let mut roots = BTreeSet::new();
+    for key in found {
+        m31_single_target::ordered_labels(&key, &mut roots);
+    }
+    let charts: Vec<_> = roots
+        .iter()
+        .map(|&origin| Chart {
+            origin,
+            flips: vec![],
+        })
+        .collect();
+    let (reconstructed, auxiliaries, basis_rows) = assemble(c, &charts, 24, output);
+    assert_eq!(roots, reconstructed);
+    (roots, pair_charts, prefix_sums, auxiliaries, basis_rows)
+}
+
+pub(super) fn run() {
+    let seed = std::env::args()
+        .nth(2)
+        .map(|s| s.parse::<u64>().unwrap())
+        .unwrap_or(11_781_661);
+    let c = Curve::new(P, A, B);
+    let started = Instant::now();
+    let base = factor_base(c);
+    let base_seconds = started.elapsed().as_secs_f64();
+    let output_dir = std::env::var_os("S3_BASIS_DIR").map(PathBuf::from);
+    let kind = std::env::args().nth(3);
+    let kinds = match kind.as_deref() {
+        Some("planted") => &["planted"][..],
+        Some("unplanted") => &["unplanted"][..],
+        None => &["planted", "unplanted"][..],
+        _ => panic!("kind must be planted or unplanted"),
+    };
+    for &kind in kinds {
+        let target = m31_single_target::target(c, &base, seed, kind, 6);
+        let output = output_dir.as_ref().map(|dir| {
+            BufWriter::new(
+                File::create(dir.join(format!("target-{}.basis.txt", target.0))).unwrap(),
+            )
+        });
+        let direct_first = std::env::var_os("S3_DIRECT_FIRST").is_some();
+        let (indexed, pair_charts, prefix_sums, auxiliaries, basis_rows);
+        let (direct, top, evaluations);
+        let indexed_seconds;
+        let direct_seconds;
+        if direct_first {
+            let started = Instant::now();
+            (direct, top, evaluations) = direct_six(c, &base, target);
+            direct_seconds = started.elapsed().as_secs_f64() + base_seconds;
+            let started = Instant::now();
+            (indexed, pair_charts, prefix_sums, auxiliaries, basis_rows) =
+                indexed_six(c, &base, target, output);
+            indexed_seconds = started.elapsed().as_secs_f64() + base_seconds;
+        } else {
+            let started = Instant::now();
+            (indexed, pair_charts, prefix_sums, auxiliaries, basis_rows) =
+                indexed_six(c, &base, target, output);
+            indexed_seconds = started.elapsed().as_secs_f64() + base_seconds;
+            let started = Instant::now();
+            (direct, top, evaluations) = direct_six(c, &base, target);
+            direct_seconds = started.elapsed().as_secs_f64() + base_seconds;
+        }
+        let signed = m31_single_target::signed_group_solve::<4>(c, &base, target);
+        assert_eq!(indexed, direct);
+        assert_eq!(indexed, signed);
+        assert_ne!(top, 0, "the direct degree-24 certificate must be nonzero");
+        println!(
+            "{{\"seed\":{seed},\"kind\":\"{kind}\",\"summands\":6,\"width\":24,\"direct_degree_lower_bound\":24,\"structured_degree_cap\":2,\"target\":{},\"target_x\":{},\"target_y\":{},\"roots\":{},\"pair_charts\":{pair_charts},\"prefix_sums\":{prefix_sums},\"auxiliary_variables\":{auxiliaries},\"basis_rows\":{basis_rows},\"quadratic_rows\":{},\"direct_multisets\":{evaluations},\"indexed_total_seconds\":{indexed_seconds},\"direct_total_seconds\":{direct_seconds},\"top_coefficient\":{top}}}",
+            target.0,
+            target.0,
+            target.1,
+            indexed.len(),
+            if indexed.is_empty() { 0 } else { basis_rows - auxiliaries - 24 },
+        );
+    }
+}
