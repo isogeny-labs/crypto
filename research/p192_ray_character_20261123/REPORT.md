@@ -980,6 +980,32 @@ order greater than four. The later
 only forces at least one leftover class; it does not rule out
 `k≈√m`. [pcc:unverified]
 
+A stronger **asymptotic** screen applies to a near-complete grid.
+For the lifted subgroup `Γ=±H⊂F_r^×`, let `L=|Γ|=2m`.
+Scaling a coset grid gives `A+B⊂Γ`, with
+`A=I∪-I` and `B=J∪-J`. In the balanced case
+`|A|=|B|=s`, [Shkredov, Proposition 11, Theorem 8,
+and Remark 14](https://arxiv.org/html/1702.01197) combine an
+additive-energy bound with the sumset containment to give
+`s≪L^(19/39)(log₂ L)^(57/65)`, provided
+`L<r^(1/2)(log₂ r)^(-1/5)` and `s≤√r`.
+Indeed, their displayed inequalities give
+`s^8 L≪(E⁺(Γ)+L²)s^5(log₂s)²` and
+`E⁺(Γ)≪L^(32/13)(log₂L)^(41/65)`; rearranging yields
+the stated exponent. Thus a family of balanced grids with
+`s≈√L` cannot persist asymptotically under these conditions.
+[pcc:unverified]
+
+The finite P-192 instance does satisfy the theorem's size
+conditions: `log₂L≈86.984` and the energy condition's right
+side has log₂ size about `94.483`. But the hypothetical grid
+above would have `s=2h≈2^43.492` in the no-sign-overlap
+case (and no larger side otherwise), whereas the bound's
+scale **before its unspecified constant** is about `2^48.027`.
+This source therefore does not certify a P-192 exclusion of
+that grid. An explicit finite bound or a concrete index
+construction remains necessary. [pcc:unverified]
+
 The [`y_coset_control.sage`](y_coset_control.sage) replay uses
 direct Sage point multiplication to check the normalized
 `A_H([d]G)/A_H(G)` at `d=1,2,3,5` for `m=8,40`.
