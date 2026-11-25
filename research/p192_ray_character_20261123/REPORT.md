@@ -1361,14 +1361,33 @@ two horizontal degree-13 ideal directions and returns to the
 starting curve
 would yield a noninteger endomorphism of degree `13^k`.
 Since `13^51<ceil(|D|/4)`, such a return needs at least
-`k=52` edges. This is a chain-length floor, not a charged
-cost for constructing or evaluating a level-structure action.
+`k=52` edges by the degree argument alone. The GP replay
+constructs the reduced prime form above `13` and composes
+its class one million times, rejecting every principal
+return; its final result agrees with `qfbpow(form,1000000)`.
+An order-three form over discriminant `-23` checks that the
+same composition comparison detects a return.
+PARI's [`qfbcomp` and `qfbpow`](https://pari.math.u-bordeaux.fr/dochtml/html-stable/Quadratic_number_fields_and_binary_quadratic_forms.html)
+compute reduced class products and powers. Hence the
+one-direction ideal-class cycle has **more than one million**
+edges. This is a chain-length certificate for that ideal
+direction, not a charged cost for constructing or evaluating
+a level-structure action.
+The separate [`cm_mixed_ideal_gate.gp`](cm_mixed_ideal_gate.gp)
+replay also finds no nontrivial class relation of the form
+`[13]^i[23]^j[5]^e5[11]^e11[31]^e31=1` with
+`|i|,|j|≤1000` and each ramified exponent in `{0,1}`.
+The ramified classes' order two is checked. Thus short
+return paths built only from these specified ideal classes
+reduce to integer or backtracking actions; the bounded
+screen says nothing about other split primes or exponents
+outside the box. [pcc:unverified]
 For the existing optimized odd-isogeny formula in
 [`endo_generic_point.rs`](../../src/ecc/endo_generic_point.rs),
 a degree-13 edge costs `35M` on an affine first input and
-`90M+1S` on a later Jacobian input. Even at the 52-edge
-floor, that specific chain path would spend at least
-`4625M+51S` to move one point, before its kernel and map
+`90M+1S` on a later Jacobian input. The class-order check
+raises this specific chain path's per-point formula floor to
+`90000035M+1000000S`, before its kernel and map
 construction, versus `1045M+1165S` per direct scalar-orbit
 step in the equal-weight candidate above. This is a formula
 comparison for that implementation, not a universal isogeny
