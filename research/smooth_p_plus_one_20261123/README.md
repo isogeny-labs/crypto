@@ -62,12 +62,20 @@ chart refuses all sixteen forms on one target; both arms remain incomplete
 on all five degree-32 targets. All completed sets match Direct, and failed
 prefixes stay unaccepted. This is local output qualification. [pcc:unverified]
 
-The latest [factorwise-fiber report](FACTORWISE_RESULT.md)
+The [factorwise-fiber report](FACTORWISE_RESULT.md)
 ([PDF](FACTORWISE_RESULT.pdf)) checks a separate monic divisor for each fine
 fiber. All 17,606 admissible bindings have full column rank in the new
 eight-equation, seven-variable system, including the previous two-image rank
 defects. The guarded coverage and local tangent argument are written out;
-formalization and solver extraction remain open. [pcc:unverified]
+formalization remains open and the following panel checks extraction.
+[pcc:unverified]
+
+The latest [factorwise extraction report](FACTORWISE_EXTRACT_RESULT.md)
+([PDF](FACTORWISE_EXTRACT_RESULT.pdf)) completes all eight degree-16 answers,
+including the earlier F127 two-image refusal. Both factorwise and cofactor
+complete 8/13 fixed queries; all five degree-32 queries remain incomplete in
+both arms. Every accepted answer matches Direct. The existing RUR guard,
+shared deadline and whole-answer contract stay unchanged. [pcc:unverified]
 
 - [Initial rank argument](REPORT.md) ([PDF](REPORT.pdf)): collapsed and distinct-image charts.
 - [Initial native controls](NATIVE.md) ([PDF](NATIVE.pdf)): original encodings and retained failures.
@@ -84,6 +92,7 @@ formalization and solver extraction remain open. [pcc:unverified]
 - [Full-cutoff protocol](FULL_CUTOFF.md) and [reproduction](FULL_CUTOFF_REPRODUCE.md).
 - [Full-cutoff extraction protocol](FULL_CUTOFF_EXTRACT.md) and [reproduction](FULL_CUTOFF_EXTRACT_REPRODUCE.md).
 - [Factorwise argument/audit protocol](FACTORWISE.md) and [reproduction](FACTORWISE_REPRODUCE.md).
+- [Factorwise extraction protocol](FACTORWISE_EXTRACT.md) and [reproduction](FACTORWISE_EXTRACT_REPRODUCE.md).
 - [Native source](native/src/main.rs) and [evidence](evidence/).
 
 The original reports and manifests retain their historical revision scope.

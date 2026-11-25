@@ -287,3 +287,29 @@ hashes at01:16 UTC and exits2 before upload/replay. This is now observed for
 both older larger-control files and the three full-cutoff-extraction files.
 It establishes neither absent keys nor a particular permission diagnosis.
 No manual retry was issued and final-result-head CI is not claimed passed.
+
+## Factorwise complete-output controls
+
+Source `d54d9d37bd`, before-call identity `8dd11c8e44`: 43 feature tests,
+16 default tests and the release build pass. The new dispatch stub covers
+factor-variable order, dimensions, every chart in an empty union and expired
+budget. Three frozen paired panels run once and emit all 26 records, with
+16 exact and 10 undetermined outcomes, no mismatch or capture omission.
+All panels exit zero with empty stderr; all 16 pre-call hashes stay unchanged.
+Claims PCC-20261125-1afa6b and 29f2a4 are unsigned. [pcc:unverified]
+
+The [report](FACTORWISE_EXTRACT_RESULT.md) records 8/13 complete answers for
+each arm. The factorwise constructor resolves the former F127 chart refusal;
+all eight degree-16 answers match Direct. Both arms remain incomplete on
+all five degree-32 targets. Factorwise finishes 22/24/24/24/23 of 119 charts
+before timeout. No recovery, timing comparison or EKS execution is included.
+Historical pushforward records and all acceptance guards remain unchanged.
+[pcc:unverified]
+
+Three more raw files require artifact migration: `factorwise_extract_v1/`
+`f127_d4.jsonl` (149,177 bytes), `f8191_d4.jsonl` (79,879 bytes), and
+`f8191_d5.jsonl` (171,132 bytes). Together with the five preceding files,
+eight await required upload/replay. The last observed HTTP403 job above
+concerns the earlier five; no successful upload or current-head CI pass is
+claimed. The live hook has 682 queued records and no receiving URL configured.
+[pcc:unverified]

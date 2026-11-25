@@ -81,6 +81,11 @@ the requested end-to-end cost conclusion.
   on those points. The guarded coverage/local proof remains handwritten and
   unsigned; no new solver call or global radical conclusion is included.
   [pcc:unverified]
+- **Factorwise full-output component:** the [paired controls](../research/smooth_p_plus_one_20261123/FACTORWISE_EXTRACT_RESULT.md)
+  complete all eight degree-16 answers, resolving the old F127 two-image
+  refusal. Both factorwise and cofactor complete 8/13 fixed queries; all five
+  degree-32 targets remain incomplete. Exact sets match Direct with the same
+  conservative guard, whole-answer policy and deadline. [pcc:unverified]
 - **Limits:** deadline completion and smaller individual systems are not a
   measured total-cost advantage. The Direct control uses generic decomposition
   and additional relation charts. The absence of an admitted comparison gives
@@ -108,8 +113,10 @@ the requested end-to-end cost conclusion.
   repeated-image coverage and local Jacobian ranks. [pcc:unverified]
 - [x] Integrate the full catalog into a bounded fixed-panel extractor and
   retain its paired complete/incomplete output controls. [pcc:unverified]
-- [ ] Resolve the repeated-image refusal and degree-32 completion limits, then
-  complete matched equal-scope recovery with admitted costs.
+- [x] Resolve the fixed F127 repeated-image refusal through separately
+  qualified factorwise equations and complete-output controls. [pcc:unverified]
+- [ ] Resolve degree-32 completion limits, then complete matched equal-scope
+  recovery with admitted costs.
 - [ ] Publish and build the exact workload revision through the supported
   EKS route, obtain budget/isolation admission, and retain raw evidence and
   independent replay. An available generic ecbench image alone is insufficient.
@@ -120,14 +127,14 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Integrate the finitely qualified factorwise presentation into the bounded
-full-catalog extractor, then run a separately frozen panel with the existing
-targets, deadline, form policy and whole-answer checks. The written local
-argument and finite rank restoration cover admissible relation points;
-excluded algebraic points and fixed-form completion remain open. Preserve
-the earlier F127 [7,7,82,82] refusal and degree-32 shared-deadline failures,
-and keep the conservative RUR guard. No complete extraction or cheaper
-whole-call encoding has yet been established by the tangent audit.
+Investigate replacing each full map fiber by the product of its liftable-base
+abscissae, using the comparator's existing whole-base membership idea within
+each small fiber. Review prior sources, establish guarded coverage and local
+rank, and charge factor construction before a new fixed-limit comparison.
+This is a proposed follow-up; no implementation, global radical proof or
+measured gain is supplied. Preserve the earlier F127 [7,7,82,82] refusal and
+degree-32 shared-deadline failures, and keep the conservative RUR guard.
+Full degree-32 completion and a lower complete-query cost remain open.
 Price the sum of all branch construction/elimination/output work before a
 cold comparison; the first-collision study already shows that a smaller
 individual system can increase total work.
