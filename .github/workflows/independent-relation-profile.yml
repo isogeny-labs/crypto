@@ -70,16 +70,24 @@ jobs:
               p128) name=tw2cj-lazy-sib8-p128 ;;
               p256) name=tw2cj-lazy-sib8-p256 ;;
             esac
-            seq=$(jq -r --arg name "$name" '
-              . as $plan
-              | ($plan.arms | map(.name) | index($name)) as $arm_index
-              | $plan.executions[]
-              | select(.arm == $arm_index and .workload == 0 and .warmup == false)
-              | .seq' "$out/plan.json")
-            test "$(printf '%s\n' "$seq" | wc -l | tr -d ' ')" = 1
             dir="$out/$arm"
             mkdir -p "$dir"
-            target/release/ecbench profile-input --spec "$spec" --seq "$seq" > "$dir/input.json"
+            method_id=$(jq -r --arg name "$name" \
+              '.arms[] | select(.name == $name) | .method.method_id' "$out/plan.json")
+            test -n "$method_id"
+            seq=
+            executions=$(jq -r .executions "$out/plan.json")
+            for ((candidate = 0; candidate < executions; candidate++)); do
+              target/release/ecbench profile-input --spec "$spec" --seq "$candidate" \
+                > "$dir/candidate-input.json"
+              if test "$(jq -r .expected_method_id "$dir/candidate-input.json")" = "$method_id"; then
+                test -z "$seq"
+                seq=$candidate
+                cp "$dir/candidate-input.json" "$dir/input.json"
+              fi
+            done
+            rm -f "$dir/candidate-input.json"
+            test -n "$seq"
             target/release/ecbench exec < "$dir/input.json" > "$dir/unprofiled-child.json"
             ECBENCH_CALLGRIND_SOLVE=1 timeout 600s valgrind \
               --tool=callgrind --cache-sim=no --branch-sim=no \
