@@ -125,6 +125,48 @@ before table construction or lookup. This is a counting gate for this
 enumerative interface; it does not constrain algebraic aggregation of many
 labels into one point-dependent evaluation. [pcc:unverified]
 
+### Square-action collision walk screen
+
+The known square multipliers `2` and `5` also allow a walk
+within one scalar-sign class. A match `[a]G=±[b]Q` between
+known square multipliers gives `d=±a/b (mod r)`; since
+`χ_r(-1)=+1`, it gives the sign and in fact the entire scalar.
+Self-collisions of a base or target walk only relate known
+multipliers. With no cross-collision, a finite walk has no
+zero-error negative certificate unless it covers the class.
+This is a collision route to a full scalar relation, rather
+than a separate cheap character evaluation. [pcc:unverified]
+
+An optimistic *independent uniform-sampling* screen makes the
+99%-accuracy cost explicit. Store `A` distinct labels from the
+base square class and test `B` target labels. For a uniform
+positive target, the exact miss probability is
+`binom(N-A,B)/binom(N,B)≈exp(-AB/N)` when `A,B≪N`, where
+`N=(r-1)/4`. A negative target never matches, so with equal
+sign priors an all-miss negative decision has error about
+`exp(-AB/N)/2`. Requiring at most 1% overall error gives the
+approximate condition `AB≥N ln(50)` and optimistically
+`A+B≥2√(N ln(50))≈2.232R`, with a balanced table of about
+`2^95.984` records. A 1-PiB cap at 32 bytes per record leaves
+`A≤2^45` and requires about `2^146.968` target samples in
+this model. These are birthday-model figures, not a lower
+bound on structured or algebraically aggregated walks.
+[pcc:unverified]
+
+The focused native benchmark now times doubling against full
+Jacobian addition in the same process. Eight sequential
+10,000-factor runs on Apple M4 Pro/macOS 27.2 gave median CPU
+`double/add=0.643222` (range `0.623163–0.661600`) and wall
+median `0.638972` (range `0.599526–0.669642`). Raw timing,
+source and binary hashes, host, and command are in
+[`SQUARE_WALK_DOUBLING_MEASUREMENTS.jsonl`](SQUARE_WALK_DOUBLING_MEASUREMENTS.jsonl).
+Even charging every sampled label at this measured *doubling*
+rate, the ideal independent-sampling 99%-accuracy calculation
+is `2.232·0.643222≈1.436R` before lookup, storage, restarts,
+or the more expensive 5-multiple steps. The measurement is a
+component cost; no full square-action walk was timed or shown
+to mix uniformly. [pcc:unverified]
+
 ## Generic-group sign-bit boundary
 
 Apply [Shoup's generic-group collision method](https://www.shoup.net/papers/dlbounds1.pdf)

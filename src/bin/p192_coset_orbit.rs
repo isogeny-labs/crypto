@@ -210,6 +210,16 @@ fn main() {
     let add_wall_elapsed = add_wall.elapsed();
     let add_cpu_elapsed = cpu_now() - add_cpu;
 
+    let mut double_walk = curve.from_affine(&generator);
+    let double_wall = Instant::now();
+    let double_cpu = cpu_now();
+    for _ in 0..add_count {
+        double_walk = curve.double(&double_walk);
+    }
+    black_box(double_walk);
+    let double_wall_elapsed = double_wall.elapsed();
+    let double_cpu_elapsed = cpu_now() - double_cpu;
+
     println!(
         "count={} target_scalar={} width={} step_scalar={} prefix_ratio={}",
         count, target_scalar, WIDTH, STEP, prefix_ratio
@@ -231,6 +241,17 @@ fn main() {
         add_count,
         add_wall_elapsed.as_nanos(),
         add_cpu_elapsed.as_nanos()
+    );
+    println!(
+        "double_count={} double_wall_ns={} double_cpu_ns={}",
+        add_count,
+        double_wall_elapsed.as_nanos(),
+        double_cpu_elapsed.as_nanos()
+    );
+    println!(
+        "double_to_full_add_wall_ratio={:.6} double_to_full_add_cpu_ratio={:.6}",
+        double_wall_elapsed.as_secs_f64() / add_wall_elapsed.as_secs_f64(),
+        double_cpu_elapsed.as_secs_f64() / add_cpu_elapsed.as_secs_f64()
     );
     println!(
         "orbit_to_full_add_wall_ratio={:.6} orbit_to_full_add_cpu_ratio={:.6}",
