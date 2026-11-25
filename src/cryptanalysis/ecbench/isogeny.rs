@@ -471,7 +471,6 @@ impl Fp<'_> {
     fn fixed_mersenne_product<const D: usize, const SQUARE: bool>(
         &mut self, a: &[u64; D], b: &[u64; D], m: &[u64; D],
     ) -> [u64; D] {
-        const P: u64 = (1u64 << 61) - 1;
         let mut acc = [0u128; 7];
         if SQUARE {
             for i in 0..D {
@@ -487,16 +486,16 @@ impl Fp<'_> {
                 }
             }
         }
-        let mut t = [0u64; 7];
-        for i in 0..2*D-1 {
-            t[i] = Self::fold_fixed_mersenne(acc[i]);
-        }
+        // m holds the canonical NEGATED non-leading coefficients.
+        // Each column has at most D convolution terms and D-1
+        // reduction terms, each at most (P-1)^2. For D <= 4 the
+        // total is < 7*2^122 and the first Mersenne fold fits in u64.
+        // Eliminate high terms from most to least significant; only
+        // fold a coefficient when it is consumed or returned.
         for j in (D..2*D-1).rev() {
-            let c = t[j];
+            let c = Self::fold_fixed_mersenne(acc[j]);
             for i in 0..D {
-                let v = Self::fold_fixed_mersenne(c as u128 * m[i] as u128);
-                let x = &mut t[j-D+i];
-                *x = if *x >= v { *x - v } else { *x + P - v };
+                acc[j-D+i] += c as u128 * m[i] as u128;
             }
         }
         // Count the actual coefficient products, including padded zeros,
@@ -504,8 +503,114 @@ impl Fp<'_> {
         self.tally.muls += (if SQUARE { D*(D+1)/2 } else { D*D }) as u64
             + (D*(D-1)) as u64;
         let mut result = [0u64; D];
-        result.copy_from_slice(&t[..D]);
+        for i in 0..D {
+            result[i] = Self::fold_fixed_mersenne(acc[i]);
+        }
         result
+    }
+
+    // The deferred convolution has at most D+(D-1) products per
+    // coefficient. For D<=4 and p<=2^30 the u64 sum is < 7*2^60;
+    // for p<=2^61-1 the u128 sum is < 7*2^122.
+    // Inputs are canonical residues; m is the negated monic modulus.
+    #[inline]
+    fn fixed_general_product<const D: usize, const SQUARE: bool, const SMALL: bool>(
+        &mut self, a: &[u64; D], b: &[u64; D], m: &[u64; D],
+    ) -> [u64; D] {
+        macro_rules! accumulate {
+            ($word:ty) => {{
+                let mut acc = [0 as $word; 7];
+                if SQUARE {
+                    for i in 0..D {
+                        acc[2*i] += a[i] as $word * a[i] as $word;
+                        for j in i+1..D {
+                            acc[i+j] += 2 * (a[i] as $word * a[j] as $word);
+                        }
+                    }
+                } else {
+                    for i in 0..D {
+                        for j in 0..D {
+                            acc[i+j] += a[i] as $word * b[j] as $word;
+                        }
+                    }
+                }
+                let p = self.p as $word;
+                for j in (D..2*D-1).rev() {
+                    let c = acc[j] % p;
+                    for i in 0..D {
+                        acc[j-D+i] += c * m[i] as $word;
+                    }
+                }
+                let mut result = [0u64; D];
+                for i in 0..D {
+                    result[i] = (acc[i] % p) as u64;
+                }
+                result
+            }};
+        }
+        self.tally.muls += (if SQUARE { D*(D+1)/2 } else { D*D }) as u64
+            + (D*(D-1)) as u64;
+        if SMALL { accumulate!(u64) } else { accumulate!(u128) }
+    }
+
+    fn fixed_general_pow<const D: usize, const SMALL: bool>(
+        &mut self, base: &[u64], mut e: u64, m: &[u64],
+    ) -> Vec<u64> {
+        let reduced = self.rem(base, m);
+        let mut b = [0u64; D];
+        b[..reduced.len()].copy_from_slice(&reduced);
+        let mut modulus = [0u64; D];
+        for i in 0..D {
+            modulus[i] = if m[i] == 0 { 0 } else { self.p - m[i] };
+        }
+        let mut r = [0u64; D];
+        r[0] = 1;
+        if e >= (1u64 << 30) && e.count_ones() >= 12 {
+            let b2 = self.fixed_general_product::<D, true, SMALL>(&b, &b, &modulus);
+            let mut odd = [[0u64; D]; 4];
+            odd[0] = b;
+            for i in 1..4 {
+                odd[i] = self.fixed_general_product::<D, false, SMALL>(&odd[i-1], &b2, &modulus);
+            }
+            let mut bit = 63i32 - e.leading_zeros() as i32;
+            let mut started = false;
+            while bit >= 0 {
+                if ((e >> bit) & 1) == 0 {
+                    r = self.fixed_general_product::<D, true, SMALL>(&r, &r, &modulus);
+                    bit -= 1;
+                    continue;
+                }
+                let mut low = (bit - 2).max(0);
+                while ((e >> low) & 1) == 0 { low += 1; }
+                let width = (bit - low + 1) as u32;
+                let value = ((e >> low) & ((1u64 << width) - 1)) as usize;
+                if started {
+                    for _ in low..=bit {
+                        r = self.fixed_general_product::<D, true, SMALL>(&r, &r, &modulus);
+                    }
+                    r = self.fixed_general_product::<D, false, SMALL>(&r, &odd[(value-1)/2], &modulus);
+                } else {
+                    r = odd[(value-1)/2];
+                }
+                started = true;
+                bit = low - 1;
+            }
+        } else {
+            let mut started = false;
+            while e != 0 {
+                if e & 1 == 1 {
+                    r = if started { self.fixed_general_product::<D, false, SMALL>(&r, &b, &modulus) } else { b };
+                    started = true;
+                }
+                e >>= 1;
+                if e != 0 {
+                    b = self.fixed_general_product::<D, true, SMALL>(&b, &b, &modulus);
+                }
+            }
+        }
+        let mut out = r.to_vec();
+        Self::trim(&mut out);
+        out
     }
 
     fn fixed_mersenne_pow<const D: usize>(
@@ -515,10 +620,33 @@ impl Fp<'_> {
         let mut b = [0u64; D];
         b[..reduced.len()].copy_from_slice(&reduced);
         let mut modulus = [0u64; D];
-        modulus.copy_from_slice(&m[..D]);
+        for i in 0..D {
+            modulus[i] = if m[i] == 0 { 0 } else { self.p - m[i] };
+        }
         let mut r = [0u64; D];
         r[0] = 1;
-        if e >= (1u64 << 30) && e.count_ones() >= 12 {
+        // The two exact exponents used by Frobenius and equal-degree
+        // splitting on this Mersenne field have short addition chains.
+        // b_k denotes base^(2^k-1); b_(i+j) = b_i^(2^j)*b_j.
+        // This preserves exact ring exponentiation even for zero divisors.
+        if e == (1u64 << 60) - 1 || e == (1u64 << 61) - 1 {
+            let extend = |field: &mut Self, mut a: [u64; D], tail: &[u64; D], k: usize| {
+                for _ in 0..k {
+                    a = field.fixed_mersenne_product::<D, true>(&a, &a, &modulus);
+                }
+                field.fixed_mersenne_product::<D, false>(&a, tail, &modulus)
+            };
+            let b2 = extend(self, b, &b, 1);
+            let b3 = extend(self, b2, &b, 1);
+            let b6 = extend(self, b3, &b3, 3);
+            let b12 = extend(self, b6, &b6, 6);
+            let b15 = extend(self, b12, &b3, 3);
+            let b30 = extend(self, b15, &b15, 15);
+            r = extend(self, b30, &b30, 30);
+            if e == (1u64 << 61) - 1 {
+                r = extend(self, r, &b, 1);
+            }
+        } else if e >= (1u64 << 30) && e.count_ones() >= 12 {
             let b2 = self.fixed_mersenne_product::<D, true>(&b, &b, &modulus);
             let mut odd = [[0u64; D]; 4];
             odd[0] = b;
@@ -574,6 +702,18 @@ impl Fp<'_> {
                 self.fixed_mersenne_pow::<3>(base, e, m)
             } else {
                 self.fixed_mersenne_pow::<4>(base, e, m)
+            };
+        }
+        if self.p > 3 && self.p <= (1u64 << 61) - 1 && self.p & 1 == 1
+            && (4..=5).contains(&m.len()) && m.last() == Some(&1)
+            && m.iter().all(|&x| x < self.p)
+            && base.iter().all(|&x| x < self.p)
+        {
+            return match (m.len(), self.p <= (1u64 << 30)) {
+                (4, true) => self.fixed_general_pow::<3, true>(base, e, m),
+                (5, true) => self.fixed_general_pow::<4, true>(base, e, m),
+                (4, false) => self.fixed_general_pow::<3, false>(base, e, m),
+                _ => self.fixed_general_pow::<4, false>(base, e, m),
             };
         }
         let mut r = vec![1];
@@ -1666,5 +1806,55 @@ mod tests {
         }
     }
 
+
+    #[test]
+    fn round147_general_fixed_pow_matches_exact_polynomial_arithmetic() {
+        for p in [5u64, 7, 101, 65_521, 1_000_000_007, 1_073_741_789,
+                  1_073_741_827, 4_294_967_291, 2_305_843_009_213_693_921,
+                  (1u64 << 61) - 1] {
+            let mut tally = FieldTally::default();
+            let mut f = Fp { p, tally: &mut tally };
+            let mut state = p ^ 0x147_2026_11_23u64;
+            let mut next = || {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                state
+            };
+            for d in [3usize, 4] {
+                for i in 0..64usize {
+                    let mut m: Vec<u64> = (0..d).map(|_| next() % p).collect();
+                    if i % 7 == 0 { m.fill(0); }
+                    m.push(1);
+                    let base: Vec<u64> = (0..(i % (2*d+1)))
+                        .map(|_| if i % 11 == 0 { p-1 } else { next() % p }).collect();
+                    let e = [0, 1, 2, p, (p-1)/2, u64::MAX, next(), (1u64<<32)-1][i%8];
+                    let got = f.powmod(&base, e, &m);
+                    // Use ordinary exact polynomial convolution and long
+                    // division, independently of fixed-product arithmetic.
+                    let product = |field: &mut Fp<'_>, a: &[u64], b: &[u64]| {
+                        if a.is_empty() || b.is_empty() { return Vec::new(); }
+                        let mut t = vec![0u64; a.len()+b.len()-1];
+                        for (j, &x) in a.iter().enumerate() {
+                            for (k, &y) in b.iter().enumerate() {
+                                t[j+k] = ((t[j+k] as u128 + x as u128*y as u128) % p as u128) as u64;
+                            }
+                        }
+                        field.rem(&t, &m)
+                    };
+                    let mut exp = e;
+                    let mut b = f.rem(&base, &m);
+                    let mut expected = vec![1u64];
+                    while exp != 0 {
+                        if exp & 1 == 1 { expected = product(&mut f, &expected, &b); }
+                        exp >>= 1;
+                        if exp != 0 { b = product(&mut f, &b, &b); }
+                    }
+                    Fp::trim(&mut expected);
+                    assert_eq!(got, expected, "p={p}, d={d}, i={i}, e={e}");
+                }
+            }
+        }
+    }
 
 }
