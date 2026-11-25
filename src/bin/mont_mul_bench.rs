@@ -371,8 +371,9 @@ mod analyze {
         print!("{md}");
     }
 
-    const COLORS: [&str; 8] = [
+    const COLORS: [&str; 11] = [
         "#9aa0a6", "#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc948", "#b07aa1",
+        "#ff9da7", "#9c755f", "#2f4b7c",
     ];
 
     fn speedup_svg(bars: &[(String, u64, String, f64, f64, f64)]) -> String {
@@ -419,7 +420,7 @@ mod analyze {
             for (ai, a) in arms.iter().enumerate() {
                 if let Some(b) = bars.iter().find(|b| &b.0 == f && &b.2 == a) {
                     let x = gx + bw * ai as f64;
-                    write!(s, "<rect x='{x:.1}' y='{:.1}' width='{:.1}' height='{:.1}' fill='{}'><title>{a} {f}: {:.3}× [{:.3}, {:.3}]</title></rect>", y(b.3), bw * 0.9, y(0.0) - y(b.3), COLORS[ai % 11], b.3, b.4, b.5).unwrap();
+                    write!(s, "<rect x='{x:.1}' y='{:.1}' width='{:.1}' height='{:.1}' fill='{}'><title>{a} {f}: {:.3}× [{:.3}, {:.3}]</title></rect>", y(b.3), bw * 0.9, y(0.0) - y(b.3), COLORS[ai % COLORS.len()], b.3, b.4, b.5).unwrap();
                     let cx = x + bw * 0.45;
                     write!(
                         s,
@@ -434,7 +435,7 @@ mod analyze {
         }
         for (ai, a) in arms.iter().enumerate() {
             let lx = ml + (ai as f64) * 96.0;
-            write!(s, "<rect x='{lx}' y='{}' width='12' height='12' fill='{}'/><text x='{}' y='{}'>{a}</text>", h - 30.0, COLORS[ai % 11], lx + 16.0, h - 20.0).unwrap();
+            write!(s, "<rect x='{lx}' y='{}' width='12' height='12' fill='{}'/><text x='{}' y='{}'>{a}</text>", h - 30.0, COLORS[ai % COLORS.len()], lx + 16.0, h - 20.0).unwrap();
         }
         s.push_str("</svg>\n");
         s
@@ -485,7 +486,7 @@ mod analyze {
         )
         .unwrap();
         for (i, (op, pts)) in lines.iter().enumerate() {
-            let c = COLORS[(i + 1) % 11];
+            let c = COLORS[(i + 1) % COLORS.len()];
             let d: Vec<String> = pts
                 .iter()
                 .map(|(l, v)| format!("{:.1},{:.1}", x(*l), y(*v)))
