@@ -933,7 +933,7 @@ on the full marked orbit. This rules out using the theorem's
 were found. A proposed evaluator must retain extra oriented
 data and charge its construction and evaluation. [pcc:unverified]
 
-### Conditional oriented coset grid
+### Oriented coset direct cost and conditional grid
 
 The paired-`y` identity in the two-offset screen below retains
 orientation that the `x`-multiset discards: the signs needed to
@@ -950,6 +950,24 @@ product `B_C` screened above. An exact division-polynomial
 identity, `ψ_(2j)(P)=2y([j]P)ψ_j(P)^4`, also identifies each
 `y`-factor character with `χ_p(ψ_(2j)(P)/2)`; it does not
 compress the product. [pcc:unverified]
+
+The direct `y`-coset evaluation deserves a cold cost gate before
+requiring a paired grid. At the first remaining size,
+`m=76,517,458,511,310,880,473,565,352`, evaluating the
+base and one target has exactly `2m≈2^86.984` factors.
+Against the report's `R≈2^95.826` group-addition reference,
+the **entire** per-factor allowance is `R/(2m)≈458.811`
+addition equivalents, including point and field work, index
+generation, and amortized setup. For illustration, applying
+the report's `C=384` trial-cost assumption to each factor's
+point work alone gives `2mC≈2^95.569`, only 0.257 bits below
+`R` **before** the remaining costs. The additive grid is
+not a prerequisite at the factor-count level: first establish
+that `A_H` is the exact sign on P-192, then measure a fully
+charged direct cold evaluation. The four smaller subgroups
+already have counterexamples; the first remaining subgroup
+has no exactness certificate or measured direct cost.
+[pcc:unverified]
 
 For the first large P-192 subgroup size beyond 95,560,
 `m=8·9564682313913860059195669≈2^85.984`, a **hypothetical**
