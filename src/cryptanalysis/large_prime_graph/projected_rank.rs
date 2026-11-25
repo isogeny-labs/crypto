@@ -27,6 +27,18 @@ pub struct ProjectedRankAudit {
     pub independent_row_indices: Vec<usize>,
     pub redundant_row_indices: Vec<usize>,
     pub inconsistent_row_indices: Vec<usize>,
+    /// Original, ascending input-row indices forming a basis of the augmented
+    /// [small | fixed-known-RHS] row space. Always includes every independent
+    /// small-coordinate row and at most one nonzero residual-RHS row.
+    /// This is valid only when all unknowns are explicit small columns.
+    #[serde(default)]
+    pub augmented_basis_row_indices: Vec<usize>,
+    /// Sparse payload retained by this exact affine row-space basis.
+    #[serde(default)]
+    pub augmented_basis_nonzeros: usize,
+    /// Original source coefficients retained, without combining witnesses.
+    #[serde(default)]
+    pub augmented_basis_source_terms: usize,
     /// Field operations do not include ordered-map/search overhead.
     pub elimination_steps: u64,
     pub elimination_multiply_add_terms: u64,
@@ -71,6 +83,16 @@ pub fn audit_projected_rank(
     relations: &[CompleteRelation],
     ell: u64,
 ) -> Result<ProjectedRankAudit, LpGraphError> {
+    audit_projected_rank_in_order(relations, ell, 0..relations.len())
+}
+
+// Internal exact echelon shared by input-order and payload-weight-order
+// selectors. The latter only permutes original indices, never source rows.
+fn audit_projected_rank_in_order(
+    relations: &[CompleteRelation],
+    ell: u64,
+    order: impl IntoIterator<Item = usize>,
+) -> Result<ProjectedRankAudit, LpGraphError> {
     if !valid_modulus(ell) {
         return Err(LpGraphError::InvalidModulus);
     }
@@ -90,7 +112,8 @@ pub fn audit_projected_rank(
     };
     // Pivot -> (normalized sparse coefficients, correspondingly reduced RHS).
     let mut pivots: BTreeMap<u32, (BTreeMap<u32, u64>, u64)> = BTreeMap::new();
-    for (row_index, relation) in relations.iter().enumerate() {
+    for row_index in order {
+        let relation = &relations[row_index];
         let mut current: BTreeMap<u32, u64> = relation.small.iter().copied().collect();
         let mut rhs = relation.rhs;
         audit.peak_working_nonzeros = audit
@@ -147,6 +170,27 @@ pub fn audit_projected_rank(
     // Adding a single RHS column increases matrix rank by at most one.
     audit.augmented_rank =
         audit.useful_small_rank + usize::from(!audit.inconsistent_row_indices.is_empty());
+    // The original pivot rows span the S-projection. Every remaining
+    // augmented residual is either zero or (0,...,0,delta), so retaining
+    // the FIRST contradictory source row (if present) spans the entire
+    // one-dimensional RHS residual. Never replace source-bearing original
+    // relations by reduced rows, as that would discard their provenance.
+    audit.augmented_basis_row_indices = audit.independent_row_indices.clone();
+    if let Some(&first) = audit.inconsistent_row_indices.first() {
+        audit.augmented_basis_row_indices.push(first);
+    }
+    audit.augmented_basis_row_indices.sort_unstable();
+    audit.augmented_basis_nonzeros = audit
+        .augmented_basis_row_indices
+        .iter()
+        .map(|&i| relations[i].small.len())
+        .sum();
+    audit.augmented_basis_source_terms = audit
+        .augmented_basis_row_indices
+        .iter()
+        .map(|&i| relations[i].sources.len())
+        .sum();
+    debug_assert_eq!(audit.augmented_basis_row_indices.len(), audit.augmented_rank);
     debug_assert_eq!(
         audit.input_rows,
         audit.independent_row_indices.len()
@@ -154,4 +198,63 @@ pub fn audit_projected_rank(
             + audit.inconsistent_row_indices.len()
     );
     Ok(audit)
+}
+
+/// Return an exact augmented-row-space basis using unchanged original rows.
+///
+/// The selection first audits sparse factor-base rank over prime `F_ell`.
+/// It retains the pivot originals and at most one additional row with a
+/// nonzero residual known RHS. Every original equation is a linear consequence
+/// of the retained affine equations; unsatisfiability, if any, is preserved.
+///
+/// The returned rows are clones, including their original source witnesses;
+/// callers must charge the rank audit, output cloning, sparse fill and later
+/// solver costs. This is opt-in and does NOT change the production LP filter.
+/// All target/other unknowns must be explicit small columns, not hidden in RHS.
+pub fn select_augmented_basis(
+    relations: &[CompleteRelation],
+    ell: u64,
+) -> Result<(Vec<CompleteRelation>, ProjectedRankAudit), LpGraphError> {
+    let audit = audit_projected_rank(relations, ell)?;
+    let retained = audit
+        .augmented_basis_row_indices
+        .iter()
+        .map(|&i| relations[i].clone())
+        .collect();
+    Ok((retained, audit))
+}
+
+/// Select a minimum-fixed-payload **original** basis of the augmented rowspace.
+///
+/// For each unchanged row, the additive weight is its number of factor-base
+/// coefficients plus its number of original source-witness coefficients.
+/// Linear independence over F_ell defines a representable matroid on the
+/// original augmented vectors [small | fixed-known-RHS]. The greedy theorem
+/// makes sorted independent-row admission optimal for this FIXED sum of
+/// payload entries; it does not optimize fill, wall time, memory or cold DLP.
+///
+/// The returned third value is the number of row-key comparisons performed
+/// by sorting. Charge that O(R log R) work, the O(R) row-index vector,
+/// the complete sparse echelon and all original-row clones before comparing
+/// against the default input-order selection. No production path is changed.
+/// If a target scalar is unknown, its coefficient MUST be an explicit column.
+pub fn select_min_payload_augmented_basis(
+    relations: &[CompleteRelation],
+    ell: u64,
+) -> Result<(Vec<CompleteRelation>, ProjectedRankAudit, usize), LpGraphError> {
+    let mut order: Vec<usize> = (0..relations.len()).collect();
+    let mut comparisons = 0usize;
+    order.sort_unstable_by(|&i, &j| {
+        comparisons += 1;
+        let weight_i = relations[i].small.len() as u128 + relations[i].sources.len() as u128;
+        let weight_j = relations[j].small.len() as u128 + relations[j].sources.len() as u128;
+        weight_i.cmp(&weight_j).then_with(|| i.cmp(&j))
+    });
+    let audit = audit_projected_rank_in_order(relations, ell, order)?;
+    let retained = audit
+        .augmented_basis_row_indices
+        .iter()
+        .map(|&i| relations[i].clone())
+        .collect();
+    Ok((retained, audit, comparisons))
 }

@@ -22,6 +22,10 @@ mod coupled_controls;
 #[path = "dimension_controls.rs"]
 mod dimension_controls;
 
+#[cfg(test)]
+#[path = "port_mass_controls.rs"]
+mod port_mass_controls;
+
 #[derive(Clone, Debug)]
 pub(super) struct Parameters {
     pub radix: usize,
