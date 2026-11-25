@@ -715,7 +715,7 @@ impl Fp<'_> {
                 self.fixed_mersenne_pow::<4>(base, e, m)
             };
         }
-        if self.p > 3 && self.p <= (1u64 << 61) - 1 && self.p & 1 == 1
+        if self.p > 3 && self.p < (1u64 << 61) && self.p & 1 == 1
             && (4..=5).contains(&m.len()) && m.last() == Some(&1)
             && m.iter().all(|&x| x < self.p)
             && base.iter().all(|&x| x < self.p)
