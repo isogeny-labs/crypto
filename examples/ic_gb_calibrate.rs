@@ -10,7 +10,7 @@
 //! never the unit ideal — the degenerate "no solutions over F_p" case that
 //! ruins affine random systems is excluded by construction.
 
-use crypto_lib::cryptanalysis::f4_fp::{f4, normalise, Ordering, Poly, F4Options};
+use crypto_lib::cryptanalysis::f4_fp::{f4, normalise, F4Options, Ordering, Poly};
 use std::time::Duration;
 
 // ── tiny deterministic RNG (xorshift64*) ────────────────────────────
@@ -29,6 +29,7 @@ impl Rng {
     }
 }
 
+#[allow(dead_code)]
 fn mulmod(a: u64, b: u64, p: u64) -> u64 {
     ((a as u128 * b as u128) % p as u128) as u64
 }
@@ -103,7 +104,10 @@ fn random_homogeneous_quadric(rng: &mut Rng, n: usize, p: u64) -> Poly {
 fn main() {
     let p: u64 = 65521;
     println!("p={p}  target: solving_degree == semi-regular d_reg for m = n+1, n+2");
-    println!("{:>2} {:>2} {:>8} {:>9} {:>9} {:>8} {:>7} {:>6}", "n", "m", "pred", "solving", "reached", "rows", "cols", "ms");
+    println!(
+        "{:>2} {:>2} {:>8} {:>9} {:>9} {:>8} {:>7} {:>6}",
+        "n", "m", "pred", "solving", "reached", "rows", "cols", "ms"
+    );
     let mut ok = 0;
     let mut total = 0;
     for n in 3..=6usize {
@@ -111,14 +115,22 @@ fn main() {
             let m = n + extra;
             let pred = semireg_dreg(n, m, 60);
             let mut rng = Rng(0x9E3779B97F4A7C15 ^ ((n as u64) << 8) ^ extra as u64);
-            let polys: Vec<Poly> = (0..m).map(|_| random_homogeneous_quadric(&mut rng, n, p)).collect();
+            let polys: Vec<Poly> = (0..m)
+                .map(|_| random_homogeneous_quadric(&mut rng, n, p))
+                .collect();
             let opts = F4Options::new(Ordering::Grevlex, 30).with_budget(Duration::from_secs(60));
             let rep = f4(&polys, n, p, &opts);
             let pred_s = pred.map(|v| v.to_string()).unwrap_or("-".into());
             println!(
                 "{:>2} {:>2} {:>8} {:>9} {:>9} {:>8} {:>7} {:>6.1}",
-                n, m, pred_s, rep.solving_degree, rep.degree_reached,
-                rep.max_rows, rep.max_cols, rep.ms
+                n,
+                m,
+                pred_s,
+                rep.solving_degree,
+                rep.degree_reached,
+                rep.max_rows,
+                rep.max_cols,
+                rep.ms
             );
             if let Some(pr) = pred {
                 total += 1;
