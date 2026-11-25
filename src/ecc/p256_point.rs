@@ -435,6 +435,7 @@ impl P256Jacobian {
         }
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn to_textbook(&self, p: &BigUint) -> Point {
         if self.is_identity() {
             return Point::Infinity;
