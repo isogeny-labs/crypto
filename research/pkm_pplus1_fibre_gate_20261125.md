@@ -35,6 +35,20 @@ construction fails. For any `q`, the same `c_top=0` choice requires
 ramified or nonsplit layer and checks that it produced `2^t` distinct
 roots; it does not select the nonzero `c_top` needed at full height.
 
+Two named fields have explicit full-height top-value routes. The NIST
+P-192 prime is `p=2^192-2^64-1`, so
+`p+1=2^64(2^128-1)` and `3 | (2^128-1)`. An order-three element `h` of
+`U` satisfies `h+h^(-1)=-1`; therefore `c_top=p-1` gives exactly `2^64`
+distinct abscissae through 64 quadratic layers. This fixes the high-
+and low-degree maps mathematically but does not make the current `u64`
+solver or full-rank pipeline feasible. The s59-plus prime is
+`p=2^58+2^18-1`, so `p+1=2^18(2^40+1)` and
+`257 | (2^40+1)` because `2^8=-1 (mod 257)`. For a norm-one element
+`g` with `g^((p+1)/257) != 1`, choose
+`h=g^((p+1)/257)` of order 257 and `c_top=Tr(h)`. A deterministic
+`F_(p^2)` representation and scan for the first such `g` still need to
+be frozen and replayed before an s59-plus solver run.
+
 ## Named-field decisions for the existing three-summand plan
 
 The prime valuations and density proxies are from `WIDE_M3_GATE.md`.
@@ -45,9 +59,9 @@ height used by a resource-gated design can be smaller than either maximum.
 | Field | `v=v2(p+1)` | Odd part `q` | `t_zero` | `t_full` | Construction and cost decision |
 |:--|--:|:--|--:|--:|:--|
 | s59 minus | 1 | `>1` | none | 1 | A noncritical height-1 fibre exists, but the three-summand density screen rejects this side. |
-| s59 plus | 18 | `>1` | 16 | 18 | The advertised height 18 requires a selected nonzero `c_top` and independent split/lift verification. The current `u64`, `t<30` representation can express it; F4, rank, memory and cold cost remain unmeasured. |
+| s59 plus | 18 | `2^40+1`, divisible by 257 | 16 | 18 | Select an order-257 norm-one `h` and `c_top=Tr(h)` as above. The current `u64`, `t<30` representation can express height 18; numeric selection, split/lift verification, F4, rank, memory and cold cost remain open. |
 | s59 registry | 1 | `>1` | none | 1 | Height 1 is constructible with noncritical top; density rejects this side. |
-| NIST P-192 | 64 | `>1` | 62 | 64 | Height 64 requires nonzero `c_top`. Its exact fibre exists mathematically, but current field/tower widths and full-rank resource scale block implementation. |
+| NIST P-192 | 64 | `2^128-1`, divisible by 3 | 62 | 64 | Use `c_top=p-1` from an order-three norm-one element. The exact degree-`2^64` fibre exists mathematically, but current field/tower widths and full-rank resource scale block implementation. |
 | NIST P-224 | 1 | `>1` | none | 1 | A height-1 fibre exists; density rejects this side. The distinct `p-1` height-76 row remains in the main gate. |
 | NIST P-256 | 96 | `>1` | 94 | 96 | The main gate's height 87 can use `c_top=0`; its required field width and full-rank scale exceed the bounded implementation. |
 | NIST P-384 | 32 | `>1` | 30 | 32 | Height 32 needs nonzero `c_top`, but the density proxy already rejects this side. |
