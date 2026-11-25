@@ -40,6 +40,7 @@ pub mod sdith;
 pub mod slh_dsa;
 pub mod snova;
 pub mod sqisign;
+pub(crate) mod strassen;
 pub mod uov;
 pub mod x_wing;
 
