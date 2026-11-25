@@ -1,0 +1,52 @@
+{
+  "schema": "current-root-build-plan/v1",
+  "recorded_utc": "2026-11-24T04:56:22.558744+00:00",
+  "recorded_before_build": true,
+  "canonical_commit": "9ef955b17dc3b0eb1d1ac49985cf1cdb0dbf4598",
+  "repair_review_commit": "b6712327ff0168fc3b620495b7d61349a6ca8b61",
+  "repair_pr": 5078,
+  "tracking_pr": 5128,
+  "root_source_delta_before_control": [],
+  "cargo_files": {
+    "Cargo.toml": "f1ddf20080c584d3078144d396fa5bd0af3501d9d23c043289235ffc57225188",
+    "Cargo.lock": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0"
+  },
+  "compiler": "rustc1.100.0,0ef1bc386059596dada8fb65b50425aab2ea637a",
+  "cargo": "1.100.0,3acc79c0c2026-11-05",
+  "command": "cargo test --locked --offline --release --lib --no-run -j1",
+  "default_features": true,
+  "root_module_or_test_exclusions": false,
+  "profile_overrides": {
+    "opt_level": 0,
+    "lto": "off",
+    "codegen_units": 16,
+    "debug": 0
+  },
+  "profile_scope": "unoptimized correctness build, never performance control/admission",
+  "environment": {
+    "CARGO_HOME": "/dev/shm/relation-root-cargo-home",
+    "CARGO_TARGET_DIR": "/dev/shm/relation-root-build-436",
+    "CARGO_BUILD_JOBS": "1",
+    "RAYON_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1"
+  },
+  "cpu": 0,
+  "wall_limit_seconds": 1800,
+  "address_space_bytes": 12884901888,
+  "per_file_limit_bytes": 1073741824,
+  "storage": "existing executable localtmpfs,8.8GiB filesystem with16GiB cgroup; no cloud dispatch",
+  "failure_policy": "retain every compile/dependency/hydration/resource failure; hydrate exact current tracked inputs when needed; never regenerate frozen locks or remove code/tests; retry only after a diagnosed change",
+  "future_test_execution": "only after successful build, separately frozen copy/hash/roster and prospective full-suite plan, test_threads1; none executed yet",
+  "native_integration": "already present in src/cryptanalysis/f4_fp/certified.rs; old36cases historical, current context must be requalified; do not blindly reapply old pendinghunk",
+  "source_review": "trace state access/stray duplicated completeness fragment, duplicate test module alias, test borrow and missing derives; do not import unrelated PR5078 arithmetic optimizations or delete the sole field_value_cached algorithm",
+  "reference_sources": [
+    "Cargo test --help in source-notes/cargo-test-help-434.txt",
+    "canonical CHECKPOINT.md current summaries before historical entries",
+    "current-to-repair-434.patch",
+    "canonical Cargo/source tree"
+  ],
+  "performance_experiment": false,
+  "15x_admission": false,
+  "checkpoint_S3_waiver": "persistent user authorization; no credentials required"
+}
