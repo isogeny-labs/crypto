@@ -59,35 +59,35 @@ ns/MA alone, while the interval's moved only 0.44–0.83 → 0.37.
 So the correct scaling statement is: 33× fewer multiply-adds, **7.4× less
 work**, and a 4.5× residual per-operation gap that is the engineering target.
 
-## Why the price differs: the counter is not the runtime
+## Why the price differs: rayon handoff, not just bookkeeping
 
-`echelon` increments `muladds` only from `Acc::sub_tail`, i.e. once per
-non-zero entry of a pivot row's tail. Everything else in the elimination loop is
-uncounted: the word-scan of the accumulator, `Acc::take` and its reductions,
-`drain_from`, `Pivot::new` (which copies and re-indexes a row), the sort, and
-the bitset maintenance (`runs`, `bits`, `hi`).
+A `sample` profile with `RAYON_NUM_THREADS=1` still shows the work is not
+running in place: the main thread sits 69 % in `__psynch_cvwait` and the single
+worker spends 35 % in `swtch_pri` plus 16 % in `cvwait`, with only ~13 % in
+`f4_fp_tower` frames, ~11 % in the par-iter map closure and 3.5 % in the row
+sort. In other words, even one worker pays a latch handoff and an idle spin for
+every `par_iter` call, and `eliminate` issues one such call per chunk per step.
 
-The interval arm's rows are dense (190–465 nnz/row), so its runtime is
-concentrated in the counted tail arithmetic and the price per counted op is
-near a true F_p multiply-add. The candidate's rows are 3.5–3.8× sparser
-(39–116 nnz/row), so a larger fraction of its time sits in the per-row
-bookkeeping that the counter does not see. The count is honest about
-multiply-adds; it is simply not a proxy for wall time in the sparse regime.
+That matters because the sparse arm has more, smaller tasks per unit of work:
+`per_task` is sized only from the column count (`(1<<18)/(8·nq)`, clamped to
+4–64), so an 821×583 candidate system gets ~56 rows per task regardless of how
+cheap each row is, and each task carries a handoff. The dense 1493×928 interval
+system does ~10× more arithmetic per task, so the same handoff is amortised
+away.
 
-A `sample` profile of a candidate run confirms the elimination phase dominates
-(`f4_tower_cached` → `eliminate` → rayon chunk reduction), so this is not time
-lost elsewhere in the oracle. The profile also shows what the uncounted time
-looks like at the bottom: on a host that was running other work, 72 % of samples
-sat in `swtch_pri` thread yielding inside the rayon pool and 20 % in
-`__psynch_cvwait`. Small sparse row tasks plus a busy host means scheduler
-overhead, not arithmetic, becomes a large share — which the muladd counter
-cannot see by construction.
+Concrete, testable proposal (not yet implemented, needs a rebuild):
 
-That splits the price gap into two uncounted terms which this note does **not**
-yet separate: per-row bookkeeping inside `echelon` (scan, drain, pivot copies,
-bitset work) and thread-pool scheduling. Both are engineering targets; only a
-quiet-host A/B with the per-step `ms_rows / ms_reduce / ms_echelon / ms_update`
-breakdown surfaced in the store will apportion them.
+- give `per_task` a sparsity term so sparse systems get coarser tasks (or run
+  one serial reduction when the system is small enough that the handoff
+  dominates), and
+- compare against the recorded deterministic operation totals, which must not
+  change: the echelon is order-independent here, so any change that alters
+  `ops` is a bug rather than a speedup.
+
+Expected effect if the diagnosis is right: the candidate's 1.69 ns/MA at one
+thread falls toward the interval's 0.37, i.e. the per-system speedup moves from
+7.35× toward the 33× operation ratio. If it does not move, the residual is
+inside `echelon`'s bookkeeping and the same comparison locates it.
 
 ## Consequence
 
@@ -96,11 +96,10 @@ breakdown surfaced in the store will apportion them.
   operation count**. On a quiet single thread the same comparison is 0.136
   (7.35×), so the pipeline figures are conservative by roughly the factor the
   host's scheduler takes from the sparse arm.
-- The remaining headroom is 4.5× per system, and it is an engineering target,
-  not a mathematical one: cut the uncounted work — the sparse-echelon per-row
-  bookkeeping (`Pivot::new` copies, accumulator drain, bitset maintenance).
-  Closing the price gap would turn 7.35× into ~33× on identical hardware; the
-  op count would not change at all.
+- The remaining headroom is 4.5× per system, and the profile points at task
+  granularity plus the uncounted per-row work in `echelon`, not at arithmetic.
+  Closing it would turn 7.35× into ~33× on identical hardware; the op count
+  would not change at all.
 - Any future claim should quote wall or GAE per instance and treat the 32× as
   an operation-count invariant that is *not* load-dependent and *not* a
   speedup.
