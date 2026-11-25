@@ -206,3 +206,33 @@ an absent key without ListBucket permission. No successful upload, remote byte
 replay or object absence is asserted. The supported local and workflow routes
 have both been tried; store access or an approved replacement is an external
 dependency. No manual retry, exception label or policy change was made.
+
+## Complete cutoff catalog qualification
+
+The [new report](FULL_CUTOFF_RESULT.md) retains a target-independent multiset
+catalog and three complete finite witness audits. Source 16f5902e2d passes
+36 feature tests and nine default tests; both executables build. The frozen
+five-command protocol exits zero throughout, with empty stderr and unchanged
+before-call hashes. The certificate is evaluated by the existing native
+checker; its formal proof field is empty. Claims 3a7978, f9071f, 941283 and
+f70c64 remain unsigned. [pcc:unverified]
+
+The catalogs have 36/18/119 charts and partition 70/35/1001 unsigned tuples.
+The audit checks all 17,606 admissible signed bindings and records 90 explicit
+identity/target-abscissa exclusions. Rank-two bindings occur in two-image
+charts; the complete branch count and singularity handling remain costs for
+the next extractor comparison. No new solver, recovery, admitted timing or
+EKS run is represented. [pcc:unverified]
+
+Evidence is in `evidence/full_cutoff_v1`, with a separate before-call identity,
+post-call unchanged-byte check, raw outputs, tests, certificate and exact
+command. `evidence/FULL_CUTOFF_SHA256SUMS` covers these files. All new data
+files fit the inline policy threshold; the two earlier larger-control files
+still have the separately documented artifact-migration dependency.
+
+At the subsequent normal CI read, identity head `5f69c1ea75` has four successful,
+21 skipped and one failed check. The failed migration
+[run45518137335](https://github.com/isogeny-labs/crypto/actions/runs/45518137335),
+job138882992159, again returns HTTP403 on both older content-addressed
+HeadObject requests before upload/replay. The final-head checks are not claimed
+passed, and no absent-key or specific permission diagnosis is inferred.

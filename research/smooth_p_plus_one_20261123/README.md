@@ -39,13 +39,21 @@ with shared lookup, Direct/cofactor each use one four-leaf call plus two
 singleton rows, while Refined uses four calls plus three singleton rows.
 Both earlier first-row histories remain unchanged. [pcc:unverified]
 
-The latest [larger-control report](LARGER_FULL_OUTPUT_RESULT.md)
+The [larger-control report](LARGER_FULL_OUTPUT_RESULT.md)
 ([PDF](LARGER_FULL_OUTPUT_RESULT.pdf)) adds F8191 degree-16/32 endpoints and
 separate whole-answer replay. Direct recovers the degree-32 fixture after eight
 calls; the other five endpoints remain incomplete. Across retained/new inputs,
 145 complete sets and 98 consumed rows pass local replay, while 33 incomplete
 queries retain missing outputs. The checker shares reference/consumer source.
 [pcc:unverified]
+
+The latest [full-cutoff report](FULL_CUTOFF_RESULT.md)
+([PDF](FULL_CUTOFF_RESULT.pdf)) extends the catalog to every feasible fine-image
+multiset. Three public fixture audits check complete tuple coverage and every
+admissible signed RR5 witness. At degree 32 the catalog has 119 systems;
+1,104 of 16,008 checked bindings have effective Jacobian rank two. These are
+finite point/equation checks; solver integration and total branch costs are
+next. [pcc:unverified]
 
 - [Initial rank argument](REPORT.md) ([PDF](REPORT.pdf)): collapsed and distinct-image charts.
 - [Initial native controls](NATIVE.md) ([PDF](NATIVE.pdf)): original encodings and retained failures.
@@ -59,6 +67,7 @@ queries retain missing outputs. The checker shares reference/consumer source.
 - [Common-lookup protocol](BASE_LOOKUP.md) and [reproduction](BASE_LOOKUP_REPRODUCE.md).
 - [Full-output protocol](FULL_OUTPUT.md) and [reproduction](FULL_OUTPUT_REPRODUCE.md).
 - [Larger-control/replay protocol](LARGER_FULL_OUTPUT.md) and [reproduction](LARGER_FULL_OUTPUT_REPRODUCE.md).
+- [Full-cutoff protocol](FULL_CUTOFF.md) and [reproduction](FULL_CUTOFF_REPRODUCE.md).
 - [Native source](native/src/main.rs) and [evidence](evidence/).
 
 The original reports and manifests retain their historical revision scope.

@@ -4,7 +4,7 @@
 - **Kind:** implementation gap; measurement gap; access/build-route dependency
 - **Affected work:** [smooth p+1 refinement](../research/smooth_p_plus_one_20261123/REFINEMENT_RESULT.md), PR #5142
 - **Next action owner:** smooth-p-plus-one continuation
-- **Last updated:** 2026-11-24
+- **Last updated:** 2026-11-25
 
 ## Problem
 
@@ -59,6 +59,12 @@ the requested end-to-end cost conclusion.
   and cofactor exhausts 30 budgets. Every complete answer is separately compared
   to its declared reference and consumed receipts are replayed; the checker
   shares reference/consumer source and is unsigned. [pcc:unverified]
+- **Complete cutoff catalog:** the [finite audit](../research/smooth_p_plus_one_20261123/FULL_CUTOFF_RESULT.md)
+  partitions every distinct-abscissa tuple in the three existing bases. The
+  degree-32 catalog has 119 charts and checks 16,008 valid RR5 bindings; 1,104
+  have effective rank two in two-image charts. This restores rational-point
+  coverage at the catalog level; no solver was called and total cost remains
+  unmeasured. [pcc:unverified]
 - **Missing capability:** a complete degree-32 full-base comparison,
   successful full-base oriented-S3 output, qualified counters or timing for
   every phase, an exact-source registered EKS image, and independent replay.
@@ -87,8 +93,10 @@ the requested end-to-end cost conclusion.
   prefixes, rank histories and original first-row controls. [pcc:unverified]
 - [x] Qualify larger full-output controls and separate whole-answer replay,
   retaining all five incomplete endpoints and 30 budget failures. [pcc:unverified]
-- [ ] Investigate full-coverage cutoff partitions and complete a matched,
-  equal-scope recovery comparison with admitted costs.
+- [x] Derive and finitely qualify capacity-bounded cutoff multisets, including
+  repeated-image coverage and local Jacobian ranks. [pcc:unverified]
+- [ ] Integrate the full catalog into the bounded extractor and complete a
+  matched, equal-scope recovery comparison with admitted costs.
 - [ ] Publish and build the exact workload revision through the supported
   EKS route, obtain budget/isolation admission, and retain raw evidence and
   independent replay. An available generic ecbench image alone is insufficient.
@@ -99,12 +107,15 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Investigate extending the existing coefficient cutoff to all feasible
-fine-image multisets. Establish rational chart coverage and repeated-image
-behavior before a separately frozen full-coverage test. Price the sum of
-all branch construction/elimination/output work; the prior first-collision
+Integrate the qualified full fine-image catalog into the bounded extractor.
+Retain the whole-answer comparison with Direct on the shared distinct-abscissa,
+target-disjoint domain and incomplete status whenever any branch fails. Check
+how the two-image singular charts interact with the conservative RUR guard;
+the finite witness audit does not establish algebraic extraction completion.
+Price the sum of all branch construction/elimination/output work; the prior first-collision
 study shows that a smaller individual system need not reduce whole-call work.
-This is a proposed construction question, not a completed mechanism or gain.
+This is the next implementation and measurement question; the finite catalog
+qualification does not measure its solver cost.
 Keep every first-row/lookup/full-output/larger control and identity frozen.
 Then extend qualification to the registered EKS build and admitted comparison.
 Degree-32 cofactor and full-base oriented completeness remain open under fixed
