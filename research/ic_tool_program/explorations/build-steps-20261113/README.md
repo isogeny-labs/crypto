@@ -11,7 +11,7 @@
 
 ns per stored pair, median over 5 processes, one thread:
 
-| step | k0n53 (2^44.3) | k0n61 (2^47.2) |
+| step | icv1-f2m53-tm56619371-dac20a85 (2^44.3) | icv1-f2m61-t158598901-ab42b6c5 (2^47.2) |
 |:--|--:|--:|
 | set-up | 0.50 | 0.34 |
 | row additions | 3.24 | 2.74 |
@@ -35,7 +35,7 @@ On random keys at the same sizes:
 - **A partition-local filter word:** taking the filter word from the hash's
   top bits, the partition's own bits, cuts placement from 8.5–12.6 to
   5.0–5.7 ns per pair. That is the candidate lever, worth about 4–6% of
-  set-up at k0n53 if it carries over.
+  set-up at icv1-f2m53-tm56619371-dac20a85 if it carries over.
   - It changes the table format shared with the GPU kernel
     (`gpu/ecc2k/pairtable.cuh`, `fold2k.cu`) and stored tables, so it is
     left as a decision, not made here.

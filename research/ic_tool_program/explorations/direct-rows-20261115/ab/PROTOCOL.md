@@ -5,9 +5,9 @@ optimizing the index calculus.
 
 ## Why
 
-The verify phase (`setup_phases_ns.verify`) costs 10–13 ms at k0n53 and
-15–16 ms at k0n61. Temporary timers in `FactorBaseLogSolver::push` (not
-committed; `RAYON_NUM_THREADS=1`, k0n53, three repetitions) split it:
+The verify phase (`setup_phases_ns.verify`) costs 10–13 ms at icv1-f2m53-tm56619371-dac20a85 and
+15–16 ms at icv1-f2m61-t158598901-ab42b6c5. Temporary timers in `FactorBaseLogSolver::push` (not
+committed; `RAYON_NUM_THREADS=1`, icv1-f2m53-tm56619371-dac20a85, three repetitions) split it:
 - about 5.1 ms a repetition goes to `verify_collected_relation`, the group
   check of each collected relation;
 - about 7.4 ms a repetition goes to `LogSystem::push`, about 28 µs a row.
@@ -33,8 +33,8 @@ committed; `RAYON_NUM_THREADS=1`, k0n53, three repetitions) split it:
   work.
 - **Exploration** ([`../explore/`](../explore/), one process an arm, three
   repetitions each):
-  - verify fell 9.99–11.1 → 4.22–4.68 ms at k0n53 and 14.7–16.5 →
-    6.75–6.96 ms at k0n61;
+  - verify fell 9.99–11.1 → 4.22–4.68 ms at icv1-f2m53-tm56619371-dac20a85 and 14.7–16.5 →
+    6.75–6.96 ms at icv1-f2m61-t158598901-ab42b6c5;
   - 160 and 172 counted and answer fields were identical.
 - **Replay sentinels:** `ecbench` reproduced 51 sessions and 90 records,
   0 failing.
@@ -51,7 +51,7 @@ committed; `RAYON_NUM_THREADS=1`, k0n53, three repetitions) split it:
 
 ## Workload, schedule, metrics and statistics
 
-- **Rows:** `M1-T01` at `k0n53` and `k0n61`.
+- **Rows:** `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` and `icv1-f2m61-t158598901-ab42b6c5`.
 - **Isolation:** `isolated_bench --cpus 2` with `RAYON_NUM_THREADS=1`.
 - **Schedule:** **24 rounds**, cycled over the six orders of `a q d` (four
   cycles).
@@ -80,8 +80,8 @@ Medians `a / d`:
 
 | row | verify | set-up |
 |:--|:--|:--|
-| k0n53 | [1.9, 3.0] | [1.00, 1.04] |
-| k0n61 | [1.8, 2.8] | [1.00, 1.02] |
+| icv1-f2m53-tm56619371-dac20a85 | [1.9, 3.0] | [1.00, 1.04] |
+| icv1-f2m61-t158598901-ab42b6c5 | [1.8, 2.8] | [1.00, 1.02] |
 
 ## Identity
 

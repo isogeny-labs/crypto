@@ -700,7 +700,7 @@ fn closure(eqs: &[Poly], nv: u32, c: u32, deadline: Instant) -> (usize, usize, u
         let mut new_low: Vec<usize> = vec![];
         for s in &srcs {
             cnt += 1;
-            if cnt % 4096 == 0 && Instant::now() > deadline {
+            if cnt.is_multiple_of(4096) && Instant::now() > deadline {
                 return (plain.unwrap_or(basis.dim), basis.dim, rounds, true);
             }
             let v = match *s {
@@ -758,12 +758,11 @@ fn closure(eqs: &[Poly], nv: u32, c: u32, deadline: Instant) -> (usize, usize, u
 }
 
 fn cols_upto(nv: u32, c: u32) -> u64 {
-    let mut s = 0u64;
+    // d = 0 term is b = 1.
+    let mut s = 1u64;
     let mut b = 1u64;
-    for d in 0..=c as u64 {
-        if d > 0 {
-            b = b * (nv as u64 - d + 1) / d;
-        }
+    for d in 1..=c as u64 {
+        b = b * (nv as u64 - d + 1) / d;
         s += b;
     }
     s
@@ -942,7 +941,7 @@ fn run(args: &[String]) {
                             _ => &vw,
                         };
                         match sym_system(b, x_r, m, &f) {
-                            Some((e, nv, z)) if z == 0 => Some((e, nv, b.clone())),
+                            Some((e, nv, 0)) => Some((e, nv, b.clone())),
                             _ => None,
                         }
                     }
@@ -1147,7 +1146,7 @@ fn selftest() {
         let xx = roots[0];
         let x4s: Vec<u64> = (0..(1u64 << 11)).filter(|&x| s3(xx, x3, x) == 0).collect();
         for &x4 in &x4s {
-            if [x1, x2, x3, x4].iter().any(|&v| v == 1) {
+            if [x1, x2, x3, x4].contains(&1) {
                 continue;
             }
             checked += 1;
@@ -1172,7 +1171,7 @@ fn selftest() {
         let x1 = r.next() & f.mask();
         let x2 = r.next() & f.mask();
         for x3 in (0..(1u64 << 11)).filter(|&x| s3(x1, x2, x) == 0) {
-            if [x1, x2, x3].iter().any(|&v| v == 1) {
+            if [x1, x2, x3].contains(&1) {
                 continue;
             }
             c2 += 1;
