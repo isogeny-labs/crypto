@@ -134,6 +134,17 @@ authorization or explicit owner-approved alternative, final runnable native
 protocol and the existing evidence gates would permit testing the lead.
 Resolving the checkpoint conflict would not itself establish an improvement.
 
+2026-11-24: [conditional linearized trace fibers](../research/trace_linearized_fibers_20261124/README.md)
+identify the trace-zero one-dimensional S3 kernel, its explicit aligned basis,
+and normalized ratio-class operator reuse. The new scalar adapter keeps all
+determinant-zero and coordinate-zero branches and has exact development
+controls; it does not search unknown leaves or return signed group relations.
+The proposed small-quotient-set criterion still needs actual inventory density,
+ratio search, all setup and relation-rank work. Standard half-trace is already
+a reusable field-wide map and must be in the reference; repeated Gaussian
+elimination alone would be too weak a comparator. The successful-work exit
+conditions remain open. [pcc:unverified]
+
 2026-11-24: [trace-kernel auxiliary basis selection](../research/trace_kernel_basis_20261124/README.md)
 adds a native single-auxiliary coefficient constructor and minimum-weight
 vector-basis selector. Its objective counts descended coefficient occurrences,

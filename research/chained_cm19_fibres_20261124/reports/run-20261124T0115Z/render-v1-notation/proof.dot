@@ -1,0 +1,12 @@
+digraph actual {
+ graph [rankdir=LR, bgcolor="white", pad="0.12", nodesep="0.28", ranksep="0.30"];
+ node [shape=box, style="rounded,filled", fillcolor="#eef4f8", color="#3a6078", fontname="DejaVu Sans", fontsize=11, margin="0.13,0.10"];
+ edge [color="#416477", arrowsize=0.7];
+ D [label="True weighted fibre\nD = P8 + P9 + 2P16\ndegree 4, noncanonical"];
+ Q [label="Conic kernel\nrank 4, dimension 2\nq = X² − XZ + YZ"];
+ J [label="Actual cover differentials\nω4 = ω1 − 5ω3\n14 values + first jets"];
+ N [label="Numerator systems\n28 rows, ranks 14 / 22\nquartic p4, sextic p6"];
+ E [label="True map equality\n28 zeros > 16 / 24\ng = (p4/q², p6/q³)", fillcolor="#e7f3e8"];
+ L [label="Local extension\norders bounded 8 / 16 / 24\nall 17 images verified", fillcolor="#e7f3e8"];
+ D -> Q; Q -> N; J -> N; N -> E; E -> L;
+}

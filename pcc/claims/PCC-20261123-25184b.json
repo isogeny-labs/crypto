@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T20:08:00Z",
+ "id": "PCC-20261123-25184b",
+ "kind": "statement",
+ "producer": {
+  "commit": "f23014aadcb56d2d60494dcd551e1757fcfa32bf",
+  "model": "Codex",
+  "session": "cohort-validation-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/hashed_ecdl_cohort_validation_20261123/cohort/evidence/BUILD-RESULT.json",
+    "sha256": "12f0929813e71b3e9e1d21540f2f4f32023ee16a29daf5b32d507f7562c0f3fa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/hashed_ecdl_cohort_validation_20261123/cohort",
+ "statement": "Expanded-cohort strict C and locked offline Rust compilation completed with exit0, no sampled memory/disk stop and input pre/post hashes equal. Nine separately copied read-only qualifier executables were produced; none has yet been invoked. Peak sampled cgroup14875947008bytes and minimum free disk238649344bytes. This is compilation/software preparation, no new target or solver execution. C compiler/library postbuild readback matches earlier admission identities but is not a reconstructed new pre-call manifest; runtime library will be pinned before calls. Unsigned producer evidence."
+}

@@ -1,0 +1,44 @@
+name: Rootfind Round 145 source-exact Rust A/B
+on:
+  push:
+    branches:
+      - automation/rootfind-round145-lazy-reduction-20261123
+  pull_request:
+    paths:
+      - src/cryptanalysis/ecbench/isogeny.rs
+      - research/rootfind_round144/**
+      - .github/workflows/rootfind_round145.yml
+permissions:
+  contents: read
+jobs:
+  native-source-exact:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            src/cryptanalysis/ecbench/isogeny.rs
+            research/rootfind_round144
+      - name: Compile source-exact baseline and optimized Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin d28cff7a261cd368efd71809846be0fdd86c8c88
+          mkdir -p /tmp/rootfind_round145
+          git show FETCH_HEAD:src/cryptanalysis/ecbench/isogeny.rs > /tmp/rootfind_round145/baseline.rs
+          echo "baseline $(git rev-parse FETCH_HEAD) candidate $(git rev-parse HEAD)"
+          cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round145/optimized.rs
+          for name in baseline optimized; do
+            cat research/rootfind_round144/bench_helper.rs >> "/tmp/rootfind_round145/${name}.rs"
+          done
+          cp research/rootfind_round144/source_exact_main.rs /tmp/rootfind_round145/main.rs
+          rustc --version
+          rustc --edition=2021 -C opt-level=3 -C target-cpu=native /tmp/rootfind_round145/main.rs -o /tmp/rootfind_round145/bench
+      - name: Differential correctness and before/after benchmarks
+        run: /tmp/rootfind_round145/bench

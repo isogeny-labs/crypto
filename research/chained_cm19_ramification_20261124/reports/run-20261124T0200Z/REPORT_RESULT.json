@@ -1,0 +1,36 @@
+{
+  "schema": "inspected-scientific-report/v1",
+  "final": {
+    "path": "/dev/shm/chained-cm19-ramification24/research/chained_cm19_ramification_20261124/reports/run-20261124T0200Z/REPORT.pdf",
+    "bytes": 190139,
+    "sha256": "fc712f23a66eea2ebcbb5d92c9a1ddab1f8dcdbc4996844b8f0d7c1f17d62f67"
+  },
+  "pages": 2,
+  "pipeline": [
+    "dot -Tsvg branches.dot -o branches.svg",
+    "inkscape branches.svg --export-type=pdf --export-filename=branches.pdf",
+    "pdflatex -interaction=nonstopmode -halt-on-error -output-directory /dev/shm/ct24-ramification-report-render-v2 REPORT.tex (two passes)",
+    "pdftoppm -scale-to 1550 -png /dev/shm/ct24-ramification-report-render-v2/REPORT.pdf /dev/shm/ct24-ramification-report-render-v2/page"
+  ],
+  "environment": {
+    "XDG_CACHE_HOME": "/dev/shm/ct23-report-font-cache",
+    "XDG_CONFIG_HOME": "/dev/shm/ct23-report-config",
+    "SOURCE_DATE_EPOCH": "1795442400"
+  },
+  "QA": "Both final v2 pages individually viewed1550; all four maps/Frobenius arrows/canonical formula/factor/branch scheme/evidence table/limits readable, no clipping or overlap.",
+  "final_log": "No Overfull/Underfull/Warning/Error matches in final two-pass TeX log.",
+  "original_rasters": [
+    {
+      "path": "/dev/shm/ct24-ramification-report-render-v2/page-1.png",
+      "bytes": 230070,
+      "sha256": "1c5f95a00fd105adf6a42d6319ceccce2385920fcfa54f46b9db4fa6de350562"
+    },
+    {
+      "path": "/dev/shm/ct24-ramification-report-render-v2/page-2.png",
+      "bytes": 334787,
+      "sha256": "08f14fef2654eea08518ac4c06fdbcfd86fde2c8e07bcf869a572fee69a430ed"
+    }
+  ],
+  "first_negative": "Whole original v1 TeX/log/streams/argv/status preserved in render-v1-tex-negative; missing closing display delimiter, first pdflatex exit1/no report PDF. Only markup correction, fresh v2 output, no scientific rerun. Inkscape exported successfully with nonfatal wrapper warnings retained.",
+  "scope": "Actual canonical and four branch certificates/proof bridges; full geometric formal/signed standing and original whole artifact custody remain open."
+}
