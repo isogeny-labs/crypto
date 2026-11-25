@@ -54,7 +54,18 @@ multiply-adds; it is simply not a proxy for wall time in the sparse regime.
 
 A `sample` profile of a candidate run confirms the elimination phase dominates
 (`f4_tower_cached` → `eliminate` → rayon chunk reduction), so this is not time
-lost elsewhere in the oracle.
+lost elsewhere in the oracle. The profile also shows what the uncounted time
+looks like at the bottom: on a host that was running other work, 72 % of samples
+sat in `swtch_pri` thread yielding inside the rayon pool and 20 % in
+`__psynch_cvwait`. Small sparse row tasks plus a busy host means scheduler
+overhead, not arithmetic, becomes a large share — which the muladd counter
+cannot see by construction.
+
+That splits the price gap into two uncounted terms which this note does **not**
+yet separate: per-row bookkeeping inside `echelon` (scan, drain, pivot copies,
+bitset work) and thread-pool scheduling. Both are engineering targets; only a
+quiet-host A/B with the per-step `ms_rows / ms_reduce / ms_echelon / ms_update`
+breakdown surfaced in the store will apportion them.
 
 ## Consequence
 
@@ -62,11 +73,11 @@ lost elsewhere in the oracle.
   0.284–0.314, and the deterministic 32× op reduction **described as an
   operation count**.
 - The remaining headroom is roughly 5× per system, and it is an engineering
-  target, not a mathematical one: cut per-row overhead in the sparse echelon
-  (avoid the `Pivot::new` copy, batch the accumulator drain, prune bitset work
-  per pivot hit). Recovering half the price gap would move the closed-pipeline
-  ratio from ~0.29 toward ~0.15 on identical hardware; the op count would not
-  change at all.
+  target, not a mathematical one: cut the uncounted work — the sparse-echelon
+  per-row bookkeeping (`Pivot::new` copies, accumulator drain, bitset
+  maintenance) and, on a loaded host, rayon scheduling. Recovering half the
+  price gap would move the closed-pipeline ratio from ~0.29 toward ~0.15 on
+  identical hardware; the op count would not change at all.
 - Any future claim should quote wall or GAE per instance and treat the 32× as
   an operation-count invariant that is *not* load-dependent and *not* a
   speedup.
