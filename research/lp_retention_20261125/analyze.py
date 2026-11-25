@@ -16,7 +16,8 @@ def ci(v, seed=7, n=10000):
 
 
 def load(name):
-    path = os.path.join(R, name + ".json")
+    # REAL was collected after the root crate built; it lives with the Addendum A runs.
+    path = os.path.join("results_confirm" if name == "real" else R, name + ".json")
     return json.load(open(path)) if os.path.exists(path) else None
 
 
@@ -27,7 +28,8 @@ def table(rep):
         for b in r["budgets"]:
             d = t.setdefault(b["fraction"], {p: [] for p in POL})
             for o in b["outcomes"]:
-                d[NAME[o["policy"]]].append(o["rank"]["left_nullity"])
+                if o["policy"] in NAME:  # the frozen five; Addendum A's sixth is scored by confirm_h7.py
+                    d[NAME[o["policy"]]].append(o["rank"]["left_nullity"])
     return t
 
 

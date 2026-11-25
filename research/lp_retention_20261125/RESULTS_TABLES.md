@@ -80,6 +80,16 @@ Relabel invariance (degree, spectral, core_then_random, random unchanged): ok
 | 0.02 | 4 | 298 | 94 | 99 | 6 | 3.254 [2.745, 3.764] | 3.043 [2.732, 3.390] | 1.069 [0.955, 1.216] |
 | 0.01 | 1 | 146 | 18 | 29 | 1 | 8.854 [6.632, 12.032] | 5.162 [4.513, 6.044] | 1.784 [1.206, 2.502] |
 
+### real (pool 59864, full-pool left nullity 59636)
+
+| budget | random | smallest_lp | degree | spectral | core_then_random | smallest_lp/degree | smallest_lp/spectral | spectral/degree |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 0.25 | 14738 | 14738 | 14757 | 14747 | 14738 | 0.999 [0.999, 0.999] | 0.999 [0.999, 0.999] | 0.999 [0.999, 0.999] |
+| 0.1 | 5758 | 5758 | 5844 | 5817 | 5758 | 0.985 [0.985, 0.985] | 0.990 [0.990, 0.990] | 0.995 [0.995, 0.995] |
+| 0.05 | 2765 | 2875 | 2890 | 2862 | 2765 | 0.995 [0.995, 0.995] | 1.005 [1.005, 1.005] | 0.990 [0.990, 0.990] |
+| 0.02 | 969 | 1150 | 1140 | 1125 | 969 | 1.009 [1.009, 1.009] | 1.022 [1.022, 1.022] | 0.987 [0.987, 0.987] |
+| 0.01 | 372 | 573 | 557 | 551 | 372 | 1.029 [1.029, 1.029] | 1.040 [1.040, 1.040] | 0.989 [0.989, 0.989] |
+
 ## Decisions
 
 - H1 (FP, 0.25: smallest_lp beats degree and spectral): supported
@@ -87,4 +97,4 @@ Relabel invariance (degree, spectral, core_then_random, random unchanged): ok
 - H4 FPr: smallest_lp ties random: no (smallest_lp/random 1.542 [1.539, 1.544], 1.540 [1.535, 1.545], 1.540 [1.532, 1.548]); best centrality spectral beats random: yes
 - H4 SYNr: smallest_lp ties random: no (smallest_lp/random 2.667 [2.640, 2.697]); best centrality spectral beats random: yes
 - H5 (SYN, 0.25): smallest_lp/degree 1.174 [1.168, 1.181]; smallest_lp/spectral 1.100 [1.086, 1.118]; smallest_lp/random 3.297 [3.250, 3.351]
-- H6: blocked: no REAL stream (root crate did not produce lp_graph_collect)
+- H6: see real table
