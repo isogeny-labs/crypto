@@ -1040,6 +1040,35 @@ already have counterexamples; the first remaining subgroup
 has no exactness certificate or measured direct cost.
 [pcc:unverified]
 
+A reproducible *point-operation* estimate sharpens the illustrative
+`C=384` line. The arithmetic-only
+[`direct_coset_cost.py`](direct_coset_cost.py) searches the first
+100,000 powers of a certified quotient generator `h=3^t` for
+`t=n/m`, retaining powers coprime to `m`. Its best signed-digit
+representative is `u=min(h^45273,-h^45273) mod r`, with 181
+digits and weight 52. Iterating `[u]` on a point uses 180
+doublings and 51 additions per next factor in the binary
+nonadjacent form, or 231 group operations under an optimistic
+unit-cost count. Two cold traversals cost `2(m-1)·231`, about
+`0.5035R≈2^94.836` such operations. Since the raw `u^j`
+indices represent the same quotient coset as the positive
+indices, their product differs only by a fixed sign independent
+of the input marking; that sign cancels in the base/target
+character ratio. [pcc:unverified]
+
+In Jacobian coordinates `x=X/Z², y=Y/Z³`, each nonidentity
+factor satisfies `χ_p(y)=χ_p(YZ)` when `Z≠0` because the
+exponents 3 and 1 have the same parity. Thus the character
+of the whole oriented product can be formed from projective
+coordinates and one final field-character computation, without
+an affine inversion for every factor. This is an algebraic
+accounting observation, not a measured implementation: field
+multiplications, memory traffic, setup, the relative costs of
+doublings and additions, and the final character computation
+must be charged. Above all, the first large coset has not
+passed the P-192 exactness gate; the operation estimate is
+conditional on that missing identity. [pcc:unverified]
+
 For the first large P-192 subgroup size beyond 95,560,
 `m=8·9564682313913860059195669≈2^85.984`, a **hypothetical**
 additive paired-index grid with `h=6,185,364,116,659` offsets,
