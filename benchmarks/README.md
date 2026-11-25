@@ -46,6 +46,15 @@ is preserved separately pending validation admission.
 
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 
+The [25 November Curve25519 projective-split qualification](20261125-curve25519-projective-split/)
+retains the frozen `m=3` counted-F4 comparison: candidate/baseline ratios
+`1.001116` at `t=3` and `1.000464` at `t=4`; both `t=5` arms timed out and
+both `t=6` arms were memory-killed before one target. It is not qualified for
+`m=4`, supplies no exponent or subexponential claim, and remains outside the
+admitted table because no independent replay, validator report, matched-rho
+reference, or `VALIDATION.json` exists. [Study](../research/curve25519_projective_split_20261118/),
+[PDF](20261125-curve25519-projective-split/report.pdf). [pcc:unverified]
+
 The [17 November native Rust identity component study](20261117-native-identity/) has checked pipeline full-paid paired medians1.306792/1.286039/1.254269 and work medians3.242510/3.067128/2.907275 at n3/4/6,25mainblocks each,AMD EPYC9V74 localL0. Ordinary95 controls reject n4/n6; prospective simultaneous screens pass. The unsigned synthetic polynomial-kernel result remains outside the admitted table; no15x claim. [Study](../research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md),[PDF](20261117-native-identity/results-report.pdf). [pcc:unverified]
 
 The [29 October synthetic generator-study planning record](20261029-generator-preflight/)

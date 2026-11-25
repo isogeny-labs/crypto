@@ -2114,7 +2114,7 @@ fn f4cost_m(
         done += 1;
     }
     let tot = oracle.solver_totals().unwrap_or_default();
-    let native = oracle.relation_counters();
+    let native_random = oracle.relation_counters();
     let per_target = tot.ops as f64 / done.max(1) as f64;
     let learn_muladds = oracle
         .setup_native()
@@ -2161,6 +2161,7 @@ fn f4cost_m(
         p_done += 1;
     }
     let p_ops = oracle.solver_totals().map_or(0, |t| t.ops) - p_ops0;
+    let native_including_planted = oracle.relation_counters();
     // Exact coverage of the base at this m: the fraction of the subgroup that
     // is a sum of m base points (the hit rate an ideal oracle would see).
     let all = crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points(
@@ -2236,11 +2237,12 @@ fn f4cost_m(
         "muladds_per_hit": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
         "setup_group_ops": setup_ops.adds + setup_ops.doubles,
         "setup_native": oracle.setup_native(),
-        "poly_terms_per_specialisation": native.get("pkm_system_terms").copied().unwrap_or(0) as f64
-            / native.get("pkm_system_specialisations").copied().unwrap_or(1).max(1) as f64,
+        "poly_terms_per_specialisation": native_random.get("pkm_system_terms").copied().unwrap_or(0) as f64
+            / native_random.get("pkm_system_specialisations").copied().unwrap_or(1).max(1) as f64,
         "hits": hits, "hits_verified": verified,
         "hit_rate": hits as f64 / done.max(1) as f64, "max_nnz_cap": max_nnz,
-        "native": native,
+        "native": native_random,
+        "native_including_planted": native_including_planted,
     });
     out["solver_extra"] = json!(tot.extra);
     out["covered_projected_points"] = json!(covered_projected);

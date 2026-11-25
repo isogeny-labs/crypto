@@ -861,6 +861,39 @@ pub struct PkmSemaevOracle {
 }
 
 impl PkmSemaevOracle {
+    /// Record which normalized projective chart supplied an exact, signed
+    /// relation. Classification is made from the lifted points, not from an
+    /// algebraic root alone: the first two summands reach `(1:0)` exactly
+    /// when they are inverses. The zero-valued invalid-row counter is
+    /// materialized as well so evidence consumers need not interpret a
+    /// missing key as a successful verification.
+    fn record_projective_chart(
+        &mut self,
+        curve: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        idx: &[usize],
+    ) {
+        if self.mode != PkmMode::Projective || idx.len() != 3 {
+            return;
+        }
+        self.native.entry("pkm_invalid_rows".into()).or_insert(0);
+        let p = curve.p;
+        let a = fb.points[idx[0]];
+        let b = fb.points[idx[1]];
+        let identity = !a.infinity
+            && !b.infinity
+            && a.x == b.x
+            && addm(a.y, b.y, p) == 0;
+        self.bump(
+            if identity {
+                "pkm_projective_identity_chart_hits"
+            } else {
+                "pkm_projective_affine_chart_hits"
+            },
+            1,
+        );
+    }
+
     /// `m` summands over the Kummer tower `g·μ_{2^t}`.
     pub fn new(m: u32, t: u32, g: u64) -> Self {
         PkmSemaevOracle {
@@ -1892,6 +1925,7 @@ impl PkmSemaevOracle {
                 any = true;
                 if xs.iter().all(|x| fb.x_index.contains_key(x)) {
                     if let Some(idx) = lift_abscissae(curve, fb, ops, xs, *t) {
+                        self.record_projective_chart(curve, fb, &idx);
                         if i != 0 {
                             self.bump("pkm_lift_hits_nonidentity", 1);
                         }
@@ -2211,6 +2245,15 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         counters: &mut OracleCounters,
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
+        self.native.entry("pkm_invalid_rows".into()).or_insert(0);
+        if self.mode == PkmMode::Projective {
+            self.native
+                .entry("pkm_projective_affine_chart_hits".into())
+                .or_insert(0);
+            self.native
+                .entry("pkm_projective_identity_chart_hits".into())
+                .or_insert(0);
+        }
         if !self.in_lift {
             self.shared_pts.clear();
             if let Some(ks) = self
@@ -2513,6 +2556,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             }
             if xs.iter().all(|x| fb.x_index.contains_key(x)) {
                 if let Some(idx) = lift_abscissae(curve, fb, ops, xs, point) {
+                    self.record_projective_chart(curve, fb, &idx);
                     return Some(idx);
                 }
             }
@@ -2768,6 +2812,27 @@ mod tests {
 
         let invalid = one.sub(&zero, p).mul(&zero.sub(&one, p), p);
         assert!(!invalid.terms.is_empty(), "normalization excludes (0:0)");
+
+        let mut witness_ops = GroupOps::default();
+        let inverse_witness = lift_abscissae(
+            curve,
+            &fb,
+            &mut witness_ops,
+            &[g.x, g.x, q.x],
+            q,
+        )
+        .expect("the inverse-pair identity witness lifts with signs");
+        assert_eq!(sum(curve, &fb, &inverse_witness), q);
+        assert!(
+            curve
+                .add(
+                    &mut GroupOps::default(),
+                    fb.points[inverse_witness[0]],
+                    fb.points[inverse_witness[1]],
+                )
+                .infinity,
+            "the accepted witness actually traverses the identity chart"
+        );
 
         let mut projective = oracle(&inst, &fb, 3, 3, "m=3,mode=projective");
         let mut ops = GroupOps::default();
