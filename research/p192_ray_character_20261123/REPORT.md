@@ -1517,6 +1517,35 @@ the diagnostic `d·[h]φ(G)` route. The reproducible
 retain the exact endpoint identifiers, marks, seeds, timings,
 and all 5,120 sampled scalar/sign pairs. [pcc:unverified]
 
+The same degree-5 endpoint was screened at the other P-192
+subgroup sizes below the first large coset. At `m=40` and
+`m=19,112`, the full base product has sign `+1` and the full
+`[2]` product sign `−1`, contradicting `χ_r(2)=+1`.
+At `m=95,560`, both base and `[2]` full products have sign
+`+1`, so the base doubling check passes. The full `[3]`
+product also has sign `+1`; its normalized ratio is `+1`
+against `χ_r(3)=−1`. This gives an explicit, independent
+exactness falsifier at each of the four short even subgroup
+orders on this endpoint. It does not test larger cosets or
+more distant CM classes. [pcc:unverified]
+
+[`horizontal_short_coset_screen.sage`](horizontal_short_coset_screen.sage)
+computes these products via the bounded division-polynomial
+recurrence, checking its first four terms against direct
+point multiplication in every run. Each 95,560-factor
+marking was split into 20 disjoint sorted-index blocks of at
+most 5,000 factors; the product of their character signs is
+the full character. The 60 raw blocks, interval boundaries,
+source hashes, and completed-sign summary are in
+[`SHORT_M95560_SEGMENTS.jsonl`](SHORT_M95560_SEGMENTS.jsonl).
+The `m=40` and `m=19,112` rows are in
+[`SHORT_M40_M19112_SEGMENTS.jsonl`](SHORT_M40_M19112_SEGMENTS.jsonl).
+The initial unchunked 95,560-factor command was interrupted
+after printing only its base sign, so the comparison uses
+the separately completed block replay. These are known-marking
+exactness checks, not a measured cold arbitrary-target
+evaluator. [pcc:unverified]
+
 The finite controls also rule out two shortcuts from CM data
 alone. The same replay fixes `p=223`, `r=241`, and `m=24`:
 `y²=x³+8x+7` is exact on all 120 signed classes, while
