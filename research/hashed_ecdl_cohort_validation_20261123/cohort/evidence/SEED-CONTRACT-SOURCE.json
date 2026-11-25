@@ -1,0 +1,17 @@
+{
+  "scope": "source read, not checker execution or canonical acceptance",
+  "source": "/workspace/classical-ecdlp-validation-ready/tools/experiment_protocol.py",
+  "source_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+  "checkout_commit": "0396dc3397e276baac955cccfa4c4237d960955e",
+  "excerpts": [
+    {
+      "first_line": 350,
+      "text": "def seeds_table(p: dict[str, Any], nonce: str | None = None) -> list[dict[str, Any]]:\n    sd = p[\"randomization\"][\"seed_derivation\"]\n    sha = p[\"freeze\"][\"protocol_sha256\"] or protocol_hash(p)\n    if sd[\"method\"] == \"external_nonce\" and not nonce:\n        raise Refused(\"external_nonce seeds require the post-freeze nonce\")\n    rows = []\n    n_inst, n_rep = p[\"sample_size\"][\"instances\"], p[\"sample_size\"][\"replicates\"]\n    explicit = sd.get(\"seeds\") or []\n    k = 0\n    for arm in p[\"arms\"]:\n        for i in range(n_inst):\n            for r in range(n_rep):\n                if sd[\"method\"] == \"protocol_hash_sha256\":\n                    seed: int | str = derive_seed(sha, arm[\"id\"], str(i), r)\n                elif sd[\"method\"] == \"explicit_list\":\n                    seed = explicit[k % len(explicit)] if explicit else \"\"\n                    k += 1\n                elif sd[\"method\"] == \"harness_drawn\":\n                    seed = \"\"\n                else:\n                    seed = derive_seed(sha + \":\" + str(nonce), arm[\"id\"], str(i), r)\n                rows.append({\"arm\": arm[\"id\"], \"instance\": str(i), \"replicate\": r, \"seed\": seed})\n    return rows\n\n\ndef freeze(path: Path, commit: str | None, filed_before: bool) -> dict[str, Any]:"
+    },
+    {
+      "first_line": 508,
+      "text": "        seed_method = protocol[\"randomization\"][\"seed_derivation\"][\"method\"]\n        nonce = e[\"protocol\"].get(\"seed_nonce\")\n        if seed_method == \"external_nonce\" and not nonce:\n            f.append(\"external_nonce export is missing protocol.seed_nonce\")\n        elif seed_method != \"harness_drawn\":\n            table = {(s[\"arm\"], s[\"instance\"], s[\"replicate\"]): s[\"seed\"] for s in seeds_table(protocol, nonce)}\n            for r in measured:\n                key = (r[\"arm\"], r[\"instance_id\"], r[\"replicate\"])\n                if key not in table:\n                    f.append(f\"run {r['run_id']}: execution cell is outside the protocol-derived seed table\")\n                elif r[\"seed\"] is None or str(r[\"seed\"]) != str(table[key]):\n                    f.append(f\"run {r['run_id']}: seed {r['seed']} is not the protocol-derived seed {table[key]}\")\n    if verify_files and base is not None:\n        files = e[\"files\"] + [a for r in e[\"runs\"] for a in r[\"artifacts\"]] + e[\"analysis\"][\"outputs\"]"
+    }
+  ],
+  "consequence": "harness_drawn selects empty canonical derived seeds and skips canonical seed-table comparison; native fixed target/seed bindings must remain a separate required gate"
+}
