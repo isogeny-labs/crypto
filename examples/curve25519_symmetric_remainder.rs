@@ -586,10 +586,12 @@ fn dlog_table(curve: Curve, generator: Point, r: u64) -> HashMap<Point, u64> {
     table
 }
 
-fn planted_targets(cfg: Config, d: u64) -> Result<Vec<Target>, String> {
+fn planted_targets_with_logs(
+    cfg: Config,
+    d: u64,
+    logs: &HashMap<Point, u64>,
+) -> Result<Vec<Target>, String> {
     let roots = roots_of_unity(cfg.curve.p, d)?;
-    let generator = Point(Some((GX, GY)));
-    let logs = dlog_table(cfg.curve, generator, R);
     let mut base = Vec::new();
     for (i, &w) in roots.iter().enumerate() {
         let x = addm(cfg.lo, mulm(cfg.g, w, cfg.curve.p), cfg.curve.p);
@@ -597,7 +599,7 @@ fn planted_targets(cfg: Config, d: u64) -> Result<Vec<Target>, String> {
             base.push((i, w, Point(Some((x, y)))));
         }
     }
-    let mut seen = HashSet::new();
+    let mut seen_x = HashSet::new();
     let mut out = Vec::new();
     for i in 0..base.len() {
         for j in i + 1..base.len() {
@@ -618,7 +620,8 @@ fn planted_targets(cfg: Config, d: u64) -> Result<Vec<Target>, String> {
                     let Some(&scalar) = logs.get(&sum) else {
                         continue;
                     };
-                    if scalar == 0 || !seen.insert(scalar) {
+                    let target_x = sum.0.unwrap().0;
+                    if scalar == 0 || !seen_x.insert(target_x) {
                         continue;
                     }
                     out.push(Target {
@@ -633,6 +636,42 @@ fn planted_targets(cfg: Config, d: u64) -> Result<Vec<Target>, String> {
         }
     }
     Ok(out)
+}
+
+fn planted_targets(cfg: Config, d: u64) -> Result<Vec<Target>, String> {
+    let logs = dlog_table(cfg.curve, Point(Some((GX, GY))), R);
+    planted_targets_with_logs(cfg, d, &logs)
+}
+
+fn run_search_g() -> Result<(), String> {
+    let curve = Curve { p: P, a: A, b: B };
+    let logs = dlog_table(curve, Point(Some((GX, GY))), R);
+    for g in 1..P {
+        let cfg = Config { curve, lo: LO, g };
+        let d7 = planted_targets_with_logs(cfg, 7, &logs)?;
+        if d7.len() < 4 {
+            continue;
+        }
+        let d9 = planted_targets_with_logs(cfg, 9, &logs)?;
+        if d9.len() < 4 {
+            continue;
+        }
+        let d19 = planted_targets_with_logs(cfg, 19, &logs)?;
+        if d19.len() < 4 {
+            continue;
+        }
+        println!(
+            "{}",
+            serde_json::json!({
+                "schema": "curve25519.symmetric-remainder-g-search/v1",
+                "selection": "first positive integer g with at least four distinct planted subgroup target abscissae at every qualification order",
+                "g": g,
+                "planted_distinct_target_x": {"7": d7.len(), "9": d9.len(), "19": d19.len()}
+            })
+        );
+        return Ok(());
+    }
+    Err("no g satisfies the planted-target preflight".into())
 }
 
 fn random_target(cfg: Config, d: u64, index: u64, seed: u64) -> Target {
@@ -949,8 +988,9 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let result = match args.get(1).map(String::as_str) {
         Some("selftest") => run_selftest(),
+        Some("search-g") => run_search_g(),
         Some("cell") => run_cell(&args[2..]),
-        _ => Err("usage: curve25519_symmetric_remainder selftest | cell --arm direct|quotient --d N --kind random|planted --index I [--cap 300 --dmax 24 --seed 20261125]".into()),
+        _ => Err("usage: curve25519_symmetric_remainder selftest | search-g | cell --arm direct|quotient --d N --kind random|planted --index I [--cap 300 --dmax 24 --seed 20261125]".into()),
     };
     if let Err(e) = result {
         eprintln!("curve25519_symmetric_remainder: {e}");
