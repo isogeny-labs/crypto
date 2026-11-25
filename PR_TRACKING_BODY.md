@@ -1,0 +1,5 @@
+Recover a source-coherent current-root baseline for the original 15× relation pipeline. PR #5078 already owns main-build repairs; this lane will audit and qualify the relevant repair history for the relation integration, preserving every maintained algorithm, test, frozen failure and strongest control. [pcc:unverified]
+
+Planned checks: bind canonical and repair commits, verify source/API coherence, run the unfiltered current-root release library suite, inspect the already-present certified.rs integration and requalify its declared 36-case matrix in the coherent current context. Any failed or resource-limited attempt remains evidence. This tracking step does not establish a current-root pass or speedup. [pcc:unverified]
+
+Build/correctness work uses UserLocalCPU0, one numerical thread, zero cloud and the persistent checkpoint/S3 waiver. The original prospective full-boundary, strongest-control, six-case, repetition/A/A and complete-proof requirements remain unchanged; actual timing still needs its original protocol conditions. PR #5102 remains the completed diagnostic component with separate publication gates. Original 15× remains unachieved. [pcc:unverified]
