@@ -1557,6 +1557,33 @@ sign evaluator on P-192**. Four selected markings cannot estimate
 its full-group bias; no useful-bias or cold-cost claim follows.
 [pcc:unverified]
 
+### Trace-index division-polynomial residue screen
+
+A separate fixed-index screen evaluated the quadratic character
+of `ψ_k(P)` at six public P-192 markings `d=1,2,3,5,7,11`.
+The 11 odd indices are built from the half-order, inverse
+powers of two, `r−2`, `r−4`, `r−6`, and Frobenius trace
+`t=p+1−r`; their formulas and the complete six-point rows
+are in [`division_feature_screen.py`](division_feature_screen.py)
+and [`DIVISION_FEATURE_SAMPLES.jsonl`](DIVISION_FEATURE_SAMPLES.jsonl).
+Each sign is normalized by its value at `G`. The index
+`k=t−2=31607402316713927207482677197` matched `χ_r(d)`
+at all six selection markings, but a disjoint check at
+`d=10` gave feature sign `−1` against scalar sign `+1`.
+Thus this specific logarithmic-depth division-polynomial
+feature is not exact on P-192. [pcc:unverified]
+
+Two seeded uniform-marking diagnostics for the selected
+`k=t−2` feature found 117/256 agreements (seed 20261125)
+and 2014/4096 (fresh seed 20261126). The latter has estimated
+correlation `−0.01660`; its approximate 95% Wilson interval
+after converting from agreement to correlation is
+`[−0.0472,0.0140]`. Zero remains compatible with that sample.
+The file retains each sampled scalar and both signs. These
+samples neither prove zero bias nor certify a correlation
+large enough for a cold below-rho sign computation; a full
+cost and calibration would also be required. [pcc:unverified]
+
 ### Oracle-model check: EDS residue and shifted Legendre
 
 Two published oracle problems are adjacent to this sign goal but do
