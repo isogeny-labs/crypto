@@ -1111,6 +1111,25 @@ checks all 120 marked classes and finds
 exhaustive finite identity for that curve, not a transfer
 theorem for P-192. [pcc:unverified]
 
+The same replay supplies a matched negative control at the
+same scalar order and subgroup size. On
+`E/F_271: y²=x³+7x+3`, with `G=(1,108)` and `r=241`,
+the order-24 `y`-product disagrees on 72 of the 120 marked
+classes. They form exactly three complete cosets of `H`
+(primitive-scalar exponents 2, 3, and 4 among the five
+cosets). Thus the required subgroup transformation holds,
+but full exactness depends on the curve. [pcc:unverified]
+
+For triage only, an artificial null model assigns independent
+uniform signs to the `n=(r-1)/2` base-point `y`-coordinates.
+The `t=n/m` coset products then have independent signs;
+after normalizing the base coset, exactness on every marking
+imposes `t-1` independent sign constraints and has model
+probability `2^(-(t-1))`. The positive order-241 control
+shows why this model is not a deterministic exclusion. Its
+independence assumption is unverified for elliptic-curve
+coordinates, especially at P-192 size. [pcc:unverified]
+
 The same replay exhausts paired index grids for this subgroup.
 There is no disjoint 2-by-2 grid `I±J⊂H`; consequently a
 larger grid with at least two centers and two offsets is also

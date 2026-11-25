@@ -1,8 +1,8 @@
 """Finite control for the proper-subgroup y-product and paired index grids.
 
 Run with ``sage -python research/p192_ray_character_20261123/y_coset_small_control.sage``.
-This checks every marked class on one 241-point curve and exhausts the
-2-by-2 paired grids in its 24-class scalar subgroup.
+This checks every marked class on two curves of order 241 and exhausts
+the 2-by-2 paired grids in their common 24-class scalar subgroup.
 """
 
 from itertools import combinations
@@ -10,11 +10,7 @@ from itertools import combinations
 from sage.all import EllipticCurve, GF, ZZ, kronecker
 
 
-p, r, m = 223, 241, 24
-curve = EllipticCurve(GF(p), [8, 7])
-assert curve.order() == r
-base = curve(0, 26)
-assert base.order() == r
+r, m = 241, 24
 half = (r - 1) // 2
 generator = int(GF(r).multiplicative_generator())
 subgroup_generator = pow(generator, half // m, r)
@@ -29,7 +25,7 @@ classes = {class_rep(pow(subgroup_generator, j, r)) for j in range(m)}
 assert len(classes) == m
 
 
-def y_sign(point):
+def y_sign(point, p):
     product = GF(p)(1)
     for scalar in classes:
         product *= (scalar * point)[1]
@@ -37,11 +33,34 @@ def y_sign(point):
     return int(kronecker(ZZ(product), p))
 
 
-base_sign = y_sign(base)
-for scalar in range(1, half + 1):
-    observed = y_sign(scalar * base) * base_sign
-    expected = int(kronecker(scalar, r))
-    assert observed == expected, (scalar, observed, expected)
+controls = (
+    (223, 8, 7, 0, 26, set()),
+    (271, 7, 3, 1, 108, {2, 3, 4}),
+)
+for p, a, b, gx, gy, expected_bad_cosets in controls:
+    curve = EllipticCurve(GF(p), [a, b])
+    assert curve.order() == r
+    base = curve(gx, gy)
+    assert base.order() == r
+    base_sign = y_sign(base, p)
+    bad = {
+        scalar
+        for scalar in range(1, half + 1)
+        if y_sign(scalar * base, p) * base_sign
+        != int(kronecker(scalar, r))
+    }
+    bad_cosets = {
+        exponent
+        for exponent in range(half // m)
+        if min(pow(generator, exponent, r), r - pow(generator, exponent, r))
+        in bad
+    }
+    assert bad_cosets == expected_bad_cosets, (p, bad_cosets)
+    assert len(bad) == m * len(bad_cosets), (p, len(bad))
+    print(
+        f"p={p} r={r} m={m} checked_classes={half} "
+        f"mismatches={len(bad)} bad_cosets={sorted(bad_cosets)}"
+    )
 
 
 # A paired grid has distinct classes i+j and i-j for every (i,j),
@@ -93,7 +112,6 @@ for first, second in combinations(range(1, half + 1), 2):
 
 assert best_single == 4
 print(
-    f"p={p} r={r} m={m} checked_classes={half} "
-    f"exact_y_sign=true max_single_center_offsets={best_single} "
+    f"r={r} m={m} max_single_center_offsets={best_single} "
     "disjoint_2x2_grids=0"
 )
