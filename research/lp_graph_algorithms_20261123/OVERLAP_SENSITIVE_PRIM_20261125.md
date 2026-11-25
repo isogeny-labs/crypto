@@ -38,7 +38,7 @@ column other than `j`, or a source id.
   overlaps `m`, the explicit edge `(m,u)` is strictly below `K(m,u)` and below
   every other implicit candidate. Over all `u`, `K(m,u)` is minimized by the
   first unvisited `u` in `(w,q,index)` order, and if that `u` overlaps `m` the
-  explicit `(m,u)` edge already beats it. Hence each Prim step picks
+  explicit `(m,u)` edge is already smaller. Hence each Prim step picks
   `min(best explicit edge in a lazy heap, K(m, first unvisited))`.
   Keys include `(v,u)`, so ties break exactly as in the exhaustive Prim.
 * **Materialization.** A selected implicit edge is formed by the same
@@ -48,7 +48,7 @@ column other than `j`, or a source id.
   `implicit_key_mismatches` (tests require 0).
 
 Two earlier ingredients were removed after mutation testing showed they could
-not change the result, which the bullets above prove: a per-row "exceptional
+not change the result, as the bullets above show: a per-row "exceptional
 best disjoint endpoint" for rows overlapping `m`, and an overlap skip in the
 implicit scan.
 
