@@ -17,14 +17,26 @@ fn pool(seed: u64, rows: usize, lp: u64, unit: bool, modulus: u64) -> Vec<Partia
         unit_coefficients: unit,
         ..SyntheticParams::default()
     };
-    split_by_arity(&synthetic_stream(&p, modulus), modulus).unwrap().0
+    split_by_arity(&synthetic_stream(&p, modulus), modulus)
+        .unwrap()
+        .0
 }
 
 /// Rows whose LP coefficients cancel mod ℓ are complete, not partials.
 #[test]
 fn cancelling_rows_split_as_complete() {
-    let mk = |large: Vec<(u64, u64)>| PartialRelation { id: 0, small: vec![], large, rhs: 0 };
-    let rels = vec![mk(vec![(5, 1), (5, 2)]), mk(vec![(5, 1), (5, 1)]), mk(vec![(5, 1), (7, 1)]), mk(vec![])];
+    let mk = |large: Vec<(u64, u64)>| PartialRelation {
+        id: 0,
+        small: vec![],
+        large,
+        rhs: 0,
+    };
+    let rels = vec![
+        mk(vec![(5, 1), (5, 2)]),
+        mk(vec![(5, 1), (5, 1)]),
+        mk(vec![(5, 1), (7, 1)]),
+        mk(vec![]),
+    ];
     let (partials, complete, wide) = split_by_arity(&rels, 3).unwrap();
     assert_eq!((partials.len(), complete.len(), wide), (2, 2, 0));
 }
@@ -45,7 +57,10 @@ fn useful_rank_matches_dense_rank_for_every_policy() {
                     let subset: Vec<_> = kept.iter().map(|&i| rels[i].clone()).collect();
                     let idx = LpIndex::build(&subset, ell).unwrap();
                     let dense = dense_rank(&idx.rows, idx.num_columns(), ell).unwrap();
-                    assert_eq!(snap.rank, dense, "ell={ell} seed={seed} unit={unit} {policy:?}");
+                    assert_eq!(
+                        snap.rank, dense,
+                        "ell={ell} seed={seed} unit={unit} {policy:?}"
+                    );
                     assert_eq!(snap.left_nullity, kept.len() - dense);
                     let b1 = cycle_count(&rels, ell, &kept).unwrap();
                     assert!(snap.left_nullity <= b1, "useful rank above the cycle count");
@@ -74,17 +89,43 @@ fn budget_is_exact_sorted_distinct_and_deterministic() {
     let r2 = retain(&rels, ell, 100, RetentionPolicy::Random, 2).unwrap();
     assert_ne!(r1, r2);
     let d1 = retain(&rels, ell, 100, RetentionPolicy::Degree, 1).unwrap();
-    assert_eq!(d1, retain(&rels, ell, 100, RetentionPolicy::Degree, 2).unwrap());
+    assert_eq!(
+        d1,
+        retain(&rels, ell, 100, RetentionPolicy::Degree, 2).unwrap()
+    );
 }
 
 #[test]
 fn complete_and_wide_rows_are_refused() {
     let ell = 101;
-    let mk = |large: Vec<(u64, u64)>| PartialRelation { id: 0, small: vec![], large, rhs: 0 };
-    let e = retain(&[mk(vec![(5, 1)]), mk(vec![])], ell, 1, RetentionPolicy::Degree, 0);
-    assert_eq!(e, Err(RetentionError::UnsupportedArity { row: 1, arity: 0 }));
-    let e = retain(&[mk(vec![(5, 1), (7, 1), (9, 1)])], ell, 1, RetentionPolicy::Degree, 0);
-    assert_eq!(e, Err(RetentionError::UnsupportedArity { row: 0, arity: 3 }));
+    let mk = |large: Vec<(u64, u64)>| PartialRelation {
+        id: 0,
+        small: vec![],
+        large,
+        rhs: 0,
+    };
+    let e = retain(
+        &[mk(vec![(5, 1)]), mk(vec![])],
+        ell,
+        1,
+        RetentionPolicy::Degree,
+        0,
+    );
+    assert_eq!(
+        e,
+        Err(RetentionError::UnsupportedArity { row: 1, arity: 0 })
+    );
+    let e = retain(
+        &[mk(vec![(5, 1), (7, 1), (9, 1)])],
+        ell,
+        1,
+        RetentionPolicy::Degree,
+        0,
+    );
+    assert_eq!(
+        e,
+        Err(RetentionError::UnsupportedArity { row: 0, arity: 3 })
+    );
 }
 
 /// Hand-checked graph: triangle a-b-c (odd, unit coefficients: unbalanced, so
@@ -100,9 +141,15 @@ fn hand_graph_counts() {
         rhs: 0,
     };
     let rels = vec![
-        mk(0, vec![1, 2]), mk(1, vec![2, 3]), mk(2, vec![3, 1]),
-        mk(3, vec![4, 5]), mk(4, vec![5, 6]), mk(5, vec![6, 7]), mk(6, vec![7, 4]),
-        mk(7, vec![8]), mk(8, vec![8]),
+        mk(0, vec![1, 2]),
+        mk(1, vec![2, 3]),
+        mk(2, vec![3, 1]),
+        mk(3, vec![4, 5]),
+        mk(4, vec![5, 6]),
+        mk(5, vec![6, 7]),
+        mk(6, vec![7, 4]),
+        mk(7, vec![8]),
+        mk(8, vec![8]),
     ];
     let all: Vec<usize> = (0..rels.len()).collect();
     let snap = useful_rank(&rels, ell, &all).unwrap();
@@ -127,7 +174,9 @@ fn fp_toy_collects_replays_and_ranks() {
     assert_eq!(fp_toy::replay(&bad), Err(0));
     let n = col.partials.len();
     let out = compare_policies(&col.partials, inst.ell, n / 4, &RetentionPolicy::ALL, 0).unwrap();
-    assert!(out.iter().all(|o| o.kept == n / 4 && o.rank.left_nullity <= o.cycle_count));
+    assert!(out
+        .iter()
+        .all(|o| o.kept == n / 4 && o.rank.left_nullity <= o.cycle_count));
 }
 
 /// SinglesThenSpectral keeps every one-LP row before any two-LP row.

@@ -144,7 +144,8 @@ fn main() {
             for r in 0..repeats {
                 let seed = base + r;
                 let col = fp_toy::collect(&inst, smooth, lp, draws, seed);
-                let replayed = fp_toy::replay(&col).unwrap_or_else(|i| panic!("replay failed at row {i}"));
+                let replayed =
+                    fp_toy::replay(&col).unwrap_or_else(|i| panic!("replay failed at row {i}"));
                 let (pool, _, wide) = split_by_arity(&col.partials, modulus).expect("split");
                 batches.push((seed, pool, col.complete, wide, Some(replayed)));
                 if !dump.is_empty() {
@@ -153,10 +154,17 @@ fn main() {
             }
         }
         "synthetic" => {
-            modulus = get("--modulus", &((1u64 << 61) - 1).to_string()).parse().unwrap();
-            let arity: Vec<u64> = get("--arity", "0,6,12").split(',').map(|x| x.parse().unwrap()).collect();
+            modulus = get("--modulus", &((1u64 << 61) - 1).to_string())
+                .parse()
+                .unwrap();
+            let arity: Vec<u64> = get("--arity", "0,6,12")
+                .split(',')
+                .map(|x| x.parse().unwrap())
+                .collect();
             let rows: usize = get("--rows", "40000").parse().unwrap();
-            let lp_columns: u64 = get("--lp-columns", &(2 * rows as u64 / 3).to_string()).parse().unwrap();
+            let lp_columns: u64 = get("--lp-columns", &(2 * rows as u64 / 3).to_string())
+                .parse()
+                .unwrap();
             let unit = args.iter().any(|a| a == "--unit");
             params = serde_json::json!({"rows": rows, "lp_columns": lp_columns, "arity_weights": arity, "unit": unit});
             for r in 0..repeats {
@@ -169,12 +177,15 @@ fn main() {
                     unit_coefficients: unit,
                     ..SyntheticParams::default()
                 };
-                let (pool, complete, wide) = split_by_arity(&synthetic_stream(&sp, modulus), modulus).expect("split");
+                let (pool, complete, wide) =
+                    split_by_arity(&synthetic_stream(&sp, modulus), modulus).expect("split");
                 batches.push((seed, pool, complete.len(), wide, None));
             }
         }
         "relations" => {
-            modulus = get("--modulus", "0").parse().expect("--modulus (the relation prime ℓ)");
+            modulus = get("--modulus", "0")
+                .parse()
+                .expect("--modulus (the relation prime ℓ)");
             let path = get("--relations", "");
             let f = std::io::BufReader::new(std::fs::File::open(&path).expect("--relations"));
             let rels: Vec<PartialRelation> = f
@@ -212,7 +223,15 @@ fn main() {
             budgets[0].fraction,
             line.join(" ")
         );
-        out.push(Repeat { seed, pool: pool.len(), complete, dropped_wide: wide, replayed, full, budgets });
+        out.push(Repeat {
+            seed,
+            pool: pool.len(),
+            complete,
+            dropped_wide: wide,
+            replayed,
+            full,
+            budgets,
+        });
     }
     let report = Report {
         schema: "lp-retention-eval/v1",

@@ -78,7 +78,10 @@ impl RetentionPolicy {
 pub enum RetentionError {
     Graph(LpGraphError),
     /// A row has no large prime (a complete relation) or more than two.
-    UnsupportedArity { row: usize, arity: usize },
+    UnsupportedArity {
+        row: usize,
+        arity: usize,
+    },
 }
 
 impl From<LpGraphError> for RetentionError {
@@ -247,7 +250,10 @@ pub fn retain(
             let score: Vec<f64> = (0..n).map(|i| g.lp_ends(i).map(|v| w[v]).sum()).collect();
             let arity = |i: usize| g.lp_ends(i).count();
             order.sort_by(|&a, &b| {
-                arity(a).cmp(&arity(b)).then(score[b].total_cmp(&score[a])).then(a.cmp(&b))
+                arity(a)
+                    .cmp(&arity(b))
+                    .then(score[b].total_cmp(&score[a]))
+                    .then(a.cmp(&b))
             });
         }
         RetentionPolicy::CoreThenRandom => {
@@ -355,8 +361,8 @@ pub fn compare_policies(
 /// solver: it emits `PartialRelation`s with logs taken modulo `ℓ`, the largest
 /// prime factor of `p − 1`, and replays every relation it emits.
 pub mod fp_toy {
-    use super::SplitMix;
     use super::super::super::large_prime_filter::PartialRelation;
+    use super::SplitMix;
     use serde::{Deserialize, Serialize};
 
     fn pow_mod(mut b: u64, mut e: u64, p: u64) -> u64 {

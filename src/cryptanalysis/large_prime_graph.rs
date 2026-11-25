@@ -38,9 +38,9 @@ use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, VecDeque};
 
 pub mod block_wiedemann;
 pub mod eval;
-pub mod witness;
 pub mod projected_rank;
 pub mod retention;
+pub mod witness;
 
 // ---------------------------------------------------------------------------
 // Field helpers (uncounted; the evaluator times phases instead)
@@ -98,7 +98,9 @@ pub enum LpGraphError {
     },
     /// A direct caller supplied a zero/out-of-range coefficient or a repeated
     /// LP column. Use LpIndex::build to normalize collector input first.
-    NonCanonicalRow { row: usize },
+    NonCanonicalRow {
+        row: usize,
+    },
 }
 
 // ---------------------------------------------------------------------------
