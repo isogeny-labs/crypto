@@ -1517,6 +1517,22 @@ the diagnostic `d·[h]φ(G)` route. The reproducible
 retain the exact endpoint identifiers, marks, seeds, timings,
 and all 5,120 sampled scalar/sign pairs. [pcc:unverified]
 
+A bounded two-step extension of the endpoint screen enumerates all
+16 rational paths with each edge degree in `{5,11,13}`. These paths
+reach eight distinct endpoint `j`-invariants. Every path has a
+counterexample among the fixed public scalar marks
+`2,3,5,7,11,13,4,10,14,15,17,19,23,29,31`; for example, the
+`5→11` path fails at `d=2`, and both `5→13` paths fail by `d=3`.
+The computation checks the composite map on `[7]G` independently
+of the precomputed endpoint point. The script and complete path,
+mark, and sign rows are in
+[`two_hop_m8_screen.sage`](two_hop_m8_screen.sage) and
+[`TWO_HOP_M8_SCREEN.jsonl`](TWO_HOP_M8_SCREEN.jsonl).
+This is an exactness screen for these 16 paths at `m=8` only;
+the second edges were not classified as horizontal, and the
+result does not decide the first large P-192 coset.
+[pcc:unverified]
+
 The same degree-5 endpoint was screened at the other P-192
 subgroup sizes below the first large coset. At `m=40` and
 `m=19,112`, the full base product has sign `+1` and the full
