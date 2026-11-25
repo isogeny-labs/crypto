@@ -2,7 +2,8 @@
 
 use super::*;
 use crate::admission::dimensions::{
-    audit_node_dimensions, path_precision_envelope, NodeDimensions,
+    audit_node_dimensions, audit_uniform_history, path_precision_envelope, NodeDimensions,
+    UNIFORM_HISTORY_LAMBDA_THRESHOLD, UNIFORM_HISTORY_SCALE_FLOOR,
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::network::FnPredicate;
@@ -254,6 +255,63 @@ fn root_precision_envelope_covers_all_active_scales_and_native_increments() {
             }
         }
     }
+}
+
+#[test]
+fn uniform_history_threshold_covers_every_possible_active_depth() {
+    let audit = audit_uniform_history(UNIFORM_HISTORY_LAMBDA_THRESHOLD).unwrap();
+    assert!(audit.threshold_proof_applies);
+    assert_eq!(audit.leaf_divisor, 8_192);
+    assert_eq!(audit.root_u, 512);
+    assert_eq!(audit.scale_floor, 24);
+    assert_eq!(audit.inherited_precision_constant, 81);
+    assert_eq!(audit.normalized_precision_constant, 34);
+    assert_eq!(audit.depths.len(), 5);
+    assert_eq!(
+        audit.depths.iter().map(|case| case.u).collect::<Vec<_>>(),
+        vec![512, 256, 128, 64, 32]
+    );
+    assert!(audit.depths.iter().all(|case| {
+        case.shrink_factor < BigUint::from(audit.leaf_divisor)
+            && case.u >= UNIFORM_HISTORY_SCALE_FLOOR
+            && case.inherited_absorption_holds
+            && case.evaluation_absorption_holds
+    }));
+    assert!(audit.all_absorption_checks_hold);
+
+    // The scale-floor proof is strict at the claimed threshold: if a possible
+    // active depth had u<=23, then lambda^5<C^6*24^6, contradicting these
+    // exact endpoint values for lambda>=2^26 and C=2^17.
+    let c = BigUint::one() << 17usize;
+    assert!(
+        BigUint::from(UNIFORM_HISTORY_LAMBDA_THRESHOLD).pow(5)
+            > c.pow(6) * BigUint::from(24u8).pow(6)
+    );
+
+    // From h^5<C^3*(u+1)^3 and u>=24, h<=512*(u+1).  These two base cases,
+    // followed by a factor-at-most-two induction, establish both absorptions.
+    let u = BigUint::from(UNIFORM_HISTORY_SCALE_FLOOR);
+    assert!(BigUint::from(2u16).pow(9).pow(5) * (&u + BigUint::one()).pow(2) >= c.pow(3));
+    assert!(
+        BigUint::from(81u8) * BigUint::from(512u16) * &u * (&u + BigUint::one())
+            <= (BigUint::one() << 25usize)
+    );
+    assert!(
+        BigUint::from(8u8) * &u * (BigUint::from(2u8) * &u + BigUint::one())
+            <= (BigUint::one() << 25usize)
+    );
+}
+
+#[test]
+fn smaller_root_log_size_exposes_the_unabsorbed_deep_history() {
+    let audit = audit_uniform_history(1 << 23).unwrap();
+    assert!(!audit.threshold_proof_applies);
+    assert_eq!(audit.depths.last().unwrap().u, 8);
+    assert!(!audit.all_absorption_checks_hold);
+    assert!(audit
+        .depths
+        .iter()
+        .any(|case| !case.inherited_absorption_holds));
 }
 
 #[test]

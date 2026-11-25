@@ -194,6 +194,194 @@ pub struct PathPrecisionEnvelope {
     pub precision_bound: BigUint,
 }
 
+/// First root log-size for the elementary uniform-history absorption proof.
+///
+/// This is a threshold in `lambda=ceil(log2(s))`, not in the edge count `s`.
+pub const UNIFORM_HISTORY_LAMBDA_THRESHOLD: u64 = 1 << 26;
+
+/// Scale floor obtained at every potentially active depth above the threshold.
+pub const UNIFORM_HISTORY_SCALE_FLOOR: u64 = 24;
+
+/// Exact absorption checks at one depth that is not excluded by shrinkage and
+/// the fixed root leaf cutoff.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct UniformHistoryDepthAudit {
+    /// Zero-based recursive depth.
+    pub depth: u32,
+    /// `8^depth`; an active history requires this to be below the leaf divisor.
+    pub shrink_factor: BigUint,
+    /// Source scale `floor(lambda/(2^17*2^depth))`.
+    pub u: u64,
+    /// Twice the sum of all earlier source scales.
+    pub prior_a: u64,
+    /// Current cumulative packet exponent `prior_a+2*u`.
+    pub current_a: u64,
+    /// Left side of `81*h*u <= 2^(u+1)`.
+    pub inherited_absorption_lhs: BigUint,
+    /// Exponent on the right side of the inherited-precision check.
+    pub inherited_absorption_rhs_exponent: u64,
+    /// Whether the inherited-precision check holds at this depth.
+    pub inherited_absorption_holds: bool,
+    /// Left side of `8*u*(current_a+1) <= 2^(prior_a+u+1)`.
+    pub evaluation_absorption_lhs: BigUint,
+    /// Exponent on the right side of the evaluation-loss check.
+    pub evaluation_absorption_rhs_exponent: u64,
+    /// Whether the evaluation-loss check holds at this depth.
+    pub evaluation_absorption_holds: bool,
+}
+
+/// Finite source-schedule audit covering every depth that an active history
+/// can reach under the checked eight-fold child shrinkage.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct UniformHistoryAudit {
+    /// Symbolic root log-size `ceil(log2(s))`.
+    pub lambda: u64,
+    /// `floor(sqrt(lambda))`, used by the fixed root leaf cutoff `floor(s/h)`.
+    pub leaf_divisor: u64,
+    /// Root source scale `floor(lambda/2^17)`.
+    pub root_u: u64,
+    /// Whether the elementary all-lambda proof applies at this root size.
+    pub threshold_proof_applies: bool,
+    /// Uniform lower bound on `u` used by the threshold proof.
+    pub scale_floor: u64,
+    /// Coarse finite-history precision constant.
+    pub inherited_precision_constant: u64,
+    /// Resulting local normalized-precision constant.
+    pub normalized_precision_constant: u64,
+    /// Exact checks for every depth not excluded by the leaf/shrink argument.
+    pub depths: Vec<UniformHistoryDepthAudit>,
+    /// Whether both absorption inequalities hold at every listed depth.
+    pub all_absorption_checks_hold: bool,
+}
+
+fn floor_sqrt_u64(value: u64) -> u64 {
+    if value < 2 {
+        return value;
+    }
+    let mut lo = 1u64;
+    let mut hi = 1u64 << value.ilog2().div_ceil(2);
+    while lo + 1 < hi {
+        let mid = lo + (hi - lo) / 2;
+        if mid <= value / mid {
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
+    if hi <= value / hi {
+        hi
+    } else {
+        lo
+    }
+}
+
+fn at_most_power_of_two(value: &BigUint, exponent: u64) -> bool {
+    if value.is_zero() {
+        return true;
+    }
+    let bits = value.bits();
+    if bits <= exponent {
+        return true;
+    }
+    if bits != exponent.saturating_add(1) {
+        return false;
+    }
+    let Ok(shift) = usize::try_from(exponent) else {
+        return false;
+    };
+    value == &(BigUint::one() << shift)
+}
+
+/// Audit the precision-absorption conditions uniformly over possible active
+/// depths for one symbolic root log-size.
+///
+/// Let the root have `s` edges and `lambda=ceil(log2(s))`.  An active node at
+/// depth `d` has more than `floor(s/h)` edges for
+/// `h=floor(sqrt(lambda))`, while strict child checking gives
+/// `8^d*M_d<=s`.  Hence it can exist only when `8^d<h`; this routine audits
+/// exactly those depths.
+///
+/// For every `lambda>=2^26`, elementary integer inequalities give `u_d>=24`.
+/// They then imply both conditions checked below for all possible depths:
+/// the finite-history constant 81 is absorbed into one local unit, and the
+/// evaluation loss is absorbed into another.  Combined with the native
+/// taper bound this yields `p_next*u <= 34*M*2^(a-i)`.  This function checks
+/// the finite schedule; it does not extract a graph history or price integer
+/// and rational arithmetic.
+pub fn audit_uniform_history(lambda: u64) -> Result<UniformHistoryAudit> {
+    let leaf_divisor = floor_sqrt_u64(lambda);
+    let root_u = lambda / super::EPSILON_DENOMINATOR;
+    if leaf_divisor <= 1 || root_u == 0 {
+        return Err(invalid("uniform history root scale"));
+    }
+
+    let mut depths = Vec::new();
+    let mut depth = 0u32;
+    let mut shrink_factor = BigUint::one();
+    let mut prior_a = 0u64;
+    while shrink_factor < BigUint::from(leaf_divisor) {
+        let u = root_u.checked_shr(depth).unwrap_or(0);
+        if u == 0 {
+            break;
+        }
+        let current_a = prior_a
+            .checked_add(
+                2u64.checked_mul(u)
+                    .ok_or_else(|| invalid("history scale width"))?,
+            )
+            .ok_or_else(|| invalid("history scale width"))?;
+        let inherited_lhs = BigUint::from(81u8) * BigUint::from(leaf_divisor) * BigUint::from(u);
+        let inherited_rhs_exponent = u
+            .checked_add(1)
+            .ok_or_else(|| invalid("history exponent width"))?;
+        let evaluation_lhs = BigUint::from(8u8)
+            * BigUint::from(u)
+            * BigUint::from(
+                current_a
+                    .checked_add(1)
+                    .ok_or_else(|| invalid("history exponent width"))?,
+            );
+        let evaluation_rhs_exponent = prior_a
+            .checked_add(u)
+            .and_then(|value| value.checked_add(1))
+            .ok_or_else(|| invalid("history exponent width"))?;
+        let inherited_holds = at_most_power_of_two(&inherited_lhs, inherited_rhs_exponent);
+        let evaluation_holds = at_most_power_of_two(&evaluation_lhs, evaluation_rhs_exponent);
+        depths.push(UniformHistoryDepthAudit {
+            depth,
+            shrink_factor: shrink_factor.clone(),
+            u,
+            prior_a,
+            current_a,
+            inherited_absorption_lhs: inherited_lhs,
+            inherited_absorption_rhs_exponent: inherited_rhs_exponent,
+            inherited_absorption_holds: inherited_holds,
+            evaluation_absorption_lhs: evaluation_lhs,
+            evaluation_absorption_rhs_exponent: evaluation_rhs_exponent,
+            evaluation_absorption_holds: evaluation_holds,
+        });
+        prior_a = current_a;
+        depth = depth
+            .checked_add(1)
+            .ok_or_else(|| invalid("history depth width"))?;
+        shrink_factor *= BigUint::from(8u8);
+    }
+    let all_absorption_checks_hold = depths
+        .iter()
+        .all(|case| case.inherited_absorption_holds && case.evaluation_absorption_holds);
+    Ok(UniformHistoryAudit {
+        lambda,
+        leaf_divisor,
+        root_u,
+        threshold_proof_applies: lambda >= UNIFORM_HISTORY_LAMBDA_THRESHOLD,
+        scale_floor: UNIFORM_HISTORY_SCALE_FLOOR,
+        inherited_precision_constant: 81,
+        normalized_precision_constant: 34,
+        depths,
+        all_absorption_checks_hold,
+    })
+}
+
 /// Price the precision increments on a strictly shrinking source-parameter path.
 ///
 /// Premises for use: root M <= s, each next M <= M/8, source (D.4)

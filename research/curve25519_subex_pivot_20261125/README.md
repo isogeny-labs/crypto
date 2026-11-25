@@ -194,6 +194,87 @@ the packet-capacity and precision premises.  It does not yet bind those
 premises to every actual recursive child or price ring/rational bit
 operations.  Those history/refinement obligations remain the next gate.
 
+### Uniform source-history bridge
+
+The capacity and normalized-precision premises are now bound to the successful
+source path at the scalar-invariant level.  Production packing calls
+`pack_labels(..., enforce_bounds=true)`, which rejects unless
+`K*L<=3M`.  The remaining precision bridge combines the finite-history
+bound already proved in
+`research/hashed_ecdl_precision_history_20261123` on `origin/main`,
+
+```text
+p_d <= 81*s*2^A,
+```
+
+with two checks enforced by the actual recursive source: an evaluated child
+has `8*M_(d+1)<=M_d`, and a call is active only above the root-fixed leaf
+cutoff `floor(s/h)`, where `h=floor(sqrt(lambda))` and
+`lambda=ceil(log2(s))`.  Therefore every possible active depth satisfies
+
+```text
+8^d < h.
+```
+
+For the source scale `u_d=floor(lambda/(2^17*2^d))`, this implies
+`u_d>=24` whenever `lambda>=2^26`.  The proof is elementary: if
+`u_d<=23`, then
+
+```text
+lambda^5 < (2^17)^6 * 24^6 < 2^130,
+```
+
+contradicting `lambda^5>=2^130`.  The same depth inequality gives
+
+```text
+h^5 < (2^17)^3*(u+1)^3,
+h <= 512*(u+1)                    for u>=24.
+```
+
+The base cases at `u=24`, followed by factor-at-most-two induction, yield
+
+```text
+81*h*u <= 2^(u+1),
+8*u*(A+2*u+1) <= 2^(A+u+1).
+```
+
+These are exactly the inherited-precision and evaluation-loss absorption
+conditions for the existing finite-history endpoint.  Together with the
+native taper term they give the uniform local bound
+
+```text
+p_next*u <= 34*M*2^(A+2*u-i)
+```
+
+at every possible active child history above the threshold.  This is an
+unverified producer derivation composed from separately retained components,
+not a new kernel-checked refinement theorem. [pcc:unverified]
+
+The exact-integer Rust certificate is `tensor-history-audit`.  At the first
+claimed threshold `lambda=2^26`, it enumerates the only five depths not
+excluded by shrinkage:
+
+| depth | `8^d` | `u_d` | inherited absorption | evaluation absorption |
+| ---: | ---: | ---: | :---: | :---: |
+| 0 | 1 | 512 | pass | pass |
+| 1 | 8 | 256 | pass | pass |
+| 2 | 64 | 128 | pass | pass |
+| 3 | 512 | 64 | pass | pass |
+| 4 | 4096 | 32 | pass | pass |
+
+The negative control `lambda=2^23` reaches `u=16` and `u=8`; both fail
+the inherited absorption check, so the certificate distinguishes the missing
+margin rather than accepting every schedule.  The focused native suite now
+passes 9/9 controls. [pcc:unverified]
+
+This threshold is asymptotic: it means a root edge count on the order of
+`2^(2^26)`, far outside the live `usize` representation and irrelevant to
+practical 255-bit security.  It closes the uniform capacity/precision bridge
+for the theorem path, not the complete cost theorem.  Ring operations,
+interpolation, Hermite rational numerators/denominators, description bit
+widths, and their composition over the recursive call tree remain to be
+priced with a depth-independent constant.
+
 ## Primary references and local context
 
 - Akshima et al., pinned Bochum v0.2, Theorem 4:

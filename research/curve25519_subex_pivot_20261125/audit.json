@@ -66,5 +66,43 @@
     },
     "claim_boundary": "finite dimension/work envelope conditional on supplied dimensions; actual child-history refinement and bit-operation induction remain open"
   },
-  "next_gate": "bind packet-capacity and uniform precision premises to every actual child history, then compose packet-entry and ring/rational bit costs with a depth-independent constant"
+  "uniform_source_history_bridge": {
+    "library_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
+    "native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-history-audit.rs",
+    "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
+    "test_result": {
+      "passed": 9,
+      "failed": 0
+    },
+    "packet_capacity_binding": "production packing rejects unless K*L<=3M",
+    "history_inputs": "finite-history p_d<=81*s*2^A component on origin/main; native strict 8-fold child shrink; root-fixed leaf cutoff floor(s/floor(sqrt(lambda)))",
+    "lambda_threshold": "2^26",
+    "derived_scale_floor": 24,
+    "threshold_cases": [
+      {
+        "depth": 0,
+        "u": 512
+      },
+      {
+        "depth": 1,
+        "u": 256
+      },
+      {
+        "depth": 2,
+        "u": 128
+      },
+      {
+        "depth": 3,
+        "u": 64
+      },
+      {
+        "depth": 4,
+        "u": 32
+      }
+    ],
+    "threshold_result": "all inherited-precision and evaluation-loss absorptions pass, giving the conditional local constant 34 at every possible active depth",
+    "negative_control": "lambda=2^23 reaches u=16 and u=8 and fails inherited-precision absorption",
+    "claim_boundary": "exact symbolic integer schedule plus producer derivation; no allocated graph, practical Curve25519 attack, signed verification or complete bit-cost theorem"
+  },
+  "next_gate": "price ring, interpolation and Hermite rational intermediate widths and compose description/entry costs over the recursive call tree with a depth-independent constant"
 }
