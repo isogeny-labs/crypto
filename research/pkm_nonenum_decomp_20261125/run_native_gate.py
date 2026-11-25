@@ -130,12 +130,22 @@ def main():
     parser.add_argument("--bin", type=Path, required=True)
     parser.add_argument("--binary-sha256", required=True)
     parser.add_argument("--source-commit", required=True)
+    parser.add_argument("--toolchain", required=True,
+                        help="declared rustup build toolchain; verify against the separate build receipt")
     parser.add_argument("--store", type=Path, required=True)
     parser.add_argument("--through-test", type=int, choices=(1, 2, 3), default=3)
     args = parser.parse_args()
 
     commit = subprocess.check_output(["git", "-C", str(REPO), "rev-parse",
                                       "--verify", f"{args.source_commit}^{{commit}}"], text=True).strip()
+    head = subprocess.check_output(["git", "-C", str(REPO), "rev-parse", "HEAD"],
+                                   text=True).strip()
+    if head != commit:
+        parser.error("checkout HEAD differs from the declared source commit")
+    dirty = subprocess.check_output(["git", "-C", str(REPO), "status",
+                                     "--porcelain=v1", "--untracked-files=no"], text=True)
+    if dirty:
+        parser.error("tracked checkout is not clean at the declared source commit")
     pinned_source = subprocess.check_output(["git", "-C", str(REPO), "show", f"{commit}:{SOURCE}"])
     current_source = (REPO / SOURCE).read_bytes()
     if sha(current_source) != sha(pinned_source):
@@ -149,7 +159,10 @@ def main():
               "source_commit": commit, "source_sha256": sha(current_source),
               "binary_sha256": binary_sha, "binary_path": str(binary),
               "runner_sha256": sha(Path(__file__).read_bytes()),
-              "toolchain": subprocess.check_output(["rustc", "--version"], text=True).strip(),
+              "declared_toolchain_id": args.toolchain,
+              "declared_toolchain_version": subprocess.check_output(
+                  ["rustup", "run", args.toolchain, "rustc", "--version"],
+                  text=True).strip(),
               "platform": platform.platform(), "tests": list(TESTS),
               "wall_cap_s": WALL_CAP_S, "rss_cap_kib": RSS_CAP_KIB}
     rec = records(args.store)
