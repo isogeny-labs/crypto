@@ -172,10 +172,44 @@ the gain needs the `b` products of a round to run in parallel (or a fast
 kernel search add `≈ N/b` products, the difference between the two product
 columns.
 
+## Real relation streams (Joux–Vitse two-large-prime collector)
+
+Added 2026-11-25. Source: `examples/jv_sieve_deferred_pair_compare` at
+`1dbc66c01`, fixture `--generate --p P --seed 1`, worker `--method two-lp
+--seed 1 --max-descent-residuals 262144` on the public fixture only. The
+relation batch is the collector's own `work.final_projection.inputs` (source
+relations plus at most 32 target descents), unchanged; the modulus is
+`work.l`. Run summary: `results_real/jv_two_lp_runs.json`; evaluator records:
+`results_real/jv_two_lp_p*.json`.
+
+| p | relations (full / 1LP / 2LP) | recovered | R | C | rank / left nullity (≤2-entry rows) | balanced / unbalanced | pivot out | MST out, Z vs pivot | L BFS / low-stretch |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 401 | 37 (4 / 12 / 21) | no (descent cap) | 69 | 40 | 35 / 30 | 0 / 2 | 30 | 30, −0.8 % | 7 / 7 |
+| 809 | 320 (41 / 123 / 156) | no (descent cap) | 352 | 99 | 99 / 251 | 37 / 37 | 253 | 253, −4.6 % | 525 / 475 |
+| 1201 | 1852 (208 / 685 / 959) | yes, matches fixture | 1854 | 156 | 156 / 1698 | 418 / 386 | 1698 | refused (degree 69) | 4101 / 4366 |
+| 1511 | 3046 (398 / 1089 / 1559) | yes, matches fixture | 3048 | 191 | 191 / 2857 | 700 / 669 | 2857 | refused (degree 65) | 6921 / 7231 |
+
+p = 101 produced no source relations and p = 211 only 5; neither was
+evaluated. Observations (single runs):
+
+1. **Exact DSU = pivot filter again.** At p = 1201 and 1511 every row has at
+   most two large primes, and the DSU left nullity equals the pivot filter's
+   output exactly (1698, 2857); dense rank agrees. At p = 401 and 809 a few
+   descent rows carry 3–4 large primes, outside the DSU domain, so the
+   filter's output is the comparison only on the ≤2-entry part.
+2. **About half the cycles are balanced**, as in the plain (±1) binary streams.
+3. **MST** helps a little where it runs (−0.8 %, −4.6 % residual nonzeros) and
+   refuses the two streams that solved (column degree above 64).
+4. **Low-stretch trees** win at p = 809 (−9.5 % cycle length) but lose at
+   1201 and 1511 (+6.5 %, +4.5 %): no consistent gain over BFS on real data.
+5. Residual matrices are small (N = 132–573). At the two solved sizes the
+   min-degree width is N − 17 and N − 16 (dense), and FM partitioning saves
+   0–5.3 % of the column-net volume against contiguous rows (k = 2, 4, 8).
+
 ## Next
 
-- Prime-field and Gaudry-cubic collectors through `--input` JSONL (only the
-  binary-curve collector exposes its stream so far).
+- Plain prime-field and Gaudry-cubic collectors through `--input` JSONL (the
+  binary-curve and Joux–Vitse collectors are covered).
 - A parallel block-Wiedemann product loop and a fast matrix generator before
   any block-size speed claim.
 - Any speed claim needs the repository's benchmark protocol (`ecbench`, bench
