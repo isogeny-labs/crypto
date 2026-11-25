@@ -8,6 +8,7 @@ import json
 import os
 import platform
 import resource
+import signal
 import subprocess
 import sys
 import tempfile
@@ -114,10 +115,15 @@ def invoke(binary, cpus, memory, timeout_seconds, public_q, stream, arm):
                 except BrokenPipeError:
                     input_error = "child closed stdin before receiving the complete request"
         timed_out_event = threading.Event()
+        child_reaped = threading.Event()
 
         def kill_on_timeout():
+            if child_reaped.is_set():
+                return
             try:
-                proc.kill()
+                # Popen.kill() polls and can reap the child before wait4,
+                # losing the per-call CPU and peak-RSS receipt.
+                os.kill(proc.pid, signal.SIGKILL)
                 timed_out_event.set()
             except ProcessLookupError:
                 pass
@@ -128,6 +134,7 @@ def invoke(binary, cpus, memory, timeout_seconds, public_q, stream, arm):
             pid, status, usage = os.wait4(proc.pid, 0)
             assert pid == proc.pid
         finally:
+            child_reaped.set()
             timer.cancel()
         wall_ns = time.perf_counter_ns() - started
         exit_code = os.waitstatus_to_exitcode(status)
@@ -141,7 +148,7 @@ def invoke(binary, cpus, memory, timeout_seconds, public_q, stream, arm):
         output = json.loads(output_bytes)
     except (ValueError, UnicodeDecodeError):
         pass
-    timed_out = timed_out_event.is_set()
+    timed_out = timed_out_event.is_set() and exit_code == -signal.SIGKILL
     return {
         "arm": arm, "public_Q": public_q,
         "input": request, "input_sha256": hashlib.sha256(input_bytes).hexdigest(),
