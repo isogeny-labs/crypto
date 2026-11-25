@@ -1937,7 +1937,6 @@ fn solve_with_verification(
             }
         }
     }
-    measurement::end_online();
     let filter_pipeline = if graph.uses_filter() {
         let cpu = PhaseCpuNs {
             setup: cpu_after_setup.saturating_sub(cpu_start),
@@ -1978,6 +1977,12 @@ fn solve_with_verification(
     if let Some(report) = &filter_pipeline {
         counters.lp_merge_ops_uncharged = report.filter.merges as u64;
     }
+    // The charged v2 final check belongs to the target-dependent interval.
+    // Keep the clock open through a deferred filter, which can pin d only
+    // after collection, and through the final verification itself.
+    let check_in_online = verify_candidate || charge_checks;
+    let _recovery_check =
+        check_in_online.then(|| measurement::scope(measurement::Phase::RecoveryCheck));
     if charge_checks {
         if let Some(d) = recovered {
             counters.final_checks = 1;
@@ -1988,10 +1993,12 @@ fn solve_with_verification(
     }
     phase_group_ops.insert("relations".into(), rel_ops);
     phase_group_ops.insert("verification".into(), verify_ops);
-    let verified_fast = verify_candidate
+    let verified_fast = check_in_online
         && recovered.is_some_and(|d| instance.fast.mul_u64(instance.generator, d) == target);
-    let verified_independent = verify_candidate
+    let verified_independent = check_in_online
         && recovered.is_some_and(|d| independent_verify(instance, target, d).is_ok());
+    drop(_recovery_check);
+    measurement::end_online();
     Ok(LargePrimeReport {
         trace_evidence: options.abscissa_basis.map(|basis| trace_line::Evidence {
             basis,
@@ -2003,7 +2010,7 @@ fn solve_with_verification(
         exhausted: recovered.is_none(),
         verified_fast,
         verified_independent,
-        verification_performed: verify_candidate,
+        verification_performed: check_in_online,
         config,
         factor_base: base.report,
         mitm: decomposer.report,
