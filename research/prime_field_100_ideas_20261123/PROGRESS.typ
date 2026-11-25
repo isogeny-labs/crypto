@@ -396,3 +396,19 @@ The owner reversed the earlier stop and the three `E(F_p)` workstreams resumed i
 )
 
 Together with #24 above, executed controls touch 32 numbered proposals across shared scripts. #97 was not tested: the generated stream has no sieve intervals, interval action or interval cost. The #link("PROGRESS.md")[full report] links frozen sources, raw outputs, failures, hashes and the item-specific missing constructions for the other proposals. Compiled executables remain local with hashes in their post-call receipts after the artifact store returned HTTP 403 on earlier binary objects.
+
+== Item-by-item audit and further bounded controls
+
+The new #link("EC_ITEMS_001_034_MATRIX.md")[1--34], #link("EC_LEADS_35_67_EVIDENCE.md")[35--67], and #link("WS68_100_EVIDENCE_MATRIX.md")[68--100] evidence matrices have exactly 100 distinct numbered rows. Each separates the original mechanism from an executed EC check, partial control, literal obstruction, or missing construction. Their primary labels are 2 bounded original-mechanism executions, 32 partial controls, 16 literal-premise screens, and 50 descriptions without a runnable EC construction or matching input. These are producer classifications `[pcc:unverified]`, not 100 executions of the named methods.
+
+#table(
+  columns: (auto, 1fr),
+  table.header([Item], [New observation and boundary]),
+  [14], [A #link("EC_VORONOI_014_PROTOCOL.md")[matched-budget index-space Voronoi adaptation] selected 764 triples per arm. At `z=0`, boundary versus fixed hash had 0/0 versus 2/2 hits/rank; at `z=320`, 12/2 versus 3/2. Target dependence prevents a stable-bias claim; S4 wall time was not measured.],
+  [16], [A #link("EC_ISOGENY_016_PROTOCOL.md")[nonidentity 2-isogeny] on supersingular `E/F_1019` preserved tested point addition and kernel cosets. The image-abscissa product 390 differed from the image sum abscissa 687. No path collector was tested.],
+  [43, 44, 48], [An #link("EC_SIGN_ENERGY_PROTOCOL.md")[exact EC sign-energy check] marked 2 of 16 candidates. The Boolean indicator had multilinear degree 3; six nonmatching masks had no better one-bit neighbor. No VQE, device or annealing trajectory was run.],
+  [73], [A #link("WS68_RS_RECORD.post-call.json")[nonsystematic RS(6,4) record-repair run] recovered six prechecked EC rows from two erasures and separately one error, then rechecked group identities. Storage was 6 symbols/row versus 4 raw; decoder field cost remains unpriced. The frozen source comment calling the code systematic is corrected in the receipt.],
+  [98], [With supplied `log(P_0)=1`, a #link("WS68_KNOWNLOG_SUBSTITUTE.post-call.json")[native substitution] kept six EC identities and target coverage while each matrix fell from 6 to 4 nonzeros with rank 2. Blind deletion invalidated four rows. Known-log acquisition and full costs remain unpriced.],
+)
+
+Unsigned execution claims `PCC-20261125-9d087f`, `PCC-20261125-50a713`, `PCC-20261125-b31d12`, `PCC-20261125-df4a41`, and `PCC-20261125-be5ecf` pin the new raw outputs; results remain `[pcc:unverified]`. The active goal remains open for proposals whose original EC mechanism, input, cost boundary or hardware has not been exercised. The next substantive work needs an immutable natural EC relation stream for filtering and an actual time-ordered interval action for #97.
