@@ -1004,9 +1004,11 @@ impl OpenCoefMap {
     // Complete occupied-entry views used by the original collision-ledger tests.
     #[cfg(test)]
     fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
-        self.keys.iter().enumerate().filter_map(move |(i, &key)| {
-            (key != 0).then(|| (key, (self.us[i], self.zs[i], self.bs[i])))
-        })
+        self.keys
+            .iter()
+            .enumerate()
+            .filter(|&(_, &key)| key != 0)
+            .map(move |(i, &key)| (key, (self.us[i], self.zs[i], self.bs[i])))
     }
 
     #[cfg(test)]
@@ -1156,7 +1158,10 @@ impl OpenRefMap {
         self.len = 0;
         for (i, key) in old_keys.into_iter().enumerate() {
             if key != 0 {
-                self.insert(key, (old_parents[i], old_pools[i], old_minus[i], old_owns[i]));
+                self.insert(
+                    key,
+                    (old_parents[i], old_pools[i], old_minus[i], old_owns[i]),
+                );
             }
         }
     }
@@ -6960,8 +6965,8 @@ impl CountedGroup for PrimeCurve {
             let px = f.to_mont(p.x);
             let py = f.to_mont(p.y);
             ops.field_ops.muls += 2; // parent once
-            // Interleave up to 4 λ chains when m is large enough that
-            // the mul latency would otherwise serialize (sib=8 typical).
+                                     // Interleave up to 4 λ chains when m is large enough that
+                                     // the mul latency would otherwise serialize (sib=8 typical).
             for s in 0..k {
                 let (i, j, want_minus) = slots[s];
                 let inv = dxs[s]; // Montgomery
@@ -12461,6 +12466,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
 /// an empty slot; the one key whose `+ 1` wraps (`u64::MAX`) has its own
 /// field.  Linear probing from a multiplicative hash; if the load would
 /// pass 7/8 (the caller's size hint was too small) the table doubles.
+#[allow(dead_code)]
 struct TwTable {
     slots: Vec<[u64; 5]>,
     special: Option<(u128, u64, u64)>,
@@ -12468,12 +12474,14 @@ struct TwTable {
 }
 
 /// What [`TwTable::entry`] found.
+#[allow(dead_code)]
 enum TwEntry<'a> {
     Vacant(TwVacant<'a>),
     Occupied((u128, u64, u64)),
 }
 
 /// An empty place in a [`TwTable`] for the key just looked up.
+#[allow(dead_code)]
 struct TwVacant<'a> {
     table: &'a mut TwTable,
     /// Slot index, or `usize::MAX` for the `u64::MAX` key's own field.
@@ -12481,6 +12489,7 @@ struct TwVacant<'a> {
     key: u64,
 }
 
+#[allow(dead_code)]
 impl TwVacant<'_> {
     fn insert(self, val: (u128, u64, u64)) {
         if self.idx == usize::MAX {
@@ -12498,6 +12507,7 @@ impl TwVacant<'_> {
     }
 }
 
+#[allow(dead_code)]
 impl TwTable {
     /// Room for `entries` keys at load at most 3/4.
     fn with_capacity(entries: usize) -> Self {
@@ -13504,8 +13514,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         let _ = fault;
         // The sibling walk's state (only with `sib`): see "Sibling points".
         let key_bound = g.abscissa_key_bound().unwrap_or(0);
-        let mut sw =
-            sib.map(|(m, pool)| SibWalk::new(m, pool, p1, c, key_bound, tw.t as usize));
+        let mut sw = sib.map(|(m, pool)| SibWalk::new(m, pool, p1, c, key_bound, tw.t as usize));
         loop {
             while tw.rank < need && tw.steps < t_max {
                 if let Some(sw) = sw.as_mut() {
@@ -13734,7 +13743,15 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         // Plan each of the m jumps on the stack (m ≤ 16), then form every
         // sibling pair from ONE batched inversion of the denominators.
         debug_assert!(m <= 16);
-        let mut plans = [(0usize, g.identity(), 0u128, 0u64, 0u64, false, (0u128, 0u64, 0u64)); 16];
+        let mut plans = [(
+            0usize,
+            g.identity(),
+            0u128,
+            0u64,
+            0u64,
+            false,
+            (0u128, 0u64, 0u64),
+        ); 16];
         let mut js = [(g.identity(), false); 16];
         for pos in 0..m {
             let h = sw.cur[pos];
@@ -13771,8 +13788,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     }
                     // Eager sign bits: use batch-lifted y when present
                     // (FastPrime path), else one sibling_lift mul.
-                    let pt_plus = match sp.y_plus.and_then(|y| g.affine_elt(sp.key_plus - 1, y))
-                    {
+                    let pt_plus = match sp.y_plus.and_then(|y| g.affine_elt(sp.key_plus - 1, y)) {
                         // Field mul already charged inside sibling_pairs_batch.
                         Some(pt) => pt,
                         None => g
@@ -13800,10 +13816,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                             submod(c.1, ga, r),
                             submod(c.2, be, r),
                         );
-                        let pt = match sp
-                            .y_minus
-                            .and_then(|y| g.affine_elt(sp.key_minus - 1, y))
-                        {
+                        let pt = match sp.y_minus.and_then(|y| g.affine_elt(sp.key_minus - 1, y)) {
                             Some(pt) => pt,
                             None => g
                                 .sibling_lift(ops, sw.parent, sp.key_minus, sp.lambda_minus)
@@ -18570,7 +18583,7 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
     if let Some(o) = &s4 {
         calibrate_s4(inst, o, &mut calib);
     }
-    // Its factored counterpart, where the half-trace exists (odd `n`).
+    // Its factored counterpart (any parity of `n`).
     let s4f = (m_used == 3 && inst.n <= cfg.s4_max_degree)
         .then(|| FactoredSubspaceOracle::new(&basis, inst.b, &inst.gf))
         .flatten();
@@ -24208,10 +24221,7 @@ mod wwalk_table_tests {
                             // expansion (was `m` serial inversions).
                             assert_eq!(f.invs, parents);
                             let batch_muls = 3 * (m as u64 - 1) * parents;
-                            assert_eq!(
-                                f.muls,
-                                (2 * m as u64 + 1) * parents - skipped + batch_muls
-                            );
+                            assert_eq!(f.muls, (2 * m as u64 + 1) * parents - skipped + batch_muls);
                             assert_eq!(f.sqrs, 2 * m as u64 * parents - skipped);
                             assert!(skipped <= 2 * parents);
                         }

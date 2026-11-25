@@ -1,0 +1,141 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/quartic_diem_ladder_20261121",
+ "status": "pass",
+ "independent": true,
+ "disposition": "validated",
+ "validated_commit": "6b5e2a7d668c7f5fc74105dcaad7cb4ffbcf7ad0",
+ "study_tree": "3baebc98699047869f5e86959fcd5a78ba312cc5",
+ "report": "validator-report.md",
+ "raw_data": [
+  {
+   "path": "../raw/run.jsonl",
+   "sha256": "1a850423a772eca0edb05936888d9604c6359c97f2204f77b38c01d140ffd142"
+  },
+  {
+   "path": "../raw/run131101_odd.jsonl",
+   "sha256": "9977d44245b93379af37b5863a5ade5926d0853f48f5c22ad3abab1b4c39345a"
+  },
+  {
+   "path": "../raw/run131101_even.jsonl",
+   "sha256": "98efb7faf63b615164f5b3c7e5ae7452f6a59adfcb7422bc6d865f13697f85a9"
+  }
+ ],
+ "headline": [
+  {
+   "name": "IC/rho sfb p=131101 w=0.0 (gm over 5 curves)",
+   "claimed": 0.00019217139750491374,
+   "recomputed": 0.00019217139750491374
+  },
+  {
+   "name": "slope ln(IC/rho) sfb w=0.0",
+   "claimed": -0.8285288325706618,
+   "recomputed": -0.8285288325706618
+  },
+  {
+   "name": "IC/rho sfb p=131101 w=0.1 (gm over 5 curves)",
+   "claimed": 0.7749111294144002,
+   "recomputed": 0.7749111294144002
+  },
+  {
+   "name": "slope ln(IC/rho) sfb w=0.1",
+   "claimed": -0.36553403166508375,
+   "recomputed": -0.36553403166508375
+  },
+  {
+   "name": "IC/rho sfb p=131101 w=1.0 (gm over 5 curves)",
+   "claimed": 7.747212577118463,
+   "recomputed": 7.747212577118463
+  },
+  {
+   "name": "slope ln(IC/rho) sfb w=1.0",
+   "claimed": -0.3651960189993081,
+   "recomputed": -0.3651960189993081
+  },
+  {
+   "name": "FPM-mid exponent sfb",
+   "claimed": 0.8625978635421402,
+   "recomputed": 0.8625978635421402
+  },
+  {
+   "name": "IC/rho new p=131101 w=0.0 (gm over 5 curves)",
+   "claimed": 0.00023103766674856637,
+   "recomputed": 0.00023103766674856637
+  },
+  {
+   "name": "slope ln(IC/rho) new w=0.0",
+   "claimed": -0.8128496303096084,
+   "recomputed": -0.8128496303096084
+  },
+  {
+   "name": "IC/rho new p=131101 w=0.1 (gm over 5 curves)",
+   "claimed": 1.2286159748714853,
+   "recomputed": 1.2286159748714853
+  },
+  {
+   "name": "slope ln(IC/rho) new w=0.1",
+   "claimed": -0.3589107746445861,
+   "recomputed": -0.3589107746445861
+  },
+  {
+   "name": "IC/rho new p=131101 w=1.0 (gm over 5 curves)",
+   "claimed": 12.2839965372357,
+   "recomputed": 12.2839965372357
+  },
+  {
+   "name": "slope ln(IC/rho) new w=1.0",
+   "claimed": -0.3586464752671122,
+   "recomputed": -0.3586464752671122
+  },
+  {
+   "name": "FPM-mid exponent new",
+   "claimed": 0.9237619743914353,
+   "recomputed": 0.9237619743914353
+  },
+  {
+   "name": "paired sfb/new FPM mid, pooled gm",
+   "claimed": 0.6828218623440027,
+   "recomputed": 0.6828218623440027
+  },
+  {
+   "name": "la_add / native_all, sfb p=131101 (ratio of gms)",
+   "claimed": 0.8521846014649228,
+   "recomputed": 0.8521846014649198
+  },
+  {
+   "name": "certified runs re-verified with validator arithmetic (RESULTS: all 210)",
+   "claimed": 210,
+   "recomputed": 210
+  }
+ ],
+ "checks": {
+  "certificates_independent": {
+   "curves": 40,
+   "curves_all_ok": 40,
+   "rows_checked": 210,
+   "rows_cert_ok": 210
+  },
+  "replay": {
+   "rows_replayed": 72,
+   "rows_equal": 72,
+   "ic_runs_replayed": 48,
+   "rho_runs_replayed": 10,
+   "instances_replayed": 12,
+   "instances_equal": 12
+  },
+  "headline_agreement_1e-9": true,
+  "frozen_verdict_every_cell_unresolved": true,
+  "no_missing_keys_in_ic_rows": true,
+  "verdicts_unchanged_under_frozen_110min_cap": true
+ },
+ "scripts": [
+  "picarith.py",
+  "verify_certificates.py",
+  "recompute.py",
+  "replay.sh",
+  "compare_replay.py",
+  "cap_subsets.py",
+  "build_gate_artifacts.py"
+ ],
+ "label": "[pcc:unverified] (no pcc claim was created by the validator)"
+}

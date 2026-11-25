@@ -5,9 +5,6 @@
 //! A separate arithmetic checker verifies the certificate without root finding.
 //! Counters measure native field operations, including inverse exponentiation;
 //! primality validation, serialization, and certificate replay are excluded.
-#[cfg(test)]
-use std::collections::HashMap;
-
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
@@ -308,7 +305,7 @@ impl Engine<'_> {
         // Exact odd-prime identities. No field operations are performed, so
         // none should be added to the trace or field-work budget.
         let trivial = if value == 1 { Some(1) }
-            else if value == 2 { Some((p + 1) / 2) }
+            else if value == 2 { Some(p.div_ceil(2)) }
             else if value == p - 1 { Some(p - 1) }
             else if value == p - 2 { Some((p - 1) / 2) }
             else { None };
@@ -760,6 +757,7 @@ impl Engine<'_> {
         })?;
         Ok(acc)
     }
+#[allow(dead_code)]
 fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
         self.report.counters.observe(&event);
         if let Err(error) = (self.sink)(&event) {
@@ -775,6 +773,7 @@ fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
     /// Off-diagonal products are doubled with one field addition, while
     /// diagonals use the field-square operation. The independently checked
     /// Product event is identical to generic polynomial multiplication.
+    #[allow(dead_code)]
     fn square(&mut self, a: &[u64]) -> Work<Vec<u64>> {
         let mut product = if a.is_empty() {
             vec![]
@@ -808,6 +807,7 @@ fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
         Ok(product)
     }
 
+#[allow(dead_code)]
 fn div_general(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
         // Constant-unit division preserves the quotient without field work.
@@ -987,7 +987,7 @@ fn vinv(a: u64, p: u64) -> u64 {
     // The modulus is an odd prime bounded by 2^61-1.
     if r1 == 1 { return 1; }
     if r1 == p - 1 { return p - 1; }
-    if r1 == 2 { return (p + 1) / 2; }
+    if r1 == 2 { return p.div_ceil(2); }
     if r1 == p - 2 { return (p - 1) / 2; }
     let (mut t0, mut t1) = (0i64, 1i64);
     while r1 != 0 {
@@ -1107,6 +1107,7 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     if p <= u32::MAX as u64 && a.len() >= 8 && b.len() >= 8 {
         return vproduct_barrett32(a, b, p);
+    }
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         // Sparse root polynomials often have zero middle coefficients.
@@ -1898,6 +1899,7 @@ fn quartic_square(a: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
     quartic_reduce(t, c, p)
 }
 #[inline]
+#[allow(dead_code)]
 fn quartic_coordinates(a: &[u64]) -> [u64; 4] {
     [a.first().copied().unwrap_or(0), a.get(1).copied().unwrap_or(0),
      a.get(2).copied().unwrap_or(0), a.get(3).copied().unwrap_or(0)]
@@ -1983,6 +1985,7 @@ fn vpower_quartic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
     Ok(quartic_trim(accumulator))
 }
 #[inline]
+#[allow(dead_code)]
 fn vquartic_replay_mul(a: &[u64], b: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
     debug_assert_eq!(modulus.len(), 5);
     quartic_trim(quartic_mul(
@@ -1990,6 +1993,7 @@ fn vquartic_replay_mul(a: &[u64], b: &[u64], modulus: &[u64], p: u64) -> Vec<u64
         [modulus[0], modulus[1], modulus[2], modulus[3]], p))
 }
 #[inline]
+#[allow(dead_code)]
 fn vquartic_replay_square(a: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
     debug_assert_eq!(modulus.len(), 5);
     quartic_trim(quartic_square(
@@ -2404,7 +2408,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             } => {
                 canonical(accumulator, p)?;
                 canonical(base, p)?;
-                let state = powers.get_mut(id).ok_or("missing power begin")?;
+                let Some(Some(TraceComputation::Power(state))) = computations.get_mut(*id as usize) else { return Err("missing power begin".into()); };
                 if state.exponent == 0 {
                     return Err("power continued after completion".into());
                 }
@@ -2439,7 +2443,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::PowerEnd { id, value } => {
                 canonical(value, p)?;
-                let state = powers.remove(id).ok_or("missing power begin")?;
+                let state = computations.get_mut(*id as usize).and_then(Option::take).ok_or("missing power begin")?;
+                let TraceComputation::Power(state) = state else { return Err("missing power begin".into()); };
                 if state.exponent != 0 || state.acc != *value {
                     return Err("incomplete power chain".into());
                 }
@@ -2516,7 +2521,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::GcdEnd { id, value } => {
                 canonical(value, p)?;
-                let (a, b) = gcds.remove(id).ok_or("missing gcd begin")?;
+                let state = computations.get_mut(*id as usize).and_then(Option::take).ok_or("missing gcd begin")?;
+                let TraceComputation::Gcd((a, b)) = state else { return Err("missing gcd begin".into()); };
                 if !b.is_empty() || vmonic(a, p) != *value {
                     return Err("incomplete Euclidean chain".into());
                 }
@@ -2604,7 +2610,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 for v in [xp_mod_f, linear_part] {
                     canonical(v, p)?;
                 }
-                if !powers.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+                if computations.iter().any(Option::is_some) || inverse.is_some() || split.is_some() {
                     return Err("unfinished native computation".into());
                 }
                 let acknowledged = index < report.events.len();
@@ -2692,11 +2698,6 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         if g != *linear_part || product != g {
                             return Err("distinct-root completeness failed".into());
                         }
-                        previous = Some(r);
-                        product = vproduct(&product, &[(p - r) % p, 1], p);
-                    }
-                    if g != *linear_part || product != g {
-                        return Err("distinct-root completeness failed".into());
                     }
                 }
                 finished = true;
@@ -2748,45 +2749,9 @@ fn vproduct_barrett32(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     trim(result)
 }
 
-#[inline]
-fn field_value_cached(op: &FieldOp, a: u64, b: u64, p: u64, reciprocal32: u64) -> u64 {
-    // Dispatch once by operation; the 61-bit Mersenne fast path must not
-    // take an extra wrapper call or reciprocal guard on every field event.
-    match op {
-        FieldOp::Add => {
-            if a < p && b < p {
-                let sum = a + b;
-                if sum >= p { sum - p } else { sum }
-            } else {
-                ((a as u128 + b as u128) % p as u128) as u64
-            }
-        }
-        FieldOp::Sub => {
-            if a < p && b < p {
-                if a >= b { a - b } else { a + p - b }
-            } else {
-                ((a as u128 + p as u128 - b as u128) % p as u128) as u64
-            }
-        }
-        FieldOp::Mul | FieldOp::Square => {
-            if p == MAX_PRIME && a < p && b < p {
-                let product = a as u128 * b as u128;
-                let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
-                if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
-            } else if reciprocal32 != 0 && a < p && b < p {
-                let product = a * b; // canonical p <= 2^32-1
-                let quotient = ((product as u128 * reciprocal32 as u128) >> 64) as u64;
-                let remainder = product - quotient * p;
-                // The quotient underestimates floor(product/p) by at most 1.
-                if remainder >= p { remainder - p } else { remainder }
-            } else {
-                ((a as u128 * b as u128) % p as u128) as u64
-            }
-        }
-    }
-}
 
 #[inline]
+#[allow(dead_code)]
 fn monic_power_degree(poly: &[u64]) -> Option<usize> {
     if poly.len() < 2 || poly[0] != 0 || *poly.last()? != 1
         || poly[1..poly.len() - 1].iter().any(|&c| c != 0)
@@ -2797,6 +2762,7 @@ fn monic_power_degree(poly: &[u64]) -> Option<usize> {
 }
 
 #[inline]
+#[allow(dead_code)]
 fn vremainder(a: &[u64], m: &[u64], p: u64) -> Result<Vec<u64>, String> {
     if m.len() < 4 || m.last() != Some(&1) || (m[1] == 0 && m[2] == 0) {
         return Ok(vdiv(a, m, p)?.1);
@@ -2833,6 +2799,7 @@ fn vremainder(a: &[u64], m: &[u64], p: u64) -> Result<Vec<u64>, String> {
 /// Return k for the canonical monomial X^k (k>=1).
 /// Most dense polynomials fail the cheap first/last coefficient check.
 #[inline]
+#[allow(dead_code)]
 fn monic_x_shift(a: &[u64]) -> Option<usize> {
     if a.len() < 2 || a[0] != 0 || *a.last().unwrap() != 1 {
         return None;
@@ -3230,7 +3197,7 @@ mod tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };
@@ -3477,7 +3444,7 @@ mod tests {
                 }
                 let reference = vdiv(&a, &b, p).unwrap();
                 let mut sink = |_event: &RootEvent| Ok(());
-                let mut engine = Engine { reciprocal32: if p <= u32::MAX as u64 { ((1u128 << 64) / p as u128) as u64 } else { 0 },
+                let mut engine = Engine {
                     report: RootReport {
                         schema: "prime-root-trace/v1".into(),
                         p,

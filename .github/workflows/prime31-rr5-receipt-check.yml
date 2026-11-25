@@ -1,0 +1,125 @@
+name: Prime31 RR5 receipt checker source-bound native tests
+
+# Validation only: no timed ECDLP benchmark, RR5 extraction, or EKS spending.
+on:
+  pull_request:
+    paths:
+      - 'research/cheap_ecdlp_cold_gate_20261123/**'
+      - 'research/prime31_ic_20261115/native/**'
+      - '.github/workflows/prime31-rr5-receipt-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prime31-receipt-check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-bound-native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CARGO_BUILD_JOBS: '2'
+      RAYON_NUM_THREADS: '1'
+      RUST_TEST_THREADS: '1'
+      CARGO_TERM_COLOR: never
+      RECEIPT_DIR: prime31-receipt-ci
+      MANIFEST: research/cheap_ecdlp_cold_gate_20261123/Cargo.toml
+    steps:
+      - name: Check out immutable PR head or dispatch revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/cheap_ecdlp_cold_gate_20261123/
+            /research/prime31_ic_20261115/native/
+            /src/cryptanalysis/f4_fp_tower.rs
+            /src/cryptanalysis/sig_fp_tower.rs
+      - name: Record exact source, source tree and toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RECEIPT_DIR"
+          git rev-parse HEAD | tee "$RECEIPT_DIR/source-sha.txt"
+          expected="${{ github.event.pull_request.head.sha || github.sha }}"
+          test "$(git rev-parse HEAD)" = "$expected"
+          git status --porcelain --untracked-files=no > "$RECEIPT_DIR/initial-git-status.txt"
+          test ! -s "$RECEIPT_DIR/initial-git-status.txt"
+          rustup toolchain install 1.100.0 --profile minimal
+          rustup run 1.100.0 rustc -vV | tee "$RECEIPT_DIR/rustc.txt"
+          rustup run 1.100.0 cargo -V | tee "$RECEIPT_DIR/cargo.txt"
+          sha256sum "$MANIFEST" \
+            research/cheap_ecdlp_cold_gate_20261123/src/bin/rr5_receipt_check.rs \
+            research/cheap_ecdlp_cold_gate_20261123/rr5_grevlex_b8_producer_row.json \
+            research/prime31_ic_20261115/native/Cargo.toml \
+            research/prime31_ic_20261115/native/lib.rs \
+            research/prime31_ic_20261115/native/Cargo.lock \
+            src/cryptanalysis/f4_fp_tower.rs \
+            src/cryptanalysis/sig_fp_tower.rs \
+            > "$RECEIPT_DIR/source.sha256"
+      - name: Resolve and freeze exact dependency lock for this execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          # This standalone package has no committed lock yet; archive the
+          # resolved lock and never silently report cross-run reproducibility.
+          cargo +1.100.0 generate-lockfile --manifest-path "$MANIFEST"
+          cp research/cheap_ecdlp_cold_gate_20261123/Cargo.lock "$RECEIPT_DIR/Cargo.lock"
+          sha256sum "$RECEIPT_DIR/Cargo.lock" > "$RECEIPT_DIR/lock.sha256"
+      - name: Compile exact checker tests and retain executable identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          set -o pipefail
+          cargo +1.100.0 test --release --locked --no-run --bin rr5_receipt_check \
+            --manifest-path "$MANIFEST" --message-format=json \
+            > "$RECEIPT_DIR/compile.jsonl" 2> "$RECEIPT_DIR/compile.stderr"
+          jq -r 'select(.reason=="compiler-artifact" and .target.name=="rr5_receipt_check" and .profile.test==true) | .executable // empty' \
+            "$RECEIPT_DIR/compile.jsonl" > "$RECEIPT_DIR/executable-paths.txt"
+          test "$(wc -l < "$RECEIPT_DIR/executable-paths.txt")" -eq 1
+          test -x "$(cat "$RECEIPT_DIR/executable-paths.txt")"
+          sha256sum "$(cat "$RECEIPT_DIR/executable-paths.txt")" > "$RECEIPT_DIR/executable.sha256"
+      - name: Execute original-Rust RR5 tests (not scientific timing)
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          cargo +1.100.0 test --release --locked --bin rr5_receipt_check \
+            --manifest-path "$MANIFEST" -- --test-threads=1 --nocapture \
+            > "$RECEIPT_DIR/test.stdout" 2> "$RECEIPT_DIR/test.stderr"
+          rc=$?
+          set -e
+          printf '%s\n' "$rc" > "$RECEIPT_DIR/test.exit"
+          cat "$RECEIPT_DIR/test.stdout"
+          cat "$RECEIPT_DIR/test.stderr" >&2
+          exit "$rc"
+      - name: Final source and locked-input integrity checks
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -s "$RECEIPT_DIR/source.sha256"; then
+            sha256sum -c "$RECEIPT_DIR/source.sha256" \
+              > "$RECEIPT_DIR/source-replay.txt" 2>&1
+          fi
+          if test -f "$RECEIPT_DIR/Cargo.lock"; then
+            sha256sum research/cheap_ecdlp_cold_gate_20261123/Cargo.lock \
+              > "$RECEIPT_DIR/post-lock.sha256"
+            cmp -s research/cheap_ecdlp_cold_gate_20261123/Cargo.lock "$RECEIPT_DIR/Cargo.lock"
+          fi
+          git status --porcelain --untracked-files=no > "$RECEIPT_DIR/final-git-status.txt"
+          find "$RECEIPT_DIR" -type f ! -name file-digests.txt -print0 \
+            | sort -z | xargs -0 -r sha256sum > "$RECEIPT_DIR/file-digests.txt"
+      - name: Retain full result including failures and caps
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr5-receipt-${{ github.run_id }}-${{ github.run_attempt }}
+          path: prime31-receipt-ci/
+          retention-days: 21
+          if-no-files-found: warn
