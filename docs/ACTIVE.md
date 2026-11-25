@@ -478,3 +478,4 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 - [ ] #5131 chord-slope gcd gate: exact squarefree signed generic split selector, quartic tangent guard and identity/target exceptions; four symbolic expansions passed; linear-D construction remains charged. [pcc:unverified]
 
 - [ ] #5131 signed-slope batch moments: exact Laurent/Hermite diagnostic, 13 symbolic identities + 13 support checks; relaxed coset control matches 905 positive and reciprocal moments but selector degrees 0/906. Actual-Dickson exact miss predicate remains open. [pcc:unverified]
+- [ ] #5131 affine-block join: exact structured-target reporting, 4096-target conditional B31 list count 246144 vs 7876608 direct candidates, not timing; uniform-marginal rank-hit bound and scoped cold full-list square-root barrier. Arbitrary-target actual-Dickson contraction remains open. [pcc:unverified]
