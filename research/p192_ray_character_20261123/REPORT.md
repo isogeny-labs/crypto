@@ -908,6 +908,23 @@ coset product. This is a boundary of that published construction,
 not an impossibility claim for other period constructions.
 [pcc:unverified]
 
+[Morain, Mihăilescu, and Schost, §§3–4](https://cs.uwaterloo.ca/~eschost/publications/issac07-proc.pdf)
+also use *ordinate* elliptic Gaussian periods for even divisors
+`q` of `ℓ-1`; these retain `y`-coordinate information that an
+`x`-period loses. Their algorithm compares Frobenius on the
+period algebra with scalar action to recover the Frobenius
+eigenvalue `λ` modulo `ℓ`. Specializing their selected torsion
+line to P-192's rational order-`r` subgroup gives `ℓ=r` and
+`λ=1`: every coordinate of `[a]G` lies in `F_p`, so Frobenius
+fixes every ordinate period and the comparison returns this
+already known eigenvalue. The even-`q` period is defined by
+an `H`-sum with `|H|=(r-1)/q`; the paper supplies neither a
+sub-reference construction of a marked P-192 period nor an
+exactness identity for the relative sign of `G` and `Q`.
+This closes the Frobenius-eigenvalue use of its ordinate period
+in this rational-line specialization, not arbitrary oriented
+periods or product algorithms. [pcc:unverified]
+
 [Bernstein et al., Definition 4.6 and Theorem 4.11](https://velusqrt.isogeny.org/velusqrt-20200616.pdf)
 give a near-square-root evaluation of an elliptic `x`-product
 when its index set has an **additive** disjoint decomposition
