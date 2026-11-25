@@ -1,0 +1,38 @@
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp: In function ‘std::vector<audit::Item> signed_audit::enumerate(const std::vector<audit::Point>&, bool)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp:32:5: error: reference to ‘SSL’ is ambiguous
+   32 |     SSL ssl;std::vector<SSLPoint> points;for(const auto& q:symbols)points.push_back(ssl.make(q));auto out_point=ssl.make({});std::vector<Item> out;
+      |     ^~~
+In file included from /usr/include/openssl/ec.h:21,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/audit_arithmetic.hpp:2,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp:1:
+/usr/include/openssl/types.h:198:23: note: candidates are: ‘typedef struct ssl_st SSL’
+  198 | typedef struct ssl_st SSL;
+      |                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/audit_arithmetic.hpp:42:8: note:                 ‘struct audit::SSL’
+   42 | struct SSL {
+      |        ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp:32:85: error: ‘ssl’ was not declared in this scope
+   32 |     SSL ssl;std::vector<SSLPoint> points;for(const auto& q:symbols)points.push_back(ssl.make(q));auto out_point=ssl.make({});std::vector<Item> out;
+      |                                                                                     ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp:32:113: error: ‘ssl’ was not declared in this scope
+   32 |     SSL ssl;std::vector<SSLPoint> points;for(const auto& q:symbols)points.push_back(ssl.make(q));auto out_point=ssl.make({});std::vector<Item> out;
+      |                                                                                                                 ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp: In function ‘int signed_audit::run(int, char**)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp:41:5: error: reference to ‘SSL’ is ambiguous
+   41 |     SSL ssl;auto generator=EC_GROUP_get0_generator(ssl.group.get());BN gx(BN_new()),gy(BN_new());require(EC_POINT_get_affine_coordinates(ssl.group.get(),generator,gx.get(),gy.get(),ssl.context.get())==1,"known generator");
+      |     ^~~
+/usr/include/openssl/types.h:198:23: note: candidates are: ‘typedef struct ssl_st SSL’
+  198 | typedef struct ssl_st SSL;
+      |                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/audit_arithmetic.hpp:42:8: note:                 ‘struct audit::SSL’
+   42 | struct SSL {
+      |        ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp:41:52: error: ‘ssl’ was not declared in this scope
+   41 |     SSL ssl;auto generator=EC_GROUP_get0_generator(ssl.group.get());BN gx(BN_new()),gy(BN_new());require(EC_POINT_get_affine_coordinates(ssl.group.get(),generator,gx.get(),gy.get(),ssl.context.get())==1,"known generator");
+      |                                                    ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp:45:182: error: expected ‘,’ or ‘;’ before ‘)’ token
+   45 |     const Big inverse_two=(subgroup_order+1)/2;Point half=multiply(kappa,inverse_two);require(plus(half,half)==kappa,"known halftrace double");auto sk=ssl.make(kappa),sh=ssl.make({});auto scalar=bn(inverse_two);require(EC_POINT_mul(ssl.group.get(),sh.get(),nullptr,sk.get(),scalar.get(),ssl.context.get())==1&&ssl.encode(sh.get())==key(half),"independent halftrace multiplication");Matrix aliases;for(size_t j=0;j<base.size();++j)for(int sign:{1,-1})if(half==(sign==1?base[j]:negative(base[j]))){Row row=canonical;for(auto& x:row)x=-x;row[j]+=2*sign;require(row_sum(row,base).zero,"halftrace alias norm");aliases.push_back(row);all.push_back(row);}
+      |                                                                                                                                                                                      ^
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v1/source/signed_words.cpp:45:249: error: ‘sh’ was not declared in this scope
+   45 |     const Big inverse_two=(subgroup_order+1)/2;Point half=multiply(kappa,inverse_two);require(plus(half,half)==kappa,"known halftrace double");auto sk=ssl.make(kappa),sh=ssl.make({});auto scalar=bn(inverse_two);require(EC_POINT_mul(ssl.group.get(),sh.get(),nullptr,sk.get(),scalar.get(),ssl.context.get())==1&&ssl.encode(sh.get())==key(half),"independent halftrace multiplication");Matrix aliases;for(size_t j=0;j<base.size();++j)for(int sign:{1,-1})if(half==(sign==1?base[j]:negative(base[j]))){Row row=canonical;for(auto& x:row)x=-x;row[j]+=2*sign;require(row_sum(row,base).zero,"halftrace alias norm");aliases.push_back(row);all.push_back(row);}
+      |                                                                                                                                                                                                                                                         ^~

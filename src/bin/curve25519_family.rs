@@ -1458,9 +1458,15 @@ fn support(k: u32, form: &str, t: u32) -> Value {
         }
         "isogeny" => {
             let mut ops = crypto_lib::cryptanalysis::ic_boundary::GroupOps::default();
-            crypto_lib::cryptanalysis::ic_framework::prime_tower::isogeny_tower(p, t, 0, crypto_lib::cryptanalysis::ic_framework::prime_tower::AuxFamily::Any, &mut ops)
-                .expect("isogeny tower")
-                .v
+            crypto_lib::cryptanalysis::ic_framework::prime_tower::isogeny_tower(
+                p,
+                t,
+                0,
+                crypto_lib::cryptanalysis::ic_framework::prime_tower::AuxFamily::Any,
+                &mut ops,
+            )
+            .expect("isogeny tower")
+            .v
         }
         "kummer" => {
             if (p - 1) % span != 0 {
@@ -1553,7 +1559,7 @@ fn iso_census(k: u32, t: u32, seed_lo: u64, seed_hi: u64) {
     use crypto_lib::cryptanalysis::ic_boundary::{
         CountedGroup, GroupOps, PrimeCurve, PrimeInstance, PrimePoint,
     };
-    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{AuxFamily, PrimeIsogenyBase};
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::PrimeIsogenyBase;
     use crypto_lib::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
     let m = build_miniature(k);
     let inst = PrimeInstance {
@@ -1877,7 +1883,9 @@ fn f4cost_m(
         prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
     };
     use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
-    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{
+        isogeny_tower, AuxFamily, PrimeIsogenyBase,
+    };
     use crypto_lib::cryptanalysis::ic_framework::stages::{
         DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params,
     };
@@ -2006,7 +2014,8 @@ fn f4cost_m(
             let fb = PrimeIsogenyBase { instance: &inst }
                 .build(&ctx, &params, &mut GroupOps::default())
                 .expect("isogeny base");
-            let tower = isogeny_tower(m.p, t, t0_lo, AuxFamily::Any, &mut GroupOps::default()).expect("tower");
+            let tower = isogeny_tower(m.p, t, t0_lo, AuxFamily::Any, &mut GroupOps::default())
+                .expect("tower");
             let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
             (
                 fb,
