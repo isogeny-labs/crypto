@@ -5,6 +5,7 @@ on:
     paths:
       - 'summation_split/sector_complete.py'
       - 'summation_split/test_sector_complete.py'
+      - 'summation_split/test_sector_firstfall.py'
       - 'summation_split/sector.py'
       - 'summation_split/core.py'
       - '.github/workflows/semaev-complete-charts.yml'
@@ -24,4 +25,4 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install 'sympy==1.13.3'
       - name: Exact Fp resultants and complete polynomial witnesses
-        run: PYTHONPATH=. python -m unittest -q summation_split.test_sector_complete
+        run: PYTHONPATH=. python -m unittest -q summation_split.test_sector_complete summation_split.test_sector_firstfall
