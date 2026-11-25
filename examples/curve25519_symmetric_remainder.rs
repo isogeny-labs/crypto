@@ -32,6 +32,7 @@ const R: u64 = 131_203;
 const GX: u64 = 349_837;
 const GY: u64 = 122;
 const LO: u64 = 349_833;
+const FACTOR_G: u64 = 3;
 const SEED: u64 = 20_261_125;
 
 #[inline]
@@ -749,7 +750,7 @@ fn run_cell(args: &[String]) -> Result<(), String> {
     let cfg = Config {
         curve: Curve { p: P, a: A, b: B },
         lo: LO,
-        g: 1,
+        g: FACTOR_G,
     };
     let target = target_for(cfg, d, &kind, index, seed)?;
     let (xt, yt) = target.point.0.ok_or("target is identity")?;
@@ -884,7 +885,7 @@ fn run_selftest() -> Result<(), String> {
     let main = Config {
         curve: Curve { p: P, a: A, b: B },
         lo: LO,
-        g: 1,
+        g: FACTOR_G,
     };
     let generator = Point(Some((GX, GY)));
     if !main.curve.on_curve(generator) || main.curve.mul(R, generator) != Point(None) {
