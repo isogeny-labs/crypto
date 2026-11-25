@@ -1,0 +1,23 @@
+\\ P-192 Frobenius-order certificate. Run: gp -q cm_endomorphism_gate.gp
+p = 6277101735386680763835789423207666416083908700390324961279;
+r = 6277101735386680763835789423176059013767194773182842284081;
+t = p + 1 - r;
+D = t^2 - 4*p;
+factors = [5, 11, 31, 14140398275856956083603613626459809774163796198179979683];
+if(t != 31607402316713927207482677199, error("unexpected trace"));
+if(D != -24109379060336110122544161233113975664949272517896865359515, error("unexpected discriminant"));
+if(D % 4 != 1 || D >= 0, error("not a negative 1-mod-4 discriminant"));
+if(prod(i=1, #factors, factors[i]) != -D, error("factorization mismatch"));
+for(i=1, #factors, if(isprime(factors[i]) != 1, error("factor not certified prime")));
+if(gcd(t, p) != 1, error("not ordinary"));
+min_noninteger_degree = (-D + 3) \ 4;
+if(kronecker(D, 2) != -1 || kronecker(D, 3) != -1 || kronecker(D, 7) != -1, error("small inert-prime check failed"));
+if(kronecker(D, 5) != 0 || kronecker(D, 11) != 0, error("small ramified-prime check failed"));
+if(kronecker(D, 13) != 1, error("13 unexpectedly nonsplit"));
+if(13^51 >= min_noninteger_degree, error("13-chain lower bound failed"));
+print("trace=", t);
+print("Frobenius_discriminant=", D);
+print("squarefree_factors=", factors);
+print("minimum_noninteger_endomorphism_degree=", min_noninteger_degree);
+print("horizontal_2_3_7=inert; horizontal_5_11=ramified; horizontal_13=split; one-direction_13_cycle_edges>=52");
+print("End(E)=Z[pi]; pi acts as identity on E(F_p)");

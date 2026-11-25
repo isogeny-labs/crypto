@@ -1335,6 +1335,49 @@ maximal. Maximal CM order is therefore not a sufficient
 exactness condition either. These finite counterexamples do
 not determine the P-192 norm sign. [pcc:unverified]
 
+For P-192 itself, the Frobenius order has an independently
+checkable constraint. With `p` the field prime and `r` the
+prime group order, `t=p+1-r=31607402316713927207482677199`
+and
+
+`D=t²-4p=-24109379060336110122544161233113975664949272517896865359515`
+`=-5·11·31·14140398275856956083603613626459809774163796198179979683`.
+
+The [`cm_endomorphism_gate.gp`](cm_endomorphism_gate.gp) replay
+checks the factorization and `isprime` of each factor;
+`D≡1 (mod 4)` is therefore a fundamental discriminant. P-192 is
+ordinary because `gcd(t,p)=1`. For an ordinary curve,
+[`Z[π]⊆End_Fp(E)⊆O_K`](https://ocw.mit.edu/courses/18-783-elliptic-curves-fall-2025/mit18_783_f25_lec13.pdf);
+since `disc(Z[π])=D` is fundamental, all three rings coincide.
+Every endomorphism is `a+bπ` for integers `a,b`, and
+`deg(a+bπ)=((2a+bt)²+|D|b²)/4`. If `b≠0`, its degree is at
+least `ceil(|D|/4)=6027344765084027530636040308278493916237318129474216339879`
+(`≈2^191.941`). On `E(F_p)`, Frobenius `π` is the identity,
+so `a+bπ` acts as `[a+b]`. This rules out a low-degree
+noninteger CM **self-map** as the cheap scalar-orbit step.
+The same replay finds `2,3,7` inert, `5,11` ramified, and
+`13` the first split prime. A chain that repeats one of the
+two horizontal degree-13 ideal directions and returns to the
+starting curve
+would yield a noninteger endomorphism of degree `13^k`.
+Since `13^51<ceil(|D|/4)`, such a return needs at least
+`k=52` edges. This is a chain-length floor, not a charged
+cost for constructing or evaluating a level-structure action.
+For the existing optimized odd-isogeny formula in
+[`endo_generic_point.rs`](../../src/ecc/endo_generic_point.rs),
+a degree-13 edge costs `35M` on an affine first input and
+`90M+1S` on a later Jacobian input. Even at the 52-edge
+floor, that specific chain path would spend at least
+`4625M+51S` to move one point, before its kernel and map
+construction, versus `1045M+1165S` per direct scalar-orbit
+step in the equal-weight candidate above. This is a formula
+comparison for that implementation, not a universal isogeny
+lower bound or a measured wall-time comparison. These gates
+do not bound the evaluation cost of a high-degree map,
+the construction or evaluation of horizontal isogenies between
+different curves, or the doubling norm's exactness.
+[pcc:unverified]
+
 For triage only, an artificial null model assigns independent
 uniform signs to the `n=(r-1)/2` base-point `y`-coordinates.
 The `t=n/m` coset products then have independent signs;
