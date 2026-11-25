@@ -1138,6 +1138,25 @@ coset. That is neither a full-run timing nor a matched rho
 search: the reference is a full-add microbenchmark, and the
 P-192 exactness condition is unresolved. [pcc:unverified]
 
+The same measurement gives a conditional **bias-amplification gate**
+for a direct full-coset evaluator. If its per-factor CPU cost stayed
+at the six-run median, one traversal would cost
+`147.8075215/(2·458.8111801)≈0.16108R` in the full-add
+reference. A shared base traversal and `k` target traversals
+would therefore cost `(k+1)·0.16108R` before setup and other
+overheads. At most five target traversals fit below `R` on
+that optimistic accounting; six would cost about `1.128R`.
+For an **unverified independent-error model** in which each
+target sign agrees with the desired scalar sign with probability
+`p`, five-vote majority reaches 99% accuracy only when
+`p≥0.89436`, or sign correlation `2p−1≥0.78872`. Three votes
+require correlation about `0.88219`, and one vote requires
+`0.98`. These are conditional numerical thresholds, not a
+measured bias, an independence claim, or a lower bound on
+other sign algorithms. A weak empirical bias would not make
+this particular direct-evaluation and majority scheme a
+below-reference 99% sign computation. [pcc:unverified]
+
 For the first large P-192 subgroup size beyond 95,560,
 `m=8·9564682313913860059195669≈2^85.984`, a **hypothetical**
 additive paired-index grid with `h=6,185,364,116,659` offsets,
