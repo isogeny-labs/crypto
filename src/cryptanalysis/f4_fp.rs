@@ -390,34 +390,13 @@ fn mulmod(a: u64, b: u64, p: u64) -> u64 {
 
 fn invmod(a: u64, p: u64) -> u64 {
     super::jv_bitops::charge(super::jv_bitops::Kind::FieldInv, 1);
-    // p prime, a != 0
-    if (2..1 << 32).contains(&p) {
-        // the same powers, each product reduced by Barrett's method
-        // instead of a 128-bit division
-        let fp = Barrett::new(p);
-        let mut r = 1u64;
-        let mut base = a % p;
-        let mut e = p - 2;
-        while e > 0 {
-            if e & 1 == 1 {
-                r = fp.reduce(r * base);
-            }
-            base = fp.reduce(base * base);
-            e >>= 1;
-        }
-        return r;
+    // p prime, a != 0.  Shared inverse; a non-unit keeps the old Fermat
+    // value `a^(p−2)`: 0 for `a ≡ 0`, except `p = 2` where it was 1.
+    match crate::gcd::int::inv_mod_u64(a, p) {
+        Some(v) => v,
+        None if p == 2 => 1,
+        None => 0,
     }
-    let mut r = 1u64;
-    let mut base = a % p;
-    let mut e = p - 2;
-    while e > 0 {
-        if e & 1 == 1 {
-            r = mulmod(r, base, p);
-        }
-        base = mulmod(base, base, p);
-        e >>= 1;
-    }
-    r
 }
 
 /// Reduction modulo a fixed `p < 2³²` by Barrett's method: a precomputed
@@ -1875,18 +1854,13 @@ fn tracked_rref_contributors(
 }
 
 fn inv_mod_u64(a: u64, p: u64) -> u64 {
-    // Fermat
-    let mut base = a % p;
-    let mut e = p - 2;
-    let mut acc = 1u64;
-    while e > 0 {
-        if e & 1 == 1 {
-            acc = ((acc as u128 * base as u128) % p as u128) as u64;
-        }
-        base = ((base as u128 * base as u128) % p as u128) as u64;
-        e >>= 1;
+    // Shared inverse for the prime `p`; a non-unit keeps the old Fermat
+    // value `a^(p−2)`: 0 for `a ≡ 0`, except `p = 2` where it was 1.
+    match crate::gcd::int::inv_mod_u64(a, p) {
+        Some(v) => v,
+        None if p == 2 => 1,
+        None => 0,
     }
-    acc
 }
 
 enum TraceMode<'a> {

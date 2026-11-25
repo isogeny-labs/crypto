@@ -290,11 +290,7 @@ fn point_order(ec: &Ec, p: Pt, n: u64, fac: &[(u64, u32)]) -> u64 {
 }
 
 fn gcd64(a: u64, b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else {
-        gcd64(b, a % b)
-    }
+    crate::gcd::int::gcd_u64(a, b)
 }
 
 /// `(n1, n2)` with `E(F_p) = Z/n1 × Z/n2` from the exponent of 24 random points.

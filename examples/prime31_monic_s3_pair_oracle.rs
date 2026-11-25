@@ -58,9 +58,9 @@ fn divrem(f:Fp,a:&Poly,b:&Poly)->(Poly,Poly) {
     }
     (trim(q),r)
 }
-fn gcd(f:Fp,mut a:Poly,mut b:Poly)->Poly {
-    while !zero(&b){let (_,r)=divrem(f,&a,&b);a=b;b=r;}
-    if zero(&a){a}else{scale(f,&a,f.inv(*a.last().unwrap()))}
+fn gcd(f:Fp,a:Poly,b:Poly)->Poly {
+    // Monic gcd through the shared module; the zero polynomial here is `[0]`.
+    trim(crypto_lib::gcd::poly::gcd(&crypto_lib::gcd::poly::Fp64::new(f.p),&a,&b))
 }
 fn powmod(f:Fp,mut base:Poly,mut exp:u64,modulus:&Poly)->Poly {
     assert!(degree(modulus)>0);

@@ -221,15 +221,10 @@ fn basis_coordinates(
     Ok(label)
 }
 
-fn polynomial_gcd(mut a: BigUint, mut b: BigUint) -> BigUint {
-    while !b.is_zero() {
-        while !a.is_zero() && a.bits() >= b.bits() {
-            let shift = (a.bits() - b.bits()) as usize;
-            a ^= &b << shift;
-        }
-        std::mem::swap(&mut a, &mut b);
-    }
-    a
+fn polynomial_gcd(a: BigUint, b: BigUint) -> BigUint {
+    // GF(2)[x] gcd by the shared bit-packed gcd (BigUint bit i = coeff of x^i).
+    let g = crate::gcd::gf2::gcd(&a.to_u64_digits(), &b.to_u64_digits());
+    BigUint::from_bytes_le(&g.iter().flat_map(|w| w.to_le_bytes()).collect::<Vec<u8>>())
 }
 fn exact_field(curve: &BinaryCurve) -> bool {
     let n = curve.m;

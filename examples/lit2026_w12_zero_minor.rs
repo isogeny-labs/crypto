@@ -124,18 +124,7 @@ impl Fp {
 }
 
 pub fn inv_mod(a: u64, m: u64) -> u64 {
-    let (mut t, mut nt) = (0i128, 1i128);
-    let (mut r, mut nr) = (m as i128, (a % m) as i128);
-    while nr != 0 {
-        let q = r / nr;
-        (t, nt) = (nt, t - q * nt);
-        (r, nr) = (nr, r - q * nr);
-    }
-    assert_eq!(r, 1, "not invertible");
-    if t < 0 {
-        t += m as i128;
-    }
-    t as u64
+    crypto_lib::gcd::int::inv_mod_u64(a, m).expect("not invertible")
 }
 
 // ───────────────────────── counted linear algebra ─────────────────────────

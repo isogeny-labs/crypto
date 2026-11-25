@@ -65,11 +65,8 @@ fn factor(mut n: u64) -> Vec<(u64, u32)> {
     }
     out
 }
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 fn roots(gf: &Gf2, quad: &exact::Quadratic<'_>, a: u64, x: u64) -> Vec<u64> {
     let x2 = gf.sqr(x);

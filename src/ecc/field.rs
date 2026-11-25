@@ -259,27 +259,9 @@ pub(crate) fn single_word(n: &BigUint) -> Option<u64> {
 /// `a⁻¹ mod m` for `0 < a < m`, or `None` when `gcd(a, m) ≠ 1`.  Variable
 /// time (see [`FieldElement::inv_vartime`]).
 ///
-/// The extended Euclidean algorithm on `(m, a)`, keeping only `a`'s
-/// coefficient `t`.  Those coefficients alternate in sign and never
-/// exceed `m` in magnitude, so the loop carries their magnitudes in a
-/// `u64` and recovers the sign of the last one from the parity of the
-/// step count: no signed or double-width arithmetic.
+/// Delegates to the shared [`crate::gcd::int::inv_mod_u64`].
 pub(crate) fn inv_mod_u64(a: u64, m: u64) -> Option<u64> {
-    let (mut r0, mut r1) = (m, a);
-    let (mut t0, mut t1) = (0u64, 1u64);
-    let mut odd = false;
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 + q * t1);
-        odd = !odd;
-    }
-    if r0 != 1 {
-        return None;
-    }
-    // `t0` is the coefficient from before the last step; it is positive
-    // exactly when the step count is odd.
-    Some(if odd { t0 } else { m - t0 })
+    crate::gcd::int::inv_mod_u64(a, m)
 }
 
 impl PartialEq for FieldElement {

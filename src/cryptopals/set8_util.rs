@@ -9,9 +9,8 @@
 //!   *unique* small prime factors (challenge 57 wants no repeats).
 //! - `hmac_sha256` — the MAC the challenges authenticate with.
 
-use num_bigint::{BigInt, BigUint, ToBigInt};
-use num_integer::Integer;
-use num_traits::{One, Zero};
+use num_bigint::{BigUint, ToBigInt};
+use num_traits::Zero;
 
 /// Parse a base-10 string as a `BigUint`.  Panics on garbage input —
 /// the only callers pass embedded string literals.
@@ -20,18 +19,10 @@ pub fn parse_big(s: &str) -> BigUint {
         .expect("set8_util::parse_big: invalid decimal literal")
 }
 
-/// Compute modular inverse via the extended Euclidean algorithm.
-/// Same as `crate::utils::mod_inverse` but kept inline here so the
-/// module is self-contained.
+/// Modular inverse in `[0, m)`, `None` unless `gcd(a, m) = 1`, via the
+/// shared [`crate::gcd::int::modinv_big`].
 fn mod_inv(a: &BigUint, m: &BigUint) -> Option<BigUint> {
-    let a_i = a.to_bigint().unwrap();
-    let m_i = m.to_bigint().unwrap();
-    let g = a_i.extended_gcd(&m_i);
-    if g.gcd != BigInt::one() {
-        return None;
-    }
-    let x = ((g.x % &m_i) + &m_i) % &m_i;
-    x.to_biguint()
+    crate::gcd::int::modinv_big(a, m)
 }
 
 /// Combine two congruences with the Chinese Remainder Theorem.

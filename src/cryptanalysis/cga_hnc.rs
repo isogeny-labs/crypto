@@ -374,13 +374,8 @@ pub fn orbit_smoothness_report(
     }
 }
 
-fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        let r = a % b;
-        a = b;
-        b = r;
-    }
-    a
+fn gcd_u64(a: u64, b: u64) -> u64 {
+    crate::gcd::int::gcd_u64(a, b)
 }
 
 // ── Phase 2: Point operations + 2-isogeny transport + Pohlig-Hellman ──────
@@ -432,12 +427,17 @@ fn modular_inverse(x: &BigInt, p: &BigInt) -> Option<BigInt> {
                 .to_u64()
                 .expect("x mod p is below a one-word p"),
         };
-        return mod_inverse_u64(x_word, p_word).map(BigInt::from);
+        return crate::gcd::int::inv_mod_u64(x_word, p_word).map(BigInt::from);
     }
     let x_pos = mod_pos(x.clone(), p);
     let xu = x_pos.to_biguint()?;
     let pu = p.to_biguint()?;
-    let inv_u = mod_inverse(&xu, &pu)?;
+    // `utils::mod_inverse` (the old call) gave `None` for a zero residue,
+    // also when `p = 1`; keep that.
+    if xu.is_zero() {
+        return None;
+    }
+    let inv_u = crate::gcd::int::modinv_big(&xu, &pu)?;
     Some(inv_u.to_bigint().unwrap())
 }
 
@@ -1209,14 +1209,8 @@ fn crt_combine_pairs(pairs: &[(u64, u64)]) -> (BigInt, BigInt) {
 }
 
 fn gcd_bi(a: &BigInt, b: &BigInt) -> BigInt {
-    let mut x = a.clone();
-    let mut y = b.clone();
-    while !y.is_zero() {
-        let r = &x % &y;
-        x = y;
-        y = r;
-    }
-    x.abs()
+    // |gcd(a, b)| via the shared Lehmer / half-GCD.
+    BigInt::from(crate::gcd::int::gcd_big(a.magnitude(), b.magnitude()))
 }
 
 #[cfg(test)]

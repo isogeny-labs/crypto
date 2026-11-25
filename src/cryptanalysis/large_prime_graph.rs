@@ -65,14 +65,7 @@ fn neg_mod(a: u64, p: u64) -> u64 {
 }
 
 fn inv_mod(a: u64, p: u64) -> Option<u64> {
-    let (mut old_r, mut r) = (a as i128, p as i128);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        (old_r, r) = (r, old_r - q * r);
-        (old_s, s) = (s, old_s - q * s);
-    }
-    (old_r == 1).then(|| old_s.rem_euclid(p as i128) as u64)
+    crate::gcd::int::inv_mod_u64(a, p)
 }
 
 fn valid_modulus(p: u64) -> bool {

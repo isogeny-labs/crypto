@@ -427,17 +427,11 @@ impl RhoScalar for u128 {
         }
     }
     fn inverse_mod(v: Self, m: Self) -> Option<Self> {
-        use num_bigint::BigInt;
-        use num_integer::Integer;
+        // `v = 0` is `None` even for `m = 1` (old contract).
         if v == 0 {
             return None;
         }
-        let e = BigInt::from(v).extended_gcd(&BigInt::from(m));
-        if e.gcd != BigInt::from(1) {
-            return None;
-        }
-        let x = e.x.mod_floor(&BigInt::from(m));
-        Self::from_biguint(&x.to_biguint()?)
+        crate::gcd::int::inv_mod_u128(v, m)
     }
 }
 
@@ -975,17 +969,11 @@ fn sub_mod(left: u64, right: u64, modulus: u64) -> u64 {
 }
 
 fn inverse_mod(value: u64, modulus: u64) -> Option<u64> {
+    // `value = 0` is `None` even for `modulus = 1` (old contract).
     if value == 0 {
         return None;
     }
-    let (mut old_r, mut r) = (modulus as i128, value as i128);
-    let (mut old_t, mut t) = (0i128, 1i128);
-    while r != 0 {
-        let quotient = old_r / r;
-        (old_r, r) = (r, old_r - quotient * r);
-        (old_t, t) = (t, old_t - quotient * t);
-    }
-    (old_r == 1).then_some(old_t.rem_euclid(modulus as i128) as u64)
+    crate::gcd::int::inv_mod_u64(value, modulus)
 }
 
 /// Jump index of a point (a fixed 64-bit mixer; part of the walk definition).

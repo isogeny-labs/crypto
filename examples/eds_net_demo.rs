@@ -13,13 +13,8 @@
 use crypto_lib::cryptanalysis::eds_net::{build_net, check_net_relation, legendre};
 use crypto_lib::cryptanalysis::eds_tate::{ec_add, ec_mul, ec_order};
 
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        let t = a % b;
-        a = b;
-        b = t;
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 fn toy(p: u64, min_r: u64) -> Option<(u64, u64, (u64, u64), u64)> {

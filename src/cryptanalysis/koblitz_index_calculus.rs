@@ -447,13 +447,8 @@ fn poly_mulmod(a: u64, b: u64, f: u64) -> u64 {
 }
 
 /// `gcd(a, b)` in `F_2[x]`, monic by construction (F_2 has one unit).
-fn poly_gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        let r = poly_rem(a, b);
-        a = b;
-        b = r;
-    }
-    a
+fn poly_gcd(a: u64, b: u64) -> u64 {
+    crate::gcd::gf2::gcd_word(a, b)
 }
 
 /// `x^(2^k) mod f` by repeated squaring of the residue.
@@ -512,13 +507,12 @@ fn poly_mulmod_wide(a: u128, b: u128, f: u128) -> u128 {
     poly_rem_wide(acc, f)
 }
 
-fn poly_gcd_wide(mut a: u128, mut b: u128) -> u128 {
-    while b != 0 {
-        let r = poly_rem_wide(a, b);
-        a = b;
-        b = r;
-    }
-    a
+fn poly_gcd_wide(a: u128, b: u128) -> u128 {
+    // Shared bit-packed GF(2)[x] gcd on the two 64-bit words.
+    let g = crate::gcd::gf2::gcd(&[a as u64, (a >> 64) as u64], &[b as u64, (b >> 64) as u64]);
+    g.iter()
+        .enumerate()
+        .fold(0u128, |acc, (i, &w)| acc | (w as u128) << (64 * i))
 }
 
 fn poly_x_pow_2k_wide(k: u32, f: u128) -> u128 {
@@ -17660,14 +17654,8 @@ fn add_mod_u64(a: u64, b: u64, m: u64) -> u64 {
 /// `a⁻¹ mod m` by the extended Euclidean algorithm, or `None` when
 /// `gcd(a, m) ≠ 1`.
 fn inverse_mod_u64(a: u64, m: u64) -> Option<u64> {
-    let (mut old_r, mut r) = (a as i128 % m as i128, m as i128);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        (old_r, r) = (r, old_r - q * r);
-        (old_s, s) = (s, old_s - q * s);
-    }
-    (old_r == 1).then(|| old_s.rem_euclid(m as i128) as u64)
+    // `a % m` keeps the old panic on m = 0.
+    crate::gcd::int::inv_mod_u64(a % m, m)
 }
 
 #[derive(Clone, Debug, Serialize)]

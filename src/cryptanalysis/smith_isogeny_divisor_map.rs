@@ -109,7 +109,8 @@ fn pw(b: u64, mut e: u64, p: u64) -> u64 {
 }
 fn inv(a: u64, p: u64) -> u64 {
     assert!(!a.is_multiple_of(p), "inverse of zero");
-    pw(a, p - 2, p)
+    // p prime: the value a^(p−2) gave.
+    crate::gcd::int::inv_mod_u64(a, p).expect("inverse modulo a prime")
 }
 fn chi_p(a: u64, p: u64) -> i8 {
     let a = a % p;
@@ -203,41 +204,18 @@ fn pmonic(a: &[u64], p: u64) -> Poly {
     }
     a
 }
+/// Monic `gcd(a, b)`, by `crate::gcd::poly::gcd`.
 fn pgcd(a: &[u64], b: &[u64], p: u64) -> Poly {
-    let (mut a, mut b) = (a.to_vec(), b.to_vec());
-    ptrim(&mut a);
-    ptrim(&mut b);
-    while !b.is_empty() {
-        let r = prem(&a, &b, p);
-        a = b;
-        b = r;
-    }
-    pmonic(&a, p)
+    crate::gcd::poly::gcd(&crate::gcd::poly::Fp64::new(p), a, b)
 }
-/// `(g, s, t)` with `s a + t b = g` monic.
+/// `(g, s, t)` with `s a + t b = g` monic, by `crate::gcd::poly::xgcd`
+/// (the classical cofactors).  For `a = b = 0` it keeps the old `(0, 1, 0)`.
 fn pxgcd(a: &[u64], b: &[u64], p: u64) -> (Poly, Poly, Poly) {
-    let (mut r0, mut r1) = (a.to_vec(), b.to_vec());
-    ptrim(&mut r0);
-    ptrim(&mut r1);
-    let (mut s0, mut s1): (Poly, Poly) = (vec![1], Vec::new());
-    let (mut t0, mut t1): (Poly, Poly) = (Vec::new(), vec![1]);
-    while !r1.is_empty() {
-        let (q, r) = pdivrem(&r0, &r1, p);
-        let s2 = psub(&s0, &pmul(&q, &s1, p), p);
-        let t2 = psub(&t0, &pmul(&q, &t1, p), p);
-        r0 = r1;
-        r1 = r;
-        s0 = s1;
-        s1 = s2;
-        t0 = t1;
-        t1 = t2;
+    let (g, s, t) = crate::gcd::poly::xgcd(&crate::gcd::poly::Fp64::new(p), a, b);
+    if g.is_empty() {
+        return (Vec::new(), vec![1], Vec::new());
     }
-    if let Some(&l) = r0.last() {
-        let li = inv(l, p);
-        (pscale(&r0, li, p), pscale(&s0, li, p), pscale(&t0, li, p))
-    } else {
-        (r0, s0, t0)
-    }
+    (g, s, t)
 }
 #[allow(dead_code)]
 fn peval(a: &[u64], x: u64, p: u64) -> u64 {
@@ -2079,6 +2057,10 @@ fn ring_minpoly(mu: &[u64], a: &[u64], p: u64) -> Poly {
 }
 
 fn poly_inv_mod(a: &[u64], mu: &[u64], p: u64) -> Option<Poly> {
+    if pdeg(mu) >= 1 {
+        return crate::gcd::poly::inv_mod(&crate::gcd::poly::Fp64::new(p), a, mu);
+    }
+    // Constant or zero `mu`: as before.
     let (g, s, _) = pxgcd(a, mu, p);
     (pdeg(&g) == 0).then(|| prem(&s, mu, p))
 }
