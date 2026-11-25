@@ -8,7 +8,6 @@ n=23 Koblitz is a frozen public-synthetic experimental control, NOT ECC2K-130.
 from __future__ import annotations
 
 import argparse
-import csv
 from datetime import datetime, timezone
 import json
 import os
@@ -16,18 +15,20 @@ from pathlib import Path
 import platform
 import subprocess
 import sys
-import time
+
+from hourly_cpu_telemetry import EXTRA, append_row, compare_cpu, read_history, run_measured
 
 REPO = Path(__file__).resolve().parents[1]
 CSV_PATH = REPO / "results/hourly_log.csv"
 BASELINE_PATH = REPO / "results/relation_baseline.json"
 ALERT_PATH = REPO / "results/hourly_alert.md"
+CPU_BASELINE_PATH = REPO / "results/relation_cpu_baselines.json"
 HEADER = [
     "timestamp_utc", "source_sha", "curve_n", "curve_a", "factor_base_hash",
     "natural_trials", "natural_relations", "planted_count", "planted_verified",
     "unsat_count", "unsat_hits", "wall_seconds", "relations_per_sec",
     "success_rate", "status", "anomaly", "host_cpu", "run_url", "details",
-]
+] + EXTRA
 THRESHOLD = 0.20
 EXPECTED_NATURAL = 256
 EXPECTED_PLANTED = 64
@@ -114,13 +115,7 @@ def compare(metrics: dict, baseline: dict) -> list[str]:
 
 
 def append_log(row: dict) -> None:
-    CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
-    needs_header = not CSV_PATH.exists() or CSV_PATH.stat().st_size == 0
-    with CSV_PATH.open("a", encoding="utf-8", newline="") as output:
-        writer = csv.DictWriter(output, fieldnames=HEADER, extrasaction="ignore")
-        if needs_header:
-            writer.writeheader()
-        writer.writerow(row)
+    append_row(CSV_PATH, HEADER, row)
 
 
 def run_command(args: list[str], timeout: int) -> subprocess.CompletedProcess:
@@ -156,9 +151,7 @@ def main() -> int:
             if build.returncode:
                 raise RuntimeError(f"Cargo build rc={build.returncode}: {build.stderr[-1800:]}")
         binary = REPO / "target/release/examples/koblitz_relation_yield_bridge"
-        start = time.perf_counter()
-        outcome = run_command([str(binary)], args.run_timeout)
-        wall_seconds = time.perf_counter() - start
+        outcome, wall_seconds = run_measured(binary, run_command, args.run_timeout, row)
         if outcome.returncode:
             raise RuntimeError(f"relation harness rc={outcome.returncode}: {outcome.stderr[-1800:]}")
         data = json.loads(outcome.stdout)
@@ -172,7 +165,8 @@ def main() -> int:
             )
         if BASELINE_PATH.exists():
             baseline = json.loads(BASELINE_PATH.read_text(encoding="utf-8"))
-            issues = compare(metrics, baseline)
+            issues = [issue for issue in compare(metrics, baseline)
+                      if not issue.startswith("relations_per_sec:")]
         else:
             baseline = {
                 "schema": "hourly_relation_baseline.v1", "established_at": timestamp,
@@ -187,9 +181,16 @@ def main() -> int:
             BASELINE_PATH.parent.mkdir(parents=True, exist_ok=True)
             BASELINE_PATH.write_text(json.dumps(baseline, indent=2) + "\n", encoding="utf-8")
             row["details"] = "first successful run; baseline established; no comparison"
+        store = (json.loads(CPU_BASELINE_PATH.read_text(encoding="utf-8"))
+                 if CPU_BASELINE_PATH.exists() else {"schema": "hourly_cpu_baselines.v1", "cohorts": {}})
+        if not issues:
+            issues.extend(compare_cpu(row, read_history(CSV_PATH), store))
+        if store["cohorts"]:
+            CPU_BASELINE_PATH.write_text(json.dumps(store, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         if issues:
             row["status"] = "regression"
     except (OSError, ValueError, KeyError, json.JSONDecodeError, subprocess.TimeoutExpired, RuntimeError) as exc:
+        row["status"] = "failed"
         issues = [f"run failed: {type(exc).__name__}: {exc}"]
         row["details"] = str(exc)[:500].replace("\n", " ")
     row["anomaly"] = " | ".join(issues)[:1000]
@@ -205,7 +206,9 @@ def main() -> int:
             f"- Wall seconds: {row['wall_seconds']}\n"
             f"- Relations/second: {row['relations_per_sec']}\n"
             f"- Success rate: {row['success_rate']}\n"
-            f"- Threshold: > {THRESHOLD * 100:.0f}% change from committed first-run baseline\n\n"
+            f"- CPU baseline state: {row['baseline_state']} ({row['baseline_samples']} samples)\n"
+            f"- CPU baseline version: {row['baseline_version']}\n"
+            f"- Threshold: > {THRESHOLD * 100:.0f}% change from matching CPU cohort; global yield/identity checks retained\n\n"
             + "\n".join(f"- {issue}" for issue in issues) +
             "\n\nThe CSV row is retained even on failure. Throughput excludes compilation but includes "
             "factor-base construction and exact pair enumeration. Runner-to-runner CPU variation "
