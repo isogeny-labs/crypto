@@ -18,7 +18,8 @@
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
 use super::mont_vt::{
-    CiosKernel, KaratsubaKernel, Mont, MulKernel, ProdKernel, SqrKernel, TunedKernel,
+    AdxKernel, AdxSqrKernel, CiosKernel, KaratsubaKernel, Mont, MulKernel, MulxKernel, ProdKernel,
+    SqrKernel, TunedKernel,
 };
 use num_bigint::BigUint;
 
@@ -170,6 +171,10 @@ fn mont_dispatch<K: MulKernel>(
 ///   production `scalar_mul` path after this change.
 /// * `tuned_wnaf` — `tuned` with width-4 (≤ 3 limbs) / width-5 NAF and the
 ///   binary-GCD inverse: the production `scalar_mul_vartime` path.
+/// * `adx` — inline-asm `mulx`/`adcx`/`adox` product at 4 limbs (squares as
+///   `a·a`), `tuned` elsewhere or without ADX; `adx_sqr` keeps `tuned`'s
+///   dedicated squaring; `mulx` — the intrinsic CIOS at every width;
+///   `adx_wnaf` — `adx` with the `tuned_wnaf` ladder.
 /// * `karatsuba` — one-level Karatsuba products + squaring, exact width.
 /// * `sqr_bingcd` — `sqr` with the final `Z⁻¹` by the fixed-width binary
 ///   extended GCD instead of the Fermat power.
@@ -202,6 +207,19 @@ pub fn scalar_mul_arm(arm: &str, p: &Point, k: &BigUint, a: &FieldElement) -> Op
                 5
             };
             mont_dispatch::<TunedKernel>(x, y, k, a, Wnaf(w), true, false)
+        }
+        // ADX kernels are dispatched only after the CPU check.
+        "adx" | "adx_sqr" | "adx_wnaf" if !super::mont_vt::has_adx() => None,
+        "adx" => mont_dispatch::<AdxKernel>(x, y, k, a, Binary, false, false),
+        "adx_sqr" => mont_dispatch::<AdxSqrKernel>(x, y, k, a, Binary, false, false),
+        "mulx" => mont_dispatch::<MulxKernel>(x, y, k, a, Binary, false, false),
+        "adx_wnaf" => {
+            let w = if x.modulus.bits().div_ceil(64) <= 3 {
+                4
+            } else {
+                5
+            };
+            mont_dispatch::<AdxKernel>(x, y, k, a, Wnaf(w), true, false)
         }
         _ => None,
     }
@@ -239,6 +257,21 @@ pub fn field_kernel_probe(
             "sqr" => (0..iters).for_each(|_| acc = ctx.sqr(std::hint::black_box(&acc))),
             "karatsuba_mul" => {
                 (0..iters).for_each(|_| acc = ctx.mul_karatsuba(std::hint::black_box(&acc), &bm))
+            }
+            "adx_mul" => {
+                ctx.mul_adx4(&acc, &bm)?;
+                (0..iters)
+                    .for_each(|_| acc = ctx.mul_adx4(std::hint::black_box(&acc), &bm).unwrap())
+            }
+            "mulx_mul" => {
+                if !super::mont_vt::has_adx() {
+                    return None;
+                }
+                #[cfg(target_arch = "x86_64")]
+                (0..iters).for_each(|_| {
+                    // SAFETY: has_adx() checked above.
+                    acc = unsafe { ctx.mul_mulx(std::hint::black_box(&acc), &bm) }
+                })
             }
             "sos_mul" => (0..iters)
                 .for_each(|_| acc = ctx.redc(Mont::<N>::mul_wide(std::hint::black_box(&acc), &bm))),
@@ -2064,7 +2097,11 @@ mod mont_kernel_arms {
         BigUint::from(1u8) << e
     }
 
-    const ARMS: [&str; 9] = [
+    const ARMS: [&str; 13] = [
+        "adx",
+        "adx_sqr",
+        "mulx",
+        "adx_wnaf",
         "tuned",
         "tuned_wnaf",
         "pad9_cios",
