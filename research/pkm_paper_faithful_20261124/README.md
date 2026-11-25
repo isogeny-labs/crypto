@@ -218,11 +218,26 @@ exactly `m − 2 = 4`) and a rebuild, `ic` SHA-256 `3c22886c…`; the only sourc
 change is that cap, and the `m = 5` rerun on the new binary is identical
 (129 targets, 0.031, `k = 2683`).
 
-## 7. Files
+## 7. The solver boundary (see `CHAIN_DIAGNOSTIC.md`)
+
+A single-system probe at `p = 3907` puts the F4 ceiling between 14 and 18
+variables: `m = 5, t = 2` (13 vars) and `m = 4, t = 3` (14 vars) are refuted
+at degree 7 in under 4 s; `m = 5, t = 3` (18 vars) never decides at degree
+bound 8, 10 or 12, and `m = 6, t = 3` (22 vars) does not finish one system in
+30 min. Since the density condition forces `m·t ≈ log2 p`, the tower height is
+the field size no matter how `m` is chosen: 192 variables for P-192 against a
+measured ceiling of ~14. `m` is therefore not the lever; the smoothness bound
+`B` is, because `m·n0 ≈ log2 p / log2 B`. That relationship, and the fact that
+no `B > 2` run exists anywhere (the paper included), is the remaining gap
+between this record and any statement about 2^32 or 2^96 degrees.
+
+## 8. Files
 * `run.sh` — the exact commands, in order.
 * `results/*.json` — the raw `ic bench` output, one file per row above
   (`r16t8_fullrank.json` is the strict-certificate run of §5).
 * `verify.py` — §4, all three checks, plus the density table.
 * `m_sweep.py` — the §6 table from `results/m*_p12t*.json`.
+* `CHAIN_DIAGNOSTIC.md` — §7, the solver-boundary probe and its raw rows
+  (`chain_diag.jsonl`, `results/diag_*.json`).
 * `pilot_iso.json` — the `pkm_tower_pilot` row that emitted `E'`, `#E'` and
   `V` for the §4 construction check.
