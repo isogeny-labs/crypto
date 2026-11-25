@@ -6,9 +6,9 @@ pursuing the doubled folded filter, a table-format change.
 
 ## Why
 
-- The admitted stage costs 3.8–4.3 cycles a summand at k0n53, after huge
+- The admitted stage costs 3.8–4.3 cycles a summand at icv1-f2m53-tm56619371-dac20a85, after huge
   pages.
-- Admitted keys are 2.8% of summands at k0n53 and 2.0% at k0n61. Nearly
+- Admitted keys are 2.8% of summands at icv1-f2m53-tm56619371-dac20a85 and 2.0% at icv1-f2m61-t158598901-ab42b6c5. Nearly
   all are false positives, and each costs a bucket and run read.
 - A filter one bit wider (16 bits a key in place of 8) admits about a
   fifth as many absent keys.
@@ -32,8 +32,8 @@ pursuing the doubled folded filter, a table-format change.
 
   | row | admitted (cycles a summand) | filter | admitted rate | collect |
   |:--|:--|:--|:--|:--|
-  | k0n53 | 3.8–4.3 → 1.6–1.9 | +0.1 | 0.028 → 0.006 | 172–196 → 158–168 ms (one 229 outlier) |
-  | k0n61 | 3.2–3.3 → 1.2–1.3 | −1.1 to +0.3 | 0.020 → 0.004 | 960–1229 → 884–1060 ms |
+  | icv1-f2m53-tm56619371-dac20a85 | 3.8–4.3 → 1.6–1.9 | +0.1 | 0.028 → 0.006 | 172–196 → 158–168 ms (one 229 outlier) |
+  | icv1-f2m61-t158598901-ab42b6c5 | 3.2–3.3 → 1.2–1.3 | −1.1 to +0.3 | 0.020 → 0.004 | 960–1229 → 884–1060 ms |
 
   - Certificates and the 160 and 172 counted and answer fields were
     identical between the arms.
@@ -50,7 +50,7 @@ pursuing the doubled folded filter, a table-format change.
 
 ## Workload, schedule, metrics and statistics
 
-- **Rows:** `M1-T01` at `k0n53` and `k0n61`.
+- **Rows:** `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` and `icv1-f2m61-t158598901-ab42b6c5`.
 - **Isolation:** `isolated_bench --cpus 2` with `RAYON_NUM_THREADS=1`.
 - **Schedule:** **24 rounds**, cycled over the six orders of `a q d` (four
   cycles).
@@ -82,8 +82,8 @@ Medians `a / d`:
 
 | row | collect | filter + admitted | admitted | build | set-up |
 |:--|:--|:--|:--|:--|:--|
-| k0n53 | [1.04, 1.12] | [1.15, 1.30] | [2.0, 2.8] | [0.95, 1.03] | [1.02, 1.08] |
-| k0n61 | [1.04, 1.12] | [1.12, 1.30] | [2.2, 3.0] | [0.95, 1.03] | [1.03, 1.10] |
+| icv1-f2m53-tm56619371-dac20a85 | [1.04, 1.12] | [1.15, 1.30] | [2.0, 2.8] | [0.95, 1.03] | [1.02, 1.08] |
+| icv1-f2m61-t158598901-ab42b6c5 | [1.04, 1.12] | [1.12, 1.30] | [2.2, 3.0] | [0.95, 1.03] | [1.03, 1.10] |
 
 ## Identity
 

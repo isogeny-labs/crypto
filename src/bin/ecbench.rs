@@ -342,6 +342,11 @@ enum Cmd {
         /// writes it.
         #[arg(long, conflicts_with = "json")]
         doc: bool,
+        /// Expand a committed historical spec as replay does (`spec::plan`):
+        /// a pinned field profile still binds, but an unpinned pre-policy
+        /// spec is not refused. New runs always use the strict plan.
+        #[arg(long)]
+        replay: bool,
     },
     /// Run a session.
     Run {
@@ -2046,9 +2051,15 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             spec: path,
             json,
             doc,
+            replay,
         } => {
             let text = read(&path)?;
-            let p = spec::plan_for_new_run(spec::Spec::from_json(&text)?)?;
+            let parsed = spec::Spec::from_json(&text)?;
+            let p = if replay {
+                spec::plan(parsed)?
+            } else {
+                spec::plan_for_new_run(parsed)?
+            };
             for w in &p.warnings {
                 eprintln!("ecbench: warning: {w}");
             }
