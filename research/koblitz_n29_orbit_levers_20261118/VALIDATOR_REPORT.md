@@ -240,7 +240,7 @@ The 29 calibrated Frobenius maps, `points_sha256`, columns, coefficients, `absci
   - Independent Python, sharing no code with the producer, reproduces each record's
     `priced_gae(w) = G − C + w(U + n_C)`, the per-arm band S and every paired point estimate
     (max relative difference 1.4e-15). It uses `cost.unpriced` lookup, `NON_OPERATION_COUNTERS`
-    excluded, table and sibling work behind markers, and the pinned K_1/GF(2^29) calibration.
+    excluded, table and sibling work behind markers, and the pinned icv1-f2m29-tm40309-30c52b96 calibration.
   - Its own target-cluster bootstrap (different RNG) moves CI ends by at most 0.029 (gen-c1 /
     rho-v5 at w = 1) and changes no conclusion.
   - Band S at w = 0 / 0.1 / 1:

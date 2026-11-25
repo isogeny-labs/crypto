@@ -5,7 +5,7 @@
 //! a (fb + 2) x (fb + 1) system with a planted solution.
 //! Usage: native_fixed_costs NAME P A B GX GY N H FB REPS   (hex except H, FB, REPS)
 use crypto_lib::cryptanalysis::ec_index_calculus::{
-    build_factor_base, build_factor_base_projected, build_pair_sum_table,
+    build_compact_pair_sum_table, build_factor_base, build_factor_base_projected,
     gaussian_eliminate_mod_n_particular,
 };
 use crypto_lib::ecc::curve::CurveParams;
@@ -41,7 +41,7 @@ fn main() {
         let mut t_tab = vec![];
         let mut entries = 0usize;
         let mut fb = vec![];
-        let mut table = build_pair_sum_table(&curve, &[]);
+        let mut table = build_compact_pair_sum_table(&curve, &[]);
         for _ in 0..reps {
             let t = Instant::now();
             fb = if projected {
@@ -51,7 +51,7 @@ fn main() {
             };
             t_fb.push(ms(t));
             let t = Instant::now();
-            table = build_pair_sum_table(&curve, &fb);
+            table = build_compact_pair_sum_table(&curve, &fb);
             t_tab.push(ms(t));
             entries = table.len();
         }

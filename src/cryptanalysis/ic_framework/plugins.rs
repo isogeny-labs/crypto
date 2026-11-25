@@ -8730,7 +8730,6 @@ mod ksum_frobenius_tests {
     }
 }
 
-
 #[cfg(test)]
 mod wwalk_binary_tests {
     use super::*;
