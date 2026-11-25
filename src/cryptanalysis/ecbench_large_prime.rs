@@ -1981,8 +1981,8 @@ fn solve_with_verification(
     // Keep the clock open through a deferred filter, which can pin d only
     // after collection, and through the final verification itself.
     let check_in_online = verify_candidate || charge_checks;
-    let _recovery_check =
-        check_in_online.then(|| measurement::scope(measurement::Phase::RecoveryCheck));
+    let _recovery_check = (check_in_online && recovered.is_some())
+        .then(|| measurement::scope(measurement::Phase::RecoveryCheck));
     if charge_checks {
         if let Some(d) = recovered {
             counters.final_checks = 1;
