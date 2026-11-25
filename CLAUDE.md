@@ -26,6 +26,15 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+## Authorized target scope
+
+Work in this repository is limited to public benchmark instances, published
+challenge curves, toy or synthetic parameters, and systems the owner operates
+or is explicitly authorized to test. Do not develop or test operational
+attacks against production keys, wallets, accounts, or third-party systems.
+A task that requires a non-public target stops and asks for written
+authorization before proceeding.
+
 **Goal** (AGENTS.md, "Goal: what to work on next"): the SessionStart hook
 prints `tools/goal_brief.py` — the pinned goal and items in `docs/ACTIVE.md`,
 then the newest session-log open threads. With no other instruction, take the
@@ -41,6 +50,13 @@ separate CRIU/EBS contract. The
 experiment director freezes this route in the task card; the executor runs it
 unchanged. Preserve explicitly requested environments and keep local development
 checks local. Loading instructions alone does not authorize an experiment.
+
+**Experiment seeds and A/B repeatability** (owner, 2026-11-23): follow
+[docs/experiment-seeds.md](docs/experiment-seeds.md), policy
+`isogeny-labs/experiment-seeds/v1`. Freeze explicit seed panels and logical
+streams before execution; pair public workloads, retain raw failures and replay
+records, and preserve the existing stronger A/A, isolation and native-execution
+rules. Apply the same contract in scheduled tasks and handoffs.
 
 **First step of every task** (owner, 2026-11-16): before any other work, add
 the task to "Active items" in `docs/ACTIVE.md`, commit that alone, push, and

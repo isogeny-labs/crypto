@@ -917,6 +917,9 @@ pub struct PkmSemaevOracle {
     inherit: bool,
     /// Algebraic tower/quotient root descent instead of `O(|V|^m)` `grid()` fallback.
     descent: bool,
+    /// `|V|^m` at or below which `grid()` replaces descent (`grid_crossover=`; 0 forces
+    /// descent on every domain, which the descent-versus-grid gate uses).
+    grid_crossover: u64,
     /// One learned trace per branch system (one entry without guessing).
     traces: Vec<Option<Arc<F4Trace>>>,
     /// Learning cost and shape counters, reported as setup native work.
@@ -971,6 +974,7 @@ impl PkmSemaevOracle {
             trace: false,
             inherit: true,
             descent: true,
+            grid_crossover: Self::DESCENT_GRID_CROSSOVER,
             traces: Vec::new(),
             trace_setup: BTreeMap::new(),
             lifts: false,
@@ -1055,7 +1059,7 @@ impl PkmSemaevOracle {
         spec: &super::PipelineSpec,
         inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
     ) -> Result<Self, String> {
-        use super::prime_tower::{AuxFamily, isogeny_tower, supersingular_tower, AuxKind};
+        use super::prime_tower::{isogeny_tower, supersingular_tower, AuxFamily, AuxKind};
         let fb = &spec.factor_base_params;
         let oracle = match spec.factor_base.as_str() {
             "prime-kummer" => Self::new(m, fb.u64("t")? as u32, fb.u64_or("g", 1)?),
@@ -1246,6 +1250,7 @@ impl PkmSemaevOracle {
             1 => true,
             o => return Err(format!("pkm-semaev: descent is 0 or 1, not {o}")),
         };
+        self.grid_crossover = params.u64_or("grid_crossover", Self::DESCENT_GRID_CROSSOVER)?;
         let lifts = params.u64_or("lifts", 0)?;
         if lifts > 2 {
             return Err(format!("pkm-semaev: lifts is 0, 1 or 2, not {lifts}"));
@@ -1570,7 +1575,7 @@ impl PkmSemaevOracle {
             return false;
         };
         let v = prep.v.len() as u64;
-        v.saturating_pow(self.m) <= Self::DESCENT_GRID_CROSSOVER
+        v.saturating_pow(self.m) <= self.grid_crossover
     }
 
     /// `descent=1` and the domain is large enough that descent wins.
@@ -3284,6 +3289,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "stop F4 once at most this many standard monomials remain",
             ),
             (
+                "grid_crossover",
+                "|V|^m at or below which grid() replaces root descent (default 512; 0 forces descent)",
+            ),
+            (
                 "crosscheck",
                 "1 to grid-check every F4 refutation (diagnostic, not charged)",
             ),
@@ -4006,7 +4015,7 @@ pub fn decomposable_points(
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::PrimeInstance;
-    use crate::cryptanalysis::ic_framework::prime_tower::{AuxFamily, PrimeKummerBase};
+    use crate::cryptanalysis::ic_framework::prime_tower::PrimeKummerBase;
     use crate::cryptanalysis::ic_framework::stages::FactorBaseBuilder;
     use rand::{rngs::StdRng, Rng, SeedableRng};
 
@@ -4250,7 +4259,9 @@ mod tests {
     /// the base's Vélu chain, and F4 matches the grid.
     #[test]
     fn isogeny_tower_form_agrees_with_grid() {
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{
+            isogeny_tower, AuxFamily, PrimeIsogenyBase,
+        };
         let inst = instance();
         let t = 4;
         let b = PrimeIsogenyBase { instance: &inst };
@@ -4259,7 +4270,8 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
+        let tower =
+            isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         // Every zero of the rules is a zero of the chain: L(x) = c on V.
         for &x in &tower.v {
             assert_eq!(tower.eval(x), Some(tower.c));
@@ -4283,7 +4295,9 @@ mod tests {
     #[test]
     fn trace_agrees_with_plain_f4_and_grid() {
         use crate::cryptanalysis::ic_boundary::prime_factor_base;
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{
+            isogeny_tower, AuxFamily, PrimeIsogenyBase,
+        };
         let inst = instance();
         let curve = &inst.curve;
         let t = 4;
@@ -4415,7 +4429,9 @@ mod tests {
     /// decomposable set with 1 and 2 guessed levels; `G ≥ t` is refused.
     #[test]
     fn isogeny_guessing_agrees_with_grid() {
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{
+            isogeny_tower, AuxFamily, PrimeIsogenyBase,
+        };
         let inst = instance();
         let t = 4;
         let b = PrimeIsogenyBase { instance: &inst };
@@ -4424,7 +4440,8 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
+        let tower =
+            isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
         let (v, c) = (tower.v.clone(), tower.c);
         for g in [1, 2] {
@@ -4716,7 +4733,9 @@ mod tests {
     /// `m = 3` on PKM's isogeny tower, both presentations.
     #[test]
     fn isogeny_tower_m3_agrees_with_grid() {
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{
+            isogeny_tower, AuxFamily, PrimeIsogenyBase,
+        };
         let inst = instance();
         let t = 3;
         let b = PrimeIsogenyBase { instance: &inst };
@@ -4725,7 +4744,8 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
+        let tower =
+            isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
         let (v, c) = (tower.v.clone(), tower.c);
         agrees_with_grid_m3(
@@ -5967,6 +5987,88 @@ mod tests {
                 )
             };
             assert_eq!(run(&mut o1), run(&mut o0));
+        }
+    }
+
+    /// Lead 1A-3 gate: with descent forced on every domain
+    /// (`grid_crossover=0`, so `grid()` never decides a consistent system),
+    /// the tower-basis root extraction misses no decomposition: its verdict
+    /// equals the exact decomposable set on planted and random targets at
+    /// `m = 3` (also against the grid engine) and at `m = 4`, where `grid()`
+    /// does not exist and the exact set is the ground truth.
+    #[test]
+    fn descent_roots_match_ground_truth_at_m3() {
+        descent_gate(3, 3, 12, 12);
+    }
+
+    /// `m = 4` half of the gate, on the `t = 2` tower (8 ring variables plus
+    /// the chain unknowns) so the debug-profile F4 stays tractable.
+    #[test]
+    fn descent_roots_match_ground_truth_at_m4() {
+        descent_gate(4, 2, 6, 4);
+    }
+
+    fn descent_gate(m: u32, t: u32, planted: u64, random: u64) {
+        let inst = instance();
+        let curve = &inst.curve;
+        let fb = base(&inst, t);
+        let g = inst.generator_point();
+        {
+            let exact = decomposable_points(curve, &fb, m, &mut GroupOps::default());
+            let mut descent = oracle(&inst, &fb, m, t, &format!("m={m},grid_crossover=0"));
+            let mut grid = (m == 3).then(|| oracle(&inst, &fb, 3, t, "m=3,engine=exhaustive"));
+            let mut rng = StdRng::seed_from_u64(0x1a3 + u64::from(m));
+            let mut hits = 0;
+            for k in 0..planted + random {
+                let target = if k < planted {
+                    let idx: Vec<usize> =
+                        (0..m).map(|_| rng.gen_range(0..fb.points.len())).collect();
+                    sum(curve, &fb, &idx)
+                } else {
+                    let s = rng.gen_range(1..inst.r);
+                    curve.mul(&mut GroupOps::default(), g, s)
+                };
+                if target.infinity {
+                    continue;
+                }
+                let want = exact.contains(&curve.key(&target));
+                eprintln!("descent gate m={m} t={t} target {k} want={want}");
+                let got = descent.decompose(
+                    &ctx(&inst),
+                    &fb,
+                    &mut GroupOps::default(),
+                    &mut OracleCounters::default(),
+                    target,
+                );
+                if let Some(idx) = &got {
+                    assert_eq!(idx.len(), m as usize);
+                    assert_eq!(sum(curve, &fb, idx), target, "m={m} target {k}");
+                }
+                assert_eq!(got.is_some(), want, "m={m}: descent verdict, target {k}");
+                if let Some(gr) = grid.as_mut() {
+                    let gv = gr
+                        .decompose(
+                            &ctx(&inst),
+                            &fb,
+                            &mut GroupOps::default(),
+                            &mut OracleCounters::default(),
+                            target,
+                        )
+                        .is_some();
+                    assert_eq!(gv, got.is_some(), "m=3: grid against descent, target {k}");
+                }
+                hits += usize::from(want);
+            }
+            assert!(hits >= 3, "m={m}: planted targets must decompose ({hits})");
+            let n = descent.relation_counters();
+            assert_eq!(
+                n.get("pkm_descent_deferred_to_grid").copied().unwrap_or(0),
+                0
+            );
+            assert!(
+                n.get("pkm_consistent_systems").copied().unwrap_or(0) >= hits as u64,
+                "m={m}: descent decided the consistent systems"
+            );
         }
     }
 }

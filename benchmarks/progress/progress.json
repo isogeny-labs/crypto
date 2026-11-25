@@ -157,13 +157,13 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261124T0350Z-ecc2k-cold15m-candidate3-primary",
+  "latest_record": "20261121T0437Z-jv-cover-f4-round4-confirm",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
-    "invalid": 11,
-    "measured": 331,
-    "open": 62
+    "invalid": 8,
+    "measured": 323,
+    "open": 53
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -427,310 +427,6 @@
       ],
       "problem": "dlpwai:static-dh-p224-shape",
       "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 21360464.0,
-      "latest": 21360464.0,
-      "latest_derived": {},
-      "metric": "complete_cold_profile_ir",
-      "points": [
-        {
-          "commit": "e65dc230265e",
-          "date": "2026-11-24",
-          "derived": {},
-          "n": 2,
-          "record": "20261124T0212Z-ecc2k-cold50x-current-profile",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            21360464.0,
-            21360464.0
-          ],
-          "summary": "Descriptive fixed query profile only; both Ir21360464. Persistent local envelope, complete raw retained, unsigned.",
-          "value": 21360464.0
-        }
-      ],
-      "problem": "ecc2k130-index-calculus-cold-query",
-      "unit": "ir"
-    },
-    {
-      "better": "lower",
-      "first": 21566178.0,
-      "latest": 14688697.0,
-      "latest_derived": {
-        "improvement_vs_first_percent": 31.8901,
-        "improvement_vs_previous_percent": 8.3871
-      },
-      "metric": "complete_cold_query_ir",
-      "points": [
-        {
-          "commit": "b6c4fc82f683",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 0.0
-          },
-          "n": 5,
-          "record": "20261124T0227Z-ecc2k-cold50x-dense-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            21566178.0,
-            21566178.0
-          ],
-          "summary": "All120 rows retained; first index regresses and fails50x plus all no-regression guards. Complete separate arithmetic replay and original source identity retained.",
-          "value": 21566178.0
-        },
-        {
-          "commit": "bd865aacc0c2",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 7.2308,
-            "improvement_vs_previous_percent": 7.2308
-          },
-          "n": 5,
-          "record": "20261124T0233Z-ecc2k-cold50x-inline-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            20006773.0,
-            20006773.0
-          ],
-          "summary": "Complete frozen120-row inline index component gains6.28% whole and9.71% oracle against matched previous best, all six controls pass,80 tuples replay. Requested50x unmet. Complete raw/binaries include rejected prior panel and invalid pilots; unsigned local custody only.",
-          "value": 20006773.0
-        },
-        {
-          "commit": "f3ae17d0d3c3",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 19.8401,
-            "improvement_vs_previous_percent": 13.5921
-          },
-          "n": 5,
-          "record": "20261124T0314Z-ecc2k-cold15m-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            17287437.0,
-            17287437.0
-          ],
-          "summary": "First candidate misses15M and one n83 oracle guard; all raw rows retained. Unsigned producer checks, remote custody and independent admission remain open.",
-          "value": 17287437.0
-        },
-        {
-          "commit": "1837c3ffa516",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 25.6547,
-            "improvement_vs_previous_percent": 7.2538
-          },
-          "n": 5,
-          "record": "20261124T0331Z-ecc2k-cold15m-candidate2-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            16033438.0,
-            16033438.0
-          ],
-          "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
-          "value": 16033438.0
-        },
-        {
-          "commit": "781e12c34c58",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 31.8901,
-            "improvement_vs_previous_percent": 8.3871
-          },
-          "n": 5,
-          "record": "20261124T0350Z-ecc2k-cold15m-candidate3-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            14688697.0,
-            14688697.0
-          ],
-          "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
-          "value": 14688697.0
-        }
-      ],
-      "problem": "ecc2k130-index-calculus-cold-query",
-      "unit": "ir"
-    },
-    {
-      "better": "lower",
-      "first": 12458426.0,
-      "latest": 10024047.0,
-      "latest_derived": {
-        "improvement_vs_first_percent": 19.54,
-        "improvement_vs_previous_percent": 11.8282
-      },
-      "metric": "complete_oracle_ir",
-      "points": [
-        {
-          "commit": "bd865aacc0c2",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 0.0
-          },
-          "n": 5,
-          "record": "20261124T0233Z-ecc2k-cold50x-inline-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            12458426.0,
-            12458426.0
-          ],
-          "summary": "Complete frozen120-row inline index component gains6.28% whole and9.71% oracle against matched previous best, all six controls pass,80 tuples replay. Requested50x unmet. Complete raw/binaries include rejected prior panel and invalid pilots; unsigned local custody only.",
-          "value": 12458426.0
-        },
-        {
-          "commit": "f3ae17d0d3c3",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 1.3915,
-            "improvement_vs_previous_percent": 1.3915
-          },
-          "n": 5,
-          "record": "20261124T0314Z-ecc2k-cold15m-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            12285072.0,
-            12285072.0
-          ],
-          "summary": "First candidate misses15M and one n83 oracle guard; all raw rows retained. Unsigned producer checks, remote custody and independent admission remain open.",
-          "value": 12285072.0
-        },
-        {
-          "commit": "1837c3ffa516",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 8.7463,
-            "improvement_vs_previous_percent": 7.4587
-          },
-          "n": 5,
-          "record": "20261124T0331Z-ecc2k-cold15m-candidate2-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            11368770.0,
-            11368770.0
-          ],
-          "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
-          "value": 11368770.0
-        },
-        {
-          "commit": "781e12c34c58",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 19.54,
-            "improvement_vs_previous_percent": 11.8282
-          },
-          "n": 5,
-          "record": "20261124T0350Z-ecc2k-cold15m-candidate3-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            10024047.0,
-            10024047.0
-          ],
-          "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
-          "value": 10024047.0
-        }
-      ],
-      "problem": "ecc2k130-index-calculus-cold-query",
-      "unit": "ir"
-    },
-    {
-      "better": "neutral",
-      "first": 16.0,
-      "latest": 16.0,
-      "latest_derived": {},
-      "metric": "engineering_calls",
-      "points": [
-        {
-          "commit": "2e9a7b71fff2",
-          "date": "2026-11-24",
-          "derived": {},
-          "n": 1,
-          "record": "20261124T0233Z-ecc2k-cold50x-inline-preflight",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "Three phase calibrations and16 engineering calls pass; full separately frozen primary reports actual effect,50x remains unmet.",
-          "value": 16.0
-        }
-      ],
-      "problem": "ecc2k130-index-calculus-cold-query",
-      "unit": "count"
-    },
-    {
-      "better": "lower",
-      "first": 17273580.0,
-      "latest": 14689119.0,
-      "latest_derived": {
-        "improvement_vs_first_percent": 14.9619,
-        "improvement_vs_previous_percent": 8.3057
-      },
-      "metric": "pilot_complete_cold_query_ir",
-      "points": [
-        {
-          "commit": "14819dcac965",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 0.0
-          },
-          "n": 1,
-          "record": "20261124T0312Z-ecc2k-cold15m-preflight",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            17273580.0,
-            17273580.0
-          ],
-          "summary": "First candidate misses15M and one n83 oracle guard; all raw rows retained. Unsigned producer checks, remote custody and independent admission remain open.",
-          "value": 17273580.0
-        },
-        {
-          "commit": "4b2821dba553",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 7.2592,
-            "improvement_vs_previous_percent": 7.2592
-          },
-          "n": 1,
-          "record": "20261124T0327Z-ecc2k-cold15m-candidate2-preflight",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            16019656.0,
-            16019656.0
-          ],
-          "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
-          "value": 16019656.0
-        },
-        {
-          "commit": "56102c19bf36",
-          "date": "2026-11-24",
-          "derived": {
-            "improvement_vs_first_percent": 14.9619,
-            "improvement_vs_previous_percent": 8.3057
-          },
-          "n": 1,
-          "record": "20261124T0347Z-ecc2k-cold15m-candidate3-v3-preflight",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            14689119.0,
-            14689119.0
-          ],
-          "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
-          "value": 14689119.0
-        }
-      ],
-      "problem": "ecc2k130-index-calculus-cold-query",
-      "unit": "ir"
     },
     {
       "better": "higher",
@@ -31509,299 +31205,6 @@
     },
     {
       "better": "lower",
-      "first": 21360373.0,
-      "latest": 21360373.0,
-      "latest_derived": {},
-      "metric": "n131_uniform_cold_ir",
-      "points": [
-        {
-          "commit": "0a2e495ef2d5",
-          "date": "2026-11-24",
-          "derived": {},
-          "n": 5,
-          "record": "20261123T2351Z-ecc2k-cold50-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            21360373.0,
-            21360373.0
-          ],
-          "summary": "Fixed n131 uniform final21360373Ir,51.48% below unchanged original44023404 (matched baseline44038338:51.50%). Oracle23.62% lower.120 matched rows/all controls pass;80 tuple replays. Producer unsigned; integration/custody/admission/historical gates pending.",
-          "value": 21360373.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-cold50",
-      "unit": "ir"
-    },
-    {
-      "better": "lower",
-      "first": 13811466.0,
-      "latest": 13811466.0,
-      "latest_derived": {},
-      "metric": "n131_uniform_oracle_ir",
-      "points": [
-        {
-          "commit": "0a2e495ef2d5",
-          "date": "2026-11-24",
-          "derived": {},
-          "n": 5,
-          "record": "20261123T2351Z-ecc2k-cold50-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            13811466.0,
-            13811466.0
-          ],
-          "summary": "Fixed n131 uniform final21360373Ir,51.48% below unchanged original44023404 (matched baseline44038338:51.50%). Oracle23.62% lower.120 matched rows/all controls pass;80 tuple replays. Producer unsigned; integration/custody/admission/historical gates pending.",
-          "value": 13811466.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-cold50",
-      "unit": "ir"
-    },
-    {
-      "better": "lower",
-      "first": 6623882.0,
-      "latest": 6623882.0,
-      "latest_derived": {},
-      "metric": "n131_uniform_setup_ir",
-      "points": [
-        {
-          "commit": "0a2e495ef2d5",
-          "date": "2026-11-24",
-          "derived": {},
-          "n": 5,
-          "record": "20261123T2351Z-ecc2k-cold50-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            6623882.0,
-            6623882.0
-          ],
-          "summary": "Fixed n131 uniform final21360373Ir,51.48% below unchanged original44023404 (matched baseline44038338:51.50%). Oracle23.62% lower.120 matched rows/all controls pass;80 tuple replays. Producer unsigned; integration/custody/admission/historical gates pending.",
-          "value": 6623882.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-cold50",
-      "unit": "ir"
-    },
-    {
-      "better": "neutral",
-      "first": 16.0,
-      "latest": 16.0,
-      "latest_derived": {},
-      "metric": "pilot_calls",
-      "points": [
-        {
-          "commit": "0bc9d5a2f217",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": null,
-          "record": "20261123T2323Z-ecc2k-cold50-preflight",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "16-call engineering pilot and three-binary calibration valid; candidate1 misses50% target (45.9443% lower in its uniform pilot). Zero primary rows; superseded by separately profiled candidate2, not an excluded primary subset.",
-          "value": 16.0
-        },
-        {
-          "commit": "07c8c78a708d",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": null,
-          "record": "20261123T2338Z-ecc2k-cold50-candidate2-preflight",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "Candidate2 16-call engineering preflight and three calibrations valid;49.1996% uniform pilot reduction is below50%. Primary120 rows unattempted; candidate3 tests the unchanged goal with one index visit.",
-          "value": 16.0
-        },
-        {
-          "commit": "0c3c7a031991",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": null,
-          "record": "20261123T2348Z-ecc2k-cold50-candidate3-preflight",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "All16 engineering calls and three calibrations pass. Single n131 uniform pilot clears50% at51.5124%; this record does not establish the final primary result.",
-          "value": 16.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-cold50",
-      "unit": "count"
-    },
-    {
-      "better": "neutral",
-      "first": 34987635.0,
-      "latest": 23781983.0,
-      "latest_derived": {},
-      "metric": "whole_cold_ir",
-      "points": [
-        {
-          "commit": "ad5f91c4b439",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": 2,
-          "record": "20261123T2303Z-ecc2k-cold50-incumbent-profile",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            34987635.0,
-            34987635.0
-          ],
-          "summary": "Two identical source-bound incumbent profiles identify exact input conversion and arithmetic hotspots; no gain or50% conclusion.",
-          "value": 34987635.0
-        },
-        {
-          "commit": "e64469e6aea1",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": 2,
-          "record": "20261123T2329Z-ecc2k-cold50-residual-profile",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            23781983.0,
-            23781983.0
-          ],
-          "summary": "Two fixed absolute candidate1 profiles identify multiplication/reduction interfaces; source/protocol before data, exact manifest-command bookkeeping imported afterwards. No gain comparison.",
-          "value": 23781983.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-cold50",
-      "unit": "ir"
-    },
-    {
-      "better": "lower",
-      "first": 44038405.0,
-      "latest": 44038405.0,
-      "latest_derived": {},
-      "metric": "baseline_profile_complete_ir",
-      "points": [
-        {
-          "commit": "065176db5621",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": 2,
-          "record": "20261123T1852Z-ecc2k-halftrace-baseline-profile",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            44038405.0,
-            44038405.0
-          ],
-          "summary": "Two identical-source baseline A/A cold profiles; known query output matches native; hotspot diagnosis only, unsigned producer evidence.",
-          "value": 44038405.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-halftrace-setup",
-      "unit": "ir"
-    },
-    {
-      "better": "lower",
-      "first": 34999782.0,
-      "latest": 34999782.0,
-      "latest_derived": {},
-      "metric": "n131_uniform_cold_ir",
-      "points": [
-        {
-          "commit": "8453eb6263d6",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": 5,
-          "record": "20261123T1918Z-ecc2k-halftrace-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            34999782.0,
-            34999782.0
-          ],
-          "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
-          "value": 34999782.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-halftrace-setup",
-      "unit": "ir"
-    },
-    {
-      "better": "lower",
-      "first": 18107673.0,
-      "latest": 18107673.0,
-      "latest_derived": {},
-      "metric": "n131_uniform_oracle_ir",
-      "points": [
-        {
-          "commit": "8453eb6263d6",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": 5,
-          "record": "20261123T1918Z-ecc2k-halftrace-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            18107673.0,
-            18107673.0
-          ],
-          "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
-          "value": 18107673.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-halftrace-setup",
-      "unit": "ir"
-    },
-    {
-      "better": "lower",
-      "first": 15966306.0,
-      "latest": 15966306.0,
-      "latest_derived": {},
-      "metric": "n131_uniform_setup_ir",
-      "points": [
-        {
-          "commit": "8453eb6263d6",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": 5,
-          "record": "20261123T1918Z-ecc2k-halftrace-primary",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            15966306.0,
-            15966306.0
-          ],
-          "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
-          "value": 15966306.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-halftrace-setup",
-      "unit": "ir"
-    },
-    {
-      "better": "neutral",
-      "first": 12.0,
-      "latest": 12.0,
-      "latest_derived": {},
-      "metric": "pilot_calls",
-      "points": [
-        {
-          "commit": "8d3905a93a51",
-          "date": "2026-11-23",
-          "derived": {},
-          "n": null,
-          "record": "20261123T1913Z-ecc2k-halftrace-preflight",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "Both partition calibrations and12-call engineering pilot complete; fixed source/cases/criteria retained. No primary gain conclusion.",
-          "value": 12.0
-        }
-      ],
-      "problem": "kernel:ecc2k130-ic-halftrace-setup",
-      "unit": "count"
-    },
-    {
-      "better": "lower",
       "first": 44024513.0,
       "latest": 44024513.0,
       "latest_derived": {},
@@ -32888,6 +32291,52 @@
       "unit": "wall_s"
     },
     {
+      "better": "lower",
+      "first": 774222391.0,
+      "latest": 774222391.0,
+      "latest_derived": {},
+      "metric": "f4_callgrind_ir_ccov53_hilbert_trace",
+      "points": [
+        {
+          "commit": "b5795d406107",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 1,
+          "record": "20261121T0437Z-jv-cover-f4-round4-confirm",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Hilbert+trace 1.231x wall 10/10 pre-registered; full F4 1.060 not significant; H1 counted cost schedule-dependent [pcc:unverified]",
+          "value": 774222391.0
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 1137381291.0,
+      "latest": 1137381291.0,
+      "latest_derived": {},
+      "metric": "f4_callgrind_ir_ccov53",
+      "points": [
+        {
+          "commit": "7f3bbb4efc13",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 1,
+          "record": "20261121T0018Z-jv-cover-f4-packed-interreduce-confirm",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp packed interreduction, lazy columns, interning table: jv_cover dlp 1.090x wall (11/12, pre-registered) [pcc:unverified]",
+          "value": 1137381291.0
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ir"
+    },
+    {
       "better": "higher",
       "first": 0.865,
       "latest": 0.865,
@@ -33115,6 +32564,553 @@
           ],
           "summary": "Shipped F4 defaults (f4-parallel, gf2-m4ri on; f4-memory opt-in) vs old paths, same binary, native ABBA, 384 runs, 0 fingerprint mismatches: sum of f4_fp times 1.141x [1.098,1.158] at 4 threads (pre-registered primary met), 1.034 at 1 thread (n.s.); small systems slower at 4 threads (quart_n3 0.811, cubic_n4 0.865); GF(2) cold Macaulay kernel 1.34-1.49x; counted units unchanged [pcc:unverified]",
           "value": 1.492
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 727075.0,
+      "latest": 727075.0,
+      "latest_derived": {},
+      "metric": "jv_ccov53_f4_muls_per_test_default",
+      "points": [
+        {
+          "commit": "f5885c3c4668",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 4,
+          "record": "20261120T2209Z-jv-cover-fl-threshold-screen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Faugere-Lachartre column threshold: counted -0.5% at best; wall in noise [pcc:unverified]",
+          "value": 727075.0
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "fmul"
+    },
+    {
+      "better": "higher",
+      "first": 1.091,
+      "latest": 1.091,
+      "latest_derived": {
+        "value_over_reference": 1.091
+      },
+      "metric": "jv_dlp53_cpu_b0_over_b1",
+      "points": [
+        {
+          "commit": "7f3bbb4efc13",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.091
+          },
+          "n": 12,
+          "record": "20261121T0018Z-jv-cover-f4-packed-interreduce-confirm",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "f4_fp packed interreduction, lazy columns, interning table: jv_cover dlp 1.090x wall (11/12, pre-registered) [pcc:unverified]",
+          "value": 1.091
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.251,
+      "latest": 1.251,
+      "latest_derived": {
+        "value_over_reference": 1.251
+      },
+      "metric": "jv_dlp53_cpu_baseline_over_jemalloc",
+      "points": [
+        {
+          "commit": "e5b5847a7b74",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.251
+          },
+          "n": 8,
+          "record": "20261120T2241Z-jv-cover-f4-allocation-confirm",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            1.154,
+            1.305
+          ],
+          "summary": "pre-registered: jemalloc 1.256x wall 8/8, move fix 1.033 not significant [pcc:unverified]",
+          "value": 1.251
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.042,
+      "latest": 1.042,
+      "latest_derived": {
+        "value_over_reference": 1.042
+      },
+      "metric": "jv_dlp53_trace_counted_s_branch_off_over_on",
+      "points": [
+        {
+          "commit": "ea2c575bdd7a",
+          "date": "2026-11-24",
+          "derived": {
+            "value_over_reference": 1.042
+          },
+          "n": 10,
+          "record": "20261124T1642Z-jv-cover-f4-branch-traces-confirm",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "branch traces: counted S 1.042x lower, deterministic counted cost; wall not significant [pcc:unverified]",
+          "value": 1.042
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.018,
+      "latest": 1.018,
+      "latest_derived": {
+        "value_over_reference": 1.018
+      },
+      "metric": "jv_dlp53_trace_wall_branch_off_over_on",
+      "points": [
+        {
+          "commit": "ea2c575bdd7a",
+          "date": "2026-11-24",
+          "derived": {
+            "value_over_reference": 1.018
+          },
+          "n": 10,
+          "record": "20261124T1642Z-jv-cover-f4-branch-traces-confirm",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            0.97,
+            1.148
+          ],
+          "summary": "branch traces: counted S 1.042x lower, deterministic counted cost; wall not significant [pcc:unverified]",
+          "value": 1.018
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.021,
+      "latest": 1.021,
+      "latest_derived": {},
+      "metric": "jv_dlp53_wall_aa",
+      "points": [
+        {
+          "commit": "e5b5847a7b74",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 8,
+          "record": "20261120T2241Z-jv-cover-f4-allocation-confirm",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.964,
+            1.081
+          ],
+          "summary": "pre-registered: jemalloc 1.256x wall 8/8, move fix 1.033 not significant [pcc:unverified]",
+          "value": 1.021
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.09,
+      "latest": 1.09,
+      "latest_derived": {
+        "value_over_reference": 1.09
+      },
+      "metric": "jv_dlp53_wall_b0_over_b1",
+      "points": [
+        {
+          "commit": "7f3bbb4efc13",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.09
+          },
+          "n": 12,
+          "record": "20261121T0018Z-jv-cover-f4-packed-interreduce-confirm",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            0.99,
+            1.098
+          ],
+          "summary": "f4_fp packed interreduction, lazy columns, interning table: jv_cover dlp 1.090x wall (11/12, pre-registered) [pcc:unverified]",
+          "value": 1.09
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.256,
+      "latest": 1.256,
+      "latest_derived": {
+        "value_over_reference": 1.256
+      },
+      "metric": "jv_dlp53_wall_baseline_over_jemalloc",
+      "points": [
+        {
+          "commit": "e5b5847a7b74",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.256
+          },
+          "n": 8,
+          "record": "20261120T2241Z-jv-cover-f4-allocation-confirm",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            1.159,
+            1.309
+          ],
+          "summary": "pre-registered: jemalloc 1.256x wall 8/8, move fix 1.033 not significant [pcc:unverified]",
+          "value": 1.256
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.033,
+      "latest": 1.033,
+      "latest_derived": {
+        "value_over_reference": 1.033
+      },
+      "metric": "jv_dlp53_wall_baseline_over_movefix",
+      "points": [
+        {
+          "commit": "e5b5847a7b74",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.033
+          },
+          "n": 8,
+          "record": "20261120T2241Z-jv-cover-f4-allocation-confirm",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            0.943,
+            1.069
+          ],
+          "summary": "pre-registered: jemalloc 1.256x wall 8/8, move fix 1.033 not significant [pcc:unverified]",
+          "value": 1.033
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.06,
+      "latest": 1.06,
+      "latest_derived": {
+        "value_over_reference": 1.06
+      },
+      "metric": "jv_dlp53_wall_full_old_over_new",
+      "points": [
+        {
+          "commit": "b5795d406107",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.06
+          },
+          "n": 10,
+          "record": "20261121T0437Z-jv-cover-f4-round4-confirm",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            0.947,
+            1.172
+          ],
+          "summary": "Hilbert+trace 1.231x wall 10/10 pre-registered; full F4 1.060 not significant; H1 counted cost schedule-dependent [pcc:unverified]",
+          "value": 1.06
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.18,
+      "latest": 1.18,
+      "latest_derived": {
+        "value_over_reference": 1.18
+      },
+      "metric": "jv_dlp53_wall_glibc_over_jemalloc",
+      "points": [
+        {
+          "commit": "f5885c3c4668",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.18
+          },
+          "n": 6,
+          "record": "20261120T2212Z-jv-cover-allocator-ab",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            1.174,
+            1.245
+          ],
+          "summary": "jemalloc preloaded vs glibc on jv_cover dlp: 18.18 -> 15.40 s, 6/6 [pcc:unverified]",
+          "value": 1.18
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.231,
+      "latest": 1.231,
+      "latest_derived": {
+        "value_over_reference": 1.231
+      },
+      "metric": "jv_dlp53_wall_hilbert_over_hilbert_trace",
+      "points": [
+        {
+          "commit": "b5795d406107",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.231
+          },
+          "n": 10,
+          "record": "20261121T0437Z-jv-cover-f4-round4-confirm",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            1.147,
+            1.241
+          ],
+          "summary": "Hilbert+trace 1.231x wall 10/10 pre-registered; full F4 1.060 not significant; H1 counted cost schedule-dependent [pcc:unverified]",
+          "value": 1.231
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.021,
+      "latest": 1.021,
+      "latest_derived": {
+        "value_over_reference": 1.021
+      },
+      "metric": "jv_dlp53_wall_never_over_nested",
+      "points": [
+        {
+          "commit": "f5885c3c4668",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.021
+          },
+          "n": 8,
+          "record": "20261120T2149Z-jv-cover-f4-inner-policy-ab",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "nested-call inner-parallelism policy: null (+-2% in +-7% spread); reverted [pcc:unverified]",
+          "value": 1.021
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.103,
+      "latest": 1.103,
+      "latest_derived": {
+        "value_over_reference": 1.103
+      },
+      "metric": "jv_dlp53_wall_par_old_over_default",
+      "points": [
+        {
+          "commit": "e3dc9f66c225",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.103
+          },
+          "n": 6,
+          "record": "20261120T2059Z-jv-cover-f4-dispatch-ab",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            1.02,
+            1.199
+          ],
+          "summary": "f4-parallel default vs F4_FP_PAR_OLD=1 on jv_cover dlp: 19.33 vs 21.32 s median, 6 rounds [pcc:unverified]",
+          "value": 1.103
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.4,
+      "latest": 1.4,
+      "latest_derived": {
+        "value_over_reference": 1.4
+      },
+      "metric": "jv_quartic_cprime_wall_glibc_over_jemalloc",
+      "points": [
+        {
+          "commit": "7f3bbb4efc13",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.4
+          },
+          "n": 4,
+          "record": "20261121T0018Z-f4-consumer-allocator-screen",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            1.385,
+            1.427
+          ],
+          "summary": "jemalloc vs glibc: jv_quartic 1.40x (4/4), jv_quintic 0.94x (0/4); shipped jv_quartic 1.45x [pcc:unverified]",
+          "value": 1.4
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.45,
+      "latest": 1.45,
+      "latest_derived": {
+        "value_over_reference": 1.45
+      },
+      "metric": "jv_quartic_cprime_wall_main_over_shipped",
+      "points": [
+        {
+          "commit": "7f3bbb4efc13",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.45
+          },
+          "n": 4,
+          "record": "20261121T0018Z-f4-consumer-allocator-screen",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            1.441,
+            1.455
+          ],
+          "summary": "jemalloc vs glibc: jv_quartic 1.40x (4/4), jv_quintic 0.94x (0/4); shipped jv_quartic 1.45x [pcc:unverified]",
+          "value": 1.45
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.45,
+      "latest": 1.45,
+      "latest_derived": {
+        "value_over_reference": 1.45
+      },
+      "metric": "jv_quartic_wall_main_over_shipped",
+      "points": [
+        {
+          "commit": "7f3bbb4efc13",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.45
+          },
+          "n": 4,
+          "record": "20261121T0018Z-f4-consumer-allocator-screen",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            1.441,
+            1.455
+          ],
+          "summary": "jemalloc vs glibc: jv_quartic 1.40x (4/4), jv_quintic 0.94x (0/4); shipped jv_quartic 1.45x [pcc:unverified]",
+          "value": 1.45
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.94,
+      "latest": 0.94,
+      "latest_derived": {
+        "value_over_reference": 0.94
+      },
+      "metric": "jv_quintic_weierstrass_wall_glibc_over_jemalloc",
+      "points": [
+        {
+          "commit": "7f3bbb4efc13",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 0.94
+          },
+          "n": 4,
+          "record": "20261121T0018Z-f4-consumer-allocator-screen",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": [
+            0.878,
+            0.965
+          ],
+          "summary": "jemalloc vs glibc: jv_quartic 1.40x (4/4), jv_quintic 0.94x (0/4); shipped jv_quartic 1.45x [pcc:unverified]",
+          "value": 0.94
+        }
+      ],
+      "problem": "kernel:f4_fp",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.124,
+      "latest": 1.124,
+      "latest_derived": {
+        "value_over_reference": 1.124
+      },
+      "metric": "quad_n7_4t_par_old_over_default",
+      "points": [
+        {
+          "commit": "e3dc9f66c225",
+          "date": "2026-11-25",
+          "derived": {
+            "value_over_reference": 1.124
+          },
+          "n": 6,
+          "record": "20261120T2057Z-f4-small-step-bisect",
+          "reference": 1.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "knob bisection of the small-system F4 cost: no knob explains it; sub-ms noise [pcc:unverified]",
+          "value": 1.124
         }
       ],
       "problem": "kernel:f4_fp",
@@ -34853,6 +34849,422 @@
       ],
       "problem": "kernel:m4gb_gf_p_addmul",
       "unit": "wall_s"
+    },
+    {
+      "better": "higher",
+      "first": 1.2245,
+      "latest": 1.2245,
+      "latest_derived": {},
+      "metric": "mayo-36x24x12-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0278,
+            1.3324
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.2245
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.667,
+      "latest": 1.667,
+      "latest_derived": {},
+      "metric": "mayo-36x36x36-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2445,
+            2.1729
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.667
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.035,
+      "latest": 1.035,
+      "latest_derived": {},
+      "metric": "mayo-n36-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9098,
+            1.3552
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.035
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 3.573,
+      "latest": 3.573,
+      "latest_derived": {},
+      "metric": "mayo-n512-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.9195,
+            3.935
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 3.573
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.3428,
+      "latest": 2.3428,
+      "latest_derived": {},
+      "metric": "mceliece-36x24x12-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.4696,
+            3.9156
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 2.3428
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 4.512,
+      "latest": 4.512,
+      "latest_derived": {},
+      "metric": "mceliece-36x36x36-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.1417,
+            6.3606
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 4.512
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.54,
+      "latest": 0.54,
+      "latest_derived": {},
+      "metric": "mceliece-n36-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.3902,
+            0.6264
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 0.54
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.3061,
+      "latest": 0.3061,
+      "latest_derived": {},
+      "metric": "mceliece-n512-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.1821,
+            0.7217
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 0.3061
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.7744,
+      "latest": 1.7744,
+      "latest_derived": {},
+      "metric": "qr-uov-36x24x12-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2303,
+            2.2062
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.7744
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.4768,
+      "latest": 1.4768,
+      "latest_derived": {},
+      "metric": "qr-uov-36x36x36-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2432,
+            2.2295
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.4768
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.6826,
+      "latest": 1.6826,
+      "latest_derived": {},
+      "metric": "qr-uov-n36-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7715,
+            2.2588
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.6826
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.4968,
+      "latest": 1.4968,
+      "latest_derived": {},
+      "metric": "qr-uov-n512-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2568,
+            2.2032
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.4968
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.972,
+      "latest": 0.972,
+      "latest_derived": {},
+      "metric": "uov-36x24x12-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4917,
+            1.5965
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 0.972
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0448,
+      "latest": 1.0448,
+      "latest_derived": {},
+      "metric": "uov-36x36x36-old-over-new",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.65,
+            1.4089
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.0448
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.1852,
+      "latest": 1.1852,
+      "latest_derived": {},
+      "metric": "uov-n36-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.062,
+            1.2733
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 1.1852
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 3.8592,
+      "latest": 3.8592,
+      "latest_derived": {},
+      "metric": "uov-n512-schoolbook-over-strassen32",
+      "points": [
+        {
+          "commit": "323ff3701854",
+          "date": "2026-11-25",
+          "derived": {},
+          "n": 5,
+          "record": "20261125T0508Z-pqc-strassen",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.3659,
+            13.4347
+          ],
+          "summary": "Shared src/pqc/strassen.rs product (PR #5172) vs each toy scheme's old loop at 36x36x36: old/new 4.51 McEliece GF(2), 1.67 MAYO GF(16), 1.04 UOV GF(256), 1.48 QR-UOV F_31^3, from the row-order loop, not Strassen; Strassen cutoff 32 vs schoolbook at n=512: 3.6-3.9x GF(16)/GF(256), 1.5x F_31^3, 0.31x GF(2) bytes. Medians of 5 batches, one thread, shared macOS host under load 20-43, not isolated; crossover cells noisy; unvalidated.",
+          "value": 3.8592
+        }
+      ],
+      "problem": "kernel:pqc_dense_matmul",
+      "unit": "ratio"
     },
     {
       "better": "higher",
