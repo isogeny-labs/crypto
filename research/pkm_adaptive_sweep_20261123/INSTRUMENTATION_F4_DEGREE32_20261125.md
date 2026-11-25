@@ -59,14 +59,45 @@ either arm hit the degree bound 8.
    hit rate 0.006 against an expected ≈0.03 — a relation-density failure on that
    instance, not an intermediate regularity blow-up past degree 8.
 
+## Two-factor decomposition of the charged GAE
+
+In these stores `total_gae` equals the solver's `gae` exactly: the walk and
+`setup` components price to zero, so the charged ratio is *only* the solver.
+
+| Seed | Arm | MA/call | GAE/call | GAE per MA | median ns/MA |
+|---:|:--|---:|---:|---:|---:|
+| 20261185 | int | 127.38M | 1708.4k | 0.01341 | 0.82 |
+| 20261185 | cand | 3.98M | 1207.4k | 0.30354 | 11.30 |
+| 20261221 | int | 127.40M | 1518.0k | 0.01192 | 0.65 |
+| 20261221 | cand | 3.97M | 147.2k | 0.03705 | 3.25 |
+| 20261276 | int | 127.33M | 894.1k | 0.00702 | 0.45 |
+| 20261276 | cand | 3.97M | 212.1k | 0.05344 | 2.46 |
+
+So the ratio factors as (32× fewer multiply-adds per system) × (3–14× more
+GAE per multiply-add) = 1.4×, 10.3×, 4.2× per system, which reproduces the
+observed combined ratios (0.51, 0.17, 0.24) once calls per relation are
+included. The second factor is the pricing model following measured `ns/op`:
+the candidate's own operations are individually more expensive in the measured
+calibration, and the interval arm's median `ns/op` itself moved 0.45–0.82
+across the three runs on the same field and binary.
+
+Two consequences follow, and both weaken earlier wording in this note and in
+`RESULT_F4_DEGREE32_SOURCE_PINNED_EQUAL18_20261125.md`:
+
+- The residual gap is **not** setup or target-walk cost. It is per-operation
+  price. Driving the multiply-add count down further only helps if the
+  per-operation calibration stays flat.
+- Charged GAE is **not** load-independent here: it is `ops × measured ns/op`,
+  and the measured `ns/op` varies by up to 1.8× across runs of the same arm.
+  The "GAE is component evidence, timings are not" split in the result doc is
+  too strong; GAE inherits part of the timing noise.
+
 ## Consequence for the next gate
 
-Because the per-system factor is a near-constant 32× and calls/relation is
-unaffected, the remaining cost in the charged-GAE ratio (0.17–0.51 across the
-three instances) is not in the F4 elimination at all: it is setup, base
-construction and target-walk work, which the candidate pays per relation. That
-is what a 14-bit equal-size rung and, later, a full collection→LA→descent
-pipeline would have to measure.
+The 14-bit rung therefore tests two things at once: whether the 32× per-system
+multiply-add factor survives, and whether the per-operation price penalty stays
+where it was. A 14-bit pass with a *worse* GAE ratio than 13 bits would suggest
+the price factor is the size-dependent term, not the matrix shape.
 
 ## Claim boundary
 

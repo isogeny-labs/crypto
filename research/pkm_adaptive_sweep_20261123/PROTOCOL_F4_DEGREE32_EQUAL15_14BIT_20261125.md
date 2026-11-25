@@ -56,6 +56,18 @@ CLI seed `20261300`, `--bits 14`, `--family generic`, `--targets walk`,
 `--solver-budget-seconds 5`, whole-call cap 3600 s, order
 **interval, candidate, candidate, interval**.
 
+## Parallel peer panel
+
+A separate protocol in the same directory,
+`PROTOCOL_F4_DEGREE32_14BIT_SINGLE_CURVE_20261125.md`, tests the same candidate
+(aux seed 7) against a different control on the same 14-bit curve:
+`prime-interval:t=5,lo=1` under binary `1ae5170f…`, whose source includes the
+`prime-interval` factor-base registration still uncommitted in
+`src/bin/ic/bench.rs`. The two panels are independent and must not be pooled:
+different control construction, different binary, different target seeds. If
+both pass, the 14-bit component lead is robust to control choice; if they
+disagree, the control construction — not the map — is the suspect.
+
 ## Gate
 
 Passes only if all four invocations exit zero, both arms stay at 15
