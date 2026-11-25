@@ -1,5 +1,12 @@
 # Independent relation throughput
 
+The pool-128 discriminator has advanced to a frozen paired wall/rank panel.
+See `P128_PROTOCOL.md`, `p128-panel-spec.json`, and
+`analyze_p128_panel.py`. The panel charges full solve setup, uses 16 public
+targets and an A/A control, and requires exact rank 3 with zero dependent rows
+on every measured execution before wall time is interpreted. No panel result
+has been recorded yet. [pcc:unverified]
+
 Status: active controlled study. Measurements and conclusions remain
 `[pcc:unverified]` until the repository validation and replay gates are complete.
 
