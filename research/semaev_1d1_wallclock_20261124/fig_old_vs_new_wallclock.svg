@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" font-family="sans-serif" font-size="12"><rect width="760" height="420" fill="#fff"/>
+<text x="70" y="24" font-size="15" font-weight="600">1D-1 fast path vs generic, Prime31 B=64: wall time (log scale)</text>
+<text x="70" y="40" fill="#555">median, whiskers min..max of 21 interleaved reps; A/A = old vs old. Contended VM, no PMU, not isolab.</text>
+<line x1="70" x2="740" y1="335.3" y2="335.3" stroke="#ddd"/><text x="64" y="339.3" text-anchor="end">1</text>
+<line x1="70" x2="740" y1="253.2" y2="253.2" stroke="#ddd"/><text x="64" y="257.2" text-anchor="end">10</text>
+<line x1="70" x2="740" y1="171.2" y2="171.2" stroke="#ddd"/><text x="64" y="175.2" text-anchor="end">100</text>
+<line x1="70" x2="740" y1="89.1" y2="89.1" stroke="#ddd"/><text x="64" y="93.1" text-anchor="end">1000</text>
+<rect x="90.0" y="271.3" width="44" height="88.7" fill="#c0504d"/>
+<line x1="112.0" x2="112.0" y1="275.7" y2="239.4" stroke="#222"/>
+<text x="112.0" y="235.4" text-anchor="middle" font-size="10">6.02</text>
+<rect x="150.0" y="254.8" width="44" height="105.2" fill="#e8a09e"/>
+<line x1="172.0" x2="172.0" y1="274.8" y2="220.8" stroke="#222"/>
+<text x="172.0" y="216.8" text-anchor="middle" font-size="10">9.57</text>
+<rect x="210.0" y="328.8" width="44" height="31.2" fill="#2a7ab0"/>
+<line x1="232.0" x2="232.0" y1="336.0" y2="273.1" stroke="#222"/>
+<text x="232.0" y="269.1" text-anchor="middle" font-size="10">1.2</text>
+<text x="170.0" y="378" text-anchor="middle">build B=64</text><text x="170.0" y="394" text-anchor="middle" fill="#2a7ab0">5.0x (median ratio)</text>
+<rect x="313.33333333333337" y="227.8" width="44" height="132.2" fill="#c0504d"/>
+<line x1="335.33333333333337" x2="335.33333333333337" y1="245.8" y2="199.1" stroke="#222"/>
+<text x="335.33333333333337" y="195.1" text-anchor="middle" font-size="10">20.4</text>
+<rect x="373.33333333333337" y="234.0" width="44" height="126.0" fill="#e8a09e"/>
+<line x1="395.33333333333337" x2="395.33333333333337" y1="245.8" y2="201.2" stroke="#222"/>
+<text x="395.33333333333337" y="197.2" text-anchor="middle" font-size="10">17.2</text>
+<rect x="433.33333333333337" y="331.7" width="44" height="28.3" fill="#2a7ab0"/>
+<line x1="455.33333333333337" x2="455.33333333333337" y1="332.4" y2="277.1" stroke="#222"/>
+<text x="455.33333333333337" y="273.1" text-anchor="middle" font-size="10">1.11</text>
+<text x="393.33333333333337" y="378" text-anchor="middle">decompose_three x100</text><text x="393.33333333333337" y="394" text-anchor="middle" fill="#2a7ab0">18.5x (median ratio)</text>
+<rect x="536.6666666666667" y="77.2" width="44" height="282.8" fill="#c0504d"/>
+<line x1="558.6666666666667" x2="558.6666666666667" y1="84.1" y2="65.7" stroke="#222"/>
+<text x="558.6666666666667" y="61.7" text-anchor="middle" font-size="10">1.4e+03</text>
+<rect x="596.6666666666667" y="76.4" width="44" height="283.6" fill="#e8a09e"/>
+<line x1="618.6666666666667" x2="618.6666666666667" y1="83.7" y2="67.3" stroke="#222"/>
+<text x="618.6666666666667" y="63.3" text-anchor="middle" font-size="10">1.43e+03</text>
+<rect x="656.6666666666667" y="173.0" width="44" height="187.0" fill="#2a7ab0"/>
+<line x1="678.6666666666667" x2="678.6666666666667" y1="185.6" y2="158.9" stroke="#222"/>
+<text x="678.6666666666667" y="154.9" text-anchor="middle" font-size="10">95.2</text>
+<text x="616.6666666666667" y="378" text-anchor="middle">decompose_four x100</text><text x="616.6666666666667" y="394" text-anchor="middle" fill="#2a7ab0">14.7x (median ratio)</text>
+<rect x="590" y="50" width="10" height="10" fill="#c0504d"/><text x="605" y="59">generic (old)</text>
+<rect x="590" y="66" width="10" height="10" fill="#e8a09e"/><text x="605" y="75">A/A old</text>
+<rect x="590" y="82" width="10" height="10" fill="#2a7ab0"/><text x="605" y="91">fast (new)</text>
+</svg>
