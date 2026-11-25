@@ -5,6 +5,7 @@ pub mod extractor;
 pub mod relation_adapter;
 pub mod query_pipeline;
 mod selector_circuit;
+mod split_selector;
 
 #[cfg(test)]
 mod independent_tests;
