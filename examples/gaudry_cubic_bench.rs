@@ -76,6 +76,7 @@ fn one(
         max_large_primes: max_lp,
         max_merge_level: merge_cap,
         arity: 3,
+        ..GaudryOptions::default()
     };
     let g = run_gaudry_opts(&inst, &base, seed, &opts);
     let r = run_rho3(&inst, seed);
