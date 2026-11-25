@@ -32,6 +32,7 @@
 //! signing algorithm, and the compression.  Toy parameters, not
 //! constant-time; see SECURITY.md.
 
+use super::strassen::{self, Ring};
 use crate::hash::sha3::shake256;
 use crate::utils::random::random_bytes;
 
@@ -146,20 +147,27 @@ fn zero_matrix(r: usize, c: usize) -> Matrix {
     vec![vec![ZERO; c]; r]
 }
 
-fn mat_mul(a: &Matrix, b: &Matrix) -> Matrix {
-    let (r, k, c) = (a.len(), b.len(), b[0].len());
-    let mut out = zero_matrix(r, c);
-    for i in 0..r {
-        for l in 0..k {
-            if w_is_zero(&a[i][l]) {
-                continue;
-            }
-            for j in 0..c {
-                out[i][j] = w_add(&out[i][j], &w_mul(&a[i][l], &b[l][j]));
-            }
-        }
+/// `W` for [`super::strassen`]. `W` has odd characteristic, so Strassen
+/// needs `w_sub` here, not just `w_add`.
+struct WRing;
+impl Ring for WRing {
+    type Elt = W;
+    const ZERO: W = ZERO;
+    const SKIP_ZERO: bool = true;
+    fn add(a: W, b: W) -> W {
+        w_add(&a, &b)
     }
-    out
+    fn sub(a: W, b: W) -> W {
+        w_sub(&a, &b)
+    }
+    fn mul(a: W, b: W) -> W {
+        w_mul(&a, &b)
+    }
+}
+
+/// Schoolbook below `strassen::STRASSEN_CUTOFF`, Strassen above it.
+fn mat_mul(a: &Matrix, b: &Matrix) -> Matrix {
+    strassen::mul::<WRing>(a, b)
 }
 
 fn transpose(a: &Matrix) -> Matrix {
@@ -346,6 +354,29 @@ pub fn qr_uov_verify(pk: &QrUovPublicKey, msg: &[u8], sig: &[W]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn strassen_matches_schoolbook_w() {
+        strassen::tests::assert_strassen_matches_naive::<WRing>(|x| {
+            [
+                (x % 31) as u32,
+                ((x >> 16) % 31) as u32,
+                ((x >> 32) % 31) as u32,
+            ]
+        });
+    }
+
+    #[test]
+    #[ignore = "timing report; run with --release --ignored --nocapture"]
+    fn strassen_crossover_w() {
+        strassen::tests::crossover_report::<WRing>("F_31^3", |x| {
+            [
+                (x % 31) as u32,
+                ((x >> 16) % 31) as u32,
+                ((x >> 32) % 31) as u32,
+            ]
+        });
+    }
 
     #[test]
     fn modulus_is_irreducible() {
