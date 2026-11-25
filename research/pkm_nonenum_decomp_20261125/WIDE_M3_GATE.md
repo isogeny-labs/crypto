@@ -32,3 +32,19 @@ after 60 seconds already at `t=3` over `F_97`. Therefore mathematical degree
 availability alone does not admit a wide run. The next cost decision requires
 a source-pinned solver whose certified prefix work and peak memory are
 measured on the frozen independent-curve ladder.
+
+## Existing implementation ceiling (2026-11-25 audit)
+
+`src/cryptanalysis/ic_framework/pkm_semaev.rs` already has a separate
+degree-2 Dickson tower and F4 witness path for `p+1` analogue fields.
+Its `dickson_abscissae` currently accepts `1 <= t < 30`; the native F4
+backend uses a `u64` modulus and at most 64 tower variables. Thus the
+s59-plus available height 18 is within these representation limits, subject
+to a verified norm-one construction and measured complete cost. P-192's
+height 64, and the favorable P-256 and P-521 heights, exceed the current
+backend's limits as well as its field width. These are implementation gates,
+not arithmetic exclusions. The `p-1` Kummer staged-resultant diagnostic
+returned exact witnesses at `t=3` but was censored in its second resultant
+at `t=4`; see `RESULTANT_DIAGNOSTIC_20261125.md`. Its expanded output is
+unsuitable for wide cost projection. P-384 remains screened out by the
+relation-density proxy independently of solver choice.
