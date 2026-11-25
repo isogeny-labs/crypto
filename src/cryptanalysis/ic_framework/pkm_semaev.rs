@@ -963,7 +963,31 @@ pub struct PkmSemaevOracle {
     dataset_artifact: Option<serde_json::Value>,
 }
 
+#[derive(Default)]
+struct BasisDfsStats {
+    visited_nodes: u64,
+    root_split_branches: u64,
+    terminal_leaves: u64,
+    algebraic_tuples: u64,
+    peak_live_basis_cache_terms: u64,
+    branch_copy_basis_terms: u64,
+    branch_copy_state_slots: u64,
+}
+
 impl PkmSemaevOracle {
+    fn record_basis_dfs(&mut self, stats: BasisDfsStats) {
+        self.bump("pkm_basis_dfs_visited_nodes", stats.visited_nodes);
+        self.bump("pkm_basis_dfs_root_split_branches", stats.root_split_branches);
+        self.bump("pkm_basis_dfs_terminal_leaves", stats.terminal_leaves);
+        self.bump("pkm_basis_dfs_algebraic_tuples", stats.algebraic_tuples);
+        let peak = self
+            .native
+            .entry("pkm_basis_dfs_peak_live_basis_cache_terms_lower_bound_max".into())
+            .or_default();
+        *peak = (*peak).max(stats.peak_live_basis_cache_terms);
+        self.bump("pkm_basis_dfs_branch_copy_basis_terms", stats.branch_copy_basis_terms);
+        self.bump("pkm_basis_dfs_branch_copy_state_slots", stats.branch_copy_state_slots);
+    }
     /// `m` summands over the Kummer tower `g·μ_{2^t}`.
     pub fn new(m: u32, t: u32, g: u64) -> Self {
         PkmSemaevOracle {
@@ -2729,7 +2753,7 @@ impl PkmSemaevOracle {
         init_fixed_s0: &[(usize, u64)],
         x_r: u64,
         shared_lift_xs: Option<&[u64]>,
-    ) -> (Vec<Vec<u64>>, Vec<Vec<Vec<u64>>>, u64) {
+    ) -> (Vec<Vec<u64>>, Vec<Vec<Vec<u64>>>, u64, BasisDfsStats) {
         let (a, b) = self.s3_coefficients(curve);
         let m = self.m as usize;
         let t = self.t as usize;
@@ -2810,6 +2834,8 @@ impl PkmSemaevOracle {
         let mut found_standard: Vec<Vec<u64>> = Vec::new();
         let mut found_shared: Vec<Vec<Vec<u64>>> = vec![Vec::new(); n_shared];
         let free_done_init = vec![false; cur_ring.n_free];
+        let cache_root_terms = rule_roots.values().map(|roots| roots.len() as u64).sum();
+        let mut stats = BasisDfsStats::default();
 
         #[allow(clippy::too_many_arguments)]
         fn dfs(
@@ -2828,11 +2854,19 @@ impl PkmSemaevOracle {
             mut fixed_tower: Vec<Vec<Option<u64>>>,
             mut free_done: Vec<bool>,
             mults: &mut u64,
+            stats: &mut BasisDfsStats,
+            stack_basis_terms: u64,
+            cache_root_terms: u64,
             found_standard: &mut Vec<Vec<u64>>,
             found_shared: &mut [Vec<Vec<u64>>],
         ) {
             let p = curve.p;
             let m = oracle.m as usize;
+            stats.visited_nodes += 1;
+            let basis_terms = cur_basis.iter().map(|g| g.len() as u64).sum::<u64>();
+            stats.peak_live_basis_cache_terms = stats.peak_live_basis_cache_terms.max(
+                stack_basis_terms + basis_terms + cache_root_terms,
+            );
 
             // Step 1: Linear RREF + upward tower propagation + free-var cascade.
             loop {
@@ -3056,6 +3090,7 @@ impl PkmSemaevOracle {
                 if let (Some(x0), None) = (known_x[0], known_x[1]) {
                     for x1 in PkmSemaevOracle::solve_s3_for_middle(curve, a, b, x0, x_r, mults) {
                         if root_v_rank.contains_key(&x1) {
+                            stats.algebraic_tuples += 1;
                             found_standard.push(vec![x0, x1]);
                         }
                     }
@@ -3066,6 +3101,7 @@ impl PkmSemaevOracle {
                         for x0 in PkmSemaevOracle::solve_s3_for_middle(curve, a, b, x1, x_r, mults)
                         {
                             if root_v_rank.contains_key(&x0) {
+                                stats.algebraic_tuples += 1;
                                 found_standard.push(vec![x0, x1]);
                             }
                         }
@@ -3076,6 +3112,7 @@ impl PkmSemaevOracle {
 
             // Leaf: all tower variables fixed!
             if cur_ring.n_tower() == 0 {
+                stats.terminal_leaves += 1;
                 let xs: Vec<u64> = known_x.into_iter().map(|o| o.unwrap()).collect();
                 if let Some(lift_xs) = shared_lift_xs {
                     for (li, &lx) in lift_xs.iter().enumerate() {
@@ -3087,10 +3124,12 @@ impl PkmSemaevOracle {
                             PkmSemaevOracle::eval_free_only_poly_at_u0(p, g, lx % p, mults) == 0
                         });
                         if ok {
+                            stats.algebraic_tuples += 1;
                             found_shared[li].push(xs.clone());
                         }
                     }
                 } else if PkmSemaevOracle::semaev_zero_m(curve, a, b, &xs, x_r, mults) {
+                    stats.algebraic_tuples += 1;
                     found_standard.push(xs);
                 }
                 return;
@@ -3129,6 +3168,11 @@ impl PkmSemaevOracle {
             let rule = &cur_ring.rules[chosen_var];
             let cached = rule_roots.contains_key(&PkmSemaevOracle::rule_abcd(rule));
             let roots = PkmSemaevOracle::lookup_rule_roots(rule_roots, curve, rule);
+            stats.root_split_branches += roots.len() as u64;
+            let parent_terms = cur_basis.iter().map(|g| g.len() as u64).sum::<u64>();
+            stats.peak_live_basis_cache_terms = stats.peak_live_basis_cache_terms.max(
+                stack_basis_terms + parent_terms + cache_root_terms,
+            );
             // Cached prepare()-time roots cost nothing at runtime; a miss still
             // pays a one-shot Tonelli–Shanks (~34 Fp mults on a 31-bit prime).
             if !cached {
@@ -3146,6 +3190,10 @@ impl PkmSemaevOracle {
                 let (s_idx, l_idx) = c_orig.remove(chosen_var);
                 let mut c_fixed = fixed_tower.clone();
                 c_fixed[s_idx][l_idx] = Some(rt);
+                stats.branch_copy_basis_terms += c_basis.iter().map(|g| g.len() as u64).sum::<u64>();
+                stats.branch_copy_state_slots +=
+                    (c_orig.len() + c_fixed.iter().map(Vec::len).sum::<usize>() + free_done.len())
+                        as u64;
                 dfs(
                     oracle,
                     curve,
@@ -3162,6 +3210,9 @@ impl PkmSemaevOracle {
                     c_fixed,
                     free_done.clone(),
                     mults,
+                    stats,
+                    stack_basis_terms + parent_terms,
+                    cache_root_terms,
                     found_standard,
                     found_shared,
                 );
@@ -3184,6 +3235,9 @@ impl PkmSemaevOracle {
             fixed_tower,
             free_done_init,
             &mut mults,
+            &mut stats,
+            0,
+            cache_root_terms,
             &mut found_standard,
             &mut found_shared,
         );
@@ -3209,7 +3263,7 @@ impl PkmSemaevOracle {
         for fl in &mut found_shared {
             canonicalize(fl);
         }
-        (found_standard, found_shared, mults)
+        (found_standard, found_shared, mults, stats)
     }
 
     /// Parent-to-child `F_p` basis inheritance across the `G`-level summand-0
@@ -3315,7 +3369,7 @@ impl PkmSemaevOracle {
                 }
                 if !self.shared_pts.is_empty() {
                     let lift_xs: Vec<u64> = self.shared_pts.iter().map(|pt| pt.x).collect();
-                    let (_, per_lift, m_ext) = self.extract_solutions_from_basis(
+                    let (_, per_lift, m_ext, dfs) = self.extract_solutions_from_basis(
                         curve,
                         None,
                         &cur_ring,
@@ -3325,6 +3379,7 @@ impl PkmSemaevOracle {
                         Some(&lift_xs),
                     );
                     self.bump("pkm_grid_fp_mults_uncharged", m_ext);
+                    self.record_basis_dfs(dfs);
                     let pts = self.shared_pts.clone();
                     for (li, t_pt) in pts.iter().enumerate() {
                         for xs in &per_lift[li] {
@@ -3335,6 +3390,7 @@ impl PkmSemaevOracle {
                                         self.bump("pkm_lift_hits_nonidentity", 1);
                                     }
                                     self.bump("pkm_consistent_systems", 1);
+                                    self.bump("pkm_basis_dfs_verified_tuples", 1);
                                     return Ok(Some(idx));
                                 }
                             }
@@ -3345,15 +3401,17 @@ impl PkmSemaevOracle {
                     continue;
                 }
 
-                let (sols, _, m_ext) = self.extract_solutions_from_basis(
+                let (sols, _, m_ext, dfs) = self.extract_solutions_from_basis(
                     curve, None, &cur_ring, &rep.basis, &fixed_s0, x_r, None,
                 );
                 self.bump("pkm_grid_fp_mults_uncharged", m_ext);
+                self.record_basis_dfs(dfs);
                 for xs in &sols {
                     any_extracted = true;
                     if let Membership::T0Bits { q: Some(q), .. } = self.membership {
                         if let Some(idx) = self.t0_lift(curve, fb, ops, &q, xs, point) {
                             self.bump("pkm_consistent_systems", 1);
+                            self.bump("pkm_basis_dfs_verified_tuples", 1);
                             return Ok(Some(idx));
                         }
                         counters.lift_failures += 1;
@@ -3362,6 +3420,7 @@ impl PkmSemaevOracle {
                     if xs.iter().all(|x| fb.x_index.contains_key(x)) {
                         if let Some(idx) = lift_abscissae(curve, fb, ops, xs, point) {
                             self.bump("pkm_consistent_systems", 1);
+                            self.bump("pkm_basis_dfs_verified_tuples", 1);
                             return Ok(Some(idx));
                         }
                     }
@@ -3467,7 +3526,7 @@ impl PkmSemaevOracle {
             (self.use_descent_extraction(), basis_info)
         {
             let lift_xs: Vec<u64> = pts.iter().map(|t| t.x).collect();
-            let (_, per_lift, mults) = self.extract_solutions_from_basis(
+            let (_, per_lift, mults, dfs) = self.extract_solutions_from_basis(
                 curve,
                 br_idx,
                 ring,
@@ -3477,6 +3536,7 @@ impl PkmSemaevOracle {
                 Some(&lift_xs),
             );
             self.bump("pkm_grid_fp_mults_uncharged", mults);
+            self.record_basis_dfs(dfs);
             for (i, t) in pts.iter().enumerate() {
                 for xs in &per_lift[i] {
                     any = true;
@@ -3486,6 +3546,7 @@ impl PkmSemaevOracle {
                                 self.bump("pkm_lift_hits_nonidentity", 1);
                             }
                             self.bump("pkm_consistent_systems", 1);
+                            self.bump("pkm_basis_dfs_verified_tuples", 1);
                             return Some(idx);
                         }
                     }
@@ -4192,10 +4253,11 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                             last = Some((rep, ring, fixed_s0, branch, undecided));
                             break;
                         }
-                        let (br_sols, _, m_ext) = self.extract_solutions_from_basis(
+                        let (br_sols, _, m_ext, dfs) = self.extract_solutions_from_basis(
                             curve, branch, &ring, &rep.basis, &fixed_s0, x_r, None,
                         );
                         self.bump("pkm_grid_fp_mults_uncharged", m_ext);
+                        self.record_basis_dfs(dfs);
                         // Check if any extracted tuple on this branch lifts to `fb` before stopping
                         // multi-branch search (so an accidental twist root on branch 0 never masks
                         // a curve solution on a later branch!).
@@ -4306,6 +4368,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         for xs in &solutions {
             if let Membership::T0Bits { q: Some(q), .. } = self.membership {
                 if let Some(idx) = self.t0_lift(curve, fb, ops, &q, xs, point) {
+                    if self.engine == PkmEngine::F4 && self.use_descent_extraction() {
+                        self.bump("pkm_basis_dfs_verified_tuples", 1);
+                    }
                     return Some(idx);
                 }
                 counters.lift_failures += 1;
@@ -4313,6 +4378,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             }
             if xs.iter().all(|x| fb.x_index.contains_key(x)) {
                 if let Some(idx) = lift_abscissae(curve, fb, ops, xs, point) {
+                    if self.engine == PkmEngine::F4 && self.use_descent_extraction() {
+                        self.bump("pkm_basis_dfs_verified_tuples", 1);
+                    }
                     return Some(idx);
                 }
             }
@@ -4662,8 +4730,17 @@ mod tests {
             )
             .expect("forced basis descent must recover a planted relation");
         assert_eq!(sum(&inst.curve, &fb, &indices), target);
+        let dfs = o.relation_counters();
+        assert!(dfs["pkm_basis_dfs_visited_nodes"] > 0);
+        assert!(dfs["pkm_basis_dfs_terminal_leaves"] > 0);
+        assert!(dfs["pkm_basis_dfs_root_split_branches"] > 0);
+        assert_eq!(dfs["pkm_basis_dfs_verified_tuples"], 1);
+        assert!(
+            dfs["pkm_basis_dfs_terminal_leaves"] <= (1u64 << (3 * 3)),
+            "the basis extractor may not enumerate more leaves than the full grid"
+        );
         assert_eq!(
-            o.relation_counters()
+            dfs
                 .get("pkm_descent_deferred_to_grid")
                 .copied()
                 .unwrap_or(0),
