@@ -1,74 +1,62 @@
-# Encoding-width diagnostic: what the 32× actually measures — 2026-11-25
+# Aux-variable count drives F4 cost; the isogeny factor is a constant — 2026-11-25
 
-Controlled experiment on one instance (`icv1-fp13-tm13-9e2d11f6`, seed
-20261185), one base (`prime-abscissa:below=32`, 18 abscissae), one binary
-(`8e654529…`, commit `cc7d6141f2`), 16 repeats. The **only** change is the
-oracle's encoding width: `bits=5,lo=0` versus `bits=6,lo=0`.
+**This document replaces an earlier version of the same file** whose headline
+claimed the 32× was "the interval arm's bit-encoding". The prediction in that
+version — that the ratio should step up by an order of magnitude once the
+matched base crossed 2^5 — was tested and **failed**. What follows is the
+corrected reading, with the failed prediction kept visible because the way it
+failed is the informative part.
 
-The registry states what that parameter is: `prime-abscissa:below=2^T` is
-"pkm-semaev's bits=T interval (the naive algebraic arm)" — the interval
-membership is expressed by T bit variables per base element. So this compares
-the same relations under a 5-bit and a 6-bit encoding.
+One binary (`8e654529…`, commit `cc7d6141f2`), one instance
+(`icv1-fp13-tm13-9e2d11f6`, seed 20261185), `m = 2` chain F4, degree bound 8.
 
-## Result
+## The four measurements
 
-| Quantity | bits=5 | bits=6 | ratio |
-|:--|---:|---:|---:|
-| F4 calls | 1645 | 1645 | — |
-| Relations found | 219 | 219 | — |
-| Target trials | 1666 | 1666 | — |
-| Multiply-adds per call | 127.38M | 1956.84M | **15.4×** |
-| Elimination steps per call | 11.73 | 21.10 | 1.80× |
-| Max matrix rows | 1493 | 6037 | 4.04× |
-| Max matrix cols | 928 | 3629 | 3.91× |
-| Non-zeros per row | 189.9 | 465.5 | 2.45× |
-| Charged GAE (16 repeats) | 0.991B | 8.257B | 8.3× |
+| Run | Base | Aux vars / summand | MA/call | Max rows | nnz/row | D | Relations |
+|:--|---:|---:|---:|---:|---:|---:|---:|
+| interval, `bits=5` | 18 | 5 | 127.4M | 1493 | 189.9 | 6 | 219 |
+| isogeny `t=5` | 18 | 5 | **3.97M** | 821 | 54.7 | 5 | 208 |
+| interval, `bits=6` | 18 | 6 | 1956.8M | 6037 | 465.5 | 7 | 219 |
+| interval, `bits=6` | 26 | 6 | 2002.9M | 5544 | 444.2 | 7 | 15 |
+| isogeny `t=6` | 26 | 6 | **55.9M** | 1711 | 116.0 | 5 | 19 |
 
-Relations and trials are **identical**, so nothing about the search changed:
-the entire 8.3× GAE difference is the shape of the polynomial system. One extra
-bit variable per base element — two variables in total, for a two-summand
-decomposition — costs 15.4× in elimination work.
+## What the numbers say
 
-For reference, the degree-32 isogeny arm on the same instance is 3.97M
-multiply-adds per call with 12.4 steps and an 821×583 matrix. So:
+1. **Auxiliary-variable count sets the cost, base size does not.** At `bits=6`
+   the interval arm costs 1956.8M per call on 18 abscissae and 2002.9M on 26 —
+   a 2 % difference for a 44 % larger base. Going from 5 to 6 aux variables
+   multiplies it by 15.4×. The isogeny arm moves the same way: 3.97M → 55.9M
+   (14.1×) for the same +2 variables. Both systems are almost exactly as
+   sensitive to aux count as each other.
 
-- isogeny vs interval at `bits=5` (the size-matched, fair comparison): **32×**
-- isogeny vs interval at `bits=6` (deliberately over-encoded control): **494×**
+2. **At equal aux count the isogeny is 32–36× cheaper, and that is the whole
+   effect.** T = 5: 127.4/3.97 = 32.1×. T = 6: 2002.9/55.9 = **35.8×**. The
+   factor is stable because the mechanism is stable: the interval's rows carry
+   3.5–3.8× more non-zeros (189.9 vs 54.7; 444.2 vs 116.0) in a matrix with
+   1.8–3.2× more rows, and resolves at one higher degree (6–7 vs 5).
 
-## What this means
+3. **The failed prediction.** If the 32× were purely an encoding-width effect,
+   a 26-point base paired with `t=6` should have shown ~10²–10³×. It showed
+   35.8×, because raising the base size forced the isogeny's tower to `t = 6`
+   too — the two arms scale together in aux count. The earlier doc's
+   "encoding term" framing was too strong: encoding width matters, but it
+   matters equally on both sides, so it cannot explain the ratio.
 
-The 32× is the cost of the interval arm's bit-window encoding at T = 5. It is
-not evidence that the isogeny's elimination algebra is intrinsically 32×
-cheaper than an interval's at equal encoding; it is evidence that an isogeny
-fiber needs **no** encoding, while an interval does, and that the encoding is
-the dominant term. That is precisely the motivation the PKM construction gives
-for itself (§3.4 builds a fibre map instead of a bit-decomposed interval), so
-the comparison is fair as posed — but the mechanism sentence has to name the
-encoding, not a generic "banded vs dense" difference.
+So the honest mechanism sentence is: *the isogeny chain and the bit-window
+interval respond identically to auxiliary-variable count, and at equal count the
+isogeny's Macaulay rows are ~3.5× sparser and its matrix smaller, which yields
+a constant 32–36× per-system saving.* That is the "banded quadratic chain
+versus dense bit-coupled S₃" reading from `INSTRUMENTATION_F4_DEGREE32_20261125.md`,
+now with a matched-aux-count control behind it.
 
-It also produces a falsifiable scaling prediction: because the interval arm's
-cost jumps ~15× per extra encoding bit while the isogeny arm's grows with tower
-length only, the measured advantage should improve **in steps** as the
-size-matched base crosses a power of two:
+## Consequence for scaling
 
-- base 15–18 points (T = 5): 32× per system, observed at 13, 14 and 15 bits;
-- base 19–32 points (T = 6): predicted ~10²–10³× per system.
+Because the ratio is set by matching T rather than by absolute base size, the
+13-, 14- and 15-bit panels all landing at 32× is not a coincidence of window
+width — they all used T = 5. A rung that needs T = 6 on both sides should land
+near 36×, which is what this probe shows. The factor is therefore expected to
+stay in the low tens, not to explode, as size grows.
 
-The 15-bit panel's bases were 19, 17 and 14, all still inside the T = 5
-window, which is why they reproduced 32× rather than something larger. A pair
-with ~26–32 abscissae would test the prediction directly. It is not free: the
-`bits=6` interval arm at 18 points already took ~10 minutes per 16-repeat call
-on this host, and a 30-point base would be worse, so the test should be run
-with fewer repeats and a budget cap rather than as a full panel.
-
-## Caveat on the contrived control
-
-The `bits=6` run over-encodes an 18-point base that only needs 5 bits. It is
-not a legitimate performance comparison and is not reported as one; it is a
-sensitivity probe that isolates the encoding term. The only peer-reviewed
-comparison in this lane remains the size-matched one.
-
-Stores: `encoding_width_bits5_20261185.json`
-(SHA-256 `0b9e4637652d6f4f18fccd632bd1c073c8e0b4f03ae4827d41683dddae05e414`) and
-`encoding_width_bits6_20261185.json`
-(SHA-256 `987de48fba0fbe76aebe16b2737666b9d950a2e0fc9110090ae80e7e8e37b6fe`).
+Stores: `encoding_width_bits5_20261185.json`,
+`encoding_width_bits6_20261185.json`, `aux_vars_t6_int26_20261185.json`,
+`aux_vars_t6_cand26_20261185.json`.
