@@ -149,9 +149,24 @@ elimination loop (it rebuilds the column map and the row vector after every
 pivot, O(rows x pivots)) dominates. Details:
 `evidence/m31-mst-strategies-20261125/`.
 
+## Incremental column maintenance in `eliminate`
+
+The outer loop now keeps a slab of rows with append-only ids, an id-ordered
+member set per large column, a `(degree, column)` priority set, and running
+totals for atoms and rows over the caps, instead of rebuilding all of them
+after every pivot. The live rows in id order are exactly the vector the old
+loop rebuilt, so member order, ties, column choice, refusals and output
+are unchanged. A differential build of the old and new source over 12,018
+runs (4000 seeded streams, M31, synthetic streams up to 4000 rows, three
+strategies) prints identical output. On M31 the exhaustive MST stage falls
+from 29.43 M to 7.71 M instructions (0.262x; wall 3.34 ms to about 1 ms);
+on synthetic streams the gain grows with size, 3.2x at 500 rows to 25x at
+4000 rows, as the old cost was quadratic. With the loop fixed, shared-key
+is 0.96x and overlap-sensitive 1.43x the exhaustive arm's instructions on
+M31. Details: `evidence/m31-mst-strategies-20261125/incremental-eliminate/`.
+
 ## Next step
 
-On streams like M31 the remaining cost is in `eliminate`, not in the trees:
-maintaining the column incidence map incrementally across pivots, instead
-of rebuilding it and the row vector each time, is the change that can move
-this stage. Its share of a cold M31 solve has not been measured.
+Profile the MST stage again after the incremental loop to see what now
+dominates, and measure its share of a cold M31 solve, which has not been
+measured here.

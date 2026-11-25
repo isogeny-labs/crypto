@@ -641,7 +641,7 @@ fn eliminate(
             }
         }
     }
-    let mut rows: Vec<_> = relations
+    let rows: Vec<_> = relations
         .into_iter()
         .enumerate()
         .filter(|(i, r)| r.large.is_empty() || active[*i])
@@ -653,39 +653,52 @@ fn eliminate(
         .flat_map(|r| r.large.iter().map(|x| x.0))
         .collect::<BTreeSet<_>>()
         .len();
+    // Incremental state. `slab` keeps every row under an append-only id, so
+    // the surviving rows in id order are exactly the row vector the original
+    // loop rebuilt after each pivot (survivors in order, then new edge rows).
+    // Each column's member set is ordered by id, which reproduces the
+    // original member order and so the Prim vertex numbering and ties;
+    // `order` holds `(degree, column)` so its first element is the original
+    // `min_by_key(|(j, v)| (v.len(), j))`. The atom total and the number of
+    // rows over the weight/source caps replace the per-pivot rescans.
+    let mut slab: Vec<Option<WorkRow>> = rows.into_iter().map(Some).collect();
+    let mut columns = BTreeMap::<u64, BTreeSet<usize>>::new();
+    let mut persistent: u128 = 0;
+    let mut unfit = 0usize;
+    for (i, r) in slab.iter().enumerate() {
+        let r = r.as_ref().expect("fresh slab");
+        persistent += atoms(r) as u128;
+        unfit += usize::from(!fits(r, options));
+        for &(j, _) in &r.large {
+            columns.entry(j).or_default().insert(i);
+        }
+    }
+    let mut order: BTreeSet<(usize, u64)> = columns.iter().map(|(&j, m)| (m.len(), j)).collect();
     loop {
-        let persistent = rows.iter().try_fold(0usize, |s, r| s.checked_add(atoms(r)));
-        if persistent.is_none_or(|v| v > limits.max_active_coefficients)
-            || rows.iter().any(|r| !fits(r, options))
-        {
+        if persistent > limits.max_active_coefficients as u128 || unfit > 0 {
             stats.budget_refusals += 1;
             return Ok(None);
         }
         stats.largest_active_coefficients =
-            stats.largest_active_coefficients.max(persistent.unwrap());
-        let mut columns = BTreeMap::<u64, Vec<usize>>::new();
-        for (i, r) in rows.iter().enumerate() {
-            for &(j, _) in &r.large {
-                columns.entry(j).or_default().push(i);
-            }
-        }
-        let Some((&j, members)) = columns.iter().min_by_key(|(j, v)| (v.len(), **j)) else {
+            stats.largest_active_coefficients.max(persistent as usize);
+        let Some(&(k, j)) = order.first() else {
             break;
         };
-        let k = members.len();
         stats.largest_column_degree = stats.largest_column_degree.max(k);
         if k > limits.max_column_degree {
             stats.budget_refusals += 1;
             return Ok(None);
         }
+        let members: Vec<usize> = columns[&j].iter().copied().collect();
         let mut normalized = Vec::with_capacity(k);
-        for &i in members {
-            let a = rows[i].coefficient(j);
+        for &i in &members {
+            let row = slab[i].as_ref().expect("live member");
+            let a = row.coefficient(j);
             let inverse = inverse_mod(a, p).ok_or(LargePrimeFilterError::NonInvertiblePivot {
                 large_prime: j,
                 coefficient: a,
             })?;
-            normalized.push(scale_row(&rows[i], inverse, p));
+            normalized.push(scale_row(row, inverse, p));
             stats.normalized_rows += 1;
         }
         let Some(edges) = tree_rows(&normalized, j, strategy, options, limits, stats) else {
@@ -693,17 +706,42 @@ fn eliminate(
             return Ok(None);
         };
         debug_assert!(edges.iter().all(|r| r.coefficient(j) == 0));
-        let chosen: BTreeSet<_> = members.iter().copied().collect();
-        let mut next: Vec<_> = rows
-            .into_iter()
-            .enumerate()
-            .filter_map(|(i, r)| (!chosen.contains(&i)).then_some(r))
-            .collect();
+        let mut move_column =
+            |columns: &mut BTreeMap<u64, BTreeSet<usize>>, jj: u64, id: usize, insert: bool| {
+                let set = columns.entry(jj).or_default();
+                order.remove(&(set.len(), jj));
+                if insert {
+                    set.insert(id);
+                } else {
+                    set.remove(&id);
+                }
+                if set.is_empty() {
+                    columns.remove(&jj);
+                } else {
+                    order.insert((set.len(), jj));
+                }
+            };
+        for &i in &members {
+            let row = slab[i].take().expect("live member");
+            persistent -= atoms(&row) as u128;
+            unfit -= usize::from(!fits(&row, options));
+            for &(jj, _) in &row.large {
+                move_column(&mut columns, jj, i, false);
+            }
+        }
         report.pivots += 1;
         report.merges += edges.len();
-        next.extend(edges);
-        rows = next;
+        for row in edges {
+            let id = slab.len();
+            persistent += atoms(&row) as u128;
+            unfit += usize::from(!fits(&row, options));
+            for &(jj, _) in &row.large {
+                move_column(&mut columns, jj, id, true);
+            }
+            slab.push(Some(row));
+        }
     }
+    let rows: Vec<WorkRow> = slab.into_iter().flatten().collect();
     stats.output_nonzeros = rows.iter().map(|r| r.small.len()).sum();
     report.complete_relations = rows.len();
     report.cycles_closed = rows.iter().filter(|r| r.sources.len() > 1).count();
