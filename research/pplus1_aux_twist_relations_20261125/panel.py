@@ -195,6 +195,17 @@ def main(out: Path) -> None:
     gen = e.points()[1]
     assert e.mul(R, gen) is None
     target = e.mul(TARGET_K, gen)
+    small_wall0, small_cpu0 = time.perf_counter(), time.process_time()
+    small_x = []
+    for x in range(P):
+        if any(y * y % P == e.rhs(x) for y in range(P)):
+            small_x.append(x)
+        if len(small_x) == 2:
+            break
+    assert len(small_x) == 2
+    small_setup = {"wall_s": time.perf_counter() - small_wall0,
+                   "cpu_s": time.process_time() - small_cpu0,
+                   "aux_group_ops": 0}
     d = nonsquare()
     twist_wall0, twist_cpu0 = time.perf_counter(), time.process_time()
     twist = Curve(d * d, d * d * d * 26)
@@ -223,13 +234,13 @@ def main(out: Path) -> None:
                    "cpu_s": time.process_time() - torus_cpu0,
                    "aux_group_ops": 0}
     fibers = {
-        "small_x": list(range(P)),
+        "small_x": small_x,
         "pplus1_torus": torus_x,
         "unrelated_aux": aux_x,
         "twist_raw": normalized,
         "twist_shifted": [(x + shift) % P for x in normalized],
     }
-    setup = {"small_x": {"wall_s": 0, "cpu_s": 0, "aux_group_ops": 0},
+    setup = {"small_x": small_setup,
              "pplus1_torus": torus_setup, "unrelated_aux": aux_setup,
              "twist_raw": twist_setup,
              "twist_shifted": {k: twist_setup[k] + shift_setup[k] for k in twist_setup}}
