@@ -17,6 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 - [x] Submit the Rust prime-field polynomial and map profiler (Codex, completed 2026-11-25, branch codex/rust-prime-field-experiments, PR #5200)
+- [x] Unify two runnable cryptanalysis leads under one frozen, same-target ECbench end-to-end panel with retained records and replay (Codex, completed local integration 2026-11-25, branch codex/lead-e2e-unify-20261125, PR #5204; K1-17, 16/16 verified and replayed, L0)
 - [x] Correct `research/tensor_contraction_ecdlp_review_20261121/POLYNOMIAL_DECAY.md` §0.3, §2.2, §6: under Theorem A's (λ+B)^{C₀K²} overhead, e ≍ K^{-β} gives bounded-occurrence #3-SAT in 2^Õ(n^{2/(2+β)}) (β = 1: n^{2/3}), not 2^Õ(n^{1-β/2}) (√n); √n holds only with an overhead 2^{o(K²)} (Claude Code, completed 2026-11-25, branch claude/polynomial-decay-n23, PR #5197; workspace#160)
 - [ ] Add a Strassen path for the dense matrix products in the toy PQC schemes (MAYO, UOV, QR-UOV, McEliece) with a shared schoolbook loop and per-field cutoff (claude, 2026-11-24, branch claude/pqc-strassen-20261124, PR #5172; pqc tests pass; timings in bench.record 20261125T0508Z-pqc-strassen, unvalidated, loaded host)
 - [x] Large-prime graph leads: (A) prime-field automorphism-orbit and Gaudry-cubic relation streams through the evaluator (opt-in capture in both collectors); (B) parallel block Wiedemann (rayon; results identical to serial) with a thread/block-size schedule (Claude Code, started 2026-11-25, branch claude/lp-graph-leads-20261125)
