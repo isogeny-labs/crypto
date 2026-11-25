@@ -395,7 +395,7 @@ mod analyze {
             }
             f
         };
-        let (w, h, ml, mb, mt) = (980.0, 460.0, 60.0, 90.0, 40.0);
+        let (w, h, ml, mb, mt) = (980.0, 480.0, 60.0, 110.0, 40.0);
         let ymax = bars
             .iter()
             .filter(|b| b.2 != "biguint")
@@ -434,8 +434,9 @@ mod analyze {
             write!(s, "<text x='{tx:.1}' y='{y1:.1}' text-anchor='middle'>{f}</text><text x='{tx:.1}' y='{y2:.1}' text-anchor='middle' fill='#555'>{limbs} limbs</text>", tx = ml + gw * (fi as f64 + 0.5), y1 = h - mb + 18.0, y2 = h - mb + 33.0).unwrap();
         }
         for (ai, a) in arms.iter().enumerate() {
-            let lx = ml + (ai as f64) * 96.0;
-            write!(s, "<rect x='{lx}' y='{}' width='12' height='12' fill='{}'/><text x='{}' y='{}'>{a}</text>", h - 30.0, COLORS[ai % COLORS.len()], lx + 16.0, h - 20.0).unwrap();
+            let lx = ml + ((ai % 6) as f64) * 150.0;
+            let ly = h - 44.0 + ((ai / 6) as f64) * 20.0;
+            write!(s, "<rect x='{lx}' y='{ly}' width='12' height='12' fill='{}'/><text x='{}' y='{}'>{a}</text>", COLORS[ai % COLORS.len()], lx + 16.0, ly + 10.0).unwrap();
         }
         s.push_str("</svg>\n");
         s

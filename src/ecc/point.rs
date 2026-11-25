@@ -36,6 +36,33 @@ fn mont_scalar_mul_vt<const N: usize>(
     mont_ladder_arm::<N, ProdKernel>(x, y, k, a, MontLadder::Binary, false)
 }
 
+/// Whether `m` passes the Miller–Rabin test of
+/// [`is_probable_prime`](super::endo_generic_chain_set::is_probable_prime)
+/// (40 fixed prime bases), remembered per thread for the last eight moduli
+/// so a walk over one field pays for it once.  Gates the wNAF/binary-GCD
+/// path of [`Point::scalar_mul_vartime`]: on a composite modulus that path
+/// could return another representative than `scalar_mul`'s (a unit `Z`
+/// inverts truly instead of to `Z^(p−2)`), so composites keep exactly
+/// `scalar_mul`.
+fn modulus_is_prime_cached(m: &BigUint) -> bool {
+    use std::cell::RefCell;
+    thread_local! {
+        static SEEN: RefCell<Vec<(BigUint, bool)>> = const { RefCell::new(Vec::new()) };
+    }
+    SEEN.with(|seen| {
+        if let Some((_, p)) = seen.borrow().iter().find(|(q, _)| q == m) {
+            return *p;
+        }
+        let p = super::endo_generic_chain_set::is_probable_prime(m);
+        let mut seen = seen.borrow_mut();
+        if seen.len() == 8 {
+            seen.remove(0);
+        }
+        seen.push((m.clone(), p));
+        p
+    })
+}
+
 /// The scalar-multiplication algorithm of a [`mont_ladder_arm`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum MontLadder {
@@ -59,22 +86,41 @@ fn mont_ladder_arm<const N: usize, K: MulKernel>(
     let xm = ctx.enter(&x.value)?;
     let ym = ctx.enter(&y.value)?;
     let am = ctx.enter(&a.value)?;
-    let acc = match ladder {
-        MontLadder::Binary => ctx.ladder_binary::<K>(&xm, &ym, &am, k),
-        MontLadder::Wnaf(w) => match ctx.ladder_wnaf::<K>(&xm, &ym, &am, k, w) {
-            Some(acc) => acc,
-            None => ctx.ladder_binary::<K>(&xm, &ym, &am, k),
+    let fermat = |z: &[u64; N]| ctx.pow_k::<K>(z, &(&x.modulus - 2u32));
+    let binary = || ctx.ladder_binary::<K>(&xm, &ym, &am, k);
+    let wnaf = match ladder {
+        MontLadder::Binary => None,
+        MontLadder::Wnaf(w) => ctx.ladder_wnaf::<K>(&xm, &ym, &am, k, w),
+    };
+    // A wNAF result whose `Z` has a binary-GCD inverse is the binary
+    // ladder's point (over a prime always; on a composite modulus when no
+    // denominator met a zero divisor).  Otherwise — the identity, or a
+    // non-unit `Z`, which only a composite modulus produces — recompute
+    // with the binary ladder and the Fermat power, i.e. exactly
+    // `scalar_mul`, as `FieldElement::inv_vartime` falls back to `inv`.
+    let (j, zi) = match wnaf {
+        Some(Some(j)) if euclid => match ctx.inv_bingcd(&j.z) {
+            Some(zi) => (j, zi),
+            None => match binary() {
+                None => return Some(Point::Infinity),
+                Some(j) => {
+                    let zi = fermat(&j.z);
+                    (j, zi)
+                }
+            },
         },
-    };
-    let Some(j) = acc else {
-        return Some(Point::Infinity);
-    };
-    let zi = if euclid {
-        ctx.inv_bingcd(&j.z)
-            .unwrap_or_else(|| ctx.pow_k::<K>(&j.z, &(&x.modulus - 2u32)))
-    } else {
-        // Z^(p−2) in Montgomery form (same Fermat inverse FieldElement::inv uses).
-        ctx.pow_k::<K>(&j.z, &(&x.modulus - 2u32))
+        _ => {
+            let Some(j) = binary() else {
+                return Some(Point::Infinity);
+            };
+            let zi = if euclid {
+                ctx.inv_bingcd(&j.z).unwrap_or_else(|| fermat(&j.z))
+            } else {
+                // Z^(p−2) in Montgomery form (same Fermat inverse FieldElement::inv uses).
+                fermat(&j.z)
+            };
+            (j, zi)
+        }
     };
     let zi2 = K::sqr(&ctx, &zi);
     let zi3 = K::mul(&ctx, &zi2, &zi);
@@ -392,14 +438,16 @@ impl Point {
     /// When `p` fits a word the same Jacobian ladder runs on word
     /// arithmetic and inverts once at the end with the word Euclid of
     /// [`FieldElement::inv_vartime`].  On P-256 and secp256k1 this is
-    /// `scalar_mul`'s specialised ladder.  On another multi-word `p` the
-    /// fixed-width Montgomery path runs a width-4 (≤ 3 limbs) or width-5
+    /// `scalar_mul`'s specialised ladder.  On another multi-word `p` that
+    /// passes Miller–Rabin (cached per thread) the fixed-width Montgomery
+    /// path runs a width-4 (≤ 3 limbs) or width-5
     /// NAF with its odd multiples made affine through the curve
     /// isomorphism scaled by `Z(2P)` and one batch inversion, and inverts
     /// by the fixed-width binary extended GCD (falling back to the Fermat
     /// power where that finds no inverse, as `inv_vartime` does); where
     /// the table meets the identity or a non-unit it keeps `scalar_mul`'s
-    /// binary ladder.  For the set-up multiplications of the
+    /// binary ladder.  A composite multi-word modulus runs `scalar_mul`
+    /// itself, so there the result is exactly `scalar_mul`'s.  For the set-up multiplications of the
     /// cryptanalysis walks and searches (walker starts, subgroup
     /// projections, verification of a recovered log).
     pub fn scalar_mul_vartime(&self, k: &BigUint, a: &FieldElement) -> Point {
@@ -652,7 +700,11 @@ impl Point {
         // Opt out with `IC_MONT_VT=0` for A/B against the BigUint ladder.
         // Exact limb widths (5..8 limbs no longer pad to 9; 2026-11-25).
         let limbs = x.modulus.bits().div_ceil(64);
-        if prime_vartime && limbs >= 2 && std::env::var("IC_MONT_VT").as_deref() != Ok("0") {
+        if prime_vartime
+            && limbs >= 2
+            && std::env::var("IC_MONT_VT").as_deref() != Ok("0")
+            && modulus_is_prime_cached(&x.modulus)
+        {
             let w = if limbs <= 3 { 4 } else { 5 };
             if let Some(pt) =
                 mont_dispatch::<ProdKernel>(x, y, k, a, MontLadder::Wnaf(w), true, false)

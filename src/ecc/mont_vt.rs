@@ -1152,9 +1152,9 @@ mod tests {
         check::<7>(&(two(448) - two(224) - 1u32), &mut rng);
         check::<8>(&(two(512) - 569u32), &mut rng);
         check::<9>(&(two(521) - 1u32), &mut rng);
-        // Composite 3·(2^127 − 1): multiples of 3 have no inverse.
+        // Composite 3·(2^127 − 1) (129 bits, 3 limbs): multiples of 3 have no inverse.
         let m = BigUint::from(3u8) * (two(127) - 1u32);
-        let ctx = Mont::<2>::new(&m).unwrap();
+        let ctx = Mont::<3>::new(&m).unwrap();
         let am = ctx.enter(&BigUint::from(6u8)).unwrap();
         assert_eq!(ctx.inv_bingcd(&am), None);
         let bm = ctx.enter(&BigUint::from(5u8)).unwrap();
