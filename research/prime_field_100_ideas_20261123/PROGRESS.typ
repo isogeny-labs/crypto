@@ -283,6 +283,32 @@ silently promoted by a screen.
 
 == Next controlled batch
 <next-controlled-batch>
+=== Prepared native runs and admission status
+<prepared-native-runs-and-admission-status>
+Following the request to execute experiments, three distinct public-EC
+checks were frozen in parallel. \#24 has
+#link("S4_MATCHED_GP.gp")[PARI/GP source] and a
+#link("S4_MATCHED_REPORT.md")[matched report] for the `z=0` versus
+`z=320` comparison on `E/F_1009`. \#35--39 have a
+#link("EC_GRAPH_RANK_GP.gp")[PARI/GP source] and
+#link("EC_GRAPH_RANK_PROTOCOL.md")[protocol] for same-support
+coefficient matrices with independently checked EC row identities.
+\#75/\#76/\#84 have a #link("WS68_FILTER_REPLAY.rs")[native Rust source]
+and #link("WS68_FILTER_PROTOCOL.md")[protocol] for coefficient-aware
+partial-row closure, rank, target coverage, and a disjoint block on
+`E/F_17`. Each protocol identifies fixed inputs, control, expected
+checks, raw-output path, and interpretation boundary. #strong[These
+three experiments have not been launched.] `[pcc:unverified]`
+
+The required `scripts/checkpoint.sh gate` was retried after the request
+to execute; its presigned S3 upload again returned HTTP 403. All three
+configured AWS profiles failed identity checks, and there is no ambient
+AWS identity. No supported checkpoint transport currently passes, so the
+repository\'s pre-run gate stopped the launch. The scripts are prepared,
+and the raw-output paths remain absent. The earlier exact support census
+remains the only \#24 calculation from the first pass.
+`[pcc:unverified]`
+
 + Restore valid checkpoint credentials, pass
   `scripts/checkpoint.sh gate`, then run the already frozen \#24
   comparison in the #link("WORKSTREAM_001_034.md")[1--34 workstream].

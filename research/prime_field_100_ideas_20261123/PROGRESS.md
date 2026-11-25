@@ -73,6 +73,12 @@ Every numbered item remains in the [assessment ledger](README.md), with its stat
 
 ## Next controlled batch
 
+### Prepared native runs and admission status
+
+Following the request to execute experiments, three distinct public-EC checks were frozen in parallel. #24 has [PARI/GP source](S4_MATCHED_GP.gp) and a [matched report](S4_MATCHED_REPORT.md) for the `z=0` versus `z=320` comparison on `E/F_1009`. #35–39 have a [PARI/GP source](EC_GRAPH_RANK_GP.gp) and [protocol](EC_GRAPH_RANK_PROTOCOL.md) for same-support coefficient matrices with independently checked EC row identities. #75/#76/#84 have a [native Rust source](WS68_FILTER_REPLAY.rs) and [protocol](WS68_FILTER_PROTOCOL.md) for coefficient-aware partial-row closure, rank, target coverage, and a disjoint block on `E/F_17`. Each protocol identifies fixed inputs, control, expected checks, raw-output path, and interpretation boundary. **These three experiments have not been launched.** `[pcc:unverified]`
+
+The required `scripts/checkpoint.sh gate` was retried after the request to execute; its presigned S3 upload again returned HTTP 403. All three configured AWS profiles failed identity checks, and there is no ambient AWS identity. No supported checkpoint transport currently passes, so the repository's pre-run gate stopped the launch. The scripts are prepared, and the raw-output paths remain absent. The earlier exact support census remains the only #24 calculation from the first pass. `[pcc:unverified]`
+
 1. Restore valid checkpoint credentials, pass `scripts/checkpoint.sh gate`, then run the already frozen #24 comparison in the [1–34 workstream](WORKSTREAM_001_034.md). Preserve structural support, exact decompositions, independent rank, and arithmetic work as separate observations.
 2. Obtain one immutable set of independently checked EC full and partial relations for #75/#76/#84, including source-row witnesses and target column; then freeze a matched filter replay. Stop if source-row combinations or target-column recovery fail.
 3. Obtain time-ordered relation and descent traces, then freeze the #96/#97 policy panel against the best fixed controls. Include tuning, setup, rank, solve, and artifact budgets.
