@@ -48,3 +48,17 @@ In-call load polling now censors any future competing process. The stored
 `amended_selection.last_screened_index=37` is an off-by-one metadata error;
 `selection-correction:1` records the actual last screened index, 36, without
 rewriting the raw store.
+
+## Quiet-load retry, 2026-11-25
+
+The aborted first call remains in the original successor store, SHA-256
+`ddab40eb3660da1fd75f282ebf05e17d74d28ae181459ed972dcebd2239eea47`.
+`AMENDMENT_QUIET_REPLAY_20261125.md` froze a separate qualifying store by
+copying 96 source-pinned selection and size-only records, with a provenance
+record identifying the source store. The first attempted curve-6 load check
+found a concurrent research solver and coordination processes; the runner
+refused to start the timed call. The new store has 98 records, SHA-256
+`ebb2550492f5c2dab621d0d4dff6dfed3a3057b4fd5c51cba2084f5e5512ee33`.
+It contains zero timed calls. Its `s_over_rho` remains unmeasured. The
+host also launched fresh Rust and solver jobs after earlier competing process
+trees were stopped, so no quiet timed comparison is claimed from this retry.
