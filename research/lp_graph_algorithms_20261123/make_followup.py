@@ -21,6 +21,8 @@ ax[1].set_yscale("log"); ax[1].set_title("Single-thread wall time (orientation o
 recs = []
 for f in sorted(glob.glob(os.path.join(here, "results_real", "*.json"))):
     e = json.load(open(f))
+    if "eval" in e:
+        e = e["eval"]  # {collector, eval} records from lp_graph_collect_fields
     if e.get("schema") != "lp-graph-eval/v1":
         continue  # run summaries, not evaluator records
     g = e["rank"]["gain_dsu"]
