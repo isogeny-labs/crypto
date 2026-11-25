@@ -86,6 +86,12 @@ the requested end-to-end cost conclusion.
   refusal. Both factorwise and cofactor complete 8/13 fixed queries; all five
   degree-32 targets remain incomplete. Exact sets match Direct with the same
   conservative guard, whole-answer policy and deadline. [pcc:unverified]
+- **Liftable-fiber component:** the [gated controls](../research/smooth_p_plus_one_20261123/LIFTABLE_FIBERS_RESULT.md)
+  retain all17,606 full-rank finite bindings and complete four of five
+  degree32 targets. An F127 comparator mismatch stops that panel before the
+  final target; candidate totals are11 exact,1 incomplete,1 unattempted.
+  The unchanged comparator input has different recorded RUR bytes from its
+  prior successful output. Semantic diagnosis is the next gate. [pcc:unverified]
 - **Limits:** deadline completion and smaller individual systems are not a
   measured total-cost advantage. The Direct control uses generic decomposition
   and additional relation charts. The absence of an admitted comparison gives
@@ -127,14 +133,13 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Investigate replacing each full map fiber by the product of its liftable-base
-abscissae, using the comparator's existing whole-base membership idea within
-each small fiber. Review prior sources, establish guarded coverage and local
-rank, and charge factor construction before a new fixed-limit comparison.
-This is a proposed follow-up; no implementation, global radical proof or
-measured gain is supplied. Preserve the earlier F127 [7,7,82,82] refusal and
-degree-32 shared-deadline failures, and keep the conservative RUR guard.
-Full degree-32 completion and a lower complete-query cost remain open.
+Validate the retained F127 comparator RUR coordinates against their exact
+equations and fixed form in an offline native audit. Use both the old
+successful output and the new mismatching output for target(41,95); their
+serialized inputs are identical. Preserve the failed panel and its missing
+suffix. Diagnose the parametrization/extraction contract before changing a
+guard or retry policy. Then separately qualify any correction and return to
+the remaining degree32 completion and admitted complete-cost requirements.
 Price the sum of all branch construction/elimination/output work before a
 cold comparison; the first-collision study already shows that a smaller
 individual system can increase total work.

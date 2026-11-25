@@ -70,12 +70,20 @@ defects. The guarded coverage and local tangent argument are written out;
 formalization remains open and the following panel checks extraction.
 [pcc:unverified]
 
-The latest [factorwise extraction report](FACTORWISE_EXTRACT_RESULT.md)
+The [factorwise extraction report](FACTORWISE_EXTRACT_RESULT.md)
 ([PDF](FACTORWISE_EXTRACT_RESULT.pdf)) completes all eight degree-16 answers,
 including the earlier F127 two-image refusal. Both factorwise and cofactor
 complete 8/13 fixed queries; all five degree-32 queries remain incomplete in
 both arms. Every accepted answer matches Direct. The existing RUR guard,
 shared deadline and whole-answer contract stay unchanged. [pcc:unverified]
+
+The latest [liftable-fiber report](LIFTABLE_FIBERS_RESULT.md)
+([PDF](LIFTABLE_FIBERS_RESULT.pdf)) completes four of five degree-32 answers.
+It retains one larger timeout and an F127 comparator mismatch that stops
+that panel before its final target. The candidate has11 exact outputs among
+12 attempted/13 planned queries; every accepted set matches Direct. All
+17,606 finite bindings keep full column rank. This bounded output result
+does not establish a successful full comparison or timing gain. [pcc:unverified]
 
 - [Initial rank argument](REPORT.md) ([PDF](REPORT.pdf)): collapsed and distinct-image charts.
 - [Initial native controls](NATIVE.md) ([PDF](NATIVE.pdf)): original encodings and retained failures.
@@ -93,6 +101,7 @@ shared deadline and whole-answer contract stay unchanged. [pcc:unverified]
 - [Full-cutoff extraction protocol](FULL_CUTOFF_EXTRACT.md) and [reproduction](FULL_CUTOFF_EXTRACT_REPRODUCE.md).
 - [Factorwise argument/audit protocol](FACTORWISE.md) and [reproduction](FACTORWISE_REPRODUCE.md).
 - [Factorwise extraction protocol](FACTORWISE_EXTRACT.md) and [reproduction](FACTORWISE_EXTRACT_REPRODUCE.md).
+- [Liftable-fiber argument/protocol](LIFTABLE_FIBERS.md) and [reproduction](LIFTABLE_FIBERS_REPRODUCE.md).
 - [Native source](native/src/main.rs) and [evidence](evidence/).
 
 The original reports and manifests retain their historical revision scope.

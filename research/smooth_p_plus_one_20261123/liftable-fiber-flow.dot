@@ -1,0 +1,13 @@
+digraph liftable {
+  graph [rankdir=LR,bgcolor="transparent",ranksep=.4];
+  node [shape=box,style="rounded,filled",fillcolor="#e6f0ec",fontname="DejaVu Sans",fontsize=11];
+  edge [color="#44645c"];
+  base [label="Public liftable base\ngroup by fine image"];
+  member [label="Product of distinct linear factors\ninside each query deadline"];
+  factors [label="Same monic-divisor equations\nsame capacity catalog"];
+  accepted [label="All charts complete\nwhole set equals Direct"];
+  fail [label="Incomplete or mismatch\npreserve failure and missing suffix",fillcolor="#f7eade"];
+  base -> member -> factors;
+  factors -> accepted;
+  factors -> fail;
+}

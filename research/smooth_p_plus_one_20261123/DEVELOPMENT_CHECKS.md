@@ -313,3 +313,37 @@ eight await required upload/replay. The last observed HTTP403 job above
 concerns the earlier five; no successful upload or current-head CI pass is
 claimed. The live hook has 682 queued records and no receiving URL configured.
 [pcc:unverified]
+
+## Liftable-fiber qualification and retained mismatch
+
+Source `3b7cd7422d`, identity `c2d6a4c318`: 47 feature tests and20 default
+tests pass, with a successful release build. The public-base grouping and
+polynomial construction are inside each shared query deadline. Three finite
+audits pass, retaining all17,606 full-rank bindings and exact prior per-chart
+counts. All18 pre-call files remain unchanged. Claims PCC-20261125-6cb640,
+8eaff2 and4219a4 are unsigned. [pcc:unverified]
+
+The [report](LIFTABLE_FIBERS_RESULT.md) preserves24 of26 planned query
+records:17 exact,6 undetermined,1 mismatch, plus2 unattempted queries.
+LiftableCutoff completes11 of12 attempted queries, including four of five
+degree32 targets. F127 cofactor returns an incorrect empty answer on target
+(41,95), stopping that panel. Its prepared equations, prefix and form match
+the previous successful record, but RUR bytes differ. No semantic diagnosis
+or retry is represented. Other panels finish; no capture is omitted. The
+next step is offline native RUR/equation validation. [pcc:unverified]
+
+The new panel files have111,438 /79,847 /572,672 bytes. They join eight prior
+files requiring artifact upload/replay. No new upload, admitted cost result or
+current-head CI pass is claimed. The private stream now holds709 records with
+no receiver configured.
+[pcc:unverified]
+
+At the next normal-cadence CI read, identity head `c2d6a4c318` has four
+successful checks,21 skipped and one failed migration. Actual
+[run45529687536](https://github.com/isogeny-labs/crypto/actions/runs/45529687536),
+job138921738326, logs five HeadObject HTTP403 responses at02:00 UTC and
+exits2 before upload/replay. The five logged hashes correspond to all three
+factorwise-extraction files and the F127/F8191-depth4 full-cutoff-extraction
+files. The job does not supply access outcomes for every pending file; it
+also predates the three newest liftable panel files. No absent-key or specific
+permission diagnosis is inferred. No manual retry was issued. [pcc:unverified]
