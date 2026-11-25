@@ -63,6 +63,8 @@ same two factor-base columns; the auxiliary variants have no measured yield
 advantage at this size. The plot [counted target work](figures/work.svg) shows
 the lower bounds and rho range.
 
+![Counted target-curve work at matched factor-base size](figures/work.svg)
+
 **Cheap falsifier per candidate.** Torus: verify exact norm-one order, eight
 distinct Dickson roots, then count target lifts and independent rows per
 complete work. Unrelated curve: verify smooth subgroup/coset and distinct x
