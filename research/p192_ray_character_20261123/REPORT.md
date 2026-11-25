@@ -919,6 +919,20 @@ charged to a surviving coset feature. An additive decomposition
 and a proof connecting the resulting `x`-product to the required
 sign would be separate proof obligations. [pcc:unverified]
 
+There is also an exact information loss in the `x`-product itself.
+For a surviving coset `C` of `H` with odd index `t`, define
+`M_C(P;T)=∏_(j∈C)(T-x([j]P))`. A generator `h` of `H`
+permutes `C` modulo `±1`, and `x(-R)=x(R)`, so
+`M_C([h]P;T)=M_C(P;T)` as a polynomial, for every `P`.
+But with `h=g^t` for a primitive scalar `g`, odd `t` gives
+`χ_r(h)=-1`; hence the desired sign changes between `P`
+and `[h]P`. Thus no fixed-parameter evaluation of `M_C`,
+or function of its coefficients alone, can equal the ray sign
+on the full marked orbit. This rules out using the theorem's
+`x`-product output *alone* even if an additive index system
+were found. A proposed evaluator must retain extra oriented
+data and charge its construction and evaluation. [pcc:unverified]
+
 ### Second division-polynomial jet: a compact exactness screen
 
 The first derivative of `ψ_r` at `x(P)` was screened in the local
