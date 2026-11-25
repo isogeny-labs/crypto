@@ -26,6 +26,8 @@ pub enum Memory {
     Gi4,
     #[serde(rename = "8Gi")]
     Gi8,
+    #[serde(rename = "14Gi")]
+    Gi14,
 }
 impl Memory {
     fn is_default(&self) -> bool {
@@ -35,6 +37,7 @@ impl Memory {
         match self {
             Self::Gi4 => "4Gi",
             Self::Gi8 => "8Gi",
+            Self::Gi14 => "14Gi",
         }
     }
 }
@@ -556,6 +559,14 @@ mod tests {
         assert_ne!(eight.hash(), old.hash());
         assert_eq!(serde_json::to_value(&eight).unwrap()["memory"], "8Gi");
         assert_eq!(eight.deadline_unix_seconds, old.deadline_unix_seconds);
+        explicit["memory"] = Value::String("14Gi".into());
+        let fourteen = Request::parse(&serde_json::to_vec(&explicit).unwrap()).unwrap();
+        assert_eq!(fourteen.memory, Memory::Gi14);
+        assert_eq!(fourteen.memory.as_str(), "14Gi");
+        assert_ne!(fourteen.hash(), old.hash());
+        assert_ne!(fourteen.hash(), eight.hash());
+        assert_eq!(fourteen.deadline_unix_seconds, old.deadline_unix_seconds);
+        assert_eq!(serde_json::to_value(&fourteen).unwrap()["memory"], "14Gi");
         for invalid in [
             serde_json::json!("16Gi"),
             serde_json::json!("8192Mi"),
@@ -573,7 +584,7 @@ mod tests {
             serde_json::from_str(include_str!("../../request.schema.json")).unwrap();
         assert_eq!(
             schema["properties"]["memory"]["enum"],
-            serde_json::json!(["4Gi", "8Gi"])
+            serde_json::json!(["4Gi", "8Gi", "14Gi"])
         );
         assert_eq!(schema["properties"]["memory"]["default"], "4Gi");
         assert!(!schema["required"]
