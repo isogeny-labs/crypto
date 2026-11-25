@@ -1,0 +1,23 @@
+[package]
+name = "semaev-1d1-shim"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# Standalone: the full `crypto` lib needs >9 GB of rustc RSS to build and was
+# OOM-killed twice in this shared 16 GB container.  This crate compiles the
+# UNMODIFIED src/cryptanalysis/semaev_projection.rs via #[path] and supplies
+# only its imports (see src/lib.rs and README.md).
+[workspace]
+
+[dependencies]
+num-bigint = { version = "0.4", features = ["serde"] }
+num-traits = "0.2"
+serde = { version = "1", features = ["derive"] }
+
+[[bin]]
+name = "wallclock"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
