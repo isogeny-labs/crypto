@@ -3718,7 +3718,8 @@ mod tests {
                     ..Default::default()
                 };
                 let (_, params) =
-                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}")).unwrap();
+                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec},lean_layout=1"))
+                        .unwrap();
                 pspec.factor_base_params = params;
                 for (key, v) in fbp {
                     pspec.factor_base_params.set(key, *v);

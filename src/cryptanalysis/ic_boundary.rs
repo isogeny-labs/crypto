@@ -14806,6 +14806,10 @@ impl FrobeniusPairTable {
                     skips += 1;
                     continue;
                 }
+                if sib && j == rep + 1 {
+                    // P + (-P) is the identity, as known from the layout.
+                    continue;
+                }
                 // A deferred negative is formed from its partner here
                 // (only the non-sibling fallback reads an odd slot).
                 let x = if deferred && j % 2 == 1 {
@@ -14854,9 +14858,6 @@ impl FrobeniusPairTable {
                             (Some(field.sqr(lm) ^ lm ^ base), j + 1),
                         ]
                     }
-                } else if sib && j == rep + 1 {
-                    // `P + (−P)`: the identity, known from the layout.
-                    [(None, j), (None, j)]
                 } else {
                     let u = g.add(&mut ops, p, x);
                     [
