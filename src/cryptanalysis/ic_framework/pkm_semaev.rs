@@ -1283,7 +1283,7 @@ impl PkmSemaevOracle {
             let max_m = match self.mode {
                 PkmMode::Full => 3,
                 PkmMode::Sym => 4,
-                PkmMode::Chain => 5,
+                PkmMode::Chain => 6,
             };
             if !(2..=max_m).contains(&self.m) {
                 return Err(format!(

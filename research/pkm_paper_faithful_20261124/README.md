@@ -175,11 +175,54 @@ and the answer is checked against something the harness did not produce.
 * **No large-prime variation, no descent, no shared precomputation.** These are
   single-target solves per rung.
 
-## 6. Files
+## 6. The `m`-ladder, m = 2..6
 
+`m` is the only parameter in §3.2's cost formula that changes the exponent, so
+the natural next question is the `m`-axis. One prime, `p = 3907`, with `t` the
+power of two nearest `p^{1/m}` (`predicted` is `|F|^m/(m!·p)`, as in §3):
+
+| m | t | \|V\| | p^(1/m) | \|F\| | cols | predicted | observed | targets | rank | D | wall | k |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 2 | 6 | 64 | 62.5 | 50 | 25 | 0.320 | 0.271 | 140 | 26 | 5 | 43 s | 2683 |
+| 3 | 4 | 16 | 15.7 | 18 | 9 | 0.249 | 0.270 | 37 | 10 | 6 | 142 s | 2683 |
+| 4 | 3 | 8 | 7.9 | 6 | 3 | 0.014 | 0.023 | 171 | 4 | 7 | 488 s | 2683 |
+| 5 | 3 | 8 | 5.2 | 6 | 3 | 0.017 | 0.031 | 129 | 4 | — | 17 s | 2683 |
+| 6 | 3 | 8 | 4.0 | 6 | 3 | 0.017 | 0.118 | 34 | 4 | — | 40 s | 2683 |
+
+**m = 1 is refused, and is degenerate.** Both modes reject `m < 2`
+(`pkm-semaev: mode Chain takes m in 2..=6, not 1`). That is the right answer:
+`S_2(x_1, X) = x_1 − X`, so a "relation" is just `x_1 = X`, and the paper's
+condition `|V| ≈ p^{1/1} = p` would make the factor base all of `E`. Every
+target then decomposes into one base element trivially, the columns' logarithms
+are the object being computed, and there is nothing left for step 5 to do.
+
+**Where the solver stops.** The density holds through `m = 4` (observed within
+1.9× of `|F|^m/(m!·p)` at every `m`; the `m = 6` point is 4 relations out of 34
+targets and is not worth reading). What changes is the algebraic engine: the
+F4 solving degree climbs 5 → 6 → 7, and at `m = 5` and `m = 6` the F4 exceeds
+its degree bound on **every** system (`budget_exceeded == calls`, `D = 0`) and
+the oracle decides on the exact grid instead. So the `m = 5, 6` costs in the
+table are `|V|^m` enumeration — the brute force the paper's Gröbner-basis step
+exists to replace — and are cheap only because `|V| = 8` here. At a real size
+`|V| = p^{1/m}`, that enumeration is `p`.
+
+That is the answer to "can the `m`-axis carry us": not with this solver. The
+`s`-chain system stops being tractable at `m = 5` on a 12-bit field, long
+before the factor base is the limit. Raising `m` needs a cheaper `S_{m+1}`
+chain first.
+
+Binary note: `m = 2..5` ran on the pinned `06439ae5…` build. `m = 6` needed the
+chain cap raised from `2..=5` to `2..=6` in
+`src/cryptanalysis/ic_framework/pkm_semaev.rs` (the ring's `MAX_FREE = 4` is
+exactly `m − 2 = 4`) and a rebuild, `ic` SHA-256 `3c22886c…`; the only source
+change is that cap, and the `m = 5` rerun on the new binary is identical
+(129 targets, 0.031, `k = 2683`).
+
+## 7. Files
 * `run.sh` — the exact commands, in order.
 * `results/*.json` — the raw `ic bench` output, one file per row above
   (`r16t8_fullrank.json` is the strict-certificate run of §5).
 * `verify.py` — §4, all three checks, plus the density table.
+* `m_sweep.py` — the §6 table from `results/m*_p12t*.json`.
 * `pilot_iso.json` — the `pkm_tower_pilot` row that emitted `E'`, `#E'` and
   `V` for the §4 construction check.
