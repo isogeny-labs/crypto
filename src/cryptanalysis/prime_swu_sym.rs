@@ -124,7 +124,7 @@ impl PrimeField {
         }
     }
     pub fn legendre(&self, a: u64) -> i8 {
-        if a % self.p == 0 {
+        if a.is_multiple_of(self.p) {
             return 0;
         }
         let mut dummy = OpTrace::default();
@@ -153,7 +153,7 @@ impl PrimeField {
                 s += 1;
             }
             let mut c = self.pow(self.non_square_z, q, tr);
-            let mut x = self.pow(n, (q + 1) / 2, tr);
+            let mut x = self.pow(n, q.div_ceil(2), tr);
             let mut t = self.pow(n, q, tr);
             let mut m = s;
             while t != 1 {
