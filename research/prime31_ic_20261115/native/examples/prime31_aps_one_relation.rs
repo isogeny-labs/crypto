@@ -18,6 +18,7 @@ use prime31_algebraic_ic::{check_curve, Arithmetic, Point, PRIME31};
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
 use std::time::Instant;
+use std::thread;
 
 const P: u64 = 2_147_483_647;
 const N: u64 = 2_147_446_831;
@@ -1833,6 +1834,16 @@ fn algebraic_mode_factorized_chord<const LINEAR:bool>(
     parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,
     compact:bool,packed:bool,use_public_y:bool
 )->Result<(Option<Solution>,Stats),String>{
+    algebraic_mode_factorized_chord_rows::<LINEAR>(
+        parts,q,ar,compact,packed,use_public_y,0..parts[0].len())
+}
+fn algebraic_mode_factorized_chord_rows<const LINEAR:bool>(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),ar:&mut Arithmetic,
+    compact:bool,packed:bool,use_public_y:bool,rows:std::ops::Range<usize>
+)->Result<(Option<Solution>,Stats),String>{
+    if rows.start>rows.end || rows.end>parts[0].len(){
+        return Err("factorized S3: invalid left-row range".into());
+    }
     if compact && packed {return Err("APS index: choose only one mode".into());}
     let lookup=(!compact && !packed).then(||reverse_index(&parts[2]));
     let packed_lookup=if packed{Some(PackedXIndex::from_source(&parts[2])?)}else{None};
@@ -1849,7 +1860,8 @@ fn algebraic_mode_factorized_chord<const LINEAR:bool>(
     let mut fibres:[Vec<u64>;2]=std::array::from_fn(|j|
         Vec::with_capacity(parts[j].len()));
     for j in 0..2 {
-        for point in &parts[j] {
+        let points=if j==0 {&parts[j][rows.clone()]} else {&parts[j]};
+        for point in points {
             // For either sign of a rational ordinate, the unordered
             // two-root S3 fibre is exactly the same. Always verify y^2.
             let rhs=rhs_from_x::<true>(point.pt.0);
@@ -1872,7 +1884,7 @@ fn algebraic_mode_factorized_chord<const LINEAR:bool>(
     let mut denoms=Vec::with_capacity(parts[1].len());
     let mut prefix=Vec::with_capacity(parts[1].len()+1);
     let mut inverses=vec![0u64;parts[1].len()];
-    for (i,left) in parts[0].iter().enumerate(){
+    for (i,left) in parts[0].iter().enumerate().skip(rows.start).take(rows.len()){
         let x=left.pt.0;
         denoms.clear();
         prefix.clear();
@@ -1902,7 +1914,7 @@ fn algebraic_mode_factorized_chord<const LINEAR:bool>(
         if total_inverse!=1 {
             return Err("factorized S3: batch inversion invariant".into());
         }
-        let u=fibres[0][i];
+        let u=fibres[0][i-rows.start];
         for (j,right) in parts[1].iter().enumerate(){
             let z=right.pt.0;
             let v=fibres[1][j];
@@ -1947,6 +1959,117 @@ fn algebraic_mode_factorized_chord<const LINEAR:bool>(
         }
     }
     Ok((None,stats))
+}
+
+// Every worker owns a disjoint contiguous range of left rows. All workers
+// finish before returning; the coordinator selects the earliest serial-order
+// witness and charges even the rows computed after another worker found one.
+fn algebraic_parallel_factorized(
+    parts:&[Vec<Labelled>;3],q:(u64,u64),workers:usize
+)->Result<(Option<Solution>,Stats,Vec<serde_json::Value>),String>{
+    if workers==0 || workers>parts[0].len() || workers>128 {
+        return Err("parallel APS requires 1..=128 workers, no more than left rows".into());
+    }
+    let work=thread::scope(|scope| {
+        let mut handles=Vec::with_capacity(workers);
+        for worker in 0..workers {
+            let begin=parts[0].len()*worker/workers;
+            let end=parts[0].len()*(worker+1)/workers;
+            handles.push(scope.spawn(move || {
+                let started=Instant::now();
+                let mut ar=Arithmetic::default();
+                let result=algebraic_mode_factorized_chord_rows::<false>(
+                    parts,q,&mut ar,false,true,false,begin..end);
+                (worker,begin,end,started.elapsed().as_nanos(),ar.counts.group_additions,result)
+            }));
+        }
+        handles.into_iter().map(|h|h.join().map_err(|_|"APS worker panicked".to_string()))
+            .collect::<Result<Vec<_>,_>>()
+    })?;
+    let mut selected:Option<Solution>=None;
+    let mut total=Stats::default();
+    let mut reports=Vec::with_capacity(workers);
+    for (worker,begin,end,wall_ns,verification_additions,result) in work {
+        let (solution,stats)=result?;
+        let found_witness=solution.is_some();
+        if let Some(candidate)=solution {
+            if selected.as_ref().is_none_or(|old| candidate.indices<old.indices) {
+                selected=Some(candidate);
+            }
+        }
+        reports.push(json!({
+            "worker":worker,"left_rows_assigned":[begin,end],
+            "left_rows_started":if stats.pair_s3==0{0}else{
+                (stats.pair_s3+parts[1].len() as u64-1)/parts[1].len() as u64},
+            "s3_pairs":stats.pair_s3,"s3_sqrts":stats.s3_sqrt,
+            "batch_inversions":stats.batch_inversions,
+            "matched_x":stats.matched_x,"signed_candidates":stats.signed_candidates,
+            "unusable_beta":stats.unusable_beta,
+            "verification_group_additions":verification_additions,
+            "worker_wall_ns":wall_ns,"found_witness":found_witness
+        }));
+        total.pair_s3+=stats.pair_s3;
+        total.s3_sqrt+=stats.s3_sqrt;
+        total.batch_inversions+=stats.batch_inversions;
+        total.matched_x+=stats.matched_x;
+        total.signed_candidates+=stats.signed_candidates;
+        total.unusable_beta+=stats.unusable_beta;
+    }
+    Ok((selected,total,reports))
+}
+
+// Development parity gate on the first public Q of the archived 48-Q panel.
+// Its serial arm runs first, so these clocks must not be used for a speed claim.
+fn parallel_row_fixture(workers:usize)->Result<serde_json::Value,String>{
+    const Q:(u64,u64)=(578_200_132,373_493_797);
+    const PROFILE:[usize;3]=[384,384,16_384];
+    let mut source_ar=Arithmetic::default();
+    check_curve(PRIME31,&mut source_ar)?;
+    if !source_ar.on_curve(PRIME31,Some(Q)){
+        return Err("parallel APS fixture target is off curve".into());
+    }
+    let source_started=Instant::now();
+    let (parts,identities,duplicates)=source_walk_profile_jac_joint(
+        Q,SEED,&mut source_ar,PROFILE)?;
+    let source_ns=source_started.elapsed().as_nanos();
+    let mut serial_ar=Arithmetic::default();
+    let (serial,serial_stats)=algebraic_mode_factorized_chord::<false>(
+        &parts,Q,&mut serial_ar,false,true,false)?;
+    let parallel_started=Instant::now();
+    let (parallel,stats,worker_reports)=algebraic_parallel_factorized(
+        &parts,Q,workers)?;
+    let parallel_ns=parallel_started.elapsed().as_nanos();
+    let serial_value=json_solution(&serial);
+    let parallel_value=json_solution(&parallel);
+    if serial_value!=parallel_value{
+        return Err("parallel APS witness differs from serial traversal".into());
+    }
+    Ok(json!({
+        "standing":"[pcc:unverified]","kind":"development parity, not performance",
+        "p":P,"n":N,"public_Q":Q,"profile":PROFILE,"seed":format!("{SEED:016x}"),
+        "workers":workers,"source_ns":source_ns,
+        "rejected_identity":identities,"rejected_duplicate_x":duplicates,
+        "serial_witness":serial_value,"parallel_witness":parallel_value,
+        "serial_s3_pairs":serial_stats.pair_s3,
+        "parallel_s3_pairs_including_speculation":stats.pair_s3,
+        "parallel_worker_wall_ns":parallel_ns,"worker_reports":worker_reports
+    }))
+}
+
+#[cfg(test)]
+mod parallel_row_tests {
+    use super::*;
+
+    #[test]
+    fn one_and_four_workers_match_serial_public_fixture() {
+        for workers in [1,4] {
+            let report=parallel_row_fixture(workers).unwrap();
+            assert_eq!(report["serial_witness"],report["parallel_witness"]);
+            assert_eq!(report["worker_reports"].as_array().unwrap().len(),workers);
+            assert!(report["parallel_s3_pairs_including_speculation"]
+                .as_u64().unwrap()>=report["serial_s3_pairs"].as_u64().unwrap());
+        }
+    }
 }
 
 fn execute_factorized_unequal(q:(u64,u64),sizes:[usize;3],round_limit:usize)
@@ -3969,6 +4092,13 @@ fn linear_chord_roots_equal_square_denominator_and_s3(){
 
 fn main()->Result<(),String> {
     let args:Vec<String>=std::env::args().skip(1).collect();
+    if args.len()==2 && args[0]=="--parallel-row-fixture" {
+        let workers=args[1].parse::<usize>()
+            .map_err(|_|"parallel APS worker count must be an integer".to_string())?;
+        let result=parallel_row_fixture(workers)?;
+        println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
+        return Ok(());
+    }
     if args.len()==1 && args[0]=="--aps-linear-chord-24q" {
         let result=aps_linear_chord_24q_panel()?;
         println!("{}",serde_json::to_string_pretty(&result).map_err(|e|e.to_string())?);
