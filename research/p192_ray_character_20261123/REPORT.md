@@ -1069,6 +1069,27 @@ must be charged. Above all, the first large coset has not
 passed the P-192 exactness gate; the operation estimate is
 conditional on that missing identity. [pcc:unverified]
 
+The repository's native arithmetic paths differ on this point.
+[`p192_native.rs`](../../src/cryptanalysis/p192_native.rs)
+has Jacobian doubling and mixed addition with an **affine** second
+operand, but its scalar-multiplication entry point also takes an
+affine base. Reusing it on a changing coset orbit would require
+normalizing every new base and would add a field inversion per
+factor. [`endo_generic_point.rs`](../../src/ecc/endo_generic_point.rs)
+provides full Jacobian addition and doubling; a direct orbit
+loop using those primitives could avoid that normalization.
+Its documented P-192 `a=-3` formulas price a doubling at
+`3M+5S` and a full addition at `11M+5S`, where `M,S` are
+field multiplication and squaring. The selected signed-digit
+step therefore has a formula count of `1101M+1155S`, plus
+`2M` per factor to accumulate `YZ` into a product. These
+counts omit field additions and subtractions, scalar-digit
+handling, exceptional branches, and the final field-character
+operation. The existing `scalar_mul_wnaf` wrapper itself still
+expects an affine base, so this is a **backend feasibility and
+cost-formula audit**, not a benchmark of a ready evaluator.
+[pcc:unverified]
+
 For the first large P-192 subgroup size beyond 95,560,
 `m=8·9564682313913860059195669≈2^85.984`, a **hypothetical**
 additive paired-index grid with `h=6,185,364,116,659` offsets,
