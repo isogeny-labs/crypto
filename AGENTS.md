@@ -37,6 +37,15 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+## Authorized target scope
+
+Work in this repository is limited to public benchmark instances, published
+challenge curves, toy or synthetic parameters, and systems the owner operates
+or is explicitly authorized to test. Do not develop or test operational
+attacks against production keys, wallets, accounts, or third-party systems.
+A task that requires a non-public target stops and asks for written
+authorization before proceeding.
+
 In a custom sparse checkout, a dated journal may need `git add --sparse` even
 after it is tracked. Stage that file explicitly and inspect its staged diff
 before committing or pushing (adopted lesson `L-d5062ba05212`).
