@@ -41,6 +41,12 @@ SHA-256 pins for this prepared implementation:
   up to `2 * 384 * 384 = 294912` pair-root entries before those points are
   consumed, even when the present row search stops early. That construction
   needs its own cost and parity screen before entering a future comparison.
+  The two archived 48-Q queue development repeats performed 1,743,744 and
+  1,806,336 S3 pairs including speculative work. An unconditional inverted
+  pair index would prepare 7,077,888 pairs over those same 48 calls, 4.06×
+  and 3.92× the observed pair work before queueing a third-partition point.
+  Those counts screen this particular point-stream layout; they are not a
+  measured timing of an inverted implementation.
 - Native rho: four workers, 64 logical lanes, 64 shared jumps, DP bits 5,
   two-million-step cap, paired V2 walk seed and 64 explicit restart seeds.
   Each worker report and all speculative or peer-stopped work stay in the
