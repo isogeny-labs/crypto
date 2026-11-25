@@ -2283,13 +2283,18 @@ fn ug_karatsuba(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
     for (i, &c) in z2.iter().enumerate() {
         out[i + 2 * h] = addm(out[i + 2 * h], c, p);
     }
-    for (i, &c) in z1.iter().enumerate() {
+    // z1 − z0 − z2 over the longest of the three: any of them may have been
+    // trimmed shorter by a cancellation mod p, and a z0/z2 coefficient past
+    // z1's length must still be subtracted.
+    for i in 0..z0.len().max(z1.len()).max(z2.len()) {
         let mid = subm(
-            subm(c, *z0.get(i).unwrap_or(&0), p),
+            subm(*z1.get(i).unwrap_or(&0), *z0.get(i).unwrap_or(&0), p),
             *z2.get(i).unwrap_or(&0),
             p,
         );
-        out[i + h] = addm(out[i + h], mid, p);
+        if mid != 0 {
+            out[i + h] = addm(out[i + h], mid, p);
+        }
     }
     let mut out = out;
     ug_trim(&mut out);
@@ -4343,6 +4348,29 @@ mod tests {
     use crate::cryptanalysis::ic_framework::prime_tower::{AuxFamily, PrimeKummerBase};
     use crate::cryptanalysis::ic_framework::stages::FactorBaseBuilder;
     use rand::{rngs::StdRng, Rng, SeedableRng};
+
+    /// Karatsuba equals schoolbook, over a tiny prime where the top
+    /// coefficients of `(a0 + a1)(b0 + b1)` cancel often (the t = 11
+    /// resgcd disagreements came from a cancelled `z1` leaving `z0`/`z2`
+    /// overhang unsubtracted), on balanced and unbalanced lengths.
+    #[test]
+    fn karatsuba_matches_schoolbook_under_cancellation() {
+        let mut rng = StdRng::seed_from_u64(11);
+        for p in [3u64, 5, 7, 65_521] {
+            for _ in 0..400 {
+                let la = rng.gen_range(1..200usize);
+                let lb = rng.gen_range(1..200usize);
+                let mut a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+                let mut b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+                *a.last_mut().unwrap() = 1;
+                *b.last_mut().unwrap() = 1;
+                let mut want = ug_school(&a, &b, p, &mut 0);
+                ug_trim(&mut want);
+                let got = ug_karatsuba(&a, &b, p, &mut 0);
+                assert_eq!(got, want, "p = {p}, lengths {la} × {lb}");
+            }
+        }
+    }
 
     /// A 24-bit prime-order curve `y² = x³ − 3x + b` with `2^7 | p − 1`
     /// (curve e3-c2 of experiment E3, from
