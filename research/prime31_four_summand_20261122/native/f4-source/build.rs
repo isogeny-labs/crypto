@@ -301,7 +301,7 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/prime_fast.rs",
-            "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+            "0aaac6eaa73a9766cfe46e19f0cb26e125c7b4e2d1f5d8dc848865ab000dde6d",
             &[
                 Range {
                     start: "/// Largest field size the Montgomery layer supports (`p < 2^62` keeps\n",

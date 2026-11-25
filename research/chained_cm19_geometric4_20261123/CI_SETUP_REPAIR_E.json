@@ -1,0 +1,32 @@
+{
+  "recorded": "2026-11-23T23:52:35.814588+00:00",
+  "workflow": ".github/workflows/chained-cm19-geometric4.yml",
+  "original_full_source": "research/chained_cm19_geometric4_20261123/maintenance/chained-cm19-geometric4-prepublish-D.yml",
+  "before_sha256": "84133d598683767cc349028d17af6acfb31d7b500d56139ef56f5aa4770c57c8",
+  "after_sha256": "bc8f8e6b23b0f53198e45c3047757e7afd61bbf427cdc1fce6583fbd6ae820b7",
+  "cause": "GitHub startup annotation explicitly disallows dtolnay/rust-toolchain@stable under the organization action allowlist.",
+  "primary_source": "https://github.com/isogeny-labs/cryptanalysis/actions/runs/45284281306",
+  "original_annotation_html": {
+    "path": "/dev/shm/ct23-ca1961-startup-original.html",
+    "bytes": 143218,
+    "sha256": "c04f5aab78fce76cf6fdd3fc9f06986afa25247c4138ce48a71d72c9a06b264d"
+  },
+  "change": "Use standard official rustup CLI on the same Ubuntu runner to install the same exact1.99.1/rustfmt/clippy; existing byte-hash checks, scientific sources/default logic/bounds unchanged. No third-party action, organization policy edit or scientific rerun.",
+  "scope": "Substantive CI setup repair in CA; prepublication same-policy correction for new crypto workflow. No CI retry/rerun or head-budget workaround.",
+  "actionlint": {
+    "version": "1.7.7",
+    "official_release_archive_sha256": "023070a287cd8cccd71515fedc843f1985bf96c436b7effaecce67290e7e0757",
+    "binary_sha256": "9f7dedb4e23f89f2922073d1a6720405b7b520d4f5832ebb96f0d55a2958886c",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "yaml_parse_exit": 0,
+  "tool_preparation_negative": {
+    "attempt": "go install actionlint",
+    "exit": 1,
+    "full_stdout": "",
+    "full_stderr": "Go: Unknown option: install\n",
+    "cause": "/usr/bin/go is not the Go compiler; it reports Go: Unknown option: install. No compiler/tool source build occurred. Official native release plus complete published checksum used instead."
+  }
+}
