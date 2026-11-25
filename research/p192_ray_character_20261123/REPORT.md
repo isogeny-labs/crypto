@@ -1029,6 +1029,23 @@ and that condition increases with `k`. Only `k=1,2` of this
 corollary apply here. This does not screen other intersection
 bounds or source methods. [pcc:unverified]
 
+The hypothetical balanced grid also has a precise conditional
+character-sum obstruction. Put `A=I∪(-I)` and `B=J∪(-J)`;
+its paired-index condition gives `A+B⊂Γ=±H`, with zero
+excluded. Because `Γ` is proper, choose a nontrivial
+multiplicative character `η` of `F_r^×` that is one on `Γ`.
+Then `Σ_(a∈A,b∈B)η(a+b)=|A||B|` exactly. Any proved
+strict cancellation bound for this character and these sets
+would rule out the grid. The proposed side sizes are
+`|A|=|B|≈2^43.492≈r^0.22652`. The
+[Paley graph conjecture as stated by Cochrane–Yip–Yoo,
+§1](https://arxiv.org/html/2608.02568) predicts cancellation
+for sides above any fixed positive power of `r`, but the same
+source identifies the range below `r^(1/2)` as open in
+general. Thus this is a conditional obstruction and a
+description of the missing estimate, not a P-192 exclusion.
+[pcc:unverified]
+
 The [`y_coset_control.sage`](y_coset_control.sage) replay uses
 direct Sage point multiplication to check the normalized
 `A_H([d]G)/A_H(G)` at `d=1,2,3,5` for `m=8,40`.
