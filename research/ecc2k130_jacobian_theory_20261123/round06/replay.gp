@@ -1,0 +1,14 @@
+s=vector(132);s[1]=2;s[2]=-1;for(j=2,131,s[j+1]=-s[j]-2*s[j-1]);
+V=divrem(1-s[132]*x^131+2^131*x^262,1+x+2*x^2);
+if(V[2]!=0,error("nonexact numerator quotient"));
+A=Mod(1,2)*V[1];Phi=Mod(1,2)*sum(j=0,130,x^j);
+if(A!=Phi || !polisirreducible(A),error("reduced numerator irreducibility"));
+R=Mod(1,2)*(1+x^131);
+if((1+x)*A!=R || poldegree(gcd(R,deriv(R)))!=0,error("target product"));
+print("reduced_A=Phi131; irreducible=pass; (1+x)*Phi131=1+x^131; squarefree=pass");
+B=List();for(d=1,131,if(poldegree(divrem(R,Mod(1,2)*(1+x^d))[2])<0,listput(B,d)));
+if(Vec(B)!=[1,131],error("branch degrees"));print("branch_binomial_degrees=",Vec(B));
+print("RH equation: base_genus+branch_degree*(invariant+1)/2=131");
+for(h=0,131,for(j=1,2,d=[1,131][j];f=if(d==1,130,0);for(c=1,131,if(h+d*c==131 && f<=h,print("h=",h,"; g=",h+130,"; branch_degree=",d,"; invariant=",2*c-1,"; base_rank=",f)))));
+print("etale: h=131; g=261; base_rank=131");
+quit;

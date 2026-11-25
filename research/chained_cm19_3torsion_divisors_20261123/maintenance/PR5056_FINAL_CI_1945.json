@@ -1,0 +1,76 @@
+{
+  "schema": "scheduled-final-head-review/v1",
+  "PR": 5056,
+  "head": "024c8953fef8dd0899de1dd24f663dfdd9c47cf2",
+  "commit_time": "2026-11-23T18:54:19Z",
+  "eligible": "2026-11-23T19:44:19Z",
+  "review_interval": "2026-11-23T19:45:39Z..2026-11-23T19:48:37.677479+00:00",
+  "all_attempt_checks": 26,
+  "all_event_runs": 20,
+  "failed_jobs": 4,
+  "failed_runs": 5,
+  "merge_set": [
+    {
+      "name": "size",
+      "conclusion": "success",
+      "details_url": "https://github.com/isogeny-labs/crypto/actions/runs/45243306477/job/137933410508"
+    },
+    {
+      "name": "gate",
+      "conclusion": "success",
+      "details_url": "https://github.com/isogeny-labs/crypto/actions/runs/45243306557/job/137933409891"
+    },
+    {
+      "name": "gate",
+      "conclusion": "success",
+      "details_url": "https://github.com/isogeny-labs/crypto/actions/runs/45243306524/job/137933409388"
+    },
+    {
+      "name": "artifacts",
+      "conclusion": "success",
+      "details_url": "https://github.com/isogeny-labs/crypto/actions/runs/45243306185/job/137933407713"
+    }
+  ],
+  "logs": [
+    {
+      "job": 137933411063,
+      "name": "parity",
+      "source_url": "https://github.com/isogeny-labs/crypto/actions/runs/45243306509/job/137933411063",
+      "bytes": 22579,
+      "sha256": "97512e6392b0cef015c53baee93b6dd119392d43bce2d6228e7819dce17602d6",
+      "full_decoded_RAM": "/dev/shm/ct23-5056-final-log-137933411063.log",
+      "durability": "GitHub job source subject to retention; full RAM originals pending approved custody, not byte-archived claim."
+    },
+    {
+      "job": 137933409996,
+      "name": "native-rust-quadratics",
+      "source_url": "https://github.com/isogeny-labs/crypto/actions/runs/45243306431/job/137933409996",
+      "bytes": 35892,
+      "sha256": "7c1e6f809a705efe4dfd3972133d7677f06ee12e492d0dc5b4e33e2aefd7bed3",
+      "full_decoded_RAM": "/dev/shm/ct23-5056-final-log-137933409996.log",
+      "durability": "GitHub job source subject to retention; full RAM originals pending approved custody, not byte-archived claim."
+    },
+    {
+      "job": 137933409628,
+      "name": "native-rust-trace-field",
+      "source_url": "https://github.com/isogeny-labs/crypto/actions/runs/45243306450/job/137933409628",
+      "bytes": 35908,
+      "sha256": "6c08f7a3b1ffb430359f103eaf1e9669fa1e55acf826dbc0595e1453fdb69f20",
+      "full_decoded_RAM": "/dev/shm/ct23-5056-final-log-137933409628.log",
+      "durability": "GitHub job source subject to retention; full RAM originals pending approved custody, not byte-archived claim."
+    },
+    {
+      "job": 137933408015,
+      "name": "current",
+      "source_url": "https://github.com/isogeny-labs/crypto/actions/runs/45243306215/job/137933408015",
+      "bytes": 639906,
+      "sha256": "48c07294622cc54e7899ec7bd276ca1b3a06dd9ffa9c5815f051c8e4cef6a52b",
+      "full_decoded_RAM": "/dev/shm/ct23-5056-final-log-137933408015.log",
+      "durability": "GitHub job source subject to retention; full RAM originals pending approved custody, not byte-archived claim."
+    }
+  ],
+  "next_unchanged_review_not_before": "2026-11-23T23:48:37.677479+00:00",
+  "notes": "No green-at-merge assertion, manual rerun, gate waiver or own merge. CT330 push failed without a job.",
+  "review_time_boundary": "Conservative interval from pre-review clock to full-log inventory completion, not an exact API timestamp.",
+  "diagnosis": "Round123/124 unchanged frozen source-shape assertions; parity unrecorded GENUS_LADDER_EXPORT_CORE,GOLDEN_PRINT,QDIAG_CS,QDIAG_Q; backend missing frozen leaderboard.json. No gate waiver or unrelated source rewrite."
+}
