@@ -20,7 +20,10 @@ ax[0].set_title("Block Wiedemann: work vs rounds")
 ax[1].set_yscale("log"); ax[1].set_title("Single-thread wall time (orientation only)")
 recs = []
 for f in sorted(glob.glob(os.path.join(here, "results_real", "*.json"))):
-    e = json.load(open(f)); g = e["rank"]["gain_dsu"]
+    e = json.load(open(f))
+    if e.get("schema") != "lp-graph-eval/v1":
+        continue  # run summaries, not evaluator records
+    g = e["rank"]["gain_dsu"]
     tot = g["balanced_cycles"] + g["unbalanced_cycles"]
     recs.append((os.path.basename(f)[:-5], g["balanced_cycles"] / tot if tot else 0))
 ax[2].barh([r[0] for r in recs], [r[1] for r in recs])
