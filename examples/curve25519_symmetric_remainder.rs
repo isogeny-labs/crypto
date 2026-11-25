@@ -1,3 +1,5 @@
+#![recursion_limit = "256"]
+
 //! Paired direct-remainder / explicit-quotient systems for
 //! `research/curve25519_symmetric_remainder_20261125/`.
 //!
