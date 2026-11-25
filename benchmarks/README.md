@@ -78,6 +78,19 @@ matched-rho reference, or `VALIDATION.json` exists.
 [Study](../research/curve25519_selective_quotient_20261125/),
 [PDF](20261125-curve25519-selective-quotient/report.pdf). [pcc:unverified]
 
+The [25 November Curve25519 quotient-layout qualification](20261125-curve25519-quotient-layout/)
+retains 60 counted native-Rust rows over five frozen layouts at `d=19`, plus
+12 fresh-seed reproduction rows from the predecessor binary. The primary
+quotient-first F layout retains maximum productive degree 4 but its paired F/D
+geometric mean is `1.2934390725`, descriptive 95% interval
+`[1.2934369447, 1.2934413625]`, against the frozen upper target `<0.75`; peak
+RSS reaches 2.3766 times D. This ordinary-grevlex variable permutation is not
+a true block-order solver. Scaling and `m=4` were not opened. It remains
+outside the admitted table because no independent replay, validator report,
+matched-rho reference, or `VALIDATION.json` exists.
+[Study](../research/curve25519_quotient_layout_20261125/),
+[PDF](20261125-curve25519-quotient-layout/report.pdf). [pcc:unverified]
+
 The [17 November native Rust identity component study](20261117-native-identity/) has checked pipeline full-paid paired medians1.306792/1.286039/1.254269 and work medians3.242510/3.067128/2.907275 at n3/4/6,25mainblocks each,AMD EPYC9V74 localL0. Ordinary95 controls reject n4/n6; prospective simultaneous screens pass. The unsigned synthetic polynomial-kernel result remains outside the admitted table; no15x claim. [Study](../research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md),[PDF](20261117-native-identity/results-report.pdf). [pcc:unverified]
 
 The [29 October synthetic generator-study planning record](20261029-generator-preflight/)
