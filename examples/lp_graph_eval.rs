@@ -66,8 +66,10 @@ fn main() {
     };
     // Explicit opt-in avoids changing historical serialized records.
     // Oversized or >2-LP inputs are reported as a skip by evaluate_stream.
-    let mut params = EvalParams::default();
-    params.compare_exact_forest = args.iter().any(|arg| arg == "--exact-forest");
+    let mut params = EvalParams {
+        compare_exact_forest: args.iter().any(|arg| arg == "--exact-forest"),
+        ..EvalParams::default()
+    };
     if let Some(v) = get("--forest-max-rows") {
         params.forest_max_rows = v.parse().expect("--forest-max-rows integer");
         assert!(

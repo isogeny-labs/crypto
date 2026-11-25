@@ -1,0 +1,105 @@
+{
+  "branch": "claude/funny-brown-735uvs",
+  "closed_utc": "2026-11-24T17:31:06+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/f4_round5_finish_20261124/scripts/confirm.sh",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/br/jv_cover",
+        "10",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/confirm5"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-24T16:42:54+00:00",
+      "wall_s": 309.5
+    }
+  ],
+  "commit": "ea2c575bdd7a2c549a9c133fdfb80507f2341e84",
+  "commit_dirty": false,
+  "created_utc": "2026-11-24T16:42:49+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v819-x86_64-with-glibc2.39"
+  },
+  "id": "20261124T1642Z-jv-cover-f4-branch-traces-confirm",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 10,
+      "name": "jv_dlp53_trace_counted_s_branch_off_over_on",
+      "note": "S 298.081 -> 285.951; counted oracle mults identical in every run of each arm (deterministic); 31 relations, correct log in all 30 runs",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.042
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 10,
+      "name": "jv_dlp53_trace_wall_branch_off_over_on",
+      "note": "8/10; below the A/A median deviation 2.5%: not significant; CPU 1.040",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": [
+        0.97,
+        1.148
+      ],
+      "unit": "ratio",
+      "value": 1.018
+    }
+  ],
+  "problem": "kernel:f4_fp",
+  "raw": [
+    {
+      "bytes": 7303,
+      "path": "research/f4_round5_finish_20261124/data/confirm/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/84/84d695b032816518c294b9745a5ae012a094867e64d07765a43ed33d5e1ac393",
+      "sha256": "84d695b032816518c294b9745a5ae012a094867e64d07765a43ed33d5e1ac393",
+      "uploaded": false
+    },
+    {
+      "bytes": 1767,
+      "path": "research/f4_round5_finish_20261124/CONFIRM_PROTOCOL.md",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/38c7a2c115a84d1e9e404a11090ee071332cf44c6b9a22f71d3189ba645c26ef",
+      "sha256": "38c7a2c115a84d1e9e404a11090ee071332cf44c6b9a22f71d3189ba645c26ef",
+      "uploaded": false
+    },
+    {
+      "bytes": 810,
+      "path": "research/f4_round5_finish_20261124/scripts/confirm.sh",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ff/ff33216f7d7689bba07d217805d4f1281cb216e4591b578d89fa2a8cb702f099",
+      "sha256": "ff33216f7d7689bba07d217805d4f1281cb216e4591b578d89fa2a8cb702f099",
+      "uploaded": false
+    },
+    {
+      "bytes": 2201,
+      "path": "research/f4_round5_finish_20261124/data/pilot_runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d8/d8f8fc42edb7fe97ef57af4d60ff4b5e86d677d136c9cf8b527d9868d37f0cc8",
+      "sha256": "d8f8fc42edb7fe97ef57af4d60ff4b5e86d677d136c9cf8b527d9868d37f0cc8",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/f4_round5_finish_20261124/reports/run-20261124T1700Z/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/f4_round5_finish_20261124/reports/run-20261124T1700Z/confirm.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "jv-cover-f4-branch-traces-confirm",
+  "status": "measured",
+  "summary": "branch traces: counted S 1.042x lower, deterministic counted cost; wall not significant [pcc:unverified]",
+  "validation": null
+}
