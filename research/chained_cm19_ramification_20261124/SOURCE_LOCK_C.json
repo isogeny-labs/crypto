@@ -1,0 +1,412 @@
+{
+  "schema": "frozen-source-runtime-input-lock/v1",
+  "native_toolchain": "1.99.1",
+  "tool_binary_sha256": {
+    "rustc": "b53b780f77f952062f8ca8a3b70aef2390b1e45ad91939be94afdc9543026853",
+    "clippy-driver": "89b6cc8d0d988b00a3f65bc90c76fedbaedb6bcb442b34563aefe3621f26544b",
+    "rustfmt": "68cb47a2a38daa8ff2ec6d623a2374b0a165d77ec74f1f654216665018c04598"
+  },
+  "runtime_file_sha256": {
+    "/home/agent/.cargo/bin/rustup": "b1c8cb14e30889e7e2999e6b69e62d9e9b9ffc0f4df8180564d306d9680e6c55",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/libLLVM-23-rust-1.99.1-stable.so": "ed06fbed8d297efa92979aeb227a4ce5b87b1a462d0aeac66d093300fad74824",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/libLLVM.so.23.1-rust-1.99.1-stable": "1cfbe1392a767227b88b33ab6187283e281c63f80f9b1ca9010d9cee5fdf9131",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/librustc_driver-7ed0375ae352bd75.so": "5a2cd52edba7d15f8d898b92a912638f5b73a089c7c1bfde5604ab45665602c7",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libaddr2line-b2546485fb156a81.rlib": "b92a365bcad231e218121951e4761a962cb3a47cdbdfda527dc2e6f337f564ec",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libadler2-e749a99f48dba5bc.rlib": "018c9ad5584ac4821eb9dacaa30a0220e62360b71a09b6b8b709069f34d7c911",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/liballoc-3988244237fec6ee.rlib": "1713afb7fc9da7a917293bafdede9562ceddd75700d5a5ff57d4eeb2e42ce9b1",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcfg_if-77a19c181a6f6522.rlib": "b931e7312afe263b8993a35e9d9937e8dfccd4a556afadcf8f9a7427b6855075",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcompiler_builtins-2d9557d6e902a200.rlib": "a98391e40d69b94b5d63d4c4dcfcfa76612688ba93e93acd8c9f5e23232dc2b6",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libcore-1d288395a3394ed3.rlib": "b346ce2305e13b1a5ec9ab6e093028caee38227c540cdaf78d7b253f59ae5913",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgetopts-d370f30754c98ce9.rlib": "452b6eaed2774c50e3f635d0bd30801b501269abaf049281bb814ed04ce1ba7f",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libgimli-a024a39c5ca178d0.rlib": "62cf1d74bc75f84bf5829ca3d01aedd52d6ab9264e376235f6e813e47e15d9b9",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libhashbrown-bd00bf133bcf4229.rlib": "0851a5f28052a130ebb3a757e6de31c880bd493c47ad32a76d7a6ad57f6d427c",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/liblibc-6cf0fcd942b0e793.rlib": "08840e04dd64d4cf9985e659ebe553c8b8672544579588cca4d1999958beed59",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libmemchr-e57d23b4cf2c7093.rlib": "5fe7ac19bee9008929af78844623ba80aef51ff40c0144c50085dd0399b4c84f",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libminiz_oxide-4ee1421476c1c513.rlib": "1c2cac3d6b897ebabffd00bd8104020f77566932f40257f344258e1e6031814c",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libobject-9ab214bf508f4fb2.rlib": "88eceffaef2d7006f2b47252107d2b257eacbb1fe8ad0c641200c21774bb1bb3",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_abort-5cae43b27ff5f42e.rlib": "0dc1179cdff5a02105da8a58e5459eb8d50d5d7ff42fbcb184abc2168b7d4697",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libpanic_unwind-4c962e8757b7fd52.rlib": "4405757e011b71607b273854035143dfc13d5390eadc65f228c68fb30dde51fc",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libproc_macro-012ffcc53aba0ce4.rlib": "37d84ce6901277ee4582f1f147e17bb94b780cc3f409565cf005f8ee65049d4c",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libprofiler_builtins-1eed01feea74fabd.rlib": "d0c0c0625e5ef7023bce42c37178b1d6959d8191ddbd08f95ecbbc7f963aa22f",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_demangle-23edf219dcb73297.rlib": "abfa1e86e1aa11c927b76d8a250e80ef30679771ffdaedbae1e77c34f7a0e1bb",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_literal_escaper-0bcf9fe2451b4cf2.rlib": "3c0f6112624eed607f4e2a2be43fcdb3adf7b3c74c1d7e86b7a73bcd044fc9f4",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_alloc-e4d7e1d94de777fa.rlib": "c5d6935e127a89b363ea265e09c5559dd039676da6dec6aac0e81ac47d1e6248",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_core-fb3f24e4abf4be88.rlib": "d873f3613afe4256d60bcb722552d558f370e981431aca90b22d9df93f85b14a",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/librustc_std_workspace_std-5437dec005526111.rlib": "276cd7b63b156775ef64c994c450bceaaa0a18ddb0a7009d35c68ea72be127c6",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd-7e719de9c4abc98f.rlib": "ea104615e69d068c8a12c749135c7138b3ec28c7275ae163f91169a03561f75b",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libstd_detect-ce90372c8b94015d.rlib": "21fa7e8e6935292bd1a0071725492a967a99ea2b54129dc77297916f6570ca39",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libsysroot-22c4bd49b12831db.rlib": "1e6ef82108df796bb91a414d42d9943cf0830e0e847ace39fbdc64f35f5e1643",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libtest-a1ccee9d65338c17.rlib": "8ca3b6279ce3b436b6628c0f9a2eaea0283f46675474f1eaa819db7880971ca2",
+    "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib/libunwind-87f8da15080ba246.rlib": "cb05e3b32dc9ee1cc6ec6a9cba01c2ea81eb44cb8c655760d5243a66d1179c5d"
+  },
+  "limits": {
+    "seconds_per_phase": 120,
+    "address_space_kib": 2097152,
+    "workers": 1,
+    "available_RAM_floor_bytes": 268435456,
+    "compiler_temporary_floor_bytes": 67108864
+  },
+  "ambient_boundary": "Exact native tools/Rust runtime hashes; installed transitive standard libraries and OS remain disclosed ambient inputs, not a hermetic/independent execution proof.",
+  "qualifier": "Whole original native-built and separate0555 executable, complete streams/argv/pre/post guards.",
+  "authority": "Current mainAGENTS042f9fe3 reviewed instruction applies via exact CURRENT_AGENTS_REVIEW_I; original rootAGENTSbc5217 and old source/input subjects stay immutable.",
+  "recorded": "2026-11-24T01:49:05.054506+00:00",
+  "classification": "CHECKPOINT_CLASSIFICATION_A.md and PROTOCOL_C.md, actual fixed quotient-field/branch-map correctness only.",
+  "profile": "First actual residual quadratic branch C; observed B modulus/line parameter, true E functions, exact Frobenius/collision/coordinate/group trace certificates; no target outcome pattern assumed.",
+  "files": {
+    ".artifacts/config.json": {
+      "bytes": 6109,
+      "sha256": "4e71a9ede165f46d73f9fbd9902f914fad8115f0a422089c5c501caf7e6d3052",
+      "mode": 384
+    },
+    ".gitattributes": {
+      "bytes": 24115,
+      "sha256": "fff6b37446d00d7bd9bab2fd84fb8ec41be0403def43f58af6f30b288f4d36a1",
+      "mode": 384
+    },
+    ".gitignore": {
+      "bytes": 5343,
+      "sha256": "d0ffd9e4d1833d47997a29c0120cf87934353c6e16c6d3986df38d0b94e65a84",
+      "mode": 384
+    },
+    "AGENTS.md": {
+      "bytes": 152091,
+      "sha256": "a6d1a1da5d48c4b3fb9b5caa1d074ded49ed77448baa58a616b200422471ad53",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-2bf624.json": {
+      "bytes": 1138,
+      "sha256": "3e01ae66ab62c78f41a175b59525d7ea3f78617a26bbb2c4edb63da2249f7e13",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-58eb34.json": {
+      "bytes": 1024,
+      "sha256": "7ea288dc1776c69b886d5c103140f46bb6f9a3cb67aef6d3fc27ca211f351f3a",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-5e0a6f.json": {
+      "bytes": 1153,
+      "sha256": "c066915c5701012146b93485f0c6e02b0b3a07ff9b2cc3e1cc4e8f2a73f39fa2",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-604246.json": {
+      "bytes": 1039,
+      "sha256": "1e9057b1f417e0d85b9612366fd17d9a361a9ff3a32aa29fca724060203bb5c0",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-73fe27.json": {
+      "bytes": 979,
+      "sha256": "35ffaf38b9748c41586f14ceb53831cb65217267bd364fa8599dba279b240e49",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-7d58e4.json": {
+      "bytes": 944,
+      "sha256": "28cdc86fdbb9b51d01e77aae4b98ff527307aeae9e441f8cd9fb3f9bced0b0e2",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-9a6918.json": {
+      "bytes": 1026,
+      "sha256": "704bc632eb37b2abdc5deb9b707d896ba22a431121cad007ba41a4a78ea7f417",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-9b4968.json": {
+      "bytes": 905,
+      "sha256": "0235af6ad3d11a0f42b3e4001e75b29ec3939c2224546c54704dc19564b473b9",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-b0036d.json": {
+      "bytes": 999,
+      "sha256": "ffb0ab121e3f0dd750e903c3c9b9f6eba5c1885a341bf92a8ffc86e6c0644ea1",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-c06659.json": {
+      "bytes": 1014,
+      "sha256": "16b013b39b38acf67b052dd04089ba3f5abe38573f095a064ea5b5b3c0932cd5",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-c95eab.json": {
+      "bytes": 1032,
+      "sha256": "6cafaee6008bfe564ab6bc0edf2e7bf9fb3159ddad89934173f49a85603fc56a",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-ec4024.json": {
+      "bytes": 962,
+      "sha256": "e973beed424a908e66361a92ca1956bc1dc9cf163f8a27d4feba75862b790fca",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-f005a4.json": {
+      "bytes": 963,
+      "sha256": "cc0821d8f02903dc5d8175a3ae77902ebca64ba34b433f902a6d69137b3d92a2",
+      "mode": 384
+    },
+    "pcc/claims/PCC-20261124-f062d9.json": {
+      "bytes": 1143,
+      "sha256": "43ae4d4a42004f5171a7bb049eb8fd9e25f108bd1f28af95762f20a007684a90",
+      "mode": 384
+    },
+    "pcc/keyring.json": {
+      "bytes": 473,
+      "sha256": "21929cc6389f58d0f847912af7f3fbf44e91ca90725965780085353c1322031c",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/ACTUAL_FUNCTIONS_PROOF_E.md": {
+      "bytes": 4304,
+      "sha256": "e4c63ca1d20835c1fecaf240c1ab7a41ecbeba0162950aaf3d0b1d0730fdf1b6",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/CURRENT_RESULT_I.md": {
+      "bytes": 3009,
+      "sha256": "d86a7115801a646694090488a20bd08b2946928c83b84d0941430898d9fb2575",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/FIRST_E_NATIVE_INVENTORY.json": {
+      "bytes": 14847,
+      "sha256": "dc83d64819e319fa6060c740d6c099e8305a011ad501d83a8e35fca606782b71",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/FIRST_F_NATIVE_INVENTORY.json": {
+      "bytes": 14751,
+      "sha256": "60010aeb284ec4903a9c2b00c943beda44942563791bfe42357fcdf0deff920f",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/FIRST_G_FORMAL_INVENTORY.json": {
+      "bytes": 7346,
+      "sha256": "b0619b9ae023fb1ef4094e5d49e5a430583ec59e3eba6acbff157222cfcd6428",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/FORMAL_COUNT_CORRECTION_G.md": {
+      "bytes": 547,
+      "sha256": "e0b5baa9dd89c790e121e3897b578b5dd643895cd54355262da1e92b4f59f495",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/LOCAL_EVALUATION_PROOF_F.md": {
+      "bytes": 3244,
+      "sha256": "62753afc6af44e159df264d6f8ab7224c4d49f9e1edd34575e222f857b16c1d0",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/NEXT_RAMIFICATION_H.md": {
+      "bytes": 2322,
+      "sha256": "43ac4c29d93c52e1a27bc34b0193add4528d8e70b6a7fe3588120a9aa5804de7",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/WEIGHTED_FIBRE_S4_PROOF_H.md": {
+      "bytes": 2040,
+      "sha256": "5c19843903e54624a6803aa98f198db16ee06303f9ac22bcddc98c6b3a790d21",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/first-C-native/weighted-fibres.stdout": {
+      "bytes": 6600,
+      "sha256": "bcb9158ee87875ec60218cc9dc81d1dc56b18ba56dd32ae71f6103b67a2926a9",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/first-E-native/actual-functions.stdout": {
+      "bytes": 19267,
+      "sha256": "2f17b4c9a1f3a5ec369ae89a2f4e3f4765a781a0207155f49c5c5f7d84ba9a7a",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/first-F-native/polynomial-evaluation.stdout": {
+      "bytes": 22726,
+      "sha256": "04bbc64a9c4cec9e336ec5780197d3b0cf951e07ee63db5db0f9940cc6ee9790",
+      "mode": 384
+    },
+    "research/chained_cm19_fibres_20261124/maintenance/CURRENT_AGENTS_REVIEW_I.json": {
+      "bytes": 1341,
+      "sha256": "c4e839ecb781272cae79cd5061f9a0d58f8e3506f8213aae48b531c81b290080",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/ACTUAL_RAMIFICATION_PROOF_B.md": {
+      "bytes": 3030,
+      "sha256": "ef47da7956380f4d1fefb3a86b6cc900efd92f619a3be8d225da708833c0370f",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/BOOTSTRAP_A.json": {
+      "bytes": 1374,
+      "sha256": "b7f6cf9569757f414dd0732934a0e1fb8e064314b5d629a142cf5355be01e3f4",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/CHECKPOINT_CLASSIFICATION_A.md": {
+      "bytes": 939,
+      "sha256": "28ccba6f8463a13811e854e932836aa4b6d4b59d39feb1b749cf2aac78ef5338",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/FIRST_A_LINT_NEGATIVE.json": {
+      "bytes": 12767,
+      "sha256": "2325579b62b9dbf4b5c77736afe91b4b7451f00d10bca2a6bd2224bf74e37425",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/FIRST_B_NATIVE_INVENTORY.json": {
+      "bytes": 15332,
+      "sha256": "b0af6ce28c848d696728244c0060fbad0fc79a20d9aec01f65230b2b6441e28e",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/FORMAT_PREPARATION_A.json": {
+      "bytes": 300,
+      "sha256": "bada2b49ce9484a4543be54b1178cad75333bda34b8408eef18b1c235ed1b28b",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/FORMAT_PREPARATION_B.json": {
+      "bytes": 199,
+      "sha256": "0f2a6f46d8a79e6111c9825c8f15ff5b348cd5e319cd25c77ba529518b706e3c",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/FORMAT_PREPARATION_C.json": {
+      "bytes": 543,
+      "sha256": "c3fe0f089edae9efd180045ca1089ee4dace0ea8bbd30e824c7a29d39ad35923",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/FORMAT_PREPARATION_C2.json": {
+      "bytes": 394,
+      "sha256": "e1f903ef39dd6596d5b70be34fd6414e94ccb2ba94b5418ea3195d73aad0c89f",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/HARDWARE_CONTEXT_A.json": {
+      "bytes": 313,
+      "sha256": "67a940e400a6208f97f20622eb38f80439582b6b5a8013a79333a3583daaa2db",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/LEAD_AND_PROOF_PLAN_A.md": {
+      "bytes": 4881,
+      "sha256": "214c510a710cfcde5409af4530fb6be4682ba3bbbed9fa6247584b6436c06d41",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/PRIMARY_SOURCES_A.md": {
+      "bytes": 2549,
+      "sha256": "011914df7987b2fff6c32139da8ebc228f88cb08cd301c56b2f630a8a8bfb0b6",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/PRIMARY_SOURCES_C.md": {
+      "bytes": 1523,
+      "sha256": "7592cc1bbee798f220b7f7e052e5ff4e70d3f05246594e98d5577419d565644f",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/PROTOCOL_A.md": {
+      "bytes": 3773,
+      "sha256": "f0ad4160f2efcf48aa50a9256509e6b2ff2c3474084da457713a8a37b4244f3a",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/PROTOCOL_B.md": {
+      "bytes": 1414,
+      "sha256": "b0efd5b35b1fcba3e39cbe49e5b67ccdb56d87ee098c1b36077fb0a210be817d",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/PROTOCOL_C.md": {
+      "bytes": 3115,
+      "sha256": "611f8368ce29be29d4bc23d27b6bf57efa22f1661cbda8a52abce96d31f378b9",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/SOURCE_LOCK_A.json": {
+      "bytes": 15082,
+      "sha256": "c84793cf31af4c499c13ef0d2adcc07a763eaad54ce2d834d1ce345c1e8e3f62",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/SOURCE_LOCK_B.json": {
+      "bytes": 17669,
+      "sha256": "3e884fdb6b01edeb3e56221d9a6a89068068b4a90aae8d3c110156fb122fbb40",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/custody_metadata_A.py": {
+      "bytes": 6684,
+      "sha256": "58b6ed148dd39a971e1de6324d8bd3c8b01c285fb75080ce9804bab790a9abdc",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/custody_metadata_B.py": {
+      "bytes": 6684,
+      "sha256": "bed6f74db6ed248e3f818656f138966581fcffe5db55c329a87b4a419fa1c731",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/custody_metadata_C.py": {
+      "bytes": 6684,
+      "sha256": "f6a40dba0bb8295e34a64f5cede1d28b7940f99840d27ad7aa06b711cccc5805",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/field_c.rs": {
+      "bytes": 2575,
+      "sha256": "1e07b46d12cdd0db385aa2dfd511b5120d534f7a5c6f72242b59808c649fff82",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/first-A-native-lint-negative/POST_CALL_MANIFEST.json": {
+      "bytes": 24294,
+      "sha256": "20cc83fc05ad8ca32c43a815b92a4648fd7ce93743f9ac87fdfcb89cb22fbe29",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/first-A-native-lint-negative/clippy.stderr": {
+      "bytes": 666,
+      "sha256": "ffbe04f412a77df39297349e774bc6efa9b59bfcc14c06620be4a3fde68bc232",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/first-B-native/canonical-ramification.stdout": {
+      "bytes": 3915,
+      "sha256": "5189248d79e454c60a61efaa1cfa967d875a673aec69c7bcb241343d0bbf7b5a",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/main_a.rs": {
+      "bytes": 11857,
+      "sha256": "5422be78cde683f2c7bf996b39fbe15023b8ad3488bb7945de57d2cf270e6418",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/main_b.rs": {
+      "bytes": 11952,
+      "sha256": "beb6945cce287b0b09e3d5ea625341758c1c2e8f1b2bde254ae3dcced0be1798",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/main_c.rs": {
+      "bytes": 10358,
+      "sha256": "8c207f69a0798e26993581aee4a2ed35922494c2a5978cd2c7a2ad4f2e20b25c",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/maintenance/CURRENT_AGENTS_REVIEW_RESULT_B.json": {
+      "bytes": 1262,
+      "sha256": "ee7753ccc5d8ee63884bbba4d80c0f48389dba2eafdea50132d17ade1b7929b8",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/preformat-draft-A/main_a-second-draft.rs": {
+      "bytes": 9320,
+      "sha256": "c25d270451547f523ee385186f9212398de96701b6eeda91161e636125797a64",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/preformat-draft-A/main_a.rs": {
+      "bytes": 9284,
+      "sha256": "0e391c1bbf80b60782a583a697aaf685770d1e209c269c260a747f6bb10e34be",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/preformat-draft-B/main_b.rs": {
+      "bytes": 11952,
+      "sha256": "beb6945cce287b0b09e3d5ea625341758c1c2e8f1b2bde254ae3dcced0be1798",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/preformat-draft-C/field_c.rs": {
+      "bytes": 1909,
+      "sha256": "3ac301351ac80c9bdd60350ef412dd96010bc6258d9eefafcdf5e275e037833f",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/preformat-draft-C/main_c-second-draft.rs": {
+      "bytes": 7691,
+      "sha256": "449713e3b6f563a8f77d4f8234622000b1ace3eaf5e671a55bd5ce487d3f6f6b",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/preformat-draft-C/main_c-third-draft.rs": {
+      "bytes": 10082,
+      "sha256": "f25939a8fefd0cc7487fc2b79f02c9ab35d03dde49e5a5ff61eb955b01c85e05",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/preformat-draft-C/main_c.rs": {
+      "bytes": 7674,
+      "sha256": "85fa384a9bb2320a7d3fa45fb2f5f76968699854e7321958ac2e2434a576a04e",
+      "mode": 384
+    },
+    "research/chained_cm19_ramification_20261124/run_first_A.sh": {
+      "bytes": 2591,
+      "sha256": "6af30bfb07cd626abda06cc9c72ff4f367aad2f31d71b9a17d6847fe3a5439c6",
+      "mode": 493
+    },
+    "research/chained_cm19_ramification_20261124/run_first_B.sh": {
+      "bytes": 2591,
+      "sha256": "6848b3ba468c61fe93233ba59c6e6628c60c8e0ff3413b20134d54b10e0a466b",
+      "mode": 493
+    },
+    "research/chained_cm19_ramification_20261124/run_first_C.sh": {
+      "bytes": 2594,
+      "sha256": "1dc5bd64e90686fbf7fafc1eda50b6030ca146bd89cc39f86f125b1844eb6d07",
+      "mode": 493
+    }
+  }
+}
