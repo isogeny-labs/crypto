@@ -37,6 +37,28 @@ one instance and 0.44–0.65 in another, on one host and one binary.
 3. **The gap is the per-operation price.** One counted candidate multiply-add
    costs 2.5–15.7 ns of wall time against 0.44–0.83 ns for the interval arm.
 
+## The single-threaded basis: 7.35×, with a 4.5× price gap
+
+The multi-threaded numbers above mix the algorithm with the scheduler. Re-running
+the same two arms with `RAYON_NUM_THREADS=1` (4 repeats each, same instance,
+quiet host) separates them:
+
+| Arm | Ops | Solver wall | ns per counted MA | Charged GAE |
+|:--|---:|---:|---:|---:|
+| interval | 43.19G | 16.16 s | 0.374 | 0.338G |
+| candidate | 1.303G | 2.20 s | 1.689 | 0.046G |
+| ratio | **33.1×** | **0.136** | 4.51× | **0.136** |
+
+Single-threaded, the degree-32 map solves the same 4 target repeats for
+**0.136 of the charged cost — a 7.35× per-system speedup**. The 33× operation
+reduction is diluted by a 4.5× higher price per counted multiply-add, not by
+3–30× as the loaded runs suggested. Most of the earlier spread was thread-pool
+scheduling: the candidate's price fell from 2.5–15.7 ns/MA under load to 1.69
+ns/MA alone, while the interval's moved only 0.44–0.83 → 0.37.
+
+So the correct scaling statement is: 33× fewer multiply-adds, **7.4× less
+work**, and a 4.5× residual per-operation gap that is the engineering target.
+
 ## Why the price differs: the counter is not the runtime
 
 `echelon` increments `muladds` only from `Acc::sub_tail`, i.e. once per
@@ -71,13 +93,14 @@ breakdown surfaced in the store will apportion them.
 
 - The correct headline for a user is the closed-pipeline charged ratio,
   0.284–0.314, and the deterministic 32× op reduction **described as an
-  operation count**.
-- The remaining headroom is roughly 5× per system, and it is an engineering
-  target, not a mathematical one: cut the uncounted work — the sparse-echelon
-  per-row bookkeeping (`Pivot::new` copies, accumulator drain, bitset
-  maintenance) and, on a loaded host, rayon scheduling. Recovering half the
-  price gap would move the closed-pipeline ratio from ~0.29 toward ~0.15 on
-  identical hardware; the op count would not change at all.
+  operation count**. On a quiet single thread the same comparison is 0.136
+  (7.35×), so the pipeline figures are conservative by roughly the factor the
+  host's scheduler takes from the sparse arm.
+- The remaining headroom is 4.5× per system, and it is an engineering target,
+  not a mathematical one: cut the uncounted work — the sparse-echelon per-row
+  bookkeeping (`Pivot::new` copies, accumulator drain, bitset maintenance).
+  Closing the price gap would turn 7.35× into ~33× on identical hardware; the
+  op count would not change at all.
 - Any future claim should quote wall or GAE per instance and treat the 32× as
   an operation-count invariant that is *not* load-dependent and *not* a
   speedup.
