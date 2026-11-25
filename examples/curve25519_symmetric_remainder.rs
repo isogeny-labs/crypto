@@ -18,6 +18,8 @@
 
 use std::cell::Cell;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
+use std::fmt::Write as _;
+use std::path::Path;
 use std::time::{Duration, Instant};
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, Ordering, Poly};
@@ -985,13 +987,301 @@ fn run_selftest() -> Result<(), String> {
     Ok(())
 }
 
+#[derive(Clone, Debug, serde::Deserialize)]
+struct MeasuredRow {
+    arm: String,
+    d: u64,
+    kind: String,
+    index: usize,
+    target_scalar: u64,
+    target_x: u64,
+    target_y: u64,
+    field_ops: u64,
+    solving_degree_max: u32,
+    censored: bool,
+    membership_build_coeff_ops: u64,
+    peak_rss_kib: Option<u64>,
+    planted_equations_zero: Option<bool>,
+    planted_group_verified: Option<bool>,
+}
+
+fn geometric_mean(values: &[f64]) -> f64 {
+    (values.iter().map(|x| x.ln()).sum::<f64>() / values.len() as f64).exp()
+}
+
+fn paired_interval(ratios: &[f64], seed: u64, draws: usize) -> (f64, f64) {
+    let mut rng = Rng(seed);
+    let mut samples = Vec::with_capacity(draws);
+    for _ in 0..draws {
+        let mut log_sum = 0.0;
+        for _ in 0..ratios.len() {
+            log_sum += ratios[rng.next() as usize % ratios.len()].ln();
+        }
+        samples.push((log_sum / ratios.len() as f64).exp());
+    }
+    samples.sort_by(f64::total_cmp);
+    let lo = (draws - 1) * 25 / 1000;
+    let hi = (draws - 1) * 975 / 1000;
+    (samples[lo], samples[hi])
+}
+
+fn run_analyze(args: &[String]) -> Result<(), String> {
+    let raw = arg(
+        args,
+        "--raw",
+        "research/curve25519_symmetric_remainder_20261125/raw",
+    );
+    let out = arg(
+        args,
+        "--out",
+        "research/curve25519_symmetric_remainder_20261125/evidence",
+    );
+    let mut paths: Vec<_> = std::fs::read_dir(&raw)
+        .map_err(|e| format!("read {raw}: {e}"))?
+        .filter_map(Result::ok)
+        .map(|e| e.path())
+        .filter(|p| p.extension().and_then(|x| x.to_str()) == Some("json"))
+        .collect();
+    paths.sort();
+    let mut rows = Vec::new();
+    for path in &paths {
+        let bytes = std::fs::read(path).map_err(|e| format!("read {}: {e}", path.display()))?;
+        rows.push(
+            serde_json::from_slice::<MeasuredRow>(&bytes)
+                .map_err(|e| format!("parse {}: {e}", path.display()))?,
+        );
+    }
+    if rows.len() != 72 {
+        return Err(format!("expected 72 rows, found {}", rows.len()));
+    }
+    let mut unique = HashSet::new();
+    for row in &rows {
+        if !unique.insert((row.d, row.kind.clone(), row.index, row.arm.clone())) {
+            return Err("duplicate row key".into());
+        }
+    }
+    let planted_bad = rows
+        .iter()
+        .filter(|r| {
+            r.kind == "planted"
+                && (r.planted_equations_zero != Some(true)
+                    || r.planted_group_verified != Some(true))
+        })
+        .count();
+    let mut paired_csv = String::from(
+        "d,kind,index,direct_field_ops,quotient_field_ops,ratio,direct_solving_degree_max,quotient_solving_degree_max,direct_peak_rss_kib,quotient_peak_rss_kib\n",
+    );
+    let mut cells = Vec::new();
+    let mut random_ratio_by_d: BTreeMap<u64, Vec<f64>> = BTreeMap::new();
+    let mut random_pairs_by_d: BTreeMap<u64, Vec<(&MeasuredRow, &MeasuredRow)>> = BTreeMap::new();
+    for d in [7, 9, 19] {
+        for kind in ["random", "planted"] {
+            let count = if kind == "random" { 8 } else { 4 };
+            for index in 0..count {
+                let direct = rows
+                    .iter()
+                    .find(|r| r.d == d && r.kind == kind && r.index == index && r.arm == "direct")
+                    .ok_or_else(|| format!("missing direct d={d} {kind} i={index}"))?;
+                let quotient = rows
+                    .iter()
+                    .find(|r| r.d == d && r.kind == kind && r.index == index && r.arm == "quotient")
+                    .ok_or_else(|| format!("missing quotient d={d} {kind} i={index}"))?;
+                if (direct.target_scalar, direct.target_x, direct.target_y)
+                    != (quotient.target_scalar, quotient.target_x, quotient.target_y)
+                {
+                    return Err(format!("target mismatch d={d} {kind} i={index}"));
+                }
+                let ratio = quotient.field_ops as f64 / direct.field_ops as f64;
+                writeln!(
+                    paired_csv,
+                    "{d},{kind},{index},{},{},{ratio:.12},{},{},{},{}",
+                    direct.field_ops,
+                    quotient.field_ops,
+                    direct.solving_degree_max,
+                    quotient.solving_degree_max,
+                    direct.peak_rss_kib.unwrap_or(0),
+                    quotient.peak_rss_kib.unwrap_or(0)
+                )
+                .unwrap();
+                if kind == "random" && !direct.censored && !quotient.censored {
+                    random_ratio_by_d.entry(d).or_default().push(ratio);
+                    random_pairs_by_d
+                        .entry(d)
+                        .or_default()
+                        .push((direct, quotient));
+                }
+            }
+        }
+        let mut arm_cells = serde_json::Map::new();
+        for arm in ["direct", "quotient"] {
+            let selected: Vec<_> = rows
+                .iter()
+                .filter(|r| r.d == d && r.kind == "random" && r.arm == arm)
+                .collect();
+            let arithmetic_mean =
+                selected.iter().map(|r| r.field_ops as f64).sum::<f64>() / selected.len() as f64;
+            let values: Vec<f64> = selected.iter().map(|r| r.field_ops as f64).collect();
+            arm_cells.insert(
+                arm.to_string(),
+                serde_json::json!({
+                    "random_rows": selected.len(),
+                    "censored": selected.iter().filter(|r| r.censored).count(),
+                    "field_ops_arithmetic_mean": arithmetic_mean,
+                    "field_ops_geometric_mean": geometric_mean(&values),
+                    "solving_degree_max_values": selected.iter().map(|r| r.solving_degree_max).collect::<BTreeSet<_>>(),
+                    "peak_rss_kib_max": selected.iter().filter_map(|r| r.peak_rss_kib).max()
+                }),
+            );
+        }
+        let ratios = random_ratio_by_d.get(&d).unwrap();
+        let (lo, hi) = paired_interval(ratios, SEED ^ d, 10_000);
+        cells.push(serde_json::json!({
+            "d": d,
+            "arms": arm_cells,
+            "paired_ratio_geometric_mean": geometric_mean(ratios),
+            "paired_ratio_descriptive_95": [lo, hi]
+        }));
+    }
+
+    let d19_pairs = random_pairs_by_d.get(&19).unwrap();
+    let d19_ratios = random_ratio_by_d.get(&19).unwrap();
+    let d19_ratio = geometric_mean(d19_ratios);
+    let (d19_lo, d19_hi) = paired_interval(d19_ratios, SEED, 10_000);
+    let degree_drop_pairs = d19_pairs
+        .iter()
+        .filter(|(d, q)| q.solving_degree_max + 1 <= d.solving_degree_max)
+        .count();
+    let max_build_ratio = d19_pairs
+        .iter()
+        .map(|(d, q)| q.membership_build_coeff_ops as f64 / d.membership_build_coeff_ops as f64)
+        .fold(0.0, f64::max);
+    let max_rss_ratio = d19_pairs
+        .iter()
+        .map(|(d, q)| q.peak_rss_kib.unwrap() as f64 / d.peak_rss_kib.unwrap() as f64)
+        .fold(0.0, f64::max);
+    let censor_gate = [7, 9, 19].iter().all(|&d| {
+        let direct = rows
+            .iter()
+            .filter(|r| r.d == d && r.arm == "direct" && r.censored)
+            .count();
+        let quotient = rows
+            .iter()
+            .filter(|r| r.d == d && r.arm == "quotient" && r.censored)
+            .count();
+        quotient <= direct
+    });
+    let correctness = planted_bad == 0;
+    let enough_pairs = d19_pairs.len() >= 6;
+    let ratio_gate = d19_hi < 0.5;
+    let degree_gate = degree_drop_pairs >= 6;
+    let resource_gate = max_build_ratio <= 2.0 && max_rss_ratio <= 2.0;
+    let qualifies =
+        correctness && censor_gate && enough_pairs && ratio_gate && degree_gate && resource_gate;
+    let analysis = serde_json::json!({
+        "schema": "curve25519.symmetric-remainder-analysis/v1",
+        "study_id": "EXP-C25519-SYMREM-001",
+        "rows": rows.len(),
+        "planned": 72,
+        "attempted": 72,
+        "completed": rows.iter().filter(|r| !r.censored).count(),
+        "censored": rows.iter().filter(|r| r.censored).count(),
+        "planted_bad": planted_bad,
+        "target_pairs_exact": true,
+        "cells": cells,
+        "qualification_d19": {
+            "completed_random_pairs": d19_pairs.len(),
+            "paired_ratio_geometric_mean": d19_ratio,
+            "paired_ratio_descriptive_95": [d19_lo, d19_hi],
+            "degree_drop_pairs": degree_drop_pairs,
+            "max_membership_build_coeff_ops_ratio": max_build_ratio,
+            "max_peak_rss_ratio": max_rss_ratio,
+            "gates": {
+                "correctness": correctness,
+                "candidate_censoring_not_greater": censor_gate,
+                "minimum_six_pairs": enough_pairs,
+                "ratio_upper_lt_0_5": ratio_gate,
+                "degree_drop_at_least_six_pairs": degree_gate,
+                "build_and_rss_each_le_2": resource_gate
+            }
+        },
+        "qualifies_for_scaling": qualifies,
+        "decision": if qualifies { "continue_to_gated_scaling" } else { "stop_before_scaling_and_m4" },
+        "claim_boundary": "stage diagnostic only; no total-work or subexponential ECDLP claim"
+    });
+    std::fs::create_dir_all(&out).map_err(|e| format!("mkdir {out}: {e}"))?;
+    std::fs::write(
+        Path::new(&out).join("analysis.json"),
+        serde_json::to_string_pretty(&analysis).unwrap() + "\n",
+    )
+    .map_err(|e| format!("write analysis: {e}"))?;
+    std::fs::write(Path::new(&out).join("paired.csv"), paired_csv)
+        .map_err(|e| format!("write paired csv: {e}"))?;
+
+    let points: Vec<(u64, f64)> = random_ratio_by_d
+        .iter()
+        .map(|(&d, r)| (d, geometric_mean(r)))
+        .collect();
+    let x = |d: u64| 110.0 + (d as f64 - 7.0) / 12.0 * 650.0;
+    let y = |ratio: f64| 440.0 - ratio / 2.25 * 330.0;
+    let polyline = points
+        .iter()
+        .map(|&(d, r)| format!("{:.1},{:.1}", x(d), y(r)))
+        .collect::<Vec<_>>()
+        .join(" ");
+    let mut marks = String::new();
+    for &(d, ratio) in &points {
+        writeln!(marks, "<circle cx=\"{:.1}\" cy=\"{:.1}\" r=\"6\" fill=\"#d1495b\"/><text x=\"{:.1}\" y=\"{:.1}\" text-anchor=\"middle\" font-size=\"15\">{ratio:.3}</text>", x(d), y(ratio), x(d), y(ratio)-12.0).unwrap();
+    }
+    let svg = format!(
+        r##"<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">
+<rect width="900" height="520" fill="#ffffff"/>
+<text x="450" y="34" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="bold">Explicit quotient / direct F4 work</text>
+<text x="450" y="58" text-anchor="middle" font-family="sans-serif" font-size="14">paired geometric mean, 8 random targets; lower is better</text>
+<line x1="90" y1="440" x2="800" y2="440" stroke="#333"/>
+<line x1="90" y1="90" x2="90" y2="440" stroke="#333"/>
+<line x1="90" y1="{threshold:.1}" x2="800" y2="{threshold:.1}" stroke="#2a9d8f" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="795" y="{threshold_label:.1}" text-anchor="end" font-family="sans-serif" font-size="14" fill="#16766c">qualification ceiling 0.50</text>
+<polyline points="{polyline}" fill="none" stroke="#d1495b" stroke-width="3"/>
+{marks}
+<text x="445" y="495" text-anchor="middle" font-family="sans-serif" font-size="16">factor-base order d</text>
+<text x="24" y="265" transform="rotate(-90 24 265)" text-anchor="middle" font-family="sans-serif" font-size="16">Q / D field_ops</text>
+<text x="110" y="464" text-anchor="middle" font-family="sans-serif" font-size="14">7</text>
+<text x="218" y="464" text-anchor="middle" font-family="sans-serif" font-size="14">9</text>
+<text x="760" y="464" text-anchor="middle" font-family="sans-serif" font-size="14">19</text>
+<text x="110" y="104" font-family="sans-serif" font-size="13" fill="#555">[pcc:unverified] stage diagnostic</text>
+</svg>
+"##,
+        threshold = y(0.5),
+        threshold_label = y(0.5) - 8.0,
+    );
+    std::fs::write(Path::new(&out).join("figure.svg"), svg)
+        .map_err(|e| format!("write svg: {e}"))?;
+    let export = serde_json::json!({
+        "schema": "experiment.export/v1",
+        "experiment_id": "EXP-C25519-SYMREM-001",
+        "status": if qualifies { "qualified" } else { "completed_negative" },
+        "flow": {"planned": 72, "attempted": 72, "completed": 72, "excluded": 0, "censored": 0},
+        "primary_metric": "F_p multiply-adds in F4 elimination",
+        "decision": if qualifies { "continue_to_gated_scaling" } else { "stop_before_scaling_and_m4" },
+        "label": "[pcc:unverified]"
+    });
+    std::fs::write(
+        Path::new(&out).join("experiment.export.json"),
+        serde_json::to_string_pretty(&export).unwrap() + "\n",
+    )
+    .map_err(|e| format!("write export: {e}"))?;
+    println!("{}", serde_json::to_string(&analysis).unwrap());
+    Ok(())
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let result = match args.get(1).map(String::as_str) {
         Some("selftest") => run_selftest(),
         Some("search-g") => run_search_g(),
+        Some("analyze") => run_analyze(&args[2..]),
         Some("cell") => run_cell(&args[2..]),
-        _ => Err("usage: curve25519_symmetric_remainder selftest | search-g | cell --arm direct|quotient --d N --kind random|planted --index I [--cap 300 --dmax 24 --seed 20261125]".into()),
+        _ => Err("usage: curve25519_symmetric_remainder selftest | search-g | analyze [--raw DIR --out DIR] | cell --arm direct|quotient --d N --kind random|planted --index I [--cap 300 --dmax 24 --seed 20261125]".into()),
     };
     if let Err(e) = result {
         eprintln!("curve25519_symmetric_remainder: {e}");
