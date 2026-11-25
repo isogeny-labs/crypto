@@ -6,6 +6,8 @@ publish = false
 
 [dependencies]
 serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+hex = "0.4"
 prime31-four-summand = { path = "../../prime31_four_summand_20261122/native", optional = true }
 prime31-algebraic-ic = { path = "../../prime31_four_summand_20261122/native/original-native", optional = true }
 crypto_lib = { package = "rr5-original-f4-closure", path = "../../prime31_four_summand_20261122/native/f4-source", optional = true }

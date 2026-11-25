@@ -1,6 +1,7 @@
 //! Native, bounded development solver for the regular four-summand chart.
 #[cfg(feature = "production-controls")]
 mod accounting;
+mod cutoff;
 #[cfg(feature = "production-controls")]
 mod oriented;
 mod polynomial;
@@ -781,6 +782,10 @@ fn main() -> Result<(), String> {
     }
     if ((curve.p + 1) >> depth) < 4 {
         return Err("depth leaves no regular fiber for the fixture generator".into());
+    }
+    if modes == ["partition-audit"] {
+        println!("{}", cutoff::audit(curve, depth)?);
+        return Ok(());
     }
     #[cfg(feature = "production-controls")]
     if let Some(result) = accounting::dispatch(curve, depth, Path::new(solver), modes, started) {

@@ -76,7 +76,6 @@ impl Polynomial {
             .join("+")
     }
 
-    #[cfg(test)]
     fn evaluate(&self, assignment: &[i64]) -> i64 {
         self.terms.iter().fold(0, |total, (powers, coefficient)| {
             let mut result = *coefficient;
@@ -258,10 +257,36 @@ impl System {
             .collect()
     }
 
-    #[cfg(all(test, feature = "production-controls"))]
     pub fn satisfied(&self, assignment: &[i64]) -> bool {
         assignment.len() == self.names.len()
             && self.equations.iter().all(|f| f.evaluate(assignment) == 0)
+    }
+
+    /// Formal derivatives at a recorded assignment, used by the finite audit.
+    pub fn jacobian(&self, assignment: &[i64]) -> Vec<Vec<i64>> {
+        assert_eq!(assignment.len(), self.names.len());
+        self.equations
+            .iter()
+            .map(|f| {
+                (0..self.names.len())
+                    .map(|j| {
+                        f.terms.iter().fold(0, |sum, (powers, coefficient)| {
+                            if powers[j] == 0 {
+                                return sum;
+                            }
+                            let mut term = coefficient * i64::from(powers[j]) % f.p;
+                            for (i, (&power, &value)) in powers.iter().zip(assignment).enumerate() {
+                                let degree = power - u8::from(i == j);
+                                for _ in 0..degree {
+                                    term = term * value % f.p;
+                                }
+                            }
+                            (sum + term).rem_euclid(f.p)
+                        })
+                    })
+                    .collect()
+            })
+            .collect()
     }
 
     #[cfg(all(test, feature = "production-controls"))]
