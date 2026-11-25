@@ -11,8 +11,10 @@
 use super::hgcd::{self, PolyRing};
 
 /// Degree at and above which the half-GCD recursion runs (below it,
-/// classical Euclid).  Measured with `src/bin/hgcd_bench.rs`.
-pub const HGCD_THRESHOLD: usize = 96;
+/// classical Euclid).  Measured with `src/bin/hgcd_bench.rs` (F_p,
+/// p = 2^61 − 1, Karatsuba products): half-GCD loses below degree ~1000 and
+/// wins from ~2048 (gcd and xgcd ≈ 1.2–1.3× at 2048–4096).
+pub const HGCD_THRESHOLD: usize = 2048;
 /// Operand length at and above which multiplication uses Karatsuba.
 pub const KARATSUBA_THRESHOLD: usize = 24;
 

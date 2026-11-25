@@ -8,8 +8,9 @@
 use super::hgcd::{self, PolyRing};
 
 /// Degree at and above which the half-GCD recursion runs.  Measured with
-/// `src/bin/hgcd_bench.rs`.
-pub const HGCD_THRESHOLD_BITS: usize = 1536;
+/// `src/bin/hgcd_bench.rs`: break-even near 8192, ≈1.4× at 16384 and ≈2×
+/// at 32768.
+pub const HGCD_THRESHOLD_BITS: usize = 8192;
 /// Word length at and above which multiplication uses Karatsuba.
 pub const KARATSUBA_WORDS: usize = 12;
 

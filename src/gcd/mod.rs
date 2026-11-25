@@ -23,9 +23,13 @@
 //! agree bit for bit.
 //!
 //! Crossovers ([`poly::HGCD_THRESHOLD`], [`gf2::HGCD_THRESHOLD_BITS`],
-//! [`int::HGCD_THRESHOLD_BITS`]) come from `src/bin/hgcd_bench.rs`; below
-//! them the half-GCD entry points run the classical algorithm, so they are
-//! never slower than it by more than a branch.
+//! [`int::HGCD_THRESHOLD_BITS`], [`int::GCD_HGCD_THRESHOLD_BITS`]) come
+//! from `src/bin/hgcd_bench.rs`; below them the entry points run the
+//! classical algorithm (Euclid, or Lehmer for integers), so they are never
+//! slower than it by more than a branch.  Half-GCD pays only for large
+//! operands (polynomial degree in the thousands, integers of thousands of
+//! bits); for the small operands most callers pass, the gain comes from
+//! the faster classical kernels (binary GCD, one-divide inverse, Lehmer).
 
 pub mod gf2;
 pub mod hgcd;

@@ -18,10 +18,14 @@ use num_bigint::{BigInt, BigUint, Sign};
 use num_integer::Integer;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
-/// Bit length at and above which [`gcd_big`], [`xgcd_big`] and
-/// [`modinv_big`] use the recursive half-GCD (below: Lehmer).  Measured
-/// with `src/bin/hgcd_bench.rs`.
-pub const HGCD_THRESHOLD_BITS: u64 = 4096;
+/// Bit length at and above which [`xgcd_big`] and [`modinv_big`] use the
+/// recursive half-GCD (below: Lehmer).  Measured with
+/// `src/bin/hgcd_bench.rs`: equal to Lehmer near 4096–8192 bits, ≈1.5× at
+/// 16384, ≈2.2× at 131072 (Lehmer itself is 4–5× classical Euclid).
+pub const HGCD_THRESHOLD_BITS: u64 = 8192;
+/// Bit length at and above which [`gcd_big`] (no cofactors) uses the
+/// recursive half-GCD: plain Lehmer stays faster up to about 2^17 bits.
+pub const GCD_HGCD_THRESHOLD_BITS: u64 = 131_072;
 /// Bits stripped per round below which the recursion takes Lehmer steps.
 const RECURSION_MIN_BITS: u64 = 1024;
 
@@ -353,9 +357,9 @@ fn reduce(a: BigInt, b: BigInt, stop: u64, want: bool, thr: u64) -> (IMat, BigIn
     (m, a, b)
 }
 
-/// `gcd(a, b)`: Lehmer, recursive half-GCD from [`HGCD_THRESHOLD_BITS`].
+/// `gcd(a, b)`: Lehmer, recursive half-GCD from [`GCD_HGCD_THRESHOLD_BITS`].
 pub fn gcd_big(a: &BigUint, b: &BigUint) -> BigUint {
-    gcd_big_with_threshold(a, b, HGCD_THRESHOLD_BITS)
+    gcd_big_with_threshold(a, b, GCD_HGCD_THRESHOLD_BITS)
 }
 
 /// [`gcd_big`] with an explicit half-GCD bit threshold (`u64::MAX`: Lehmer
