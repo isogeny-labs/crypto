@@ -1,0 +1,59 @@
+name: pkm-semaev engines correctness
+
+# resgcd / scan / exhaustive / F4 must return the same decompositions
+# (agrees_with_grid*), and the resgcd Karatsuba product must equal schoolbook
+# under mod-p cancellation. Correctness only; no timings are measured here.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'src/cryptanalysis/ic_framework/pkm_semaev.rs'
+      - '.github/workflows/pkm-semaev-engines.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/cryptanalysis/ic_framework/pkm_semaev.rs'
+      - '.github/workflows/pkm-semaev-engines.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  library:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|pkm-semaev-engines.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|pkm-semaev-engines.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 60
+    env:
+      CARGO_BUILD_JOBS: 2
+      CARGO_PROFILE_RELEASE_CODEGEN_UNITS: 256
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/factor-base/
+            /Cargo.toml
+            /Cargo.lock
+            /.cargo/
+            /build.rs
+            /src/
+            /examples/
+            /tests/
+            /tools/aps-export/
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /.github/scripts/
+      - name: Materialize compile-time inputs
+        run: node .github/scripts/ci-scope.mjs --materialize
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - uses: Swatinem/rust-cache@v2
+      - name: Engines agree with the grid; Karatsuba equals schoolbook
+        run: cargo test --release --locked --lib pkm_semaev::tests -- --test-threads=2
