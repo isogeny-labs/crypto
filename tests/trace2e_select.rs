@@ -13,10 +13,11 @@ use crypto_lib::cryptanalysis::ic_boundary::{
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
     trace_cut, trace_kernel_basis, BinarySubspaceBase, MitmOracle,
 };
-use crypto_lib::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params, Targets};
+use crypto_lib::cryptanalysis::ic_framework::stages::{
+    FactorBaseBuilder, InstanceCtx, Params, Targets,
+};
 use crypto_lib::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
 use crypto_lib::cryptanalysis::koblitz_fast::FastPoint;
-
 
 fn ctx<'a>(inst: &'a BinaryInstance, g: &'a BinaryGroup<'a>) -> InstanceCtx<'a, BinaryGroup<'a>> {
     InstanceCtx {
@@ -62,9 +63,20 @@ fn brute_cut(inst: &BinaryInstance, basis: &[u64]) -> BTreeSet<u64> {
 /// solved for).
 #[test]
 fn trace2e_is_the_prefix_subspace_cut_to_two_e() {
-    for (a, n, d) in [(1u8, 17u32, 6u32), (0, 19, 7), (1, 19, 7), (0, 23, 8), (1, 23, 8), (0, 13, 5)] {
+    for (a, n, d) in [
+        (1u8, 17u32, 6u32),
+        (0, 19, 7),
+        (1, 19, 7),
+        (0, 23, 8),
+        (1, 23, 8),
+        (0, 13, 5),
+    ] {
         let inst = koblitz_instance(a, n).expect("a Koblitz curve");
-        let fb = build(&inst, &format!("binary-subspace:dimension={d},select=trace2e")).unwrap();
+        let fb = build(
+            &inst,
+            &format!("binary-subspace:dimension={d},select=trace2e"),
+        )
+        .unwrap();
         let prefix: Vec<u64> = (0..d).map(|k| 1u64 << k).collect();
         let want = brute_cut(&inst, &prefix);
         let got: BTreeSet<u64> = fb.points.iter().map(|p| p.x).collect();
@@ -75,7 +87,11 @@ fn trace2e_is_the_prefix_subspace_cut_to_two_e() {
         // Only the coset is enumerated: 2^(D-1) abscissae, less the
         // zero one when the coset is the linear kernel (K0).
         let coset = (1u64 << (d - 1)) - u64::from(a == 0);
-        assert_eq!(fb.cost.get("as_solves"), coset, "K{a}-{n}: scanned outside the cut");
+        assert_eq!(
+            fb.cost.get("as_solves"),
+            coset,
+            "K{a}-{n}: scanned outside the cut"
+        );
         assert_eq!(fb.cost.get("abscissae_scanned"), coset);
         let g = BinaryGroup(&inst.fast);
         let mut ops = GroupOps::default();
@@ -102,7 +118,11 @@ fn trace2e_handles_explicit_bases_and_even_degree() {
         let got: BTreeSet<u64> = fb.points.iter().map(|p| p.x).collect();
         assert_eq!(got, brute_cut(&inst, &prefix), "n = {n} prefix");
         let basis = [0x3u64, 0x5, 0x18, 0x21, 0x40];
-        let fb = build(&inst, "binary-subspace:dimension=5,basis=0x3;0x5;0x18;0x21;0x40,select=trace2e").unwrap();
+        let fb = build(
+            &inst,
+            "binary-subspace:dimension=5,basis=0x3;0x5;0x18;0x21;0x40,select=trace2e",
+        )
+        .unwrap();
         let got: BTreeSet<u64> = fb.points.iter().map(|p| p.x).collect();
         assert_eq!(got, brute_cut(&inst, &basis), "n = {n} explicit");
     }
@@ -114,13 +134,31 @@ fn trace2e_handles_explicit_bases_and_even_degree() {
 #[test]
 fn trace_cut_edge_cases_and_refusals() {
     let k0 = koblitz_instance(0, 13).unwrap();
-    let k1 = koblitz_instance(1, 13).unwrap();
+    let k1 = koblitz_instance(1, 17).expect("a = 1 over F_2^17 (n = 13 has no a = 1 instance)");
+    // Four independent elements of ker Tr on K1-17's field (monomials of
+    // trace 0, or sums of two monomials of trace 1).
+    let tr = |v: u64| k1.artin_schreier.trace(v);
+    let ones: Vec<u64> = (0..17).map(|k| 1u64 << k).filter(|&e| tr(e) == 1).collect();
+    let k1_kernel: Vec<u64> = (0..17)
+        .map(|k| 1u64 << k)
+        .map(|e| if tr(e) == 1 { e ^ ones[0] } else { e })
+        .filter(|&e| e != 0)
+        .take(4)
+        .collect();
+    assert!(k1_kernel.iter().all(|&e| tr(e) == 0));
     let kernel = trace_kernel_basis(&k0, 4).unwrap();
     assert_eq!(trace_cut(&k0, &kernel).unwrap(), (kernel.clone(), 0));
-    assert!(trace_cut(&k1, &kernel).is_err());
+    assert!(
+        trace_cut(&k1, &k1_kernel).is_err(),
+        "Tr = 0 on the span and Tr(a) = 1"
+    );
     assert!(build(&k0, "binary-subspace:dimension=1,select=trace2e").is_err());
     assert!(build(&k0, "binary-subspace:dimension=4,select=trace4e").is_err());
-    assert!(build(&k0, "binary-subspace:dimension=3,basis=1;2;4,select=strict4e").is_err());
+    assert!(build(
+        &k0,
+        "binary-subspace:dimension=3,basis=1;2;4,select=strict4e"
+    )
+    .is_err());
 }
 
 /// **End to end**: the pipeline with a `trace2e` base and the plain
@@ -128,7 +166,6 @@ fn trace_cut_edge_cases_and_refusals() {
 /// cofactor-4 Koblitz curves.
 #[test]
 fn trace2e_base_recovers_a_planted_logarithm() {
-
     for (a, n, d) in [(1u8, 17u32, 6u32), (0, 19, 7)] {
         let inst = koblitz_instance(a, n).unwrap();
         let g = BinaryGroup(&inst.fast);
@@ -156,7 +193,10 @@ fn trace2e_base_recovers_a_planted_logarithm() {
             None,
         )
         .expect("the configuration should run");
-        assert!(report.verified, "K{a}-{n}: did not recover the planted logarithm");
+        assert!(
+            report.verified,
+            "K{a}-{n}: did not recover the planted logarithm"
+        );
         assert_eq!(report.recovered, Some(planted));
     }
 }

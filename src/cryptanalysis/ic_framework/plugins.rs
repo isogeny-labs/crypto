@@ -60,11 +60,10 @@ use crate::cryptanalysis::gls_fp2::{gls_line_base, Fp2Curve, Fp2Point, GlsInstan
 use crate::cryptanalysis::glv_invariant_base::{glv_orbit_base, AutomorphismGroup};
 use crate::cryptanalysis::ic_boundary::{
     binary_affine_subspace_factor_base, binary_subspace_factor_base, decompose_mitm,
-    decompose_mitm_frobenius, koblitz_factor_base,
-    prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
-    CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, KSumTable, OracleCounters, PairTable,
-    PrimeCurve, PrimeInstance, PrimePoint, Relation, TargetWalk, TauOrbitCheck, WSumTable,
-    WalkOpts, WalkTable,
+    decompose_mitm_frobenius, koblitz_factor_base, prime_factor_base, prime_factor_base_strided,
+    BinaryGroup, BinaryInstance, ColumnFold, CountedGroup, FactorBase, FrobeniusPairTable,
+    GroupOps, KSumTable, OracleCounters, PairTable, PrimeCurve, PrimeInstance, PrimePoint,
+    Relation, TargetWalk, TauOrbitCheck, WSumTable, WalkOpts, WalkTable,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::{with_cached_point_lifts, FastPoint};
