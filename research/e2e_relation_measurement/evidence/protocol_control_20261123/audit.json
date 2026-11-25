@@ -1,0 +1,22 @@
+{
+  "accepted": 20,
+  "audit_interval": {
+    "cpu_ns": 3029000,
+    "scope": "from main entry through input read, hashing, and verification; excludes interpreter startup and receipt writing",
+    "wall_ns": 3035875
+  },
+  "audit_source_sha256": "b68f14917744804b545018ddbaceb2aa2361cb210a07f9023bdd62b6a3756c34",
+  "candidates": 23,
+  "limitations": [
+    "No root-completeness proof or independent solver execution.",
+    "No seed-stream regeneration, timing validation, resource verification, or record authentication.",
+    "Without a verified scalar, subgroup membership of Q in <P> is not independently certified.",
+    "Primality and curve arithmetic are checked only for primes below 2^32."
+  ],
+  "nonzero_b": 3,
+  "record_sha256": "d89a203542e81e099d19233ee246e90787133d031eee1557d767fe09387ae243",
+  "reported_roots": 3,
+  "signed_witnesses": 3,
+  "status": "verified",
+  "top_form_regularity_verified": 11
+}

@@ -1,0 +1,140 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=18mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,graphicx,booktabs,amsmath,amssymb,array}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\begin{document}
+{\Large\bfseries The actual degree-four cover has four distinct branch values}\par
+{\large\bfseries A canonical ramification line and exact quadratic-field images}\par
+24 November 2026 \quad crypto PR5110 \quad [pcc:unverified]
+
+\textbf{Result and scope.} The actual global map $f_4:C\to E$ now has
+a complete ramification divisor and every branch image, including the
+quadratic orbit. Exact native coefficients, local differential values,
+factor identities and extension-field evaluations pass strict checks.
+The interpretation uses the named actual-map, smoothness, canonical-basis
+and tame Riemann--Hurwitz bridges. Those remain written mathematics,
+with full geometric formalization and independent signed standing open.
+Native B 2bf624, native C 147cd6; written proofs 604246 and de29b0.
+
+\[
+\begin{split}
+C/\mathbb F_7:\;&X^4+4XY^3+2Y^4+5X^2Z^2+6XYZ^2+2Y^2Z^2+Z^4=0,\\
+E/\mathbb F_7:\;&v^2=u^3+2u+6.
+\end{split}
+\]
+
+\textbf{The actual differential fixes the line.} On $X=1$, write
+$y=Y/X,z=Z/X$ and $\theta=dy/F_z=-dz/F_y$. Exact chart transitions
+and genus three give the genuine basis $\theta,y\theta,z\theta$ of
+holomorphic differentials. All 17 inherited actual local values give
+the complete rank-three linear certificate
+\[
+ f_4^*\!\left(\frac{du}{2v}\right)=(2+z)\theta,\qquad h=2X+Z.
+\]
+Existence comes from the actual holomorphic pullback; equality at 17
+points determines its linear form, since a nonzero line meets the
+quartic in degree four. Rational zero points alone are not used to
+guess the complete ramification divisor.
+
+\textbf{The entire line section.} Parametrize $h=0$ by $[U:V:5U]$.
+Full homogeneous multiplication yields
+\[
+\begin{aligned}
+F(U,V,5U)&=2U^4+3U^3V+U^2V^2+4UV^3+2V^4\\
+ &=2(V-4U)(V-5U)(V^2+4UV+6U^2).
+\end{aligned}
+\]
+The $V^4$ coefficient 2 excludes an infinity zero. All seven nonzero
+evaluations prove the quadratic irreducible; the factors are distinct
+and separable. All four geometric zeros are simple. The true degree-four
+map is separable and tame in characteristic seven, so their indices
+are $e=2$, and their total ramification degree is four.
+
+\begin{center}
+\includegraphics[width=\linewidth,height=83mm,keepaspectratio]{branches.pdf}
+\end{center}
+Here $\alpha^2+4\alpha+6=0$ and $\alpha^7=3-\alpha$.
+The full native equality matrix of the four target values is the
+identity: there are four distinct branch values, with the displayed
+Frobenius action.
+
+\newpage
+{\Large\bfseries Actual quotient-field evaluation and reproducible evidence}\par
+
+\textbf{The quadratic orbit is evaluated from the functions.} Use the
+observed field $K=\mathbb F_7[\alpha]/(\alpha^2+4\alpha+6)$, with the
+exact basis $1,\alpha$. For the actual parent $g=f_4-(3,5)$ and its
+homogeneous functions $g=(p_4/q^2,p_6/q^3)$, at $(1:\alpha:5)$ the
+native certificate retains
+\[
+\begin{gathered}
+q=3+5\alpha,\qquad p_4=2+\alpha,\qquad p_6=1,\\
+g=(5-\alpha,3-2\alpha),\qquad f_4=(3-\alpha,4-\alpha).
+\end{gathered}
+\]
+The second point and image are the genuine Frobenius conjugates.
+Both curve and elliptic equations hold; every actual denominator is
+nonzero. All 49 field Frobenius/norm records, conjugation-squared and
+Frobenius-49 identities, and 48 norm inverses are retained. These are
+operations in the actual irreducible polynomial quotient, not integers
+modulo 49. Conrad's finite-fields Theorems 1.1, 2.5, 4.1 and 4.6 provide
+the exact field and conjugation hypotheses.
+
+\textbf{The base-field branch description.} The complete support is
+$(3,2),(3,5)$ and the degree-two closed point on the affine target chart
+\[
+u^2+4u+6=0,\qquad v=u+1.
+\]
+The monic quadratic and linear relation are derived from the computed
+coordinates, then checked on both values. The residual pair's elliptic
+\emph{group} sum is $(5,1)$, separately computed and Frobenius-fixed.
+Since the rational pair sums to $O$, the full branch divisor class
+$B-4O$ is represented by $(5,1)$ under the standard elliptic Abel/group
+identification. This written bridge is distinct from coordinate field trace.
+
+\begin{center}
+\begin{tabular}{lllll}
+\toprule
+New unit & Frozen source & Whole lock files & Strict phases & Full stdout\\
+\midrule
+Canonical divisor B & \texttt{3c6d3b26} & 51 & $7/7$ pass & 3915 bytes\\
+Residual branches C & \texttt{c17417cd} & 72 & $7/7$ pass & 6467 bytes\\
+\bottomrule
+\end{tabular}
+\end{center}
+Each unit used complete GitHub readback before first calls, pinned
+Rust 1.99.1, warnings errors, opt3, overflow/debug assertions,
+120 seconds/2 GiB/one worker, and unchanged source/tool/qualifier guards.
+Each retains 40 whole small originals. B keeps every linear row,
+RREF/residual and full factor witness. C derives both residual points
+from the actual observed factor; no distinct-image pattern was assumed.
+The old 17-point image population was not repeated.
+
+\textbf{Real controls and first failure.} B's actual linear and binary
+coefficient mutations reject. At each residual point C changes the actual
+$p_4$ $X^4$ coefficient by one; both changed images fail the elliptic
+equation and actual-map equality. Pristine restores. First A compiled
+successfully but strict Clippy rejected an indexed two-column loop;
+no mathematical case or qualifier execution ran. Its 33 whole originals,
+666-byte diagnostic and compiled-only ELF remain unchanged. B fixes
+iterator spelling with identical mathematical predicates and no suppression.
+
+\textbf{Original custody and CI.} Original B/C executed and separately
+copied0555 ELFs are 4648624/4638624 bytes, hash prefixes
+\texttt{549fcb54}/\texttt{7dd3c67e}; A's compiled-only original is
+4648768 bytes, \texttt{2dffbb14}. Whole originals remain in RAM pending
+approved durable custody. The focused native-only CI setup passes syntax
+and actionlint; new CI artifacts remain distinct. Required/applicable CI,
+stacked parents and the frozen main ledger fork retain their merge rules.
+
+\textbf{Next concrete chain.} Use the actual branch divisor and class to
+review and construct $S_4$ sign/cubic resolvents, then test whether their
+natural Jacobian correspondences carry a component beyond the common
+elliptic factor. No such nontrivial Prym transfer is assumed. Full sources,
+locks, proof maps and inventories are in the study. Primary geometry:
+Vakil21.5.B; Stacks0C1B and0BYA. All scientific standing remains
+[pcc:unverified].
+\end{document}
