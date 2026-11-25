@@ -45,6 +45,7 @@ remain charged.
 | H-GEN-STRIDE | fixed or relation-renewed affine stride | fewer generation operations without rank loss | existing rounds 29/30 | rejected: dependent clusters or 2.6x probe inflation |
 | H-GEN-SIB | sibling generation from one batched inversion | lower counted work and, after implementation repair, lower wall per independent rank | profile pool 64 and 256 on the same curve/seed, then paired A/B | active; existing wall result is negative |
 | H-GEN-HOT | per-parent subset selection or key/reference bookkeeping dominates the sibling wall regression | one named software path accounts for at least 20% of samples or instructions unique to the sibling arm | matched CPU sampling and Callgrind profiles | active diagnostic |
+| H-GEN-CACHE | cache each parent's seed-coefficient residues and pre-plan minus coefficients once | at least 5% fewer solve instructions in both frozen pool arms with identical semantic controls | source-exact Callgrind replay of sequences 242/243 | active; candidate frozen in `CACHE_PROTOCOL.md` |
 | H-YIELD-POOL | a larger jump pool reduces collision clustering enough to raise independent rank per generated child | pool 256 beats pool 64 on held-out rank/child and rank/second, with duplicate and zero-row rates no worse | fresh k = 28 and 32 paired blocks | unconfirmed; counted-cost evidence only |
 | H-YIELD-FILTER | a cheap point-only prefilter can enrich rank-contributing collisions | held-out rank/second improves over a matched-random filter with the same acceptance rate | train-only predicate freeze, matched random negative control | queued; no predicate selected before the profile |
 
@@ -63,6 +64,19 @@ pool-256 arm and sequence 243 is the pool-64 arm; both are workload 0, measured
 round 1, and algorithm seed `5769128089488788324`. Each profiled child must
 match its unprofiled child on the recovered scalar and deterministic work and
 counter fields before its instruction profile is interpreted.
+
+Workflow run `45558180700` passed those controls. Pool 256 used 7,883,046 solve
+instructions versus 5,210,850 for pool 64 (+51.3%). The difference is almost
+entirely in `generic_ic_precompute`: 6,757,351 versus 4,084,179. Within that
+phase, `sib_expand` accounts for 66.31% / 65.82% inclusive and 40.37% / 40.10%
+self instructions; `sibling_pairs_batch` accounts for 22.72% / 22.54%.
+Pool 256 expands 719 parents and takes 11,473 steps to reach rank 3, while pool
+64 expands 433 parents and takes 6,854 steps. Thus P1 holds, while P2's proposed
+pool-size-specific bookkeeping explanation is rejected: the hot-path shares are
+nearly unchanged, and pool 256's excess comes primarily from doing more parent
+expansions on this matched target rather than a distinct pool-256-only hotspot.
+This one matched execution is diagnostic evidence, not the held-out pool-size
+decision. [pcc:unverified]
 
 ## Prior-art receipt
 
@@ -97,6 +111,7 @@ arithmetic are explicitly outside the Lean scope.
 ## Artifacts
 
 - `PROFILE_PROTOCOL.md`: diagnostic profile frozen before collection.
+- `CACHE_PROTOCOL.md`: source-exact parent-residue cache discriminator.
 - `profiles/`: new, write-once profile outputs.
 - A separately frozen `experiment.protocol/v1` record will govern the paired
   wall/rank comparison after the profile identifies one implementation change.

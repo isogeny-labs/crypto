@@ -13740,16 +13740,19 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         sw.parents_n += 1;
         self.sib_parents += 1;
         let c = sw.c;
+        // Cache the parent seed coefficients' residues.  A parent feeds up to
+        // sixteen children, so reducing it once here avoids repeating the same
+        // `% r` in every minus child.  Plus children keep the existing bounded
+        // integer representation; only subtraction needs the residues.
+        let (parent_u1, parent_u2) = self.parts(c.0);
+        let (parent_u1, parent_u2) = (parent_u1 % r, parent_u2 % r);
         // Plan each of the m jumps on the stack (m ≤ 16), then form every
         // sibling pair from ONE batched inversion of the denominators.
         debug_assert!(m <= 16);
         let mut plans = [(
-            0usize,
             g.identity(),
-            0u128,
-            0u64,
-            0u64,
             false,
+            (0u128, 0u64, 0u64),
             (0u128, 0u64, 0u64),
         ); 16];
         let mut js = [(g.identity(), false); 16];
@@ -13762,8 +13765,19 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             let skip_minus = sw.prev_h == Some(h)
                 || (sw.prev2_h == Some(h) && sw.prev_h.is_some_and(|ph| sw.s_tm2.contains(&ph)));
             let want_minus = !skip_minus;
+            let (a1, a2) = self.parts(al);
+            debug_assert!(a1 < r && a2 < r);
             let cp = (c.0 + al, addmod(c.1, ga, r), addmod(c.2, be, r));
-            plans[pos] = (h, jp, al, ga, be, want_minus, cp);
+            let cm = if want_minus {
+                (
+                    self.pack_alpha(submod(parent_u1, a1, r), submod(parent_u2, a2, r)),
+                    submod(c.1, ga, r),
+                    submod(c.2, be, r),
+                )
+            } else {
+                (0, 0, 0)
+            };
+            plans[pos] = (jp, want_minus, cp, cm);
             js[pos] = (jp, want_minus);
         }
         let pairs = g
@@ -13776,9 +13790,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     })
                     .collect()
             });
-        for (pos, (&(_h, jp, al, ga, be, want_minus, cp), sp)) in
-            plans[..m].iter().zip(pairs).enumerate()
-        {
+        for (pos, (&(jp, want_minus, cp, cm), sp)) in plans[..m].iter().zip(pairs).enumerate() {
             match sp {
                 Some(sp) => {
                     ops.adds += 1;
@@ -13809,13 +13821,6 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                         xref: None,
                     });
                     if want_minus {
-                        let (u1, u2) = self.parts(c.0);
-                        let (a1, a2) = self.parts(al);
-                        let cm = (
-                            self.pack_alpha(submod(u1 % r, a1 % r, r), submod(u2 % r, a2 % r, r)),
-                            submod(c.1, ga, r),
-                            submod(c.2, be, r),
-                        );
                         let pt = match sp.y_minus.and_then(|y| g.affine_elt(sp.key_minus - 1, y)) {
                             Some(pt) => pt,
                             None => g
