@@ -108,6 +108,30 @@ macro_rules! policy {
 // Deliberately explicit.  A new method must choose a search strategy and a
 // claim/accounting scope; the registry-exhaustiveness test fails otherwise.
 const POLICIES: &[PolicyDecl] = &[
+    policy!(
+        "bsgs.prime_mont4_v1",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.diem_kgrow",
+        ImplementationAb,
+        DiagnosticOnly,
+        DiagnosticModel
+    ),
+    policy!(
+        "ic.growing_arity",
+        ImplementationAb,
+        DiagnosticOnly,
+        DiagnosticModel
+    ),
+    policy!(
+        "ic.aux_tower_solver",
+        ImplementationAb,
+        DiagnosticOnly,
+        DiagnosticModel
+    ),
     policy!("ic.orbit_rank_v1", NativeGrid, DiagnosticOnly, StandardBand),
     policy!(
         "ic.hashed_native_v1",
@@ -779,6 +803,15 @@ const POLICIES: &[PolicyDecl] = &[
 
 fn parameter_role(method: &str, name: &str) -> Option<ParameterRole> {
     use ParameterRole::*;
+    if matches!(method, "ic.diem_kgrow" | "ic.growing_arity" | "ic.aux_tower_solver") {
+        return match name {
+            "bits" | "p" | "k" | "k_min" | "k_max" | "oracle" | "planted" => {
+                Some(WorkloadScope)
+            }
+            "trial_budget" => Some(ResourceEnvelope),
+            _ => None,
+        };
+    }
     if method == "ic.hashed_native_v1" {
         return Some(match name {
             "backend" | "m" | "threshold" | "derive_last" | "smallest_first" | "cache_entries"

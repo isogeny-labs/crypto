@@ -602,7 +602,14 @@ mod tests {
                     "{} cofactor",
                     cell.cell_id
                 );
-                assert_eq!(facts.icv1.as_str(), cell.identity.icv1.as_deref().unwrap());
+                // The earlier source cells pin the compact ICV1 slug.
+                let recorded = cell.identity.icv1.as_deref().unwrap();
+                let built = if recorded.starts_with("icv1-") {
+                    facts.slug.as_str()
+                } else {
+                    facts.icv1.as_str()
+                };
+                assert_eq!(built, recorded, "{} ICV1", cell.cell_id);
                 assert_eq!(facts.ec1.as_deref(), cell.identity.ec1.as_deref());
                 assert_eq!(
                     facts.curve_uid.as_deref(),
