@@ -19,7 +19,7 @@ Regenerated automatically by `.github/workflows/gb-baseline-rebench.yml` (`tools
 
 ## Panel
 
-- **N31** — Koblitz K_0/2^31 (binary, Frobenius-invariant factor base 0); harness `examples/groebner_stage_bench.rs`, engine koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)
+- **N31** — Koblitz icv1-f2m31-tm90707-c95f16f5 (binary, Frobenius-invariant factor base 0); harness `examples/groebner_stage_bench.rs`, engine koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)
 - **M31** — p = 2^31 - 1 (Mersenne prime), Dickson torus tower (2^t | p + 1); harness `examples/pkm_tower_pilot.rs`, engine f4_tower_generic (F4 over F_p)
 - m values: [2, 3, 4, 5, 6, 7, 8, 9]
 

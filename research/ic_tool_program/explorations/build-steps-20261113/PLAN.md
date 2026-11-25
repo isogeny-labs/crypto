@@ -34,7 +34,7 @@ that holds that time, so the steps are measured first.
 
 ## Runs
 
-- **Rows:** suite `M1-T01` at `k0n53` (2^44.3) and `k0n61` (2^47.2).
+- **Rows:** suite `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` (2^44.3) and `icv1-f2m61-t158598901-ab42b6c5` (2^47.2).
 - **Processes:** 5 each, under `isolated_bench run --wait --cpus 2` with
   `RAYON_NUM_THREADS=1`. With one thread, the steps should sum to `whole`.
 - **Read-out:** per process, each step's ns per stored pair, summed over

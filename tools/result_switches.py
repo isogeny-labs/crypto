@@ -34,6 +34,10 @@ RECORDED_EXACT = (
     "D4_BIN_MVAR", "FES_GPU_TIMING", "PENCIL_RETAINED_INVENTORY", "SMITH_CANONICAL_SWEEP",
     # HKY2_SIMD selects the field kernel; N83_SAT_PHASE_TRACE times solve phases (overhead).
     "HKY2_SIMD", "N83_SAT_PHASE_TRACE",
+    # QDIAG_Q/QDIAG_CS pick the quartic_ladder diag workload; GOLDEN_PRINT makes the
+    # gaudry golden test print and skip its assertions; GENUS_LADDER_EXPORT_CORE
+    # names a core-dump path. Recorded so a run states them.
+    "QDIAG_Q", "QDIAG_CS", "GOLDEN_PRINT", "GENUS_LADDER_EXPORT_CORE",
 )
 # Read by the sources but cannot change a computed value.
 # GH_TOKEN and GITHUB_TOKEN are credentials read by `ic update`: they must never

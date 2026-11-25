@@ -595,7 +595,7 @@ pub(crate) fn rpow<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
 /// Per-field precomputation (non-cube, Sylow generator) is done once in `new`.
 pub(crate) struct Cube<R: Ring> {
     pub r: R,
-    #[cfg_attr(not(test), allow(dead_code, reason = "read by the test-only root_before_skip_digit"))]
+    #[allow(dead_code)]
     n: u128,
     // Reuse the 3-coprime cofactor instead of dividing u128 group orders
     // on each AMM root query. Computed once during field initialization.
@@ -614,7 +614,7 @@ pub(crate) struct Cube<R: Ring> {
     // Cache repeated AMM digit corrections for all roots in this field.
     w_squared: R::E,
     c_inv_squared: R::E,
-    #[cfg_attr(not(test), allow(dead_code, reason = "read by the test-only root_before_skip_digit"))]
+    #[allow(dead_code)]
     p3s: u128,
 }
 impl<R: Ring> Cube<R> {
