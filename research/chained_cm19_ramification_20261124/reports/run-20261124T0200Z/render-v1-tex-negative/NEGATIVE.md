@@ -1,0 +1,1 @@
+First report TeX pass exited1: Missing $ inserted at paragraph after the second-page gathered display. A closing display delimiter was omitted. No report PDF produced. Full original TeX/streams/argv/status/log preserved. Insert only closing display delimiter, use fresh v2 render directory and inspect every final page; no mathematical source/qualification rerun. [pcc:unverified]
