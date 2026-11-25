@@ -412,3 +412,17 @@ The new #link("EC_ITEMS_001_034_MATRIX.md")[1--34], #link("EC_LEADS_35_67_EVIDEN
 )
 
 Unsigned execution claims `PCC-20261125-9d087f`, `PCC-20261125-50a713`, `PCC-20261125-b31d12`, `PCC-20261125-df4a41`, and `PCC-20261125-be5ecf` pin the new raw outputs; results remain `[pcc:unverified]`. The active goal remains open for proposals whose original EC mechanism, input, cost boundary or hardware has not been exercised. The next substantive work needs an immutable natural EC relation stream for filtering and an actual time-ordered interval action for #97.
+
+== Further parallel bounded runs
+
+Three additional local public-EC experiments were frozen and run in parallel. Their source, raw outputs, failed attempts, hashes, and limits are linked from the #link("PROGRESS.md")[full report]. Unsigned claims `PCC-20261125-34ff7d`, `PCC-20261125-c35277`, and `PCC-20261125-e6787f` pin their producer outputs; all remain `[pcc:unverified]`.
+
+#table(
+  columns: (auto, 1fr),
+  table.header([Item], [Result and boundary]),
+  [24], [A #link("S4_SAME_TARGET_PROTOCOL.md")[same-target S4 comparison] constructed generic then `Z=0` and direct `Z=0` resultants on identical 4096 triples. Four ABBA passes agreed on 24 signed rows and rank 4/17. Generic total CPU was 74/84 ms, direct 74/74 ms. Setup and validation are charged within this component; the timing does not establish a gain or full solver cost.],
+  [48], [A #link("EC_ANNEAL48_PROTOCOL.md")[four-spin EC annealing run] found 90/128 capped successes with 1083 EC evaluations versus uniform 116/128 with 926. The first GP source failed parsing and is preserved; a separate one-quote V2 repair ran. This result concerns only the fixed energy and schedule.],
+  [97], [A #link("WS68_INTERVAL_POLICY.post-call.json")[scalar-interval policy control] pinned all 24 arms on eight targets. Fixed8/fixed32/PID totaled 2104/2200/2114 counted group additions; PID beat the better fixed arm on 2/8. Scalar intervals are not a genuine sieve interval, and modular elimination and wall time remain unpriced.],
+)
+
+The 100-row matrices now have 3 bounded original-mechanism executions, 32 partial controls, 16 literal-premise screens, and 49 entries lacking a runnable EC construction or matching input. No full same-target index-calculus pipeline has been completed in this batch; the goal and draft PR remain open.
