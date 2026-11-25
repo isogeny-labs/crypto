@@ -13,24 +13,17 @@ use crate::cryptanalysis::diem_kgrow::{
     k_of_p, log2_extension_ic_catalog, log2_rho_catalog, CellRequest, ChargedCellReport,
 };
 use crate::cryptanalysis::ext_curve::{ExtCurve, ExtField, ExtPoint, Fp2, Fp3};
-use crate::cryptanalysis::ic_boundary::{
-    CountedGroup, FactorBase, GroupOps, OracleCounters,
-};
+use crate::cryptanalysis::ic_boundary::{CountedGroup, FactorBase, GroupOps, OracleCounters};
 use crate::cryptanalysis::ic_framework::stages::{DecompositionOracle, InstanceCtx, Params};
 use crate::cryptanalysis::line_oracle::{semaev_s3, LineOracle};
 use crate::cryptanalysis::line_s4_oracle::LineS4Oracle;
 
 /// Which decomposition instrument a cell uses.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum OracleKind {
     Brute,
+    #[default]
     Semaev,
-}
-
-impl Default for OracleKind {
-    fn default() -> Self {
-        Self::Semaev
-    }
 }
 
 impl OracleKind {
@@ -65,7 +58,11 @@ where
         for (j, pt) in lifts.into_iter().enumerate() {
             points.push(pt);
             col_of.push(col);
-            coef_of.push(if j == 0 { 1 } else { p.saturating_sub(1).max(1) });
+            coef_of.push(if j == 0 {
+                1
+            } else {
+                p.saturating_sub(1).max(1)
+            });
         }
     }
     if points.len() < 2 {
@@ -104,7 +101,11 @@ fn frobenius_line_base(
         for (j, pt) in lifts.into_iter().enumerate() {
             points.push(pt);
             col_of.push(col);
-            coef_of.push(if j == 0 { 1 } else { p.saturating_sub(1).max(1) });
+            coef_of.push(if j == 0 {
+                1
+            } else {
+                p.saturating_sub(1).max(1)
+            });
         }
     }
     if points.len() < 3 {
@@ -129,7 +130,7 @@ fn pick_subfield_ab(p: u64, seed: u64) -> (u64, u64) {
         let a3 = a.wrapping_mul(a).wrapping_mul(a) % p;
         let b2 = b.wrapping_mul(b) % p;
         let disc = (4 * a3 + 27 * b2) % p;
-        if disc != 0 && a % p != 0 {
+        if disc != 0 && !a.is_multiple_of(p) {
             return (a % p, b % p);
         }
         a = (a + 1) % p;
