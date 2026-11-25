@@ -84,3 +84,35 @@ durable failed-call records, replay/runtime/resume and external/scaling panels
 remain open. The inherited library assertion andJV cap do not establish a full
 suite pass. PR2949 merged; unpublished continuation preserved separately.
 G1-G3/G6partial,G4/G5unrun,0panels,comparison_admissible=false.
+
+## 2026-11-23: #5067 larger-scale replication admission
+
+Separate four-step Velu/fiber replication is tracked in draft #5088 and
+[its admission audit](../research/pkm_larger_scale_20261123/ADMISSION.md).
+The proposed 14--31-bit population and exact-Prime31 comparison remain
+unexecuted. Existing budget telemetry 45219644370 skipped budget reads and
+failed; artifact retrieval returned403. This runtime has no AWS identity.
+Historical source reproduction remains incomplete; the new panel additionally
+needs a native fixed-instance consumer rather than the old Python driver.
+These are access/accounting and implementation gaps, not a mathematical
+obstruction or evidence that the candidate cannot scale. [pcc:unverified]
+
+Exit conditions for this continuation: current daily/monthly spent-plus-reserved
+readback, live capacity and checkpoint admission; identified-source native
+build/replay; immutable held-out population and qualified native consumer;
+then the full matched independent-rank/cold-cost comparison specified in
+[the admission draft](../research/pkm_larger_scale_20261123/PROTOCOL.md).
+Recheck when the existing telemetry route or approved identity supplies the
+readback. No new build/job is authorized while the balance is unknown.
+
+### 2026-11-23 native-workload continuation (#5088)
+
+The shared native manifest generator/validator now has six passing release
+unit tests and an immutable CLI fixture receipt. Production IC/rho import is
+implemented but not integration-qualified: the full consumer test build emits
+ten E0425 unresolved names in unchanged prime_root_trace.rs. Source code and
+[development receipts](../research/pkm_larger_scale_20261123/CONTINUATION.md)
+retain that boundary. Existing telemetry raw logs specifically show OIDC
+AssumeRoleWithWebIdentity denial; this narrows the access blocker without
+supplying a budget balance or permitting a launch. Exit conditions above
+remain open. [pcc:unverified]
