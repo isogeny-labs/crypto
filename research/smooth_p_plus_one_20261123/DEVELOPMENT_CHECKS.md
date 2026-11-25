@@ -159,3 +159,26 @@ registered execution and admitted costs. Existing complete-chart/output and
 canonical-export access limitations remain open. At the 23:40 UTC check-in,
 the source identity head da258b6de6 had gate jobs in progress and several draft
 jobs skipped; that is not a current-head CI pass.
+
+## Larger controls and separate whole-answer replay
+
+Auditor source 15ff500915 passes 33 feature tests and six default tests and
+builds; the recovery executable remains byte-equal to source 77c465a6d1's
+frozen binary. Six mutations include a lost unused row with reconciled counts,
+which the exhaustive set comparison rejects. Both historical F127 audits pass
+before either new suite is run. Claims 2b5ba8 and 4c549b remain unsigned.
+[pcc:unverified]
+
+The [larger report](LARGER_FULL_OUTPUT_RESULT.md) retains six F8191 endpoints:
+only degree-32 Direct recovers (eight calls, 15 rows, scalar 4356). Degree-16
+ranks are 1/0/1 after 30 complete queries each; degree-32 Refined has rank nine
+after 30 complete queries and cofactor exhausts all 30 query budgets. Every
+reported complete set matches its declared reference and all consumed receipts
+replay. Successful replay/process exit does not convert an incomplete endpoint
+into recovery. [pcc:unverified]
+
+The auditor shares fixture/reference/consumer source; it is separate post-run
+execution, not independently implemented or signed validation. Its work lies
+outside the recorded recovery intervals. No admitted cost ratio or new cloud
+job is represented. Next investigate full-coverage cutoff partitions and their
+total branch work, with the registered payload/admission still open.

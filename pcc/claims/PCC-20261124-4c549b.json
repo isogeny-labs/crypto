@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T23:58:05Z",
+ "id": "PCC-20261124-4c549b",
+ "kind": "statement",
+ "producer": {
+  "commit": "49517176cd4dc0df24bf1d100d8c2f2b3d55710f",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/f8191_d4.jsonl",
+    "sha256": "c4b2291685c75e9e56e9c3d9739a22e98604f018083448fc778b00dbe402e312"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/f8191_d5.jsonl",
+    "sha256": "11a964135c20cc8c50ce19b792443451cf8b7f2e0b935932f62f719354a603de"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/audit_f127_full.jsonl",
+    "sha256": "4c6c02ee90f11302fdf65e22159665f555fe91bb1ca5829196e2fec0fbffcabe"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/audit_f127_lookup.jsonl",
+    "sha256": "0eb4312c9e732c08338d05a0d18bfd83b91992b8ed8c0fb1aa5f36959013236f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/audit_f8191_d4.jsonl",
+    "sha256": "83cab3adf8286e8b8006eab5355debdbd0bc7be139e73710aea513e422af873a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/audit_f8191_d5.jsonl",
+    "sha256": "4229e7f3ae47b684f9928cdaaaebed8ce159fe1e69205f06c2d3ebd2a78608e5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/source_identity.json",
+    "sha256": "4aaaef2c68bde81aeb13234369646979bcbebc5a07740d6b5bd798ce550dc16f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-larger-output",
+ "statement": "The frozen F8191 depth4/5 common-lookup full-output suites finish with six valid process receipts. Degree16 Direct/Refined/cofactor have ranks 1/0/1 after 30 completed queries each, with no recovered scalar. Degree32 Direct recovers scalar 4356 after eight calls and 15 consumed rows; Refined has rank9 after 30 complete calls; cofactor has rank0 and 30 oracle-budget-exhausted queries. All four separate recorded-output audits pass, including both retained F127 suites; every reported complete oracle set and consumed receipt matches its declared reference/replay, while incomplete queries remain uncertified. All six wrapper exits are zero and stderr is empty. These are unsigned local output/software observations, not independent signed validation or admitted cost evidence."
+}

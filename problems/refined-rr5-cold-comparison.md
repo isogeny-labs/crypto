@@ -53,6 +53,12 @@ the requested end-to-end cost conclusion.
   All twelve F127 arms recover; with lookup, Direct/cofactor use one oracle call
   plus two singleton rows each, and Refined uses four calls plus three singletons.
   This strengthens the reference and charges every rank update. [pcc:unverified]
+- **Larger endpoint/replay component:** [F8191 controls](../research/smooth_p_plus_one_20261123/LARGER_FULL_OUTPUT_RESULT.md)
+  retain one recovered and five incomplete endpoints. At degree32, Direct
+  recovers after eight calls, Refined reaches rank nine in 30 complete queries,
+  and cofactor exhausts 30 budgets. Every complete answer is separately compared
+  to its declared reference and consumed receipts are replayed; the checker
+  shares reference/consumer source and is unsigned. [pcc:unverified]
 - **Missing capability:** a complete degree-32 full-base comparison,
   successful full-base oriented-S3 output, qualified counters or timing for
   every phase, an exact-source registered EKS image, and independent replay.
@@ -79,8 +85,10 @@ the requested end-to-end cost conclusion.
   layer, preserving the original four-leaf refusals. [pcc:unverified]
 - [x] Qualify full-output relation consumption equally across arms with retained
   prefixes, rank histories and original first-row controls. [pcc:unverified]
-- [ ] Qualify larger full-output controls with the strengthened reference, then
-  complete a matched, equal-scope recovery comparison with admitted costs.
+- [x] Qualify larger full-output controls and separate whole-answer replay,
+  retaining all five incomplete endpoints and 30 budget failures. [pcc:unverified]
+- [ ] Investigate full-coverage cutoff partitions and complete a matched,
+  equal-scope recovery comparison with admitted costs.
 - [ ] Publish and build the exact workload revision through the supported
   EKS route, obtain budget/isolation admission, and retain raw evidence and
   independent replay. An available generic ecbench image alone is insufficient.
@@ -91,10 +99,13 @@ Scaling and any broader mathematical claim remain separate requirements.
 
 ## Next discriminating step
 
-Qualify the larger supported workload under the newly implemented common
-full-output policy and its strengthened Direct reference, using a separate
-finite protocol with unchanged solver caps and explicit incomplete outcomes.
-Keep every first-row/lookup/full-output control and source identity frozen.
+Investigate extending the existing coefficient cutoff to all feasible
+fine-image multisets. Establish rational chart coverage and repeated-image
+behavior before a separately frozen full-coverage test. Price the sum of
+all branch construction/elimination/output work; the prior first-collision
+study shows that a smaller individual system need not reduce whole-call work.
+This is a proposed construction question, not a completed mechanism or gain.
+Keep every first-row/lookup/full-output/larger control and identity frozen.
 Then extend qualification to the registered EKS build and admitted comparison.
 Degree-32 cofactor and full-base oriented completeness remain open under fixed
 budgets; the common lookup does not implement the missing target-in-base
@@ -141,3 +152,10 @@ four F127 suites. All twelve arms recover, every returned set/consumed prefix
 is retained, and both earlier first-row histories match. The reference now
 uses all rows with the same stop policy; larger workloads and admitted complete
 costs remain open. [pcc:unverified]
+
+2026-11-25, larger-output publication: two F8191 suites and four separate audits
+finish; only degree-32 Direct recovers in the fixed 30-draw domain. The local
+checker compares 145 completed sets across historical/new records and replays
+98 rows, preserving all 33 missing incomplete outputs. The next proposed
+construction question is full-coverage fine-image multiset partitioning; no
+such construction or admitted cost result is supplied here. [pcc:unverified]

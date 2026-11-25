@@ -32,12 +32,20 @@ arm. All three F127 arms recover with four four-leaf calls each; the original
 policy retains all five cofactor refusals and matches its recorded history.
 This is a recovery-policy coverage result, with no cost ratio. [pcc:unverified]
 
-The latest [full-output report](FULL_OUTPUT_RESULT.md)
+The [full-output report](FULL_OUTPUT_RESULT.md)
 ([PDF](FULL_OUTPUT_RESULT.pdf)) consumes every returned relation until recovery,
 charging each replay and rank update. All twelve policy/arm controls recover;
 with shared lookup, Direct/cofactor each use one four-leaf call plus two
 singleton rows, while Refined uses four calls plus three singleton rows.
 Both earlier first-row histories remain unchanged. [pcc:unverified]
+
+The latest [larger-control report](LARGER_FULL_OUTPUT_RESULT.md)
+([PDF](LARGER_FULL_OUTPUT_RESULT.pdf)) adds F8191 degree-16/32 endpoints and
+separate whole-answer replay. Direct recovers the degree-32 fixture after eight
+calls; the other five endpoints remain incomplete. Across retained/new inputs,
+145 complete sets and 98 consumed rows pass local replay, while 33 incomplete
+queries retain missing outputs. The checker shares reference/consumer source.
+[pcc:unverified]
 
 - [Initial rank argument](REPORT.md) ([PDF](REPORT.pdf)): collapsed and distinct-image charts.
 - [Initial native controls](NATIVE.md) ([PDF](NATIVE.pdf)): original encodings and retained failures.
@@ -50,6 +58,7 @@ Both earlier first-row histories remain unchanged. [pcc:unverified]
 - [Cold-accounting protocol](COLD_ACCOUNTING.md) and [reproduction](COLD_ACCOUNTING_REPRODUCE.md).
 - [Common-lookup protocol](BASE_LOOKUP.md) and [reproduction](BASE_LOOKUP_REPRODUCE.md).
 - [Full-output protocol](FULL_OUTPUT.md) and [reproduction](FULL_OUTPUT_REPRODUCE.md).
+- [Larger-control/replay protocol](LARGER_FULL_OUTPUT.md) and [reproduction](LARGER_FULL_OUTPUT_REPRODUCE.md).
 - [Native source](native/src/main.rs) and [evidence](evidence/).
 
 The original reports and manifests retain their historical revision scope.
