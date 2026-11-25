@@ -933,6 +933,64 @@ on the full marked orbit. This rules out using the theorem's
 were found. A proposed evaluator must retain extra oriented
 data and charge its construction and evaluation. [pcc:unverified]
 
+### Conditional oriented coset grid
+
+The paired-`y` identity in the two-offset screen below retains
+orientation that the `x`-multiset discards: the signs needed to
+replace `i±j` by fixed coset representatives depend only on
+the public indices. Define the distinct
+candidate `A_C(P)=χ_p(∏_(j∈C)y([j]P))`, using fixed positive
+representatives of a coset `C`. For even `m=|C|` and odd subgroup
+index, `A_C([h]P)=-A_C(P)` under a subgroup generator `h`:
+the representative-sign product is `h^m=-1 (mod r)` and
+`χ_p(-1)=-1`. This necessary transformation is the same as
+the ray sign, but does not establish equality outside the
+subgroup orbit. The `y` candidate is distinct from the odd-EDS
+product `B_C` screened above. An exact division-polynomial
+identity, `ψ_(2j)(P)=2y([j]P)ψ_j(P)^4`, also identifies each
+`y`-factor character with `χ_p(ψ_(2j)(P)/2)`; it does not
+compress the product. [pcc:unverified]
+
+For the first large P-192 subgroup size beyond 95,560,
+`m=8·9564682313913860059195669≈2^85.984`, a **hypothetical**
+additive paired-index grid with `h=6,185,364,116,659` offsets,
+`c=6,185,364,116,659` centers, and
+`k=5,337,750,920,790` leftover classes would cover
+`2hc+k=m`. Its base-and-target point list would have
+`2(h+c+k)=35,416,958,308,216≈2^45.010` entries, before
+scalar-multiplication, product-tree, resultant, and setup costs.
+A dense 24-byte-coefficient numerator of degree `3h` alone
+would use `445,346,216,399,472≈2^48.662` bytes, below 1 PiB;
+scratch space is unpriced. This arithmetic only gives a
+conditional window: no such grid has been constructed or costed,
+and `A_C` has not passed a P-192 exactness test at this size.
+[pcc:unverified]
+
+A zero-remainder grid is excluded for every proper coset
+subgroup here. If `I±J` covered all classes modulo `±1`,
+then the lifted coset `±C` would equal
+`(I∪-I)+(J∪-J)`. Scaling by a representative of `C`
+would make this an additive decomposition of the proper
+lifted subgroup `±H`.
+For nontrivial `I,J` this contradicts the complete
+[Rudnev–Tyrrell additive-decomposition theorem](https://arxiv.org/html/2607.24270)
+for proper multiplicative subgroups of a prime field with
+order greater than four. The later
+[Cochrane–Yip–Yoo stability refinement](https://arxiv.org/html/2608.02568)
+only forces at least one leftover class; it does not rule out
+`k≈√m`. [pcc:unverified]
+
+The [`y_coset_control.sage`](y_coset_control.sage) replay uses
+direct Sage point multiplication to check the normalized
+`A_H([d]G)/A_H(G)` at `d=1,2,3,5` for `m=8,40`.
+Both orders already fail at `d=2`: the observed sign is `-1`
+while `χ_r(2)=+1`. Every other coset is a scalar translate
+of `H`; changing its representatives only multiplies the
+`y`-product by a constant sign. Hence exactness for any coset
+would imply exactness for `H`, and these checks exclude all
+cosets of these two orders. They do not test the larger orders.
+[pcc:unverified]
+
 ### Second division-polynomial jet: a compact exactness screen
 
 The first derivative of `ψ_r` at `x(P)` was screened in the local
