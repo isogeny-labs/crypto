@@ -1,0 +1,20 @@
+{
+  "schema": "lead-ecbench-map/v1",
+  "spec": "smoke-n11.json",
+  "reference_arm": "rho-strong",
+  "control_arm": "rho-aa",
+  "leads": [
+    {
+      "id": "LEAD-ICE-rootfind-pairtable-oracle",
+      "arm": "rootfind-m2",
+      "source": "crypto-autoresearcher:knowledge/leads/ecdlp/ic-engine/LEAD-ICE-rootfind-pairtable-oracle.yaml",
+      "scope": "complete m=2 root-finding pipeline on the declared n=11 workload"
+    },
+    {
+      "id": "LEAD-ICB-large-prime-variants",
+      "arm": "double-large-prime",
+      "source": "crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-large-prime-variants.yaml",
+      "scope": "complete n-1 two-large-prime pipeline on the same declared target"
+    }
+  ]
+}
