@@ -783,7 +783,7 @@ impl F4ResourceLimits {
             n = n.checked_add(cols.checked_mul(4)?)?;
             n = n.checked_add(rows.checked_mul(4)?)?;
             if recording {
-                let words = rows / 64 + usize::from(rows % 64 != 0);
+                let words = rows / 64 + usize::from(!rows.is_multiple_of(64));
                 n = n.checked_add(rectangle.checked_mul(2)?)?;
                 n = n.checked_add(rows.checked_mul(words)?)?;
                 n = n.checked_add(rows.checked_mul(rows.min(cols))?)?;
