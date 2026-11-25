@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T02:23:35Z",
+ "id": "PCC-20261124-afb0db",
+ "kind": "execution",
+ "producer": {
+  "commit": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "model": "GPT-6 Astra Pro",
+  "session": "manual-m31-publication-preflight-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/leads/2026-11-23/manual-m31-publication-preflight.json",
+    "sha256": "33b6e92a71209d35ee2d5e192413888a96ff5cb5b23c76c273fafcc402ed65b3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Public documentation-publication metadata only; no private history, no scientific execution, no full repository validation.",
+ "statement": "A documentation-only preflight using exact public source ceba74bb64854027c4dd16f00428bf676383bfdb ran the official PCC prose linter and ledger-prefix check, the official artifact selector, and a partial-source benchrec gate. The initial prose lint found four missing tags, leads.log was selected by artifact policy, and the incomplete benchrec gate exited 1. This unsigned administrative record makes no scientific execution, solve, measurement, or speedup claim."
+}
