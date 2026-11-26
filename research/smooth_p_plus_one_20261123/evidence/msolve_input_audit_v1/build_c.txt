@@ -1,0 +1,8 @@
+In file included from research/smooth_p_plus_one_20261123/native/diagnostics/msolve-parser-probe.c:21:
+research/smooth_p_plus_one_20261123/native/diagnostics/msolve-0.7.5-parser.inc: In function ‘store_exponent’:
+research/smooth_p_plus_one_20261123/native/diagnostics/msolve-0.7.5-parser.inc:30:19: warning: comparison of integer expressions of different signedness: ‘len_t’ {aka ‘int’} and ‘size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+   30 |     for (i = 0; i < strlen(term)+1; ++i) {
+      |                   ^
+research/smooth_p_plus_one_20261123/native/diagnostics/msolve-0.7.5-parser.inc:31:33: warning: comparison of integer expressions of different signedness: ‘len_t’ {aka ‘int’} and ‘size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+   31 |         if (term[i] == '*' || i == strlen(term)) {
+      |                                 ^~

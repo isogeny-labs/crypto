@@ -1,0 +1,15 @@
+digraph audit {
+  rankdir=LR;
+  graph [bgcolor="white", ranksep=.4];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fa", color="#325b82", fontname="Helvetica", fontsize=11];
+  edge [color="#325b82", fontname="Helvetica", fontsize=10];
+  records [label="Frozen recovery records\nMasks, complete sets, consumed rows"];
+  set [label="Enumerate declared reference set\nCompare full returned output"];
+  replay [label="Fresh consumer replay\nCompare receipts, ranks and work"];
+  missing [label="Incomplete query\nRetain missing output", fillcolor="#fff2db"];
+  records -> set [label="complete query"];
+  records -> missing [label="undetermined"];
+  records -> replay [label="singleton"];
+  set -> replay;
+  missing -> replay [label="no rows added"];
+}

@@ -1,0 +1,55 @@
+{
+  "format": "dickson.development_flow/v1",
+  "canonical_experiment_export": false,
+  "canonical_export_status": "previously unreadable canonical schema/tooling; no check-export validation claimed",
+  "source_commit": "6a0c732e8e033b2839857c481b425c96364e4403",
+  "protocol": "../../BASE_LOOKUP.md",
+  "raw": [
+    "original.jsonl",
+    "lookup.jsonl"
+  ],
+  "plan": {
+    "policies": [
+      "original",
+      "base-lookup"
+    ],
+    "arms_per_policy": [
+      "Direct",
+      "Refined",
+      "ProductionCofactorMsolve"
+    ],
+    "prime": 127,
+    "depth": 4,
+    "seed": 781815,
+    "max_draws": 30
+  },
+  "flow": {
+    "planned_suites": 2,
+    "attempted_suites": 2,
+    "finished_suites": 2,
+    "planned_arms": 6,
+    "attempted_arms": 6,
+    "finished_arms": 6,
+    "recovered_arms": 6,
+    "excluded_arms": 0,
+    "unrun_arms": [],
+    "retries": 0
+  },
+  "failures_retained": [
+    {
+      "policy": "original",
+      "mode": "ProductionCofactorMsolve",
+      "draws": [
+        2,
+        3,
+        4,
+        8,
+        11
+      ],
+      "reason": "production UnsupportedChart: target-in-base chart not implemented"
+    }
+  ],
+  "qualification": "local_development_only",
+  "signed_verification": false,
+  "cloud_job_submitted": false
+}

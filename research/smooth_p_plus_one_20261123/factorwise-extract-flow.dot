@@ -1,0 +1,11 @@
+digraph extraction {
+  graph [rankdir=LR,bgcolor="transparent",ranksep=0.4];
+  node [shape=box,style="rounded,filled",fillcolor="#e6f0ec",fontname="DejaVu Sans",fontsize=11];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#44645c"];
+  factors [label="Factorwise equations\nall 36 / 18 / 119 charts"];
+  guard [label="Same fixed forms and RUR guard\none shared 3-second query limit"];
+  complete [label="Every chart complete\ncompare whole answer with Direct"];
+  failed [label="Any unfinished chart\nretain prefix, mark undetermined",fillcolor="#f7eade"];
+  factors -> guard -> complete;
+  guard -> failed;
+}

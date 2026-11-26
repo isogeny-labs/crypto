@@ -1,0 +1,109 @@
+\documentclass[10pt]{article}
+\usepackage[margin=.65in]{geometry}
+\usepackage{amsmath,amssymb,graphicx,booktabs,hyperref,xcolor}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+{\Large\bf Anchored ratio queries with original indexed witnesses}\par
+Curve25519 research component \hfill 24 November 2026
+
+\textbf{Implemented.} Public target $T$, supplied old physical columns,
+original context and finite limits enter the Rust query. No scalar, private
+target tag, numeric label, planted tuple or root list enters it. For each
+old column it tries both signs $P$, forms $T-P$, enumerates original inverse
+fibres, tests the implicit ratio condition $r^q=h^q$, and returns checked
+original two-member target-circuit witnesses on adjacent cosets
+$j_2=j_1+1$. Numeric $(j,t)$ indexing is a separate replay phase.
+
+\includegraphics[width=\linewidth]{flow.pdf}
+
+\textbf{Recorded correctness.} One source-qualified fixed native call
+completed four groups, zero failed, with 42 raw records. The toy declared
+base has 24 raw labels, 44 signed admitted leaves and six physical columns.
+All 208 direct-reference pair witnesses across all 12 nonzero image targets
+equal the complete ALL outputs. FIRST returns a member of the matching set.
+The reference shares field/group/raw-map primitives and bypasses inverse
+and coset-search algorithms; it is not independent signed validation.
+
+Original actual parameters remain $p=2^{255}-19$, $A=486662$,
+$a=60824497$, $q=213156431$, $K=20633$. Five selected queries produce four
+roots, each with 339 original witness values and original numeric-index /
+signed-row / group replay. No $q=1$ substitute or full actual-base enumeration.
+The no-root RFC-generator case exhausts only one supplied old column.
+
+\begin{center}\small
+\begin{tabular}{lrrrrr}\toprule
+Actual fixed case & roots & admission & prefix & pairs & $q$ powers\\\midrule
+three-old ALL & 1 & 3 & 3 & 64 & 177\\
+three-old FIRST & 1 & 3 & 2 & 9 & 33\\
+one-old known & 1 & 1 & 1 & 28 & 85\\
+one-old negative & 1 & 1 & 1 & 28 & 85\\
+one-old RFC target & 0 & 1 & 1 & 12 & 68\\\bottomrule
+\end{tabular}\end{center}
+These are partial native API/loop counts, not timing or complete field work.
+FIRST validates all supplied columns before its search prefix. Coset setup
+has 144 babies and a 145 giant bound. Separate numeric indexing uses 14600
+babies and a 14600 giant bound; the old adapter does not expose actual giant
+iterations. Its setup is not free.
+
+\textcolor{gray}{\footnotesize Native PCC-20261124-0a02aa. Producer evidence,
+unsigned/unverified; complete cold attack cost and native formal refinement open.}
+\newpage
+{\Large\bf Closing a row is different from obtaining a useful kernel}
+
+The known-consistent actual root has a new complementary column with one
+supplied old column. Supplying its second column changes the closure flag.
+That second column is chosen fixture data; no unknown relation collection
+or actual informative kernel has been established by that comparison.
+
+\textbf{Separate synthetic row controls.} Toy columns and tags are chosen
+for validator $Q=[5]G$. Group tags are replayed \emph{before} exact rank.
+Native elimination checks invertible row operations and complete left-kernel
+products. Every recovered scalar is checked by $[x]G=Q$.
+\begin{center}\small
+\begin{tabular}{lrrrrl}\toprule
+Synthetic control & rank & aug & core rows & useful & target coefficients\\\midrule
+tree & 2 & 2 & 0 & 0 & no kernel\\
+closure, zero tag & 2 & 2 & 3 & 0 & $v^Ta=v^Tb=0$\\
+informative closure & 2 & 3 & 3 & 1 & $v^Ta=5,\ v^Tb=12$\\\bottomrule
+\end{tabular}\end{center}
+The last recovers validator $5\pmod {13}$. These are synthetic algebra
+controls, not query-discovered DLP recovery. Existing owner-floor singleton
+peeling and scalar-recovery laws are referenced; no new Lean proof is claimed.
+
+\textbf{Refusals and provenance.} Ten admission/cap cases reject, as do all
+95 toy witness-variable increments, four root mutations, wrong target and
+wrong synthetic tags. The first positive unit accidentally used an excluded
+identity-sum fixture; its source and failure are retained. Validator sign
+selection was corrected before qualification. Clippy diagnostics and the
+one inadvertently repeated pre-repair check are preserved too.
+
+Three final release tests, formatting, strict all-target Clippy and build
+pass. Source118 is the previous111 plus seven new crate inputs, in six
+constituent archives. Five compiled inputs and the retained executable match
+pre/post. Source was published before immutable qualification and the sole
+600-second/2-GiB correctness call. The complete 364851-byte raw JSONL and all
+36 raw-tree members round-trip through one 49256-byte archive.
+
+\textbf{Exponent-relevant next step.} Query performs no explicit $q$-element
+ratio scan, but the old-column list still has linear admission and exhaustive
+selection. Merely raising its cap keeps that loop family and cannot meet
+the preceding prospective closure-query target. This is a statement about
+this implementation and model, not every data structure or index-calculus
+method. A no-root result on one old column is not full-base absence.
+
+The missing primitive is a structured intersection with $T-S$ that yields
+two-old-column rows and nonzero target-tag kernels without a free $L^2$ sum
+table or an $L$-sized scan. Review primary 3SUM-indexing tradeoffs and the
+actual old-set structure before choosing an approach. Persistent validated
+old sets, cached encodings, and deducing $j_2=j_1+1$ can reduce repeated work,
+but do not themselves move the selection exponent. Charge construction,
+updates, useful yield, memory, numeric indexing and final scalar replay to
+one cold DLP. No such campaign is scheduled here.
+
+\textbf{Source context.} HAC section 3.6.2, Algorithm 3.56, supplies BSGS;
+original frozen map/circuit/index code supplies semantics; Diem's large-prime
+and private-label arguments supply the row-recovery context. Full native
+checker, curve and sampler refinements and independently signed execution stay
+open. No measured exponent, uniform yield or fastest-tool claim is made.
+\end{document}

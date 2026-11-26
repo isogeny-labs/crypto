@@ -1,0 +1,68 @@
+{
+  "schema": "curve25519.pair-trace-protocol/v1",
+  "study_id": "EXP-C25519-PAIRTRACE-001",
+  "frozen_date": "2026-11-25",
+  "parent_revision": "a41230c232",
+  "implementation": "native Rust in Isogeny Labs crypto",
+  "javascript": false,
+  "curve": {
+    "family_k": 20,
+    "p": 1048573,
+    "r": 131203,
+    "generator": [349837, 122],
+    "factor_base": "x=349833+3*w, w in mu_d"
+  },
+  "seed": 2026112503,
+  "arms": {
+    "D": "symmetric S4 plus direct cubic-remainder membership",
+    "R": "raw roots plus quadratized two-S3 chain and scalar membership",
+    "P": "pair-trace swap quotient plus quadratized two-S3 chain"
+  },
+  "primary_arm": "P",
+  "solver": {
+    "engine": "f4_fp",
+    "ordering": "grevlex",
+    "threads": 1,
+    "degree_ceiling": 24,
+    "primary_metric": "F_p multiply-adds in F4 elimination"
+  },
+  "stages": [
+    {
+      "d": 7,
+      "random_per_arm": 4,
+      "planted_per_arm": 4,
+      "cap_seconds": 120,
+      "P_over_D_upper_95_lt": 1.0,
+      "P_degree_max": 4,
+      "degree_pairs_required": 3,
+      "P_over_D_peak_rss_each_le": 1.5
+    },
+    {
+      "d": 9,
+      "random_per_arm": 4,
+      "planted_per_arm": 4,
+      "cap_seconds": 180,
+      "P_over_D_upper_95_lt": 0.85,
+      "P_over_R_upper_95_lt": 0.95,
+      "P_degree_max": 4,
+      "degree_pairs_required": 3,
+      "P_over_D_peak_rss_each_le": 1.4
+    },
+    {
+      "d": 19,
+      "random_per_arm": 8,
+      "planted_per_arm": 4,
+      "cap_seconds": 300,
+      "P_over_D_upper_95_lt": 0.5,
+      "P_over_R_upper_95_lt": 0.75,
+      "P_degree_max": 3,
+      "degree_pairs_required": 6,
+      "P_over_D_peak_rss_each_le": 1.25,
+      "P_over_D_build_ops_each_le": 1.25
+    }
+  ],
+  "bootstrap_resamples": 10000,
+  "bootstrap_seed": 2026112503,
+  "gated_scaling_orders": [21, 27, 57],
+  "claim_boundary": "relation-system stage diagnostic only; no total-work or subexponential ECDLP claim"
+}

@@ -1,0 +1,21 @@
+{
+ "schema": "isogeny-labs/experiment-seeds/v1",
+ "study": "research/quartic_diem_nofb_20261126",
+ "master_seed": null,
+ "note": "No master seed: every stream is keyed directly by its public identity (prime, curve seed, target seed, solver seed) through the binary's own fixed derivations below, unchanged from the parent studies. Workload keys exclude the arm; both arms share the solver stream (paired). Intentional reuse: curves and solver seeds 1, 2 are the parent's (research/quartic_diem_la_20261123); solver seeds 3, 4 are held-out and new.",
+ "prng": {"library": "rand 0.8.8 (Cargo.lock)", "algorithm": "StdRng = ChaCha12 (rand_chacha 0.3.1)", "seeding": "StdRng::seed_from_u64 (PCG32 expansion of the u64 into the 32-byte key)", "mix64": "SplitMix64 finaliser, src/cryptanalysis/residual_walk.rs:336"},
+ "streams": {
+  "curve": "state = mix64(curve_seed ^ (p << 32)) | 1 -> next_smooth_quartic_with_point (quartic_ladder.rs make_instance)",
+  "generator": "StdRng::seed_from_u64(mix64(curve_seed ^ 0x6E6E7A7A01012323)) -> random classes until one of order r",
+  "target": "t = StdRng::seed_from_u64(mix64(target_seed ^ 0x7A26E7A26E7A26E7)).gen_range(1..r); target_seed = curve_seed (one target per curve)",
+  "solver": "StdRng::seed_from_u64(solver_seed) (run_diem_with); the full-core fallback draws from a clone; skip_wiedemann_draws advances the main stream identically in both arms",
+  "bootstrap": "numpy default_rng(20261126) in analyze.py"
+ },
+ "panel": {
+  "primes": [4099, 16411, 65537, 131101],
+  "curve_seeds": {"4099": [35, 205, 220, 257, 295], "16411": [93, 158, 252, 366, 382], "65537": [13, 57, 156, 166, 369], "131101": [53, 177, 193, 228, 288]},
+  "solver_seeds": {"replicate_parent": [1, 2], "held_out_primary": [3, 4]},
+  "arms": ["2lp-sfb-sge", "2lp-sfb-sge-nofb"],
+  "arm_order": "baseline first within each (curve, seed)"
+ }
+}

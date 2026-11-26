@@ -1,0 +1,14 @@
+digraph flow {
+  rankdir=LR;
+  graph [bgcolor="white", nodesep=.3, ranksep=.4];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fa", color="#325b82", fontname="Helvetica", fontsize=11];
+  edge [color="#325b82", fontname="Helvetica", fontsize=10];
+  all [label="Complete ordered oracle output\nGeneration/extraction charged"];
+  next [label="Submit next row\nRetain row and receipt"];
+  check [label="Replay, dedup, rank, linear algebra\nAll consumer work charged"];
+  stop [label="Scalar recovered?", shape=diamond];
+  done [label="Stop and verify\nRetain unused suffix", fillcolor="#ddf3ec"];
+  all -> next -> check -> stop;
+  stop -> next [label="no, more rows"];
+  stop -> done [label="yes"];
+}

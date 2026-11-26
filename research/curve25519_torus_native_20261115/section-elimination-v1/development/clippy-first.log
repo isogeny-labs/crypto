@@ -1,0 +1,15 @@
+    Checking torus-point-solver v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-point-solver)
+    Checking torus-section-elimination v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-section-elimination)
+error: manual implementation of `.is_multiple_of()`
+   --> src/sparse.rs:173:39
+    |
+173 |                 sum = e.add(&sum, &if (row + below) % 2 == 0 { p } else { e.neg(&p) })?;
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `(row + below).is_multiple_of(2)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#manual_is_multiple_of
+    = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: could not compile `torus-section-elimination` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `torus-section-elimination` (lib test) due to 1 previous error

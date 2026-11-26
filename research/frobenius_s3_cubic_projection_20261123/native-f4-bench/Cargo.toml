@@ -1,0 +1,17 @@
+[package]
+name = "m31-f4-matched"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "m31-f4-matched"
+path = "../m31_charted.rs"
+
+[features]
+default = ["native-f4"]
+native-f4 = []
+
+[dependencies]
+crypto_lib = { package = "rr5-original-f4-closure", path = "../../prime31_rr5_public_relations_20261123/native/f4-source" }
+rayon = "1.10"

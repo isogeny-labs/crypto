@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-25T01:58:24Z",
+ "id": "PCC-20261125-8eaff2",
+ "kind": "execution",
+ "producer": {
+  "commit": "660d7cbbb902668050a826c6cae6ff07decaa964",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/liftable_fibers_v1/feature_tests.txt",
+    "sha256": "13021e690949c17f6bd61915a936a7095352518c717cb753c6c408ff7e2bc35f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/liftable_fibers_v1/default_tests.txt",
+    "sha256": "0c0e6ece9cd4ed159897bda2a74f21a34bb76bc40466d7ff16baf62a5e241598"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/liftable_fibers_v1/build.txt",
+    "sha256": "276937f700b1f2b93d89c30d5c86fddf1f51b15c3ba8f5a68e51e94145cfb245"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/native/src/liftable.rs",
+    "sha256": "7df47dad4c2061006558b14c88d3418af488685a36ed5b46ce3251c72da61110"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/native/src/system.rs",
+    "sha256": "437bc7874542cf2ad452cce4db631eaa5502ae01c434c5d8867f53b10615454c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/native/src/full_cutoff.rs",
+    "sha256": "aebb71359d931b12ed4cf84643350c83c09a06ce4a4b6868a5cba07f202e1938"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-liftable-fibers",
+ "statement": "The liftable-fiber source passes 47 feature tests and 20 default tests and builds in the recorded local Rust environment. New controls check exact public-base fiber membership, malformed data, nonliftable-root rejection and bounded full-catalog dispatch. This is producer-local unsigned source qualification."
+}

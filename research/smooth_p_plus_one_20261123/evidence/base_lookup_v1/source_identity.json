@@ -1,0 +1,52 @@
+{
+  "format": "dickson.development_identity/v1",
+  "created_utc": "2026-11-24T23:14:22.175509+00:00",
+  "source_commit": "6a0c732e8e033b2839857c481b425c96364e4403",
+  "base_main": "2af748ace3eff34b63c9f06950fd4fcd3dcc47b6",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "accounting": "local_development_only",
+  "files": {
+    "binary": {
+      "path": "/workspace/scratch/dickson-base-lookup-v1",
+      "sha256": "f643f9fb437e31b58422c54b5ff13f6a0f829da13bbe1778b9de7341c0b6c6e7"
+    },
+    "msolve": {
+      "path": "/workspace/scratch/msolve/root/usr/bin/msolve",
+      "sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+    },
+    "protocol": {
+      "path": "/workspace/scratch/isogeny-labs-crypto/research/smooth_p_plus_one_20261123/BASE_LOOKUP.md",
+      "sha256": "8e87206cb440c6cad39ca5b3d477676055ca5dec093ec45de8c50018f280dce5"
+    },
+    "command": {
+      "path": "/workspace/scratch/isogeny-labs-crypto/research/smooth_p_plus_one_20261123/evidence/base_lookup_v1/command.sh",
+      "sha256": "4e809a8645d684091bb0ba93e7b582843be4cd3548e6975e54ec228ca765437d"
+    },
+    "accounting_source": {
+      "path": "/workspace/scratch/isogeny-labs-crypto/research/smooth_p_plus_one_20261123/native/src/accounting.rs",
+      "sha256": "e043a5639d4f99caaed133a5e4a7bd1e5f362935c28503c0b0addac0558980cc"
+    },
+    "consumer": {
+      "path": "/workspace/scratch/isogeny-labs-crypto/research/prime31_four_summand_20261122/native/relation_adapter.rs",
+      "sha256": "1915ef03235d68900b696c12a9abca5de51abd68f55d40ee568c4476124a7350"
+    }
+  },
+  "planned_policies": [
+    "original",
+    "base-lookup"
+  ],
+  "planned_arms_per_policy": [
+    "Direct",
+    "Refined",
+    "ProductionCofactorMsolve"
+  ],
+  "prime": 127,
+  "depth": 4,
+  "seed": 781815,
+  "max_draws": 30,
+  "child_seconds": 120,
+  "outer_seconds_per_suite": 400,
+  "kill_grace_seconds": 5,
+  "virtual_memory_kib": 2097152,
+  "workers": 1
+}

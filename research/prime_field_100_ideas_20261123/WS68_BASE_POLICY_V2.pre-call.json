@@ -1,0 +1,16 @@
+{
+  "record_type":"immutable_pre_call",
+  "created_utc":"2026-11-25T05:21:14Z",
+  "admission":"user-authorized local bypass; checkpoint remains unqualified (prior S3 HTTP 403, later missing .resume); restored local headroom 2.1 GiB",
+  "source":{"path":"WS68_BASE_POLICY_V2.rs","sha256":"74edf95cbd6c65f3c0aab8856f7663a93d5d50def16511359ba6c90a0c17cf3c"},
+  "immutable_qualifier":{"path":"WS68_BASE_POLICY_V2.qualifier.rs","sha256":"74edf95cbd6c65f3c0aab8856f7663a93d5d50def16511359ba6c90a0c17cf3c"},
+  "v1_failure":{"post_call":"WS68_BASE_POLICY.post-call.json","stdout_sha256":"67c94214631013d5d3c7da37816ad240b8ef5f98fdceb1443826de39f41ea416","change":"add known-log anchor x0=1; count only acquired pair hits"},
+  "compiler":{"path":"/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc","sha256":"1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_BASE_POLICY_V2","WS68_BASE_POLICY_V2.qualifier.rs","-o","WS68_BASE_POLICY_V2.bin"],
+  "curve":{"p":1009,"a":1,"b":14,"G":[0,425],"order":1013},
+  "target_scalars":[123,277,411,509,701,827,941,1003],
+  "stream":{"same_as_v1":true,"cap_per_target":512,"policies":["fixed8","fixed16","expand128"]},
+  "acceptance":"all emitted point relations and recovered target scalars checked; exact rank_base/rank_aug and censored cases preserved",
+  "cost_scope":"pair-table group-addition counts, trial scalar-multiply/add counts, base lift tests separate; no modular elimination or wall-time price",
+  "claim_boundary":"bounded local policy diagnostic, not complete cost or speedup"
+}

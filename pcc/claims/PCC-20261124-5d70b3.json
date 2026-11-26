@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T22:59:15Z",
+ "id": "PCC-20261124-5d70b3",
+ "kind": "statement",
+ "producer": {
+  "commit": "7d4ecdff41c98849a43b9151efb0442ddf120efb",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/cold_accounting_v1/layout_identity.json",
+    "sha256": "10ed5c2960230643de3b60815ff76d261a090ce43666fc7409169c6eae34fcd6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/cold_accounting_v1/layout_tests.txt",
+    "sha256": "33e32aead3b05c012adb0ecccd43754b23326b8fe0e58302c9a8c81799dd8cbc"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-source-layout",
+ "statement": "The historical production-source bytes pinned by PCC-20261124-f6947c are restored from ed5bdacdcb, while the current compiled implementation is byte-identical to qualified source a4cd5ee0b3 under production_current.rs. No claim, gate, ledger history, executable or frozen control was rewritten. All 23 feature tests pass after the module-path repair. The prior claim now reports not_covered rather than a hash failure locally; unsigned evidence remains unverified."
+}

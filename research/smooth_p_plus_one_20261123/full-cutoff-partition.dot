@@ -1,0 +1,14 @@
+digraph cutoff {
+  graph [rankdir=TB, bgcolor="white", pad="0.12", nodesep="0.2", ranksep="0.25"];
+  node [shape=box, style="rounded,filled", fillcolor="#e6f2ee", fontname="Helvetica", fontsize=10];
+  edge [color="#4d665f", arrowsize=0.7];
+  base [label="Liftable abscissae B\ncount each fine-image fiber"];
+  mult [label="All feasible multiplicities\n0 <= m_b <= n_b; sum m_b = 4"];
+  poly [label="Monic P_m retains repeats\ncutoff equality + RR5"];
+  audit [label="Finite witness audit\ncoverage, equations, ranks"];
+  solver [label="Next: complete solver union\nall branch work charged", style="rounded,dashed", fillcolor="white"];
+  { rank=same; base; mult; poly; }
+  { rank=same; audit; solver; }
+  base -> mult -> poly -> audit;
+  audit -> solver [style=dashed];
+}

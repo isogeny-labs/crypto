@@ -1,0 +1,67 @@
+{
+  "cargo_home": "/workspace/scratch/cdbe94c88979/toolchain/cargo",
+  "cargo_target_dir": "/workspace/scratch/cdbe94c88979/root-target",
+  "command": [
+    "cargo",
+    "+1.100.0",
+    "test",
+    "--locked",
+    "--release",
+    "--lib",
+    "-j2"
+  ],
+  "compiler_diagnostic_count": 11,
+  "compiler_diagnostics": [
+    "error[E0428]: the name `round73_mersenne_single_fold` is defined multiple times",
+    "error[E0425]: cannot find value `powers` in this scope",
+    "error[E0425]: cannot find value `powers` in this scope",
+    "error[E0425]: cannot find value `gcds` in this scope",
+    "error[E0425]: cannot find value `powers` in this scope",
+    "error[E0425]: cannot find value `gcds` in this scope",
+    "error[E0425]: cannot find value `previous` in this scope",
+    "error[E0425]: cannot find value `r` in this scope",
+    "error[E0425]: cannot find value `r` in this scope",
+    "error[E0425]: cannot find value `g` in this scope",
+    "error[E0425]: cannot find value `g` in this scope"
+  ],
+  "cwd_at_execution": "/workspace/scratch/cdbe94c88979/crypto",
+  "earlier_record_preserved": "ROOT_GATE.json",
+  "exit_code": 101,
+  "files": {
+    "root-attempt-03.stderr": {
+      "bytes": 9468,
+      "sha256": "df90a3195d9100fe253cb473a736dfd24ea95c923c024212766464c3ff65c53f"
+    },
+    "root-attempt-03.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "root-restored-inputs.txt": {
+      "bytes": 3892,
+      "sha256": "9b74fc92f508c31d53215918be8f057818810a6370088b9b51dab32ba23ba2b1"
+    }
+  },
+  "interpretation": "Root library gate remains failed in unchanged root code. The native RR5 bundle has a separately scoped qualification record. No unrelated source was patched to make this gate pass.",
+  "missing_input_errors_in_final_attempt": false,
+  "outer_limit_seconds": 180,
+  "pcc_standing": "unverified",
+  "producer_commit": "8aa70e211f9a42e9823e859b1c7197c8677dceca",
+  "restored_tracked_input_count": 64,
+  "root_source_identities": {
+    "8aa70e211f9a42e9823e859b1c7197c8677dceca": {
+      "Cargo.lock": "afc9511377b3549c26a44d8e285e865e2d2041b4",
+      "Cargo.toml": "6dc85759954e45c352674bcb181cdf7d969097d4",
+      "src": "d1dcddc6d0ad1ffeb3fdb6f5ccc00f184f77f35c"
+    },
+    "e1552f1e0942690228900cc86eb6b0c8b4de88c1": {
+      "Cargo.lock": "afc9511377b3549c26a44d8e285e865e2d2041b4",
+      "Cargo.toml": "6dc85759954e45c352674bcb181cdf7d969097d4",
+      "src": "d1dcddc6d0ad1ffeb3fdb6f5ccc00f184f77f35c"
+    }
+  },
+  "root_worktree_matches_base": true,
+  "rustup_home": "/workspace/scratch/cdbe94c88979/toolchain/rustup",
+  "schema": "rr5.payload.root-gate-final.v1",
+  "scope": "Required root library development check after exact tracked sparse-input restoration; no scientific extraction.",
+  "unsigned": true
+}

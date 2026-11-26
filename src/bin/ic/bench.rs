@@ -36,6 +36,7 @@ use crypto_lib::cryptanalysis::ic_boundary::{
 };
 use crypto_lib::cryptanalysis::ic_framework::genroot::GenRootOracle;
 use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
+use crypto_lib::cryptanalysis::ic_framework::indexed_resultant::IndexedResultantOracle;
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
 use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::{PkmSemaevOracle, PrimeIntervalBase};
 use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
@@ -425,6 +426,9 @@ fn listing() -> Value {
                                     {"name": "left", "means": "sources in the target-independent table, 1..m-1; default ceil(m/2)"},
                                     {"name": "max_table", "means": "left-table record cap, default 4000000"}],
                      "needs": "the generalized root-finder's exact S3 chain (tools/generalized-rootfinder); fiber root-finding is counted, not priced, so S is marked partial"},
+                    {"name": "indexed-s3", "summands": 5, "regimes": ["prime"],
+                     "parameters": [{"name": "m", "means": "summands, fixed at 5 (default)"}],
+                     "needs": "a finite prime-field factor base; indexes quadratic S3 roots once and probes them with signed triples"},
                     {"name": "pkm-semaev", "summands": "2 or 3", "regimes": ["prime"],
                      "parameters": [
                         {"name": "m", "means": "summands, 2 or 3"},
@@ -835,12 +839,14 @@ fn run_prime(
             );
         let mut hashed = HashedTensorOracle::new();
         let mut genroot = GenRootOracle::new(m);
+        let mut indexed_s3 = IndexedResultantOracle::default();
         // Built on the base's own tower, so it refuses any other base.
         let mut pkm = match or_name {
             "pkm-semaev" => Some(PkmSemaevOracle::from_spec(m, &spec, inst)?),
             _ => None,
         };
         let oracle: &mut dyn DecompositionOracle<_> = match or_name {
+            "indexed-s3" => &mut indexed_s3,
             "pkm-semaev" => pkm.as_mut().expect("built above"),
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
@@ -857,7 +863,7 @@ fn run_prime(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
                      mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-floor, \
                      rootfind-floor-batch-v1, rootfind-kmitm, rootfind-kmitm-batch-v1, \
-                     rootfind-subtract-gpu, hashed-tensor, genroot or pkm-semaev"
+                     rootfind-subtract-gpu, hashed-tensor, genroot, indexed-s3 or pkm-semaev"
                 ))
             }
         };

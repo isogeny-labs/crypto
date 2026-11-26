@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Fixed payload entry point. Preserve failures before uploading to the existing
+# command-job results location. It accepts no arbitrary target, argv or limits.
+set -euo pipefail
+[[ $# == 2 ]] || { echo 'usage: run SOURCE_REVISION PROTOCOL_SHA256' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+revision=$1 protocol=$2 output=${ISOLAB_OUTPUT_DIR:?} results_uri=${ISOLAB_RESULTS_URI:?}
+[[ "$revision" =~ ^[a-f0-9]{40}$ && "$protocol" =~ ^[a-f0-9]{64}$ ]]
+[[ "$results_uri" == s3://isolab-results-104186811093-us-east-2/runs/* ]]
+mkdir -p "$output"
+[[ -z $(find "$output" -mindepth 1 -print -quit) ]] || { echo 'refusing a nonempty results directory' >&2; exit 2; }
+child=''
+finish() {
+  local status=$?
+  trap - EXIT
+  set +e
+  if ! jq -n --argjson status "$status" --arg revision "$revision" --arg protocol "$protocol" \
+    '{schema:"rr5.b677.job-exit/v1",exit_status:$status,source_revision:$revision,
+      protocol_sha256:$protocol,scientific_run_completed:($status==0)}' > "$output/job-exit.json"; then
+    status=92
+    echo 'RR5 exit-record generation failed' >&2
+  fi
+  if ! (cd "$output" && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum) \
+    > "$output/SHA256SUMS"; then
+    status=92
+    echo 'RR5 checksum-manifest generation failed' >&2
+  fi
+  if ! aws s3 cp "$output/" "$results_uri" --recursive --only-show-errors; then
+    echo 'RR5 evidence upload failed; local exit records do not establish durable custody' >&2
+    exit 91
+  fi
+  exit "$status"
+}
+trap finish EXIT
+stop_child() {
+  local status=$1 pid=${child:-${!:-}}
+  trap '' TERM INT
+  if [[ -n "$pid" ]]; then
+    # Also address the child directly if TERM arrives before setsid establishes
+    # the group. It is still our unreaped child and cannot have been PID-reused.
+    kill -KILL -- "-$pid" "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+  fi
+  exit "$status"
+}
+trap 'stop_child 143' TERM
+trap 'stop_child 130' INT
+cp "$here/build-info.json" "$output/build-info.json"
+cp "$here/PROTOCOL.md" "$output/PROTOCOL.md"
+cp "$here/source-manifest.json" "$output/source-manifest.json"
+cp "$here/source.sha256" "$output/source.sha256"
+[[ $(sha256sum "$here/PROTOCOL.md" | cut -d' ' -f1) == "$protocol" ]]
+jq -es --arg revision "$revision" --arg protocol "$protocol" \
+  'length==1 and (.[0] | .schema=="rr5.b677.build/v1" and .source_revision==$revision and .protocol_sha256==$protocol
+    and .source_repository=="https://github.com/isogeny-labs/crypto"
+    and .target=="x86_64-unknown-linux-musl" and .architecture=="linux/amd64")' \
+  "$here/build-info.json" >/dev/null
+for name in rr5-b677-gate rr5-b677-receipt-check run sequence verify-call; do
+  actual=$(sha256sum "$here/$name" | cut -d' ' -f1)
+  [[ "$actual" == "$(jq -er --arg name "$name" '.payload_sha256[$name]' "$here/build-info.json")" ]]
+done
+for name in source-manifest.json source.sha256; do
+  actual=$(sha256sum "$here/$name" | cut -d' ' -f1)
+  [[ "$actual" == "$(jq -er --arg name "$name" '.metadata_sha256[$name]' "$here/build-info.json")" ]]
+done
+# TERM handlers, slow child shutdown, or an ignored signal cannot extend the
+# registered scientific interval. The parent remains alive to archive evidence.
+set +e
+setsid timeout --signal=KILL 180 "$here/sequence" "$revision" "$protocol" &
+child=$!
+wait "$child"
+status=$?
+child=''
+set -e
+exit "$status"

@@ -1,0 +1,81 @@
+{
+ "schema": "ecbench.spec/v2",
+ "curve_policy": {
+  "mode": "diagnostic",
+  "off_panel_reason": "panel Koblitz curves outside any phase lane: instrument check of the native binary-subspace select=trace2e factor base against its explicit-x stand-in and the C1 ratios (workspace PR #141); operation counts only"
+ },
+ "label": "trace2e native builder check K1-17",
+ "description": "research/trace2e_builder_20261125/README.md: native select=trace2e vs the explicit-x stand-in (same abscissa set) and vs binary-subspace at C1's frozen D, fresh targets. Operation counts only.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 17
+   }
+  ],
+  "targets_per_curve": 16,
+  "target_seed": 202611291701,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-frob",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius"
+   }
+  },
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "ic-sub6",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=6",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "2000000000"
+    }
+   }
+  },
+  {
+   "name": "ic-t2e6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=6,select=trace2e",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "2000000000"
+    }
+   }
+  },
+  {
+   "name": "ic-cut6",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "explicit-x:xs=3;5;11;13;17;23;25;27;29;33;37;39;45;47;49;57;59;61;63",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "2000000000"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 202611291702,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

@@ -1,0 +1,18 @@
+digraph oriented_chain {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.45", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3f9", color="#53677e", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.1"];
+  edge [color="#53677e"];
+  source [label="Existing oriented S3 pair identity\nNew composition: two pairs + public-target line"];
+  dense [label="Exact-base dense membership\n11 variables; degree 7 / 8 / 14"];
+  tower [label="Quadratic Dickson membership\n23 or 27 variables; total degree 3"];
+  visitor [label="Unchanged native F4 / algebraic-root visitor\nOne 3-second query deadline; fixed allocation caps"];
+  limited [label="26 / 26 full-base calls incomplete\nMatrix admission exceeds 2,000,000 entries\nZero extracted assignments", fillcolor="#fff0d6"];
+  control [label="Separate fixed-slot native control passes\n312 ordered semantic witnesses per model\nNo full-base or total-cost conclusion", fillcolor="#f1eef7"];
+  source -> dense;
+  source -> tower;
+  dense -> visitor;
+  tower -> visitor;
+  visitor -> limited;
+  limited -> control [style=dashed, arrowhead=none];
+  {rank=same; dense; tower;}
+}

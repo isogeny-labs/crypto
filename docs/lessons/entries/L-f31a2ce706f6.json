@@ -1,0 +1,14 @@
+{
+  "action": "Check capacity before the gate and place only rebuildable dependency cache on adequately sized storage, with exact source pins and per-file readback; treat RAM as ephemeral and preserve all failed logs/raw/binaries.",
+  "created": "2026-11-24T00:30:28Z",
+  "evidence": [
+    "research/curve25519_torus_native_20261115/received-ideal-v1/development/CACHE_RECOVERY.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "lean-instance-gate"
+  ],
+  "trigger": "A maintained Mathlib gate cache get may prefetch the full dependency build into a near-full persistent workspace",
+  "why": "Full prefetch exhausted disk; verified relocation of91191cache files restored capacity without source or scientific evidence changes."
+}

@@ -1,0 +1,12 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",pad="0.12",nodesep="0.3",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,color="#365773",fillcolor="#eef4f8",margin="0.13,0.10"];
+ edge [color="#627888",fontname="Helvetica",fontsize=10];
+ p [label="Original unknown-point circuit\nEvery original variable and equation retained"];
+ a [label="Augmented regular chart\n21 explicit difference inverses\n5 normalized coefficient unknowns"];
+ b [label="One of 6 guarded pivot charts\n1 minor inverse + cleared residual\nExact selected-row sparse cancellation",fillcolor="#fff1d8",color="#a67c30"];
+ c [label="Reconstruct all coefficients\nCheck full augmented equations\nOriginal index / image-Q and raw-R replay",fillcolor="#e8f2e9"];
+ p -> a; a -> b [label="classical coefficient elimination"];
+ b -> c;
+ a -> c [label="retained augmented fallback",style=dashed];
+}

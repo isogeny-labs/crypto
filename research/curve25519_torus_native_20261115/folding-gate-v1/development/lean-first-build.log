@@ -1,0 +1,22 @@
+info: Curve25519FoldingGate: no previous manifest, creating one from scratch
+info: toolchain not updated; already up-to-date
+⚠ [2/3] Built FoldingGate (7.6s)
+warning: FoldingGate.lean:40:36: Variable name `hL` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hL
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: FoldingGate.lean:49:34: This simp argument is unused:
+  Nat.add_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Nat.succ_mul, Nat.add_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: FoldingGate.lean:82:0: 'FoldingGate.support_budget_bound' depends on axioms: [propext, Quot.sound]
+info: FoldingGate.lean:83:0: 'FoldingGate.six_support_no_floor_guarantee' depends on axioms: [propext, Quot.sound]
+info: FoldingGate.lean:84:0: 'FoldingGate.linear_interpolation_guards_imply_floor' depends on axioms: [propext, Quot.sound]
+info: FoldingGate.lean:85:0: 'FoldingGate.six_support_guards_incompatible' depends on axioms: [propext, Quot.sound]
+info: FoldingGate.lean:86:0: 'FoldingGate.declared_length_ge_threshold' does not depend on any axioms
+Build completed successfully (3 jobs).

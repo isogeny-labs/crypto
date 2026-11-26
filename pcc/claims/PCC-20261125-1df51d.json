@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-25T00:50:42Z",
+ "id": "PCC-20261125-1df51d",
+ "kind": "statement",
+ "producer": {
+  "commit": "d181477253eaceb5ed55597915ec262eac0a4310",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-20261125"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_cutoff_extract_v1/f127_d4.jsonl",
+    "sha256": "9d3dc33436d10d07ead0b8d0ab51db8167d52830dc87e64917ddf84b57d8e144"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_cutoff_extract_v1/f8191_d4.jsonl",
+    "sha256": "e2223188c5664fd3a9e858a26f5f185039fb94db8d92ba2a21f62c93f69da771"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_cutoff_extract_v1/f8191_d5.jsonl",
+    "sha256": "9d041de625af65a98156ceb1c6ab5c81015873d592b0111048e237fb120d9774"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_cutoff_extract_v1/precall_identity.json",
+    "sha256": "3a1b3e350444a26d727be1ad573982211f72263e3feb7e76b52ed30908fa809e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-full-cutoff-extraction",
+ "statement": "All three frozen paired panels exit zero with empty panel stderr and emit all 26 planned query records. FullCutoff completes 7 of 13 full signed answers; the unchanged cofactor-msolve comparator completes 8 of 13. FullCutoff completes three F127 queries, refuses (116,69) after 7 of 36 charts and all 16 forms of its next chart, completes all four F8191 degree-16 queries, and times out on all five degree-32 queries after 26,27,27,27,28 of 119 charts. The comparator completes all eight degree-16 queries and exhausts all five degree-32 budgets. Every accepted set equals the full Direct reference. All incomplete prefixes remain unaccepted; no required prefix/RUR capture omission occurs. These are unsigned local output controls, not a timing or recovery result."
+}

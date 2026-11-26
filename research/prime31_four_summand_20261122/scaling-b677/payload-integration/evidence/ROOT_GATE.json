@@ -1,0 +1,33 @@
+{
+  "schema": "rr5.b677.root-gate/v1",
+  "command": "cargo +1.100.0 test --locked --release --lib -j2",
+  "attempts": [
+    {
+      "exit": 101,
+      "scope": "initial sparse checkout",
+      "stderr": "root-attempt-01.stderr"
+    },
+    {
+      "exit": 101,
+      "scope": "generalized-rootfinder restored; other fixture inputs still sparse or store-backed",
+      "stderr": "root-attempt-02.stderr"
+    }
+  ],
+  "root_source_and_manifests_equal_origin_main": true,
+  "origin_main": "e07e257b17805a68877e2c4bd7aa18776f321bf0",
+  "non_missing_input_diagnostics": [
+    "the name `round73_mersenne_single_fold` is defined multiple times",
+    "cannot find value `powers` in this scope",
+    "cannot find value `powers` in this scope",
+    "cannot find value `gcds` in this scope",
+    "cannot find value `powers` in this scope",
+    "cannot find value `gcds` in this scope",
+    "cannot find value `previous` in this scope",
+    "cannot find value `r` in this scope",
+    "cannot find value `r` in this scope",
+    "cannot find value `g` in this scope",
+    "cannot find value `g` in this scope"
+  ],
+  "scope": "full root gate did not pass; these failures do not replace the separately recorded standalone RR5 qualification",
+  "signed_pcc": false
+}

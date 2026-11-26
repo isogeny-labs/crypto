@@ -1,0 +1,16 @@
+{
+  "action": "round each full-precision value once at the displayed precision (format(x, '.3f')) and compare strings; values whose 4th decimal is 5 after a first rounding expose double rounding (0.83246 -> 0.8325 -> 0.833)",
+  "created": "2026-11-26T04:28:58Z",
+  "evidence": [
+    "research/quartic_diem_nofb_20261126/validation/checks_extra.json",
+    "research/quartic_diem_nofb_20261126/validation/validator-report.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "checking the numbers a RESULTS.md table or report displays against analysis.json",
+  "why": "nofb validation: 5 of 38 displayed-number groups were double-rounded, including the headline pooled GAE_1 ratio (0.8324606 shown as 0.833 in RESULTS.md, report.typ, the bench record summary and the commit subject) and two interval ends (0.2634980 as 0.264, 0.2164865 as 0.217)"
+}
