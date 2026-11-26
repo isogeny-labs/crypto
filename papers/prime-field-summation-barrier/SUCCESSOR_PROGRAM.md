@@ -44,7 +44,7 @@ The status of the program is:
 | Theorem 18 | unconditional in the stated static-provenance model | product-tree preprocessing plus fully adaptive query branching |
 | Proposition 19 | exact reduction plus literature audit | split-tree recovery is group \(k\)SUM-Indexing; current indexing upper bounds remain above one-half after relation accounting |
 | Theorem 20 | exact exponent criterion | piecewise sub-rho conditions for preprocessing exponent \(s\) and amortized batch-query exponent \(t\) |
-| Theorem 21 | unconditional quotient obstruction | exact homomorphic buckets, affine algebraic-group linearizations, and low-degree isogeny quotients cannot compress the prime-order subgroup |
+| Theorem 21 | unconditional bucket/quotient obstruction | arbitrary exact separate-label predicates, exact compositional buckets, affine algebraic-group linearizations, and low-degree isogeny quotients cannot compress the prime-order subgroup |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1659,8 +1659,7 @@ coefficient by \(s_0=\max\{s,2\}\), so the identical case split applies.
 This criterion turns the broad ARQP question into a falsifiable target. The
 exponent \(t\) is amortized over the complete collection batch, so ordinary
 multipoint evaluation and shared target processing do not escape the balance.
-In
-the balanced sparse branch \(s-t\ge1\), a candidate must cross the line
+In the balanced sparse branch \(s-t\ge1\), a candidate must cross the line
 \(s+t=m-1\), not merely compress the \(N^m\) expanded sum table.  In the
 boundary branch \(s-t<1\), it must instead achieve \(t<m/2-1\).  The trivial
 scan, full sum table, balanced meet-in-the-middle table, and the
@@ -1669,19 +1668,49 @@ first branch and has \(s+t=m+1/2\).  A barrier theorem may therefore prove the
 corresponding piecewise inequalities for an explicitly closed elliptic
 group-indexing model. [pcc:unverified]
 
-### Theorem 21 (no proper exact homomorphic bucket quotient)
+### Theorem 21 (no compressed exact bucket filter or compositional quotient)
 
-Let \(G\subseteq E(\mathbb F_p)\) be cyclic of prime order \(n\), and let
-\(\psi:G\to H\) be a group homomorphism used as an exact bucket label for
-partial sums.  Then exactly one of the following holds:
+Let \(G\subseteq E(\mathbb F_p)\) be cyclic of prime order \(n\).  First,
+suppose three label maps
+
+\[
+\lambda_A:G\to L_A,\qquad
+\lambda_B:G\to L_B,\qquad
+\lambda_T:G\to L_T
+\]
+
+and a predicate \(R\subseteq L_A\times L_B\times L_T\) decide addition
+exactly:
+
+\[
+R(\lambda_A(P),\lambda_B(Q),\lambda_T(T))
+\quad\Longleftrightarrow\quad P+Q=T.
+\]
+
+Then all three label maps are injective.  In particular,
+\(|L_A|,|L_B|,|L_T|\ge n\); an exact filter based only on separately
+compressed bucket labels is impossible even when its predicate is arbitrary.
+
+Second, let \(L\) be any label set equipped with an arbitrary binary operation
+\(\star:L\times L\to L\), and suppose a bucket label \(\psi:G\to L\) is
+compositional:
+
+\[
+\psi(P+Q)=\psi(P)\star\psi(Q)
+\qquad(P,Q\in G).
+\]
+
+No group, associativity, cancellation, or inverse axioms are assumed for
+\((L,\star)\).  Nevertheless, exactly one of the following holds:
 
 1. \(\psi\) is trivial, so the compatibility test
-   \(\psi(A)+\psi(B)=\psi(T)\) rejects no candidate pair; or
-2. \(\psi\) is injective, so \(|H|\ge n\) and the label distinguishes every
+   \(\psi(A)\star\psi(B)=\psi(T)\) rejects no candidate pair; or
+2. \(\psi\) is injective, so \(|L|\ge n\) and the label distinguishes every
    element of \(G\).
 
-In particular there is no nontrivial exact homomorphic bucket map from \(G\)
-to a group of size \(o(n)\).
+In particular there is no nontrivial compositional bucket map from
+\(G\) to a label set of size \(o(n)\).  Group homomorphisms are only a special
+case.
 
 Two algebraic consequences hold.
 
@@ -1697,9 +1726,45 @@ Two algebraic consequences hold.
 
 #### Proof
 
-The kernel of \(\psi\) is a subgroup of the prime-order group \(G\), hence is
-either \(\{O\}\) or \(G\).  These are respectively the injective and trivial
-cases.  An injective map forces \(|H|\ge n\).
+If \(\lambda_A(P)=\lambda_A(P')\), take \(Q=O\) and \(T=P\).  The predicate
+accepts the label triple for \((P,O,P)\), hence accepts the identical label
+triple for \((P',O,P)\).  Exactness gives \(P'=P\), so \(\lambda_A\) is
+injective.  The same argument with the two summand positions exchanged proves `[pcc:unverified]`
+injectivity of \(\lambda_B\).  If
+\(\lambda_T(T)=\lambda_T(T')\), use the accepted triple \((T,O,T)\);
+exactness of the identical label triple \((T,O,T')\) gives \(T=T'\).
+
+Put \(K=\{P\in G:\psi(P)=\psi(O)\}\).  If \(P\in K\), compositionality gives
+
+\[
+\psi(O)=\psi(P-P)
+=\psi(P)\star\psi(-P)
+=\psi(O)\star\psi(-P)
+=\psi(-P),
+\]
+
+so \(-P\in K\).  If \(P,Q\in K\), then
+
+\[
+\psi(P-Q)=\psi(P)\star\psi(-Q)
+=\psi(O)\star\psi(-Q)
+=\psi(-Q)=\psi(O),
+\]
+
+so \(P-Q\in K\).  Thus \(K\) is a subgroup.
+
+Moreover,
+
+\[
+\psi(P)=\psi(Q)\quad\Longleftrightarrow\quad P-Q\in K.
+\]
+
+The forward implication follows by composing both equal labels with
+\(\psi(-Q)\); the reverse implication follows from
+\(\psi(P)=\psi((P-Q)+Q)=\psi(O)\star\psi(Q)=\psi(Q)\).
+Hence the fibres of \(\psi\) are exactly the cosets of \(K\).  Prime order
+forces \(K=\{O\}\) or \(K=G\), giving respectively the injective and constant
+cases.  An injective label map forces \(|L|\ge n\).
 
 A morphism \(E\to\mathbb G_a\) is a global regular function on the proper
 geometrically integral curve \(E\), hence is constant.  The same is true for
@@ -1712,11 +1777,14 @@ second case the kernel scheme has at least \(n\) distinct geometric points,
 so \(\deg\phi\ge n\).  Therefore \(d<n\) forces trivial intersection and
 injectivity on \(G\). \(\square\)
 
-This theorem rules out exact additive/multiplicative coset labels,
+This theorem rules out every exact separately labelled bucket predicate and
+every smaller globally compositional label, including
+additive/multiplicative coset labels,
 globally compatible rational linearizations, and low-degree isogeny fibres as
-the missing compact generator.  It does not cover non-homomorphic hashing,
-one-sided filters with false positives, target-dependent rational functions,
-or data structures that exploit coordinates without preserving addition.
+the missing compact generator.  It does not cover one-sided filters with false
+positives, target-dependent rational functions, joint encodings that do not
+factor through separate labels, or data structures that exploit coordinates
+without preserving addition.
 Those mechanisms remain inside the indexing boundary of Proposition 19.
 [pcc:unverified]
 

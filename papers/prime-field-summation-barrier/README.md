@@ -52,11 +52,15 @@ factor-base boundary branch (`s-t < 1`) requires `t < m/2-1`.  Under the
 conventional `N^2` sparse linear-algebra model, replace `s` by `max(s,2)` in
 that case split. `[pcc:unverified]`
 
-Theorem 21 closes one natural implicit-generator family unconditionally:
-prime-order elliptic subgroups admit no proper nontrivial homomorphic bucket
-quotient; algebraic-group maps to additive or multiplicative field groups are
-trivial; and isogenies of degree below the subgroup order are injective on the
-subgroup. Non-homomorphic and one-sided-error filters remain open.
+Theorem 21 closes one natural implicit-generator family unconditionally. An
+arbitrary exact addition predicate based on separate summand/target labels
+forces every label map to be injective. Prime-order elliptic subgroups also
+admit no proper nontrivial exact compositional bucket quotient, even when the
+label operation is not a group law;
+algebraic-group maps to additive or multiplicative field groups are trivial;
+and isogenies of degree below the subgroup order are injective on the subgroup.
+One-sided-error filters, target-specific functions, and joint encodings remain
+open.
 `[pcc:unverified]`
 
 ## Source and claim crosswalk
@@ -100,10 +104,12 @@ They do not verify an asymptotic lower bound or an algebraic solver model.
 
 Native replay on 2026-11-26 used the `rust:1.83-alpine` container image at
 digest `sha256:0ac946ed7597a9f053a1be2ce38c09aa88b3d7079a91ea491493615294b1f699`:
-five tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
+seven tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
 optimization against direct minimization and verifies the exact `m=3,4,5`
 fractions in the indexing-family audit plus the finite cyclic-group kernel of
-Theorem 21. `[pcc:unverified]`
+Theorem 21, including exhaustive arbitrary label algebras through order seven
+and exact separate-label predicates for small groups.
+`[pcc:unverified]`
 
 ## Owed before review-ready status
 

@@ -193,4 +193,96 @@ fn prime_cyclic_groups_have_no_smaller_nontrivial_homomorphic_bucket() {
     }
 }
 
+fn has_exact_composition_rule(labels: &[usize], label_count: usize) -> bool {
+    let group_order = labels.len();
+    let mut table = vec![None; label_count * label_count];
+    for left in 0..group_order {
+        for right in 0..group_order {
+            let slot = labels[left] * label_count + labels[right];
+            let sum_label = labels[(left + right) % group_order];
+            match table[slot] {
+                Some(previous) if previous != sum_label => return false,
+                Some(_) => {}
+                None => table[slot] = Some(sum_label),
+            }
+        }
+    }
+    true
+}
+
+#[test]
+fn prime_cyclic_groups_have_no_smaller_exact_compositional_labels() {
+    for prime_order in [3_usize, 5, 7] {
+        for label_count in 1..prime_order {
+            let number_of_maps = label_count.pow(prime_order as u32);
+            for code in 0..number_of_maps {
+                let mut remainder = code;
+                let mut labels = vec![0; prime_order];
+                for label in &mut labels {
+                    *label = remainder % label_count;
+                    remainder /= label_count;
+                }
+                let constant = labels.iter().all(|label| *label == labels[0]);
+                assert!(constant || !has_exact_composition_rule(&labels, label_count));
+            }
+        }
+    }
+}
+
+fn decode_labels(mut code: usize, group_order: usize, label_count: usize) -> Vec<usize> {
+    let mut labels = vec![0; group_order];
+    for label in &mut labels {
+        *label = code % label_count;
+        code /= label_count;
+    }
+    labels
+}
+
+fn exact_addition_predicate_exists(
+    left_labels: &[usize],
+    right_labels: &[usize],
+    target_labels: &[usize],
+    label_count: usize,
+) -> bool {
+    let group_order = left_labels.len();
+    let mut predicate = vec![None; label_count.pow(3)];
+    for left in 0..group_order {
+        for right in 0..group_order {
+            for target in 0..group_order {
+                let slot = (left_labels[left] * label_count + right_labels[right]) * label_count
+                    + target_labels[target];
+                let should_accept = (left + right) % group_order == target;
+                match predicate[slot] {
+                    Some(previous) if previous != should_accept => return false,
+                    Some(_) => {}
+                    None => predicate[slot] = Some(should_accept),
+                }
+            }
+        }
+    }
+    true
+}
+
+#[test]
+fn smaller_separate_labels_cannot_decide_addition_exactly() {
+    for (prime_order, label_count) in [(3_usize, 1_usize), (3, 2), (5, 2)] {
+        let number_of_maps = label_count.pow(prime_order as u32);
+        for left_code in 0..number_of_maps {
+            let left = decode_labels(left_code, prime_order, label_count);
+            for right_code in 0..number_of_maps {
+                let right = decode_labels(right_code, prime_order, label_count);
+                for target_code in 0..number_of_maps {
+                    let target = decode_labels(target_code, prime_order, label_count);
+                    assert!(!exact_addition_predicate_exists(
+                        &left,
+                        &right,
+                        &target,
+                        label_count,
+                    ));
+                }
+            }
+        }
+    }
+}
+
 fn main() {}
