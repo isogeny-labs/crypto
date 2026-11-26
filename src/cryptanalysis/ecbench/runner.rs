@@ -189,6 +189,8 @@ struct DiagnosticSessionClock {
     portable: Instant,
     previous: std::cell::Cell<u64>,
     preparation: PreparationObservations,
+    #[cfg(test)]
+    fixture_tick: Option<std::cell::Cell<u64>>,
 }
 #[cfg(target_os = "linux")]
 fn diagnostic_monotonic_ns() -> Result<u64, String> {
@@ -246,6 +248,8 @@ impl DiagnosticSessionClock {
                 lock_acquired_ns: None,
                 execute_entry_ns: None,
             },
+            #[cfg(test)]
+            fixture_tick: None,
         })
     }
     fn checked_offset(&self, raw_ns: u64) -> Result<u64, String> {
@@ -259,6 +263,11 @@ impl DiagnosticSessionClock {
         Ok(offset)
     }
     fn offset(&self) -> Result<u64, String> {
+        #[cfg(test)]
+        if let Some(tick) = &self.fixture_tick {
+            tick.set(tick.get() + 1);
+            return self.checked_offset(tick.get());
+        }
         #[cfg(target_os = "linux")]
         {
             let boot = std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
@@ -3586,6 +3595,23 @@ mod diagnostic_reap_publication_regression_tests {
         )
         .unwrap()
     }
+    fn fixture_clock() -> DiagnosticSessionClock {
+        DiagnosticSessionClock {
+            origin_ns: 0,
+            boot_id: None,
+            time_namespace: None,
+            time_namespace_offsets: None,
+            #[cfg(not(target_os = "linux"))]
+            portable: Instant::now(),
+            previous: std::cell::Cell::new(0),
+            preparation: PreparationObservations {
+                lock_wait_started_ns: None,
+                lock_acquired_ns: None,
+                execute_entry_ns: None,
+            },
+            fixture_tick: Some(std::cell::Cell::new(0)),
+        }
+    }
     fn assert_pending(journal: &SessionResourceJournal) {
         let status = journal
             .close_on_external_exit(&diagnostic_json_bytes(journal).unwrap(), None)
@@ -3597,7 +3623,7 @@ mod diagnostic_reap_publication_regression_tests {
     #[test]
     fn ok_without_observed_reap_cannot_mark_or_read_sidecars() {
         for observed in [false, true] {
-            let clock = DiagnosticSessionClock::begin().unwrap();
+            let clock = fixture_clock();
             let mut reaped = Reaped::spawn_failed("fixture".into());
             reaped.spawn_error = None;
             reaped.reap_observed = observed;
@@ -3638,7 +3664,7 @@ mod diagnostic_reap_publication_regression_tests {
     fn publication_collision_preserves_previous_bytes_and_pending_failure() {
         for block_tail in [false, true] {
             let root = Root::new();
-            let clock = DiagnosticSessionClock::begin().unwrap();
+            let clock = fixture_clock();
             let mut journal = journal();
             let prior_journal = diagnostic_json_bytes(&journal).unwrap();
             let record = root.0.join("records.jsonl");
@@ -3683,17 +3709,7 @@ mod diagnostic_reap_publication_regression_tests {
     fn diagnostic_raw_clock_offset_rejects_underflow_and_regression() {
         let clock = DiagnosticSessionClock {
             origin_ns: 100,
-            boot_id: None,
-            time_namespace: None,
-            time_namespace_offsets: None,
-            #[cfg(not(target_os = "linux"))]
-            portable: Instant::now(),
-            previous: std::cell::Cell::new(0),
-            preparation: PreparationObservations {
-                lock_wait_started_ns: None,
-                lock_acquired_ns: None,
-                execute_entry_ns: None,
-            },
+            ..fixture_clock()
         };
         assert!(clock.checked_offset(99).is_err());
         assert_eq!(clock.checked_offset(105).unwrap(), 5);

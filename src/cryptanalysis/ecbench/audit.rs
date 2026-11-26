@@ -742,6 +742,13 @@ fn compare_replay(
                 .retain(|k, _| !legacy::is_setup_descriptor(k) || rec.native.contains_key(k));
         }
     }
+    if legacy::admits_pre_walk_jump_descriptor(r) {
+        for (ph, recorded) in rep.phases.iter_mut().zip(&r.phases) {
+            if ph.name == "relations" && !recorded.native.contains_key("walk_jumps_materialised") {
+                ph.native.remove("walk_jumps_materialised");
+            }
+        }
+    }
     // The three-lead adapters' cost-accounting counters are compared only
     // where the record has them (`legacy::admits_pre_cost_accounting`).
     if legacy::admits_pre_cost_accounting(r) {

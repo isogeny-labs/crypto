@@ -388,7 +388,7 @@ unsafe fn eliminate_packed_prefix(
     let coefficient_mask = (1u64 << width) - 1;
     let mut rank = 0;
     macro_rules! consume {
-        ($j:literal, $v:ident, $lane:literal) => {{
+        ($j:literal, $v:ident, $lane:literal $(, $pending:ident)*) => {{
             if $j >= rows {
                 return (rank, rows, false);
             }
@@ -405,30 +405,31 @@ unsafe fn eliminate_packed_prefix(
                 if rank == width {
                     return (rank, $j + 1, false);
                 }
-                let bitmask = _mm_set1_epi16((1u16 << bit) as i16);
-                let pivot = _mm_set1_epi16(row as i16);
-                let m0 = _mm_cmpeq_epi16(_mm_and_si128(lo, bitmask), bitmask);
-                let m1 = _mm_cmpeq_epi16(_mm_and_si128(hi, bitmask), bitmask);
-                lo = _mm_xor_si128(lo, _mm_and_si128(m0, pivot));
-                hi = _mm_xor_si128(hi, _mm_and_si128(m1, pivot));
+                // Only registers with unconsumed rows need propagation.
+                $(
+                    let bitmask = _mm_set1_epi16((1u16 << bit) as i16);
+                    let pivot = _mm_set1_epi16(row as i16);
+                    let mask = _mm_cmpeq_epi16(_mm_and_si128($pending, bitmask), bitmask);
+                    $pending = _mm_xor_si128($pending, _mm_and_si128(mask, pivot));
+                )*
             }
         }};
     }
-    consume!(0, lo, 0);
-    consume!(1, lo, 1);
-    consume!(2, lo, 2);
-    consume!(3, lo, 3);
-    consume!(4, lo, 4);
-    consume!(5, lo, 5);
-    consume!(6, lo, 6);
-    consume!(7, lo, 7);
-    consume!(8, hi, 0);
-    consume!(9, hi, 1);
-    consume!(10, hi, 2);
-    consume!(11, hi, 3);
-    consume!(12, hi, 4);
-    consume!(13, hi, 5);
-    consume!(14, hi, 6);
+    consume!(0, lo, 0, lo, hi);
+    consume!(1, lo, 1, lo, hi);
+    consume!(2, lo, 2, lo, hi);
+    consume!(3, lo, 3, lo, hi);
+    consume!(4, lo, 4, lo, hi);
+    consume!(5, lo, 5, lo, hi);
+    consume!(6, lo, 6, lo, hi);
+    consume!(7, lo, 7, hi);
+    consume!(8, hi, 0, hi);
+    consume!(9, hi, 1, hi);
+    consume!(10, hi, 2, hi);
+    consume!(11, hi, 3, hi);
+    consume!(12, hi, 4, hi);
+    consume!(13, hi, 5, hi);
+    consume!(14, hi, 6, hi);
     consume!(15, hi, 7);
     (rank, rows, false)
 }
@@ -751,10 +752,10 @@ impl ProductProjection {
                 u = u.add(x);
             }
         }
-        return (
+        (
             ProjectedResult::Unique(u, F2mElement::from_words(&product_words, c.m)),
             rows,
-        );
+        )
     }
 }
 
