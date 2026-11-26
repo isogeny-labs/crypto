@@ -63,6 +63,14 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [26 November Rust Prime31 norm-one-torus m=5 component study](20261126-norm-one-torus-m5/)
+retains a report PDF plus SVG and 150 dpi PNG copies. Its publicly precommitted
+producer run reports 48.356 ms versus 10.355 ms median setup-plus-query time
+(4.669821x) and 57,052 versus 2 setup inversions. The clock was non-isolated,
+there is no matched rho reference, and PCC claim `PCC-20261126-7a50b7` lacks
+independent signatures; it remains outside the admitted table.
+[pcc:unverified]
+
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 
 The [25 November Curve25519 projective-split qualification](20261125-curve25519-projective-split/)
