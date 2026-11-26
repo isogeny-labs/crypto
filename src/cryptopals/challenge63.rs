@@ -178,6 +178,37 @@ pub struct Poly {
     pub coeffs: Vec<Gf128>,
 }
 
+/// GF(2^128) as a [`crate::gcd::poly::PolyField`].
+struct Gf128Field;
+
+impl crate::gcd::poly::PolyField for Gf128Field {
+    type E = Gf128;
+    fn zero(&self) -> Gf128 {
+        Gf128::zero()
+    }
+    fn one(&self) -> Gf128 {
+        Gf128::one()
+    }
+    fn add(&self, a: Gf128, b: Gf128) -> Gf128 {
+        a.add(b)
+    }
+    fn sub(&self, a: Gf128, b: Gf128) -> Gf128 {
+        a.add(b)
+    }
+    fn mul(&self, a: Gf128, b: Gf128) -> Gf128 {
+        a.mul(b)
+    }
+    fn inv(&self, a: Gf128) -> Gf128 {
+        a.inv()
+    }
+    fn is_zero(&self, a: Gf128) -> bool {
+        a.is_zero()
+    }
+    fn neg(&self, a: Gf128) -> Gf128 {
+        a
+    }
+}
+
 impl Poly {
     pub fn new(mut coeffs: Vec<Gf128>) -> Self {
         while coeffs.len() > 1 && coeffs.last().unwrap().is_zero() {
@@ -270,12 +301,15 @@ impl Poly {
         self.scale(inv)
     }
 
+    /// Monic `gcd(a, b)` (the zero polynomial when both are zero), by
+    /// `crate::gcd::poly::gcd`.
     pub fn gcd(a: &Self, b: &Self) -> Self {
-        if b.deg() < 0 {
-            return a.monic();
+        let g = crate::gcd::poly::gcd(&Gf128Field, &a.coeffs, &b.coeffs);
+        if g.is_empty() {
+            Poly::zero()
+        } else {
+            Poly::new(g)
         }
-        let (_, r) = a.divmod(b);
-        Self::gcd(b, &r)
     }
 
     /// Compute `self^e mod m` for `BigUint` exponent.

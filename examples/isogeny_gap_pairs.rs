@@ -87,7 +87,9 @@ fn powmod(mut a: u64, mut e: u64, p: u64) -> u64 {
     r
 }
 fn invmod(a: u64, p: u64) -> u64 {
-    powmod(a, p - 2, p)
+    // `p` is prime: the old Fermat power `a^(p-2)` is the inverse of a
+    // unit; a non-unit (`a ≡ 0`) keeps the old Fermat value.
+    crypto_lib::gcd::int::inv_mod_u64(a, p).unwrap_or_else(|| powmod(a, p - 2, p))
 }
 fn modp_i(v: i128, p: u64) -> u64 {
     let m = v.rem_euclid(p as i128);

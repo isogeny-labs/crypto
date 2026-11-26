@@ -23,16 +23,8 @@ use super::walk::{self, RouteIndex, StartCurve, Walk, WalkConfig};
 type Pt = Option<(u64, u64)>;
 
 fn inv_mod(a: u64, q: u64) -> u64 {
-    let mut r = 1u64;
-    let (mut b, mut e) = (a % q, q - 2);
-    while e > 0 {
-        if e & 1 == 1 {
-            r = r * b % q;
-        }
-        b = b * b % q;
-        e >>= 1;
-    }
-    r
+    // Prime q >= 3: Fermat's a^(q-2) is the inverse of a unit and 0 for a = 0 mod q.
+    crate::gcd::int::inv_mod_u64(a, q).unwrap_or(0)
 }
 
 fn add(q: u64, a: u64, p1: Pt, p2: Pt) -> Pt {

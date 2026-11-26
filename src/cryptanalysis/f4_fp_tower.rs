@@ -1155,6 +1155,13 @@ pub struct TowerF4Options {
     /// ([`degree_of`] on it is the weighted degree; [`mask_of`] and
     /// [`free_of`] are unchanged).
     pub weights: Option<TowerWeights>,
+    /// Tower-pair scheduling omissions for a bounded, open-top embedding.
+    /// Bit `v` may be set only when the rule is exactly `y_v^2 = 0` and
+    /// `2*w(v) > max_degree`; [`f4_tower`] validates both conditions before
+    /// doing work. Such a pair is necessarily above the run's degree cap, so
+    /// omitting it changes neither a within-cap row nor the computed bounded
+    /// basis. The default zero mask preserves ordinary quotient-ring F4.
+    pub omit_zero_top_pairs: u64,
 }
 
 /// What an F4 run that ended in a refutation learned about its system
@@ -1183,11 +1190,49 @@ impl F4Trace {
     pub fn kept_rows(&self) -> usize {
         self.steps.iter().map(|s| s.kept.len()).sum()
     }
+
+    /// Replay a refutation while propagating cofactors of the original
+    /// generators, returning `c_i` with `sum_i c_i input_i = 1`.
+    ///
+    /// This deliberately narrow exporter accepts only independent height-four
+    /// radix-2 Kummer blocks
+    /// `z_0^2=z_1, z_1^2=z_2, z_2^2=z_3, z_3^2=0`, no free variables, and
+    /// weights `1,2,4,8` in every block.  Such a block is the binary encoding
+    /// of one ordinary exponent below 16.  Every cofactor and every product
+    /// with an original input is decoded before acceptance; touching the top
+    /// truncation rule, using a non-canonical weighted key, or exceeding
+    /// `max_product_degree` is an error.  Consequently the returned identity
+    /// holds in the ordinary polynomial ring, not merely in the truncated
+    /// tower quotient.
+    ///
+    /// The returned [`RPoly`] keys remain in `weights`.  For an accepted term,
+    /// its ordinary exponent in block `b` is the four-bit integer carried by
+    /// mask bits `4b..4b+4`, and [`degree_of`] is the sum of those exponents.
+    /// Extraction fails closed above 64 original generators or 3,000,000 live
+    /// provenance terms.  Its final deterministic ordinary-ring check uses
+    /// the producer/verifier's ascending decoded-exponent product order and
+    /// enforces the frozen 2,000,000-live-term accumulator cap.  A separate
+    /// 2,000,000-product internal work censor bounds extraction time; hitting
+    /// that censor means no certificate was exported, not that a supplied
+    /// certificate violates the evidence format.
+    pub fn unit_certificate(
+        &self,
+        input: &[RPoly],
+        ring: &TowerRing,
+        weights: TowerWeights,
+        max_product_degree: u32,
+    ) -> Result<Vec<RPoly>, String> {
+        replay_radix4_unit_certificate(self, input, ring, weights, max_product_degree)
+    }
 }
 
 #[derive(Clone, Debug)]
 pub(crate) struct ScatterPlan {
     elem_id: u32,
+    /// The monomial multiplying `elem_id`. The ordinary certificate replay
+    /// propagates original-generator cofactors through it; the numeric replay
+    /// only needs the precompiled scatter moves below.
+    mult: Mono,
     expected_lead: u32,
     unit_moves: Vec<(u32, u32)>,
     scaled_moves: Vec<(u32, u32, u32)>,
@@ -1345,6 +1390,7 @@ fn build_scatter_plan(
     }
     ScatterPlan {
         elem_id,
+        mult,
         expected_lead: c_col_of[&expected_lead_mono],
         unit_moves,
         scaled_moves,
@@ -1875,6 +1921,876 @@ pub(crate) fn replay_compiled(
     rep.replay_failure = Some("trace exhausted");
 }
 
+// ── Original-generator replay for the height-four radix embedding ───
+
+type GeneratorProof = Vec<MonoMap<u32>>;
+const MAX_UNIT_CERTIFICATE_GENERATORS: usize = 64;
+const MAX_UNIT_CERTIFICATE_TERMS: usize = 3_000_000;
+const MAX_UNIT_CERTIFICATE_RECOMPOSITION_PRODUCTS: usize = 2_000_000;
+const MAX_UNIT_CERTIFICATE_ACCUMULATOR_TERMS: usize = 2_000_000;
+
+fn proof_terms(proof: &GeneratorProof) -> Option<usize> {
+    proof
+        .iter()
+        .try_fold(0usize, |n, poly| n.checked_add(poly.len()))
+}
+
+fn check_live_proof_terms_with_limit<'a>(
+    proofs: impl IntoIterator<Item = &'a GeneratorProof>,
+    additional: usize,
+    limit: usize,
+) -> Result<(), String> {
+    let mut total = additional;
+    for proof in proofs {
+        let Some(proof_terms) = proof_terms(proof) else {
+            return Err(format!(
+                "unit certificate aggregate provenance term budget exceeded: attempted at least {}, limit {limit}",
+                limit.saturating_add(1)
+            ));
+        };
+        let Some(next) = total.checked_add(proof_terms) else {
+            return Err(format!(
+                "unit certificate aggregate provenance term budget exceeded: attempted at least {}, limit {limit}",
+                limit.saturating_add(1)
+            ));
+        };
+        total = next;
+        if total > limit {
+            return Err(format!(
+                "unit certificate aggregate provenance term budget exceeded: attempted {total}, limit {limit}"
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn check_live_proof_terms<'a>(
+    proofs: impl IntoIterator<Item = &'a GeneratorProof>,
+    additional: usize,
+) -> Result<(), String> {
+    check_live_proof_terms_with_limit(proofs, additional, MAX_UNIT_CERTIFICATE_TERMS)
+}
+
+fn check_replay_live_proof_terms(
+    persistent: &[Option<GeneratorProof>],
+    raw: &[GeneratorProof],
+    reduced: &[Option<GeneratorProof>],
+    echelon: &[(u32, Vec<u32>, GeneratorProof)],
+    additional: usize,
+) -> Result<(), String> {
+    check_live_proof_terms(
+        persistent
+            .iter()
+            .filter_map(Option::as_ref)
+            .chain(raw.iter())
+            .chain(reduced.iter().filter_map(Option::as_ref))
+            .chain(echelon.iter().map(|(_, _, proof)| proof)),
+        additional,
+    )
+}
+
+struct Radix4ProofRing<'a> {
+    ring: &'a TowerRing,
+    fp: Fp,
+    weights: TowerWeights,
+    blocks: usize,
+    valid_mask: u64,
+    max_product_degree: u32,
+}
+
+impl<'a> Radix4ProofRing<'a> {
+    fn new(
+        ring: &'a TowerRing,
+        weights: TowerWeights,
+        max_product_degree: u32,
+    ) -> Result<Self, String> {
+        const DEPTH: usize = 4;
+        if ring.n_free != 0
+            || ring.rules.is_empty()
+            || ring.rules.len() > 64
+            || !ring.rules.len().is_multiple_of(DEPTH)
+        {
+            return Err(
+                "unit certificate requires nonempty height-four radix blocks and no free variables"
+                    .into(),
+            );
+        }
+        if max_product_degree == 0 {
+            return Err("unit certificate product-degree cap must be positive".into());
+        }
+        for block in 0..ring.rules.len() / DEPTH {
+            for level in 0..DEPTH {
+                let j = block * DEPTH + level;
+                let rule = ring.rules[j];
+                let next = (level + 1 < DEPTH).then_some((j + 1) as u8);
+                let b = u64::from(next.is_some());
+                if rule
+                    != (SquareRule {
+                        next,
+                        a: 0,
+                        b,
+                        c: 0,
+                        d: 0,
+                    })
+                {
+                    return Err(format!(
+                        "unit certificate requires exact zero-top Kummer rule at tower variable {j}"
+                    ));
+                }
+                if weights.weight(j as u32) != 1u32 << level {
+                    return Err(format!(
+                        "unit certificate requires radix weight {} at tower variable {j}",
+                        1u32 << level
+                    ));
+                }
+            }
+        }
+        let valid_mask = if ring.rules.len() == 64 {
+            u64::MAX
+        } else {
+            (1u64 << ring.rules.len()) - 1
+        };
+        if weights.planes.iter().any(|plane| plane & !valid_mask != 0) {
+            return Err("unit certificate weights extend past the radix blocks".into());
+        }
+        Ok(Self {
+            ring,
+            fp: Fp::new(ring.p),
+            weights,
+            blocks: ring.rules.len() / DEPTH,
+            valid_mask,
+            max_product_degree,
+        })
+    }
+
+    fn decoded_degree(&self, m: Mono) -> Result<u32, String> {
+        let mask = mask_of(m);
+        if mask & !self.valid_mask != 0 || free_of(m) != [0; MAX_FREE] {
+            return Err("unit certificate monomial lies outside the radix blocks".into());
+        }
+        let degree = (0..self.blocks)
+            .map(|b| ((mask >> (4 * b)) & 0xf) as u32)
+            .sum::<u32>();
+        let expected = mono_w(mask, [0; MAX_FREE], self.weights);
+        if m != expected || degree_of(m) != degree {
+            return Err("unit certificate encountered a noncanonical weighted monomial".into());
+        }
+        if degree > self.max_product_degree {
+            return Err(format!(
+                "unit certificate multiplier degree {degree} exceeds cap {}",
+                self.max_product_degree
+            ));
+        }
+        Ok(degree)
+    }
+
+    fn decoded_lex_cmp(&self, a: Mono, b: Mono) -> std::cmp::Ordering {
+        let (a, b) = (mask_of(a), mask_of(b));
+        for block in 0..self.blocks {
+            let shift = 4 * block;
+            let order = ((a >> shift) & 0xf).cmp(&((b >> shift) & 0xf));
+            if order != std::cmp::Ordering::Equal {
+                return order;
+            }
+        }
+        std::cmp::Ordering::Equal
+    }
+
+    fn rekey_input(&self, p: &RPoly) -> Result<RPoly, String> {
+        let mut terms = Vec::with_capacity(p.len());
+        for (&m, &c) in p.monos.iter().zip(&p.coefs) {
+            let mask = mask_of(m);
+            if c == 0
+                || u64::from(c) >= self.ring.p
+                || mask & !self.valid_mask != 0
+                || free_of(m) != [0; MAX_FREE]
+            {
+                return Err("unit certificate input is not a canonical radix polynomial".into());
+            }
+            let weighted = mono_w(mask, [0; MAX_FREE], self.weights);
+            self.decoded_degree(weighted)?;
+            terms.push((weighted, u64::from(c)));
+        }
+        Ok(RPoly::from_terms(self.fp, terms))
+    }
+
+    fn multiply_keys(&self, a: Mono, b: Mono) -> Result<Mono, String> {
+        self.decoded_degree(a)?;
+        self.decoded_degree(b)?;
+        let (ma, mb) = (mask_of(a), mask_of(b));
+        let mut out = 0u64;
+        let mut degree = 0u32;
+        for block in 0..self.blocks {
+            let shift = 4 * block;
+            let ea = (ma >> shift) & 0xf;
+            let eb = (mb >> shift) & 0xf;
+            let Some(e) = ea.checked_add(eb) else {
+                return Err("unit certificate exponent addition overflow".into());
+            };
+            if e >= 16 {
+                return Err(format!(
+                    "unit certificate would touch the zero top rule in radix block {block}"
+                ));
+            }
+            out |= e << shift;
+            degree += e as u32;
+        }
+        if degree > self.max_product_degree {
+            return Err(format!(
+                "unit certificate product degree {degree} exceeds cap {}",
+                self.max_product_degree
+            ));
+        }
+        Ok(mono_w(out, [0; MAX_FREE], self.weights))
+    }
+}
+
+fn proof_basis(n: usize, input: usize) -> GeneratorProof {
+    let mut proof = vec![MonoMap::default(); n];
+    proof[input].insert(ONE, 1);
+    proof
+}
+
+fn proof_add_scaled(
+    dst: &mut GeneratorProof,
+    src: &GeneratorProof,
+    scale: u64,
+    fp: Fp,
+) -> Result<(), String> {
+    let scale = scale % fp.p;
+    if scale == 0 {
+        return Ok(());
+    }
+    let attempted = proof_terms(dst).and_then(|n| proof_terms(src).and_then(|m| n.checked_add(m)));
+    if attempted.is_none_or(|n| n > MAX_UNIT_CERTIFICATE_TERMS) {
+        let attempted = attempted
+            .map(|n| n.to_string())
+            .unwrap_or_else(|| format!("at least {}", MAX_UNIT_CERTIFICATE_TERMS + 1));
+        return Err(format!(
+            "unit certificate provenance term budget exceeded: attempted {attempted}, limit {MAX_UNIT_CERTIFICATE_TERMS}"
+        ));
+    }
+    for (to, from) in dst.iter_mut().zip(src) {
+        for (&m, &c) in from {
+            let add = fp.mul(scale, u64::from(c)) as u32;
+            let old = to.get(&m).copied().unwrap_or(0);
+            let new = fp.add(u64::from(old), u64::from(add)) as u32;
+            if new == 0 {
+                to.remove(&m);
+            } else {
+                to.insert(m, new);
+            }
+        }
+    }
+    Ok(())
+}
+
+fn proof_sub_scaled(
+    dst: &mut GeneratorProof,
+    src: &GeneratorProof,
+    scale: u64,
+    fp: Fp,
+) -> Result<(), String> {
+    proof_add_scaled(dst, src, fp.neg(scale % fp.p), fp)
+}
+
+fn proof_scale(proof: &mut GeneratorProof, scale: u64, fp: Fp) {
+    let scale = scale % fp.p;
+    for poly in proof {
+        if scale == 0 {
+            poly.clear();
+            continue;
+        }
+        for c in poly.values_mut() {
+            *c = fp.mul(u64::from(*c), scale) as u32;
+        }
+    }
+}
+
+fn proof_multiply_mono(
+    proof: &GeneratorProof,
+    mult: Mono,
+    radix: &Radix4ProofRing<'_>,
+) -> Result<GeneratorProof, String> {
+    radix.decoded_degree(mult)?;
+    let mut out = vec![MonoMap::default(); proof.len()];
+    for (to, from) in out.iter_mut().zip(proof) {
+        for (&m, &c) in from {
+            let product = radix.multiply_keys(m, mult)?;
+            let old = to.get(&product).copied().unwrap_or(0);
+            let new = radix.fp.add(u64::from(old), u64::from(c)) as u32;
+            if new == 0 {
+                to.remove(&product);
+            } else {
+                to.insert(product, new);
+            }
+        }
+    }
+    let terms = proof_terms(&out);
+    if terms.is_none_or(|n| n > MAX_UNIT_CERTIFICATE_TERMS) {
+        let attempted = terms
+            .map(|n| n.to_string())
+            .unwrap_or_else(|| format!("at least {}", MAX_UNIT_CERTIFICATE_TERMS + 1));
+        return Err(format!(
+            "unit certificate provenance term budget exceeded: attempted {attempted}, limit {MAX_UNIT_CERTIFICATE_TERMS}"
+        ));
+    }
+    Ok(out)
+}
+
+fn proof_into_polys(proof: GeneratorProof) -> Vec<RPoly> {
+    proof
+        .into_iter()
+        .map(|poly| {
+            let mut terms: Vec<(Mono, u32)> = poly.into_iter().collect();
+            terms.sort_unstable_by_key(|(monomial, _)| std::cmp::Reverse(*monomial));
+            let mut monos = Vec::with_capacity(terms.len());
+            let mut coefs = Vec::with_capacity(terms.len());
+            for (monomial, coefficient) in terms {
+                monos.push(monomial);
+                coefs.push(coefficient);
+            }
+            RPoly { monos, coefs }
+        })
+        .collect()
+}
+
+fn initial_echelon_with_proof(
+    input: &[(usize, RPoly)],
+    n_original: usize,
+    fp: Fp,
+) -> Result<Vec<(RPoly, GeneratorProof)>, String> {
+    if n_original > MAX_UNIT_CERTIFICATE_GENERATORS {
+        return Err(format!(
+            "unit certificate has {n_original} generators, exceeding cap {MAX_UNIT_CERTIFICATE_GENERATORS}"
+        ));
+    }
+    let mut all: Vec<Mono> = input
+        .iter()
+        .flat_map(|(_, p)| p.monos.iter().copied())
+        .collect();
+    all.sort_unstable_by(|a, b| b.cmp(a));
+    all.dedup();
+    let col_of: MonoMap<u32> = all
+        .iter()
+        .enumerate()
+        .map(|(i, &m)| (m, i as u32))
+        .collect();
+    let mut rows: Vec<(Row, GeneratorProof)> = input
+        .iter()
+        .map(|(original, p)| {
+            (
+                Row {
+                    cols: p.monos.iter().map(|m| col_of[m]).collect(),
+                    vals: p.coefs.clone(),
+                },
+                proof_basis(n_original, *original),
+            )
+        })
+        .collect();
+    rows.retain(|(r, _)| !r.cols.is_empty());
+    rows.sort_by_key(|(r, _)| (r.cols[0], r.cols.len()));
+    check_live_proof_terms(rows.iter().map(|(_, proof)| proof), 0)?;
+
+    let mut pivot_of = vec![NONE; all.len()];
+    let mut pivots: Vec<(Row, GeneratorProof)> = Vec::new();
+    let n_rows = rows.len();
+    for (row_index, (row, mut proof)) in rows.into_iter().enumerate() {
+        let mut dense = vec![0u64; all.len()];
+        for (&c, &v) in row.cols.iter().zip(&row.vals) {
+            dense[c as usize] = u64::from(v);
+        }
+        let mut lead = None;
+        for c in row.cols[0] as usize..all.len() {
+            let v = fp.reduce(dense[c]);
+            dense[c] = v;
+            if v == 0 {
+                continue;
+            }
+            let k = pivot_of[c];
+            if k != NONE {
+                let (pivot, pivot_proof) = &pivots[k as usize];
+                for (&pc, &pv) in pivot.cols.iter().zip(&pivot.vals) {
+                    let product = fp.mul(v, u64::from(pv));
+                    dense[pc as usize] = fp.add(fp.reduce(dense[pc as usize]), fp.neg(product));
+                }
+                let possible_growth = proof_terms(pivot_proof)
+                    .and_then(|terms| terms.checked_add(n_rows - row_index - 1))
+                    .ok_or("unit certificate aggregate provenance term count overflow")?;
+                check_live_proof_terms(
+                    pivots
+                        .iter()
+                        .map(|(_, proof)| proof)
+                        .chain(std::iter::once(&proof)),
+                    possible_growth,
+                )?;
+                proof_sub_scaled(&mut proof, pivot_proof, v, fp)?;
+            } else {
+                lead = Some((c, v));
+                break;
+            }
+        }
+        let Some((lead, value)) = lead else {
+            continue;
+        };
+        let inv = fp.inv(value);
+        proof_scale(&mut proof, inv, fp);
+        let mut out = Row {
+            cols: Vec::new(),
+            vals: Vec::new(),
+        };
+        for (c, value) in dense.into_iter().enumerate().skip(lead) {
+            let value = fp.mul(fp.reduce(value), inv);
+            if value != 0 {
+                out.cols.push(c as u32);
+                out.vals.push(value as u32);
+            }
+        }
+        debug_assert_eq!(out.vals.first(), Some(&1));
+        pivot_of[lead] = pivots.len() as u32;
+        pivots.push((out, proof));
+        check_live_proof_terms(
+            pivots.iter().map(|(_, proof)| proof),
+            n_rows - row_index - 1,
+        )?;
+    }
+    Ok(pivots
+        .into_iter()
+        .map(|(row, proof)| {
+            (
+                RPoly {
+                    monos: row.cols.iter().map(|&c| all[c as usize]).collect(),
+                    coefs: row.vals,
+                },
+                proof,
+            )
+        })
+        .collect())
+}
+
+fn verify_radix4_certificate(
+    input: &[RPoly],
+    proof: &GeneratorProof,
+    radix: &Radix4ProofRing<'_>,
+) -> Result<(), String> {
+    verify_radix4_certificate_with_limits(
+        input,
+        proof,
+        radix,
+        MAX_UNIT_CERTIFICATE_RECOMPOSITION_PRODUCTS,
+        MAX_UNIT_CERTIFICATE_ACCUMULATOR_TERMS,
+    )
+}
+
+fn verify_radix4_certificate_with_limits(
+    input: &[RPoly],
+    proof: &GeneratorProof,
+    radix: &Radix4ProofRing<'_>,
+    max_product_work: usize,
+    max_accumulator_terms: usize,
+) -> Result<(), String> {
+    if proof.len() != input.len() {
+        return Err("unit certificate generator count differs from the original input".into());
+    }
+    let product_terms = proof
+        .iter()
+        .zip(input)
+        .try_fold(0usize, |total, (cofactor, generator)| {
+            cofactor
+                .len()
+                .checked_mul(generator.len())
+                .and_then(|terms| total.checked_add(terms))
+        });
+    if product_terms.is_none_or(|terms| terms > max_product_work) {
+        let attempted = product_terms
+            .map(|terms| terms.to_string())
+            .unwrap_or_else(|| format!("at least {}", max_product_work.saturating_add(1)));
+        return Err(format!(
+            "unit certificate internal recomposition product-work budget exceeded: attempted {attempted}, limit {max_product_work}"
+        ));
+    }
+    let mut sum: MonoMap<u32> = MonoMap::default();
+    for (cofactor, generator) in proof.iter().zip(input) {
+        let mut generator_terms: Vec<(Mono, u32)> = generator
+            .monos
+            .iter()
+            .copied()
+            .zip(generator.coefs.iter().copied())
+            .collect();
+        let mut generator_degree = 0;
+        for &(m, _) in &generator_terms {
+            generator_degree = generator_degree.max(radix.decoded_degree(m)?);
+        }
+        generator_terms.sort_unstable_by(|(a, _), (b, _)| radix.decoded_lex_cmp(*a, *b));
+
+        let mut cofactor_terms: Vec<(Mono, u32)> = cofactor
+            .iter()
+            .map(|(&monomial, &coefficient)| (monomial, coefficient))
+            .collect();
+        for &(cm, _) in &cofactor_terms {
+            let cofactor_degree = radix.decoded_degree(cm)?;
+            if cofactor_degree
+                .checked_add(generator_degree)
+                .is_none_or(|degree| degree > radix.max_product_degree)
+            {
+                return Err(format!(
+                    "unit certificate cofactor degree {cofactor_degree} plus generator degree {generator_degree} exceeds cap {}",
+                    radix.max_product_degree
+                ));
+            }
+        }
+        cofactor_terms.sort_unstable_by(|(a, _), (b, _)| radix.decoded_lex_cmp(*a, *b));
+
+        for &(cm, cc) in &cofactor_terms {
+            for &(gm, gc) in &generator_terms {
+                let product = radix.multiply_keys(cm, gm)?;
+                let term = radix.fp.mul(u64::from(cc), u64::from(gc));
+                let old = sum.get(&product).copied().unwrap_or(0);
+                let new = radix.fp.add(u64::from(old), term) as u32;
+                if new == 0 {
+                    sum.remove(&product);
+                } else {
+                    if old == 0 && sum.len() >= max_accumulator_terms {
+                        let attempted = sum.len().saturating_add(1);
+                        return Err(format!(
+                            "unit certificate recomposition accumulator-term budget exceeded: attempted {attempted}, limit {max_accumulator_terms}"
+                        ));
+                    }
+                    sum.insert(product, new);
+                }
+            }
+        }
+    }
+    if sum.len() != 1 || sum.get(&ONE) != Some(&1) {
+        return Err("unit certificate failed ordinary original-generator recomposition".into());
+    }
+    Ok(())
+}
+
+fn replay_radix4_unit_certificate(
+    trace: &F4Trace,
+    input: &[RPoly],
+    ring: &TowerRing,
+    weights: TowerWeights,
+    max_product_degree: u32,
+) -> Result<Vec<RPoly>, String> {
+    let radix = Radix4ProofRing::new(ring, weights, max_product_degree)?;
+    if input.is_empty() {
+        return Err("unit certificate requires at least one original generator".into());
+    }
+    if input.len() > MAX_UNIT_CERTIFICATE_GENERATORS {
+        return Err(format!(
+            "unit certificate has {} generators, exceeding cap {MAX_UNIT_CERTIFICATE_GENERATORS}",
+            input.len()
+        ));
+    }
+    let mut weighted = Vec::new();
+    for (original, p) in input.iter().enumerate() {
+        let p = radix.rekey_input(p)?;
+        if !p.is_empty() {
+            weighted.push((original, p));
+        }
+    }
+    if weighted.is_empty() {
+        return Err("unit certificate input contains no nonzero generator".into());
+    }
+    let mut start = initial_echelon_with_proof(&weighted, input.len(), radix.fp)?;
+    if let Some(unit) = start.iter().position(|(poly, _)| poly.is_unit()) {
+        let export_terms = proof_terms(&start[unit].1)
+            .ok_or("unit certificate aggregate provenance term count overflow")?;
+        check_live_proof_terms(start.iter().map(|(_, proof)| proof), export_terms)?;
+        let proof = start.swap_remove(unit).1;
+        verify_radix4_certificate(
+            &weighted_input_in_original_order(input, &radix)?,
+            &proof,
+            &radix,
+        )?;
+        return Ok(proof_into_polys(proof));
+    }
+    start.sort_by_key(|(p, _)| std::cmp::Reverse(p.lm().expect("nonzero echelon row")));
+    let dag = trace
+        .compiled
+        .as_deref()
+        .ok_or("unit certificate trace has no compiled refutation")?;
+    if start.len() != dag.init_elems.len() {
+        return Err("unit certificate initial basis count differs from the trace".into());
+    }
+
+    let mut values: Vec<Vec<u32>> = vec![Vec::new(); dag.n_elems];
+    let mut proofs: Vec<Option<GeneratorProof>> = vec![None; dag.n_elems];
+    for (g, ((poly, proof), spec)) in start.into_iter().zip(&dag.init_elems).enumerate() {
+        if poly.lm() != Some(spec.expected_lm) || poly.monos != spec.monos {
+            return Err("unit certificate initial basis differs from the trace".into());
+        }
+        if !spec.needed {
+            continue;
+        }
+        for &m in &poly.monos {
+            radix.decoded_degree(m)?;
+        }
+        let mut dense = vec![0u32; spec.monos.len()];
+        for (&m, &c) in poly.monos.iter().zip(&poly.coefs) {
+            let at = spec
+                .monos
+                .binary_search_by(|probe| m.cmp(probe))
+                .map_err(|_| "unit certificate input support lies outside the trace")?;
+            dense[at] = c;
+        }
+        values[g] = dense;
+        proofs[g] = Some(proof);
+    }
+    check_live_proof_terms(proofs.iter().filter_map(Option::as_ref), 0)?;
+
+    for st in &dag.steps {
+        if st.degree > max_product_degree {
+            return Err(format!(
+                "unit certificate trace degree {} exceeds cap {max_product_degree}",
+                st.degree
+            ));
+        }
+        let kernel = Kernel::with_budget(radix.fp, 2 * st.n_cols + 4);
+        let mut raw_pivots = Vec::with_capacity(st.pivs.len());
+        let mut raw_proofs = Vec::with_capacity(st.pivs.len());
+        for plan in &st.pivs {
+            let mut ignored_muladds = 0;
+            let row = plan.eval_row(
+                radix.fp,
+                &values[plan.elem_id as usize],
+                st.n_cols,
+                &mut ignored_muladds,
+            );
+            if row.cols.first().copied() != Some(plan.expected_lead) {
+                return Err("unit certificate reducer pivot vanished or shifted".into());
+            }
+            let source = proofs[plan.elem_id as usize]
+                .as_ref()
+                .ok_or("unit certificate trace references an unavailable element")?;
+            let source_terms = proof_terms(source)
+                .ok_or("unit certificate aggregate provenance term count overflow")?;
+            check_replay_live_proof_terms(&proofs, &raw_proofs, &[], &[], source_terms)?;
+            let mut proof = proof_multiply_mono(source, plan.mult, &radix)?;
+            if row.vals[0] != 1 {
+                let inv = radix.fp.inv(u64::from(row.vals[0]));
+                proof_scale(&mut proof, inv, radix.fp);
+                let mut row = row;
+                for value in &mut row.vals {
+                    *value = radix.fp.mul(u64::from(*value), inv) as u32;
+                }
+                raw_pivots.push(row);
+            } else {
+                raw_pivots.push(row);
+            }
+            raw_proofs.push(proof);
+        }
+
+        let mut bred = vec![Vec::<u32>::new(); st.pivs.len()];
+        let mut bred_proofs: Vec<Option<GeneratorProof>> = vec![None; st.pivs.len()];
+        for &k in &st.piv_order {
+            let k = k as usize;
+            let start_q = st.q_start[st.piv_leads[k] as usize] as usize;
+            let mut acc = vec![0u64; st.nq - start_q];
+            let mut proof = std::mem::take(&mut raw_proofs[k]);
+            for (&c, &v) in raw_pivots[k].cols[1..].iter().zip(&raw_pivots[k].vals[1..]) {
+                let q = st.q_of[c as usize];
+                if q != NONE {
+                    acc[q as usize - start_q] = u64::from(v);
+                }
+            }
+            for (&c, &v) in raw_pivots[k].cols[1..].iter().zip(&raw_pivots[k].vals[1..]) {
+                let c = c as usize;
+                if st.q_of[c] != NONE {
+                    continue;
+                }
+                let j = st.pivot_of[c] as usize;
+                let offset = st.q_start[c] as usize - start_q;
+                kernel.sub(&mut acc[offset..], u64::from(v), &bred[j]);
+                let dependency = bred_proofs[j]
+                    .as_ref()
+                    .ok_or("unit certificate reducer dependency order differs")?;
+                let possible_growth = proof_terms(&proof)
+                    .and_then(|terms| {
+                        proof_terms(dependency).and_then(|growth| terms.checked_add(growth))
+                    })
+                    .ok_or("unit certificate aggregate provenance term count overflow")?;
+                check_replay_live_proof_terms(
+                    &proofs,
+                    &raw_proofs,
+                    &bred_proofs,
+                    &[],
+                    possible_growth,
+                )?;
+                proof_sub_scaled(&mut proof, dependency, u64::from(v), radix.fp)?;
+            }
+            bred[k] = acc.iter().map(|&x| radix.fp.reduce(x) as u32).collect();
+            let proof_len = proof_terms(&proof)
+                .ok_or("unit certificate aggregate provenance term count overflow")?;
+            check_replay_live_proof_terms(&proofs, &raw_proofs, &bred_proofs, &[], proof_len)?;
+            bred_proofs[k] = Some(proof);
+        }
+
+        let mut echelon: Vec<(u32, Vec<u32>, GeneratorProof)> = Vec::new();
+        for (si, sr) in st.s_rows.iter().enumerate() {
+            let mut ignored_muladds = 0;
+            let row = sr.plan.eval_row(
+                radix.fp,
+                &values[sr.plan.elem_id as usize],
+                st.n_cols,
+                &mut ignored_muladds,
+            );
+            let source = proofs[sr.plan.elem_id as usize]
+                .as_ref()
+                .ok_or("unit certificate trace references an unavailable S-row element")?;
+            let source_terms = proof_terms(source)
+                .ok_or("unit certificate aggregate provenance term count overflow")?;
+            check_replay_live_proof_terms(
+                &proofs,
+                &raw_proofs,
+                &bred_proofs,
+                &echelon,
+                source_terms,
+            )?;
+            let mut proof = proof_multiply_mono(source, sr.plan.mult, &radix)?;
+            let mut acc = vec![0u64; st.nq];
+            for (&c, &v) in row.cols.iter().zip(&row.vals) {
+                let q = st.q_of[c as usize];
+                if q != NONE {
+                    acc[q as usize] = u64::from(v);
+                }
+            }
+            for (&c, &v) in row.cols.iter().zip(&row.vals) {
+                let c = c as usize;
+                if st.q_of[c] == NONE {
+                    let j = st.pivot_of[c] as usize;
+                    let offset = st.q_start[c] as usize;
+                    kernel.sub(&mut acc[offset..], u64::from(v), &bred[j]);
+                    let dependency = bred_proofs[j]
+                        .as_ref()
+                        .ok_or("unit certificate missing reduced pivot proof")?;
+                    let possible_growth = proof_terms(&proof)
+                        .and_then(|terms| {
+                            proof_terms(dependency).and_then(|growth| terms.checked_add(growth))
+                        })
+                        .ok_or("unit certificate aggregate provenance term count overflow")?;
+                    check_replay_live_proof_terms(
+                        &proofs,
+                        &raw_proofs,
+                        &bred_proofs,
+                        &echelon,
+                        possible_growth,
+                    )?;
+                    proof_sub_scaled(&mut proof, dependency, u64::from(v), radix.fp)?;
+                }
+            }
+            for (lead, row, prior_proof) in &echelon {
+                let lead = *lead as usize;
+                let factor = radix.fp.reduce(acc[lead]);
+                if factor != 0 {
+                    kernel.sub(&mut acc[lead..], factor, row);
+                    let possible_growth = proof_terms(&proof)
+                        .and_then(|terms| {
+                            proof_terms(prior_proof).and_then(|growth| terms.checked_add(growth))
+                        })
+                        .ok_or("unit certificate aggregate provenance term count overflow")?;
+                    check_replay_live_proof_terms(
+                        &proofs,
+                        &raw_proofs,
+                        &bred_proofs,
+                        &echelon,
+                        possible_growth,
+                    )?;
+                    proof_sub_scaled(&mut proof, prior_proof, factor, radix.fp)?;
+                }
+            }
+            let lead = sr.expected_q_lead as usize;
+            if acc[..lead].iter().any(|&x| radix.fp.reduce(x) != 0) {
+                return Err("unit certificate new leads differ from the trace".into());
+            }
+            let lead_value = radix.fp.reduce(acc[lead]);
+            if lead_value == 0 {
+                return Err("unit certificate witness pivot vanished".into());
+            }
+            if st.is_final && si + 1 == st.s_rows.len() {
+                if lead + 1 != st.nq {
+                    return Err("unit certificate final row is not the constant column".into());
+                }
+                proof_scale(&mut proof, radix.fp.inv(lead_value), radix.fp);
+                let export_terms = proof_terms(&proof)
+                    .and_then(|terms| terms.checked_mul(2))
+                    .ok_or("unit certificate aggregate provenance term count overflow")?;
+                check_replay_live_proof_terms(
+                    &proofs,
+                    &raw_proofs,
+                    &bred_proofs,
+                    &echelon,
+                    export_terms,
+                )?;
+                let original = weighted_input_in_original_order(input, &radix)?;
+                verify_radix4_certificate(&original, &proof, &radix)?;
+                return Ok(proof_into_polys(proof));
+            }
+            let inv = radix.fp.inv(lead_value);
+            proof_scale(&mut proof, inv, radix.fp);
+            let mut monic = Vec::with_capacity(st.nq - lead);
+            monic.push(1);
+            monic.extend(acc[lead + 1..].iter().map(|&x| {
+                let x = radix.fp.reduce(x);
+                radix.fp.mul(x, inv) as u32
+            }));
+            let output_element = if let Some((element, keep)) = &sr.out_elem {
+                let mut compact = Vec::with_capacity(keep.len());
+                for (keep, &value) in keep.iter().zip(&monic) {
+                    if *keep {
+                        compact.push(value);
+                    } else if value != 0 {
+                        return Err("unit certificate element support widened".into());
+                    }
+                }
+                let element = *element as usize;
+                if element >= values.len() || proofs[element].is_some() {
+                    return Err("unit certificate trace reuses an output element".into());
+                }
+                values[element] = compact;
+                Some(element)
+            } else {
+                None
+            };
+            let keep_echelon = si + 1 < st.s_rows.len();
+            let copies = usize::from(output_element.is_some()) + usize::from(keep_echelon);
+            let additional = proof_terms(&proof)
+                .and_then(|terms| terms.checked_mul(copies))
+                .ok_or("unit certificate aggregate provenance term count overflow")?;
+            check_replay_live_proof_terms(
+                &proofs,
+                &raw_proofs,
+                &bred_proofs,
+                &echelon,
+                additional,
+            )?;
+            match (output_element, keep_echelon) {
+                (Some(element), true) => {
+                    proofs[element] = Some(proof.clone());
+                    let at = echelon.partition_point(|(other, _, _)| *other < sr.expected_q_lead);
+                    echelon.insert(at, (sr.expected_q_lead, monic, proof));
+                }
+                (Some(element), false) => proofs[element] = Some(proof),
+                (None, true) => {
+                    let at = echelon.partition_point(|(other, _, _)| *other < sr.expected_q_lead);
+                    echelon.insert(at, (sr.expected_q_lead, monic, proof));
+                }
+                (None, false) => {}
+            }
+        }
+    }
+    Err("unit certificate trace exhausted without a refutation".into())
+}
+
+fn weighted_input_in_original_order(
+    input: &[RPoly],
+    radix: &Radix4ProofRing<'_>,
+) -> Result<Vec<RPoly>, String> {
+    input.iter().map(|p| radix.rekey_input(p)).collect()
+}
+
 impl TowerF4Options {
     pub fn new(max_degree: u32) -> Self {
         TowerF4Options {
@@ -1890,11 +2806,18 @@ impl TowerF4Options {
             record_trace: false,
             replay: None,
             weights: None,
+            omit_zero_top_pairs: 0,
         }
     }
     /// Run in the grading `w` (see [`TowerF4Options::weights`]).
     pub fn with_weights(mut self, w: TowerWeights) -> Self {
         self.weights = (!w.is_unit()).then_some(w);
+        self
+    }
+    /// Omit only validated, necessarily-above-bound `y_v^2 = 0` tower pairs.
+    /// See [`TowerF4Options::omit_zero_top_pairs`].
+    pub fn omitting_zero_top_pairs(mut self, mask: u64) -> Self {
+        self.omit_zero_top_pairs = mask;
         self
     }
     pub fn on_step(mut self, f: fn(usize, &StepTrace)) -> Self {
@@ -1992,6 +2915,15 @@ pub struct TowerF4Report {
     pub muladds: u64,
     pub critical_pairs_reduced: u64,
     pub tower_pairs_reduced: u64,
+    /// Pair instances not scheduled by the validated bounded zero-top mask.
+    /// This counts basis-element/variable instances, not selected variables.
+    pub open_top_pairs_omitted: u64,
+    /// The validated omission mask bound into this report.
+    pub open_top_pair_omission_mask: u64,
+    /// Rewrites through an omitted zero-top rule. Validation proves this is
+    /// zero for every processed within-cap row; kept explicit in receipts so
+    /// callers do not infer that invariant from the omission count.
+    pub open_top_reductions: u64,
     pub pairs_product_skipped: u64,
     pub pairs_chain_skipped: u64,
     pub reducer_rows: u64,
@@ -2858,6 +3790,9 @@ struct State {
     pairs: Vec<Pair>,
     /// The grading every key of this run is in.
     w: TowerWeights,
+    /// Validated zero-top variables whose necessarily-above-bound tower
+    /// pairs are not scheduled.
+    omit_zero_top_pairs: u64,
 }
 
 /// Every monomial `L'` with `lo | L' | L`, `L'` ≠ `L`, is passed to `f`
@@ -2925,6 +3860,10 @@ impl State {
         while bits != 0 {
             let v = bits.trailing_zeros();
             bits &= bits - 1;
+            if self.omit_zero_top_pairs & (1u64 << v) != 0 {
+                rep.open_top_pairs_omitted += 1;
+                continue;
+            }
             self.pairs.push(Pair {
                 kind: PairKind::Tower(h as u32, v as u8),
                 lcm: lh,
@@ -3289,9 +4228,39 @@ fn f4_tower_cached(
     ring.check();
     let w = opts.weights.unwrap_or(TowerWeights::UNIT);
     w.check(ring);
+    let valid_tower_mask = if ring.n_tower() == 64 {
+        u64::MAX
+    } else {
+        (1u64 << ring.n_tower()) - 1
+    };
+    assert!(
+        opts.omit_zero_top_pairs & !valid_tower_mask == 0,
+        "f4_fp_tower: omitted zero-top pair mask contains a variable outside the ring"
+    );
+    let mut omitted = opts.omit_zero_top_pairs;
+    while omitted != 0 {
+        let v = omitted.trailing_zeros();
+        omitted &= omitted - 1;
+        let rule = ring.rules[v as usize];
+        assert!(
+            rule == (SquareRule {
+                next: None,
+                a: 0,
+                b: 0,
+                c: 0,
+                d: 0,
+            }),
+            "f4_fp_tower: omitted tower pair {v} is not an exact zero-top rule"
+        );
+        assert!(
+            2 * w.weight(v) > opts.max_degree,
+            "f4_fp_tower: omitted zero-top pair {v} can occur within the degree cap"
+        );
+    }
     let started = Instant::now();
     let fp = Fp::new(ring.p);
     let mut rep = TowerF4Report::default();
+    rep.open_top_pair_omission_mask = opts.omit_zero_top_pairs;
     let finish = |mut rep: TowerF4Report| {
         rep.ms = started.elapsed().as_secs_f64() * 1e3;
         rep
@@ -3318,6 +4287,15 @@ fn f4_tower_cached(
             p.monos = t.iter().map(|x| x.0).collect();
             p.coefs = t.iter().map(|x| x.1).collect();
         }
+    }
+    if opts.omit_zero_top_pairs != 0 {
+        assert!(
+            inputs
+                .iter()
+                .flat_map(|p| &p.monos)
+                .all(|&m| degree_of(m) <= opts.max_degree),
+            "f4_fp_tower: bounded zero-top omission requires every input term within the degree cap"
+        );
     }
     if inputs.iter().any(|p| p.is_unit()) {
         rep.inconsistent = true;
@@ -3386,6 +4364,7 @@ fn f4_tower_cached(
         lm_index: MonoMap::default(),
         pairs: Vec::new(),
         w,
+        omit_zero_top_pairs: opts.omit_zero_top_pairs,
     };
     let mut init_lms: Vec<Mono> = Vec::new();
     let mut init_monos: Vec<Vec<Mono>> = Vec::new();
@@ -5719,6 +6698,359 @@ mod tests {
             }
         }
         assert!(lazy_runs > 20 && eager_runs > 20 && cancelled > 100);
+    }
+
+    fn open_radix4_ring(p: u64, blocks: usize) -> TowerRing {
+        let mut rules = Vec::with_capacity(4 * blocks);
+        for block in 0..blocks {
+            for level in 0..4 {
+                rules.push(SquareRule {
+                    next: (level < 3).then_some((4 * block + level + 1) as u8),
+                    a: 0,
+                    b: u64::from(level < 3),
+                    c: 0,
+                    d: 0,
+                });
+            }
+        }
+        TowerRing::new(p, rules, 0)
+    }
+
+    fn open_top_mask(blocks: usize) -> u64 {
+        (0..blocks).map(|b| 1u64 << (4 * b + 3)).sum()
+    }
+
+    #[test]
+    fn bounded_zero_top_omission_skips_only_above_cap_pair_instances() {
+        let ring = open_radix4_ring(101, 1);
+        let weights = TowerWeights::radix_blocks(1, 4, 4);
+        let mut x = vec![0u32; 4];
+        x[0] = 1;
+        let input = vec![ring.from_raw(&[(x, 1)])];
+
+        let default = f4_tower(&input, &ring, &TowerF4Options::new(9).with_weights(weights));
+        assert!(!default.inconsistent);
+        assert_eq!(default.open_top_pair_omission_mask, 0);
+        assert_eq!(default.open_top_pairs_omitted, 0);
+        assert_eq!(default.open_top_reductions, 0);
+        assert_eq!(default.pairs_above_bound, 1);
+        assert_eq!(default.tower_pairs_reduced, 3);
+
+        let bounded = f4_tower(
+            &input,
+            &ring,
+            &TowerF4Options::new(9)
+                .with_weights(weights)
+                .omitting_zero_top_pairs(open_top_mask(1)),
+        );
+        assert!(
+            !bounded.inconsistent,
+            "an open top may not fabricate a unit"
+        );
+        assert_eq!(bounded.basis, default.basis);
+        assert_eq!(bounded.pairs_above_bound, 0);
+        assert_eq!(bounded.tower_pairs_reduced, 3);
+        assert_eq!(bounded.open_top_pair_omission_mask, 1 << 3);
+        assert_eq!(bounded.open_top_pairs_omitted, 1);
+        assert_eq!(bounded.open_top_reductions, 0);
+    }
+
+    #[test]
+    fn bounded_zero_top_omission_rejects_invalid_mask_rule_cap_and_input() {
+        let ring = open_radix4_ring(101, 1);
+        let weights = TowerWeights::radix_blocks(1, 4, 4);
+        let one = vec![ring.from_raw(&[(vec![0; 4], 1)])];
+        assert!(std::panic::catch_unwind(|| {
+            f4_tower(
+                &one,
+                &ring,
+                &TowerF4Options::new(9)
+                    .with_weights(weights)
+                    .omitting_zero_top_pairs(1 << 7),
+            )
+        })
+        .is_err());
+        assert!(std::panic::catch_unwind(|| {
+            f4_tower(
+                &one,
+                &ring,
+                &TowerF4Options::new(9)
+                    .with_weights(weights)
+                    .omitting_zero_top_pairs(1),
+            )
+        })
+        .is_err());
+        assert!(std::panic::catch_unwind(|| {
+            f4_tower(
+                &one,
+                &ring,
+                &TowerF4Options::new(16)
+                    .with_weights(weights)
+                    .omitting_zero_top_pairs(1 << 3),
+            )
+        })
+        .is_err());
+        let misweighted_top = TowerWeights::from_slice(&[1, 2, 4, 4]);
+        assert!(std::panic::catch_unwind(|| {
+            f4_tower(
+                &one,
+                &ring,
+                &TowerF4Options::new(9)
+                    .with_weights(misweighted_top)
+                    .omitting_zero_top_pairs(1 << 3),
+            )
+        })
+        .is_err());
+
+        let mut exponent_ten = vec![0u32; 4];
+        exponent_ten[0] = 10;
+        let above_cap = vec![ring.from_raw(&[(exponent_ten, 1)])];
+        assert!(std::panic::catch_unwind(|| {
+            f4_tower(
+                &above_cap,
+                &ring,
+                &TowerF4Options::new(9)
+                    .with_weights(weights)
+                    .omitting_zero_top_pairs(1 << 3),
+            )
+        })
+        .is_err());
+    }
+
+    #[test]
+    fn bounded_open_top_matches_default_inhomogeneous_multiblock_rows() {
+        let p = 101;
+        let ring = open_radix4_ring(p, 2);
+        let weights = TowerWeights::radix_blocks(2, 4, 4);
+        let mut x2 = vec![0u32; 8];
+        x2[0] = 2;
+        let mut y = vec![0u32; 8];
+        y[4] = 1;
+        let mut xy = vec![0u32; 8];
+        xy[0] = 1;
+        xy[4] = 1;
+        let mut x = vec![0u32; 8];
+        x[0] = 1;
+        let input = vec![
+            ring.from_raw(&[(x2, 1), (y, 1), (vec![0; 8], 1)]),
+            ring.from_raw(&[(xy, 1), (x, 1), (vec![0; 8], 2)]),
+        ];
+
+        let default = f4_tower(&input, &ring, &TowerF4Options::new(9).with_weights(weights));
+        let bounded = f4_tower(
+            &input,
+            &ring,
+            &TowerF4Options::new(9)
+                .with_weights(weights)
+                .omitting_zero_top_pairs(open_top_mask(2)),
+        );
+        assert_eq!(bounded.basis, default.basis);
+        assert_eq!(bounded.inconsistent, default.inconsistent);
+        assert_eq!(bounded.degree_reached, default.degree_reached);
+        assert_eq!(bounded.solving_degree_max, default.solving_degree_max);
+        assert_eq!(bounded.steps, default.steps);
+        assert_eq!(
+            bounded.critical_pairs_reduced,
+            default.critical_pairs_reduced
+        );
+        assert_eq!(bounded.tower_pairs_reduced, default.tower_pairs_reduced);
+        assert_eq!(bounded.trace.len(), default.trace.len());
+        for (open, ordinary) in bounded.trace.iter().zip(&default.trace) {
+            assert_eq!(
+                (
+                    open.degree,
+                    open.critical_pairs,
+                    open.tower_pairs,
+                    open.s_rows,
+                    open.reducer_rows,
+                    open.promoted_rows,
+                    open.cols,
+                    open.nnz,
+                    open.residual_rows,
+                    open.residual_cols,
+                    open.fresh,
+                    open.basis_active,
+                ),
+                (
+                    ordinary.degree,
+                    ordinary.critical_pairs,
+                    ordinary.tower_pairs,
+                    ordinary.s_rows,
+                    ordinary.reducer_rows,
+                    ordinary.promoted_rows,
+                    ordinary.cols,
+                    ordinary.nnz,
+                    ordinary.residual_rows,
+                    ordinary.residual_cols,
+                    ordinary.fresh,
+                    ordinary.basis_active,
+                )
+            );
+        }
+        assert!(bounded.open_top_pairs_omitted >= 2);
+        assert_eq!(bounded.open_top_reductions, 0);
+        assert_eq!(
+            default.pairs_above_bound,
+            bounded.pairs_above_bound + bounded.open_top_pairs_omitted as usize
+        );
+    }
+
+    #[test]
+    fn radix4_refutation_exports_original_generator_unit_identity() {
+        let p = 101;
+        let ring = open_radix4_ring(p, 2);
+        let weights = TowerWeights::radix_blocks(2, 4, 4);
+        let mut xy = vec![0u32; 8];
+        xy[0] = 1;
+        xy[4] = 1;
+        let mut x = vec![0u32; 8];
+        x[0] = 1;
+        let inputs = vec![
+            ring.from_raw(&[(xy, 1), (vec![0; 8], p - 1)]),
+            ring.from_raw(&[(x, 1)]),
+        ];
+        let mut opts = TowerF4Options::new(9)
+            .with_weights(weights)
+            .omitting_zero_top_pairs(open_top_mask(2));
+        opts.record_trace = true;
+        let mut report = f4_tower(&inputs, &ring, &opts);
+        assert!(report.inconsistent);
+        assert_eq!(report.open_top_reductions, 0);
+        let trace = report.learned.take().expect("recorded refutation");
+        assert!(trace.compiled.is_some());
+        let certificate = trace
+            .unit_certificate(&inputs, &ring, weights, 9)
+            .expect("ordinary original-generator identity");
+        assert_eq!(certificate.len(), inputs.len());
+        for cofactor in &certificate {
+            for &m in &cofactor.monos {
+                assert_eq!(degree_of(m), {
+                    let mask = mask_of(m);
+                    ((mask & 0xf) + ((mask >> 4) & 0xf)) as u32
+                });
+            }
+        }
+        assert!(trace.unit_certificate(&inputs, &ring, weights, 1).is_err());
+
+        let mut damaged = trace.clone();
+        let dag = Arc::make_mut(damaged.compiled.as_mut().unwrap());
+        let plan = &mut dag
+            .steps
+            .last_mut()
+            .unwrap()
+            .s_rows
+            .last_mut()
+            .unwrap()
+            .plan;
+        plan.mult = mono_w(0xf, [0; MAX_FREE], weights);
+        assert!(damaged
+            .unit_certificate(&inputs, &ring, weights, 9)
+            .is_err());
+    }
+
+    #[test]
+    fn radix4_unit_identity_includes_initial_echelon_provenance() {
+        let p = 101;
+        let ring = open_radix4_ring(p, 1);
+        let weights = TowerWeights::radix_blocks(1, 4, 4);
+        let mut x = vec![0u32; 4];
+        x[0] = 1;
+        let inputs = vec![
+            ring.from_raw(&[(x.clone(), 1)]),
+            ring.from_raw(&[(x, 1), (vec![0; 4], 1)]),
+        ];
+        let mut opts = TowerF4Options::new(9)
+            .with_weights(weights)
+            .omitting_zero_top_pairs(open_top_mask(1));
+        opts.record_trace = true;
+        let mut report = f4_tower(&inputs, &ring, &opts);
+        assert!(report.inconsistent);
+        let trace = report.learned.take().expect("initial unit trace");
+        assert!(trace.compiled.is_none());
+        let certificate = trace
+            .unit_certificate(&inputs, &ring, weights, 9)
+            .expect("initial-echelon identity");
+        assert_eq!(certificate.len(), 2);
+        assert!(certificate.iter().all(|c| !c.is_empty()));
+    }
+
+    #[test]
+    fn radix4_unit_identity_combines_initial_duplicates_before_compiled_refutation() {
+        let p = 101;
+        let ring = open_radix4_ring(p, 2);
+        let weights = TowerWeights::radix_blocks(2, 4, 4);
+        let mut x2 = vec![0u32; 8];
+        x2[0] = 2;
+        let mut x = vec![0u32; 8];
+        x[0] = 1;
+        let mut xy = vec![0u32; 8];
+        xy[0] = 1;
+        xy[4] = 1;
+        let inputs = vec![
+            ring.from_raw(&[(x2.clone(), 1)]),
+            ring.from_raw(&[(x2, 1), (x, 1)]),
+            ring.from_raw(&[(xy, 1), (vec![0; 8], p - 1)]),
+        ];
+        let mut opts = TowerF4Options::new(9)
+            .with_weights(weights)
+            .omitting_zero_top_pairs(open_top_mask(2));
+        opts.record_trace = true;
+        let mut report = f4_tower(&inputs, &ring, &opts);
+        assert!(report.inconsistent);
+        let trace = report.learned.take().expect("recorded later refutation");
+        assert!(
+            trace
+                .compiled
+                .as_ref()
+                .is_some_and(|compiled| !compiled.steps.is_empty()),
+            "the duplicate-leading echelon must be followed by a compiled step"
+        );
+        let certificate = trace
+            .unit_certificate(&inputs, &ring, weights, 9)
+            .expect("identity spanning initial and compiled elimination");
+        assert_eq!(certificate.len(), 3);
+        assert!(certificate.iter().all(|cofactor| !cofactor.is_empty()));
+    }
+
+    #[test]
+    fn unit_certificate_resource_caps_and_canonical_cancellation_order() {
+        let first = proof_basis(2, 0);
+        let second = proof_basis(2, 1);
+        assert!(check_live_proof_terms_with_limit([&first, &second], 0, 2).is_ok());
+        assert!(check_live_proof_terms_with_limit([&first, &second], 0, 1).is_err());
+
+        let p = 101;
+        let ring = open_radix4_ring(p, 1);
+        let weights = TowerWeights::radix_blocks(1, 4, 4);
+        let radix = Radix4ProofRing::new(&ring, weights, 2).unwrap();
+        let mut x = vec![0u32; 4];
+        x[0] = 1;
+        let mut x2 = vec![0u32; 4];
+        x2[0] = 2;
+        let input = weighted_input_in_original_order(
+            &[
+                ring.from_raw(&[(vec![0; 4], 1), (x, 1)]),
+                ring.from_raw(&[(x2, 1)]),
+            ],
+            &radix,
+        )
+        .unwrap();
+        let x_key = mono_w(1, [0; MAX_FREE], weights);
+        let mut proof = vec![MonoMap::default(); 2];
+        proof[0].insert(ONE, 1);
+        proof[0].insert(x_key, (p - 1) as u32);
+        proof[1].insert(ONE, 1);
+
+        // Ascending exponent order expands (1-x)(1+x)+x^2 with peak two.
+        // Reversing the first multiplier's order would transiently peak at
+        // three, so this boundary also binds replay order to BTreeMap order.
+        assert!(verify_radix4_certificate_with_limits(&input, &proof, &radix, 5, 2).is_ok());
+        let work_error =
+            verify_radix4_certificate_with_limits(&input, &proof, &radix, 4, 2).unwrap_err();
+        assert!(work_error.contains("internal recomposition product-work"));
+        let accumulator_error =
+            verify_radix4_certificate_with_limits(&input, &proof, &radix, 5, 1).unwrap_err();
+        assert!(accumulator_error.contains("accumulator-term budget"));
     }
 
     #[test]

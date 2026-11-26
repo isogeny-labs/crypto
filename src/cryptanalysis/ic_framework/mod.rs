@@ -83,11 +83,11 @@ pub mod residual;
 pub mod rootfind;
 pub mod rootfind_floor;
 pub mod rootfind_gpu;
-pub mod semaev_projection_oracle;
 pub mod rootfind_kmitm;
 #[cfg(target_arch = "x86_64")]
 mod rootfind_kmitm_avx2;
 mod rootfind_kmitm_ifma;
+pub mod semaev_projection_oracle;
 pub mod shared_rank;
 pub mod solver_units;
 pub mod solvers;
@@ -101,7 +101,7 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_relations_touching_check, price_phase, Calibration, CompletionRule,
+    collect_and_solve_relations_touching_check_batched, price_phase, Calibration, CompletionRule,
     CountedGroup, FactorBase, GroupOps, KnownLogSolver, OracleCounters, PhaseCost, PipelineOutcome,
     RecoveryCheck, Relation, RelationSolver, RestartPool, TargetSource,
 };
@@ -554,6 +554,56 @@ pub fn run_pipeline_public<G: CountedGroup>(
     .map(|(report, _)| report)
 }
 
+fn target_source(targets: Targets) -> TargetSource {
+    match targets {
+        Targets::Random => TargetSource::Random,
+        Targets::Stride => TargetSource::Stride,
+        Targets::StrideRenew => TargetSource::StrideRenew,
+        Targets::StrideGenerator => TargetSource::StrideGenerator,
+        Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
+        Targets::StrideRenewJoint => TargetSource::StrideRenewJoint,
+        Targets::Walk
+        | Targets::Residual
+        | Targets::ResidualFused
+        | Targets::ResidualFusedDp
+        | Targets::ResidualFusedEq
+        | Targets::ResidualFusedEqChain => TargetSource::Walk,
+        Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
+        Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
+            lanes: 4,
+            batched: false,
+        },
+        Targets::WalkPrimeSerial8 => TargetSource::WalkPrimeLanes {
+            lanes: 8,
+            batched: false,
+        },
+        Targets::WalkPrimeSerial16 => TargetSource::WalkPrimeLanes {
+            lanes: 16,
+            batched: false,
+        },
+        Targets::WalkPrimeBatch4 => TargetSource::WalkPrimeLanes {
+            lanes: 4,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch8 => TargetSource::WalkPrimeLanes {
+            lanes: 8,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch16 => TargetSource::WalkPrimeLanes {
+            lanes: 16,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch256 => TargetSource::WalkPrimeLanes {
+            lanes: 256,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch1024 => TargetSource::WalkPrimeLanes {
+            lanes: 1024,
+            batched: true,
+        },
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 fn run_pipeline_inner<G: CountedGroup>(
     ctx: &InstanceCtx<G>,
@@ -570,6 +620,30 @@ fn run_pipeline_inner<G: CountedGroup>(
     // degenerate subgroup order before any work.
     if ctx.r < 2 || ctx.cofactor.is_multiple_of(ctx.r) {
         return Err("pipeline requires r >= 2 and a cofactor nonzero modulo r".into());
+    }
+    let source = target_source(spec.targets);
+    if matches!(spec.targets, Targets::WalkPrimeFast) && ctx.group.native_walk_adder().is_none() {
+        return Err("walk-prime-fast requires a prime curve with p < 2^62".into());
+    }
+    if matches!(source, TargetSource::WalkPrimeLanes { .. })
+        && !ctx.group.supports_native_lane_walk()
+    {
+        return Err("walk-prime-serial/batch requires a prime curve with p < 2^62".into());
+    }
+    let oracle_batch_width = oracle.preferred_batch_size();
+    if oracle_batch_width > 1 {
+        if !matches!(source, TargetSource::WalkPrimeLanes { .. }) {
+            return Err(format!(
+                "{} requires a walk-prime-serial/batch target source",
+                oracle.name()
+            ));
+        }
+        if progress.is_some() {
+            return Err(format!(
+                "{} does not support the scalar per-query progress observer",
+                oracle.name()
+            ));
+        }
     }
     let started = Instant::now();
 
@@ -786,61 +860,6 @@ fn run_pipeline_inner<G: CountedGroup>(
         }
     }
     let setup_seed_ns = seed_start.elapsed().as_nanos() as u64;
-    let source = match spec.targets {
-        Targets::Random => TargetSource::Random,
-        Targets::Stride => TargetSource::Stride,
-        Targets::StrideRenew => TargetSource::StrideRenew,
-        Targets::StrideGenerator => TargetSource::StrideGenerator,
-        Targets::StrideRenewDeferredGuard => TargetSource::StrideRenewDeferredGuard,
-        Targets::StrideRenewJoint => TargetSource::StrideRenewJoint,
-        Targets::Walk
-        | Targets::Residual
-        | Targets::ResidualFused
-        | Targets::ResidualFusedDp
-        | Targets::ResidualFusedEq
-        | Targets::ResidualFusedEqChain => TargetSource::Walk,
-        Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
-        Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
-            lanes: 4,
-            batched: false,
-        },
-        Targets::WalkPrimeSerial8 => TargetSource::WalkPrimeLanes {
-            lanes: 8,
-            batched: false,
-        },
-        Targets::WalkPrimeSerial16 => TargetSource::WalkPrimeLanes {
-            lanes: 16,
-            batched: false,
-        },
-        Targets::WalkPrimeBatch4 => TargetSource::WalkPrimeLanes {
-            lanes: 4,
-            batched: true,
-        },
-        Targets::WalkPrimeBatch8 => TargetSource::WalkPrimeLanes {
-            lanes: 8,
-            batched: true,
-        },
-        Targets::WalkPrimeBatch16 => TargetSource::WalkPrimeLanes {
-            lanes: 16,
-            batched: true,
-        },
-        Targets::WalkPrimeBatch256 => TargetSource::WalkPrimeLanes {
-            lanes: 256,
-            batched: true,
-        },
-        Targets::WalkPrimeBatch1024 => TargetSource::WalkPrimeLanes {
-            lanes: 1024,
-            batched: true,
-        },
-    };
-    if matches!(spec.targets, Targets::WalkPrimeFast) && ctx.group.native_walk_adder().is_none() {
-        return Err("walk-prime-fast requires a prime curve with p < 2^62".into());
-    }
-    if matches!(source, TargetSource::WalkPrimeLanes { .. })
-        && !ctx.group.supports_native_lane_walk()
-    {
-        return Err("walk-prime-serial/batch requires a prime curve with p < 2^62".into());
-    }
     measurement::begin_online(measurement::Phase::TargetQuery);
     let (checked_full_rank, completion) = match matrix_factory.filter(|_| !known) {
         // An injected factory states its own completion and verification
@@ -932,6 +951,11 @@ fn run_pipeline_inner<G: CountedGroup>(
                 ))
             }
         };
+        // Progress observers are scalar and see one query at a time.  The
+        // ordinary production/ecbench path has no observer and may use an
+        // oracle's native multi-target kernel on an already-laned target
+        // source.
+        let batch_width = oracle_batch_width;
         let oracle_cell = std::cell::RefCell::new(&mut *oracle);
         let mut xprobe_fn = |counters: &mut OracleCounters, x: u64| -> bool {
             oracle_cell
@@ -941,8 +965,34 @@ fn run_pipeline_inner<G: CountedGroup>(
         };
         let xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool> =
             (walk_sib > 0).then_some(&mut xprobe_fn as _);
+        let mut batch_witnesses: Vec<Option<Vec<usize>>> = Vec::new();
+        let mut batch_fn = |ops: &mut GroupOps,
+                            counters: &mut OracleCounters,
+                            points: &[G::Elt],
+                            _coefficients: &[(u64, u64)],
+                            out: &mut [Vec<Relation>]| {
+            batch_witnesses.clear();
+            batch_witnesses.resize_with(points.len(), || None);
+            oracle_cell.borrow_mut().decompose_batch(
+                ctx,
+                &fb,
+                ops,
+                counters,
+                points,
+                &mut batch_witnesses,
+            );
+            for (slot, witness) in out.iter_mut().zip(&mut batch_witnesses) {
+                slot.clear();
+                if let Some(summands) = witness.take() {
+                    slot.push(Relation::Summands(summands));
+                }
+            }
+        };
+        let batch_oracle: Option<
+            &mut crate::cryptanalysis::ic_boundary::BatchRelationsOracle<'_, G::Elt>,
+        > = (batch_width > 1).then_some(&mut batch_fn);
         let mut trial = 0u64;
-        collect_and_solve_relations_touching_check(
+        collect_and_solve_relations_touching_check_batched(
             ctx.group,
             ctx.generator,
             ctx.target,
@@ -975,6 +1025,8 @@ fn run_pipeline_inner<G: CountedGroup>(
             line_guard,
             recovery_check,
             xprobe,
+            batch_width,
+            batch_oracle,
         )
     };
     for (name, value) in oracle.relation_counters() {

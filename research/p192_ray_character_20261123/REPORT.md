@@ -125,6 +125,48 @@ before table construction or lookup. This is a counting gate for this
 enumerative interface; it does not constrain algebraic aggregation of many
 labels into one point-dependent evaluation. [pcc:unverified]
 
+### Square-action collision walk screen
+
+The known square multipliers `2` and `5` also allow a walk
+within one scalar-sign class. A match `[a]G=±[b]Q` between
+known square multipliers gives `d=±a/b (mod r)`; since
+`χ_r(-1)=+1`, it gives the sign and in fact the entire scalar.
+Self-collisions of a base or target walk only relate known
+multipliers. With no cross-collision, a finite walk has no
+zero-error negative certificate unless it covers the class.
+This is a collision route to a full scalar relation, rather
+than a separate cheap character evaluation. [pcc:unverified]
+
+An optimistic *independent uniform-sampling* screen makes the
+99%-accuracy cost explicit. Store `A` distinct labels from the
+base square class and test `B` target labels. For a uniform
+positive target, the exact miss probability is
+`binom(N-A,B)/binom(N,B)≈exp(-AB/N)` when `A,B≪N`, where
+`N=(r-1)/4`. A negative target never matches, so with equal
+sign priors an all-miss negative decision has error about
+`exp(-AB/N)/2`. Requiring at most 1% overall error gives the
+approximate condition `AB≥N ln(50)` and optimistically
+`A+B≥2√(N ln(50))≈2.232R`, with a balanced table of about
+`2^95.984` records. A 1-PiB cap at 32 bytes per record leaves
+`A≤2^45` and requires about `2^146.968` target samples in
+this model. These are birthday-model figures, not a lower
+bound on structured or algebraically aggregated walks.
+[pcc:unverified]
+
+The focused native benchmark now times doubling against full
+Jacobian addition in the same process. Eight sequential
+10,000-factor runs on Apple M4 Pro/macOS 27.2 gave median CPU
+`double/add=0.643222` (range `0.623163–0.661600`) and wall
+median `0.638972` (range `0.599526–0.669642`). Raw timing,
+source and binary hashes, host, and command are in
+[`SQUARE_WALK_DOUBLING_MEASUREMENTS.jsonl`](SQUARE_WALK_DOUBLING_MEASUREMENTS.jsonl).
+Even charging every sampled label at this measured *doubling*
+rate, the ideal independent-sampling 99%-accuracy calculation
+is `2.232·0.643222≈1.436R` before lookup, storage, restarts,
+or the more expensive 5-multiple steps. The measurement is a
+component cost; no full square-action walk was timed or shown
+to mix uniformly. [pcc:unverified]
+
 ## Generic-group sign-bit boundary
 
 Apply [Shoup's generic-group collision method](https://www.shoup.net/papers/dlbounds1.pdf)
@@ -1096,6 +1138,67 @@ expects an affine base, so this is a **backend feasibility and
 cost-formula audit**, not a benchmark of a ready evaluator.
 [pcc:unverified]
 
+The [`p192_coset_orbit`](../../src/bin/p192_coset_orbit.rs)
+binary now implements the bounded full-Jacobian width-5
+prefix loop and accumulates the projective `YZ` product. It
+checks `Q=[7]G` with the independent textbook BigUint point
+arithmetic, checks the public step scalar's subgroup order,
+checks each prefix's final point against textbook scalar
+multiplication, and compares the 16-factor projective product
+sign with an affine y product. All of these checks passed at
+16 and 10,000 factors. It does **not** traverse the full
+`m≈2^85.984` coset or establish the proposed sign's exactness.
+[pcc:unverified]
+
+The binary also accepts a public target as two hexadecimal
+coordinates after the factor count. It checks that the point
+lies on P-192 and has order dividing `r`, then runs the same
+bounded prefix and independent endpoint/product checks. The
+[`TARGET_INPUT_VALIDATION.txt`](TARGET_INPUT_VALIDATION.txt)
+record pins the updated source and binary hashes: external
+coordinates for `[7]G` reproduce the built-in 16-factor
+ratio, an independently constructed `[11]G` passes, and an
+off-curve input is rejected. The earlier 10,000-factor timing
+record retains its original source hash; this input path was
+not used for those measurements. A prefix ratio is not yet
+the proposed full-coset scalar sign. [pcc:unverified]
+
+On one Apple M4 Pro/macOS 27.2 host, six separate 10,000-factor
+base-and-`[7]G` target runs measured a median of `147.808`
+process-CPU full-Jacobian-add times per orbit factor
+(range `143.578–152.405`); the corresponding wall median was
+`148.537` (range `135.707–161.293`). Each same-process
+reference arm executed `4,060,000` full Jacobian additions;
+the pair evaluated 20,000 factors. The exact raw times,
+source/binary hashes, host, and commands are in
+[`PREFIX_MEASUREMENTS.txt`](PREFIX_MEASUREMENTS.txt). Setup
+was timed separately and is retained there. Dividing the
+median CPU ratio by the `458.811` per-factor reference
+allowance gives a **derived conditional** `0.322` ratio if
+the measured component cost persisted across the full
+coset. That is neither a full-run timing nor a matched rho
+search: the reference is a full-add microbenchmark, and the
+P-192 exactness condition is unresolved. [pcc:unverified]
+
+The same measurement gives a conditional **bias-amplification gate**
+for a direct full-coset evaluator. If its per-factor CPU cost stayed
+at the six-run median, one traversal would cost
+`147.8075215/(2·458.8111801)≈0.16108R` in the full-add
+reference. A shared base traversal and `k` target traversals
+would therefore cost `(k+1)·0.16108R` before setup and other
+overheads. At most five target traversals fit below `R` on
+that optimistic accounting; six would cost about `1.128R`.
+For an **unverified independent-error model** in which each
+target sign agrees with the desired scalar sign with probability
+`p`, five-vote majority reaches 99% accuracy only when
+`p≥0.89436`, or sign correlation `2p−1≥0.78872`. Three votes
+require correlation about `0.88219`, and one vote requires
+`0.98`. These are conditional numerical thresholds, not a
+measured bias, an independence claim, or a lower bound on
+other sign algorithms. A weak empirical bias would not make
+this particular direct-evaluation and majority scheme a
+below-reference 99% sign computation. [pcc:unverified]
+
 For the first large P-192 subgroup size beyond 95,560,
 `m=8·9564682313913860059195669≈2^85.984`, a **hypothetical**
 additive paired-index grid with `h=6,185,364,116,659` offsets,
@@ -1173,6 +1276,25 @@ condition has log₂ scale `89.763`, above `log₂L≈86.984`,
 and that condition increases with `k`. Only `k=1,2` of this
 corollary apply here. This does not screen other intersection
 bounds or source methods. [pcc:unverified]
+
+The paper's less restrictive **Theorem 1.1** gives a stronger
+finite check. Take its invariant set `Q=Γ`. If `A+B⊂Γ`, fix
+`k+1` distinct members `a₀,…,aₖ` of `A`; translating by `a₀`
+puts all of `B+a₀` in `Γ∩(Γ+a₀−a₁)∩…∩(Γ+a₀−aₖ)`.
+Multiplication by any `λ∈Γ` preserves this intersection's
+size after scaling the shifts, so the theorem's sum over
+`λ∈Q` bounds `|B|` by
+`4(k+1)(L^(1/(2k+1))+1)^(k+1)`. Its three explicit
+conditions hold for `k=1,…,9` at the P-192 `r,L`; among
+these, `k=8` is strongest and gives `|B|≤2^51.589209`.
+The proposed lifted grid side is `|B|=2c≈2^43.491996`,
+8.097213 bits below that ceiling. Thus this direct theorem
+application improves the `k=2` corollary's numeric bound but
+still permits the proposed grid. The reproducible
+[`grid_intersection_gate.py`](grid_intersection_gate.py) checks
+all theorem conditions and the bound at the stated integers.
+This does not construct a grid or price its evaluation.
+[pcc:unverified]
 
 The hypothetical balanced grid also has a precise conditional
 character-sum obstruction. Put `A=I∪(-I)` and `B=J∪(-J)`;
@@ -1323,6 +1445,145 @@ field state and one coset traversal. This avoids constructing
 degree of `D₂` alone supplies no sublinear orbit evaluator.
 [pcc:unverified]
 
+Factoring this sextic does not split the P-192 norm. In fact,
+`D₂` is irreducible over `F_p` whenever `p≡3 (mod 4)` and
+`#E(F_p)≡1 (mod 4)`. Write `F` for Frobenius on `E[4]` and
+`t=p+1-#E(F_p)`. Then `t≡p≡3 (mod 4)`, so Cayley–Hamilton
+gives `F³=2F−I` and `F⁶=I` on `E[4]`. Modulo 2 its characteristic
+polynomial is `X²+X+1`; hence neither `F` nor `F²` fixes a
+nonzero 2-torsion point. If `T` has exact order 4, none of
+`F(T),F²(T),F³(T)` equals `±T`: the first two would fix
+`2T` modulo 2, and the third would make `F(2T)` equal `2T`
+or zero. Thus Frobenius cycles all six `x`-coordinates of
+exact-order-4 points, proving irreducibility of `D₂`.
+
+For a root `α∈F_(p⁶)`, the norm sign can be rewritten as
+`χ_(p⁶)(M_H(P;α))`. This changes the field of evaluation but
+does not evaluate the degree-`m` orbit polynomial. The
+[`doubling_sextic_factor_gate.gp`](doubling_sextic_factor_gate.gp)
+replay confirms irreducibility for P-192 and five finite
+controls. Those controls include both exact and inexact
+coset-sign cases, so irreducibility cannot certify exactness.
+[pcc:unverified]
+
+Maximal CM order is also insufficient to decide this sign.
+The [`maximal_cm_exact_control.gp`](maximal_cm_exact_control.gp)
+replay fixes `p=107`, `r=97`, `m=16`, and subgroup generator
+`5³ mod 97`. The two curves `y²=x³+6x+15` and
+`y²=x³+7x+6` have the same trace `11` and fundamental
+discriminant `-307`, so both have maximal endomorphism order.
+Their `j`-invariants are `99` and `9`, respectively. On all
+48 signed markings, the first curve has zero normalized
+coset-sign mismatches and the second has 32. The replay
+also retains the separate `F_271` fundamental-discriminant
+control with 72 mismatches among 120 signed markings.
+A preliminary three-representative screen falsely labeled
+the second `F_107` curve exact because it reoriented the
+index set for each coset; the fixed-index full-class replay
+corrects that result. These finite controls do not decide
+the P-192 coset. [pcc:unverified]
+
+The independent [`maximal_cm_class_scan.py`](maximal_cm_class_scan.py)
+enumerates all nonsingular short-Weierstrass models over
+`F_107` with order 97. It finds 159 models, 53 at each of
+`j=9,51,99`. Every `j=99` model is exact for this order-16
+product; no `j=9` or `j=51` model is exact. The inexact
+normalized mismatch count at `j=9` is 16 or 32 depending
+on the chosen base generator. PARI/GP independently checks
+one model at each `j` and `h(-307)=3`. Thus exactness varies
+across the three CM classes sharing the same fundamental
+discriminant; it is stable under the tested isomorphism
+models. This does not supply a class invariant that decides
+the P-192 case. [pcc:unverified]
+
+### Small horizontal endpoints as compact sign candidates
+
+The matched CM-class control suggests testing the same small
+coset product **after** a rational horizontal isogeny. For a
+public isogeny `φ:E→E′` of degree coprime to `r`, the point-only
+feature is `A_8(φ(Q))/A_8(φ(G))`, using eight fixed scalar
+representatives on `E′`. Since `φ([d]G)=[d]φ(G)`, it can be
+evaluated from public `Q` without knowing `d`; the known-scalar
+controls below use `d` only to label their expected ray signs.
+The degree-5 map and eight scalar multiples make this a compact
+candidate, but its cold online cost was not benchmarked.
+[pcc:unverified]
+
+Sage constructs one rational degree-5, one degree-11, and two
+degree-13 isogenies from P-192. The degree-5 endpoint matched
+`χ_r(d)` at the seven selected markings `1,2,3,5,7,11,13`.
+The first disjoint doubling witness is already `d=2`:
+the normalized feature is `+1` at `[2]G` and `−1` at `[4]G`,
+while both scalar signs are `+1`. The product of the eight
+endpoint duplication-sextic values at `[2]φ(G)` has character
+`−1`, independently checking the failure of doubling invariance.
+The degree-11 endpoint fails at `d=2`, and both degree-13
+endpoints fail at `d=3`. Thus none of these four one-edge
+endpoints gives an exact eight-factor P-192 sign on every
+marking. [pcc:unverified]
+
+For the fixed degree-5 endpoint, a 1,024-scalar diagnostic
+(seed `20261127`) gave `520` agreements. A fresh 4,096-scalar
+uniform holdout (seed `20261128`) gave `2062` agreements,
+estimated correlation `0.00683594` and approximate 95% Wilson
+interval `[-0.02378,0.03744]`. Zero is compatible with this
+holdout; it gives no certified useful bias and cannot exclude
+a much smaller one. The first eight holdout rows also compute
+the feature directly from `φ([d]G)`, checking equality with
+the diagnostic `d·[h]φ(G)` route. The reproducible
+[`horizontal_m8_screen.sage`](horizontal_m8_screen.sage) and
+[`HORIZONTAL_M8_SCREEN.jsonl`](HORIZONTAL_M8_SCREEN.jsonl)
+retain the exact endpoint identifiers, marks, seeds, timings,
+and all 5,120 sampled scalar/sign pairs. [pcc:unverified]
+
+A bounded two-step extension of the endpoint screen enumerates all
+16 rational paths with each edge degree in `{5,11,13}`. These paths
+reach eight distinct endpoint `j`-invariants. Every path has a
+counterexample among the fixed public scalar marks
+`2,3,5,7,11,13,4,10,14,15,17,19,23,29,31`; for example, the
+`5→11` path fails at `d=2`, and both `5→13` paths fail by `d=3`.
+The computation checks the composite map on `[7]G` independently
+of the precomputed endpoint point. The script and complete path,
+mark, and sign rows are in
+[`two_hop_m8_screen.sage`](two_hop_m8_screen.sage) and
+[`TWO_HOP_M8_SCREEN.jsonl`](TWO_HOP_M8_SCREEN.jsonl).
+All these rational edges are horizontal: every codomain is
+`F_p`-isogenous to P-192 and therefore has its Frobenius trace;
+the fundamental discriminant calculated below forces its
+endomorphism ring to be the same maximal order. This is an
+exactness screen for these 16 paths at `m=8` only, and does not
+decide the first large P-192 coset.
+[pcc:unverified]
+
+The same degree-5 endpoint was screened at the other P-192
+subgroup sizes below the first large coset. At `m=40` and
+`m=19,112`, the full base product has sign `+1` and the full
+`[2]` product sign `−1`, contradicting `χ_r(2)=+1`.
+At `m=95,560`, both base and `[2]` full products have sign
+`+1`, so the base doubling check passes. The full `[3]`
+product also has sign `+1`; its normalized ratio is `+1`
+against `χ_r(3)=−1`. This gives an explicit, independent
+exactness falsifier at each of the four short even subgroup
+orders on this endpoint. It does not test larger cosets or
+more distant CM classes. [pcc:unverified]
+
+[`horizontal_short_coset_screen.sage`](horizontal_short_coset_screen.sage)
+computes these products via the bounded division-polynomial
+recurrence, checking its first four terms against direct
+point multiplication in every run. Each 95,560-factor
+marking was split into 20 disjoint sorted-index blocks of at
+most 5,000 factors; the product of their character signs is
+the full character. The 60 raw blocks, interval boundaries,
+source hashes, and completed-sign summary are in
+[`SHORT_M95560_SEGMENTS.jsonl`](SHORT_M95560_SEGMENTS.jsonl).
+The `m=40` and `m=19,112` rows are in
+[`SHORT_M40_M19112_SEGMENTS.jsonl`](SHORT_M40_M19112_SEGMENTS.jsonl).
+The initial unchunked 95,560-factor command was interrupted
+after printing only its base sign, so the comparison uses
+the separately completed block replay. These are known-marking
+exactness checks, not a measured cold arbitrary-target
+evaluator. [pcc:unverified]
+
 The finite controls also rule out two shortcuts from CM data
 alone. The same replay fixes `p=223`, `r=241`, and `m=24`:
 `y²=x³+8x+7` is exact on all 120 signed classes, while
@@ -1463,6 +1724,58 @@ Thus this specified compact second-jet feature is **not an exact
 sign evaluator on P-192**. Four selected markings cannot estimate
 its full-group bias; no useful-bias or cold-cost claim follows.
 [pcc:unverified]
+
+### Trace-index division-polynomial residue screen
+
+A separate fixed-index screen evaluated the quadratic character
+of `ψ_k(P)` at six public P-192 markings `d=1,2,3,5,7,11`.
+The 11 odd indices are built from the half-order, inverse
+powers of two, `r−2`, `r−4`, `r−6`, and Frobenius trace
+`t=p+1−r`; their formulas and the complete six-point rows
+are in [`division_feature_screen.py`](division_feature_screen.py)
+and [`DIVISION_FEATURE_SAMPLES.jsonl`](DIVISION_FEATURE_SAMPLES.jsonl).
+Each sign is normalized by its value at `G`. The index
+`k=t−2=31607402316713927207482677197` matched `χ_r(d)`
+at all six selection markings, but a disjoint check at
+`d=10` gave feature sign `−1` against scalar sign `+1`.
+Thus this specific logarithmic-depth division-polynomial
+feature is not exact on P-192. [pcc:unverified]
+
+Two seeded uniform-marking diagnostics for the selected
+`k=t−2` feature found 117/256 agreements (seed 20261125)
+and 2014/4096 (fresh seed 20261126). The latter has estimated
+correlation `−0.01660`; its approximate 95% Wilson interval
+after converting from agreement to correlation is
+`[−0.0472,0.0140]`. Zero remains compatible with that sample.
+The file retains each sampled scalar and both signs. These
+samples neither prove zero bias nor certify a correlation
+large enough for a cold below-rho sign computation; a full
+cost and calibration would also be required. [pcc:unverified]
+
+### Characteristic-index division-polynomial screen
+
+The [EDS Frobenius argument of Shipsey and Swart,
+§4](https://eprint.iacr.org/2008/444.pdf) motivates checking
+indices near the field characteristic `p`; its published scalar
+recovery algorithm assumes a different group-order relation.
+On P-192, five compact point-only features were evaluated:
+`χ_p(ψ_(p−2)(Q))`, `χ_p(ψ_p(Q))`, `χ_p(ψ_(p+2)(Q))`, and
+`χ_p(ψ_(p±1)(Q)/(2y(Q)))`. The even-index quotient makes those
+two features invariant under `Q↦−Q`, as are the three odd-index
+features. The replay checks that symmetry and matches the
+recurrence to Sage's direct polynomials at indices `3,5,7`.
+[pcc:unverified]
+
+After normalization at `G`, the first three features and the
+`p−1` quotient give `−1` at `[2]G` against `χ_r(2)=+1`.
+The `p+2` feature and `p+1` quotient give `+1` at `[3]G`
+against `χ_r(3)=−1`. All five therefore fail exactness on
+P-192 at a public known marking. The script
+[`characteristic_index_screen.sage`](characteristic_index_screen.sage)
+and [`CHARACTERISTIC_INDEX_SCREEN.jsonl`](CHARACTERISTIC_INDEX_SCREEN.jsonl)
+retain the 12-mark panel, source hash, signs, and witnesses.
+This bounded screen does not estimate bias or charge a complete
+arbitrary-target sign computation. [pcc:unverified]
 
 ### Oracle-model check: EDS residue and shifted Legendre
 

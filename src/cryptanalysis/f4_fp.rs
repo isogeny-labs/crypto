@@ -55,7 +55,11 @@
 //! the descent systems of the coordinate thread can be timed at `m = 3`.
 
 use std::collections::HashSet;
-use std::sync::atomic::{AtomicU64, Ordering as AtomicOrdering};
+use std::marker::PhantomData;
+use std::num::NonZeroU64;
+use std::rc::Rc;
+use std::sync::atomic::{AtomicU64, AtomicU8, AtomicUsize, Ordering as AtomicOrdering};
+use std::thread::ThreadId;
 use std::time::{Duration, Instant};
 
 use rayon::prelude::*;
@@ -123,6 +127,10 @@ fn notify_progress(progress: F4Progress) {
     });
 }
 
+fn progress_observer_active() -> bool {
+    OBSERVER.with(|slot| slot.borrow().is_some())
+}
+
 // ── Field arithmetic ───────────────────────────────────────────────
 
 /// Process-wide count of `F_p` multiplications spent in row reduction
@@ -154,11 +162,13 @@ pub fn native_stair_ops_total() -> u64 {
 #[inline]
 fn count_native(n: u64) {
     NATIVE_OPS.fetch_add(n, AtomicOrdering::Relaxed);
+    visit_account_charge(VisitAccountingCounter::Comparisons, n);
 }
 
 #[inline]
 fn count_stair(n: u64) {
     NATIVE_STAIR.fetch_add(n, AtomicOrdering::Relaxed);
+    visit_account_charge(VisitAccountingCounter::DivisibilityTests, n);
 }
 
 thread_local! {
@@ -372,6 +382,94 @@ fn count_norm(n: usize) {
     if super::jv_bitops::enabled() {
         NORM_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
     }
+    if let Ok(n) = u64::try_from(n) {
+        // `count_ops` conservatively records a multiply-subtract.  Pivot
+        // normalization is multiplication-only and reads one rather than two
+        // field elements, so correct those two leaves in the same phase.
+        visit_account_uncharge(VisitAccountingCounter::FieldAdditions, n);
+        visit_account_uncharge(VisitAccountingCounter::RowReads, n);
+    } else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_operations"),
+            "normalization length does not fit u64",
+        );
+    }
+}
+
+#[inline]
+fn visit_account_row_operations(n: usize) {
+    let Ok(n) = u64::try_from(n) else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_operations"),
+            "row-operation count does not fit u64",
+        );
+        return;
+    };
+    let Some(reads) = n.checked_mul(2) else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_reads"),
+            "row-operation read count overflowed",
+        );
+        return;
+    };
+    visit_account_with(|accounting| {
+        accounting.charge(VisitAccountingCounter::RowOperations, n);
+        accounting.charge(VisitAccountingCounter::FieldMultiplications, n);
+        accounting.charge(VisitAccountingCounter::FieldAdditions, n);
+        accounting.charge(VisitAccountingCounter::RowReads, reads);
+        accounting.charge(VisitAccountingCounter::RowWrites, n);
+    });
+}
+
+#[inline]
+fn visit_account_row_structure(n: usize) {
+    let Ok(n) = u64::try_from(n) else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_operations"),
+            "row-operation count does not fit u64",
+        );
+        return;
+    };
+    let Some(reads) = n.checked_mul(2) else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_reads"),
+            "row-operation read count overflowed",
+        );
+        return;
+    };
+    visit_account_with(|accounting| {
+        accounting.charge(VisitAccountingCounter::RowOperations, n);
+        accounting.charge(VisitAccountingCounter::FieldAdditions, n);
+        accounting.charge(VisitAccountingCounter::RowReads, reads);
+        accounting.charge(VisitAccountingCounter::RowWrites, n);
+    });
+}
+
+#[inline]
+fn count_words(n: u64) {
+    super::jv_bitops::words(n);
+    visit_account_charge(VisitAccountingCounter::WordOperations, n);
+}
+
+#[inline]
+fn count_probes(n: u64, key_words: u64) {
+    super::jv_bitops::probes(n, key_words);
+    match n.checked_mul(key_words) {
+        Some(words) => visit_account_with(|accounting| {
+            accounting.charge(VisitAccountingCounter::HashProbes, n);
+            accounting.charge(VisitAccountingCounter::WordOperations, words);
+        }),
+        None => visit_account_block(
+            "counter_overflow",
+            Some("word_operations"),
+            format!("checked probe word product {n} * {key_words} failed"),
+        ),
+    }
 }
 
 #[inline]
@@ -381,15 +479,18 @@ fn count_ops(n: usize) {
     // bitop/v1 (`jv_bitops`, off unless a study turns it on): one row
     // operation is a multiply-subtract
     super::jv_bitops::row_ops(n as u64);
+    visit_account_row_operations(n);
 }
 
 #[inline]
 fn mulmod(a: u64, b: u64, p: u64) -> u64 {
+    visit_account_charge(VisitAccountingCounter::FieldMultiplications, 1);
     ((a as u128 * b as u128) % p as u128) as u64
 }
 
 fn invmod(a: u64, p: u64) -> u64 {
     super::jv_bitops::charge(super::jv_bitops::Kind::FieldInv, 1);
+    visit_account_charge(VisitAccountingCounter::FieldInversions, 1);
     // p prime, a != 0
     if (2..1 << 32).contains(&p) {
         // the same powers, each product reduced by Barrett's method
@@ -495,6 +596,7 @@ fn total_degree(m: &[u32]) -> u32 {
 fn scale_monic(f: &mut Poly, p: u64) {
     let inv = invmod(f[0].1, p);
     super::jv_bitops::charge(super::jv_bitops::Kind::FieldMul, f.len() as u64);
+    visit_account_charge_usize(VisitAccountingCounter::FieldMultiplications, f.len());
     if (2..1 << 32).contains(&p) {
         let fp = Barrett::new(p);
         for (_, c) in f.iter_mut() {
@@ -539,8 +641,18 @@ fn normalise_owned(mut out: Poly, p: u64, ord: Ordering) -> Poly {
         }
         same
     });
-    super::jv_bitops::words(super::jv_bitops::sort_cost(scanned as usize) + scanned);
+    let sort = super::jv_bitops::sort_cost(scanned as usize);
+    match sort.checked_add(scanned) {
+        Some(words) => count_words(words),
+        None => visit_account_block(
+            "counter_overflow",
+            Some("word_operations"),
+            "normalization sort plus scan cost overflowed",
+        ),
+    }
+    visit_account_charge(VisitAccountingCounter::SortComparisons, sort);
     super::jv_bitops::charge(super::jv_bitops::Kind::FieldAdd, merges);
+    visit_account_charge(VisitAccountingCounter::FieldAdditions, merges);
     // drop the sums that cancelled
     out.retain(|(_, c)| *c != 0);
     if !out.is_empty() {
@@ -1975,21 +2087,46 @@ fn f4_dispatch(
     n_vars: usize,
     p: u64,
     opts: &F4Options,
+    account: VisitAccount<'_>,
     trace: TraceMode,
 ) -> F4Report {
-    if opts.resource_limits.is_some() {
-        return f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), trace);
+    if matches!(account, VisitAccount::Off) && visit_accounting_unsuspended_active() {
+        visit_account_block(
+            "accounting_token_missing",
+            None,
+            "native F4 dispatch entered an active solver ledger without its borrowed token",
+        );
+        return f4_accounting_stopped_report();
     }
-    match opts.stop_hilbert {
-        Some(chunk) => f4_hilbert_guarded(input, n_vars, p, opts, chunk, trace),
-        None => f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), trace),
+    if account.control().stopped() {
+        return f4_accounting_stopped_report();
+    }
+    let report = if opts.resource_limits.is_some() {
+        f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), account, trace)
+    } else {
+        match opts.stop_hilbert {
+            Some(chunk) => f4_hilbert_guarded(input, n_vars, p, opts, chunk, account, trace),
+            None => f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), account, trace),
+        }
+    };
+    if account.control().stopped() {
+        f4_accounting_stopped_report()
+    } else {
+        report
     }
 }
 
 /// [`f4`] recording the trace of the run.
 pub fn f4_record(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> (F4Report, F4Trace) {
     let mut trace = F4Trace::default();
-    let r = f4_dispatch(input, n_vars, p, opts, TraceMode::Record(&mut trace));
+    let r = f4_dispatch(
+        input,
+        n_vars,
+        p,
+        opts,
+        VisitAccount::Off,
+        TraceMode::Record(&mut trace),
+    );
     (r, trace)
 }
 
@@ -2008,6 +2145,7 @@ pub fn f4_replay(
         n_vars,
         p,
         opts,
+        VisitAccount::Off,
         TraceMode::Replay(Cursor {
             node: Node::Root(trace),
             base: 0,
@@ -2814,14 +2952,27 @@ fn gm_update<K: PartialEq>(
     // lcm compares, a packed monomial being two words each), every alive
     // element gets a divisibility, coprimality and lcm, and criteria M/F
     // compare candidate pairs (charged at the quadratic bound)
-    super::jv_bitops::words(
-        if gm {
-            6 * (pairs.len() + above.len()) as u64
-        } else {
-            0
-        } + 6 * k as u64,
-    );
+    let held = pairs.len().checked_add(above.len());
+    let legacy_words = if gm {
+        held.unwrap_or(usize::MAX).saturating_mul(6)
+    } else {
+        0
+    }
+    .saturating_add(k.saturating_mul(6));
+    visit_account_charge_usize(VisitAccountingCounter::WordOperations, legacy_words);
+    super::jv_bitops::words(u64::try_from(legacy_words).unwrap_or(u64::MAX));
+    if held.is_none() {
+        visit_account_block(
+            "counter_overflow",
+            Some("word_operations"),
+            "held-pair population overflowed usize",
+        );
+    }
     if gm {
+        if let Some(held) = held {
+            visit_account_charge_usize(VisitAccountingCounter::DivisibilityTests, held);
+            visit_account_charge_product(VisitAccountingCounter::Comparisons, held, 2);
+        }
         // Criterion B: an old pair (g1, g2) whose lcm `h` divides is covered
         // by (g1, h) and (h, g2) unless one of those has the same lcm.  Pairs
         // held above the degree bound are tested too: a pair the criterion
@@ -2853,6 +3004,8 @@ fn gm_update<K: PartialEq>(
         if !alive[i] {
             continue;
         }
+        visit_account_charge(VisitAccountingCounter::CriticalPairCandidates, 1);
+        visit_account_charge(VisitAccountingCounter::DivisibilityTests, 1);
         let lmi = lm(i);
         if div(h, &lmi) {
             // `basis[i]` is redundant in the final basis, but its pair with
@@ -2866,7 +3019,19 @@ fn gm_update<K: PartialEq>(
     }
     let mut kept = vec![true; cand.len()];
     if gm {
-        super::jv_bitops::words(2 * (cand.len() * cand.len()) as u64);
+        match cand
+            .len()
+            .checked_mul(cand.len())
+            .and_then(|n| n.checked_mul(2))
+            .and_then(|n| u64::try_from(n).ok())
+        {
+            Some(words) => count_words(words),
+            None => visit_account_block(
+                "counter_overflow",
+                Some("word_operations"),
+                "quadratic critical-pair comparison bound overflowed",
+            ),
+        }
         // Criteria M and F: drop (h, g1) when another pair (h, g2) still
         // standing has an lcm dividing its own; of several with equal lcms
         // the last one stays.  A coprime pair is never dropped here (it may
@@ -2878,17 +3043,24 @@ fn gm_update<K: PartialEq>(
             if cand[a].2 {
                 continue;
             }
-            if (0..cand.len()).any(|b| b != a && kept[b] && div(&cand[b].1, &cand[a].1)) {
+            if (0..cand.len()).any(|b| {
+                if b == a || !kept[b] {
+                    return false;
+                }
+                visit_account_charge(VisitAccountingCounter::DivisibilityTests, 1);
+                div(&cand[b].1, &cand[a].1)
+            }) {
                 kept[a] = false;
             }
         }
     }
-    Ok(cand
+    let selected: Vec<_> = cand
         .into_iter()
         .zip(kept)
         .filter(|((_, _, cp), keep)| !cp && *keep)
         .map(|((i, l, _), _)| (i, l))
-        .collect())
+        .collect();
+    Ok(selected)
 }
 
 fn lcm(a: &[u32], b: &[u32]) -> Vec<u32> {
@@ -3237,7 +3409,7 @@ fn rref32(
             return None;
         }
         let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
-        super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
+        count_words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
         let Some(r) = found else {
             continue;
         };
@@ -3562,10 +3734,13 @@ fn rref32_deferred(
 /// so the reduced echelon form, and every counted operation, is the one the
 /// 64-bit accumulators give.  `F4_FP_NARROW_ACC=0` keeps the 64-bit path
 /// (also kept under `F4_FP_MEM=1`, whose fused kernel is 64-bit).
-fn narrow_acc_interval(p: u64) -> Option<usize> {
+fn narrow_acc_enabled() -> bool {
     static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    let on = *ON.get_or_init(|| std::env::var("F4_FP_NARROW_ACC").as_deref() != Ok("0"));
-    if !on || mem_site(0) {
+    *ON.get_or_init(|| std::env::var("F4_FP_NARROW_ACC").as_deref() != Ok("0"))
+}
+
+fn narrow_acc_interval(p: u64) -> Option<usize> {
+    if !narrow_acc_enabled() || mem_site(0) {
         return None;
     }
     narrow_acc_interval_for(p)
@@ -5234,7 +5409,7 @@ fn rref_ckpt(
                 }
             }
             let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
-            super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
+            count_words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
             let Some(r) = found else {
                 continue;
             };
@@ -5294,6 +5469,57 @@ fn rref_ckpt(
 
 /// Degree-bounded F4.
 pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
+    f4_with_visit_account(input, n_vars, p, opts, VisitAccount::Off)
+}
+
+fn f4_accounting_stopped_report() -> F4Report {
+    F4Report {
+        basis: Vec::new(),
+        inconsistent: false,
+        degree_reached: 0,
+        solving_degree: 0,
+        solving_degree_max: 0,
+        max_cols_to_solution: 0,
+        steps_to_solution: 0,
+        steps: 0,
+        max_rows: 0,
+        max_cols: 0,
+        ms: 0.0,
+        timed_out: false,
+        resource_limit: None,
+        pairs_above_bound: 0,
+        staircase_at_stop: None,
+        field_ops: 0,
+        blocked_steps: 0,
+        trace_mismatch: false,
+        hilbert: HilbertStop::Off,
+        hilbert_check_ops: 0,
+        resumed_ms: 0.0,
+        first_hilbert_deviation_degree: None,
+        last_hilbert_deviation_degree: None,
+        staircase_extinction_degree: None,
+        hilbert_deviations: Vec::new(),
+    }
+}
+
+fn f4_with_visit_account(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    account: VisitAccount<'_>,
+) -> F4Report {
+    if matches!(account, VisitAccount::Off) && visit_accounting_unsuspended_active() {
+        visit_account_block(
+            "accounting_token_missing",
+            None,
+            "native F4 entered an active solver ledger without its borrowed token",
+        );
+        return f4_accounting_stopped_report();
+    }
+    if account.control().stopped() {
+        return f4_accounting_stopped_report();
+    }
     notify_progress(F4Progress {
         event: "begin",
         variables: n_vars,
@@ -5305,7 +5531,10 @@ pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
         field_multiplications: 0,
         elapsed_ms: 0.0,
     });
-    let report = f4_dispatch(input, n_vars, p, opts, TraceMode::Off);
+    let report = f4_dispatch(input, n_vars, p, opts, account, TraceMode::Off);
+    if account.control().stopped() {
+        return f4_accounting_stopped_report();
+    }
     mem_stats_report(report.ms);
     notify_progress(F4Progress {
         event: "complete",
@@ -5515,6 +5744,7 @@ fn f4_hilbert_guarded(
     p: u64,
     opts: &F4Options,
     chunk: usize,
+    account: VisitAccount<'_>,
     mut trace: TraceMode,
 ) -> F4Report {
     let ops0 = field_ops_now();
@@ -5535,18 +5765,18 @@ fn f4_hilbert_guarded(
         // ideal `(h)` makes `R/(h)` finite-dimensional, so the `n` forms in
         // `n` variables are a regular sequence (Lemma 1); the Macaulay
         // degree `sum(d_i - 1) + 1` bounds the degrees that matter.
-        let lead: Vec<Poly> = input
-            .iter()
-            .zip(&degs)
-            .map(|(f, &d)| {
-                let t: Vec<(Vec<u32>, u64)> = f
-                    .iter()
-                    .filter(|(e, _)| total_degree(e) == d)
-                    .cloned()
-                    .collect();
-                normalise(&t, p, opts.order)
-            })
-            .collect();
+        let mut lead = Vec::with_capacity(input.len());
+        for (f, &d) in input.iter().zip(&degs) {
+            let t: Vec<(Vec<u32>, u64)> = f
+                .iter()
+                .filter(|(e, _)| total_degree(e) == d)
+                .cloned()
+                .collect();
+            lead.push(normalise(&t, p, opts.order));
+            if account.control().stopped() {
+                return f4_accounting_stopped_report();
+            }
+        }
         let bound: usize = degs.iter().map(|&d| d as usize).product();
         let dreg: u32 = degs.iter().map(|d| d - 1).sum::<u32>() + 1;
         let mut co = F4Options::new(opts.order, dreg.min(opts.max_degree));
@@ -5557,15 +5787,28 @@ fn f4_hilbert_guarded(
         // function is a heuristic here that makes the check cheap.
         co.hilbert_expect = Some(complete_intersection_hilbert(&degs));
         co.max_pairs_per_step = Some(chunk);
-        let r = f4_with_arithmetic(&lead, n_vars, p, &co, arithmetic_mode(), TraceMode::Off);
+        let r = f4_with_arithmetic(
+            &lead,
+            n_vars,
+            p,
+            &co,
+            arithmetic_mode(),
+            account,
+            TraceMode::Off,
+        );
+        if account.control().stopped() {
+            return f4_accounting_stopped_report();
+        }
         check_ops = r.field_ops;
         let lms: Vec<&[u32]> = r.basis.iter().map(|g| g[0].0.as_slice()).collect();
-        if !r.timed_out
-            && !r.inconsistent
-            && lead.iter().all(|f| !f.is_empty())
-            && staircase_at_most(&lms, n_vars, bound).is_some()
-        {
-            status = HilbertStop::Applied;
+        if !r.timed_out && !r.inconsistent && lead.iter().all(|f| !f.is_empty()) {
+            let finite_staircase = staircase_at_most(&lms, n_vars, bound).is_some();
+            if account.control().stopped() {
+                return f4_accounting_stopped_report();
+            }
+            if finite_staircase {
+                status = HilbertStop::Applied;
+            }
         }
     }
     if status == HilbertStop::Applied {
@@ -5574,7 +5817,18 @@ fn f4_hilbert_guarded(
         o.max_pairs_per_step = Some(chunk);
         // the main run is the one a trace records or replays (the check
         // on the leading forms is never traced)
-        let r = f4_with_arithmetic(input, n_vars, p, &o, arithmetic_mode(), trace.reborrow());
+        let r = f4_with_arithmetic(
+            input,
+            n_vars,
+            p,
+            &o,
+            arithmetic_mode(),
+            account,
+            trace.reborrow(),
+        );
+        if account.control().stopped() {
+            return f4_accounting_stopped_report();
+        }
         if r.hilbert == HilbertStop::Applied {
             return F4Report {
                 field_ops: field_ops_now() - ops0,
@@ -5596,7 +5850,18 @@ fn f4_hilbert_guarded(
         }
         _ => TraceMode::Off,
     };
-    let r = f4_with_arithmetic(input, n_vars, p, &plain, arithmetic_mode(), fallback);
+    let r = f4_with_arithmetic(
+        input,
+        n_vars,
+        p,
+        &plain,
+        arithmetic_mode(),
+        account,
+        fallback,
+    );
+    if account.control().stopped() {
+        return f4_accounting_stopped_report();
+    }
     F4Report {
         field_ops: field_ops_now() - ops0,
         ms: t0.elapsed().as_secs_f64() * 1e3,
@@ -5613,6 +5878,7 @@ fn f4_with_arithmetic(
     p: u64,
     opts: &F4Options,
     mode: u8,
+    account: VisitAccount<'_>,
     mut trace: TraceMode<'_>,
 ) -> F4Report {
     let t0 = Instant::now();
@@ -5755,6 +6021,13 @@ fn f4_with_arithmetic(
             }
         };
     }
+    macro_rules! account_or_abort {
+        ($control:expr) => {
+            if $control.stopped() {
+                abort_call!(F4Stop::Accounting);
+            }
+        };
+    }
     macro_rules! bounded_deadline {
         () => {
             if opts.resource_limits.is_some() && opts.deadline.is_some_and(|d| Instant::now() > d) {
@@ -5762,6 +6035,7 @@ fn f4_with_arithmetic(
             }
         };
     }
+    account_or_abort!(account.control());
     if let Some(limits) = &opts.resource_limits {
         let incompatible = if opts.checkpoint.is_some()
             || opts.checkpoint_stop_after.is_some()
@@ -5820,7 +6094,12 @@ fn f4_with_arithmetic(
         lmp: Option<&mut Vec<u128>>,
         limits: Option<&F4ResourceLimits>,
         deadline: Option<Instant>,
+        account: VisitAccount<'_>,
     ) -> Result<(), F4Stop> {
+        let (account_phase, control) = account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+        if control.stopped() {
+            return Err(F4Stop::Accounting);
+        }
         let k = basis.len();
         let n = f[0].0.len();
         let new: Vec<(usize, Vec<u32>, u128)> = match lmp {
@@ -5865,6 +6144,9 @@ fn f4_with_arithmetic(
                 new.into_iter().map(|(i, l)| (i, l, 0)).collect()
             }
         };
+        if account.control().stopped() {
+            return Err(F4Stop::Accounting);
+        }
         for (i, l, lp) in new {
             let d = total_degree(&l);
             let pair = Pair {
@@ -5883,32 +6165,46 @@ fn f4_with_arithmetic(
         *pairs_above_bound = above.len();
         basis.push(f);
         alive.push(true);
+        drop(account_phase);
+        if account.control().stopped() {
+            return Err(F4Stop::Accounting);
+        }
         Ok(())
     }
 
-    for f in input {
-        bounded_deadline!();
-        let f = normalise(f, p, ord);
-        if f.is_empty() {
-            continue;
+    {
+        let (account_phase, control) =
+            account.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+        account_or_abort!(control);
+        for f in input {
+            bounded_deadline!();
+            let f = normalise(f, p, ord);
+            account_or_abort!(account.control());
+            if f.is_empty() {
+                continue;
+            }
+            if total_degree(&f[0].0) == 0 {
+                return report(&basis, &alive, true, 0, 0, 0, 0, 0, false, 0, (0, 0, 0), 0);
+            }
+            basis_terms += f.len();
+            account_or_abort!(account.charge_usize(VisitAccountingCounter::BasisTerms, f.len()));
+            admit!(add(
+                f,
+                &mut basis,
+                &mut alive,
+                &mut pairs,
+                &mut above,
+                opts.max_degree,
+                &mut pairs_above_bound,
+                gm,
+                lm_packed.as_mut(),
+                opts.resource_limits.as_ref(),
+                opts.resource_limits.and(opts.deadline),
+                account,
+            ));
         }
-        if total_degree(&f[0].0) == 0 {
-            return report(&basis, &alive, true, 0, 0, 0, 0, 0, false, 0, (0, 0, 0), 0);
-        }
-        basis_terms += f.len();
-        admit!(add(
-            f,
-            &mut basis,
-            &mut alive,
-            &mut pairs,
-            &mut above,
-            opts.max_degree,
-            &mut pairs_above_bound,
-            gm,
-            lm_packed.as_mut(),
-            opts.resource_limits.as_ref(),
-            opts.resource_limits.and(opts.deadline),
-        ));
+        drop(account_phase);
+        account_or_abort!(account.control());
     }
     let input_lms_now: Vec<Vec<u32>> = basis.iter().map(|f| f[0].0.clone()).collect();
     let mut input_mismatch = false;
@@ -6200,6 +6496,9 @@ fn f4_with_arithmetic(
         let mut last_snap = Instant::now();
         let mut snaps = 0usize;
         // symbolic preprocessing
+        let (account_symbolic, control) =
+            account.phase_scope(VisitAccountingPhaseV1::SymbolicPreprocessing);
+        account_or_abort!(control);
         let recording = trace.recording();
         let mut rows_poly: Vec<(usize, Vec<u32>)> = Vec::new(); // (basis index, multiplier)
         let mut seen: FxSet<(usize, Vec<u32>)> = FxSet::default();
@@ -6242,18 +6541,30 @@ fn f4_with_arithmetic(
                 }
             }
         } else {
-            d = pairs.iter().map(|pr| pr.degree).min().unwrap();
-            degree_reached = degree_reached.max(d);
-            let (selected, rest): (Vec<Pair>, Vec<Pair>) =
-                pairs.drain(..).partition(|pr| pr.degree == d);
-            pairs = rest;
-            let mut selected = selected;
-            if let Some(c) = opts.max_pairs_per_step {
-                if selected.len() > c {
-                    selected.sort_by(|a, b| cmp_monomial(&a.lcm, &b.lcm, ord));
-                    pairs.extend(selected.split_off(c));
+            let selected = {
+                let (account_pairs, control) =
+                    account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+                account_or_abort!(control);
+                d = pairs.iter().map(|pr| pr.degree).min().unwrap();
+                degree_reached = degree_reached.max(d);
+                let (selected, rest): (Vec<Pair>, Vec<Pair>) =
+                    pairs.drain(..).partition(|pr| pr.degree == d);
+                pairs = rest;
+                let mut selected = selected;
+                if let Some(c) = opts.max_pairs_per_step {
+                    if selected.len() > c {
+                        selected.sort_by(|a, b| cmp_monomial(&a.lcm, &b.lcm, ord));
+                        pairs.extend(selected.split_off(c));
+                    }
                 }
-            }
+                account_or_abort!(account.charge_usize(
+                    VisitAccountingCounter::CriticalPairsSelected,
+                    selected.len(),
+                ));
+                drop(account_pairs);
+                account_or_abort!(account.control());
+                selected
+            };
             selected_len = selected.len();
             for pr in &selected {
                 bounded_deadline!();
@@ -6281,6 +6592,13 @@ fn f4_with_arithmetic(
         let (cols, sparse, tp1): (Cols, Vec<Vec<(u32, u64)>>, Instant) = if let Some(pk) =
             packed.as_mut()
         {
+            if account.enabled() {
+                account_or_abort!(account.block(
+                    "uninstrumented_branch",
+                    None,
+                    "packed symbolic preprocessing is not yet allocation-complete",
+                ));
+            }
             pk.extend(&basis);
             let pk = &*pk;
             // Spread over threads only from `F4_FP_PAR_SYM_SEEDS` seed rows
@@ -6457,6 +6775,9 @@ fn f4_with_arithmetic(
             }
             let tp1 = Instant::now();
             // matrix: columns in decreasing monomial order, rows sparse
+            let (account_columns, control) =
+                account.phase_scope(VisitAccountingPhaseV1::ColumnOrdering);
+            account_or_abort!(control);
             let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
             cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
             let col_of: FxMap<&[u32], u32> = cols
@@ -6465,8 +6786,13 @@ fn f4_with_arithmetic(
                 .map(|(i, m)| (m.as_slice(), i as u32))
                 .collect();
             let n_cols = cols.len();
+            drop(account_columns);
+            account_or_abort!(account.control());
             // `(column, coefficient)` in increasing column order, so the
             // leading term first; every row is monic
+            let (account_matrix, control) =
+                account.phase_scope(VisitAccountingPhaseV1::MatrixConstruction);
+            account_or_abort!(control);
             let to_sparse = |(idx, m): &(usize, Vec<u32>)| -> Vec<(u32, u64)> {
                 let mut em = vec![0u32; n_vars];
                 basis[*idx]
@@ -6487,9 +6813,26 @@ fn f4_with_arithmetic(
             } else {
                 rows_poly.iter().map(to_sparse).collect()
             };
+            drop(account_matrix);
+            account_or_abort!(account.control());
             (Cols::Plain(cols), sparse, tp1)
         };
+        drop(account_symbolic);
+        account_or_abort!(account.control());
         let n_cols = cols.len();
+        let (account_matrix, control) =
+            account.phase_scope(VisitAccountingPhaseV1::MatrixConstruction);
+        account_or_abort!(control);
+        account_or_abort!(
+            account.charge_usize(VisitAccountingCounter::SymbolicRows, rows_poly.len())
+        );
+        account_or_abort!(account.charge_usize(VisitAccountingCounter::MatrixRows, sparse.len()));
+        account_or_abort!(account.charge_usize(VisitAccountingCounter::MatrixColumns, n_cols));
+        account_or_abort!(account.charge_product(
+            VisitAccountingCounter::MatrixEntries,
+            sparse.len(),
+            n_cols,
+        ));
         let parallel = sparse.len() * n_cols > PAR_WORK;
         let tp2 = Instant::now();
         let mut input_lm = vec![false; n_cols];
@@ -6516,19 +6859,75 @@ fn f4_with_arithmetic(
         // probe and the column-index probe), per column (the done-set probe,
         // the reducer search over the basis at its bound, the column sort),
         // and the pair rows' scans over the reducer columns
-        if super::jv_bitops::enabled() {
-            let entries: u64 = sparse.iter().map(|r| r.len() as u64).sum();
-            let nc = n_cols as u64;
-            super::jv_bitops::probes(2 * entries + nc, 2);
-            super::jv_bitops::words(
-                2 * entries + super::jv_bitops::sort_cost(n_cols) + nc * basis.len() as u64,
-            );
-            let scans: u64 = sparse[..n_pair_rows]
-                .iter()
-                .map(|r| r.first().map_or(0, |e| nc - e.0 as u64))
-                .sum();
-            super::jv_bitops::words(scans);
+        if super::jv_bitops::enabled() || account.enabled() {
+            let entries = sparse.iter().try_fold(0u64, |sum, row| {
+                sum.checked_add(u64::try_from(row.len()).ok()?)
+            });
+            let nc = u64::try_from(n_cols).ok();
+            if let (Some(entries), Some(nc)) = (entries, nc) {
+                if let Some(probes) = entries.checked_mul(2).and_then(|n| n.checked_add(nc)) {
+                    super::jv_bitops::probes(probes, 2);
+                    if let Some(words) = probes.checked_mul(2) {
+                        account_or_abort!(
+                            account.charge(VisitAccountingCounter::HashProbes, probes)
+                        );
+                        account_or_abort!(
+                            account.charge(VisitAccountingCounter::WordOperations, words)
+                        );
+                    } else {
+                        account_or_abort!(account.block(
+                            "counter_overflow",
+                            Some("word_operations"),
+                            format!("checked probe word product {probes} * 2 failed"),
+                        ));
+                    }
+                } else {
+                    account_or_abort!(account.block(
+                        "counter_overflow",
+                        Some("hash_probes"),
+                        "symbolic probe count overflowed",
+                    ));
+                }
+                let sort = super::jv_bitops::sort_cost(n_cols);
+                account_or_abort!(account.charge(VisitAccountingCounter::SortComparisons, sort));
+                let basis_words = nc.checked_mul(u64::try_from(basis.len()).unwrap_or(u64::MAX));
+                let words = entries
+                    .checked_mul(2)
+                    .and_then(|n| n.checked_add(sort))
+                    .and_then(|n| n.checked_add(basis_words?));
+                if let Some(words) = words {
+                    super::jv_bitops::words(words);
+                    account_or_abort!(account.charge(VisitAccountingCounter::WordOperations, words));
+                } else {
+                    account_or_abort!(account.block(
+                        "counter_overflow",
+                        Some("word_operations"),
+                        "symbolic matrix-build word count overflowed",
+                    ));
+                }
+                let scans = sparse[..n_pair_rows].iter().try_fold(0u64, |sum, row| {
+                    sum.checked_add(row.first().map_or(0, |entry| nc - u64::from(entry.0)))
+                });
+                if let Some(scans) = scans {
+                    super::jv_bitops::words(scans);
+                    account_or_abort!(account.charge(VisitAccountingCounter::WordOperations, scans));
+                } else {
+                    account_or_abort!(account.block(
+                        "counter_overflow",
+                        Some("word_operations"),
+                        "pair-row scan count overflowed",
+                    ));
+                }
+            } else {
+                account_or_abort!(account.block(
+                    "counter_overflow",
+                    Some("matrix_entries"),
+                    "matrix shape does not fit u64",
+                ));
+            }
         }
+        drop(account_matrix);
+        account_or_abort!(account.control());
         // The reducer rows of symbolic preprocessing have distinct leading
         // columns, none of them an lcm: they are already an echelon form.
         // Reduce each pair row by them alone, column by column, then take
@@ -6536,6 +6935,8 @@ fn f4_with_arithmetic(
         // other columns only.  Its rows are exactly the rows of the whole
         // matrix's reduced echelon form whose pivot is not a reducer's
         // leading monomial — the only ones that can be new.
+        let (account_rows, control) = account.phase_scope(VisitAccountingPhaseV1::RowReduction);
+        account_or_abort!(control);
         let (pair_rows, reducers) = sparse.split_at(n_pair_rows);
         const NONE: u32 = u32::MAX;
         let mut reducer_at = vec![NONE; n_cols];
@@ -6901,6 +7302,8 @@ fn f4_with_arithmetic(
                 piv.map(|piv| (rows, piv))
             })
         };
+        drop(account_rows);
+        account_or_abort!(account.control());
         if debug {
             eprintln!(
                 "f4 step {steps}: degree {d}, {} pairs, {} rows × {n_cols} cols, {} pivots, basis {}",
@@ -6928,6 +7331,8 @@ fn f4_with_arithmetic(
         };
         let tp3 = Instant::now();
         // new polynomials: rows whose pivot column is not an input leading monomial
+        let (account_basis, control) = account.phase_scope(VisitAccountingPhaseV1::BasisCleanup);
+        account_or_abort!(control);
         let mut new_polys: Vec<Poly> = Vec::new();
         let mut new_terms = 0usize;
         for (row, &c) in rows.iter().zip(&pivots) {
@@ -7070,6 +7475,7 @@ fn f4_with_arithmetic(
         }
         for f in new_polys {
             basis_terms += f.len();
+            account_or_abort!(account.charge_usize(VisitAccountingCounter::BasisTerms, f.len()));
             admit!(add(
                 f,
                 &mut basis,
@@ -7082,8 +7488,11 @@ fn f4_with_arithmetic(
                 lm_packed.as_mut(),
                 opts.resource_limits.as_ref(),
                 opts.resource_limits.and(opts.deadline),
+                account,
             ));
         }
+        drop(account_basis);
+        account_or_abort!(account.control());
         if let Some(ops_step0) = ops_step0 {
             let lms: Vec<&[u32]> = basis
                 .iter()
@@ -7131,6 +7540,8 @@ fn f4_with_arithmetic(
     }
     // final interreduction of the alive basis (tails); the basis is not used
     // again, so its polynomials are moved rather than copied term by term
+    let (account_basis, control) = account.phase_scope(VisitAccountingPhaseV1::BasisCleanup);
+    account_or_abort!(control);
     let mut reduced: Vec<Poly> = std::mem::take(&mut basis)
         .into_iter()
         .zip(&alive)
@@ -7148,8 +7559,14 @@ fn f4_with_arithmetic(
         interreduce_linear(&reduced, n_vars, p, ord)
             .unwrap_or_else(|| interreduce(&reduced, p, ord))
     };
+    account_or_abort!(account.control());
     if debug {
         eprintln!("f4 interreduce ms: {:.2}", ti.elapsed().as_secs_f64() * 1e3);
+    }
+    for polynomial in &reduced {
+        account_or_abort!(
+            account.charge_usize(VisitAccountingCounter::BasisTerms, polynomial.len())
+        );
     }
     let (dff, dlf, ddreg, dfalls) = if opts.record_hilbert_diagnostics {
         hilbert_diagnostic(input, &reduced, n_vars, opts.deadline)
@@ -7162,6 +7579,8 @@ fn f4_with_arithmetic(
             b.commit();
         }
     }
+    drop(account_basis);
+    account_or_abort!(account.control());
     F4Report {
         basis: reduced,
         inconsistent: false,
@@ -7453,7 +7872,10 @@ fn reduce_skipping_vecs(f: &Poly, basis: &[Poly], skip: usize, p: u64, ord: Orde
                 });
                 *v = (*v + mulmod(neg, *gc, p)) % p;
                 super::jv_bitops::row_ops(1);
-                super::jv_bitops::probes(1, 2);
+                // `mulmod` charges the multiplication; this hook records the
+                // remaining multiply-add structure without charging it twice.
+                visit_account_row_structure(1);
+                count_probes(1, 2);
             }
         } else {
             out.push((mono, c));
@@ -7703,11 +8125,17 @@ fn reduce_skipping_packed(
                 0
             });
             *v = match fp {
-                Some(fp) if gc < p => fp.reduce(*v + neg * gc),
-                _ => (*v + mulmod(neg, gc, p)) % p,
+                Some(fp) if gc < p => {
+                    visit_account_row_operations(1);
+                    fp.reduce(*v + neg * gc)
+                }
+                _ => {
+                    visit_account_row_structure(1);
+                    (*v + mulmod(neg, gc, p)) % p
+                }
             };
             super::jv_bitops::row_ops(1);
-            super::jv_bitops::probes(1, 2);
+            count_probes(1, 2);
         }
     }
     // popped in decreasing order: already leading-first
@@ -7732,6 +8160,7 @@ fn make_monic(mut f: Poly, p: u64) -> Poly {
 enum F4Stop {
     Resource(F4ResourceLimit),
     Deadline,
+    Accounting,
 }
 
 impl From<F4ResourceLimit> for F4Stop {
@@ -7801,7 +8230,8 @@ fn reduce_skipping_bounded(
                 let v = work.get_mut(scratch.as_slice()).unwrap();
                 *v = (*v + mulmod(neg, *gc, p)) % p;
                 super::jv_bitops::row_ops(1);
-                super::jv_bitops::probes(1, 2);
+                visit_account_row_structure(1);
+                count_probes(1, 2);
             }
         } else {
             out.push((mono, c));
@@ -7937,6 +8367,1527 @@ fn autoreduce_with(polys: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<P
 
 // ── Solving ────────────────────────────────────────────────────────
 
+/// Caller-supplied provenance for one accounted visitor invocation.
+///
+/// The generic solver cannot derive these bindings reliably: in particular,
+/// it cannot know the protocol case, the public-system serialization or the
+/// executable that embedded this module.  A source-bound outer record must
+/// independently recompute every digest before it admits this ledger.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingBindingV1 {
+    pub attempt_id: String,
+    pub protocol_id: String,
+    pub case_id: String,
+    pub arm_id: String,
+    pub case_sha256: String,
+    pub system_sha256: String,
+    pub f4_source_sha256: String,
+    pub executable_sha256: String,
+}
+
+/// Request the fail-closed, call-owned accounting path.
+///
+/// Legacy [`solve_visit`] remains unchanged.  Accounted callers use
+/// [`solve_visit_accounted_v1`] (or its traced counterpart) and must execute
+/// it from inside a dedicated one-thread Rayon pool.  That makes nested Rayon
+/// work stay on the call's owning worker instead of escaping a thread-local
+/// meter merely because the global pool happens to contain one worker.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingRequestV1 {
+    pub binding: VisitAccountingBindingV1,
+}
+
+const VISIT_ACCOUNTING_CONTEXT_FAULT_NONE: u8 = 0;
+const VISIT_ACCOUNTING_CONTEXT_FAULT_FOREIGN_THREAD: u8 = 1;
+static VISIT_ACCOUNTING_CONTEXT_IDS: AtomicU64 = AtomicU64::new(1);
+
+/// Per-call ownership identity for the explicit-token migration.
+///
+/// The authoritative ledger is still worker TLS.  The borrowed token gates
+/// traversal and native-driver mutations and cannot enter detached `'static`
+/// work; shared arithmetic, reducers, roots and allocation helpers remain a
+/// non-authoritative TLS shadow until later migration.
+struct VisitAccountingContext {
+    id: NonZeroU64,
+    owner_thread: ThreadId,
+    fault: AtomicU8,
+}
+
+impl VisitAccountingContext {
+    fn new() -> Option<Self> {
+        let mut observed = VISIT_ACCOUNTING_CONTEXT_IDS.load(AtomicOrdering::Relaxed);
+        let id = loop {
+            let id = NonZeroU64::new(observed)?;
+            let next = observed.checked_add(1)?;
+            match VISIT_ACCOUNTING_CONTEXT_IDS.compare_exchange_weak(
+                observed,
+                next,
+                AtomicOrdering::Relaxed,
+                AtomicOrdering::Relaxed,
+            ) {
+                Ok(_) => break id,
+                Err(current) => observed = current,
+            }
+        };
+        Some(Self {
+            id,
+            owner_thread: std::thread::current().id(),
+            fault: AtomicU8::new(VISIT_ACCOUNTING_CONTEXT_FAULT_NONE),
+        })
+    }
+
+    #[cfg(test)]
+    fn unbound_test_token(&self) -> VisitAccountingToken<'_> {
+        VisitAccountingToken(self)
+    }
+
+    fn record_foreign_thread(&self) {
+        let _ = self.fault.compare_exchange(
+            VISIT_ACCOUNTING_CONTEXT_FAULT_NONE,
+            VISIT_ACCOUNTING_CONTEXT_FAULT_FOREIGN_THREAD,
+            AtomicOrdering::Release,
+            AtomicOrdering::Relaxed,
+        );
+    }
+}
+
+#[derive(Clone, Copy)]
+struct VisitAccountingToken<'a>(&'a VisitAccountingContext);
+
+impl VisitAccountingToken<'_> {
+    fn id(self) -> NonZeroU64 {
+        self.0.id
+    }
+}
+
+#[derive(Clone, Copy)]
+enum VisitAccount<'a> {
+    Off,
+    On(VisitAccountingToken<'a>),
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum VisitAccountingControl {
+    Continue,
+    Stop,
+}
+
+impl VisitAccountingControl {
+    fn stopped(self) -> bool {
+        self == Self::Stop
+    }
+}
+
+#[derive(Clone, Copy)]
+enum VisitAccountingEntryMode {
+    CallerPool,
+    PrivateFirstExecutor,
+}
+
+impl VisitAccountingEntryMode {
+    fn ownership_mode(self) -> &'static str {
+        match self {
+            Self::CallerPool => "caller_one_thread_rayon_tls_unproven",
+            Self::PrivateFirstExecutor => "private_one_thread_first_result_tls_shadow",
+        }
+    }
+
+    fn callback_stop_disposition(self) -> VisitDispositionV1 {
+        match self {
+            Self::CallerPool => VisitDispositionV1::CallbackStopped,
+            Self::PrivateFirstExecutor => VisitDispositionV1::WitnessFound,
+        }
+    }
+}
+
+/// The solver outcome.  This is deliberately independent of whether its work
+/// ledger is complete: a fully counted timeout is still not a complete solve,
+/// and a reconciliation failure does not rewrite a completed solver outcome.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VisitDispositionV1 {
+    CompleteNonempty,
+    CompleteEmpty,
+    EmptyDomain,
+    WitnessFound,
+    CallbackStopped,
+    TimedOut,
+    ResourceStopped,
+    TraceError,
+    Incomplete,
+    InvalidInput,
+    Unsupported,
+}
+
+/// One sticky reason an accounted invocation cannot be promoted.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingBlockerV1 {
+    pub code: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phase: Option<VisitAccountingPhaseV1>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub counter: Option<&'static str>,
+    pub detail: String,
+}
+
+/// Exclusive phase buckets of the admitted visitor call.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VisitAccountingPhaseV1 {
+    Validation,
+    InputNormalization,
+    CriticalPairs,
+    SymbolicPreprocessing,
+    ColumnOrdering,
+    MatrixConstruction,
+    RowReduction,
+    BasisCleanup,
+    Traversal,
+    Specialization,
+    RootExtraction,
+    CandidateVerification,
+    CallbackDelivery,
+    TraceDelivery,
+    AccountingOverhead,
+}
+
+impl VisitAccountingPhaseV1 {
+    const ALL: [Self; 15] = [
+        Self::Validation,
+        Self::InputNormalization,
+        Self::CriticalPairs,
+        Self::SymbolicPreprocessing,
+        Self::ColumnOrdering,
+        Self::MatrixConstruction,
+        Self::RowReduction,
+        Self::BasisCleanup,
+        Self::Traversal,
+        Self::Specialization,
+        Self::RootExtraction,
+        Self::CandidateVerification,
+        Self::CallbackDelivery,
+        Self::TraceDelivery,
+        Self::AccountingOverhead,
+    ];
+
+    fn index(self) -> usize {
+        self as usize
+    }
+}
+
+/// Additive leaves of one phase.  Unlike units are never converted or added
+/// together.  `wall_ns` and `thread_cpu_ns` are observations, not operation
+/// prices; their presence here only lets the fixed phase partition reconcile.
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingWorkV1 {
+    pub field_multiplications: u64,
+    pub field_additions: u64,
+    pub field_inversions: u64,
+    pub row_operations: u64,
+    pub row_reads: u64,
+    pub row_writes: u64,
+    pub word_operations: u64,
+    pub hash_probes: u64,
+    pub comparisons: u64,
+    pub divisibility_tests: u64,
+    pub sort_comparisons: u64,
+    pub critical_pair_candidates: u64,
+    pub critical_pairs_selected: u64,
+    pub symbolic_rows: u64,
+    pub symbolic_monomials: u64,
+    pub matrix_rows: u64,
+    pub matrix_columns: u64,
+    pub matrix_entries: u64,
+    pub pivot_candidates: u64,
+    pub basis_terms: u64,
+    pub specialization_terms: u64,
+    pub root_candidates: u64,
+    pub candidate_terms_checked: u64,
+    pub traversal_nodes: u64,
+    pub branch_deliveries: u64,
+    pub callback_deliveries: u64,
+    pub trace_deliveries: u64,
+    pub allocation_requests: u64,
+    pub payload_bytes_requested: u64,
+    pub payload_bytes_released: u64,
+    pub wall_ns: u64,
+    pub thread_cpu_ns: u64,
+}
+
+impl VisitAccountingWorkV1 {
+    fn checked_add_assign(&mut self, other: &Self) -> Option<()> {
+        macro_rules! add {
+            ($($field:ident),+ $(,)?) => {{
+                $(self.$field = self.$field.checked_add(other.$field)?;)+
+            }};
+        }
+        add!(
+            field_multiplications,
+            field_additions,
+            field_inversions,
+            row_operations,
+            row_reads,
+            row_writes,
+            word_operations,
+            hash_probes,
+            comparisons,
+            divisibility_tests,
+            sort_comparisons,
+            critical_pair_candidates,
+            critical_pairs_selected,
+            symbolic_rows,
+            symbolic_monomials,
+            matrix_rows,
+            matrix_columns,
+            matrix_entries,
+            pivot_candidates,
+            basis_terms,
+            specialization_terms,
+            root_candidates,
+            candidate_terms_checked,
+            traversal_nodes,
+            branch_deliveries,
+            callback_deliveries,
+            trace_deliveries,
+            allocation_requests,
+            payload_bytes_requested,
+            payload_bytes_released,
+            wall_ns,
+            thread_cpu_ns,
+        );
+        Some(())
+    }
+}
+
+/// One named phase and its additive leaves.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingPhaseRecordV1 {
+    pub phase: VisitAccountingPhaseV1,
+    pub work: VisitAccountingWorkV1,
+}
+
+/// Call-owned logical-payload observations.  These do not purport to include
+/// allocator metadata or process RSS; the separate whole-job record must keep
+/// those units distinct.
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingMemoryV1 {
+    pub live_payload_bytes_at_finish: u64,
+    pub peak_live_payload_bytes: u64,
+    pub peak_scratch_payload_bytes: u64,
+    pub allocator_overhead_included: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingArmV1 {
+    pub ordering: &'static str,
+    pub selection_strategy: &'static str,
+    pub ownership_mode: &'static str,
+    pub accounting_token_mode: &'static str,
+    pub rayon_threads: usize,
+    pub inside_rayon_worker: bool,
+    pub max_degree: u32,
+    pub deadline_present: bool,
+    pub deadline_remaining_ns_at_entry: Option<u64>,
+    pub deadline_remaining_ns_overflowed: bool,
+    pub domain_root_mode: &'static str,
+    pub trace_sink: bool,
+    pub resource_max_pairs: Option<usize>,
+    pub resource_max_symbolic_monomials: Option<usize>,
+    pub resource_max_matrix_entries: Option<usize>,
+    pub visit_timing_enabled: bool,
+    pub legacy_bitops_enabled: bool,
+    pub implementation_environment: &'static str,
+    pub arithmetic_mode: u8,
+    pub packed_monomials_enabled: bool,
+    pub symbolic_parallel_enabled: bool,
+    pub gebauer_moeller_enabled: bool,
+    pub faugere_lachartre_enabled: bool,
+    pub faugere_lachartre_build_mode: &'static str,
+    pub faugere_lachartre_min_columns: usize,
+    pub blocked_pair_reduction_enabled: bool,
+    pub narrow_accumulators_enabled: bool,
+    pub linear_interreduce_enabled: bool,
+    pub lazy_simd: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingReconciliationV1 {
+    pub phase_sum_equals_total: bool,
+    pub memory_balanced: bool,
+    pub operation_tracking_complete: bool,
+    pub memory_tracking_complete: bool,
+    pub work_ownership_complete: bool,
+    pub checked_arithmetic: bool,
+}
+
+/// Versioned accounting for one admitted `f4_fp::solve_visit` call only.
+///
+/// This is not a whole-collector record and never authorizes a
+/// `fully_charged` RR9, B31 or ECDLP label by itself.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingV1 {
+    pub schema: &'static str,
+    pub scope: &'static str,
+    pub binding: VisitAccountingBindingV1,
+    pub arm: VisitAccountingArmV1,
+    pub solver_disposition: VisitDispositionV1,
+    pub accounting_complete: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blocker: Option<VisitAccountingBlockerV1>,
+    pub total: VisitAccountingWorkV1,
+    pub phases: Vec<VisitAccountingPhaseRecordV1>,
+    pub memory: VisitAccountingMemoryV1,
+    pub reconciliation: VisitAccountingReconciliationV1,
+    pub whole_collector_accounting_required: bool,
+}
+
+/// Validation/unsupported failures from the accounted entry point retain the
+/// sealed ledger rather than dropping preflight work behind `Err(String)`.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountedErrorV1 {
+    pub message: String,
+    pub accounting: VisitAccountingV1,
+}
+
+impl std::fmt::Display for VisitAccountedErrorV1 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.message)
+    }
+}
+
+impl std::error::Error for VisitAccountedErrorV1 {}
+
+#[derive(Clone, Copy)]
+#[allow(dead_code)] // Reserved leaves remain unreachable while promotion gates are false.
+enum VisitAccountingCounter {
+    FieldMultiplications,
+    FieldAdditions,
+    FieldInversions,
+    RowOperations,
+    RowReads,
+    RowWrites,
+    WordOperations,
+    HashProbes,
+    Comparisons,
+    DivisibilityTests,
+    SortComparisons,
+    CriticalPairCandidates,
+    CriticalPairsSelected,
+    SymbolicRows,
+    SymbolicMonomials,
+    MatrixRows,
+    MatrixColumns,
+    MatrixEntries,
+    PivotCandidates,
+    BasisTerms,
+    SpecializationTerms,
+    RootCandidates,
+    CandidateTermsChecked,
+    TraversalNodes,
+    BranchDeliveries,
+    CallbackDeliveries,
+    TraceDeliveries,
+    AllocationRequests,
+    PayloadBytesRequested,
+    PayloadBytesReleased,
+    WallNs,
+    ThreadCpuNs,
+}
+
+impl VisitAccountingCounter {
+    fn name(self) -> &'static str {
+        match self {
+            Self::FieldMultiplications => "field_multiplications",
+            Self::FieldAdditions => "field_additions",
+            Self::FieldInversions => "field_inversions",
+            Self::RowOperations => "row_operations",
+            Self::RowReads => "row_reads",
+            Self::RowWrites => "row_writes",
+            Self::WordOperations => "word_operations",
+            Self::HashProbes => "hash_probes",
+            Self::Comparisons => "comparisons",
+            Self::DivisibilityTests => "divisibility_tests",
+            Self::SortComparisons => "sort_comparisons",
+            Self::CriticalPairCandidates => "critical_pair_candidates",
+            Self::CriticalPairsSelected => "critical_pairs_selected",
+            Self::SymbolicRows => "symbolic_rows",
+            Self::SymbolicMonomials => "symbolic_monomials",
+            Self::MatrixRows => "matrix_rows",
+            Self::MatrixColumns => "matrix_columns",
+            Self::MatrixEntries => "matrix_entries",
+            Self::PivotCandidates => "pivot_candidates",
+            Self::BasisTerms => "basis_terms",
+            Self::SpecializationTerms => "specialization_terms",
+            Self::RootCandidates => "root_candidates",
+            Self::CandidateTermsChecked => "candidate_terms_checked",
+            Self::TraversalNodes => "traversal_nodes",
+            Self::BranchDeliveries => "branch_deliveries",
+            Self::CallbackDeliveries => "callback_deliveries",
+            Self::TraceDeliveries => "trace_deliveries",
+            Self::AllocationRequests => "allocation_requests",
+            Self::PayloadBytesRequested => "payload_bytes_requested",
+            Self::PayloadBytesReleased => "payload_bytes_released",
+            Self::WallNs => "wall_ns",
+            Self::ThreadCpuNs => "thread_cpu_ns",
+        }
+    }
+
+    fn field(self, work: &mut VisitAccountingWorkV1) -> &mut u64 {
+        match self {
+            Self::FieldMultiplications => &mut work.field_multiplications,
+            Self::FieldAdditions => &mut work.field_additions,
+            Self::FieldInversions => &mut work.field_inversions,
+            Self::RowOperations => &mut work.row_operations,
+            Self::RowReads => &mut work.row_reads,
+            Self::RowWrites => &mut work.row_writes,
+            Self::WordOperations => &mut work.word_operations,
+            Self::HashProbes => &mut work.hash_probes,
+            Self::Comparisons => &mut work.comparisons,
+            Self::DivisibilityTests => &mut work.divisibility_tests,
+            Self::SortComparisons => &mut work.sort_comparisons,
+            Self::CriticalPairCandidates => &mut work.critical_pair_candidates,
+            Self::CriticalPairsSelected => &mut work.critical_pairs_selected,
+            Self::SymbolicRows => &mut work.symbolic_rows,
+            Self::SymbolicMonomials => &mut work.symbolic_monomials,
+            Self::MatrixRows => &mut work.matrix_rows,
+            Self::MatrixColumns => &mut work.matrix_columns,
+            Self::MatrixEntries => &mut work.matrix_entries,
+            Self::PivotCandidates => &mut work.pivot_candidates,
+            Self::BasisTerms => &mut work.basis_terms,
+            Self::SpecializationTerms => &mut work.specialization_terms,
+            Self::RootCandidates => &mut work.root_candidates,
+            Self::CandidateTermsChecked => &mut work.candidate_terms_checked,
+            Self::TraversalNodes => &mut work.traversal_nodes,
+            Self::BranchDeliveries => &mut work.branch_deliveries,
+            Self::CallbackDeliveries => &mut work.callback_deliveries,
+            Self::TraceDeliveries => &mut work.trace_deliveries,
+            Self::AllocationRequests => &mut work.allocation_requests,
+            Self::PayloadBytesRequested => &mut work.payload_bytes_requested,
+            Self::PayloadBytesReleased => &mut work.payload_bytes_released,
+            Self::WallNs => &mut work.wall_ns,
+            Self::ThreadCpuNs => &mut work.thread_cpu_ns,
+        }
+    }
+}
+
+struct VisitAccountingBuilder {
+    request: VisitAccountingRequestV1,
+    arm: VisitAccountingArmV1,
+    token_identity: Option<NonZeroU64>,
+    phases: [VisitAccountingWorkV1; 15],
+    total: VisitAccountingWorkV1,
+    current_phase: VisitAccountingPhaseV1,
+    last_wall: Instant,
+    last_cpu_ns: Option<u64>,
+    blocker: Option<VisitAccountingBlockerV1>,
+    checked_arithmetic: bool,
+    suspended_depth: usize,
+    live_payload_bytes: u64,
+    peak_live_payload_bytes: u64,
+    peak_scratch_payload_bytes: u64,
+    operation_tracking_complete: bool,
+    memory_tracking_complete: bool,
+    work_ownership_complete: bool,
+}
+
+impl VisitAccountingBuilder {
+    #[cfg(test)]
+    fn new(request: VisitAccountingRequestV1, opts: &F4Options, trace_sink: bool) -> Self {
+        Self::new_for_entry(
+            request,
+            opts,
+            trace_sink,
+            VisitAccountingEntryMode::CallerPool,
+            true,
+        )
+    }
+
+    fn new_for_entry(
+        request: VisitAccountingRequestV1,
+        opts: &F4Options,
+        trace_sink: bool,
+        entry_mode: VisitAccountingEntryMode,
+        resolve_profile: bool,
+    ) -> Self {
+        let last_wall = Instant::now();
+        let last_cpu_ns = visit_thread_cpu_ns();
+        let forbidden_environment = VISIT_ACCOUNTING_FORBIDDEN_ENV
+            .iter()
+            .any(|name| std::env::var_os(name).is_some());
+        // Do not resolve environment-backed OnceLocks for a call that will
+        // be rejected.  Otherwise a forbidden environment could permanently
+        // alter later legacy calls even though this invocation did no work.
+        let (
+            implementation_environment,
+            arithmetic,
+            packed,
+            symbolic,
+            gm,
+            fl,
+            fl_build_mode,
+            fl_min_columns,
+            fl_blocked,
+            narrow_accumulators,
+            linear_interreduce,
+            legacy_bitops,
+            simd,
+        ) = if forbidden_environment || !resolve_profile {
+            (
+                if forbidden_environment {
+                    "f4_environment_present_unresolved"
+                } else {
+                    "f4_profile_not_resolved_during_rejected_preflight"
+                },
+                0,
+                false,
+                false,
+                false,
+                false,
+                "unresolved",
+                0,
+                false,
+                false,
+                false,
+                false,
+                "unresolved",
+            )
+        } else {
+            let simd = match lazy_simd_kind() {
+                0 => "scalar",
+                1 => "avx2",
+                2 => "avx512f",
+                _ => "invalid",
+            };
+            (
+                "f4_environment_absent",
+                arithmetic_mode(),
+                packed_enabled(),
+                symbolic_parallel(),
+                gebauer_moeller(),
+                fl_enabled(),
+                if fl_mode_tiles(0) {
+                    "column_tiles"
+                } else {
+                    "row_blocks"
+                },
+                fl_min_cols(),
+                fl_blocked_pairs(),
+                narrow_acc_enabled(),
+                linear_interreduce_enabled(),
+                super::jv_bitops::enabled(),
+                simd,
+            )
+        };
+        let (deadline_remaining_ns_at_entry, deadline_remaining_ns_overflowed) = match opts.deadline
+        {
+            None => (None, false),
+            Some(deadline) => {
+                let nanos = deadline.saturating_duration_since(last_wall).as_nanos();
+                match u64::try_from(nanos) {
+                    Ok(nanos) => (Some(nanos), false),
+                    Err(_) => (None, true),
+                }
+            }
+        };
+        let resource = opts.resource_limits;
+        Self {
+            request,
+            arm: VisitAccountingArmV1 {
+                ordering: match opts.order {
+                    Ordering::Lex => "lex",
+                    Ordering::Grlex => "grlex",
+                    Ordering::Grevlex => "grevlex",
+                },
+                selection_strategy: "normal_degree_by_degree",
+                ownership_mode: entry_mode.ownership_mode(),
+                accounting_token_mode: "not_started_preflight_rejected",
+                rayon_threads: rayon::current_num_threads(),
+                inside_rayon_worker: rayon::current_thread_index().is_some(),
+                max_degree: opts.max_degree,
+                deadline_present: opts.deadline.is_some(),
+                deadline_remaining_ns_at_entry,
+                deadline_remaining_ns_overflowed,
+                domain_root_mode: match opts.domain_roots {
+                    DomainRootMode::Scan => "scan",
+                    DomainRootMode::Frobenius => "frobenius",
+                    DomainRootMode::Auto => "auto",
+                },
+                trace_sink,
+                resource_max_pairs: resource.map(|limits| limits.max_pairs),
+                resource_max_symbolic_monomials: resource
+                    .map(|limits| limits.max_symbolic_monomials),
+                resource_max_matrix_entries: resource.map(|limits| limits.max_matrix_entries),
+                visit_timing_enabled: opts.visit_timing,
+                legacy_bitops_enabled: legacy_bitops,
+                implementation_environment,
+                arithmetic_mode: arithmetic,
+                packed_monomials_enabled: packed,
+                symbolic_parallel_enabled: symbolic,
+                gebauer_moeller_enabled: gm,
+                faugere_lachartre_enabled: fl,
+                faugere_lachartre_build_mode: fl_build_mode,
+                faugere_lachartre_min_columns: fl_min_columns,
+                blocked_pair_reduction_enabled: fl_blocked,
+                narrow_accumulators_enabled: narrow_accumulators,
+                linear_interreduce_enabled: linear_interreduce,
+                lazy_simd: simd,
+            },
+            token_identity: None,
+            phases: std::array::from_fn(|_| VisitAccountingWorkV1::default()),
+            total: VisitAccountingWorkV1::default(),
+            current_phase: VisitAccountingPhaseV1::Validation,
+            last_wall,
+            last_cpu_ns,
+            blocker: None,
+            checked_arithmetic: true,
+            suspended_depth: 0,
+            live_payload_bytes: 0,
+            peak_live_payload_bytes: 0,
+            peak_scratch_payload_bytes: 0,
+            // Operation, memory and work ownership are independent promotion
+            // gates.  The current slice deliberately leaves all three false
+            // until every admitted path is source-complete, explicitly
+            // token-owned and independently reviewed.
+            operation_tracking_complete: false,
+            memory_tracking_complete: false,
+            work_ownership_complete: false,
+        }
+    }
+
+    fn bind_token(&mut self, token: VisitAccountingToken<'_>) {
+        self.token_identity = Some(token.id());
+        self.arm.accounting_token_mode = "borrowed_traversal_native_driver_tls_helper_shadow_v1";
+    }
+
+    fn block(
+        &mut self,
+        code: &'static str,
+        counter: Option<&'static str>,
+        detail: impl Into<String>,
+    ) {
+        if self.blocker.is_none() {
+            self.blocker = Some(VisitAccountingBlockerV1 {
+                code,
+                phase: Some(self.current_phase),
+                counter,
+                detail: detail.into(),
+            });
+        }
+    }
+
+    fn charge(&mut self, counter: VisitAccountingCounter, amount: u64) {
+        if amount == 0 {
+            return;
+        }
+        let phase = self.current_phase;
+        let phase_slot = counter.field(&mut self.phases[phase.index()]);
+        let phase_next = phase_slot.checked_add(amount);
+        let total_slot = counter.field(&mut self.total);
+        let total_next = total_slot.checked_add(amount);
+        match (phase_next, total_next) {
+            (Some(p), Some(t)) => {
+                *phase_slot = p;
+                *total_slot = t;
+            }
+            _ => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "counter_overflow",
+                    Some(counter.name()),
+                    format!("checked addition of {amount} failed"),
+                );
+            }
+        }
+    }
+
+    fn uncharge(&mut self, counter: VisitAccountingCounter, amount: u64) {
+        if amount == 0 {
+            return;
+        }
+        let phase = self.current_phase;
+        let phase_slot = counter.field(&mut self.phases[phase.index()]);
+        let phase_next = phase_slot.checked_sub(amount);
+        let total_slot = counter.field(&mut self.total);
+        let total_next = total_slot.checked_sub(amount);
+        match (phase_next, total_next) {
+            (Some(p), Some(t)) => {
+                *phase_slot = p;
+                *total_slot = t;
+            }
+            _ => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "counter_underflow",
+                    Some(counter.name()),
+                    format!("checked subtraction of {amount} failed"),
+                );
+            }
+        }
+    }
+
+    fn close_current_interval(&mut self) {
+        let now = Instant::now();
+        let cpu_now = visit_thread_cpu_ns();
+        match u64::try_from(now.duration_since(self.last_wall).as_nanos()) {
+            Ok(ns) => self.charge(VisitAccountingCounter::WallNs, ns),
+            Err(_) => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "timer_overflow",
+                    Some("wall_ns"),
+                    "wall-clock interval exceeds u64 nanoseconds",
+                );
+            }
+        }
+        self.last_wall = now;
+        match (self.last_cpu_ns, cpu_now) {
+            (Some(before), Some(after)) => match after.checked_sub(before) {
+                Some(ns) => self.charge(VisitAccountingCounter::ThreadCpuNs, ns),
+                None => {
+                    self.checked_arithmetic = false;
+                    self.block(
+                        "timer_regression",
+                        Some("thread_cpu_ns"),
+                        "thread CPU clock moved backwards",
+                    );
+                }
+            },
+            _ => self.block(
+                "thread_cpu_clock_unavailable",
+                Some("thread_cpu_ns"),
+                "a call-owned thread CPU observation is required",
+            ),
+        }
+        self.last_cpu_ns = cpu_now;
+    }
+
+    fn transition(&mut self, next: VisitAccountingPhaseV1) {
+        self.close_current_interval();
+        self.current_phase = next;
+    }
+
+    fn pause_external_work(&mut self) {
+        if self.suspended_depth == 0 {
+            self.close_current_interval();
+            VISIT_ACCOUNTING_CHARGING_CALLS.fetch_sub(1, AtomicOrdering::Relaxed);
+        }
+        match self.suspended_depth.checked_add(1) {
+            Some(depth) => self.suspended_depth = depth,
+            None => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "suspension_overflow",
+                    None,
+                    "external-work suspension depth overflowed",
+                );
+            }
+        }
+    }
+
+    fn resume_external_work(&mut self) {
+        match self.suspended_depth.checked_sub(1) {
+            Some(depth) => {
+                self.suspended_depth = depth;
+                if depth == 0 {
+                    // Exclude arbitrary callback/sink body time and work from
+                    // this solver-owned ledger.
+                    self.last_wall = Instant::now();
+                    self.last_cpu_ns = visit_thread_cpu_ns();
+                    VISIT_ACCOUNTING_CHARGING_CALLS.fetch_add(1, AtomicOrdering::Relaxed);
+                    let environment_changed = VISIT_ACCOUNTING_FORBIDDEN_ENV
+                        .iter()
+                        .any(|name| std::env::var_os(name).is_some());
+                    if environment_changed
+                        || progress_observer_active()
+                        || super::jv_bitops::enabled() != self.arm.legacy_bitops_enabled
+                    {
+                        self.block(
+                            "configuration_changed_during_external_work",
+                            None,
+                            "callback or trace-sink work changed a frozen solver mode",
+                        );
+                    }
+                }
+            }
+            None => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "suspension_underflow",
+                    None,
+                    "external-work suspension depth underflowed",
+                );
+            }
+        }
+    }
+
+    fn seal(mut self, disposition: VisitDispositionV1) -> VisitAccountingV1 {
+        self.transition(VisitAccountingPhaseV1::AccountingOverhead);
+        let final_environment_changed = VISIT_ACCOUNTING_FORBIDDEN_ENV
+            .iter()
+            .any(|name| std::env::var_os(name).is_some());
+        if final_environment_changed
+            || super::jv_bitops::enabled() != self.arm.legacy_bitops_enabled
+        {
+            self.block(
+                "configuration_changed_during_call",
+                None,
+                "a frozen process-global solver mode changed before seal",
+            );
+        }
+        let memory_balanced = self.live_payload_bytes == 0;
+        // Charge gate and preliminary reconciliation work to the explicit
+        // accounting-overhead phase.  The final clock read is necessarily
+        // the boundary of the observable interval.
+        self.close_current_interval();
+        let mut phase_sum = VisitAccountingWorkV1::default();
+        let mut sum_ok = true;
+        for work in &self.phases {
+            if phase_sum.checked_add_assign(work).is_none() {
+                sum_ok = false;
+                break;
+            }
+        }
+        let phase_sum_equals_total = sum_ok && phase_sum == self.total;
+        if !phase_sum_equals_total {
+            self.block(
+                "reconciliation_mismatch",
+                None,
+                "componentwise phase sum differs from the independently accumulated total",
+            );
+        }
+        if !memory_balanced {
+            self.block(
+                "memory_reconciliation_mismatch",
+                Some("payload_bytes_released"),
+                format!(
+                    "{} logical payload bytes remain live at seal",
+                    self.live_payload_bytes
+                ),
+            );
+        }
+        if !self.memory_tracking_complete {
+            self.block(
+                "memory_tracking_gap",
+                Some("payload_bytes_requested"),
+                "logical allocation and scratch coverage is not yet source-complete",
+            );
+        }
+        if !self.operation_tracking_complete {
+            self.block(
+                "operation_tracking_gap",
+                None,
+                "operation and branch coverage is not yet source-complete",
+            );
+        }
+        if !self.work_ownership_complete {
+            let ownership_mode = self.arm.ownership_mode;
+            self.block(
+                "work_ownership_gap",
+                None,
+                format!(
+                    "ownership mode {} does not prove exclusive solver work ownership",
+                    ownership_mode
+                ),
+            );
+        }
+        let phases = VisitAccountingPhaseV1::ALL
+            .iter()
+            .copied()
+            .map(|phase| VisitAccountingPhaseRecordV1 {
+                phase,
+                work: self.phases[phase.index()].clone(),
+            })
+            .collect();
+        VisitAccountingV1 {
+            schema: "crypto.f4-fp.visit-accounting/v1",
+            scope: "solve_visit_call_only",
+            binding: self.request.binding,
+            arm: self.arm,
+            solver_disposition: disposition,
+            accounting_complete: self.blocker.is_none()
+                && phase_sum_equals_total
+                && memory_balanced
+                && self.operation_tracking_complete
+                && self.memory_tracking_complete
+                && self.work_ownership_complete
+                && self.checked_arithmetic,
+            blocker: self.blocker,
+            total: self.total,
+            phases,
+            memory: VisitAccountingMemoryV1 {
+                live_payload_bytes_at_finish: self.live_payload_bytes,
+                peak_live_payload_bytes: self.peak_live_payload_bytes,
+                peak_scratch_payload_bytes: self.peak_scratch_payload_bytes,
+                allocator_overhead_included: false,
+            },
+            reconciliation: VisitAccountingReconciliationV1 {
+                phase_sum_equals_total,
+                memory_balanced,
+                operation_tracking_complete: self.operation_tracking_complete,
+                memory_tracking_complete: self.memory_tracking_complete,
+                work_ownership_complete: self.work_ownership_complete,
+                checked_arithmetic: self.checked_arithmetic,
+            },
+            whole_collector_accounting_required: true,
+        }
+    }
+}
+
+thread_local! {
+    static VISIT_ACCOUNTING_ACTIVE: std::cell::RefCell<Option<VisitAccountingBuilder>> = const { std::cell::RefCell::new(None) };
+}
+static VISIT_ACCOUNTING_CHARGING_CALLS: AtomicUsize = AtomicUsize::new(0);
+
+#[cfg(unix)]
+fn visit_thread_cpu_ns() -> Option<u64> {
+    let mut ts = libc::timespec {
+        tv_sec: 0,
+        tv_nsec: 0,
+    };
+    // SAFETY: `ts` points to writable storage and CLOCK_THREAD_CPUTIME_ID
+    // does not retain the pointer.
+    if unsafe { libc::clock_gettime(libc::CLOCK_THREAD_CPUTIME_ID, &mut ts) } != 0 {
+        return None;
+    }
+    let seconds = u64::try_from(ts.tv_sec).ok()?;
+    let nanos = u64::try_from(ts.tv_nsec).ok()?;
+    seconds.checked_mul(1_000_000_000)?.checked_add(nanos)
+}
+
+#[cfg(not(unix))]
+fn visit_thread_cpu_ns() -> Option<u64> {
+    None
+}
+
+fn visit_accounting_active() -> bool {
+    VISIT_ACCOUNTING_ACTIVE.with(|slot| slot.borrow().is_some())
+}
+
+fn visit_accounting_unsuspended_active() -> bool {
+    VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+        slot.borrow()
+            .as_ref()
+            .is_some_and(|accounting| accounting.suspended_depth == 0)
+    })
+}
+
+fn visit_accounting_merge_context_fault(
+    token: VisitAccountingToken<'_>,
+    accounting: &mut VisitAccountingBuilder,
+) {
+    if token.0.fault.load(AtomicOrdering::Acquire) == VISIT_ACCOUNTING_CONTEXT_FAULT_FOREIGN_THREAD
+    {
+        accounting.block(
+            "foreign_thread_work",
+            None,
+            "borrowed accounting token was used outside its owning thread",
+        );
+    }
+}
+
+fn visit_account_with_token(
+    token: VisitAccountingToken<'_>,
+    run_when_blocked: bool,
+    allow_suspended: bool,
+    f: impl FnOnce(&mut VisitAccountingBuilder),
+) -> VisitAccountingControl {
+    if std::thread::current().id() != token.0.owner_thread {
+        token.0.record_foreign_thread();
+        return VisitAccountingControl::Stop;
+    }
+    VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+        let mut slot = slot.borrow_mut();
+        let Some(accounting) = slot.as_mut() else {
+            return VisitAccountingControl::Stop;
+        };
+        if accounting.token_identity != Some(token.id()) {
+            accounting.block(
+                "accounting_token_mismatch",
+                None,
+                "borrowed accounting token does not own the active ledger",
+            );
+            return VisitAccountingControl::Stop;
+        }
+        visit_accounting_merge_context_fault(token, accounting);
+        if accounting.suspended_depth != 0 && !allow_suspended {
+            accounting.block(
+                "accounting_token_suspended",
+                None,
+                "solver-owned token was used while external work was suspended",
+            );
+            return VisitAccountingControl::Stop;
+        }
+        if accounting.blocker.is_some() && !run_when_blocked {
+            return VisitAccountingControl::Stop;
+        }
+        f(accounting);
+        if accounting.blocker.is_some() {
+            VisitAccountingControl::Stop
+        } else {
+            VisitAccountingControl::Continue
+        }
+    })
+}
+
+impl<'a> VisitAccount<'a> {
+    fn enabled(self) -> bool {
+        matches!(self, Self::On(_))
+    }
+
+    fn control(self) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |_| {}),
+        }
+    }
+
+    fn charge(self, counter: VisitAccountingCounter, amount: u64) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.charge(counter, amount);
+            }),
+        }
+    }
+
+    fn charge_usize(self, counter: VisitAccountingCounter, value: usize) -> VisitAccountingControl {
+        match u64::try_from(value) {
+            Ok(value) => self.charge(counter, value),
+            Err(_) => self.block(
+                "counter_overflow",
+                Some(counter.name()),
+                "usize observation does not fit u64",
+            ),
+        }
+    }
+
+    fn charge_product(
+        self,
+        counter: VisitAccountingCounter,
+        left: usize,
+        right: usize,
+    ) -> VisitAccountingControl {
+        match left.checked_mul(right).and_then(|n| u64::try_from(n).ok()) {
+            Some(value) => self.charge(counter, value),
+            None => self.block(
+                "counter_overflow",
+                Some(counter.name()),
+                format!("checked product {left} * {right} failed"),
+            ),
+        }
+    }
+
+    fn block(
+        self,
+        code: &'static str,
+        counter: Option<&'static str>,
+        detail: impl Into<String>,
+    ) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.block(code, counter, detail);
+            }),
+        }
+    }
+
+    fn phase_scope(
+        self,
+        phase: VisitAccountingPhaseV1,
+    ) -> (VisitAccountingTokenPhaseScope<'a>, VisitAccountingControl) {
+        let mut previous = None;
+        let control = match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                previous = Some(accounting.current_phase);
+                accounting.transition(phase);
+            }),
+        };
+        (
+            VisitAccountingTokenPhaseScope {
+                token: match self {
+                    Self::Off => None,
+                    Self::On(token) => Some(token),
+                },
+                previous,
+                _not_send: PhantomData,
+            },
+            control,
+        )
+    }
+
+    fn pause_external(
+        self,
+    ) -> Result<VisitAccountingTokenExternalPause<'a>, VisitAccountingControl> {
+        let mut active = false;
+        let control = match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.pause_external_work();
+                active = true;
+            }),
+        };
+        let guard = VisitAccountingTokenExternalPause {
+            token: match self {
+                Self::Off => None,
+                Self::On(token) => Some(token),
+            },
+            active,
+            _not_send: PhantomData,
+        };
+        if control.stopped() {
+            drop(guard);
+            Err(VisitAccountingControl::Stop)
+        } else {
+            Ok(guard)
+        }
+    }
+}
+
+struct VisitAccountingTokenPhaseScope<'a> {
+    token: Option<VisitAccountingToken<'a>>,
+    previous: Option<VisitAccountingPhaseV1>,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+impl Drop for VisitAccountingTokenPhaseScope<'_> {
+    fn drop(&mut self) {
+        if let (Some(token), Some(previous)) = (self.token, self.previous.take()) {
+            let _ = visit_account_with_token(token, true, false, |accounting| {
+                accounting.transition(previous);
+            });
+        }
+    }
+}
+
+struct VisitAccountingTokenExternalPause<'a> {
+    token: Option<VisitAccountingToken<'a>>,
+    active: bool,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+impl Drop for VisitAccountingTokenExternalPause<'_> {
+    fn drop(&mut self) {
+        if self.active {
+            if let Some(token) = self.token {
+                let _ = visit_account_with_token(token, true, true, |accounting| {
+                    accounting.resume_external_work();
+                });
+            }
+        }
+    }
+}
+
+#[inline]
+fn visit_account_with(f: impl FnOnce(&mut VisitAccountingBuilder)) {
+    if VISIT_ACCOUNTING_CHARGING_CALLS.load(AtomicOrdering::Relaxed) == 0 {
+        return;
+    }
+    VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+        if let Some(accounting) = slot.borrow_mut().as_mut() {
+            if accounting.suspended_depth == 0 {
+                f(accounting);
+            }
+        }
+    });
+}
+
+#[inline]
+fn visit_account_charge(counter: VisitAccountingCounter, amount: u64) {
+    visit_account_with(|accounting| accounting.charge(counter, amount));
+}
+
+#[inline]
+fn visit_account_uncharge(counter: VisitAccountingCounter, amount: u64) {
+    visit_account_with(|accounting| accounting.uncharge(counter, amount));
+}
+
+fn visit_account_block(
+    code: &'static str,
+    counter: Option<&'static str>,
+    detail: impl Into<String>,
+) {
+    visit_account_with(|accounting| accounting.block(code, counter, detail));
+}
+
+struct VisitAccountingSession<'a> {
+    active: bool,
+    context: &'a VisitAccountingContext,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+impl<'a> VisitAccountingSession<'a> {
+    fn begin(
+        mut builder: VisitAccountingBuilder,
+        context: &'a VisitAccountingContext,
+    ) -> Result<Self, VisitAccountingBuilder> {
+        let token = VisitAccountingToken(context);
+        builder.bind_token(token);
+        if std::thread::current().id() != token.0.owner_thread {
+            token.0.record_foreign_thread();
+            visit_accounting_merge_context_fault(token, &mut builder);
+            return Err(builder);
+        }
+        VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+            let mut slot = slot.borrow_mut();
+            if slot.is_some() {
+                Err(builder)
+            } else {
+                *slot = Some(builder);
+                VISIT_ACCOUNTING_CHARGING_CALLS.fetch_add(1, AtomicOrdering::Relaxed);
+                Ok(Self {
+                    active: true,
+                    context,
+                    _not_send: PhantomData,
+                })
+            }
+        })
+    }
+
+    /// Borrow the per-call token from the live session.  This brands every
+    /// production token use with the session lease: Rust will not allow the
+    /// session to be sealed while a token-derived account or guard is live.
+    fn token<'session>(&'session self) -> VisitAccountingToken<'session> {
+        VisitAccountingToken(self.context)
+    }
+
+    fn finish(mut self, disposition: VisitDispositionV1) -> VisitAccountingV1 {
+        self.active = false;
+        let mut builder = VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+            slot.borrow_mut()
+                .take()
+                .expect("accounted visitor session must still own its meter")
+        });
+        visit_accounting_merge_context_fault(VisitAccountingToken(self.context), &mut builder);
+        let unbalanced_suspension = builder.suspended_depth != 0;
+        if unbalanced_suspension {
+            builder.block(
+                "unbalanced_external_work_suspension",
+                None,
+                "accounting session reached seal while external work remained suspended",
+            );
+            // The excluded interval has no valid endpoint.  Resume only the
+            // local clock state so sealing does not charge arbitrary external
+            // work; the global charging count was already decremented by the
+            // first pause and therefore must not be decremented again below.
+            builder.suspended_depth = 0;
+            builder.last_wall = Instant::now();
+            builder.last_cpu_ns = visit_thread_cpu_ns();
+        } else {
+            VISIT_ACCOUNTING_CHARGING_CALLS.fetch_sub(1, AtomicOrdering::Relaxed);
+        }
+        builder.seal(disposition)
+    }
+}
+
+impl Drop for VisitAccountingSession<'_> {
+    fn drop(&mut self) {
+        if self.active {
+            let builder = VISIT_ACCOUNTING_ACTIVE.with(|slot| slot.borrow_mut().take());
+            if builder.is_some_and(|accounting| accounting.suspended_depth == 0) {
+                VISIT_ACCOUNTING_CHARGING_CALLS.fetch_sub(1, AtomicOrdering::Relaxed);
+            }
+        }
+    }
+}
+
+const VISIT_ACCOUNTING_FORBIDDEN_ENV: [&str; 33] = [
+    "F4_DEBUG",
+    "F4_FP_BRANCH",
+    "F4_FP_DEFERRED_PAR",
+    "F4_FP_FL",
+    "F4_FP_FL_BLOCKED",
+    "F4_FP_FL_MIN_COLS",
+    "F4_FP_FREEZE",
+    "F4_FP_GM",
+    "F4_FP_LAZY_AVX2",
+    "F4_FP_LAZY_AVX512",
+    "F4_FP_LAZY_SIMD",
+    "F4_FP_LINEAR_INTERREDUCE",
+    "F4_FP_LINEAR_ROOTS",
+    "F4_FP_MEM",
+    "F4_FP_MEM_A",
+    "F4_FP_MEM_B",
+    "F4_FP_MEM_C",
+    "F4_FP_MEM_OLD",
+    "F4_FP_MEM_STATS",
+    "F4_FP_NARROW",
+    "F4_FP_NARROW_ACC",
+    "F4_FP_PACKED",
+    "F4_FP_PAR_FL_INBLOCK",
+    "F4_FP_PAR_FL_MODE",
+    "F4_FP_PAR_FL_TILES",
+    "F4_FP_PAR_FL_WORK",
+    "F4_FP_PAR_OLD",
+    "F4_FP_PAR_PROF",
+    "F4_FP_PAR_SYM_FRONTIER",
+    "F4_FP_PAR_SYM_SEEDS",
+    "F4_FP_SYMBOLIC_PAR",
+    "F4_FP_THREAD_OPS",
+    "F4_STAIR",
+];
+
+fn visit_accounting_binding_error(binding: &VisitAccountingBindingV1) -> Option<String> {
+    for (name, value) in [
+        ("attempt_id", binding.attempt_id.as_str()),
+        ("protocol_id", binding.protocol_id.as_str()),
+        ("case_id", binding.case_id.as_str()),
+        ("arm_id", binding.arm_id.as_str()),
+    ] {
+        if value.is_empty() || value.len() > 256 || value.chars().any(char::is_control) {
+            return Some(format!(
+                "{name} must contain 1..=256 non-control characters"
+            ));
+        }
+    }
+    for (name, value) in [
+        ("case_sha256", binding.case_sha256.as_str()),
+        ("system_sha256", binding.system_sha256.as_str()),
+        ("f4_source_sha256", binding.f4_source_sha256.as_str()),
+        ("executable_sha256", binding.executable_sha256.as_str()),
+    ] {
+        if value.len() != 64
+            || !value
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        {
+            return Some(format!("{name} must be 64 lowercase hexadecimal bytes"));
+        }
+    }
+    None
+}
+
+fn visit_accounting_basic_configuration_error(
+    opts: &F4Options,
+    trace_pool: bool,
+) -> Option<String> {
+    if progress_observer_active() {
+        return Some("progress observation is outside VisitAccountingV1".into());
+    }
+    if rayon::current_num_threads() != 1 {
+        return Some("accounted visitor requires a one-thread Rayon pool".into());
+    }
+    if rayon::current_thread_index().is_none() {
+        return Some("accounted visitor must run inside the owning one-thread Rayon worker".into());
+    }
+    if opts.order != Ordering::Grevlex {
+        return Some("accounted visitor supports only grevlex ordering".into());
+    }
+    if trace_pool {
+        return Some("trace reuse is outside VisitAccountingV1".into());
+    }
+    if opts.sibling_batch {
+        return Some("sibling batching is outside VisitAccountingV1".into());
+    }
+    if opts.checkpoint.is_some()
+        || opts.checkpoint_stop_after.is_some()
+        || opts.checkpoint_in_step.is_some()
+        || opts.checkpoint_stop_in_rref.is_some()
+    {
+        return Some("checkpoint paths are outside VisitAccountingV1".into());
+    }
+    if opts.weights.is_some() {
+        return Some("weighted block reduction is outside VisitAccountingV1".into());
+    }
+    if opts.stop_hilbert.is_some() || opts.hilbert_expect.is_some() {
+        return Some("Hilbert stopping is outside VisitAccountingV1".into());
+    }
+    if opts.stop_staircase.is_some() {
+        return Some("staircase stopping is outside VisitAccountingV1".into());
+    }
+    if opts.max_pairs_per_step.is_some() {
+        return Some("pair batching is outside the normal VisitAccountingV1 strategy".into());
+    }
+    if opts.capture_run_log {
+        return Some("run-log diagnostics are outside VisitAccountingV1".into());
+    }
+    if opts.record_hilbert_diagnostics {
+        return Some("post-hoc Hilbert diagnostics are outside VisitAccountingV1".into());
+    }
+    let present: Vec<&str> = VISIT_ACCOUNTING_FORBIDDEN_ENV
+        .iter()
+        .copied()
+        .filter(|name| std::env::var_os(name).is_some())
+        .collect();
+    if !present.is_empty() {
+        return Some(format!(
+            "accounted visitor requires the frozen F4 environment to be absent; present: {}",
+            present.join(",")
+        ));
+    }
+    if opts.deadline.is_some_and(|deadline| {
+        u64::try_from(
+            deadline
+                .saturating_duration_since(Instant::now())
+                .as_nanos(),
+        )
+        .is_err()
+    }) {
+        return Some("deadline remainder does not fit VisitAccountingV1 nanoseconds".into());
+    }
+    None
+}
+
+fn visit_accounting_resolved_configuration_error() -> Option<String> {
+    // Bind the effective values too: an earlier call in this process may have
+    // initialized a OnceLock while an environment override was present.
+    if arithmetic_mode() != 2
+        || !packed_enabled()
+        || !symbolic_parallel()
+        || !gebauer_moeller()
+        || !fl_enabled()
+        || !fl_blocked_pairs()
+        || !linear_interreduce_enabled()
+        || !branch_enabled()
+        || !freeze_enabled()
+        || par_old()
+        || par_prof()
+        || mem_stats()
+        || (0..3).any(mem_site)
+        || !deferred_parallel()
+        || stair_scan()
+        || thread_ops_mode()
+        || !visit_accounting_cached_profile_is_default(
+            fl_mode_tiles(0),
+            fl_min_cols(),
+            narrow_acc_enabled(),
+        )
+    {
+        return Some("resolved F4 implementation profile is not the frozen default".into());
+    }
+    None
+}
+
+fn visit_accounting_cached_profile_is_default(
+    fl_tiles: bool,
+    fl_min_columns: usize,
+    narrow_accumulators: bool,
+) -> bool {
+    !fl_tiles && fl_min_columns == FL_MIN_COLS && narrow_accumulators
+}
+
+fn visit_account_charge_usize(counter: VisitAccountingCounter, value: usize) {
+    match u64::try_from(value) {
+        Ok(value) => visit_account_charge(counter, value),
+        Err(_) => visit_account_block(
+            "counter_overflow",
+            Some(counter.name()),
+            "usize observation does not fit u64",
+        ),
+    }
+}
+
+fn visit_account_charge_product(counter: VisitAccountingCounter, left: usize, right: usize) {
+    match left.checked_mul(right).and_then(|n| u64::try_from(n).ok()) {
+        Some(value) => visit_account_charge(counter, value),
+        None => visit_account_block(
+            "counter_overflow",
+            Some(counter.name()),
+            format!("checked product {left} * {right} failed"),
+        ),
+    }
+}
+
 /// Opt-in, exclusive wall-time phases of one recursive visitor call.
 ///
 /// The four phase buckets partition `total_ns`. They measure elapsed time,
@@ -8047,6 +9998,10 @@ pub struct VisitReport {
     /// it. Omitted when disabled, preserving existing serialized reports.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timings: Option<VisitTimings>,
+    /// Fail-closed, call-owned accounting emitted only by the explicit v1
+    /// accounted entry points.  Legacy callers keep their serialized shape.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accounting_v1: Option<Box<VisitAccountingV1>>,
 }
 
 // Interior-mutability keeps the clock independent of VisitState's mutable
@@ -8142,6 +10097,7 @@ enum VisitEnd {
     TimedOut,
     TraceStopped,
     ResourceLimited,
+    AccountingStopped,
 }
 
 /// Borrowed events for one depth-first traversal. `assignments` contains only
@@ -8182,11 +10138,12 @@ pub enum VisitEvent<'a> {
     },
 }
 
-struct VisitState<'a, F, S> {
+struct VisitState<'a, 'account, F, S> {
     original: &'a [Poly],
     domains: &'a [Option<Vec<u64>>],
     p: u64,
     opts: &'a F4Options,
+    account: VisitAccount<'account>,
     assignment: Vec<u64>,
     visitor: F,
     sink: Option<S>,
@@ -8199,17 +10156,38 @@ struct VisitState<'a, F, S> {
     domain_index: Vec<Option<FxMap<u64, usize>>>,
 }
 
-impl<F, S> VisitState<'_, F, S>
+impl<F, S> VisitState<'_, '_, F, S>
 where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
-    fn emit(&mut self, event: VisitEvent<'_>) -> bool {
+    fn emit(&mut self, event: VisitEvent<'_>) -> Result<(), VisitEnd> {
         if self.report.trace_stopped {
-            return false;
+            return Err(VisitEnd::TraceStopped);
         }
         if let Some(sink) = &mut self.sink {
-            if let Err(mut error) = sink(event) {
+            let (account_phase, control) = self
+                .account
+                .phase_scope(VisitAccountingPhaseV1::TraceDelivery);
+            if control.stopped()
+                || self
+                    .account
+                    .charge(VisitAccountingCounter::TraceDeliveries, 1)
+                    .stopped()
+            {
+                return Err(VisitEnd::AccountingStopped);
+            }
+            let delivered = {
+                let _external = self
+                    .account
+                    .pause_external()
+                    .map_err(|_| VisitEnd::AccountingStopped)?;
+                sink(event)
+            };
+            if self.account.control().stopped() {
+                return Err(VisitEnd::AccountingStopped);
+            }
+            if let Err(mut error) = delivered {
                 let mut end = error.len().min(512);
                 while !error.is_char_boundary(end) {
                     end -= 1;
@@ -8217,16 +10195,28 @@ where
                 error.truncate(end);
                 self.report.trace_stopped = true;
                 self.report.trace_error = Some(error);
-                return false;
+                drop(account_phase);
+                if self.account.control().stopped() {
+                    return Err(VisitEnd::AccountingStopped);
+                }
+                return Err(VisitEnd::TraceStopped);
+            }
+            drop(account_phase);
+            if self.account.control().stopped() {
+                return Err(VisitEnd::AccountingStopped);
             }
         }
-        true
+        Ok(())
     }
     fn expired(&self) -> bool {
         self.opts.deadline.is_some_and(|d| Instant::now() >= d)
     }
 
     fn walk(&mut self, input: &[Poly], active: &[usize], parent_id: Option<usize>) -> VisitEnd {
+        let (_account_phase, control) = self.account.phase_scope(VisitAccountingPhaseV1::Traversal);
+        if control.stopped() {
+            return VisitEnd::AccountingStopped;
+        }
         if self.report.trace_stopped {
             return VisitEnd::TraceStopped;
         }
@@ -8235,6 +10225,13 @@ where
         }
         let node_id = self.next_node;
         self.next_node += 1;
+        if self
+            .account
+            .charge(VisitAccountingCounter::TraversalNodes, 1)
+            .stopped()
+        {
+            return VisitEnd::AccountingStopped;
+        }
         if self.sink.is_some() {
             let assignments: Vec<_> = self
                 .assignment
@@ -8243,14 +10240,14 @@ where
                 .enumerate()
                 .filter(|(i, _)| !active.contains(i))
                 .collect();
-            if !self.emit(VisitEvent::System {
+            if let Err(end) = self.emit(VisitEvent::System {
                 node_id,
                 parent_id,
                 active_variables: active,
                 assignments: &assignments,
                 polynomials: input,
             }) {
-                return VisitEnd::TraceStopped;
+                return end;
             }
         }
         // Sink persistence may itself consume the remaining deadline. It is
@@ -8261,21 +10258,51 @@ where
         if active.is_empty() {
             // A degree-truncated basis can describe a strict superset of
             // the original variety. Never expose those spurious roots.
-            let residual_satisfied = input.iter().all(|g| eval(g, &[], self.p) == 0);
-            let original_satisfied = residual_satisfied.then(|| {
-                self.original
-                    .iter()
-                    .all(|g| eval(g, &self.assignment, self.p) == 0)
-            });
+            let (residual_satisfied, original_satisfied) = {
+                let (_phase, control) = self
+                    .account
+                    .phase_scope(VisitAccountingPhaseV1::CandidateVerification);
+                if control.stopped() {
+                    return VisitEnd::AccountingStopped;
+                }
+                for g in input {
+                    if self
+                        .account
+                        .charge_usize(VisitAccountingCounter::CandidateTermsChecked, g.len())
+                        .stopped()
+                    {
+                        return VisitEnd::AccountingStopped;
+                    }
+                }
+                let residual_satisfied = input.iter().all(|g| eval(g, &[], self.p) == 0);
+                let original_satisfied = residual_satisfied.then(|| {
+                    for g in self.original {
+                        if self
+                            .account
+                            .charge_usize(VisitAccountingCounter::CandidateTermsChecked, g.len())
+                            .stopped()
+                        {
+                            return false;
+                        }
+                    }
+                    self.original
+                        .iter()
+                        .all(|g| eval(g, &self.assignment, self.p) == 0)
+                });
+                (residual_satisfied, original_satisfied)
+            };
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
             if self.sink.is_some() {
                 let assignment = self.assignment.clone();
-                if !self.emit(VisitEvent::Candidate {
+                if let Err(end) = self.emit(VisitEvent::Candidate {
                     node_id,
                     assignment: &assignment,
                     residual_satisfied,
                     original_satisfied,
                 }) {
-                    return VisitEnd::TraceStopped;
+                    return end;
                 }
             }
             if self.sink.is_some() && self.expired() {
@@ -8288,11 +10315,29 @@ where
                 self.report.candidates_rejected += 1;
                 return VisitEnd::Complete;
             }
-            self.report.solutions_visited += 1;
             let stop = {
                 let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
+                let (_account_phase, control) = self
+                    .account
+                    .phase_scope(VisitAccountingPhaseV1::CallbackDelivery);
+                if control.stopped()
+                    || self
+                        .account
+                        .charge(VisitAccountingCounter::CallbackDeliveries, 1)
+                        .stopped()
+                {
+                    return VisitEnd::AccountingStopped;
+                }
+                let _external = match self.account.pause_external() {
+                    Ok(external) => external,
+                    Err(_) => return VisitEnd::AccountingStopped,
+                };
                 (self.visitor)(&self.assignment)
             };
+            self.report.solutions_visited += 1;
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
             return if stop {
                 VisitEnd::Stopped
             } else {
@@ -8320,12 +10365,26 @@ where
                     - before.replay_attempts) as usize;
                 (r, None)
             } else if self.sink.is_some() {
+                if matches!(self.account, VisitAccount::On(_)) {
+                    self.account.block(
+                        "uninstrumented_branch",
+                        None,
+                        "recording-specific contributor recovery is not operation-complete",
+                    );
+                    return VisitEnd::AccountingStopped;
+                }
                 let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
                 (r, Some(trace))
             } else {
-                (f4(input, active.len(), self.p, self.opts), None)
+                (
+                    f4_with_visit_account(input, active.len(), self.p, self.opts, self.account),
+                    None,
+                )
             }
         };
+        if self.account.control().stopped() {
+            return VisitEnd::AccountingStopped;
+        }
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
         }
@@ -8359,13 +10418,13 @@ where
             // Preserve the diagnostic event without cloning the incoming
             // generators or admitting root recovery from an incomplete call.
             if let Some(trace) = &trace {
-                if !self.emit(VisitEvent::NativeResult {
+                if let Err(end) = self.emit(VisitEvent::NativeResult {
                     node_id,
                     report: &r,
                     trace,
                     generating_set: input,
                 }) {
-                    return VisitEnd::TraceStopped;
+                    return end;
                 }
             }
             return VisitEnd::ResourceLimited;
@@ -8385,13 +10444,13 @@ where
         });
         let generating_set = preserved.as_deref().unwrap_or(&r.basis);
         if let Some(trace) = &trace {
-            if !self.emit(VisitEvent::NativeResult {
+            if let Err(end) = self.emit(VisitEvent::NativeResult {
                 node_id,
                 report: &r,
                 trace,
                 generating_set,
             }) {
-                return VisitEnd::TraceStopped;
+                return end;
             }
         }
         if r.timed_out || self.expired() {
@@ -8416,6 +10475,12 @@ where
             }
             let var = *vars.iter().next().unwrap();
             let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+            let (account_phase, control) = self
+                .account
+                .phase_scope(VisitAccountingPhaseV1::RootExtraction);
+            if control.stopped() {
+                return VisitEnd::AccountingStopped;
+            }
             let frobenius = self.domains[active[var]].as_ref().is_some_and(|domain| {
                 match self.opts.domain_roots {
                     DomainRootMode::Scan => false,
@@ -8443,13 +10508,46 @@ where
                     coefficients[e[var] as usize] = *c;
                 }
                 self.report.domain_frobenius_univariates += 1;
-                let Some(roots) = domain_roots_frobenius(
+                let before = self.report.domain_root_field_multiplications;
+                let roots = domain_roots_frobenius(
                     &coefficients,
                     self.domain_index[original].as_ref().expect("built above"),
                     self.p,
                     &mut self.report.domain_root_field_multiplications,
                     self.opts.deadline,
-                ) else {
+                );
+                match self
+                    .report
+                    .domain_root_field_multiplications
+                    .checked_sub(before)
+                {
+                    Some(muls) => {
+                        if self
+                            .account
+                            .charge(VisitAccountingCounter::FieldMultiplications, muls)
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                    None => {
+                        if self
+                            .account
+                            .block(
+                                "counter_underflow",
+                                Some("field_multiplications"),
+                                "finite-domain root counter regressed",
+                            )
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                }
+                if self.account.control().stopped() {
+                    return VisitEnd::AccountingStopped;
+                }
+                let Some(roots) = roots else {
                     return VisitEnd::TimedOut;
                 };
                 roots
@@ -8478,21 +10576,62 @@ where
                     coefficients[e[var] as usize] = *c;
                 }
                 self.report.factored_univariates += 1;
-                let Some(roots) = super::glv_invariant_base::poly_roots_fp_counted_until(
+                let before = self.report.root_field_multiplications;
+                let roots = super::glv_invariant_base::poly_roots_fp_counted_until(
                     &coefficients,
                     self.p,
                     0x4634_524f_4f54,
                     &mut self.report.root_field_multiplications,
                     self.opts.deadline,
-                ) else {
+                );
+                match self.report.root_field_multiplications.checked_sub(before) {
+                    Some(muls) => {
+                        if self
+                            .account
+                            .charge(VisitAccountingCounter::FieldMultiplications, muls)
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                    None => {
+                        if self
+                            .account
+                            .block(
+                                "counter_underflow",
+                                Some("field_multiplications"),
+                                "unrestricted root counter regressed",
+                            )
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                }
+                if self.account.control().stopped() {
+                    return VisitEnd::AccountingStopped;
+                }
+                let Some(roots) = roots else {
                     return VisitEnd::TimedOut;
                 };
                 roots
             };
+            if self
+                .account
+                .charge_usize(VisitAccountingCounter::RootCandidates, roots.len())
+                .stopped()
+            {
+                return VisitEnd::AccountingStopped;
+            }
             if best.as_ref().is_none_or(|(_, old)| roots.len() < old.len()) {
                 best = Some((var, roots));
             }
-            if best.as_ref().is_some_and(|(_, roots)| roots.is_empty()) {
+            let empty_roots = best.as_ref().is_some_and(|(_, roots)| roots.is_empty());
+            drop(account_phase);
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
+            if empty_roots {
                 return VisitEnd::Complete;
             }
         }
@@ -8529,7 +10668,14 @@ where
             if full_field {
                 self.report.full_field_branches += 1;
             }
-            if !self.emit(VisitEvent::Branch {
+            if self
+                .account
+                .charge(VisitAccountingCounter::BranchDeliveries, 1)
+                .stopped()
+            {
+                return VisitEnd::AccountingStopped;
+            }
+            if let Err(end) = self.emit(VisitEvent::Branch {
                 node_id,
                 original_variable: original,
                 value,
@@ -8541,19 +10687,39 @@ where
                     "finite_domain"
                 },
             }) {
-                return VisitEnd::TraceStopped;
+                return end;
             }
             if self.sink.is_some() && self.expired() {
                 return VisitEnd::TimedOut;
             }
             self.assignment[original] = value;
-            let sub: Vec<_> = generating_set
-                .iter()
-                .map(|g| {
-                    normalise_owned(specialise(g, var, value, self.p), self.p, self.opts.order)
-                })
-                .filter(|g| !g.is_empty())
-                .collect();
+            let sub: Vec<_> = {
+                let (_phase, control) = self
+                    .account
+                    .phase_scope(VisitAccountingPhaseV1::Specialization);
+                if control.stopped() {
+                    return VisitEnd::AccountingStopped;
+                }
+                for g in generating_set {
+                    if self
+                        .account
+                        .charge_usize(VisitAccountingCounter::SpecializationTerms, g.len())
+                        .stopped()
+                    {
+                        return VisitEnd::AccountingStopped;
+                    }
+                }
+                generating_set
+                    .iter()
+                    .map(|g| {
+                        normalise_owned(specialise(g, var, value, self.p), self.p, self.opts.order)
+                    })
+                    .filter(|g| !g.is_empty())
+                    .collect()
+            };
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
             let end = self.walk(&sub, &remaining, Some(node_id));
             if end != VisitEnd::Complete {
                 return end;
@@ -8746,6 +10912,300 @@ where
     }
 }
 
+fn visit_disposition(
+    report: &VisitReport,
+    empty_domain: bool,
+    callback_stop_disposition: VisitDispositionV1,
+) -> VisitDispositionV1 {
+    if report.trace_stopped {
+        VisitDispositionV1::TraceError
+    } else if report.stopped_early {
+        callback_stop_disposition
+    } else if report.timed_out {
+        VisitDispositionV1::TimedOut
+    } else if report.resource_limit.is_some() {
+        VisitDispositionV1::ResourceStopped
+    } else if !report.complete {
+        VisitDispositionV1::Incomplete
+    } else if report.complete && empty_domain {
+        VisitDispositionV1::EmptyDomain
+    } else if report.complete && report.solutions_visited == 0 {
+        VisitDispositionV1::CompleteEmpty
+    } else {
+        VisitDispositionV1::CompleteNonempty
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn solve_visit_accounted_impl<F, S>(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    request: VisitAccountingRequestV1,
+    entry_mode: VisitAccountingEntryMode,
+    visitor: F,
+    sink: Option<S>,
+) -> Result<VisitReport, VisitAccountedErrorV1>
+where
+    F: FnMut(&[u64]) -> bool,
+    S: FnMut(VisitEvent<'_>) -> Result<(), String>,
+{
+    let trace_sink = sink.is_some();
+    let nested = visit_accounting_active();
+    let binding_error = (!nested)
+        .then(|| visit_accounting_binding_error(&request.binding))
+        .flatten();
+    let basic_configuration_error = (!nested && binding_error.is_none())
+        .then(|| visit_accounting_basic_configuration_error(opts, false))
+        .flatten();
+    let resolve_profile = !nested && binding_error.is_none() && basic_configuration_error.is_none();
+    let mut builder = VisitAccountingBuilder::new_for_entry(
+        request,
+        opts,
+        trace_sink,
+        entry_mode,
+        resolve_profile,
+    );
+    if nested {
+        builder.block(
+            "nested_accounted_call",
+            None,
+            "an accounted visitor is already active on this worker",
+        );
+        return Err(VisitAccountedErrorV1 {
+            message: "nested accounted visitor calls are unsupported".into(),
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    if let Some(error) = binding_error {
+        builder.block("invalid_binding", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::InvalidInput),
+        });
+    }
+    if let Some(error) = basic_configuration_error {
+        builder.block("unsupported_configuration", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    if builder.arm.implementation_environment != "f4_environment_absent" {
+        let error = "F4 environment changed during accounted preflight".to_string();
+        builder.block("unsupported_configuration", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    if let Some(error) = visit_accounting_basic_configuration_error(opts, false) {
+        builder.block("unsupported_configuration", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    if let Some(error) = visit_accounting_resolved_configuration_error() {
+        builder.block("unsupported_configuration", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    let Some(context) = VisitAccountingContext::new() else {
+        let error = "accounting context identifier space is exhausted".to_string();
+        builder.block("accounting_context_exhausted", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    };
+    let session = VisitAccountingSession::begin(builder, &context).map_err(|mut builder| {
+        builder.block(
+            "nested_accounted_call",
+            None,
+            "accounted meter ownership changed during preflight",
+        );
+        VisitAccountedErrorV1 {
+            message: "accounted visitor meter is already active".into(),
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        }
+    })?;
+    let account = VisitAccount::On(session.token());
+    let initial_accounting_stopped = account
+        .charge_usize(VisitAccountingCounter::SymbolicRows, input.len())
+        .stopped()
+        || input.iter().any(|polynomial| {
+            account
+                .charge_usize(VisitAccountingCounter::SymbolicMonomials, polynomial.len())
+                .stopped()
+        })
+        || account
+            .charge_usize(VisitAccountingCounter::Comparisons, domains.len())
+            .stopped()
+        || domains.iter().flatten().any(|domain| {
+            account
+                .charge_usize(VisitAccountingCounter::Comparisons, domain.len())
+                .stopped()
+        });
+    if initial_accounting_stopped || account.control().stopped() {
+        let mut report = VisitReport::default();
+        report.accounting_v1 = Some(Box::new(session.finish(VisitDispositionV1::Incomplete)));
+        return Ok(report);
+    }
+    let empty_domain = domains.iter().flatten().any(Vec::is_empty);
+    match solve_visit_impl(
+        input, n_vars, p, opts, domains, account, visitor, sink, None,
+    ) {
+        Ok(mut report) => {
+            let disposition = visit_disposition(
+                &report,
+                empty_domain,
+                entry_mode.callback_stop_disposition(),
+            );
+            report.accounting_v1 = Some(Box::new(session.finish(disposition)));
+            Ok(report)
+        }
+        Err(message) => Err(VisitAccountedErrorV1 {
+            accounting: session.finish(VisitDispositionV1::InvalidInput),
+            message,
+        }),
+    }
+}
+
+/// One equation-checked witness and the accounted report that produced it.
+///
+/// `first_solution` is `None` when traversal completes without a witness or
+/// stops for another reason.  A present witness is also reflected by
+/// [`VisitDispositionV1::WitnessFound`] in `report.accounting_v1`.
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct VisitFirstReportV1 {
+    pub report: VisitReport,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_solution: Option<Vec<u64>>,
+}
+
+/// Private, sequential entry point for the first equation-checked witness.
+///
+/// The executor owns a one-thread Rayon pool and exposes no caller callback or
+/// trace sink, preventing those extension points from submitting unrelated
+/// work to that pool. Traversal, delivery and native-driver orchestration now
+/// borrow a session-branded token, but shared arithmetic, reducers, roots and
+/// allocation helpers still use the worker-local meter as a shadow.
+/// `work_ownership_complete` therefore remains false until every admitted
+/// charged path carries explicit call ownership.
+pub struct VisitAccountingExecutorV1 {
+    pool: rayon::ThreadPool,
+}
+
+impl VisitAccountingExecutorV1 {
+    /// Build a fresh executor with its own single worker.
+    pub fn try_new() -> Result<Self, rayon::ThreadPoolBuildError> {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .map(|pool| Self { pool })
+    }
+
+    /// Return the first equation-checked solution, if one is reached.
+    ///
+    /// Calls require `&mut self`, so one executor cannot admit overlapping
+    /// solves through this API.  The report remains call-scoped; construction,
+    /// replay, persistence, and whole-collector work need outer accounting.
+    #[allow(clippy::too_many_arguments)]
+    pub fn solve_first(
+        &mut self,
+        input: &[Poly],
+        n_vars: usize,
+        p: u64,
+        opts: &F4Options,
+        domains: &[Option<Vec<u64>>],
+        request: VisitAccountingRequestV1,
+    ) -> Result<VisitFirstReportV1, VisitAccountedErrorV1> {
+        let (report, first_solution) = self.pool.install(move || {
+            let mut first_solution = None;
+            let report = solve_visit_accounted_impl(
+                input,
+                n_vars,
+                p,
+                opts,
+                domains,
+                request,
+                VisitAccountingEntryMode::PrivateFirstExecutor,
+                |solution| {
+                    first_solution = Some(solution.to_vec());
+                    true
+                },
+                None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+            )?;
+            Ok((report, first_solution))
+        })?;
+        Ok(VisitFirstReportV1 {
+            report,
+            first_solution,
+        })
+    }
+}
+
+/// Accounted plain visitor for the frozen single-thread, normal-grevlex path.
+///
+/// This entry point preserves its ledger on validation failure through
+/// [`VisitAccountedErrorV1`].  It must be invoked inside a dedicated
+/// one-thread Rayon pool.  The returned record covers only this solver call;
+/// public-system construction, arbitrary callback work, replay, storage and
+/// the enclosing relation collector require their own ledger.
+pub fn solve_visit_accounted_v1(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    request: VisitAccountingRequestV1,
+    visitor: impl FnMut(&[u64]) -> bool,
+) -> Result<VisitReport, VisitAccountedErrorV1> {
+    solve_visit_accounted_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        request,
+        VisitAccountingEntryMode::CallerPool,
+        visitor,
+        None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+    )
+}
+
+/// Traced accounted visitor.  Trace delivery belongs to this call, but the
+/// sink's own persistence/storage implementation remains outer work.  Trace
+/// reuse is intentionally unsupported by v1.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_visit_traced_accounted_v1(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    request: VisitAccountingRequestV1,
+    visitor: impl FnMut(&[u64]) -> bool,
+    sink: impl FnMut(VisitEvent<'_>) -> Result<(), String>,
+) -> Result<VisitReport, VisitAccountedErrorV1> {
+    solve_visit_accounted_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        request,
+        VisitAccountingEntryMode::CallerPool,
+        visitor,
+        Some(sink),
+    )
+}
+
 /// Visit exact solutions in the Cartesian product of `domains` (`None`
 /// means all of F_p), stopping when the visitor returns true. Domain
 /// restrictions define the requested problem; completeness is relative to
@@ -8775,6 +11235,7 @@ pub fn solve_visit(
         p,
         opts,
         domains,
+        VisitAccount::Off,
         visitor,
         None::<fn(VisitEvent<'_>) -> Result<(), String>>,
         None,
@@ -8802,7 +11263,17 @@ pub fn solve_visit_traced(
     if opts.stop_hilbert.is_some() {
         return Err("traced visitor does not support Hilbert stopping".into());
     }
-    solve_visit_impl(input, n_vars, p, opts, domains, visitor, Some(sink), None)
+    solve_visit_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        VisitAccount::Off,
+        visitor,
+        Some(sink),
+        None,
+    )
 }
 
 /// Reuse certified native traces across attempts in one explicitly scoped
@@ -8827,6 +11298,7 @@ pub fn solve_visit_reusing(
         p,
         opts,
         domains,
+        VisitAccount::Off,
         visitor,
         None::<fn(VisitEvent<'_>) -> Result<(), String>>,
         Some(pool),
@@ -8834,12 +11306,13 @@ pub fn solve_visit_reusing(
 }
 
 #[allow(clippy::too_many_arguments)]
-fn solve_visit_impl<F, S>(
+fn solve_visit_impl<'account, F, S>(
     input: &[Poly],
     n_vars: usize,
     p: u64,
     opts: &F4Options,
     domains: &[Option<Vec<u64>>],
+    account: VisitAccount<'account>,
     visitor: F,
     sink: Option<S>,
     pool: Option<&mut TracePool>,
@@ -8848,6 +11321,9 @@ where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
+    if account.control().stopped() {
+        return Ok(VisitReport::default());
+    }
     let timing = opts.visit_timing.then(VisitClock::new);
     if opts.resource_limits.is_some() && (pool.is_some() || opts.sibling_batch) {
         return Ok(VisitReport {
@@ -8886,6 +11362,7 @@ where
         domains,
         p,
         opts,
+        account,
         assignment: vec![0; n_vars],
         visitor,
         sink,
@@ -8895,7 +11372,10 @@ where
         timing: timing.as_ref(),
         domain_index: vec![None; n_vars],
     };
-    let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
+    let mut end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
+    if account.control().stopped() {
+        end = VisitEnd::AccountingStopped;
+    }
     state.report.complete = end == VisitEnd::Complete;
     state.report.stopped_early = end == VisitEnd::Stopped;
     state.report.timed_out = end == VisitEnd::TimedOut;
@@ -9445,6 +11925,1155 @@ mod visit_timing_tests {
             results.push(runs);
         }
         assert_eq!(results[0], results[1]);
+    }
+}
+
+#[cfg(test)]
+mod visit_accounting_tests {
+    use super::*;
+
+    fn request(id: &str) -> VisitAccountingRequestV1 {
+        VisitAccountingRequestV1 {
+            binding: VisitAccountingBindingV1 {
+                attempt_id: id.into(),
+                protocol_id: "test.visit-accounting/v1".into(),
+                case_id: format!("case-{id}"),
+                arm_id: "normal-grevlex".into(),
+                case_sha256: "11".repeat(32),
+                system_sha256: "22".repeat(32),
+                f4_source_sha256: "33".repeat(32),
+                executable_sha256: "44".repeat(32),
+            },
+        }
+    }
+
+    fn in_owner_pool<T: Send>(f: impl FnOnce() -> T + Send) -> T {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .unwrap()
+            .install(f)
+    }
+
+    fn accounting(report: &VisitReport) -> &VisitAccountingV1 {
+        report
+            .accounting_v1
+            .as_ref()
+            .expect("accounted entry point returns its ledger")
+    }
+
+    fn assert_reconciles_in_modes(
+        record: &VisitAccountingV1,
+        ownership_mode: &str,
+        accounting_token_mode: &str,
+    ) {
+        let mut sum = VisitAccountingWorkV1::default();
+        for phase in &record.phases {
+            sum.checked_add_assign(&phase.work).unwrap();
+        }
+        assert_eq!(sum, record.total);
+        assert!(record.reconciliation.phase_sum_equals_total);
+        assert!(record.reconciliation.checked_arithmetic);
+        assert!(!record.reconciliation.operation_tracking_complete);
+        assert!(!record.reconciliation.memory_tracking_complete);
+        assert!(!record.reconciliation.work_ownership_complete);
+        assert_eq!(record.arm.ownership_mode, ownership_mode);
+        assert_eq!(record.arm.accounting_token_mode, accounting_token_mode);
+        assert_eq!(record.scope, "solve_visit_call_only");
+        assert!(record.whole_collector_accounting_required);
+    }
+
+    fn assert_reconciles_in_mode(record: &VisitAccountingV1, ownership_mode: &str) {
+        assert_reconciles_in_modes(
+            record,
+            ownership_mode,
+            "borrowed_traversal_native_driver_tls_helper_shadow_v1",
+        );
+    }
+
+    fn assert_reconciles(record: &VisitAccountingV1) {
+        assert_reconciles_in_mode(record, "caller_one_thread_rayon_tls_unproven");
+    }
+
+    fn assert_reconciles_rejected(record: &VisitAccountingV1) {
+        assert_reconciles_in_modes(
+            record,
+            "caller_one_thread_rayon_tls_unproven",
+            "not_started_preflight_rejected",
+        );
+    }
+
+    fn begin_counter_overflow_session<'a>(
+        context: &'a VisitAccountingContext,
+        id: &str,
+        opts: &F4Options,
+        trace_sink: bool,
+        counter: VisitAccountingCounter,
+    ) -> VisitAccountingSession<'a> {
+        let mut builder = VisitAccountingBuilder::new(request(id), opts, trace_sink);
+        *counter.field(&mut builder.total) = u64::MAX;
+        *counter.field(&mut builder.phases[VisitAccountingPhaseV1::Validation.index()]) = u64::MAX;
+        VisitAccountingSession::begin(builder, context)
+            .ok()
+            .expect("test owns the accounted session")
+    }
+
+    fn assert_empty_accounting_stop(report: &F4Report) {
+        assert!(report.basis.is_empty());
+        assert!(!report.inconsistent && !report.timed_out);
+        assert_eq!(report.degree_reached, 0);
+        assert_eq!(report.solving_degree, 0);
+        assert_eq!(report.steps, 0);
+        assert_eq!(report.max_rows, 0);
+        assert_eq!(report.max_cols, 0);
+        assert_eq!(report.field_ops, 0);
+        assert!(report.resource_limit.is_none());
+    }
+
+    fn assert_no_non_time_work(record: &VisitAccountingV1) {
+        let mut work = record.total.clone();
+        work.wall_ns = 0;
+        work.thread_cpu_ns = 0;
+        assert_eq!(work, VisitAccountingWorkV1::default());
+    }
+
+    #[test]
+    fn native_preblocked_token_stops_before_engine_entry() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let mut builder =
+                VisitAccountingBuilder::new(request("native-preblocked-token"), &opts, false);
+            builder.block(
+                "seeded_native_block",
+                None,
+                "test blocker must stop before the native engine",
+            );
+            let session = VisitAccountingSession::begin(builder, &context)
+                .ok()
+                .expect("test owns the accounted session");
+
+            // `p = 1` is an engine-entry tripwire: Barrett construction would
+            // panic if the blocked token admitted any native setup.
+            let report = f4_with_visit_account(&[], 0, 1, &opts, VisitAccount::On(session.token()));
+            assert_empty_accounting_stop(&report);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "seeded_native_block");
+            assert_eq!(
+                record.blocker.as_ref().unwrap().phase,
+                Some(VisitAccountingPhaseV1::Validation)
+            );
+            assert_no_non_time_work(&record);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn native_tokenless_entry_stops_before_engine_entry() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            for entry in ["plain", "record", "replay"] {
+                let context = VisitAccountingContext::new().unwrap();
+                let session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(
+                        request(&format!("native-token-missing-{entry}")),
+                        &opts,
+                        false,
+                    ),
+                    &context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+
+                // Every public F4 entry deliberately uses `Off`. While an
+                // unsuspended ledger is active, that is a missing authority
+                // rather than a legacy call. `p = 1` proves dispatch remains
+                // untouched for plain, recording and replay entry points.
+                let report = match entry {
+                    "plain" => f4(&[], 0, 1, &opts),
+                    "record" => f4_record(&[], 0, 1, &opts).0,
+                    "replay" => f4_replay(&[], 0, 1, &opts, &F4Trace::default()),
+                    _ => unreachable!(),
+                };
+                assert_empty_accounting_stop(&report);
+
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                assert_eq!(
+                    record.blocker.as_ref().unwrap().code,
+                    "accounting_token_missing"
+                );
+                assert_eq!(
+                    record.blocker.as_ref().unwrap().phase,
+                    Some(VisitAccountingPhaseV1::Validation)
+                );
+                assert_no_non_time_work(&record);
+                assert_reconciles(&record);
+            }
+        });
+    }
+
+    #[test]
+    fn native_same_thread_token_mismatch_stops_before_engine_entry() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let owning_context = VisitAccountingContext::new().unwrap();
+            let wrong_context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("native-token-mismatch"), &opts, false),
+                &owning_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let report = f4_with_visit_account(
+                &[],
+                0,
+                1,
+                &opts,
+                VisitAccount::On(wrong_context.unbound_test_token()),
+            );
+            assert_empty_accounting_stop(&report);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "accounting_token_mismatch"
+            );
+            assert_eq!(
+                record.blocker.as_ref().unwrap().phase,
+                Some(VisitAccountingPhaseV1::Validation)
+            );
+            assert_no_non_time_work(&record);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn native_scoped_foreign_thread_stops_before_engine_entry() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("native-foreign-thread-token"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let token = session.token();
+            let report = std::thread::scope(|scope| {
+                scope
+                    .spawn(move || {
+                        let opts = F4Options::new(Ordering::Grevlex, 4);
+                        f4_with_visit_account(&[], 0, 1, &opts, VisitAccount::On(token))
+                    })
+                    .join()
+                    .unwrap()
+            });
+            assert_empty_accounting_stop(&report);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "foreign_thread_work");
+            assert_eq!(
+                record.blocker.as_ref().unwrap().phase,
+                Some(VisitAccountingPhaseV1::Validation)
+            );
+            assert_no_non_time_work(&record);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn native_driver_counter_overflow_stops_before_later_phases() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_counter_overflow_session(
+                &context,
+                "native-basis-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::BasisTerms,
+            );
+            let input = vec![vec![(vec![1], 1), (vec![0], 6)]];
+
+            let (sender, receiver) = std::sync::mpsc::channel();
+            let report = observe_progress(sender, || {
+                f4_with_visit_account(&input, 1, 7, &opts, VisitAccount::On(session.token()))
+            });
+            assert_empty_accounting_stop(&report);
+            let events: Vec<_> = receiver.try_iter().collect();
+            assert_eq!(
+                events.iter().map(|event| event.event).collect::<Vec<_>>(),
+                vec!["begin"]
+            );
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            let blocker = record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(
+                blocker.phase,
+                Some(VisitAccountingPhaseV1::InputNormalization)
+            );
+            assert_eq!(blocker.counter, Some("basis_terms"));
+            assert_eq!(record.total.field_multiplications, 2);
+            assert_eq!(record.total.field_inversions, 1);
+            assert_eq!(record.total.basis_terms, u64::MAX);
+            assert_eq!(record.total.critical_pair_candidates, 0);
+            assert_eq!(record.total.critical_pairs_selected, 0);
+            assert_eq!(record.total.matrix_entries, 0);
+            assert_eq!(record.total.row_operations, 0);
+            assert!(!record.reconciliation.checked_arithmetic);
+            assert!(record.reconciliation.phase_sum_equals_total);
+            assert!(!record.reconciliation.operation_tracking_complete);
+            assert!(!record.reconciliation.memory_tracking_complete);
+            assert!(!record.reconciliation.work_ownership_complete);
+            assert!(!record.accounting_complete);
+            assert_eq!(
+                record.arm.accounting_token_mode,
+                "borrowed_traversal_native_driver_tls_helper_shadow_v1"
+            );
+        });
+    }
+
+    #[test]
+    fn two_thread_accounted_native_entry_is_rejected_before_token_creation() {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(2)
+            .build()
+            .unwrap()
+            .install(|| {
+                let error = solve_visit_accounted_v1(
+                    &[],
+                    0,
+                    7,
+                    &F4Options::new(Ordering::Grevlex, 4),
+                    &[],
+                    request("two-thread-native-rejection"),
+                    |_| false,
+                )
+                .unwrap_err();
+                let record = &error.accounting;
+                assert_eq!(record.solver_disposition, VisitDispositionV1::Unsupported);
+                assert_eq!(
+                    record.blocker.as_ref().unwrap().code,
+                    "unsupported_configuration"
+                );
+                assert!(error.message.contains("one-thread Rayon pool"));
+                assert_eq!(record.arm.rayon_threads, 2);
+                assert!(record.arm.inside_rayon_worker);
+                assert_eq!(
+                    record.arm.accounting_token_mode,
+                    "not_started_preflight_rejected"
+                );
+                assert_no_non_time_work(record);
+                assert_reconciles_rejected(record);
+            });
+    }
+
+    #[test]
+    fn legacy_entry_point_preserves_serialized_shape() {
+        let report = solve_visit(
+            &[],
+            0,
+            7,
+            &F4Options::new(Ordering::Grevlex, 4),
+            &[],
+            |_| false,
+        )
+        .unwrap();
+        assert!(report.accounting_v1.is_none());
+        assert!(serde_json::to_value(report)
+            .unwrap()
+            .get("accounting_v1")
+            .is_none());
+    }
+
+    #[test]
+    fn cached_effective_profile_controls_are_bound_and_fail_closed() {
+        assert!(visit_accounting_cached_profile_is_default(
+            false,
+            FL_MIN_COLS,
+            true
+        ));
+        assert!(!visit_accounting_cached_profile_is_default(
+            true,
+            FL_MIN_COLS,
+            true
+        ));
+        assert!(!visit_accounting_cached_profile_is_default(
+            false,
+            FL_MIN_COLS + 1,
+            true
+        ));
+        assert!(!visit_accounting_cached_profile_is_default(
+            false,
+            FL_MIN_COLS,
+            false
+        ));
+
+        let report = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("cached-profile"),
+                |_| false,
+            )
+            .unwrap()
+        });
+        let arm = &accounting(&report).arm;
+        assert_eq!(arm.faugere_lachartre_build_mode, "row_blocks");
+        assert_eq!(arm.faugere_lachartre_min_columns, FL_MIN_COLS);
+        assert!(arm.narrow_accumulators_enabled);
+    }
+
+    #[test]
+    fn zero_variable_complete_and_callback_stop_are_distinct_and_reconcile() {
+        for stop in [false, true] {
+            let report = in_owner_pool(|| {
+                solve_visit_accounted_v1(
+                    &[],
+                    0,
+                    7,
+                    &F4Options::new(Ordering::Grevlex, 4),
+                    &[],
+                    request(if stop { "stop" } else { "complete" }),
+                    |_| stop,
+                )
+                .unwrap()
+            });
+            let record = accounting(&report);
+            assert_eq!(
+                record.solver_disposition,
+                if stop {
+                    VisitDispositionV1::CallbackStopped
+                } else {
+                    VisitDispositionV1::CompleteNonempty
+                }
+            );
+            assert_eq!(record.total.traversal_nodes, 1);
+            assert_eq!(record.total.callback_deliveries, 1);
+            assert_eq!(record.total.matrix_entries, 0);
+            assert_reconciles(record);
+            // The first slice deliberately refuses promotion until the
+            // logical-allocation coverage gate is complete.
+            assert!(!record.accounting_complete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "memory_tracking_gap");
+        }
+    }
+
+    #[test]
+    fn private_first_executor_matches_legacy_and_is_sequentially_reusable() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let mut legacy_first = None;
+        let legacy = solve_visit(&input, 1, 7, &opts, &[None], |solution| {
+            legacy_first = Some(solution.to_vec());
+            true
+        })
+        .unwrap();
+        assert!(legacy.stopped_early);
+
+        let mut executor = VisitAccountingExecutorV1::try_new().unwrap();
+        let first = executor
+            .solve_first(&input, 1, 7, &opts, &[None], request("private-first"))
+            .unwrap();
+        assert_eq!(first.first_solution, legacy_first);
+        assert_eq!(first.first_solution, Some(vec![1]));
+        assert!(first.report.stopped_early);
+        let record = accounting(&first.report);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::WitnessFound);
+        assert_reconciles_in_mode(record, "private_one_thread_first_result_tls_shadow");
+        assert!(!record.accounting_complete);
+
+        let empty = executor
+            .solve_first(
+                &[],
+                1,
+                7,
+                &opts,
+                &[Some(Vec::new())],
+                request("private-empty"),
+            )
+            .unwrap();
+        assert!(empty.first_solution.is_none());
+        assert!(!empty.report.stopped_early);
+        let record = accounting(&empty.report);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::EmptyDomain);
+        assert_reconciles_in_mode(record, "private_one_thread_first_result_tls_shadow");
+    }
+
+    #[test]
+    fn empty_domain_and_expired_entry_have_distinct_dispositions() {
+        let empty = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &[],
+                1,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[Some(vec![])],
+                request("empty-domain"),
+                |_| panic!("empty domain reached callback"),
+            )
+            .unwrap()
+        });
+        assert_eq!(
+            accounting(&empty).solver_disposition,
+            VisitDispositionV1::EmptyDomain
+        );
+        assert_eq!(accounting(&empty).total.traversal_nodes, 1);
+        assert_eq!(accounting(&empty).total.callback_deliveries, 0);
+        assert_reconciles(accounting(&empty));
+
+        let timeout = in_owner_pool(|| {
+            let mut opts = F4Options::new(Ordering::Grevlex, 4);
+            opts.deadline = Some(Instant::now() - Duration::from_millis(1));
+            solve_visit_accounted_v1(&[], 0, 7, &opts, &[], request("timeout"), |_| {
+                panic!("expired deadline reached callback")
+            })
+            .unwrap()
+        });
+        assert_eq!(
+            accounting(&timeout).solver_disposition,
+            VisitDispositionV1::TimedOut
+        );
+        assert_eq!(accounting(&timeout).total.traversal_nodes, 0);
+        assert_reconciles(accounting(&timeout));
+    }
+
+    #[test]
+    fn resource_and_trace_stops_retain_their_solver_dispositions() {
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 1], 1), (vec![0, 0], 6)],
+        ];
+        let resource = in_owner_pool(|| {
+            let mut opts = F4Options::new(Ordering::Grevlex, 10);
+            opts.resource_limits = Some(F4ResourceLimits {
+                max_pairs: 0,
+                max_symbolic_monomials: 1024,
+                max_matrix_entries: 100_000,
+            });
+            solve_visit_accounted_v1(
+                &input,
+                2,
+                7,
+                &opts,
+                &[None, None],
+                request("resource"),
+                |_| panic!("resource stop reached callback"),
+            )
+            .unwrap()
+        });
+        assert_eq!(
+            accounting(&resource).solver_disposition,
+            VisitDispositionV1::ResourceStopped
+        );
+        assert!(!resource.complete && resource.resource_limit.is_some());
+        assert_reconciles(accounting(&resource));
+
+        let traced = in_owner_pool(|| {
+            solve_visit_traced_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("trace"),
+                |_| panic!("trace error reached solution callback"),
+                |_| Err("accounted trace refusal".into()),
+            )
+            .unwrap()
+        });
+        assert_eq!(
+            accounting(&traced).solver_disposition,
+            VisitDispositionV1::TraceError
+        );
+        assert_eq!(accounting(&traced).total.trace_deliveries, 1);
+        assert_reconciles(accounting(&traced));
+    }
+
+    #[test]
+    fn known_uninstrumented_branches_stop_before_native_or_delivery_work() {
+        let input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+
+        let traced = in_owner_pool(|| {
+            let mut system_events = 0usize;
+            let mut other_events = 0usize;
+            let report = solve_visit_traced_accounted_v1(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                request("recording-boundary"),
+                |_| panic!("recording blocker reached visitor"),
+                |event| {
+                    match event {
+                        VisitEvent::System { .. } => system_events += 1,
+                        _ => other_events += 1,
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
+            (report, system_events, other_events)
+        });
+        assert_eq!((traced.1, traced.2), (1, 0));
+        assert!(!traced.0.complete && !traced.0.trace_stopped);
+        assert_eq!(traced.0.f4_runs, 0);
+        let record = accounting(&traced.0);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::Incomplete);
+        assert_eq!(
+            record.blocker.as_ref().unwrap().code,
+            "uninstrumented_branch"
+        );
+        assert_eq!(
+            record.blocker.as_ref().unwrap().phase,
+            Some(VisitAccountingPhaseV1::Traversal)
+        );
+        assert_eq!(record.total.traversal_nodes, 1);
+        assert_eq!(record.total.trace_deliveries, 1);
+        assert_eq!(record.total.matrix_entries, 0);
+        assert_eq!(record.total.root_candidates, 0);
+        assert_eq!(record.total.branch_deliveries, 0);
+        assert_eq!(record.total.callback_deliveries, 0);
+        assert_reconciles(record);
+
+        let packed = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                request("packed-boundary"),
+                |_| panic!("packed blocker reached visitor"),
+            )
+            .unwrap()
+        });
+        assert!(!packed.complete && !packed.stopped_early && !packed.timed_out);
+        assert_eq!(packed.f4_runs, 0);
+        let record = accounting(&packed);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::Incomplete);
+        assert_eq!(
+            record.blocker.as_ref().unwrap().code,
+            "uninstrumented_branch"
+        );
+        assert_eq!(
+            record.blocker.as_ref().unwrap().phase,
+            Some(VisitAccountingPhaseV1::SymbolicPreprocessing)
+        );
+        assert_eq!(record.total.matrix_entries, 0);
+        assert_eq!(record.total.root_candidates, 0);
+        assert_eq!(record.total.branch_deliveries, 0);
+        assert_eq!(record.total.callback_deliveries, 0);
+        assert_reconciles(record);
+    }
+
+    #[test]
+    fn delivery_counter_overflow_stops_before_external_bodies() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+
+            let callback_context = VisitAccountingContext::new().unwrap();
+            let callback_session = begin_counter_overflow_session(
+                &callback_context,
+                "callback-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::CallbackDeliveries,
+            );
+            let mut callback_entered = false;
+            let callback_report = solve_visit_impl(
+                &[],
+                0,
+                7,
+                &opts,
+                &[],
+                VisitAccount::On(callback_session.token()),
+                |_| {
+                    callback_entered = true;
+                    false
+                },
+                None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+                None,
+            )
+            .unwrap();
+            assert!(!callback_entered);
+            assert_eq!(callback_report.solutions_visited, 0);
+            let callback_record = callback_session.finish(visit_disposition(
+                &callback_report,
+                false,
+                VisitDispositionV1::CallbackStopped,
+            ));
+            assert_eq!(
+                callback_record.solver_disposition,
+                VisitDispositionV1::Incomplete
+            );
+            let blocker = callback_record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(
+                blocker.phase,
+                Some(VisitAccountingPhaseV1::CallbackDelivery)
+            );
+            assert_eq!(blocker.counter, Some("callback_deliveries"));
+            assert!(!callback_record.reconciliation.checked_arithmetic);
+            assert!(callback_record.reconciliation.phase_sum_equals_total);
+            assert_eq!(
+                callback_record.arm.accounting_token_mode,
+                "borrowed_traversal_native_driver_tls_helper_shadow_v1"
+            );
+
+            let trace_context = VisitAccountingContext::new().unwrap();
+            let trace_session = begin_counter_overflow_session(
+                &trace_context,
+                "trace-overflow",
+                &opts,
+                true,
+                VisitAccountingCounter::TraceDeliveries,
+            );
+            let mut visitor_entered = false;
+            let mut sink_entered = false;
+            let trace_report = solve_visit_impl(
+                &[],
+                0,
+                7,
+                &opts,
+                &[],
+                VisitAccount::On(trace_session.token()),
+                |_| {
+                    visitor_entered = true;
+                    false
+                },
+                Some(|_: VisitEvent<'_>| {
+                    sink_entered = true;
+                    Ok(())
+                }),
+                None,
+            )
+            .unwrap();
+            assert!(!visitor_entered && !sink_entered);
+            assert!(!trace_report.trace_stopped);
+            let trace_record = trace_session.finish(visit_disposition(
+                &trace_report,
+                false,
+                VisitDispositionV1::CallbackStopped,
+            ));
+            assert_eq!(
+                trace_record.solver_disposition,
+                VisitDispositionV1::Incomplete
+            );
+            let blocker = trace_record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.phase, Some(VisitAccountingPhaseV1::TraceDelivery));
+            assert_eq!(blocker.counter, Some("trace_deliveries"));
+            assert!(!trace_record.reconciliation.checked_arithmetic);
+            assert!(trace_record.reconciliation.phase_sum_equals_total);
+            assert_eq!(
+                trace_record.arm.accounting_token_mode,
+                "borrowed_traversal_native_driver_tls_helper_shadow_v1"
+            );
+        });
+    }
+
+    #[test]
+    fn same_thread_token_mismatch_stops_before_callback_work() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let owning_context = VisitAccountingContext::new().unwrap();
+            let wrong_context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("token-mismatch"), &opts, false),
+                &owning_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let mut callback_entered = false;
+            let report = solve_visit_impl(
+                &[],
+                0,
+                7,
+                &opts,
+                &[],
+                VisitAccount::On(wrong_context.unbound_test_token()),
+                |_| {
+                    callback_entered = true;
+                    false
+                },
+                None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+                None,
+            )
+            .unwrap();
+            assert!(!callback_entered);
+            assert!(!report.complete && !report.stopped_early);
+            assert_eq!(report.solutions_visited, 0);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "accounting_token_mismatch"
+            );
+            assert_eq!(record.total.traversal_nodes, 0);
+            assert_eq!(record.total.callback_deliveries, 0);
+            assert!(!record.accounting_complete);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn scoped_foreign_thread_token_use_is_sticky_and_uncharged() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("foreign-thread-token"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let token = session.token();
+            let control = std::thread::scope(|scope| {
+                scope
+                    .spawn(move || {
+                        VisitAccount::On(token).charge(VisitAccountingCounter::TraversalNodes, 1)
+                    })
+                    .join()
+                    .unwrap()
+            });
+            assert_eq!(control, VisitAccountingControl::Stop);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "foreign_thread_work");
+            assert_eq!(record.total.traversal_nodes, 0);
+            assert_eq!(record.total.callback_deliveries, 0);
+            assert!(!record.accounting_complete);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn forgotten_external_pause_fails_closed_and_releases_session_slot() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("forgotten-pause"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let pause = VisitAccount::On(session.token()).pause_external().unwrap();
+            std::mem::forget(pause);
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "unbalanced_external_work_suspension"
+            );
+            assert!(!record.accounting_complete);
+            assert_reconciles(&record);
+
+            let next_context = VisitAccountingContext::new().unwrap();
+            let next = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("after-forgotten-pause"), &opts, false),
+                &next_context,
+            )
+            .ok()
+            .expect("failed session releases the worker ledger slot");
+            let next_record = next.finish(VisitDispositionV1::Incomplete);
+            assert_ne!(
+                next_record.blocker.as_ref().unwrap().code,
+                "unbalanced_external_work_suspension"
+            );
+            assert_reconciles(&next_record);
+        });
+    }
+
+    #[test]
+    fn unsupported_configuration_and_invalid_binding_retain_ledgers() {
+        let outside = solve_visit_accounted_v1(
+            &[],
+            0,
+            7,
+            &F4Options::new(Ordering::Grevlex, 4),
+            &[],
+            request("outside-pool"),
+            |_| false,
+        )
+        .unwrap_err();
+        assert_eq!(
+            outside.accounting.solver_disposition,
+            VisitDispositionV1::Unsupported
+        );
+        assert_eq!(
+            outside.accounting.blocker.as_ref().unwrap().code,
+            "unsupported_configuration"
+        );
+        assert_reconciles_rejected(&outside.accounting);
+
+        let invalid = in_owner_pool(|| {
+            let mut bad = request("bad-binding");
+            bad.binding.case_sha256 = "not-a-digest".into();
+            solve_visit_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                bad,
+                |_| false,
+            )
+            .unwrap_err()
+        });
+        assert_eq!(
+            invalid.accounting.solver_disposition,
+            VisitDispositionV1::InvalidInput
+        );
+        assert_eq!(
+            invalid.accounting.blocker.as_ref().unwrap().code,
+            "invalid_binding"
+        );
+        assert_reconciles_rejected(&invalid.accounting);
+
+        let observed = in_owner_pool(|| {
+            let (sender, _receiver) = std::sync::mpsc::channel();
+            observe_progress(sender, || {
+                solve_visit_accounted_v1(
+                    &[],
+                    0,
+                    7,
+                    &F4Options::new(Ordering::Grevlex, 4),
+                    &[],
+                    request("progress-observer"),
+                    |_| false,
+                )
+                .unwrap_err()
+            })
+        });
+        assert_eq!(
+            observed.accounting.solver_disposition,
+            VisitDispositionV1::Unsupported
+        );
+        assert!(observed.message.contains("progress observation"));
+        assert_reconciles_rejected(&observed.accounting);
+    }
+
+    #[test]
+    fn checked_overflow_and_reconciliation_faults_fail_closed() {
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let mut overflow = VisitAccountingBuilder::new(request("overflow"), &opts, false);
+        overflow.total.callback_deliveries = u64::MAX;
+        overflow.phases[VisitAccountingPhaseV1::Validation.index()].callback_deliveries = u64::MAX;
+        overflow.charge(VisitAccountingCounter::CallbackDeliveries, 1);
+        overflow.operation_tracking_complete = true;
+        overflow.memory_tracking_complete = true;
+        overflow.work_ownership_complete = true;
+        let overflow = overflow.seal(VisitDispositionV1::CompleteEmpty);
+        assert_eq!(overflow.blocker.as_ref().unwrap().code, "counter_overflow");
+        assert!(!overflow.accounting_complete);
+        assert!(!overflow.reconciliation.checked_arithmetic);
+
+        let mut mismatch = VisitAccountingBuilder::new(request("mismatch"), &opts, false);
+        mismatch.phases[VisitAccountingPhaseV1::Validation.index()].traversal_nodes = 1;
+        mismatch.operation_tracking_complete = true;
+        mismatch.memory_tracking_complete = true;
+        mismatch.work_ownership_complete = true;
+        let mismatch = mismatch.seal(VisitDispositionV1::CompleteEmpty);
+        assert_eq!(
+            mismatch.blocker.as_ref().unwrap().code,
+            "reconciliation_mismatch"
+        );
+        assert!(!mismatch.accounting_complete);
+        assert!(!mismatch.reconciliation.phase_sum_equals_total);
+
+        let mut ownership = VisitAccountingBuilder::new(request("ownership"), &opts, false);
+        ownership.operation_tracking_complete = true;
+        ownership.memory_tracking_complete = true;
+        let ownership = ownership.seal(VisitDispositionV1::CompleteEmpty);
+        assert_eq!(
+            ownership.blocker.as_ref().unwrap().code,
+            "work_ownership_gap"
+        );
+        assert!(!ownership.accounting_complete);
+        assert!(!ownership.reconciliation.work_ownership_complete);
+    }
+
+    #[test]
+    fn concurrent_owned_workers_do_not_cross_contaminate() {
+        let handles: Vec<_> = [3usize, 7]
+            .into_iter()
+            .map(|callbacks| {
+                std::thread::spawn(move || {
+                    in_owner_pool(|| {
+                        let domains = [Some((0..callbacks as u64).collect())];
+                        let report = solve_visit_accounted_v1(
+                            &[],
+                            1,
+                            11,
+                            &F4Options::new(Ordering::Grevlex, 2),
+                            &domains,
+                            request(&format!("concurrent-{callbacks}")),
+                            |_| false,
+                        )
+                        .unwrap();
+                        let record = report.accounting_v1.unwrap();
+                        (callbacks, record)
+                    })
+                })
+            })
+            .collect();
+        for handle in handles {
+            let (callbacks, record) = handle.join().unwrap();
+            assert_eq!(record.total.callback_deliveries, callbacks as u64);
+            assert_eq!(record.total.branch_deliveries, callbacks as u64);
+            assert_eq!(record.total.traversal_nodes, callbacks as u64 + 1);
+            assert!(record.binding.attempt_id.ends_with(&callbacks.to_string()));
+            assert_reconciles(&record);
+        }
+    }
+
+    #[test]
+    fn callback_body_is_outside_the_solver_owned_meter() {
+        let report = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("callback-boundary"),
+                |_| {
+                    assert_eq!(mulmod(3, 5, 7), 1);
+                    let _ = normalise_owned(vec![(vec![], 3), (vec![], 4)], 7, Ordering::Grevlex);
+                    let nested_input = vec![vec![(vec![1], 1), (vec![0], 6)]];
+                    let mut nested = Vec::new();
+                    solve_visit(
+                        &nested_input,
+                        1,
+                        7,
+                        &F4Options::new(Ordering::Grevlex, 2),
+                        &[None],
+                        |solution| {
+                            nested.push(solution.to_vec());
+                            false
+                        },
+                    )
+                    .unwrap();
+                    assert_eq!(nested, vec![vec![1]]);
+
+                    let nested_accounted = solve_visit_accounted_v1(
+                        &[],
+                        0,
+                        7,
+                        &F4Options::new(Ordering::Grevlex, 2),
+                        &[],
+                        request("callback-nested-accounted"),
+                        |_| panic!("rejected nested accounted call reached callback"),
+                    )
+                    .unwrap_err();
+                    assert_eq!(
+                        nested_accounted.accounting.solver_disposition,
+                        VisitDispositionV1::Unsupported
+                    );
+                    assert_eq!(
+                        nested_accounted.accounting.blocker.as_ref().unwrap().code,
+                        "nested_accounted_call"
+                    );
+                    assert_reconciles_rejected(&nested_accounted.accounting);
+
+                    let packed_input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
+                    let packed_report = solve_visit(
+                        &packed_input,
+                        1,
+                        7,
+                        &F4Options::new(Ordering::Grevlex, 4),
+                        &[None],
+                        |_| panic!("inconsistent nested packed solve reached callback"),
+                    )
+                    .unwrap();
+                    assert!(packed_report.complete);
+                    assert_eq!(packed_report.solutions_visited, 0);
+                    false
+                },
+            )
+            .unwrap()
+        });
+        let record = accounting(&report);
+        assert_eq!(record.total.callback_deliveries, 1);
+        assert_eq!(record.total.field_multiplications, 0);
+        assert_eq!(record.total.field_additions, 0);
+        assert_reconciles(record);
+    }
+
+    #[test]
+    fn trace_sink_body_is_outside_the_solver_owned_meter() {
+        let report = in_owner_pool(|| {
+            solve_visit_traced_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("trace-boundary"),
+                |_| false,
+                |_| {
+                    assert_eq!(mulmod(3, 5, 7), 1);
+                    Ok(())
+                },
+            )
+            .unwrap()
+        });
+        let record = accounting(&report);
+        assert_eq!(record.total.trace_deliveries, 2);
+        assert_eq!(record.total.callback_deliveries, 1);
+        assert_eq!(record.total.field_multiplications, 0);
+        assert_reconciles(record);
+    }
+
+    #[test]
+    fn accounted_real_f4_preserves_plain_solution_sequence() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let mut plain = Vec::new();
+        solve_visit(&input, 1, 7, &opts, &[None], |solution| {
+            plain.push(solution.to_vec());
+            false
+        })
+        .unwrap();
+        let (accounted, record) = in_owner_pool(|| {
+            let mut solutions = Vec::new();
+            let report = solve_visit_accounted_v1(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                request("real-f4-parity"),
+                |solution| {
+                    solutions.push(solution.to_vec());
+                    false
+                },
+            )
+            .unwrap();
+            (solutions, report.accounting_v1.unwrap())
+        });
+        assert_eq!(plain, vec![vec![1], vec![6]]);
+        assert_eq!(accounted, plain);
+        assert!(record.total.traversal_nodes > 0);
+        assert!(record.total.field_multiplications > 0);
+        assert_eq!(
+            record.arm.legacy_bitops_enabled,
+            super::super::jv_bitops::enabled()
+        );
+        assert_reconciles(&record);
     }
 }
 
@@ -10109,6 +13738,7 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
             }
         }
         v = (v + t) % p;
+        visit_account_charge(VisitAccountingCounter::FieldAdditions, 1);
     }
     v
 }
@@ -11524,9 +15154,11 @@ mod tests {
                 .map(|_| monomials.iter().map(|m| (m.clone(), next() % p)).collect())
                 .collect();
             let opts = F4Options::new(Ordering::Grevlex, 6);
-            let wide = f4_with_arithmetic(&sys, 3, p, &opts, 0, TraceMode::Off);
-            let narrow = f4_with_arithmetic(&sys, 3, p, &opts, 1, TraceMode::Off);
-            let deferred = f4_with_arithmetic(&sys, 3, p, &opts, 2, TraceMode::Off);
+            let wide = f4_with_arithmetic(&sys, 3, p, &opts, 0, VisitAccount::Off, TraceMode::Off);
+            let narrow =
+                f4_with_arithmetic(&sys, 3, p, &opts, 1, VisitAccount::Off, TraceMode::Off);
+            let deferred =
+                f4_with_arithmetic(&sys, 3, p, &opts, 2, VisitAccount::Off, TraceMode::Off);
             assert_eq!(narrow.basis, wide.basis, "p={p}");
             assert_eq!(narrow.steps, wide.steps, "p={p}");
             assert_eq!(

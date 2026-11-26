@@ -70,17 +70,8 @@ fn pow_mod(mut b: u64, mut e: u64, m: u64) -> u64 {
 }
 
 fn inv_mod(a: u64, m: u64) -> Option<u64> {
-    let (mut old_r, mut r) = (a as i128 % m as i128, m as i128);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        (old_r, r) = (r, old_r - q * r);
-        (old_s, s) = (s, old_s - q * s);
-    }
-    if old_r != 1 {
-        return None;
-    }
-    Some(old_s.rem_euclid(m as i128) as u64)
+    // `a % m` keeps the old panic on m = 0.
+    crate::gcd::int::inv_mod_u64(a % m, m)
 }
 
 /// Legendre symbol `(a/p)` for an odd prime `p`.
@@ -828,23 +819,14 @@ fn bareiss_det(mut m: Vec<Vec<BigInt>>) -> BigInt {
 }
 
 fn ext_gcd_big(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
-    let (mut old_r, mut r) = (a.clone(), b.clone());
-    let (mut old_s, mut s) = (BigInt::one(), BigInt::zero());
-    let (mut old_t, mut t) = (BigInt::zero(), BigInt::one());
-    while !r.is_zero() {
-        let q = &old_r / &r;
-        let nr = &old_r - &q * &r;
-        old_r = std::mem::replace(&mut r, nr);
-        let ns = &old_s - &q * &s;
-        old_s = std::mem::replace(&mut s, ns);
-        let nt = &old_t - &q * &t;
-        old_t = std::mem::replace(&mut t, nt);
-    }
-    if old_r.is_negative() {
-        (-old_r, -old_s, -old_t)
-    } else {
-        (old_r, old_s, old_t)
-    }
+    // Shared extended gcd on |a|, |b|, signs folded into the cofactors (g >= 0).
+    // The only caller (`hnf_diagonal`) passes residues in [0, modulus) and
+    // needs only the Bézout identity: the HNF diagonal it returns is a lattice
+    // invariant, and the cofactors equal classical Euclid's except at ties.
+    let (g, s, t) = crate::gcd::int::xgcd_big(a.magnitude(), b.magnitude());
+    let u = if a.is_negative() { -s } else { s };
+    let v = if b.is_negative() { -t } else { t };
+    (BigInt::from(g), u, v)
 }
 
 /// Diagonal of the Hermite normal form of the lattice spanned by `rows`
@@ -1098,19 +1080,10 @@ impl Modp {
     fn mul(&self, a: u64, b: u64) -> u64 {
         self.reduce(a * b)
     }
-    fn pow(&self, mut b: u64, mut e: u64) -> u64 {
-        let mut r = 1u64;
-        while e > 0 {
-            if e & 1 == 1 {
-                r = self.mul(r, b);
-            }
-            b = self.mul(b, b);
-            e >>= 1;
-        }
-        r
-    }
     fn inv(&self, a: u64) -> u64 {
-        self.pow(a, self.p - 2)
+        // Was Fermat a^(p-2); p is an odd CRT prime, so this is the shared
+        // inverse, and 0 for a ≡ 0 as before.
+        crate::gcd::int::inv_mod_u64(a, self.p).unwrap_or(0)
     }
 }
 

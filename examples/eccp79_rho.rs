@@ -405,27 +405,8 @@ fn solve_collision(
 }
 
 fn modinv(a: &BigUint, n: &BigUint) -> Option<BigUint> {
-    // Extended Euclidean.
-    use num_bigint::BigInt;
-    use num_bigint::Sign;
-    let (mut old_r, mut r) = (
-        BigInt::from_biguint(Sign::Plus, n.clone()),
-        BigInt::from_biguint(Sign::Plus, a.clone()),
-    );
-    let (mut old_s, mut s) = (BigInt::zero(), BigInt::one());
-    while !r.is_zero() {
-        let q = &old_r / &r;
-        let new_r = &old_r - &q * &r;
-        old_r = std::mem::replace(&mut r, new_r);
-        let new_s = &old_s - &q * &s;
-        old_s = std::mem::replace(&mut s, new_s);
-    }
-    if old_r != BigInt::one() {
-        return None;
-    }
-    let n_int = BigInt::from_biguint(Sign::Plus, n.clone());
-    let res = ((old_s % &n_int) + &n_int) % &n_int;
-    res.to_biguint()
+    // Shared Lehmer / half-GCD inverse; `None` unless gcd(a, n) = 1.
+    crypto_lib::gcd::int::modinv_big(a, n)
 }
 
 /// Message sent from a worker to the coordinator when a DP is found.

@@ -97,15 +97,8 @@ fn pow_mod(mut a: u64, mut e: u64, modulus: u64, n: u32) -> u64 {
 }
 
 /// Binary polynomial gcd on bit-packed `u64`s.
-fn gf2x_gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        let db = 63 - b.leading_zeros();
-        while a != 0 && 63 - a.leading_zeros() >= db {
-            a ^= b << (63 - a.leading_zeros() - db);
-        }
-        std::mem::swap(&mut a, &mut b);
-    }
-    a
+fn gf2x_gcd(a: u64, b: u64) -> u64 {
+    crate::gcd::gf2::gcd_word(a, b)
 }
 
 /// `x^(2^k) mod f`, with `x^(2^k)` reduced by repeated squaring.
@@ -428,23 +421,37 @@ fn pmulmod(f: &Gf2Log, a: &[u32], b: &[u32], m: &[u32]) -> Vec<u32> {
     pmod(f, &r, m)
 }
 
+/// `F_{2^N}` as a [`crate::gcd::poly::PolyField`].
+struct LogField<'a>(&'a Gf2Log);
+
+impl crate::gcd::poly::PolyField for LogField<'_> {
+    type E = u32;
+    fn zero(&self) -> u32 {
+        0
+    }
+    fn one(&self) -> u32 {
+        1
+    }
+    fn add(&self, a: u32, b: u32) -> u32 {
+        a ^ b
+    }
+    fn sub(&self, a: u32, b: u32) -> u32 {
+        a ^ b
+    }
+    fn mul(&self, a: u32, b: u32) -> u32 {
+        self.0.mul(a, b)
+    }
+    fn inv(&self, a: u32) -> u32 {
+        self.0.inv(a)
+    }
+    fn neg(&self, a: u32) -> u32 {
+        a
+    }
+}
+
+/// Monic `gcd(a, b)` (empty when both are zero), by `crate::gcd::poly::gcd`.
 fn pgcd(f: &Gf2Log, a: &[u32], b: &[u32]) -> Vec<u32> {
-    let mut a = a.to_vec();
-    let mut b = b.to_vec();
-    ptrim(&mut a);
-    ptrim(&mut b);
-    while !b.is_empty() {
-        let r = pmod(f, &a, &b);
-        a = b;
-        b = r;
-    }
-    if let Some(&lead) = a.last() {
-        let li = f.inv(lead);
-        for c in a.iter_mut() {
-            *c = f.mul(*c, li);
-        }
-    }
-    a
+    crate::gcd::poly::gcd(&LogField(f), a, b)
 }
 
 fn pdiv_exact(f: &Gf2Log, a: &[u32], m: &[u32]) -> Vec<u32> {
