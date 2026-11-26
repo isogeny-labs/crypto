@@ -236,6 +236,14 @@ group is also detected against that direct oracle. The remaining link is the
 quantified refinement for every admitted graph, not an untested finite
 semantic target. `[pcc:unverified]`
 
+The direct oracle also exhausts all 25 left/right set-partition pairs of three
+labeled edges, all 64 products of per-vertex delta-table bases, and four label
+schedules, for 6,400 further configurations. Since both sides of the identity
+are separately linear in every old tensor table, this basis determines the
+factorization map for arbitrary tensor entries on each tested structural
+shape. This strengthens the independent finite refinement without claiming
+all packet counts, edge counts, or labelings. `[pcc:unverified]`
+
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.

@@ -172,6 +172,16 @@ detects both a removed mode and a wrong target group against the direct oracle.
 End-to-end controls then recover the original direct tensor count at one and
 three active levels and across two taper coordinates.
 
+A second global control exhausts all five set partitions of three labeled
+edges on each side, all 64 delta-basis tensor configurations for every
+partition pair, and four full-label schedules: 6,400 cases. For a fixed graph
+shape, both the direct and extracted contractions are separately linear in
+each old tensor table. The products of per-vertex delta functions form a basis
+of those tables, and the sum of all vertex arities is three on each side.
+Thus the 64 basis configurations determine the factorization map for arbitrary
+old tensor entries on every tested partition/label shape, rather than merely
+sampling 64 truth tables. `[pcc:unverified]`
+
 These controls make the algebraic components load-bearing, but do not quantify
 over every admitted graph or establish a typed refinement from every live Rust
 child back to this polynomial. C1 items 1–3 close only after that independent

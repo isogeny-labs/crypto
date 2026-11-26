@@ -172,6 +172,65 @@ fn two_port_graph(
     }
 }
 
+fn partition_basis_graph(left_groups: &[usize], right_groups: &[usize], basis: usize) -> Bipartite {
+    fn side(
+        groups: &[usize],
+        basis: usize,
+        offset: usize,
+    ) -> (Vec<TensorVertex>, Vec<(usize, usize)>) {
+        let vertices = groups.iter().copied().max().map_or(0, |group| group + 1);
+        let mut ports = vec![Vec::new(); vertices];
+        let mut endpoints = vec![(0usize, 0usize); groups.len()];
+        for (edge, &vertex) in groups.iter().enumerate() {
+            endpoints[edge] = (vertex, ports[vertex].len());
+            ports[vertex].push(edge);
+        }
+        let tensors = ports
+            .into_iter()
+            .map(|edges| {
+                let assignment = edges
+                    .iter()
+                    .enumerate()
+                    .fold(0usize, |value, (port, edge)| {
+                        value | (((basis >> (offset + edge)) & 1) << port)
+                    });
+                TensorVertex {
+                    tensor: predicate(edges.len(), 1u8 << assignment),
+                    edges,
+                }
+            })
+            .collect();
+        (tensors, endpoints)
+    }
+
+    assert_eq!(left_groups.len(), right_groups.len());
+    let edges = left_groups.len();
+    let (left, left_endpoints) = side(left_groups, basis, 0);
+    let (right, right_endpoints) = side(right_groups, basis, edges);
+    Bipartite {
+        left,
+        right,
+        edges: (0..edges)
+            .map(|edge| Edge {
+                left: left_endpoints[edge],
+                right: right_endpoints[edge],
+            })
+            .collect(),
+    }
+}
+
+fn refinement_labels(vertices: usize, schedule: usize, side: usize) -> Vec<usize> {
+    (0..vertices)
+        .map(|vertex| match schedule {
+            0 => 0,
+            1 => (vertex + side) % 4,
+            2 => (3 * vertex + side + 1) % 4,
+            3 => 3 - (vertex + side) % 4,
+            _ => unreachable!(),
+        })
+        .collect()
+}
+
 fn direct_and_extracted(
     graph: &Bipartite,
     row_labels: &[usize],
@@ -413,6 +472,52 @@ fn direct_deformation_matches_group_factorization_for_all_binary_tables() {
             }
         }
     }
+}
+
+#[test]
+fn direct_factorization_matches_every_three_edge_partition_basis() {
+    let mut meter = Meter::new(Limits {
+        steps: 20_000_000_000,
+        ..Limits::default()
+    });
+    let ring = Ring::new(4, 5, &mut meter).unwrap();
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 2,
+        length: 4,
+        array: 16,
+    };
+    let z = ring.point(&3u8.into()).unwrap();
+    let partitions = [[0usize, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [0, 1, 2]];
+    let mut cases = 0usize;
+    for left_groups in &partitions {
+        for right_groups in &partitions {
+            for schedule in 0..4 {
+                for basis in 0..64usize {
+                    let graph = partition_basis_graph(left_groups, right_groups, basis);
+                    let rows = refinement_labels(graph.left.len(), schedule, 0);
+                    let columns = refinement_labels(graph.right.len(), schedule, 1);
+                    let (expected, actual) = direct_and_extracted(
+                        &graph,
+                        &rows,
+                        &columns,
+                        &z,
+                        &ring,
+                        &parameters,
+                        &mut meter,
+                    )
+                    .unwrap();
+                    assert_eq!(
+                        actual, expected,
+                        "left={left_groups:?}, right={right_groups:?}, schedule={schedule}, basis={basis}",
+                    );
+                    cases += 1;
+                }
+            }
+        }
+    }
+    assert_eq!(cases, 6_400);
 }
 
 #[test]
