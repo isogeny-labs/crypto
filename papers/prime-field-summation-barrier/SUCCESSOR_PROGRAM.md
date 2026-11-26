@@ -45,7 +45,7 @@ The status of the program is:
 | Proposition 19 | exact reduction plus literature audit | split-tree recovery is group \(k\)SUM-Indexing; current indexing upper bounds remain above one-half after relation accounting |
 | Theorem 20 | exact exponent criterion | piecewise sub-rho conditions for preprocessing exponent \(s\) and amortized batch-query exponent \(t\) |
 | Theorem 21 | unconditional bucket/quotient obstruction | arbitrary exact separate-label predicates, exact compositional buckets, affine algebraic-group linearizations, and low-degree isogeny quotients cannot compress the prime-order subgroup |
-| Theorem 22 | unconditional one-sided label trade-off | compressing either partial-sum label set forces a quantified false-verification blowup |
+| Theorem 22 | unconditional one-sided label trade-off | compressing either partial-sum label set or the attainable targets forces a quantified false-verification blowup |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1810,18 +1810,22 @@ R\bigl(\lambda_A(a),\lambda_B(b),\lambda_T(a+b)\bigr)
 holds.  Let \(F\) be the number of false accepted triples
 \((a,b,t)\in A\times B\times G\) with \(t\ne a+b\).  Put
 \(k_A=|\operatorname{im}\lambda_A|\) and
-\(k_B=|\operatorname{im}\lambda_B|\).  Then
+\(k_B=|\operatorname{im}\lambda_B|\).  Also put
+\(S=A+B\), \(s=|S|\), and
+\(k_T=|\lambda_T(S)|\).  Then
 
 \[
 \begin{split}
 F&\ge |B|\left(\sum_{C\in A/\lambda_A}|C|^2-|A|\right)
  \ge |B|\left(\frac{|A|^2}{k_A}-|A|\right),\\
 F&\ge |A|\left(\sum_{D\in B/\lambda_B}|D|^2-|B|\right)
- \ge |A|\left(\frac{|B|^2}{k_B}-|B|\right).
+ \ge |A|\left(\frac{|B|^2}{k_B}-|B|\right),\\
+F&\ge \sum_{H\in S/\lambda_T}|H|^2-s
+ \ge \frac{s^2}{k_T}-s.
 \end{split}
 \]
 
-Consequently \(F\) is at least the maximum of the two right-hand sides.  If
+Consequently \(F\) is at least the maximum of the three right-hand sides.  If
 \(B_q\) independent uniform targets in \(G\) are queried and the filter
 enumerates and explicitly verifies every accepted candidate pair, then its [pcc:unverified]
 expected number of false verifications is at least
@@ -1852,15 +1856,25 @@ and also supplies \(a'\).  These collisions therefore contribute
 distinct false triples.  Cauchy--Schwarz gives
 \(\sum_C|C|^2\ge |A|^2/k_A\).  The analogous argument, fixing
 \(a\in A\) and colliding two elements of a \(\lambda_B\)-fibre, proves the [pcc:unverified]
-second bound.  Finally, each false triple has one target coordinate, so a
+second bound.
+
+For every \(t\in S\), choose one pair \((a_t,b_t)\) with \(a_t+b_t=t\).
+For distinct \(t,t'\in S\) in the same \(\lambda_T\)-fibre, the true triple
+\((a_t,b_t,t)\) and the false triple \((a_t,b_t,t')\) have the same three
+labels.  Distinct ordered pairs \((t,t')\) give distinct false triples because
+the chosen pair determines its sum \(t\).  Thus a target fibre \(H\)
+contributes \(|H|(|H|-1)\) false triples.  Summing and applying
+Cauchy--Schwarz proves the third bound. [pcc:unverified]
+
+Finally, each false triple has one target coordinate, so a
 uniform query selects it with probability \(1/|G|\); linearity of expectation
 over the batch gives \(B_qF/|G|\). \(\square\)
 
 The theorem is unconditional for one-sided predicates that factor through
 separate, target-independent labels and enumerate all accepted pairs.  It
 quantifies the false-positive escape hatch left by Theorem 21: compressing a
-partial-sum side below its cardinality necessarily creates a second-moment
-verification cost.  It does not cover joint encodings, target-specific label
+partial-sum side or the attainable target set below its cardinality
+necessarily creates a second-moment verification cost.  It does not cover joint encodings, target-specific label
 maps, signed algebraic summaries whose intermediate terms cancel, or
 algorithms that recover witnesses without enumerating accepted pairs.  Those
 remain within the general preprocessing/query problem. [pcc:unverified]
