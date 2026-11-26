@@ -2,12 +2,13 @@ name: Rootfind Round 145 source-exact Rust A/B
 on:
   push:
     branches:
+      - main
       - automation/rootfind-round145-lazy-reduction-20261123
-  pull_request:
     paths:
       - src/cryptanalysis/ecbench/isogeny.rs
       - research/rootfind_round144/**
       - .github/workflows/rootfind_round145.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:

@@ -380,6 +380,7 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         | "walk_pool_restarts"
         | "walk_pool_offsets"
         | "walk_jumps"
+        | "walk_jumps_materialised"
         | "native_walk_calls"
         | "lane_count"
         | "lane_batch_inversion"
