@@ -75,6 +75,35 @@ pub struct NodeDimensionAudit {
     pub retained_jet_vector_slots_lower_bound: BigUint,
 }
 
+/// Coarse bit-width and arithmetic-operation envelopes for one active call.
+///
+/// Counts are representation-level upper bounds for the current direct
+/// algorithms. They are not calibrated machine-operation counts.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ArithmeticWidthAudit {
+    /// Fixed number of coordinates in every extension-ring element.
+    pub extension_degree: BigUint,
+    /// Canonical bits in every stored extension coefficient.
+    pub coefficient_bits_bound: BigUint,
+    /// Bits sufficient for an unreduced coefficient product plus accumulation.
+    pub ring_multiplication_temporary_bits_bound: BigUint,
+    /// Bits sufficient for every integer binomial coefficient used in recovery.
+    pub binomial_integer_bits_bound: BigUint,
+    /// Uniform upper bound `4M` on one tapered multiplicity.
+    pub maximum_multiplicity_bound: BigUint,
+    /// Bits sufficient for one `e_zero*(-t/alpha)^k` rational multiplier.
+    pub rational_multiplier_bits_bound: BigUint,
+    /// Bits sufficient for numerator and denominator of a naively accumulated
+    /// Hermite output coordinate.
+    pub rational_accumulator_bits_bound: BigUint,
+    /// Ring operations in all direct Lagrange interpolations of this call.
+    pub interpolation_ring_operations_bound: BigUint,
+    /// Ring operations in tapered series construction and recovery.
+    pub recovery_ring_operations_bound: BigUint,
+    /// Big-rational multiply/add operations in tapered recovery.
+    pub recovery_rational_operations_bound: BigUint,
+}
+
 fn ceil_sqrt(value: &BigUint) -> BigUint {
     if value <= &BigUint::one() {
         return value.clone();
@@ -183,6 +212,78 @@ pub fn audit_node_dimensions(input: &NodeDimensions) -> Result<NodeDimensionAudi
     })
 }
 
+/// Price the current direct interpolation and Hermite-recovery representation.
+///
+/// The rational-width bound deliberately permits a naive product of all term
+/// denominators. Reduction by `num_rational` can only decrease the represented
+/// numerator and denominator. Ring coefficients remain canonical modulo
+/// `2^precision`; only a multiply/add temporary reaches `2*precision+1` bits.
+pub fn audit_arithmetic_widths(
+    input: &NodeDimensions,
+    extension_degree: &BigUint,
+) -> Result<ArithmeticWidthAudit> {
+    if extension_degree.is_zero() {
+        return Err(invalid("zero extension degree"));
+    }
+    let dimensions = audit_node_dimensions(input)?;
+    let one = BigUint::one();
+    let two = BigUint::from(2u8);
+    let four = BigUint::from(4u8);
+    let grid_points = &two * &dimensions.packet_length;
+    let maximum_multiplicity = &four * &input.edges;
+    let precision_log = BigUint::from(ceil_log2(&(&input.precision + &one)));
+
+    // Every base numerator and denominator in e_zero is smaller than 2L, so
+    // its logarithmic size is at most a+1.  The total exponent over the grid
+    // is bounded by the retained jet mass J.  The subsequent ratio power has
+    // exponent below one multiplicity.
+    let multiplier_bits = (&dimensions.retained_jet_coefficients + &maximum_multiplicity)
+        * BigUint::from(u64::from(input.a) + 1)
+        + &one;
+    let rational_accumulator_bits = &dimensions.retained_jet_coefficients * &multiplier_bits
+        + &input.precision
+        + BigUint::from(ceil_log2(&(&dimensions.retained_jet_coefficients + &one)))
+        + &one;
+
+    let samples = &dimensions.samples_per_node;
+    // The direct Lagrange routine builds each basis polynomial by multiplying
+    // by n-1 linear factors.  Four n^3 plus the Newton-inverse allowance is a
+    // simple envelope for its ring calls.
+    let interpolation_per_node = &four * samples.pow(3)
+        + samples * (BigUint::from(3u8) * &precision_log + BigUint::from(8u8));
+    let interpolation_ring_operations = &dimensions.active_nodes * interpolation_per_node;
+
+    // For each jet and grid point, cover the binomial series, one dense
+    // truncated product, and a Newton inverse.  The remaining reciprocal and
+    // quotient products contribute four further q_max^2 terms.
+    let q_squared = maximum_multiplicity.pow(2);
+    let recovery_per_jet = &four * &grid_points * &q_squared
+        + &four * &q_squared
+        + &four * &grid_points * &maximum_multiplicity
+        + &grid_points * (BigUint::from(3u8) * &precision_log + &one);
+    let recovery_ring_operations = &dimensions.active_nodes * recovery_per_jet;
+
+    let rational_power_operations = &dimensions.active_nodes
+        * &grid_points
+        * (BigUint::from(2u8) * BigUint::from(ceil_log2(&(&maximum_multiplicity + &one))) + &one);
+    let rational_reconstruction_operations =
+        &dimensions.retained_jet_coefficients * (&two * extension_degree + &one);
+
+    Ok(ArithmeticWidthAudit {
+        extension_degree: extension_degree.clone(),
+        coefficient_bits_bound: input.precision.clone(),
+        ring_multiplication_temporary_bits_bound: &two * &input.precision + &one,
+        binomial_integer_bits_bound: &maximum_multiplicity + &one,
+        maximum_multiplicity_bound: maximum_multiplicity,
+        rational_multiplier_bits_bound: multiplier_bits,
+        rational_accumulator_bits_bound: rational_accumulator_bits,
+        interpolation_ring_operations_bound: interpolation_ring_operations,
+        recovery_ring_operations_bound: recovery_ring_operations,
+        recovery_rational_operations_bound: rational_power_operations
+            + rational_reconstruction_operations,
+    })
+}
+
 /// Coarse root-only precision bound, independently of original description size.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PathPrecisionEnvelope {
@@ -252,6 +353,50 @@ pub struct UniformHistoryAudit {
     pub depths: Vec<UniformHistoryDepthAudit>,
     /// Whether both absorption inequalities hold at every listed depth.
     pub all_absorption_checks_hold: bool,
+}
+
+/// One exact scale comparison used to compose local branching exponents.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RecursionCompositionDepthAudit {
+    /// Zero-based recursive depth.
+    pub depth: u32,
+    /// Source scale at this depth.
+    pub u: u64,
+    /// Whether `u_0 <= 4^(d+1)*u_d`.
+    pub geometric_scale_comparison_holds: bool,
+}
+
+/// Depth-independent exponent constants for the complete recursion tree.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RecursionCompositionAudit {
+    /// Symbolic root log-size.
+    pub lambda: u64,
+    /// Root source scale.
+    pub root_u: u64,
+    /// Per-active-call child-invocation exponent constant.
+    pub local_child_exponent_constant: u64,
+    /// Constant in `sum_d M_d/sqrt(u_d) <= C*s/sqrt(u_0)`.
+    pub path_sum_constant: u64,
+    /// Constant for the product of active-call branching factors.
+    pub active_tree_exponent_constant: u64,
+    /// Constant for exhaustive assignments at each leaf.
+    pub leaf_exponent_constant: u64,
+    /// Whether the root leaf divisor is at least `sqrt(u_0)`.
+    pub leaf_scale_absorbed: bool,
+    /// Constant absorbing packet-entry coefficient traversal.
+    pub packet_entry_exponent_constant: u64,
+    /// Combined constant in the exponent relative to `s/sqrt(u_0)`.
+    pub total_root_u_exponent_constant: u64,
+    /// Combined constant relative to `s/sqrt(lambda)`.
+    pub total_root_log_exponent_constant: u64,
+    /// Polynomial factor in the root packet-entry exponent bound.
+    pub packet_entry_polynomial_factor: BigUint,
+    /// Whether the packet-entry exponent is at most `s/sqrt(u_0)`.
+    pub packet_entry_absorbed: bool,
+    /// Exact scale checks for every potentially active depth.
+    pub depths: Vec<RecursionCompositionDepthAudit>,
+    /// Whether all finite composition checks hold.
+    pub all_composition_checks_hold: bool,
 }
 
 fn floor_sqrt_u64(value: u64) -> u64 {
@@ -379,6 +524,89 @@ pub fn audit_uniform_history(lambda: u64) -> Result<UniformHistoryAudit> {
         normalized_precision_constant: 34,
         depths,
         all_absorption_checks_hold,
+    })
+}
+
+/// Compose the active-call exponent over the entire strict-shrink recursion.
+///
+/// The local constant 96 covers the weighted-tuple exponent after the
+/// normalized-precision bound, active nodes, interpolation samples, and the
+/// fixed radix.  Since `M_d<=s/8^d` and
+/// `u_0<=4^(d+1)*u_d`, the geometric path sum is below
+/// `3*s/sqrt(u_0)`.  Direct leaves and packet-entry choice traversal each
+/// add at most one further unit.  All remaining arithmetic widths and direct
+/// operation counts from [`audit_arithmetic_widths`] are polynomial factors.
+pub fn audit_recursion_composition(lambda: u64) -> Result<RecursionCompositionAudit> {
+    let history = audit_uniform_history(lambda)?;
+    if !history.threshold_proof_applies || !history.all_absorption_checks_hold {
+        return Err(invalid("uniform history absorption is not established"));
+    }
+    let depths: Vec<_> = history
+        .depths
+        .iter()
+        .map(|case| {
+            let scale = BigUint::from(4u8).pow(case.depth + 1) * BigUint::from(case.u);
+            RecursionCompositionDepthAudit {
+                depth: case.depth,
+                u: case.u,
+                geometric_scale_comparison_holds: BigUint::from(history.root_u) <= scale,
+            }
+        })
+        .collect();
+
+    // With K*L<=3M, p*u<=34*M*D, u<=u_0 and a<=4u_0:
+    // candidates < 102*s^2*2^(5u_0), so one packet entry has exponent at most
+    // 2^(4u_0)*(8+2lambda+5u_0).  Multiplication by u_0 below is stronger than
+    // the sqrt(u_0) needed to absorb this into s/sqrt(u_0), using
+    // s>2^(lambda-1).
+    let packet_entry_factor = BigUint::from(8u8)
+        + BigUint::from(2u8) * BigUint::from(lambda)
+        + BigUint::from(5u8) * BigUint::from(history.root_u);
+    let entry_power = history
+        .root_u
+        .checked_mul(4)
+        .ok_or_else(|| invalid("entry exponent width"))?;
+    let entry_rhs_exponent = lambda
+        .checked_sub(1)
+        .and_then(|value| value.checked_sub(entry_power))
+        .ok_or_else(|| invalid("entry absorption width"))?;
+    let packet_entry_absorbed = at_most_power_of_two(
+        &(&packet_entry_factor * BigUint::from(history.root_u)),
+        entry_rhs_exponent,
+    );
+
+    let local_child_exponent_constant = 96u64;
+    let path_sum_constant = 3u64;
+    let active_tree_exponent_constant = local_child_exponent_constant * path_sum_constant;
+    let leaf_exponent_constant = 1u64;
+    let leaf_scale_absorbed =
+        BigUint::from(history.leaf_divisor).pow(2) >= BigUint::from(history.root_u);
+    let packet_entry_exponent_constant = 1u64;
+    let total_root_u_exponent_constant =
+        active_tree_exponent_constant + leaf_exponent_constant + packet_entry_exponent_constant;
+    // For lambda>=2^26, floor(lambda/2^17)>=lambda/2^18, whose square-root
+    // conversion factor is exactly 2^9=512.
+    let total_root_log_exponent_constant = total_root_u_exponent_constant * 512;
+    let all_composition_checks_hold = packet_entry_absorbed
+        && leaf_scale_absorbed
+        && depths
+            .iter()
+            .all(|case| case.geometric_scale_comparison_holds);
+    Ok(RecursionCompositionAudit {
+        lambda,
+        root_u: history.root_u,
+        local_child_exponent_constant,
+        path_sum_constant,
+        active_tree_exponent_constant,
+        leaf_exponent_constant,
+        leaf_scale_absorbed,
+        packet_entry_exponent_constant,
+        total_root_u_exponent_constant,
+        total_root_log_exponent_constant,
+        packet_entry_polynomial_factor: packet_entry_factor,
+        packet_entry_absorbed,
+        depths,
+        all_composition_checks_hold,
     })
 }
 

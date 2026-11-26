@@ -5,7 +5,7 @@
 //! allocates a graph nor prices the remaining ring/rational bit operations.
 
 use hashed_ecdl_tensor::admission::dimensions::{
-    audit_uniform_history, UNIFORM_HISTORY_LAMBDA_THRESHOLD,
+    audit_recursion_composition, audit_uniform_history, UNIFORM_HISTORY_LAMBDA_THRESHOLD,
 };
 use serde_json::json;
 
@@ -42,6 +42,24 @@ fn run() -> Result<(), String> {
             })
         })
         .collect();
+    let composition = if audit.threshold_proof_applies && audit.all_absorption_checks_hold {
+        let value = audit_recursion_composition(lambda).map_err(|error| error.to_string())?;
+        Some(json!({
+            "local_child_exponent_constant": value.local_child_exponent_constant,
+            "path_sum_constant": value.path_sum_constant,
+            "active_tree_exponent_constant": value.active_tree_exponent_constant,
+            "leaf_exponent_constant": value.leaf_exponent_constant,
+            "leaf_scale_absorbed": value.leaf_scale_absorbed,
+            "packet_entry_exponent_constant": value.packet_entry_exponent_constant,
+            "packet_entry_polynomial_factor": value.packet_entry_polynomial_factor.to_string(),
+            "packet_entry_absorbed": value.packet_entry_absorbed,
+            "total_root_u_exponent_constant": value.total_root_u_exponent_constant,
+            "total_root_log_exponent_constant": value.total_root_log_exponent_constant,
+            "all_checks_hold": value.all_composition_checks_hold
+        }))
+    } else {
+        None
+    };
     let report = json!({
         "schema": "hashed-ecdl-tensor-history-audit/v1",
         "scope": "exact source-schedule absorption checks; no graph extraction or complete bit-cost theorem",
@@ -58,7 +76,8 @@ fn run() -> Result<(), String> {
             "normalized_local_precision": audit.normalized_precision_constant
         },
         "all_absorption_checks_hold": audit.all_absorption_checks_hold,
-        "possible_active_depths": depths
+        "possible_active_depths": depths,
+        "recursion_composition": composition
     });
     println!("{}", serde_json::to_string_pretty(&report).unwrap());
     Ok(())

@@ -54,7 +54,7 @@ dimension `Theta(B^2)`, not `Theta(B)`.
 These are upper-model and counting conclusions, not an unconditional lower
 bound for every coordinate-aware relation generator.  In particular, a
 nonuniform target generator with proved useful-row density would need its own
-analysis.
+analysis. [pcc:unverified]
 
 ## Focused D.4.6--7 child-call audit
 
@@ -190,9 +190,8 @@ ceil(p*u/(M*D))                          1
 
 Seven native dimension/work controls pass, including exact enumeration of
 small weighted tuples.  This closes the local exponent algebra conditional on
-the packet-capacity and precision premises.  It does not yet bind those
-premises to every actual recursive child or price ring/rational bit
-operations.  Those history/refinement obligations remain the next gate.
+the packet-capacity and precision premises.  The following components bind
+those premises to recursive histories and price the remaining arithmetic.
 
 ### Uniform source-history bridge
 
@@ -201,7 +200,8 @@ source path at the scalar-invariant level.  Production packing calls
 `pack_labels(..., enforce_bounds=true)`, which rejects unless
 `K*L<=3M`.  The remaining precision bridge combines the finite-history
 bound already proved in
-`research/hashed_ecdl_precision_history_20261123` on `origin/main`,
+`research/hashed_ecdl_precision_history_20261123` on `origin/main`.
+[pcc:unverified]
 
 ```text
 p_d <= 81*s*2^A,
@@ -272,8 +272,107 @@ This threshold is asymptotic: it means a root edge count on the order of
 practical 255-bit security.  It closes the uniform capacity/precision bridge
 for the theorem path, not the complete cost theorem.  Ring operations,
 interpolation, Hermite rational numerators/denominators, description bit
-widths, and their composition over the recursive call tree remain to be
-priced with a depth-independent constant.
+widths, and their composition over the recursive call tree are priced in the
+next component.
+
+### Arithmetic widths and recursion-tree composition
+
+Those remaining source-cost terms now have an executable coarse certificate.
+For one active call, let `J` be the total retained jet coefficients and
+`q_max` the maximum tapered multiplicity.  The exact dimension identities
+give
+
+```text
+J <= 8*M*L,                 q_max <= 4*M.
+```
+
+Every stored extension coefficient is canonical below `2^p), and the direct
+ring multiplication has temporary width at most `2p+1`.  In Hermite
+recovery, grid numerators and denominators are smaller than `2L`.  Thus one
+rational multiplier has at most
+
+```text
+B = (J+q_max)*(a+1)+1
+```
+
+bits in its numerator and denominator.  Even allowing the output accumulator
+to use the product of all `J` term denominators gives the conservative bound
+
+```text
+W = J*B + p + ceil(log2(J+1)) + 1.
+```
+
+This covers the unreduced common denominator; normalization by
+`num_rational` can only reduce the represented values.  The direct
+interpolation, series, reciprocal, quotient, and rational-operation counts are
+also explicit polynomials in `M,L,p` and the fixed extension degree.  A
+native control constructs the real small grids and rational multipliers and
+checks every intermediate numerator and denominator against `B` and `W`.
+[pcc:unverified]
+
+The default arithmetic fixture `M=64,K=8,a=u=2,i=0,p=128`, extension degree
+32, reports:
+
+```text
+stored coefficient bits                         128
+ring multiplication temporary bits              257
+binomial integer bits                            257
+rational multiplier bits                       3649
+rational accumulator bits                   3503179
+direct interpolation ring operations      2172538584
+recovery ring operations                    14206128
+recovery rational operations                   63312
+```
+
+The large numbers are safe envelopes, not observed runtime or calibrated
+machine operations.
+
+For the call tree, `nD<=6M` and `p*u<=34MD` give
+`np<=204M^2/u`.  The weighted-tuple bound plus the active-node, sample, and
+radix factors is therefore at most `96M/sqrt(u)` bits per active call.
+Along any root-to-leaf path,
+
+```text
+M_d <= s/8^d,
+u_0 <= 4^(d+1)*u_d,
+sum_d M_d/sqrt(u_d) <= 3s/sqrt(u_0).
+```
+
+Hence the product of active branching factors has exponent at most
+`288s/sqrt(u_0)`.  Direct leaf enumeration adds one unit.  Packet-entry
+coefficient traversal adds another: using `a<=4u_0`, its exponent is at most
+
+```text
+2^(4u_0) * (8+2lambda+5u_0) <= s/sqrt(u_0)
+```
+
+above the same threshold.  Packet descriptions, vertices including isolates,
+ring/interpolation work, and the rational widths above are fixed-degree
+polynomial factors; packet descriptions contain no recursive evaluator
+callback.
+
+The resulting producer-level source-cost envelope is
+
+```text
+bit work <= (s + description_length)^O(1)
+            * 2^(290*s/sqrt(u_0))
+         <= (s + description_length)^O(1)
+            * 2^(148480*s/sqrt(lambda)).
+```
+
+The second line uses `u_0=floor(lambda/2^17)>=lambda/2^18`.  The constant is
+deliberately loose and depth independent.  The exact schedule certificate
+reports constants 96, 3, 288, 290, and 148480, with leaf, packet-entry, and
+all depth comparisons passing at `lambda=2^26`.  The focused native suite
+passes 12/12 controls. [pcc:unverified]
+
+This reaches a subexponential **source-cost certificate**, not a verified
+Curve25519 break.  It composes the retained finite-history result with the
+actual Rust representation and control flow, but has not been independently
+refined against every Rust execution or kernel-checked as one theorem.  The
+general contraction theorem and its prime-field ECDLP reduction remain
+external assumptions; the live `usize` backend still takes the documented
+finite-size fallback on every representable input. [pcc:unverified]
 
 ## Primary references and local context
 

@@ -2,7 +2,8 @@
 
 use super::*;
 use crate::admission::dimensions::{
-    audit_node_dimensions, audit_uniform_history, path_precision_envelope, NodeDimensions,
+    audit_arithmetic_widths, audit_node_dimensions, audit_recursion_composition,
+    audit_uniform_history, path_precision_envelope, NodeDimensions,
     UNIFORM_HISTORY_LAMBDA_THRESHOLD, UNIFORM_HISTORY_SCALE_FLOOR,
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
@@ -210,6 +211,90 @@ fn active_call_work_envelope_fixture_is_exact() {
 }
 
 #[test]
+fn arithmetic_width_fixture_is_exact() {
+    let mut input = dimensions(64, 2, 2, 0, 128);
+    input.packets = 8u8.into();
+    let audit = audit_arithmetic_widths(&input, &32u8.into()).unwrap();
+    assert_eq!(audit.extension_degree, 32u8.into());
+    assert_eq!(audit.coefficient_bits_bound, 128u8.into());
+    assert_eq!(
+        audit.ring_multiplication_temporary_bits_bound,
+        257u16.into()
+    );
+    assert_eq!(audit.binomial_integer_bits_bound, 257u16.into());
+    assert_eq!(audit.maximum_multiplicity_bound, 256u16.into());
+    assert_eq!(audit.rational_multiplier_bits_bound, 3_649u16.into());
+    assert_eq!(audit.rational_accumulator_bits_bound, 3_503_179u32.into());
+    assert!(!audit.interpolation_ring_operations_bound.is_zero());
+    assert!(!audit.recovery_ring_operations_bound.is_zero());
+    assert!(!audit.recovery_rational_operations_bound.is_zero());
+    assert!(audit_arithmetic_widths(&input, &BigUint::zero()).is_err());
+}
+
+#[test]
+fn rational_width_envelope_covers_exact_small_grid_recovery() {
+    let mut meter = Meter::new(Limits::default());
+    let mut saw_width_above_coefficient_precision = false;
+    for a in 1usize..=3 {
+        let length = 1usize << a;
+        for u in 1usize..=a {
+            let edges = length.div_ceil(3).max(u);
+            let parameters = Parameters {
+                radix: 2,
+                u,
+                a,
+                length,
+                array: length * length,
+            };
+            let input = dimensions(edges, a as u32, u as u32, 0, 7);
+            let audit = audit_arithmetic_widths(&input, &4u8.into()).unwrap();
+            let points = deformation::grid(&parameters, &meter).unwrap();
+            let alpha = BigInt::one() << (a + 1);
+            let coefficient = BigRational::from_integer(BigInt::from(127u8));
+            let mut accumulator = BigRational::zero();
+            for &t in &points {
+                let qt = multiplicity(edges, &parameters, t).unwrap();
+                if qt == 0 {
+                    continue;
+                }
+                let mut e_zero = BigRational::one();
+                for &q in &points {
+                    if q == 0 || q == t {
+                        continue;
+                    }
+                    let qq = multiplicity(edges, &parameters, q).unwrap();
+                    if qq == 0 {
+                        continue;
+                    }
+                    let fraction = BigRational::new(BigInt::from(-q), BigInt::from(t - q));
+                    e_zero *= rational_power(fraction, qq, &mut meter).unwrap();
+                }
+                for value in [e_zero.numer(), e_zero.denom()] {
+                    assert!(BigUint::from(value.bits()) <= audit.rational_multiplier_bits_bound);
+                }
+                let ratio = BigRational::new(BigInt::from(-t), alpha.clone());
+                let mut multiplier = e_zero;
+                for _ in 0..qt {
+                    accumulator += &multiplier * &coefficient;
+                    for value in [accumulator.numer(), accumulator.denom()] {
+                        let bits = BigUint::from(value.bits());
+                        saw_width_above_coefficient_precision |= bits > input.precision;
+                        assert!(bits <= audit.rational_accumulator_bits_bound);
+                    }
+                    multiplier *= &ratio;
+                    for value in [multiplier.numer(), multiplier.denom()] {
+                        assert!(
+                            BigUint::from(value.bits()) <= audit.rational_multiplier_bits_bound
+                        );
+                    }
+                }
+            }
+        }
+    }
+    assert!(saw_width_above_coefficient_precision);
+}
+
+#[test]
 fn root_precision_envelope_covers_all_active_scales_and_native_increments() {
     // Actual source scales at astronomical sizes, without allocating a graph.
     for root_u in [1u64, 3, 8] {
@@ -312,6 +397,35 @@ fn smaller_root_log_size_exposes_the_unabsorbed_deep_history() {
         .depths
         .iter()
         .any(|case| !case.inherited_absorption_holds));
+}
+
+#[test]
+fn recursion_composition_has_depth_independent_constants() {
+    let audit = audit_recursion_composition(UNIFORM_HISTORY_LAMBDA_THRESHOLD).unwrap();
+    assert_eq!(audit.root_u, 512);
+    assert_eq!(audit.local_child_exponent_constant, 96);
+    assert_eq!(audit.path_sum_constant, 3);
+    assert_eq!(audit.active_tree_exponent_constant, 288);
+    assert_eq!(audit.leaf_exponent_constant, 1);
+    assert!(audit.leaf_scale_absorbed);
+    assert_eq!(audit.packet_entry_exponent_constant, 1);
+    assert_eq!(audit.total_root_u_exponent_constant, 290);
+    assert_eq!(audit.total_root_log_exponent_constant, 148_480);
+    assert!(audit.packet_entry_absorbed);
+    assert!(audit
+        .depths
+        .iter()
+        .all(|case| case.geometric_scale_comparison_holds));
+    assert!(audit.all_composition_checks_hold);
+    assert!(audit_recursion_composition(1 << 23).is_err());
+
+    // Local tuple constant: nD<=6M and p*u<=34MD give np<=204M^2/u.
+    // sqrt(204)<15, and the ceiling contributes at most five more units.
+    assert!(204u16 < 15u16.pow(2));
+    assert_eq!(5 * 15 + 5, 80);
+    // Active-node, sample, and radix terms use the remaining 16 units.
+    assert_eq!(80 + 4 + 5 + 6, 95);
+    assert!(audit.local_child_exponent_constant >= 95);
 }
 
 #[test]
