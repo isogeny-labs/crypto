@@ -74,12 +74,22 @@ def locate_package() -> str:
 # ───────────────────────── toy curve arithmetic ─────────────────────────
 # Self-contained (p passed explicitly), used only to pick a decomposable target
 # and a base x-set.  The algebra of S4/membership is done by M2, not here.
-def curve_points(p: int, a: int, b: int):
+# ic_semaev_m2.py is a TOY-INPUT correctness driver with planted targets, not an
+# admitted benchmark. A real M31-scale (p = 2^31-1) cold measurement needs frozen
+# public inputs, subgroup provenance and the gated benchmark path, not this; so p
+# is capped and the x-scan is bounded (no range(p) materialization).
+TOY_P_MAX = 2 ** 24
+
+
+def curve_points(p: int, a: int, b: int, want_x: int | None = None):
+    """On-curve (x, y) points, scanning x upward; stops once `want_x` distinct
+    on-curve x-values have been seen (bounded work, no full range(p) scan)."""
     try:
         from sympy import sqrt_mod
     except ImportError:
         sqrt_mod = None
     pts = []
+    seen_x = set()
     for x in range(p):
         r = (x * x * x + a * x + b) % p
         if sqrt_mod is not None:
@@ -90,6 +100,9 @@ def curve_points(p: int, a: int, b: int):
             pts.append((x, y))
             if y:
                 pts.append((x, (-y) % p))
+            seen_x.add(x)
+            if want_x is not None and len(seen_x) >= want_x:
+                break
     return pts
 
 
@@ -111,7 +124,14 @@ def eadd(P1, P2, p: int, a: int):
 
 
 def base_set_and_target(p: int, a: int, b: int, k: int, force_xq=None):
-    aff = curve_points(p, a, b)
+    if p > TOY_P_MAX:
+        sys.exit(
+            f"error: p={p} exceeds the toy bound {TOY_P_MAX}. This is a toy-input\n"
+            "  correctness driver with planted targets, not an admitted M31-scale\n"
+            "  benchmark; a cold measurement needs frozen public inputs, subgroup\n"
+            "  provenance and the gated benchmark path (PR #5250 defers that A/B)."
+        )
+    aff = curve_points(p, a, b, want_x=k)
     by_x = {}
     for q in aff:
         by_x.setdefault(q[0], q)
@@ -268,7 +288,38 @@ def parse(stdout: str) -> dict:
     return out
 
 
+# ───────────────────────── result validation ────────────────────────────
+def validate_result(parsed: dict, mode: str):
+    """Return (ok, reason). Reject incomplete or semantically-invalid M2 output
+    so the CLI never fail-opens on an rc==0 run: completion (DONE), count
+    consistency, and -- for verify -- exactly one matched stratum and PASS."""
+    if not parsed.get("done"):
+        return False, "output did not reach DONE (truncated or aborted mid-run)"
+    if mode in ("specialized", "parametric") and parsed.get("mode") != mode:
+        return False, f"mode marker {parsed.get('mode')!r} != requested {mode!r}"
+    if mode == "specialized":
+        if not isinstance(parsed.get("dim"), int):
+            return False, "no DIM in specialized output"
+        if parsed.get("gbsize") != len(parsed.get("gb", [])):
+            return False, f"GBSIZE {parsed.get('gbsize')} != {len(parsed.get('gb', []))} GB lines"
+    elif mode == "parametric":
+        nb = parsed.get("nbranches")
+        if not isinstance(nb, int):
+            return False, "no NBRANCHES in parametric output"
+        if nb != len(parsed.get("branches", [])):
+            return False, f"NBRANCHES {nb} != {len(parsed.get('branches', []))} emitted branches"
+    elif mode == "verify":
+        if not isinstance(parsed.get("nbranches"), int):
+            return False, "no NBRANCHES in verify output"
+        if parsed.get("nmatch") != 1:
+            return False, f"NMATCH {parsed.get('nmatch')} != 1 (target must hit exactly one disjoint stratum)"
+        if parsed.get("verify") != "PASS":
+            return False, f"VERIFY {parsed.get('verify')!r} (parametric branch != direct solve)"
+    return True, ""
+
+
 # ───────────────────────── CLI ──────────────────────────────────────────
+# Exit codes: 0 ok; 1 M2 process error; 2 timeout; 3 output invalid/incomplete.
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Semaev S4 decomposition via Macaulay2 ComprehensiveGBs")
     ap.add_argument("mode", choices=["specialized", "parametric", "verify"])
@@ -303,10 +354,18 @@ def main(argv=None):
         print(f"timeout after {res['wall']}s (p={args.p} k={args.k} mode={args.mode})")
         return 2
     if res["rc"] != 0:
-        sys.stderr.write(res["stderr"])
+        sys.stderr.write(res.get("stderr", ""))
         print(f"M2 exited {res['rc']}")
         return 1
     parsed = parse(res["stdout"])
+    ok, reason = validate_result(parsed, args.mode)
+    if not ok:
+        # Fail closed: an rc==0 run whose output is incomplete or semantically
+        # wrong is a failure, not a pass. Retain the raw streams for triage.
+        sys.stderr.write(res.get("stdout", ""))
+        sys.stderr.write("\n" + res.get("stderr", ""))
+        print(f"invalid result ({args.mode}): {reason}")
+        return 3
     parsed.update(p=args.p, a=args.a, b=args.b, k=args.k, target=xq,
                   base_set=xset, wall=res["wall"], method=args.method)
     import json

@@ -83,5 +83,70 @@ class ComprehensiveGBsBackend(unittest.TestCase):
                 os.environ["CGB_PACKAGE_PATH"] = saved
 
 
+# ── Canned M2 stdout fixtures. These tests need NO M2 installation. ──────────
+_SPEC_OK = "MODE specialized\nONE_IN_IDEAL 0\nDIM 0\nGBSIZE 3\nGB x3\nGB x2\nGB x1\nDONE\n"
+_SPEC_TRUNC = "MODE specialized\nONE_IN_IDEAL 0\nDIM 0\nGBSIZE 3\nGB x3\nGB x2\nGB x1\n"
+_VERIFY_PASS = "NBRANCHES 9\nNMATCH 1\nVERIFY PASS\nDONE\n"
+_VERIFY_FAIL = "NBRANCHES 9\nNMATCH 1\nVERIFY FAIL\nDONE\n"
+_VERIFY_NOBRANCH = "NBRANCHES 9\nNMATCH 0\nVERIFY NOBRANCH\nDONE\n"
+_VERIFY_NMATCH2 = "NBRANCHES 9\nNMATCH 2\nVERIFY PASS\nDONE\n"
+_PARAM_OK = ("MODE parametric\nNBRANCHES 2\nBRANCH\nE 0\nN t-1\nG x+t*y\n"
+             "BRANCH\nE t-1\nN 1\nG 1\nDONE\n")
+_PARAM_COUNT_MISMATCH = "MODE parametric\nNBRANCHES 2\nBRANCH\nE 0\nN t-1\nG x+t*y\nDONE\n"
+
+
+class ParseAndValidate(unittest.TestCase):
+    """Semantic validation of M2 output. Runs without M2 (fixtures are canned),
+    so the fail-closed contract is a permanent regression guard in CI."""
+
+    def _v(self, text, mode):
+        return drv.validate_result(drv.parse(text), mode)
+
+    def test_valid_outputs_accepted(self):
+        self.assertTrue(self._v(_SPEC_OK, "specialized")[0])
+        self.assertTrue(self._v(_VERIFY_PASS, "verify")[0])
+        self.assertTrue(self._v(_PARAM_OK, "parametric")[0])
+
+    def test_invalid_outputs_rejected(self):
+        for text, mode in [
+            (_SPEC_TRUNC, "specialized"),            # no DONE (truncated)
+            (_VERIFY_FAIL, "verify"),                # branch != direct solve
+            (_VERIFY_NOBRANCH, "verify"),            # no matching stratum
+            (_VERIFY_NMATCH2, "verify"),             # NMATCH != 1
+            (_PARAM_COUNT_MISMATCH, "parametric"),   # declared != emitted branches
+        ]:
+            ok, reason = self._v(text, mode)
+            self.assertFalse(ok, f"{mode}: expected reject, got accept")
+            self.assertTrue(reason)
+
+    def test_main_exit_codes_without_m2(self):
+        import contextlib
+        import io
+        saved = (drv.locate_m2, drv.locate_package, drv.run_m2)
+        drv.locate_m2 = lambda: "M2-stub"
+        drv.locate_package = lambda: "pkg-stub"
+        try:
+            def run(mode, canned):
+                drv.run_m2 = lambda *a, **k: canned
+                with contextlib.redirect_stdout(io.StringIO()), \
+                     contextlib.redirect_stderr(io.StringIO()):
+                    return drv.main([mode, "--p", "101", "--k", "3"])
+            ok = {"timeout": False, "rc": 0, "stderr": "", "wall": 0.1}
+            self.assertEqual(run("verify", {**ok, "stdout": _VERIFY_PASS}), 0)
+            self.assertEqual(run("verify", {**ok, "stdout": _VERIFY_FAIL}), 3)
+            self.assertEqual(run("verify", {**ok, "stdout": _VERIFY_NMATCH2}), 3)
+            self.assertEqual(run("verify", {**ok, "stdout": _VERIFY_NOBRANCH}), 3)
+            self.assertEqual(run("specialized", {**ok, "stdout": _SPEC_TRUNC}), 3)
+            self.assertEqual(run("specialized", {"timeout": False, "rc": 1,
+                                                 "stdout": "", "stderr": "boom", "wall": 0.1}), 1)
+            self.assertEqual(run("verify", {"timeout": True, "wall": 600}), 2)
+        finally:
+            drv.locate_m2, drv.locate_package, drv.run_m2 = saved
+
+    def test_large_p_refused(self):
+        with self.assertRaises(SystemExit):
+            drv.base_set_and_target(drv.TOY_P_MAX + 1, 1, 1, 3)
+
+
 if __name__ == "__main__":
     unittest.main()
