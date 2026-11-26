@@ -194,10 +194,14 @@ Peak RSS, reporting, coordination and publication costs are outside these
 wrapper diagnostics. Original map synthesis remains unpriced.
 [pcc:unverified]
 
-From the repository root, use fresh output names:
+From the repository root, hydrate the exact KM record with the artifact
+reader, then use fresh output names. The configured S3 store defaults to
+hash-checked Git-history recovery; no S3 upload is claimed.
 
 ```bash
 study=research/nist_cover_three_tests_20261116/projective_verification_20261126
+python3 tools/artifacts/artifacts.py pull --source git \
+    "$study/evidence/transport-v1"
 bash "$study/run.sh" evidence/replay-endpoints-01
 bash "$study/check-transport.sh" evidence/replay-transport-01
 bash "$study/check-normalization.sh" evidence/replay-normalization-01
