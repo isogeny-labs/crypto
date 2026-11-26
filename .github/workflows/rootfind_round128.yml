@@ -2,12 +2,13 @@ name: Rootfind Round 128 source-exact benchmark
 on:
   push:
     branches:
+      - main
       - automation/rootfind-round128-isogeny-poly-20261123
-  pull_request:
     paths:
       - src/cryptanalysis/ecbench/isogeny.rs
       - research/rootfind_round128/**
       - .github/workflows/rootfind_round128.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:

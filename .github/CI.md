@@ -17,7 +17,7 @@ the entire historical research corpus. Failures and timeouts remain failures.
   `cd_attack` clippy for 93 seconds. They waited approximately 219–222 minutes
   for runners. Queue delay and execution time are different problems.
 - The ecbench job allows 300 minutes and replays every committed deterministic
-  run, including 320 column-sweep solves. It also performs dedicated historical
+  run, including 320 column-sweep invocations. It also performs dedicated historical
   replays before replaying those sessions again in the corpus loop.
 
 The integration branch has 352 workflows. Its newer decision to retire
@@ -70,6 +70,25 @@ continues to check every root target. Rust release builds and ecbench use caches
 Main-branch rolling releases retain their existing full packaging behavior.
 The ecbench workflow also starts on every PR/merge group so dependency and
 embedded-data changes cannot disappear behind an incomplete trigger allowlist.
+
+### Historical rootfinding workflow triggers
+
+`rootfind_round128.yml` through `rootfind_round147.yml` follow the research
+lane specified in `AGENTS.md`: path-filtered pushes to `main` and manual
+dispatch. Each also retains its historical automation-branch push trigger.
+The push filters retain the same source, study and workflow paths previously
+used by that workflow's PR trigger. The twenty workflows contain twenty-six
+jobs after matrix expansion; running that family on every change to the shared
+`ecbench/isogeny.rs` file exceeded the thirty-check PR budget.
+
+All native build commands, differential checks, repetitions, timeouts and
+failure handling remain in those workflows. Rounds 133 through 139 fetch their
+baseline by the immutable head commit of the original merged PR, because the
+old branch names were deleted. Their prior checkout failures must be repaired
+and their existing checks executed before the routing change is accepted.
+This scoped policy supersedes the older general PR-research wording below for
+these twenty workflows; it changes neither the three merge gates nor their
+required outcomes.
 
 ### Frozen workflow pins
 
@@ -239,7 +258,7 @@ actionlint .github/workflows/{codeql,ecbench,release,rust-all-targets,rust-lint,
 ```
 
 `workflow-lint` also checks all workflow GitHub Actions expressions, triggers
-and job semantics with SHA-256 verified actionlint 1.7.12. Its YAML structure
+and job semantics with SHA-256-pinned actionlint 1.7.12. Its YAML structure
 check keeps its existing job name. `workflows-parse` owns YAML regression
 fixtures, the historical-stage manual-only rule, classifier fixtures and the
 PR budget contract. Both jobs use sparse checkouts of the metadata they read.

@@ -143,6 +143,8 @@ impl BatchedParams {
             strategy: DecompositionStrategy::PairTable,
             linear_algebra: LinearAlgebra::Sparse(SparseSolveOptions::default()),
             allow_direct_relation: false,
+            // Preserve the tournament's full scan when library defaults change.
+            collection_window: Some(usize::MAX),
             ..KoblitzIcOptions::default()
         }
     }
