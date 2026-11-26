@@ -1528,9 +1528,12 @@ of the precomputed endpoint point. The script and complete path,
 mark, and sign rows are in
 [`two_hop_m8_screen.sage`](two_hop_m8_screen.sage) and
 [`TWO_HOP_M8_SCREEN.jsonl`](TWO_HOP_M8_SCREEN.jsonl).
-This is an exactness screen for these 16 paths at `m=8` only;
-the second edges were not classified as horizontal, and the
-result does not decide the first large P-192 coset.
+All these rational edges are horizontal: every codomain is
+`F_p`-isogenous to P-192 and therefore has its Frobenius trace;
+the fundamental discriminant calculated below forces its
+endomorphism ring to be the same maximal order. This is an
+exactness screen for these 16 paths at `m=8` only, and does not
+decide the first large P-192 coset.
 [pcc:unverified]
 
 The same degree-5 endpoint was screened at the other P-192

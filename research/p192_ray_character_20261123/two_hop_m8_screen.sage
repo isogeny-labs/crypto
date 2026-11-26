@@ -4,15 +4,16 @@ Run from the repository root:
   sage -python -u research/p192_ray_character_20261123/two_hop_m8_screen.sage \
     > research/p192_ray_character_20261123/TWO_HOP_M8_SCREEN.jsonl
 
-The public scalar labels are controls. This screen tests only the listed
-markings and does not classify the second edges as horizontal.
+The public scalar labels are controls. All enumerated rational edges are
+horizontal: the source Frobenius discriminant is fundamental, and each
+F_p-isogenous curve has the same Frobenius trace and maximal order.
 """
 
 import hashlib
 import json
 from pathlib import Path
 
-from sage.all import EllipticCurve, GF, kronecker
+from sage.all import EllipticCurve, GF, ZZ, kronecker
 
 P = 6277101735386680763835789423207666416083908700390324961279
 R = 6277101735386680763835789423176059013767194773182842284081
@@ -26,6 +27,9 @@ G = E(
     0x07192B95FFC8DA78631011ED6B24CDD573F977A11E794811,
 )
 assert R * G == E(0)
+TRACE = P + 1 - R
+DISCRIMINANT = ZZ(TRACE * TRACE - 4 * P)
+assert DISCRIMINANT.is_fundamental_discriminant()
 MARKS = (2, 3, 5, 7, 11, 13, 4, 10, 14, 15, 17, 19, 23, 29, 31)
 
 
@@ -51,16 +55,19 @@ def sorted_edges(curve, degree):
 print(json.dumps({"metadata": {
     "source_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     "p": str(P), "r": str(R), "m": 8, "reps": [str(x) for x in REPS],
+    "frobenius_discriminant": str(DISCRIMINANT),
     "degrees": [5, 11, 13], "marks": list(MARKS),
 }}, sort_keys=True), flush=True)
 
 for first_degree in (5, 11, 13):
     for first_index, first in enumerate(sorted_edges(E, first_degree)):
         intermediate = first(G)
+        assert intermediate != intermediate.curve()(0)
         assert R * intermediate == intermediate.curve()(0)
         for second_degree in (5, 11, 13):
             for second_index, second in enumerate(sorted_edges(first.codomain(), second_degree)):
                 target = second(intermediate)
+                assert target != target.curve()(0)
                 assert R * target == target.curve()(0)
                 # Check the composite on a point supplied independently of target.
                 assert second(first(7 * G)) == 7 * target
