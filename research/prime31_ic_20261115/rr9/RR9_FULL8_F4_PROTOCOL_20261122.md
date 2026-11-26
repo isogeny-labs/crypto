@@ -832,6 +832,8 @@ protocol that preserves, rather than replaces, this attempt's receipt.
 Complete-cost promotion remains blocked by the separate
 [RR9 call-owned F4 and whole-collector accounting problem](../../../problems/rr9-f4-whole-collector-accounting.md).
 The bounded full8 receipt cannot substitute for either ledger named there.
+`VisitAccountingV1` instruments only `f4_fp::solve_visit`; this producer calls
+`f4_fp_tower::f4_tower`, so that ledger supplies no full8 engine accounting.
 
 ## Prior-work gate and hypothesis
 

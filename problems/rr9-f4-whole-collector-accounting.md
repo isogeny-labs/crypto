@@ -3,7 +3,7 @@
 - **Status:** `open`
 - **Kind:** implementation gap; measurement and accounting gap
 - **Affected work:** the prospective [Prime31 common-support RR9/F4 protocol](../research/prime31_shared_coefficient_membership_20261118/PROTOCOL_RR9_F4_20261120.md) and its [machine-readable v1 protocol](../research/prime31_shared_coefficient_membership_20261118/protocol-rr9-f4-v1.json), the [RR9 and closures development report](../research/prime31_rr9_and_closures_20261119/REPORT.md) and [raw result](../research/prime31_rr9_and_closures_20261119/RESULTS.json), and the separate [B8 full-eight precursor protocol](../research/prime31_ic_20261115/rr9/RR9_FULL8_F4_PROTOCOL_20261122.md)
-- **Next action owner:** PR #5203, narrow F4 accounting implementation slice
+- **Next action owner:** draft PR #5227, call-owned F4 accounting implementation slice
 - **Last updated:** 2026-11-26
 
 ## Problem
@@ -54,6 +54,17 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   runner's one-thread check reduces one source of interleaving but does not
   make these deltas call-owned. Process peak RSS at the end and elapsed phase
   buckets likewise do not account for allocations, scratch peaks or operations.
+- **Draft call-owned foundation:** draft PR #5227 adds opt-in
+  `solve_visit_accounted_v1` and traced entry points, checked call-owned phase
+  totals, distinct solver dispositions, sticky blockers, provenance/arm
+  bindings, legacy-report shape preservation, callback/sink isolation and
+  focused ownership/reconciliation controls.  The implementation deliberately
+  keeps both operation-coverage and memory-coverage promotion gates false;
+  admitted records currently seal with `memory_tracking_gap`, with the
+  independent operation-coverage flag also false.  Allocation/scratch,
+  remaining operation/branch coverage, the prospective RR9 runner, and the
+  outer collector are not complete.  This foundation therefore satisfies no
+  checklist item and authorizes no scientific row.
 - **Observed partial collector charge:** the development whole-solve code adds
   only `rec.f4_field_ops + rec.root_field_muls` for each RR9 call. Its Prime31
   scaling table derives a lower bound from the smaller observed UNSAT
@@ -91,9 +102,11 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   but incomplete accounting and short censored calls cannot distinguish
   intrinsic algebraic growth from implementation, allocation, ordering or
   instrumentation costs.
-- **Missing capability:** a call-owned, checked and reconciled F4 ledger, plus
-  a distinct whole-collector ledger that covers every attempt and every phase
-  in a common, source-bound schema.
+- **Missing capability:** source-complete call-owned operation,
+  allocation/capacity and scratch accounting (including remaining pivot and
+  unowned-branch coverage), prospective runner integration, and a distinct
+  whole-collector ledger that covers every attempt and phase in a common,
+  source-bound schema.
 - **What this evidence does not establish:** it does not invalidate the B4/B8
   fibre observations, supply a B31 cost ratio, refute any unexecuted RR9 stratum,
   or justify abandoning the active RR9 lane. Only a regime ruled out by its
@@ -157,13 +170,16 @@ still require prospective executions and independent replay.
 
 ## Next discriminating step
 
-- **Action or proof obligation:** implement only the `VisitAccountingV1`
-  slice in `src/cryptanalysis/f4_fp.rs` for one single-thread normal-grevlex
-  `solve_visit` path used by the v1 RR9 runner. Route every operation in that
-  path through a call-owned ledger, add the reconciliation/disposition object
-  to `VisitReport`, and add the focused hand-count and unchanged-solution
-  tests. Do not combine this first slice with a new B31 run or with the
-  whole-collector implementation.
+- **Action or proof obligation:** finish and independently review the
+  `VisitAccountingV1` slice in `src/cryptanalysis/f4_fp.rs`: route every
+  admitted allocation/capacity/scratch and remaining operation/branch through
+  checked call-owned accounting, stop on the first unowned operation, close
+  the remaining phase and hand-count controls, and keep both coverage gates
+  false until that review passes. Keep both copied-source bridges compiling
+  while completing the ledger, then integrate only through a prospectively
+  frozen successor RR9 runner schema.
+  Do not combine this slice with a B31 run or the whole-collector
+  implementation.
 - **Inputs and controls:** use small deterministic polynomial systems to
   exercise each phase, then the existing public B8 known-chart case only as a
   non-registered integration preflight. Compare solutions, completion states
@@ -196,3 +212,10 @@ main. B4/B8 development evidence is retained, the larger Prime31 timeout rows
 remain censored and inconclusive, and the accounting obstruction is
 unresolved. Creating this record does not close a lead or establish a research
 result.
+
+2026-11-26: Draft PR #5227 gained the opt-in call-owned accounting
+foundation and focused non-scientific controls.  Independent source review
+found remaining operation and allocation/scratch coverage, stop-on-blocker,
+and whole-collector gaps, so both private promotion gates remain false and
+admitted ledgers fail closed.  No registered or scientific case was run; all
+B4/B8/B31, full8, collector and six-size obligations remain open.
