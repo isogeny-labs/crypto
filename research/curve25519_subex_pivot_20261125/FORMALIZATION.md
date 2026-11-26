@@ -263,6 +263,11 @@ three maps agree in 76.17 seconds under Rust 1.78 debug. This meets the
 90-second scaling target but remains a bounded refinement rather than a
 quantified proof. `[pcc:unverified]`
 
+`COEFFICIENT_MAP_REFINEMENT.md` states the reusable incidence-basis lemma
+behind those maps, proves the producer implication `D=E=H`, maps each object
+to Rust, and lists the six checks required from an independent kernel.
+`[pcc:unverified]`
+
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.

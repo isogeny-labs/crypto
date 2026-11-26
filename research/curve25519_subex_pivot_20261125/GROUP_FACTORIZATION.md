@@ -202,6 +202,12 @@ row/source forms, without `child`, `next_tuple`, or packet entry. The direct
 kernel, mode-expanded, and production-child maps agree in 76.17 seconds,
 still below the 90-second scaling target. `[pcc:unverified]`
 
+`COEFFICIENT_MAP_REFINEMENT.md` extracts the reusable triangular lemma. It
+defines the direct kernel map `D`, independent mode-expanded map `E`, and
+production child-product map `H` over old-incidence masks, and gives the
+producer proof of `D=E=H`. The independent machine-check boundary remains
+explicit. `[pcc:unverified]`
+
 These controls make the algebraic components load-bearing, but do not quantify
 over every admitted graph or establish a typed refinement from every live Rust
 child back to this polynomial. C1 items 1–3 close only after that independent
