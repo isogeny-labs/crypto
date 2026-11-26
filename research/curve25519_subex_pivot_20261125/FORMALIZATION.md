@@ -348,6 +348,13 @@ nontrivial extension-coordinate polynomials.  A combined two-taper/deep
 diagnostic remained live past 90 seconds, so these bounded tests do not close
 C1. `[pcc:unverified]`
 
+No allocated strict-history fixture exists for the current backend. A direct
+production `Setup` control at `usize::MAX` returns no recursive parameters;
+the general reason is `lambda<=usize::BITS<128*1024`, hence root `u=0` for
+every host-representable graph. Closing C1 with an executed strict history
+therefore requires an implicit symbolic representation and a new refinement,
+not a larger native allocation. `[pcc:unverified]`
+
 ## C2 — Complete source cost
 
 C2 is R1–R5 plus the assertion that all code executed by an active call is

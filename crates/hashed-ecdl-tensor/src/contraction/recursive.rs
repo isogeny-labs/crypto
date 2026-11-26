@@ -953,4 +953,24 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn usize_backend_cannot_enter_the_strict_source_branch() {
+        // Every representable edge count has lambda<=usize::BITS, whereas the
+        // source schedule needs floor(lambda/(128*1024))>=1. Check the largest
+        // possible edge count through the production Setup path as a witness
+        // to that representation boundary; smaller inputs have no larger u.
+        assert!((usize::BITS as usize) < 128 * 1024);
+        let mut meter = Meter::new(Limits {
+            steps: 1_000_000_000,
+            ..Limits::default()
+        });
+        let setup = Setup::new(usize::MAX, 0, &mut meter).unwrap();
+        assert_eq!(setup.lambda, usize::BITS as usize);
+        assert!(setup.parameters(usize::MAX, 0).unwrap().is_none());
+        assert!(setup
+            .parameters(usize::MAX, usize::BITS as usize)
+            .unwrap()
+            .is_none());
+    }
 }

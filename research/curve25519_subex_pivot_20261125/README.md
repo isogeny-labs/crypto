@@ -121,6 +121,14 @@ These are bounded exact controls under non-strict diagnostic recursion; the
 one-edge child does not meet the source shrink premise, so this is not a live
 strict history or a proof of the asymptotic induction. `[pcc:unverified]`
 
+A production-path control closes the corresponding finite representability
+question: `Setup::new(usize::MAX,0)` cannot return recursive parameters at any
+depth. Universally, every allocated graph has
+`lambda<=usize::BITS<128*1024`, so the source schedule has root `u=0`.
+Consequently no larger allocated Rust fixture can become the missing strict
+history. The next bridge must use an implicit/symbolic graph representation
+and receive a fresh refinement and cost audit. `[pcc:unverified]`
+
 A heterogeneous attempt with a two-taper `u=2,a=2,L=4` root and two compact
 nested levels remained live past 90 seconds and was interrupted without a
 result.  Thus the fast two-taper one-level and three-level one-taper controls

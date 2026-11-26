@@ -220,6 +220,14 @@
     "discarded_preflight": "the larger diagnostic taper a=2,length=4 at every level exceeded 60 seconds; a heterogeneous u=2 root plus two compact levels remained live past 90 seconds; both were interrupted and no result from either is claimed",
     "claim_boundary": "bounded exact counterexample search through the production deformation/child/interpolation/recovery routines with executed-node certificates; diagnostic recursion is non-strict and the one-edge child does not satisfy source shrinkage, so this is not a source-admitted history or asymptotic induction proof"
   },
+  "strict_backend_boundary_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+    "test": "contraction::recursive::tests::usize_backend_cannot_enter_the_strict_source_branch",
+    "finite_witness": "Setup::new(usize::MAX,0) returns no recursive parameters at depth zero or usize::BITS",
+    "universal_reason": "every host-representable edge count has lambda<=usize::BITS<128*1024, so root u=floor(lambda/(128*1024)) is zero and all deeper u values are zero",
+    "focused_result": "1 passed; 0 failed under Rust 1.78",
+    "claim_boundary": "proves unreachability of the current allocated strict branch, not the symbolic contraction theorem; an implicit representation would require a fresh refinement and cost audit"
+  },
   "multi_taper_hermite_control": {
     "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
     "test": "contraction::recursive::tests::multi_taper_hermite_recovers_extension_polynomials_across_precisions",
@@ -379,5 +387,5 @@
     "complete_library_result": "183 passed; 0 failed",
     "claim_boundary": "producer-side general argument plus finite exact controls; independent or kernel-checked iterator refinement remains unverified"
   },
-  "next_gate": "capture a source-admitted strict recursive history rather than the current non-shrinking diagnostic tree; independently bind every node's K,L,tau,p to checked packing, shrinkage and precision history, then prove the depth-first sum of tuple/child exponents and description bits is at most C*s/sqrt(log s) plus polynomial overhead; preserve the exact total-work reduction ledger and accept a counterexample to any premise as decisive"
+  "next_gate": "design an implicit symbolic-history certificate because the usize backend provably cannot execute a strict source branch; bind every symbolic node's K,L,tau,p to checked packing, shrinkage and precision history, and prove the depth-first sum of tuple/child exponents and description bits is at most C*s/sqrt(log s) plus polynomial overhead; require a fresh refinement/cost audit and accept a counterexample to any premise as decisive"
 }

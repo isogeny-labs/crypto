@@ -33,6 +33,20 @@ cargo run --locked --release \
   --bin tensor-guards -- scan 0 520
 ```
 
+The production `Setup` boundary also has a direct unit control:
+
+```text
+cargo test --locked \
+  --manifest-path crates/hashed-ecdl-tensor/Cargo.toml \
+  --lib usize_backend_cannot_enter_the_strict_source_branch
+```
+
+It runs `Setup::new(usize::MAX,0)` and confirms that root and deep parameter
+requests both return no recursive parameters. The universal step is the
+checked integer inequality `usize::BITS < 128*1024`: every smaller edge count
+has no larger `lambda` and therefore also has root `u=0`.
+`[pcc:unverified]`
+
 ## Interpretation
 
 `lambda` is the logarithm of the tensor graph's edge count, not the bit length
