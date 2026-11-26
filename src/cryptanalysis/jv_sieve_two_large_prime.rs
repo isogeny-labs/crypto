@@ -78,6 +78,9 @@ mod extension_remainder_dlp;
 mod principal_relation;
 pub use extension_remainder_dlp::{run_extension_remainder_dlp_on, ExtensionRemainderDlpOptions};
 
+#[path = "jv_extension_anchored_dlp.rs"]
+pub mod extension_anchored_dlp;
+
 /// Distinct roots of a nonzero polynomial of degree <= 2, or refusal.
 /// Repeated roots are refused, rather than silently treated as simple roots.
 fn low_degree_roots(ring: &FpRing, f: &[u64], sqrt: &[u64]) -> Option<Vec<u64>> {

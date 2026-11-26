@@ -1418,6 +1418,171 @@ fn sieve_line_threshold(
     (hits, cost)
 }
 
+/// Tag-stamped sieve counter array that also retains the exact factor-base
+/// abscissae `x` hitting each parameter `s` (degree-9 norm => at most 9 hits).
+pub struct HitBuckets {
+    id: u32,
+    tag: Vec<u32>,
+    cnt: Vec<u8>,
+    xs: Vec<[u16; 9]>,
+}
+
+impl HitBuckets {
+    pub fn new(p: u64) -> Self {
+        let n = p as usize;
+        Self {
+            id: 0,
+            tag: vec![u32::MAX; n],
+            cnt: vec![0; n],
+            xs: vec![[0u16; 9]; n],
+        }
+    }
+
+    #[inline]
+    pub fn hits_for(&self, s: u64) -> &[u16] {
+        let i = s as usize;
+        if self.tag.get(i).copied() != Some(self.id) {
+            return &[];
+        }
+        let c = (self.cnt[i] as usize).min(9);
+        &self.xs[i][..c]
+    }
+}
+
+/// Sieve one line with `minimum` hit threshold while recording the exact
+/// factor-base abscissae `x` for every hit `s`, eliminating post-sieve
+/// `counts_buf` scans and `roots_by_table` re-evaluations.
+pub fn sieve_line_buckets(
+    ring: &FpRing,
+    setup: &SieveSetup,
+    line: &Line,
+    buckets: &mut HitBuckets,
+    shared: Option<&SharedB>,
+    minimum: u8,
+) -> (Vec<u64>, SieveCost) {
+    let p = setup.p;
+    let m = minimum;
+    let mut cost = SieveCost::default();
+    buckets.id = buckets.id.wrapping_add(1);
+    if buckets.id == u32::MAX {
+        buckets.tag.iter_mut().for_each(|t| *t = u32::MAX);
+        buckets.id = 0;
+    }
+    let id = buckets.id;
+    let m0 = ring.muls();
+    let mut t2 = difference_table(ring, &line.p2, &mut cost.adds);
+    let (mut t3, mut t4) = if shared.is_some() {
+        (Vec::new(), Vec::new())
+    } else {
+        (
+            difference_table(ring, &line.p3, &mut cost.adds),
+            difference_table(ring, &line.p4, &mut cost.adds),
+        )
+    };
+    let mut hits: Vec<u64> = Vec::new();
+    let mut pending: Vec<(u64, u64, u64, u16)> = Vec::with_capacity(256);
+    let bump = |s: u64,
+                x_u16: u16,
+                buckets: &mut HitBuckets,
+                hits: &mut Vec<u64>,
+                cost: &mut SieveCost| {
+        if s == 0 {
+            return;
+        }
+        let i = s as usize;
+        cost.lookups += 1;
+        cost.roots += 1;
+        if buckets.tag[i] != id {
+            buckets.tag[i] = id;
+            buckets.cnt[i] = 0;
+        }
+        let c = buckets.cnt[i] as usize;
+        if c < 9 {
+            buckets.xs[i][c] = x_u16;
+        }
+        buckets.cnt[i] += 1;
+        if buckets.cnt[i] == m {
+            hits.push(s);
+        }
+    };
+    let flush = |pending: &mut Vec<(u64, u64, u64, u16)>,
+                 buckets: &mut HitBuckets,
+                 hits: &mut Vec<u64>,
+                 cost: &mut SieveCost| {
+        if pending.is_empty() {
+            return;
+        }
+        let n = pending.len();
+        let mut pre = Vec::with_capacity(n);
+        let mut acc = 1u64;
+        for &(_, _, a2, _) in pending.iter() {
+            pre.push(acc);
+            acc = mm(acc, a2, p);
+        }
+        let mut inv = inv_mod(acc, p);
+        cost.muls += 3 * (n as u64 - 1) + INV_COST;
+        for i in (0..n).rev() {
+            let (re, r, a2, x_u16) = pending[i];
+            let inv_a2 = mm(inv, pre[i], p);
+            inv = mm(inv, a2, p);
+            let s1 = mm(am(re, r, p), inv_a2, p);
+            cost.muls += 1;
+            bump(s1, x_u16, buckets, hits, cost);
+            if r != 0 {
+                let s2 = mm(sm(re, r, p), inv_a2, p);
+                cost.muls += 1;
+                bump(s2, x_u16, buckets, hits, cost);
+            }
+        }
+        pending.clear();
+    };
+    for x in 0..p {
+        cost.steps += 1;
+        if setup.in_base[x as usize] {
+            cost.base_steps += 1;
+            let a = t2[0];
+            let (re, n4) = match shared {
+                Some(sh) => {
+                    cost.shared_reads += 2;
+                    (sh.re[x as usize], sh.n4[x as usize])
+                }
+                None => (t3[0], t4[0]),
+            };
+            let r = mm(n4, setup.rho[x as usize], p);
+            cost.muls += 1;
+            if a == 0 {
+                if re != 0 {
+                    let c = ring.eval(&line.a0, x);
+                    let s = mm(mm(c, c, p), inv_mod(re, p), p);
+                    cost.muls += INV_COST + 2;
+                    bump(s, x as u16, &mut *buckets, &mut hits, &mut cost);
+                }
+            } else {
+                pending.push((re, r, am(a, a, p), x as u16));
+                if pending.len() == 256 {
+                    flush(&mut pending, &mut *buckets, &mut hits, &mut cost);
+                }
+            }
+        }
+        for t in [&mut t2, &mut t3, &mut t4] {
+            if t.is_empty() {
+                continue;
+            }
+            let d = t.len() - 1;
+            for k in 0..d {
+                t[k] = am(t[k], t[k + 1], p);
+            }
+            cost.adds += d as u64;
+        }
+    }
+    flush(&mut pending, buckets, &mut hits, &mut cost);
+    cost.muls += ring.muls() - m0;
+    // bitop/v1: factor-base test of every x + per root: tag compare, xs[i][c]
+    // store, cnt increment, threshold compare (4 word ops) + shared reads.
+    super::jv_bitops::words(cost.steps + 4 * cost.lookups + 2 * cost.shared_reads);
+    (hits, cost)
+}
+
 /// A relation `Σ ε_i B_i = 0` over `m` distinct factor-base classes.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct SieveRel {
