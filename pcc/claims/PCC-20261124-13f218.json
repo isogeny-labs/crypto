@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:34:39Z",
+ "id": "PCC-20261124-13f218",
+ "kind": "statement",
+ "producer": {
+  "commit": "e547eaceb9c5f9b76ee3ca8e826af0b955371c1e",
+  "model": "",
+  "session": "codex-ecc2k-cold10m-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/summary.json",
+    "sha256": "8b1b4077ae1ac4856c7d80be2768da716d297dc8a05d8a4f4579512dfda901b0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/grid-audit.json",
+    "sha256": "482d88756718dd676d74ea9ef95fe377f44b974966d13c8078e9872ad3b23e36"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/polynomial-replay.json",
+    "sha256": "0558ddd1ff5f721637b15be85e8afda6beebf87d890795a1239df7304dabd5eb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/checks/source-final.json",
+    "sha256": "91e5e3cbb938e731748fd770b6207f41771abd5982a5e2bd8940063cceee953d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "First strict-sub10M full panel completes120/120 rows, all six regression controls pass,80 tuples replay and source inventory is unchanged. Uniform n131 cold median12,286,102Ir in all five repeats; strict10M remains unmet. Full setup4,578,930, oracle7,621,332 and post85,840Ir retained."
+}

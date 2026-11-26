@@ -203,3 +203,73 @@ rerun as well. A paired table per instance: same $N$ and same $\gamma$ as A4
 where the random stream allows. Any difference in N is reported.
 
 **Stop.** All 1050 runs done, or a control fails (fix, rerun, record).
+
+## A6. KLPT CVP: headroom in the e₁ rule (2026-11-25)
+
+Written before any A6 code exists. A5's code and results stay frozen.
+
+**Question.** In A5 the rule $\ell^{e_1}\ge pN^3$ leaves a search ball of
+about $\pi$ lattice points. After the sum-of-two-squares and parity filters,
+$e_1$ often bumps (340 and 237 bumps over 525 runs per ℓ). Does a rule with
+headroom, $\ell^{e_1}\ge\kappa pN^3$, give a smaller final norm?
+
+**Arms.** $\kappa\in\{1,2,4,8,16\}$. The $\kappa=1$ arm reproduces A5
+exactly and is the control: its runs must equal A5's in every column except
+wall time. Same 105 rows, ℓ∈{2,3}, same seeds. Only the rule changes.
+
+**Hypothesis H6.** Raising $\kappa$ by a factor $f$ costs at most
+$\lceil\log_\ell f\rceil$ in $e_1$ and saves bumps. Prediction: the best
+$\kappa$ improves the 28-bit median $\log_p\ell^e$ over A5 by between 0.00 and
+0.05. No $\kappa$ improves it by more than 0.10. Large $\kappa$ ($\ge8$) is
+worse than A5.
+
+**Falsifiers.**
+- An improvement above 0.10 means bumps cost more than the ball-size model
+  says. Investigate.
+- If the $\kappa=1$ control differs from A5, stop: something changed besides
+  the rule.
+
+**Outputs.** Paired medians per (band, ℓ, κ), bump counts, report, graph and
+PDF.
+
+## A7. P1.6/Q018: xedni p=17 Experiment A under explicit samplers (2026-11-25)
+
+Written before any A7 code exists.
+
+**Question.** Jacobson–Koblitz–Silverman–Stein–Teske (2000) report 317
+dependent cases in 100,000 runs of Experiment A at $p=17$. Upstream A002 could
+not reproduce this because the sampler is unspecified and no certified
+dependence test was available. Is the published rate robust to the choice of
+sampler, or specific to it?
+
+**Setting.** Taken from upstream `refs/jacobson-et-al2000.md` and A002: the
+curve $y^2=x^3+2x+2$ over $\mathbb F_{17}$, of order 19, generator $(3,1)$,
+with $P_1\ne\pm P_2$. The point count and lattice steps are as in the paper's
+§5.4, as read by the implementer, who records the reading.
+
+**Samplers (each stated fully in code and report).**
+- S1: projective lifts uniform in a fixed box; nearest coefficient-lattice
+  vector.
+- S2: shortest projective lifts; smallest-discriminant curve in a fixed
+  neighbourhood (upstream A002's choice).
+- S3: projective lifts uniform in the box; coefficient vector uniform in the
+  same neighbourhood.
+
+**Dependence test.**
+- *Dependent:* an exact rational relation with coefficients bounded by $B$ is
+  found and verified in $E(\mathbb Q)$ with exact arithmetic.
+- *Independent:* the height-pairing regulator is certified above its error
+  bound.
+- *Undecided:* everything else. The undecided rate is always reported, never
+  dropped.
+
+**Hypothesis H7 (kill, from the triage).** The dependent rates of S1–S3 spread
+by more than 3×, with non-overlapping 95% Wilson intervals. Then the published
+317/100,000 is specific to its sampler, and Q018 closes as unanswerable as
+posed.
+
+**Alternative.** All rates are within 3× of each other. Then compare them with
+317/100,000.
+
+**Runs.** 100,000 per sampler if affordable; otherwise at least 20,000 with
+Wilson intervals. Fixed seeds. Native Rust.

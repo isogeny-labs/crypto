@@ -1,0 +1,65 @@
+{
+  "schema": "profile/v1",
+  "kind": "manifest",
+  "subcommand": "cpu",
+  "label": "Candidate1 residual costs before candidate2",
+  "status": "ok",
+  "reason": null,
+  "started_utc": "2026-11-23T23:27:50Z",
+  "wall_seconds": 0.505,
+  "cwd": "/workspace/crypto",
+  "command": [
+    "research/trace_zero_cold50_20261123/bin/elimination",
+    "one",
+    "research/trace_zero_projected_20261115/inputs/scale-n131-d12-uniform.json",
+    "elimination"
+  ],
+  "isolation": "none",
+  "binary": {
+    "path": "/workspace/crypto/research/trace_zero_cold50_20261123/bin/elimination",
+    "sha256": "c89f88ed68ff4db620fca68e61c97ea72d5ddd9f5e5c339e763d23dffe458602",
+    "bytes": 13603360
+  },
+  "git": {
+    "commit": "e64469e6aea1b9c558c8f6c79bb69cfc697369bf",
+    "dirty_tracked_files": 0
+  },
+  "tools": {
+    "valgrind": {
+      "path": "/workspace/scratch/profile-tools/root/usr/bin/valgrind",
+      "version": "valgrind-3.24.0"
+    }
+  },
+  "host": {
+    "hostname": "49d6f53fbd3b",
+    "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpu_features": [
+      "adx",
+      "aes",
+      "avx2",
+      "avx512f",
+      "avx512ifma",
+      "bmi2",
+      "gfni",
+      "pclmulqdq",
+      "popcnt",
+      "sha_ni",
+      "vpclmulqdq"
+    ],
+    "kernel": "6.18.57",
+    "arch": "x86_64",
+    "logical_cpus": 1,
+    "mem_kib": 18440100,
+    "event_sources": [
+      "breakpoint",
+      "msr",
+      "software"
+    ],
+    "hardware_pmu": false,
+    "perf_event_paranoid": "2",
+    "kptr_restrict": "0",
+    "gpus": []
+  },
+  "hotspots_method": "callgrind",
+  "event": "Ir (instructions executed, simulated)"
+}

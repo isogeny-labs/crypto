@@ -1,0 +1,3133 @@
+{
+  "schema": "lp-retention-eval/v1",
+  "source": "fp",
+  "modulus": 199081,
+  "relabel": true,
+  "params": {
+    "draws": 150000,
+    "instance": {
+      "ell": 199081,
+      "g": 1001,
+      "p": 2191483649
+    },
+    "lp_bound": 65536,
+    "smooth_bound": 4096
+  },
+  "repeats": [
+    {
+      "seed": 4000,
+      "pool": 34826,
+      "complete": 19037,
+      "dropped_wide": 0,
+      "replayed": 34826,
+      "full": {
+        "policy": "Random",
+        "budget": 34826,
+        "kept": 34826,
+        "rank": {
+          "vertices": 5822,
+          "rows": 34826,
+          "rank": 5822,
+          "left_nullity": 29004,
+          "components": 1892,
+          "unflagged_components": 0,
+          "unions": 3930,
+          "balanced_cycles": 769,
+          "unbalanced_cycles": 792,
+          "singletons": 29335,
+          "zero_rows": 0
+        },
+        "cycle_count": 29004
+      },
+      "budgets": [
+        {
+          "fraction": 0.25,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 8706,
+              "kept": 8706,
+              "rank": {
+                "vertices": 4213,
+                "rows": 8706,
+                "rank": 4182,
+                "left_nullity": 4524,
+                "components": 2843,
+                "unflagged_components": 31,
+                "unions": 1370,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 7336,
+                "zero_rows": 0
+              },
+              "cycle_count": 4524
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 8706,
+              "kept": 8706,
+              "rank": {
+                "vertices": 1650,
+                "rows": 8706,
+                "rank": 1650,
+                "left_nullity": 7056,
+                "components": 1650,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8706,
+                "zero_rows": 0
+              },
+              "cycle_count": 7056
+            },
+            {
+              "policy": "Degree",
+              "budget": 8706,
+              "kept": 8706,
+              "rank": {
+                "vertices": 2591,
+                "rows": 8706,
+                "rank": 2576,
+                "left_nullity": 6130,
+                "components": 16,
+                "unflagged_components": 15,
+                "unions": 2575,
+                "balanced_cycles": 443,
+                "unbalanced_cycles": 486,
+                "singletons": 5202,
+                "zero_rows": 0
+              },
+              "cycle_count": 6130
+            },
+            {
+              "policy": "Spectral",
+              "budget": 8706,
+              "kept": 8706,
+              "rank": {
+                "vertices": 2514,
+                "rows": 8706,
+                "rank": 2482,
+                "left_nullity": 6224,
+                "components": 37,
+                "unflagged_components": 32,
+                "unions": 2477,
+                "balanced_cycles": 406,
+                "unbalanced_cycles": 393,
+                "singletons": 5430,
+                "zero_rows": 0
+              },
+              "cycle_count": 6224
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 8706,
+              "kept": 8706,
+              "rank": {
+                "vertices": 4098,
+                "rows": 8706,
+                "rank": 4067,
+                "left_nullity": 4639,
+                "components": 2710,
+                "unflagged_components": 31,
+                "unions": 1388,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 7318,
+                "zero_rows": 0
+              },
+              "cycle_count": 4639
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 8706,
+              "kept": 8706,
+              "rank": {
+                "vertices": 556,
+                "rows": 8706,
+                "rank": 556,
+                "left_nullity": 8150,
+                "components": 556,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8706,
+                "zero_rows": 0
+              },
+              "cycle_count": 8150
+            }
+          ]
+        },
+        {
+          "fraction": 0.1,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 3482,
+              "kept": 3482,
+              "rank": {
+                "vertices": 2588,
+                "rows": 3482,
+                "rank": 2493,
+                "left_nullity": 989,
+                "components": 2024,
+                "unflagged_components": 95,
+                "unions": 564,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 2918,
+                "zero_rows": 0
+              },
+              "cycle_count": 989
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 3482,
+              "kept": 3482,
+              "rank": {
+                "vertices": 667,
+                "rows": 3482,
+                "rank": 667,
+                "left_nullity": 2815,
+                "components": 667,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3482,
+                "zero_rows": 0
+              },
+              "cycle_count": 2815
+            },
+            {
+              "policy": "Degree",
+              "budget": 3482,
+              "kept": 3482,
+              "rank": {
+                "vertices": 1610,
+                "rows": 3482,
+                "rank": 1600,
+                "left_nullity": 1882,
+                "components": 12,
+                "unflagged_components": 10,
+                "unions": 1598,
+                "balanced_cycles": 226,
+                "unbalanced_cycles": 221,
+                "singletons": 1437,
+                "zero_rows": 0
+              },
+              "cycle_count": 1882
+            },
+            {
+              "policy": "Spectral",
+              "budget": 3482,
+              "kept": 3482,
+              "rank": {
+                "vertices": 1542,
+                "rows": 3482,
+                "rank": 1524,
+                "left_nullity": 1958,
+                "components": 20,
+                "unflagged_components": 18,
+                "unions": 1522,
+                "balanced_cycles": 183,
+                "unbalanced_cycles": 180,
+                "singletons": 1597,
+                "zero_rows": 0
+              },
+              "cycle_count": 1958
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 3482,
+              "kept": 3482,
+              "rank": {
+                "vertices": 2577,
+                "rows": 3482,
+                "rank": 2485,
+                "left_nullity": 997,
+                "components": 2002,
+                "unflagged_components": 92,
+                "unions": 575,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 2907,
+                "zero_rows": 0
+              },
+              "cycle_count": 997
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 3482,
+              "kept": 3482,
+              "rank": {
+                "vertices": 170,
+                "rows": 3482,
+                "rank": 170,
+                "left_nullity": 3312,
+                "components": 170,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3482,
+                "zero_rows": 0
+              },
+              "cycle_count": 3312
+            }
+          ]
+        },
+        {
+          "fraction": 0.05,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 1568,
+                "rows": 1741,
+                "rank": 1462,
+                "left_nullity": 279,
+                "components": 1282,
+                "unflagged_components": 106,
+                "unions": 286,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1455,
+                "zero_rows": 0
+              },
+              "cycle_count": 279
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 318,
+                "rows": 1741,
+                "rank": 318,
+                "left_nullity": 1423,
+                "components": 318,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1741,
+                "zero_rows": 0
+              },
+              "cycle_count": 1423
+            },
+            {
+              "policy": "Degree",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 1075,
+                "rows": 1741,
+                "rank": 1063,
+                "left_nullity": 678,
+                "components": 13,
+                "unflagged_components": 12,
+                "unions": 1062,
+                "balanced_cycles": 131,
+                "unbalanced_cycles": 115,
+                "singletons": 433,
+                "zero_rows": 0
+              },
+              "cycle_count": 678
+            },
+            {
+              "policy": "Spectral",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 1016,
+                "rows": 1741,
+                "rank": 997,
+                "left_nullity": 744,
+                "components": 21,
+                "unflagged_components": 19,
+                "unions": 995,
+                "balanced_cycles": 86,
+                "unbalanced_cycles": 94,
+                "singletons": 566,
+                "zero_rows": 0
+              },
+              "cycle_count": 744
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 1588,
+                "rows": 1741,
+                "rank": 1479,
+                "left_nullity": 262,
+                "components": 1280,
+                "unflagged_components": 109,
+                "unions": 308,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1433,
+                "zero_rows": 0
+              },
+              "cycle_count": 262
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 75,
+                "rows": 1741,
+                "rank": 75,
+                "left_nullity": 1666,
+                "components": 75,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1741,
+                "zero_rows": 0
+              },
+              "cycle_count": 1666
+            }
+          ]
+        },
+        {
+          "fraction": 0.02,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 722,
+                "rows": 696,
+                "rank": 650,
+                "left_nullity": 46,
+                "components": 621,
+                "unflagged_components": 72,
+                "unions": 101,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 595,
+                "zero_rows": 0
+              },
+              "cycle_count": 46
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 132,
+                "rows": 696,
+                "rank": 132,
+                "left_nullity": 564,
+                "components": 132,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 696,
+                "zero_rows": 0
+              },
+              "cycle_count": 564
+            },
+            {
+              "policy": "Degree",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 589,
+                "rows": 696,
+                "rank": 572,
+                "left_nullity": 124,
+                "components": 18,
+                "unflagged_components": 17,
+                "unions": 571,
+                "balanced_cycles": 46,
+                "unbalanced_cycles": 41,
+                "singletons": 38,
+                "zero_rows": 0
+              },
+              "cycle_count": 124
+            },
+            {
+              "policy": "Spectral",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 589,
+                "rows": 696,
+                "rank": 564,
+                "left_nullity": 132,
+                "components": 26,
+                "unflagged_components": 25,
+                "unions": 563,
+                "balanced_cycles": 15,
+                "unbalanced_cycles": 26,
+                "singletons": 92,
+                "zero_rows": 0
+              },
+              "cycle_count": 132
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 708,
+                "rows": 696,
+                "rank": 650,
+                "left_nullity": 46,
+                "components": 604,
+                "unflagged_components": 58,
+                "unions": 104,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 592,
+                "zero_rows": 0
+              },
+              "cycle_count": 46
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 27,
+                "rows": 696,
+                "rank": 27,
+                "left_nullity": 669,
+                "components": 27,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 696,
+                "zero_rows": 0
+              },
+              "cycle_count": 669
+            }
+          ]
+        },
+        {
+          "fraction": 0.01,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 373,
+                "rows": 348,
+                "rank": 336,
+                "left_nullity": 12,
+                "components": 329,
+                "unflagged_components": 37,
+                "unions": 44,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 304,
+                "zero_rows": 0
+              },
+              "cycle_count": 12
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 68,
+                "rows": 348,
+                "rank": 68,
+                "left_nullity": 280,
+                "components": 68,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 348,
+                "zero_rows": 0
+              },
+              "cycle_count": 280
+            },
+            {
+              "policy": "Degree",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 338,
+                "rows": 348,
+                "rank": 323,
+                "left_nullity": 25,
+                "components": 16,
+                "unflagged_components": 15,
+                "unions": 322,
+                "balanced_cycles": 10,
+                "unbalanced_cycles": 16,
+                "singletons": 0,
+                "zero_rows": 0
+              },
+              "cycle_count": 26
+            },
+            {
+              "policy": "Spectral",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 339,
+                "rows": 348,
+                "rank": 309,
+                "left_nullity": 39,
+                "components": 31,
+                "unflagged_components": 30,
+                "unions": 308,
+                "balanced_cycles": 3,
+                "unbalanced_cycles": 4,
+                "singletons": 33,
+                "zero_rows": 0
+              },
+              "cycle_count": 39
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 379,
+                "rows": 348,
+                "rank": 339,
+                "left_nullity": 9,
+                "components": 328,
+                "unflagged_components": 40,
+                "unions": 51,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 297,
+                "zero_rows": 0
+              },
+              "cycle_count": 9
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 13,
+                "rows": 348,
+                "rank": 13,
+                "left_nullity": 335,
+                "components": 13,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 348,
+                "zero_rows": 0
+              },
+              "cycle_count": 335
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": 4001,
+      "pool": 34833,
+      "complete": 19035,
+      "dropped_wide": 0,
+      "replayed": 34833,
+      "full": {
+        "policy": "Random",
+        "budget": 34833,
+        "kept": 34833,
+        "rank": {
+          "vertices": 5819,
+          "rows": 34833,
+          "rank": 5819,
+          "left_nullity": 29014,
+          "components": 1891,
+          "unflagged_components": 0,
+          "unions": 3928,
+          "balanced_cycles": 786,
+          "unbalanced_cycles": 752,
+          "singletons": 29367,
+          "zero_rows": 0
+        },
+        "cycle_count": 29014
+      },
+      "budgets": [
+        {
+          "fraction": 0.25,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 8708,
+              "kept": 8708,
+              "rank": {
+                "vertices": 4256,
+                "rows": 8708,
+                "rank": 4227,
+                "left_nullity": 4481,
+                "components": 2833,
+                "unflagged_components": 29,
+                "unions": 1423,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 1,
+                "singletons": 7284,
+                "zero_rows": 0
+              },
+              "cycle_count": 4481
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 8708,
+              "kept": 8708,
+              "rank": {
+                "vertices": 1695,
+                "rows": 8708,
+                "rank": 1695,
+                "left_nullity": 7013,
+                "components": 1695,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8708,
+                "zero_rows": 0
+              },
+              "cycle_count": 7013
+            },
+            {
+              "policy": "Degree",
+              "budget": 8708,
+              "kept": 8708,
+              "rank": {
+                "vertices": 2576,
+                "rows": 8708,
+                "rank": 2561,
+                "left_nullity": 6147,
+                "components": 16,
+                "unflagged_components": 15,
+                "unions": 2560,
+                "balanced_cycles": 495,
+                "unbalanced_cycles": 441,
+                "singletons": 5212,
+                "zero_rows": 0
+              },
+              "cycle_count": 6147
+            },
+            {
+              "policy": "Spectral",
+              "budget": 8708,
+              "kept": 8708,
+              "rank": {
+                "vertices": 2482,
+                "rows": 8708,
+                "rank": 2457,
+                "left_nullity": 6251,
+                "components": 29,
+                "unflagged_components": 25,
+                "unions": 2453,
+                "balanced_cycles": 411,
+                "unbalanced_cycles": 398,
+                "singletons": 5446,
+                "zero_rows": 0
+              },
+              "cycle_count": 6251
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 8708,
+              "kept": 8708,
+              "rank": {
+                "vertices": 4066,
+                "rows": 8708,
+                "rank": 4040,
+                "left_nullity": 4668,
+                "components": 2725,
+                "unflagged_components": 26,
+                "unions": 1341,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 7367,
+                "zero_rows": 0
+              },
+              "cycle_count": 4668
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 8708,
+              "kept": 8708,
+              "rank": {
+                "vertices": 559,
+                "rows": 8708,
+                "rank": 559,
+                "left_nullity": 8149,
+                "components": 559,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8708,
+                "zero_rows": 0
+              },
+              "cycle_count": 8149
+            }
+          ]
+        },
+        {
+          "fraction": 0.1,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 3483,
+              "kept": 3483,
+              "rank": {
+                "vertices": 2609,
+                "rows": 3483,
+                "rank": 2523,
+                "left_nullity": 960,
+                "components": 2025,
+                "unflagged_components": 86,
+                "unions": 584,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 1,
+                "singletons": 2898,
+                "zero_rows": 0
+              },
+              "cycle_count": 960
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 3483,
+              "kept": 3483,
+              "rank": {
+                "vertices": 683,
+                "rows": 3483,
+                "rank": 683,
+                "left_nullity": 2800,
+                "components": 683,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3483,
+                "zero_rows": 0
+              },
+              "cycle_count": 2800
+            },
+            {
+              "policy": "Degree",
+              "budget": 3483,
+              "kept": 3483,
+              "rank": {
+                "vertices": 1632,
+                "rows": 3483,
+                "rank": 1622,
+                "left_nullity": 1861,
+                "components": 11,
+                "unflagged_components": 10,
+                "unions": 1621,
+                "balanced_cycles": 241,
+                "unbalanced_cycles": 192,
+                "singletons": 1429,
+                "zero_rows": 0
+              },
+              "cycle_count": 1861
+            },
+            {
+              "policy": "Spectral",
+              "budget": 3483,
+              "kept": 3483,
+              "rank": {
+                "vertices": 1501,
+                "rows": 3483,
+                "rank": 1479,
+                "left_nullity": 2004,
+                "components": 23,
+                "unflagged_components": 22,
+                "unions": 1478,
+                "balanced_cycles": 175,
+                "unbalanced_cycles": 155,
+                "singletons": 1675,
+                "zero_rows": 0
+              },
+              "cycle_count": 2004
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 3483,
+              "kept": 3483,
+              "rank": {
+                "vertices": 2556,
+                "rows": 3483,
+                "rank": 2462,
+                "left_nullity": 1021,
+                "components": 2051,
+                "unflagged_components": 94,
+                "unions": 505,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 2978,
+                "zero_rows": 0
+              },
+              "cycle_count": 1021
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 3483,
+              "kept": 3483,
+              "rank": {
+                "vertices": 171,
+                "rows": 3483,
+                "rank": 171,
+                "left_nullity": 3312,
+                "components": 171,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3483,
+                "zero_rows": 0
+              },
+              "cycle_count": 3312
+            }
+          ]
+        },
+        {
+          "fraction": 0.05,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 1596,
+                "rows": 1741,
+                "rank": 1483,
+                "left_nullity": 258,
+                "components": 1306,
+                "unflagged_components": 113,
+                "unions": 290,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1451,
+                "zero_rows": 0
+              },
+              "cycle_count": 258
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 335,
+                "rows": 1741,
+                "rank": 335,
+                "left_nullity": 1406,
+                "components": 335,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1741,
+                "zero_rows": 0
+              },
+              "cycle_count": 1406
+            },
+            {
+              "policy": "Degree",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 1085,
+                "rows": 1741,
+                "rank": 1079,
+                "left_nullity": 662,
+                "components": 7,
+                "unflagged_components": 6,
+                "unions": 1078,
+                "balanced_cycles": 113,
+                "unbalanced_cycles": 112,
+                "singletons": 438,
+                "zero_rows": 0
+              },
+              "cycle_count": 662
+            },
+            {
+              "policy": "Spectral",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 1047,
+                "rows": 1741,
+                "rank": 1027,
+                "left_nullity": 714,
+                "components": 21,
+                "unflagged_components": 20,
+                "unions": 1026,
+                "balanced_cycles": 82,
+                "unbalanced_cycles": 82,
+                "singletons": 551,
+                "zero_rows": 0
+              },
+              "cycle_count": 714
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 1556,
+                "rows": 1741,
+                "rank": 1454,
+                "left_nullity": 287,
+                "components": 1291,
+                "unflagged_components": 102,
+                "unions": 265,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1476,
+                "zero_rows": 0
+              },
+              "cycle_count": 287
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 1741,
+              "kept": 1741,
+              "rank": {
+                "vertices": 76,
+                "rows": 1741,
+                "rank": 76,
+                "left_nullity": 1665,
+                "components": 76,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1741,
+                "zero_rows": 0
+              },
+              "cycle_count": 1665
+            }
+          ]
+        },
+        {
+          "fraction": 0.02,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 727,
+                "rows": 696,
+                "rank": 648,
+                "left_nullity": 48,
+                "components": 614,
+                "unflagged_components": 79,
+                "unions": 113,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 583,
+                "zero_rows": 0
+              },
+              "cycle_count": 48
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 136,
+                "rows": 696,
+                "rank": 136,
+                "left_nullity": 560,
+                "components": 136,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 696,
+                "zero_rows": 0
+              },
+              "cycle_count": 560
+            },
+            {
+              "policy": "Degree",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 601,
+                "rows": 696,
+                "rank": 588,
+                "left_nullity": 108,
+                "components": 14,
+                "unflagged_components": 13,
+                "unions": 587,
+                "balanced_cycles": 36,
+                "unbalanced_cycles": 43,
+                "singletons": 30,
+                "zero_rows": 0
+              },
+              "cycle_count": 108
+            },
+            {
+              "policy": "Spectral",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 604,
+                "rows": 696,
+                "rank": 585,
+                "left_nullity": 111,
+                "components": 21,
+                "unflagged_components": 19,
+                "unions": 583,
+                "balanced_cycles": 26,
+                "unbalanced_cycles": 27,
+                "singletons": 60,
+                "zero_rows": 0
+              },
+              "cycle_count": 111
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 708,
+                "rows": 696,
+                "rank": 640,
+                "left_nullity": 56,
+                "components": 600,
+                "unflagged_components": 68,
+                "unions": 108,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 588,
+                "zero_rows": 0
+              },
+              "cycle_count": 56
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 696,
+              "kept": 696,
+              "rank": {
+                "vertices": 27,
+                "rows": 696,
+                "rank": 27,
+                "left_nullity": 669,
+                "components": 27,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 696,
+                "zero_rows": 0
+              },
+              "cycle_count": 669
+            }
+          ]
+        },
+        {
+          "fraction": 0.01,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 377,
+                "rows": 348,
+                "rank": 335,
+                "left_nullity": 13,
+                "components": 323,
+                "unflagged_components": 42,
+                "unions": 54,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 294,
+                "zero_rows": 0
+              },
+              "cycle_count": 13
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 63,
+                "rows": 348,
+                "rank": 63,
+                "left_nullity": 285,
+                "components": 63,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 348,
+                "zero_rows": 0
+              },
+              "cycle_count": 285
+            },
+            {
+              "policy": "Degree",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 338,
+                "rows": 348,
+                "rank": 323,
+                "left_nullity": 25,
+                "components": 16,
+                "unflagged_components": 15,
+                "unions": 322,
+                "balanced_cycles": 14,
+                "unbalanced_cycles": 12,
+                "singletons": 0,
+                "zero_rows": 0
+              },
+              "cycle_count": 26
+            },
+            {
+              "policy": "Spectral",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 359,
+                "rows": 348,
+                "rank": 335,
+                "left_nullity": 13,
+                "components": 25,
+                "unflagged_components": 24,
+                "unions": 334,
+                "balanced_cycles": 7,
+                "unbalanced_cycles": 7,
+                "singletons": 0,
+                "zero_rows": 0
+              },
+              "cycle_count": 14
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 384,
+                "rows": 348,
+                "rank": 336,
+                "left_nullity": 12,
+                "components": 323,
+                "unflagged_components": 48,
+                "unions": 61,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 287,
+                "zero_rows": 0
+              },
+              "cycle_count": 12
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 348,
+              "kept": 348,
+              "rank": {
+                "vertices": 13,
+                "rows": 348,
+                "rank": 13,
+                "left_nullity": 335,
+                "components": 13,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 348,
+                "zero_rows": 0
+              },
+              "cycle_count": 335
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": 4002,
+      "pool": 35410,
+      "complete": 18790,
+      "dropped_wide": 0,
+      "replayed": 35410,
+      "full": {
+        "policy": "Random",
+        "budget": 35410,
+        "kept": 35410,
+        "rank": {
+          "vertices": 5819,
+          "rows": 35410,
+          "rank": 5819,
+          "left_nullity": 29591,
+          "components": 1913,
+          "unflagged_components": 0,
+          "unions": 3906,
+          "balanced_cycles": 833,
+          "unbalanced_cycles": 782,
+          "singletons": 29889,
+          "zero_rows": 0
+        },
+        "cycle_count": 29591
+      },
+      "budgets": [
+        {
+          "fraction": 0.25,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 8852,
+              "kept": 8852,
+              "rank": {
+                "vertices": 4200,
+                "rows": 8852,
+                "rank": 4172,
+                "left_nullity": 4680,
+                "components": 2817,
+                "unflagged_components": 28,
+                "unions": 1383,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 7469,
+                "zero_rows": 0
+              },
+              "cycle_count": 4680
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 8852,
+              "kept": 8852,
+              "rank": {
+                "vertices": 1684,
+                "rows": 8852,
+                "rank": 1684,
+                "left_nullity": 7168,
+                "components": 1684,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8852,
+                "zero_rows": 0
+              },
+              "cycle_count": 7168
+            },
+            {
+              "policy": "Degree",
+              "budget": 8852,
+              "kept": 8852,
+              "rank": {
+                "vertices": 2628,
+                "rows": 8852,
+                "rank": 2617,
+                "left_nullity": 6235,
+                "components": 14,
+                "unflagged_components": 11,
+                "unions": 2614,
+                "balanced_cycles": 516,
+                "unbalanced_cycles": 448,
+                "singletons": 5274,
+                "zero_rows": 0
+              },
+              "cycle_count": 6235
+            },
+            {
+              "policy": "Spectral",
+              "budget": 8852,
+              "kept": 8852,
+              "rank": {
+                "vertices": 2548,
+                "rows": 8852,
+                "rank": 2530,
+                "left_nullity": 6322,
+                "components": 26,
+                "unflagged_components": 18,
+                "unions": 2522,
+                "balanced_cycles": 408,
+                "unbalanced_cycles": 389,
+                "singletons": 5533,
+                "zero_rows": 0
+              },
+              "cycle_count": 6322
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 8852,
+              "kept": 8852,
+              "rank": {
+                "vertices": 4124,
+                "rows": 8852,
+                "rank": 4098,
+                "left_nullity": 4754,
+                "components": 2805,
+                "unflagged_components": 26,
+                "unions": 1319,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 7533,
+                "zero_rows": 0
+              },
+              "cycle_count": 4754
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 8852,
+              "kept": 8852,
+              "rank": {
+                "vertices": 564,
+                "rows": 8852,
+                "rank": 564,
+                "left_nullity": 8288,
+                "components": 564,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8852,
+                "zero_rows": 0
+              },
+              "cycle_count": 8288
+            }
+          ]
+        },
+        {
+          "fraction": 0.1,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 3541,
+              "kept": 3541,
+              "rank": {
+                "vertices": 2617,
+                "rows": 3541,
+                "rank": 2521,
+                "left_nullity": 1020,
+                "components": 2048,
+                "unflagged_components": 96,
+                "unions": 569,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 2972,
+                "zero_rows": 0
+              },
+              "cycle_count": 1020
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 3541,
+              "kept": 3541,
+              "rank": {
+                "vertices": 685,
+                "rows": 3541,
+                "rank": 685,
+                "left_nullity": 2856,
+                "components": 685,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3541,
+                "zero_rows": 0
+              },
+              "cycle_count": 2856
+            },
+            {
+              "policy": "Degree",
+              "budget": 3541,
+              "kept": 3541,
+              "rank": {
+                "vertices": 1657,
+                "rows": 3541,
+                "rank": 1650,
+                "left_nullity": 1891,
+                "components": 8,
+                "unflagged_components": 7,
+                "unions": 1649,
+                "balanced_cycles": 258,
+                "unbalanced_cycles": 207,
+                "singletons": 1427,
+                "zero_rows": 0
+              },
+              "cycle_count": 1891
+            },
+            {
+              "policy": "Spectral",
+              "budget": 3541,
+              "kept": 3541,
+              "rank": {
+                "vertices": 1631,
+                "rows": 3541,
+                "rank": 1611,
+                "left_nullity": 1930,
+                "components": 22,
+                "unflagged_components": 20,
+                "unions": 1609,
+                "balanced_cycles": 201,
+                "unbalanced_cycles": 161,
+                "singletons": 1570,
+                "zero_rows": 0
+              },
+              "cycle_count": 1930
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 3541,
+              "kept": 3541,
+              "rank": {
+                "vertices": 2563,
+                "rows": 3541,
+                "rank": 2495,
+                "left_nullity": 1046,
+                "components": 2035,
+                "unflagged_components": 68,
+                "unions": 528,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3013,
+                "zero_rows": 0
+              },
+              "cycle_count": 1046
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 3541,
+              "kept": 3541,
+              "rank": {
+                "vertices": 173,
+                "rows": 3541,
+                "rank": 173,
+                "left_nullity": 3368,
+                "components": 173,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3541,
+                "zero_rows": 0
+              },
+              "cycle_count": 3368
+            }
+          ]
+        },
+        {
+          "fraction": 0.05,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 1770,
+              "kept": 1770,
+              "rank": {
+                "vertices": 1563,
+                "rows": 1770,
+                "rank": 1465,
+                "left_nullity": 305,
+                "components": 1280,
+                "unflagged_components": 98,
+                "unions": 283,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1487,
+                "zero_rows": 0
+              },
+              "cycle_count": 305
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 1770,
+              "kept": 1770,
+              "rank": {
+                "vertices": 332,
+                "rows": 1770,
+                "rank": 332,
+                "left_nullity": 1438,
+                "components": 332,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1770,
+                "zero_rows": 0
+              },
+              "cycle_count": 1438
+            },
+            {
+              "policy": "Degree",
+              "budget": 1770,
+              "kept": 1770,
+              "rank": {
+                "vertices": 1155,
+                "rows": 1770,
+                "rank": 1145,
+                "left_nullity": 625,
+                "components": 11,
+                "unflagged_components": 10,
+                "unions": 1144,
+                "balanced_cycles": 131,
+                "unbalanced_cycles": 119,
+                "singletons": 376,
+                "zero_rows": 0
+              },
+              "cycle_count": 625
+            },
+            {
+              "policy": "Spectral",
+              "budget": 1770,
+              "kept": 1770,
+              "rank": {
+                "vertices": 1093,
+                "rows": 1770,
+                "rank": 1077,
+                "left_nullity": 693,
+                "components": 17,
+                "unflagged_components": 16,
+                "unions": 1076,
+                "balanced_cycles": 103,
+                "unbalanced_cycles": 91,
+                "singletons": 500,
+                "zero_rows": 0
+              },
+              "cycle_count": 693
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 1770,
+              "kept": 1770,
+              "rank": {
+                "vertices": 1561,
+                "rows": 1770,
+                "rank": 1476,
+                "left_nullity": 294,
+                "components": 1297,
+                "unflagged_components": 85,
+                "unions": 264,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1506,
+                "zero_rows": 0
+              },
+              "cycle_count": 294
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 1770,
+              "kept": 1770,
+              "rank": {
+                "vertices": 78,
+                "rows": 1770,
+                "rank": 78,
+                "left_nullity": 1692,
+                "components": 78,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1770,
+                "zero_rows": 0
+              },
+              "cycle_count": 1692
+            }
+          ]
+        },
+        {
+          "fraction": 0.02,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 708,
+              "kept": 708,
+              "rank": {
+                "vertices": 729,
+                "rows": 708,
+                "rank": 654,
+                "left_nullity": 54,
+                "components": 619,
+                "unflagged_components": 75,
+                "unions": 110,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 598,
+                "zero_rows": 0
+              },
+              "cycle_count": 54
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 708,
+              "kept": 708,
+              "rank": {
+                "vertices": 126,
+                "rows": 708,
+                "rank": 126,
+                "left_nullity": 582,
+                "components": 126,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 708,
+                "zero_rows": 0
+              },
+              "cycle_count": 582
+            },
+            {
+              "policy": "Degree",
+              "budget": 708,
+              "kept": 708,
+              "rank": {
+                "vertices": 617,
+                "rows": 708,
+                "rank": 599,
+                "left_nullity": 109,
+                "components": 19,
+                "unflagged_components": 18,
+                "unions": 598,
+                "balanced_cycles": 49,
+                "unbalanced_cycles": 37,
+                "singletons": 24,
+                "zero_rows": 0
+              },
+              "cycle_count": 109
+            },
+            {
+              "policy": "Spectral",
+              "budget": 708,
+              "kept": 708,
+              "rank": {
+                "vertices": 614,
+                "rows": 708,
+                "rank": 589,
+                "left_nullity": 119,
+                "components": 26,
+                "unflagged_components": 25,
+                "unions": 588,
+                "balanced_cycles": 29,
+                "unbalanced_cycles": 31,
+                "singletons": 60,
+                "zero_rows": 0
+              },
+              "cycle_count": 119
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 708,
+              "kept": 708,
+              "rank": {
+                "vertices": 727,
+                "rows": 708,
+                "rank": 658,
+                "left_nullity": 50,
+                "components": 620,
+                "unflagged_components": 69,
+                "unions": 107,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 601,
+                "zero_rows": 0
+              },
+              "cycle_count": 50
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 708,
+              "kept": 708,
+              "rank": {
+                "vertices": 28,
+                "rows": 708,
+                "rank": 28,
+                "left_nullity": 680,
+                "components": 28,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 708,
+                "zero_rows": 0
+              },
+              "cycle_count": 680
+            }
+          ]
+        },
+        {
+          "fraction": 0.01,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 354,
+              "kept": 354,
+              "rank": {
+                "vertices": 384,
+                "rows": 354,
+                "rank": 342,
+                "left_nullity": 12,
+                "components": 329,
+                "unflagged_components": 42,
+                "unions": 55,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 299,
+                "zero_rows": 0
+              },
+              "cycle_count": 12
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 354,
+              "kept": 354,
+              "rank": {
+                "vertices": 67,
+                "rows": 354,
+                "rank": 67,
+                "left_nullity": 287,
+                "components": 67,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 354,
+                "zero_rows": 0
+              },
+              "cycle_count": 287
+            },
+            {
+              "policy": "Degree",
+              "budget": 354,
+              "kept": 354,
+              "rank": {
+                "vertices": 341,
+                "rows": 354,
+                "rank": 322,
+                "left_nullity": 32,
+                "components": 20,
+                "unflagged_components": 19,
+                "unions": 321,
+                "balanced_cycles": 17,
+                "unbalanced_cycles": 16,
+                "singletons": 0,
+                "zero_rows": 0
+              },
+              "cycle_count": 33
+            },
+            {
+              "policy": "Spectral",
+              "budget": 354,
+              "kept": 354,
+              "rank": {
+                "vertices": 357,
+                "rows": 354,
+                "rank": 334,
+                "left_nullity": 20,
+                "components": 24,
+                "unflagged_components": 23,
+                "unions": 333,
+                "balanced_cycles": 12,
+                "unbalanced_cycles": 9,
+                "singletons": 0,
+                "zero_rows": 0
+              },
+              "cycle_count": 21
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 354,
+              "kept": 354,
+              "rank": {
+                "vertices": 383,
+                "rows": 354,
+                "rank": 339,
+                "left_nullity": 15,
+                "components": 330,
+                "unflagged_components": 44,
+                "unions": 53,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 301,
+                "zero_rows": 0
+              },
+              "cycle_count": 15
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 354,
+              "kept": 354,
+              "rank": {
+                "vertices": 14,
+                "rows": 354,
+                "rank": 14,
+                "left_nullity": 340,
+                "components": 14,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 354,
+                "zero_rows": 0
+              },
+              "cycle_count": 340
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": 4003,
+      "pool": 35150,
+      "complete": 18785,
+      "dropped_wide": 0,
+      "replayed": 35150,
+      "full": {
+        "policy": "Random",
+        "budget": 35150,
+        "kept": 35150,
+        "rank": {
+          "vertices": 5836,
+          "rows": 35150,
+          "rank": 5836,
+          "left_nullity": 29314,
+          "components": 1892,
+          "unflagged_components": 0,
+          "unions": 3944,
+          "balanced_cycles": 797,
+          "unbalanced_cycles": 794,
+          "singletons": 29615,
+          "zero_rows": 0
+        },
+        "cycle_count": 29314
+      },
+      "budgets": [
+        {
+          "fraction": 0.25,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 8787,
+              "kept": 8787,
+              "rank": {
+                "vertices": 4231,
+                "rows": 8787,
+                "rank": 4201,
+                "left_nullity": 4586,
+                "components": 2831,
+                "unflagged_components": 30,
+                "unions": 1400,
+                "balanced_cycles": 1,
+                "unbalanced_cycles": 0,
+                "singletons": 7386,
+                "zero_rows": 0
+              },
+              "cycle_count": 4586
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 8787,
+              "kept": 8787,
+              "rank": {
+                "vertices": 1679,
+                "rows": 8787,
+                "rank": 1679,
+                "left_nullity": 7108,
+                "components": 1679,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8787,
+                "zero_rows": 0
+              },
+              "cycle_count": 7108
+            },
+            {
+              "policy": "Degree",
+              "budget": 8787,
+              "kept": 8787,
+              "rank": {
+                "vertices": 2619,
+                "rows": 8787,
+                "rank": 2605,
+                "left_nullity": 6182,
+                "components": 15,
+                "unflagged_components": 14,
+                "unions": 2604,
+                "balanced_cycles": 472,
+                "unbalanced_cycles": 511,
+                "singletons": 5200,
+                "zero_rows": 0
+              },
+              "cycle_count": 6182
+            },
+            {
+              "policy": "Spectral",
+              "budget": 8787,
+              "kept": 8787,
+              "rank": {
+                "vertices": 2543,
+                "rows": 8787,
+                "rank": 2523,
+                "left_nullity": 6264,
+                "components": 26,
+                "unflagged_components": 20,
+                "unions": 2517,
+                "balanced_cycles": 391,
+                "unbalanced_cycles": 445,
+                "singletons": 5434,
+                "zero_rows": 0
+              },
+              "cycle_count": 6264
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 8787,
+              "kept": 8787,
+              "rank": {
+                "vertices": 4109,
+                "rows": 8787,
+                "rank": 4087,
+                "left_nullity": 4700,
+                "components": 2722,
+                "unflagged_components": 22,
+                "unions": 1387,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 7400,
+                "zero_rows": 0
+              },
+              "cycle_count": 4700
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 8787,
+              "kept": 8787,
+              "rank": {
+                "vertices": 560,
+                "rows": 8787,
+                "rank": 560,
+                "left_nullity": 8227,
+                "components": 560,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8787,
+                "zero_rows": 0
+              },
+              "cycle_count": 8227
+            }
+          ]
+        },
+        {
+          "fraction": 0.1,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 3515,
+              "kept": 3515,
+              "rank": {
+                "vertices": 2626,
+                "rows": 3515,
+                "rank": 2521,
+                "left_nullity": 994,
+                "components": 2047,
+                "unflagged_components": 105,
+                "unions": 579,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 2936,
+                "zero_rows": 0
+              },
+              "cycle_count": 994
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 3515,
+              "kept": 3515,
+              "rank": {
+                "vertices": 690,
+                "rows": 3515,
+                "rank": 690,
+                "left_nullity": 2825,
+                "components": 690,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3515,
+                "zero_rows": 0
+              },
+              "cycle_count": 2825
+            },
+            {
+              "policy": "Degree",
+              "budget": 3515,
+              "kept": 3515,
+              "rank": {
+                "vertices": 1600,
+                "rows": 3515,
+                "rank": 1587,
+                "left_nullity": 1928,
+                "components": 14,
+                "unflagged_components": 13,
+                "unions": 1586,
+                "balanced_cycles": 228,
+                "unbalanced_cycles": 245,
+                "singletons": 1456,
+                "zero_rows": 0
+              },
+              "cycle_count": 1928
+            },
+            {
+              "policy": "Spectral",
+              "budget": 3515,
+              "kept": 3515,
+              "rank": {
+                "vertices": 1536,
+                "rows": 3515,
+                "rank": 1512,
+                "left_nullity": 2003,
+                "components": 27,
+                "unflagged_components": 24,
+                "unions": 1509,
+                "balanced_cycles": 185,
+                "unbalanced_cycles": 198,
+                "singletons": 1623,
+                "zero_rows": 0
+              },
+              "cycle_count": 2003
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 3515,
+              "kept": 3515,
+              "rank": {
+                "vertices": 2582,
+                "rows": 3515,
+                "rank": 2497,
+                "left_nullity": 1018,
+                "components": 2015,
+                "unflagged_components": 85,
+                "unions": 567,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 2948,
+                "zero_rows": 0
+              },
+              "cycle_count": 1018
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 3515,
+              "kept": 3515,
+              "rank": {
+                "vertices": 173,
+                "rows": 3515,
+                "rank": 173,
+                "left_nullity": 3342,
+                "components": 173,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3515,
+                "zero_rows": 0
+              },
+              "cycle_count": 3342
+            }
+          ]
+        },
+        {
+          "fraction": 0.05,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 1757,
+              "kept": 1757,
+              "rank": {
+                "vertices": 1601,
+                "rows": 1757,
+                "rank": 1484,
+                "left_nullity": 273,
+                "components": 1305,
+                "unflagged_components": 117,
+                "unions": 296,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1461,
+                "zero_rows": 0
+              },
+              "cycle_count": 273
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 1757,
+              "kept": 1757,
+              "rank": {
+                "vertices": 337,
+                "rows": 1757,
+                "rank": 337,
+                "left_nullity": 1420,
+                "components": 337,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1757,
+                "zero_rows": 0
+              },
+              "cycle_count": 1420
+            },
+            {
+              "policy": "Degree",
+              "budget": 1757,
+              "kept": 1757,
+              "rank": {
+                "vertices": 1092,
+                "rows": 1757,
+                "rank": 1080,
+                "left_nullity": 677,
+                "components": 13,
+                "unflagged_components": 12,
+                "unions": 1079,
+                "balanced_cycles": 117,
+                "unbalanced_cycles": 144,
+                "singletons": 417,
+                "zero_rows": 0
+              },
+              "cycle_count": 677
+            },
+            {
+              "policy": "Spectral",
+              "budget": 1757,
+              "kept": 1757,
+              "rank": {
+                "vertices": 996,
+                "rows": 1757,
+                "rank": 975,
+                "left_nullity": 782,
+                "components": 22,
+                "unflagged_components": 21,
+                "unions": 974,
+                "balanced_cycles": 80,
+                "unbalanced_cycles": 95,
+                "singletons": 608,
+                "zero_rows": 0
+              },
+              "cycle_count": 782
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 1757,
+              "kept": 1757,
+              "rank": {
+                "vertices": 1586,
+                "rows": 1757,
+                "rank": 1494,
+                "left_nullity": 263,
+                "components": 1291,
+                "unflagged_components": 92,
+                "unions": 295,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1462,
+                "zero_rows": 0
+              },
+              "cycle_count": 263
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 1757,
+              "kept": 1757,
+              "rank": {
+                "vertices": 76,
+                "rows": 1757,
+                "rank": 76,
+                "left_nullity": 1681,
+                "components": 76,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1757,
+                "zero_rows": 0
+              },
+              "cycle_count": 1681
+            }
+          ]
+        },
+        {
+          "fraction": 0.02,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 703,
+              "kept": 703,
+              "rank": {
+                "vertices": 745,
+                "rows": 703,
+                "rank": 662,
+                "left_nullity": 41,
+                "components": 623,
+                "unflagged_components": 83,
+                "unions": 122,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 581,
+                "zero_rows": 0
+              },
+              "cycle_count": 41
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 703,
+              "kept": 703,
+              "rank": {
+                "vertices": 140,
+                "rows": 703,
+                "rank": 140,
+                "left_nullity": 563,
+                "components": 140,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 703,
+                "zero_rows": 0
+              },
+              "cycle_count": 563
+            },
+            {
+              "policy": "Degree",
+              "budget": 703,
+              "kept": 703,
+              "rank": {
+                "vertices": 600,
+                "rows": 703,
+                "rank": 589,
+                "left_nullity": 114,
+                "components": 12,
+                "unflagged_components": 11,
+                "unions": 588,
+                "balanced_cycles": 48,
+                "unbalanced_cycles": 33,
+                "singletons": 34,
+                "zero_rows": 0
+              },
+              "cycle_count": 114
+            },
+            {
+              "policy": "Spectral",
+              "budget": 703,
+              "kept": 703,
+              "rank": {
+                "vertices": 556,
+                "rows": 703,
+                "rank": 537,
+                "left_nullity": 166,
+                "components": 21,
+                "unflagged_components": 19,
+                "unions": 535,
+                "balanced_cycles": 22,
+                "unbalanced_cycles": 20,
+                "singletons": 126,
+                "zero_rows": 0
+              },
+              "cycle_count": 166
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 703,
+              "kept": 703,
+              "rank": {
+                "vertices": 722,
+                "rows": 703,
+                "rank": 649,
+                "left_nullity": 54,
+                "components": 613,
+                "unflagged_components": 73,
+                "unions": 109,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 594,
+                "zero_rows": 0
+              },
+              "cycle_count": 54
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 703,
+              "kept": 703,
+              "rank": {
+                "vertices": 27,
+                "rows": 703,
+                "rank": 27,
+                "left_nullity": 676,
+                "components": 27,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 703,
+                "zero_rows": 0
+              },
+              "cycle_count": 676
+            }
+          ]
+        },
+        {
+          "fraction": 0.01,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 351,
+              "kept": 351,
+              "rank": {
+                "vertices": 391,
+                "rows": 351,
+                "rank": 340,
+                "left_nullity": 11,
+                "components": 324,
+                "unflagged_components": 51,
+                "unions": 67,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 284,
+                "zero_rows": 0
+              },
+              "cycle_count": 11
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 351,
+              "kept": 351,
+              "rank": {
+                "vertices": 71,
+                "rows": 351,
+                "rank": 71,
+                "left_nullity": 280,
+                "components": 71,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 351,
+                "zero_rows": 0
+              },
+              "cycle_count": 280
+            },
+            {
+              "policy": "Degree",
+              "budget": 351,
+              "kept": 351,
+              "rank": {
+                "vertices": 353,
+                "rows": 351,
+                "rank": 338,
+                "left_nullity": 13,
+                "components": 16,
+                "unflagged_components": 15,
+                "unions": 337,
+                "balanced_cycles": 12,
+                "unbalanced_cycles": 2,
+                "singletons": 0,
+                "zero_rows": 0
+              },
+              "cycle_count": 14
+            },
+            {
+              "policy": "Spectral",
+              "budget": 351,
+              "kept": 351,
+              "rank": {
+                "vertices": 372,
+                "rows": 351,
+                "rank": 346,
+                "left_nullity": 5,
+                "components": 27,
+                "unflagged_components": 26,
+                "unions": 345,
+                "balanced_cycles": 3,
+                "unbalanced_cycles": 2,
+                "singletons": 1,
+                "zero_rows": 0
+              },
+              "cycle_count": 5
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 351,
+              "kept": 351,
+              "rank": {
+                "vertices": 380,
+                "rows": 351,
+                "rank": 337,
+                "left_nullity": 14,
+                "components": 327,
+                "unflagged_components": 43,
+                "unions": 53,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 298,
+                "zero_rows": 0
+              },
+              "cycle_count": 14
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 351,
+              "kept": 351,
+              "rank": {
+                "vertices": 13,
+                "rows": 351,
+                "rank": 13,
+                "left_nullity": 338,
+                "components": 13,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 351,
+                "zero_rows": 0
+              },
+              "cycle_count": 338
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": 4004,
+      "pool": 34785,
+      "complete": 18949,
+      "dropped_wide": 0,
+      "replayed": 34785,
+      "full": {
+        "policy": "Random",
+        "budget": 34785,
+        "kept": 34785,
+        "rank": {
+          "vertices": 5814,
+          "rows": 34785,
+          "rank": 5813,
+          "left_nullity": 28972,
+          "components": 1905,
+          "unflagged_components": 1,
+          "unions": 3909,
+          "balanced_cycles": 771,
+          "unbalanced_cycles": 755,
+          "singletons": 29350,
+          "zero_rows": 0
+        },
+        "cycle_count": 28972
+      },
+      "budgets": [
+        {
+          "fraction": 0.25,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 8696,
+              "kept": 8696,
+              "rank": {
+                "vertices": 4181,
+                "rows": 8696,
+                "rank": 4155,
+                "left_nullity": 4541,
+                "components": 2828,
+                "unflagged_components": 26,
+                "unions": 1353,
+                "balanced_cycles": 1,
+                "unbalanced_cycles": 0,
+                "singletons": 7342,
+                "zero_rows": 0
+              },
+              "cycle_count": 4541
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 8696,
+              "kept": 8696,
+              "rank": {
+                "vertices": 1667,
+                "rows": 8696,
+                "rank": 1667,
+                "left_nullity": 7029,
+                "components": 1667,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8696,
+                "zero_rows": 0
+              },
+              "cycle_count": 7029
+            },
+            {
+              "policy": "Degree",
+              "budget": 8696,
+              "kept": 8696,
+              "rank": {
+                "vertices": 2595,
+                "rows": 8696,
+                "rank": 2580,
+                "left_nullity": 6116,
+                "components": 20,
+                "unflagged_components": 15,
+                "unions": 2575,
+                "balanced_cycles": 436,
+                "unbalanced_cycles": 461,
+                "singletons": 5224,
+                "zero_rows": 0
+              },
+              "cycle_count": 6116
+            },
+            {
+              "policy": "Spectral",
+              "budget": 8696,
+              "kept": 8696,
+              "rank": {
+                "vertices": 2494,
+                "rows": 8696,
+                "rank": 2464,
+                "left_nullity": 6232,
+                "components": 41,
+                "unflagged_components": 30,
+                "unions": 2453,
+                "balanced_cycles": 377,
+                "unbalanced_cycles": 387,
+                "singletons": 5479,
+                "zero_rows": 0
+              },
+              "cycle_count": 6232
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 8696,
+              "kept": 8696,
+              "rank": {
+                "vertices": 4076,
+                "rows": 8696,
+                "rank": 4047,
+                "left_nullity": 4649,
+                "components": 2724,
+                "unflagged_components": 29,
+                "unions": 1352,
+                "balanced_cycles": 2,
+                "unbalanced_cycles": 0,
+                "singletons": 7342,
+                "zero_rows": 0
+              },
+              "cycle_count": 4649
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 8696,
+              "kept": 8696,
+              "rank": {
+                "vertices": 554,
+                "rows": 8696,
+                "rank": 554,
+                "left_nullity": 8142,
+                "components": 554,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 8696,
+                "zero_rows": 0
+              },
+              "cycle_count": 8142
+            }
+          ]
+        },
+        {
+          "fraction": 0.1,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 3478,
+              "kept": 3478,
+              "rank": {
+                "vertices": 2562,
+                "rows": 3478,
+                "rank": 2478,
+                "left_nullity": 1000,
+                "components": 2020,
+                "unflagged_components": 84,
+                "unions": 542,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 2936,
+                "zero_rows": 0
+              },
+              "cycle_count": 1000
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 3478,
+              "kept": 3478,
+              "rank": {
+                "vertices": 698,
+                "rows": 3478,
+                "rank": 698,
+                "left_nullity": 2780,
+                "components": 698,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3478,
+                "zero_rows": 0
+              },
+              "cycle_count": 2780
+            },
+            {
+              "policy": "Degree",
+              "budget": 3478,
+              "kept": 3478,
+              "rank": {
+                "vertices": 1660,
+                "rows": 3478,
+                "rank": 1647,
+                "left_nullity": 1831,
+                "components": 14,
+                "unflagged_components": 13,
+                "unions": 1646,
+                "balanced_cycles": 238,
+                "unbalanced_cycles": 228,
+                "singletons": 1366,
+                "zero_rows": 0
+              },
+              "cycle_count": 1831
+            },
+            {
+              "policy": "Spectral",
+              "budget": 3478,
+              "kept": 3478,
+              "rank": {
+                "vertices": 1484,
+                "rows": 3478,
+                "rank": 1461,
+                "left_nullity": 2017,
+                "components": 27,
+                "unflagged_components": 23,
+                "unions": 1457,
+                "balanced_cycles": 167,
+                "unbalanced_cycles": 162,
+                "singletons": 1692,
+                "zero_rows": 0
+              },
+              "cycle_count": 2017
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 3478,
+              "kept": 3478,
+              "rank": {
+                "vertices": 2519,
+                "rows": 3478,
+                "rank": 2452,
+                "left_nullity": 1026,
+                "components": 1976,
+                "unflagged_components": 67,
+                "unions": 543,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 2935,
+                "zero_rows": 0
+              },
+              "cycle_count": 1026
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 3478,
+              "kept": 3478,
+              "rank": {
+                "vertices": 170,
+                "rows": 3478,
+                "rank": 170,
+                "left_nullity": 3308,
+                "components": 170,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 3478,
+                "zero_rows": 0
+              },
+              "cycle_count": 3308
+            }
+          ]
+        },
+        {
+          "fraction": 0.05,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 1739,
+              "kept": 1739,
+              "rank": {
+                "vertices": 1591,
+                "rows": 1739,
+                "rank": 1479,
+                "left_nullity": 260,
+                "components": 1316,
+                "unflagged_components": 112,
+                "unions": 275,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1464,
+                "zero_rows": 0
+              },
+              "cycle_count": 260
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 1739,
+              "kept": 1739,
+              "rank": {
+                "vertices": 342,
+                "rows": 1739,
+                "rank": 342,
+                "left_nullity": 1397,
+                "components": 342,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1739,
+                "zero_rows": 0
+              },
+              "cycle_count": 1397
+            },
+            {
+              "policy": "Degree",
+              "budget": 1739,
+              "kept": 1739,
+              "rank": {
+                "vertices": 1111,
+                "rows": 1739,
+                "rank": 1101,
+                "left_nullity": 638,
+                "components": 11,
+                "unflagged_components": 10,
+                "unions": 1100,
+                "balanced_cycles": 130,
+                "unbalanced_cycles": 122,
+                "singletons": 387,
+                "zero_rows": 0
+              },
+              "cycle_count": 638
+            },
+            {
+              "policy": "Spectral",
+              "budget": 1739,
+              "kept": 1739,
+              "rank": {
+                "vertices": 1033,
+                "rows": 1739,
+                "rank": 1015,
+                "left_nullity": 724,
+                "components": 19,
+                "unflagged_components": 18,
+                "unions": 1014,
+                "balanced_cycles": 87,
+                "unbalanced_cycles": 94,
+                "singletons": 544,
+                "zero_rows": 0
+              },
+              "cycle_count": 724
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 1739,
+              "kept": 1739,
+              "rank": {
+                "vertices": 1546,
+                "rows": 1739,
+                "rank": 1451,
+                "left_nullity": 288,
+                "components": 1257,
+                "unflagged_components": 95,
+                "unions": 289,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1450,
+                "zero_rows": 0
+              },
+              "cycle_count": 288
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 1739,
+              "kept": 1739,
+              "rank": {
+                "vertices": 76,
+                "rows": 1739,
+                "rank": 76,
+                "left_nullity": 1663,
+                "components": 76,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 1739,
+                "zero_rows": 0
+              },
+              "cycle_count": 1663
+            }
+          ]
+        },
+        {
+          "fraction": 0.02,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 695,
+              "kept": 695,
+              "rank": {
+                "vertices": 721,
+                "rows": 695,
+                "rank": 648,
+                "left_nullity": 47,
+                "components": 615,
+                "unflagged_components": 73,
+                "unions": 106,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 589,
+                "zero_rows": 0
+              },
+              "cycle_count": 47
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 695,
+              "kept": 695,
+              "rank": {
+                "vertices": 137,
+                "rows": 695,
+                "rank": 137,
+                "left_nullity": 558,
+                "components": 137,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 695,
+                "zero_rows": 0
+              },
+              "cycle_count": 558
+            },
+            {
+              "policy": "Degree",
+              "budget": 695,
+              "kept": 695,
+              "rank": {
+                "vertices": 560,
+                "rows": 695,
+                "rank": 545,
+                "left_nullity": 150,
+                "components": 16,
+                "unflagged_components": 15,
+                "unions": 544,
+                "balanced_cycles": 39,
+                "unbalanced_cycles": 32,
+                "singletons": 80,
+                "zero_rows": 0
+              },
+              "cycle_count": 150
+            },
+            {
+              "policy": "Spectral",
+              "budget": 695,
+              "kept": 695,
+              "rank": {
+                "vertices": 620,
+                "rows": 695,
+                "rank": 600,
+                "left_nullity": 95,
+                "components": 21,
+                "unflagged_components": 20,
+                "unions": 599,
+                "balanced_cycles": 30,
+                "unbalanced_cycles": 33,
+                "singletons": 33,
+                "zero_rows": 0
+              },
+              "cycle_count": 95
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 695,
+              "kept": 695,
+              "rank": {
+                "vertices": 724,
+                "rows": 695,
+                "rank": 650,
+                "left_nullity": 45,
+                "components": 621,
+                "unflagged_components": 74,
+                "unions": 103,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 592,
+                "zero_rows": 0
+              },
+              "cycle_count": 45
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 695,
+              "kept": 695,
+              "rank": {
+                "vertices": 28,
+                "rows": 695,
+                "rank": 28,
+                "left_nullity": 667,
+                "components": 28,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 695,
+                "zero_rows": 0
+              },
+              "cycle_count": 667
+            }
+          ]
+        },
+        {
+          "fraction": 0.01,
+          "outcomes": [
+            {
+              "policy": "Random",
+              "budget": 347,
+              "kept": 347,
+              "rank": {
+                "vertices": 374,
+                "rows": 347,
+                "rank": 335,
+                "left_nullity": 12,
+                "components": 326,
+                "unflagged_components": 39,
+                "unions": 48,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 299,
+                "zero_rows": 0
+              },
+              "cycle_count": 12
+            },
+            {
+              "policy": "SmallestLp",
+              "budget": 347,
+              "kept": 347,
+              "rank": {
+                "vertices": 72,
+                "rows": 347,
+                "rank": 72,
+                "left_nullity": 275,
+                "components": 72,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 347,
+                "zero_rows": 0
+              },
+              "cycle_count": 275
+            },
+            {
+              "policy": "Degree",
+              "budget": 347,
+              "kept": 347,
+              "rank": {
+                "vertices": 348,
+                "rows": 347,
+                "rank": 331,
+                "left_nullity": 16,
+                "components": 18,
+                "unflagged_components": 17,
+                "unions": 330,
+                "balanced_cycles": 9,
+                "unbalanced_cycles": 8,
+                "singletons": 0,
+                "zero_rows": 0
+              },
+              "cycle_count": 17
+            },
+            {
+              "policy": "Spectral",
+              "budget": 347,
+              "kept": 347,
+              "rank": {
+                "vertices": 329,
+                "rows": 347,
+                "rank": 307,
+                "left_nullity": 40,
+                "components": 23,
+                "unflagged_components": 22,
+                "unions": 306,
+                "balanced_cycles": 4,
+                "unbalanced_cycles": 4,
+                "singletons": 33,
+                "zero_rows": 0
+              },
+              "cycle_count": 40
+            },
+            {
+              "policy": "CoreThenRandom",
+              "budget": 347,
+              "kept": 347,
+              "rank": {
+                "vertices": 380,
+                "rows": 347,
+                "rank": 341,
+                "left_nullity": 6,
+                "components": 330,
+                "unflagged_components": 39,
+                "unions": 50,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 297,
+                "zero_rows": 0
+              },
+              "cycle_count": 6
+            },
+            {
+              "policy": "SinglesThenSpectral",
+              "budget": 347,
+              "kept": 347,
+              "rank": {
+                "vertices": 13,
+                "rows": 347,
+                "rank": 13,
+                "left_nullity": 334,
+                "components": 13,
+                "unflagged_components": 0,
+                "unions": 0,
+                "balanced_cycles": 0,
+                "unbalanced_cycles": 0,
+                "singletons": 347,
+                "zero_rows": 0
+              },
+              "cycle_count": 334
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

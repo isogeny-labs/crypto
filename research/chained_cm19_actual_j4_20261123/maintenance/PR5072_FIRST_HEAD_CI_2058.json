@@ -1,0 +1,77 @@
+{
+  "schema": "scheduled-current-head-required-gates-missing/v1",
+  "recorded": "2026-11-23T21:06:02.857883+00:00",
+  "PR": 5072,
+  "head": "092e3f546a664c95631f58e2f8276b4de56cd9df",
+  "latest_ready": "2026-11-23T20:05:42Z",
+  "eligible": "2026-11-23T20:55:42Z",
+  "review_lower_clock": "2026-11-23T20:58:18Z",
+  "all_attempt_checks": 3,
+  "all_event_runs": 4,
+  "checks": [
+    {
+      "id": 137977079248,
+      "name": "review",
+      "status": "completed",
+      "conclusion": "skipped",
+      "details_url": "https://github.com/isogeny-labs/crypto/actions/runs/45255745920/job/137977079248"
+    },
+    {
+      "id": 137976987746,
+      "name": "review",
+      "status": "completed",
+      "conclusion": "success",
+      "details_url": "https://github.com/isogeny-labs/crypto/actions/runs/45255750703/job/137976987746"
+    },
+    {
+      "id": 137976975005,
+      "name": "migrate",
+      "status": "completed",
+      "conclusion": "success",
+      "details_url": "https://github.com/isogeny-labs/crypto/actions/runs/45255745946/job/137976975005"
+    }
+  ],
+  "runs": [
+    {
+      "id": 45255750703,
+      "name": "Free LLM pull-request review",
+      "event": "pull_request_target",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1
+    },
+    {
+      "id": 45255745920,
+      "name": "Free LLM pull-request review",
+      "event": "pull_request_target",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_attempt": 1
+    },
+    {
+      "id": 45255745946,
+      "name": "artifact-autofix",
+      "event": "pull_request_target",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1
+    },
+    {
+      "id": 45255736551,
+      "name": ".github/workflows/ct330-f103-rho-bsgs-paired.yml",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_attempt": 1
+    }
+  ],
+  "required_merge_names": [
+    "gate",
+    "size",
+    "artifacts"
+  ],
+  "found_required_names": [],
+  "workflow_files": "Exact current-head declared triggers read:validation pull_request no path/branchfilter, size/artifacts main PR including ready/synchronize. Enabled-state API endpoints rejected400 by connector allowlist; cause of absent gates unresolved, no disabled-state assertion.",
+  "merge_status": "Required checks not satisfied; missing checks not labelled green/inapplicable, no waiver/emptycommit/rerun. Actual frozenledgerfork remains blocked.",
+  "next_unchanged_review_not_before": "2026-11-24T01:06:02.857883+00:00"
+}

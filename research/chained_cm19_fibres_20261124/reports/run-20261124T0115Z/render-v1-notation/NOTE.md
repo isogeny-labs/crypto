@@ -1,0 +1,1 @@
+First complete two-page report render preserved. Both pages visually inspected. Replace ambiguous O_C(4/6) shorthand by explicit separate section spaces; improve literal-source/hash spacing. No source, algorithm, qualification or mathematical result changed. Final v2 re-render and individual-page inspection required. [pcc:unverified]

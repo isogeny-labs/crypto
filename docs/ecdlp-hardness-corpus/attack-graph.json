@@ -7,26 +7,26 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 654,
-    "frontier": 431,
+    "nodes": 660,
+    "frontier": 435,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
       "definition": 48,
       "assumed": 18,
-      "proved_external": 132,
+      "proved_external": 133,
       "algorithm": 12,
-      "conditional": 91,
-      "measured": 31,
-      "proved_internal_unreviewed": 78,
+      "conditional": 92,
+      "measured": 32,
+      "proved_internal_unreviewed": 81,
       "open": 92,
       "heuristic": 71,
-      "refuted": 37,
-      "proved_external_unread": 44
+      "refuted": 38,
+      "proved_external_unread": 43
     },
     "by_formal_state": {
-      "none": 589,
-      "kernel_checked": 55,
+      "none": 591,
+      "kernel_checked": 59,
       "stated_open": 3,
       "lean_written_unchecked": 1,
       "native_exact": 6
@@ -596,6 +596,24 @@
       "pressure": []
     },
     {
+      "id": "ALG-WD-THERIAULT-2003",
+      "label": "Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2)))",
+      "status": "conditional",
+      "formal": "none",
+      "action": "discharge each condition, or keep the row labelled conditional",
+      "impact": 5,
+      "downstream": [
+        "ALG-SP-JV-COVER-DECOMPOSITION",
+        "COND-WD-JV-COVER-DECOMP",
+        "COND-WD-KMPS-INEFFECTIVE",
+        "THM-WD-DIEM-SMALL-GENUS",
+        "THM-WD-GTTD-THM1"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "ATTACK-MOV-PAIRING",
       "label": "MOV pairing transfer",
       "status": "conditional",
@@ -660,24 +678,6 @@
         "GAP-WD-JV-ISOGENY-CONJ",
         "RED-ISOGENY-DLP-TRANSPORT",
         "THEOREM-JMV-ISOGENY-REDUCTION"
-      ],
-      "depends_citations": [],
-      "research_targets": [],
-      "pressure": []
-    },
-    {
-      "id": "ALG-WD-THERIAULT-2003",
-      "label": "Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2)))",
-      "status": "proved_external_unread",
-      "formal": "none",
-      "action": "read the primary text, record its SHA-256, confirm the statement and hypotheses",
-      "impact": 5,
-      "downstream": [
-        "ALG-SP-JV-COVER-DECOMPOSITION",
-        "COND-WD-JV-COVER-DECOMP",
-        "COND-WD-KMPS-INEFFECTIVE",
-        "THM-WD-DIEM-SMALL-GENUS",
-        "THM-WD-GTTD-THM1"
       ],
       "depends_citations": [],
       "research_targets": [],
@@ -1718,7 +1718,7 @@
     },
     {
       "id": "GAP-RP-CYCLE-CLOSURE-LAW",
-      "label": "Two-summand relation-graph first-cycle law",
+      "label": "Two-summand useful balanced-circuit stopping law",
       "status": "open",
       "formal": "none",
       "action": "prove or refute",
@@ -1728,7 +1728,20 @@
       ],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "THM-IC-SIGNLESS-INCIDENCE-RANK",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-BALANCED-CYCLE-CONTROLS",
+          "relation": "qualifies"
+        },
+        {
+          "from": "THM-RP-CYCLE-TARGET-PROJECTION",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "GAP-SP-BOUNDED-ROOT-SUMPOLY",
@@ -3598,6 +3611,23 @@
       "pressure": [
         {
           "from": "CEX-PA-ALWAYS-ACCEPT",
+          "relation": "refutes"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES",
+      "label": "'Any first graph cycle closes two-summand elimination over an odd scalar field'",
+      "status": "refuted",
+      "formal": "kernel_checked",
+      "action": "audit every dependent; repair or retract the estimates that use it",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": [
+        {
+          "from": "CEX-RP-ODD-CYCLE-NO-CLOSURE",
           "relation": "refutes"
         }
       ]
@@ -5832,7 +5862,7 @@
     },
     {
       "id": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-      "label": "Two-summand pair-table IC family costs ~0.75 r^(1/6) in S units: no crossover with rho",
+      "label": "Conditional two-summand pair-table family law; r^(1/6) at rho(K)=K/2",
       "status": "conditional",
       "formal": "none",
       "action": "discharge each condition, or keep the row labelled conditional",
@@ -5840,7 +5870,12 @@
       "downstream": [],
       "depends_citations": [],
       "research_targets": [],
-      "pressure": []
+      "pressure": [
+        {
+          "from": "MEAS-RP-NATURAL-CYCLE-STOPPING-M31",
+          "relation": "qualifies"
+        }
+      ]
     },
     {
       "id": "COND-SP-FGHR-PDP-EDWARDS",
@@ -6653,6 +6688,18 @@
       "pressure": []
     },
     {
+      "id": "CEX-RP-ODD-CYCLE-NO-CLOSURE",
+      "label": "Triangle and self-pair loop need not close unsigned elimination over F3 (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "CEX-SP-SEMAEV15-T2-TRACE",
       "label": "Trace identity: d_ff = 2 on Semaev's t = 2 rows (checked); solver needs 2 or 3",
       "status": "proved_internal_unreviewed",
@@ -7165,6 +7212,18 @@
       "pressure": []
     },
     {
+      "id": "THM-RP-BALANCED-CYCLE-CONTROLS",
+      "label": "Square and parallel-edge circuits give unsigned row dependencies over F3 (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
       "id": "THM-RP-BAND-AFFINE",
       "label": "Priced cost is affine in the native-work weight; band reversals force an interior crossing (Lean)",
       "status": "proved_internal_unreviewed",
@@ -7195,6 +7254,18 @@
       "label": "Cofactor-4 curves: two-summand relation space has rank C-1 (A-RC3/A-LA4)",
       "status": "proved_internal_unreviewed",
       "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 0,
+      "downstream": [],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-RP-CYCLE-TARGET-PROJECTION",
+      "label": "A row dependency recovers the target only with nonzero target projection (Lean)",
+      "status": "proved_internal_unreviewed",
+      "formal": "kernel_checked",
       "action": "independent review, then kernel-check",
       "impact": 0,
       "downstream": [],
