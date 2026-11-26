@@ -125,8 +125,18 @@ the complete schema-2 child family from structural atoms, containers and
 fields. Exact family coverage gives child atoms
 `T R(2+Q+2K)+4TV+8TM`, so this trace is `T` times a polynomial factor rather
 than a second tuple exponential. Source isolates are charged through `V` and
-the original description length. Schema-5 absorption of this exact formula
-remains to be rederived. `[pcc:unverified]`
+the original description length. Schema 6 composes the remaining nonvertex
+units into 11 header terms plus 3 entry-value terms and binds the vertex factor
+7 without changing the local exponent. `[pcc:unverified]`
+
+The schema-1 node-refinement certificate composes all finite interfaces in one
+verification order: factorization, normalized source dimensions, packing, and
+the complete child family. It checks cross-object `M,K,L,a,i,T,R` equality and
+reports actual maximum child size/degree. Its strict entry point accepts only
+when the fixed radix-64 guards hold. The admitted radix-2 control passes the
+composed finite report but correctly fails strict admission. Thus R1 now has a
+generic finite checker; constructing a uniform accepted family remains open.
+`[pcc:unverified]`
 
 The schema-6 symbolic transcript now closes R1 item 4 at the scalar level once
 the packing premises hold. Each side contributes at most `3M/64` endpoints to

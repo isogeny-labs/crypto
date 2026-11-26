@@ -31,6 +31,7 @@ pub mod floor_sum;
 pub mod joint;
 pub mod metrics;
 pub mod network;
+pub mod node_refinement_certificate;
 pub mod optimized;
 pub mod packing_provenance_certificate;
 pub mod partial;

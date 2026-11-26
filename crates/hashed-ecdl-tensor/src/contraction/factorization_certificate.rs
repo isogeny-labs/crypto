@@ -15,6 +15,10 @@ use crate::factorization_certificate::{
     SourceDimensionWitness, SCHEMA,
 };
 use crate::network::FnPredicate;
+use crate::node_refinement_certificate::{
+    verify as verify_node_refinement, verify_strict as verify_strict_node_refinement,
+    Certificate as NodeRefinementCertificate, SCHEMA as NODE_REFINEMENT_SCHEMA,
+};
 use crate::packing_provenance_certificate::{
     description_envelope as packing_description_envelope, verify as verify_packing_provenance,
     Certificate as PackingProvenanceCertificate, EdgeEndpoints,
@@ -844,6 +848,34 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
             .map(|child| serde_json::to_vec(child).unwrap().len())
             .sum::<usize>(),
         3_764
+    );
+    let node = NodeRefinementCertificate {
+        schema: NODE_REFINEMENT_SCHEMA,
+        source: SourceDimensionWitness {
+            a: 1,
+            u: 1,
+            coordinate: 0,
+            require_normalized_precision: true,
+        },
+        factorization: conditional_certificate.clone(),
+        packing: conditional_provenance.clone(),
+        children: conditional_children.clone(),
+    };
+    let serialized_node = serde_json::to_vec(&node).unwrap();
+    let parsed_node: NodeRefinementCertificate = serde_json::from_slice(&serialized_node).unwrap();
+    assert_eq!(serde_json::to_vec(&parsed_node).unwrap(), serialized_node);
+    let node_summary = verify_node_refinement(&parsed_node, &mut meter).unwrap();
+    assert!(node_summary.normalized_precision_admitted);
+    assert!(!node_summary.strict_source_refinement_admitted);
+    assert_eq!(
+        verify_strict_node_refinement(&parsed_node, &mut meter).unwrap_err(),
+        "node refinement strict source guards"
+    );
+    let mut bad_node_context = parsed_node;
+    bad_node_context.source.require_normalized_precision = false;
+    assert_eq!(
+        verify_node_refinement(&bad_node_context, &mut meter).unwrap_err(),
+        "node refinement context"
     );
     let mut missing_child = conditional_children.clone();
     missing_child.pop();

@@ -393,6 +393,15 @@ actual-width canonical-binary ceilings on every path. The trace is therefore
 isolates remain charged through the original vertex-description length.
 `[pcc:unverified]`
 
+`NODE_REFINEMENT_CERTIFICATE.md` composes the accepted factorization, normalized
+source dimensions, schema-3 packing provenance, and complete schema-2 child
+family in one standalone verifier. It checks all cross-interface dimensions
+and exposes a strict entry point that requires the actual radix-64 shrink and
+degree guards. The admitted radix-2 fixture passes the full composed report but
+is correctly rejected by the strict entry point. This defines a generic finite
+refinement boundary; constructing a uniform strict family remains open.
+`[pcc:unverified]`
+
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical
 binary factor by
