@@ -1876,6 +1876,7 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
 /// Unsupported instruction sets retain the existing word-field fallback.
 #[cfg(all(test, target_arch = "x86_64"))]
 #[inline]
+#[cfg_attr(not(test), allow(dead_code))]
 pub(crate) fn mul_mod131(a: &[u64; 3], b: &[u64; 3]) -> Option<[u64; 3]> {
     debug_assert_eq!((a[2] | b[2]) & !7, 0);
     #[cfg(target_arch = "x86_64")]
@@ -1960,6 +1961,7 @@ pub(crate) unsafe fn mul_mod131_hw(a: &[u64; 3], b: &[u64; 3]) -> [u64; 3] {
 /// three-bit high limb is spread directly; other ISAs keep the scalar path.
 #[cfg(test)]
 #[inline]
+#[cfg_attr(not(test), allow(dead_code))]
 pub(crate) fn square_mod131(a: &[u64; 3]) -> Option<[u64; 3]> {
     debug_assert_eq!(a[2] & !7, 0);
     #[cfg(target_arch = "x86_64")]

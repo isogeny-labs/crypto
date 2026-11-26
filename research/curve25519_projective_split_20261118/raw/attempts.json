@@ -1,0 +1,21 @@
+{
+  "schema": "curve25519.projective-split-attempts/v1",
+  "planned_cells": 8,
+  "attempted_cells": 8,
+  "process_attempts": 9,
+  "completed_cells": 4,
+  "censored_cells": 4,
+  "interrupted_retries": 1,
+  "binary_sha256": "249c9415a43d060012ad179ab6d814da7ee0530e8ad8ee50693bc272c80764fc",
+  "attempts": [
+    {"sequence": 1, "cell": "t3-chain", "exit": 0, "status": "complete", "targets_done": 32, "planted_done": 8},
+    {"sequence": 2, "cell": "t3-projective", "exit": 0, "status": "complete", "targets_done": 32, "planted_done": 8},
+    {"sequence": 3, "cell": "t4-chain", "exit": null, "status": "interrupted", "reason": "environment restart detached a live solver from its defunct tee output sink; process terminated and repeated unchanged", "excluded_from_analysis": true},
+    {"sequence": 4, "cell": "t4-chain", "exit": 0, "status": "complete", "targets_done": 32, "planted_done": 8},
+    {"sequence": 5, "cell": "t4-projective", "exit": 0, "status": "complete", "targets_done": 32, "planted_done": 8},
+    {"sequence": 6, "cell": "t5-chain", "exit": 124, "status": "censored-timeout", "cap_seconds": 900, "targets_done": 0, "aggregate_file_bytes": 0},
+    {"sequence": 7, "cell": "t5-projective", "exit": 124, "status": "censored-timeout", "cap_seconds": 900, "targets_done": 0, "aggregate_file_bytes": 0},
+    {"sequence": 8, "cell": "t6-chain", "exit": 137, "status": "censored-memory-kill", "targets_done": 0, "aggregate_file_bytes": 0},
+    {"sequence": 9, "cell": "t6-projective", "exit": 137, "status": "censored-memory-kill", "targets_done": 0, "aggregate_file_bytes": 0}
+  ]
+}

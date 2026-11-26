@@ -1,0 +1,64 @@
+{
+  "schema": "curve25519.symmetric-remainder-protocol/v1",
+  "study_id": "EXP-C25519-SYMREM-001",
+  "frozen_date": "2026-11-25",
+  "status": "frozen_before_implementation_or_measurement",
+  "parent_revision": "e9c13c712a",
+  "language": "native Rust",
+  "javascript": false,
+  "curve": {
+    "family": "curve25519",
+    "k": 20,
+    "p": 1048573,
+    "r": 131203,
+    "montgomery_A": 926,
+    "short_weierstrass_a": 63700,
+    "short_weierstrass_b": 872826,
+    "generator": [349837, 122],
+    "abscissa_shift": 349833
+  },
+  "factor_base": {
+    "form": "x = lo + g*w",
+    "g": 1,
+    "qualification_orders": [7, 9, 19],
+    "scaling_orders_gated": [21, 27, 57]
+  },
+  "system": {
+    "m": 3,
+    "domain": "unordered distinct roots only",
+    "common_relation": "symmetrized S4 in transformed elementary symmetric functions",
+    "baseline": "direct symbolic remainder elimination",
+    "candidate": "explicit quotient and residue auxiliaries for every modular multiplication",
+    "circuitize_s4": false
+  },
+  "engine": {
+    "name": "f4_fp",
+    "order": "grevlex",
+    "release": true,
+    "threads": 1,
+    "degree_ceiling": 24,
+    "per_system_cap_s": 300,
+    "primary_unit": "F_p multiply-adds in F4 elimination"
+  },
+  "targets": {
+    "seed": 20261125,
+    "random_per_cell": 8,
+    "planted_per_cell": 4,
+    "paired": true,
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20261125
+  },
+  "qualification": {
+    "invalid_relations": 0,
+    "planted_exact_fraction": 1.0,
+    "candidate_censoring_not_greater": true,
+    "minimum_completed_random_pairs_at_d19": 6,
+    "paired_ratio_upper_95_lt": 0.5,
+    "solving_degree_drop_at_least": 1,
+    "solving_degree_drop_minimum_pairs": 6,
+    "specialization_work_ratio_max": 2.0,
+    "peak_rss_ratio_max": 2.0
+  },
+  "stop_rule": "failure of any qualification condition closes the arm before scaling or m=4",
+  "claim_boundary": "stage diagnostic only; no total-work or subexponential ECDLP claim"
+}
