@@ -295,5 +295,13 @@
     "complete_library_result": "175 passed; 0 failed",
     "claim_boundary": "finite load-bearing mutation gate; unique placement and factorization for every admitted graph remain unverified"
   },
+  "weighted_tuple_enumeration_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+    "test": "contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials",
+    "cases": "three Cartesian-oracle fixtures; one/two packets; both target groups; repeated modes; weights 1/2/3; precisions 5/6/7",
+    "observed_gate": "production next_tuple enumerates every and only admissible exponent vector exactly once",
+    "complete_library_result": "175 passed; 0 failed",
+    "claim_boundary": "finite exact enumeration controls; all-shape iterator refinement remains unverified"
+  },
   "next_gate": "independently refine or kernel-check the combined contraction/source-cost theorem; preserve the exact total-work reduction ledger while seeking a counterexample to any remaining premise"
 }

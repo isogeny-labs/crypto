@@ -237,6 +237,12 @@ coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.
 `[pcc:unverified]`
 
+Production `next_tuple` also matches an independent Cartesian enumeration in
+three multi-group fixtures spanning repeated modes, two packets, weights
+1/2/3, unequal target bounds, and precisions 5/6/7. This strengthens the finite
+completeness/uniqueness gate for the exponent tuple without replacing its
+all-shape proof obligation. `[pcc:unverified]`
+
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper
 control.  An isolated recovery control additionally covers `u=2` and `u=3`,

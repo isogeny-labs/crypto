@@ -736,51 +736,112 @@ mod tests {
 
     #[test]
     fn weighted_enumeration_has_no_missing_or_repeated_monomials() {
-        let mut meter = Meter::new(Limits::default());
-        let modes: Vec<_> = [1usize, 2, 3]
-            .iter()
-            .map(|&weight| Mode {
-                packet: 0,
-                source: 1,
-                target: 0,
-                weight,
-                rows: vec![],
-                columns: vec![],
-            })
-            .collect();
-        let mut beta = vec![0; 3];
-        let mut usage = vec![0; 2];
-        let bounds = [2, 0];
-        let mut weight = 0;
-        let mut actual = BTreeSet::new();
-        loop {
-            assert!(actual.insert(beta.clone()));
-            if !next_tuple(
-                &mut beta,
-                &modes,
-                &mut usage,
-                &bounds,
-                &mut weight,
-                5,
-                2,
-                &mut meter,
-            )
-            .unwrap()
-            {
-                break;
+        fn independent(
+            modes: &[Mode],
+            bounds: &[usize],
+            precision: usize,
+            radix: usize,
+        ) -> BTreeSet<Vec<usize>> {
+            fn visit(
+                index: usize,
+                modes: &[Mode],
+                bounds: &[usize],
+                precision: usize,
+                radix: usize,
+                beta: &mut [usize],
+                usage: &mut [usize],
+                weight: usize,
+                out: &mut BTreeSet<Vec<usize>>,
+            ) {
+                if index == modes.len() {
+                    out.insert(beta.to_vec());
+                    return;
+                }
+                let mode = &modes[index];
+                let group = mode.packet * radix + mode.target;
+                let capacity = bounds[group] - usage[group];
+                let weight_capacity = (precision - 1 - weight) / mode.weight;
+                for exponent in 0..=capacity.min(weight_capacity) {
+                    beta[index] = exponent;
+                    usage[group] += exponent;
+                    visit(
+                        index + 1,
+                        modes,
+                        bounds,
+                        precision,
+                        radix,
+                        beta,
+                        usage,
+                        weight + exponent * mode.weight,
+                        out,
+                    );
+                    usage[group] -= exponent;
+                }
+                beta[index] = 0;
             }
+
+            let mut out = BTreeSet::new();
+            let mut beta = vec![0; modes.len()];
+            let mut usage = vec![0; bounds.len()];
+            visit(
+                0, modes, bounds, precision, radix, &mut beta, &mut usage, 0, &mut out,
+            );
+            out
         }
-        let mut expected = BTreeSet::new();
-        for a in 0..=2 {
-            for b in 0..=2 {
-                for c in 0..=2 {
-                    if a + b + c <= 2 && a + 2 * b + 3 * c < 5 {
-                        expected.insert(vec![a, b, c]);
-                    }
+
+        let mut meter = Meter::new(Limits::default());
+        let cases = [
+            (
+                vec![(0usize, 0usize, 1usize), (0, 0, 2), (0, 0, 3)],
+                vec![2, 0],
+                5,
+            ),
+            (
+                vec![(0, 0, 1), (0, 1, 2), (1, 0, 1), (1, 0, 3)],
+                vec![1, 2, 2, 0],
+                6,
+            ),
+            (
+                vec![(0, 1, 1), (0, 1, 1), (1, 1, 2), (1, 0, 3), (1, 0, 1)],
+                vec![1, 3, 2, 1],
+                7,
+            ),
+        ];
+        for (descriptions, bounds, precision) in cases {
+            let modes: Vec<_> = descriptions
+                .into_iter()
+                .map(|(packet, target, weight)| Mode {
+                    packet,
+                    source: target ^ 1,
+                    target,
+                    weight,
+                    rows: vec![],
+                    columns: vec![],
+                })
+                .collect();
+            let mut beta = vec![0; modes.len()];
+            let mut usage = vec![0; bounds.len()];
+            let mut weight = 0;
+            let mut actual = BTreeSet::new();
+            loop {
+                assert!(actual.insert(beta.clone()));
+                if !next_tuple(
+                    &mut beta,
+                    &modes,
+                    &mut usage,
+                    &bounds,
+                    &mut weight,
+                    precision,
+                    2,
+                    &mut meter,
+                )
+                .unwrap()
+                {
+                    break;
                 }
             }
+            assert_eq!(actual, independent(&modes, &bounds, precision, 2));
         }
-        assert_eq!(actual, expected);
     }
 
     #[test]

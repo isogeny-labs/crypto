@@ -75,8 +75,11 @@ divisible by `2^w_mu`. A tuple contributes a multiple of
 It therefore vanishes modulo `2^p` once the tuple weight reaches `p`.
 `next_tuple` enumerates exactly the nonnegative exponent vectors below this
 weight, subject to the target-row degree bounds. The native enumeration
-control checks uniqueness and completeness on small weighted instances, but
-the all-shape statement remains part of the refinement obligation.
+control now compares production traversal with an independent Cartesian
+oracle in three fixtures, including repeated modes, two packets, both target
+groups, unequal group bounds, weights 1/2/3, and precisions 5/6/7. Every
+admissible tuple appears once and no inadmissible tuple appears, but the
+all-shape statement remains part of the refinement obligation.
 `[pcc:unverified]`
 
 ## Evidence and remaining gate
