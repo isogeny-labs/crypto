@@ -157,6 +157,13 @@ tables initially used global child-edge identifiers instead of local packet
 port indices. The corrected producer and independent checker now agree.
 `[pcc:unverified]`
 
+The positive certificate is now serialized to JSON and parsed into fresh data
+before verification. Its exact wire size is 2,162 bytes under the pinned Rust
+dependencies. A schema-version mutation and a noncanonical ring coordinate are
+rejected before the six algebraic checks, an overflowing structural count fails
+closed, and reserialization is byte-for-byte stable. `[pcc:unverified]`
+
 This is not yet an external or theorem-assistant kernel. Producer and checker
-still compile in the same Rust crate, the certificate is not serialized, and
-the positive control is a bounded correlated-port fixture. `[pcc:unverified]`
+still compile in the same test-only Rust module, there is no standalone checker
+executable, and the positive control is a bounded correlated-port fixture.
+`[pcc:unverified]`

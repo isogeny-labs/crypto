@@ -347,11 +347,12 @@
     "source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
     "test": "contraction::recursive::factorization_certificate::independent_certificate_checks_all_six_factorization_obligations",
     "checks": "exact packet coverage; incidence groups; mode target/source placement; crossing scalar series; independent Cartesian retained-tuple coverage; independent packet coefficient tables",
-    "mutations": "duplicate packet edge, reassigned mode target, removed retained tuple, altered packet table entry",
-    "observed_gate": "honest certificate accepted and all four mutations rejected",
+    "wire_format": "schema-versioned JSON, 2162 bytes for the correlated two-port fixture, deterministic byte-for-byte round trip",
+    "mutations": "schema mismatch, noncanonical ring element, overflowing structural count, duplicate packet edge, reassigned mode target, removed retained tuple, altered packet table entry",
+    "observed_gate": "serialized honest certificate accepted and all seven mutations rejected",
     "implementation_diagnostic": "checker found and localized an initial producer bug that indexed packet table bits by global child edge instead of local packet port",
     "complete_library_result": "180 passed; 0 failed",
-    "claim_boundary": "same-crate test-only checker and bounded correlated-port fixture; no serialized external or theorem-assistant kernel"
+    "claim_boundary": "same-crate test-only checker and bounded correlated-port fixture; no standalone external executable or theorem-assistant kernel"
   },
   "weighted_tuple_enumeration_control": {
     "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",

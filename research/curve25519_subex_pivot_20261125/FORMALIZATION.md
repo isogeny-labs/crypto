@@ -272,7 +272,10 @@ A separate test-only certificate checker now implements those six checks over
 plain certificate data without invoking production child construction during
 verification. Duplicate packet coverage, mode-target reassignment, tuple
 removal, and packet-table mutation are rejected. The checker remains in the
-same crate and is not an external proof kernel. `[pcc:unverified]`
+same crate and is not an external proof kernel. The positive certificate now
+round-trips through a stable 2,162-byte JSON representation; schema mismatch
+and noncanonical ring-element mutations are also rejected, and an overflowing
+structural count fails closed. `[pcc:unverified]`
 
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
