@@ -95,24 +95,60 @@ ell_t = max_(0 <= j < m_t)
           max(0, -v2(E_t(0)) - j*(i-a-1)).
 ```
 
-The remaining quantified lemma is to connect this exact expression, plus the
-live child-evaluation losses, to the production allowance `[pcc:unverified]`
+This loss is covered by the first term of the production allowance. Put
+
+```text
+A = a-i,  v = u-i,  B = L/2^i,  m_t = h*v.
+```
+
+The uniform full-grid derivative valuation is translation invariant. Writing
+the taper weight as `u-min(v2(q),u)` cancels that uniform component. Layers
+`k<=i` still cancel by translation; for `k=i+r>i`, summing the nonzero
+multiples of `2^k` gives the exact contribution
+
+```text
+2*B*(r+1)/2^r - A - 2.
+```
+
+Consequently `[pcc:unverified]`
+
+```text
+-v2(E_t(0))/h
+  = sum_(r=1..v) (2*B*(r+1)/2^r - A - 2)
+  = 2*B*(3-(v+3)/2^v) - v*(A+2)
+  < 6*B.
+```
+
+The worst evaluation power is `j=m_t-1`. Since `v<=A` and
+`A*(A+1)<=2^(A+1)=2B`, its additional loss is below
+
+```text
+h*v*(A+1) <= 2*h*B.
+```
+
+Therefore `ell_t<8*h*B`, exactly the `node_loss` term in
+`child_precision`. The separate `8*M*(a+1)` evaluation allowance is not
+needed for tapered recovery itself; its connection to the live deformation
+evaluation remains a separate C1 obligation. `[pcc:unverified]`
+
+The complete production allowance is
 
 ```text
 8*h*(L/2^i) + 8*M*(a+1).
 ```
 
-The native small-grid control checks the direct multiplier inequality for
-source-shaped `a>=2u`. A separate mutation computes the same `u=2` jets only
-at root precision and then canonically lifts them: recovery returns `7` while
-the true constant is `3`. This is not a live-path counterexample, because
-`active` computes at `child_precision`; it demonstrates that the precision
-premise is load-bearing and cannot be dropped. `[pcc:unverified]`
+The native small-grid control checks both the exact layer-sum identity and the
+strict `ell_t<node_loss` inequality for source-shaped `a>=2u`. A separate
+mutation computes the same `u=2` jets only at root precision and then
+canonically lifts them: recovery returns `7` while the true constant is `3`.
+This is not a live-path counterexample, because `active` computes at
+`child_precision`; it demonstrates that the precision premise is load-bearing
+and cannot be dropped. `[pcc:unverified]`
 
 ## Acceptance gate
 
-C1 item 5 closes only after an independent proof or kernel refinement covers
-both the fraction-field identity and the all-parameter precision inequality,
-and links them to the live Rust objects. The finite positive and negative
-controls remain counterexample searches, not substitutes for that gate.
+C1 item 5 closes only after an independent proof or kernel refinement checks
+the fraction-field identity and layer-sum derivation and links them to the
+live Rust objects. The finite positive and negative controls remain
+counterexample searches, not substitutes for that gate.
 `[pcc:unverified]`

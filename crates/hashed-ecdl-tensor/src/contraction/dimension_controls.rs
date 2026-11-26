@@ -295,7 +295,7 @@ fn rational_width_envelope_covers_exact_small_grid_recovery() {
 }
 
 #[test]
-fn child_precision_covers_rational_multiplier_loss_on_small_source_grids() {
+fn node_precision_covers_exact_rational_loss_on_small_source_grids() {
     let meter = Meter::new(Limits::default());
     for u in 1usize..=3 {
         for a in 2 * u..=2 * u + 2 {
@@ -325,17 +325,31 @@ fn child_precision_covers_rational_multiplier_loss_on_small_source_grids() {
                             * (i64::try_from(deformation::valuation(q)).unwrap()
                                 - i64::try_from(difference_valuation).unwrap());
                     }
-                    let coordinate = i64::try_from(deformation::valuation(t)).unwrap();
+                    let coordinate = deformation::valuation(t);
+                    let a_gap = a - coordinate;
+                    let active_layers = u - coordinate;
+                    let scaled_length = parameters.length >> coordinate;
+                    let layer_loss: usize = (1..=active_layers)
+                        .map(|r| 2 * scaled_length * (r + 1) / (1 << r) - a_gap - 2)
+                        .sum();
+                    let h = (3 * edges).div_ceil(u);
+                    assert_eq!(
+                        -e_zero_valuation,
+                        i64::try_from(h * layer_loss).unwrap(),
+                        "exact denominator loss at edges={edges}, u={u}, a={a}, t={t}"
+                    );
+                    let coordinate = i64::try_from(coordinate).unwrap();
                     let evaluation_step = coordinate - i64::try_from(a + 1).unwrap();
                     let final_multiplier_valuation =
                         e_zero_valuation + i64::try_from(qt - 1).unwrap() * evaluation_step;
                     let rational_loss =
                         usize::try_from(-final_multiplier_valuation.min(0)).unwrap();
-                    let prescribed_loss = child_precision(edges, &parameters, t, 7).unwrap() - 7;
+                    let node_loss = 8 * h * scaled_length;
                     assert!(
-                        rational_loss <= prescribed_loss,
+                        rational_loss < node_loss,
                         "edges={edges}, u={u}, a={a}, t={t}"
                     );
+                    assert!(node_loss <= child_precision(edges, &parameters, t, 7).unwrap() - 7);
                 }
             }
         }

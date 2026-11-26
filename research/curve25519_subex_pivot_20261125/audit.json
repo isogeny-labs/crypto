@@ -225,13 +225,13 @@
   "hermite_precision_controls": {
     "identity_note": "research/curve25519_subex_pivot_20261125/HERMITE_IDENTITY.md",
     "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
-    "positive_loss_test": "contraction::recursive::dimension_controls::child_precision_covers_rational_multiplier_loss_on_small_source_grids",
+    "positive_loss_test": "contraction::recursive::dimension_controls::node_precision_covers_exact_rational_loss_on_small_source_grids",
     "negative_test": "contraction::recursive::tests::root_precision_jets_are_insufficient_for_tapered_hermite_recovery",
-    "positive_gate": "the prescribed child loss covers the exact E_t(0) and (-t/alpha)^j rational-multiplier loss on source-shaped small grids",
+    "positive_gate": "the exact tapered-grid layer sum matches -v2(E_t(0)) and the rational-multiplier loss is strictly below the 8h(L/2^i) node allowance on source-shaped small grids",
     "negative_gate": "root-precision jets lifted into the declared child rings return 7 instead of the true constant 3",
     "focused_result": "2 passed; 0 failed",
     "complete_library_result": "173 passed; 0 failed",
-    "claim_boundary": "the negative is not a live-path counterexample because active computes at child_precision; the all-parameter precision inequality and Rust refinement remain unverified"
+    "claim_boundary": "the negative is not a live-path counterexample because active computes at child_precision; the all-parameter layer-sum derivation, deformation-evaluation allowance and Rust refinement remain independently unverified"
   },
   "next_gate": "independently refine or kernel-check the combined contraction/source-cost theorem; preserve the exact total-work reduction ledger while seeking a counterexample to any remaining premise"
 }

@@ -178,8 +178,9 @@ contraction. `[pcc:unverified]` This decomposes into:
 6. creation-time representatives are lifted canonically at later precisions.
 
 `HERMITE_IDENTITY.md` states item 5 as an explicit fraction-field identity,
-maps every term to `recover`, and isolates the remaining all-parameter 2-adic
-loss inequality. `[pcc:unverified]`
+maps every term to `recover`, and derives an all-parameter recovery loss below
+the existing `8h(L/2^i)` node allowance. Independent checking and the live
+Rust refinement link remain open. `[pcc:unverified]`
 
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper
