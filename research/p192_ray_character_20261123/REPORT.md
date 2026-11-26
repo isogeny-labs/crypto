@@ -1277,6 +1277,25 @@ and that condition increases with `k`. Only `k=1,2` of this
 corollary apply here. This does not screen other intersection
 bounds or source methods. [pcc:unverified]
 
+The paper's less restrictive **Theorem 1.1** gives a stronger
+finite check. Take its invariant set `Q=Γ`. If `A+B⊂Γ`, fix
+`k+1` distinct members `a₀,…,aₖ` of `A`; translating by `a₀`
+puts all of `B+a₀` in `Γ∩(Γ+a₀−a₁)∩…∩(Γ+a₀−aₖ)`.
+Multiplication by any `λ∈Γ` preserves this intersection's
+size after scaling the shifts, so the theorem's sum over
+`λ∈Q` bounds `|B|` by
+`4(k+1)(L^(1/(2k+1))+1)^(k+1)`. Its three explicit
+conditions hold for `k=1,…,9` at the P-192 `r,L`; among
+these, `k=8` is strongest and gives `|B|≤2^51.589209`.
+The proposed lifted grid side is `|B|=2c≈2^43.491996`,
+8.097213 bits below that ceiling. Thus this direct theorem
+application improves the `k=2` corollary's numeric bound but
+still permits the proposed grid. The reproducible
+[`grid_intersection_gate.py`](grid_intersection_gate.py) checks
+all theorem conditions and the bound at the stated integers.
+This does not construct a grid or price its evaluation.
+[pcc:unverified]
+
 The hypothetical balanced grid also has a precise conditional
 character-sum obstruction. Put `A=I∪(-I)` and `B=J∪(-J)`;
 its paired-index condition gives `A+B⊂Γ=±H`, with zero
