@@ -124,4 +124,36 @@ fn audited_fixed_arity_exponents_exceed_one_half() {
     assert_eq!((5_u128, 2 * 5 - 1), (5, 9));
 }
 
+fn implicit_ds_exponent(m: f64, s: f64, t: f64) -> f64 {
+    if s - t >= 1.0 {
+        s / (s + m - 1.0 - t)
+    } else {
+        (1.0 + t) / m
+    }
+}
+
+#[test]
+fn piecewise_implicit_data_structure_balance_matches_grid_search() {
+    let cases = [
+        (3.0, 1.0, 0.0),
+        (3.0, 2.5, 0.5),
+        (4.0, 1.0, 1.5),
+        (4.0, 3.0, 0.5),
+        (5.0, 1.25, 0.75),
+        (5.0, 4.0, 1.0),
+    ];
+
+    for (m, s, t) in cases {
+        assert!(t < m - 1.0);
+        let predicted = implicit_ds_exponent(m, s, t);
+        let mut observed = f64::INFINITY;
+        for step in 1..=100_000 {
+            let alpha = (step as f64) / (100_000.0 * m);
+            let exponent = (s * alpha).max(1.0 - (m - 1.0 - t) * alpha);
+            observed = observed.min(exponent);
+        }
+        assert!((predicted - observed).abs() < 1e-5);
+    }
+}
+
 fn main() {}

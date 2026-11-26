@@ -44,6 +44,13 @@ exponent still stays strictly above one-half.  The proposition also explains
 why an unconditional extension is difficult: strong adaptive lower bounds for
 ordinary integer 3SUM-Indexing are themselves open. `[pcc:unverified]`
 
+Theorem 20 gives the exact piecewise decision line for future constructions.
+If preprocessing and one-witness query costs are `N^s` and `N^t`, the balanced
+sparse branch (`s-t >= 1`) crosses rho exactly when `s+t < m-1`; the
+factor-base boundary branch (`s-t < 1`) requires `t < m/2-1`.  Under the
+conventional `N^2` sparse linear-algebra model, replace `s` by `max(s,2)` in
+that case split. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint

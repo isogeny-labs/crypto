@@ -43,6 +43,7 @@ The status of the program is:
 | Theorem 17 | unconditional density-one statement for fixed \(m\) | sparse-regime \(m\)-sum expansion and the resulting exact separated-sketch barrier |
 | Theorem 18 | unconditional in the stated static-provenance model | product-tree preprocessing plus fully adaptive query branching |
 | Proposition 19 | exact reduction plus literature audit | split-tree recovery is group \(k\)SUM-Indexing; current indexing upper bounds remain above one-half after relation accounting |
+| Theorem 20 | exact exponent criterion | piecewise sub-rho conditions for preprocessing exponent \(s\) and query exponent \(t\) |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1527,7 +1528,7 @@ where the common exponent is
 \[
 E_{m,\delta}
 =\frac{m+1/2-\delta}{2m-1/2-2\delta}
-=\frac12+rac{3/4}{2m-1/2-2\delta}
+=\frac12+\frac{3/4}{2m-1/2-2\delta}
 >\frac12.
 \]
 
@@ -1563,6 +1564,104 @@ The literature statements and the distinction between cell-probe space,
 preprocessing time, and algebraic-RAM work are recorded in
 [`LITERATURE.md`](LITERATURE.md).  No integer-indexing algorithm is claimed to
 apply to elliptic groups without that missing adaptation. `[pcc:unverified]`
+
+### Theorem 20 (exact exponent criterion for an implicit data structure)
+
+Fix \(m\ge3\).  Suppose a split-\(S_3\) relation data structure on a factor
+base of size \(N\) has charged preprocessing
+
+\[
+P=N^{s+o(1)}
+\]
+
+and answers a uniform target query in
+
+\[
+Q=N^{t+o(1)}
+\]
+
+charged operations, returning at most \(N^{o(1)}\) verified relation witnesses `[pcc:unverified]`
+per query.  Assume \(0\le t<m-1\), constant rank gain, and
+\(N=p^{\alpha+o(1)}\) with \(0<\alpha\le1/m\).  The exact tuple-count upper
+bound gives the following optimized relation-stage exponent:
+
+\[
+E_{\rm rel}(s,t;m)=
+\begin{cases}
+\displaystyle\frac{s}{s+m-1-t},&s-t\ge1,\\[6pt]
+\displaystyle\frac{1+t}{m},&s-t<1.
+\end{cases}
+\]
+
+The two branches have the respective sub-rho criteria
+
+\[
+\begin{array}{rcl}
+s-t\ge1&:&s+t<m-1,\\
+s-t<1&:&t<m/2-1.
+\end{array}
+\]
+
+If the conventional sparse factor-base linear-algebra charge
+\(T_{\rm LA}=N^{2+o(1)}\) is included, put \(s_0=\max\{s,2\}\) and substitute
+\(s_0\) for \(s\) in the same piecewise formula and criteria.
+
+The statements involving \(N^2\) are conditional on that conventional linear
+algebra cost model; they are not a lower bound for every possible structured
+matrix algorithm.
+
+#### Proof
+
+Across a uniform target, the expected number of ordered decompositions is at
+most \(N^m/p\).  Therefore collecting \(\Theta(N)\) rows with
+\(N^{o(1)}\) reported witnesses per query requires at least
+
+\[
+B=p^{1+o(1)}N^{-(m-1)}
+\]
+
+uniform target queries.  With \(N=p^{\alpha+o(1)}\), preprocessing and all
+queries therefore contribute exponents
+
+\[
+s\alpha,
+\qquad
+1-(m-1-t)\alpha.
+\]
+
+The first is increasing and the second decreasing because \(t<m-1\).  They
+are equal at
+
+\[
+\alpha_*=\frac1{s+m-1-t}.
+\]
+
+This balance is feasible under \(\alpha\le1/m\) exactly when \(s-t\ge1\).
+In that case substitution gives the first branch, and the inequality
+
+\[
+\frac{s}{s+m-1-t}<\frac12
+\]
+
+is equivalent to \(s+t<m-1\).
+
+When \(s-t<1\), the balance lies beyond the permitted interval.  The maximum
+is still decreasing at \(\alpha=1/m\), so the infimum is attained by taking
+\(\alpha=1/m-o(1)\).  The query exponent tends to \((1+t)/m\), while
+\(s/m<(1+t)/m\); this gives the second branch and its criterion
+\(t<m/2-1\).  Adding an \(N^{2+o(1)}\) term only replaces the increasing
+coefficient by \(s_0=\max\{s,2\}\), so the identical case split applies.
+\(\square\)
+
+This criterion turns the broad ARQP question into a falsifiable target.  In
+the balanced sparse branch \(s-t\ge1\), a candidate must cross the line
+\(s+t=m-1\), not merely compress the \(N^m\) expanded sum table.  In the
+boundary branch \(s-t<1\), it must instead achieve \(t<m/2-1\).  The trivial
+scan, full sum table, balanced meet-in-the-middle table, and the
+Dinur--Golovnev family all remain on the non-sub-rho side; the last lies in the
+first branch and has \(s+t=m+1/2\).  A barrier theorem may therefore prove the
+corresponding piecewise inequalities for an explicitly closed elliptic
+group-indexing model. [pcc:unverified]
 
 ### Exact remaining computational gap
 

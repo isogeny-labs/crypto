@@ -71,6 +71,22 @@ cannot lower the exponent.  The calculation therefore rejects this known
 upper-bound family as a sub-rho mechanism; it is not a lower bound for unknown
 data structures. `[pcc:unverified]`
 
+More generally, if an implicit one-witness data structure has preprocessing
+`N^s` and query cost `N^t`, balancing preprocessing against the
+`p N^(t-(m-1))` relation-query cost gives, when `s-t >= 1`,
+
+```text
+E_rel = s / (s + m - 1 - t).
+```
+
+In this balanced sparse branch, a sub-rho relation stage is equivalent to
+`s+t < m-1`.  If `s-t < 1`, the optimum reaches the factor-base boundary
+`alpha=1/m-o(1)` instead and has exponent `(1+t)/m`, which is sub-rho exactly
+when `t < m/2-1`.  The 2026 `k`SUM-Indexing family lies in the first branch and
+has `s+t=m+1/2`, independent of `delta`, so it misses the required line by
+`3/2` powers of `N`.  This restatement separates the open data-structure
+inequality from the elliptic relation accounting. `[pcc:unverified]`
+
 ## Consequence for the research goal
 
 The remaining theorem is no longer plausibly a consequence of degree or

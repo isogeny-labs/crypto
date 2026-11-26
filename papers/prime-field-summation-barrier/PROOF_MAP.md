@@ -15,6 +15,7 @@ proof obligations from computational-model assumptions.
 | split-tree dimension and exceptional-component audit | split-tree and Macaulay sections | generic dimension count, saturation, rationality filtering | hand audit, unreviewed | check degeneracies against PR #4829 implementation notes |
 | static-provenance eliminant direct sum | successor Theorem 18 | explicit pre-target leaf provenance, uniform targets, charged leaf records | exact counting proof, unreviewed `[pcc:unverified]` | independent proof review and finite native replay |
 | group-`k`SUM-indexing reduction and upper-bound audit | successor Proposition 19 | associativity, exact relation count, Dinur--Golovnev 2026 parameters | exact reduction and algebra audit, unreviewed `[pcc:unverified]` | independent review; determine whether the indexing construction transports to elliptic groups |
+| implicit-data-structure exponent criterion | successor Theorem 20 | one-witness query model, sparse yield, optional conventional `N^2` linear algebra | exact balance calculation, unreviewed `[pcc:unverified]` | independent algebra and scope review |
 | unrestricted compact-circuit barrier | successor programme | new preprocessing/query direct-sum theorem | **open; not claimed** | formulate a narrow model with a falsifiable lower-bound target |
 
 ## Explicit non-implications
