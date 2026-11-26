@@ -8,7 +8,7 @@ use crate::BigUint;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 
-pub(crate) const SCHEMA: u32 = 5;
+pub(crate) const SCHEMA: u32 = 6;
 const EPSILON_DENOMINATOR: u64 = 128 * 1024;
 const MINIMUM_LAMBDA: u64 = 1 << 26;
 
@@ -61,6 +61,11 @@ pub struct Certificate {
     pub(crate) child_edge_bound_numerator: u64,
     pub(crate) strict_edge_bound_numerator: u64,
     pub(crate) packet_degree_factor: u64,
+    pub(crate) provenance_header_multiplier: u64,
+    pub(crate) provenance_entry_multiplier: u64,
+    pub(crate) provenance_vertex_multiplier: u64,
+    pub(crate) provenance_combined_multiplier: u64,
+    pub(crate) provenance_description_composed: bool,
     pub(crate) depths: Vec<DepthCertificate>,
     pub(crate) local_child_exponent_constant: u64,
     pub(crate) path_sum_constant: u64,
@@ -85,10 +90,12 @@ pub struct VerificationSummary {
     pub active_depths: usize,
     /// Number of endpoint dimension witnesses checked across all depths.
     pub normalized_coordinate_witnesses: usize,
-    /// Local exponent unit reserved for factorization-certificate descriptions.
+    /// Local exponent unit reserved for factorization and provenance descriptions.
     pub description_overhead_constant: u64,
     /// Whether source packing bounds imply strict edge and packet-degree shrink.
     pub strict_packing_shrink_certified: bool,
+    /// Whether provenance is one tuple factor times structural polynomial data.
+    pub provenance_description_composed: bool,
     /// Constant in `log2(T) <= C*M/sqrt(u)` from the source mode bounds.
     pub tuple_exponent_constant: u64,
     /// Root-`u` exponent constant for the complete recursion composition.
@@ -215,6 +222,14 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         "packing strict edge bound",
     )?;
     let packet_degree_factor = 2u64;
+    let provenance_header_multiplier = 11u64;
+    let provenance_entry_multiplier = 3u64;
+    let provenance_vertex_multiplier = 7u64;
+    let provenance_combined_multiplier = checked_add(
+        provenance_header_multiplier,
+        provenance_entry_multiplier,
+        "provenance description multiplier",
+    )?;
     if leaf_divisor <= 1
         || root_u == 0
         || certificate.leaf_divisor != leaf_divisor
@@ -235,6 +250,11 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         || certificate.child_edge_bound_numerator != child_edge_bound_numerator
         || certificate.strict_edge_bound_numerator != strict_edge_bound_numerator
         || certificate.packet_degree_factor != packet_degree_factor
+        || certificate.provenance_header_multiplier != provenance_header_multiplier
+        || certificate.provenance_entry_multiplier != provenance_entry_multiplier
+        || certificate.provenance_vertex_multiplier != provenance_vertex_multiplier
+        || certificate.provenance_combined_multiplier != provenance_combined_multiplier
+        || !certificate.provenance_description_composed
         || strict_edge_bound_numerator > packing_radix
         || (tuple_square_root_ceiling - 1).pow(2) >= mode_precision_product_constant
         || tuple_square_root_ceiling.pow(2) < mode_precision_product_constant
@@ -267,6 +287,14 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         let packet_length = power_of_two(current_a, "normalized packet length")?;
         let normalized_edges = BigUint::from(u) * &packet_length;
         let normalized_packets = BigUint::from(3u8) * BigUint::from(u);
+        let provenance_header_lhs = BigUint::from(19u8) + BigUint::from(2u8) * &normalized_packets;
+        let provenance_header_rhs =
+            BigUint::from(2 * provenance_header_multiplier) * &normalized_packets;
+        let provenance_entry_lhs = BigUint::from(18u8) * &normalized_edges;
+        let provenance_entry_rhs = BigUint::from(provenance_entry_multiplier)
+            * &normalized_packets
+            * BigUint::from(2u8)
+            * &packet_length;
         let description_polynomial = checked_mul(
             16,
             checked_add(
@@ -366,6 +394,10 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
             || !at_most_power_of_two(&evaluation_lhs, evaluation_rhs_exponent)
             || !geometric_holds
             || !description_absorbed
+            || normalized_packets.is_zero()
+            || BigUint::from(provenance_header_multiplier) * &normalized_packets < BigUint::one()
+            || provenance_header_lhs > provenance_header_rhs
+            || provenance_entry_lhs > provenance_entry_rhs
         {
             return Err("symbolic history depth inequality".into());
         }
@@ -444,6 +476,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         normalized_coordinate_witnesses: 2 * index,
         description_overhead_constant,
         strict_packing_shrink_certified: true,
+        provenance_description_composed: true,
         tuple_exponent_constant,
         total_root_u_exponent_constant,
         total_root_log_exponent_constant,

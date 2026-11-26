@@ -128,7 +128,7 @@ than a second tuple exponential. Source isolates are charged through `V` and
 the original description length. Schema-5 absorption of this exact formula
 remains to be rederived. `[pcc:unverified]`
 
-The schema-5 symbolic transcript now closes R1 item 4 at the scalar level once
+The schema-6 symbolic transcript now closes R1 item 4 at the scalar level once
 the packing premises hold. Each side contributes at most `3M/64` endpoints to
 one group, so a child has at most `6M/64` edges and
 `8*(6M/64)<=M`. Old degrees are unchanged, and packet vertices have degree at
@@ -168,14 +168,16 @@ quadratic left bound grows by less than two.  For evaluation,
 
 The schema-versioned transcript in `SYMBOLIC_HISTORY_CERTIFICATE.md` gives a
 separate executable scalar boundary. Its verifier independently reconstructs
-all five threshold depths and composition constants from a 7,544-byte JSON
-fixture without importing the producer dimension audit or graph code. Schema 5
+all five threshold depths and composition constants from a 7,718-byte JSON
+fixture without importing the producer dimension audit or graph code. Schema 6
 also reconstructs a normalized `M,K,L,tau,p` family at both coordinate
 endpoints of every depth and checks the exact local identities `KL=3M`,
 `tau D=2L`, `nD=6M`, `pu=34MD`, `npu=204M^2`, and the tuple exponent
-constant `80`. This strengthens R2's finite replay and proves consistency of
-its scalar premises, but does not discharge R1's graph-realization premise.
-`[pcc:unverified]`
+constant `80`. It also checks provenance multipliers `11,3,7,14`, composing
+the complete finite trace into one tuple factor plus polynomial structural
+data without changing `96`, `290`, or `148480`. This strengthens R2's finite
+replay and proves consistency of its scalar premises, but does not discharge
+R1's graph-realization premise. `[pcc:unverified]`
 
 For the schema-2 factorization description, the same verifier reconstructs
 `Delta_d=2L_d+16(lambda+a_d+u_d+1)` after charging the tuple count and checks

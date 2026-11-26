@@ -22,7 +22,7 @@ plain fields it independently reconstructs:
 6. leaf-scale and packet-entry absorption; and
 7. the reported constants `96`, `3`, `288`, `290`, and `148480`.
 
-Schema 5 also commits to the local source-bound chain
+Schema 6 also commits to the local source-bound chain
 
 ```text
 K L <= 3M,
@@ -53,7 +53,7 @@ whole coordinate range. They show that the scalar obligations are mutually
 compatible and bind concrete `M,K,L,tau,p` values; they still do not prove that
 a graph or packing realizes the witness. `[pcc:unverified]`
 
-Schema 5 also charges the schema-2 factorization-certificate description
+Schema 6 also charges the schema-2 factorization-certificate description
 envelope. After the tuple count `T` has been charged, every remaining scalar,
 coefficient-width, container, and framing factor in the JSON and canonical
 binary bounds is covered by the deliberately coarse exponent
@@ -78,7 +78,32 @@ interpolation samples, and radix. The global constants therefore remain
 unchanged. This is an arithmetic replay of the description formulas, still
 conditional on the source and active-node premises. `[pcc:unverified]`
 
-Schema 5 additionally binds the source packing bounds to strict recursion. For
+Schema 6 additionally composes the complete provenance-description envelope.
+Summing primitive atoms, containers, and fields over the exact child family
+gives
+
+```text
+T R (Q + 19 + 2K) + 7 T V + 18 T M.
+```
+
+Writing `H=TRK` and `E_v=TKS` for factorization header and entry-value terms,
+the standalone verifier checks the uniform domination constants
+
+```text
+R(Q+19+2K) <= 11 R K(Q+2),
+18M <= 3 K (2L) <= 3 K S.
+```
+
+The first follows from `K>=1`; the normalized witness has `K=3u`. The second
+uses `M=uL` and `S=2^(2L)+R-1>=2L`. Hence every nonvertex provenance unit is
+bounded by 11 header terms plus 3 entry-value terms. The remaining `7TV`
+units explicitly charge original vertex references, including isolates, to
+the original description-length polynomial. Provenance therefore has the
+existing tuple factor `T`, not a second tuple exponential, and does not consume
+another local exponent unit. The verifier binds constants `11,3,7,14` and
+keeps `80+1+4+5+6=96` unchanged. `[pcc:unverified]`
+
+Schema 6 also binds the source packing bounds to strict recursion. For
 radix `R=64`, group-port balance gives at most `3M/64` retained endpoints from
 each of the two bipartite sides. Therefore every group child has at most
 
@@ -115,7 +140,7 @@ verifier checks both endpoint identities
 `1+a = u+(a-u+1) = a+1`, which proves `tau D=2L` uniformly for every
 coordinate between them.
 
-The newline-terminated schema-5 JSON fixture is 7,544 bytes. The native command
+The newline-terminated schema-6 JSON fixture is 7,718 bytes. The native command
 
 ```text
 cargo run --locked \
@@ -127,8 +152,9 @@ cargo run --locked \
 reports five active depths, ten normalized endpoint witnesses, description
 overhead constant `1`, root `u=512`, total root-`u` exponent constant `290`,
 strict packing shrink `true`, root-log constant `148480`, and tuple exponent
-constant `80`. The companion native emitter deterministically regenerates the
-fixture. Verifier input is capped at 1 MiB.
+constant `80`. It also reports provenance description composition `true`. The
+companion native emitter deterministically regenerates the fixture. Verifier
+input is capped at 1 MiB.
 `[pcc:unverified]`
 
 ## Remaining refinement boundary
@@ -139,8 +165,9 @@ family satisfying them. It does not show that a symbolic graph realizes those
 normalized rows, or that the external contraction theorem applies. The next
 useful certificate layer must define a graph/packing realization interface to
 the schema-2 factorization obligations while keeping the external theorem an
-explicit independent premise. The finite standalone
-`verify_source_dimensions` interface now binds an accepted schema-2 object to
-the same `(M,K,L,tau,D,p)` vocabulary, but graph/packing provenance remains
-unproved. An independent or kernel-checked derivation of the
-description-composition inequality also remains open. `[pcc:unverified]`
+explicit independent premise. The finite packing/child provenance interfaces
+now bind accepted schema-2 objects to the same `(M,K,L,tau,D,p)` vocabulary and
+the schema-6 verifier composes their structural description, but no uniform
+arbitrary-size family realizes the normalized rows. A theorem-assistant or
+separately kernel-checked derivation and the external contraction theorem also
+remain open. `[pcc:unverified]`

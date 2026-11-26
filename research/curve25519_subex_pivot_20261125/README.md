@@ -315,7 +315,7 @@ passes 14/14 controls. [pcc:unverified]
 `SYMBOLIC_HISTORY_CERTIFICATE.md` now separates this transcript from its
 producer. A standalone module reconstructs the five-depth schedule, both
 precision absorptions, geometric path comparisons, packet-entry absorption,
-and final constants from a stable 7,544-byte JSON fixture. Schema 5 additionally
+and final constants from a stable 7,718-byte JSON fixture. Schema 6 additionally
 checks the chain from `K L<=3M`, `tau D=2L`, and `p u<=34 M D` to
 `n p<=204 M^2/u` and tuple exponent constant `80`. Every depth now binds the
 normalized family `M=uL`, `K=3u`, and `p_i=34L(L/2^i)` at both coordinate
@@ -323,13 +323,16 @@ endpoints. The independent verifier reconstructs and checks the exact
 identities `KL=3M`, `tau D=2L`, `nD=6M`, `pu=34MD`, and
 `npu=204M^2`; the closed-form tile/distance schedule covers the full coordinate
 range. It imports neither the producer dimension audit nor
-contraction/packing/factorization code. Schema, missing-depth,
+contraction/packing/factorization code. Schema 6 also binds provenance
+description multipliers `11,3,7,14`, proving the complete finite trace has one
+tuple factor and polynomial structural overhead without changing constants
+`96`, `290`, or `148480`. Schema, missing-depth,
 precision-transition, normalized-dimension, source-constant, and final-constant
 mutations are rejected. This is an independent normalized scalar replay, not
 graph realization or a proof of the external theorem.
 `[pcc:unverified]`
 
-Schema 5 also makes the strict child edge/degree implication explicit. Source
+Schema 6 also makes the strict child edge/degree implication explicit. Source
 group balance contributes at most `3M/64` endpoints from each side, hence a
 child has at most `6M/64` edges and `8*6=48<=64` proves eight-fold shrinkage.
 Old vertex degrees are preserved and packet vertices have degree at most `2L`,

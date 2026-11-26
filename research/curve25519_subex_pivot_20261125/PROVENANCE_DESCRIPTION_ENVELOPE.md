@@ -68,9 +68,10 @@ F_child = 9 T R + 2 T V + 8 T M.
 Thus child provenance is `T` times a polynomial structural factor; it does
 not introduce a second tuple exponential. Source isolates enter through `V`
 and remain part of the original description length rather than being hidden
-under the edge count. Connecting this exact structural formula to the
-schema-5 absorption inequality is still a separate asymptotic step.
-`[pcc:unverified]`
+under the edge count. The schema-6 symbolic transcript now composes the
+nonvertex expression into 11 factorization-header terms plus 3 entry-value
+terms and charges `7TV` to original description length, without changing the
+local exponent. `[pcc:unverified]`
 
 ## Native control
 
