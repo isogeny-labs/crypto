@@ -1004,6 +1004,189 @@ pub fn measure_native_fq3_prims(p: u64, l: u64) -> Fq3Prims {
     Fq3Prims { mul, sq, inv }
 }
 
+/// Symmetric Karatsuba (`Fq` in 4 `FieldMul`s, `Fq3` product in 32 `FieldMul`s)
+/// and Chung-Hasan SQR2 (`Fq3` square in 28 `FieldMul`s) tower over the same
+/// Barrett reducer `Red`. Used as the symmetric tuned-tower rho reference so
+/// IC vs rho comparisons are evaluated under both schoolbook and Karatsuba
+/// extension towers without unexecuted formula credits.
+pub struct KaratsubaArith<const COUNT: bool = false> {
+    r: Red,
+    p: u64,
+    w: u64,
+    s: [u64; 2],
+    c: OpCounts,
+}
+
+impl<const COUNT: bool> KaratsubaArith<COUNT> {
+    pub fn new(p: u64) -> Self {
+        let f = Fq3::new(p);
+        Self {
+            r: Red::new(p),
+            p,
+            w: f.f.w,
+            s: f.s.0,
+            c: OpCounts::default(),
+        }
+    }
+    #[inline(always)]
+    fn product(&self, a: u64, b: u64) -> u64 {
+        if COUNT {
+            jv_bitops::hook_mul(self.p);
+        }
+        a * b
+    }
+    #[inline(always)]
+    fn addp(&self, a: u64, b: u64) -> u64 {
+        if COUNT {
+            jv_bitops::hook_add(self.p);
+        }
+        let s = a + b;
+        if s >= self.p {
+            s - self.p
+        } else {
+            s
+        }
+    }
+    #[inline(always)]
+    fn subp(&self, a: u64, b: u64) -> u64 {
+        if COUNT {
+            jv_bitops::hook_add(self.p);
+        }
+        if a >= b {
+            a - b
+        } else {
+            a + self.p - b
+        }
+    }
+    /// Karatsuba `F_q` product: 4 `FieldMul`s, 5 `FieldAdd`s.
+    #[inline(always)]
+    pub fn fq_mul(&self, a: &[u64], b: &[u64]) -> [u64; 2] {
+        let m0 = self.r.r(self.product(a[0], b[0]));
+        let m1 = self.r.r(self.product(a[1], b[1]));
+        let sa = self.addp(a[0], a[1]);
+        let sb = self.addp(b[0], b[1]);
+        let m2 = self.r.r(self.product(sa, sb));
+        let wm1 = self.r.r(self.product(self.w, m1));
+        [self.addp(m0, wm1), self.subp(self.subp(m2, m0), m1)]
+    }
+    /// `F_q` squaring: 4 `FieldMul`s, 2 `FieldAdd`s.
+    #[inline(always)]
+    pub fn fq_sq(&self, a: &[u64]) -> [u64; 2] {
+        let m0 = self.r.r(self.product(a[0], a[0]));
+        let m1 = self.r.r(self.product(a[1], a[1]));
+        let wm1 = self.r.r(self.product(self.w, m1));
+        let two_a0 = self.addp(a[0], a[0]);
+        let c1 = self.r.r(self.product(two_a0, a[1]));
+        [self.addp(m0, wm1), c1]
+    }
+    fn fq_inv(&self, a: &[u64]) -> [u64; 2] {
+        let m0 = self.r.r(self.product(a[0], a[0]));
+        let m1 = self.r.r(self.product(a[1], a[1]));
+        let wm1 = self.r.r(self.product(self.w, m1));
+        let n = self.subp(m0, wm1);
+        let ni = inv_mod(n, self.p);
+        if COUNT {
+            jv_bitops::hook_add(self.p);
+        }
+        [
+            self.r.r(self.product(a[0], ni)),
+            self.r.r(self.product((self.p - a[1]) % self.p, ni)),
+        ]
+    }
+    /// 6-mul cubic Karatsuba + 2 reductions by `theta^3 = s`: 32 `FieldMul`s.
+    pub fn mul(&mut self, a: &X6, b: &X6) -> X6 {
+        self.c.mul += 1;
+        let (a0, a1, a2) = (&a[0..2], &a[2..4], &a[4..6]);
+        let (b0, b1, b2) = (&b[0..2], &b[2..4], &b[4..6]);
+        let add2 = |u: &[u64], v: &[u64]| [self.addp(u[0], v[0]), self.addp(u[1], v[1])];
+        let sub2 = |u: &[u64], v: &[u64]| [self.subp(u[0], v[0]), self.subp(u[1], v[1])];
+        let v0 = self.fq_mul(a0, b0);
+        let v1 = self.fq_mul(a1, b1);
+        let v2 = self.fq_mul(a2, b2);
+        let t01 = self.fq_mul(&add2(a0, a1), &add2(b0, b1));
+        let t02 = self.fq_mul(&add2(a0, a2), &add2(b0, b2));
+        let t12 = self.fq_mul(&add2(a1, a2), &add2(b1, b2));
+        let d1 = sub2(&sub2(&t01, &v0), &v1);
+        let d2 = add2(&sub2(&sub2(&t02, &v0), &v2), &v1);
+        let d3 = sub2(&sub2(&t12, &v1), &v2);
+        let s3 = self.fq_mul(&self.s, &d3);
+        let s4 = self.fq_mul(&self.s, &v2);
+        let c0 = add2(&v0, &s3);
+        let c1 = add2(&d1, &s4);
+        [c0[0], c0[1], c1[0], c1[1], d2[0], d2[1]]
+    }
+    /// Chung-Hasan SQR2 + 2 reductions by `theta^3 = s`: 28 `FieldMul`s.
+    pub fn sq(&mut self, a: &X6) -> X6 {
+        self.c.sq += 1;
+        let (a0, a1, a2) = (&a[0..2], &a[2..4], &a[4..6]);
+        let add2 = |u: &[u64], v: &[u64]| [self.addp(u[0], v[0]), self.addp(u[1], v[1])];
+        let sub2 = |u: &[u64], v: &[u64]| [self.subp(u[0], v[0]), self.subp(u[1], v[1])];
+        let s0 = self.fq_sq(a0);
+        let two_a0 = add2(a0, a0);
+        let s1 = self.fq_mul(&two_a0, a1);
+        let s2 = self.fq_sq(&add2(&sub2(a0, a1), a2));
+        let two_a1 = add2(a1, a1);
+        let s3 = self.fq_mul(&two_a1, a2);
+        let s4 = self.fq_sq(a2);
+        let d2 = sub2(&sub2(&add2(&add2(&s2, &s1), &s3), &s0), &s4);
+        let sd3 = self.fq_mul(&self.s, &s3);
+        let sd4 = self.fq_mul(&self.s, &s4);
+        let c0 = add2(&s0, &sd3);
+        let c1 = add2(&s1, &sd4);
+        [c0[0], c0[1], c1[0], c1[1], d2[0], d2[1]]
+    }
+    /// Adjugate inversion using `fq_sq` + `fq_mul`: 65 `FieldMul`s + 1 `FieldInv`.
+    pub fn inv(&mut self, a: &X6) -> X6 {
+        self.c.inv += 1;
+        let (a0, a1, a2) = (&a[0..2], &a[2..4], &a[4..6]);
+        let sub2 = |u: [u64; 2], v: [u64; 2]| [self.subp(u[0], v[0]), self.subp(u[1], v[1])];
+        let add2 = |u: [u64; 2], v: [u64; 2]| [self.addp(u[0], v[0]), self.addp(u[1], v[1])];
+        let b0 = sub2(self.fq_sq(a0), self.fq_mul(&self.s, &self.fq_mul(a1, a2)));
+        let b1 = sub2(self.fq_mul(&self.s, &self.fq_sq(a2)), self.fq_mul(a0, a1));
+        let b2 = sub2(self.fq_sq(a1), self.fq_mul(a0, a2));
+        let n = add2(
+            self.fq_mul(a0, &b0),
+            self.fq_mul(&self.s, &add2(self.fq_mul(a2, &b1), self.fq_mul(a1, &b2))),
+        );
+        let ni = self.fq_inv(&n);
+        let (c0, c1, c2) = (
+            self.fq_mul(&b0, &ni),
+            self.fq_mul(&b1, &ni),
+            self.fq_mul(&b2, &ni),
+        );
+        [c0[0], c0[1], c1[0], c1[1], c2[0], c2[1]]
+    }
+}
+
+/// Measure the executed Karatsuba + Chung-Hasan `F_{q^3}` tower in `bitop/v1`.
+pub fn measure_karatsuba_fq3_prims(p: u64, l: u64) -> Fq3Prims {
+    assert!(jv_bitops::enabled(), "jv_bitops counting is off");
+    assert!((5..=1823).contains(&p), "bounded native rho prime");
+    jv_bitops::claim();
+    jv_bitops::set_moduli(p, l);
+    let _g = jv_bitops::enter(Phase::Harness);
+    let f = Fq3::new(p);
+    let mut rng = StdRng::seed_from_u64(5);
+    let (a, b) = loop {
+        let a = f.random(&mut rng);
+        let b = f.random(&mut rng);
+        if a != E6::ZERO && b != E6::ZERO {
+            break (to_x6(&a), to_x6(&b));
+        }
+    };
+    let mut ar = KaratsubaArith::<true>::new(p);
+    let before = jv_bitops::snapshot();
+    std::hint::black_box(ar.mul(&a, &b));
+    let mul = jv_bitops::snapshot().since(&before).total();
+    let before = jv_bitops::snapshot();
+    std::hint::black_box(ar.sq(&a));
+    let sq = jv_bitops::snapshot().since(&before).total();
+    let before = jv_bitops::snapshot();
+    std::hint::black_box(ar.inv(&a));
+    let inv = jv_bitops::snapshot().since(&before).total();
+    Fq3Prims { mul, sq, inv }
+}
+
 /// `c`'s `F_{q³}` operations at the selected calibration plus its group-law
 /// `F_p` additions.
 fn add_arith(t: &mut OpTally, c: &OpCounts, pr: &Fq3Prims) {
@@ -1403,6 +1586,43 @@ mod tests {
                 ok += r.correct as usize;
             }
             assert_eq!(ok, 3, "neg {neg} batch {batch}");
+        }
+    }
+
+    #[test]
+    fn karatsuba_tower_matches_schoolbook_and_counts_exact_32_28_65_products() {
+        for &p in &[53u64, 101, 251, 307, 383, 503, 661, 1009] {
+            let f = Fq3::new(p);
+            let mut rng = StdRng::seed_from_u64(42 + p);
+            let mut ka = KaratsubaArith::<false>::new(p);
+            let mut sa = Arith::<false> {
+                r: Red::new(p),
+                p,
+                w: f.f.w,
+                s: f.s.0,
+                a2: [0; 6],
+                a4: [0; 6],
+                c: OpCounts::default(),
+                flips: 0,
+            };
+            for _ in 0..48 {
+                let a = f.random(&mut rng);
+                let b = f.random(&mut rng);
+                if a == E6::ZERO {
+                    continue;
+                }
+                let (xa, xb) = (to_x6(&a), to_x6(&b));
+                assert_eq!(ka.mul(&xa, &xb), sa.mul(&xa, &xb), "mul p={p}");
+                assert_eq!(ka.sq(&xa), sa.sq(&xa), "sq p={p}");
+                assert_eq!(ka.inv(&xa), sa.inv(&xa), "inv p={p}");
+            }
+            jv_bitops::enable(true);
+            let pr = measure_karatsuba_fq3_prims(p, p);
+            jv_bitops::enable(false);
+            assert_eq!(pr.mul.get(Kind::FieldMul), 32, "mul count p={p}");
+            assert_eq!(pr.sq.get(Kind::FieldMul), 28, "sq count p={p}");
+            assert_eq!(pr.inv.get(Kind::FieldMul), 65, "inv count p={p}");
+            assert_eq!(pr.inv.get(Kind::FieldInv), 1, "inv finv p={p}");
         }
     }
 }

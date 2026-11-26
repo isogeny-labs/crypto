@@ -1940,12 +1940,20 @@ fn tracked_rref_contributors(
         if r >= n {
             break;
         }
-        let Some(pr) = (r..n).find(|&i| m[i][c] != 0) else {
+        let Some(pr) = (r..n).find(|&i| {
+            super::jv_bitops::words(1);
+            m[i][c] != 0
+        }) else {
             continue;
         };
         m.swap(r, pr);
         who.swap(r, pr);
         let inv = inv_mod_u64(m[r][c], p);
+        if super::jv_bitops::enabled() {
+            let e = p - 2;
+            let fermat_muls = (64 - e.leading_zeros() as u64) + e.count_ones() as u64;
+            super::jv_bitops::charge(super::jv_bitops::Kind::FieldMul, fermat_muls);
+        }
         for v in m[r].iter_mut() {
             *v = ((*v as u128 * inv as u128) % p as u128) as u64;
         }
@@ -1955,6 +1963,7 @@ fn tracked_rref_contributors(
         count_ops(ncols);
         let pivot_row = m[r].clone();
         let pivot_who = who[r].clone();
+        super::jv_bitops::words(n as u64);
         for i in 0..n {
             if deadline.is_some_and(|d| Instant::now() > d) {
                 return None;
@@ -1962,10 +1971,12 @@ fn tracked_rref_contributors(
             if i != r && m[i][c] != 0 {
                 let f = m[i][c];
                 let neg = p - f;
+                super::jv_bitops::charge(super::jv_bitops::Kind::FieldAdd, 1);
                 for (x, &y) in m[i].iter_mut().zip(&pivot_row) {
                     *x = ((*x as u128 + neg as u128 * y as u128) % p as u128) as u64;
                 }
                 count_ops(ncols);
+                super::jv_bitops::words(words as u64);
                 for (a, &b) in who[i].iter_mut().zip(&pivot_who) {
                     *a |= b;
                 }
@@ -1974,6 +1985,7 @@ fn tracked_rref_contributors(
         piv.push((r, c));
         r += 1;
     }
+    super::jv_bitops::words((piv.len() * n) as u64);
     Some(
         piv.into_iter()
             .map(|(row, col)| {
@@ -16771,5 +16783,34 @@ mod sibling_batch_tests {
                 "{key} serialised under the default"
             );
         }
+    }
+
+    #[test]
+    fn tracked_rref_charges_jv_bitops_without_changing_f4_report_field_ops() {
+        let p = 1009u64;
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let system = vec![
+            vec![(vec![2, 0], 1), (vec![0, 1], 5), (vec![0, 0], 13)],
+            vec![(vec![1, 1], 1), (vec![1, 0], 7), (vec![0, 0], 29)],
+            vec![(vec![0, 2], 1), (vec![1, 0], 11), (vec![0, 1], 3)],
+        ];
+        super::super::jv_bitops::enable(false);
+        let (rep_off, trace_off) = f4_record(&system, 2, p, &opts);
+
+        super::super::jv_bitops::enable(true);
+        super::super::jv_bitops::claim();
+        super::super::jv_bitops::set_moduli(p, p);
+        let _guard = super::super::jv_bitops::enter(super::super::jv_bitops::Phase::Descent);
+        let before = super::super::jv_bitops::snapshot();
+        let (rep_on, trace_on) = f4_record(&system, 2, p, &opts);
+        let delta = super::super::jv_bitops::snapshot().since(&before).total();
+        drop(_guard);
+        super::super::jv_bitops::enable(false);
+
+        assert_eq!(rep_off.field_ops, rep_on.field_ops);
+        assert_eq!(rep_off.basis, rep_on.basis);
+        assert_eq!(trace_off.steps.len(), trace_on.steps.len());
+        assert!(delta.get(super::super::jv_bitops::Kind::FieldMul) > rep_on.field_ops);
+        assert!(delta.get(super::super::jv_bitops::Kind::WordOp) > 0);
     }
 }
