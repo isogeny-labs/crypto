@@ -402,6 +402,15 @@ is correctly rejected by the strict entry point. This defines a generic finite
 refinement boundary; constructing a uniform strict family remains open.
 `[pcc:unverified]`
 
+`SYMMETRIC_SOURCE_FAMILY.md` gives the first explicit strict root construction.
+With `N` vertices per side, `L` parallel edges per pair, and cyclic labels in
+`q=64^a` buckets, every class is full, `KL=M`, group loads are exactly `M/64`
+per side, and every child has `M/32` edges. A standalone exponent certificate
+checks the actual `Setup` degree, `LD`, and `2D^2 delta` guards at the
+schema-6 threshold and larger even root exponents. The unresolved step is
+closure: the old/packet child graph is not yet proved to retain this symmetric
+family or balanced conditional labels. `[pcc:unverified]`
+
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical
 binary factor by

@@ -138,6 +138,15 @@ composed finite report but correctly fails strict admission. Thus R1 now has a
 generic finite checker; constructing a uniform accepted family remains open.
 `[pcc:unverified]`
 
+The schema-1 symmetric-source certificate supplies an explicit strict root
+family: a complete bipartite graph on `N` vertices per side with `L` parallel
+edges per pair and cyclic `64^a` labels. It proves uniform class size, `KL=M`,
+exact `M/64` endpoint load per side/group, and `M_child=M/32`, while checking
+the source degree, `LD`, and `2D^2 delta` guards by exponents. It passes at
+`lambda=2^26` and larger checked even exponents. This advances R1 at the root;
+closure of the old/packet child shape under the next packing call remains open.
+`[pcc:unverified]`
+
 The schema-6 symbolic transcript now closes R1 item 4 at the scalar level once
 the packing premises hold. Each side contributes at most `3M/64` endpoints to
 one group, so a child has at most `6M/64` edges and

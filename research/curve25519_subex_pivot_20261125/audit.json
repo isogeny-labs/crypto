@@ -440,5 +440,14 @@
     "dependency_boundary": "imports serialized certificate verifiers and exact integers only, not graph, source packing, deformation, packet tensor or contraction implementations",
     "claim_boundary": "generic finite node checker with fail-closed strict admission; no construction of a uniform arbitrary-size strict family, proof that the unreachable live branch emits bundles, external contraction proof or practical Curve25519 attack"
   },
-  "next_gate": "construct or refute a uniform arbitrary-size strict family accepted by the schema-1 node interface and compatible with the schema-6 scalar schedule; separately rederive the external contraction theorem and accept a counterexample to any premise as decisive"
+  "symmetric_source_family_control": {
+    "note": "research/curve25519_subex_pivot_20261125/SYMMETRIC_SOURCE_FAMILY.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/symmetric_source_family_certificate.rs",
+    "wire_format": "schema-1 JSON exponent transcript; no graph allocation",
+    "construction": "N vertices per bipartite side, L parallel edges per vertex pair, cyclic labels modulo q=64^a, M=N^2L=2^lambda",
+    "checks": "root u=floor(lambda/2^17), a=2u, label/array/class/packet/degree exponents; cyclic balanced class divisibility; exact KL=M; exact M/64 endpoint load per side/group and M/32 child edges; source degree and 2L<=delta using floor(9lambda/10); M>=LD; M>=2D^2delta using ceil(9lambda/10)",
+    "observed_gate": "lambda=2^26 transcript passes with a=1024, log2N=33553920, log2degree=33554944, delta exponents [60397977,60397978] and child exponent lambda-5; larger checked even exponents pass; altered degree and odd vertex parity fail",
+    "claim_boundary": "explicit infinite parity-compatible strict root family and packing proof; no closure of old/packet children under the next conditional-label call, external contraction proof or practical Curve25519 attack"
+  },
+  "next_gate": "prove or refute recursive closure of the symmetric root construction, potentially by exploiting packet-pattern symmetry and auxiliary packet vertices; then feed any closed family through the schema-1 node interface, and separately rederive the external contraction theorem"
 }
