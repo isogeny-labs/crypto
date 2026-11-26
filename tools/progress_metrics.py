@@ -1310,8 +1310,28 @@ def ecc2k_cold15m(ref, since):
                          source=f"{path}@{commit}")
 
 
+def p192_fixed_synthesis(ref, since):
+    """Copy measured fixed-input replay costs; no historical-cost estimates."""
+    path = "research/nist_cover_three_tests_20261116/synthesis_costs_20261126/summary.json"
+    since_day = since + "T00:00:00Z" if len(since) == 10 else since
+    for date, commit, text in file_history(ref, path, since_day):
+        data = json.loads(text)
+        for suffix, field, unit in (
+                ("attempts", "attempt_count", "count"),
+                ("complete_chains", "complete_chain_count", "count"),
+                ("artifact_matches", "artifact_match_count", "count"),
+                ("executed_wrapper_seconds", "executed_wrapper_seconds", "seconds"),
+                ("nested_build_seconds", "nested_build_seconds", "seconds"),
+                ("nested_native_seconds", "nested_native_seconds", "seconds")):
+            emit(f"p192.fixed_synthesis.{suffix}", data.get(field), date=date,
+                 problem="p192-genus3-map-verification", unit=unit, better="neutral",
+                 label="Measured fixed-input replay; torsion generation excluded; PCC unverified",
+                 source=f"{path}@{commit}")
+
+
 def main():
     a = args()
+    p192_fixed_synthesis(a.ref, a.since)
     fixed_lucas_conductor(a.ref, a.since)
     conductor_memory_frontier(a.ref, a.since)
     jacobian_catalog(a.ref, a.since)

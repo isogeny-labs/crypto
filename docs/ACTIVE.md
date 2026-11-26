@@ -19,7 +19,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 - [ ] Repair the inherited aimed-gather registry-custody validation failure without changing original scientific values, raw records or reports, so the P-192 verification stack can land (Codex, started 2026-11-26, branch lane/p192-synthesis-costs-20261126, PR #5258; Conductor T-6).
 
-- [ ] Recover/replay the fixed P-192 original synthesis costs with source/artifact binding and all executed costs, distinguishing given torsion/model inputs from construction; retain prior evidence and existing execution limits/user waiver (Codex, started 2026-11-26, branch lane/p192-synthesis-costs-20261126; PR #5258, stacked follow-up to PR #5257).
+- [ ] Recover/replay the fixed P-192 original synthesis costs with source/artifact binding and all executed costs, distinguishing given torsion/model inputs from construction; retain prior evidence and existing execution limits/user waiver (Codex, started 2026-11-26, branch lane/p192-synthesis-costs-20261126; PR #5258 consolidating the frozen #5255/#5256/#5257 stack; Conductor T-5/T-7, bounded attempt-v1 running from GIVEN recorded inputs).
 
 - [x] Implement callable direct P-192 f_* from valid rational 22x85 KM class input:12 end-to-end cases pass including infinity0..3, public F(G)/double, RR2, repeated supports and triple pole; standalone/replay-tree/class-only API checks pass; full189.715s diagnostic wrapper evidence/report retained (Codex, completed component 2026-11-26, branch lane/p192-km-pushforward-20261126, PR #5257 after #5256; unchanged limits/user waiver, historical original synthesis costs remain open). [pcc:unverified]
 
