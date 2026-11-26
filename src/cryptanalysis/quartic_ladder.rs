@@ -3220,19 +3220,27 @@ mod tests {
         let n = 30usize;
         // x random; rows random sparse plus a diagonal (nonsingular)
         let x: Vec<u64> = (0..n).map(|_| g.gen_range(0..r)).collect();
+        let ct = (n - 1) as u32;
         let mut rows: Vec<Row> = Vec::new();
         for i in 0..n + 12 {
+            // The first n rows are consistent anchors (nonzero rhs). The 12
+            // extra rows are non-anchors (zero rhs, no `ct` entry): exactly
+            // the rows `select_rows` may drop, since it never drops an anchor.
+            let extra = i >= n;
             let mut t: Vec<(u32, u64)> = vec![((i % n) as u32, g.gen_range(1..r))];
             for c in 0..n as u32 {
-                if c as usize != i % n && g.gen_range(0..6) == 0 {
+                if c as usize != i % n && g.gen_range(0..6) == 0 && !(extra && c == ct) {
                     t.push((c, if g.gen_bool(0.5) { 1 } else { g.gen_range(2..r) }));
                 }
             }
             t.sort_unstable_by_key(|e| e.0);
-            let b = t.iter().fold(0u64, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r));
+            let b = if extra {
+                0
+            } else {
+                t.iter().fold(0u64, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r))
+            };
             rows.push((t, b));
         }
-        let ct = (n - 1) as u32;
         let mut nat = Nat::default();
         let sq = select_rows(&rows, n, ct, n, &mut nat);
         assert_eq!(sq.len(), n);
