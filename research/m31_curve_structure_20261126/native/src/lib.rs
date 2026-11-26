@@ -139,6 +139,17 @@ pub fn powmod(mut a: u64, mut e: u64, n: u64) -> u64 {
     }
     o
 }
+/// Hot-loop scalar arithmetic mod the group order without division (inputs < n < 2^32).
+#[inline(always)]
+fn addn(a: u64, b: u64, n: u64) -> u64 {
+    let s = a + b;
+    if s >= n { s - n } else { s }
+}
+#[inline(always)]
+fn negn(a: u64, n: u64) -> u64 {
+    if a == 0 { 0 } else { n - a }
+}
+
 #[inline(always)]
 fn jump_of(x: u64) -> usize {
     ((x.wrapping_mul(0x9e37_79b9_7f4a_7c15)) >> 59) as usize
@@ -168,6 +179,20 @@ struct Ctx {
     beta2: u64,
     lambda: u64,
     lambda2: u64,
+    lams: [u64; 3],
+    barrett_m: u64,
+}
+impl Ctx {
+    /// x mod n for x < 2^62, n < 2^32 (Barrett, one 64x64->128 multiply).
+    #[inline(always)]
+    fn barrett(&self, x: u64) -> u64 {
+        let q = ((x as u128 * self.barrett_m as u128) >> 64) as u64;
+        let mut r = x - q * self.n;
+        while r >= self.n {
+            r -= self.n;
+        }
+        r
+    }
 }
 
 impl Ctx {
@@ -177,43 +202,56 @@ impl Ctx {
         match self.arm {
             Arm::Plain => {}
             Arm::Neg => {
-                if w.y > P / 2 {
-                    w.y = P - w.y;
-                    w.a = (self.n - w.a) % self.n;
-                    w.b = (self.n - w.b) % self.n;
-                }
+                // branch-free select (the sign is a fair coin, so a branch mispredicts half the time)
+                let mask = 0u64.wrapping_sub((w.y > P / 2) as u64);
+                w.y ^= (w.y ^ (P - w.y)) & mask;
+                w.a ^= (w.a ^ negn(w.a, self.n)) & mask;
+                w.b ^= (w.b ^ negn(w.b, self.n)) & mask;
             }
             Arm::Aut6 => {
-                // orbit of x under zeta: {x, beta x, beta^2 x}, beta^2 x = -x - beta x (one mult)
+                // orbit of x under zeta: {x, beta x, beta^2 x}, beta^2 x = -x - beta x (one mult);
+                // branch-free selection, Barrett reduction for the coefficient scaling.
                 let bx = f.mul(self.beta, w.x);
                 f.c.canon_mul += 1;
                 let b2x = F::neg(F::add(w.x, bx));
-                let (mut mx, mut mu) = (w.x, 0u8);
-                if bx < mx {
-                    mx = bx;
-                    mu = 1;
-                }
-                if b2x < mx {
-                    mx = b2x;
-                    mu = 2;
-                }
-                // (beta x, y) = lambda * (x, y) on the order-n subgroup
-                if mu == 1 {
-                    w.a = mulmod(w.a, self.lambda, self.n);
-                    w.b = mulmod(w.b, self.lambda, self.n);
-                } else if mu == 2 {
-                    w.a = mulmod(w.a, self.lambda2, self.n);
-                    w.b = mulmod(w.b, self.lambda2, self.n);
-                }
+                let c1 = (bx < w.x) as usize;
+                let m01 = if c1 == 1 { bx } else { w.x };
+                let c2 = (b2x < m01) as usize;
+                let mu = c2 * 2 + (1 - c2) * c1;
+                let mx = if c2 == 1 { b2x } else { m01 };
+                let lam = self.lams[mu];
+                w.a = self.barrett(w.a * lam);
+                w.b = self.barrett(w.b * lam);
                 w.x = mx;
-                if w.y > P / 2 {
-                    w.y = P - w.y;
-                    w.a = (self.n - w.a) % self.n;
-                    w.b = (self.n - w.b) % self.n;
-                }
-                let _ = self.beta2;
+                let mask = 0u64.wrapping_sub((w.y > P / 2) as u64);
+                w.y ^= (w.y ^ (P - w.y)) & mask;
+                w.a ^= (w.a ^ negn(w.a, self.n)) & mask;
+                w.b ^= (w.b ^ negn(w.b, self.n)) & mask;
+                let _ = (self.beta2, self.lambda, self.lambda2);
             }
         }
+    }
+}
+
+/// The walk function applied to one walk with its own inversion (cycle replay only; counted).
+fn step_single(ctx: &Ctx, f: &mut F, acoef: u64, jumps: &[((u64, u64), u64, u64)], w: Walk) -> Walk {
+    let n = ctx.n;
+    let mut off = 0usize;
+    loop {
+        let j = (jump_of(w.x) + off) % JUMPS;
+        let (jp, c, d) = jumps[j];
+        let s = add_counted(f, acoef, Some((w.x, w.y)), Some(jp));
+        let (x3, y3) = match s {
+            Some(v) => v,
+            None => return w, // cannot occur inside a fruitless cycle; caller's confirmation fails
+        };
+        let mut nw = Walk { x: x3, y: y3, a: addn(w.a, c, n), b: addn(w.b, d, n), off: 0, since_dp: w.since_dp + 1 };
+        ctx.canon(f, &mut nw);
+        if ctx.arm != Arm::Plain && off + 1 < JUMPS && jump_of(nw.x) == j {
+            off += 1;
+            continue;
+        }
+        return nw;
     }
 }
 
@@ -272,6 +310,8 @@ pub fn solve(job: &Job) -> Solve {
         beta2: F::red(beta * beta),
         lambda,
         lambda2: mulmod(lambda, lambda, n),
+        lams: [1, lambda % n.max(1), mulmod(lambda, lambda, n.max(1))],
+        barrett_m: (u64::MAX / n),
     };
     if arm == Arm::Aut6 {
         let (gx, gy) = g.unwrap();
@@ -326,15 +366,15 @@ pub fn solve(job: &Job) -> Solve {
     let mut pre = vec![0u64; w_n];
     let mut jidx = vec![0usize; w_n];
     let use_la = arm != Arm::Plain;
-    // Fruitless-cycle detection (neg / aut6): ring of the last RING accepted states per walk;
-    // a repeat at distance L <= RING is a fruitless L-cycle, escaped deterministically by
-    // doubling the cycle's minimum-x point (counted with its own inversion).
     const RING: usize = 12;
-    let mut ring: Vec<[Walk; RING]> = vec![[Walk { x: u64::MAX, y: 0, a: 0, b: 0, off: 0, since_dp: 0 }; RING]; w_n];
+    const FULL_EVERY: u64 = 16;
+    let mut false_cycle_alarms = 0u64;
     let mut ring_pos = vec![0usize; w_n];
+    let mut rx: Vec<[u64; RING]> = vec![[u64::MAX; RING]; w_n];
     let mut cycle_escapes = 0u64;
     let mut cycle_len_hist = [0u64; RING + 1];
     let mut ring_compares = 0u64;
+    let walk_t0 = Instant::now();
     let recovered = 'outer: loop {
         for k in 0..w_n {
             let w = walks[k];
@@ -371,7 +411,7 @@ pub fn solve(job: &Job) -> Solve {
             let l = f.mul(F::sub(jp.1, w.y), dens[k]);
             let x3 = F::sub(F::sub(f.sqr(l), w.x), jp.0);
             let y3 = F::sub(f.mul(l, F::sub(w.x, x3)), w.y);
-            let mut nw = Walk { x: x3, y: y3, a: (w.a + c) % n, b: (w.b + d) % n, off: 0, since_dp: w.since_dp + 1 };
+            let mut nw = Walk { x: x3, y: y3, a: addn(w.a, c, n), b: addn(w.b, d, n), off: 0, since_dp: w.since_dp + 1 };
             ctx.canon(&mut f, &mut nw);
             if use_la && w.off + 1 < JUMPS && jump_of(nw.x) == j {
                 // Wiener-Zuccherato look-ahead: reject, retry from w with the next jump.
@@ -382,40 +422,54 @@ pub fn solve(job: &Job) -> Solve {
             }
             accepted += 1;
             if use_la {
+                // x-only ring of the last RING accepted x per walk. Every accepted step compares
+                // with the x of 2 and 4 steps ago (the common fruitless 2- and 4-cycles); every
+                // FULL_EVERY accepted steps the whole ring is scanned (longer cycles). On a hit at
+                // distance L the cycle is replayed with the same walk function (unbatched, counted)
+                // and left deterministically by doubling its minimum-x point.
                 let pos = ring_pos[k];
+                let at = |d: usize| rx[k][(pos + RING - d) % RING];
                 let mut found = 0usize;
-                for dist in 1..=RING {
-                    ring_compares += 1;
-                    let e = &ring[k][(pos + RING - dist) % RING];
-                    if e.x == nw.x && e.y == nw.y {
-                        found = dist;
-                        break;
+                ring_compares += 2;
+                if at(2) == nw.x {
+                    found = 2;
+                } else if at(4) == nw.x {
+                    found = 4;
+                } else if accepted % FULL_EVERY == 0 {
+                    ring_compares += RING as u64;
+                    for dist in 1..=RING {
+                        if at(dist) == nw.x {
+                            found = dist;
+                            break;
+                        }
                     }
                 }
                 if found > 0 {
-                    cycle_escapes += 1;
-                    cycle_len_hist[found] += 1;
-                    let mut m = nw;
-                    for dist in 1..found {
-                        let e = ring[k][(pos + RING - dist) % RING];
-                        if e.x < m.x {
-                            m = e;
-                        }
+                    // confirm the cycle by replay: L steps from nw must return to nw
+                    let mut cyc = vec![nw];
+                    let mut cur_w = nw;
+                    for _ in 0..found {
+                        cur_w = step_single(&ctx, &mut restart_f, acoef, &jumps, cur_w);
+                        cyc.push(cur_w);
                     }
-                    let d2 = add_counted(&mut restart_f, acoef, Some((m.x, m.y)), Some((m.x, m.y)));
-                    let mut esc = match d2 {
-                        Some((x, y)) => Walk { x, y, a: (m.a * 2) % n, b: (m.b * 2) % n, off: 0, since_dp: nw.since_dp },
-                        None => next_start(&mut restart_f),
-                    };
-                    ctx.canon(&mut restart_f, &mut esc);
-                    for e in ring[k].iter_mut() {
-                        e.x = u64::MAX;
+                    if cur_w.x == nw.x && cur_w.y == nw.y {
+                        cycle_escapes += 1;
+                        cycle_len_hist[found] += 1;
+                        let m = *cyc[..found].iter().min_by_key(|e| e.x).unwrap();
+                        let d2 = add_counted(&mut restart_f, acoef, Some((m.x, m.y)), Some((m.x, m.y)));
+                        let mut esc = match d2 {
+                            Some((x, y)) => Walk { x, y, a: addn(m.a, m.a, n), b: addn(m.b, m.b, n), off: 0, since_dp: nw.since_dp },
+                            None => next_start(&mut restart_f),
+                        };
+                        ctx.canon(&mut restart_f, &mut esc);
+                        rx[k] = [u64::MAX; RING];
+                        walks[k] = esc;
+                        continue;
                     }
-                    walks[k] = esc;
-                    continue;
+                    false_cycle_alarms += 1;
                 }
-                ring[k][pos] = nw;
-                ring_pos[k] = (pos + 1) % RING;
+                rx[k][pos] = nw.x;
+                ring_pos[k] = if pos + 1 == RING { 0 } else { pos + 1 };
             }
             if nw.since_dp > max_len {
                 // walk trapped in a fruitless cycle (or pathologically long): restart, charged.
@@ -445,6 +499,7 @@ pub fn solve(job: &Job) -> Solve {
             walks[k] = nw;
         }
     };
+    let walk_wall_ms = walk_t0.elapsed().as_secs_f64() * 1e3;
     let wall_ms = cold.elapsed().as_secs_f64() * 1e3;
     let verified = scalar_ref(acoef, recovered, g) == q;
     let arm_s = match arm {
@@ -456,12 +511,12 @@ pub fn solve(job: &Job) -> Solve {
     let rc = restart_f.c;
     let json = format!(
         "{{\"arm\":\"{}\",\"seed\":\"{:#018x}\",\"W\":{},\"dp_bits\":{},\"steps\":{},\"accepted_steps\":{},\"lookahead_rejects\":{},\
-\"restarts_cycle\":{},\"cycle_escapes\":{},\"cycle_len_hist\":{:?},\"ring_compares\":{},\"restarts_selfhit\":{},\"restarts_special\":{},\"distinguished_points\":{},\
+\"restarts_cycle\":{},\"cycle_escapes\":{},\"cycle_len_hist\":{:?},\"ring_compares\":{},\"false_cycle_alarms\":{},\"restarts_selfhit\":{},\"restarts_special\":{},\"distinguished_points\":{},\
 \"walk_mul\":{},\"walk_sqr\":{},\"walk_inv\":{},\"canon_mul\":{},\"restart_mul\":{},\"restart_inv\":{},\
-\"setup_mul\":{},\"setup_inv\":{},\"total_mul\":{},\"recovered\":{},\"verified\":{},\"wall_ms\":{:.3}}}",
-        arm_s, seed, w_n, dp_bits, steps, accepted, lookahead_rejects, restarts_cycle, cycle_escapes, cycle_len_hist, ring_compares, restarts_selfhit, restarts_special,
+\"setup_mul\":{},\"setup_inv\":{},\"total_mul\":{},\"recovered\":{},\"verified\":{},\"wall_ms\":{:.3},\"walk_wall_ms\":{:.3}}}",
+        arm_s, seed, w_n, dp_bits, steps, accepted, lookahead_rejects, restarts_cycle, cycle_escapes, cycle_len_hist, ring_compares, false_cycle_alarms, restarts_selfhit, restarts_special,
         dps.len(), wc.mul, wc.sqr, wc.inv, wc.canon_mul, rc.mul, rc.inv, setup_counts.mul, setup_counts.inv,
-        wc.mul + rc.mul + setup_counts.mul, recovered, verified, wall_ms
+        wc.mul + rc.mul + setup_counts.mul, recovered, verified, wall_ms, walk_wall_ms
     );
     Solve { recovered, verified, steps, json }
 }

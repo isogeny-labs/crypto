@@ -45,3 +45,14 @@ Falsification: A/A CI excludes 1 (instrument problem), or any unverified recover
   used anywhere.
 - T raised from 300 to 2000 trials per cell: the native driver solves a B677 instance in about 2 ms, so the larger
   panel costs about a minute on one core and tightens the intervals. All other design elements unchanged.
+
+## Amendment 2 (2026-11-26, after the first T = 2000 run; engineering only)
+The first native run (kept unedited in `evidence/v1_engine/`, all 24,000 solves verified) showed the negation-map
+arm 1.5x *slower* than plain rho in wall time despite 0.715x the group operations. Diagnosis by per-step walk timing:
+branch mispredictions in the sign canonicalisation (a fair coin per step) and a 12-entry full-state cycle ring
+scanned every step, plus u64 division in coefficient updates. That is an unequal-engineering defect against the
+comparator the task names as fair, so the engine was fixed before any conclusion was drawn:
+branch-free sign/orbit selection, division-free coefficient arithmetic (Barrett for the ζ scaling), an x-only cycle
+ring checked at distances 2 and 4 every step and fully every 16 accepted steps, with replay-confirmed escape, and a
+separate walk-phase wall clock. The walk function, partition, jump table, start schedule, DP rule, seeds and design
+are unchanged. The full panel is rerun (same manifest, same T); the v2 run is primary and v1 is reported alongside.
