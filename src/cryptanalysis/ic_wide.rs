@@ -708,6 +708,7 @@ pub fn run_f2m4<S: NarrowRhoScalar>(
     rel.count("repeated_targets_skipped", repeats_skipped);
     rel.count("target_guard_probes", guard_probes);
     rel.count("walk_jumps", walk_jumps + pool.len() as u64);
+    rel.count("walk_jumps_materialised", walk_jumps);
     rel.count("walk_pool_offsets", pool.len() as u64);
     rel.count("walk_pool_ops", pool_ops.adds + pool_ops.doubles);
     rel.count("walk_pool_restarts", pool_taken);
