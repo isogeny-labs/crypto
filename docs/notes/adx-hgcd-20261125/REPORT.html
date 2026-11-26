@@ -385,12 +385,10 @@ git blob is pinned by
 <code>docs/ic/validation/reference-currency.json</code> (the
 <code>recompute</code> check).</p>
 <p><strong>Reverted by the lead after review</strong> (speed or
-provenance): <code>prime_fast.rs</code> (division-free binary inverse in
-the FastCurve rho walks; its root-finding gcd now uses half-GCD above
-the crossover only), <code>isoclass_rho/field.rs</code> (per-step
-F_{2^m} inverse would allocate), <code>hyperelliptic_word.rs</code>
-(stack arrays + table inverse), <code>jv_sieve.rs</code> (hash-checked
-by <code>sha256sum -c</code> in live preparation scripts).</p>
+provenance): <code>isoclass_rho/field.rs</code> (per-step F_{2^m}
+inverse would allocate), <code>hyperelliptic_word.rs</code> (stack
+arrays + table inverse), <code>jv_sieve.rs</code> (hash-checked by
+<code>sha256sum -c</code> in live preparation scripts).</p>
 <p><strong>Speed effect on routed sites.</strong> Most routed sites pass
 small operands (degree ≤ 8 Cantor/quartic gcds, single-word integers);
 for them the shared module runs its classical kernels, so the effect is

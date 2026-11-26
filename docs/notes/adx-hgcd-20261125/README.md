@@ -175,8 +175,6 @@ reference, whose git blob is pinned by
 `docs/ic/validation/reference-currency.json` (the `recompute` check).
 
 **Reverted by the lead after review** (speed or provenance):
-`prime_fast.rs` (division-free binary inverse in the FastCurve rho walks; its
-root-finding gcd now uses half-GCD above the crossover only),
 `isoclass_rho/field.rs` (per-step F_{2^m} inverse would allocate),
 `hyperelliptic_word.rs` (stack arrays + table inverse), `jv_sieve.rs`
 (hash-checked by `sha256sum -c` in live preparation scripts).
