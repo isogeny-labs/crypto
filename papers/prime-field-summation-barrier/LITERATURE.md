@@ -87,6 +87,18 @@ has `s+t=m+1/2`, independent of `delta`, so it misses the required line by
 `3/2` powers of `N`.  This restatement separates the open data-structure
 inequality from the elliptic relation accounting. `[pcc:unverified]`
 
+For the requested small arities, the favourable indexing-family exponent is:
+
+| `m` | `delta=0` | `delta=1/2` | `delta=1` |
+|---:|---:|---:|---:|
+| 3 | `7/11` | `2/3` | `5/7` |
+| 4 | `3/5` | `8/13` | `7/11` |
+| 5 | `11/19` | `10/17` | `3/5` |
+
+Every entry is strictly above `1/2`; increasing `delta` does not rescue the
+family because its space saving is overpaid by target-query work.
+`[pcc:unverified]`
+
 ## Consequence for the research goal
 
 The remaining theorem is no longer plausibly a consequence of degree or

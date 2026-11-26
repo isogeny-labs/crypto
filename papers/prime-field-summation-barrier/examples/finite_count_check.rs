@@ -156,4 +156,27 @@ fn piecewise_implicit_data_structure_balance_matches_grid_search() {
     }
 }
 
+#[test]
+fn audited_indexing_family_small_arity_fractions() {
+    // (m, delta numerator, delta denominator, expected numerator, denominator)
+    let cases = [
+        (3_i128, 0_i128, 1_i128, 7_i128, 11_i128),
+        (3, 1, 2, 2, 3),
+        (3, 1, 1, 5, 7),
+        (4, 0, 1, 3, 5),
+        (4, 1, 2, 8, 13),
+        (4, 1, 1, 7, 11),
+        (5, 0, 1, 11, 19),
+        (5, 1, 2, 10, 17),
+        (5, 1, 1, 3, 5),
+    ];
+
+    for (m, delta_num, delta_den, expected_num, expected_den) in cases {
+        let numerator = (2 * m + 1) * delta_den - 2 * delta_num;
+        let denominator = (4 * m - 1) * delta_den - 4 * delta_num;
+        assert_eq!(numerator * expected_den, expected_num * denominator);
+        assert!(2 * numerator > denominator);
+    }
+}
+
 fn main() {}
