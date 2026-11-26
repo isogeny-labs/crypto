@@ -21,7 +21,7 @@ from pathlib import Path
 
 
 ROSTER_SHA256 = "271fdaf1b23b87fb5b2b8a6ecb7ac1f6492e146d7e8b4deb2f6f251d618d9123"
-SOURCE_COMMIT = "4d5019bba92f075e2abdc961b1a86bcd07738cdf"
+SOURCE_COMMIT = "12663f43ee3f03169e54683cb4998b89474c86ab"
 MANIFEST_SHA256 = "a2236a912fd094548d14125d4280053610c59de1898a709b4ef777b525ae9d1b"
 TESTS = (
     "kummer_m3_basis_descent_complete_small_curve_census",
