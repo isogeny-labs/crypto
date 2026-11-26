@@ -255,7 +255,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 - [ ] Reproduce the genus 2–4 HEC index calculus comparison and examine the mathematical contribution (Codex, started 2026-11-18, branch research/hec-tenfold-replay, PR #4789)
 - [x] Publish the fresh P-192 plane-quartic transfer acceptance replay, machine receipt and exact remaining obligations (Codex, completed 2026-11-19, branch codex/p192-quartic-transfer-assessment-20261119, PR #4788)
 
-- [ ] Graph-anchored multi-pattern quadratic descent, certified F4 trace replay, fast Phase-1 candidate extraction, and multi-prime scaling for extension-field graph IC (Cursor, in progress, started 2026-11-18, resumed 2026-11-26, branch cursor/graph-index-calculus-ecdlp-7226, PR #5247)
+- [x] Graph-anchored multi-pattern quadratic descent, certified F4 trace replay, fast Phase-1 candidate extraction, and multi-prime scaling for extension-field graph IC: added Z-exact `SignedMatroidGraph` (2-LP DSU + 3-LP hypergraph + 7-engine head-to-head), `HitBuckets` sieve + deterministic Frobenius-norm quartic splitting, Karatsuba `F_{p^6}` tower + full `bitop/v1` LA/F4 closure (`foreign_hook_calls=0`), and multi-pattern `(1^6)+(1^4,2)+(1^2,2^2)+(2^3)` traced descent (`8.92x` descent, `1.81x` relations, `3.33x` E2E `w=0` at `p=1009`, `73/73` bundles qualified; Cursor, completed 2026-11-26, branch cursor/graph-index-calculus-ecdlp-7226, PR #5247) `[pcc:unverified]`
 
 - [x] Keep the n83_d18_shared_bits include_bytes! CSV in Git (store policy keep entry) so CI `check --all-targets` can compile it (Claude, started 2026-11-19, branch aburan28/zealous-lovelace-tc390j-keep-n83-csv, PR #4786)
 

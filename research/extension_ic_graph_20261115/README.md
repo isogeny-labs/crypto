@@ -497,68 +497,46 @@ OriginalIC4525556132414is lower on this sample; all complete costs/bands/
 ratios remain null. Exact records/report/custody are retained and the owned
 runner is deleted. ResultPCC-7d4d7e remains unverified. [pcc:unverified]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## Signed-matroid partial-relation graph and multi-pattern descent (26 November)
+
+The [signed-matroid and multi-pattern study](anchored_multi_pattern_20261126/report.pdf)
+([frozen protocol](anchored_multi_pattern_20261126/protocol.json),
+[Panel A summary](anchored_multi_pattern_20261126/panel_a_run50_summary.json),
+[7-engine graph head-to-head](anchored_multi_pattern_20261126/graph_engine_head_to_head.json),
+[Panel B multi-prime summary](anchored_multi_pattern_20261126/panel_b_multiprime_summary.json))
+closes the remaining `zero_dim_la` and `tracked_rref_contributors` `bitop/v1` hooks
+(`foreign_hook_calls == 0`), adds a `(32, 28, 65)` Karatsuba/Chung-Hasan $\mathbb{F}_{p^6}$
+tower alongside `(55, 55, 80)` schoolbook arithmetic, replaces `BTreeMap` BFS with
+an online $\mathbb{Z}$-exact `SignedMatroidGraph` (`src/cryptanalysis/jv_signed_matroid_graph.rs`),
+adds hit-bucket sieving plus deterministic zero-RNG Frobenius-norm quartic splitting,
+and couples exported $\mathbb{Z}$ divisor anchors to multi-pattern `(1^6), (1^4,2), (1^2,2^2), (2^3)`
+descent with cold F4 trace replay (`src/cryptanalysis/jv_anchored_descent.rs`). [pcc:unverified]
+
+- **Seven-engine partial-relation graph head-to-head (`p = 1009, seed = 389`, `100,088` sources):**
+  `1lp-singleton-table` stalls at rank `315 / 508` on `155,648` planes, while modular $\mathbb{F}_\ell$-inverting
+  engines (`2lp-forest-witness-fl`, `klp-markowitz-2core`, `klp-sharedkey-prim-mst`) export `0`
+  valid $\mathbb{Z}$ anchors due to cofactor torsion loss. [pcc:unverified]
+  `2lp-signed-matroid-dsu` reaches full rank `508 / 508` with `0` modular inversions, exports `20,667`
+  $\mathbb{Z}$-exact unit anchors, achieves the lowest mean row weight (`16.26`), and cuts pure graph +
+  projection `bitop/v1` cost to `254.61e6` (`1.54x` below `2lp-deferred-bfs`, `4.08x` below
+  `klp-markowitz-2core`, `7.66x` below `klp-sharedkey-prim-mst`, and `33.44x` below `2lp-forest-witness-fl`),
+  while `3lp-signed-matroid-hyper` cascades `(1^3, 2^3)` triples into `21,080` anchors at `291.04e6`
+  graph bitops. [pcc:unverified]
+- **Panel A 13-arm Run50 ablation (`p = 1009, seed = 389`, 58-bit $\ell = 263,807,419,614,139,553$):**
+  All 13 arms recover `d = 242624768583643540` from public input (`Spec.d = 0`). [pcc:unverified]
+  `TracedAnchored` cuts Phase-3 descent `w=0` bitops by `8.920x` (`4.368T -> 0.490T`, `3,415 -> 666`
+  residuals), and `signed-matroid-2lp:traced-anchored` cuts Phase-1 relation bitops by `1.807x`
+  (`2.043T -> 1.131T`; `2.089x` wall reduction `22.78s -> 10.90s`) and end-to-end `w=0` bitops by
+  `3.329x` (`6.872T -> 2.065T`; `w=1` Karatsuba `2.068T`, `11.89s` wall), standing `63.3x` below
+  analytical and `36.1x` below empirical `B=16` Karatsuba Pollard rho (`74.52T`, `60.70s` wall) on
+  this restricted weak-cover family. [pcc:unverified]
+- **Panel B multi-prime scaling (`p in {307, 383, 503, 661, 1009}` x 3 fresh seeds = 60 IC bundles) & controls:**
+  `2-LP` overcomes `p = 383` `1-LP` starvation (`3/3` vs `1/3` solved), anchor coverage follows
+  $p \cdot f(p) \approx 64..77$ (log-slope `-0.854`), end-to-end `signed-matroid-2lp:traced-anchored`
+  scales with log-slope `1.393` (`1.337` on `661..1009`) vs Karatsuba Pollard rho `3.000` (`69.6x`
+  analytical / `96.4x` empirical ratio at `p = 1009`), `-C overflow-checks=on` matches standard
+  release bit-for-bit, and the pre-sealed standalone qualifier
+  ([Panel A](anchored_multi_pattern_20261126/qualification_panel_a.json),
+  [Panel B part 1](anchored_multi_pattern_20261126/qualification_panel_b_part1.json),
+  [Panel B part 2](anchored_multi_pattern_20261126/qualification_panel_b_part2.json))
+  passes `73 / 73` bundles (`failed_bundles == 0`). [pcc:unverified]
