@@ -798,21 +798,7 @@ fn find_roots_fp_u64_stack(coeffs: &[FieldElement], p_big: &BigUint) -> Option<V
             return None;
         }
         let a_can = mmul(a_mont, 1, p, neg_pinv);
-        let (mut old_r, mut r) = (a_can, p);
-        let (mut old_s, mut s) = (1i64, 0i64);
-        while r != 0 {
-            let q = old_r / r;
-            (old_r, r) = (r, old_r - q * r);
-            (old_s, s) = (s, old_s - (q as i64) * s);
-        }
-        if old_r != 1 {
-            return None;
-        }
-        let inv_can = if old_s < 0 {
-            (old_s + p as i64) as u64
-        } else {
-            old_s as u64
-        };
+        let inv_can = crate::gcd::int::inv_mod_u64(a_can, p)?;
         Some(mmul(inv_can, r2, p, neg_pinv))
     }
 
@@ -984,7 +970,7 @@ fn find_roots_fp_u64_stack(coeffs: &[FieldElement], p_big: &BigUint) -> Option<V
 
     let mut f = StackPoly {
         c: [0; 9],
-        len: coeffs.len(),
+        len: coeffs.len().max(1),
     };
     for (idx, fe) in coeffs.iter().enumerate() {
         let v = if fe.value.is_zero() {
@@ -2322,19 +2308,11 @@ fn mul_mod_u64(a: u64, b: u64, p: u64) -> u64 {
     ((a as u128 * b as u128) % p as u128) as u64
 }
 
-/// Extended-Euclid inverse modulo a prime `p` (no exponentiation).
+/// Extended-Euclid inverse modulo a prime `p` (no exponentiation), by the
+/// shared `crate::gcd::int::inv_mod_u64`.
 fn inv_prime_u64(a: u64, p: u64) -> u64 {
-    let (mut t, mut newt) = (0i128, 1i128);
-    let (mut r, mut newr) = (p as i128, (a % p) as i128);
-    while newr != 0 {
-        let q = r / newr;
-        let (t2, r2) = (t - q * newt, r - q * newr);
-        t = newt;
-        newt = t2;
-        r = newr;
-        newr = r2;
-    }
-    (t.rem_euclid(p as i128)) as u64
+    // As before: 0 for a ≡ 0 (unchecked).
+    crate::gcd::int::inv_mod_u64(a, p).unwrap_or(0)
 }
 
 /// Montgomery batch inversion over a prime `p`: one extended-Euclid inverse
@@ -3245,20 +3223,10 @@ fn gaussian_eliminate_mod_u64(
     (!failed).then_some(pivot_rows)
 }
 
-/// `a^{-1} mod n` by the extended Euclidean algorithm, `None` when
-/// `gcd(a, n) ≠ 1`.
+/// `a^{-1} mod n` in `[0, n)` by the shared `crate::gcd::int::inv_mod_u64`,
+/// `None` when `gcd(a, n) ≠ 1`.
 fn inv_mod_u64(a: u64, n: u64) -> Option<u64> {
-    let (mut old_r, mut r) = (a as i128, n as i128);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        (old_r, r) = (r, old_r - q * r);
-        (old_s, s) = (s, old_s - q * s);
-    }
-    if old_r != 1 {
-        return None;
-    }
-    Some(old_s.rem_euclid(n as i128) as u64)
+    crate::gcd::int::inv_mod_u64(a, n)
 }
 
 // ── Incremental elimination across rank-deficient retries ───────────────

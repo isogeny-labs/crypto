@@ -1,0 +1,32 @@
+{
+  "work_unit": "hypothetical normalized work units (illustration only)",
+  "exponent_model": {
+    "arity": 5,
+    "trial_n_exponent": 0.0,
+    "trial_b_exponent": 1.0,
+    "retention_n_penalty": 0.0,
+    "retention_b_penalty": 0.0,
+    "linear_algebra_b_exponent": 2.0,
+    "beta_min": 0.0,
+    "beta_max": 1.0,
+    "extra_costs": [],
+    "memory_constraints": []
+  },
+  "relation_input": {
+    "group_order_log2": 100.0,
+    "factor_base_population_log2": 20.0,
+    "arity": 5,
+    "tuple_mode": "distinct",
+    "trial_work_log2": 20.0,
+    "required_rank_increments_log2": 20.0,
+    "conditional_useful_retention": 1.0,
+    "solvability_probability": null
+  },
+  "additional_phases": [
+    {"name": "base_setup", "work": {"status": "known", "log2_work": 20.0}, "reusable": true},
+    {"name": "linear_algebra", "work": {"status": "known", "log2_work": 40.0}, "reusable": false},
+    {"name": "recovery_verification", "work": {"status": "unknown"}, "reusable": false}
+  ],
+  "required_phases": ["base_setup", "relation_collection", "linear_algebra", "recovery_verification"],
+  "target_count_log2": 0.0
+}

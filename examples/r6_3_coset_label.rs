@@ -790,15 +790,9 @@ fn pmulmod(a: u64, b: u64, f: u64, n: u32) -> u64 {
     r
 }
 
-fn pgcd(mut a: u64, mut b: u64) -> u64 {
-    let deg = |v: u64| 63 - v.leading_zeros() as i32;
-    while b != 0 {
-        while a != 0 && deg(a) >= deg(b) {
-            a ^= b << (deg(a) - deg(b));
-        }
-        std::mem::swap(&mut a, &mut b);
-    }
-    a
+fn pgcd(a: u64, b: u64) -> u64 {
+    // GF(2)[x] gcd (shared implementation).
+    crypto_lib::gcd::gf2::gcd_word(a, b)
 }
 
 /// Rabin's test for `f` of degree `n <= 40`.

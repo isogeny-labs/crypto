@@ -30,8 +30,7 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::ops::{BitAnd, BitOr, BitXor, Shl, Shr, Sub};
 
-use num_bigint::{BigInt, BigUint};
-use num_integer::Integer;
+use num_bigint::BigUint;
 use num_traits::{One, ToPrimitive, Zero};
 use rand::distributions::uniform::{SampleBorrow, SampleUniform, UniformInt, UniformSampler};
 use rand::Rng;
@@ -530,15 +529,12 @@ impl RhoScalar for U192 {
         }
     }
     fn inverse_mod(v: Self, m: Self) -> Option<Self> {
+        // `v = 0` is `None` even for `m = 1` (old contract).
         if v.is_zero() {
             return None;
         }
-        let e = BigInt::from(v.to_big()).extended_gcd(&BigInt::from(m.to_big()));
-        if e.gcd != BigInt::one() {
-            return None;
-        }
-        let x = e.x.mod_floor(&BigInt::from(m.to_big()));
-        U192::from_big(&x.to_biguint()?)
+        let x = crate::gcd::int::modinv_big(&v.to_big(), &m.to_big())?;
+        U192::from_big(&x)
     }
 }
 

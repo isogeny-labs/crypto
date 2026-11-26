@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:20:11Z",
+ "id": "PCC-20261124-e73b21",
+ "kind": "statement",
+ "producer": {
+  "commit": "060cd7b2271d87cdab2b2e41a1370bda3d6f20a3",
+  "model": "",
+  "session": "codex-ecc2k-cold15m-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/grid-audit.json",
+    "sha256": "68ef453b9b676b9c3979da1e4965da735d27677d3aa4142752a39a990ccbaba6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/summary.json",
+    "sha256": "04f92552028e942d0d97881624e541d457a506a8f1ea1323cf874221c215f57d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/polynomial-replay.json",
+    "sha256": "c89977553be6c025dad795eb76544981779f469919ee84e3caffd16368a289d0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/checks/source-final.json",
+    "sha256": "91e5e3cbb938e731748fd770b6207f41771abd5982a5e2bd8940063cceee953d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The first full below15M bundle completes120 exact-output rows and80 saved-tuple replays, unchanged source inventory. Uniform n131 median17,287,437Ir still misses strict15M, and n83 positive oracle regresses about1.70%, failing that guard. All rows are retained; further tuning requires a separate frozen candidate."
+}

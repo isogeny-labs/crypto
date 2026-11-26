@@ -819,8 +819,16 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
-        let mut rootfind_floor = RootfindFloorOracle::new(m, inst);
-        let mut rootfind_kmitm = RootfindKMitmOracle::new_prime(m, inst);
+        let mut rootfind_floor = if or_name == "rootfind-floor-batch-v1" {
+            RootfindFloorOracle::new_batch_v1(m, inst)
+        } else {
+            RootfindFloorOracle::new(m, inst)
+        };
+        let mut rootfind_kmitm = if or_name == "rootfind-kmitm-batch-v1" {
+            RootfindKMitmOracle::new_prime_batch_v1(m, inst)
+        } else {
+            RootfindKMitmOracle::new_prime(m, inst)
+        };
         let mut rootfind_gpu =
             crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(
                 m, inst,
@@ -839,16 +847,17 @@ fn run_prime(
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
-            "rootfind-floor" => &mut rootfind_floor,
-            "rootfind-kmitm" => &mut rootfind_kmitm,
+            "rootfind-floor" | "rootfind-floor-batch-v1" => &mut rootfind_floor,
+            "rootfind-kmitm" | "rootfind-kmitm-batch-v1" => &mut rootfind_kmitm,
             "rootfind-subtract-gpu" => &mut rootfind_gpu,
             "hashed-tensor" => &mut hashed,
             "genroot" => &mut genroot,
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
-                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-subtract-gpu, \
-                     hashed-tensor, genroot or pkm-semaev"
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-floor, \
+                     rootfind-floor-batch-v1, rootfind-kmitm, rootfind-kmitm-batch-v1, \
+                     rootfind-subtract-gpu, hashed-tensor, genroot or pkm-semaev"
                 ))
             }
         };

@@ -125,24 +125,10 @@ impl Fp {
     }
 }
 
-/// `a⁻¹ mod m` by word-sized extended Euclid: coefficient magnitudes with
-/// alternating signs, one hardware division per step (as `ic_boundary::invmod`).
+/// `a⁻¹ mod m` in `[0, m)` via the shared `crypto_lib::gcd`; panics on a
+/// non-unit.
 fn inv_mod(a: u64, m: u64) -> u64 {
-    let (mut r0, mut r1) = (m, a % m);
-    let (mut t0, mut t1) = (0u64, 1u64);
-    let mut neg0 = true;
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 + q * t1);
-        neg0 = !neg0;
-    }
-    assert_eq!(r0, 1, "not invertible");
-    if neg0 {
-        m - t0
-    } else {
-        t0
-    }
+    crypto_lib::gcd::int::inv_mod_u64(a, m).expect("not invertible")
 }
 
 /// Montgomery arithmetic modulo an odd `p < 2^62`, `R = 2^64`: REDC needs
@@ -324,11 +310,8 @@ fn brent(n: u64) -> u64 {
     unreachable!()
 }
 
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 fn isqrt(n: u128) -> u128 {

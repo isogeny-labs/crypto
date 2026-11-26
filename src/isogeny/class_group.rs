@@ -71,14 +71,10 @@ fn reduce_i64(mut a: i64, mut b: i64, mut c: i64) -> (i64, i64, i64) {
 
 /// Extended gcd on `i128`: returns `(g, u, v)` with `u·a + v·b = g = gcd(|a|,|b|)`.
 fn ext_gcd_i128(a: i128, b: i128) -> (i128, i128, i128) {
-    if b == 0 {
-        let sign = if a < 0 { -1 } else { 1 };
-        return (a.abs(), sign, 0);
-    }
-    let (g, u1, v1) = ext_gcd_i128(b, a.rem_euclid(b));
-    let u = v1;
-    let v = u1 - (a.div_euclid(b)) * v1;
-    (g, u, v)
+    // Shared classical extended Euclid (g >= 0).  The only caller,
+    // `compose_i64`, needs just the Bézout identity: the composed b3 is
+    // unique mod 2·a3 and r is reduced mod v1, so the result is unchanged.
+    crate::gcd::int::xgcd_i128(a, b)
 }
 
 /// Gauss/Shanks composition on `i64` forms (same steps as
@@ -479,18 +475,13 @@ impl fmt::Display for BinaryQuadraticForm {
 /// Extended GCD over `BigInt`.  Returns `(g, u, v)` with `g = u·a + v·b`,
 /// `g > 0`.
 fn ext_gcd(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
-    if b.is_zero() {
-        let sign = if a.is_negative() {
-            BigInt::from(-1)
-        } else {
-            BigInt::one()
-        };
-        return (a.abs(), sign, BigInt::zero());
-    }
-    let (g, u1, v1) = ext_gcd(b, &a.mod_floor(b));
-    let u = v1.clone();
-    let v = u1 - (a.div_floor(b)) * v1;
-    (g, u, v)
+    // Shared extended gcd on |a|, |b| with the signs folded into the
+    // cofactors (g >= 0; g > 0 unless both are zero).  `compose` needs just
+    // the Bézout identity (b3 is unique mod 2·a3), so the result is unchanged.
+    let (g, s, t) = crate::gcd::int::xgcd_big(a.magnitude(), b.magnitude());
+    let u = if a.is_negative() { -s } else { s };
+    let v = if b.is_negative() { -t } else { t };
+    (BigInt::from(g), u, v)
 }
 
 // (CRT helper removed: Cohen 5.4.7 in `compose` no longer needs it.)
@@ -573,15 +564,8 @@ fn enumerate_reduced_forms_bigint(disc: &BigInt) -> Vec<BinaryQuadraticForm> {
 }
 
 #[inline]
-fn gcd_i64(mut x: i64, mut y: i64) -> i64 {
-    x = x.abs();
-    y = y.abs();
-    while y != 0 {
-        let t = x % y;
-        x = y;
-        y = t;
-    }
-    x
+fn gcd_i64(x: i64, y: i64) -> i64 {
+    crate::gcd::int::gcd_i64(x, y) as i64
 }
 
 #[inline]

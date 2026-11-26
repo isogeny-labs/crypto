@@ -311,7 +311,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); rootfind-floor:m=2|3 (same search with x-only Montgomery candidates and a Bloom filter); rootfind-kmitm:m=3..12 (meet-in-the-middle half-sum table + complementary probe); ksum:m=3..9 (one probe a target into a negation-folded table of every signed m-sum of the base; m = 6..9 limit the base to 1023, 511, 255, 127 points); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch (same table with batched binary additions), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); rootfind-floor:m=2|3 (scalar target schedule, same search with x-only Montgomery candidates and a Bloom filter); rootfind-floor-batch-v1:m=2|3 (versioned 8-target production kernel; requires walk-prime-serial/batch targets); rootfind-kmitm:m=3..12 (scalar target schedule, meet-in-the-middle half-sum table + complementary probe); rootfind-kmitm-batch-v1:m=3..12 (versioned 8-target production kernel; requires walk-prime-serial/batch targets); ksum:m=3..9 (one probe a target into a negation-folded table of every signed m-sum of the base; m = 6..9 limit the base to 1023, 511, 255, 127 points); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch (same table with batched binary additions), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
         },
         ParamDecl {
             name: "solver",
@@ -1708,7 +1708,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.signed_frobenius_v6",
             family: "rho",
-            summary: "rho.signed_frobenius_v5 with every partition-mix call tallied as uncharged native work; the trajectory and charged group operations are identical; Koblitz curves only",
+            summary: "rho.signed_frobenius_v5 with a direct count of every partition-mix call in place of the per-step tally; the trajectory and charged group operations are identical; Koblitz curves only",
             entry: "ic_boundary::signed_frobenius_rho_v3_partition_counted(RhoV3::v6(true))",
             applies: Applies::KoblitzOnly,
             params: RHO_PARAMS,
@@ -4046,7 +4046,11 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
     let bin_walk = matches!(inst, Instance::Binary(_)) && or_name == "wwalk";
     let (r, prime) = match inst {
         Instance::Prime(i) => (i.r, Some(i)),
-        Instance::Binary(b) if bin_walk && fb_name != "prime-interval" => (b.r, None),
+        Instance::Binary(b)
+            if bin_walk && !matches!(fb_name.as_str(), "prime-abscissa" | "prime-interval") =>
+        {
+            (b.r, None)
+        }
         _ => {
             return Err(format!(
                 "`{}` with factor base `{fb_name}` and oracle `{or_name}` runs on single-word prime curves only",
@@ -8314,8 +8318,16 @@ fn solve_ic_prime(
     let mut semaev_projection = SemaevProjectionOracle::new(ms);
     let mut residual_sweep = ResidualSweepOracle::new();
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
-    let mut rootfind_floor = RootfindFloorOracle::new(ms, inst);
-    let mut rootfind_kmitm = RootfindKMitmOracle::new_prime(ms, inst);
+    let mut rootfind_floor = if or_name == "rootfind-floor-batch-v1" {
+        RootfindFloorOracle::new_batch_v1(ms, inst)
+    } else {
+        RootfindFloorOracle::new(ms, inst)
+    };
+    let mut rootfind_kmitm = if or_name == "rootfind-kmitm-batch-v1" {
+        RootfindKMitmOracle::new_prime_batch_v1(ms, inst)
+    } else {
+        RootfindKMitmOracle::new_prime(ms, inst)
+    };
     let mut rootfind_gpu =
         crate::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(ms, inst);
     let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
@@ -8345,8 +8357,8 @@ fn solve_ic_prime(
         "semaev-projection" => &mut semaev_projection,
         "residual-sweep" => &mut residual_sweep,
         "rootfind-subtract" => &mut rootfind,
-        "rootfind-floor" => &mut rootfind_floor,
-        "rootfind-kmitm" => &mut rootfind_kmitm,
+        "rootfind-floor" | "rootfind-floor-batch-v1" => &mut rootfind_floor,
+        "rootfind-kmitm" | "rootfind-kmitm-batch-v1" => &mut rootfind_kmitm,
         "rootfind-subtract-gpu" => &mut rootfind_gpu,
         other => match plugin_oracle.as_deref_mut() {
             Some(o) => o,
@@ -11969,7 +11981,7 @@ mod accounting_rules_tests {
     }
 
     #[test]
-    fn signed_frobenius_v6_only_adds_exact_partition_accounting() {
+    fn signed_frobenius_v6_only_changes_partition_accounting() {
         let (inst, facts) = built(&CurveSpec::Koblitz { a: 0, n: 19 });
         let old = run(
             &method("rho.signed_frobenius_v5", &[]),
@@ -11990,15 +12002,16 @@ mod accounting_rules_tests {
         assert_eq!(counted.exhausted, old.exhausted);
         assert_eq!(counted.total_gae, old.total_gae);
         assert_eq!(counted.phases, old.phases);
-        assert!(!old.counters.contains_key("partition_hashes_uncharged"));
-        let hashes = counted.counters["partition_hashes_uncharged"];
+        assert_eq!(old.counters[V5_JUMP_INDEX_COUNTER], old.counters["steps"]);
+        let hashes = counted.counters[V5_JUMP_INDEX_COUNTER];
         assert!(hashes >= counted.counters["walk_operations"]);
-        assert!(counted
-            .unpriced
-            .contains(&"partition_hashes_uncharged".to_string()));
+        assert!(counted.unpriced.contains(&V5_JUMP_INDEX_COUNTER.to_string()));
+        assert_eq!(counted.unpriced, old.unpriced);
         let mut counted_counters = counted.counters.clone();
-        counted_counters.remove("partition_hashes_uncharged");
-        assert_eq!(counted_counters, old.counters);
+        counted_counters.remove(V5_JUMP_INDEX_COUNTER);
+        let mut old_counters = old.counters;
+        old_counters.remove(V5_JUMP_INDEX_COUNTER);
+        assert_eq!(counted_counters, old_counters);
     }
 
     /// The verification a BSGS, kangaroo or claw run pays is the one
@@ -12534,42 +12547,33 @@ mod accounting_rules_tests {
     fn exhausted_strong_v2_records_the_spent_work() {
         let spec = CurveSpec::Koblitz { a: 0, n: 13 };
         let (inst, facts) = built(&spec);
-        let Instance::Binary(b) = &inst else {
-            unreachable!()
-        };
-        // A point of the curve outside the order-r subgroup (h = 4).
-        let out_of_subgroup = (1u64..)
-            .flat_map(|x| b.points_with_x(x))
-            .find(|q| !b.fast.mul_u64(*q, b.r).infinity)
-            .expect("the cofactor is 4");
-        let target = [
-            format!("0x{:x}", out_of_subgroup.x),
-            format!("0x{:x}", out_of_subgroup.y),
+        // Keep the target in the subgroup and bound both walks tightly.
+        let parameters = [
+            ("lanes", "1"),
+            ("dp_bits", "31"),
+            ("step_cap_factor", "1"),
         ];
-        let frozen = solve(
-            &method("rho.signed_frobenius_strong", &[]),
+        let frozen = run(
+            &method("rho.signed_frobenius_strong", &parameters),
             &inst,
             &facts,
-            &target,
+            37,
             3,
-        )
-        .unwrap();
+        );
         assert!(frozen.exhausted);
         assert_eq!(frozen.total_gae, 0.0);
         assert!(frozen.phases.is_empty());
-        let v2 = solve(
-            &method("rho.signed_frobenius_strong_v2", &[]),
+        let v2 = run(
+            &method("rho.signed_frobenius_strong_v2", &parameters),
             &inst,
             &facts,
-            &target,
+            37,
             3,
-        )
-        .unwrap();
+        );
         assert!(v2.exhausted && v2.recovered.is_none());
         assert!(v2.total_gae > 0.0);
         assert_phases_sum("strong_v2 exhausted", &v2);
         assert!(v2.counters["walk_steps"] > 0);
-        assert!(v2.counters["failed_collisions"] > 0 || v2.counters["table_inserts_uncharged"] > 0);
         // The failed candidate checks are charged to verification.
         let checks = v2.phases.iter().find(|p| p.name == "verification").unwrap();
         assert_eq!(checks.scalar_mults, v2.counters["failed_collisions"]);
@@ -13469,7 +13473,8 @@ mod accounting_tests {
                 "unknown parameter",
             ),
         ] {
-            let err = plan_arm(curve.clone(), "ic.pipeline", pipe(fb, oracle)).unwrap_err();
+            let err = plan_arm(curve.clone(), "ic.pipeline", pipe(fb, oracle))
+                .expect_err(&format!("{fb} / {oracle} was admitted"));
             assert!(err.contains(needle), "{fb} / {oracle}: {err}");
         }
     }

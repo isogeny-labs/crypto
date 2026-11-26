@@ -80,13 +80,9 @@ fn poly_div(mut a: u64, b: u64) -> (u64, u64) {
     (q, a)
 }
 
-fn poly_gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        let r = poly_mod(a, b);
-        a = b;
-        b = r;
-    }
-    a
+fn poly_gcd(a: u64, b: u64) -> u64 {
+    // GF(2)[x] gcd of single-word polynomials (shared implementation).
+    crypto_lib::gcd::gf2::gcd_word(a, b)
 }
 
 fn poly_mul(a: u64, b: u64) -> u64 {

@@ -45,6 +45,12 @@ RECORDED_EXACT = (
 NOT_RESULT_AFFECTING = frozenset({"HOSTNAME", "PATH", "TMPDIR", "CRYPTO_AUDIT_DIR", "TASKQ_TASK_ID",
                                   "NOINTERLEAVE",  # Fp64::batch_inv chain layout: same inverses, timing only
                                   "FASTGROUP_SMOKE_OUT",  # output path only
+                                  # genus_ladder export_core: appends the reduced core to a
+                                  # JSONL path from a cloned RNG; the run's result is unchanged
+                                  "GENUS_LADDER_EXPORT_CORE",
+                                  # read only inside #[cfg(test)] code: the #[ignore]d quartic_ladder
+                                  # diag_attempts inputs and gaudry_cubic's print-instead-of-assert mode
+                                  "QDIAG_Q", "QDIAG_CS", "GOLDEN_PRINT",
                                   "GH_TOKEN", "GITHUB_TOKEN"})
 
 

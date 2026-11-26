@@ -14806,6 +14806,10 @@ impl FrobeniusPairTable {
                     skips += 1;
                     continue;
                 }
+                if sib && j == rep + 1 {
+                    // P + (-P) is the identity, as known from the layout.
+                    continue;
+                }
                 // A deferred negative is formed from its partner here
                 // (only the non-sibling fallback reads an odd slot).
                 let x = if deferred && j % 2 == 1 {
@@ -14854,9 +14858,6 @@ impl FrobeniusPairTable {
                             (Some(field.sqr(lm) ^ lm ^ base), j + 1),
                         ]
                     }
-                } else if sib && j == rep + 1 {
-                    // `P + (−P)`: the identity, known from the layout.
-                    [(None, j), (None, j)]
                 } else {
                     let u = g.add(&mut ops, p, x);
                     [
@@ -16039,6 +16040,13 @@ pub enum Relation {
     },
 }
 
+/// A native multi-target decomposition kernel used by the production
+/// relation loop.  The coefficient pairs correspond to `points` and let a
+/// future stateful collector return explicit [`Relation::Row`] values; the
+/// current prime root-finding kernels return ordered `Summands` rows.
+pub type BatchRelationsOracle<'a, E> =
+    dyn FnMut(&mut GroupOps, &mut OracleCounters, &[E], &[(u64, u64)], &mut [Vec<Relation>]) + 'a;
+
 /// The shared relation loop with an explicit completion rule. The
 /// `TargetPinned` wrapper above preserves historical run semantics.
 #[allow(clippy::too_many_arguments)]
@@ -16224,6 +16232,57 @@ pub fn collect_and_solve_relations_touching_check<G: CountedGroup, L: RelationSo
     verify_ladder: RecoveryCheck<'_, G::Elt>,
     xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool>,
 ) -> PipelineOutcome {
+    collect_and_solve_relations_touching_check_batched(
+        g,
+        generator,
+        target,
+        r,
+        h,
+        fb,
+        seed,
+        max_trials,
+        targets,
+        pool_mode,
+        matrix,
+        completion,
+        oracle,
+        touch,
+        line_guard,
+        verify_ladder,
+        xprobe,
+        1,
+        None,
+    )
+}
+
+/// Batch-capable form of [`collect_and_solve_relations_touching_check`].
+/// The historical public entry point remains a width-one wrapper so existing
+/// downstream callers retain both their source API and scalar semantics.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_touching_check_batched<
+    G: CountedGroup,
+    L: RelationSolver + ?Sized,
+>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    line_guard: bool,
+    verify_ladder: RecoveryCheck<'_, G::Elt>,
+    xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool>,
+    batch_width: usize,
+    batch_oracle: Option<&mut BatchRelationsOracle<'_, G::Elt>>,
+) -> PipelineOutcome {
     let capacity = if targets.is_guarded() { 1 << 12 } else { 0 };
     if line_guard {
         collect_and_solve_relations_scaled_touching(
@@ -16245,6 +16304,8 @@ pub fn collect_and_solve_relations_touching_check<G: CountedGroup, L: RelationSo
             GuardLineSet::with_capacity(capacity),
             verify_ladder,
             xprobe,
+            batch_width,
+            batch_oracle,
         )
     } else {
         collect_and_solve_relations_scaled_touching(
@@ -16266,6 +16327,8 @@ pub fn collect_and_solve_relations_touching_check<G: CountedGroup, L: RelationSo
             fast_map(capacity),
             verify_ladder,
             xprobe,
+            batch_width,
+            batch_oracle,
         )
     }
 }
@@ -16310,6 +16373,8 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         fast_map(if targets.is_guarded() { 1 << 12 } else { 0 }),
         RecoveryCheck::DoubleAndAdd,
         None,
+        1,
+        None,
     )
 }
 
@@ -16337,6 +16402,8 @@ fn collect_and_solve_relations_scaled_touching<
     mut seen: R,
     verify_ladder: RecoveryCheck<'_, G::Elt>,
     mut xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool>,
+    batch_width: usize,
+    mut batch_oracle: Option<&mut BatchRelationsOracle<'_, G::Elt>>,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
     let mut rel = PhaseCost::default();
@@ -16467,6 +16534,30 @@ fn collect_and_solve_relations_scaled_touching<
     let mut lane_requests = Vec::with_capacity(lanes.len());
     let mut lane_outputs = Vec::with_capacity(lanes.len());
     let (mut lane_rounds, mut lane_prepared) = (0u64, 0u64);
+    // Only the already-laned prime walk exposes several independent query
+    // points before the matrix consumes any of them. Batch their oracle
+    // probes in that same order; renewed strides keep scalar scheduling so
+    // that a hit can change the next point before it is drawn.
+    let batch_width = batch_width.max(1);
+    let batch_enabled = batch_width > 1
+        && batch_oracle.is_some()
+        && matches!(targets, TargetSource::WalkPrimeLanes { .. });
+    let mut batch_pending: std::collections::VecDeque<(
+        G::Elt,
+        u64,
+        u64,
+        Option<usize>,
+        Option<Vec<Relation>>,
+    )> = std::collections::VecDeque::new();
+    // Reuse the batch envelopes in the hot relation loop. Witness vectors
+    // still move into `batch_pending`, but scheduling a miss-only batch does
+    // not touch the allocator after these capacities have been established.
+    let mut batch_meta: Vec<(G::Elt, u64, u64, Option<usize>)> = Vec::with_capacity(batch_width);
+    let mut batch_points = Vec::with_capacity(batch_width);
+    let mut batch_coefficients = Vec::with_capacity(batch_width);
+    let mut batch_answers: Vec<Vec<Relation>> = Vec::with_capacity(batch_width);
+    let (mut oracle_batch_calls, mut oracle_batch_targets, mut oracle_batch_max_targets) =
+        (0u64, 0u64, 0u64);
     // `bitop/v1`-only bookkeeping (`PhaseCost::work`): the coefficient
     // updates modulo `r`, the step hashes, and the random draws of the
     // target stream, none of which the group-operation ledger sees.
@@ -16584,8 +16675,10 @@ fn collect_and_solve_relations_scaled_touching<
     let mut sr_slot: Option<usize> = None;
     let (mut sr_multiple_ops, mut sr_centres, mut sr_unused_plus) = (0u64, 0u64, 0u64);
 
-    while trials < max_trials {
-        if lane_config.is_some() && lane_queue.is_empty() {
+    while trials < max_trials || !batch_pending.is_empty() {
+        let pending_query = batch_pending.pop_front();
+        let from_pending = pending_query.is_some();
+        if pending_query.is_none() && lane_config.is_some() && lane_queue.is_empty() {
             lane_requests.clear();
             for (index, lane) in lanes.iter_mut().enumerate() {
                 if lane.fresh || lane.segment_steps >= segment_cap {
@@ -16677,373 +16770,394 @@ fn collect_and_solve_relations_scaled_touching<
             }
             lane_rounds += 1;
         }
-        // Exclusive phase marks (no-ops without an `ic_measurement`
-        // session): drawing the target-dependent query point.
-        measurement::mark(measurement::Phase::TargetQuery);
-        let (point, a, b, lane_id) = match targets {
-            TargetSource::Random | TargetSource::RandomUnguarded => {
-                rng_draws += 2;
-                let a = scale_coeff(&mut scale, rng.gen_range(1..r), r);
-                let b = rng.gen_range(1..r);
-                let ag = g.mul(&mut rel.group_ops, generator, a);
-                let bq = g.mul(&mut rel.group_ops, target, b);
-                let point = g.add(&mut rel.group_ops, ag, bq);
-                if g.is_identity(&point) {
-                    direct_skipped += 1;
-                    continue;
+        let (point, a, b, lane_id, precomputed) = if let Some((point, a, b, lane_id, relations)) =
+            pending_query
+        {
+            (point, a, b, lane_id, relations)
+        } else {
+            // Exclusive phase marks (no-ops without an `ic_measurement`
+            // session): drawing the target-dependent query point.
+            measurement::mark(measurement::Phase::TargetQuery);
+            let (point, a, b, lane_id) = match targets {
+                TargetSource::Random | TargetSource::RandomUnguarded => {
+                    rng_draws += 2;
+                    let a = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+                    let b = rng.gen_range(1..r);
+                    let ag = g.mul(&mut rel.group_ops, generator, a);
+                    let bq = g.mul(&mut rel.group_ops, target, b);
+                    let point = g.add(&mut rel.group_ops, ag, bq);
+                    if g.is_identity(&point) {
+                        direct_skipped += 1;
+                        continue;
+                    }
+                    (point, a, b, None)
                 }
-                (point, a, b, None)
-            }
-            TargetSource::Walk | TargetSource::WalkPrimeFast | TargetSource::WalkSharedJumps => {
-                if walk_fresh || segment_steps >= segment_cap {
-                    if walk_restarts == 0 || shared_jumps {
-                        // The first segment, and every segment of the
-                        // unguarded diagnostic, starts from a fresh
-                        // `[a]G + [b]Q`.
-                        rng_draws += 2;
-                        wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
-                        wb = rng.gen_range(1..r);
-                        let ag = g.mul(&mut rel.group_ops, generator, wa);
-                        let bq = g.mul(&mut rel.group_ops, target, wb);
-                        walk_point = g.add(&mut rel.group_ops, ag, bq);
-                    } else {
-                        // Offset `k mod 16` for the k-th restart, drawn
-                        // here if this is the first restart to reach it.
-                        let idx = (pool_taken as usize) % pool_count;
-                        pool_taken += 1;
-                        if idx == pool.len() {
-                            let off = draw_pool_offset(
-                                g,
-                                generator,
-                                target,
-                                r,
-                                &mut pool_rng,
-                                &mut rel.group_ops,
-                                &mut pool_ops,
-                                &mut scale,
-                            );
-                            pool.push(off);
+                TargetSource::Walk
+                | TargetSource::WalkPrimeFast
+                | TargetSource::WalkSharedJumps => {
+                    if walk_fresh || segment_steps >= segment_cap {
+                        if walk_restarts == 0 || shared_jumps {
+                            // The first segment, and every segment of the
+                            // unguarded diagnostic, starts from a fresh
+                            // `[a]G + [b]Q`.
+                            rng_draws += 2;
+                            wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+                            wb = rng.gen_range(1..r);
+                            let ag = g.mul(&mut rel.group_ops, generator, wa);
+                            let bq = g.mul(&mut rel.group_ops, target, wb);
+                            walk_point = g.add(&mut rel.group_ops, ag, bq);
+                        } else {
+                            // Offset `k mod 16` for the k-th restart, drawn
+                            // here if this is the first restart to reach it.
+                            let idx = (pool_taken as usize) % pool_count;
+                            pool_taken += 1;
+                            if idx == pool.len() {
+                                let off = draw_pool_offset(
+                                    g,
+                                    generator,
+                                    target,
+                                    r,
+                                    &mut pool_rng,
+                                    &mut rel.group_ops,
+                                    &mut pool_ops,
+                                    &mut scale,
+                                );
+                                pool.push(off);
+                            }
+                            let (op, oa, ob) = pool[idx];
+                            walk_point = if let Some(add) = native_walk.as_mut() {
+                                native_walk_calls += 1;
+                                add(&mut rel.group_ops, walk_point, op)
+                            } else {
+                                g.add(&mut rel.group_ops, walk_point, op)
+                            };
+                            wa = addmod(wa, oa, r);
+                            wb = addmod(wb, ob, r);
+                            walk_modr_adds += 2;
+                            // A fresh index map for the segment: Fisher–Yates
+                            // over the sixteen jumps, no group operation.
+                            for i in (1..jump_count).rev() {
+                                jump_perm.swap(i, rng.gen_range(0..i + 1));
+                            }
+                            rng_draws += jump_count as u64 - 1;
                         }
-                        let (op, oa, ob) = pool[idx];
+                        walk_fresh = false;
+                        walk_restarts += 1;
+                        segment_steps = 0;
+                    } else {
+                        let hsh = mix(g.key(&walk_point));
+                        let j = jump_perm[((hsh >> 24) as usize) % jump_count];
+                        if !jumps_ready {
+                            jumps.reserve(jump_coefs.len());
+                            for &(aj, bj) in &jump_coefs {
+                                let ag = g.mul(&mut rel.group_ops, generator, aj);
+                                let bq = g.mul(&mut rel.group_ops, target, bj);
+                                jumps.push((g.add(&mut rel.group_ops, ag, bq), aj, bj));
+                            }
+                            walk_jumps_materialised = jump_coefs.len() as u64;
+                            jumps_ready = true;
+                        }
+                        let (jp, aj, bj) = jumps[j];
                         walk_point = if let Some(add) = native_walk.as_mut() {
                             native_walk_calls += 1;
-                            add(&mut rel.group_ops, walk_point, op)
+                            add(&mut rel.group_ops, walk_point, jp)
                         } else {
-                            g.add(&mut rel.group_ops, walk_point, op)
+                            g.add(&mut rel.group_ops, walk_point, jp)
                         };
-                        wa = addmod(wa, oa, r);
-                        wb = addmod(wb, ob, r);
+                        wa = addmod(wa, aj, r);
+                        wb = addmod(wb, bj, r);
                         walk_modr_adds += 2;
-                        // A fresh index map for the segment: Fisher–Yates
-                        // over the sixteen jumps, no group operation.
-                        for i in (1..jump_count).rev() {
-                            jump_perm.swap(i, rng.gen_range(0..i + 1));
-                        }
-                        rng_draws += jump_count as u64 - 1;
+                        walk_mix_hashes += 1;
+                        walk_steps += 1;
+                        segment_steps += 1;
                     }
-                    walk_fresh = false;
-                    walk_restarts += 1;
-                    segment_steps = 0;
-                } else {
-                    let hsh = mix(g.key(&walk_point));
-                    let j = jump_perm[((hsh >> 24) as usize) % jump_count];
-                    if !jumps_ready {
-                        jumps.reserve(jump_coefs.len());
-                        for &(aj, bj) in &jump_coefs {
-                            let ag = g.mul(&mut rel.group_ops, generator, aj);
-                            let bq = g.mul(&mut rel.group_ops, target, bj);
-                            jumps.push((g.add(&mut rel.group_ops, ag, bq), aj, bj));
-                        }
-                        walk_jumps_materialised = jump_coefs.len() as u64;
-                        jumps_ready = true;
-                    }
-                    let (jp, aj, bj) = jumps[j];
-                    walk_point = if let Some(add) = native_walk.as_mut() {
-                        native_walk_calls += 1;
-                        add(&mut rel.group_ops, walk_point, jp)
-                    } else {
-                        g.add(&mut rel.group_ops, walk_point, jp)
-                    };
-                    wa = addmod(wa, aj, r);
-                    wb = addmod(wb, bj, r);
-                    walk_modr_adds += 2;
-                    walk_mix_hashes += 1;
-                    walk_steps += 1;
-                    segment_steps += 1;
-                }
-                if g.is_identity(&walk_point) {
-                    walk_fresh = true;
-                    direct_skipped += 1;
-                    continue;
-                }
-                (walk_point, wa, wb, None)
-            }
-            TargetSource::Stride
-            | TargetSource::StrideRenew
-            | TargetSource::StrideRenewDeferredGuard
-            | TargetSource::StrideRenewJoint => {
-                if walk_fresh {
-                    rng_draws += 2;
-                    wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
-                    wb = rng.gen_range(1..r);
-                    walk_point = match joint_gq {
-                        Some(gq) => joint_mul(g, &mut rel.group_ops, generator, target, gq, wa, wb),
-                        None => {
-                            let ag = g.mul(&mut rel.group_ops, generator, wa);
-                            let bq = g.mul(&mut rel.group_ops, target, wb);
-                            g.add(&mut rel.group_ops, ag, bq)
-                        }
-                    };
-                    walk_fresh = false;
-                    stride_restarts += 1;
-                } else {
-                    let (sp, sa, sb) = stride;
-                    walk_point = g.add(&mut rel.group_ops, walk_point, sp);
-                    wa = addmod(wa, sa, r);
-                    wb = addmod(wb, sb, r);
-                    walk_modr_adds += 2;
-                    stride_steps += 1;
-                }
-                if g.is_identity(&walk_point) {
-                    walk_fresh = true;
-                    direct_skipped += 1;
-                    continue;
-                }
-                (walk_point, wa, wb, None)
-            }
-            TargetSource::StrideRenewSib { .. } => {
-                let m = sr_m;
-                if walk_fresh {
-                    // The start, as `StrideRenew(Joint)` draws it.
-                    rng_draws += 2;
-                    wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
-                    wb = rng.gen_range(1..r);
-                    walk_point = match joint_gq {
-                        Some(gq) => joint_mul(g, &mut rel.group_ops, generator, target, gq, wa, wb),
-                        None => {
-                            let ag = g.mul(&mut rel.group_ops, generator, wa);
-                            let bq = g.mul(&mut rel.group_ops, target, wb);
-                            g.add(&mut rel.group_ops, ag, bq)
-                        }
-                    };
-                    walk_fresh = false;
-                    stride_restarts += 1;
-                    if let Some(slot) = sr_slot.take() {
-                        sr_unused_plus += sr_plus_unused(slot, m);
-                    }
-                    sr_anchor = (walk_point, wa, wb);
                     if g.is_identity(&walk_point) {
                         walk_fresh = true;
                         direct_skipped += 1;
                         continue;
                     }
                     (walk_point, wa, wb, None)
-                } else {
-                    if !sr_ready {
-                        // [1]S..[m + 1]S: one doubling and m - 1 additions.
-                        let (sp, sa, sb) = stride;
-                        sr_mults.clear();
-                        sr_mults.push((sp, sa, sb));
-                        for i in 2..=m + 1 {
-                            let (lp, la, lb) = sr_mults[i - 2];
-                            let pt = if i == 2 {
-                                g.double(&mut rel.group_ops, sp)
-                            } else {
-                                g.add(&mut rel.group_ops, lp, sp)
-                            };
-                            sr_mults.push((pt, addmod(la, sa, r), addmod(lb, sb, r)));
-                            walk_modr_adds += 2;
-                            sr_multiple_ops += 1;
-                        }
-                        sr_ready = true;
-                    }
-                    let slot = match sr_slot {
-                        Some(slot) => slot,
-                        None => {
-                            // A new block: C = A + [m + 1]S.
-                            let (ap, aa, ab) = sr_anchor;
-                            let (mp, ma, mb) = sr_mults[m];
-                            sr_centre = (
-                                g.add(&mut rel.group_ops, ap, mp),
-                                addmod(aa, ma, r),
-                                addmod(ab, mb, r),
-                            );
-                            walk_modr_adds += 2;
-                            sr_centres += 1;
-                            0
-                        }
-                    };
-                    // The block's last slot hands its point on as the anchor.
-                    sr_slot = (slot < 2 * m).then_some(slot + 1);
-                    let (cp, ca, cb) = sr_centre;
-                    stride_steps += 1;
-                    walk_modr_adds += 2;
-                    let (point, pa, pb) = if slot < m {
-                        // C − [i]S, i = m - slot: form the pair i now.
-                        let i = m - slot;
-                        let (jp, ja, jb) = sr_mults[i - 1];
-                        let (pa, pb) = (submod(ca, ja, r), submod(cb, jb, r));
-                        match g.x_sibling_pair_counted(&mut rel.group_ops, cp, jp) {
-                            Some((plus, minus_x)) => {
-                                rel.group_ops.adds += 1;
-                                sw_second += 1;
-                                sw_pairs += 1;
-                                sr_plus[i] = Some(plus);
-                                sw_xprobes += 1;
-                                let probe = xprobe.as_mut().expect("checked above");
-                                if !probe(&mut ctr, minus_x) {
-                                    trials += 1;
-                                    continue;
-                                }
-                                // A hit: the point itself, one addition.
-                                sw_lifts += 1;
-                                (g.add(&mut rel.group_ops, cp, g.neg(jp)), pa, pb)
+                }
+                TargetSource::Stride
+                | TargetSource::StrideRenew
+                | TargetSource::StrideRenewDeferredGuard
+                | TargetSource::StrideRenewJoint => {
+                    if walk_fresh {
+                        rng_draws += 2;
+                        wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+                        wb = rng.gen_range(1..r);
+                        walk_point = match joint_gq {
+                            Some(gq) => {
+                                joint_mul(g, &mut rel.group_ops, generator, target, gq, wa, wb)
                             }
                             None => {
-                                // C = ±[i]S or C = O: both signs in full.
-                                sw_full_pairs += 1;
-                                sr_plus[i] = Some(g.add(&mut rel.group_ops, cp, jp));
-                                (g.add(&mut rel.group_ops, cp, g.neg(jp)), pa, pb)
+                                let ag = g.mul(&mut rel.group_ops, generator, wa);
+                                let bq = g.mul(&mut rel.group_ops, target, wb);
+                                g.add(&mut rel.group_ops, ag, bq)
                             }
-                        }
-                    } else if slot == m {
-                        (cp, ca, cb)
+                        };
+                        walk_fresh = false;
+                        stride_restarts += 1;
                     } else {
-                        let i = slot - m;
-                        let (_, ja, jb) = sr_mults[i - 1];
-                        let plus = sr_plus[i].take().expect("formed with its minus side");
-                        (plus, addmod(ca, ja, r), addmod(cb, jb, r))
-                    };
-                    if sr_slot.is_none() {
-                        sr_anchor = (point, pa, pb);
+                        let (sp, sa, sb) = stride;
+                        walk_point = g.add(&mut rel.group_ops, walk_point, sp);
+                        wa = addmod(wa, sa, r);
+                        wb = addmod(wb, sb, r);
+                        walk_modr_adds += 2;
+                        stride_steps += 1;
                     }
-                    if g.is_identity(&point) {
+                    if g.is_identity(&walk_point) {
                         walk_fresh = true;
                         direct_skipped += 1;
                         continue;
                     }
-                    // A target that may yield a relation is the anchor of
-                    // the next block if it does (set below).
-                    walk_point = point;
-                    wa = pa;
-                    wb = pb;
-                    (point, pa, pb, None)
+                    (walk_point, wa, wb, None)
                 }
-            }
-            TargetSource::StrideGenerator => {
-                if walk_fresh {
-                    // R₀ = Q: a = 0, b = 1, no group work.
-                    walk_point = target;
-                    wa = 0;
-                    wb = 1;
-                    walk_fresh = false;
-                    stride_restarts += 1;
-                } else {
-                    walk_point = g.add(&mut rel.group_ops, walk_point, stride.0);
-                    wa = addmod(wa, stride.1, r);
-                    stride_steps += 1;
-                    if wa == 0 {
-                        // k = r: the progression is back at Q and every
-                        // further target would repeat one already tried.
-                        break;
+                TargetSource::StrideRenewSib { .. } => {
+                    let m = sr_m;
+                    if walk_fresh {
+                        // The start, as `StrideRenew(Joint)` draws it.
+                        rng_draws += 2;
+                        wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+                        wb = rng.gen_range(1..r);
+                        walk_point = match joint_gq {
+                            Some(gq) => {
+                                joint_mul(g, &mut rel.group_ops, generator, target, gq, wa, wb)
+                            }
+                            None => {
+                                let ag = g.mul(&mut rel.group_ops, generator, wa);
+                                let bq = g.mul(&mut rel.group_ops, target, wb);
+                                g.add(&mut rel.group_ops, ag, bq)
+                            }
+                        };
+                        walk_fresh = false;
+                        stride_restarts += 1;
+                        if let Some(slot) = sr_slot.take() {
+                            sr_unused_plus += sr_plus_unused(slot, m);
+                        }
+                        sr_anchor = (walk_point, wa, wb);
+                        if g.is_identity(&walk_point) {
+                            walk_fresh = true;
+                            direct_skipped += 1;
+                            continue;
+                        }
+                        (walk_point, wa, wb, None)
+                    } else {
+                        if !sr_ready {
+                            // [1]S..[m + 1]S: one doubling and m - 1 additions.
+                            let (sp, sa, sb) = stride;
+                            sr_mults.clear();
+                            sr_mults.push((sp, sa, sb));
+                            for i in 2..=m + 1 {
+                                let (lp, la, lb) = sr_mults[i - 2];
+                                let pt = if i == 2 {
+                                    g.double(&mut rel.group_ops, sp)
+                                } else {
+                                    g.add(&mut rel.group_ops, lp, sp)
+                                };
+                                sr_mults.push((pt, addmod(la, sa, r), addmod(lb, sb, r)));
+                                walk_modr_adds += 2;
+                                sr_multiple_ops += 1;
+                            }
+                            sr_ready = true;
+                        }
+                        let slot = match sr_slot {
+                            Some(slot) => slot,
+                            None => {
+                                // A new block: C = A + [m + 1]S.
+                                let (ap, aa, ab) = sr_anchor;
+                                let (mp, ma, mb) = sr_mults[m];
+                                sr_centre = (
+                                    g.add(&mut rel.group_ops, ap, mp),
+                                    addmod(aa, ma, r),
+                                    addmod(ab, mb, r),
+                                );
+                                walk_modr_adds += 2;
+                                sr_centres += 1;
+                                0
+                            }
+                        };
+                        // The block's last slot hands its point on as the anchor.
+                        sr_slot = (slot < 2 * m).then_some(slot + 1);
+                        let (cp, ca, cb) = sr_centre;
+                        stride_steps += 1;
+                        walk_modr_adds += 2;
+                        let (point, pa, pb) = if slot < m {
+                            // C − [i]S, i = m - slot: form the pair i now.
+                            let i = m - slot;
+                            let (jp, ja, jb) = sr_mults[i - 1];
+                            let (pa, pb) = (submod(ca, ja, r), submod(cb, jb, r));
+                            match g.x_sibling_pair_counted(&mut rel.group_ops, cp, jp) {
+                                Some((plus, minus_x)) => {
+                                    rel.group_ops.adds += 1;
+                                    sw_second += 1;
+                                    sw_pairs += 1;
+                                    sr_plus[i] = Some(plus);
+                                    sw_xprobes += 1;
+                                    let probe = xprobe.as_mut().expect("checked above");
+                                    if !probe(&mut ctr, minus_x) {
+                                        trials += 1;
+                                        continue;
+                                    }
+                                    // A hit: the point itself, one addition.
+                                    sw_lifts += 1;
+                                    (g.add(&mut rel.group_ops, cp, g.neg(jp)), pa, pb)
+                                }
+                                None => {
+                                    // C = ±[i]S or C = O: both signs in full.
+                                    sw_full_pairs += 1;
+                                    sr_plus[i] = Some(g.add(&mut rel.group_ops, cp, jp));
+                                    (g.add(&mut rel.group_ops, cp, g.neg(jp)), pa, pb)
+                                }
+                            }
+                        } else if slot == m {
+                            (cp, ca, cb)
+                        } else {
+                            let i = slot - m;
+                            let (_, ja, jb) = sr_mults[i - 1];
+                            let plus = sr_plus[i].take().expect("formed with its minus side");
+                            (plus, addmod(ca, ja, r), addmod(cb, jb, r))
+                        };
+                        if sr_slot.is_none() {
+                            sr_anchor = (point, pa, pb);
+                        }
+                        if g.is_identity(&point) {
+                            walk_fresh = true;
+                            direct_skipped += 1;
+                            continue;
+                        }
+                        // A target that may yield a relation is the anchor of
+                        // the next block if it does (set below).
+                        walk_point = point;
+                        wa = pa;
+                        wb = pb;
+                        (point, pa, pb, None)
                     }
                 }
-                if g.is_identity(&walk_point) {
-                    // Q + [k]G = O: step past it; a restart would return to Q.
-                    direct_skipped += 1;
-                    continue;
+                TargetSource::StrideGenerator => {
+                    if walk_fresh {
+                        // R₀ = Q: a = 0, b = 1, no group work.
+                        walk_point = target;
+                        wa = 0;
+                        wb = 1;
+                        walk_fresh = false;
+                        stride_restarts += 1;
+                    } else {
+                        walk_point = g.add(&mut rel.group_ops, walk_point, stride.0);
+                        wa = addmod(wa, stride.1, r);
+                        stride_steps += 1;
+                        if wa == 0 {
+                            // k = r: the progression is back at Q and every
+                            // further target would repeat one already tried.
+                            break;
+                        }
+                    }
+                    if g.is_identity(&walk_point) {
+                        // Q + [k]G = O: step past it; a restart would return to Q.
+                        direct_skipped += 1;
+                        continue;
+                    }
+                    (walk_point, wa, wb, None)
                 }
-                (walk_point, wa, wb, None)
-            }
-            TargetSource::StrideGeneratorSib { .. } => {
-                let m = sw_m;
-                let k = sw_next;
-                if k >= r {
-                    // k = r: back at Q, as `StrideGenerator` stops.
-                    break;
-                }
-                sw_next += 1;
-                wa = k;
-                wb = 1;
-                let point = if k == 0 {
-                    // R₀ = Q: a = 0, b = 1, no group work.
-                    stride_restarts += 1;
-                    target
-                } else {
-                    if k == 1 {
-                        // Set-up: [1]G..[m]G, [m + 1]G, [2m + 1]G (m + 1
-                        // operations), and the first centre Q + [m + 1]G.
-                        sw_mults.push(generator);
-                        let mut last = generator;
-                        for i in 2..=m {
-                            last = if i == 2 {
+                TargetSource::StrideGeneratorSib { .. } => {
+                    let m = sw_m;
+                    let k = sw_next;
+                    if k >= r {
+                        // k = r: back at Q, as `StrideGenerator` stops.
+                        break;
+                    }
+                    sw_next += 1;
+                    wa = k;
+                    wb = 1;
+                    let point = if k == 0 {
+                        // R₀ = Q: a = 0, b = 1, no group work.
+                        stride_restarts += 1;
+                        target
+                    } else {
+                        if k == 1 {
+                            // Set-up: [1]G..[m]G, [m + 1]G, [2m + 1]G (m + 1
+                            // operations), and the first centre Q + [m + 1]G.
+                            sw_mults.push(generator);
+                            let mut last = generator;
+                            for i in 2..=m {
+                                last = if i == 2 {
+                                    g.double(&mut rel.group_ops, generator)
+                                } else {
+                                    g.add(&mut rel.group_ops, last, generator)
+                                };
+                                sw_mults.push(last);
+                            }
+                            let m1 = if m == 1 {
                                 g.double(&mut rel.group_ops, generator)
                             } else {
                                 g.add(&mut rel.group_ops, last, generator)
                             };
-                            sw_mults.push(last);
+                            sw_step = g.add(&mut rel.group_ops, m1, last);
+                            sw_centre = g.add(&mut rel.group_ops, target, m1);
+                            sw_kc = m + 1;
+                        } else if k == sw_kc + m + 1 {
+                            sw_centre = g.add(&mut rel.group_ops, sw_centre, sw_step);
+                            sw_kc += 2 * m + 1;
                         }
-                        let m1 = if m == 1 {
-                            g.double(&mut rel.group_ops, generator)
-                        } else {
-                            g.add(&mut rel.group_ops, last, generator)
-                        };
-                        sw_step = g.add(&mut rel.group_ops, m1, last);
-                        sw_centre = g.add(&mut rel.group_ops, target, m1);
-                        sw_kc = m + 1;
-                    } else if k == sw_kc + m + 1 {
-                        sw_centre = g.add(&mut rel.group_ops, sw_centre, sw_step);
-                        sw_kc += 2 * m + 1;
-                    }
-                    if k < sw_kc {
-                        // C − [i]G: form the pair i now (C + [i]G is kept).
-                        let i = (sw_kc - k) as usize;
-                        let j = sw_mults[i - 1];
-                        match g.x_sibling_pair(sw_centre, j) {
-                            Some((plus, minus_x)) => {
-                                rel.group_ops.adds += 1;
-                                sw_second += 1;
-                                sw_pairs += 1;
-                                sw_plus[i] = plus;
-                                sw_xprobes += 1;
-                                let probe = xprobe.as_mut().expect("checked above");
-                                if !probe(&mut ctr, minus_x) {
-                                    trials += 1;
-                                    continue;
+                        if k < sw_kc {
+                            // C − [i]G: form the pair i now (C + [i]G is kept).
+                            let i = (sw_kc - k) as usize;
+                            let j = sw_mults[i - 1];
+                            match g.x_sibling_pair(sw_centre, j) {
+                                Some((plus, minus_x)) => {
+                                    rel.group_ops.adds += 1;
+                                    sw_second += 1;
+                                    sw_pairs += 1;
+                                    sw_plus[i] = plus;
+                                    sw_xprobes += 1;
+                                    let probe = xprobe.as_mut().expect("checked above");
+                                    if !probe(&mut ctr, minus_x) {
+                                        trials += 1;
+                                        continue;
+                                    }
+                                    // A hit: the point itself, one addition.
+                                    sw_lifts += 1;
+                                    g.add(&mut rel.group_ops, sw_centre, g.neg(j))
                                 }
-                                // A hit: the point itself, one addition.
-                                sw_lifts += 1;
-                                g.add(&mut rel.group_ops, sw_centre, g.neg(j))
+                                None => {
+                                    // C = ±[i]G or C = O: both signs in full.
+                                    sw_full_pairs += 1;
+                                    sw_plus[i] = g.add(&mut rel.group_ops, sw_centre, j);
+                                    g.add(&mut rel.group_ops, sw_centre, g.neg(j))
+                                }
                             }
-                            None => {
-                                // C = ±[i]G or C = O: both signs in full.
-                                sw_full_pairs += 1;
-                                sw_plus[i] = g.add(&mut rel.group_ops, sw_centre, j);
-                                g.add(&mut rel.group_ops, sw_centre, g.neg(j))
-                            }
+                        } else if k == sw_kc {
+                            sw_centre
+                        } else {
+                            sw_plus[(k - sw_kc) as usize]
                         }
-                    } else if k == sw_kc {
-                        sw_centre
-                    } else {
-                        sw_plus[(k - sw_kc) as usize]
+                    };
+                    if g.is_identity(&point) {
+                        direct_skipped += 1;
+                        continue;
                     }
-                };
-                if g.is_identity(&point) {
-                    direct_skipped += 1;
-                    continue;
+                    (point, wa, wb, None)
                 }
-                (point, wa, wb, None)
-            }
-            TargetSource::WalkPrimeLanes { .. } => {
-                let (lane, point, a, b) = lane_queue.pop_front().expect("nonempty lane round");
-                (point, a, b, Some(lane))
-            }
+                TargetSource::WalkPrimeLanes { .. } => {
+                    let (lane, point, a, b) = lane_queue.pop_front().expect("nonempty lane round");
+                    (point, a, b, Some(lane))
+                }
+            };
+            (point, a, b, lane_id, None)
         };
-        trials += 1;
+        // A guard-only sentinel preserves its place in the query order. It
+        // has already charged its trial and guard probe while the batch was
+        // assembled, but never entered the oracle.
+        if from_pending && precomputed.is_none() {
+            continue;
+        }
+        if !from_pending {
+            trials += 1;
+        }
         // The guard: a target this run has already decomposed carries no
         // relation the matrix does not hold, and taking it again would
         // pin the logarithm by collision rather than by relation.
-        if guarded && !defer_guard {
+        if !from_pending && guarded && !defer_guard {
             guard_probes += 1;
             if seen.insert_duplicate(g.key(&point)) {
                 repeats_skipped += 1;
@@ -17057,8 +17171,72 @@ fn collect_and_solve_relations_scaled_touching<
                 continue;
             }
         }
-        measurement::mark(measurement::Phase::TargetPdp);
-        let relations = oracle(&mut rel.group_ops, &mut ctr, point, a, b);
+        let relations = if let Some(relations) = precomputed {
+            // Queue bookkeeping belongs to the target-PDP interval even
+            // when the native kernel evaluated this target in an earlier
+            // batch. Without the mark, an empty queued answer after a hit
+            // inherits the preceding target-descent phase.
+            measurement::mark(measurement::Phase::TargetPdp);
+            relations
+        } else if batch_enabled {
+            // Take the remaining entries from this already-prepared lane
+            // round in scalar query order. The full batch is charged even if
+            // an earlier answer completes the matrix; unused answers are
+            // reported below rather than silently discarded.
+            batch_meta.clear();
+            batch_meta.push((point, a, b, lane_id));
+            let mut guard_skip = None;
+            while batch_meta.len() < batch_width && trials < max_trials {
+                let Some((lane, next, next_a, next_b)) = lane_queue.pop_front() else {
+                    break;
+                };
+                trials += 1;
+                if guarded && !defer_guard {
+                    guard_probes += 1;
+                    if seen.insert_duplicate(g.key(&next)) {
+                        repeats_skipped += 1;
+                        lanes[lane].fresh = true;
+                        guard_skip = Some((next, next_a, next_b, Some(lane)));
+                        break;
+                    }
+                }
+                batch_meta.push((next, next_a, next_b, Some(lane)));
+            }
+            batch_points.clear();
+            batch_points.extend(batch_meta.iter().map(|entry| entry.0));
+            batch_coefficients.clear();
+            batch_coefficients.extend(batch_meta.iter().map(|entry| (entry.1, entry.2)));
+            batch_answers.clear();
+            batch_answers.resize_with(batch_points.len(), Vec::new);
+            measurement::mark(measurement::Phase::TargetPdp);
+            batch_oracle.as_deref_mut().expect("batch callback present")(
+                &mut rel.group_ops,
+                &mut ctr,
+                &batch_points,
+                &batch_coefficients,
+                &mut batch_answers,
+            );
+            oracle_batch_calls += 1;
+            oracle_batch_targets += batch_points.len() as u64;
+            oracle_batch_max_targets = oracle_batch_max_targets.max(batch_points.len() as u64);
+            let first = std::mem::take(
+                batch_answers
+                    .first_mut()
+                    .expect("batch contains current target"),
+            );
+            for index in 1..batch_meta.len() {
+                let (next, next_a, next_b, next_lane) = batch_meta[index];
+                let relations = std::mem::take(&mut batch_answers[index]);
+                batch_pending.push_back((next, next_a, next_b, next_lane, Some(relations)));
+            }
+            if let Some((next, next_a, next_b, next_lane)) = guard_skip {
+                batch_pending.push_back((next, next_a, next_b, next_lane, None));
+            }
+            first
+        } else {
+            measurement::mark(measurement::Phase::TargetPdp);
+            oracle(&mut rel.group_ops, &mut ctr, point, a, b)
+        };
         if relations.is_empty() {
             continue;
         }
@@ -17207,6 +17385,26 @@ fn collect_and_solve_relations_scaled_touching<
     rel.wall_ns = rel_start.elapsed().as_nanos() as u64 - la_ns - ver.wall_ns;
     rel.count("trials", trials);
     rel.count("relations", found);
+    if oracle_batch_calls > 0 {
+        rel.count("oracle_batch_preferred_width", batch_width as u64);
+        rel.count("oracle_batch_max_targets", oracle_batch_max_targets);
+        rel.count("oracle_batch_calls", oracle_batch_calls);
+        rel.count("oracle_batch_targets", oracle_batch_targets);
+        rel.count(
+            "oracle_batch_unused_results",
+            batch_pending
+                .iter()
+                .filter(|entry| entry.4.is_some())
+                .count() as u64,
+        );
+        rel.count(
+            "oracle_batch_unused_guarded_trials",
+            batch_pending
+                .iter()
+                .filter(|entry| entry.4.is_none())
+                .count() as u64,
+        );
+    }
     rel.count("lookups", ctr.lookups);
     rel.count("sqrt_solves", ctr.sqrt_solves);
     rel.count("inversions", ctr.inversions);
@@ -24151,9 +24349,9 @@ mod wwalk_table_tests {
 
     /// `sib=m,pool=M` (sibling points): the recovered log equals the true
     /// one with one and two seeds, verified and lazy; the field operations
-    /// of the walk equal the formula (per parent `m` inversions, `2m + 1`
-    /// multiplications, `2m` squarings, less one multiplication and one
-    /// squaring per skipped known-copy minus child); a pair is one group
+    /// of the walk include a batch inversion per parent, one slope
+    /// multiplication and squaring per emitted sibling, and one eager
+    /// ordinate lift per sibling. A pair is one group
     /// addition and a second point is the priced native counter; and with
     /// `sib` off the build, its ledgers and its counters are the walk's.
     #[test]
@@ -24221,8 +24419,10 @@ mod wwalk_table_tests {
                             // expansion (was `m` serial inversions).
                             assert_eq!(f.invs, parents);
                             let batch_muls = 3 * (m as u64 - 1) * parents;
-                            assert_eq!(f.muls, (2 * m as u64 + 1) * parents - skipped + batch_muls);
-                            assert_eq!(f.sqrs, 2 * m as u64 * parents - skipped);
+                            let siblings = pairs + second;
+                            assert_eq!(t.sib_lifts, siblings);
+                            assert_eq!(f.muls, 2 * siblings + batch_muls);
+                            assert_eq!(f.sqrs, siblings);
                             assert!(skipped <= 2 * parents);
                         }
                         assert_eq!(t.walk_ops.adds, pairs + degenerate);
