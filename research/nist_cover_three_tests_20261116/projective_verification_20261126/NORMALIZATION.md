@@ -45,3 +45,18 @@ build <=300s and worker <=600s, one CPU and1GiB each. Retain exact failures,
 exits, native diagnostics and complete wrapper/build/worker clocks. Sources:
 the independently checked infinity factorization, TRANSPORT.md, actual
 quartic_km_v3 source and its monomial/RR input conventions; no novelty claim.
+
+## External-input interface, frozen after normalization-v1
+
+The six original function-level checks completed. Add an optional class.json
+argument containing exactly 22 rows of 85 canonical field coordinates under
+`class_space`. With this argument, normalize that opaque input directly and
+return the finite class space, detected multiplicity and actual KM equality.
+Do not consume the input's generating scalar or support metadata. Preserve
+the original three-argument fixture mode unchanged.
+
+Fresh normalization-v2 uses the actual class space emitted by the preceding
+projective KM worker. It must detect one infinity copy, return zero infinity
+support and preserve its KM class. The same native limits and complete cost/
+source/input records apply. This is a new CLI-input check, not a rerun of
+the unchanged six-case experiment.

@@ -14,6 +14,7 @@ work() {
     cp "$previous/transfer/source/"*.hpp "$out/source/"
     cp "$previous/relations/input/evidence/p192-d7-kernel3-plane-quartic.json" "$out/input/quartic.json"
     cp "$previous/relations/result.json" "$out/input/relations.json"
+    cp evidence/transport-v1/km.stdout "$out/input/class.json"
     cpu=$(python3 -c 'import os; print(min(os.sched_getaffinity(0)))')
     printf '%s\n' "$cpu" > "$out/selected-cpu.txt"
     git rev-parse HEAD > "$out/source-commit.txt"
@@ -28,7 +29,7 @@ work() {
     test "$code" -eq 0 || return "$code"
     sha256sum "$out/source/"* "$out/input/"* "$out/bin/normalize" > "$out/pre-call-manifest.sha256"
     set +e
-    (ulimit -v 1048576; { time timeout 600 taskset -c "$cpu" "$out/bin/normalize" "$out/input/quartic.json" "$out/input/relations.json" \
+    (ulimit -v 1048576; { time timeout 600 taskset -c "$cpu" "$out/bin/normalize" "$out/input/quartic.json" "$out/input/relations.json" "$out/input/class.json" \
         > "$out/result.json" 2> "$out/stderr.txt"; } 2> "$out/checker-cost.json")
     code=$?
     set -e

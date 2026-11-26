@@ -35,12 +35,30 @@ Normalized normalize(const QuarticKM& km,const Class& input) {
     require(infinity_multiplicity(km,finite)==0,"normalization removes all infinity support");return {m,finite};
 }
 int main(int argc,char** argv) { try {
-    auto start=std::chrono::steady_clock::now();require(argc==3,"usage: normalize-km quartic relations");
+    auto start=std::chrono::steady_clock::now();require(argc==3 || argc==4,"usage: normalize-km quartic relations [class.json]");
     auto model=read_json(argv[1]),relations=read_json(argv[2]);QuarticKM km(model,relations.at("pool"));require(km.fibers[0].x==56,"fixed KM reference");
     std::vector<Z> qc(5,Z(0));for (const auto& [e,c]:km.terms) if (e[0]+e[1]==4) qc[size_t(e[1])]=qc[size_t(e[1])]+c;
     Poly<Z> q(qc),x{Z(0),Z(1)};q=q.monic();require(q.degree()==4 && q.at(0)!=Z(0),"declared infinity and x-leading chart");
     auto p=x%q;for (int i=1;i<=4;++i) { p=powmod(p,prime,q);if (i==2) require(std::get<0>(xgcd(q,p-x)).degree()==0,"GMP infinity irreducibility subfield check"); }
     require(p==x%q,"GMP infinity Frobenius closure");
+    if (argc==4) {
+        auto supplied=read_json(argv[3]);const auto& rows=supplied.at("class_space").arr;require(rows.size()==22,"external class dimension");Class input;
+        for (const auto& row:rows) {
+            require(row.arr.size()==evaluation_count,"external class width");Vector v;
+            for (const auto& entry:row.arr) { mpz_class n(entry.scalar);require(n>=0 && n<prime,"canonical external coefficient");v.emplace_back(n); }
+            input.w.push_back(std::move(v));
+        }
+        auto result=normalize(km,input);require(km.equal(input,result.finite),"external class normalization preserves KM class");
+        auto us=std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-start).count();
+        std::cout<<"{\"standing\":\"unregistered native KM normalization of external input\",\"removed_infinity_multiplicity\":"<<result.removed<<",\"remaining_infinity_multiplicity\":0,\"KM_class_preserved\":true,\"wall_us\":"<<us<<",\"class_space\":[";
+        for (size_t i=0;i<result.finite.w.size();++i) {
+            if (i) std::cout<<',';
+            std::cout<<'[';
+            for (size_t j=0;j<result.finite.w[i].size();++j) std::cout<<(j?",":"")<<'"'<<result.finite.w[i][j].x<<'"';
+            std::cout<<']';
+        }
+        std::cout<<"],\"valid_RR_input_required\":true,\"signed_independent_verdict\":false}\n";return 0;
+    }
     auto nonzero=km.point_class(km.fibers[1].support[0]);require(!km.zero(nonzero),"actual nonzero Jacobian fixture");
     std::vector<int> multiplicities;int principal=0,nonprincipal=0;
     for (int m=0;m<=3;++m) {
