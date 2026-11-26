@@ -110,7 +110,7 @@ use std::cell::RefCell;
 use std::sync::OnceLock;
 
 use super::fx_hash::FxMap;
-use super::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use super::pq_groebner_f2::{F2BoolMono, F2BoolPoly, Mask};
 
 /// Size caps of one Macaulay matrix, in the reference builder's units:
 /// nonempty rows over all `n_vars` variables, and distinct monomials.
@@ -468,11 +468,11 @@ impl F5Plan {
                 continue;
             }
             for_each_multiplier(&layout.bits, e as usize, |s, _| {
-                if p.terms.iter().any(|t| (t.mask | s).count_ones() > e) {
+                if p.terms.iter().any(|t| (t.mask as u64 | s).count_ones() > e) {
                     return;
                 }
                 ws.clear();
-                ws.extend(p.terms.iter().map(|t| t.mask | s));
+                ws.extend(p.terms.iter().map(|t| t.mask as u64 | s));
                 ws.push(s);
                 ws.sort_unstable_by_key(|&w| (std::cmp::Reverse(w.count_ones()), w));
                 let mut k = 0;
@@ -508,7 +508,7 @@ impl F5Plan {
                 continue;
             }
             for_each_multiplier(&layout.bits, (e - d) as usize, |u, _| {
-                let mut row: Vec<u32> = p.terms.iter().map(|t| layout.rank(t.mask | u)).collect();
+                let mut row: Vec<u32> = p.terms.iter().map(|t| layout.rank(t.mask as u64 | u)).collect();
                 row.sort_unstable();
                 let mut kept = Vec::with_capacity(row.len());
                 let mut k = 0;
@@ -570,7 +570,7 @@ fn build(
     let term_vars = generating
         .iter()
         .flat_map(|(p, _)| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask);
+        .fold(0u64, |acc, t| acc | t.mask as u64);
     let occurring = if compact {
         term_vars
     } else {
@@ -640,7 +640,7 @@ fn build(
                     .is_some_and(|plan| plan.skips(&layout, degree, i, pdeg, u)),
             );
             for t in &p.terms {
-                let x = t.mask | u;
+                let x = t.mask as u64 | u;
                 let key = if use_rank {
                     let r = layout.rank(x) as usize;
                     if s.stamp[r] != generation {
@@ -836,7 +836,7 @@ fn exact_reference_rows_exceed(
                 return;
             }
             s.row_buf.clear();
-            s.row_buf.extend(p.terms.iter().map(|t| t.mask | u));
+            s.row_buf.extend(p.terms.iter().map(|t| t.mask as u64 | u));
             s.row_buf.sort_unstable();
             let mut i = 0;
             let mut nonempty = false;
@@ -1125,7 +1125,7 @@ pub fn f5_row_mask(polys: &[F2BoolPoly], n_vars: usize, degree: u32) -> Option<V
     let occurring = generating
         .iter()
         .flat_map(|(p, _)| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask);
+        .fold(0u64, |acc, t| acc | t.mask as u64);
     let layout = Layout::new(occurring, n_vars, degree);
     let plan = F5Plan::new(&generating, &layout, degree)?;
     let v = layout.bits.len();
@@ -1438,7 +1438,7 @@ pub fn matrix_rows_with(
                 let mut bits = word;
                 while bits != 0 {
                     let c = w * 64 + bits.trailing_zeros() as usize;
-                    terms.push(F2BoolMono::from_mask(s.col_mask[c]));
+                    terms.push(F2BoolMono::from_mask(s.col_mask[c] as Mask));
                     bits &= bits - 1;
                 }
             }
@@ -1598,7 +1598,7 @@ mod tests {
                         let terms: Vec<F2BoolMono> = monos
                             .iter()
                             .filter(|_| rng.gen::<u32>() % 4 == 0)
-                            .map(|&m| F2BoolMono::from_mask(m))
+                            .map(|&m| F2BoolMono::from_mask(m as Mask))
                             .collect();
                         F2BoolPoly::from_monos(terms, n_vars)
                     })
