@@ -227,12 +227,14 @@ and two outgoing forms including a square. A separate direct deformation
 oracle sums over independent left/right incidence bits and applies the full
 Cauchy packet kernel without calling `modes`, `child`, `next_tuple`, packet
 entry, or `evaluate_at`. It agrees with the extracted modes-to-child product
-for all 256 pairs of arity-two Boolean tables in each of three label/sample
-cases, 768 configurations total. The cases cover local and crossing groups,
-zero/unit/extension samples, and correlated parallel ports. Removing a
-generated mode or flipping its target group is also detected against that
-direct oracle. The remaining link is the quantified refinement for every
-admitted graph, not an untested finite semantic target. `[pcc:unverified]`
+in 1,536 configurations: all 256 endpoint-table pairs for three parallel-port
+label/sample cases and all 256 behavior pairs for each other two-port vertex
+partition (split-left, split-right, and split-both). The cases cover local and
+crossing groups, zero/unit/extension samples, correlated ports, and vertices
+assigned to both groups. Removing a generated mode or flipping its target
+group is also detected against that direct oracle. The remaining link is the
+quantified refinement for every admitted graph, not an untested finite
+semantic target. `[pcc:unverified]`
 
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent

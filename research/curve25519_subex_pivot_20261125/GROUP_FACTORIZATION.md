@@ -115,14 +115,15 @@ kernel-checked refinement remains open.
 
 The exhaustive packet oracle independently checks the coefficient-extraction
 identity on all 64 assignments of a mixed linear/quadratic fixture. A separate
-global oracle compares the extracted modes-to-child product with `D(W)` for
-all 256 pairs of arity-two Boolean tables in each of three label/sample cases,
-768 configurations total. The cases include local and crossing groups, zero,
-unit, and nontrivial extension sample values, and correlated parallel ports.
-The mutation gate additionally detects both a removed mode and a wrong target
-group against the direct oracle. End-to-end controls then recover the original
-direct tensor count at one and three active levels and across two taper
-coordinates.
+global oracle compares the extracted modes-to-child product with `D(W)` in
+1,536 configurations. It exhausts all 256 endpoint-table pairs for each of
+three parallel-port label/sample cases and for each of the other three vertex
+partitions: split-left, split-right, and split-both. The cases include local
+and crossing groups, zero, unit, and nontrivial extension sample values, and
+vertices on both sides of the group partition. The mutation gate additionally
+detects both a removed mode and a wrong target group against the direct oracle.
+End-to-end controls then recover the original direct tensor count at one and
+three active levels and across two taper coordinates.
 
 These controls make the algebraic components load-bearing, but do not quantify
 over every admitted graph or establish a typed refinement from every live Rust

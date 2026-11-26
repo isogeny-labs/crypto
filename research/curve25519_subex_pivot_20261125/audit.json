@@ -299,7 +299,7 @@
     "identity_note": "research/curve25519_subex_pivot_20261125/GROUP_FACTORIZATION.md",
     "source": "crates/hashed-ecdl-tensor/src/contraction/coupled_controls.rs",
     "test": "contraction::recursive::coupled_controls::direct_deformation_matches_group_factorization_for_all_binary_tables",
-    "cases": "all 256 pairs of arity-two Boolean tables in each of three label/sample cases; 768 total configurations covering local and crossing groups and zero, unit, and extension sample values",
+    "cases": "1,536 configurations: all 256 endpoint-table pairs in three parallel-port label/sample cases, plus all 256 behavior pairs for split-left, split-right, and split-both vertex partitions",
     "oracle_boundary": "directly sums independent left/right incidence assignments and the full Cauchy packet kernel without modes, child, next_tuple, PacketTensor::entry, or evaluate_at",
     "observed_gate": "the extracted modes-to-child group product equals the direct deformation semantics in every case",
     "complete_library_result": "176 passed; 0 failed",

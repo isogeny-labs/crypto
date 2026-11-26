@@ -134,6 +134,72 @@ fn predicate(arity: usize, table: u8) -> Arc<Tensor> {
     })
 }
 
+fn two_port_graph(
+    left_split: bool,
+    right_split: bool,
+    left_table: u8,
+    right_table: u8,
+) -> Bipartite {
+    fn side(split: bool, table: u8) -> Vec<TensorVertex> {
+        if split {
+            vec![
+                TensorVertex {
+                    tensor: predicate(1, table & 3),
+                    edges: vec![0],
+                },
+                TensorVertex {
+                    tensor: predicate(1, (table >> 2) & 3),
+                    edges: vec![1],
+                },
+            ]
+        } else {
+            vec![TensorVertex {
+                tensor: predicate(2, table),
+                edges: vec![0, 1],
+            }]
+        }
+    }
+
+    Bipartite {
+        left: side(left_split, left_table),
+        right: side(right_split, right_table),
+        edges: (0..2)
+            .map(|edge| Edge {
+                left: if left_split { (edge, 0) } else { (0, edge) },
+                right: if right_split { (edge, 0) } else { (0, edge) },
+            })
+            .collect(),
+    }
+}
+
+fn direct_and_extracted(
+    graph: &Bipartite,
+    row_labels: &[usize],
+    column_labels: &[usize],
+    z: &Element,
+    ring: &Ring,
+    parameters: &Parameters,
+    meter: &mut Meter,
+) -> Result<(Element, Element)> {
+    let packing = packing::pack_labels(
+        graph,
+        parameters,
+        row_labels.to_vec(),
+        column_labels.to_vec(),
+        false,
+        meter,
+    )?;
+    let t = 1i64;
+    let coordinate = deformation::valuation(t);
+    let kernel = deformation::Cauchy::new(parameters, t, z, ring, meter)?;
+    let modes = deformation::modes(graph, &packing, coordinate, parameters, &kernel, meter)?;
+    let direct = direct_deformed_contraction(graph, &packing, &kernel, meter)?;
+    let extracted = evaluate_generated_modes(
+        graph, &packing, parameters, coordinate, &kernel, &modes, meter,
+    )?;
+    Ok((direct, extracted))
+}
+
 fn forced(
     graph: &Bipartite,
     ring: &Ring,
@@ -302,63 +368,47 @@ fn direct_deformation_matches_group_factorization_for_all_binary_tables() {
     for (row_label, column_label, z) in cases {
         for left_table in 0..16u8 {
             for right_table in 0..16u8 {
-                let graph = Bipartite {
-                    left: vec![TensorVertex {
-                        tensor: predicate(2, left_table),
-                        edges: vec![0, 1],
-                    }],
-                    right: vec![TensorVertex {
-                        tensor: predicate(2, right_table),
-                        edges: vec![0, 1],
-                    }],
-                    edges: vec![
-                        Edge {
-                            left: (0, 0),
-                            right: (0, 0),
-                        },
-                        Edge {
-                            left: (0, 1),
-                            right: (0, 1),
-                        },
-                    ],
-                };
-                let packing = packing::pack_labels(
+                let graph = two_port_graph(false, false, left_table, right_table);
+                let (expected, actual) = direct_and_extracted(
                     &graph,
+                    &[row_label],
+                    &[column_label],
+                    &z,
+                    &ring,
                     &parameters,
-                    vec![row_label],
-                    vec![column_label],
-                    false,
-                    &mut meter,
-                )
-                .unwrap();
-                let t = 1i64;
-                let coordinate = deformation::valuation(t);
-                let kernel =
-                    deformation::Cauchy::new(&parameters, t, &z, &ring, &mut meter).unwrap();
-                let modes = deformation::modes(
-                    &graph,
-                    &packing,
-                    coordinate,
-                    &parameters,
-                    &kernel,
-                    &mut meter,
-                )
-                .unwrap();
-                let expected =
-                    direct_deformed_contraction(&graph, &packing, &kernel, &mut meter).unwrap();
-                let actual = evaluate_generated_modes(
-                    &graph,
-                    &packing,
-                    &parameters,
-                    coordinate,
-                    &kernel,
-                    &modes,
                     &mut meter,
                 )
                 .unwrap();
                 assert_eq!(
                     actual, expected,
                     "labels={row_label}/{column_label}, tables={left_table}/{right_table}",
+                );
+            }
+        }
+    }
+
+    let z = ring.point(&3u8.into()).unwrap();
+    for (left_split, right_split, rows, columns) in [
+        (true, false, vec![0, 1], vec![3]),
+        (false, true, vec![0], vec![2, 3]),
+        (true, true, vec![0, 1], vec![2, 3]),
+    ] {
+        for left_table in 0..16u8 {
+            for right_table in 0..16u8 {
+                let graph = two_port_graph(left_split, right_split, left_table, right_table);
+                let (expected, actual) = direct_and_extracted(
+                    &graph,
+                    &rows,
+                    &columns,
+                    &z,
+                    &ring,
+                    &parameters,
+                    &mut meter,
+                )
+                .unwrap();
+                assert_eq!(
+                    actual, expected,
+                    "split={left_split}/{right_split}, tables={left_table}/{right_table}",
                 );
             }
         }
