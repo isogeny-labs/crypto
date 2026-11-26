@@ -1,0 +1,42 @@
+{
+  "schema": "pre-main-local-payload-receipt/v1",
+  "S3_used": false,
+  "main_started": false,
+  "scope": "Full raw certificates and controls stay local; main has no data yet",
+  "directories": [
+    {
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/preflight",
+      "published_in_git": false,
+      "scope": "Warmup-only preflight/raw readback; not main data"
+    },
+    {
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/preflight-v2-analysis-readback",
+      "published_in_git": false,
+      "scope": "Warmup-only preflight/raw readback; not main data"
+    },
+    {
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/synthetic-measured-analysis-canary",
+      "published_in_git": false,
+      "scope": "Synthetic repeated-metadata control; no new solver/timing samples"
+    },
+    {
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/failure-finalization-canary",
+      "published_in_git": false,
+      "scope": "Infrastructure control; not main data"
+    },
+    {
+      "path": "/tmp/ecdlp-cpu-comparison-20261123/process-group-canary",
+      "published_in_git": false,
+      "scope": "Infrastructure control; not main data"
+    }
+  ],
+  "preflight_analysis": {
+    "path": "/tmp/ecdlp-cpu-comparison-20261123/preflight/analysis.json",
+    "bytes": 37052,
+    "sha256": "8af5ab6f48b3027d26a490fe02d1d9b12e5c608710cc60951ffb1ed18fe691d1"
+  },
+  "point_summary": {
+    "path": "/tmp/ecdlp-cpu-comparison-20261123/preflight/point-audit/summary.json",
+    "sha256": "18357c0b298116350a06d20512b95bc18942ffb58785321d22d648e49a6f897d"
+  }
+}

@@ -37,6 +37,54 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+## Authorized target scope
+
+Work in this repository is limited to public benchmark instances, published
+challenge curves, toy or synthetic parameters, and systems the owner operates
+or is explicitly authorized to test. Do not develop or test operational
+attacks against production keys, wallets, accounts, or third-party systems.
+A task that requires a non-public target stops and asks for written
+authorization before proceeding.
+
+## Research Gate, PCC Ledger & PR Hygiene
+
+### 1. Anti-Gate-Inflation (No Standalone Tautologies)
+
+- **MUST NOT** create standalone `*_GATE.md`, `*_AUDIT.md`, or `*_SCREEN.md` files for:
+  1. Textbook endomorphism, Frobenius, or rationality identities (e.g., $\pi(P)=P$, dual scalar actions, or class-group exact sequences).
+  2. Parameter-only or number-field algebra (embedding degrees, discriminants, ray subfields, ideal norms, or Artin checks on known integers).
+  3. Re-derivations of bounds already covered in the research atlas.
+- **Routing rule:** Parameter-side lemmas belong in untracked scratch notes or at most a 3-line inline remark inside an existing document—never as a new tracked file or dedicated commit.
+
+### 2. Coordinate-Input Gate for `PCC-*` Claims
+
+- **MUST NOT** mint a `PCC-*` ledger ID unless the commit includes an executable evaluator $f(E, G, x(Q), y(Q))$ that:
+  1. Accepts an arbitrary target point $Q = [d]G$ **solely via its curve coordinates**, with zero access to the scalar $d$ or a generating endomorphism $\alpha$.
+  2. Evaluates $f$ across all nonzero scalars $d \in \{1, \dots, r-1\}$ on the finite control curve before recording a positive or negative result.
+  3. Charges all setup and per-query evaluation costs against matched same-target Pollard $\rho$.
+- Known-scalar checks (`[k]G` for chosen $k$) and number-field constructions without a coordinate selector receive **zero** `PCC-*` claims.
+
+### 3. Ready-for-Review PR Freeze & Debt Cap
+
+- Once a PR is open and **non-draft** (ready for review), **MUST NOT** append net-new `PCC-*` claims or new research `.md` files to that branch.
+- Commits to a non-draft PR are restricted to:
+  1. Independent verifier sign-offs transitioning existing `PCC-*` claims from `unverified` to `verified`.
+  2. Fixes for failing CI, prose lint, or `origin/main` parity/lock mismatches.
+  3. Defect fixes within files already introduced by the PR.
+- **Unverified debt & blocker cap:** Never exceed **2 unverified `PCC-*` claims** on any branch (including drafts), and never push new research commits onto a branch while CI parity locks fail or Conductor claim checks are unreachable.
+
+### 4. Clean Halt Over Activity Padding
+
+- If no coordinate-input evaluator clears the control screen—or if Conductor/CI parity blocks edits—emit `STATUS: BLOCKED (<exact reason>)` and stop immediately. Never commit algebraic side-notes to demonstrate progress.
+
+### Enforcement
+
+`tools/prepush_research_gate.py` implements the non-draft freeze, PCC evidence binding, and debt/parity ceiling. Enable it per clone with `git config core.hooksPath .githooks`; CI runs the same script with `--base origin/main`.
+
+In a custom sparse checkout, a dated journal may need `git add --sparse` even
+after it is tracked. Stage that file explicitly and inspect its staged diff
+before committing or pushing (adopted lesson `L-d5062ba05212`).
+
 ## Goal: what to work on next
 
 Sessions should never need a prompt to find their work. `docs/ACTIVE.md`
@@ -203,7 +251,7 @@ Change the index or ranking only against that measurement.
 
 - **Run experiments on EKS Spot by default** (owner, 2026-10-25). For an
   authorized x86 CPU experiment or crypto benchmark, read and use
-  [isolab-eks](.agents/skills/isolab-eks/SKILL.md), then submit and verify it;
+  [isolab-eks](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md), then submit and verify it;
   do not merely give the user commands to run. This applies to Claude, Codex,
   OpenCode and their experiment agents. Authentication and routing are in
   §9a. Honor an explicitly requested backend, workload and budget.
@@ -455,7 +503,7 @@ For small-prime or pinned GF(2^83) elliptic-curve surface searches, quartic
 subgroup transfers, genus-2+ Jacobian transfers, hyperelliptic covers, Mumford
 arithmetic, gluing or polarization candidates, or Frobenius compatibility
 checks, use
-[ecdlp-surfaces](.agents/skills/ecdlp-surfaces/SKILL.md) for tool selection,
+[ecdlp-surfaces](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/ecdlp-surfaces/SKILL.md) for tool selection,
 commands, and interpretation limits.
 
 ## Reading discipline
@@ -478,7 +526,7 @@ commands, and interpretation limits.
 
 ## Preserve scope and report evidence
 
-Use [report-evidence](.agents/skills/report-evidence/SKILL.md) for implementation,
+Use [report-evidence](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/report-evidence/SKILL.md) for implementation,
 experiments, benchmarks, completion reports, and research handoffs.
 
 - Preserve the user's requested deliverables, parameters, workloads, and acceptance
@@ -731,8 +779,9 @@ Every experiment run (ICMS or ecbench session, autolab or tournament round,
 benchmark, or other research run), every PR that lands a result, and every
 substantive search for new isogenies, curves, scalar rules, endomorphisms, or
 related ECDLP mechanisms follows
-[the research-visuals skill](.agents/skills/research-visuals/SKILL.md), on
-every runtime (Claude Code reads it at `.claude/skills/research-visuals/`).
+[the research-visuals skill](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/research-visuals/SKILL.md), on
+every runtime (it lives in the workspace trunk, `isogeny-labs/workspace:.agents/skills/research-visuals/`;
+`.agents/skills/README.md`).
 Deliver a source-linked report, a graph or explanatory diagram, and a PDF
 containing the report and visual. A run report is descriptive and sits beside
 the run's records, never inside a sealed or audited session directory.
@@ -840,7 +889,7 @@ toolchain, and treat a gate change as a dependency change.
   Preserve frozen evidence and attach formalization updates as versioned
   additions rather than rewriting historical verification records.
 - Before the first Lean edit, run the
-  [`lean-instance-gate`](.agents/skills/lean-instance-gate/SKILL.md) skill:
+  [`lean-instance-gate`](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/lean-instance-gate/SKILL.md) skill:
   state the result as an instance of a Mathlib or crypto-lean structure,
   apply the existing theorem as stated, build missing laws generically in
   crypto-lean first, and write the inheritance table. The proof gate checks
@@ -1345,6 +1394,25 @@ Every cross-method comparison and every ranking must:
   `work_native` maps, `cost.unpriced` and the phase `native` maps are
   written as before, and committed sessions replay "identical". The
   numbers under both readings: `research/ecbench_table_work_pricing_20261108/`.
+- **Field-operation counters are priced exactly, in `bitop/v1`; the ratchet
+  reads bit-ops** (owner, 2026-11-21). A native counter whose operation is a
+  fixed number of field operations (today the sibling-points counters
+  `sibling_second_points`, one squaring and two field additions per point,
+  and `sibling_lift_products`; `SIBLING_WORK_COUNTERS` in
+  `src/cryptanalysis/ecbench/band.rs`) is charged at its `bitop/v1` weight
+  (`docs/units/BITOPS.md`), not at `w` group additions per operation. The
+  index-calculus ledgers' ratchet (`ic_autolab`, `research/*/ledger.json`)
+  reads bit-ops per sqrt(r) from the records (`work.bitops`; `ecbench compare
+  --unit bitop/v1`), for every arm and the rho reference alike. The `w` band
+  stays in force, and is reported next to the bit-op reading, for native work
+  that is not a counted field operation (table inserts and lookups,
+  canonicalisations, hashes); a pair that is ordered in bit-ops and
+  unresolved in the band is reported with both readings and ratchets on the
+  bit-op one. Ruled on the sibling-points panel
+  (`research/curve25519_autolab_20261104/sibling-panel/`, claim
+  `PCC-20261121-abc3ad`), where a second x-only point is 0.200 of an addition
+  in bit-ops and a whole addition at w = 1. Frozen evidence and band verdicts
+  recorded before this date are not rewritten.
 
 This applies to `ecbench compare` read-outs, tables, frontier syntheses,
 ledger rows, papers and PR descriptions. A ratio produced before this rule
@@ -1731,7 +1799,7 @@ existing EC2 key-pair name **`meow34`** when launching the instance.
 
 ### 9a. Experiments default to Iso Lab on EKS Spot
 
-Use [isolab-eks](.agents/skills/isolab-eks/SKILL.md) for supported x86 CPU
+Use [isolab-eks](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md) for supported x86 CPU
 experiments and benchmarks. Freeze the requested spec, source/image identity,
 resources, deadline and acceptance criteria, submit the job, and retain its
 receipt. The experiment runs in a pod in cluster `isolab`, namespace `isolab`,
@@ -1881,7 +1949,7 @@ conditions both sides ran under.  Before changing code for speed:
   explicitly (`RAYON_NUM_THREADS=1`), and report the pinned CPUs.
 - **Profile to find the cost, then measure the change.** Before tuning a CPU
   loop or a CUDA kernel, find where the time goes with `tools/profile.sh`
-  (the [profile skill](.agents/skills/profile/SKILL.md)). It covers `perf`
+  (the [profile skill](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/profile/SKILL.md)). It covers `perf`
   sampling, Callgrind, top-down, `nsys`, `ncu` and `nvidia-smi`, and records
   the host, the tool versions and the binary hash. Profilers perturb what
   they observe (ncu replays each launch at locked clocks), so a profile
@@ -1994,7 +2062,8 @@ workloads, under the same isolation, into the same sealed records.
   reference; the counted reference stays `rho.negation`.  A prime wall ratio is `rho.prime_fast` online wall over
   IC online wall, priced under §5a, until a prime claim branch exists.
 - **Skills:** `ecbench-measure`, `ecbench-independent-runner` and
-  `ecbench-extend` under `.agents/skills/`.
+  `ecbench-extend`, in the workspace trunk (`isogeny-labs/workspace:.agents/skills/`;
+  `.agents/skills/README.md`).
 
 Historical autolab, tournament and ICMS evidence keeps its own protocols.
 

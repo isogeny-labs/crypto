@@ -1,0 +1,92 @@
+name: Graph-IC GainDsu source-bound native test
+
+on:
+  pull_request:
+    paths:
+      - src/cryptanalysis/large_prime_graph.rs
+      - 'src/cryptanalysis/large_prime_graph/**'
+      - tests/large_prime_graph.rs
+      - examples/lp_graph_collect.rs
+      - examples/lp_graph_eval.rs
+      - research/lp_graph_algorithms_20261123/native_gain_dsu/**
+      - .github/workflows/graph-ic-gain-dsu-native.yml
+  workflow_dispatch:
+
+concurrency:
+  group: graph-ic-source-native-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  source-exact-graph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Record source identities
+        shell: bash
+        run: |
+          git rev-parse HEAD
+          rustc --version
+          sha256sum src/cryptanalysis/large_prime_graph.rs src/cryptanalysis/large_prime_graph/eval.rs src/cryptanalysis/large_prime_graph/witness.rs src/cryptanalysis/large_prime_graph/projected_rank.rs src/cryptanalysis/large_prime_filter.rs src/cryptanalysis/large_prime_filter_mst.rs tests/large_prime_graph.rs
+      - name: Native exact-source graph integration tests
+        shell: bash
+        run: |
+          bash research/lp_graph_algorithms_20261123/native_gain_dsu/run.sh
+      - name: Compile source-exact original LP evaluator CLI
+        # The real root library currently has an unrelated prime_root_trace
+        # delimiter error; this harness compiles the original graph/eval CLI
+        # source against symlinked production modules, without patching them.
+        run: cargo check --release --manifest-path research/lp_graph_algorithms_20261123/native_gain_dsu/Cargo.toml --example lp_graph_eval
+      - name: Same-seed default and opt-in exact-rank replay
+        shell: bash
+        run: |
+          cargo run --release --manifest-path research/lp_graph_algorithms_20261123/native_gain_dsu/Cargo.toml --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --out /tmp/graph-default.json
+          cargo run --release --manifest-path research/lp_graph_algorithms_20261123/native_gain_dsu/Cargo.toml --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --exact-forest --forest-max-rows 64 --out /tmp/graph-exact.json
+          cargo run --release --manifest-path research/lp_graph_algorithms_20261123/native_gain_dsu/Cargo.toml --example lp_graph_eval -- --seed 23 --rows 36 --lp-columns 12 --fb-columns 8 --arity 1,2,5 --modulus 101 --label same-seed --exact-forest --forest-max-rows 8 --out /tmp/graph-capped.json
+          python3 - <<'PY'
+          import json
+          with open('/tmp/graph-default.json') as f: old = json.load(f)
+          with open('/tmp/graph-exact.json') as f: new = json.load(f)
+          with open('/tmp/graph-capped.json') as f: cap = json.load(f)
+          assert old['schema'] == new['schema'] == cap['schema'] == 'lp-graph-eval/v1'
+          for k in ('modulus', 'rows', 'lp_columns', 'incidences', 'arity_histogram'):
+              assert old[k] == new[k] == cap[k], k
+          assert 'forest_filter' not in old and 'forest_skip_reason' not in old
+          assert 'exact_projected_rank' not in old['pivot_filter']
+          assert new.get('forest_skip_reason') is None
+          assert new['forest_filter'] is not None
+          assert not new['forest_filter']['refused']
+          assert new['forest_filter']['replay_failures'] == 0
+          assert new['pivot_filter']['replay_failures'] == 0
+          assert new['forest_filter']['exact_projected_rank'] is not None
+          assert new['pivot_filter']['exact_projected_rank'] is not None
+          if not new['mst_filter']['refused']:
+              assert new['mst_filter']['replay_failures'] == 0
+              assert new['mst_filter']['exact_projected_rank'] is not None
+          else:
+              assert new['mst_filter'].get('exact_projected_rank') is None
+          # Exact affine-basis admission is opt-in and source-preserving:
+          # useful rank alone cannot erase a nonzero known-RHS residual.
+          for arm_name in ('forest_filter', 'pivot_filter', 'mst_filter'):
+              arm = new[arm_name]
+              basis = arm.get('exact_projected_rank')
+              if arm['refused']:
+                  assert basis is None, arm_name
+                  continue
+              assert basis is not None, arm_name
+              indices = basis['augmented_basis_row_indices']
+              assert len(indices) == basis['augmented_rank'], arm_name
+              assert basis['useful_small_rank'] <= basis['augmented_rank'] <= basis['useful_small_rank'] + 1
+              assert indices == sorted(set(indices)), arm_name
+              assert all(0 <= i < arm['replayed'] for i in indices), arm_name
+              assert basis['augmented_basis_nonzeros'] <= arm['residual_nonzeros'], arm_name
+              assert basis['augmented_basis_source_terms'] <= arm['source_terms'], arm_name
+          assert cap['forest_skip_reason'] == 'row_cap'
+          assert 'forest_filter' not in cap
+          assert 'exact_projected_rank' not in cap['pivot_filter']
+          print('same-seed default / opt-in / cap checks PASS')
+          PY

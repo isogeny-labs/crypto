@@ -1,10 +1,22 @@
 # Strong-rho control for the GHS-weak plane-quartic frontier
 
-Status: implementation and protocol frozen; measurement pending. The
+Status: Round A implementation and protocol frozen; measurement pending. The
 [round-A amendment](ROUND_A.md) changes only the high/top active deadlines and
-was frozen before primary output. There is no measured result, frontier
-change, or leaderboard row yet. The live execution-admission gap is tracked in
+was frozen before primary output. [Round B](ROUND_B.md) prospectively replaces
+the generic six-product cubic square with a five-product specialization. Its
+profile and benchmark are checkpoint-blocked in the current runtime, so it has
+no measured throughput result, frontier change, or leaderboard row. The live
+execution-admission gap is tracked in
 [the problem record](../../problems/ghs-strong-rho-measurement-admission.md).
+
+The reviewed 2026-11-18 engineering composition layers reusable hot-loop
+scratch storage and hash caching, reciprocal base-field reduction, direct
+cubic inversion, corrected jump-only setup batching, and an optional
+field-counter-free build. Deterministic controls and their source-bound counts
+are in [`round-c-integration/`](round-c-integration/RESULTS.md). They establish
+the combined implementation and count identities only; checkpoint admission
+remains unavailable, so no throughput, end-to-end, frontier, or leaderboard
+claim is made `[pcc:unverified]`.
 
 This study reopens the restricted `E0/F_{q^3}` plane-quartic program for one
 specific obligation: compare its end-to-end index-calculus result with a rho
@@ -30,7 +42,42 @@ is made [pcc:unverified].
 - [`PROTOCOL.md`](PROTOCOL.md) freezes the scientific question, grid, arms,
   estimator, cost model, admission interval, and publication gates.
 - [`ROUND_A.md`](ROUND_A.md) is the prospective deadline-only amendment.
-- `main.rs` and `strong_rho.rs` are the source-hash-pinned measurement code;
+- [`ROUND_B.md`](ROUND_B.md) freezes the five-product squaring lead;
+  [`round-b/RESULTS.md`](round-b/RESULTS.md) retains its partial
+  correctness/count result and checkpoint blocker.
+- [`HOTLOOP_PROTOCOL.md`](HOTLOOP_PROTOCOL.md) and
+  [`HOTLOOP_RESULTS.md`](HOTLOOP_RESULTS.md) record the reusable scratch,
+  cached-hash, partition-mask, and table-reservation controls.
+- [`ROUND_C.md`](ROUND_C.md) and
+  [`ROUND_C_DEVIATION.md`](ROUND_C_DEVIATION.md) specify reciprocal reduction,
+  its explicit cold setup-division diagnostic, and the unmeasured width screen;
+  [`round-c-reduce-retune/`](round-c-reduce-retune/RESULTS.md) retains the
+  branch-local evidence.
+- [`ROUND_C_INV.md`](ROUND_C_INV.md) specifies direct-adjugate inversion;
+  [`round-c-inv/`](round-c-inv/RESULTS.md) retains its branch-local controls.
+- [`ROUND_C_SETUP.md`](ROUND_C_SETUP.md) and
+  [`round-c-setup/`](round-c-setup/RESULTS.md) retain the rejected first setup
+  attempt for audit. [`ROUND_C1_SETUP.md`](ROUND_C1_SETUP.md) and
+  [`round-c1-setup/`](round-c1-setup/RESULTS.md) contain the corrected
+  jump-only candidate used by the combined implementation.
+- [`ROUND_C_RETRY.md`](ROUND_C_RETRY.md) and
+  [`round-c-retry/`](round-c-retry/RESULTS.md) retain the exact negative retry2
+  screen. Its production source is intentionally excluded from the combined
+  default path.
+- [`round-c-counterfree/`](round-c-counterfree/RESULTS.md) records the optional
+  `fast-b*` field-counter-free mode and the analyzer's fail-closed authority
+  gate. Fast records are diagnostics and cannot enter modeled-cost analysis.
+- [`../quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md`](../quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md)
+  defines the source changes, counters, controls, matched measurement grid,
+  comprehensive ECBench rerun, publication gates, and follow-on PR sequence.
+- [`../quartic_ghs_r0_r99_20261119/`](../quartic_ghs_r0_r99_20261119/)
+  expands that contract into one hundred explicit R00–R99 lanes, dispatched
+  in six disjoint parallel batches with serialized composition and promotion
+  gates.
+- `main.rs` and the Round A revision of `strong_rho.rs` are the
+  source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
+  the combined prospective engineering candidate; Round A remains bound by
+  the source hash in [`ROUND_A.md`](ROUND_A.md).
   [`pod_run.sh`](pod_run.sh) compiles it for the worker and seals each split.
 - [`build_context.sh`](build_context.sh) and [`Dockerfile`](Dockerfile) create
   the exact-revision private image; [`LAUNCH.md`](LAUNCH.md) specifies the

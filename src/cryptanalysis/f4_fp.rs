@@ -598,6 +598,10 @@ pub struct F4Options {
     pub max_degree: u32,
     /// Cooperative stop: the run returns `timed_out` once past it.
     pub deadline: Option<Instant>,
+    /// Opt-in allocation admission. `None` preserves the existing paths.
+    /// Bounded runs use exponent-vector symbolic preprocessing and guarded
+    /// polynomial interreduction; see [`F4ResourceLimits`].
+    pub resource_limits: Option<F4ResourceLimits>,
     /// Stop once the leading monomials of the basis so far leave at most
     /// this many standard monomials.
     ///
@@ -633,13 +637,10 @@ pub struct F4Options {
     pub max_pairs_per_step: Option<usize>,
     /// Collect per-step diagnostics for explicit research runs. Disabled by default.
     pub capture_run_log: bool,
-    /// Compute the post-hoc degree-fall diagnostic after the run: the
-    /// first-fall degree, the last-fall degree, the observed degree of
-    /// regularity and the per-degree Hilbert deviation of the final basis from
-    /// the complete-intersection (semi-regular) expectation. Off by default —
-    /// the diagnostic is a single post-hoc staircase scan, never on the hot
-    /// path and never priced.
-    pub record_degree_falls: bool,
+    /// Compare the final leading-monomial staircase with the semi-regular
+    /// Hilbert expectation. Off by default and never priced into solver work.
+    /// This does not establish first/last fall degree or degree of regularity.
+    pub record_hilbert_diagnostics: bool,
     /// Write the run's state to this file (and resume from it if it already
     /// holds a checkpoint of this very run), at the top of a step once the
     /// given time has passed since the last write.  `None` (the default)
@@ -656,6 +657,214 @@ pub struct F4Options {
     /// Test hook for [`F4Options::checkpointing_in_step`]: stop (reported as
     /// `timed_out`) right after this many in-step snapshots.
     pub checkpoint_stop_in_rref: Option<usize>,
+    /// How the recursive visitor ([`solve_visit`] and its variants) finds the
+    /// roots of a univariate in a variable with a finite domain (a factor-base
+    /// coordinate).  Every mode returns the same roots in the same (domain)
+    /// order, so the traversal and the visitor's call sequence do not depend
+    /// on it; only the work does.  The default is the domain scan, kept as the
+    /// control.  See [`DomainRootMode`].
+    pub domain_roots: DomainRootMode,
+    /// Batched sibling extraction in the recursive visitor: at a node that
+    /// branches over a finite domain, the children are the specialisations
+    /// of one parent generating set at each domain value.  With this set,
+    /// the parent generators are rewritten once with coefficients that are
+    /// univariates in the branch variable, each sibling is specialised by
+    /// Horner evaluation, and its system is solved without F4 by triangular
+    /// back-substitution (univariate gcd, closed-form roots for degree at
+    /// most two, the counted Frobenius root finder otherwise, the shared
+    /// domain index); a child with no univariate falls back to the F4 path.
+    /// Every candidate is still checked against the original input, so the
+    /// solution set is the scan's; the order can differ where a child needs
+    /// more than one substitution.  Off by default, and never used with a
+    /// trace sink or a trace-reuse pool.
+    pub sibling_batch: bool,
+    /// Measure exclusive wall-time phases of the recursive visitor. Off by
+    /// default; no timing field is then serialized in [`VisitReport`]. This
+    /// observes the selected plain, traced, or trace-reuse path without
+    /// changing its arithmetic, domains, or stopping policy. Clock reads can
+    /// consume a small part of an existing cooperative deadline.
+    pub visit_timing: bool,
+}
+
+/// Conservative, per-native-call allocation admission, not a process-memory
+/// limit. Keep an external address-space limit for allocator overhead, input
+/// storage, exponent-vector width and caller-owned traces.
+///
+/// These limits also apply to recorded/replayed calls. Checkpoint, Hilbert,
+/// staircase and run-log modes are refused while limits are enabled: those
+/// paths do not yet have allocation admission. The recursive visitor refuses
+/// trace pools and sibling batching for the same reason.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct F4ResourceLimits {
+    /// Pending and above-degree pairs plus the temporary GM candidates,
+    /// before product/chain criteria can discard those candidates.
+    pub max_pairs: usize,
+    /// Each symbolic support, retained basis term population, reduction
+    /// work/output population and cumulative trace monomial population.
+    /// Repeated terms in different basis polynomials are counted separately.
+    pub max_symbolic_monomials: usize,
+    /// Conservative numeric workspace entries. Admission reserves eight
+    /// rows-by-columns arrays plus row/column scratch. Recording additionally
+    /// reserves two arrays, contributor bitsets and contributor index lists.
+    /// This deliberately exceeds the size of the eventual pair-row matrix.
+    pub max_matrix_entries: usize,
+}
+
+/// The first allocation admission that refused a native call. Such a report
+/// is incomplete, even when its returned basis is empty. `observed` saturates
+/// at `usize::MAX` on arithmetic overflow, which always refuses admission.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct F4ResourceLimit {
+    pub stage: &'static str,
+    pub resource: &'static str,
+    pub observed: usize,
+    pub limit: usize,
+    pub overflowed: bool,
+}
+
+impl std::fmt::Display for F4ResourceLimit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}: {} admission {} exceeds {}{}",
+            self.stage,
+            self.resource,
+            self.observed,
+            self.limit,
+            if self.overflowed {
+                " (count overflow)"
+            } else {
+                ""
+            }
+        )
+    }
+}
+
+impl F4ResourceLimits {
+    fn check(
+        &self,
+        stage: &'static str,
+        resource: &'static str,
+        observed: Option<usize>,
+        limit: usize,
+    ) -> Result<(), F4ResourceLimit> {
+        if observed.is_some_and(|n| n <= limit) {
+            Ok(())
+        } else {
+            Err(F4ResourceLimit {
+                stage,
+                resource,
+                observed: observed.unwrap_or(usize::MAX),
+                limit,
+                overflowed: observed.is_none(),
+            })
+        }
+    }
+
+    fn symbolic(&self, stage: &'static str, n: usize) -> Result<(), F4ResourceLimit> {
+        self.check(
+            stage,
+            "symbolic_monomials",
+            Some(n),
+            self.max_symbolic_monomials,
+        )
+    }
+
+    fn matrix(
+        &self,
+        stage: &'static str,
+        rows: usize,
+        cols: usize,
+        recording: bool,
+    ) -> Result<(), F4ResourceLimit> {
+        let entries = (|| {
+            let rectangle = rows.checked_mul(cols)?;
+            let mut n = rectangle.checked_mul(8)?;
+            n = n.checked_add(cols.checked_mul(4)?)?;
+            n = n.checked_add(rows.checked_mul(4)?)?;
+            if recording {
+                let words = rows / 64 + usize::from(!rows.is_multiple_of(64));
+                n = n.checked_add(rectangle.checked_mul(2)?)?;
+                n = n.checked_add(rows.checked_mul(words)?)?;
+                n = n.checked_add(rows.checked_mul(rows.min(cols))?)?;
+                n = n.checked_add(words)?;
+            }
+            Some(n)
+        })();
+        self.check(stage, "matrix_entries", entries, self.max_matrix_entries)
+    }
+
+    fn symbolic_step(
+        &self,
+        rows: usize,
+        cols: usize,
+        recording: bool,
+    ) -> Result<(), F4ResourceLimit> {
+        self.symbolic("symbolic_rows", rows)?;
+        self.symbolic("symbolic_support", cols)?;
+        self.matrix("symbolic_workspace", rows, cols.max(1), recording)
+    }
+}
+
+fn unsupported_resource_option(option: &'static str) -> F4ResourceLimit {
+    F4ResourceLimit {
+        stage: "options",
+        resource: option,
+        observed: 1,
+        limit: 0,
+        overflowed: false,
+    }
+}
+
+/// Root extraction for a univariate whose variable has a finite domain `D`.
+///
+/// The roots of `g` in `D` are exactly the `F_p`-roots of `g` that lie in
+/// `D`, because the visitor requires `D ⊂ F_p`.  The scan evaluates `g` at
+/// every element of `D`: about `|D| · terms · log deg` multiplications for
+/// each univariate at each node.  [`DomainRootMode::Frobenius`] instead finds
+/// the few rational roots with the counted `gcd(g, x^p − x)` / Cantor–Zassenhaus
+/// root finder that unrestricted univariates already use (`O(log p · deg²)`
+/// multiplications, independent of `|D|`), then keeps those in `D` through a
+/// value → position index built once per traversal and shared by every node,
+/// and returns them in domain order.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum DomainRootMode {
+    /// Evaluate the univariate at every domain element (the legacy control).
+    #[default]
+    Scan,
+    /// Frobenius root extraction filtered through the domain index.
+    Frobenius,
+    /// Per univariate, whichever of the two has the smaller estimated
+    /// multiplication count ([`domain_scan_cost`] against
+    /// [`domain_frobenius_cost`]).
+    Auto,
+}
+
+/// Multiplications the domain scan spends on one univariate: for each domain
+/// element and each term, square-and-multiply `x^e` and one coefficient
+/// product.  Exact for the scan below.
+pub fn domain_scan_cost(exponents: &[u32], domain_len: usize) -> u64 {
+    let per_point: u64 = exponents
+        .iter()
+        .map(|&e| powmod_muls(u64::from(e)) + 1)
+        .sum();
+    per_point.saturating_mul(domain_len as u64)
+}
+
+/// An upper estimate of the Frobenius root finder's multiplications for a
+/// univariate of degree `degree`: square-and-multiply for `x^p mod g`, each
+/// step a schoolbook product and a reduction, plus the gcd.  Used only to
+/// choose between the modes in [`DomainRootMode::Auto`]; never reported.
+pub fn domain_frobenius_cost(degree: u32, p: u64) -> u64 {
+    let n = u64::from(degree) + 1;
+    let step = 2 * n * n;
+    powmod_muls(p).saturating_mul(step).saturating_add(n * n)
+}
+
+/// Multiplications of the square-and-multiply loop of [`powmod`] for exponent
+/// `e`: one squaring a bit and one product a set bit.
+fn powmod_muls(e: u64) -> u64 {
+    u64::from(64 - e.leading_zeros()) + u64::from(e.count_ones())
 }
 
 impl F4Options {
@@ -664,18 +873,41 @@ impl F4Options {
             order,
             max_degree,
             deadline: None,
+            resource_limits: None,
             stop_staircase: None,
             weights: None,
             stop_hilbert: None,
             hilbert_expect: None,
             max_pairs_per_step: None,
             capture_run_log: false,
-            record_degree_falls: false,
+            record_hilbert_diagnostics: false,
             checkpoint: None,
             checkpoint_stop_after: None,
             checkpoint_in_step: None,
             checkpoint_stop_in_rref: None,
+            domain_roots: DomainRootMode::Scan,
+            sibling_batch: false,
+            visit_timing: false,
         }
+    }
+
+    /// Enable or disable recursive-visitor wall phases ([`VisitTimings`]).
+    /// Native F4 calls outside a visitor are unaffected.
+    pub fn with_visit_timing(mut self, on: bool) -> Self {
+        self.visit_timing = on;
+        self
+    }
+
+    /// Turn batched sibling extraction on or off ([`F4Options::sibling_batch`]).
+    pub fn with_sibling_batch(mut self, on: bool) -> Self {
+        self.sibling_batch = on;
+        self
+    }
+
+    /// Select the visitor's root extraction for finite-domain variables.
+    pub fn with_domain_roots(mut self, mode: DomainRootMode) -> Self {
+        self.domain_roots = mode;
+        self
     }
     /// Checkpoint the run to `path` and resume from it.
     ///
@@ -722,9 +954,9 @@ impl F4Options {
         self
     }
     /// Record the post-hoc degree-fall diagnostic. See
-    /// [`F4Options::record_degree_falls`].
-    pub fn recording_degree_falls(mut self) -> Self {
-        self.record_degree_falls = true;
+    /// [`F4Options::record_hilbert_diagnostics`].
+    pub fn recording_hilbert_diagnostics(mut self) -> Self {
+        self.record_hilbert_diagnostics = true;
         self
     }
     /// See [`F4Options::stop_staircase`].
@@ -1279,6 +1511,275 @@ pub struct TraceStep {
     pub degree: u32,
     pub rows: Vec<(usize, Vec<u32>)>,
     pub new_lms: Vec<Vec<u32>>,
+    /// The step's symbolic preprocessing, frozen by a replay
+    /// ([`FrozenStep`]); never serialized.
+    #[serde(skip)]
+    frozen: FrozenSlot,
+    /// Continuations recorded by replays that diverged at this step, keyed
+    /// by the leading monomials they found ([`TraceMode::RecordBranch`]);
+    /// never serialized.
+    #[serde(skip)]
+    branches: BranchSlot,
+}
+
+/// The branches recorded under one trace step: (the step's new leading
+/// monomials as a diverging replay found them, the continuation from the
+/// next step).  At most [`MAX_BRANCHES`] per step.
+#[derive(Default, Debug)]
+struct BranchSlot(std::sync::RwLock<Vec<(Vec<Vec<u32>>, std::sync::Arc<F4Trace>)>>);
+
+impl Clone for BranchSlot {
+    fn clone(&self) -> Self {
+        BranchSlot(std::sync::RwLock::new(self.0.read().unwrap().clone()))
+    }
+}
+
+const MAX_BRANCHES: usize = 8;
+
+/// `F4_FP_BRANCH=0` makes a diverged replay finish as a full run without
+/// following or recording a branch (the path before 2026-11-24).
+fn branch_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_BRANCH").as_deref() != Ok("0"))
+}
+
+static TRACE_GROWTH: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
+
+/// Whether replays may record new branches (default on).  A caller that
+/// replays one trace on many threads turns it off after a sequential
+/// warm-up, so the trace tree, and with it every run's counted cost, no
+/// longer depends on thread scheduling.
+pub fn set_trace_growth(on: bool) {
+    TRACE_GROWTH.store(on, AtomicOrdering::Relaxed);
+}
+
+/// See [`set_trace_growth`].
+pub fn trace_growth() -> bool {
+    TRACE_GROWTH.load(AtomicOrdering::Relaxed)
+}
+
+static BRANCH_FOLLOWS: AtomicU64 = AtomicU64::new(0);
+static BRANCH_RECORDS: AtomicU64 = AtomicU64::new(0);
+
+/// Diverged replays that continued on a recorded branch, and branches
+/// recorded, process-wide.
+pub fn branch_totals() -> (u64, u64) {
+    (
+        BRANCH_FOLLOWS.load(AtomicOrdering::Relaxed),
+        BRANCH_RECORDS.load(AtomicOrdering::Relaxed),
+    )
+}
+
+/// A step's frozen symbolic preprocessing, shared by the replays of one
+/// trace (they run on several threads).
+#[derive(Default, Debug)]
+struct FrozenSlot(std::sync::RwLock<Option<std::sync::Arc<FrozenStep>>>);
+
+impl Clone for FrozenSlot {
+    fn clone(&self) -> Self {
+        FrozenSlot(std::sync::RwLock::new(self.0.read().unwrap().clone()))
+    }
+}
+
+/// One replayed step's symbolic preprocessing, kept to rebuild the step's
+/// matrix on later systems without hashing a monomial.
+///
+/// Symbolic preprocessing on a replayed step depends only on the seed rows
+/// (the recorded rows, the same on every replay), the alive leading
+/// monomials (the same on every replay that reached the step: each earlier
+/// step's new leading monomials were checked) and the terms of the basis
+/// elements it reaches.  The frozen copy is taken on a system whose
+/// supports contain the current system's (term by term, a subsequence), so
+/// every monomial and reducer the current system reaches is in it, with the
+/// same column order and the same reducer (the first alive divisor of the
+/// monomial, a function of the leading monomials alone).  Walking the frozen
+/// columns from the current seed rows' terms through the frozen reducers of
+/// the columns reached gives exactly the monomials and reducer rows
+/// symbolic preprocessing would find; the columns not reached are dropped.
+/// Only the reducer rows' order can differ, and the reductions key reducers
+/// by their leading column.
+#[derive(Debug)]
+struct FrozenStep {
+    /// Every basis element the rows use, with its packed terms when frozen.
+    support: Vec<(usize, Vec<u128>)>,
+    /// The seed rows: basis element and, per frozen term, its column.
+    seeds: Vec<(usize, Vec<u32>)>,
+    /// The reducer rows: basis element, packed multiplier, column per term.
+    reducers: Vec<(usize, u128, Vec<u32>)>,
+    /// The columns, packed, in decreasing order.
+    cols: Vec<u128>,
+    /// Per column, the reducer row with that leading column (`u32::MAX`: none).
+    reducer_of: Vec<u32>,
+}
+
+/// The positions of `actual` within `frozen` when it is a subsequence of
+/// it (both in the polynomial's term order), else `None`.
+fn subsequence_positions(frozen: &[u128], actual: &[u128]) -> Option<Vec<u32>> {
+    let mut out = Vec::with_capacity(actual.len());
+    let mut j = 0;
+    for &t in actual {
+        while j < frozen.len() && frozen[j] != t {
+            j += 1;
+        }
+        if j == frozen.len() {
+            return None;
+        }
+        out.push(j as u32);
+        j += 1;
+    }
+    Some(out)
+}
+
+/// The union of two term lists of one polynomial, both in decreasing term
+/// order under `key`.
+fn merge_terms(a: &[u128], b: &[u128], key: impl Fn(u128) -> u128) -> Vec<u128> {
+    let mut out = Vec::with_capacity(a.len().max(b.len()));
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() && j < b.len() {
+        let (ka, kb) = (key(a[i]), key(b[j]));
+        if ka == kb {
+            out.push(a[i]);
+            i += 1;
+            j += 1;
+        } else if ka > kb {
+            out.push(a[i]);
+            i += 1;
+        } else {
+            out.push(b[j]);
+            j += 1;
+        }
+    }
+    out.extend_from_slice(&a[i..]);
+    out.extend_from_slice(&b[j..]);
+    out
+}
+
+/// One step's symbolic preprocessing: reducer rows, packed columns, and
+/// every row as column indices (as [`Packed::symbolic`] returns it).
+type Symbolic = (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>);
+
+impl FrozenStep {
+    fn from_symbolic(
+        terms: &[Vec<u128>],
+        seeds: &[(usize, Vec<u32>)],
+        extra: &[(usize, u128)],
+        cols: &[u128],
+        row_cols: &[Vec<u32>],
+    ) -> Self {
+        let n = seeds.len();
+        let mut reducer_of = vec![u32::MAX; cols.len()];
+        for (r, rc) in row_cols[n..].iter().enumerate() {
+            reducer_of[rc[0] as usize] = r as u32;
+        }
+        let mut used: Vec<usize> = seeds
+            .iter()
+            .map(|(i, _)| *i)
+            .chain(extra.iter().map(|&(i, _)| i))
+            .collect();
+        used.sort_unstable();
+        used.dedup();
+        FrozenStep {
+            support: used.iter().map(|&i| (i, terms[i].clone())).collect(),
+            seeds: seeds
+                .iter()
+                .zip(row_cols)
+                .map(|((i, _), rc)| (*i, rc.clone()))
+                .collect(),
+            reducers: extra
+                .iter()
+                .zip(&row_cols[n..])
+                .map(|(&(i, m), rc)| (i, m, rc.clone()))
+                .collect(),
+            cols: cols.to_vec(),
+            reducer_of,
+        }
+    }
+
+    /// The step's symbolic preprocessing for the current terms, or `None`
+    /// when some element has a term the frozen copy lacks.
+    fn rebuild(&self, terms: &[Vec<u128>]) -> Option<Symbolic> {
+        let top = self.support.last().map_or(0, |(i, _)| i + 1);
+        let mut pos: Vec<Vec<u32>> = vec![Vec::new(); top];
+        for (i, frozen) in &self.support {
+            pos[*i] = subsequence_positions(frozen, terms.get(*i)?)?;
+        }
+        let map = |i: usize, fcols: &[u32]| -> Vec<u32> {
+            pos[i].iter().map(|&k| fcols[k as usize]).collect()
+        };
+        let nc = self.cols.len();
+        let mut reached = vec![false; nc];
+        let mut done = vec![false; nc];
+        let mut stack: Vec<u32> = Vec::new();
+        let mut rows: Vec<Vec<u32>> = Vec::with_capacity(self.seeds.len() + self.reducers.len());
+        for (i, fc) in &self.seeds {
+            let rc = map(*i, fc);
+            done[rc[0] as usize] = true;
+            for &c in &rc {
+                if !reached[c as usize] {
+                    reached[c as usize] = true;
+                    stack.push(c);
+                }
+            }
+            rows.push(rc);
+        }
+        let mut used: Vec<u32> = Vec::new();
+        while let Some(c) = stack.pop() {
+            let c = c as usize;
+            if done[c] {
+                continue;
+            }
+            done[c] = true;
+            let r = self.reducer_of[c];
+            if r == u32::MAX {
+                continue;
+            }
+            let (i, _, fc) = &self.reducers[r as usize];
+            let rc = map(*i, fc);
+            for &x in &rc {
+                if !reached[x as usize] {
+                    reached[x as usize] = true;
+                    stack.push(x);
+                }
+            }
+            used.push(r);
+            rows.push(rc);
+        }
+        let mut new_index = vec![u32::MAX; nc];
+        let mut cols = Vec::new();
+        for c in 0..nc {
+            if reached[c] {
+                new_index[c] = cols.len() as u32;
+                cols.push(self.cols[c]);
+            }
+        }
+        for row in &mut rows {
+            for x in row.iter_mut() {
+                *x = new_index[*x as usize];
+            }
+        }
+        let extra = used
+            .iter()
+            .map(|&r| {
+                let (i, m, _) = &self.reducers[r as usize];
+                (*i, *m)
+            })
+            .collect();
+        Some((extra, cols, rows))
+    }
+}
+
+static FROZEN_HITS: AtomicU64 = AtomicU64::new(0);
+
+/// Replayed steps that rebuilt their matrix from frozen preprocessing.
+pub fn frozen_steps_total() -> u64 {
+    FROZEN_HITS.load(AtomicOrdering::Relaxed)
+}
+
+/// `F4_FP_FREEZE=0` makes every replay run its steps' symbolic
+/// preprocessing (the path before 2026-11-21), a same-binary control.
+fn freeze_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_FREEZE").as_deref() != Ok("0"))
 }
 
 /// The trace of one run (Joux–Vitse's "F4 remake": the useful rows of
@@ -1299,10 +1800,14 @@ pub struct F4Trace {
 /// for every pivot row which input rows it is a combination of.  Returns
 /// `(pivot column, contributing input rows)` per pivot.  Used once per `p`
 /// when a trace is recorded; its cost is not part of the replays.
-fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize>)> {
+fn tracked_rref_contributors(
+    rows: &[Vec<u64>],
+    p: u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<(usize, Vec<usize>)>> {
     let n = rows.len();
     if n == 0 {
-        return Vec::new();
+        return Some(Vec::new());
     }
     let ncols = rows[0].len();
     let words = n.div_ceil(64);
@@ -1317,6 +1822,9 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
     let mut piv: Vec<(usize, usize)> = Vec::new(); // (row, col)
     let mut r = 0usize;
     for c in 0..ncols {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
         if r >= n {
             break;
         }
@@ -1329,15 +1837,23 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
         for v in m[r].iter_mut() {
             *v = ((*v as u128 * inv as u128) % p as u128) as u64;
         }
+        // Charged to the recording run like any other row operation (since
+        // 2026-11-21; before, the tracked elimination a recording adds was
+        // not counted at all).
+        count_ops(ncols);
         let pivot_row = m[r].clone();
         let pivot_who = who[r].clone();
         for i in 0..n {
+            if deadline.is_some_and(|d| Instant::now() > d) {
+                return None;
+            }
             if i != r && m[i][c] != 0 {
                 let f = m[i][c];
                 let neg = p - f;
                 for (x, &y) in m[i].iter_mut().zip(&pivot_row) {
                     *x = ((*x as u128 + neg as u128 * y as u128) % p as u128) as u64;
                 }
+                count_ops(ncols);
                 for (a, &b) in who[i].iter_mut().zip(&pivot_who) {
                     *a |= b;
                 }
@@ -1346,14 +1862,16 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
         piv.push((r, c));
         r += 1;
     }
-    piv.into_iter()
-        .map(|(row, col)| {
-            let contributors: Vec<usize> = (0..n)
-                .filter(|&i| who[row][i / 64] >> (i % 64) & 1 == 1)
-                .collect();
-            (col, contributors)
-        })
-        .collect()
+    Some(
+        piv.into_iter()
+            .map(|(row, col)| {
+                let contributors: Vec<usize> = (0..n)
+                    .filter(|&i| who[row][i / 64] >> (i % 64) & 1 == 1)
+                    .collect();
+                (col, contributors)
+            })
+            .collect(),
+    )
 }
 
 fn inv_mod_u64(a: u64, p: u64) -> u64 {
@@ -1374,20 +1892,104 @@ fn inv_mod_u64(a: u64, p: u64) -> u64 {
 enum TraceMode<'a> {
     Off,
     Record(&'a mut F4Trace),
-    Replay(&'a F4Trace),
+    Replay(Cursor<'a>),
+    /// A replay that diverged at a step with no branch for what it found,
+    /// recording its continuation as one ([`BranchRec`]).
+    RecordBranch(Box<BranchRec<'a>>),
+}
+
+/// A trace node: the trace a replay started from, or a branch of it.
+#[derive(Clone)]
+enum Node<'a> {
+    Root(&'a F4Trace),
+    Branch(std::sync::Arc<F4Trace>),
+}
+
+impl Node<'_> {
+    fn get(&self) -> &F4Trace {
+        match self {
+            Node::Root(t) => t,
+            Node::Branch(t) => t,
+        }
+    }
+}
+
+/// Where a replay is: the node it follows, whose step `i` is the run's
+/// step `base + i`.
+#[derive(Clone)]
+struct Cursor<'a> {
+    node: Node<'a>,
+    base: usize,
+}
+
+/// A branch being recorded: the continuation from the run's step `base`,
+/// to be stored under step `at` of `parent` with the key `key` when the run
+/// ends cleanly.
+struct BranchRec<'a> {
+    trace: F4Trace,
+    parent: Node<'a>,
+    at: usize,
+    key: Vec<Vec<u32>>,
+}
+
+impl BranchRec<'_> {
+    fn commit(self) {
+        let mut w = self.parent.get().steps[self.at].branches.0.write().unwrap();
+        if w.len() < MAX_BRANCHES && !w.iter().any(|(k, _)| *k == self.key) {
+            w.push((self.key, std::sync::Arc::new(self.trace)));
+            BRANCH_RECORDS.fetch_add(1, AtomicOrdering::Relaxed);
+        }
+    }
+}
+
+impl TraceMode<'_> {
+    /// The same mode for one more run, borrowing the trace again.
+    fn reborrow(&mut self) -> TraceMode<'_> {
+        match self {
+            TraceMode::Off | TraceMode::RecordBranch(_) => TraceMode::Off,
+            TraceMode::Record(t) => TraceMode::Record(t),
+            TraceMode::Replay(c) => TraceMode::Replay(c.clone()),
+        }
+    }
+
+    /// The trace being recorded (a whole run or a branch).
+    fn rec_mut(&mut self) -> Option<&mut F4Trace> {
+        match self {
+            TraceMode::Record(t) => Some(t),
+            TraceMode::RecordBranch(b) => Some(&mut b.trace),
+            _ => None,
+        }
+    }
+
+    fn recording(&self) -> bool {
+        matches!(self, TraceMode::Record(_) | TraceMode::RecordBranch(_))
+    }
+}
+
+/// One F4 run with the run's stop rule: through [`f4_hilbert_guarded`] when
+/// `opts.stop_hilbert` is set, else [`f4_with_arithmetic`].  Recording and
+/// replaying go through here, so a traced run keeps the Hilbert rule (before
+/// 2026-11-21 they called the engine directly and silently ran without it).
+fn f4_dispatch(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    trace: TraceMode,
+) -> F4Report {
+    if opts.resource_limits.is_some() {
+        return f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), trace);
+    }
+    match opts.stop_hilbert {
+        Some(chunk) => f4_hilbert_guarded(input, n_vars, p, opts, chunk, trace),
+        None => f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), trace),
+    }
 }
 
 /// [`f4`] recording the trace of the run.
 pub fn f4_record(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> (F4Report, F4Trace) {
     let mut trace = F4Trace::default();
-    let r = f4_with_arithmetic(
-        input,
-        n_vars,
-        p,
-        opts,
-        arithmetic_mode(),
-        TraceMode::Record(&mut trace),
-    );
+    let r = f4_dispatch(input, n_vars, p, opts, TraceMode::Record(&mut trace));
     (r, trace)
 }
 
@@ -1401,13 +2003,15 @@ pub fn f4_replay(
     opts: &F4Options,
     trace: &F4Trace,
 ) -> F4Report {
-    f4_with_arithmetic(
+    f4_dispatch(
         input,
         n_vars,
         p,
         opts,
-        arithmetic_mode(),
-        TraceMode::Replay(trace),
+        TraceMode::Replay(Cursor {
+            node: Node::Root(trace),
+            base: 0,
+        }),
     )
 }
 
@@ -1512,6 +2116,10 @@ pub struct F4Report {
     pub max_cols: usize,
     pub ms: f64,
     pub timed_out: bool,
+    /// Allocation admission stopped this call. The basis is intentionally
+    /// empty on this path; it is not an emptiness or consistency certificate.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resource_limit: Option<F4ResourceLimit>,
     /// Pairs dropped because their lcm degree exceeded the bound: `> 0`
     /// means the basis may be a strict truncation.
     pub pairs_above_bound: usize,
@@ -1532,35 +2140,28 @@ pub struct F4Report {
     /// Milliseconds of the run (inside `ms`) that a resumed checkpoint had
     /// already spent; 0 when the run did not resume.
     pub resumed_ms: f64,
-    /// Degree-fall diagnostic, present only when
-    /// [`F4Options::record_degree_falls`] was set. `first_fall_degree` is the
-    /// smallest working degree at which the final basis has **fewer** standard
-    /// monomials than the complete-intersection (semi-regular) expectation — a
-    /// degree fall; `last_fall_degree` the largest; `degree_of_regularity_observed`
-    /// the first degree at which the quotient vanishes (no standard monomials
-    /// remain). `degree_falls` is the per-degree Hilbert deviation. All
-    /// diagnostic: never priced into `S`, outside the replay comparison, never
-    /// a stopping rule. Empty/`None` when the diagnostic was not requested.
+    /// Post-hoc Hilbert diagnostics, present only when requested. These scan
+    /// the final computed leading ideal, including a degree-truncated basis.
+    /// Deviations and staircase extinction are not formal fall-degree or
+    /// regularity measurements. Empty/None when not requested or interrupted.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub first_fall_degree: Option<u32>,
+    pub first_hilbert_deviation_degree: Option<u32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub last_fall_degree: Option<u32>,
+    pub last_hilbert_deviation_degree: Option<u32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub degree_of_regularity_observed: Option<u32>,
+    pub staircase_extinction_degree: Option<u32>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub degree_falls: Vec<DegreeFall>,
+    pub hilbert_deviations: Vec<HilbertDeviation>,
 }
 
-/// One working degree of the post-hoc degree-fall diagnostic: the
-/// complete-intersection (semi-regular) expectation, the realized count of
-/// standard monomials of the final basis, and whether the realized count is
-/// below the expectation (a degree fall at this degree).
+/// One degree of the final leading-monomial staircase against the semi-regular
+/// expectation. A deviation does not certify a degree fall in the input system.
 #[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
-pub struct DegreeFall {
+pub struct HilbertDeviation {
     pub degree: u32,
     pub hilbert_expected: usize,
     pub hilbert_realized: usize,
-    pub is_fall: bool,
+    pub is_below_expectation: bool,
 }
 
 /// What [`F4Options::stopping_by_hilbert`] did.
@@ -1630,13 +2231,58 @@ fn rref_blocked<T: Copy + Default + PartialEq + Send>(
 /// monomials whose degree stays below 128 is the sum of their packings,
 /// and the top bit of every field is free to guard divisibility tests.
 fn pack(e: &[u32]) -> u128 {
-    e.iter()
-        .enumerate()
-        .fold(0u128, |acc, (i, &x)| acc | (x as u128) << (8 * i))
+    // byte per field (exponents are below 128 on the packed path, so the
+    // truncation is exact); one load instead of a shift-or per field
+    let mut b = [0u8; 16];
+    for (d, &x) in b.iter_mut().zip(e) {
+        *d = x as u8;
+    }
+    u128::from_le_bytes(b)
 }
 
 fn unpack(x: u128, n: usize) -> Vec<u32> {
-    (0..n).map(|i| ((x >> (8 * i)) & 0xff) as u32).collect()
+    x.to_le_bytes()[..n].iter().map(|&b| b as u32).collect()
+}
+
+/// The position of the first of `lms` (packed leading monomials, in basis
+/// order) that divides `m`, as `lms.iter().position(|&a| divides(a, m))`
+/// under the guard `guard`.  With at most 8 variables every field lies in
+/// the low word, so the test runs on `u64`: exponents below 128 cannot
+/// borrow across fields, and the high words are zero.  Same position, so the
+/// same reducer, rows and probe count.
+#[inline]
+fn first_alive_divisor(lms: &[u128], guard: u128, m: u128) -> Option<usize> {
+    if guard >> 64 == 0 {
+        let (g, mg) = (guard as u64, (m | guard) as u64);
+        lms.iter().position(|&a| mg.wrapping_sub(a as u64) & g == g)
+    } else {
+        lms.iter().position(|&a| ((m | guard) - a) & guard == guard)
+    }
+}
+
+/// The columns of one F4 matrix, in decreasing monomial order: packed when
+/// the run packs its monomials (unpacked only for the terms a step emits),
+/// else one exponent vector each.
+enum Cols {
+    Packed(Vec<u128>, usize),
+    Plain(Vec<Vec<u32>>),
+}
+
+impl Cols {
+    fn len(&self) -> usize {
+        match self {
+            Cols::Packed(c, _) => c.len(),
+            Cols::Plain(c) => c.len(),
+        }
+    }
+
+    /// Column `j`'s monomial as an exponent vector.
+    fn get(&self, j: usize) -> Vec<u32> {
+        match self {
+            Cols::Packed(c, n) => unpack(c[j], *n),
+            Cols::Plain(c) => c[j].clone(),
+        }
+    }
 }
 
 /// Whether large steps run symbolic preprocessing on several threads
@@ -1701,6 +2347,75 @@ type PkBuild = std::hash::BuildHasherDefault<PackedHasher>;
 type PkMap<K, V> = std::collections::HashMap<K, V, PkBuild>;
 type PkSet<K> = std::collections::HashSet<K, PkBuild>;
 
+/// Packed monomial -> id, open addressing with linear probing, for the
+/// interning of [`Packed::symbolic`]: the tables are small (a step's
+/// columns) and probed once per row term, so one multiply-shift hash and an
+/// inline probe replace a general map's entry API.  `u128::MAX` marks an
+/// empty slot: it has every guard bit set, which no packed monomial has.
+/// Ids are whatever the caller assigns, so the table does not change them.
+struct MonoTable {
+    keys: Vec<u128>,
+    vals: Vec<u32>,
+    len: usize,
+    shift: u32,
+}
+
+impl MonoTable {
+    const EMPTY: u128 = u128::MAX;
+
+    fn with_capacity(n: usize) -> Self {
+        // at most half full
+        let cap = (2 * n.max(8)).next_power_of_two();
+        Self {
+            keys: vec![Self::EMPTY; cap],
+            vals: vec![0; cap],
+            len: 0,
+            shift: 64 - cap.trailing_zeros(),
+        }
+    }
+
+    #[inline]
+    fn slot(&self, x: u128) -> usize {
+        let h = (x as u64) ^ ((x >> 64) as u64).rotate_left(29);
+        (h.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> self.shift) as usize
+    }
+
+    /// The id stored for `x`, or `next` after storing it.
+    #[inline]
+    fn get_or_insert(&mut self, x: u128, next: u32) -> u32 {
+        let mask = self.keys.len() - 1;
+        let mut i = self.slot(x);
+        loop {
+            let k = self.keys[i];
+            if k == x {
+                return self.vals[i];
+            }
+            if k == Self::EMPTY {
+                break;
+            }
+            i = (i + 1) & mask;
+        }
+        if 2 * (self.len + 1) > self.keys.len() {
+            self.grow();
+            return self.get_or_insert(x, next);
+        }
+        self.keys[i] = x;
+        self.vals[i] = next;
+        self.len += 1;
+        next
+    }
+
+    fn grow(&mut self) {
+        let mut t = Self::with_capacity(self.keys.len());
+        for (&k, &v) in self.keys.iter().zip(&self.vals) {
+            if k != Self::EMPTY {
+                t.get_or_insert(k, v);
+            }
+        }
+        *self = t;
+    }
+}
+
 /// Packed monomials of the basis for grevlex runs with at most 15
 /// variables and every degree below 128: products are additions, a
 /// divisibility test is one guarded subtraction, and hashing and sorting
@@ -1725,6 +2440,13 @@ impl Packed {
         }
     }
 
+    /// Pack one more basis element.
+    fn push(&mut self, f: &Poly) {
+        let t: Vec<u128> = f.iter().map(|(e, _)| pack(e)).collect();
+        self.lms.push(t[0]);
+        self.terms.push(t);
+    }
+
     /// Pack the basis elements added since the last call.
     fn extend(&mut self, basis: &[Poly]) {
         while self.terms.len() < basis.len() {
@@ -1735,13 +2457,6 @@ impl Packed {
             self.lms.push(t[0]);
             self.terms.push(t);
         }
-    }
-
-    /// Does `a` divide `b`?  Each field of `b | guard` minus `a`'s keeps
-    /// its guard bit exactly when it does not borrow.
-    #[inline]
-    fn divides(&self, a: u128, b: u128) -> bool {
-        ((b | self.guard) - a) & self.guard == self.guard
     }
 
     /// A key ordered as `cmp_monomial(·, ·, Grevlex)`: the degree above
@@ -1775,6 +2490,7 @@ impl Packed {
     ) -> (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>) {
         const UNKNOWN: u32 = u32::MAX;
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        let alive_lms: Vec<u128> = alive_idx.iter().map(|&i| self.lms[i]).collect();
         let mut ids: PkMap<u128, u32> = PkMap::default();
         let mut monos: Vec<u128> = Vec::new();
         let mut is_lead: Vec<bool> = Vec::new();
@@ -1877,9 +2593,7 @@ impl Packed {
                     return None;
                 }
                 let mono = monos[id];
-                let k = alive_idx
-                    .iter()
-                    .position(|&i| self.divides(self.lms[i], mono));
+                let k = first_alive_divisor(&alive_lms, self.guard, mono);
                 count_native(k.map_or(alive_idx.len(), |k| k + 1) as u64);
                 k.map(|k| (alive_idx[k], mono - self.lms[alive_idx[k]]))
             };
@@ -1929,35 +2643,46 @@ impl Packed {
         &self,
         seeds: &[(usize, Vec<u32>)],
         alive: &[bool],
+        count: bool,
     ) -> (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>) {
         struct Interned {
-            ids: PkMap<u128, u32>,
+            ids: MonoTable,
             monos: Vec<u128>,
             done: Vec<bool>,
             queue: Vec<u32>,
         }
         impl Interned {
+            #[inline]
             fn id(&mut self, x: u128) -> u32 {
-                match self.ids.entry(x) {
-                    std::collections::hash_map::Entry::Occupied(o) => *o.get(),
-                    std::collections::hash_map::Entry::Vacant(v) => {
-                        let id = self.monos.len() as u32;
-                        v.insert(id);
-                        self.monos.push(x);
-                        self.done.push(false);
-                        self.queue.push(id);
-                        id
-                    }
+                let next = self.monos.len() as u32;
+                let id = self.ids.get_or_insert(x, next);
+                if id == next {
+                    self.monos.push(x);
+                    self.done.push(false);
+                    self.queue.push(id);
                 }
+                id
             }
         }
         let seeds: Vec<(usize, u128)> = seeds.iter().map(|(i, m)| (*i, pack(m))).collect();
         let mut seen: PkSet<(usize, u128)> = seeds.iter().copied().collect();
+        // The table starts at a typical step's column count and doubles as
+        // it fills.  (Sizing it from the seed rows' total terms, an upper
+        // bound, cost more in clearing than the probes saved: the rows share
+        // most of their monomials.)  The columns and rows are the same.
+        let hint = 256;
         let mut t = Interned {
-            ids: PkMap::default(),
-            monos: Vec::new(),
-            done: Vec::new(),
-            queue: Vec::new(),
+            ids: MonoTable::with_capacity(hint),
+            monos: Vec::with_capacity(hint),
+            done: Vec::with_capacity(hint),
+            queue: Vec::with_capacity(hint),
+        };
+        // `count`: charge the probes to the native-operation counter (the F4
+        // steps do; the final interreduction never did and still does not)
+        let count_native = |n: u64| {
+            if count {
+                count_native(n)
+            }
         };
         let mut rows: Vec<Vec<u32>> = Vec::with_capacity(seeds.len());
         for &(idx, m) in &seeds {
@@ -1967,6 +2692,8 @@ impl Packed {
             rows.push(row);
         }
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        // the alive leading monomials contiguous, for the reducer scan
+        let alive_lms: Vec<u128> = alive_idx.iter().map(|&i| self.lms[i]).collect();
         let mut extra: Vec<(usize, u128)> = Vec::new();
         while let Some(id) = t.queue.pop() {
             if t.done[id as usize] {
@@ -1974,9 +2701,7 @@ impl Packed {
             }
             t.done[id as usize] = true;
             let mono = t.monos[id as usize];
-            let found = alive_idx
-                .iter()
-                .position(|&i| self.divides(self.lms[i], mono));
+            let found = first_alive_divisor(&alive_lms, self.guard, mono);
             count_native(found.map_or(alive_idx.len(), |k| k + 1) as u64);
             if let Some(idx) = found.map(|k| alive_idx[k]) {
                 let m = mono - self.lms[idx];
@@ -2082,7 +2807,9 @@ fn gm_update<K: PartialEq>(
     div: impl Fn(&K, &K) -> bool,
     lcmf: impl Fn(&K, &K) -> K,
     coprime: impl Fn(&K, &K) -> bool,
-) -> Vec<(usize, K)> {
+    limits: Option<&F4ResourceLimits>,
+    deadline: Option<Instant>,
+) -> Result<Vec<(usize, K)>, F4Stop> {
     // bitop/v1: criterion B tests every held pair (a divisibility and two
     // lcm compares, a packed monomial being two words each), every alive
     // element gets a divisibility, coprimality and lcm, and criteria M/F
@@ -2106,9 +2833,23 @@ fn gm_update<K: PartialEq>(
         pairs.retain(|pr| keep(pr));
         above.retain(|pr| keep(pr));
     }
+    if let Some(limits) = limits {
+        limits.check(
+            "critical_pairs",
+            "pairs",
+            pairs
+                .len()
+                .checked_add(above.len())
+                .and_then(|n| n.checked_add(alive.iter().take(k).filter(|&&a| a).count())),
+            limits.max_pairs,
+        )?;
+    }
     // the new pairs (h, g) with every alive g
     let mut cand: Vec<(usize, K, bool)> = Vec::new();
     for i in 0..k {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return Err(F4Stop::Deadline);
+        }
         if !alive[i] {
             continue;
         }
@@ -2131,6 +2872,9 @@ fn gm_update<K: PartialEq>(
         // the last one stays.  A coprime pair is never dropped here (it may
         // drop others) and never kept below.
         for a in 0..cand.len() {
+            if deadline.is_some_and(|d| Instant::now() > d) {
+                return Err(F4Stop::Deadline);
+            }
             if cand[a].2 {
                 continue;
             }
@@ -2139,11 +2883,12 @@ fn gm_update<K: PartialEq>(
             }
         }
     }
-    cand.into_iter()
+    Ok(cand
+        .into_iter()
         .zip(kept)
         .filter(|((_, _, cp), keep)| !cp && *keep)
         .map(|((i, l, _), _)| (i, l))
-        .collect()
+        .collect())
 }
 
 fn lcm(a: &[u32], b: &[u32]) -> Vec<u32> {
@@ -2714,6 +3459,9 @@ fn rref32_deferred(
     fp: Barrett,
     deadline: Option<Instant>,
 ) -> Option<Vec<usize>> {
+    if let Some(every) = narrow_acc_interval(fp.p) {
+        return rref32_deferred_n32(rows, fp32, fp, deadline, every);
+    }
     let _timer = MemTimer::new(1);
     let simd = lazy_simd_kind();
     let parallel = deferred_parallel();
@@ -2807,6 +3555,243 @@ fn rref32_deferred(
     Some(pivots)
 }
 
+/// For small primes the deferred elimination keeps its accumulators in
+/// 32-bit lanes: `Some(k)` when `(p - 1) + k (p - 1)^2 < 2^32` with
+/// `k >= 256`, i.e. `p <= 4097`, normalising every `k` updates (none at all
+/// on rows shorter than that).  Each value stays exact over the integers,
+/// so the reduced echelon form, and every counted operation, is the one the
+/// 64-bit accumulators give.  `F4_FP_NARROW_ACC=0` keeps the 64-bit path
+/// (also kept under `F4_FP_MEM=1`, whose fused kernel is 64-bit).
+fn narrow_acc_interval(p: u64) -> Option<usize> {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    let on = *ON.get_or_init(|| std::env::var("F4_FP_NARROW_ACC").as_deref() != Ok("0"));
+    if !on || mem_site(0) {
+        return None;
+    }
+    narrow_acc_interval_for(p)
+}
+
+/// The interval of [`narrow_acc_interval`] for `p`, ignoring the toggles.
+fn narrow_acc_interval_for(p: u64) -> Option<usize> {
+    if !(2..=1 << 16).contains(&p) {
+        return None;
+    }
+    let q = (p - 1) * (p - 1);
+    let k = (u64::from(u32::MAX) - (p - 1)) / q.max(1);
+    (k >= 256).then_some(k as usize)
+}
+
+#[inline(always)]
+fn add_lazy32_scalar(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    for (x, &y) in acc[from..].iter_mut().zip(&pivot[from..]) {
+        *x += factor * y;
+    }
+}
+
+/// Eight 32-bit products accumulated in 32-bit lanes; the caller's
+/// normalisation interval keeps every lane below 2^32.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn add_lazy32_avx2(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    use std::arch::x86_64::{
+        __m256i, _mm256_add_epi32, _mm256_loadu_si256, _mm256_mullo_epi32, _mm256_set1_epi32,
+        _mm256_storeu_si256,
+    };
+    let (acc, pivot) = (&mut acc[from..], &pivot[from..]);
+    let multiplier = _mm256_set1_epi32(factor as i32);
+    let mut i = 0;
+    while i + 8 <= acc.len() {
+        // SAFETY: the bounds cover eight entries of both slices; the loads
+        // and the store accept unaligned pointers.
+        let values = unsafe { _mm256_loadu_si256(pivot.as_ptr().add(i) as *const __m256i) };
+        let current = unsafe { _mm256_loadu_si256(acc.as_ptr().add(i) as *const __m256i) };
+        let updated = _mm256_add_epi32(current, _mm256_mullo_epi32(values, multiplier));
+        unsafe { _mm256_storeu_si256(acc.as_mut_ptr().add(i) as *mut __m256i, updated) };
+        i += 8;
+    }
+    for (x, &y) in acc[i..].iter_mut().zip(&pivot[i..]) {
+        *x += factor * y;
+    }
+}
+
+/// Sixteen 32-bit products accumulated in 32-bit lanes.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn add_lazy32_avx512(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    use std::arch::x86_64::{
+        __m512i, _mm512_add_epi32, _mm512_loadu_si512, _mm512_mullo_epi32, _mm512_set1_epi32,
+        _mm512_storeu_si512,
+    };
+    let (acc, pivot) = (&mut acc[from..], &pivot[from..]);
+    let multiplier = _mm512_set1_epi32(factor as i32);
+    let mut i = 0;
+    while i + 16 <= acc.len() {
+        // SAFETY: as in `add_lazy32_avx2`, for sixteen entries.
+        let values = unsafe { _mm512_loadu_si512(pivot.as_ptr().add(i) as *const __m512i) };
+        let current = unsafe { _mm512_loadu_si512(acc.as_ptr().add(i) as *const __m512i) };
+        let updated = _mm512_add_epi32(current, _mm512_mullo_epi32(values, multiplier));
+        unsafe { _mm512_storeu_si512(acc.as_mut_ptr().add(i) as *mut __m512i, updated) };
+        i += 16;
+    }
+    for (x, &y) in acc[i..].iter_mut().zip(&pivot[i..]) {
+        *x += factor * y;
+    }
+}
+
+/// [`add_lazy`] in 32-bit lanes, counted the same way.
+#[inline]
+fn add_lazy32(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32, simd: u8) {
+    debug_assert_eq!(acc.len(), pivot.len());
+    #[cfg(target_arch = "x86_64")]
+    if simd == 0 {
+        add_lazy32_scalar(acc, pivot, from, factor);
+    } else if simd == 2 {
+        // SAFETY: `lazy_simd_kind` verified AVX-512F and AVX2.
+        unsafe { add_lazy32_avx512(acc, pivot, from, factor) };
+    } else {
+        // SAFETY: `lazy_simd_kind` verified AVX2 before this call.
+        unsafe { add_lazy32_avx2(acc, pivot, from, factor) };
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = simd;
+        add_lazy32_scalar(acc, pivot, from, factor);
+    }
+    count_ops(acc.len() - from);
+}
+
+/// [`reduce_lazy_by`] in 32-bit lanes, normalising every `every` updates.
+#[inline]
+fn reduce_lazy_by32(
+    acc: &mut [u32],
+    known: &[(usize, Vec<u32>)],
+    fp32: Barrett32,
+    simd: u8,
+    pending: &mut usize,
+    every: usize,
+) {
+    for (c, pivot) in known {
+        let f = fp32.reduce(acc[*c]);
+        if f != 0 {
+            add_lazy32(acc, pivot, *c, fp32.p - f, simd);
+            *pending += 1;
+            if *pending == every {
+                for x in acc.iter_mut() {
+                    *x = fp32.reduce(*x);
+                }
+                *pending = 0;
+            }
+        }
+    }
+}
+
+/// [`rref32_deferred`] with 32-bit accumulators ([`narrow_acc_interval`]):
+/// the same chunks, order, pivots and counted operations; no widening of
+/// the rows and no 64-bit reduction when they are stored.
+fn rref32_deferred_n32(
+    rows: &mut Vec<Vec<u32>>,
+    fp32: Barrett32,
+    fp: Barrett,
+    deadline: Option<Instant>,
+    every: usize,
+) -> Option<Vec<usize>> {
+    let _timer = MemTimer::new(1);
+    let simd = lazy_simd_kind();
+    let parallel = deferred_parallel();
+    let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
+    let sources = std::mem::take(rows);
+    let chunk_rows = if parallel { DEFERRED_CHUNK } else { 1 };
+    let _def_ns = PpNs(PP_DEF_NS, Instant::now());
+    pp_add(PP_DEF_ROWS, sources.len() as u64);
+    for chunk in sources.chunks(chunk_rows) {
+        pp_add(PP_DEF_CHUNKS, 1);
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let n_cols = chunk[0].len();
+        let reduce_one = |source: &Vec<u32>| -> (Vec<u32>, usize) {
+            let mut acc = source.clone();
+            let mut pending = 0usize;
+            reduce_lazy_by32(&mut acc, &known, fp32, simd, &mut pending, every);
+            (acc, pending)
+        };
+        let o0 = pp_ops();
+        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
+        let mut reduced: Vec<(Vec<u32>, usize)> = if spread {
+            chunk.par_iter().map(reduce_one).collect()
+        } else {
+            chunk.iter().map(reduce_one).collect()
+        };
+        let o1 = pp_ops();
+        pp_add(
+            if spread {
+                PP_DEF_CHUNK_PAR
+            } else {
+                PP_DEF_CHUNK_SER
+            },
+            o1 - o0,
+        );
+        let t_store = Instant::now();
+        let known_before = known.len();
+        for (acc, pending) in reduced.iter_mut() {
+            if known.len() > known_before {
+                pp_add(PP_DEF_STORE_CHECKS, known.len() as u64);
+                reduce_lazy_by32(acc, &known, fp32, simd, pending, every);
+            }
+            let mut row = std::mem::take(acc);
+            for x in row.iter_mut() {
+                *x = fp32.reduce(*x);
+            }
+            let Some(c) = row.iter().position(|&v| v != 0) else {
+                continue;
+            };
+            let inv = invmod(u64::from(row[c]), fp.p) as u32;
+            for x in &mut row[c..] {
+                *x = fp32.reduce(*x * inv);
+            }
+            count_ops(row.len() - c);
+            count_norm(row.len() - c);
+            let at = known.partition_point(|(pc, _)| *pc < c);
+            known.insert(at, (c, row));
+        }
+        pp_add(PP_DEF_STORE, pp_ops() - o1);
+        pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
+    }
+    pp_add(PP_DEF_RANK, known.len() as u64);
+    if deadline.is_some_and(|d| Instant::now() > d) {
+        return None;
+    }
+    let n_cols = known.first().map_or(0, |(_, r)| r.len());
+    let back = |i: usize| -> Vec<u32> {
+        let (_, row) = &known[i];
+        let mut acc = row.clone();
+        let mut pending = 0usize;
+        reduce_lazy_by32(&mut acc, &known[i + 1..], fp32, simd, &mut pending, every);
+        for x in acc.iter_mut() {
+            *x = fp32.reduce(*x);
+        }
+        acc
+    };
+    let o0 = pp_ops();
+    let spread = parallel && known.len() * n_cols > PAR_WORK;
+    let reduced: Vec<Vec<u32>> = if spread {
+        (0..known.len()).into_par_iter().map(back).collect()
+    } else {
+        (0..known.len()).map(back).collect()
+    };
+    pp_add(
+        if spread {
+            PP_DEF_BACK_PAR
+        } else {
+            PP_DEF_BACK_SER
+        },
+        pp_ops() - o0,
+    );
+    let pivots = known.iter().map(|(c, _)| *c).collect();
+    *rows = reduced;
+    Some(pivots)
+}
+
 /// Most entries of `B'` (reducers × free columns, 4 bytes each) the
 /// Faugère–Lachartre form is allowed; above it the step falls back to
 /// reducing each pair row through the reducer cascade.
@@ -2817,6 +3802,18 @@ const FL_BLOCK: usize = 64;
 
 /// Columns a step needs before the Faugère–Lachartre form is used.
 const FL_MIN_COLS: usize = 256;
+
+/// [`FL_MIN_COLS`], or `F4_FP_FL_MIN_COLS` when set: a measurement knob for
+/// the size at which the Faugère–Lachartre form replaces the cascade.
+fn fl_min_cols() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *C.get_or_init(|| {
+        std::env::var("F4_FP_FL_MIN_COLS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(FL_MIN_COLS)
+    })
+}
 
 /// `F4_FP_FL=0` keeps the per-pair-row reducer cascade; a same-binary
 /// control for the Faugère–Lachartre form.
@@ -4308,11 +5305,7 @@ pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
         field_multiplications: 0,
         elapsed_ms: 0.0,
     });
-    let report = if let Some(chunk) = opts.stop_hilbert {
-        f4_hilbert_guarded(input, n_vars, p, opts, chunk)
-    } else {
-        f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
-    };
+    let report = f4_dispatch(input, n_vars, p, opts, TraceMode::Off);
     mem_stats_report(report.ms);
     notify_progress(F4Progress {
         event: "complete",
@@ -4352,25 +5345,44 @@ pub fn complete_intersection_hilbert(degrees: &[u32]) -> Vec<usize> {
 /// it agrees with [`complete_intersection_hilbert`], and for an over-determined
 /// one it uses the right `(1 - t)^{n_vars}` denominator and truncates, where
 /// the complete-intersection form would not.
-pub fn semi_regular_hilbert(degrees: &[u32], n_vars: usize) -> Vec<usize> {
-    let sum_d: usize = degrees.iter().map(|&d| d as usize).sum();
-    let max_deg = sum_d + n_vars + 2;
+pub fn semi_regular_hilbert(degrees: &[u32], n_vars: usize) -> Option<Vec<usize>> {
+    semi_regular_hilbert_before(degrees, n_vars, None)
+}
+
+fn semi_regular_hilbert_before(
+    degrees: &[u32],
+    n_vars: usize,
+    deadline: Option<Instant>,
+) -> Option<Vec<usize>> {
+    let sum_d = degrees
+        .iter()
+        .try_fold(0usize, |sum, &d| sum.checked_add(d as usize))?;
+    let max_deg = sum_d.checked_add(n_vars)?.checked_add(2)?;
     // 1 / (1 - t)^{n_vars} up to max_deg: n_vars prefix-sum passes from [1,0,0,…].
-    let mut s: Vec<i128> = vec![0; max_deg + 1];
+    let count = max_deg.checked_add(1)?;
+    let mut s = Vec::<i128>::new();
+    s.try_reserve_exact(count).ok()?;
+    s.resize(count, 0);
     s[0] = 1;
     for _ in 0..n_vars {
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return None;
+        }
         for k in 1..=max_deg {
-            s[k] += s[k - 1];
+            s[k] = s[k].checked_add(s[k - 1])?;
         }
     }
     // multiply by prod_i (1 - t^{d_i}).
     for &d in degrees {
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return None;
+        }
         let d = d as usize;
         if d == 0 || d > max_deg {
             continue;
         }
         for k in (d..=max_deg).rev() {
-            s[k] -= s[k - d];
+            s[k] = s[k].checked_sub(s[k - d])?;
         }
     }
     // Coefficients up to (not including) the first non-positive one.
@@ -4379,29 +5391,70 @@ pub fn semi_regular_hilbert(degrees: &[u32], n_vars: usize) -> Vec<usize> {
         if c <= 0 {
             break;
         }
-        out.push(c as usize);
+        out.push(usize::try_from(c).ok()?);
     }
-    out
+    Some(out)
 }
 
-/// Post-hoc degree-fall diagnostic (gated by [`F4Options::record_degree_falls`]).
-///
-/// Compares the realized standard-monomial count of the final leading ideal
-/// (`uncovered_in_degree` of the computed basis) against the
-/// complete-intersection — i.e. semi-regular — Hilbert function of the input
-/// generator degrees (`complete_intersection_hilbert`, the same expectation the
-/// Hilbert stop uses). A **degree fall** at degree `d` is a degree where the
-/// realized count is strictly below the expectation: the ideal is larger than a
-/// generic system of the same degrees would be, which is exactly the first-fall
-/// phenomenon that makes a structured system cheaper than its generic bound.
-/// Returns `(first_fall, last_fall, degree_of_regularity_observed, per_degree)`.
-/// Purely diagnostic: it reads the finished basis, is never on the hot path, is
-/// never priced into `S`, and is never a stopping rule.
-fn degree_fall_diagnostic(
+/// Compare the computed basis's leading-monomial staircase with the generic
+/// semi-regular expectation. This is not a closure-space computation or a
+/// top-form syzygy calculation, so it cannot establish first/last fall degree.
+/// Extinction refers only to this computed leading ideal, not regularity of
+/// the homogeneous top-form system. A degree bound may leave a partial basis.
+/// The scan is diagnostic only and does not affect solving or charged work.
+// Diagnostic-only counting must not mutate the native staircase counter.
+// Return no value if the caller's original deadline or integer range is exhausted.
+fn diagnostic_staircase_count(
+    lms: &[&[u32]],
+    n_vars: usize,
+    degree: u32,
+    deadline: Option<Instant>,
+) -> Option<usize> {
+    fn count(
+        k: usize,
+        left: u32,
+        mono: &mut [u32],
+        lms: &[&[u32]],
+        deadline: Option<Instant>,
+    ) -> Option<usize> {
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return None;
+        }
+        if k + 1 == mono.len() {
+            mono[k] = left;
+            for lm in lms {
+                if deadline.is_some_and(|d| Instant::now() >= d) {
+                    return None;
+                }
+                if divides(lm, mono) {
+                    return Some(0);
+                }
+            }
+            return Some(1);
+        }
+        let mut result = 0usize;
+        for exponent in 0..=left {
+            mono[k] = exponent;
+            result = result.checked_add(count(k + 1, left - exponent, mono, lms, deadline)?)?;
+        }
+        Some(result)
+    }
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        return None;
+    }
+    if n_vars == 0 {
+        return Some(usize::from(degree == 0 && lms.is_empty()));
+    }
+    let mut mono = vec![0; n_vars];
+    count(0, degree, &mut mono, lms, deadline)
+}
+
+fn hilbert_diagnostic(
     input: &[Poly],
     basis: &[Poly],
     n_vars: usize,
-) -> (Option<u32>, Option<u32>, Option<u32>, Vec<DegreeFall>) {
+    deadline: Option<Instant>,
+) -> (Option<u32>, Option<u32>, Option<u32>, Vec<HilbertDeviation>) {
     let degs: Vec<u32> = input
         .iter()
         .filter_map(|f| f.iter().map(|(e, _)| total_degree(e)).max())
@@ -4410,14 +5463,16 @@ fn degree_fall_diagnostic(
     if degs.is_empty() {
         return (None, None, None, Vec::new());
     }
-    let expected = semi_regular_hilbert(&degs, n_vars);
+    let Some(expected) = semi_regular_hilbert_before(&degs, n_vars, deadline) else {
+        return (None, None, None, Vec::new());
+    };
     let lms: Vec<&[u32]> = basis
         .iter()
         .filter(|f| !f.is_empty())
         .map(|f| f[0].0.as_slice())
         .collect();
     // Scan the degrees the expectation covers, then on until the quotient
-    // vanishes (so the observed degree of regularity is captured), with a hard
+    // vanishes (the computed staircase extinction), with a hard
     // cap so a positive-dimensional ideal still terminates.
     let scan_max = expected.len() as u32 + n_vars as u32 + 1;
     let mut first_fall = None;
@@ -4426,21 +5481,23 @@ fn degree_fall_diagnostic(
     let mut falls = Vec::with_capacity(expected.len() + 1);
     for d in 0..=scan_max {
         let exp = expected.get(d as usize).copied().unwrap_or(0);
-        let real = uncovered_in_degree(&lms, n_vars, d);
-        let is_fall = real < exp;
-        if is_fall {
+        let Some(real) = diagnostic_staircase_count(&lms, n_vars, d, deadline) else {
+            return (None, None, None, Vec::new());
+        };
+        let is_below_expectation = real < exp;
+        if is_below_expectation {
             if first_fall.is_none() {
                 first_fall = Some(d);
             }
             last_fall = Some(d);
         }
-        falls.push(DegreeFall {
+        falls.push(HilbertDeviation {
             degree: d,
             hilbert_expected: exp,
             hilbert_realized: real,
-            is_fall,
+            is_below_expectation,
         });
-        // The quotient is exhausted: this is the observed degree of regularity.
+        // No standard monomial remains in this degree of the computed staircase.
         if d > 0 && real == 0 {
             dreg = Some(d);
             break;
@@ -4458,6 +5515,7 @@ fn f4_hilbert_guarded(
     p: u64,
     opts: &F4Options,
     chunk: usize,
+    mut trace: TraceMode,
 ) -> F4Report {
     let ops0 = field_ops_now();
     let t0 = Instant::now();
@@ -4514,7 +5572,9 @@ fn f4_hilbert_guarded(
         let mut o = plain.clone();
         o.hilbert_expect = Some(complete_intersection_hilbert(&degs));
         o.max_pairs_per_step = Some(chunk);
-        let r = f4_with_arithmetic(input, n_vars, p, &o, arithmetic_mode(), TraceMode::Off);
+        // the main run is the one a trace records or replays (the check
+        // on the leading forms is never traced)
+        let r = f4_with_arithmetic(input, n_vars, p, &o, arithmetic_mode(), trace.reborrow());
         if r.hilbert == HilbertStop::Applied {
             return F4Report {
                 field_ops: field_ops_now() - ops0,
@@ -4525,12 +5585,24 @@ fn f4_hilbert_guarded(
         }
         status = HilbertStop::Violated;
     }
-    let r = f4_with_arithmetic(input, n_vars, p, &plain, arithmetic_mode(), TraceMode::Off);
+    // The fallback full run.  A recording keeps only this run's steps; a
+    // replay does not apply to it (the recorded run stopped by the Hilbert
+    // rule) and reports the divergence.
+    let replayed = matches!(trace, TraceMode::Replay(_));
+    let fallback = match &mut trace {
+        TraceMode::Record(t) => {
+            **t = F4Trace::default();
+            TraceMode::Record(t)
+        }
+        _ => TraceMode::Off,
+    };
+    let r = f4_with_arithmetic(input, n_vars, p, &plain, arithmetic_mode(), fallback);
     F4Report {
         field_ops: field_ops_now() - ops0,
         ms: t0.elapsed().as_secs_f64() * 1e3,
         hilbert: status,
         hilbert_check_ops: check_ops,
+        trace_mismatch: r.trace_mismatch || replayed,
         ..r
     }
 }
@@ -4549,16 +5621,6 @@ fn f4_with_arithmetic(
     let carried = std::cell::Cell::new(Duration::ZERO);
     let ops_carry = std::cell::Cell::new(0u64);
     let mut blocked_steps = 0usize;
-    if opts.checkpoint.is_some() {
-        assert!(
-            matches!(trace, TraceMode::Off)
-                && opts.hilbert_expect.is_none()
-                && opts.stop_hilbert.is_none()
-                && opts.stop_staircase.is_none()
-                && !opts.capture_run_log,
-            "checkpointing is not combined with traces, the Hilbert or staircase stops, or the run log"
-        );
-    }
     let debug = std::env::var("F4_DEBUG").is_ok();
     let _pp_guard = par_prof().then_some(PpGuard);
     if debug {
@@ -4583,8 +5645,17 @@ fn f4_with_arithmetic(
     // Pairs over the degree bound, kept so Gebauer–Möller can retire them:
     // `pairs_above_bound` counts the ones still standing.
     let mut above: Vec<Pair> = Vec::new();
+    let mut basis_terms = 0usize;
+    let mut trace_monomials = 0usize;
+    let mut steps = 0usize;
+    let mut max_rows = 0usize;
+    let mut max_cols = 0usize;
+    let mut degree_reached = 0u32;
+    let mut solving_degree = 0u32;
+    let mut learned = (0u32, 0usize, 0usize);
     let gm = gebauer_moeller();
     let mut packed = (matches!(ord, Ordering::Grevlex)
+        && opts.resource_limits.is_none()
         && n_vars <= 15
         && opts.max_degree < 128
         && input.iter().flatten().all(|(e, _)| total_degree(e) < 128)
@@ -4614,8 +5685,12 @@ fn f4_with_arithmetic(
                 .map(|(f, _)| f.clone())
                 .collect()
         };
-        let (dff, dlf, ddreg, dfalls) = if opts.record_degree_falls && !inconsistent && !to {
-            degree_fall_diagnostic(input, &b, n_vars)
+        let (dff, dlf, ddreg, dfalls) = if opts.record_hilbert_diagnostics
+            && opts.resource_limits.is_none()
+            && !inconsistent
+            && !to
+        {
+            hilbert_diagnostic(input, &b, n_vars, opts.deadline)
         } else {
             (None, None, None, Vec::new())
         };
@@ -4632,6 +5707,7 @@ fn f4_with_arithmetic(
             max_cols: mc,
             ms: (t0.elapsed() + carried.get()).as_secs_f64() * 1e3,
             timed_out: to,
+            resource_limit: None,
             pairs_above_bound: pab,
             staircase_at_stop: None,
             field_ops: ops_carry.get() + (field_ops_now() - ops0),
@@ -4640,12 +5716,91 @@ fn f4_with_arithmetic(
             hilbert: HilbertStop::Off,
             hilbert_check_ops: 0,
             resumed_ms: carried.get().as_secs_f64() * 1e3,
-            first_fall_degree: dff,
-            last_fall_degree: dlf,
-            degree_of_regularity_observed: ddreg,
-            degree_falls: dfalls,
+            first_hilbert_deviation_degree: dff,
+            last_hilbert_deviation_degree: dlf,
+            staircase_extinction_degree: ddreg,
+            hilbert_deviations: dfalls,
         }
     };
+
+    // A refused operation returns diagnostics, but no partial basis which a
+    // caller could accidentally interpret as a certificate of an empty ideal.
+    macro_rules! abort_call {
+        ($stop:expr) => {{
+            let stop: F4Stop = $stop.into();
+            let mut r = report(
+                &[],
+                &[],
+                false,
+                degree_reached,
+                solving_degree,
+                steps,
+                max_rows,
+                max_cols,
+                matches!(&stop, F4Stop::Deadline),
+                pairs_above_bound,
+                learned,
+                blocked_steps,
+            );
+            if let F4Stop::Resource(limit) = stop {
+                r.resource_limit = Some(limit);
+            }
+            return r;
+        }};
+    }
+    macro_rules! admit {
+        ($check:expr) => {
+            if let Err(stop) = $check {
+                abort_call!(stop);
+            }
+        };
+    }
+    macro_rules! bounded_deadline {
+        () => {
+            if opts.resource_limits.is_some() && opts.deadline.is_some_and(|d| Instant::now() > d) {
+                abort_call!(F4Stop::Deadline);
+            }
+        };
+    }
+    if let Some(limits) = &opts.resource_limits {
+        let incompatible = if opts.checkpoint.is_some()
+            || opts.checkpoint_stop_after.is_some()
+            || opts.checkpoint_in_step.is_some()
+            || opts.checkpoint_stop_in_rref.is_some()
+        {
+            Some("checkpoint")
+        } else if opts.stop_hilbert.is_some()
+            || opts.hilbert_expect.is_some()
+            || opts.record_hilbert_diagnostics
+        {
+            Some("hilbert")
+        } else if opts.stop_staircase.is_some() {
+            Some("staircase")
+        } else if opts.capture_run_log {
+            Some("run_log")
+        } else {
+            None
+        };
+        if let Some(option) = incompatible {
+            admit!(Err::<(), _>(unsupported_resource_option(option)));
+        }
+        admit!(limits.check(
+            "input",
+            "symbolic_monomials",
+            input.iter().try_fold(0usize, |n, f| n.checked_add(f.len())),
+            limits.max_symbolic_monomials,
+        ));
+    }
+    if opts.checkpoint.is_some() {
+        assert!(
+            matches!(trace, TraceMode::Off)
+                && opts.hilbert_expect.is_none()
+                && opts.stop_hilbert.is_none()
+                && opts.stop_staircase.is_none()
+                && !opts.capture_run_log,
+            "checkpointing is not combined with traces, the Hilbert or staircase stops, or the run log"
+        );
+    }
 
     // add a polynomial to the basis: pairs under the Gebauer–Möller
     // criteria (or the product criterion alone, `F4_FP_GM=0`) and the
@@ -4663,7 +5818,9 @@ fn f4_with_arithmetic(
         pairs_above_bound: &mut usize,
         gm: bool,
         lmp: Option<&mut Vec<u128>>,
-    ) {
+        limits: Option<&F4ResourceLimits>,
+        deadline: Option<Instant>,
+    ) -> Result<(), F4Stop> {
         let k = basis.len();
         let n = f[0].0.len();
         let new: Vec<(usize, Vec<u32>, u128)> = match lmp {
@@ -4682,7 +5839,9 @@ fn f4_with_arithmetic(
                     |a, b| packed_divides(*a, *b),
                     |a, b| packed_lcm(*a, *b),
                     |a, b| packed_coprime(*a, *b),
-                );
+                    limits,
+                    deadline,
+                )?;
                 lmp.push(h);
                 new.into_iter().map(|(i, l)| (i, unpack(l, n), l)).collect()
             }
@@ -4700,7 +5859,9 @@ fn f4_with_arithmetic(
                     |a, b| divides(a, b),
                     |a, b| lcm(a, b),
                     |a, b| a.iter().zip(b).all(|(x, y)| *x == 0 || *y == 0),
-                );
+                    limits,
+                    deadline,
+                )?;
                 new.into_iter().map(|(i, l)| (i, l, 0)).collect()
             }
         };
@@ -4722,9 +5883,11 @@ fn f4_with_arithmetic(
         *pairs_above_bound = above.len();
         basis.push(f);
         alive.push(true);
+        Ok(())
     }
 
     for f in input {
+        bounded_deadline!();
         let f = normalise(f, p, ord);
         if f.is_empty() {
             continue;
@@ -4732,7 +5895,8 @@ fn f4_with_arithmetic(
         if total_degree(&f[0].0) == 0 {
             return report(&basis, &alive, true, 0, 0, 0, 0, 0, false, 0, (0, 0, 0), 0);
         }
-        add(
+        basis_terms += f.len();
+        admit!(add(
             f,
             &mut basis,
             &mut alive,
@@ -4742,19 +5906,24 @@ fn f4_with_arithmetic(
             &mut pairs_above_bound,
             gm,
             lm_packed.as_mut(),
-        );
+            opts.resource_limits.as_ref(),
+            opts.resource_limits.and(opts.deadline),
+        ));
     }
     let input_lms_now: Vec<Vec<u32>> = basis.iter().map(|f| f[0].0.clone()).collect();
     let mut input_mismatch = false;
     match &mut trace {
-        TraceMode::Record(t) => t.input_lms = input_lms_now,
-        TraceMode::Replay(t) => {
+        TraceMode::Record(t) => {
+            trace_monomials = input_lms_now.len();
+            t.input_lms = input_lms_now;
+        }
+        TraceMode::Replay(c) => {
             // other input leading monomials: not this trace's shape, a full run
-            if t.input_lms != input_lms_now {
+            if c.node.get().input_lms != input_lms_now {
                 input_mismatch = true;
             }
         }
-        TraceMode::Off => {}
+        TraceMode::Off | TraceMode::RecordBranch(_) => {}
     }
     let mut replay_step = 0usize;
     let mut mismatch = false;
@@ -4763,13 +5932,6 @@ fn f4_with_arithmetic(
         trace = TraceMode::Off;
     }
     // interreduce the input (tails included) so the first matrix is small
-    let mut steps = 0usize;
-    let mut max_rows = 0usize;
-    let mut max_cols = 0usize;
-    let mut degree_reached = 0u32;
-    let mut solving_degree = 0u32;
-    // (solving_degree_max, max_cols_to_solution, steps_to_solution)
-    let mut learned = (0u32, 0usize, 0usize);
     let mut staircase_at_stop: Option<usize> = None;
     let mut hilbert_violated = false;
     let mut stair = StairTracker::new(n_vars);
@@ -4893,8 +6055,9 @@ fn f4_with_arithmetic(
                 RUN_LOG.with(|l| l.borrow_mut().dropped_pairs += before - pairs.len());
             }
         }
-        if let TraceMode::Replay(t) = &trace {
-            if replay_step >= t.steps.len() {
+        if let TraceMode::Replay(c) = &trace {
+            let t = c.node.get();
+            if replay_step - c.base >= t.steps.len() {
                 // the recorded run's end: the recorded staircase, or the
                 // pairs still pending are processed as a full run
                 let lms: Vec<&[u32]> = basis
@@ -5037,13 +6200,14 @@ fn f4_with_arithmetic(
         let mut last_snap = Instant::now();
         let mut snaps = 0usize;
         // symbolic preprocessing
+        let recording = trace.recording();
         let mut rows_poly: Vec<(usize, Vec<u32>)> = Vec::new(); // (basis index, multiplier)
         let mut seen: FxSet<(usize, Vec<u32>)> = FxSet::default();
         let d;
         let mut selected_len = 0usize;
-        if let TraceMode::Replay(t) = &trace {
+        if let TraceMode::Replay(c) = &trace {
             // the recorded useful rows of this step stand in for the pairs
-            let step = &t.steps[replay_step];
+            let step = &c.node.get().steps[replay_step - c.base];
             replay_step += 1;
             d = step.degree;
             degree_reached = degree_reached.max(d);
@@ -5051,6 +6215,7 @@ fn f4_with_arithmetic(
             // (or ends off the recorded staircase) finishes as a full run
             // over all of them
             for (idx, m) in &step.rows {
+                bounded_deadline!();
                 if *idx >= basis.len() {
                     let mut r = report(
                         &basis,
@@ -5068,6 +6233,9 @@ fn f4_with_arithmetic(
                     );
                     r.trace_mismatch = true;
                     return r;
+                }
+                if let Some(limits) = &opts.resource_limits {
+                    admit!(limits.symbolic_step(rows_poly.len().saturating_add(1), 0, recording));
                 }
                 if seen.insert((*idx, m.clone())) {
                     rows_poly.push((*idx, m.clone()));
@@ -5088,6 +6256,7 @@ fn f4_with_arithmetic(
             }
             selected_len = selected.len();
             for pr in &selected {
+                bounded_deadline!();
                 for &idx in &[pr.i, pr.j] {
                     let m: Vec<u32> = pr
                         .lcm
@@ -5095,6 +6264,13 @@ fn f4_with_arithmetic(
                         .zip(&basis[idx][0].0)
                         .map(|(a, b)| a - b)
                         .collect();
+                    if let Some(limits) = &opts.resource_limits {
+                        admit!(limits.symbolic_step(
+                            rows_poly.len().saturating_add(1),
+                            0,
+                            recording
+                        ));
+                    }
                     if seen.insert((idx, m.clone())) {
                         rows_poly.push((idx, m));
                     }
@@ -5102,7 +6278,7 @@ fn f4_with_arithmetic(
             }
         }
         let n_pair_rows = rows_poly.len();
-        let (cols, sparse, tp1): (Vec<Vec<u32>>, Vec<Vec<(u32, u64)>>, Instant) = if let Some(pk) =
+        let (cols, sparse, tp1): (Cols, Vec<Vec<(u32, u64)>>, Instant) = if let Some(pk) =
             packed.as_mut()
         {
             pk.extend(&basis);
@@ -5117,10 +6293,64 @@ fn f4_with_arithmetic(
                 && rows_poly.len() >= min_seeds;
             pp_add(if sym_par { PP_SYM_PAR } else { PP_SYM_SEQ }, 1);
             pp_add(PP_SYM_SEEDS, rows_poly.len() as u64);
-            let (extra, cols_packed, row_cols) = if sym_par {
-                pk.symbolic_par(&rows_poly, &alive)
+            // A replayed step rebuilds its matrix from frozen preprocessing
+            // when the current terms fit the frozen ones ([`FrozenStep`]).
+            let slot = match &trace {
+                TraceMode::Replay(c) if freeze_enabled() => {
+                    Some(&c.node.get().steps[replay_step - 1 - c.base].frozen)
+                }
+                _ => None,
+            };
+            let frozen = slot.and_then(|f| f.0.read().unwrap().clone());
+            let rebuilt = frozen.as_ref().and_then(|fz| fz.rebuild(&pk.terms));
+            let (extra, cols_packed, row_cols) = if let Some(r) = rebuilt {
+                FROZEN_HITS.fetch_add(1, AtomicOrdering::Relaxed);
+                r
+            } else if let (Some(f), Some(old)) = (slot, frozen.as_ref()) {
+                // Widen the frozen copy to the union of its supports and the
+                // current ones (each element's terms merged in term order),
+                // preprocess that once, and rebuild the current step from it.
+                // The supports converge to the generic ones in a few systems.
+                let mut terms = pk.terms.clone();
+                for (i, ft) in &old.support {
+                    terms[*i] = merge_terms(ft, &pk.terms[*i], |x| pk.grevlex_key(x));
+                }
+                let wide = Packed {
+                    n: pk.n,
+                    guard: pk.guard,
+                    terms,
+                    lms: pk.lms.clone(),
+                };
+                let union = wide.symbolic(&rows_poly, &alive, true);
+                let new = FrozenStep::from_symbolic(
+                    &wide.terms,
+                    &rows_poly,
+                    &union.0,
+                    &union.1,
+                    &union.2,
+                );
+                let r = new
+                    .rebuild(&pk.terms)
+                    .expect("the union contains the current supports");
+                *f.0.write().unwrap() = Some(std::sync::Arc::new(new));
+                r
             } else {
-                pk.symbolic(&rows_poly, &alive)
+                let computed = if sym_par {
+                    pk.symbolic_par(&rows_poly, &alive)
+                } else {
+                    pk.symbolic(&rows_poly, &alive, true)
+                };
+                if let Some(f) = slot {
+                    let new = FrozenStep::from_symbolic(
+                        &pk.terms,
+                        &rows_poly,
+                        &computed.0,
+                        &computed.1,
+                        &computed.2,
+                    );
+                    *f.0.write().unwrap() = Some(std::sync::Arc::new(new));
+                }
+                computed
             };
             pp_add(PP_SYM_NS, pp_ns(t_sym));
             let tp1 = Instant::now();
@@ -5129,7 +6359,11 @@ fn f4_with_arithmetic(
                 .map(|(i, _)| *i)
                 .chain(extra.iter().map(|&(i, _)| i))
                 .collect();
-            rows_poly.extend(extra.iter().map(|&(i, m)| (i, unpack(m, n_vars))));
+            // the reducer rows' multipliers are read back only by a recording
+            // run (its trace); elsewhere they stay packed
+            if trace.recording() {
+                rows_poly.extend(extra.iter().map(|&(i, m)| (i, unpack(m, n_vars))));
+            }
             // Small steps (most of them, and all of `solve`'s specialised
             // runs) are cheaper on one thread than handed to the pool: the
             // hand-off wakes a worker and waits for it, which costs more than
@@ -5145,8 +6379,8 @@ fn f4_with_arithmetic(
             } else {
                 row_cols.into_iter().zip(&idxs).map(to_sparse).collect()
             };
-            let cols = cols_packed.iter().map(|&m| unpack(m, n_vars)).collect();
-            (cols, sparse, tp1)
+            // columns stay packed: only the terms of new polynomials are unpacked
+            (Cols::Packed(cols_packed, n_vars), sparse, tp1)
         } else {
             let mut monomials: FxSet<Vec<u32>> = FxSet::default();
             let mut done: FxSet<Vec<u32>> = FxSet::default();
@@ -5154,11 +6388,19 @@ fn f4_with_arithmetic(
             // One scratch monomial; a heap copy only for a monomial not seen.
             let mut em: Vec<u32> = vec![0; n_vars];
             for (idx, m) in &rows_poly {
+                bounded_deadline!();
                 for (e, _) in &basis[*idx] {
                     for (k, x) in em.iter_mut().enumerate() {
                         *x = e[k] + m[k];
                     }
                     if !monomials.contains(em.as_slice()) {
+                        if let Some(limits) = &opts.resource_limits {
+                            admit!(limits.symbolic_step(
+                                rows_poly.len(),
+                                monomials.len().saturating_add(1),
+                                recording,
+                            ));
+                        }
                         monomials.insert(em.clone());
                         queue.push(em.clone());
                     }
@@ -5167,6 +6409,7 @@ fn f4_with_arithmetic(
                 done.insert(lm);
             }
             while let Some(mono) = queue.pop() {
+                bounded_deadline!();
                 if done.contains(&mono) {
                     continue;
                 }
@@ -5181,12 +6424,26 @@ fn f4_with_arithmetic(
                         .zip(&basis[idx][0].0)
                         .map(|(a, b)| a - b)
                         .collect();
+                    if let Some(limits) = &opts.resource_limits {
+                        admit!(limits.symbolic_step(
+                            rows_poly.len().saturating_add(1),
+                            monomials.len(),
+                            recording,
+                        ));
+                    }
                     if seen.insert((idx, m.clone())) {
                         for (e, _) in &basis[idx] {
                             for (k, x) in em.iter_mut().enumerate() {
                                 *x = e[k] + m[k];
                             }
                             if !monomials.contains(em.as_slice()) {
+                                if let Some(limits) = &opts.resource_limits {
+                                    admit!(limits.symbolic_step(
+                                        rows_poly.len().saturating_add(1),
+                                        monomials.len().saturating_add(1),
+                                        recording,
+                                    ));
+                                }
                                 monomials.insert(em.clone());
                                 queue.push(em.clone());
                             }
@@ -5194,6 +6451,9 @@ fn f4_with_arithmetic(
                         rows_poly.push((idx, m));
                     }
                 }
+            }
+            if let Some(limits) = &opts.resource_limits {
+                admit!(limits.matrix("matrix", rows_poly.len(), monomials.len(), recording));
             }
             let tp1 = Instant::now();
             // matrix: columns in decreasing monomial order, rows sparse
@@ -5227,10 +6487,10 @@ fn f4_with_arithmetic(
             } else {
                 rows_poly.iter().map(to_sparse).collect()
             };
-            (cols, sparse, tp1)
+            (Cols::Plain(cols), sparse, tp1)
         };
         let n_cols = cols.len();
-        let parallel = rows_poly.len() * n_cols > PAR_WORK;
+        let parallel = sparse.len() * n_cols > PAR_WORK;
         let tp2 = Instant::now();
         let mut input_lm = vec![false; n_cols];
         for r in &sparse {
@@ -5287,7 +6547,7 @@ fn f4_with_arithmetic(
         // Block-aware reduction: with every row in one weight class the
         // reduced pair rows split by class over the free columns.
         let block_classes: Option<Vec<u8>> = opts.weights.as_ref().and_then(|w| {
-            let col_w: Vec<u8> = cols.iter().map(|m| z3_weight(m, w)).collect();
+            let col_w: Vec<u8> = (0..n_cols).map(|j| z3_weight(&cols.get(j), w)).collect();
             let homogeneous = sparse.iter().all(|r| {
                 let cw = col_w[r[0].0 as usize];
                 r.iter().all(|&(c, _)| col_w[c as usize] == cw)
@@ -5301,7 +6561,7 @@ fn f4_with_arithmetic(
         // reduced rows before the echelon form, to find the contributors of
         // every new pivot
         let mut useful: Vec<bool> = Vec::new();
-        let recording = matches!(trace, TraceMode::Record(_));
+        let recording = trace.recording();
         let mut rec_rows: Vec<Vec<u64>> = Vec::new();
         let pivots: Option<(Vec<Vec<u64>>, Vec<usize>)> = if deferred {
             let fp32 = fp32.expect("deferred mode has narrow arithmetic");
@@ -5358,8 +6618,9 @@ fn f4_with_arithmetic(
             // blocks before it, then finished in order against each other.
             // Tiny steps (most of `solve`'s specialised runs) keep the
             // cascade: building `B'` there costs more than it saves.
-            let fl = fl_enabled()
-                && n_cols >= FL_MIN_COLS
+            let fl = opts.resource_limits.is_none()
+                && fl_enabled()
+                && n_cols >= fl_min_cols()
                 && reducers.len().saturating_mul(free_cols.len()) <= FL_MAX_ENTRIES;
             let reduced: Option<Vec<Vec<u32>>> = if fl {
                 reduce_pairs_fl(
@@ -5668,16 +6929,31 @@ fn f4_with_arithmetic(
         let tp3 = Instant::now();
         // new polynomials: rows whose pivot column is not an input leading monomial
         let mut new_polys: Vec<Poly> = Vec::new();
+        let mut new_terms = 0usize;
         for (row, &c) in rows.iter().zip(&pivots) {
             if input_lm[free_cols[c]] {
                 continue;
             }
-            let poly: Poly = row
-                .iter()
-                .enumerate()
-                .filter(|(_, &v)| v != 0)
-                .map(|(j, &v)| (cols[free_cols[j]].clone(), v))
-                .collect();
+            // sized up front: a filtered collect grows by reallocation
+            let terms = row.iter().filter(|&&v| v != 0).count();
+            if let Some(limits) = &opts.resource_limits {
+                admit!(limits.check(
+                    "basis_update",
+                    "symbolic_monomials",
+                    basis_terms
+                        .checked_add(new_terms)
+                        .and_then(|n| n.checked_add(terms)),
+                    limits.max_symbolic_monomials,
+                ));
+            }
+            new_terms += terms;
+            let mut poly: Poly = Vec::with_capacity(terms);
+            poly.extend(
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(j, &v)| (cols.get(free_cols[j]), v)),
+            );
             if total_degree(&poly[0].0) == 0 {
                 return report(
                     &basis,
@@ -5702,12 +6978,33 @@ fn f4_with_arithmetic(
         }
         let learned_now = !new_polys.is_empty();
         let learned_new = new_polys.len();
-        match &mut trace {
-            TraceMode::Record(t) => {
+        if let Some(t) = trace.rec_mut() {
+            {
+                if let Some(limits) = &opts.resource_limits {
+                    // Count a step record even when it has no retained rows.
+                    // This check precedes both contributor recovery and copies.
+                    admit!(limits.check(
+                        "trace",
+                        "symbolic_monomials",
+                        trace_monomials
+                            .checked_add(1)
+                            .and_then(|n| n.checked_add(n_pair_rows))
+                            .and_then(|n| n.checked_add(new_polys.len())),
+                        limits.max_symbolic_monomials,
+                    ));
+                }
                 // the pair rows that the new pivots are combinations of
                 let retained: Vec<usize> = (0..n_pair_rows).filter(|&i| useful[i]).collect();
                 let mut needed = vec![false; retained.len()];
-                for (col, contributors) in tracked_rref_contributors(&rec_rows, p) {
+                let contributors = match tracked_rref_contributors(
+                    &rec_rows,
+                    p,
+                    opts.resource_limits.and(opts.deadline),
+                ) {
+                    Some(c) => c,
+                    None => abort_call!(F4Stop::Deadline),
+                };
+                for (col, contributors) in contributors {
                     if !input_lm[free_cols[col]] {
                         for i in contributors {
                             needed[i] = true;
@@ -5715,6 +7012,8 @@ fn f4_with_arithmetic(
                     }
                 }
                 t.steps.push(TraceStep {
+                    frozen: Default::default(),
+                    branches: Default::default(),
                     degree: d,
                     rows: retained
                         .iter()
@@ -5724,23 +7023,54 @@ fn f4_with_arithmetic(
                         .collect(),
                     new_lms: new_polys.iter().map(|f| f[0].0.clone()).collect(),
                 });
+                let step = t.steps.last().unwrap();
+                trace_monomials += 1 + step.rows.len() + step.new_lms.len();
             }
-            TraceMode::Replay(t) => {
-                let expected = &t.steps[replay_step - 1].new_lms;
-                let found: Vec<&Vec<u32>> = new_polys.iter().map(|f| &f[0].0).collect();
-                if found.len() != expected.len() || found.iter().zip(expected).any(|(a, b)| *a != b)
-                {
-                    // the shapes diverged: keep what this step found (it is
-                    // in the ideal) and finish as a full run over the pairs
-                    // the basis has accumulated
+        } else if let TraceMode::Replay(c) = &trace {
+            let at = replay_step - 1 - c.base;
+            let expected = &c.node.get().steps[at].new_lms;
+            let found: Vec<&Vec<u32>> = new_polys.iter().map(|f| &f[0].0).collect();
+            if found.len() != expected.len() || found.iter().zip(expected).any(|(a, b)| *a != b) {
+                // The shapes diverged.  What this step found is in the ideal
+                // either way.  A branch recorded for these leading monomials
+                // is followed from the next step; without one, the run
+                // continues over the pairs the basis has accumulated and
+                // records that continuation as a new branch.
+                let key: Vec<Vec<u32>> = found.iter().map(|m| (*m).clone()).collect();
+                let next = if branch_enabled() {
+                    let slot = c.node.get().steps[at].branches.0.read().unwrap();
+                    match slot.iter().find(|(k, _)| *k == key) {
+                        Some((_, b)) => {
+                            BRANCH_FOLLOWS.fetch_add(1, AtomicOrdering::Relaxed);
+                            TraceMode::Replay(Cursor {
+                                node: Node::Branch(b.clone()),
+                                base: replay_step,
+                            })
+                        }
+                        None if slot.len() < MAX_BRANCHES && trace_growth() => {
+                            mismatch = true;
+                            TraceMode::RecordBranch(Box::new(BranchRec {
+                                trace: F4Trace::default(),
+                                parent: c.node.clone(),
+                                at,
+                                key,
+                            }))
+                        }
+                        None => {
+                            mismatch = true;
+                            TraceMode::Off
+                        }
+                    }
+                } else {
                     mismatch = true;
-                    trace = TraceMode::Off;
-                }
+                    TraceMode::Off
+                };
+                trace = next;
             }
-            TraceMode::Off => {}
         }
         for f in new_polys {
-            add(
+            basis_terms += f.len();
+            admit!(add(
                 f,
                 &mut basis,
                 &mut alive,
@@ -5750,7 +7080,9 @@ fn f4_with_arithmetic(
                 &mut pairs_above_bound,
                 gm,
                 lm_packed.as_mut(),
-            );
+                opts.resource_limits.as_ref(),
+                opts.resource_limits.and(opts.deadline),
+            ));
         }
         if let Some(ops_step0) = ops_step0 {
             let lms: Vec<&[u32]> = basis
@@ -5790,32 +7122,46 @@ fn f4_with_arithmetic(
                 .collect();
             if let Some(count) = staircase_at_most(&lms, n_vars, bound) {
                 staircase_at_stop = Some(count);
-                if let TraceMode::Record(t) = &mut trace {
+                if let Some(t) = trace.rec_mut() {
                     t.stopped = true;
                 }
                 break;
             }
         }
     }
-    // final interreduction of the alive basis (tails)
-    let mut reduced: Vec<Poly> = basis
-        .iter()
+    // final interreduction of the alive basis (tails); the basis is not used
+    // again, so its polynomials are moved rather than copied term by term
+    let mut reduced: Vec<Poly> = std::mem::take(&mut basis)
+        .into_iter()
         .zip(&alive)
         .filter(|(_, &a)| a)
-        .map(|(f, _)| f.clone())
+        .map(|(f, _)| f)
         .collect();
     let ti = Instant::now();
     pp_dump("steps");
-    reduced = interreduce_linear(&reduced, n_vars, p, ord)
-        .unwrap_or_else(|| interreduce(&reduced, p, ord));
+    reduced = if let Some(limits) = &opts.resource_limits {
+        match interreduce_bounded(reduced, p, ord, limits, opts.deadline) {
+            Ok(reduced) => reduced,
+            Err(stop) => abort_call!(stop),
+        }
+    } else {
+        interreduce_linear(&reduced, n_vars, p, ord)
+            .unwrap_or_else(|| interreduce(&reduced, p, ord))
+    };
     if debug {
         eprintln!("f4 interreduce ms: {:.2}", ti.elapsed().as_secs_f64() * 1e3);
     }
-    let (dff, dlf, ddreg, dfalls) = if opts.record_degree_falls {
-        degree_fall_diagnostic(input, &reduced, n_vars)
+    let (dff, dlf, ddreg, dfalls) = if opts.record_hilbert_diagnostics {
+        hilbert_diagnostic(input, &reduced, n_vars, opts.deadline)
     } else {
         (None, None, None, Vec::new())
     };
+    // a branch is kept only from a run that ended cleanly under its rule
+    if let TraceMode::RecordBranch(b) = trace {
+        if pairs_above_bound == 0 && !(opts.hilbert_expect.is_some() && hilbert_violated) {
+            b.commit();
+        }
+    }
     F4Report {
         basis: reduced,
         inconsistent: false,
@@ -5829,6 +7175,7 @@ fn f4_with_arithmetic(
         max_cols,
         ms: (t0.elapsed() + carried.get()).as_secs_f64() * 1e3,
         timed_out: false,
+        resource_limit: None,
         pairs_above_bound,
         staircase_at_stop,
         field_ops: ops_carry.get() + (field_ops_now() - ops0),
@@ -5845,10 +7192,10 @@ fn f4_with_arithmetic(
         },
         hilbert_check_ops: 0,
         resumed_ms: carried.get().as_secs_f64() * 1e3,
-        first_fall_degree: dff,
-        last_fall_degree: dlf,
-        degree_of_regularity_observed: ddreg,
-        degree_falls: dfalls,
+        first_hilbert_deviation_degree: dff,
+        last_hilbert_deviation_degree: dlf,
+        staircase_extinction_degree: ddreg,
+        hilbert_deviations: dfalls,
     }
 }
 
@@ -5869,6 +7216,19 @@ fn linear_interreduce_enabled() -> bool {
 /// interreduction was 43 % of the whole run.  `None` outside the narrow
 /// deferred arithmetic (`p ≤ 2¹⁶`), where the caller interreduces as before.
 fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> Option<Vec<Poly>> {
+    interreduce_linear_with(basis, n_vars, p, ord, packed_enabled())
+}
+
+/// [`interreduce_linear`] with the monomial representation chosen by the
+/// caller (`packed` is only a request: it needs grevlex, n <= 15 and every
+/// degree below 128).
+fn interreduce_linear_with(
+    basis: &[Poly],
+    n_vars: usize,
+    p: u64,
+    ord: Ordering,
+    packed: bool,
+) -> Option<Vec<Poly>> {
     if !linear_interreduce_enabled() || p > 1 << 16 || arithmetic_mode() != 2 || basis.is_empty() {
         return None;
     }
@@ -5885,67 +7245,100 @@ fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> O
         })
         .map(|(_, f)| f)
         .collect();
-    let mut rows_poly: Vec<(usize, Vec<u32>)> =
-        (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
-    let mut seen: FxSet<(usize, Vec<u32>)> = rows_poly.iter().cloned().collect();
-    let mut monomials: FxSet<Vec<u32>> = FxSet::default();
-    let mut done: FxSet<Vec<u32>> = keep.iter().map(|f| f[0].0.clone()).collect();
-    let mut queue: Vec<Vec<u32>> = Vec::new();
-    for f in &keep {
-        for (e, _) in f.iter() {
-            if monomials.insert(e.clone()) {
-                queue.push(e.clone());
-            }
+    // Packed monomials (as the F4 steps use them) when the ordering is
+    // grevlex, n <= 15 and every degree is below 128: the same rows, columns
+    // and column order as the exponent-vector path below, without a heap
+    // vector per monomial.  `F4_FP_PACKED=0` keeps the vector path.
+    let packed_ok = matches!(ord, Ordering::Grevlex)
+        && n_vars <= 15
+        && packed
+        && keep
+            .iter()
+            .all(|f| f.iter().all(|(e, _)| total_degree(e) < 128));
+    let (cols, sparse): (Cols, Vec<Vec<(u32, u64)>>) = if packed_ok {
+        let mut pk = Packed::new(n_vars);
+        for f in &keep {
+            pk.push(f);
         }
-    }
-    let mut em: Vec<u32> = vec![0; n_vars];
-    while let Some(mono) = queue.pop() {
-        if !done.insert(mono.clone()) {
-            continue;
-        }
-        if let Some(idx) = (0..keep.len()).find(|&i| divides(&keep[i][0].0, &mono)) {
-            let m: Vec<u32> = mono
-                .iter()
-                .zip(&keep[idx][0].0)
-                .map(|(a, b)| a - b)
-                .collect();
-            if seen.insert((idx, m.clone())) {
-                for (e, _) in keep[idx].iter() {
-                    for (k, x) in em.iter_mut().enumerate() {
-                        *x = e[k] + m[k];
-                    }
-                    if !monomials.contains(em.as_slice()) {
-                        monomials.insert(em.clone());
-                        queue.push(em.clone());
-                    }
+        let seeds: Vec<(usize, Vec<u32>)> =
+            (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
+        let (extra, cols_packed, row_cols) = pk.symbolic(&seeds, &vec![true; keep.len()], false);
+        let idxs = (0..keep.len()).chain(extra.iter().map(|&(i, _)| i));
+        let sparse = row_cols
+            .into_iter()
+            .zip(idxs)
+            .map(|(rc, idx)| {
+                rc.into_iter()
+                    .zip(keep[idx].iter())
+                    .map(|(c, (_, v))| (c, *v))
+                    .collect()
+            })
+            .collect();
+        (Cols::Packed(cols_packed, n_vars), sparse)
+    } else {
+        let mut rows_poly: Vec<(usize, Vec<u32>)> =
+            (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
+        let mut seen: FxSet<(usize, Vec<u32>)> = rows_poly.iter().cloned().collect();
+        let mut monomials: FxSet<Vec<u32>> = FxSet::default();
+        let mut done: FxSet<Vec<u32>> = keep.iter().map(|f| f[0].0.clone()).collect();
+        let mut queue: Vec<Vec<u32>> = Vec::new();
+        for f in &keep {
+            for (e, _) in f.iter() {
+                if monomials.insert(e.clone()) {
+                    queue.push(e.clone());
                 }
-                rows_poly.push((idx, m));
             }
         }
-    }
-    let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
-    cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
-    let col_of: FxMap<&[u32], u32> = cols
-        .iter()
-        .enumerate()
-        .map(|(i, m)| (m.as_slice(), i as u32))
-        .collect();
-    let n_cols = cols.len();
-    let sparse: Vec<Vec<(u32, u64)>> = rows_poly
-        .iter()
-        .map(|(idx, m)| {
-            let mut em = vec![0u32; n_vars];
-            keep[*idx]
-                .iter()
-                .map(|(e, c)| {
-                    for (k, x) in em.iter_mut().enumerate() {
-                        *x = e[k] + m[k];
+        let mut em: Vec<u32> = vec![0; n_vars];
+        while let Some(mono) = queue.pop() {
+            if !done.insert(mono.clone()) {
+                continue;
+            }
+            if let Some(idx) = (0..keep.len()).find(|&i| divides(&keep[i][0].0, &mono)) {
+                let m: Vec<u32> = mono
+                    .iter()
+                    .zip(&keep[idx][0].0)
+                    .map(|(a, b)| a - b)
+                    .collect();
+                if seen.insert((idx, m.clone())) {
+                    for (e, _) in keep[idx].iter() {
+                        for (k, x) in em.iter_mut().enumerate() {
+                            *x = e[k] + m[k];
+                        }
+                        if !monomials.contains(em.as_slice()) {
+                            monomials.insert(em.clone());
+                            queue.push(em.clone());
+                        }
                     }
-                    (col_of[em.as_slice()], *c)
-                })
-                .collect()
-        })
-        .collect();
+                    rows_poly.push((idx, m));
+                }
+            }
+        }
+        let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
+        cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
+        let col_of: FxMap<&[u32], u32> = cols
+            .iter()
+            .enumerate()
+            .map(|(i, m)| (m.as_slice(), i as u32))
+            .collect();
+        let sparse: Vec<Vec<(u32, u64)>> = rows_poly
+            .iter()
+            .map(|(idx, m)| {
+                let mut em = vec![0u32; n_vars];
+                keep[*idx]
+                    .iter()
+                    .map(|(e, c)| {
+                        for (k, x) in em.iter_mut().enumerate() {
+                            *x = e[k] + m[k];
+                        }
+                        (col_of[em.as_slice()], *c)
+                    })
+                    .collect()
+            })
+            .collect();
+        (Cols::Plain(cols), sparse)
+    };
+    let n_cols = cols.len();
     let (pair_rows, reducers) = sparse.split_at(keep.len());
     const NONE: u32 = u32::MAX;
     let mut reducer_at = vec![NONE; n_cols];
@@ -5976,11 +7369,14 @@ fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> O
     let mut out: Vec<Poly> = rows
         .iter()
         .map(|row| {
-            row.iter()
-                .enumerate()
-                .filter(|(_, &v)| v != 0)
-                .map(|(j, &v)| (cols[free_cols[j]].clone(), v as u64))
-                .collect()
+            let mut f: Poly = Vec::with_capacity(row.iter().filter(|&&v| v != 0).count());
+            f.extend(
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(j, &v)| (cols.get(free_cols[j]), v as u64)),
+            );
+            f
         })
         .collect();
     out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
@@ -6333,6 +7729,130 @@ fn make_monic(mut f: Poly, p: u64) -> Poly {
     f
 }
 
+enum F4Stop {
+    Resource(F4ResourceLimit),
+    Deadline,
+}
+
+impl From<F4ResourceLimit> for F4Stop {
+    fn from(limit: F4ResourceLimit) -> Self {
+        Self::Resource(limit)
+    }
+}
+
+/// The exponent-vector reduction above, with admission before a new pending
+/// monomial is copied into the map/heap. The default reduction is untouched.
+fn reduce_skipping_bounded(
+    f: &Poly,
+    basis: &[Poly],
+    skip: usize,
+    p: u64,
+    ord: Ordering,
+    limits: &F4ResourceLimits,
+    deadline: Option<Instant>,
+) -> Result<Poly, F4Stop> {
+    limits.symbolic("interreduce", f.len())?;
+    let mut work: FxMap<Vec<u32>, u64> = FxMap::default();
+    let mut heap: std::collections::BinaryHeap<Keyed> = std::collections::BinaryHeap::new();
+    for (e, c) in f {
+        let v = work.entry(e.clone()).or_insert_with(|| {
+            heap.push(Keyed(e.clone(), &ord));
+            0
+        });
+        *v = (*v + c % p) % p;
+    }
+    let mut out = Vec::new();
+    let mut scratch = vec![0; f.first().map_or(0, |(e, _)| e.len())];
+    while let Some(Keyed(mono, _)) = heap.pop() {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return Err(F4Stop::Deadline);
+        }
+        let Some(c) = work.remove(&mono) else {
+            continue;
+        };
+        if c == 0 {
+            continue;
+        }
+        let g = basis
+            .iter()
+            .enumerate()
+            .find(|&(j, g)| j != skip && divides(&g[0].0, &mono));
+        if let Some((_, g)) = g {
+            let neg = p - c;
+            for (e, gc) in &g[1..] {
+                if deadline.is_some_and(|d| Instant::now() > d) {
+                    return Err(F4Stop::Deadline);
+                }
+                for (k, x) in scratch.iter_mut().enumerate() {
+                    *x = e[k] + mono[k] - g[0].0[k];
+                }
+                if !work.contains_key(scratch.as_slice()) {
+                    limits.check(
+                        "interreduce",
+                        "symbolic_monomials",
+                        work.len()
+                            .checked_add(out.len())
+                            .and_then(|n| n.checked_add(1)),
+                        limits.max_symbolic_monomials,
+                    )?;
+                    heap.push(Keyed(scratch.clone(), &ord));
+                    work.insert(scratch.clone(), 0);
+                }
+                let v = work.get_mut(scratch.as_slice()).unwrap();
+                *v = (*v + mulmod(neg, *gc, p)) % p;
+                super::jv_bitops::row_ops(1);
+                super::jv_bitops::probes(1, 2);
+            }
+        } else {
+            out.push((mono, c));
+        }
+    }
+    Ok(out)
+}
+
+fn interreduce_bounded(
+    basis: Vec<Poly>,
+    p: u64,
+    ord: Ordering,
+    limits: &F4ResourceLimits,
+    deadline: Option<Instant>,
+) -> Result<Vec<Poly>, F4Stop> {
+    let mut keep = Vec::new();
+    for (i, f) in basis.iter().enumerate() {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return Err(F4Stop::Deadline);
+        }
+        keep.push(
+            !basis
+                .iter()
+                .enumerate()
+                .any(|(j, g)| j != i && divides(&g[0].0, &f[0].0) && (g[0].0 != f[0].0 || j < i)),
+        );
+    }
+    let mut out: Vec<Poly> = basis
+        .into_iter()
+        .zip(keep)
+        .filter_map(|(f, keep)| keep.then_some(f))
+        .collect();
+    let mut terms: usize = out.iter().map(Vec::len).sum();
+    limits.symbolic("interreduce_basis", terms)?;
+    for i in 0..out.len() {
+        let r = reduce_skipping_bounded(&out[i], &out, i, p, ord, limits, deadline)?;
+        if !r.is_empty() {
+            limits.check(
+                "interreduce_basis",
+                "symbolic_monomials",
+                (terms - out[i].len()).checked_add(r.len()),
+                limits.max_symbolic_monomials,
+            )?;
+            terms = terms - out[i].len() + r.len();
+            out[i] = make_monic(r, p);
+        }
+    }
+    out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
+    Ok(out)
+}
+
 /// Interreduce a basis: drop elements whose leading monomial another
 /// divides, then reduce every tail by the others.
 pub fn interreduce(basis: &[Poly], p: u64, ord: Ordering) -> Vec<Poly> {
@@ -6417,6 +7937,35 @@ fn autoreduce_with(polys: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<P
 
 // ── Solving ────────────────────────────────────────────────────────
 
+/// Opt-in, exclusive wall-time phases of one recursive visitor call.
+///
+/// The four phase buckets partition `total_ns`. They measure elapsed time,
+/// not CPU time or a complete arithmetic-operation count. In particular,
+/// [`VisitReport::field_ops`] and the root multiplication counters remain
+/// their existing partial diagnostics. A trace sink runs in
+/// `traversal_other_ns`; `callback_ns` is only the solution visitor.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct VisitTimings {
+    /// Elapsed time from entry into the shared visitor implementation through
+    /// traversal and stop classification. Caller setup, final state destruction,
+    /// and serialization of the returned report are outside this interval.
+    pub total_ns: u64,
+    /// The selected native-call path: plain F4, recorded F4, or trace-pool
+    /// dispatch including profile/statistics bookkeeping and its
+    /// learning/replay/certification work. This is not just row elimination.
+    pub native_f4_ns: u64,
+    /// Recognized-univariate processing: coefficient preparation, finite-domain
+    /// scanning or root factoring/filtering, and the batched path's univariate
+    /// gcd/root recovery. General specialization remains traversal work.
+    pub root_recovery_ns: u64,
+    /// Time inside solution-visitor callbacks, including a callback that asks
+    /// to stop. The caller can separately subdivide this bucket.
+    pub callback_ns: u64,
+    /// Remaining elapsed work: validation, traversal, specialization, candidate
+    /// checks, trace-sink callbacks, and timing/dispatch overhead.
+    pub traversal_other_ns: u64,
+}
+
 /// Observations from the opt-in streaming/domain solver. These are stage
 /// diagnostics, not complete operation accounting or a performance claim.
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -6426,6 +7975,10 @@ pub struct VisitReport {
     /// The visitor requested termination after an equation-checked witness.
     pub stopped_early: bool,
     pub timed_out: bool,
+    /// Native allocation admission stopped traversal before another branch or
+    /// callback. Such a traversal is incomplete even with zero visited roots.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resource_limit: Option<F4ResourceLimit>,
     /// The fallible trace sink rejected an event; no later callback ran.
     pub trace_stopped: bool,
     /// At most 512 UTF-8 bytes of the first sink error.
@@ -6444,6 +7997,12 @@ pub struct VisitReport {
     pub last_fall_degree: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub degree_of_regularity_observed: Option<u32>,
+    /// Post-hoc Hilbert diagnostics folded over recorded F4 calls: min first
+    /// deviation, max last deviation and max staircase extinction degree.
+    /// These describe computed leading ideals, not formal system invariants.
+    pub first_hilbert_deviation_degree: Option<u32>,
+    pub last_hilbert_deviation_degree: Option<u32>,
+    pub staircase_extinction_degree: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_runs: usize,
@@ -6453,6 +8012,127 @@ pub struct VisitReport {
     /// Counted coefficient multiplications in the reused root finder only.
     pub root_field_multiplications: u64,
     pub full_field_branches: u64,
+    /// Finite-domain univariates whose roots came from the Frobenius root
+    /// finder and the domain index ([`DomainRootMode`]); zero, and omitted
+    /// from serialised reports, under the default scan.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub domain_frobenius_univariates: usize,
+    /// Counted multiplications of those extractions.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub domain_root_field_multiplications: u64,
+    /// Entries inserted into the per-traversal domain indexes.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub domain_index_entries: u64,
+    /// Multiplications of the domain scan (exact: [`domain_scan_cost`] for
+    /// each element evaluated), so that the two [`DomainRootMode`]s can be
+    /// compared in one unit.  In-process only: never serialised, so existing
+    /// transcripts are unchanged.
+    #[serde(skip_serializing)]
+    pub domain_scan_field_multiplications: u64,
+    /// Branching nodes whose children were extracted in one batch
+    /// ([`F4Options::sibling_batch`]); zero and omitted by default.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_nodes: usize,
+    /// Children specialised and solved by the batched path.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_children: usize,
+    /// Child systems with no univariate, handed back to the F4 path.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_fallbacks: usize,
+    /// Counted multiplications of the batched path: Horner specialisation,
+    /// univariate gcds, square roots, root finding and substitution.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub batched_field_multiplications: u64,
+    /// Wall-time accounting, only when [`F4Options::with_visit_timing`] enabled
+    /// it. Omitted when disabled, preserving existing serialized reports.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timings: Option<VisitTimings>,
+}
+
+// Interior-mutability keeps the clock independent of VisitState's mutable
+// traversal borrow. Scope guards close phases even on early return; none
+// spans recursive traversal or another measured phase.
+struct VisitClock {
+    started: Instant,
+    native_f4_ns: std::cell::Cell<u64>,
+    root_recovery_ns: std::cell::Cell<u64>,
+    callback_ns: std::cell::Cell<u64>,
+}
+
+impl VisitClock {
+    fn new() -> Self {
+        Self {
+            started: Instant::now(),
+            native_f4_ns: std::cell::Cell::new(0),
+            root_recovery_ns: std::cell::Cell::new(0),
+            callback_ns: std::cell::Cell::new(0),
+        }
+    }
+
+    fn finish(&self) -> VisitTimings {
+        let total_ns = visit_elapsed_ns(self.started);
+        let native_f4_ns = self.native_f4_ns.get();
+        let root_recovery_ns = self.root_recovery_ns.get();
+        let callback_ns = self.callback_ns.get();
+        let accounted = native_f4_ns
+            .saturating_add(root_recovery_ns)
+            .saturating_add(callback_ns);
+        debug_assert!(
+            accounted <= total_ns,
+            "visitor wall phases must not overlap"
+        );
+        VisitTimings {
+            total_ns,
+            native_f4_ns,
+            root_recovery_ns,
+            callback_ns,
+            traversal_other_ns: total_ns.saturating_sub(accounted),
+        }
+    }
+}
+
+fn visit_elapsed_ns(started: Instant) -> u64 {
+    u64::try_from(started.elapsed().as_nanos()).unwrap_or(u64::MAX)
+}
+
+enum VisitPhase {
+    NativeF4,
+    RootRecovery,
+    Callback,
+}
+
+struct VisitPhaseScope<'a> {
+    started: Instant,
+    elapsed: &'a std::cell::Cell<u64>,
+}
+
+impl Drop for VisitPhaseScope<'_> {
+    fn drop(&mut self) {
+        self.elapsed.set(
+            self.elapsed
+                .get()
+                .saturating_add(visit_elapsed_ns(self.started)),
+        );
+    }
+}
+
+fn visit_phase_scope(clock: Option<&VisitClock>, phase: VisitPhase) -> Option<VisitPhaseScope<'_>> {
+    clock.map(|clock| VisitPhaseScope {
+        started: Instant::now(),
+        elapsed: match phase {
+            VisitPhase::NativeF4 => &clock.native_f4_ns,
+            VisitPhase::RootRecovery => &clock.root_recovery_ns,
+            VisitPhase::Callback => &clock.callback_ns,
+        },
+    })
+}
+
+fn is_zero_u64(v: &u64) -> bool {
+    *v == 0
+}
+
+fn is_zero_usize(v: &usize) -> bool {
+    *v == 0
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -6461,6 +8141,7 @@ enum VisitEnd {
     Stopped,
     TimedOut,
     TraceStopped,
+    ResourceLimited,
 }
 
 /// Borrowed events for one depth-first traversal. `assignments` contains only
@@ -6512,6 +8193,10 @@ struct VisitState<'a, F, S> {
     pool: Option<&'a mut TracePool>,
     next_node: usize,
     report: VisitReport,
+    timing: Option<&'a VisitClock>,
+    /// Lazily built value → position index of each original variable's
+    /// finite domain, shared by every node of the traversal.
+    domain_index: Vec<Option<FxMap<u64, usize>>>,
 }
 
 impl<F, S> VisitState<'_, F, S>
@@ -6604,7 +8289,11 @@ where
                 return VisitEnd::Complete;
             }
             self.report.solutions_visited += 1;
-            return if (self.visitor)(&self.assignment) {
+            let stop = {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
+                (self.visitor)(&self.assignment)
+            };
+            return if stop {
                 VisitEnd::Stopped
             } else {
                 VisitEnd::Complete
@@ -6617,22 +8306,25 @@ where
             return VisitEnd::Complete;
         }
         let mut native_calls = 1;
-        let (r, trace) = if let Some(pool) = &mut self.pool {
-            let profile: Vec<_> = active
-                .iter()
-                .map(|&i| self.domains[i].as_ref().map(Vec::len))
-                .collect();
-            let before = pool.stats();
-            let r = pool.run(input, active.len(), self.p, self.opts, &profile);
-            let after = pool.stats();
-            native_calls = (after.learned - before.learned + after.replay_attempts
-                - before.replay_attempts) as usize;
-            (r, None)
-        } else if self.sink.is_some() {
-            let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
-            (r, Some(trace))
-        } else {
-            (f4(input, active.len(), self.p, self.opts), None)
+        let (r, trace) = {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::NativeF4);
+            if let Some(pool) = &mut self.pool {
+                let profile: Vec<_> = active
+                    .iter()
+                    .map(|&i| self.domains[i].as_ref().map(Vec::len))
+                    .collect();
+                let before = pool.stats();
+                let r = pool.run(input, active.len(), self.p, self.opts, &profile);
+                let after = pool.stats();
+                native_calls = (after.learned - before.learned + after.replay_attempts
+                    - before.replay_attempts) as usize;
+                (r, None)
+            } else if self.sink.is_some() {
+                let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
+                (r, Some(trace))
+            } else {
+                (f4(input, active.len(), self.p, self.opts), None)
+            }
         };
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
@@ -6641,6 +8333,43 @@ where
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
+        if let Some(d) = r.first_hilbert_deviation_degree {
+            self.report.first_hilbert_deviation_degree = Some(
+                self.report
+                    .first_hilbert_deviation_degree
+                    .map_or(d, |c| c.min(d)),
+            );
+        }
+        if let Some(d) = r.last_hilbert_deviation_degree {
+            self.report.last_hilbert_deviation_degree = Some(
+                self.report
+                    .last_hilbert_deviation_degree
+                    .map_or(d, |c| c.max(d)),
+            );
+        }
+        if let Some(d) = r.staircase_extinction_degree {
+            self.report.staircase_extinction_degree = Some(
+                self.report
+                    .staircase_extinction_degree
+                    .map_or(d, |c| c.max(d)),
+            );
+        }
+        if let Some(limit) = &r.resource_limit {
+            self.report.resource_limit = Some(limit.clone());
+            // Preserve the diagnostic event without cloning the incoming
+            // generators or admitting root recovery from an incomplete call.
+            if let Some(trace) = &trace {
+                if !self.emit(VisitEvent::NativeResult {
+                    node_id,
+                    report: &r,
+                    trace,
+                    generating_set: input,
+                }) {
+                    return VisitEnd::TraceStopped;
+                }
+            }
+            return VisitEnd::ResourceLimited;
+        }
         // An alive-only native basis can retire an input before its deferred
         // pair is processed. Preserve the exact incoming generators in the
         // opt-in traced traversal instead of claiming equality for that subset.
@@ -6655,21 +8384,6 @@ where
             generators
         });
         let generating_set = preserved.as_deref().unwrap_or(&r.basis);
-        if let Some(d) = r.first_fall_degree {
-            self.report.first_fall_degree =
-                Some(self.report.first_fall_degree.map_or(d, |c| c.min(d)));
-        }
-        if let Some(d) = r.last_fall_degree {
-            self.report.last_fall_degree =
-                Some(self.report.last_fall_degree.map_or(d, |c| c.max(d)));
-        }
-        if let Some(d) = r.degree_of_regularity_observed {
-            self.report.degree_of_regularity_observed = Some(
-                self.report
-                    .degree_of_regularity_observed
-                    .map_or(d, |c| c.max(d)),
-            );
-        }
         if let Some(trace) = &trace {
             if !self.emit(VisitEvent::NativeResult {
                 node_id,
@@ -6701,13 +8415,54 @@ where
                 continue;
             }
             let var = *vars.iter().next().unwrap();
-            let roots = if let Some(domain) = &self.domains[active[var]] {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+            let frobenius = self.domains[active[var]].as_ref().is_some_and(|domain| {
+                match self.opts.domain_roots {
+                    DomainRootMode::Scan => false,
+                    DomainRootMode::Frobenius => true,
+                    DomainRootMode::Auto => {
+                        let exponents: Vec<u32> = g.iter().map(|(e, _)| e[var]).collect();
+                        let degree = exponents.iter().copied().max().unwrap_or(0);
+                        domain_frobenius_cost(degree, self.p)
+                            < domain_scan_cost(&exponents, domain.len())
+                    }
+                }
+            });
+            let roots = if frobenius {
+                let original = active[var];
+                let domain = self.domains[original]
+                    .as_ref()
+                    .expect("selected only for a finite domain");
+                if self.domain_index[original].is_none() {
+                    self.report.domain_index_entries += domain.len() as u64;
+                    self.domain_index[original] = Some(domain_position_index(domain));
+                }
+                let degree = g.iter().map(|(e, _)| e[var]).max().unwrap_or(0) as usize;
+                let mut coefficients = vec![0; degree + 1];
+                for (e, c) in g {
+                    coefficients[e[var] as usize] = *c;
+                }
+                self.report.domain_frobenius_univariates += 1;
+                let Some(roots) = domain_roots_frobenius(
+                    &coefficients,
+                    self.domain_index[original].as_ref().expect("built above"),
+                    self.p,
+                    &mut self.report.domain_root_field_multiplications,
+                    self.opts.deadline,
+                ) else {
+                    return VisitEnd::TimedOut;
+                };
+                roots
+            } else if let Some(domain) = &self.domains[active[var]] {
                 let mut roots = Vec::new();
+                let exponents: Vec<u32> = g.iter().map(|(e, _)| e[var]).collect();
+                let per_point = domain_scan_cost(&exponents, 1);
                 for &x in domain {
                     if self.expired() {
                         return VisitEnd::TimedOut;
                     }
                     self.report.domain_evaluations += 1;
+                    self.report.domain_scan_field_multiplications += per_point;
                     let value = g.iter().fold(0, |v, (e, c)| {
                         (v + mulmod(*c, powmod(x, u64::from(e[var]), self.p), self.p)) % self.p
                     });
@@ -6759,6 +8514,14 @@ where
         let full_field = !has_univariate && self.domains[active[var]].is_none();
         let mut remaining = active.to_vec();
         let original = remaining.remove(var);
+        if self.opts.sibling_batch
+            && !has_univariate
+            && !full_field
+            && self.sink.is_none()
+            && self.pool.is_none()
+        {
+            return self.batched_siblings(generating_set, var, original, &remaining, node_id);
+        }
         for value in values {
             if self.expired() {
                 return VisitEnd::TimedOut;
@@ -6792,6 +8555,189 @@ where
                 .filter(|g| !g.is_empty())
                 .collect();
             let end = self.walk(&sub, &remaining, Some(node_id));
+            if end != VisitEnd::Complete {
+                return end;
+            }
+        }
+        VisitEnd::Complete
+    }
+
+    /// Build the value → position index of an original variable's domain
+    /// once per traversal.
+    fn ensure_domain_index(&mut self, original: usize) {
+        if self.domain_index[original].is_none() {
+            if let Some(domain) = &self.domains[original] {
+                self.report.domain_index_entries += domain.len() as u64;
+                self.domain_index[original] = Some(domain_position_index(domain));
+            }
+        }
+    }
+
+    /// [`F4Options::sibling_batch`]: every child of a finite-domain branching
+    /// node, from one sibling family, in domain order.
+    fn batched_siblings(
+        &mut self,
+        generating_set: &[Poly],
+        var: usize,
+        original: usize,
+        remaining: &[usize],
+        node_id: usize,
+    ) -> VisitEnd {
+        let family = sibling_family(generating_set, var);
+        let domain = self.domains[original]
+            .clone()
+            .expect("batched only over a finite domain");
+        self.report.batched_nodes += 1;
+        for value in domain {
+            if self.expired() {
+                return VisitEnd::TimedOut;
+            }
+            self.assignment[original] = value;
+            let mut muls = 0u64;
+            let polys = specialise_family(&family, value, self.p, &mut muls);
+            self.report.batched_field_multiplications += muls;
+            self.report.batched_children += 1;
+            let end = self.tri_solve(polys, remaining, node_id);
+            if end != VisitEnd::Complete {
+                return end;
+            }
+        }
+        VisitEnd::Complete
+    }
+
+    /// Solve one child system without F4: repeatedly take a variable with a
+    /// univariate polynomial, extract the roots of the gcd of all its
+    /// univariates (restricted to its domain), substitute each and recurse.
+    /// A system with no univariate goes to the F4 path ([`Self::walk`]).
+    /// Leaves are checked against the original input as the walk's are.
+    fn tri_solve(&mut self, polys: Vec<SparsePoly>, vars: &[usize], node_id: usize) -> VisitEnd {
+        if self.expired() {
+            return VisitEnd::TimedOut;
+        }
+        // Constants: a nonzero one is inconsistent, a zero one says nothing.
+        let mut live: Vec<SparsePoly> = Vec::with_capacity(polys.len());
+        for g in polys {
+            if g.iter().all(|(e, _)| e.iter().all(|&k| k == 0)) {
+                if g.iter().fold(0u64, |s, (_, c)| (s + c) % self.p) != 0 {
+                    return VisitEnd::Complete;
+                }
+            } else {
+                live.push(g);
+            }
+        }
+        if vars.is_empty() {
+            let ok = self
+                .original
+                .iter()
+                .all(|g| eval(g, &self.assignment, self.p) == 0);
+            if !ok {
+                self.report.candidates_rejected += 1;
+                return VisitEnd::Complete;
+            }
+            self.report.solutions_visited += 1;
+            let stop = {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
+                (self.visitor)(&self.assignment)
+            };
+            return if stop {
+                VisitEnd::Stopped
+            } else {
+                VisitEnd::Complete
+            };
+        }
+        if vars
+            .iter()
+            .any(|&i| self.domains[i].as_ref().is_some_and(Vec::is_empty))
+        {
+            return VisitEnd::Complete;
+        }
+        // Univariates by local variable, as dense coefficient vectors.
+        let p = self.p;
+        let mut univariates: Vec<Vec<Vec<u64>>> = vec![Vec::new(); vars.len()];
+        for g in &live {
+            let mut support = None;
+            let mut single = true;
+            for (e, _) in g {
+                for (j, &k) in e.iter().enumerate() {
+                    if k > 0 {
+                        match support {
+                            None => support = Some(j),
+                            Some(s) if s != j => single = false,
+                            _ => {}
+                        }
+                    }
+                }
+            }
+            if let (true, Some(j)) = (single, support) {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+                let degree = g.iter().map(|(e, _)| e[j]).max().unwrap_or(0) as usize;
+                let mut dense = vec![0u64; degree + 1];
+                for (e, c) in g {
+                    let k = e[j] as usize;
+                    dense[k] = (dense[k] + c) % p;
+                }
+                univariates[j].push(dense_trim(dense));
+            }
+        }
+        let mut muls = 0u64;
+        let mut best: Option<(usize, Vec<u64>)> = None;
+        for (j, us) in univariates.iter().enumerate() {
+            if us.is_empty() {
+                continue;
+            }
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+            let h = us
+                .iter()
+                .skip(1)
+                .fold(us[0].clone(), |h, u| dense_gcd(&h, u, p, &mut muls));
+            let h = dense_gcd(&h, &[], p, &mut muls);
+            if h.len() <= 1 {
+                // No common root of this variable's univariates.
+                self.report.batched_field_multiplications += muls;
+                return VisitEnd::Complete;
+            }
+            if best.as_ref().is_none_or(|(_, b)| h.len() < b.len()) {
+                best = Some((j, h));
+            }
+        }
+        let Some((z, h)) = best else {
+            self.report.batched_field_multiplications += muls;
+            self.report.batched_fallbacks += 1;
+            let normalised: Vec<Poly> = live
+                .into_iter()
+                .map(|g| normalise_owned(g, self.p, self.opts.order))
+                .filter(|g| !g.is_empty())
+                .collect();
+            return self.walk(&normalised, vars, Some(node_id));
+        };
+        let z_original = vars[z];
+        let roots = {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+            let Some(mut roots) = dense_roots_fp(&h, p, &mut muls, self.opts.deadline) else {
+                self.report.batched_field_multiplications += muls;
+                return VisitEnd::TimedOut;
+            };
+            if self.domains[z_original].is_some() {
+                self.ensure_domain_index(z_original);
+                let index = self.domain_index[z_original].as_ref().expect("built above");
+                let mut hits: Vec<(usize, u64)> = roots
+                    .iter()
+                    .filter_map(|r| index.get(r).map(|&pos| (pos, *r)))
+                    .collect();
+                hits.sort_unstable_by_key(|&(pos, _)| pos);
+                roots = hits.into_iter().map(|(_, r)| r).collect();
+            }
+            self.report.batched_field_multiplications += muls;
+            roots
+        };
+        let mut rest = vars.to_vec();
+        rest.remove(z);
+        for r in roots {
+            let mut muls = 0u64;
+            let next = substitute_var(&live, z, r, p, &mut muls);
+            self.report.batched_field_multiplications += muls;
+            self.assignment[z_original] = r;
+            let end = self.tri_solve(next, &rest, node_id);
             if end != VisitEnd::Complete {
                 return end;
             }
@@ -6902,6 +8848,18 @@ where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
+    let timing = opts.visit_timing.then(VisitClock::new);
+    if opts.resource_limits.is_some() && (pool.is_some() || opts.sibling_batch) {
+        return Ok(VisitReport {
+            resource_limit: Some(unsupported_resource_option(if pool.is_some() {
+                "trace_pool"
+            } else {
+                "sibling_batch"
+            })),
+            timings: timing.as_ref().map(VisitClock::finish),
+            ..VisitReport::default()
+        });
+    }
     if opts.checkpoint.is_some()
         || opts.checkpoint_stop_after.is_some()
         || opts.checkpoint_in_step.is_some()
@@ -6934,12 +8892,560 @@ where
         pool,
         next_node: 0,
         report: VisitReport::default(),
+        timing: timing.as_ref(),
+        domain_index: vec![None; n_vars],
     };
     let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
     state.report.complete = end == VisitEnd::Complete;
     state.report.stopped_early = end == VisitEnd::Stopped;
     state.report.timed_out = end == VisitEnd::TimedOut;
+    state.report.timings = timing.as_ref().map(VisitClock::finish);
     Ok(state.report)
+}
+
+// BEGIN PUBLIC F4 RESOURCE LIMIT CONTROLS
+// This public-API-only module can be selected verbatim by an exact-source
+// qualifier whose outer module re-exports `cryptanalysis::f4_fp::*`.
+#[cfg(test)]
+mod resource_limit_tests {
+    use super::*;
+    use std::time::{Duration, Instant};
+
+    fn options(order: Ordering) -> F4Options {
+        let mut opts = F4Options::new(order, 10);
+        opts.resource_limits = Some(F4ResourceLimits {
+            max_pairs: 128,
+            max_symbolic_monomials: 1024,
+            max_matrix_entries: 100_000,
+        });
+        opts
+    }
+
+    fn two_roots() -> Vec<Poly> {
+        // Independently: x²=1 forces x=±1; xy=1 then forces y=x in F7.
+        vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 1], 1), (vec![0, 0], 6)],
+        ]
+    }
+
+    #[test]
+    fn bounded_native_and_traced_positive_control() {
+        let input = two_roots();
+        let bounded = options(Ordering::Grevlex);
+        let plain = F4Options::new(Ordering::Grevlex, 10);
+        let reference = f4(&input, 2, 7, &plain);
+        let actual = f4(&input, 2, 7, &bounded);
+        assert!(actual.resource_limit.is_none() && !actual.timed_out && !actual.inconsistent);
+        assert_eq!(actual.basis, reference.basis);
+        let mut roots = Vec::new();
+        let report = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &bounded,
+            &[None, None],
+            |s| {
+                roots.push(s.to_vec());
+                false
+            },
+            |_| Ok(()),
+        )
+        .unwrap();
+        roots.sort();
+        assert!(report.complete && report.resource_limit.is_none() && !report.timed_out);
+        assert_eq!(roots, vec![vec![1, 1], vec![6, 6]]);
+    }
+
+    #[test]
+    fn pair_limit_includes_above_degree_pairs_and_stops_traversal() {
+        let input = two_roots();
+        let mut opts = options(Ordering::Grevlex);
+        opts.max_degree = 1;
+        opts.resource_limits.as_mut().unwrap().max_pairs = 0;
+        let r = f4(&input, 2, 7, &opts);
+        let limit = r.resource_limit.unwrap();
+        assert_eq!(
+            (limit.stage, limit.resource, limit.observed, limit.limit),
+            ("critical_pairs", "pairs", 1, 0)
+        );
+        assert!(!r.inconsistent && !r.timed_out && r.basis.is_empty());
+        assert_eq!(r.steps, 0);
+        assert_eq!(solve(&input, 2, 7, &opts).verdict, Verdict::Undetermined);
+        let mut refused_native = 0;
+        let report = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |_| panic!("a resource stop must not call the solution visitor"),
+            |event| {
+                match event {
+                    VisitEvent::NativeResult {
+                        report,
+                        generating_set,
+                        ..
+                    } => {
+                        assert!(report.resource_limit.is_some());
+                        assert_eq!(generating_set, input.as_slice());
+                        refused_native += 1;
+                    }
+                    VisitEvent::Branch { .. } | VisitEvent::Candidate { .. } => {
+                        panic!("a resource stop must not branch or produce a candidate");
+                    }
+                    _ => {}
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!(refused_native, 1);
+        assert!(!report.complete && !report.stopped_early && !report.timed_out);
+        assert!(report.resource_limit.is_some());
+        assert_eq!(report.solutions_visited, 0);
+        assert_eq!(report.full_field_branches, 0);
+    }
+
+    #[test]
+    fn symbolic_closure_refuses_new_support_before_matrix_allocation() {
+        // The first two pair rows have five distinct monomials. Reducing
+        // xy^6 by the second generator adds y^11 and y^5 z^6: seven total,
+        // although the input itself contains only six terms.
+        let input = vec![
+            vec![(vec![2, 0, 0], 1), (vec![0, 7, 0], 1), (vec![0, 0, 7], 1)],
+            vec![(vec![1, 1, 0], 1), (vec![0, 6, 0], 1), (vec![0, 0, 6], 1)],
+        ];
+        let mut opts = options(Ordering::Lex);
+        opts.resource_limits
+            .as_mut()
+            .unwrap()
+            .max_symbolic_monomials = 6;
+        let r = f4(&input, 3, 7, &opts);
+        let limit = r.resource_limit.unwrap();
+        assert_eq!(
+            (limit.stage, limit.resource, limit.observed, limit.limit),
+            ("symbolic_support", "symbolic_monomials", 7, 6)
+        );
+        assert_eq!((r.steps, r.max_rows, r.max_cols), (0, 0, 0));
+        assert!(!r.inconsistent && !r.timed_out);
+    }
+
+    #[test]
+    fn recording_reserves_dense_copies_and_contributor_storage() {
+        // x²=0 and x²+1=0 contradict each other. The first matrix has two
+        // rows and two columns; this budget admits the ordinary workspace
+        // while refusing the additional recording workspace in advance.
+        let input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
+        let mut opts = options(Ordering::Grevlex);
+        opts.resource_limits.as_mut().unwrap().max_matrix_entries = 48;
+        let plain = f4(&input, 1, 7, &opts);
+        assert!(plain.inconsistent && plain.resource_limit.is_none());
+        let (recorded, trace) = f4_record(&input, 1, 7, &opts);
+        let limit = recorded.resource_limit.unwrap();
+        assert_eq!(limit.resource, "matrix_entries");
+        assert!(limit.observed > limit.limit);
+        assert!(!recorded.inconsistent && !recorded.timed_out);
+        assert_eq!(recorded.steps, 0);
+        assert!(trace.steps.is_empty());
+    }
+
+    #[test]
+    fn replay_obeys_the_current_call_limits() {
+        let input = two_roots();
+        let mut opts = options(Ordering::Grevlex);
+        let (recorded, trace) = f4_record(&input, 2, 7, &opts);
+        assert!(recorded.resource_limit.is_none() && !recorded.timed_out);
+        let replayed = f4_replay(&input, 2, 7, &opts, &trace);
+        assert!(replayed.resource_limit.is_none() && !replayed.trace_mismatch);
+        assert_eq!(replayed.basis, recorded.basis);
+        opts.resource_limits.as_mut().unwrap().max_matrix_entries = 0;
+        let refused = f4_replay(&input, 2, 7, &opts, &trace);
+        assert_eq!(refused.resource_limit.unwrap().resource, "matrix_entries");
+        assert!(!refused.inconsistent && !refused.timed_out && refused.basis.is_empty());
+    }
+
+    #[test]
+    fn final_interreduce_cannot_expand_past_the_term_budget() {
+        // The leading terms x and y are coprime, hence there is no F4 step.
+        // Substitution in x-y^4 produces x-(z+w)^4, with six nonzero terms
+        // over F7, already more than the entire five-term input budget.
+        let input = vec![
+            vec![(vec![1, 0, 0, 0], 1), (vec![0, 4, 0, 0], 6)],
+            vec![
+                (vec![0, 1, 0, 0], 1),
+                (vec![0, 0, 1, 0], 6),
+                (vec![0, 0, 0, 1], 6),
+            ],
+        ];
+        let mut opts = options(Ordering::Lex);
+        opts.resource_limits
+            .as_mut()
+            .unwrap()
+            .max_symbolic_monomials = 5;
+        let r = f4(&input, 4, 7, &opts);
+        let limit = r.resource_limit.unwrap();
+        assert!(limit.stage.starts_with("interreduce"));
+        assert_eq!(limit.resource, "symbolic_monomials");
+        assert_eq!(r.steps, 0);
+        assert!(!r.inconsistent && !r.timed_out);
+    }
+
+    #[test]
+    fn bounded_calls_refuse_unguarded_optional_modes() {
+        let input = two_roots();
+        for mode in ["checkpoint", "hilbert", "staircase", "run_log"] {
+            let mut opts = options(Ordering::Grevlex);
+            match mode {
+                "checkpoint" => {
+                    opts.checkpoint = Some(("must-not-be-written".into(), Duration::ZERO))
+                }
+                "hilbert" => opts.stop_hilbert = Some(1),
+                "staircase" => opts.stop_staircase = Some(8),
+                "run_log" => opts.capture_run_log = true,
+                _ => unreachable!(),
+            }
+            let r = f4(&input, 2, 7, &opts);
+            let limit = r.resource_limit.unwrap();
+            assert_eq!((limit.stage, limit.resource), ("options", mode));
+            assert_eq!(r.steps, 0);
+            assert!(!r.inconsistent && !r.timed_out);
+        }
+        let mut opts = options(Ordering::Grevlex);
+        opts.sibling_batch = true;
+        let r = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |_| panic!("unsupported mode reached callback"),
+            |_| Ok(()),
+        )
+        .unwrap();
+        assert!(!r.complete && r.resource_limit.is_some());
+        opts.sibling_batch = false;
+        let mut pool = TracePool::new("resource-cap-refusal", 2, 1024).unwrap();
+        let r = solve_visit_reusing(&input, 2, 7, &opts, &[None, None], &mut pool, |_| {
+            panic!("unsupported reuse reached callback")
+        })
+        .unwrap();
+        assert!(!r.complete && r.resource_limit.is_some());
+        assert_eq!(r.f4_runs, 0);
+    }
+
+    #[test]
+    fn bounded_deadline_is_incomplete_and_distinct_from_resource_admission() {
+        let mut opts = options(Ordering::Grevlex);
+        opts.deadline = Some(Instant::now() - Duration::from_millis(1));
+        let r = f4(&two_roots(), 2, 7, &opts);
+        assert!(r.timed_out && r.resource_limit.is_none() && !r.inconsistent);
+        let r = solve_visit_traced(
+            &two_roots(),
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |_| panic!("expired deadline reached callback"),
+            |_| Ok(()),
+        )
+        .unwrap();
+        assert!(r.timed_out && !r.complete && r.resource_limit.is_none());
+    }
+}
+
+// END PUBLIC F4 RESOURCE LIMIT CONTROLS
+
+#[cfg(test)]
+mod visit_timing_tests {
+    use super::*;
+
+    fn partition(report: &VisitReport) -> VisitTimings {
+        let timing = report.timings.expect("opt-in wall accounting is present");
+        assert_eq!(
+            timing.total_ns,
+            timing.native_f4_ns
+                + timing.root_recovery_ns
+                + timing.callback_ns
+                + timing.traversal_other_ns,
+            "exclusive wall buckets must partition the total"
+        );
+        timing
+    }
+
+    fn diagnostics(report: &VisitReport) -> serde_json::Value {
+        let mut value = serde_json::to_value(report).unwrap();
+        let fields = value.as_object_mut().unwrap();
+        fields.remove("timings");
+        // Native row-operation counts are process-wide unless explicitly
+        // configured otherwise. Parallel tests can affect this one field.
+        fields.remove("field_ops");
+        value
+    }
+
+    type Branches = Vec<(usize, usize, u64, &'static str)>;
+
+    fn coupled_fixture(
+        timing: bool,
+        traced: bool,
+        mode: DomainRootMode,
+    ) -> (Vec<Vec<u64>>, Branches, VisitReport) {
+        // x^2=1, y=x over F7: an unrestricted root followed by a
+        // finite-domain variable exercises both kinds of root recovery.
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 0], 1), (vec![0, 1], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 4)
+            .with_domain_roots(mode)
+            .with_visit_timing(timing);
+        let domains = [Some(vec![1, 2, 3, 6]), None];
+        let mut solutions = Vec::new();
+        let mut branches = Vec::new();
+        let visitor = |s: &[u64]| {
+            solutions.push(s.to_vec());
+            false
+        };
+        let report = if traced {
+            solve_visit_traced(&input, 2, 7, &opts, &domains, visitor, |event| {
+                if let VisitEvent::Branch {
+                    node_id,
+                    original_variable,
+                    value,
+                    source,
+                } = event
+                {
+                    branches.push((node_id, original_variable, value, source));
+                }
+                Ok(())
+            })
+        } else {
+            solve_visit(&input, 2, 7, &opts, &domains, visitor)
+        }
+        .unwrap();
+        (solutions, branches, report)
+    }
+
+    #[test]
+    fn default_off_preserves_serialized_report_shape() {
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        assert!(!opts.visit_timing);
+        assert!(
+            !opts
+                .clone()
+                .with_visit_timing(true)
+                .with_visit_timing(false)
+                .visit_timing
+        );
+        for traced in [false, true] {
+            let (_, _, report) = coupled_fixture(false, traced, DomainRootMode::Scan);
+            assert!(report.timings.is_none());
+            assert!(serde_json::to_value(&report)
+                .unwrap()
+                .get("timings")
+                .is_none());
+        }
+        assert!(serde_json::to_value(VisitReport::default())
+            .unwrap()
+            .get("timings")
+            .is_none());
+    }
+
+    #[test]
+    fn opt_in_preserves_each_visitors_solutions_branches_and_diagnostics() {
+        for traced in [false, true] {
+            for mode in [
+                DomainRootMode::Scan,
+                DomainRootMode::Frobenius,
+                DomainRootMode::Auto,
+            ] {
+                let (before, before_branches, old) = coupled_fixture(false, traced, mode);
+                let (after, after_branches, timed) = coupled_fixture(true, traced, mode);
+                assert_eq!(after, before);
+                assert_eq!(after_branches, before_branches);
+                assert_eq!(diagnostics(&timed), diagnostics(&old));
+                let mut expected = after;
+                expected.sort();
+                assert_eq!(expected, vec![vec![1, 1], vec![6, 6]]);
+                assert!(timed.complete && !timed.stopped_early && !timed.timed_out);
+                partition(&timed);
+            }
+        }
+    }
+
+    #[test]
+    fn callback_stop_retains_callback_time_without_native_work() {
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let mut callbacks = 0;
+        let report = solve_visit(&[], 0, 7, &opts, &[], |_| {
+            callbacks += 1;
+            // Deliberate callback work distinguishes this bucket from
+            // residual traversal without assuming the solver's speed.
+            std::thread::sleep(Duration::from_millis(2));
+            true
+        })
+        .unwrap();
+        let timing = partition(&report);
+        assert_eq!(callbacks, 1);
+        assert!(report.stopped_early && !report.complete && !report.timed_out);
+        assert_eq!(timing.native_f4_ns, 0);
+        assert_eq!(timing.root_recovery_ns, 0);
+        assert!(timing.callback_ns >= 1_000_000);
+    }
+
+    #[test]
+    fn empty_domain_and_expired_deadline_retain_zero_work_partitions() {
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let empty = solve_visit(&[], 1, 7, &opts, &[Some(vec![])], |_| {
+            panic!("empty domain must not visit a solution")
+        })
+        .unwrap();
+        assert!(empty.complete);
+        let expired = opts.with_budget(Duration::ZERO);
+        let timeout = solve_visit(&[], 0, 7, &expired, &[], |_| {
+            panic!("expired deadline must not visit a solution")
+        })
+        .unwrap();
+        assert!(timeout.timed_out && !timeout.complete);
+        for report in [&empty, &timeout] {
+            let timing = partition(report);
+            assert_eq!(timing.native_f4_ns, 0);
+            assert_eq!(timing.root_recovery_ns, 0);
+            assert_eq!(timing.callback_ns, 0);
+            assert_eq!(timing.total_ns, timing.traversal_other_ns);
+        }
+    }
+
+    #[test]
+    fn empty_univariate_root_set_retains_recovery_time() {
+        // -1 is not a square in F7. Native F4 leaves a univariate, whose
+        // empty field-root set returns directly from the recovery loop.
+        let input = vec![vec![(vec![2], 1), (vec![0], 1)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let report = solve_visit(&input, 1, 7, &opts, &[None], |_| {
+            panic!("x^2+1 has no F7 root")
+        })
+        .unwrap();
+        let timing = partition(&report);
+        assert!(report.complete && !report.timed_out);
+        assert_eq!(report.factored_univariates, 1);
+        assert_eq!(report.solutions_visited, 0);
+        assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+        assert_eq!(timing.callback_ns, 0);
+    }
+
+    #[test]
+    fn trace_stop_retains_prior_work_and_charges_sink_time_to_other() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        for after_roots in [false, true] {
+            let report = solve_visit_traced(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                |_| panic!("trace sink stops before the first solution"),
+                |event| {
+                    if !after_roots || matches!(event, VisitEvent::Branch { .. }) {
+                        std::thread::sleep(Duration::from_millis(2));
+                        Err("timing test sink stop".into())
+                    } else {
+                        Ok(())
+                    }
+                },
+            )
+            .unwrap();
+            let timing = partition(&report);
+            assert!(report.trace_stopped && !report.complete && !report.timed_out);
+            assert_eq!(timing.callback_ns, 0);
+            assert!(timing.traversal_other_ns >= 1_000_000);
+            if after_roots {
+                assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+            } else {
+                assert_eq!(timing.native_f4_ns, 0);
+                assert_eq!(timing.root_recovery_ns, 0);
+            }
+        }
+    }
+
+    #[test]
+    fn batched_back_substitution_preserves_results_and_phase_partition() {
+        let input = vec![vec![(vec![0, 2], 1), (vec![1, 0], 6)]];
+        let domains = [Some(vec![4]), None];
+        let mut results = Vec::new();
+        for enabled in [false, true] {
+            let opts = F4Options::new(Ordering::Grevlex, 4)
+                .with_sibling_batch(true)
+                .with_visit_timing(enabled);
+            let mut solutions = Vec::new();
+            let report = solve_visit(&input, 2, 7, &opts, &domains, |s| {
+                solutions.push(s.to_vec());
+                false
+            })
+            .unwrap();
+            assert!(report.complete && report.batched_nodes > 0);
+            if enabled {
+                let timing = partition(&report);
+                assert!(timing.root_recovery_ns > 0);
+            } else {
+                assert!(report.timings.is_none());
+            }
+            results.push((solutions, diagnostics(&report)));
+        }
+        assert_eq!(results[0], results[1]);
+        let mut solutions = results.remove(0).0;
+        solutions.sort();
+        assert_eq!(solutions, vec![vec![4, 2], vec![4, 5]]);
+    }
+
+    #[test]
+    fn cold_and_warm_trace_reuse_preserve_results_with_timing_enabled() {
+        // The native reuse module's xy=1, x^2=1 fixture exercises both
+        // learning and certified replay, with separately initialized pools.
+        let input = vec![
+            vec![(vec![1, 1], 1), (vec![0, 0], 4)],
+            vec![(vec![2, 0], 1), (vec![0, 0], 4)],
+        ];
+        let domains = [Some((0..5).collect()), Some((0..5).collect())];
+        let mut results = Vec::new();
+        for enabled in [false, true] {
+            let opts = F4Options::new(Ordering::Grevlex, 8).with_visit_timing(enabled);
+            let mut pool = TracePool::new("visit-timing-control", 4, 10_000).unwrap();
+            let mut runs = Vec::new();
+            for _ in 0..2 {
+                let mut solutions = Vec::new();
+                let report = solve_visit_reusing(&input, 2, 5, &opts, &domains, &mut pool, |s| {
+                    solutions.push(s.to_vec());
+                    false
+                })
+                .unwrap();
+                assert!(report.complete);
+                if enabled {
+                    let timing = partition(&report);
+                    assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+                } else {
+                    assert!(report.timings.is_none());
+                }
+                let mut sorted = solutions.clone();
+                sorted.sort();
+                assert_eq!(sorted, vec![vec![1, 1], vec![4, 4]]);
+                let stats = pool.stats();
+                runs.push((
+                    solutions,
+                    diagnostics(&report),
+                    stats.learned,
+                    stats.replay_attempts,
+                    stats.accepted,
+                    stats.certification_reductions,
+                ));
+            }
+            assert!(pool.stats().accepted > 0);
+            assert!(pool.stats().certification_reductions > 0);
+            results.push(runs);
+        }
+        assert_eq!(results[0], results[1]);
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -6974,6 +9480,312 @@ pub struct SolveReport {
     /// evaluation against the input keeps the verdict exact.  Non-zero only
     /// when some run of the tree was truncated.
     pub candidates_rejected: usize,
+}
+
+/// Seed of the Cantor–Zassenhaus split stream shared with the unrestricted
+/// univariate path of the visitor.  The split stream changes only the work,
+/// never the root set.
+const VISIT_ROOT_SEED: u64 = 0x4634_524f_4f54;
+
+/// Value → position of a finite domain (the visitor validates that its
+/// values are distinct and below `p`).  Built once per traversal and
+/// variable, then shared by every node.
+pub(crate) fn domain_position_index(domain: &[u64]) -> FxMap<u64, usize> {
+    let mut index = FxMap::default();
+    index.reserve(domain.len());
+    for (position, &x) in domain.iter().enumerate() {
+        index.insert(x, position);
+    }
+    index
+}
+
+/// The roots in a finite domain of the univariate `coefficients` (low to
+/// high), in domain order: the counted `F_p`-root finder
+/// ([`super::glv_invariant_base::poly_roots_fp_counted_until`]), then the
+/// domain index.  Exact because the domain lies in `F_p`; `None` only when
+/// the deadline expires.  Multiplications are added to `muls`.
+pub(crate) fn domain_roots_frobenius(
+    coefficients: &[u64],
+    index: &FxMap<u64, usize>,
+    p: u64,
+    muls: &mut u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let rational = super::glv_invariant_base::poly_roots_fp_counted_until(
+        coefficients,
+        p,
+        VISIT_ROOT_SEED,
+        muls,
+        deadline,
+    )?;
+    let mut hits: Vec<(usize, u64)> = rational
+        .into_iter()
+        .filter_map(|r| index.get(&r).map(|&position| (position, r)))
+        .collect();
+    hits.sort_unstable_by_key(|&(position, _)| position);
+    Some(hits.into_iter().map(|(_, r)| r).collect())
+}
+
+/// The domain scan exactly as the visitor runs it (the control), with its
+/// multiplications counted: `terms` are `(exponent, coefficient)`.
+#[cfg(test)]
+pub(crate) fn domain_roots_scan(
+    terms: &[(u32, u64)],
+    domain: &[u64],
+    p: u64,
+    muls: &mut u64,
+) -> Vec<u64> {
+    let exponents: Vec<u32> = terms.iter().map(|&(e, _)| e).collect();
+    *muls += domain_scan_cost(&exponents, domain.len());
+    domain
+        .iter()
+        .copied()
+        .filter(|&x| {
+            terms.iter().fold(0, |v, &(e, c)| {
+                (v + mulmod(c, powmod(x, u64::from(e), p), p)) % p
+            }) == 0
+        })
+        .collect()
+}
+
+// ── Batched sibling extraction (`F4Options::sibling_batch`) ────────────────
+//
+// A sparse polynomial over the child's local variables, as the visitor's
+// `specialise` produces it (exponent vector, coefficient), without the
+// normalisation the F4 path needs.
+pub(crate) type SparsePoly = Vec<(Vec<u32>, u64)>;
+
+/// The generators of a branching node rewritten once for all its children:
+/// for each generator, its terms grouped by the exponent vector with the
+/// branch variable removed, each group's coefficient a univariate in the
+/// branch variable (low to high).  Specialising at `x = v` is one Horner
+/// evaluation per group.
+pub(crate) type SiblingFamily = Vec<Vec<(Vec<u32>, Vec<u64>)>>;
+
+pub(crate) fn sibling_family(generators: &[Poly], var: usize) -> SiblingFamily {
+    generators
+        .iter()
+        .map(|g| {
+            let mut groups: std::collections::BTreeMap<Vec<u32>, Vec<u64>> =
+                std::collections::BTreeMap::new();
+            for (e, c) in g {
+                let mut rest = e.clone();
+                let k = rest.remove(var) as usize;
+                let coeffs = groups.entry(rest).or_default();
+                if coeffs.len() <= k {
+                    coeffs.resize(k + 1, 0);
+                }
+                coeffs[k] = *c;
+            }
+            groups.into_iter().collect()
+        })
+        .collect()
+}
+
+/// The children's system at `x = v`: Horner on every coefficient group,
+/// zero terms and zero polynomials dropped.
+pub(crate) fn specialise_family(
+    family: &SiblingFamily,
+    v: u64,
+    p: u64,
+    muls: &mut u64,
+) -> Vec<SparsePoly> {
+    family
+        .iter()
+        .filter_map(|groups| {
+            let terms: SparsePoly = groups
+                .iter()
+                .filter_map(|(e, coeffs)| {
+                    let mut acc = 0u64;
+                    for &c in coeffs.iter().rev() {
+                        acc = (mulmod(acc, v, p) + c) % p;
+                    }
+                    *muls += coeffs.len().saturating_sub(1) as u64;
+                    (acc != 0).then(|| (e.clone(), acc))
+                })
+                .collect();
+            (!terms.is_empty()).then_some(terms)
+        })
+        .collect()
+}
+
+/// Substitute local variable `z = r` in every polynomial and drop it from
+/// the exponent vectors; equal monomials are merged and zero polynomials
+/// dropped.
+pub(crate) fn substitute_var(
+    polys: &[SparsePoly],
+    z: usize,
+    r: u64,
+    p: u64,
+    muls: &mut u64,
+) -> Vec<SparsePoly> {
+    polys
+        .iter()
+        .filter_map(|g| {
+            let mut merged: std::collections::BTreeMap<Vec<u32>, u64> =
+                std::collections::BTreeMap::new();
+            for (e, c) in g {
+                let mut rest = e.clone();
+                let k = u64::from(rest.remove(z));
+                let t = if k == 0 {
+                    *c
+                } else {
+                    *muls += powmod_muls(k) + 1;
+                    mulmod(*c, powmod(r, k, p), p)
+                };
+                let slot = merged.entry(rest).or_insert(0);
+                *slot = (*slot + t) % p;
+            }
+            let out: SparsePoly = merged.into_iter().filter(|(_, c)| *c != 0).collect();
+            (!out.is_empty()).then_some(out)
+        })
+        .collect()
+}
+
+fn dense_trim(mut v: Vec<u64>) -> Vec<u64> {
+    while v.last() == Some(&0) {
+        v.pop();
+    }
+    v
+}
+
+/// `a mod b` for dense polynomials (low to high), `b` trimmed and nonzero.
+fn dense_rem(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+    let mut r = dense_trim(a.to_vec());
+    let inv = inv_mod_u64(*b.last().expect("nonzero divisor"), p);
+    while r.len() >= b.len() {
+        let lead = mulmod(*r.last().expect("nonempty"), inv, p);
+        let shift = r.len() - b.len();
+        for (i, &bi) in b.iter().enumerate() {
+            r[shift + i] = (r[shift + i] + p - mulmod(lead, bi, p)) % p;
+        }
+        *muls += b.len() as u64 + 1;
+        r = dense_trim(r);
+    }
+    r
+}
+
+/// Monic gcd of two dense polynomials (either may be zero).
+pub(crate) fn dense_gcd(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+    let (mut x, mut y) = (dense_trim(a.to_vec()), dense_trim(b.to_vec()));
+    while !y.is_empty() {
+        let r = dense_rem(&x, &y, p, muls);
+        x = y;
+        y = r;
+    }
+    if let Some(&lead) = x.last() {
+        let inv = inv_mod_u64(lead, p);
+        *muls += x.len() as u64;
+        for c in &mut x {
+            *c = mulmod(*c, inv, p);
+        }
+    }
+    x
+}
+
+/// Square root modulo an odd prime (Tonelli–Shanks), multiplications
+/// counted; `None` for a non-residue.
+pub(crate) fn sqrt_mod_counted(n: u64, p: u64, muls: &mut u64) -> Option<u64> {
+    let n = n % p;
+    if n == 0 {
+        return Some(0);
+    }
+    let pw = |a: u64, e: u64, muls: &mut u64| {
+        *muls += powmod_muls(e);
+        powmod(a, e, p)
+    };
+    if pw(n, (p - 1) / 2, muls) != 1 {
+        return None;
+    }
+    if p % 4 == 3 {
+        return Some(pw(n, (p + 1) / 4, muls));
+    }
+    let (mut q, mut s) = (p - 1, 0u32);
+    while q % 2 == 0 {
+        q /= 2;
+        s += 1;
+    }
+    let mut z = 2u64;
+    while pw(z, (p - 1) / 2, muls) != p - 1 {
+        z += 1;
+    }
+    let (mut m, mut c, mut t, mut r) = (
+        s,
+        pw(z, q, muls),
+        pw(n, q, muls),
+        pw(n, q.div_ceil(2), muls),
+    );
+    while t != 1 {
+        let (mut i, mut tt) = (0u32, t);
+        while tt != 1 {
+            tt = mulmod(tt, tt, p);
+            *muls += 1;
+            i += 1;
+            if i == m {
+                return None;
+            }
+        }
+        let mut b = c;
+        for _ in 0..(m - i - 1) {
+            b = mulmod(b, b, p);
+            *muls += 1;
+        }
+        m = i;
+        c = mulmod(b, b, p);
+        t = mulmod(t, c, p);
+        r = mulmod(r, b, p);
+        *muls += 3;
+    }
+    Some(r)
+}
+
+/// All `F_p`-roots of the dense polynomial `h` (low to high, trimmed,
+/// degree at least one), ascending: closed form for degree one and, at an
+/// odd prime, two; the counted Frobenius root finder otherwise.  `None`
+/// only when the deadline expires.
+pub(crate) fn dense_roots_fp(
+    h: &[u64],
+    p: u64,
+    muls: &mut u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let mut roots = match h.len() {
+        0 | 1 => Vec::new(),
+        2 => {
+            *muls += 1;
+            vec![mulmod((p - h[0]) % p, inv_mod_u64(h[1], p), p)]
+        }
+        3 if p % 2 == 1 => {
+            let (c0, c1, c2) = (h[0], h[1], h[2]);
+            let disc = (mulmod(c1, c1, p) + p - mulmod(4 % p, mulmod(c2, c0, p), p)) % p;
+            *muls += 4;
+            let inv2a = inv_mod_u64(mulmod(2, c2, p), p);
+            match sqrt_mod_counted(disc, p, muls) {
+                None => Vec::new(),
+                Some(s) => {
+                    *muls += 2;
+                    let neg_b = (p - c1) % p;
+                    let r1 = mulmod((neg_b + s) % p, inv2a, p);
+                    let r2 = mulmod((neg_b + p - s) % p, inv2a, p);
+                    if r1 == r2 {
+                        vec![r1]
+                    } else {
+                        vec![r1, r2]
+                    }
+                }
+            }
+        }
+        _ => super::glv_invariant_base::poly_roots_fp_counted_until(
+            h,
+            p,
+            VISIT_ROOT_SEED,
+            muls,
+            deadline,
+        )?,
+    };
+    roots.sort_unstable();
+    roots.dedup();
+    Some(roots)
 }
 
 /// Roots in `F_p` of a univariate polynomial given as `(degree, coeff)`.
@@ -7154,6 +9966,9 @@ fn solve_rec(
         *timed_out = true;
         return Verdict::Undetermined;
     }
+    if r.resource_limit.is_some() {
+        return Verdict::Undetermined;
+    }
     if r.inconsistent {
         return Verdict::Inconsistent;
     }
@@ -7312,17 +10127,55 @@ mod tests {
     fn semi_regular_hilbert_matches_hand_computed_series() {
         // Square complete intersection of two quadrics in two variables:
         // (1 - t^2)^2 / (1 - t)^2 = (1 + t)^2 = 1 + 2t + t^2.
-        assert_eq!(semi_regular_hilbert(&[2, 2], 2), vec![1, 2, 1]);
+        assert_eq!(semi_regular_hilbert(&[2, 2], 2), Some(vec![1, 2, 1]));
         // Over-determined: three quadrics in two variables,
         // (1 - t^2)^3 / (1 - t)^2, truncated at the first non-positive
         // coefficient, is [1, 2].
-        assert_eq!(semi_regular_hilbert(&[2, 2, 2], 2), vec![1, 2]);
+        assert_eq!(semi_regular_hilbert(&[2, 2, 2], 2), Some(vec![1, 2]));
         // One linear form in one variable: 1 / (1 - t) * (1 - t) = 1.
-        assert_eq!(semi_regular_hilbert(&[1], 1), vec![1]);
+        assert_eq!(semi_regular_hilbert(&[1], 1), Some(vec![1]));
     }
 
     #[test]
-    fn degree_falls_absent_for_a_regular_sequence() {
+    fn diagnostic_staircase_matches_exact_counts_and_obeys_the_original_deadline() {
+        let leading = [vec![2, 0], vec![1, 1]];
+        let lms: Vec<&[u32]> = leading.iter().map(Vec::as_slice).collect();
+        for degree in 0..=8 {
+            assert_eq!(
+                diagnostic_staircase_count(&lms, 2, degree, None),
+                Some(uncovered_in_degree(&lms, 2, degree))
+            );
+        }
+        let expired = Some(Instant::now() - Duration::from_millis(1));
+        assert_eq!(diagnostic_staircase_count(&lms, 2, 8, expired), None);
+        assert_eq!(semi_regular_hilbert_before(&[2, 2], 2, expired), None);
+    }
+
+    #[test]
+    fn affine_staircase_extinction_is_not_top_form_regularity() {
+        // x^2-1 and xy-1 give the affine basis {x-y, y^2-1}, whose
+        // staircase is empty in degree 2. Their top forms generate (x^2,xy),
+        // which retains y^d at every degree and has no finite regularity degree.
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 1], 1), (vec![0, 0], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 8).recording_hilbert_diagnostics();
+        let report = f4(&input, 2, 7, &opts);
+        assert!(!report.inconsistent && !report.timed_out);
+        assert_eq!(report.staircase_extinction_degree, Some(2));
+        let top = [vec![2, 0], vec![1, 1]];
+        let lms: Vec<&[u32]> = top.iter().map(Vec::as_slice).collect();
+        assert_eq!(diagnostic_staircase_count(&lms, 2, 8, None), Some(1));
+    }
+
+    #[test]
+    fn hilbert_expectation_overflow_is_unavailable_instead_of_wrapping() {
+        assert!(semi_regular_hilbert(&[2; 128], 128).is_none());
+    }
+
+    #[test]
+    fn hilbert_deviations_absent_for_a_regular_sequence() {
         // x^2 - 1, y^2 - 1 over F_7: a regular sequence (square complete
         // intersection), so the realized Hilbert function equals the
         // semi-regular expectation at every degree — no degree fall — and the
@@ -7332,20 +10185,20 @@ mod tests {
             vec![(vec![0, 2], 1), (vec![0, 0], 6)], // y^2 - 1
         ];
         let mut opts = F4Options::new(Ordering::Grevlex, 8);
-        opts.record_degree_falls = true;
+        opts.record_hilbert_diagnostics = true;
         let r = f4(&input, 2, 7, &opts);
         assert!(!r.inconsistent && !r.timed_out);
-        assert!(!r.degree_falls.is_empty(), "the diagnostic ran");
+        assert!(!r.hilbert_deviations.is_empty(), "the diagnostic ran");
         assert!(
-            r.degree_falls.iter().all(|s| !s.is_fall),
+            r.hilbert_deviations.iter().all(|s| !s.is_below_expectation),
             "a regular sequence has no degree fall: {:?}",
-            r.degree_falls
+            r.hilbert_deviations
         );
-        assert_eq!(r.first_fall_degree, None);
-        assert_eq!(r.last_fall_degree, None);
-        assert_eq!(r.degree_of_regularity_observed, Some(3));
+        assert_eq!(r.first_hilbert_deviation_degree, None);
+        assert_eq!(r.last_hilbert_deviation_degree, None);
+        assert_eq!(r.staircase_extinction_degree, Some(3));
         let realized: Vec<usize> = r
-            .degree_falls
+            .hilbert_deviations
             .iter()
             .take(3)
             .map(|s| s.hilbert_realized)
@@ -7354,42 +10207,48 @@ mod tests {
     }
 
     #[test]
-    fn degree_fall_detected_on_an_over_determined_system() {
+    fn hilbert_deviation_does_not_claim_a_formal_first_fall_degree() {
         // x^2 - 1, y^2 - 1, x*y - x over F_7. The extra form forces y = 1
         // (reduced basis {x^2 - 1, y - 1}), so the realized Hilbert function
         // {1, x} is [1, 1, 0] — below the semi-regular [1, 2] at degree 1.
-        // First and last fall are degree 1; the quotient vanishes at degree 2.
+        // The staircase deviates at degree 1 and is empty at degree 2.
+        // Every input has degree 2, so V_{F,1} is zero: a formal degree
+        // fall at degree 1 is impossible. This prevents the old relabelling.
         let input: Vec<Poly> = vec![
             vec![(vec![2, 0], 1), (vec![0, 0], 6)], // x^2 - 1
             vec![(vec![0, 2], 1), (vec![0, 0], 6)], // y^2 - 1
             vec![(vec![1, 1], 1), (vec![1, 0], 6)], // x*y - x
         ];
         let mut opts = F4Options::new(Ordering::Grevlex, 8);
-        opts.record_degree_falls = true;
+        opts.record_hilbert_diagnostics = true;
         let r = f4(&input, 2, 7, &opts);
         assert!(!r.inconsistent && !r.timed_out);
-        assert_eq!(r.first_fall_degree, Some(1));
-        assert_eq!(r.last_fall_degree, Some(1));
-        assert_eq!(r.degree_of_regularity_observed, Some(2));
-        let d1 = r.degree_falls.iter().find(|s| s.degree == 1).unwrap();
+        assert_eq!(r.first_hilbert_deviation_degree, Some(1));
+        assert_eq!(r.last_hilbert_deviation_degree, Some(1));
+        assert_eq!(r.staircase_extinction_degree, Some(2));
+        let d1 = r.hilbert_deviations.iter().find(|s| s.degree == 1).unwrap();
         assert_eq!(
-            (d1.hilbert_realized, d1.hilbert_expected, d1.is_fall),
+            (
+                d1.hilbert_realized,
+                d1.hilbert_expected,
+                d1.is_below_expectation
+            ),
             (1, 2, true)
         );
     }
 
     #[test]
-    fn degree_falls_off_by_default() {
-        // Without record_degree_falls the diagnostic does not run (zero cost).
+    fn hilbert_deviations_off_by_default() {
+        // Without record_hilbert_diagnostics the diagnostic does not run (zero cost).
         let input: Vec<Poly> = vec![
             vec![(vec![2, 0], 1), (vec![0, 0], 6)],
             vec![(vec![0, 2], 1), (vec![0, 0], 6)],
         ];
         let opts = F4Options::new(Ordering::Grevlex, 8);
         let r = f4(&input, 2, 7, &opts);
-        assert!(r.degree_falls.is_empty());
-        assert_eq!(r.first_fall_degree, None);
-        assert_eq!(r.degree_of_regularity_observed, None);
+        assert!(r.hilbert_deviations.is_empty());
+        assert_eq!(r.first_hilbert_deviation_degree, None);
+        assert_eq!(r.staircase_extinction_degree, None);
     }
 
     #[test]
@@ -8499,6 +11358,53 @@ mod tests {
     }
 
     #[test]
+    fn narrow_accumulators_match_wide_rref() {
+        let mut x = 0x0fed_cba9_8765_4321u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for p in [2u64, 3, 29, 53, 101, 251, 4093] {
+            let fp = Barrett::new(p);
+            let narrow = Barrett32::new(p);
+            // the 32-bit reduction holds on every u32, not only on p(p-1)
+            for probe in [0u32, 1, u32::MAX, u32::MAX - 1, 1 << 31] {
+                assert_eq!(narrow.reduce(probe) as u64, probe as u64 % p, "p={p}");
+            }
+            for _ in 0..10_000 {
+                let probe = next() as u32;
+                assert_eq!(narrow.reduce(probe) as u64, probe as u64 % p, "p={p}");
+            }
+            let interval = narrow_acc_interval_for(p);
+            assert!(interval.is_some_and(|k| k >= 256), "p={p}");
+            for every in [1usize, 2, 7, interval.unwrap()] {
+                for (rows, cols) in [(1, 1), (7, 9), (20, 15), (40, 33), (64, 70)] {
+                    let mut wide: Vec<Vec<u64>> = (0..rows)
+                        .map(|_| (0..cols).map(|_| next() % p).collect())
+                        .collect();
+                    let mut narrow_rows: Vec<Vec<u32>> = wide
+                        .iter()
+                        .map(|row| row.iter().map(|&v| v as u32).collect())
+                        .collect();
+                    let want = rref(&mut wide, fp, None).unwrap();
+                    let got =
+                        rref32_deferred_n32(&mut narrow_rows, narrow, fp, None, every).unwrap();
+                    assert_eq!(got, want, "p={p} every={every} {rows}x{cols}");
+                    let widened: Vec<Vec<u64>> = narrow_rows
+                        .into_iter()
+                        .map(|row| row.into_iter().map(u64::from).collect())
+                        .collect();
+                    assert_eq!(widened, wide, "p={p} every={every} {rows}x{cols}");
+                }
+            }
+        }
+        assert_eq!(narrow_acc_interval_for(4099), None);
+        assert_eq!(narrow_acc_interval_for(65_521), None);
+    }
+
+    #[test]
     fn narrow_arithmetic_matches_wide_rref() {
         let mut x = 0x0123_4567_89ab_cdefu64;
         let mut next = || {
@@ -8982,6 +11888,196 @@ mod packed_set_tests {
     /// Reduction by a set with its monomials packed against the vector one,
     /// for sets that reduce a good deal (multiples of one another).
     #[test]
+    fn first_alive_divisor_matches_the_u128_scan() {
+        let mut rng = Xs(0x5eed_0fd1_d1d0_u64);
+        for n in 1usize..=15 {
+            let guard = (0..n).fold(0u128, |g, i| g | 0x80u128 << (8 * i));
+            let mono = |rng: &mut Xs, top: u64| {
+                (0..n).fold(0u128, |a, i| a | ((rng.below(top) as u128) << (8 * i)))
+            };
+            for len in [0usize, 1, 3, 4, 5, 9, 31] {
+                let lms: Vec<u128> = (0..len).map(|_| mono(&mut rng, 3)).collect();
+                for _ in 0..200 {
+                    let m = mono(&mut rng, 6);
+                    let want = lms.iter().position(|&a| ((m | guard) - a) & guard == guard);
+                    assert_eq!(first_alive_divisor(&lms, guard, m), want, "n={n} len={len}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn diverged_replays_record_and_follow_branches() {
+        let mut rng = Xs(0x0b5a_2c11_7e57_0001);
+        let (n, p) = (3usize, 31u64);
+        let monos = monomials_up_to(n, 2);
+        // dense quadrics, some with middle coefficients forced to zero:
+        // the input leading monomials stay, later steps can differ
+        let system = |rng: &mut Xs, zeros: &[usize]| -> Vec<Poly> {
+            (0..n)
+                .map(|k| {
+                    let f: Vec<_> = monos
+                        .iter()
+                        .enumerate()
+                        .map(|(i, m)| {
+                            let c = if k == 0 && i > 0 && zeros.contains(&i) {
+                                0
+                            } else {
+                                1 + rng.below(p - 1)
+                            };
+                            (m.clone(), c)
+                        })
+                        .filter(|(_, c)| *c != 0)
+                        .collect();
+                    normalise(&f, p, Ordering::Grevlex)
+                })
+                .collect()
+        };
+        let opts = F4Options::new(Ordering::Grevlex, 10);
+        let (_, trace) = f4_record(&system(&mut rng, &[]), n, p, &opts);
+        let mut followed = 0;
+        for t in 0..60 {
+            let zeros = [1 + t % 7, 2 + (t * 3) % 7];
+            let sys = system(&mut rng, &zeros);
+            let plain = f4(&sys, n, p, &opts);
+            let first = f4_replay(&sys, n, p, &opts, &trace);
+            if !first.trace_mismatch {
+                assert_eq!(first.basis, plain.basis, "system {t}");
+                continue;
+            }
+            if !trace_growth() {
+                continue; // another test turned recording off
+            }
+            // the same system again: the branch its first replay recorded
+            // (unless this step's branches are full) takes it to the end
+            let second = f4_replay(&sys, n, p, &opts, &trace);
+            if !second.trace_mismatch {
+                followed += 1;
+                assert_eq!(second.basis, plain.basis, "system {t}, on its branch");
+            }
+        }
+        if trace_growth() {
+            assert!(followed > 0, "no replay followed a branch");
+        }
+    }
+
+    #[test]
+    fn frozen_replay_steps_match_fresh_ones() {
+        let mut rng = Xs(0x7eed_f00d_1234_5678);
+        let (n, p) = (3usize, 53u64);
+        let monos = monomials_up_to(n, 2);
+        // dense quadrics: every system has the recorded shape, except those
+        // with one coefficient forced to zero (another support)
+        let system = |rng: &mut Xs, zero: Option<usize>| -> Vec<Poly> {
+            (0..n)
+                .map(|k| {
+                    let f: Vec<_> = monos
+                        .iter()
+                        .enumerate()
+                        .map(|(i, m)| {
+                            let c = if k == 0 && zero == Some(i) {
+                                0
+                            } else {
+                                1 + rng.below(p - 1)
+                            };
+                            (m.clone(), c)
+                        })
+                        .filter(|(_, c)| *c != 0)
+                        .collect();
+                    normalise(&f, p, Ordering::Grevlex)
+                })
+                .collect()
+        };
+        let opts = F4Options::new(Ordering::Grevlex, 10);
+        let (rec, trace) = f4_record(&system(&mut rng, None), n, p, &opts);
+        assert!(!rec.trace_mismatch);
+        let before = frozen_steps_total();
+        for t in 0..12 {
+            let zero = (t % 4 == 3).then_some(1 + t % 3);
+            let sys = system(&mut rng, zero);
+            let plain = f4(&sys, n, p, &opts);
+            // the first replay of a step freezes it, the second reuses it
+            let first = f4_replay(&sys, n, p, &opts, &trace);
+            let second = f4_replay(&sys, n, p, &opts, &trace);
+            assert_eq!(first.basis, second.basis, "system {t}");
+            assert_eq!(first.trace_mismatch, second.trace_mismatch, "system {t}");
+            if !first.trace_mismatch {
+                assert_eq!(first.basis, plain.basis, "system {t}");
+            }
+        }
+        assert!(frozen_steps_total() > before, "no step was reused");
+    }
+
+    #[test]
+    fn mono_table_interns_like_a_map() {
+        let mut rng = Xs(0x0bad_cafe_dead_beef);
+        let mut t = MonoTable::with_capacity(4);
+        let mut m: std::collections::HashMap<u128, u32> = Default::default();
+        for _ in 0..20_000 {
+            // small packed monomials in 6 fields, many repeats
+            let x = (0..6).fold(0u128, |a, i| a | ((rng.below(5) as u128) << (8 * i)));
+            let next = m.len() as u32;
+            let want = *m.entry(x).or_insert(next);
+            assert_eq!(t.get_or_insert(x, next), want);
+        }
+        assert_eq!(t.len, m.len());
+    }
+
+    #[test]
+    fn packed_linear_interreduction_matches_the_vector_path() {
+        let mut rng = Xs(0x2468_ace0_1357_9bdf);
+        for (n, p) in [(3usize, 31u64), (4, 53), (5, 65_521), (6, 251)] {
+            for _ in 0..6 {
+                let monos = monomials_up_to(n, 3);
+                let gens: Vec<Poly> = (0..n + 1)
+                    .map(|_| {
+                        let k = 3 + rng.below(6) as usize;
+                        let f: Vec<_> = (0..k)
+                            .map(|_| {
+                                (
+                                    monos[rng.below(monos.len() as u64) as usize].clone(),
+                                    1 + rng.below(p - 1),
+                                )
+                            })
+                            .collect();
+                        normalise(&f, p, Ordering::Grevlex)
+                    })
+                    .filter(|f| !f.is_empty())
+                    .collect();
+                // the reduced basis with tails left unreduced (F4's alive
+                // basis before its final interreduction): g_i = f_i + c f_j
+                // for an element f_j of smaller leading monomial keeps every
+                // leading monomial, so the interreduction must give back
+                // the reduced basis
+                let basis = f4(&gens, n, p, &F4Options::new(Ordering::Grevlex, 10)).basis;
+                let mut raw = basis.clone();
+                for i in 1..raw.len() {
+                    let j = rng.below(i as u64) as usize;
+                    let c = 1 + rng.below(p - 1);
+                    let mut g = basis[i].clone();
+                    g.extend(basis[j].iter().map(|(e, v)| (e.clone(), v * c % p)));
+                    raw[i] = normalise(&g, p, Ordering::Grevlex);
+                }
+                let what = format!("n={n} p={p}");
+                let packed = interreduce_linear_with(&raw, n, p, Ordering::Grevlex, true);
+                let plain = interreduce_linear_with(&raw, n, p, Ordering::Grevlex, false);
+                assert!(packed.is_some(), "linear interreduction declined {what}");
+                assert_eq!(packed, plain, "packed vs vector {what}");
+                let mut want = basis.clone();
+                want.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, Ordering::Grevlex));
+                assert_eq!(packed.unwrap(), want, "vs the reduced basis {what}");
+                // a generating set that is not a basis: the two paths still
+                // build the same matrix
+                assert_eq!(
+                    interreduce_linear_with(&gens, n, p, Ordering::Grevlex, true),
+                    interreduce_linear_with(&gens, n, p, Ordering::Grevlex, false),
+                    "generators {what}"
+                );
+            }
+        }
+    }
+
+    #[test]
     fn packed_reduction_matches_the_vector_reduction() {
         let mut rng = Xs(0x1357_9bdf_2468_ace0);
         for (n, p, ord) in [
@@ -9442,6 +12538,563 @@ mod packed_set_tests {
                 }
                 assert_eq!(mulmod(a % p, invmod(a, p), p), 1, "{a}^-1 mod {p}");
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod domain_root_tests {
+    //! [`DomainRootMode`]: the Frobenius extraction returns the scan's roots,
+    //! in the scan's order, so the visitor's traversal cannot tell them apart.
+    use super::*;
+    use rand::rngs::StdRng;
+    use rand::{Rng, SeedableRng};
+
+    fn mul_poly(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+        let mut out = vec![0u64; a.len() + b.len() - 1];
+        for (i, &x) in a.iter().enumerate() {
+            for (j, &y) in b.iter().enumerate() {
+                out[i + j] = (out[i + j] + mulmod(x, y, p)) % p;
+            }
+        }
+        out
+    }
+
+    /// Coefficients (low to high) with a nonzero leading coefficient and
+    /// degree at least one: planted roots (some repeated, some outside the
+    /// domain), an optional random cofactor that may carry irreducible
+    /// factors, and a random scale.
+    fn random_univariate(rng: &mut StdRng, p: u64, planted: &[u64]) -> Vec<u64> {
+        let mut f = vec![1u64];
+        for &r in planted {
+            f = mul_poly(&f, &[(p - r % p) % p, 1], p);
+        }
+        if planted.is_empty() || rng.gen_bool(0.5) {
+            let d = rng.gen_range(1..=4usize);
+            let mut cof: Vec<u64> = (0..d).map(|_| rng.gen_range(0..p)).collect();
+            cof.push(rng.gen_range(1..p.max(2)));
+            f = mul_poly(&f, &cof, p);
+        }
+        let scale = rng.gen_range(1..p.max(2));
+        f.iter().map(|&c| mulmod(c, scale, p)).collect()
+    }
+
+    fn terms_of(f: &[u64]) -> Vec<(u32, u64)> {
+        f.iter()
+            .enumerate()
+            .filter(|(_, &c)| c != 0)
+            .map(|(e, &c)| (e as u32, c))
+            .collect()
+    }
+
+    pub(super) fn random_domain(rng: &mut StdRng, p: u64, size: usize, must: &[u64]) -> Vec<u64> {
+        let mut seen = HashSet::new();
+        let mut d = Vec::new();
+        for &x in must {
+            if seen.insert(x % p) {
+                d.push(x % p);
+            }
+        }
+        let size = size.min(p as usize);
+        while d.len() < size {
+            let x = rng.gen_range(0..p);
+            if seen.insert(x) {
+                d.push(x);
+            }
+        }
+        // Domain order is arbitrary in the visitor; the extraction must keep it.
+        for i in (1..d.len()).rev() {
+            d.swap(i, rng.gen_range(0..=i));
+        }
+        d
+    }
+
+    fn check(f: &[u64], domain: &[u64], p: u64) {
+        let index = domain_position_index(domain);
+        let (mut scan_muls, mut frob_muls) = (0u64, 0u64);
+        let scan = domain_roots_scan(&terms_of(f), domain, p, &mut scan_muls);
+        let frob = domain_roots_frobenius(f, &index, p, &mut frob_muls, None).unwrap();
+        assert_eq!(frob, scan, "p = {p}, f = {f:?}, |D| = {}", domain.len());
+    }
+
+    #[test]
+    fn frobenius_extraction_returns_the_scans_roots_in_domain_order() {
+        let mut rng = StdRng::seed_from_u64(0x0F4D_0A1B);
+        let primes = [
+            2u64,
+            3,
+            5,
+            7,
+            13,
+            101,
+            1009,
+            65_521,
+            1_000_003,
+            2_147_483_647,
+            4_294_967_291,
+        ];
+        let mut cases = 0usize;
+        for &p in &primes {
+            for _ in 0..60 {
+                let k = rng.gen_range(0..=6usize);
+                let planted: Vec<u64> = (0..k).map(|_| rng.gen_range(0..p)).collect();
+                // Repeat a planted root now and then.
+                let mut planted = planted;
+                if !planted.is_empty() && rng.gen_bool(0.3) {
+                    planted.push(planted[0]);
+                }
+                let f = random_univariate(&mut rng, p, &planted);
+                let inside: Vec<u64> = planted
+                    .iter()
+                    .copied()
+                    .filter(|_| rng.gen_bool(0.6))
+                    .collect();
+                let size = if p <= 13 {
+                    rng.gen_range(0..=p as usize)
+                } else {
+                    rng.gen_range(0..=200usize)
+                };
+                let domain = random_domain(&mut rng, p, size, &inside);
+                check(&f, &domain, p);
+                cases += 1;
+            }
+            if p <= 13 {
+                // Degree at least p, vanishing on the whole field: x^p − x, and
+                // its product with a planted factor; full and partial domains.
+                let mut xp_x = vec![0u64; p as usize + 1];
+                xp_x[1] = p - 1;
+                xp_x[p as usize] = 1;
+                let full: Vec<u64> = (0..p).rev().collect();
+                check(&xp_x, &full, p);
+                check(&mul_poly(&xp_x, &[1, 1], p), &full[..full.len() / 2], p);
+                check(&[0, 1], &[], p);
+                cases += 3;
+            }
+        }
+        assert!(cases > 600);
+    }
+
+    #[test]
+    fn frobenius_needs_far_fewer_multiplications_on_a_large_domain() {
+        let p = 2_147_483_647u64;
+        let mut rng = StdRng::seed_from_u64(7);
+        let planted = [11u64, 23, 99_991];
+        let f = random_univariate(&mut rng, p, &planted);
+        let domain = random_domain(&mut rng, p, 1 << 14, &planted);
+        let index = domain_position_index(&domain);
+        let (mut s, mut fr) = (0u64, 0u64);
+        let a = domain_roots_scan(&terms_of(&f), &domain, p, &mut s);
+        let b = domain_roots_frobenius(&f, &index, p, &mut fr, None).unwrap();
+        assert_eq!(a, b);
+        assert_eq!(a.len(), 3);
+        assert!(fr * 10 < s, "frobenius {fr} vs scan {s}");
+    }
+
+    /// Dense random quadrics in three variables through planted points, with
+    /// finite domains on some variables: the generic F4 bases produce
+    /// univariates of degree up to eight with arbitrary roots.
+    pub(super) fn planted_system(rng: &mut StdRng, p: u64, n: usize) -> (Vec<Poly>, Vec<Vec<u64>>) {
+        let points: Vec<Vec<u64>> = (0..rng.gen_range(1..=3usize))
+            .map(|_| (0..n).map(|_| rng.gen_range(0..p)).collect())
+            .collect();
+        let mut monomials: Vec<Vec<u32>> = Vec::new();
+        for i in 0..n {
+            for j in i..n {
+                let mut e = vec![0u32; n];
+                e[i] += 1;
+                e[j] += 1;
+                monomials.push(e);
+            }
+            let mut e = vec![0u32; n];
+            e[i] = 1;
+            monomials.push(e);
+        }
+        let eval = |e: &[u32], x: &[u64]| {
+            e.iter().zip(x).fold(1u64, |v, (&k, &xi)| {
+                mulmod(v, powmod(xi, u64::from(k), p), p)
+            })
+        };
+        // Each equation is a random combination of monomials, with the constant
+        // chosen to vanish at the first planted point, times nothing else: the
+        // other planted points are kept only by the linear span (a degenerate
+        // system is still a valid traversal test).
+        let mut system = Vec::new();
+        for _ in 0..n {
+            let coeffs: Vec<u64> = monomials.iter().map(|_| rng.gen_range(0..p)).collect();
+            let mut terms: Vec<(Vec<u32>, u64)> = monomials
+                .iter()
+                .cloned()
+                .zip(coeffs.iter().copied())
+                .collect();
+            let at = |x: &[u64]| {
+                terms
+                    .iter()
+                    .fold(0u64, |v, (e, c)| (v + mulmod(*c, eval(e, x), p)) % p)
+            };
+            let c0 = (p - at(&points[0])) % p;
+            terms.push((vec![0u32; n], c0));
+            system.push(normalise(&terms, p, Ordering::Grevlex));
+        }
+        (system, points)
+    }
+
+    type Branches = Vec<(usize, usize, u64, &'static str)>;
+
+    fn traverse(
+        system: &[Poly],
+        n: usize,
+        p: u64,
+        domains: &[Option<Vec<u64>>],
+        mode: DomainRootMode,
+        stop_after: Option<usize>,
+    ) -> (Vec<Vec<u64>>, Branches, VisitReport) {
+        let opts = F4Options::new(Ordering::Grevlex, 12).with_domain_roots(mode);
+        let mut seen = Vec::new();
+        let mut branches = Vec::new();
+        let report = solve_visit_traced(
+            system,
+            n,
+            p,
+            &opts,
+            domains,
+            |s| {
+                seen.push(s.to_vec());
+                stop_after.is_some_and(|k| seen.len() >= k)
+            },
+            |event| {
+                if let VisitEvent::Branch {
+                    node_id,
+                    original_variable,
+                    value,
+                    source,
+                } = event
+                {
+                    branches.push((node_id, original_variable, value, source));
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        (seen, branches, report)
+    }
+
+    #[test]
+    fn every_mode_gives_the_identical_traversal() {
+        let mut rng = StdRng::seed_from_u64(0xD0_4A1E);
+        let mut with_frobenius = 0usize;
+        for round in 0..40 {
+            let p = [101u64, 1009, 65_521, 1_000_003][round % 4];
+            let n = 2 + round % 2;
+            let (system, points) = planted_system(&mut rng, p, n);
+            let domains: Vec<Option<Vec<u64>>> = (0..n)
+                .map(|i| {
+                    rng.gen_bool(0.75).then(|| {
+                        let must: Vec<u64> = points.iter().map(|pt| pt[i]).collect();
+                        let size = rng.gen_range(must.len()..=must.len() + 300);
+                        random_domain(&mut rng, p, size, &must)
+                    })
+                })
+                .collect();
+            for stop in [None, Some(1)] {
+                let (s0, b0, r0) = traverse(&system, n, p, &domains, DomainRootMode::Scan, stop);
+                for mode in [DomainRootMode::Frobenius, DomainRootMode::Auto] {
+                    let (s1, b1, r1) = traverse(&system, n, p, &domains, mode, stop);
+                    assert_eq!(s1, s0, "solutions differ, round {round}, {mode:?}");
+                    assert_eq!(b1, b0, "branch sequence differs, round {round}, {mode:?}");
+                    assert_eq!(
+                        (
+                            r1.complete,
+                            r1.stopped_early,
+                            r1.timed_out,
+                            r1.solutions_visited
+                        ),
+                        (
+                            r0.complete,
+                            r0.stopped_early,
+                            r0.timed_out,
+                            r0.solutions_visited
+                        )
+                    );
+                    // `field_ops` is a delta of the process-wide counter (unless
+                    // `F4_FP_THREAD_OPS=1`), so tests running in parallel leak into
+                    // it; it is not compared here.  The identical branch sequence
+                    // above already fixes every F4 input, and the single-process
+                    // example `fb_domain_rootfind` asserts `field_ops` equality.
+                    assert_eq!(
+                        (r1.candidates_rejected, r1.f4_runs, r1.full_field_branches),
+                        (r0.candidates_rejected, r0.f4_runs, r0.full_field_branches)
+                    );
+                    if mode == DomainRootMode::Frobenius {
+                        assert_eq!(r1.domain_evaluations, 0);
+                        with_frobenius += r1.domain_frobenius_univariates;
+                    }
+                }
+                assert_eq!(r0.domain_frobenius_univariates, 0);
+            }
+        }
+        assert!(
+            with_frobenius > 20,
+            "only {with_frobenius} domain univariates exercised"
+        );
+    }
+
+    #[test]
+    fn default_reports_serialise_without_the_new_fields() {
+        let json = serde_json::to_value(VisitReport::default()).unwrap();
+        for key in [
+            "domain_frobenius_univariates",
+            "domain_root_field_multiplications",
+            "domain_index_entries",
+        ] {
+            assert!(
+                json.get(key).is_none(),
+                "{key} serialised under the default"
+            );
+        }
+        assert_eq!(
+            F4Options::new(Ordering::Grevlex, 4).domain_roots,
+            DomainRootMode::Scan
+        );
+    }
+}
+
+#[cfg(test)]
+mod sibling_batch_tests {
+    //! [`F4Options::sibling_batch`]: the batched, F4-free child solve finds
+    //! the scan's solution set (and, for one-level univariate children, the
+    //! scan's exact sequence), and its arithmetic helpers are exact.
+    use super::domain_root_tests::{planted_system, random_domain};
+    use super::*;
+    use rand::rngs::StdRng;
+    use rand::{Rng, SeedableRng};
+
+    #[test]
+    fn counted_sqrt_and_dense_roots_match_brute_force() {
+        let mut rng = StdRng::seed_from_u64(0x5157);
+        for p in [3u64, 5, 7, 11, 13, 17, 101, 1009, 65_537] {
+            for _ in 0..300 {
+                let n = rng.gen_range(0..p);
+                let mut muls = 0;
+                let euler = n == 0 || powmod(n, (p - 1) / 2, p) == 1;
+                match sqrt_mod_counted(n, p, &mut muls) {
+                    Some(r) => assert_eq!(mulmod(r, r, p), n, "sqrt({n}) mod {p}"),
+                    None => assert!(!euler, "missed square root of {n} mod {p}"),
+                }
+                assert_eq!(sqrt_mod_counted(n, p, &mut muls).is_some(), euler);
+            }
+            if p > 1009 {
+                continue;
+            }
+            for _ in 0..200 {
+                let degree = rng.gen_range(1..=6usize);
+                let mut h: Vec<u64> = (0..degree).map(|_| rng.gen_range(0..p)).collect();
+                h.push(rng.gen_range(1..p));
+                let mut muls = 0;
+                let got = dense_roots_fp(&h, p, &mut muls, None).unwrap();
+                let want: Vec<u64> = (0..p)
+                    .filter(|&x| h.iter().rev().fold(0, |v, &c| (mulmod(v, x, p) + c) % p) == 0)
+                    .collect();
+                assert_eq!(got, want, "p = {p}, h = {h:?}");
+            }
+        }
+    }
+
+    /// `S₃` in the symmetric odd-characteristic expansion (as the prime-chain
+    /// builder writes it); `None` puts the target abscissa in a slot.
+    fn s3(slots: [Option<usize>; 3], n: usize, x: u64, a: u64, b: u64, p: u64) -> Poly {
+        let neg = |v: u64| (p - v % p) % p;
+        let raw: [([u32; 3], u64); 13] = [
+            ([2, 2, 0], 1),
+            ([2, 0, 2], 1),
+            ([0, 2, 2], 1),
+            ([2, 1, 1], neg(2)),
+            ([1, 2, 1], neg(2)),
+            ([1, 1, 2], neg(2)),
+            ([1, 1, 0], neg(mulmod(2, a, p))),
+            ([1, 0, 1], neg(mulmod(2, a, p))),
+            ([0, 1, 1], neg(mulmod(2, a, p))),
+            ([1, 0, 0], neg(mulmod(4, b, p))),
+            ([0, 1, 0], neg(mulmod(4, b, p))),
+            ([0, 0, 1], neg(mulmod(4, b, p))),
+            ([0, 0, 0], mulmod(a, a, p)),
+        ];
+        let terms: Vec<(Vec<u32>, u64)> = raw
+            .iter()
+            .map(|(powers, c)| {
+                let mut e = vec![0u32; n];
+                let mut c = *c;
+                for (axis, &k) in powers.iter().enumerate() {
+                    match slots[axis] {
+                        Some(v) => e[v] += k,
+                        None => c = mulmod(c, powmod(x, u64::from(k), p), p),
+                    }
+                }
+                (e, c)
+            })
+            .collect();
+        normalise(&terms, p, Ordering::Grevlex)
+    }
+
+    fn visit(
+        system: &[Poly],
+        n: usize,
+        p: u64,
+        domains: &[Option<Vec<u64>>],
+        batch: bool,
+        mode: DomainRootMode,
+        stop_after: Option<usize>,
+    ) -> (Vec<Vec<u64>>, VisitReport) {
+        let opts = F4Options::new(Ordering::Grevlex, 12)
+            .with_domain_roots(mode)
+            .with_sibling_batch(batch);
+        let mut seen = Vec::new();
+        let report = solve_visit(system, n, p, &opts, domains, |s| {
+            seen.push(s.to_vec());
+            stop_after.is_some_and(|k| seen.len() >= k)
+        })
+        .unwrap();
+        (seen, report)
+    }
+
+    fn sorted(mut v: Vec<Vec<u64>>) -> Vec<Vec<u64>> {
+        v.sort();
+        v
+    }
+
+    #[test]
+    fn one_level_children_give_the_scans_exact_sequence() {
+        let mut rng = StdRng::seed_from_u64(0xB47C);
+        let mut solutions = 0usize;
+        for round in 0..24 {
+            let p = [101u64, 103, 1009][round % 3];
+            let (a, b, x) = (
+                rng.gen_range(0..p),
+                rng.gen_range(1..p),
+                rng.gen_range(0..p),
+            );
+            let system = vec![s3([Some(0), Some(1), None], 2, x, a, b, p)];
+            let size = rng.gen_range(p as usize / 3..=p as usize);
+            let domains = vec![
+                Some(random_domain(&mut rng, p, size, &[])),
+                Some(random_domain(&mut rng, p, size, &[])),
+            ];
+            let (s0, r0) = visit(&system, 2, p, &domains, false, DomainRootMode::Scan, None);
+            for mode in [DomainRootMode::Scan, DomainRootMode::Frobenius] {
+                let (s1, r1) = visit(&system, 2, p, &domains, true, mode, None);
+                assert_eq!(s1, s0, "round {round}: sequence differs");
+                assert_eq!(r1.solutions_visited, r0.solutions_visited);
+                assert!(r1.complete);
+                assert_eq!(r1.batched_nodes, 1);
+                assert_eq!(r1.batched_children, size);
+                assert_eq!(r1.batched_fallbacks, 0);
+                assert!(r1.f4_runs < r0.f4_runs, "batched children ran F4");
+            }
+            solutions += s0.len();
+        }
+        assert!(solutions > 100, "only {solutions} solutions exercised");
+    }
+
+    #[test]
+    fn chains_and_dense_systems_give_the_scans_solution_set() {
+        let mut rng = StdRng::seed_from_u64(0xC4A1);
+        let (mut batched, mut fallbacks, mut solutions) = (0usize, 0usize, 0usize);
+        for round in 0..30 {
+            let p = [101u64, 103, 211][round % 3];
+            let (system, n, domains): (Vec<Poly>, usize, Vec<Option<Vec<u64>>>) = if round % 2 == 0
+            {
+                // m = 3 chain: S3(x0, x1, u) = 0, S3(u, x2, X) = 0, x_i in D, u free.
+                let (a, b, x) = (
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                );
+                let size = rng.gen_range(8..=24);
+                let d = random_domain(&mut rng, p, size, &[]);
+                (
+                    vec![
+                        s3([Some(0), Some(1), Some(3)], 4, x, a, b, p),
+                        s3([Some(3), Some(2), None], 4, x, a, b, p),
+                    ],
+                    4,
+                    vec![Some(d.clone()), Some(d.clone()), Some(d), None],
+                )
+            } else {
+                let n = 3;
+                let (system, points) = planted_system(&mut rng, p, n);
+                let domains = (0..n)
+                    .map(|i| {
+                        let must: Vec<u64> = points.iter().map(|pt| pt[i]).collect();
+                        {
+                            let size = rng.gen_range(must.len()..=40);
+                            Some(random_domain(&mut rng, p, size, &must))
+                        }
+                    })
+                    .collect();
+                (system, n, domains)
+            };
+            let (s0, r0) = visit(&system, n, p, &domains, false, DomainRootMode::Scan, None);
+            let (s1, r1) = visit(
+                &system,
+                n,
+                p,
+                &domains,
+                true,
+                DomainRootMode::Frobenius,
+                None,
+            );
+            assert_eq!(
+                sorted(s1.clone()),
+                sorted(s0.clone()),
+                "round {round}: solution sets differ"
+            );
+            assert_eq!(
+                (r1.complete, r1.solutions_visited),
+                (r0.complete, r0.solutions_visited)
+            );
+            for s in &s1 {
+                assert!(
+                    system.iter().all(|g| eval(g, s, p) == 0),
+                    "not a solution: {s:?}"
+                );
+            }
+            batched += r1.batched_children;
+            fallbacks += r1.batched_fallbacks;
+            solutions += s0.len();
+        }
+        assert!(batched > 200, "batched path barely exercised ({batched})");
+        assert!(fallbacks > 0, "the F4 fallback was never exercised");
+        assert!(solutions > 20, "only {solutions} solutions");
+    }
+
+    #[test]
+    fn stopping_early_returns_a_genuine_solution_and_default_is_off() {
+        let p = 1009;
+        let system = vec![s3([Some(0), Some(1), None], 2, 77, 3, 11, p)];
+        let domains = vec![Some((0..p).collect()), Some((0..p).collect())];
+        let (s, r) = visit(
+            &system,
+            2,
+            p,
+            &domains,
+            true,
+            DomainRootMode::Frobenius,
+            Some(1),
+        );
+        assert_eq!(s.len(), 1);
+        assert!(r.stopped_early);
+        assert_eq!(eval(&system[0], &s[0], p), 0);
+        assert!(!F4Options::new(Ordering::Grevlex, 4).sibling_batch);
+        let json = serde_json::to_value(VisitReport::default()).unwrap();
+        for key in [
+            "batched_nodes",
+            "batched_children",
+            "batched_fallbacks",
+            "batched_field_multiplications",
+        ] {
+            assert!(
+                json.get(key).is_none(),
+                "{key} serialised under the default"
+            );
         }
     }
 }

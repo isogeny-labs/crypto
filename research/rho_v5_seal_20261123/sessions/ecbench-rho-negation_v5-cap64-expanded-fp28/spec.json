@@ -1,0 +1,111 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "rho-parity: rho.negation_v5 k<=64 vs rho fp28",
+  "description": "After pow2+cap64: rho.negation_v5 vs rho.negation multi-curve fp28. ABBA; [d]G=Q.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 10007
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 31415
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 27182
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 16180
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 42069
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 77777
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 99991
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 12345
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 67890
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 24680
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 13579
+      }
+    ],
+    "targets_per_curve": 6,
+    "target_seed": 727
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "cand",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v5",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 181,
+    "isolation_required": "L0",
+    "timeout_seconds": 7200
+  }
+}

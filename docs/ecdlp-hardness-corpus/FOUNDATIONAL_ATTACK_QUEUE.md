@@ -33,6 +33,8 @@ vector rendering: [`foundational-attack-queue.svg`](foundational-attack-queue.sv
 
 ### 1. Fixed-population yield and rank
 
+Detailed frontier: [`YIELD_RANK_FRONTIER_20261118.md`](YIELD_RANK_FRONTIER_20261118.md).
+
 - **Checked starting point:** the mean count is a theorem; early-row and
   stopped aggregates do not determine target-wise shape or terminal rank.
 - **Next attack object:** one immutable natural-target population containing

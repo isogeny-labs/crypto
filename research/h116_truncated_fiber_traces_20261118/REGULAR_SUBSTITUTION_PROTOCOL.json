@@ -1,0 +1,23 @@
+{
+  "schema": "h116.regular-substitution-protocol/v1",
+  "protocol_id": "H116-REGULAR-SUBSTITUTION-001",
+  "frozen_before_execution": true,
+  "primes": [23, 31, 43, 211, 587],
+  "cutoffs": [1, 2, 10, 22],
+  "base_unit": "f_0=2; f_i=i^2+3i+2 mod p for i>0",
+  "outer_unit": "q_0=3; q_i=i^2+2i+1 mod p for i>0, hence q_1=4",
+  "correction": "c=(5m+7) mod p at normalized degree m",
+  "prediction": {
+    "case_count": 20,
+    "substitution_first_difference": "m+1",
+    "substitution_boundary_delta": "q_1*c mod p",
+    "inverse_substitution_first_difference": "m+1",
+    "inverse_substitution_boundary_delta": "-q_1*c*q_0^-2 mod p",
+    "normalized_coordinate_first_difference": "m",
+    "normalized_coordinate_boundary_delta": "-2*c*f_0^-3*q_0^-1 mod p",
+    "zero_correction_equal": true,
+    "constant_outer_substitution_equal": true,
+    "zero_constant_outer_rejected": true
+  },
+  "replacement_cases": 0
+}

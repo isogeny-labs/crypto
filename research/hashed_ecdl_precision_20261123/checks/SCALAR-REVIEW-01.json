@@ -1,0 +1,156 @@
+{
+  "schema": "tapered-precision-scalar-peer-review/v1",
+  "created_utc": "2026-11-23T10:21:44.851Z",
+  "scope": "Read-only scalar algebra/source-fidelity/recorded-control review. No Lean, proof gate, native build/test, cryptographic experiment, cloud/S3 operation, or secret read was run. Shell/Node used only for file inspection, source statement normalization and administrative hashing.",
+  "disposition": "supported_within_scope: conditional finite scalar lemma and recorded focused controls; unsigned local evidence review",
+  "blocking_algebra_findings": [],
+  "publication": {
+    "shared_repository": "aburan28/crypto-lean",
+    "shared_pr": 35,
+    "shared_commit": "3e47fb776a4eb5231de4c8aad2bb6e756c2f89a1",
+    "source_path": "CryptoLeanCore/TaperedPrecision.lean",
+    "remote_source_binding": "GitHub fetch_commit/fetch_file at exact commit returned Git blob42ed02cde305b5df5c8145cff3e83df653580831; local file has the identical Git blob identity and SHA25692e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a.",
+    "native_source_main": "816f9c3a942efed569049618c056d12a0c56d693",
+    "native_artifact_publication": "Pending; numerical controls and focused compiler/gate records reviewed here are local snapshots."
+  },
+  "theorem": {
+    "name": "CryptoLeanCore.TaperedPrecision.childPrecision_mul_le",
+    "decl_sha256": "72b48b96db59bc71d059360987abec830ef5c8019625d01758dbd3ba1e7034c1",
+    "decl_hash_matches_claim": true,
+    "exact_hypotheses": [
+      "All variables p,M,u,A,i,s,q,c are Nat.",
+      "u <= M",
+      "i < u (therefore u>0 and M>0)",
+      "s <= M*q",
+      "p <= c*s*2^A",
+      "c*q*u <= 2^(u+1)",
+      "8*u*(A+2*u+1) <= 2^(A+u+1)"
+    ],
+    "conclusion": "childPrecision(p,M,u,A+2*u,i)*u <= 34*M*2^(A+2*u-i)",
+    "algebra_review": "Let D=2^(A+2u-i). Integer i<u implies D>=2^(A+u+1). The ceiling product h*u<=4M gives node-loss budget32MD; the inherited/root/first-absorption chain gives p*u<=MD; the second absorption gives evaluation-loss*u<=MD. Their sum is34MD. The proof uses monotone multiplication and exact rearrangement; no division by an unknown sign or assumption of the conclusion was found.",
+    "increment_review": "increment_le correctly bounds one zero-input increment by40M2^a under0<u<=M, using h<=4M, 2^(a-i)<=2^a and a+1<=2^a. It does not accumulate a history."
+  },
+  "source_fidelity": {
+    "primary_path": "/tmp/ecdlp-precision-audit-20261123/sources/quantitative-contraction.tex",
+    "primary_git_blob": "51ba54efc29f51bbc0426f848003030da484f354",
+    "primary_sha256": "671642d7b53154d92344e8c4be0240f18929632ebcfdf73b07c3e9939b873860",
+    "reviewed_primary_span": "lines245–385: tapered Hermite p_t=p+8hD_t+8M(a+1), h=ceil(3M/u), and D.11 inherited/asymptotic estimate.",
+    "rounding": "For positive u, Nat floor expression(3M+u-1)/u equals ceil(3M/u). The main theorem gets positivity from i<u; increment_le assumes it explicitly. The definition admits u=0 and truncated subtraction outside the active domain, but no native/source fidelity is claimed there.",
+    "shift": "On active successful representable Rust calls, parameters.length=2^a and i<u<=a imply length>>i=2^(a-i). Setting a=A+2u models the cumulative-exponent increment. The integer theorem uses the valid stronger lower bound2^(A+u+1); the primary prose states the weaker2^(A+u). This is not an off-by-one defect.",
+    "rust_boundary": "Rust uses checked3M, exact div_ceil(u), the shifted length, checked node/evaluation products and checked precision additions. The Nat theorem models successful scalar arithmetic, not usize overflow/error behavior, parameter constructors, valuation/grid extraction, or an execution/refinement theorem.",
+    "source_boundary": "The scalar theorem does not prove Hermite recovery, the polynomial/ring/degree hypotheses, source admission u>=lambda^(4/5), eventual absorption from all source guards, or a counter theorem."
+  },
+  "controls": {
+    "source_sha256": "3b7a406635eda2b7320241cfbc90ef8d06980dfba99ccd96ab2bc0269a7d1321",
+    "frozen_copy_matches": true,
+    "positive": {
+      "name": "positive_scalar_instance",
+      "premises": "p64,M128,u16,A0,i15,s128,q8,c81; all six hypotheses hold.",
+      "manual_arithmetic": "403194880 <= 570425344",
+      "scope": "Nonvacuous scalar instance; not a publicly admitted or allocated recursive graph."
+    },
+    "premise_deletions": [
+      {
+        "name": "without_active_valuation",
+        "deleted": "i<u",
+        "review": "i32,u16; other five hypotheses hold; manually reviewed conclusion88704<=544 is false."
+      },
+      {
+        "name": "without_scale_width",
+        "deleted": "u<=M",
+        "review": "u16,M1; other five hypotheses hold; conclusion16782736<=4456448 is false."
+      },
+      {
+        "name": "without_inherited_budget",
+        "deleted": "p<=c*s*2^A",
+        "review": "p1000000000 exceeds1296; other five hypotheses hold; conclusion16050399232<=71303168 is false."
+      },
+      {
+        "name": "without_root_comparison",
+        "deleted": "s<=M*q",
+        "review": "s1000000000 exceeds16; inherited budget and other four premises hold; conclusion1296050399232<=71303168 is false."
+      },
+      {
+        "name": "without_inherited_absorption",
+        "deleted": "c*q*u<=2^(u+1)",
+        "review": "q62500000 makes root comparison true but absorption fails; other five premises hold; same conclusion1296050399232<=71303168 is false."
+      },
+      {
+        "name": "without_evaluation_absorption",
+        "deleted": "8*u*(A+2u+1)<=2^(A+u+1)",
+        "review": "M3,u3,A0,i2,s3,q1,c5,p15; absorption168<=16 fails, all other five hold; conclusion1701<=1632 is false."
+      }
+    ],
+    "interpretation": "Each deletion can make this six-premise theorem false while its remaining premises hold. This does not say either absorption condition is necessary for the bound at every individual input. Both are sufficient dimension-only conditions."
+  },
+  "recorded_qualification": {
+    "phases": [
+      {
+        "phase": "03c-core-increment-and-scalar",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 14497193984,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "04-scalar-premise-controls",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 14482640896,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "05-theorem-axioms",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 14469644288,
+        "stdout_sha256": "f4609f23f8940f2ce2fa81d960cc54637b7f79bdee79090fa37a11a53f213efa",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "06-pcc-lean-verifier",
+        "exit_code": 143,
+        "physical_stop": 1,
+        "peak_whole_cgroup_bytes": 15044296704,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "07-pcc-verifier-after-cache-compaction",
+        "exit_code": 143,
+        "physical_stop": 1,
+        "peak_whole_cgroup_bytes": 15032705024,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "source_binding": "03c copied source matches shared source SHA25692e4300c...;04 copied control source matches current control SHA2563b7a4066...; pre-input digests and post-input OK records agree. Existing .olean outputs are present. No compilation was repeated.",
+    "axioms": "05 names the defining formula, both resource inequalities and all seven controls. The formula/deletion controls report no axioms; the inequalities and positive instance report only propext and Quot.sound. No sorry/admit/custom axiom/native_decide/unsafe shortcut was found in inspected source. These are producer compiler/axiom outputs, not a new independent kernel run.",
+    "failures": "06 and07 both terminated at unchanged15032385536-byte physical guard, exit143, physical-stop1, empty stdout/stderr, no returned gate verdict.06 peak15044296704;07 peak15032705024. Earlier root/import/typing failures remain retained; they are not theorem counterexamples."
+  },
+  "path_81_status": {
+    "status": "written argument and partial anonymous Mathlib assembly only; no formal inherited-path theorem",
+    "review": "The proposed chain is coherent under supplied p0<=s, M0<=s, per-step positive u_j<=M_j, prior a_j<=A and8*M_(j+1)<=M_j: increment<=40M_j2^A, sumM_j<=2s, hence p_d<=s+80s2^A<=81s2^A. ProbeQ contains a rational geometric-sum assembly instance, not the full native history/increment/precision binding. Source root P0<=C*s cannot be silently replaced by p0<=s without that extra normalization/budget premise.",
+    "missing": "Formalize the complete inherited history and its source-to-code binding, then derive/check both dimension absorptions for actual source-admitted calls. Do not substitute c=81 as a proved native-path fact."
+  },
+  "cache_compaction": {
+    "scope": "Only the completed .ilean editor-index compaction was inspected.",
+    "review": "Script limits selection/unlinks to external generated .ilean files. Manifest has8643 safe relative .ilean paths totaling289914149 bytes; its digest matches receipt. Receipt reports lossless tar comparison and pre-unlink hashes, archive43482563 bytes. The reviewer did not rerun restoration/full byte comparison and does not turn producer booleans into proof. Planned later .olean.private compaction was not performed or reviewed by this agent."
+  },
+  "pcc": {
+    "claim": "PCC-20261123-75fa8c",
+    "status": "unsigned/unverified; exact normalized declaration hash agrees with supplied proof record",
+    "scope": "No signed PCC theorem verdict or execution attestation is established by this review. Both higher-level gates are incomplete."
+  },
+  "retained_limits": [
+    "No complete inherited-path81 theorem, asymptotic D.11 theorem, Hermite correctness proof, full native counter correctness/complexity, packet/tuple refinement, allocation/bit-work bound, algorithm improvement, ECDLP solve, runtime gain or novelty result is supplied.",
+    "Shared module imports only Std and preserves upstream toolchain/dependencies. Its focused compilation does not complete the full crypto-lean/Mathlib integration or CI gate.",
+    "Public nonzero native recursion is still outside the current64-bit representable API; numerical controls do not certify public graph admission.",
+    "KB status127 and primary/source fallback are retained; no fresh literature/atlas novelty clearance is inferred.",
+    "Native local-artifact publication binding is pending and must be added separately without editing this review."
+  ],
+  "evidence_manifest": "scalar-evidence-01.sha256",
+  "evidence_manifest_sha256": "a0790eb122901b6a8e7ae6b983d7e65e393faffce5c2fedee167c782021142ea"
+}

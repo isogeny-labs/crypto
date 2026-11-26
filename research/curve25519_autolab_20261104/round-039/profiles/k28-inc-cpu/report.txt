@@ -1,0 +1,339 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 9K of event 'cpu-clock'
+# Event count (approx.): 9489489480
+#
+# Overhead  Shared Object         Symbol                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+# ........  ....................  .............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+#
+    19.49%  ecbench               [.] _RNvMso_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryNtB5_10PrimeCurve7add_raw.llvm.5384899875590169803
+            |
+            ---_RNvMso_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryNtB5_10PrimeCurve7add_raw.llvm.5384899875590169803
+               |          
+               |--14.04%--_RNCINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB8_9WalkTableNtB8_10PrimePointE11build_innerNtB8_10PrimeCurveEs4_0Bc_
+               |          _RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE10build_lazyNtB6_10PrimeCurveEBa_
+               |          _RNvXsm_NtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework7pluginsINtB5_11WWalkOracleNtNtB9_11ic_boundary10PrimePointEINtNtB7_6stages19DecompositionOracleNtB1x_10PrimeCurveE7prepareBb_
+               |          _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+               |          _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+               |          0xffffffffffffffff
+               |          
+               |--4.28%--_RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary43collect_and_solve_relations_scaled_touchingNtB2_10PrimeCurveDNtB2_14RelationSolverEL_INtNtNtNtCsgczF5crJ4sT_3std11collections4hash3map7HashMapyuINtNtCscI6d9CVNmLh_4core4hash18BuildHasherDefaultNtB2_9MixHasherEENCINvNtB4_12ic_framework18run_pipeline_innerB1H_Es0_0NCB4q_s1_0EB6_
+               |          _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary43collect_and_solve_relations_touching_ladderNtB2_10PrimeCurveDNtB2_14RelationSolverEL_NCINvNtB4_12ic_framework18run_pipeline_innerB1H_Es0_0NCB2p_s1_0EB6_
+               |          _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+               |          _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+               |          0xffffffffffffffff
+               |          
+                --1.15%--_RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE4evalNtB6_10PrimeCurveEBa_
+                          |          
+                           --0.76%--_RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE10build_lazyNtB6_10PrimeCurveEBa_
+                                     _RNvXsm_NtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework7pluginsINtB5_11WWalkOracleNtNtB9_11ic_boundary10PrimePointEINtNtB7_6stages19DecompositionOracleNtB1x_10PrimeCurveE7prepareBb_
+                                     _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+                                     _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+                                     0xffffffffffffffff
+
+     6.37%  [kernel.kallsyms]     [k] exc_page_fault
+            |
+            ---exc_page_fault
+               asm_exc_page_fault
+               |          
+               |--1.28%--_RNCINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB8_9WalkTableNtB8_10PrimePointE11build_innerNtB8_10PrimeCurveEs4_0Bc_
+               |          _RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE10build_lazyNtB6_10PrimeCurveEBa_
+               |          _RNvXsm_NtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework7pluginsINtB5_11WWalkOracleNtNtB9_11ic_boundary10PrimePointEINtNtB7_6stages19DecompositionOracleNtB1x_10PrimeCurveE7prepareBb_
+               |          _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+               |          _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+               |          0xffffffffffffffff
+               |          
+                --1.19%--_RNvMs1_NtCsfKiFC1ztrmh_9hashbrown3mapINtB5_7HashMapyjINtNtCscI6d9CVNmLh_4core4hash18BuildHasherDefaultNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary9MixHasherEE6insertB1I_
+                          |          
+                           --1.18%--_RNCINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB8_9WalkTableNtB8_10PrimePointE11build_innerNtB8_10PrimeCurveEs4_0Bc_
+                                     _RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE10build_lazyNtB6_10PrimeCurveEBa_
+                                     _RNvXsm_NtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework7pluginsINtB5_11WWalkOracleNtNtB9_11ic_boundary10PrimePointEINtNtB7_6stages19DecompositionOracleNtB1x_10PrimeCurveE7prepareBb_
+                                     _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+                                     _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+                                     0xffffffffffffffff
+
+     5.76%  ecbench               [.] _RNCINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB8_9WalkTableNtB8_10PrimePointE11build_innerNtB8_10PrimeCurveEs4_0Bc_
+            |
+            ---_RNCINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB8_9WalkTableNtB8_10PrimePointE11build_innerNtB8_10PrimeCurveEs4_0Bc_
+               _RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE10build_lazyNtB6_10PrimeCurveEBa_
+               _RNvXsm_NtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework7pluginsINtB5_11WWalkOracleNtNtB9_11ic_boundary10PrimePointEINtNtB7_6stages19DecompositionOracleNtB1x_10PrimeCurveE7prepareBb_
+               _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+               _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+               0xffffffffffffffff
+
+     3.43%  [kernel.kallsyms]     [k] next_uptodate_folio
+            |
+            ---next_uptodate_folio
+               filemap_map_pages
+               do_fault
+               __handle_mm_fault
+               handle_mm_fault
+               exc_page_fault
+               asm_exc_page_fault
+
+     3.04%  ld-linux-x86-64.so.2  [.] intel_check_word.constprop.0
+            |
+            ---intel_check_word (inlined)
+               handle_intel (inlined)
+               dl_init_cacheinfo (inlined)
+               init_cpu_features (inlined)
+               dl_platform_init (inlined)
+               _dl_sysdep_start
+               _dl_start_final (inlined)
+               _dl_start
+               _start
+
+     2.16%  [vdso]                [.] __vdso_clock_gettime
+            |
+            ---__vdso_clock_gettime
+               |          
+                --2.14%--__GI___clock_gettime (inlined)
+                          _RNvMs_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis14ic_measurementNtB4_5Trace8boundary
+                          |          
+                          |--1.36%--0xffffffffffffffff
+                          |          
+                           --0.78%--_RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary43collect_and_solve_relations_scaled_touchingNtB2_10PrimeCurveDNtB2_14RelationSolverEL_INtNtNtNtCsgczF5crJ4sT_3std11collections4hash3map7HashMapyuINtNtCscI6d9CVNmLh_4core4hash18BuildHasherDefaultNtB2_9MixHasherEENCINvNtB4_12ic_framework18run_pipeline_innerB1H_Es0_0NCB4q_s1_0EB6_
+                                     _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary43collect_and_solve_relations_touching_ladderNtB2_10PrimeCurveDNtB2_14RelationSolverEL_NCINvNtB4_12ic_framework18run_pipeline_innerB1H_Es0_0NCB2p_s1_0EB6_
+                                     _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+                                     _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+                                     0xffffffffffffffff
+
+     1.99%  [kernel.kallsyms]     [k] _raw_spin_lock
+            |
+            ---_raw_spin_lock
+               |          
+                --1.91%--__pte_offset_map_lock
+                          |          
+                           --1.41%--do_anonymous_page
+                                     __handle_mm_fault
+                                     handle_mm_fault
+                                     exc_page_fault
+                                     asm_exc_page_fault
+                                     |          
+                                      --0.55%--_RNCINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB8_9WalkTableNtB8_10PrimePointE11build_innerNtB8_10PrimeCurveEs4_0Bc_
+                                                _RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE10build_lazyNtB6_10PrimeCurveEBa_
+                                                _RNvXsm_NtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework7pluginsINtB5_11WWalkOracleNtNtB9_11ic_boundary10PrimePointEINtNtB7_6stages19DecompositionOracleNtB1x_10PrimeCurveE7prepareBb_
+                                                _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+                                                _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+                                                0xffffffffffffffff
+
+     1.66%  ld-linux-x86-64.so.2  [.] get_common_cache_info.constprop.0
+            |
+            ---get_common_cache_info (inlined)
+               |          
+                --1.65%--dl_init_cacheinfo (inlined)
+                          init_cpu_features (inlined)
+                          dl_platform_init (inlined)
+                          _dl_sysdep_start
+                          _dl_start_final (inlined)
+                          _dl_start
+                          _start
+
+     1.60%  libc.so.6             [.] __memmove_avx512_unaligned_erms
+            |
+            ---__memcpy_avx512_unaligned_erms (inlined)
+
+     1.42%  ld-linux-x86-64.so.2  [.] _dl_relocate_object
+     1.41%  ecbench               [.] _RNvMs1_NtCsfKiFC1ztrmh_9hashbrown3mapINtB5_7HashMapyjINtNtCscI6d9CVNmLh_4core4hash18BuildHasherDefaultNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary9MixHasherEE6insertB1I_
+            |
+            ---_RNvMs1_NtCsfKiFC1ztrmh_9hashbrown3mapINtB5_7HashMapyjINtNtCscI6d9CVNmLh_4core4hash18BuildHasherDefaultNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary9MixHasherEE6insertB1I_
+               _RNCINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB8_9WalkTableNtB8_10PrimePointE11build_innerNtB8_10PrimeCurveEs4_0Bc_
+               _RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE10build_lazyNtB6_10PrimeCurveEBa_
+               _RNvXsm_NtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework7pluginsINtB5_11WWalkOracleNtNtB9_11ic_boundary10PrimePointEINtNtB7_6stages19DecompositionOracleNtB1x_10PrimeCurveE7prepareBb_
+               _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+               _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+               0xffffffffffffffff
+
+     1.40%  [kernel.kallsyms]     [k] _raw_spin_unlock_irqrestore
+            |
+            ---_raw_spin_unlock_irqrestore
+               |          
+                --0.51%--folio_batch_move_lru
+
+     1.34%  [kernel.kallsyms]     [k] gather_pte_stats
+            |
+            ---gather_pte_stats
+               walk_pgd_range
+               __walk_page_range
+               walk_page_vma
+               show_numa_map
+               seq_read_iter
+               seq_read
+               vfs_read
+               ksys_read
+               do_syscall_64
+               entry_SYSCALL_64_after_hwframe
+               __GI___libc_read (inlined)
+               |          
+               |--0.64%--_RNvNvNtCsgczF5crJ4sT_3std2fs14read_to_string5inner
+               |          _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench9isolation18anon_pages_by_node
+               |          _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench6record10child_main
+               |          _RNvCsdyyjvyeNazw_7ecbench3run
+               |          0xffffffffffffffff
+               |          
+                --0.60%--_RINvNtCsgczF5crJ4sT_3std2io19default_read_to_endNtNtB4_2fs4FileEB4_
+                          _RNvNvNtCsgczF5crJ4sT_3std2fs14read_to_string5inner
+                          _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench9isolation18anon_pages_by_node
+                          _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench6record10child_main
+                          _RNvCsdyyjvyeNazw_7ecbench3run
+                          0xffffffffffffffff
+
+     1.33%  [kernel.kallsyms]     [k] memcg1_commit_charge
+            |
+            ---memcg1_commit_charge
+               charge_memcg
+               __mem_cgroup_charge
+               |          
+                --1.27%--do_anonymous_page
+                          __handle_mm_fault
+                          handle_mm_fault
+                          exc_page_fault
+                          asm_exc_page_fault
+
+     1.32%  libc.so.6             [.] _int_malloc
+            |          
+             --1.24%--_int_malloc
+                       |          
+                        --1.03%--__GI___libc_malloc (inlined)
+
+     1.26%  ecbench               [.] _RNvNtNtCsi9YoAGUbCUq_10std_detect6detect5cache21detect_and_initialize
+            |
+            ---_RNvNtNtCsi9YoAGUbCUq_10std_detect6detect5cache21detect_and_initialize
+               _RNvNtCsiT8PH1w6pqq_11rand_chacha4guts11init_chacha
+               _RNvYNtNtNtCs5xYxNcWIgJX_4rand4rngs3std6StdRngNtCsalpVyfzoBYL_9rand_core11SeedableRng13seed_from_u64Cs6TdBej9u76G_10crypto_lib
+               _RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE10build_lazyNtB6_10PrimeCurveEBa_
+               _RNvXsm_NtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework7pluginsINtB5_11WWalkOracleNtNtB9_11ic_boundary10PrimePointEINtNtB7_6stages19DecompositionOracleNtB1x_10PrimeCurveE7prepareBb_
+               _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+               _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+               0xffffffffffffffff
+
+     0.94%  ecbench               [.] _RNvNvNtCsiT8PH1w6pqq_11rand_chacha4guts11refill_wide9impl_avx2
+            |
+            ---_RNvNvNtCsiT8PH1w6pqq_11rand_chacha4guts11refill_wide9impl_avx2
+               |          
+                --0.93%--_RNCINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB8_9WalkTableNtB8_10PrimePointE11build_innerNtB8_10PrimeCurveEs4_0Bc_
+                          _RINvMsF_NtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundaryINtB6_9WalkTableNtB6_10PrimePointE10build_lazyNtB6_10PrimeCurveEBa_
+                          _RNvXsm_NtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework7pluginsINtB5_11WWalkOracleNtNtB9_11ic_boundary10PrimePointEINtNtB7_6stages19DecompositionOracleNtB1x_10PrimeCurveE7prepareBb_
+                          _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+                          _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+                          0xffffffffffffffff
+
+     0.92%  libgcc_s.so.1         [.] __cpu_indicator_init
+            |
+            ---__cpu_indicator_init
+               call_init (inlined)
+               call_init (inlined)
+               _dl_init
+               _dl_start_user
+
+     0.89%  [kernel.kallsyms]     [k] __list_del_entry_valid_or_report
+            |
+            ---__list_del_entry_valid_or_report
+               __rmqueue_pcplist
+               get_page_from_freelist
+               __alloc_frozen_pages_noprof
+               alloc_pages_mpol
+               |          
+                --0.83%--vma_alloc_folio_noprof
+                          |          
+                           --0.63%--do_anonymous_page
+                                     __handle_mm_fault
+                                     handle_mm_fault
+                                     exc_page_fault
+                                     asm_exc_page_fault
+
+     0.88%  [kernel.kallsyms]     [k] clear_page_erms
+            |
+            ---clear_page_erms
+               get_page_from_freelist
+               __alloc_frozen_pages_noprof
+               alloc_pages_mpol
+               |          
+                --0.70%--vma_alloc_folio_noprof
+                          do_anonymous_page
+                          __handle_mm_fault
+                          handle_mm_fault
+                          exc_page_fault
+                          asm_exc_page_fault
+
+     0.81%  ld-linux-x86-64.so.2  [.] do_lookup_x
+            |          
+             --0.80%--do_lookup_x
+                       _dl_lookup_symbol_x
+                       |          
+                        --0.79%--resolve_map (inlined)
+                                  elf_machine_rela (inlined)
+                                  elf_dynamic_do_Rela (inlined)
+                                  _dl_relocate_object
+                                  dl_main
+                                  _dl_sysdep_start
+                                  _dl_start_final (inlined)
+                                  _dl_start
+                                  _start
+
+     0.66%  [kernel.kallsyms]     [k] filemap_map_pages
+            |
+            ---filemap_map_pages
+               do_fault
+               __handle_mm_fault
+               handle_mm_fault
+               exc_page_fault
+               asm_exc_page_fault
+
+     0.62%  ecbench               [.] _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary43collect_and_solve_relations_scaled_touchingNtB2_10PrimeCurveDNtB2_14RelationSolverEL_INtNtNtNtCsgczF5crJ4sT_3std11collections4hash3map7HashMapyuINtNtCscI6d9CVNmLh_4core4hash18BuildHasherDefaultNtB2_9MixHasherEENCINvNtB4_12ic_framework18run_pipeline_innerB1H_Es0_0NCB4q_s1_0EB6_
+            |
+            ---_RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary43collect_and_solve_relations_scaled_touchingNtB2_10PrimeCurveDNtB2_14RelationSolverEL_INtNtNtNtCsgczF5crJ4sT_3std11collections4hash3map7HashMapyuINtNtCscI6d9CVNmLh_4core4hash18BuildHasherDefaultNtB2_9MixHasherEENCINvNtB4_12ic_framework18run_pipeline_innerB1H_Es0_0NCB4q_s1_0EB6_
+               _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis11ic_boundary43collect_and_solve_relations_touching_ladderNtB2_10PrimeCurveDNtB2_14RelationSolverEL_NCINvNtB4_12ic_framework18run_pipeline_innerB1H_Es0_0NCB2p_s1_0EB6_
+               _RINvNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis12ic_framework18run_pipeline_innerNtNtB4_11ic_boundary10PrimeCurveEB6_.llvm.5384899875590169803
+               _RNvNtNtNtCs6TdBej9u76G_10crypto_lib13cryptanalysis7ecbench7methods14solve_ic_prime
+               0xffffffffffffffff
+
+     0.58%  [kernel.kallsyms]     [k] copy_mc_enhanced_fast_string
+            |
+            ---copy_mc_enhanced_fast_string
+
+     0.57%  [kernel.kallsyms]     [k] _raw_spin_unlock_irq
+            |
+            ---_raw_spin_unlock_irq
+
+     0.55%  ld-linux-x86-64.so.2  [.] strcmp
+            |
+            ---strcmp
+
+     0.54%  ld-linux-x86-64.so.2  [.] handle_intel.constprop.0
+            |
+            ---handle_intel (inlined)
+               dl_init_cacheinfo (inlined)
+               init_cpu_features (inlined)
+               dl_platform_init (inlined)
+               _dl_sysdep_start
+               _dl_start_final (inlined)
+               _dl_start
+               _start
+
+     0.53%  [kernel.kallsyms]     [k] folio_add_file_rmap_ptes
+            |
+            ---folio_add_file_rmap_ptes
+               set_pte_range
+               filemap_map_pages
+               do_fault
+               __handle_mm_fault
+               handle_mm_fault
+               exc_page_fault
+               asm_exc_page_fault
+
+     0.51%  [kernel.kallsyms]     [k] __handle_mm_fault
+            |
+            ---__handle_mm_fault
+               handle_mm_fault
+               exc_page_fault
+               asm_exc_page_fault
+
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#

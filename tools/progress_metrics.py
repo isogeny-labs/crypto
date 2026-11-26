@@ -2,6 +2,10 @@
 """Progress-metrics exporter for the `crypto` repo (Rust ECDLP / index-calculus lab).
 
 Sources (all committed, read at --ref unless noted):
+  research/prime_conductor_gap80_20261031/published-lucas{,-9551}-20261118/summary.json
+                                fixed prime Frobenius conductor, not an evaluated crossing
+  research/prime_conductor_gap80_20261031/memory-frontier-20261118/summary.json
+                                exact necessary source-model bounds, not RSS or timings
   docs/ic/leaderboard.json        IC leaders per regime (S, ratio_rho, largest log2 r); history via git log
   docs/ic/progress-timeline.json  dated headline series (ec-cold etc.); points carry their own dates
   docs/perf/history.json          on branch origin/perf-history: chained Ir performance index per push
@@ -1078,6 +1082,59 @@ def trace_local_runtime(ref, since):
                  source=source)
 
 
+
+def trace_complete_cost(ref, since):
+    """Copy native stored observations; shared-host wall data are provisional."""
+    root = "research/trace_incidence_20261116/setup_20261123/results"
+    since_day = since + "T00:00:00Z" if len(since) == 10 else since
+    for stage, filename in (("setup", "summary-a1.json"),
+                            ("target", "summary-target-a1.json"),
+                            ("progression", "summary-ap-a1.json"),
+                            ("holdout", "summary-holdout-a1.json"),
+                            ("flat", "summary-flat-a1.json"),
+                            ("field", "summary-field-a1.json"),
+                            ("scaling", "summary-scaling-a1.json"),
+                            ("hot", "summary-hot-a1.json")):
+        path = f"{root}/{filename}"
+        for date, commit, text in file_history(ref, path, since_day):
+            data = json.loads(text)
+            source = f"{path}@{commit}"
+            size = "640" if stage in ("scaling", "hot") else "128"
+            for group, row in data.get("groups", {}).items():
+                if not group.endswith("/" + size):
+                    continue
+                arm = group.rsplit("/", 1)[0].replace("/", "_").replace("-", "_")
+                prefix = f"trace.complete.{stage}.b{size}.{arm}"
+                emit(prefix + ".wall_s", row["complete_wall_s"]["median"],
+                     date=date, problem="prime-labelled-pool-recovery",
+                     unit="wall_s", better="neutral",
+                     label="Stored complete-adapter median; includes bounded censors; local PCC unverified",
+                     source=source)
+                emit(prefix + ".mean_wall_s", row["complete_wall_s"]["mean"],
+                     date=date, problem="prime-labelled-pool-recovery",
+                     unit="wall_s", better="neutral",
+                     label="Stored native complete-cost mean; bounded censors retained, PCC unverified",
+                     source=source)
+                emit(prefix + ".censored", row.get("censored"), date=date,
+                     problem="prime-labelled-pool-recovery", unit="target-round units",
+                     better="neutral", label="Retained bounded censors; PCC unverified",
+                     source=source)
+            for group, row in data.get("target_cluster_mean_ratios", {}).items():
+                reference = "native-tuned64" if stage == "hot" else "current-tuned8"
+                if not group.endswith("_over_" + reference + "/" + size):
+                    continue
+                arm = group.split("_over_", 1)[0].replace("-", "_")
+                reference_id = "native_rho64" if stage == "hot" else "rho8"
+                prefix = f"trace.complete.{stage}.b{size}.{arm}.over_{reference_id}"
+                for suffix, field in (("mean_ratio", "ratio"),
+                                      ("upper95", "bootstrap_q95")):
+                    emit(prefix + "." + suffix, row[field], date=date,
+                         problem="prime-labelled-pool-recovery", unit="cost_ratio",
+                         better="neutral",
+                         label="Stored native cluster ratio; fixed curves, bounded costs; PCC unverified",
+                         source=source)
+
+
 def relation_fusion_observations(ref, since):
     """Export raw declared-call observations, without computing ratios."""
     path = "research/relation_fusion_20261117/CANDIDATE_SUMMARY_84.json"
@@ -1121,8 +1178,61 @@ def relation_fusion_root_dag(ref, since):
                      source=f"{path}@{commit}")
 
 
+def fixed_lucas_conductor(ref, since):
+    """Track recorded conductor primes separately from evaluated crossings."""
+    cases = ((7351, "published-lucas-20261118"),
+             (9551, "published-lucas-9551-20261118"))
+    for index, directory in cases:
+        path = f"research/prime_conductor_gap80_20261031/{directory}/summary.json"
+        for date, commit, text in file_history(ref, path, since):
+            data = json.loads(text)
+            if (data.get("schema") != "fixed-lucas-qualification/v1"
+                    or data.get("fixed_published_index") != index
+                    or data.get("certificate_generated") is not True
+                    or data.get("certificate_replayed") is not True
+                    or data.get("changed_subject_reject") is not True):
+                continue
+            emit(f"conductor.fixed_lucas.n{index}.prime_bits", data.get("conductor_bits"),
+                 date=date, problem="ordinary-prime-conductor-crossing", unit="bits",
+                 better="higher",
+                 label="Fixed Frobenius conductor prime; no evaluated crossing; PCC unverified",
+                 source=f"{path}@{commit}")
+
+
+def conductor_memory_frontier(ref, since):
+    """Exact source-model bounds; neither RSS nor an evaluated crossing."""
+    path = "research/prime_conductor_gap80_20261031/memory-frontier-20261118/summary.json"
+    for date, commit, text in file_history(ref, path, since):
+        data = json.loads(text)
+        checks = data.get("native_integer_controls", {})
+        if (checks.get("optimizer_equals_exhaustive") is not True
+                or checks.get("all_bounds_hold") is not True
+                or data.get("recorded_schedule_qualification", {}).get("passed") is not True):
+            continue
+        cases = data.get("target_cases", [])
+        if not cases:
+            continue
+        case = cases[0]
+        if (case.get("schema") != "complete-memory-frontier/v1"
+                or case.get("ell") != "729845429276318409687041"
+                or case.get("cap_bytes") != "137438953472"):
+            continue
+        for suffix, field, unit in (
+            ("full_rectangle_min_slot_bytes", "all_window_single_rectangle_minimum_bytes", "bytes"),
+            ("contexts_min_under_example_cap", "all_window_contexts_minimum_under_cap", "count"),
+            ("rectangles_min_under_example_cap", "all_window_rectangles_minimum_under_cap", "count"),
+        ):
+            emit(f"conductor.pinned_evaluator.{suffix}", case.get(field),
+                 date=date, problem="isogeny-construction-source-model", unit=unit,
+                 better="neutral",
+                 label="Exact necessary source-model bound; not RSS/timing/crossing; PCC unverified",
+                 source=f"{path}@{commit}")
+
+
 def main():
     a = args()
+    fixed_lucas_conductor(a.ref, a.since)
+    conductor_memory_frontier(a.ref, a.since)
     jacobian_catalog(a.ref, a.since)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
@@ -1166,6 +1276,7 @@ def main():
     vieta_component(a.ref, a.since)
     vieta_native_speedup(a.ref, a.since)
     trace_local_runtime(a.ref, a.since)
+    trace_complete_cost(a.ref, a.since)
     relation_fusion_observations(a.ref, a.since)
     relation_fusion_repeated(a.ref, a.since)
     relation_fusion_root_dag(a.ref, a.since)

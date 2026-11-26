@@ -1,0 +1,55 @@
+{
+  "schema": "rr5.publication-checks/v1",
+  "checks": [
+    {
+      "name": "prose-pr",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "lint-prose",
+        "--stdin"
+      ],
+      "stdin_path": "/workspace/scratch/25ba7b3118bf/rr5-pr-body.md",
+      "exit_status": 0
+    },
+    {
+      "name": "prose-report",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "lint-prose",
+        "--stdin"
+      ],
+      "stdin_path": "research/prime31_four_summand_20261122/REPORT.md",
+      "exit_status": 0
+    },
+    {
+      "name": "whitespace-frozen",
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "stdin_path": null,
+      "exit_status": 2
+    },
+    {
+      "name": "whitespace-authored",
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--check",
+        "--",
+        ".",
+        ":(exclude)research/prime31_four_summand_20261122/evidence/**"
+      ],
+      "stdin_path": null,
+      "exit_status": 0
+    }
+  ],
+  "whitespace_scope": "All reported whitespace is in frozen execution receipts or historical source snapshots; preserving exact bytes takes precedence over cosmetic cleanup. Authored source/report/configuration has zero findings.",
+  "artifact_policy": "The repository artifacts check returned0 against the staged tree; no prohibited data blobs were selected.",
+  "document_qa": "All six final PDF pages inspected; separate document-qa receipt pins final bytes."
+}

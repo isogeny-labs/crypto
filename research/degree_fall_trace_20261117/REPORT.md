@@ -147,3 +147,22 @@ drops from ten to four. [pcc:unverified]
 [PDF](reports/run-20261118T0409Z/report.pdf) ·
 [Summary](reports/run-20261118T0409Z/survivor_summary.csv) ·
 [Exact supports](reports/run-20261118T0409Z/survivor_support.csv)
+
+## An exact regularity rule from survivor groups
+
+At the mixed stage of the toy flow, group survivors by (y) and count
+distinct (x)-values in each group. There are at most two groups because
+eliminating (z) gives (y(t-y)=s). The observed degree is the size of
+the larger group, plus one when the two nonempty groups are equal.
+This explains why the consecutive base at (t=3) gives degrees 4 and 3
+for two targets that each have five survivors. The group sizes are
+(4+1) and (3+2), respectively. [pcc:unverified]
+
+For this configuration, add group sizes to the survivor analysis beside
+the existing total and pair support. The interpolation proof applies
+when the points occupy one or two parallel fibers after eliminating the
+linear constraint. For three or more fibers, the controls show that
+occupancies alone can miss the degree. Use the evaluation rank or
+the Gröbner calculation in that case.
+[Proof, controls, and replay](reports/run-20261118T0459Z/RUN.md) ·
+[Figure](reports/run-20261118T0459Z/fiber_regularity.svg)

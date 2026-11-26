@@ -3197,6 +3197,15 @@ pub struct GaudryReport {
     pub relation_point_stats: Option<RelationPointStats>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub s4_f4_stats: Option<S4F4Stats>,
+    /// Present only for the cycle harvester: its extra counters.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub harvest: Option<HarvestStats>,
+    /// Present only when a non-default large-prime path ran.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lp_variant: Option<String>,
+    /// Only with [`GaudryOptions::capture_relations`]; never serialized.
+    #[serde(skip)]
+    pub captured_relations: Option<Vec<SparseRel>>,
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
@@ -3261,6 +3270,17 @@ pub struct GaudryOptions {
     /// (one more summand, [`subspace_quad_oracle`]; meet-in-the-middle only).
     /// With `arity = 4` a relation can carry up to four large primes.
     pub arity: u8,
+    /// How partial relations become full rows; see [`Harvester`].  Absent
+    /// from the serialised options in the default (eliminator) mode, so
+    /// every record written before the harvester existed is unchanged.
+    #[serde(skip_serializing_if = "Harvester::is_default")]
+    pub harvester: Harvester,
+    /// Keep a copy of every relation offered to the large-prime
+    /// eliminator (before reduction) in [`GaudryReport::captured_relations`],
+    /// so graph tools can be run on the real stream.  Off by default; not
+    /// serialized when off, so existing reports are unchanged.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub capture_relations: bool,
 }
 
 impl Default for GaudryOptions {
@@ -3275,6 +3295,8 @@ impl Default for GaudryOptions {
             max_large_primes: 0,
             max_merge_level: 0,
             arity: 3,
+            harvester: Harvester::Eliminator,
+            capture_relations: false,
         }
     }
 }
@@ -3402,6 +3424,493 @@ impl LargePrimeEliminator {
     /// pivot relations.  Exposed for experiment accounting only.
     pub fn pivot_count(&self) -> usize {
         self.pivots.len()
+    }
+}
+
+/// Which structure turns partial relations (decompositions carrying large
+/// primes) into full rows over the small base.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Default)]
+pub enum Harvester {
+    /// [`LargePrimeEliminator`]: one pivot per large prime, chained merges
+    /// (the behaviour of every run before the harvester existed).
+    #[default]
+    Eliminator,
+    /// [`GainForestHarvester`]: cycles of the large-prime graph.
+    Cycles,
+}
+
+impl Harvester {
+    fn is_default(&self) -> bool {
+        *self == Harvester::Eliminator
+    }
+}
+
+/// Counters of a [`GainForestHarvester`] run, reported beside the
+/// eliminator's own counters.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct HarvestStats {
+    /// Decompositions accepted, by number of large primes (0, 1, 2, 3).
+    pub accepted: [u64; 4],
+    /// Full rows that came straight from decompositions with no large prime.
+    pub mu_direct: u64,
+    /// Rows harvested from cycles / pinned components, as fed to the linear
+    /// algebra before the stop (`mu` of the plan, the cycle-derived part).
+    pub mu_harvested: u64,
+    /// Harvested rows by origin: a balanced cycle in a free component
+    /// (large primes cancelled), or a component attached to the sink.
+    pub rows_balanced: u64,
+    pub rows_pinned: u64,
+    /// Rows the harvester emitted (may exceed the rows fed if the run
+    /// stopped inside a burst).
+    pub rows_emitted: u64,
+    /// Unbalanced cycles / one-large-prime edges that attached a component
+    /// to the sink (no row), and unions of two free components.
+    pub pins: u64,
+    pub unions: u64,
+    /// 3-edges: accepted, reduced on arrival (two of three primes already in
+    /// a common root or the sink), peeled later out of the buffer, and still
+    /// buffered at the end.
+    pub three_edges_accepted: u64,
+    pub three_edges_on_arrival: u64,
+    pub three_edges_peeled: u64,
+    pub three_edges_left: u64,
+    /// Vertices (large primes) touched; components not attached to the sink;
+    /// vertices whose component is attached to the sink.
+    pub vertices: u64,
+    pub components_free: u64,
+    pub vertices_pinned: u64,
+    /// Mean number of distinct relations a harvested row was derived from
+    /// (the cycle length analogue: tree paths to the roots plus the closing
+    /// relation, shared parts counted once).
+    pub mean_cycle_len: f64,
+    /// Rows whose small-base part vanished with a nonzero right-hand side
+    /// (an inconsistency; must stay 0).
+    pub inconsistent: u64,
+    /// Equations that reduced to `0 = 0` (dependent; not rows).
+    pub rows_null: u64,
+    /// Mean weight of the harvested rows.
+    pub mean_row_weight: f64,
+    #[serde(skip)]
+    cycle_len_sum: u64,
+    #[serde(skip)]
+    row_weight_sum: u64,
+}
+
+#[derive(Clone, Debug, Default)]
+struct Aff {
+    /// `Σ coeff · x_col` over small-base columns (including `d`).
+    cols: Vec<(usize, u64)>,
+    k: u64,
+    /// Ids of the relations this expression was derived from.
+    rels: Vec<u32>,
+}
+
+#[derive(Clone, Debug)]
+struct HNode {
+    /// Itself for a free root, [`HSINK`] for a component attached to the
+    /// sink, otherwise the parent vertex.
+    parent: usize,
+    /// `x_v = g · x_parent + e`.
+    g: u64,
+    e: Aff,
+    size: u32,
+    touched: bool,
+}
+
+const HSINK: usize = usize::MAX;
+
+#[derive(Clone, Debug)]
+struct HEq {
+    /// `Σ coef · x_vertex + Σ s_c x_c ≡ rhs`.
+    vars: Vec<(usize, u64)>,
+    s: Vec<(usize, u64)>,
+    rhs: u64,
+    rels: Vec<u32>,
+}
+
+/// Sorted union of two sorted id lists.
+fn union_sorted(a: &[u32], b: &[u32]) -> Vec<u32> {
+    let mut out = Vec::with_capacity(a.len() + b.len());
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() || j < b.len() {
+        if j >= b.len() || (i < a.len() && a[i] < b[j]) {
+            out.push(a[i]);
+            i += 1;
+        } else if i >= a.len() || b[j] < a[i] {
+            out.push(b[j]);
+            j += 1;
+        } else {
+            out.push(a[i]);
+            i += 1;
+            j += 1;
+        }
+    }
+    out
+}
+
+/// `dst + c · src`, both sorted by column; zero entries dropped; one
+/// multiplication charged per entry of `src`.
+fn merge_scaled(
+    dst: &[(usize, u64)],
+    c: u64,
+    src: &[(usize, u64)],
+    n: u64,
+    ops: &mut u64,
+) -> Vec<(usize, u64)> {
+    let mut out = Vec::with_capacity(dst.len() + src.len());
+    let (mut i, mut j) = (0, 0);
+    while i < dst.len() || j < src.len() {
+        let take_dst = j >= src.len() || (i < dst.len() && dst[i].0 < src[j].0);
+        let take_src = i >= dst.len() || (j < src.len() && src[j].0 < dst[i].0);
+        if take_dst {
+            out.push(dst[i]);
+            i += 1;
+        } else if take_src {
+            *ops += 1;
+            let v = mm(c, src[j].1, n);
+            if v != 0 {
+                out.push((src[j].0, v));
+            }
+            j += 1;
+        } else {
+            *ops += 1;
+            let v = am(dst[i].1, mm(c, src[j].1, n), n);
+            if v != 0 {
+                out.push((dst[i].0, v));
+            }
+            i += 1;
+            j += 1;
+        }
+    }
+    out
+}
+
+/// **Gain-forest cycle harvester.**  Vertices are the large primes (base
+/// columns `> small`; the `d` column at index `small` is a small-base
+/// unknown) plus an implicit sink.  Each vertex keeps a parent and an affine
+/// map over `Z/nZ` so that `x_v = g_v · x_root + (combination of small-base
+/// columns) + const`; a root attached to the sink is pinned (`x_root` known).
+/// A relation with `k` large primes is an equation in those vertices:
+/// substituting every vertex by its root leaves an equation in at most `k`
+/// distinct free roots.  With none it is a full row (a balanced cycle, or a
+/// cycle inside a pinned component); with one the root is pinned; with two
+/// the components are joined; with three (a 3-edge of the hypergraph) the
+/// equation stays buffered until peeling reduces it.  Every accepted equation
+/// is used exactly once, so rows emitted `=` equations accepted `−` joins
+/// `−` pins `−` still buffered (the frame-matroid count).
+pub struct GainForestHarvester {
+    small: usize,
+    n: u64,
+    nodes: Vec<HNode>,
+    buffer: Vec<Option<HEq>>,
+    regs: Vec<Vec<usize>>,
+    watch: HashMap<usize, Vec<usize>>,
+    queue: Vec<usize>,
+    next_id: u32,
+    out: Vec<SparseRel>,
+    pub stats: HarvestStats,
+}
+
+impl GainForestHarvester {
+    /// `ncols` is one more than the largest column index that may occur.
+    pub fn new(small: usize, n: u64, ncols: usize) -> Self {
+        let nodes = (0..ncols)
+            .map(|i| HNode {
+                parent: i,
+                g: 1,
+                e: Aff::default(),
+                size: 1,
+                touched: false,
+            })
+            .collect();
+        GainForestHarvester {
+            small,
+            n,
+            nodes,
+            buffer: Vec::new(),
+            regs: Vec::new(),
+            watch: HashMap::new(),
+            queue: Vec::new(),
+            next_id: 0,
+            out: Vec::new(),
+            stats: HarvestStats::default(),
+        }
+    }
+
+    /// Root of `v`; afterwards `v`'s own map is relative to that root
+    /// (`HSINK` for a pinned component, with `g = 0`).
+    fn find(&mut self, v: usize, ops: &mut u64) -> usize {
+        let p = self.nodes[v].parent;
+        if p == v || p == HSINK {
+            return p;
+        }
+        let r = self.find(p, ops);
+        if r == p {
+            return r;
+        }
+        // p is attached to r (a root or the sink): compose.
+        let (gp, ep) = (self.nodes[p].g, self.nodes[p].e.clone());
+        let gv = self.nodes[v].g;
+        let n = self.n;
+        let node = &mut self.nodes[v];
+        node.e.cols = merge_scaled(&node.e.cols, gv, &ep.cols, n, ops);
+        node.e.k = am(node.e.k, mm(gv, ep.k, n), n);
+        node.e.rels = union_sorted(&node.e.rels, &ep.rels);
+        node.g = mm(gv, gp, n);
+        node.parent = r;
+        *ops += 2;
+        r
+    }
+
+    /// Substitute every vertex of `eq` by its root.  Returns the free roots
+    /// with nonzero coefficient, the small-base part, the right-hand side,
+    /// the relations composed, and whether any vertex had a free root.
+    #[allow(clippy::type_complexity)]
+    fn reduce(
+        &mut self,
+        eq: &HEq,
+        ops: &mut u64,
+    ) -> (Vec<(usize, u64)>, Vec<(usize, u64)>, u64, Vec<u32>, bool) {
+        let n = self.n;
+        let mut s = eq.s.clone();
+        let mut rhs = eq.rhs;
+        let mut rels = eq.rels.clone();
+        let mut roots: Vec<(usize, u64)> = Vec::new();
+        let mut saw_free = false;
+        for &(v, c) in &eq.vars {
+            let r = self.find(v, ops);
+            let (g, e) = if r == v {
+                (1, Aff::default())
+            } else {
+                (self.nodes[v].g, self.nodes[v].e.clone())
+            };
+            if r != HSINK {
+                saw_free = true;
+                let a = mm(c, g, n);
+                *ops += 1;
+                if let Some(x) = roots.iter_mut().find(|x| x.0 == r) {
+                    x.1 = am(x.1, a, n);
+                } else {
+                    roots.push((r, a));
+                }
+            }
+            s = merge_scaled(&s, c, &e.cols, n, ops);
+            rhs = sm(rhs, mm(c, e.k, n), n);
+            *ops += 1;
+            rels = union_sorted(&rels, &e.rels);
+        }
+        roots.retain(|x| x.1 != 0);
+        (roots, s, rhs, rels, saw_free)
+    }
+
+    fn wake(&mut self, r: usize) {
+        if let Some(list) = self.watch.remove(&r) {
+            self.queue.extend(list);
+        }
+    }
+
+    /// Apply a reduced equation with at most two free roots.
+    fn apply(
+        &mut self,
+        roots: Vec<(usize, u64)>,
+        s: Vec<(usize, u64)>,
+        rhs: u64,
+        rels: Vec<u32>,
+        saw_free: bool,
+        ops: &mut u64,
+    ) {
+        let n = self.n;
+        match roots.len() {
+            0 => {
+                if s.is_empty() {
+                    if rhs != 0 {
+                        self.stats.inconsistent += 1;
+                    } else {
+                        self.stats.rows_null += 1;
+                    }
+                    return;
+                }
+                self.stats.rows_emitted += 1;
+                if saw_free {
+                    self.stats.rows_balanced += 1;
+                } else {
+                    self.stats.rows_pinned += 1;
+                }
+                self.stats.cycle_len_sum += rels.len() as u64;
+                self.stats.row_weight_sum += s.len() as u64;
+                self.out.push(SparseRel { cols: s, rhs });
+            }
+            1 => {
+                // x_r = A^{-1} (rhs - s·x): pin the component to the sink.
+                let (r, a) = roots[0];
+                let inv = inv_mod(a, n);
+                let neg = n - inv;
+                let cols: Vec<(usize, u64)> = s
+                    .iter()
+                    .map(|&(c, v)| (c, mm(neg, v, n)))
+                    .filter(|x| x.1 != 0)
+                    .collect();
+                *ops += s.len() as u64 + 1;
+                let node = &mut self.nodes[r];
+                node.parent = HSINK;
+                node.g = 0;
+                node.e = Aff {
+                    cols,
+                    k: mm(inv, rhs, n),
+                    rels,
+                };
+                self.stats.pins += 1;
+                self.wake(r);
+            }
+            _ => {
+                // Two free roots: solve for the smaller one.
+                let (mut ra, mut aa) = roots[0];
+                let (mut rb, mut ab) = roots[1];
+                if self.nodes[ra].size > self.nodes[rb].size {
+                    std::mem::swap(&mut ra, &mut rb);
+                    std::mem::swap(&mut aa, &mut ab);
+                }
+                // A_a x_ra + A_b x_rb + s·x = rhs.
+                let inv = inv_mod(aa, n);
+                let neg = n - inv;
+                let cols: Vec<(usize, u64)> = s
+                    .iter()
+                    .map(|&(c, v)| (c, mm(neg, v, n)))
+                    .filter(|x| x.1 != 0)
+                    .collect();
+                *ops += s.len() as u64 + 3;
+                let size_a = self.nodes[ra].size;
+                let node = &mut self.nodes[ra];
+                node.parent = rb;
+                node.g = mm(neg, ab, n);
+                node.e = Aff {
+                    cols,
+                    k: mm(inv, rhs, n),
+                    rels,
+                };
+                self.nodes[rb].size += size_a;
+                self.stats.unions += 1;
+                self.wake(ra);
+            }
+        }
+    }
+
+    /// Handle one equation; a 3-edge that cannot be reduced is buffered.
+    fn process(&mut self, eq: HEq, arrival: bool, ops: &mut u64) {
+        let (roots, s, rhs, rels, saw_free) = self.reduce(&eq, ops);
+        if roots.len() <= 2 {
+            if eq.vars.len() == 3 && arrival {
+                self.stats.three_edges_on_arrival += 1;
+            }
+            self.apply(roots, s, rhs, rels, saw_free, ops);
+        } else {
+            let id = self.buffer.len();
+            let regs: Vec<usize> = roots.iter().map(|x| x.0).collect();
+            for &r in &regs {
+                self.watch.entry(r).or_default().push(id);
+            }
+            self.regs.push(regs);
+            self.buffer.push(Some(HEq {
+                vars: roots,
+                s,
+                rhs,
+                rels,
+            }));
+        }
+    }
+
+    fn drain(&mut self, ops: &mut u64) {
+        while let Some(id) = self.queue.pop() {
+            let Some(eq) = self.buffer[id].take() else {
+                continue;
+            };
+            let (roots, s, rhs, rels, saw_free) = self.reduce(&eq, ops);
+            if roots.len() <= 2 {
+                self.stats.three_edges_peeled += 1;
+                self.apply(roots, s, rhs, rels, saw_free, ops);
+            } else {
+                let new_roots: Vec<usize> = roots.iter().map(|x| x.0).collect();
+                for &r in &new_roots {
+                    if !self.regs[id].contains(&r) {
+                        self.watch.entry(r).or_default().push(id);
+                    }
+                }
+                self.regs[id] = new_roots;
+                self.buffer[id] = Some(HEq {
+                    vars: roots,
+                    s,
+                    rhs,
+                    rels,
+                });
+            }
+        }
+    }
+
+    /// Feed one relation (`Σ coeff · x_col ≡ rhs`, columns sorted); returns
+    /// the full rows it released (zero or more: a closed cycle can free
+    /// buffered 3-edges).
+    pub fn feed(&mut self, rel: SparseRel, ops: &mut u64) -> Vec<SparseRel> {
+        let mut vars = Vec::new();
+        let mut s = Vec::new();
+        for &(c, v) in &rel.cols {
+            if c > self.small {
+                vars.push((c, v));
+            } else {
+                s.push((c, v));
+            }
+        }
+        let k = vars.len().min(3);
+        self.stats.accepted[k] += 1;
+        self.next_id += 1;
+        if vars.is_empty() {
+            return vec![rel];
+        }
+        if vars.len() == 3 {
+            self.stats.three_edges_accepted += 1;
+        }
+        for &(c, _) in &vars {
+            if !self.nodes[c].touched {
+                self.nodes[c].touched = true;
+                self.stats.vertices += 1;
+            }
+        }
+        self.process(
+            HEq {
+                vars,
+                s,
+                rhs: rel.rhs,
+                rels: vec![self.next_id],
+            },
+            true,
+            ops,
+        );
+        self.drain(ops);
+        std::mem::take(&mut self.out)
+    }
+
+    /// Fill the end-of-run counters and return the statistics.
+    pub fn finish(&mut self) -> HarvestStats {
+        let mut dummy = 0u64;
+        let mut free = 0u64;
+        let mut pinned = 0u64;
+        for v in 0..self.nodes.len() {
+            if !self.nodes[v].touched {
+                continue;
+            }
+            let r = self.find(v, &mut dummy);
+            if r == v {
+                free += 1;
+            } else if r == HSINK {
+                pinned += 1;
+            }
+        }
+        self.stats.components_free = free;
+        self.stats.vertices_pinned = pinned;
+        self.stats.three_edges_left = self.buffer.iter().filter(|b| b.is_some()).count() as u64;
+        let m = self.stats.rows_emitted.max(1) as f64;
+        self.stats.mean_cycle_len = self.stats.cycle_len_sum as f64 / m;
+        self.stats.mean_row_weight = self.stats.row_weight_sum as f64 / m;
+        self.stats.clone()
     }
 }
 
@@ -3895,6 +4404,10 @@ pub fn run_gaudry_with_sampler(
     backend: LargePrimeBackend,
     sampler: ResidualSampler3,
 ) -> GaudryReport {
+    assert!(
+        !(opts.harvester == Harvester::Cycles && backend == LargePrimeBackend::SymbolicGraph),
+        "the cycle harvester replaces the pivot eliminator, not the symbolic graph"
+    );
     if backend == LargePrimeBackend::SymbolicGraph {
         assert!(
             opts.max_large_primes <= 2,
@@ -4000,6 +4513,10 @@ fn run_gaudry_impl(
         n,
         opts.max_merge_level,
     );
+    let cycles = opts.harvester == Harvester::Cycles && max_lp > 0;
+    let mut forest = GainForestHarvester::new(small, n, if cycles { base.len() + 2 } else { 0 });
+    let mut mu_harvested = 0u64;
+    let mut mu_direct = 0u64;
     let mut graph_eliminator = (backend == Some(LargePrimeBackend::SymbolicGraph)).then(|| {
         graph::GraphEliminator::new(small, base.len() - small, n)
             .expect("prime subgroup order required by symbolic graph")
@@ -4099,6 +4616,9 @@ fn run_gaudry_impl(
         sampler_restarts: backend.map(|_| 0),
         relation_point_stats: backend.map(|_| RelationPointStats::default()),
         s4_f4_stats: None,
+        harvest: None,
+        lp_variant: None,
+        captured_relations: None,
     };
     let mut la = std::time::Duration::ZERO;
     while rep.residuals < max_residuals {
@@ -4357,8 +4877,19 @@ fn run_gaudry_impl(
                     input_hash_bytes += 16;
                 }
             }
-            let full = if lp_count == 0 {
-                Some(rel)
+            if opts.capture_relations {
+                rep.captured_relations
+                    .get_or_insert_with(Vec::new)
+                    .push(rel.clone());
+            }
+            let fulls: Vec<SparseRel> = if lp_count == 0 {
+                vec![rel]
+            } else if cycles {
+                let before = la_ops;
+                let rows = forest.feed(rel, &mut la_ops);
+                merge_ops += la_ops - before;
+                rep.lp_full_relations += rows.len() as u64;
+                rows
             } else {
                 let before = la_ops;
                 let f = if let Some(graph) = &mut graph_eliminator {
@@ -4372,9 +4903,16 @@ fn run_gaudry_impl(
                 if f.is_some() {
                     rep.lp_full_relations += 1;
                 }
-                f
+                f.into_iter().collect()
             };
-            if let Some(full) = full {
+            for full in fulls {
+                if cycles {
+                    if lp_count == 0 {
+                        mu_direct += 1;
+                    } else {
+                        mu_harvested += 1;
+                    }
+                }
                 if opts.sparse_la {
                     full_rels.push(full);
                     rep.relations_independent = full_rels.len() as u64;
@@ -4439,6 +4977,10 @@ fn run_gaudry_impl(
                     }
                     la_rows_used = system.rank();
                 }
+                if cycles && rep.solved {
+                    // A closed cycle can release several rows at once.
+                    break;
+                }
             }
             la += t0.elapsed();
         }
@@ -4464,6 +5006,16 @@ fn run_gaudry_impl(
     rep.lp_merge_ops = merge_ops;
     rep.lp_abandoned = eliminator.abandoned;
     rep.lp_mean_merge_depth = eliminator.mean_merge_depth();
+    if cycles {
+        let mut st = forest.finish();
+        st.mu_harvested = mu_harvested;
+        st.mu_direct = mu_direct;
+        // For the harvester the field is the mean number of relations
+        // composed into a harvested row (the cycle-length analogue).
+        rep.lp_mean_merge_depth = st.mean_cycle_len;
+        rep.harvest = Some(st);
+        rep.lp_variant = Some("cycles".to_string());
+    }
     rep.lp_graph_work = graph_eliminator.map(|graph| graph.work);
     rep.lp_input_digest = input_hasher.map(|hasher| hasher.finalize().to_hex().to_string());
     rep.lp_input_hash_bytes = backend.map(|_| input_hash_bytes);
@@ -4814,6 +5366,7 @@ mod tests {
     /// the same answer on every residual, not merely the same counts.
     #[test]
     fn the_border_check_sends_only_the_residuals_no_degree_solves_to_the_fallback() {
+        let _env = env_lock();
         let inst = generate_instance3(271, 1);
         let pre = SymmetrisedS4::precompute(&inst.curve);
         let p = inst.curve.field.p;
@@ -5355,5 +5908,278 @@ mod tests {
             pair_each * 50 < grob_each,
             "pair {pair_each} vs triple {grob_each} F_p muls per residual"
         );
+    }
+
+    // ── the default large-prime path is unchanged ────────────────────────
+
+    /// `GAUDRY_BORDER_RETRY` is process-wide and one test flips it; a test
+    /// that compares exact reports must not run while it is set.
+    fn env_lock() -> std::sync::MutexGuard<'static, ()> {
+        static LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        LOCK.lock().unwrap_or_else(|e| e.into_inner())
+    }
+
+    /// SHA-256 of the report's JSON with the two wall-clock fields zeroed.
+    fn report_digest(mut rep: GaudryReport) -> String {
+        rep.wall_ms = 0.0;
+        rep.linear_algebra_ms = 0.0;
+        let json = serde_json::to_string(&rep).unwrap();
+        crate::hash::sha256::sha256(json.as_bytes())
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect()
+    }
+
+    /// The reports of the default (eliminator) large-prime path, byte for
+    /// byte (wall clock excluded), as the code stood before the gain-forest
+    /// harvester was ported (crypto `c9601627e`).  `GOLDEN_PRINT=1` prints
+    /// the digests instead of asserting.
+    #[test]
+    fn default_large_prime_reports_are_unchanged() {
+        let _env = env_lock();
+        let mut got: Vec<(String, String)> = Vec::new();
+        let build = |p: u64, iseed: u64, bseed: u64| {
+            let inst = generate_instance3(p, iseed);
+            let mut rng = StdRng::seed_from_u64(bseed);
+            let base = SubspaceBase::build(&inst, &mut rng);
+            (inst, base)
+        };
+        let rule = |base: &SubspaceBase| (base.len() as f64).powf(2.0 / 3.0).ceil() as usize;
+        // 0: Groebner + Wiedemann + double large primes, the bench's arm.
+        let (inst, base) = build(67, 1, 1);
+        let opts = GaudryOptions {
+            solver: Solver::Groebner,
+            sparse_la: true,
+            small_base: rule(&base),
+            max_large_primes: 2,
+            ..GaudryOptions::default()
+        };
+        let rep = run_gaudry_opts(&inst, &base, 1, &opts);
+        assert_eq!(rep.correct, Some(true));
+        got.push(("groebner_lp2_p67".into(), report_digest(rep)));
+        // 1: the plain dense run.
+        let (inst, base) = build(67, 11, 2);
+        got.push((
+            "mitm_dense_p67".into(),
+            report_digest(run_gaudry(&inst, &base, 1, 20_000)),
+        ));
+        // 2: a larger field with a merge-level cap.
+        let (inst, base) = build(151, 3, 3);
+        let opts = GaudryOptions {
+            solver: Solver::Groebner,
+            sparse_la: true,
+            small_base: rule(&base),
+            max_large_primes: 2,
+            max_merge_level: 2,
+            ..GaudryOptions::default()
+        };
+        got.push((
+            "groebner_lp2_cap2_p151".into(),
+            report_digest(run_gaudry_opts(&inst, &base, 2, &opts)),
+        ));
+        // 3, 4: the two protected backends.
+        let (inst, base) = build(67, 1, 1);
+        let opts = GaudryOptions {
+            solver: Solver::Groebner,
+            sparse_la: true,
+            small_base: rule(&base),
+            max_large_primes: 2,
+            ..GaudryOptions::default()
+        };
+        for (name, backend) in [
+            ("pivot_backend_p67", LargePrimeBackend::Pivot),
+            ("graph_backend_p67", LargePrimeBackend::SymbolicGraph),
+        ] {
+            got.push((
+                name.into(),
+                report_digest(run_gaudry_with_eliminator(&inst, &base, 1, &opts, backend)),
+            ));
+        }
+        if std::env::var_os("GOLDEN_PRINT").is_some() {
+            for (k, v) in &got {
+                println!("GOLDEN {k} {v}");
+            }
+            return;
+        }
+        const GOLDEN: &[(&str, &str)] = &[
+            (
+                "groebner_lp2_p67",
+                "3a7b0cea7e1ee1bd4d3a7313fe85b5e9758256ad2eacad3e2efda1bc4e8b900d",
+            ),
+            (
+                "mitm_dense_p67",
+                "0edf9ac1de52650d79426602b3fad1a6989907472da94feab1ad08917e6067d8",
+            ),
+            (
+                "groebner_lp2_cap2_p151",
+                "9d8ce38d7fae38fe8a4a248e9428eb1791be9815c7fb7ebb4f6794c3aeb104f8",
+            ),
+            (
+                "pivot_backend_p67",
+                "b547716bfba01e59fba2eff97226fad464178ade3fda627164c2246fcb5f5eb0",
+            ),
+            (
+                "graph_backend_p67",
+                "780b187825cd4d82ba1b25d568f7d489ca981040bf6044b20ab9874324cb7847",
+            ),
+        ];
+        assert_eq!(got.len(), GOLDEN.len());
+        for ((k, v), (gk, gv)) in got.iter().zip(GOLDEN) {
+            assert_eq!(k, gk);
+            assert_eq!(v, gv, "{k}: the default path's report changed");
+        }
+    }
+
+    // ── gain-forest harvester ────────────────────────────────────────────
+
+    /// Random relations with 0..=3 large primes over a hidden solution, fed
+    /// to the harvester: every released row holds, none is inconsistent, and
+    /// the frame-matroid count balances (every accepted large-prime
+    /// equation is a row, a join, a pin, a null row or still buffered).
+    #[test]
+    fn harvester_rows_hold_on_a_planted_system_and_the_count_balances() {
+        let n = 1_000_003u64;
+        let small = 6usize; // columns 0..5 small, 6 = d, 7.. large primes
+        let nlp = 40usize;
+        let mut rng = StdRng::seed_from_u64(21);
+        let x: Vec<u64> = (0..small + 1 + nlp).map(|_| rng.gen_range(0..n)).collect();
+        let mut h = GainForestHarvester::new(small, n, small + 1 + nlp);
+        let mut ops = 0u64;
+        let mut rows = 0u64;
+        let mut lp_eqs = 0u64;
+        for _ in 0..400 {
+            let k = rng.gen_range(0..4usize);
+            let mut cols: Vec<(usize, u64)> = Vec::new();
+            let mut push = |c: usize, rng: &mut StdRng| {
+                if cols.iter().any(|e| e.0 == c) {
+                    return;
+                }
+                cols.push((c, rng.gen_range(1..n)));
+            };
+            for _ in 0..k {
+                push(small + 1 + rng.gen_range(0..nlp), &mut rng);
+            }
+            for _ in 0..rng.gen_range(0..3usize) {
+                push(rng.gen_range(0..=small), &mut rng);
+            }
+            if cols.is_empty() {
+                continue;
+            }
+            cols.sort_unstable();
+            let lps = cols.iter().filter(|e| e.0 > small).count();
+            if lps > 0 {
+                lp_eqs += 1;
+            }
+            let rhs = cols
+                .iter()
+                .fold(0u64, |a, &(c, v)| am(a, mm(v, x[c], n), n));
+            for r in h.feed(SparseRel { cols, rhs }, &mut ops) {
+                assert!(r.cols.iter().all(|&(c, _)| c <= small), "{r:?}");
+                let lhs = r
+                    .cols
+                    .iter()
+                    .fold(0u64, |a, &(c, v)| am(a, mm(v, x[c], n), n));
+                assert_eq!(
+                    lhs, r.rhs,
+                    "harvested row must hold against the hidden solution"
+                );
+                if lps > 0 {
+                    rows += 1;
+                }
+            }
+        }
+        let st = h.finish();
+        assert_eq!(st.inconsistent, 0);
+        assert!(
+            rows > 20 && st.three_edges_accepted > 20,
+            "{st:?} rows {rows}"
+        );
+        assert_eq!(
+            lp_eqs,
+            st.rows_emitted + st.unions + st.pins + st.rows_null + st.three_edges_left,
+            "{st:?}"
+        );
+        assert_eq!(st.rows_emitted, rows, "{st:?}");
+        assert!(ops > 0);
+    }
+
+    /// On a real instance every harvested row holds against the known
+    /// logarithms of the base points (brute-forced), and the run recovers
+    /// the planted `d`.
+    #[test]
+    fn harvester_rows_hold_against_known_logs_on_a_planted_instance() {
+        let inst = generate_instance3(67, 11);
+        let mut rng = StdRng::seed_from_u64(3);
+        let base = SubspaceBase::build(&inst, &mut rng);
+        let curve = &inst.curve;
+        let n = curve.n;
+        let mut table: HashMap<Pt3, u64> = HashMap::new();
+        let mut acc = curve.g;
+        for j in 1..n {
+            table.insert(acc, j);
+            acc = curve.add(&acc, &curve.g);
+        }
+        let logs: Vec<u64> = base.points.iter().map(|pt| table[pt]).collect();
+        let small = (base.len() as f64).powf(2.0 / 3.0).ceil() as usize;
+        let col_of = |i: usize| if i < small { i } else { i + 1 };
+        let mut xs = vec![0u64; base.len() + 2];
+        for (i, &l) in logs.iter().enumerate() {
+            xs[col_of(i)] = l;
+        }
+        xs[small] = inst.d;
+        let pre = SymmetrisedS4::precompute(curve);
+        let mut stats = SolveStats::default();
+        let mut h = GainForestHarvester::new(small, n, base.len() + 2);
+        let mut ops = 0u64;
+        let mut rows = 0usize;
+        let mut rng = StdRng::seed_from_u64(77);
+        for _ in 0..300 {
+            let a = rng.gen_range(0..n);
+            let b = rng.gen_range(1..n);
+            let r = curve.add(&curve.mul(&curve.g, a), &curve.mul(&inst.q, b));
+            let decs =
+                subspace_triple_oracle_groebner(&inst, &base, &pre, &r, &mut rng, &mut stats);
+            for terms in decs {
+                let mut cols: Vec<(usize, u64)> = terms
+                    .iter()
+                    .map(|&(i, c)| {
+                        let v = c.unsigned_abs() % n;
+                        (col_of(i), if c >= 0 { v } else { (n - v) % n })
+                    })
+                    .collect();
+                cols.push((small, (n - b) % n));
+                cols.sort_unstable();
+                let rel = SparseRel { cols, rhs: a };
+                for r in h.feed(rel, &mut ops) {
+                    let lhs = r
+                        .cols
+                        .iter()
+                        .fold(0u64, |s, &(c, v)| am(s, mm(v, xs[c], n), n));
+                    assert_eq!(lhs, r.rhs, "harvested row fails against the known logs");
+                    rows += 1;
+                }
+            }
+        }
+        let st = h.finish();
+        assert!(rows > 0 && st.inconsistent == 0, "{st:?}");
+        let rep = run_gaudry_opts(
+            &inst,
+            &base,
+            1,
+            &GaudryOptions {
+                max_residuals: 200_000,
+                solver: Solver::Groebner,
+                sparse_la: true,
+                small_base: small,
+                max_large_primes: 3,
+                harvester: Harvester::Cycles,
+                ..GaudryOptions::default()
+            },
+        );
+        assert_eq!(rep.correct, Some(true), "{rep:?}");
+        let hs = rep.harvest.as_ref().expect("cycle stats present");
+        assert_eq!(hs.inconsistent, 0);
+        assert!(hs.mu_harvested + hs.mu_direct > 0 && rep.lp_merge_ops > 0);
+        assert!(hs.mu_harvested as usize >= rep.la_rows.saturating_sub(hs.mu_direct as usize));
     }
 }

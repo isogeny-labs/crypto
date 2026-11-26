@@ -1,0 +1,31 @@
+
+running 13 tests
+test algebraic_api_refuses_invalid_fields_degrees_and_coefficients ... algebraic_guard refusals=19
+ok
+test complete_small_field_coordinate_and_signed_sets_match_independent_oracles ... small_fields coordinate_cases=360 empty_cases=225 coordinate_pairs=489 rational_targets=388 signed_pairs=450
+ok
+test constant_quadratics_match_all_formal_sylvester_specializations ... formal_sylvester coefficient_specializations=2808
+ok
+test coordinate_api_refuses_invalid_curves_coordinates_and_unsplit_selectors ... coordinate_guard refusals=10
+ok
+test lifting_refuses_invalid_targets_coordinates_and_order_constraints ... lifting_guard refusals=9 valid_empty_calls=1
+ok
+test order_annihilator_filters_summands_separately_from_the_target ... order_annihilator unconstrained_pairs=2 order2_pairs=0 order4_pairs=2
+ok
+test polynomial_coefficients_match_explicit_selector_product ... explicit_selector_product polynomial_specializations=50
+ok
+test prime31_selector_degree_1302_positive_public_fixture ... prime31_positive d=1302 selector_roots=1302 polynomial_pair_checks=1695204 rational_points=1306 order_admitted_points=1306 target=(1934056707,318060938) coordinate_pairs=1 signed_pairs=1
+ok
+test prime31_selector_degree_31_positive_public_fixture ... prime31_positive d=31 selector_roots=31 polynomial_pair_checks=961 rational_points=36 order_admitted_points=36 target=(1934056707,318060938) coordinate_pairs=1 signed_pairs=1
+ok
+test prime31_selector_degree_6_positive_public_fixture ... prime31_positive d=6 selector_roots=6 polynomial_pair_checks=36 rational_points=8 order_admitted_points=8 target=(1934056707,318060938) coordinate_pairs=1 signed_pairs=1
+ok
+test registered_prime31_generator_and_declared_order_replay ... prime31_generator p=2147483647 declared_r=2147446831 G=(625037715,2100627251) order_replay=pass independent_point_count=not_performed
+ok
+test two_torsion_target_rejects_extension_only_coordinate_pairs ... two_torsion coordinate_pairs=3 extension_only_pairs_rejected=2 signed_pairs=2
+ok
+test vanishing_quadratic_leading_coefficient_retains_the_finite_doubling_branch ... vanishing_leading_coefficient target=(3,3) finite_root=1 signed_pairs=4
+ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+

@@ -1,0 +1,86 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T19:53:42Z",
+ "id": "PCC-20261118-ef4b3c",
+ "kind": "statement",
+ "producer": {
+  "commit": "04b361ff2f5efd09bf77899ecbb8e1df99fe068a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/summary.json",
+    "sha256": "9af452a440bb980941f297676c1e6c77f27f652b5a62a6e8f87a2ec62a62c626"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/proof/primitive.json",
+    "sha256": "4f5fb496f7ed05668f3824a44cb028ecb16dba9f9398b0fc36630ded8ac04afc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/results/attempt-a/blocked17-affine-baseline.json",
+    "sha256": "52b82b85fb7f574f09abaa28929462d2cb58aae9adaa920d76bebf50fb8735dc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/results/attempt-a/default-fixtures.jsonl",
+    "sha256": "dfd44f832ae1b1d6f6e8696673f1a20ca32fdc06d351dae75696631c78a52bba"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/results/attempt-a/qualification.exit",
+    "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/results/attempt-b/qualification.stdout",
+    "sha256": "aec0b32648e5dfd45454f1a4ab243c1f46528c905d467564fe9ca2f715373d13"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/pre-call.sha256",
+    "sha256": "ee2d72e0e62b494b3732a69cd30739ab56328dc896645e6a4630b9acb6a1f8c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/reuse-pre-call.sha256",
+    "sha256": "684e4de40f079bb0337cdedb11e7a742f1e9aaab6c221e194c0b199db078fb73"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/post-check-final.stdout",
+    "sha256": "ccdcac74d236f06761827b2f7acdf6529be0bdc44b97c8aa7e0626754bebc63e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/reuse-post-check.stdout",
+    "sha256": "fce46a0fa5bca0db83aab18291c844b9ed1d08586bc59a7c22c88e2b3175090a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/prepared-norm-20261118",
+ "statement": "Prepared native norms pass 768 direct-root/reuse checks, 384 collision controls and 6 invalid-modulus controls. After a retained qualifier timeout, unchanged source passes 21 prepared pipeline replays with 483 point-input evaluations across 4 fields and 18 CLI rejections. Default bytes and mathematical outputs match the old backend. Degree-10009 comparisons reuse completed same-input PARI oracle; smaller cases use fresh PARI. Native metadata confirms affine/7/64 despite accumulated shell label suffixes. Outer-timeout child cleanup is recorded. No target80 crossing, performance/memory gain, image publication or endpoint timing is established."
+}

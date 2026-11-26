@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T12:32:07Z",
+ "id": "PCC-20261123-5bd9de",
+ "kind": "statement",
+ "producer": {
+  "commit": "0eac0c327a2e4446a988bf59885d839a590694a6",
+  "model": "",
+  "session": "2026-11-23"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_realcurve_torsion_20261123/coordinates/ACTUAL_FIRST_D_RESULT.json",
+    "sha256": "86d108fed61734dc74dd7964c0be8957af381b256a21d4d52a847bed06ff87d1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_realcurve_torsion_20261123/coordinates/first-D-native/coordinates.stdout",
+    "sha256": "d68b2673acd34c1593cdca9a1089d1a83ec818e387b399c40d6e5f8f3465bb7f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "genuine-Jacobian8-D-finite-data",
+ "statement": "First genuine coordinate D0eac0c32 passes every strict native phase and guards: actual selected genus-two C/F3 has4096 distinct canonical J8 classes and4096 actual Frobenius images overF3^12,16384 generator edges,15 branch-pair J2 classes and14 deterministic basis draws. Exact Weil polynomial/F12 and fixed counts1/16/256/4096 at powers1/3/6/12 pass; omitted-basepoint mutant rejects and corrected rule matches direct cubed points. Whole2753B stdout retained;185920B full coordinate TSV and whole ELFs private custody-pending. Actual Weil8, explicit elliptic/chain morphisms, Lean and ECDLP cost advantage are not supplied."
+}

@@ -1,0 +1,28 @@
+[package]
+name = "crypto"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+# block_wiedemann::kernel_vector_parallel (same version as the root crate).
+rayon = "1.10"
+
+[lib]
+# Same library name as the root crate, so tests/large_prime_graph.rs
+# (`use crypto_lib::…`) compiles unchanged in both.
+name = "crypto_lib"
+path = "src/lib.rs"
+
+[[test]]
+name = "large_prime_graph"
+path = "../../../tests/large_prime_graph.rs"
+
+# Build the ORIGINAL evaluator CLI against the same source-exact graph modules,
+# independently of unrelated root-crate parse errors.
+[[example]]
+name = "lp_graph_eval"
+path = "../../../examples/lp_graph_eval.rs"

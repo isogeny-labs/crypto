@@ -1,0 +1,51 @@
+{
+  "schema": "h116.formal-scalar-oos-protocol/v1",
+  "protocol_id": "H116-FORMAL-SCALAR-OOS-001",
+  "status": "frozen-before-selection-and-map-data",
+  "panel_size": 5,
+  "candidate": {
+    "path": "h116_formal_scalar_jet.py",
+    "sha256": "914c1909ffdd5e6b87a01f4c2da9de8faca0187da490cb56af323e105e64b6b4",
+    "precision": 11,
+    "input_fields": ["p", "source_a", "source_b", "trace"]
+  },
+  "selection_source": {
+    "path": "COHORT_V2.json",
+    "sha256": "29e2fd5596ce3ed8e93933161e05b92229cd3065a892bc8ee59d6265f6fa2d99",
+    "fields_used": ["p", "order", "trace", "torsion_degree", "a", "b"]
+  },
+  "selection_rule": {
+    "order": "for each frozen triple, lexicographic source_a then source_b",
+    "requirements": [
+      "nonsingular",
+      "direct point count equals frozen prime order",
+      "j-invariant differs from admitted model",
+      "not an exact H115 excluded fixture"
+    ],
+    "replacement": "forbidden",
+    "failure_value": "selection_failure"
+  },
+  "separation": {
+    "candidate_all_cells_before_oracle_parse": true,
+    "independent_verifier_calls_candidate": false,
+    "independent_verifier_calls_oracle": false
+  },
+  "controls_per_cell": [
+    "full_map_prefix_0_through_10",
+    "recurrence_prefix_0_through_8",
+    "first_order_residual_0_through_9",
+    "scaled_codomain",
+    "cleared_map_identity",
+    "numerator_mutation_rejected",
+    "wrong_scalar_rejected",
+    "unscaled_target_rejected",
+    "independent_json_replay"
+  ],
+  "acceptance": "all five selected cells pass every frozen control",
+  "stopping": "five selection attempts and at most one map construction per selected cell; retain every failure and do not replace",
+  "measurement": "exact operation counts by stage; no timing or speedup claim",
+  "canonical_protocol_tool": {
+    "checkout_revision": "d54c01d3",
+    "status": "unavailable-vlt1-encrypted"
+  }
+}

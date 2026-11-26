@@ -26,6 +26,15 @@ Keep entries about this project; do not copy private global logs or chat transcr
 
 <!-- END SHARED SESSION LOG -->
 
+## Authorized target scope
+
+Work in this repository is limited to public benchmark instances, published
+challenge curves, toy or synthetic parameters, and systems the owner operates
+or is explicitly authorized to test. Do not develop or test operational
+attacks against production keys, wallets, accounts, or third-party systems.
+A task that requires a non-public target stops and asks for written
+authorization before proceeding.
+
 **Goal** (AGENTS.md, "Goal: what to work on next"): the SessionStart hook
 prints `tools/goal_brief.py` — the pinned goal and items in `docs/ACTIVE.md`,
 then the newest session-log open threads. With no other instruction, take the
@@ -33,7 +42,7 @@ first unchecked item (else the newest unowned open thread) and start. `/goal`
 re-reads the brief; `/goal <text>` pins a new goal.
 
 Run authorized x86 CPU experiments and crypto benchmarks through
-[`isolab-eks`](.claude/skills/isolab-eks/SKILL.md) on EKS Spot by default
+[`isolab-eks`](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md) on EKS Spot by default
 (owner, 2026-10-25; AGENTS.md §9a). Use the executor's existing AWS identity,
 submit from the agent, and verify source/image identity and S3 hashes. L2
 benchmarks require native L2/replay/A/A admission. Requested resume uses the
@@ -87,7 +96,7 @@ Full rule: AGENTS.md “Knowledge base first”; skill `research-kb`.
 
 Every experiment run, every PR that lands a result, and every research search
 leaves a report, a graph, and a PDF: follow the `research-visuals` skill
-(`.claude/skills/research-visuals/SKILL.md`; AGENTS.md "Research searches must
+(`isogeny-labs/workspace:.agents/skills/research-visuals/SKILL.md`; AGENTS.md "Research searches must
 leave visual reports"). Performance measurements and speedups also copy their
 PDFs, SVG graphs and PNG renders into `benchmarks/<YYYYMMDD>-<slug>/` with a row
 in `benchmarks/README.md`, in the same PR (AGENTS.md "Performance results also

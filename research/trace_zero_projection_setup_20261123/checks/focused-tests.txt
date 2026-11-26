@@ -1,0 +1,63 @@
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto/research/trace_zero_projection_setup_20261123/native/backend)
+error[E0432]: unresolved import `num_integer`
+   --> backend/src/../../../../../src/ecc/secp256k1_point.rs:588:9
+    |
+588 |     use num_integer::Integer;
+    |         ^^^^^^^^^^^ use of unresolved module or unlinked crate `num_integer`
+    |
+    = help: if you wanted to use a crate named `num_integer`, use `cargo add num_integer` to add it to your `Cargo.toml`
+
+error[E0599]: no method named `div_floor` found for struct `BigInt` in the current scope
+   --> backend/src/../../../../../src/ecc/secp256k1_point.rs:612:50
+    |
+612 |     let r1 = ((&k_red * &c.b2) * 2u8 + &c.n_int).div_floor(&two_n);
+    |                                                  ^^^^^^^^^
+    |
+   ::: /workspace/scratch/rust/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-integer-0.1.47/src/lib.rs:50:8
+    |
+ 50 |     fn div_floor(&self, other: &Self) -> Self;
+    |        --------- the method is available for `BigInt` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Integer` which provides `div_floor` is implemented but not in scope; perhaps you want to import it
+    |
+ 42 + use num_integer::Integer;
+    |
+help: there is a method `div_mod_floor` with a similar name
+    |
+612 |     let r1 = ((&k_red * &c.b2) * 2u8 + &c.n_int).div_mod_floor(&two_n);
+    |                                                      ++++
+
+error[E0599]: no method named `div_floor` found for struct `BigInt` in the current scope
+   --> backend/src/../../../../../src/ecc/secp256k1_point.rs:613:51
+    |
+613 |     let r2 = ((-&k_red * &c.b1) * 2u8 + &c.n_int).div_floor(&two_n);
+    |                                                   ^^^^^^^^^
+    |
+   ::: /workspace/scratch/rust/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-integer-0.1.47/src/lib.rs:50:8
+    |
+ 50 |     fn div_floor(&self, other: &Self) -> Self;
+    |        --------- the method is available for `BigInt` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `Integer` which provides `div_floor` is implemented but not in scope; perhaps you want to import it
+    |
+ 42 + use num_integer::Integer;
+    |
+help: there is a method `div_mod_floor` with a similar name
+    |
+613 |     let r2 = ((-&k_red * &c.b1) * 2u8 + &c.n_int).div_mod_floor(&two_n);
+    |                                                       ++++
+
+warning: unused variable: `m`
+   --> backend/src/../../../../../src/binary_ecc/f2m.rs:605:13
+    |
+605 |         let m = self.m;
+    |             ^ help: if this is intentional, prefix it with an underscore: `_m`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+warning: `full-trace-zero-backend` (lib) generated 1 warning
+error: could not compile `full-trace-zero-backend` (lib) due to 3 previous errors; 1 warning emitted

@@ -43,6 +43,101 @@ use num_traits::{One, Signed, Zero};
 use std::collections::HashMap;
 use std::fmt;
 
+/// Lagrange reduction on `i64` coefficients (same steps as
+/// [`BinaryQuadraticForm::reduce`]'s BigInt path).  Intermediate
+/// arithmetic uses `i128` to avoid overflow for `|D| ≲ 10⁹`.
+fn reduce_i64(mut a: i64, mut b: i64, mut c: i64) -> (i64, i64, i64) {
+    loop {
+        let two_a = (a as i128) * 2;
+        let mut r = (b as i128).rem_euclid(two_a);
+        if r > a as i128 {
+            r -= two_a;
+        }
+        let q = ((b as i128) - r) / two_a;
+        c = (c as i128 + q * q * (a as i128) - q * (b as i128)) as i64;
+        b = r as i64;
+        if a > c {
+            std::mem::swap(&mut a, &mut c);
+            b = -b;
+            continue;
+        }
+        if (a == c && b < 0) || a == -b {
+            b = -b;
+        }
+        break;
+    }
+    (a, b, c)
+}
+
+/// Extended gcd on `i128`: returns `(g, u, v)` with `u·a + v·b = g = gcd(|a|,|b|)`.
+fn ext_gcd_i128(a: i128, b: i128) -> (i128, i128, i128) {
+    if b == 0 {
+        let sign = if a < 0 { -1 } else { 1 };
+        return (a.abs(), sign, 0);
+    }
+    let (g, u1, v1) = ext_gcd_i128(b, a.rem_euclid(b));
+    let u = v1;
+    let v = u1 - (a.div_euclid(b)) * v1;
+    (g, u, v)
+}
+
+/// Gauss/Shanks composition on `i64` forms (same steps as
+/// [`BinaryQuadraticForm::compose`]).  Intermediates use `i128`.
+/// Returns `None` if an intermediate overflows `i64`.
+fn compose_i64(
+    a1: i64,
+    b1: i64,
+    c1: i64,
+    a2: i64,
+    b2: i64,
+    c2: i64,
+    disc: i64,
+) -> Option<(i64, i64, i64)> {
+    // Prefer a1 ≤ a2.
+    let (a1, b1, a2, b2, c2) = if a1 <= a2 {
+        (a1, b1, a2, b2, c2)
+    } else {
+        (a2, b2, a1, b1, c1)
+    };
+    let a1 = a1 as i128;
+    let b1 = b1 as i128;
+    let a2 = a2 as i128;
+    let b2 = b2 as i128;
+    let c2 = c2 as i128;
+    let disc = disc as i128;
+
+    let s = (b1 + b2) / 2;
+    let n = (b2 - b1) / 2;
+
+    let (d1, y0, _) = ext_gcd_i128(a2, a1);
+    let (d, x2, y2) = if s.rem_euclid(d1) == 0 {
+        (d1, 0i128, -y0)
+    } else {
+        let (d, x2, y3) = ext_gcd_i128(s, d1);
+        (d, x2, -(y3 * y0))
+    };
+
+    let v1 = a1 / d;
+    let v2 = a2 / d;
+    let r_raw = y2 * n - x2 * c2;
+    let r = r_raw.rem_euclid(v1);
+
+    let b3 = b2 + 2 * v2 * r;
+    let a3 = v1 * v2;
+    let numerator = b3 * b3 - disc;
+    let denominator = a3 * 4;
+    if denominator == 0 || numerator.rem_euclid(denominator) != 0 {
+        return None;
+    }
+    let c3 = numerator / denominator;
+
+    Some(reduce_i64(
+        i64::try_from(a3).ok()?,
+        i64::try_from(b3).ok()?,
+        i64::try_from(c3).ok()?,
+    ))
+}
+
 /// A primitive positive-definite integral binary quadratic form
 /// `f(x, y) = a·x² + b·x·y + c·y²` of negative discriminant
 /// `b² − 4ac = D < 0`.
@@ -111,6 +206,22 @@ impl BinaryQuadraticForm {
     /// Lagrange reduction.  Returns the unique reduced form
     /// equivalent to `self` under SL₂(Z).
     pub fn reduce(&self) -> Self {
+        // Hot path for |D| ≲ 10⁶ class-group work: i64 Lagrange when
+        // coefficients fit.  `IC_CLASS_I64=0` forces the BigInt path (A/B).
+        if std::env::var("IC_CLASS_I64").as_deref() != Ok("0") {
+            if let (Ok(a0), Ok(b0), Ok(c0)) = (
+                i64::try_from(&self.a),
+                i64::try_from(&self.b),
+                i64::try_from(&self.c),
+            ) {
+                let (a, b, c) = reduce_i64(a0, b0, c0);
+                return Self {
+                    a: BigInt::from(a),
+                    b: BigInt::from(b),
+                    c: BigInt::from(c),
+                };
+            }
+        }
         let (mut a, mut b, mut c) = (self.a.clone(), self.b.clone(), self.c.clone());
 
         loop {
@@ -179,6 +290,28 @@ impl BinaryQuadraticForm {
     pub fn compose(&self, other: &Self) -> Self {
         let d_disc = self.discriminant();
         assert_eq!(d_disc, other.discriminant());
+
+        // Hot path: i64 compose+reduce when all coeffs and D fit.
+        // `IC_CLASS_I64=0` forces BigInt (A/B).
+        if std::env::var("IC_CLASS_I64").as_deref() != Ok("0") {
+            if let (Ok(a1), Ok(b1), Ok(c1), Ok(a2), Ok(b2), Ok(c2), Ok(disc)) = (
+                i64::try_from(&self.a),
+                i64::try_from(&self.b),
+                i64::try_from(&self.c),
+                i64::try_from(&other.a),
+                i64::try_from(&other.b),
+                i64::try_from(&other.c),
+                i64::try_from(&d_disc),
+            ) {
+                if let Some((a, b, c)) = compose_i64(a1, b1, c1, a2, b2, c2, disc) {
+                    return Self {
+                        a: BigInt::from(a),
+                        b: BigInt::from(b),
+                        c: BigInt::from(c),
+                    };
+                }
+            }
+        }
 
         // Cohen's algorithm prefers a₁ ≤ a₂; swap if needed.
         let (a1, b1, _c1, a2, b2, c2) = if self.a <= other.a {
@@ -254,6 +387,25 @@ impl BinaryQuadraticForm {
             let disc = self.discriminant();
             return Self::principal(&disc).expect("principal form exists");
         }
+        // Stay in i64 for the whole binary ladder when coeffs+D fit —
+        // avoids BigInt round-trips on every compose/square.
+        // `IC_CLASS_I64=0` forces the BigInt ladder (A/B).
+        if std::env::var("IC_CLASS_I64").as_deref() != Ok("0") {
+            if let (Ok(a0), Ok(b0), Ok(c0), Ok(disc)) = (
+                i64::try_from(&self.a),
+                i64::try_from(&self.b),
+                i64::try_from(&self.c),
+                i64::try_from(&self.discriminant()),
+            ) {
+                if let Some((a, b, c)) = pow_i64(a0, b0, c0, disc, k) {
+                    return Self {
+                        a: BigInt::from(a),
+                        b: BigInt::from(b),
+                        c: BigInt::from(c),
+                    };
+                }
+            }
+        }
         let mut base = self.reduce();
         let mut acc: Option<Self> = None;
         let mut e = k;
@@ -271,6 +423,29 @@ impl BinaryQuadraticForm {
         }
         acc.unwrap()
     }
+}
+
+/// Binary exponentiation entirely in `i64`/`i128` compose.
+fn pow_i64(a: i64, b: i64, c: i64, disc: i64, k: u64) -> Option<(i64, i64, i64)> {
+    let (mut ba, mut bb, mut bc) = reduce_i64(a, b, c);
+    let mut acc: Option<(i64, i64, i64)> = None;
+    let mut e = k;
+    while e > 0 {
+        if e & 1 == 1 {
+            acc = Some(match acc {
+                None => (ba, bb, bc),
+                Some((aa, ab, ac)) => compose_i64(aa, ab, ac, ba, bb, bc, disc)?,
+            });
+        }
+        e >>= 1;
+        if e > 0 {
+            let (sa, sb, sc) = compose_i64(ba, bb, bc, ba, bb, bc, disc)?;
+            ba = sa;
+            bb = sb;
+            bc = sc;
+        }
+    }
+    acc
 }
 
 impl PartialEq for BinaryQuadraticForm {
@@ -331,8 +506,20 @@ fn ext_gcd(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
 /// "negative twin" `(a, −b, c)`.
 ///
 /// Complexity: `O(|D|^{1/2 + ε})` arithmetic operations.
+///
+/// When `D` fits in `i64` the hot loop runs in native integers
+/// (`IC_CLASS_I64=0` forces the BigInt path for A/B).
 pub fn enumerate_reduced_forms(disc: &BigInt) -> Vec<BinaryQuadraticForm> {
     assert!(disc.is_negative(), "discriminant must be negative");
+    if std::env::var("IC_CLASS_I64").as_deref() != Ok("0") {
+        if let Ok(d) = i64::try_from(disc) {
+            return enumerate_reduced_forms_i64(d);
+        }
+    }
+    enumerate_reduced_forms_bigint(disc)
+}
+
+fn enumerate_reduced_forms_bigint(disc: &BigInt) -> Vec<BinaryQuadraticForm> {
     let abs_d = disc.abs();
     // bound on a: a ≤ √(|D|/3)
     let bound_sq = &abs_d / 3;
@@ -381,6 +568,88 @@ pub fn enumerate_reduced_forms(disc: &BigInt) -> Vec<BinaryQuadraticForm> {
             b += BigInt::from(2);
         }
         a += BigInt::one();
+    }
+    forms
+}
+
+#[inline]
+fn gcd_i64(mut x: i64, mut y: i64) -> i64 {
+    x = x.abs();
+    y = y.abs();
+    while y != 0 {
+        let t = x % y;
+        x = y;
+        y = t;
+    }
+    x
+}
+
+#[inline]
+fn is_reduced_i64(a: i64, b: i64, c: i64) -> bool {
+    let abs_b = b.abs();
+    if abs_b > a || a > c {
+        return false;
+    }
+    if (abs_b == a || a == c) && b < 0 {
+        return false;
+    }
+    true
+}
+
+fn isqrt_u64(n: u64) -> u64 {
+    if n == 0 {
+        return 0;
+    }
+    let mut x = 1u64 << (64 - n.leading_zeros()).div_ceil(2);
+    if x == 0 {
+        x = 1;
+    }
+    loop {
+        let y = (x + n / x) / 2;
+        if y >= x {
+            return x;
+        }
+        x = y;
+    }
+}
+
+fn enumerate_reduced_forms_i64(disc: i64) -> Vec<BinaryQuadraticForm> {
+    debug_assert!(disc < 0);
+    let abs_d = disc.unsigned_abs();
+    let a_max = isqrt_u64(abs_d / 3) as i64;
+    let parity = disc.rem_euclid(2);
+    let mut forms = Vec::new();
+    let mut a = 1i64;
+    while a <= a_max {
+        let mut b = parity;
+        // Start b in (-a, a]; for parity 0/1 the first candidate ≥ -a+ε
+        // matching the BigInt loop (b starts at parity ∈ {0,1} ≥ 0).
+        while b <= a {
+            let num = (b as i128) * (b as i128) - (disc as i128);
+            let denom = (a as i128) * 4;
+            if num.rem_euclid(denom) == 0 {
+                let c = (num / denom) as i64;
+                if c >= a && gcd_i64(a, gcd_i64(b, c)) == 1 && is_reduced_i64(a, b, c) {
+                    forms.push(BinaryQuadraticForm {
+                        a: BigInt::from(a),
+                        b: BigInt::from(b),
+                        c: BigInt::from(c),
+                    });
+                    if b != 0 && b != a && a != c {
+                        let mb = -b;
+                        if is_reduced_i64(a, mb, c) {
+                            forms.push(BinaryQuadraticForm {
+                                a: BigInt::from(a),
+                                b: BigInt::from(mb),
+                                c: BigInt::from(c),
+                            });
+                        }
+                    }
+                }
+            }
+            b += 2;
+        }
+        a += 1;
     }
     forms
 }
@@ -435,6 +704,36 @@ pub struct ClassGroup {
 
 const MAX_TABULATED_H: usize = 64;
 
+/// Build the composition table with i64 keys when every reduced form fits.
+fn mul_table_i64(disc: &BigInt, elements: &[BinaryQuadraticForm]) -> Option<Vec<Vec<usize>>> {
+    if std::env::var("IC_CLASS_I64").as_deref() == Ok("0") {
+        return None;
+    }
+    let disc = i64::try_from(disc).ok()?;
+    let mut coeffs = Vec::with_capacity(elements.len());
+    let mut idx = HashMap::with_capacity(elements.len());
+    for (i, e) in elements.iter().enumerate() {
+        let a = i64::try_from(&e.a).ok()?;
+        let b = i64::try_from(&e.b).ok()?;
+        let c = i64::try_from(&e.c).ok()?;
+        idx.insert((a, b, c), i);
+        coeffs.push((a, b, c));
+    }
+    let n = elements.len();
+    let mut t = vec![vec![0usize; n]; n];
+    for i in 0..n {
+        let (a1, b1, c1) = coeffs[i];
+        for j in 0..n {
+            let (a2, b2, c2) = coeffs[j];
+            let (a, b, c) = compose_i64(a1, b1, c1, a2, b2, c2, disc)?;
+            t[i][j] = *idx
+                .get(&(a, b, c))
+                .expect("composition stayed inside the class group");
+        }
+    }
+    Some(t)
+}
+
 impl ClassGroup {
     /// Build `Cl(O)` for the given discriminant.  Builds the full
     /// multiplication table when `h ≤ MAX_TABULATED_H`.
@@ -445,17 +744,23 @@ impl ClassGroup {
             index_of.insert(e.clone(), i);
         }
         let mul_table = if elements.len() <= MAX_TABULATED_H {
-            let mut t = vec![vec![0usize; elements.len()]; elements.len()];
-            for i in 0..elements.len() {
-                for j in 0..elements.len() {
-                    let p = elements[i].compose(&elements[j]);
-                    let k = *index_of
-                        .get(&p)
-                        .expect("composition stayed inside the class group");
-                    t[i][j] = k;
+            // Prefer i64 compose + (a,b,c) keys (skips BigInt Hash/PartialEq
+            // reduce on every lookup).  Falls back to BinaryQuadraticForm map.
+            if let Some(t) = mul_table_i64(disc, &elements) {
+                Some(t)
+            } else {
+                let mut t = vec![vec![0usize; elements.len()]; elements.len()];
+                for i in 0..elements.len() {
+                    for j in 0..elements.len() {
+                        let p = elements[i].compose(&elements[j]);
+                        let k = *index_of
+                            .get(&p)
+                            .expect("composition stayed inside the class group");
+                        t[i][j] = k;
+                    }
                 }
+                Some(t)
             }
-            Some(t)
         } else {
             None
         };

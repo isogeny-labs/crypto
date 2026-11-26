@@ -1,0 +1,113 @@
+{
+  "schema": "prime31-iteration6-render-receipt/v1",
+  "purpose": "Document layout and artifact verification only; no cryptographic calculations",
+  "pdf_pages": 9,
+  "pdf_links": 13,
+  "validation_status": "blocked_third_inherited_syntax",
+  "source_commit": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+  "tools": {
+    "python": "3.12.14",
+    "reportlab": "4.4.9",
+    "pypdf": "6.21.4",
+    "pymupdf": "1.26.6"
+  },
+  "files": [
+    {
+      "path": "REPORT.pdf",
+      "bytes": 63446,
+      "sha256": "520d4a80717575a0fcb7d4ebff44661372bec8a5b416464a0be73df374069cad"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 38068,
+      "sha256": "1c2fba73df78741b0c4c8f3194696133069dc5b09e3ddd0c9331bfae2ae71cfc"
+    },
+    {
+      "path": "render_report.py",
+      "bytes": 40546,
+      "sha256": "8b0ca5aac76010f06def88cbe7b0995859534c2c98b3ea6521cb2a2f894b64e1"
+    },
+    {
+      "path": "report-validation.json",
+      "bytes": 8029,
+      "sha256": "856cf16d348298d978321c7749cd2720ae4396f6d1420251a0283c2e94869606"
+    },
+    {
+      "path": "figures/rational-chain-topology.svg",
+      "bytes": 9738,
+      "sha256": "6c22a0058ab21809ee56b81d5d7b826c0f585c870c49eb027a7a231354504b74"
+    },
+    {
+      "path": "figures/rational-chain-topology.png",
+      "bytes": 32733,
+      "sha256": "23c92a09b3e0238f3745ddab127c6beb7ecef03add2321c8cd6ef0b0191dc0d5"
+    }
+  ],
+  "render_command": "python3 research/prime31_summation_compression_20261122/iteration6/render_report.py",
+  "qa_command": "pdftoppm -r 110 -png REPORT.pdf <external-qa-folder>/page",
+  "visual_check": {
+    "status": "passed",
+    "reviewed_pdf_sha256": "520d4a80717575a0fcb7d4ebff44661372bec8a5b416464a0be73df374069cad",
+    "pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "method": "All nine final pages rendered at 110 dpi. Page images 1-5, 7 and 8 are byte-identical to the accepted inspected edition; changed pages 6 and 9 were visually reinspected after scoping the claim count to immutable core d6e1d03.",
+    "findings": "No clipping, overlap, missing glyphs, equation or table overflow, or margin collisions. All four iteration10 source links remain pinned to the same immutable core. PDF text contains zero NUL/replacement characters.",
+    "qa_location": "tmp/pdfs/prime31-iteration10-core-scope/ outside published artifacts",
+    "scope": "Document rendering only. Three retained compile failures precede all new native tests and identity issuance; no passing new test, new identity execution, performance gain or signed proof is asserted."
+  },
+  "source_note_sha256": {
+    "iteration6/MATHEMATICAL_NOTE.md": "948d36ca3d72661aa4cf16786ebed30fcb2ba146afb0df4420767a91e8f35ddc",
+    "iteration6/INDEPENDENT_REVIEW.md": "4761ad100b75e1ac3f1e8dccd264a18ba1433b7ba569d5b8fc0443e3f09b4cae",
+    "iteration6/ROOT_REVIEW.md": "9e573ee3c0431a6e6364bb6b4ea7476717707b58dc3f5af9c0ceb9b227ddc067",
+    "iteration7/SMOOTH_TORUS_FAMILY.md": "d4898626a557ff220ed7ddbb4d75042cd2909bdc654e54d30aa1f129a195fa66",
+    "iteration7/INDEPENDENT_REVIEW.md": "dd54122c5b9703b948d2ab590cecfc8a27e26ba34e7105531b02d9bb2900087c",
+    "iteration7/FIXED_CURVE_FIBRE_DENSITY.md": "c1725df2f00f61a972edbb5cfee803fe97bd2c27d8f761fbb08b73385c70b7a1",
+    "iteration7/SELECTABLE_CURVE_AVAILABILITY.md": "245693a861b7f40f687045ffee79637ce3b6251d29c05595f46718894d9c8da6",
+    "iteration10/S3_PENCIL_CONTRACTION.md": "9e9e64e76208202d05957794e7bd9371f9e427b2a5dded9f88aceb3ca40588ed",
+    "iteration10/S3_PENCIL_INDEPENDENT_REVIEW.md": "51556612f43c8beec330ea24328bb1f8b45a5f06d4b669a197d90bdd1688a0b3",
+    "iteration10/FAMILY_SIZE_CORRECTION.md": "841704b12548a1ab4c2e35062cff9b48a8a9229dd83d2e7b3426a629501c996d",
+    "iteration10/FAMILY_SIZE_INDEPENDENT_REVIEW.md": "d02eff6a0f5582dc9e190ee779e3688f116d4344d7f614c3707f3c8692d64539"
+  },
+  "pcc_prose_lint": {
+    "exit_code": 0,
+    "findings": 0,
+    "command": "python3 crypto-instructions/pcc.py --repo repo-audit lint-prose repo-audit/research/prime31_summation_compression_20261122/iteration6/REPORT.md",
+    "sha256": "1c2fba73df78741b0c4c8f3194696133069dc5b09e3ddd0c9331bfae2ae71cfc"
+  },
+  "source_evidence": {
+    "receipt_path": "evidence/ci-framework-restored-failure/receipt.json",
+    "receipt_sha256": "9f390381811b2809e2273d4fc6c5689740c74f79c9118cb46cb4b4e76b5c9876",
+    "native_source": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+    "run_id": 45113871392,
+    "job_id": 137492117014,
+    "artifact_id": 14790654045,
+    "artifact_zip_sha256": "b1b6d310eab134128f525529eded863ac4f6147b08c1f66037d18ab3c4f7c104",
+    "native_tests_executed": 0
+  },
+  "continued_in_pr": 4977,
+  "standing": "pcc:unverified",
+  "pinned_exports_preserved": true,
+  "immutable_source_commit": "d6e1d03aff64ff168bd1d1d565a08c8f5032ef62",
+  "immutable_source_tree": "aed09081faf0f0ac0eb7ba044995b1ede9ce86c9",
+  "immutable_note_links": [
+    "https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/S3_PENCIL_CONTRACTION.md",
+    "https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/S3_PENCIL_INDEPENDENT_REVIEW.md",
+    "https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/FAMILY_SIZE_CORRECTION.md",
+    "https://github.com/isogeny-labs/crypto/blob/d6e1d03aff64ff168bd1d1d565a08c8f5032ef62/research/prime31_summation_compression_20261122/iteration10/FAMILY_SIZE_INDEPENDENT_REVIEW.md"
+  ],
+  "report_scope": {
+    "claim_count_at_core": 16,
+    "core_commit": "d6e1d03aff64ff168bd1d1d565a08c8f5032ef62",
+    "scope": "The sixteen claims covered by this immutable core report. Later lane claims and follow-up mathematics are outside this report."
+  },
+  "finalized_at": "2026-11-23T06:18:59.526687+00:00"
+}

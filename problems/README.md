@@ -11,6 +11,13 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Vitse Prime31 full-library validation](vitse-prime31-full-library-validation.md) | blocked: duplicate production test module | completed unfiltered root-library validation for the compatibility study | root-finding test-module repair, source-bound full suite, exact-head CI/review |
+| [Extension-field graph IC trace measurement admission](extension-ic-trace-measurement-admission.md) | open | new Rust/Runpod matched IC-rho trial | funded provider, checkpoint route, frozen native isolation/replay protocol; complete accounting and root gate remain separate |
+| [Exact Prime31 pair-spectrum queries](prime31-exact-pair-spectrum-query.md) | open | sublinear empty-inclusive solving on the actual Dickson-derived pair spectrum; original-root native gate | exact component cost below the named quasi-linear-in-D baseline with charged setup/output; separate stronger pipeline exponent and original-source validation |
+| [Shared-S3 Prime31 validation and measurement access](shared-s3-prime31-execution-gates.md) | open | full-library compiler termination, authenticated dispatch, readable canonical protocol and complete production accounting | source-bound full-library pass; reviewed adapter; frozen protocol and live supported-runner admission |
+| [Shared-S3 and auxiliary-fiber Prime31 validation and measurement access](shared-s3-prime31-execution-gates.md) | open | full-library outcomes, authenticated dispatch, readable canonical protocol, checkpoint and complete production accounting | source-bound full-library pass; reviewed adapters and payload; frozen protocol and live supported-runner admission |
+| [ECC2K-130 adjoint study artifact upload](ecc2k-adjoint-artifact-store-upload.md) | open | complete raw-study store migration and normal PR5015 merge gates | original authenticated whole-object upload/read-back, generated manifests and unchanged final-head gates |
+| [Shared-S3 Prime31 validation and measurement access](shared-s3-prime31-execution-gates.md) | open | full-library compiler termination, authenticated dispatch, readable canonical protocol and complete production accounting | source-bound full-library pass; reviewed adapter; frozen protocol and live supported-runner admission |
 | [Quartic matched-rho overpricing](quartic-matched-rho-overpricing.md) | open; review requested from quartic-row owners | trusting the IC/rho gap on existing plane-quartic IC rows (may be ~1.73x too favourable to IC) | an executed negation-walk and `<rho>`-class-walk rho on the same Jacobians, under the validation gate, then a row correction |
 | [Curve25519 target-conditioned section coefficients](curve25519-section-coefficient-selection.md) | investigating | converting structured membership into exponent-moving discovery | biased coefficient constructor with complete attempt/yield/cold-cost and original-row bounds; native quotient query and actual-object proofs |
 | [P-192 mixed-3 quotient and projected relations](nist-mixed-three-quotient-and-relation-solver.md) | open | complete mixed-3 transfer/solver comparison | quotient and maps implemented at producer standing; independent/search certification, restricted solver, complete costs and budget admission remain |
@@ -137,14 +144,14 @@ cause is unknown; explicit unknowns are useful, invented explanations are not.
 - `resolved`: linked evidence meets the stated exit criteria for this specific
   obstruction. State any remaining limitations.
 - `superseded`: a linked successor now tracks this obstruction; this is not a
-  claim that it was solved.
+  claim that it was closed.
 
 These statuses describe the problem record, not the scientific status of a
 hypothesis or the completion of a campaign. Stopping work does not resolve
 a problem or authorize abandoning the user's requirement.
 
 Keep observations, calculations, hypotheses, resource/access/assistance gaps,
-and proved limits distinct. Bound a negative result by its exact inputs and
+and established limits distinct. Bound a negative result by its exact inputs and
 search limits. A resource ceiling, missing implementation, or failed search
 does not establish a mathematical obstruction or a security theorem.
 
@@ -253,7 +260,7 @@ existing review, archival, and claim-promotion rules.
 | [Prime-field divisor relation supply](prime-divisor-uniform-solver.md) | investigating | fixed-fixture algebraic IC and witness-pruned encoding implemented; growing-family cost/yield open | proved computable sub-exponential cost/yield contract; auxiliary-pipeline implementation and isolated validation |
 | [Parent-library isogeny-walk validation](root-library-isogeny-walk-runtime.md) | incomplete; processes killed, cause unknown | legacy root-library regression | exact case and full parent scope must complete without weakened acceptance; native primality checks are separate |
 | [IC six-obligation follow-up gates](ic-six-obligation-followup-gates.md) | investigating | fixed-population yield/rank, production arity-three theory, PKM lower bound, Wagner variance, and xedni selector conclusions | clean source custody and native producers; checked proof/lower-bound objects; frozen EKS protocols only after their individual gates |
-| [Hashed-ECDLP boundary-rank family lower bound](hashed-ecdl-boundary-rank-family-lower-bound.md) | open | asymptotic lower bound for the registered exact linear-message contraction | freeze the production cut family and prove a uniform exponential nonzero minor or equivalent rank bound, plus the architecture cost bridge |
+| [Hashed-ECDLP boundary-rank family lower bound](hashed-ecdl-boundary-rank-family-lower-bound.md) | narrowed | all-seed and nonnegligible-probability semantic slot-relation lower bounds refuted at PCC-unverified scope; exceptional seeds and the low-level BTNIR family remain open | freeze the BTNIR cut family and prove a representation-specific rank bound plus the architecture cost bridge [pcc:unverified] |
 
 
 | [Quadratic-twist native and formal parity](quadratic-twist-evidence-native-parity.md) | open | full uniform96/896/210census verified with0joint gains; explicit F13 dual/inverse21named/25audited;pair-weight kernel5/5 and4485base/119912query check;actual F13 row/span/adaptive/scalar bridge20named/24audited,72native source recoveries unchanged | actual-state/iid probability bridge,1921missing-model reconciliation, fresh5140-case suite incomplete at600s, broader geometry/intrinsic regularity/complete cost/Conductor |

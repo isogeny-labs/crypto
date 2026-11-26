@@ -569,6 +569,16 @@ pub struct AlgebraReport {
     pub last_fall_degree: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub degree_of_regularity_observed: Option<u32>,
+    /// Post-hoc deviations of the computed leading-monomial staircase from
+    /// the semi-regular expectation and its extinction degree. These are
+    /// diagnostics, not first/last fall degree or homogeneous regularity.
+    /// None when no solve recorded them; never priced into solver work.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub staircase_extinction_degree: Option<u32>,
     /// Absent for the legacy scan: its root-stage work is not instrumented.
     pub roots: Option<RootDiagnostics>,
 }
@@ -605,9 +615,7 @@ pub fn solve_system_reference(
         &system.equations,
         system.variables,
         p,
-        &F4Options::new(Ordering::Grevlex, degree)
-            .with_budget(budget)
-            .recording_degree_falls(),
+        &F4Options::new(Ordering::Grevlex, degree).with_budget(budget),
     );
     let complete = !report.timed_out && !matches!(report.verdict, Verdict::Undetermined);
     let mut sets = BTreeSet::new();
@@ -646,7 +654,7 @@ pub fn solve_system(
     degree: u32,
     budget: Duration,
 ) -> Result<AlgebraReport, String> {
-    solve_system_visit(system, p, degree, budget, |_| Ok(false))
+    solve_system_visit(system, p, degree, budget, false, |_| Ok(false))
 }
 
 /// Visit decoded, deduplicated coordinate sets from the existing exact-domain
@@ -660,7 +668,19 @@ pub fn visit_system(
     budget: Duration,
     visitor: impl FnMut(&[u64]) -> Result<bool, String>,
 ) -> Result<AlgebraReport, String> {
-    solve_system_visit(system, p, degree, budget, visitor)
+    solve_system_visit(system, p, degree, budget, false, visitor)
+}
+
+/// Request post-hoc Hilbert observations without changing the frozen default
+/// traversal or treating those observations as formal fall-degree invariants.
+pub fn visit_system_recording_hilbert(
+    system: &System,
+    p: u64,
+    degree: u32,
+    budget: Duration,
+    visitor: impl FnMut(&[u64]) -> Result<bool, String>,
+) -> Result<AlgebraReport, String> {
+    solve_system_visit(system, p, degree, budget, true, visitor)
 }
 
 fn solve_system_visit(
@@ -668,6 +688,7 @@ fn solve_system_visit(
     p: u64,
     degree: u32,
     budget: Duration,
+    record_hilbert_diagnostics: bool,
     mut visitor: impl FnMut(&[u64]) -> Result<bool, String>,
 ) -> Result<AlgebraReport, String> {
     let start = Instant::now();
@@ -680,13 +701,13 @@ fn solve_system_visit(
     };
     let mut sets = BTreeSet::new();
     let mut error = None;
+    let mut options = F4Options::new(Ordering::Grevlex, degree).with_budget(budget);
+    options.record_hilbert_diagnostics = record_hilbert_diagnostics;
     let report = f4_fp::solve_visit(
         &system.equations,
         system.variables,
         p,
-        &F4Options::new(Ordering::Grevlex, degree)
-            .with_budget(budget)
-            .recording_degree_falls(),
+        &options,
         &system.domains,
         |root| {
             let result = decode_root(system, root).and_then(|coordinates| {
@@ -721,6 +742,9 @@ fn solve_system_visit(
         first_fall_degree: report.first_fall_degree,
         last_fall_degree: report.last_fall_degree,
         degree_of_regularity_observed: report.degree_of_regularity_observed,
+        first_hilbert_deviation_degree: report.first_hilbert_deviation_degree,
+        last_hilbert_deviation_degree: report.last_hilbert_deviation_degree,
+        staircase_extinction_degree: report.staircase_extinction_degree,
         roots: Some(RootDiagnostics {
             equation_roots_visited: report.solutions_visited,
             candidates_rejected: report.candidates_rejected,
@@ -746,17 +770,23 @@ impl AlgebraReport {
         self.timed_out |= other.timed_out;
         self.solver_calls += other.solver_calls;
         self.solving_degree = self.solving_degree.max(other.solving_degree);
-        self.first_fall_degree = match (self.first_fall_degree, other.first_fall_degree) {
+        self.first_hilbert_deviation_degree = match (
+            self.first_hilbert_deviation_degree,
+            other.first_hilbert_deviation_degree,
+        ) {
             (Some(a), Some(b)) => Some(a.min(b)),
             (a, b) => a.or(b),
         };
-        self.last_fall_degree = match (self.last_fall_degree, other.last_fall_degree) {
+        self.last_hilbert_deviation_degree = match (
+            self.last_hilbert_deviation_degree,
+            other.last_hilbert_deviation_degree,
+        ) {
             (Some(a), Some(b)) => Some(a.max(b)),
             (a, b) => a.or(b),
         };
-        self.degree_of_regularity_observed = match (
-            self.degree_of_regularity_observed,
-            other.degree_of_regularity_observed,
+        self.staircase_extinction_degree = match (
+            self.staircase_extinction_degree,
+            other.staircase_extinction_degree,
         ) {
             (Some(a), Some(b)) => Some(a.max(b)),
             (a, b) => a.or(b),
@@ -846,16 +876,23 @@ fn solve_hybrid_visit(
             total.timed_out = true;
             break;
         };
-        let report = solve_system_visit(&branch, curve.f.p, degree, remaining, |coordinates| {
-            let mut coordinates = coordinates.to_vec();
-            coordinates.push(guess);
-            coordinates.sort_unstable();
-            if sets.insert(coordinates.clone()) {
-                visitor(&coordinates)
-            } else {
-                Ok(false)
-            }
-        })?;
+        let report = solve_system_visit(
+            &branch,
+            curve.f.p,
+            degree,
+            remaining,
+            false,
+            |coordinates| {
+                let mut coordinates = coordinates.to_vec();
+                coordinates.push(guess);
+                coordinates.sort_unstable();
+                if sets.insert(coordinates.clone()) {
+                    visitor(&coordinates)
+                } else {
+                    Ok(false)
+                }
+            },
+        )?;
         total.include(&report);
         if !total.complete {
             break;
@@ -946,13 +983,20 @@ fn solve_cover_visit(
             total.timed_out = true;
             break;
         };
-        let report = solve_system_visit(&system, curve.f.p, degree, remaining, |coordinates| {
-            if sets.insert(coordinates.to_vec()) {
-                visitor(coordinates)
-            } else {
-                Ok(false)
-            }
-        })?;
+        let report = solve_system_visit(
+            &system,
+            curve.f.p,
+            degree,
+            remaining,
+            false,
+            |coordinates| {
+                if sets.insert(coordinates.to_vec()) {
+                    visitor(coordinates)
+                } else {
+                    Ok(false)
+                }
+            },
+        )?;
         total.include(&report);
         if !total.complete {
             break;
@@ -1479,14 +1523,18 @@ pub fn find_relation(
         RelationSearch::System(encoding) => {
             let system = build_system(curve, &grouped_parts(base, encoding), encoding)?;
             match remaining() {
-                Some(budget) => solve_system_visit(&system, curve.f.p, degree, budget, &mut visit)?,
+                Some(budget) => {
+                    solve_system_visit(&system, curve.f.p, degree, budget, false, &mut visit)?
+                }
                 None => exhausted(),
             }
         }
         RelationSearch::PrunedLine3 { beta, lambda } => {
             let system = build_pruned_line_system(curve, g, q, base, beta, lambda)?;
             match remaining() {
-                Some(budget) => solve_system_visit(&system, curve.f.p, degree, budget, &mut visit)?,
+                Some(budget) => {
+                    solve_system_visit(&system, curve.f.p, degree, budget, false, &mut visit)?
+                }
                 None => exhausted(),
             }
         }
@@ -1614,6 +1662,136 @@ pub fn solve_dlp_with_mode(
     Ok(attempts)
 }
 
+/// Sample labeled bases on one producer thread and search independent bases on
+/// `workers` downstream threads. The bounded channel limits bases waiting for
+/// a solver. Seeds are assigned by attempt index before dispatch, so scheduling
+/// cannot change the sampled bases. Returned attempts are sorted by that index.
+/// A verified result stops new work; already running solvers finish their
+/// individual budgets before the function returns.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_dlp_queued(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    encoding: Encoding,
+    labels: Labels,
+    subset_size: usize,
+    seed: u64,
+    max_attempts: usize,
+    budget: Duration,
+    workers: usize,
+    queue_capacity: usize,
+) -> Result<Vec<(usize, Attempt)>, String> {
+    use std::sync::{
+        atomic::{AtomicBool, Ordering as AtomicOrdering},
+        mpsc, Arc, Mutex,
+    };
+
+    validate_instance(curve, g, q)?;
+    let arity = match encoding {
+        Encoding::Partitioned3 | Encoding::Unordered3 | Encoding::Line3 => 3,
+        _ => 4,
+    };
+    if !(1..=4).contains(&subset_size)
+        || !(1..=128).contains(&max_attempts)
+        || !(1..=128).contains(&workers)
+        || !(1..=128).contains(&queue_capacity)
+        || budget.is_zero()
+    {
+        return Err("bounded queued search requires subset size 1..=4, attempts/workers/capacity 1..=128 and a deadline".into());
+    }
+    let (work_tx, work_rx) = mpsc::sync_channel::<(usize, LabeledBase)>(queue_capacity);
+    let work_rx = Arc::new(Mutex::new(work_rx));
+    let (result_tx, result_rx) = mpsc::channel::<Result<(usize, Attempt), String>>();
+    let stop = AtomicBool::new(false);
+    let mut sampling_error = None;
+    std::thread::scope(|scope| {
+        for _ in 0..workers {
+            let rx = Arc::clone(&work_rx);
+            let tx = result_tx.clone();
+            let stop = &stop;
+            scope.spawn(move || loop {
+                let next = rx.lock().expect("APS work queue poisoned").recv();
+                let Ok((index, base)) = next else { break };
+                if stop.load(AtomicOrdering::Acquire) {
+                    continue;
+                }
+                let result = find_relation(
+                    curve,
+                    g,
+                    q,
+                    &base,
+                    RelationSearch::System(encoding),
+                    24,
+                    budget,
+                )
+                .map(|(algebra, recovery)| {
+                    (
+                        index,
+                        Attempt {
+                            base,
+                            algebra,
+                            recovery,
+                        },
+                    )
+                });
+                if matches!(
+                    &result,
+                    Err(_)
+                        | Ok((
+                            _,
+                            Attempt {
+                                recovery: Some(_),
+                                ..
+                            }
+                        ))
+                ) {
+                    stop.store(true, AtomicOrdering::Release);
+                }
+                if tx.send(result).is_err() {
+                    break;
+                }
+            });
+        }
+        drop(result_tx);
+        for index in 0..max_attempts {
+            if stop.load(AtomicOrdering::Acquire) {
+                break;
+            }
+            match sample_base(
+                curve,
+                g,
+                q,
+                &vec![subset_size; arity],
+                labels,
+                seed.wrapping_add(index as u64),
+                10_000,
+            ) {
+                Ok(base) => {
+                    if work_tx.send((index, base)).is_err() {
+                        break;
+                    }
+                }
+                Err(error) => {
+                    sampling_error = Some(error);
+                    stop.store(true, AtomicOrdering::Release);
+                    break;
+                }
+            }
+        }
+        drop(work_tx);
+    });
+    if let Some(error) = sampling_error {
+        return Err(error);
+    }
+    let mut attempts = Vec::new();
+    for result in result_rx {
+        attempts.push(result?);
+    }
+    attempts.sort_by_key(|(index, _)| *index);
+    Ok(attempts)
+}
+
 /// Existing symmetric S3 identity, expressed in the repository's certificate
 /// format. Issuing/checking a certificate evaluates it over the format's field;
 /// it is not a formal proof over every characteristic.
@@ -1715,6 +1893,48 @@ pub fn line_intersection_identity() -> super::identity_certificate::IdentityStat
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn hilbert_observations_are_opt_in_and_absent_from_frozen_default_serialization() {
+        let system = System {
+            variables: 1,
+            equations: vec![vec![(vec![2], 1), (vec![0], 6)]],
+            modulus: 7,
+            decode: Decode::Coordinates(1),
+            domains: vec![None],
+            model: (0, 1),
+        };
+        let plain = solve_system(&system, 7, 8, Duration::from_secs(5)).unwrap();
+        let observed =
+            visit_system_recording_hilbert(&system, 7, 8, Duration::from_secs(5), |_| Ok(false))
+                .unwrap();
+        assert!(plain.complete && observed.complete);
+        assert_eq!(plain.coordinate_sets, observed.coordinate_sets);
+        assert_eq!(plain.coordinate_sets, vec![vec![1], vec![6]]);
+        assert_eq!(observed.staircase_extinction_degree, Some(2));
+        let value = serde_json::to_value(&plain).unwrap();
+        for key in [
+            "first_hilbert_deviation_degree",
+            "last_hilbert_deviation_degree",
+            "staircase_extinction_degree",
+        ] {
+            assert!(
+                value.get(key).is_none(),
+                "{key} changed the frozen default record"
+            );
+        }
+        let cells = vec![leads::Cell {
+            system,
+            fixed_coordinates: vec![],
+        }];
+        let plan =
+            leads::visit_plan_recording_hilbert(&cells, 7, 8, Duration::from_secs(5), None, |_| {
+                Ok(false)
+            })
+            .unwrap();
+        assert_eq!(plan.coordinate_sets, plain.coordinate_sets);
+        assert_eq!(plan.staircase_extinction_degree, Some(2));
+    }
 
     #[test]
     fn expression_arithmetic_preserves_relative_coefficients() {
@@ -2145,10 +2365,17 @@ mod tests {
         )
         .unwrap();
         let mut order = Vec::new();
-        let full = solve_system_visit(&system, 101, 24, Duration::from_secs(20), |coordinates| {
-            order.push(coordinates.to_vec());
-            Ok(false)
-        })
+        let full = solve_system_visit(
+            &system,
+            101,
+            24,
+            Duration::from_secs(20),
+            false,
+            |coordinates| {
+                order.push(coordinates.to_vec());
+                Ok(false)
+            },
+        )
         .unwrap();
         assert!(full.complete);
         assert!(order.len() > 1);
@@ -2316,6 +2543,48 @@ mod tests {
                 assert_eq!(
                     run.algebra.coordinate_sets,
                     direct_sets(&curve, &run.base.parts)
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn queued_workers_preserve_seeded_bases_and_verify_recovery() {
+        let (curve, g, q, d) = fixture();
+        for workers in [1, 4] {
+            let runs = solve_dlp_queued(
+                &curve,
+                g,
+                q,
+                Encoding::Partitioned3,
+                Labels::Guaranteed,
+                3,
+                20261026,
+                32,
+                Duration::from_secs(10),
+                workers,
+                2,
+            )
+            .unwrap();
+            assert!(!runs.is_empty());
+            assert!(runs
+                .iter()
+                .any(|(_, run)| run.recovery.as_ref().is_some_and(|r| r.logarithm == d)));
+            for (index, run) in runs {
+                let expected = sample_base(
+                    &curve,
+                    g,
+                    q,
+                    &[3, 3, 3],
+                    Labels::Guaranteed,
+                    20261026 + index as u64,
+                    10_000,
+                )
+                .unwrap();
+                assert_eq!(run.base.parts, expected.parts);
+                assert_eq!(
+                    run.base.points.keys().collect::<Vec<_>>(),
+                    expected.points.keys().collect::<Vec<_>>()
                 );
             }
         }

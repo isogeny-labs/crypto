@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T08:40:31Z",
+ "id": "PCC-20261123-5bdc9b",
+ "kind": "measurement",
+ "producer": {
+  "commit": "2b4d943030b1fec3ea2de3c35fa9251b5e15c85f",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/summary-flat-a1.json",
+    "sha256": "53a1ca3debbc6a321b76304f4837a4013fda86cb3b184ae5ff550f901361352e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/diagnostics-flat-a1.json",
+    "sha256": "c1ef791bde5642fc2511dfa5cd1a2f73fd4425ac7c08e180cb9d3387b8f77491"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/canonical-flat.hpp",
+    "sha256": "d69e87b160776a421de8ffb3068b5e54654aa36119052efe2c207d3089469b99"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Flat confirmation completes31680 rows,31608 affine/private-answer scalar checks,29496 generation checks and12000 equal trial-list comparisons. At B128 full-flat AP8 mean complete cost0.506779ms vs current-module tuned8 rho0.538770ms; candidate/reference ratio0.940622, one-sided95% upper1.051381, so strict scoped parity criterion remains false. Versus tree AP8 mean-cost ratio0.633551. AP2 has five measured censors at B128. All controls and compatibility limits retained; unsigned data."
+}

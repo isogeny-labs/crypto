@@ -1,58 +1,20 @@
 {
   "schema": "ecdlp.weakness-analysis/v1",
-  "corpus_version": "2026-11-17",
+  "corpus_version": "2026-11-18",
   "counts": {
-    "nodes": 631,
-    "status_inflation": 17,
-    "model_scope_leaps": 10,
-    "contagious_sources": 23,
-    "hidden_assumption_clusters": 19,
+    "nodes": 659,
+    "status_inflation": 13,
+    "model_scope_leaps": 12,
+    "contagious_sources": 25,
+    "hidden_assumption_clusters": 20,
     "unwired_dependences": 11,
-    "route_closures_on_weak_support": 16,
-    "live_obstructions": 55,
-    "author_flagged": 9,
-    "attack_queue": 262,
-    "hygiene_queue": 116
+    "route_closures_on_weak_support": 15,
+    "live_obstructions": 58,
+    "author_flagged": 14,
+    "attack_queue": 273,
+    "hygiene_queue": 124
   },
   "status_inflation": [
-    {
-      "id": "ALG-SPARSE-LINEAR-ALGEBRA",
-      "status": "algorithm",
-      "weak_ancestor": "HEUR-RELATION-RANK",
-      "weak_status": "heuristic",
-      "path": [
-        "HEUR-RELATION-RANK",
-        "ALG-SPARSE-LINEAR-ALGEBRA"
-      ],
-      "impact": 8
-    },
-    {
-      "id": "THM-WD-GTTD-THM1",
-      "status": "proved_external",
-      "weak_ancestor": "HEUR-RELATION-RANK",
-      "weak_status": "heuristic",
-      "path": [
-        "HEUR-RELATION-RANK",
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "ALG-WD-GAUDRY-2000",
-        "ALG-WD-THERIAULT-2003",
-        "THM-WD-GTTD-THM1"
-      ],
-      "impact": 5
-    },
-    {
-      "id": "ATTACK-GHS-WEIL-DESCENT",
-      "status": "proved_external",
-      "weak_ancestor": "HEUR-RELATION-RANK",
-      "weak_status": "heuristic",
-      "path": [
-        "HEUR-RELATION-RANK",
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "ALG-WD-GAUDRY-2000",
-        "ATTACK-GHS-WEIL-DESCENT"
-      ],
-      "impact": 1
-    },
     {
       "id": "DEF-PF-PKM-ISOGENY-BASE",
       "status": "definition",
@@ -94,21 +56,6 @@
       "path": [
         "ASM-PF-KY-CURVE-CONSTRUCTION",
         "THM-PF-KY-NPC-SMOOTH"
-      ],
-      "impact": 1
-    },
-    {
-      "id": "THM-WD-DIEM-SMALL-GENUS",
-      "status": "proved_external",
-      "weak_ancestor": "HEUR-RELATION-RANK",
-      "weak_status": "heuristic",
-      "path": [
-        "HEUR-RELATION-RANK",
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "ALG-WD-GAUDRY-2000",
-        "ALG-WD-THERIAULT-2003",
-        "THM-WD-GTTD-THM1",
-        "THM-WD-DIEM-SMALL-GENUS"
       ],
       "impact": 1
     },
@@ -213,6 +160,28 @@
     }
   ],
   "model_scope_leaps": [
+    {
+      "edge": "ICYR-E-019",
+      "from": "GAP-IC-STOPPING-CENSORSHIP",
+      "from_model": "repository_measurement",
+      "to": "HEUR-DECOMPOSITION-PROBABILITY",
+      "to_model": "algebraic_coordinate",
+      "relation": "conditions",
+      "to_status": "heuristic",
+      "impact": 14,
+      "statement": "Stopped or success-only samples cannot identify the unconditional decomposition law without a valid censoring analysis."
+    },
+    {
+      "edge": "ICYR-E-024",
+      "from": "GAP-IC-STOPPING-CENSORSHIP",
+      "from_model": "repository_measurement",
+      "to": "HEUR-RELATION-RANK",
+      "to_model": "algebraic_coordinate",
+      "relation": "conditions",
+      "to_status": "heuristic",
+      "impact": 1,
+      "statement": "A stopped relation population cannot establish terminal-rank probabilities."
+    },
     {
       "edge": "IC6-E-020",
       "from": "GAP-WAGNER-W-SCALING",
@@ -325,6 +294,123 @@
     }
   ],
   "source_contagion": [
+    {
+      "source": "S-WEAKNESS-LEAN",
+      "title": "Lean attacks on two weak points of the ECDLP hardness graph",
+      "verification": "repository_read",
+      "refuted": [
+        "CLAIM-MARGINAL-IMPLIES-HAZARD",
+        "CLAIM-PA-SS-IMPLIES-FS",
+        "CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING",
+        "CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP",
+        "CLAIM-PA-AMBIENT-BLINDING",
+        "CLAIM-PA-ZK-IMPLIES-SOUND",
+        "CLAIM-SHOUP-ALL-ALGORITHMS"
+      ],
+      "refuted_fraction": 0.25,
+      "exposed": [
+        {
+          "id": "THM-LEFT-KERNEL-RELATIONS",
+          "status": "proved_internal_unreviewed",
+          "impact": 9
+        },
+        {
+          "id": "GAP-IC-KERNEL-MODE-SCOPE",
+          "status": "open",
+          "impact": 4
+        },
+        {
+          "id": "ASM-XEDNI-TRIAL-MARGINAL",
+          "status": "assumed",
+          "impact": 1
+        },
+        {
+          "id": "THM-HAZARD-MARGINAL-SUFFICES",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
+        },
+        {
+          "id": "THM-SD-SUBSPACE-CRITERION",
+          "status": "proved_internal_unreviewed",
+          "impact": 1
+        },
+        {
+          "id": "CEX-HAZARD-SEPARATION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-IC-SURPLUS-RIGHT-RANK",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-ALWAYS-ACCEPT",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-AMBIENT-BLINDING",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-COFACTOR-ZMOD9",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-PA-ZERO-HASH-FORGERY",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-TRANSPARENT-ENCODING",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE",
+          "status": "open",
+          "impact": 0
+        },
+        {
+          "id": "GAP-PQ2-M2-RANK-CENSUS",
+          "status": "open",
+          "impact": 0
+        },
+        {
+          "id": "THM-BOOLEAN-NSS-UNIQUE",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-MEAN-COUNT-IDENTITY",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-PA-PAIRING-DECIDES-DDH",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-SD-DEGREE2-CRITERION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        }
+      ]
+    },
     {
       "source": "S-CAMINATA-GORLA-2021",
       "title": "Solving degree, last fall degree, and related invariants",
@@ -908,113 +994,6 @@
       ]
     },
     {
-      "source": "S-WEAKNESS-LEAN",
-      "title": "Lean attacks on two weak points of the ECDLP hardness graph",
-      "verification": "repository_read",
-      "refuted": [
-        "CLAIM-MARGINAL-IMPLIES-HAZARD",
-        "CLAIM-PA-SS-IMPLIES-FS",
-        "CLAIM-PA-PEDERSEN-UNCONDITIONAL-BINDING",
-        "CLAIM-PA-COFACTOR-PRESERVES-SUBGROUP",
-        "CLAIM-PA-AMBIENT-BLINDING",
-        "CLAIM-PA-ZK-IMPLIES-SOUND",
-        "CLAIM-SHOUP-ALL-ALGORITHMS"
-      ],
-      "refuted_fraction": 0.28,
-      "exposed": [
-        {
-          "id": "ASM-XEDNI-TRIAL-MARGINAL",
-          "status": "assumed",
-          "impact": 1
-        },
-        {
-          "id": "THM-HAZARD-MARGINAL-SUFFICES",
-          "status": "proved_internal_unreviewed",
-          "impact": 1
-        },
-        {
-          "id": "THM-SD-SUBSPACE-CRITERION",
-          "status": "proved_internal_unreviewed",
-          "impact": 1
-        },
-        {
-          "id": "CEX-HAZARD-SEPARATION",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-PA-ALWAYS-ACCEPT",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-PA-AMBIENT-BLINDING",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-PA-COFACTOR-ZMOD9",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-PA-PEDERSEN-ALTERNATE-OPENING",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-PA-ZERO-HASH-FORGERY",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "CEX-TRANSPARENT-ENCODING",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "GAP-PF-TRACE-PULLBACK-FACTOR-BASE",
-          "status": "open",
-          "impact": 0
-        },
-        {
-          "id": "GAP-PQ2-M2-RANK-CENSUS",
-          "status": "open",
-          "impact": 0
-        },
-        {
-          "id": "THM-BOOLEAN-NSS-UNIQUE",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "THM-LEFT-KERNEL-RELATIONS",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "THM-MEAN-COUNT-IDENTITY",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "THM-NAGAO-LEMMA4-LITERAL-INSIDE",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "THM-PA-PAIRING-DECIDES-DDH",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        },
-        {
-          "id": "THM-SD-DEGREE2-CRITERION",
-          "status": "proved_internal_unreviewed",
-          "impact": 0
-        }
-      ]
-    },
-    {
       "source": "S-PA-LEAN",
       "title": "Five-target Lean discharge and semantic review packet (sibling repository)",
       "verification": "repository_read",
@@ -1070,6 +1049,91 @@
         {
           "id": "CEX-XT-CWZ-TRAPS",
           "status": "proved_external",
+          "impact": 0
+        }
+      ]
+    },
+    {
+      "source": "S-IC-CYCLE-CLOSURE-FORMAL-2026",
+      "title": "Two-summand cycle closure: exact incidence-algebra boundary",
+      "verification": "repository_read",
+      "refuted": [
+        "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES"
+      ],
+      "refuted_fraction": 0.167,
+      "exposed": [
+        {
+          "id": "GAP-RP-CYCLE-CLOSURE-LAW",
+          "status": "open",
+          "impact": 1
+        },
+        {
+          "id": "CEX-RP-ODD-CYCLE-NO-CLOSURE",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-IC-SIGNLESS-INCIDENCE-RANK",
+          "status": "proved_external",
+          "impact": 0
+        },
+        {
+          "id": "THM-RP-BALANCED-CYCLE-CONTROLS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-RP-CYCLE-TARGET-PROJECTION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        }
+      ]
+    },
+    {
+      "source": "S-IC-YIELD-RANK-FORMAL-2026",
+      "title": "Yield visibility, censorship and kernel-mode formal boundary checks",
+      "verification": "repository_read",
+      "refuted": [
+        "CLAIM-IC-MEAN-IMPLIES-SHAPE",
+        "CLAIM-IC-MATH-YIELD-EQUALS-SOLVER-YIELD",
+        "CLAIM-IC-SUCCESS-ONLY-UNBIASED",
+        "CLAIM-IC-ROW-SURPLUS-FULL-RIGHT-RANK"
+      ],
+      "refuted_fraction": 0.364,
+      "exposed": [
+        {
+          "id": "GAP-RP-CYCLE-CLOSURE-LAW",
+          "status": "open",
+          "impact": 1
+        },
+        {
+          "id": "CEX-IC-MEAN-SHAPE-SEPARATION",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-IC-SOLVER-INCOMPLETENESS",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-IC-STOPPING-CENSORSHIP",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "CEX-IC-SURPLUS-RIGHT-RANK",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-IC-SOLVER-VISIBLE-BOUND",
+          "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "THM-IC-UNUSED-COLUMN-RIGHT-KERNEL",
+          "status": "proved_internal_unreviewed",
           "impact": 0
         }
       ]
@@ -1294,6 +1358,26 @@
     },
     {
       "nodes": [
+        "THEOREM-RHO-THREE-PARTITION",
+        "THEOREM-CDH-SELF-CORRECTION",
+        "RED-DLP-LEAST-SIGNIFICANT-BIT",
+        "THM-XT-BK-IMPROBABILITY",
+        "THM-LEFT-KERNEL-RELATIONS"
+      ],
+      "texts": [
+        "Prime-order cyclic group",
+        "Prime group order",
+        "Prime group order q (scalar field)"
+      ],
+      "established_users": [
+        "THEOREM-RHO-THREE-PARTITION",
+        "THEOREM-CDH-SELF-CORRECTION",
+        "RED-DLP-LEAST-SIGNIFICANT-BIT"
+      ],
+      "total_impact": 9
+    },
+    {
+      "nodes": [
         "THM-CG-SOLVING-DEGREE",
         "THM-GB-CG-GBDEG-LE-DREG",
         "THM-GB-SALIZZONI-SD-LE-DREG-PLUS-1",
@@ -1347,26 +1431,6 @@
     },
     {
       "nodes": [
-        "THEOREM-RHO-THREE-PARTITION",
-        "THEOREM-CDH-SELF-CORRECTION",
-        "RED-DLP-LEAST-SIGNIFICANT-BIT",
-        "THM-XT-BK-IMPROBABILITY",
-        "THM-LEFT-KERNEL-RELATIONS"
-      ],
-      "texts": [
-        "Prime-order cyclic group",
-        "Prime group order",
-        "Prime group order q (scalar field)"
-      ],
-      "established_users": [
-        "THEOREM-RHO-THREE-PARTITION",
-        "THEOREM-CDH-SELF-CORRECTION",
-        "RED-DLP-LEAST-SIGNIFICANT-BIT"
-      ],
-      "total_impact": 0
-    },
-    {
-      "nodes": [
         "COND-NAGAO-2015-COMPLEXITY",
         "COND-ECC2K130-FFDA-PROJECTION",
         "HEUR-GB-PQ-ASSUMPTION-2",
@@ -1397,19 +1461,16 @@
     },
     {
       "nodes": [
-        "ALG-SPARSE-LINEAR-ALGEBRA",
-        "HEUR-XT-NFS-SMOOTHNESS",
-        "COND-PF-PKM-COST-THRESHOLD"
+        "CEX-PA-BATCH-ADAPTIVE",
+        "THM-IC-UNUSED-COLUMN-RIGHT-KERNEL",
+        "CEX-IC-SURPLUS-RIGHT-RANK",
+        "THM-RP-CYCLE-TARGET-PROJECTION"
       ],
       "texts": [
-        "Enough independent relations",
-        "Relations are sufficiently independent",
-        "Relations are independent enough (Delta = 10 extra)"
+        "Field coefficients"
       ],
-      "established_users": [
-        "ALG-SPARSE-LINEAR-ALGEBRA"
-      ],
-      "total_impact": 19
+      "established_users": [],
+      "total_impact": 1
     },
     {
       "nodes": [
@@ -1427,6 +1488,23 @@
         "RED-ISOGENY-DLP-TRANSPORT"
       ],
       "total_impact": 17
+    },
+    {
+      "nodes": [
+        "ATTACK-GHS-WEIL-DESCENT",
+        "THM-WD-HESS-THM12-GENUS",
+        "THM-IC-SIGNLESS-INCIDENCE-RANK"
+      ],
+      "texts": [
+        "Characteristic two",
+        "Field characteristic is not two"
+      ],
+      "established_users": [
+        "ATTACK-GHS-WEIL-DESCENT",
+        "THM-WD-HESS-THM12-GENUS",
+        "THM-IC-SIGNLESS-INCIDENCE-RANK"
+      ],
+      "total_impact": 8
     },
     {
       "nodes": [
@@ -1700,34 +1778,6 @@
       "statement": "An assumption that bounds the solving degree by a constant first fall degree regardless of the number of variables would decide an NP-complete problem in polynomial time."
     },
     {
-      "edge": "E-PF-080",
-      "obstruction": "FACT-PF-EP-LINEARIZED-NO-GAIN",
-      "obstruction_status": "conditional",
-      "closed_route": "COND-PF-HKPYY-COMPLEXITY",
-      "closed_status": "conditional",
-      "weak_support": [
-        {
-          "id": "HEUR-DECOMPOSITION-PROBABILITY",
-          "status": "heuristic"
-        }
-      ],
-      "statement": "No linearized QSP makes the QSP algorithm beat generic algorithms under its own cost estimate."
-    },
-    {
-      "edge": "E-PF-083",
-      "obstruction": "FACT-PF-MM-TRINOMIAL-NO-GAIN",
-      "obstruction_status": "conditional",
-      "closed_route": "COND-PF-HKPYY-COMPLEXITY",
-      "closed_status": "conditional",
-      "weak_support": [
-        {
-          "id": "HEUR-DECOMPOSITION-PROBABILITY",
-          "status": "heuristic"
-        }
-      ],
-      "statement": "Split linearized trinomials beat brute force but not generic algorithms."
-    },
-    {
       "edge": "E-WD-014",
       "obstruction": "COND-WD-MQ-PRIME-N-FAILS",
       "obstruction_status": "conditional",
@@ -1740,20 +1790,6 @@
         }
       ],
       "statement": "For prime N in [160, 600] the GHS construction yields no useful cover."
-    },
-    {
-      "edge": "E-WD-034",
-      "obstruction": "COND-WD-KMPS-INEFFECTIVE",
-      "obstruction_status": "conditional",
-      "closed_route": "ATTACK-GHS-WEIL-DESCENT",
-      "closed_status": "proved_external",
-      "weak_support": [
-        {
-          "id": "HEUR-RELATION-RANK",
-          "status": "heuristic"
-        }
-      ],
-      "statement": "Asymptotically, (g)GHS is almost never faster than the best non-descent solver."
     },
     {
       "edge": "E-XT-003",
@@ -1812,24 +1848,6 @@
       "statement": "Kosters-Yeo: an unrestricted first-fall-degree assumption would decide an NP-complete evaluation problem; Nagao's estimate assumes the same first-fall behaviour."
     },
     {
-      "edge": "E-RP-045",
-      "obstruction": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-      "obstruction_status": "conditional",
-      "closed_route": "GAP-END-TO-END-IC-EXPONENT",
-      "closed_status": "open",
-      "weak_support": [
-        {
-          "id": "HEUR-DECOMPOSITION-PROBABILITY",
-          "status": "heuristic"
-        },
-        {
-          "id": "HEUR-RELATION-RANK",
-          "status": "heuristic"
-        }
-      ],
-      "statement": "No base size, table fold or target generator inside the pair-table two-summand family reaches rho at any size that matters."
-    },
-    {
       "edge": "E-XT-005",
       "obstruction": "HEUR-XT-SS-ANALYSIS",
       "obstruction_status": "heuristic",
@@ -1846,6 +1864,66 @@
         }
       ],
       "statement": "The natural lifted index calculus is estimated to be slower than brute force."
+    },
+    {
+      "edge": "E-PF-080",
+      "obstruction": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+      "obstruction_status": "conditional",
+      "closed_route": "COND-PF-HKPYY-COMPLEXITY",
+      "closed_status": "conditional",
+      "weak_support": [
+        {
+          "id": "GAP-IC-SOLVER-VISIBLE-YIELD",
+          "status": "open"
+        },
+        {
+          "id": "GAP-IC-STOPPING-CENSORSHIP",
+          "status": "open"
+        },
+        {
+          "id": "GAP-IC-TARGET-STRATIFICATION",
+          "status": "open"
+        },
+        {
+          "id": "GAP-IC-YIELD-SCALING-LAW",
+          "status": "open"
+        },
+        {
+          "id": "HEUR-DECOMPOSITION-PROBABILITY",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "No linearized QSP makes the QSP algorithm beat generic algorithms under its own cost estimate."
+    },
+    {
+      "edge": "E-PF-083",
+      "obstruction": "FACT-PF-MM-TRINOMIAL-NO-GAIN",
+      "obstruction_status": "conditional",
+      "closed_route": "COND-PF-HKPYY-COMPLEXITY",
+      "closed_status": "conditional",
+      "weak_support": [
+        {
+          "id": "GAP-IC-SOLVER-VISIBLE-YIELD",
+          "status": "open"
+        },
+        {
+          "id": "GAP-IC-STOPPING-CENSORSHIP",
+          "status": "open"
+        },
+        {
+          "id": "GAP-IC-TARGET-STRATIFICATION",
+          "status": "open"
+        },
+        {
+          "id": "GAP-IC-YIELD-SCALING-LAW",
+          "status": "open"
+        },
+        {
+          "id": "HEUR-DECOMPOSITION-PROBABILITY",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "Split linearized trinomials beat brute force but not generic algorithms."
     },
     {
       "edge": "EX-068",
@@ -1876,6 +1954,40 @@
         }
       ],
       "statement": "Bounded dependence coefficients make a random reduced tuple useful with only order-1/p probability under the theorem's assumptions."
+    },
+    {
+      "edge": "E-RP-045",
+      "obstruction": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
+      "obstruction_status": "conditional",
+      "closed_route": "GAP-END-TO-END-IC-EXPONENT",
+      "closed_status": "open",
+      "weak_support": [
+        {
+          "id": "GAP-IC-SOLVER-VISIBLE-YIELD",
+          "status": "open"
+        },
+        {
+          "id": "GAP-IC-STOPPING-CENSORSHIP",
+          "status": "open"
+        },
+        {
+          "id": "GAP-IC-TARGET-STRATIFICATION",
+          "status": "open"
+        },
+        {
+          "id": "GAP-IC-YIELD-SCALING-LAW",
+          "status": "open"
+        },
+        {
+          "id": "GAP-RP-CYCLE-CLOSURE-LAW",
+          "status": "open"
+        },
+        {
+          "id": "HEUR-DECOMPOSITION-PROBABILITY",
+          "status": "heuristic"
+        }
+      ],
+      "statement": "Under the declared counting-yield and rho(K)=K/2 stopping-law specialization, no base size, table fold or target generator inside the pair-table two-summand family reaches rho at any size that matters."
     }
   ],
   "live_obstructions": [
@@ -2080,6 +2192,16 @@
       "statement": "Quadratic growth of h gives no uniform lower-bound constant; the JKSST Lean audit has an explicit scaled-lattice countermodel."
     },
     {
+      "edge": "ICYR-E-011",
+      "relation": "qualifies",
+      "from": "MEAS-PF-YIELD-CENSUS",
+      "from_status": "measured",
+      "to": "GAP-IC-TARGET-STRATIFICATION",
+      "to_status": "open",
+      "impact": 15,
+      "statement": "Full small-field enumeration shows base symmetry changes dispersion, but it does not settle natural cryptographic target strata."
+    },
+    {
       "edge": "E-RP-054",
       "relation": "qualifies",
       "from": "MEAS-RP-JV-WEAK-CLASS",
@@ -2168,6 +2290,16 @@
       "to_status": "conditional",
       "impact": 5,
       "statement": "On ECC2K-130 the transfer target exceeds 1.3e9 bits, so MOV/FR is not a route there."
+    },
+    {
+      "edge": "ICYR-E-013",
+      "relation": "qualifies",
+      "from": "MEAS-RANK-DEFICIT-CENSUS",
+      "from_status": "measured",
+      "to": "GAP-IC-TERMINAL-RANK-LAW",
+      "to_status": "open",
+      "impact": 5,
+      "statement": "Observed Delta=10 failures refute a universal surplus shortcut while leaving the replacement law open."
     },
     {
       "edge": "XL-014",
@@ -2428,9 +2560,31 @@
       "to_status": "conditional",
       "impact": 1,
       "statement": "Both source and target groups must be priced under their best known attacks."
+    },
+    {
+      "edge": "ICYRF-E-016",
+      "relation": "qualifies",
+      "from": "THM-IC-SIGNLESS-INCIDENCE-RANK",
+      "from_status": "proved_external",
+      "to": "GAP-RP-CYCLE-CLOSURE-LAW",
+      "to_status": "open",
+      "impact": 1,
+      "statement": "Over an odd scalar field the relevant incidence circuits are balanced; an arbitrary first cycle is insufficient."
     }
   ],
   "author_flagged": [
+    {
+      "id": "GAP-IC-SOLVER-VISIBLE-YIELD",
+      "status": "open",
+      "failure_modes": [
+        "Non-rational roots",
+        "Exceptional charts",
+        "Multiplicity mismatch",
+        "Incomplete solver output",
+        "Verification rejection"
+      ],
+      "impact": 18
+    },
     {
       "id": "HEUR-DECOMPOSITION-PROBABILITY",
       "status": "heuristic",
@@ -2456,15 +2610,26 @@
       "impact": 0
     },
     {
-      "id": "HEUR-RELATION-RANK",
-      "status": "heuristic",
+      "id": "GAP-IC-YIELD-SCALING-LAW",
+      "status": "open",
       "failure_modes": [
-        "Duplicate rows",
-        "Disconnected support",
-        "Automorphism dependencies",
-        "Composite scalar modulus"
+        "Persistent overdispersion",
+        "Nonvanishing zero mass",
+        "Exceptional target strata",
+        "Scale-dependent symmetry effects"
       ],
-      "impact": 11
+      "impact": 18
+    },
+    {
+      "id": "GAP-IC-STOPPING-CENSORSHIP",
+      "status": "open",
+      "failure_modes": [
+        "Stop on first recovery",
+        "Drop solver failures",
+        "Keep successful targets only",
+        "Discard late dependent rows"
+      ],
+      "impact": 16
     },
     {
       "id": "HEUR-FIRST-FALL-DEGREE",
@@ -2487,6 +2652,28 @@
         "Uncharged restart overhead"
       ],
       "impact": 7
+    },
+    {
+      "id": "GAP-IC-SUPPORT-CONNECTIVITY-LAW",
+      "status": "open",
+      "failure_modes": [
+        "Dead columns",
+        "Disconnected components",
+        "Small incidence core",
+        "Automorphism-folded dependencies"
+      ],
+      "impact": 5
+    },
+    {
+      "id": "GAP-IC-TERMINAL-RANK-LAW",
+      "status": "open",
+      "failure_modes": [
+        "Persistent rank deficit",
+        "Duplicate rows",
+        "Support deficit",
+        "Wrong scalar field"
+      ],
+      "impact": 5
     },
     {
       "id": "HEUR-ZERO-DIMENSIONAL-PDP",
@@ -2518,6 +2705,17 @@
         "Affine degree falls push the solving degree above d_reg(F^top)",
         "d_reg undefined because F^top has positive-dimensional zero set",
         "Fixed-m Boolean systems at large n are never semi-regular"
+      ],
+      "impact": 1
+    },
+    {
+      "id": "HEUR-RELATION-RANK",
+      "status": "heuristic",
+      "failure_modes": [
+        "Duplicate rows",
+        "Disconnected support",
+        "Automorphism dependencies",
+        "Composite scalar modulus"
       ],
       "impact": 1
     },
@@ -2589,20 +2787,6 @@
       "cost": "exact small-field census",
       "action": "exhaust small fields of a scaling family; compare the formula's prediction with exact counts and report the ratio with its trend",
       "score": 3.236
-    },
-    {
-      "id": "HEUR-RELATION-RANK",
-      "label": "Relation independence/rank heuristic",
-      "status": "heuristic",
-      "model": "algebraic_coordinate",
-      "impact": 11,
-      "inflates": 4,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.8,
-      "cost": "exact small-field census",
-      "action": "exhaust small fields of a scaling family; compare the formula's prediction with exact counts and report the ratio with its trend",
-      "score": 3.126
     },
     {
       "id": "HEUR-SP-SEMAEV15-ASSUMPTION1",
@@ -2703,6 +2887,34 @@
       "score": 1.557
     },
     {
+      "id": "GAP-IC-SOLVER-VISIBLE-YIELD",
+      "label": "Mathematical-to-solver-visible yield bridge",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 18,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 1.513
+    },
+    {
+      "id": "GAP-IC-YIELD-SCALING-LAW",
+      "label": "Target-wise decomposition-yield scaling law",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 18,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 1.513
+    },
+    {
       "id": "COND-ECC2K130-FFDA-PROJECTION",
       "label": "ECC2K-130 IC projection 2^86 (FFDA)",
       "status": "conditional",
@@ -2715,6 +2927,34 @@
       "cost": "discharge conditions",
       "action": "attack the weakest condition first; each condition is its own node",
       "score": 1.495
+    },
+    {
+      "id": "GAP-IC-STOPPING-CENSORSHIP",
+      "label": "Adaptive stopping and failure-censorship bridge",
+      "status": "open",
+      "model": "repository_measurement",
+      "impact": 16,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 1.459
+    },
+    {
+      "id": "GAP-IC-TARGET-STRATIFICATION",
+      "label": "Natural-target and exceptional-stratum law",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 15,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 1.431
     },
     {
       "id": "HEUR-PF-PKM-AUX-CURVE-SEARCH",
@@ -2759,6 +2999,20 @@
       "score": 1.292
     },
     {
+      "id": "HEUR-RELATION-RANK",
+      "label": "Relation independence/rank heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.8,
+      "cost": "exact small-field census",
+      "action": "exhaust small fields of a scaling family; compare the formula's prediction with exact counts and report the ratio with its trend",
+      "score": 1.268
+    },
+    {
       "id": "HEUR-WAGNER-FOUR-SUM",
       "label": "Wagner four-sum cube-root heuristic",
       "status": "heuristic",
@@ -2785,6 +3039,20 @@
       "cost": "exact small-field census",
       "action": "exhaust small fields of a scaling family; compare the formula's prediction with exact counts and report the ratio with its trend",
       "score": 1.268
+    },
+    {
+      "id": "ALG-WD-THERIAULT-2003",
+      "label": "Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2)))",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "impact": 5,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.45,
+      "cost": "discharge conditions",
+      "action": "attack the weakest condition first; each condition is its own node",
+      "score": 1.263
     },
     {
       "id": "ATTACK-MOV-PAIRING",
@@ -3011,6 +3279,48 @@
       "score": 1
     },
     {
+      "id": "GAP-IC-ROW-ENSEMBLE-LAW",
+      "label": "Relation-row ensemble law",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 5,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.983
+    },
+    {
+      "id": "GAP-IC-SUPPORT-CONNECTIVITY-LAW",
+      "label": "Relation-support connectivity law",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 5,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.983
+    },
+    {
+      "id": "GAP-IC-TERMINAL-RANK-LAW",
+      "label": "Terminal reusable-rank probability law",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 5,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.983
+    },
+    {
       "id": "ASM-GG-RANDOM-PARTITION",
       "label": "Rigorous rho analyses assume a uniformly random partition",
       "status": "assumed",
@@ -3065,6 +3375,20 @@
       "cost": "exact small-field census",
       "action": "exhaust small fields of a scaling family; compare the formula's prediction with exact counts and report the ratio with its trend",
       "score": 0.936
+    },
+    {
+      "id": "GAP-IC-KERNEL-MODE-SCOPE",
+      "label": "Route-by-route kernel-mode scope",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 4,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.925
     },
     {
       "id": "HEUR-AUTOMORPHISM-SPEEDUP",
@@ -3163,6 +3487,20 @@
       "cost": "measurement",
       "action": "measure on a scaling family without censoring",
       "score": 0.85
+    },
+    {
+      "id": "GAP-IC-YIELD-RANK-COMPOSITION",
+      "label": "Yield-to-terminal-rank composition",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "impact": 3,
+      "inflates": 0,
+      "contagion": 0,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.813
     },
     {
       "id": "GAP-RP-COMMON-KERNEL",
@@ -3807,6 +4145,20 @@
       "cost": "reduction",
       "action": "narrow the scope or reduce to a weaker assumption",
       "score": 0.674
+    },
+    {
+      "id": "GAP-RP-CYCLE-CLOSURE-LAW",
+      "label": "Two-summand useful balanced-circuit stopping law",
+      "status": "open",
+      "model": "classical_unrestricted",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 2,
+      "obstructed": 0,
+      "breakability": 0.35,
+      "cost": "open obligation",
+      "action": "prove or refute",
+      "score": 0.633
     },
     {
       "id": "GAP-SP-BOUNDED-ROOT-SUMPOLY",
@@ -4804,7 +5156,7 @@
     },
     {
       "id": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-      "label": "Two-summand pair-table IC family costs ~0.75 r^(1/6) in S units: no crossover with rho",
+      "label": "Conditional two-summand pair-table family law; r^(1/6) at rho(K)=K/2",
       "status": "conditional",
       "model": "curve_family_restricted",
       "impact": 0,
@@ -6233,20 +6585,6 @@
       "score": 2.527
     },
     {
-      "id": "ALG-WD-THERIAULT-2003",
-      "label": "Theriault 2003: single large prime, Õ(q^(2 - 2/(g + 1/2)))",
-      "status": "proved_external_unread",
-      "model": "algebraic_coordinate",
-      "impact": 5,
-      "inflates": 0,
-      "contagion": 0,
-      "obstructed": 0,
-      "breakability": 0.9,
-      "cost": "read",
-      "action": "read the primary text; confirm statement, hypotheses and the exact quantifiers the corpus uses",
-      "score": 2.527
-    },
-    {
       "id": "THM-WD-MOMOSE-CHAO",
       "label": "Momose-Chao: classes of curves with weak Weil restrictions",
       "status": "proved_external_unread",
@@ -6273,6 +6611,20 @@
       "cost": "read",
       "action": "read the primary text; confirm statement, hypotheses and the exact quantifiers the corpus uses",
       "score": 2.153
+    },
+    {
+      "id": "THM-LEFT-KERNEL-RELATIONS",
+      "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 9,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 2.095
     },
     {
       "id": "THM-WD-DIEM-GHS-ODD",
@@ -7339,6 +7691,20 @@
       "score": 0.8
     },
     {
+      "id": "CEX-IC-SURPLUS-RIGHT-RANK",
+      "label": "Row surplus with nonzero left and right kernels (Lean countermodel)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 2,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.793
+    },
+    {
       "id": "THM-SALIZZONI-EX39-EXACT",
       "label": "Salizzoni Ex. 3.9 (k=2) checked exactly: d_x = d_y = 3, d_reg = 2",
       "status": "proved_internal_unreviewed",
@@ -7369,6 +7735,48 @@
     {
       "id": "CEX-HAZARD-SEPARATION",
       "label": "Three-point model: marginals <= 1/3, hazard recurrence fails (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-IC-MEAN-SHAPE-SEPARATION",
+      "label": "Equal total yield, different coverage and fibres (Lean countermodel)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-IC-SOLVER-INCOMPLETENESS",
+      "label": "Reject-all solver hides a real decomposition (Lean countermodel)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "CEX-IC-STOPPING-CENSORSHIP",
+      "label": "Success-only selection erases a real failure (Lean countermodel)",
       "status": "proved_internal_unreviewed",
       "model": "mathematical",
       "impact": 0,
@@ -7479,6 +7887,20 @@
       "score": 0.702
     },
     {
+      "id": "CEX-RP-ODD-CYCLE-NO-CLOSURE",
+      "label": "Triangle and self-pair loop need not close unsigned elimination over F3 (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
       "id": "CEX-SUBFIELD-FACTOR-BASE",
       "label": "Subfield curve, odd n: every sum of x in F_q factor-base points lies in E(F_q), at most 2q + 1 points (Lean)",
       "status": "proved_internal_unreviewed",
@@ -7535,8 +7957,22 @@
       "score": 0.702
     },
     {
-      "id": "THM-LEFT-KERNEL-RELATIONS",
-      "label": "Left-kernel index calculus: no rank condition, failure density exactly 1/q (Lean)",
+      "id": "THM-IC-SOLVER-VISIBLE-BOUND",
+      "label": "Solver-visible yield is at most mathematical yield; completeness gives equality (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-IC-UNUSED-COLUMN-RIGHT-KERNEL",
+      "label": "An unused relation column gives a nonzero right-kernel vector (Lean)",
       "status": "proved_internal_unreviewed",
       "model": "mathematical",
       "impact": 0,
@@ -7579,6 +8015,34 @@
     {
       "id": "THM-PA-PAIRING-DECIDES-DDH",
       "label": "A nondegenerate pairing decides DDH with one evaluation (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-RP-BALANCED-CYCLE-CONTROLS",
+      "label": "Square and parallel-edge circuits give unsigned row dependencies over F3 (Lean)",
+      "status": "proved_internal_unreviewed",
+      "model": "mathematical",
+      "impact": 0,
+      "inflates": 0,
+      "contagion": 1,
+      "obstructed": 0,
+      "breakability": 0.6,
+      "cost": "review",
+      "action": "audit the Lean statement against the prose claim (statement fidelity), then the axioms",
+      "score": 0.702
+    },
+    {
+      "id": "THM-RP-CYCLE-TARGET-PROJECTION",
+      "label": "A row dependency recovers the target only with nonzero target projection (Lean)",
       "status": "proved_internal_unreviewed",
       "model": "mathematical",
       "impact": 0,

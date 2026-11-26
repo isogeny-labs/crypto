@@ -1,0 +1,10 @@
+p=262147: 2 instances, 2 SGE rows, uncertified=0
+  la_mul 4.261075e+08  FPM_mid 5.686055e+09  LA share 0.674  curves [13, 19]
+p=1048583: 6 instances, 12 SGE rows, uncertified=0
+  la_mul 3.305559e+09  FPM_mid 4.133224e+10  LA share 0.720  curves [2, 27, 117, 150, 174, 211]
+p=1572869: 6 instances, 12 SGE rows, uncertified=0
+  la_mul 6.010999e+09  FPM_mid 7.366188e+10  LA share 0.734  curves [27, 87, 103, 106, 145, 298]
+local la_mul slope 262147->1048583: 1.4778
+local la_mul slope 1048583->1572869: 1.4748
+log-factor fit c = 1.915 over [262147, 1048583, 1572869]
+c bootstrap 95%: [1.851, 1.979]

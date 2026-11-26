@@ -1,0 +1,115 @@
+{
+  "schema": "pplus-native-source-extraction/v1",
+  "repository": "isogeny-labs/crypto",
+  "revision": "bd20b95dce44a91d7f74a1367853e724f280a3b6",
+  "selected_ranges_and_wrappers": [
+    {
+      "kind": "wrapper_only",
+      "reason": "module lint attribute and required standard import",
+      "bytes": 52,
+      "sha256": "78d1660a61f13d5f14708d819b4695110644345eaa6c66ca245d44fb4c765ffc"
+    },
+    {
+      "kind": "verbatim_production_range",
+      "role": "unchanged modular arithmetic including native x86-64 multiplication, power and counted power",
+      "source_path": "src/cryptanalysis/ic_boundary.rs",
+      "source_git_blob": "2ef3958c2d83e1c6a40d2dbc345ab8a8c1032b89",
+      "source_sha256": "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
+      "start_anchor": "#[inline]\npub(crate) fn mulmod(a: u64, b: u64, m: u64) -> u64 {",
+      "end_anchor": "/// Modular inverse by the extended Euclidean algorithm:",
+      "byte_start_inclusive": 51283,
+      "byte_end_exclusive": 53826,
+      "bytes": 2543,
+      "sha256": "f92725e66fff22c43a626b135d34dff7220e2a00b0ff28c359fc43ca63072631",
+      "rewritten": false
+    },
+    {
+      "kind": "verbatim_production_range",
+      "role": "unchanged struct fields; unrelated serde derive before the selected declaration is excluded",
+      "source_path": "src/cryptanalysis/ic_boundary.rs",
+      "source_git_blob": "2ef3958c2d83e1c6a40d2dbc345ab8a8c1032b89",
+      "source_sha256": "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
+      "start_anchor": "pub struct PrimeCurve {\n",
+      "end_anchor": "impl PrimeCurve {\n",
+      "byte_start_inclusive": 247087,
+      "byte_end_exclusive": 247162,
+      "bytes": 75,
+      "sha256": "23537fa052f585babba84b33cd0787bad4a0933673e05b807339fb77a6eeacc1",
+      "rewritten": false
+    },
+    {
+      "kind": "wrapper_only",
+      "reason": "scope wrapper for selected unchanged methods",
+      "bytes": 18,
+      "sha256": "6970e68f96c9624446dda1bedd3533c091163aa600a5293a3795c2c2e063eb80"
+    },
+    {
+      "kind": "verbatim_production_range",
+      "role": "unchanged curve rhs method",
+      "source_path": "src/cryptanalysis/ic_boundary.rs",
+      "source_git_blob": "2ef3958c2d83e1c6a40d2dbc345ab8a8c1032b89",
+      "source_sha256": "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
+      "start_anchor": "    /// `x³ + ax + b`.\n",
+      "end_anchor": "    /// Legendre symbol of `a` modulo the prime `p`, by the Jacobi\n",
+      "byte_start_inclusive": 247610,
+      "byte_end_exclusive": 247841,
+      "bytes": 231,
+      "sha256": "d5c1496dddf4ab5bd9195c1e5654eb902567dcd18c2616d8dae43eaf7eec9c4e",
+      "rewritten": false
+    },
+    {
+      "kind": "verbatim_production_range",
+      "role": "unchanged sqrt and sqrt_counted methods",
+      "source_path": "src/cryptanalysis/ic_boundary.rs",
+      "source_git_blob": "2ef3958c2d83e1c6a40d2dbc345ab8a8c1032b89",
+      "source_sha256": "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
+      "start_anchor": "    /// A square root modulo `p` (Tonelli–Shanks), or `None` for a\n",
+      "end_anchor": "    /// The field operations of one affine addition of distinct, finite,\n",
+      "byte_start_inclusive": 248013,
+      "byte_end_exclusive": 249898,
+      "bytes": 1885,
+      "sha256": "48372f155cbc1e767fc9ae0a50fb42c28ae7d503b19eba74ce868f9cd062fa3d",
+      "rewritten": false
+    },
+    {
+      "kind": "wrapper_only",
+      "reason": "close method scope",
+      "bytes": 2,
+      "sha256": "412ca345ccf75bf9c0806bce695be8de808b79984251a7a54d202cf6101dd451"
+    },
+    {
+      "kind": "verbatim_production_range",
+      "role": "unchanged selector modular addition",
+      "source_path": "src/cryptanalysis/ic_framework/pkm_semaev.rs",
+      "source_git_blob": "6ed41bd81528ee2ddb9d471f1a0b4451511e5cf1",
+      "source_sha256": "f645d0c8231dd9d02e1b21ede8704612c53e4b452cc9b75b7e065bce19e74e16",
+      "start_anchor": "fn addm(a: u64, b: u64, p: u64) -> u64 {\n",
+      "end_anchor": "fn subm(a: u64, b: u64, p: u64) -> u64 {\n",
+      "byte_start_inclusive": 3640,
+      "byte_end_exclusive": 3761,
+      "bytes": 121,
+      "sha256": "311dae3e9b5c27db31d13cbf5fd7497b65235e01944ccbb62d532750e2d9b8d7",
+      "rewritten": false
+    },
+    {
+      "kind": "verbatim_production_range",
+      "role": "unchanged full Dickson fibre constructor",
+      "source_path": "src/cryptanalysis/ic_framework/pkm_semaev.rs",
+      "source_git_blob": "6ed41bd81528ee2ddb9d471f1a0b4451511e5cf1",
+      "source_sha256": "f645d0c8231dd9d02e1b21ede8704612c53e4b452cc9b75b7e065bce19e74e16",
+      "start_anchor": "/// Abscissae of a Dickson / `T_2`-torus 2-power tower over `F_p`:\n",
+      "end_anchor": "/// Factor base carried by a Dickson / `T_2`-torus tower of height `t`.\n",
+      "byte_start_inclusive": 26326,
+      "byte_end_exclusive": 28059,
+      "bytes": 1733,
+      "sha256": "4768da6236d47e605b3a31baf031c6d280b5c68b7f84323a61859241dae82347",
+      "rewritten": false
+    }
+  ],
+  "production_module_sha256": "c6dff02843fceab1cf221465056598e6cd94d3d29a350b72eed85bee4c02c56c",
+  "production_module_bytes": 6660,
+  "arithmetic_stubs": false,
+  "counter_stubs": false,
+  "full_root_library_compiled": false,
+  "full_root_tests_executed": false
+}

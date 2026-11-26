@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:52:04Z",
+ "id": "PCC-20261123-b27a48",
+ "kind": "statement",
+ "producer": {
+  "commit": "72f5939943f43d84c15110ae5124218221c8bd8b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/PROTOCOL.md",
+    "sha256": "d7fdc197e34bfc96593918f0612283c7b4c6beff73b73b9bf7c1aad5302d1c68"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/QUALIFICATION_NOTES.md",
+    "sha256": "2eaae5f86e98e8317ed6d906f049a80929544a0db5b39feb708af9abd088787c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/collector.cpp",
+    "sha256": "9c522b4dd514148341db5fc54ca9080aa5d7b4da433387f436be5c58558a4c6a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/checker.cpp",
+    "sha256": "4d5460f5c7310328db3c51fb329d7c4d93b12966c109ea196182f18a04e7b411"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/rank_roots.hpp",
+    "sha256": "12405b40a76351c6bd83bcb70e818ea706a684c4f23f6fcf18ec6c6ea6c0ba3f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/evidence/qualification-v2/result.json",
+    "sha256": "8973faf8b527a75396026224685c754ba316b9fc0cbd2d0bbb7ee44187802259"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/evidence/qualification-v2/checker-result.json",
+    "sha256": "11980249407ed58e8544183e2e38b4b74a04585db0c7bd4f80b5cd0639d29339"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/evidence/qualification-v2/pre-call-manifest.sha256",
+    "sha256": "ae46d1ccdda260ff1d8e3bd5609485cb556be2defcaf6c96bb4090e291f2d17b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-split-tangent-preparation",
+ "statement": "Qualification-v2 strictly compiles the prepared collector and separate checker. Five scalar-polynomial controls include nonmonic, repeated, irreducible and full-field boundary roots. Six immutable synthetic matrices produce declared closed-rank gains0,1,1,0,1,1. The separate checker verifies complete independent left-kernel witnesses and every combination equation, and rejects four data corruptions. Both executables reject unknown/ambiguous arguments and output collisions;existing result bytes stay equal. No actual collection, residual curve roots or new curve points executed. Production code is compiled,not dynamically qualified on the P192 tangent fixture. Producer unsigned."
+}

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T01:54:09Z",
+ "id": "PCC-20261123-8c9b8a",
+ "kind": "execution",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "gpt-6-astra",
+  "session": "prime31-rational-chain-iteration6"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-inherited-build-failure/receipt.json",
+    "sha256": "dfef8504f12c2e0c956e50931064f416f372cc56e2052bb06083a30ac2d7ffce"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-inherited-build-failure/component-tests.txt",
+    "sha256": "f03edb6499ba1a4fb04660f10b664d2addf5837158e5f9d11bcbd329c8bb80d3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-inherited-build-failure/source-sha256.txt",
+    "sha256": "5a78872813fe30776f4635b4bcb107a0d616d2648a50ad02c38b00ac43a2bc25"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-inherited-build-failure/job.log.gz",
+    "sha256": "d5b72b7ec0ff66f439bc9e855cbbe9b48f371292b3aaf3d73fe69fbcfe8cf28d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Unsigned producer CI failure and artifact-integrity receipt only.",
+ "statement": "Original-root-lock CI45096187034/job137436389923 atbf56de345c02ef6f1c55bfa047087b0e880cb09e failed before any new rational-chain test or identity issuer ran, because inherited ecbench/spec.rs test fixtures have mismatched/unclosed delimiters. Artifact14783413661 was downloaded and its SHA256b161105ca2919c01fb1957e0c6dc4be5599508e3e49d6bbbbba3a835155b471a matched. The complete failure outputs and original source/lock hashes are retained. No passing component result is asserted."
+}

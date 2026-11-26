@@ -3,6 +3,7 @@ name: Boolean solver qualification
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - src/cryptanalysis/gf2_elim.rs
       - src/cryptanalysis/koblitz_groebner.rs
@@ -12,6 +13,7 @@ on:
       - src/cryptanalysis/ic_boundary.rs
       - src/cryptanalysis/ic_framework/rootfind.rs
       - examples/f4_f5_boolean_perf.rs
+      - examples/maintained/wide/f4_f5_boolean_runtime_analyze.rs
       - tools/generalized-rootfinder/**
       - research/f4_f5_ecbench_20261019/**
       - .github/workflows/boolean-single-write-runtime.yml
@@ -21,30 +23,12 @@ permissions:
 
 jobs:
   batch-setup-controls:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
+      # Full history so Git recovery can hydrate without S3.
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/f4_f5_boolean_perf_20261018 research/f4_f5_ecbench_20261019
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Exact table keys, witnesses and group ledger
@@ -65,30 +49,11 @@ jobs:
             done
           done
   native-solver:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/f4_f5_boolean_perf_20261018 research/f4_f5_ecbench_20261019
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
@@ -96,34 +61,19 @@ jobs:
       - name: Complete root and certificate tests
         run: cargo test --release --locked --manifest-path tools/generalized-rootfinder/Cargo.toml
   runtime:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
+      # Full history so Git recovery can hydrate store-backed logs without S3
+      # (CI's ARTIFACTS_AWS key is currently rejected on this org).
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/f4_f5_boolean_perf_20261018 research/f4_f5_ecbench_20261019
+        with:
+          fetch-depth: 0
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Build before measurement
-        run: cargo build --release --locked --example f4_f5_boolean_perf --bin isolated_bench
+        run: cargo build --release --locked --example f4_f5_boolean_perf --example f4_f5_boolean_runtime_analyze --bin isolated_bench
       - name: A/A and alternating A/B, one worker
         env:
           RAYON_NUM_THREADS: '1'
@@ -157,10 +107,9 @@ jobs:
               done
             done
           done
-          rustc --edition 2021 -O research/f4_f5_boolean_perf_20261018/runtime.rs \
-            -L dependency=target/release/deps --extern serde_json="$(find target/release/deps -name 'libserde_json-*.rlib' | head -1)" \
-            -o "$out/analyze-runtime"
-          "$out/analyze-runtime" "$out" > "$out/qualification.json"
+          # Prefer the Cargo-built analyzer (links serde_json via the crate graph)
+          # over a hand-rolled rustc --extern path that breaks under rust-cache.
+          target/release/examples/f4_f5_boolean_runtime_analyze "$out" > "$out/qualification.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

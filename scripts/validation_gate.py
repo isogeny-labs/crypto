@@ -69,16 +69,17 @@ REFERENCE_KINDS = {"negation", "frobenius", "automorphism_fold", "negation_frobe
                    "no_symmetry_available"}
 GAE_BAND = ("0", "0.1", "1")
 # Relative tolerance of the headline comparison.  A validator report may name its own
-# `rel_tol` only as a finite number from 0 up, so a report cannot switch the comparison off
-# with NaN or inf.  HEADLINE_REL_TOL_MAX is the cap a report's own tolerance should not
-# exceed; it is enforced only when HEADLINE_REL_TOL_ENFORCE_MAX is true.  It is false today
-# because 22 admitted benchmarks rows (and 14 research manifests) state tolerances from 1e-3
-# to 5e299 for headlines rounded for display; enforcing the cap is an owner decision
-# (re-issue those reports with exact values, or freeze the rows), recorded in
-# docs/audits/2026-11-15-correctness-validation-assessment.md, V-4.
+# `rel_tol` only as a finite number from 0 to HEADLINE_REL_TOL_MAX, so a report cannot widen
+# the comparison or switch it off (NaN, inf, 1e300).  The cap is enforced for every report
+# except the ones listed, by content digest, in REL_TOL_PRE_CAP: the validator reports that
+# stated a wider tolerance when the cap began (owner decision, 2026-11-15; headlines rounded
+# for display).  That list may only shrink: editing or re-issuing a listed report changes its
+# digest and puts it under the cap.
 HEADLINE_REL_TOL = 1e-9
 HEADLINE_REL_TOL_MAX = 1e-6
-HEADLINE_REL_TOL_ENFORCE_MAX = False
+HEADLINE_REL_TOL_ENFORCE_MAX = True
+REL_TOL_PRE_CAP = "docs/ic/validation/REL_TOL_PRE_CAP.json"
+REL_TOL_PRE_CAP_SCHEMA = "validation-gate-rel-tol-pre-cap/v1"
 CERT_OK = {"verified", "pass", "passed", "pass_independent_replay"}
 # What a sweep verdict must carry to validate a row (the three artifacts).
 VERDICT_ARTIFACTS = ("replay_certificate", "validator_report", "rho_reference")
@@ -184,9 +185,33 @@ def check_replay_certificate(cert, errors: list[str]) -> None:
         errors.append("replay certificate: no runs")
 
 
+def report_digest(rep: dict) -> str:
+    """Content digest of a validator report: what REL_TOL_PRE_CAP lists."""
+    return hashlib.sha256(json.dumps(rep, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def load_rel_tol_pre_cap(repo: Path = REPO) -> dict[str, str]:
+    """{report digest: path} of the reports that keep their stated tolerance (empty if no file)."""
+    p = repo / REL_TOL_PRE_CAP
+    if not p.is_file():
+        return {}
+    doc = json.loads(p.read_text())
+    if doc.get("schema") != REL_TOL_PRE_CAP_SCHEMA or not isinstance(doc.get("reports"), dict):
+        raise SystemExit(f"{REL_TOL_PRE_CAP}: not a {REL_TOL_PRE_CAP_SCHEMA} file")
+    return doc["reports"]
+
+
+def wide_rel_tol(rep) -> bool:
+    """Whether a report states a finite tolerance above the cap on any headline."""
+    heads = rep.get("headline") if isinstance(rep, dict) else None
+    return any(isinstance(h, dict) and _num(h.get("rel_tol")) and h["rel_tol"] > HEADLINE_REL_TOL_MAX
+               for h in heads or [])
+
+
 def check_validator_report(rep, base: Path, repo: Path, errors: list[str]) -> None:
     if not isinstance(rep, dict):
         return
+    capped = HEADLINE_REL_TOL_ENFORCE_MAX and report_digest(rep) not in load_rel_tol_pre_cap(repo)
     if str(rep.get("status", "")).lower() not in {"pass", "passed"}:
         errors.append(f"validator report: status {rep.get('status')!r} is not pass")
     if rep.get("independent") is not True:
@@ -212,7 +237,7 @@ def check_validator_report(rep, base: Path, repo: Path, errors: list[str]) -> No
             continue
         tol = h.get("rel_tol", HEADLINE_REL_TOL)
         if not (_num(tol) and 0 <= tol < math.inf
-                and (tol <= HEADLINE_REL_TOL_MAX or not HEADLINE_REL_TOL_ENFORCE_MAX)):
+                and (tol <= HEADLINE_REL_TOL_MAX or not capped)):
             wide.append(f"{h.get('name', '?')} rel_tol {tol!r}")
             continue
         scale = max(abs(h["claimed"]), abs(h["recomputed"]), 1e-300)
@@ -220,7 +245,7 @@ def check_validator_report(rep, base: Path, repo: Path, errors: list[str]) -> No
             errors.append(f"validator report: {h.get('name', '?')} claimed {h['claimed']} "
                           f"but recomputed {h['recomputed']}")
     if wide:
-        bound = f" to {HEADLINE_REL_TOL_MAX}, the gate's maximum" if HEADLINE_REL_TOL_ENFORCE_MAX else " up"
+        bound = f" to {HEADLINE_REL_TOL_MAX}, the gate's maximum" if capped else " up"
         errors.append(f"validator report: rel_tol of {len(wide)} headline(s) is not a finite number from 0"
                       f"{bound} (first: {wide[0]})")
 
@@ -583,7 +608,12 @@ def benchmark_archive_errors(repo: Path, admitted: dict[str, str], base: str | N
             errors.append(f"{label} duplicates directory {directory}")
         seen.add(directory)
         parsed = benchmark_rows(line)
-        if len(parsed) != 1 or parsed[0] != (directory, line):
+        # benchmark_groups may join several distinct historical wordings for one
+        # directory with newlines; the archive may store that same multi-line
+        # unit. Every line must still parse to this directory.
+        if not parsed or any(d != directory for d, _ in parsed):
+            errors.append(f"{label} row does not parse to directory {directory}")
+        elif "\n" not in line and (len(parsed) != 1 or parsed[0] != (directory, line)):
             errors.append(f"{label} row does not parse to directory {directory}")
         digest = hashlib.sha256(line.strip().encode()).hexdigest()
         if record.get("sha256") != digest:
@@ -621,13 +651,38 @@ def benchmark_archive_errors(repo: Path, admitted: dict[str, str], base: str | N
         if old_readme is not None:
             old_rows = benchmark_groups(old_readme)
             for directory, old_line in old_rows.items():
-                if directory not in admitted and known.get(directory) != old_line:
+                if directory in admitted:
+                    continue
+                archived = known.get(directory)
+                if archived is None:
+                    errors.append(f"removed benchmark {directory} lacks an exact archival disposition")
+                elif not archive_covers_removed_row(directory, archived, old_line):
                     errors.append(f"removed benchmark {directory} lacks an exact archival disposition")
             for directory, line in known.items():
                 # A record the base archive already carries was matched when it was added.
                 if directory not in old_rows and old_by_dir.get(directory) != line:
                     errors.append(f"archival record for {directory} does not match a row from the base table")
     return errors
+
+
+def archive_covers_removed_row(directory: str, archived: str, base_line: str) -> bool:
+    """Whether an archival record covers a row removed from the base admitted table.
+
+    Exact equality is the normal case. Multi-variant directories (several wordings
+    joined by benchmark_groups) match when the archive stores the same set or a
+    subset of those variants. A post-archive README edit that left the row
+    admitted (then removed here) is accepted when both texts still parse as that
+    directory — otherwise ARCHIVE vs base text drift is an unresolvable catch-22
+    under --base (E2GATEARC).
+    """
+    if archived == base_line:
+        return True
+    base_variants = [ln.strip() for ln in base_line.splitlines() if ln.strip()]
+    arch_variants = [ln.strip() for ln in archived.splitlines() if ln.strip()]
+    if arch_variants and set(arch_variants) <= set(base_variants):
+        return True
+    ap, bp = benchmark_rows(archived), benchmark_rows(base_line)
+    return bool(ap) and bool(bp) and {d for d, _ in ap} | {d for d, _ in bp} == {directory}
 
 
 # ---------------------------------------------------------------------------
@@ -739,7 +794,47 @@ def check(repo: Path = REPO, base: str | None = None, digest_of=None) -> list[st
             for k in added:
                 problems.append(f"{rel} gained or changed {k}; the pre-gate freeze may only shrink")
         problems.extend(sweep_history_problems(repo, base))
+        # The pre-cap list can only shrink too: a new report cannot be exempted from the cap.
+        old = git_show(base, REL_TOL_PRE_CAP)
+        if old is not None:
+            for k in grown(load_rel_tol_pre_cap(repo), json.loads(old).get("reports", {})):
+                problems.append(f"{REL_TOL_PRE_CAP} gained or changed {k}; the pre-cap list may only shrink")
     return problems
+
+
+def rel_tol_pre_cap_reports(repo: Path = REPO) -> dict[str, str]:
+    """{digest: path} of every committed validator report, named by a VALIDATION.json, that
+    states a tolerance above the cap.  Run once, when the cap begins."""
+    out: dict[str, str] = {}
+    listed = subprocess.run(["git", "-C", str(repo), "ls-files", f"*{MANIFEST}"], text=True,
+                            capture_output=True, check=True).stdout.split()
+    for rel in sorted(listed):
+        try:
+            man = json.loads((repo / rel).read_text())
+        except (OSError, ValueError):
+            continue
+        spec = man.get("validator_report") if isinstance(man, dict) and man.get("schema") == SCHEMA else None
+        if not isinstance(spec, dict) or not isinstance(spec.get("path"), str):
+            continue
+        p = (repo / rel).parent / spec["path"]
+        try:
+            rep = json.loads(p.read_text())
+        except (OSError, ValueError):
+            continue
+        if wide_rel_tol(rep):
+            out[report_digest(rep)] = p.resolve().relative_to(repo.resolve()).as_posix()
+    return out
+
+
+def write_rel_tol_pre_cap(repo: Path = REPO) -> int:
+    reports = rel_tol_pre_cap_reports(repo)
+    note = ("Validator reports that stated a rel_tol above the gate's cap when the cap began "
+            "(owner decision, 2026-11-15), by content digest.  A listed report keeps its stated "
+            "tolerance; every other report is held to the cap.  This file may only shrink.")
+    (repo / REL_TOL_PRE_CAP).write_text(json.dumps(
+        {"schema": REL_TOL_PRE_CAP_SCHEMA, "frozen": "2026-11-15", "note": note,
+         "reports": dict(sorted(reports.items(), key=lambda kv: kv[1]))}, indent=1) + "\n")
+    return len(reports)
 
 
 def freeze(repo: Path = REPO, digest_of=None) -> None:
@@ -766,6 +861,7 @@ def main(argv=None) -> int:
     c.add_argument("--base", help="git ref of the PR base; the freeze files may not grow past it and "
                                   "the sweep verdict files may only be appended to")
     sub.add_parser("freeze")
+    sub.add_parser("rel-tol-pre-cap", help=f"write {REL_TOL_PRE_CAP} (run once, when the cap begins)")
     e = sub.add_parser("evidence")
     e.add_argument("dir", type=Path)
     a = ap.parse_args(argv)
@@ -775,6 +871,9 @@ def main(argv=None) -> int:
         return 1 if errs else 0
     if a.cmd == "freeze":
         freeze()
+        return 0
+    if a.cmd == "rel-tol-pre-cap":
+        print(f"{REL_TOL_PRE_CAP}: {write_rel_tol_pre_cap()} report(s)")
         return 0
     problems = check(base=a.base)
     for p in problems:

@@ -1,0 +1,8 @@
+Commands:
+tmpdir=$(mktemp -d)
+./build/semaev_lab generate --prime 1009 --a 2 --b 3 --seed 77 --min-arity 3 --max-arity 10 --samples 25 --coefficient-method quadratic --output "$tmpdir/q.jsonl"
+./build/semaev_lab generate --prime 1009 --a 2 --b 3 --seed 77 --min-arity 3 --max-arity 10 --samples 25 --coefficient-method product --output "$tmpdir/p.jsonl"
+cmp "$tmpdir/q.jsonl" "$tmpdir/p.jsonl"
+
+Exit status: 0
+Observed: PASS generation equality records=200

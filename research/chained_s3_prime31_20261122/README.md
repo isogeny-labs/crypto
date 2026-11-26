@@ -1,0 +1,63 @@
+# Chained S3: exact x-root intersection oracle (Prime31 pilot)
+
+2026-11-22. **Implementation committed to PR #4920; native Rust execution and performance validation pending.** Research status: component implementation, mathematically checked identity, not a complete ECDLP solver and not a demonstrated speedup. The separate symmetric-coordinate proposal PR #4921 and exact-FP64/static-elimination study PR #4922 are concurrent work, not merged into this prototype.
+
+## Mathematical mechanism
+
+For a nonsingular short-Weierstrass curve E/Fp, `f(x)=x^3+ax+b` and rational points P=(x,y), Q=(u,v), define `e1=x+u`, `e2=xu`, `M=e1(e2+a)+2b`. Then
+
+```
+S3(x,u,z) = (e1^2-4e2) z^2 - 2 M z + (e2-a)^2 - 4b e1
+disc_z(S3) = 16 f(x) f(u)
+x(P +/- Q) = (M +/- 2 y v)/(x-u)^2,  x != u.
+```
+
+The `+/-` ordering depends on which group-law sign is chosen, but the unordered roots coincide exactly with `{x(P+Q), x(P-Q)}`. Because both inputs are rational points, `disc_z S3=16f(x)f(u)` is already a square (including zero): a quadratic-residue predicate on this discriminant **cannot** reject ordinary factor-base pairs. Any useful early-rejection filter must exploit *factor-base membership, target restrictions, or a genuinely additional equation*, not the raw S3 discriminant. This is an established Semaev/group-law identity, **not a novel algebraic breakthrough**. For `x=u`, the finite root is `x(2P)`; the other branch is the point at infinity `O` (if P has order 2, both are `O`). That second branch has no finite root of the affine polynomial and must be represented explicitly.
+
+**Exact signed-three-sum lemma (finite-field version).** Let `F={P_i}` be a list of ordinary Fp-rational curve points with signs allowed, let `I` be a map from each finite S3 pair root and the infinity branch to its source index pair `(i,j)`. For any rational target R, `R=epsilon_1 P_i+epsilon_2 P_j+epsilon_3 P_k` for signs `epsilon_t in {+1,-1}` if and only if a key `x(R +/- P_k)`, with an infinity key when applicable, intersects `I` and one of the eight reconstructed signed witnesses sums exactly to R.
+
+*Proof sketch.* In the forward direction move the third signed point to the right. Both sides lie in E(Fp), so equal points have the same x key (including O). S3's discriminant factorization enumerates both possible pair abscissae, including the exceptional infinity branch. In the reverse direction the candidate is only accepted after literal signed point addition to R. This proof assumes every listed factor-base point is a rational point on E, not just a root of a bare membership polynomial. The sign reconstruction and group check rule out spurious x-only hits. The implementation asserts the polynomial identity for every generic root before indexing it.
+
+**Independent mathematical replay (2026-11-22):** a separately written Python big-integer group-law oracle enumerated all 95 finite points of `E: y²=x³+2x+3` over `F101`; both S3 quadratic roots or the documented infinity branch agreed with literal `P±Q` abscissae for all `95² = 9025` ordered finite pairs. On the 96-point group with the first four factor-base x values, exhaustive signed-three-sum enumeration and independent x-root intersection matched for **96/96 targets**, with 56 decomposable targets. This checks the mathematical model independently; **the Rust test has not been executed**.
+
+## Two paired Rust oracle arms
+
+`examples/chained_s3_prime31_pilot.rs` reuses the existing `ic_boundary::{PrimeCurve,PrimePoint,CountedGroup,GroupOps}` and `semaev_prime_poly::Curve`. The reference arm builds a signed pair table keyed by complete points. The proposed S3 arm builds a quotient index keyed by the two affine x roots of each unordered factor-base pair. The concrete **batched-denominator variant** accumulates nonzero `(x_i−x_j)²`, computes all inverses with Montgomery's prefix/reverse algorithm using *one Fermat inversion per factor-base setup*, and computes each query target's nonzero `(x_R−x_k)²` inverses using *one inversion per nonidentity target*. Exceptional equal-abscissa pairs bypass division. A target is tested by intersecting the index with the two S3 roots of `(R,P_k)`, reconstructing all necessary signs and accepting only a complete group-law witness. Equal-abscissa, order-two and identity intermediates are separate branches rather than unsafe inversions.
+
+- Fixture: p=2147483647, a=847514846, b=2087444724, documented prime order n=2147446831, G=(625037715,2100627251), cofactor 1. This is the project's pre-existing ordinary Prime31 fixture; the code checks G is on the curve and `[n]G=O`, which **does not independently prove** the full point count or primality.
+- Pilot B=32: first 32 rational x coordinates. Samples: 32 planted genuine three-term targets plus 32 public deterministic multiples of G. Both arms share every target and factor-base representative. This cohort is a correctness/control pilot, **not** an unbiased relation-yield benchmark; planted samples cannot estimate yield.
+- `cargo test --release --example chained_s3_prime31_pilot`: exhaustive agreement across every point of a nonsingular curve over F101 with a four-element factor base, plus **unbatched versus batched S3 roots versus exact group sums** on F101 and the Prime31 fixture, including the one-inversion-per-panel assertion. **Not executed in this tool runtime:** Rust/cargo are not installed here; do not count tests as passing before original-source CI.
+- `cargo run --release --example chained_s3_prime31_pilot`: prints pair table size, probes, root invocations, denominator inversions, exceptional cases, sign lift attempts, group additions/doublings and counted group-law field ops. **No measured output yet.** S3 root inversions are currently via `semaev_prime_poly::Fp::inv` (Fermat exponentiation), and not included in `GroupOps.field_ops`: the printed group-op totals are not a normalized wall-time comparison.
+
+## Complexity and limits
+
+For factor-base size B, both arms use O(B^2) pair preparation and storage; under bounded candidate multiplicity the S3 intersection uses O(B) root computations/hash probes per target, the same asymptotic query work as the signed pair table. Collisions and their signed witness checks have an additional data-dependent cost, up to O(B^3) in a completely degenerate bucket. The S3 index reduces signed-pair-key duplication and avoids unconditionally computing four elliptic group sums per unordered pair. Batched inversions reduce the setup from O(B²) *separate Fermat inversions* to one inversion plus O(B²) field multiplications, and reduce per-query inversion calls from O(B) to one (when R is nonidentity). The field-multiplication count is still O(B²) in setup and O(B) per query, so the exponent is unchanged; no wall-clock advantage is claimed without compilation and profiling. **It does not improve the asymptotic exponent over the existing balanced meet-in-the-middle family.**
+
+For uniformly distributed subgroup targets, if there are at most O(B^3) signed three-sums, the success probability is at most approximately O(B^3/n), before overlaps and rank defects. Obtaining O(B) independent relations therefore needs roughly Omega(n/B^2) target draws in the unsaturated heuristic regime. Ignoring rank deficiencies, duplicated sums, exceptional buckets, and final target descent, an *optimistic heuristic cost model* is Θ(B^2 + n/B) (B-dependent precomputation plus B probes times roughly n/B^2 relation trials). That surrogate is minimized near B≈n^(1/3), giving cost Θ(n^(2/3)); this is not a rigorous upper bound on a complete solver and is *worse*, not better, than the Θ(n^(1/2)) generic-rho exponent. The actual cold solver also pays for row independence, linear algebra, and individual logarithms. Any better claim must exhibit improved relation density, cheaper complete recovery, or a new non-generic structural mechanism, not merely a faster S3 root kernel.
+
+**Independent batch-inverse replay (2026-11-22):** a separately written Python big-integer Montgomery prefix/reverse implementation reproduced exact inverses for 10 seeded panels of lengths 1, 2, 12, 32 and 256 over F101 and F2147483647, checking both `d_i·inv_i≡1` and end accumulator 1. This validates the arithmetic template but is not execution of the committed Rust branch.
+
+## Protocol for the next validation rung
+
+1. Obtain the original-source Rust test receipt; correct any compile or exceptional-branch disagreements without changing the registered fixture.
+2. Benchmark the two arms at B=32,64,128,256 on identical held-out *uniform* target samples, separating setup, query, x-root inversions, candidate lifting, RSS and wall/CPU time; log failures and timeouts. Use batch inversion and Mersenne reduction only as a later separately registered arm, with full setup charged.
+3. Integrate the faster *verified* oracle into the existing prime-field relation collector, with tagged signed factor-base columns, independent-rank and full cold single-target recovery; compare with the strongest project IC baseline and optimized negation rho under the same budget.
+4. Investigate balanced m=4 S3 chains with **unrestricted rational auxiliary x coordinates**, explicit O branches, and structural elimination/caching. Compare against the project's existing m=4 MITM, F4 and Horner/PKM work: #4891, #4812, #4901, #4921, #4922. Do not treat expanded S5 vs unoptimized exhaustive enumeration as the incumbent.
+5. For asymptotic claims, preregister increasing-prime families, fit complete-work exponents with intervals, and require a reduction below all matched frontier bounds; a constant-factor oracle win is not enough.
+
+## Prior art, overlap, and provenance
+
+- Semaev (2004), *Summation Polynomials and the Discrete Logarithm Problem on Elliptic Curves*, https://eprint.iacr.org/2004/031 — S3 construction and intended decomposition setting.
+- Amadori–Pintore–Sala (2018), *On the discrete logarithm problem for prime-field elliptic curves*, https://ora.ox.ac.uk/objects/uuid:c99fdb39-f5b1-428d-999c-770b63363e25 — prime-field index calculus with reduced relation requirements, a mandatory non-naive comparison.
+- Kousidis–Wiemers (2019), *On the first fall degree of summation polynomials*, https://doi.org/10.1515/jmc-2017-0022 — first-fall degree does not certify actual F4 solving complexity or an asymptotic speedup.
+- Repository primary sources: `src/cryptanalysis/ic_boundary.rs`, `src/cryptanalysis/semaev_prime_poly.rs`, `RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md`, PRs #4812, #4891, #4901. The shared research-KB MCP was unavailable through this runtime; this is **not** a complete novelty audit.
+
+**2026-11-22 progress gate:** exact S3 quotient design and original-repository Rust prototype checked in; mathematical identity checked symbolically on the recorded ordinary Prime31 example, but no Rust compiler/test receipt, measured time, linear-algebra integration, cold DLP recovery, or asymptotic gain from this pilot.
+
+## 2026-11-23 complete-row and dependency control
+
+The pilot now has complete signed-row enumeration for m=3 and m=4. A point-pair table and a balanced S3 x-root table feed the same signed right-summand set. For every target on the ordinary, prime-order 97 curve `y²=x³+7x+4/F101` with B=4, both arms produce exactly the exhaustive signed-tuple row set. A separate Python integer group law gives aggregate `(successful targets, distinct rows)` of `(58,96)`, `(97,704)`, `(85,225)`, `(97,2945)` for `(m,B)=(3,4),(3,8),(4,4),(4,8)`, and Rust agrees. Cancellation yields shorter or zero rows and projective infinity intermediates remain explicit.
+
+The example also feeds signed relations into the existing `StructuredGauss` solver with an additional target column. For a verified decomposition `Aℓ = u + vz`, it inserts the augmented row `[A, -v]` with right-hand side `u`. It deduplicates the full `(A,u,v)` triple, so identical factor-base rows with different target coefficients are retained. A focused F101 test recovers `z=37` for both m values and checks `[z]G=Q`.
+
+These checks establish exact row and small-field dependency behavior for the prototype. They do not identify a faster strategy. The projective x quotient merges positive and negative pair sums, so a match must still recover signs and verify the full point. At m=4 the balanced join is meet in the middle and its pair table and collision work must be charged. The registered timing panel in `SMALL_FIELD_PROTOCOL.md` remains unrun because the required checkpoint upload credentials are absent in this runtime. The full cold Prime31 solver, rank-aware relation yield, and optimized rho comparison remain pending.

@@ -1,0 +1,160 @@
+{
+  "schema": "fass-selector.main-integration-audit/v1",
+  "observed_at_utc": "2026-11-23T01:07:27Z",
+  "reviewer": "same-team read-only integration review",
+  "standing": "unsigned source-review observations; no signed verification or execution claim",
+  "scope": "Compare frozen attempt3 source bindings with pinned current main; identify integration and merge risks without changing tested code.",
+  "tested_branch_head": "e68f631c492c15bb54d79b96714e56ff72cf9f9d",
+  "pinned_main_commit": "856dfeb0be25df78ab3877741544f64940128fac",
+  "source_manifest": {
+    "path": "research/fass_prime31_20261122/selector/evidence/attempt3/source.build.json",
+    "sha256": "1789c86a27db6be11afed8e877f63cee442ae61a0753c12b090b2d785b87d69f",
+    "entries": 14,
+    "all_local_whole_file_sha256_match": true,
+    "all_local_selected_sha256_match": true,
+    "meaning": "The working source inventory still matches attempt3. This is a source-integrity observation, not new test execution."
+  },
+  "methods": [
+    "Read attempt3/source.build.json; recomputed each of its 14 local whole-file SHA-256 values and every selected-range SHA-256 value.",
+    "Fetched file metadata at the exact pinned main commit through the connected GitHub fetch_file tool; compared full Git blob identities against git hash-object of local files.",
+    "For changed pkm_smooth_tower, semaev_projection, mod.rs and ACTIVE.md, fetched full UTF-8 content, reproduced its Git blob SHA-1 including blob header, and inspected unified source differences in memory.",
+    "Inspected the qualifier build.rs and lib.rs and the branch-original diff from 26cc445bdc6b0b3518535d5f7b8b4ec6cc08fb19 to the tested branch head.",
+    "Read live PR #4921 metadata: head e68f631c492c15bb54d79b96714e56ff72cf9f9d; draft, open and mergeable=false.",
+    "No build, test, benchmark, merge, source edit or large fetch was performed by this review."
+  ],
+  "comparisons": [
+    {
+      "path": "src/cryptanalysis/pkm_smooth_tower.rs",
+      "tested_bytes": 81214,
+      "tested_sha256": "1e4c01827bfe0dd644e885aef8a7389dd164fac5894d9c5653ed3d6a9906e95c",
+      "tested_blob_sha": "ee9e5eabba0fc1151d8b2a579b31542f41439d76",
+      "main_bytes": 93247,
+      "main_sha256": "96c1302c87dc5037795ade52026812ed546a26572adc97d2d6430690bcc68e8f",
+      "main_blob_sha": "10f27a62aec2cf6c4ab344b12de9e331749685b0",
+      "full_file": "changed",
+      "qualifier_selected_range": [
+        0,
+        40482
+      ],
+      "tested_and_main_selected_sha256": "f248c6c41a8cd1c1d4320414e7d3dddb541ddb84b61d029f0eb000efc7528d79",
+      "selected_source": "byte-identical",
+      "changes": "Main adds ResultantDecomposition, resultant_decompose_m2, counted quadratic construction, resultant-hit finishing, reusable ResultantOracleM2 and tests after the selected prefix.",
+      "implication": "The exact field, curve, root-finding and other selected prefix items used by attempt3 are unchanged. Full-file metadata must nevertheless change after reconciliation. The new resultant/product-tree oracle is an applicable follow-up comparator."
+    },
+    {
+      "path": "src/cryptanalysis/semaev_prime_poly.rs",
+      "tested_bytes": 25450,
+      "tested_sha256": "c8249ba825c946dbdb37fa5d6762f8f32d15320344693443e8af0d52f122784a",
+      "tested_and_main_blob_sha": "123ccac36794ed3ce043e01b3a9c27ed3e2ca096",
+      "full_file": "byte-identical"
+    },
+    {
+      "path": "src/cryptanalysis/semaev_projection.rs",
+      "tested_bytes": 17657,
+      "tested_sha256": "d6beeb8620340700e7b5278f012dc9da23921d48dd66f6000bbe42f5a4e4d38f",
+      "tested_blob_sha": "0d1fc1caefb25a167d8fa29fc3457188fc54a27f",
+      "main_bytes": 73768,
+      "main_sha256": "dce26dbdde35f69e5c8c5cbbfebc1bf91a61e19cf090111c790e3164c125b364",
+      "main_blob_sha": "4f6684aaf34496533d36240a25f89b1bec4c8564",
+      "full_file": "changed; whole file was compiled in attempt3",
+      "changed_used_functions": [
+        "s3_quadratic now canonicalizes x1, x2 and curve coefficients modulo p and reduces small constants modulo p.",
+        "quadratic_root_keys now creates FpOpCounts and calls the new quadratic_root_keys_counted function.",
+        "quadratic_root_keys_counted preserves the former linear/quadratic arithmetic branches while adding field-operation counter updates."
+      ],
+      "added_imports": [
+        "num_bigint::BigUint",
+        "num_traits::{One, Zero}",
+        "super::ec_index_calculus::sqrt_mod_p",
+        "super::prime_fast::{Fp64, MAX_BITS}",
+        "crate::ecc::field::FieldElement"
+      ],
+      "other_changes": "Main adds multilimb root types, counted arithmetic, rational-discriminant batch inversion/root extraction and associated projection code/tests.",
+      "implication": "The selected whole-file source is not byte-identical. On canonical inputs the inspected used arithmetic appears mathematically equivalent, but that inference is not execution evidence. The existing qualifier lacks the new imports' module/dependency graph and cannot be assumed to build unchanged."
+    },
+    {
+      "path": "src/cryptanalysis/identity_certificate.rs",
+      "tested_bytes": 29523,
+      "tested_sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+      "tested_and_main_blob_sha": "114f1f4a3f2a1be027a9b046ef166259df49dd45",
+      "full_file": "byte-identical"
+    },
+    {
+      "path": "src/hash/sha256.rs",
+      "tested_bytes": 18239,
+      "tested_sha256": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf",
+      "tested_and_main_blob_sha": "9566e3de448e21ff98811cfc4c6992ff3448962e",
+      "full_file": "byte-identical"
+    },
+    {
+      "path": "src/cryptanalysis/mod.rs",
+      "tested_sha256": "8ed0065685aff59ec3249df834db1d0fe2057dcaa438184a4da82f3279fb632c",
+      "tested_blob_sha": "1f1712809475952fea64fb380178321a29d5c594",
+      "main_sha256": "748fbe8c46c97bad5019a6e1144bc7f9bd3770efc9867fe8efcaf80819b6f15e",
+      "main_blob_sha": "18fe54e2af4125fe55d29b4d951e1292b465f77e",
+      "full_file": "changed; inventory only in focused qualifier",
+      "implication": "Main adds hky_closure_io, koblitz_log_store and semaev_field_profile. A future integration must retain those declarations and add semaev_selector; the actual root-library module graph is outside attempt3."
+    },
+    {
+      "path": "src/cryptanalysis/semaev_selector.rs",
+      "tested_sha256": "184022594e70977eb42c31fcb5d1b9cd9ecfa0081f03ca2aeb16089ee91a0446",
+      "tested_blob_sha": "aad8767c55a0320c3c0772f6b0005911e4fdfa93",
+      "main_status": "absent at pinned main (GitHub NOT_FOUND)",
+      "local_status": "matches attempt3"
+    },
+    {
+      "path": "tests/semaev_selector.rs",
+      "tested_sha256": "93e2934a2373b4c97b36339924a099c482e26a0accf1d7f83995112bd63e51d5",
+      "main_status": "absent at pinned main (GitHub NOT_FOUND)",
+      "local_status": "matches attempt3"
+    }
+  ],
+  "remaining_local_inventory": {
+    "status": "All six entries match attempt3; qualifier/study paths are new branch-local work.",
+    "paths": [
+      "research/fass_prime31_20261122/selector/PLAN.md",
+      "research/fass_prime31_20261122/selector/qualifier/Cargo.toml",
+      "research/fass_prime31_20261122/selector/qualifier/Cargo.lock",
+      "research/fass_prime31_20261122/selector/qualifier/build.rs",
+      "research/fass_prime31_20261122/selector/qualifier/src/lib.rs",
+      "research/fass_prime31_20261122/selector/qualifier/src/record.rs"
+    ]
+  },
+  "merge_risks": {
+    "branch_original_paths": [
+      "docs/ACTIVE.md",
+      "research/fass_prime31_20261122/PROTOCOL.md"
+    ],
+    "active": {
+      "main_blob_sha": "04c6e4e8d81fb6e585e10b5c35c3c20644a0886b",
+      "issue": "The branch adds one task immediately below Active items; main independently inserts many tasks at that same location and changes others. Both sets must be preserved.",
+      "conflict_assessment": "This is the only overlapping path in the branch-original diff; remote mergeable=false is consistent with this insertion conflict. No merge simulation was executed."
+    },
+    "protocol": {
+      "issue": "Branch adds PROTOCOL.md; path is absent at pinned main. No same-path addition conflict was found."
+    },
+    "session_log": {
+      "path": "docs/session-logs/2026-11-22.md",
+      "main_blob_sha": "5d9b421dcd7d200d732885bf7905e52fe2cad04c",
+      "issue": "The local new file is absent from branch base but present on main. Publishing it before reconciliation creates an add/add risk; merge complete log blocks without dropping another session."
+    },
+    "pcc_ledger": {
+      "path": "pcc/ledger.jsonl",
+      "branch_base_blob_sha": "fe08598f6a3f7240434892bb6f01494879929247",
+      "main_blob_sha": "dc5230c36c79547b67e9c3b4148b4c2ca7675928",
+      "issue": "Main's ledger has advanced. Preserve the current main byte prefix before a future native append; do not resolve a ledger conflict by choosing a side."
+    }
+  },
+  "recommendation": {
+    "immediate": "Publish the qualified branch with its exact attempt3-tested sources and explicitly leave main integration/requalification open. Do not overwrite newer main source with the old dependency body to obtain an apparent match.",
+    "future": [
+      "Reconcile current main under the repository merge workflow, preserving all ACTIVE items, complete session-log blocks, sibling module registrations and append-only ledger history.",
+      "Retain attempt3 evidence unchanged. Bind a fresh source manifest to the reconciled exact commit.",
+      "Adapt the focused qualifier to the actual current dependency graph, or use explicitly identified complete production items with exact byte-range manifests; do not substitute hand-rewritten arithmetic.",
+      "Rebuild and rerun the complete existing selector correctness suite and certificate checks against the new semaev_projection source, including diagonal, zero/linear/repeated-root, canonical/refusal and Prime31 cases. Preserve new build, pre-call and post-call bindings.",
+      "Run the root-library gate separately when its build environment permits; a focused qualifier does not close it.",
+      "Include main's new resultant_decompose_m2/ResultantOracleM2 in the later matched algebraic-comparator selection."
+    ],
+    "claim_limit": "Attempt3 supports only its frozen branch-source qualifier. It is not a current-main integration pass, a whole-library pass, a signed verification, or a performance measurement."
+  }
+}

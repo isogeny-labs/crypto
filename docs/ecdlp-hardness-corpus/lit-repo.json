@@ -1191,14 +1191,16 @@
     },
     {
       "id": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
-      "label": "Two-summand pair-table IC family costs ~0.75 r^(1/6) in S units: no crossover with rho",
+      "label": "Conditional two-summand pair-table family law; r^(1/6) at rho(K)=K/2",
       "kind": "structural_theorem",
       "status": "conditional",
       "model": "curve_family_restricted",
-      "statement": "For every two-summand pipeline with a pair table (F^2/(4t) additions) and relations needing about K/2 = F/(4k) edges before a cycle closes, each costing #E/(c-weighted) targets at the counting ceiling p = F^2/(2#E), the cost ops(F) = F^2/(4t) + c#E/(2kF) is minimized at S_family ~ 0.75 r^(1/6) on a prime-order curve; since rho's S is constant (1.25 at A=1, 0.886 at A=2) the two cross only near r ~ 22 and the gap widens as r^(1/6) (extrapolated 153x at 2^48, 6.4e7x at 2^160).",
-      "scope": "Derived law with the ledger's ladder converging to it; the table of ratios at large r is an extrapolation, not a measurement. It rests on the random-graph cycle heuristic for elimination and on the counting-ceiling yield; it covers only the pair-table two-summand family (table fold t, column fold k), not m>=3 algebraic oracles.",
+      "statement": "For a two-summand pair-table pipeline, let rho(K) be the accepted-edge stopping law for the first balanced incidence circuit with nonzero target projection on K=F/(2k) columns. Then ops(F)=F^2/(4t)+2c#E rho(F/(2k))/F^2 at the counting-ceiling yield. The displayed ledger law ops(F)=F^2/(4t)+c#E/(2kF), minimized at S_family~0.75 r^(1/6) on a prime-order curve, is the specialization rho(K)=K/2.",
+      "scope": "Conditional accounting identity, not an asymptotic lower bound. The table of large-r ratios is an extrapolation under rho(K)=K/2. Over odd scalar fields a lone odd cycle supplies no unsigned row dependency, and even a balanced dependency needs nonzero target projection. The law covers only the pair-table two-summand family, not m>=3 algebraic oracles.",
       "assumptions": [
-        "relations behave like random graph edges (cycle at ~K/2)",
+        "useful balanced-circuit stopping law rho(K)=K/2",
+        "nonzero weighted target coefficient",
+        "distinct target rows (no repeated-target collision)",
         "yield at the counting ceiling"
       ],
       "source_refs": [
@@ -1214,7 +1216,7 @@
         "RESEARCH_IC_BOUNDARY_LEDGER.md sections 11.2-11.3"
       ],
       "evidence_class": "asymptotic_heuristic",
-      "formula": "ops(F) = F^2/(4t) + c #E/(2kF);  S_family ~ 0.75 r^(1/6)"
+      "formula": "ops(F)=F^2/(4t)+2c#E rho(F/(2k))/F^2; at rho(K)=K/2, S_family~0.75 r^(1/6)"
     },
     {
       "id": "MEAS-RP-BOUNDARY-TARGETS-PRIME",
@@ -2337,12 +2339,14 @@
     },
     {
       "id": "E-RP-043",
-      "from": "HEUR-RELATION-RANK",
+      "from": "GAP-RP-CYCLE-CLOSURE-LAW",
       "to": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
       "relation": "conditions",
-      "statement": "The law assumes elimination closes when the relation graph first carries a cycle, about K/2 relations.",
+      "statement": "The r^(1/6) specialization assumes the first useful balanced circuit with nonzero target projection arrives after rho(K)=K/2 accepted relations; this is a stopping-law obligation, not a reusable full-rank-table condition.",
       "source_refs": [
-        "S-RP-IC-BOUNDARY-LEDGER"
+        "S-RP-IC-BOUNDARY-LEDGER",
+        "S-IC-YIELD-RANK-FORMAL-2026",
+        "S-IC-CYCLE-CLOSURE-FORMAL-2026"
       ]
     },
     {
@@ -2360,7 +2364,7 @@
       "from": "COND-RP-TWO-SUMMAND-FAMILY-LAW",
       "to": "GAP-END-TO-END-IC-EXPONENT",
       "relation": "obstructs",
-      "statement": "No base size, table fold or target generator inside the pair-table two-summand family reaches rho at any size that matters.",
+      "statement": "Under the declared counting-yield and rho(K)=K/2 stopping-law specialization, no base size, table fold or target generator inside the pair-table two-summand family reaches rho at any size that matters.",
       "source_refs": [
         "S-RP-IC-BOUNDARY-LEDGER"
       ]

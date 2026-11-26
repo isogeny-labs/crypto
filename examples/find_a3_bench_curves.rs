@@ -18,9 +18,70 @@
 //! ```
 
 use crypto_lib::cryptanalysis::residual_walk::is_prime_u64;
+use crypto_lib::ecc::curve::CurveParams;
+use crypto_lib::ecc::point::Point;
+use num_bigint::BigUint;
 
+/// Exact group order for small fields by the textbook quadratic-character
+/// sum.  Cost is Θ(p) modular exponentiations, so it is only used for the
+/// toy rungs.
 fn count_points(p: u64, a: u64, b: u64) -> u64 {
     crypto_lib::cryptanalysis::ai_schoof::count_points_small(p, a, b)
+}
+
+/// Exact group order by Hasse-interval search (Mestre's method): take a
+/// point `P`, compute `(p+1)P`, and scan `k` with `kP = ±(p+1)P` for
+/// `|k| ≤ 2√p`.  Then `#E` is a multiple of `ord(P)` inside the Hasse
+/// interval.  The caller only accepts a *prime* candidate `m`, and that
+/// makes the result exact: with `E(F_p) ≅ Z/n₁ × Z/n₂`, `n₁ | n₂`, a prime
+/// `m ∈ [p+1−2√p, p+1+2√p]` divisible by `ord(P)` forces `n₂ = m` and
+/// `n₁ = 1` (otherwise `#E = m² > p+1+2√p`).
+///
+/// Cost is Θ(√p) group operations, so 36–44-bit rungs are seconds, where
+/// the Θ(p) counter needs billions.
+fn count_points_hasse(p: u64, a: u64, b: u64) -> Option<u64> {
+    let curve = CurveParams {
+        name: "probe",
+        p: BigUint::from(p),
+        a: BigUint::from(a),
+        b: BigUint::from(b),
+        gx: BigUint::from(0u32),
+        gy: BigUint::from(0u32),
+        n: BigUint::from(1u32),
+        h: 1,
+    };
+    let a_fe = curve.a_fe();
+
+    // Smallest-x point on the curve; it generates a large subgroup with
+    // overwhelming probability, and a degenerate one simply yields no
+    // candidate below.
+    let mut base = None;
+    for x in 1..64u64 {
+        let rhs = (((x as u128 * x as u128 % p as u128) * x as u128 % p as u128
+            + (a as u128 * x as u128 % p as u128)
+            + b as u128)
+            % p as u128) as u64;
+        if let Some(y) = legendre_or_sqrt(rhs, p) {
+            base = Some(Point::Affine {
+                x: curve.fe(BigUint::from(x)),
+                y: curve.fe(BigUint::from(y)),
+            });
+            break;
+        }
+    }
+    let base = base?;
+
+    // k with k·P = (p+1)P  ⇒  #E = p+1−k ; the negative branch gives p+1+k.
+    let bound = 2 * (p as f64).sqrt().ceil() as u64 + 2;
+    let r = base.scalar_mul(&BigUint::from(p + 1), &a_fe);
+    if let Some(k) = base.linear_dlog_vartime(&r, bound, &a_fe) {
+        return (k <= p).then(|| p + 1 - k);
+    }
+    let neg_r = r.neg();
+    if let Some(k) = base.linear_dlog_vartime(&neg_r, bound, &a_fe) {
+        return Some(p + 1 + k);
+    }
+    None
 }
 
 fn legendre_or_sqrt(value: u64, p: u64) -> Option<u64> {
@@ -83,19 +144,25 @@ fn find_curve(bits: u32, residue_mod_4: u64) -> Option<(u64, u64, u64, u64, u64,
         if !(4 * (a as u128) * (a as u128) * (a as u128) + 27 * (b as u128) * (b as u128))
             .is_multiple_of(p as u128)
         {
-            let order = count_points(p, a, b);
-            if is_prime_u64(order) {
-                // Generator: smallest x >= 1 with a QR rhs.
-                for x in 1..p {
-                    let rhs = (((x as u128 * x as u128 % p as u128) * x as u128 % p as u128
-                        + (a as u128 * x as u128 % p as u128)
-                        + b as u128)
-                        % p as u128) as u64;
-                    if let Some(y) = legendre_or_sqrt(rhs, p) {
-                        // (x, y) is a generator: the group has prime order
-                        // and (x, y) is not the identity.
-                        let _ = count_points; // silence unused-in-some-cfg
-                        return Some((p, a, b, x, y, order));
+            // Θ(p) counting is only affordable on the toy rungs.
+            let order = if bits <= 24 {
+                Some(count_points(p, a, b))
+            } else {
+                count_points_hasse(p, a, b)
+            };
+            if let Some(order) = order {
+                if is_prime_u64(order) {
+                    // Generator: smallest x >= 1 with a QR rhs.
+                    for x in 1..p {
+                        let rhs = (((x as u128 * x as u128 % p as u128) * x as u128 % p as u128
+                            + (a as u128 * x as u128 % p as u128)
+                            + b as u128)
+                            % p as u128) as u64;
+                        if let Some(y) = legendre_or_sqrt(rhs, p) {
+                            // (x, y) is a generator: the group has prime order
+                            // and (x, y) is not the identity.
+                            return Some((p, a, b, x, y, order));
+                        }
                     }
                 }
             }
@@ -108,13 +175,43 @@ fn find_curve(bits: u32, residue_mod_4: u64) -> Option<(u64, u64, u64, u64, u64,
 }
 
 fn main() {
-    for (bits, residue, label) in [
-        (16u32, 3u64, "p256class"),
-        (20, 3, "p256class"),
-        (20, 1, "cryptoproclass"),
-        (24, 3, "p256class"),
-        (24, 1, "cryptoproclass"),
-    ] {
+    // Optional `bits` arguments extend the default ladder; a bare run
+    // reproduces the published rungs.
+    let requested: Vec<u32> = std::env::args()
+        .skip(1)
+        .filter_map(|a| a.parse().ok())
+        .collect();
+    let mut rungs: Vec<(u32, u64, &str)> = Vec::new();
+    if requested.is_empty() {
+        rungs.extend([
+            (16u32, 3u64, "p256class"),
+            (20, 3, "p256class"),
+            (20, 1, "cryptoproclass"),
+            (24, 3, "p256class"),
+            (24, 1, "cryptoproclass"),
+            (28, 3, "p256class"),
+            (28, 1, "cryptoproclass"),
+        ]);
+    } else {
+        // `p ≡ 3 (mod 4)` uses the fast Euler square root; the `p ≡ 1`
+        // branch brute-forces the root and is toy-rung only.
+        for bits in requested {
+            let residue = if bits <= 24 { 1 } else { 3 };
+            rungs.push((
+                bits,
+                residue,
+                if residue == 3 {
+                    "p256class"
+                } else {
+                    "cryptoproclass"
+                },
+            ));
+            if bits <= 24 {
+                rungs.push((bits, 3, "p256class"));
+            }
+        }
+    }
+    for (bits, residue, label) in rungs {
         match find_curve(bits, residue) {
             Some((p, a, b, gx, gy, order)) => {
                 println!(

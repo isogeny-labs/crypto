@@ -22,6 +22,8 @@ a correction is a new entry (test, retire).
     lessons.py show   ID
     lessons.py verify [--base REF]                ids match content; references resolve;
                                                   no entry from REF was edited or removed
+                                                  (restoring an entry that REF holds corrupted,
+                                                  so it matches its id again, is allowed)
 
 Status of a lesson, derived from its tests (never stored):
   candidate  fewer than 2 confirmations from distinct evidence
@@ -306,9 +308,26 @@ def verify(d: Path, base: str | None) -> list[str]:
             path = d / name
             if not path.exists():
                 errors.append(f"{name}: removed (entries are append-only)")
-            elif path.read_bytes() != old:
+            elif path.read_bytes() != old and not is_repair(name, old, path.read_bytes()):
                 errors.append(f"{name}: changed since {base} (entries are append-only)")
     return errors
+
+
+def matches_name(name: str, raw: bytes) -> bool:
+    """True when raw is a readable entry whose content-derived id is name's stem."""
+    try:
+        body = json.loads(raw)
+        return Path(name).stem == entry_id(body)
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return False
+
+
+def is_repair(name: str, old: bytes, new: bytes) -> bool:
+    """A change to an entry on the base is allowed only when the base copy was
+    already corrupt (its content no longer matches its id) and the new copy
+    matches the id again, i.e. it restores the original content. An entry that
+    is valid on the base stays immutable."""
+    return not matches_name(name, old) and matches_name(name, new)
 
 
 def cmd_verify(a, d: Path) -> int:

@@ -1,0 +1,209 @@
+name: CT205 toy cover independent arithmetic and native DLP
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/ct205-toy-transfer.yml'
+      - 'tests/prime_cover_toy_complete_dlp.rs'
+      - 'tests/prime_cover_toy_cold_cost.rs'
+      - 'tests/ct226_native_genus4_transferred_ic.rs'
+      - 'tests/ct229_impl/probe.rs'
+      - 'tests/ct231_impl/probe.rs'
+      - 'tests/ct233_impl/probe.rs'
+      - 'tests/ct235_impl/probe.rs'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
+      - 'src/prime_hyperelliptic/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - '.github/workflows/ct205-toy-transfer.yml'
+      - 'tests/prime_cover_toy_cold_cost.rs'
+      - 'tests/ct226_native_genus4_transferred_ic.rs'
+      - 'tests/ct229_impl/probe.rs'
+      - 'tests/ct231_impl/probe.rs'
+      - 'tests/ct233_impl/probe.rs'
+      - 'tests/ct235_impl/probe.rs'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-field-oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct206_sextic_obstruction.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_genus4_coset_screen.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_f101_coset_screen.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct217_norm_relation_audit.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct217_f101_norm_relation_audit.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct218_full_norm_ic.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct218_f101_full_norm_ic.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct219_anchor_free_cold_cost.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct220_split_prime_order_obstruction.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct221_zeta.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_f101_projector_audit.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_f101_extension_norm.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_f101_split_factor.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_f101_geometric_hom.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct228_full_rational_base_scaling.py
+      - name: Recount quotient curves, Jacobian and sextic-twist obstruction
+        run: |
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct206_sextic_obstruction.py
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_genus4_coset_screen.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_genus4_coset_screen.py > /tmp/ct216_f101_coset_screen.json
+          cmp /tmp/ct216_f101_coset_screen.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct216_f101_coset_screen.json
+          sha256sum /tmp/ct216_f101_coset_screen.json
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct217_norm_relation_audit.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct217_norm_relation_audit.py > /tmp/ct217_norm_relation_audit.json
+          cmp /tmp/ct217_norm_relation_audit.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct217_f101_norm_relation_audit.json
+          cat /tmp/ct217_norm_relation_audit.json
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct218_full_norm_ic.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct218_full_norm_ic.py > /tmp/ct218.json
+          cmp /tmp/ct218.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct218_f101_full_norm_ic.json
+          cat /tmp/ct218.json
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct219_anchor_free_cold_cost.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct219_anchor_free_cold_cost.py --paired
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct220_split_prime_order_obstruction.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct220_split_prime_order_obstruction.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct220_split_prime_order_obstruction.py
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct221_zeta.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct221_zeta.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct221_zeta.py
+          node --check research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs
+          node research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs --self-test
+          node research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs > /tmp/ct222_projector.json
+          cmp /tmp/ct222_projector.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_f101_projector_audit.json
+          sha256sum /tmp/ct222_projector.json
+          # CT223 exact non-rational F101^2 prime-divisor norm/pullback checks.
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py > /tmp/ct223_extension_norm.json
+          cmp /tmp/ct223_extension_norm.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_f101_extension_norm.json
+          sha256sum /tmp/ct223_extension_norm.json
+          if python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py --self-test > /tmp/ct223_opt.log 2>&1; then
+            echo 'ERROR: CT223 accidentally passed with disabled asserts' >&2
+            exit 1
+          fi
+          grep -F 'CT223 requires assertions' /tmp/ct223_opt.log
+          # CT224 splits the complementary threefold into a t=0 elliptic and a simple surface.
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py > /tmp/ct224_factor.json
+          cmp /tmp/ct224_factor.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_f101_split_factor.json
+          sha256sum /tmp/ct224_factor.json
+          # CT225 global geometric non-transfer and first abstract 109-torsion crossover.
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py > /tmp/ct225_hom.json
+          cmp /tmp/ct225_hom.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_f101_geometric_hom.json
+          sha256sum /tmp/ct225_hom.json
+          # CT228 full rational factor-base scaling, exact finite prime-order census.
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct228_full_rational_base_scaling.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct228_full_rational_base_scaling.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct228_full_rational_base_scaling.py > /tmp/ct228.json
+          echo '8ed4d9cfdcb3cc5ac21a5a45b02f70e1655f3c32dd2d84a8800d1bdf6281b131  /tmp/ct228.json' | sha256sum --check -
+
+  native-toy-dlp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      CARGO_BUILD_JOBS: '2'
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_RELEASE_DEBUG: '0'
+    steps:
+      - name: Recover hosted-runner disk
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+          df -h .
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/*/
+            /src/
+            /tests/prime_cover_toy_complete_dlp.rs
+            /tests/prime_cover_toy_cold_cost.rs
+            /tests/ct226_native_genus4_transferred_ic.rs
+            /tests/ct229_impl/probe.rs
+            /tests/ct231_impl/probe.rs
+            /tests/ct233_impl/probe.rs
+            /tests/ct235_impl/probe.rs
+            /.cargo/
+            /build.rs
+            /crates/
+            /compat/ct_dynamic_audit.rs
+            /research/ct_dynamic_audit_20261102/
+            /docs/ecdlp-audit/
+            /research/full_volcano_graphwide_ic_20261017/execution/
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct209_native_source_preflight.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct214_cost_log_validator.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct215_paired_cost_audit.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct214_cost_log_validator.py
+            /research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs
+            /research/n83_jacobian_projector_20261031/
+            /docs/ic/
+            /docs/ecbench/
+            /docs/curves/
+            /research/pencil_large_prime_20261029/
+            /tools/factor-base/
+            /tools/volcano-cli/
+            /isogeny_algos/
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - name: Fail fast on missing manifest bins and literal include resources
+        run: |
+          (cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204 && python3 -m unittest -v test_ct209_native_source_preflight.py)
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py .
+      - name: Compile and execute all toy logs plus paired fresh-state cost probe
+        run: |
+          set -euo pipefail
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct214_cost_log_validator.py -v
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct215_paired_cost_audit.py --self-test
+          cargo test --locked --release --test prime_cover_toy_complete_dlp -- --nocapture
+          cargo test --locked --release --test prime_cover_toy_cold_cost -- --nocapture 2>&1 | tee /tmp/ct214-native.log
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct214_cost_log_validator.py /tmp/ct214-native.log
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct215_paired_cost_audit.py /tmp/ct214-native.log
+          # CT226: native composite-order J(F101) relation/LA/recovery cold cost.
+          cargo test --locked --release --test ct226_native_genus4_transferred_ic paired_native_complete_composite -- --nocapture 2>&1 | tee /tmp/ct226-native.log
+          test "$(grep -c 'CT226_NATIVE_PAIR_JSON' /tmp/ct226-native.log)" -eq 3
+          # CT229: fixed six-size native reduced factor-base screen; includes the
+          # original CT226 source but only runs the independently scoped CT229 test.
+          cargo test --locked --release --test ct226_native_genus4_transferred_ic ct229_ -- --nocapture 2>&1 | tee /tmp/ct229-native.log
+          test "$(grep -c 'CT229_PANEL_JSON' /tmp/ct229-native.log)" -eq 6
+          grep 'CT229_PANEL_JSON' /tmp/ct229-native.log
+          # CT231: preregistered single-large-prime pair elimination and
+          # complete recovered source-target control, not a performance claim.
+          cargo test --locked --release --test ct226_native_genus4_transferred_ic ct231_ -- --nocapture 2>&1 | tee /tmp/ct231-native.log
+          test "$(grep -c 'CT231_PANEL_JSON' /tmp/ct231-native.log)" -eq 4
+          grep 'CT231_PANEL_JSON' /tmp/ct231-native.log
+          # CT233: exact weighted 2LP graph + fresh Q73 native source-target gate.
+          cargo test --locked --release --test ct226_native_genus4_transferred_ic ct233_ -- --nocapture 2>&1 | tee /tmp/ct233-native.log
+          test "$(grep -c 'CT233_PANEL_JSON' /tmp/ct233-native.log)" -eq 4
+          grep 'CT233_PANEL_JSON' /tmp/ct233-native.log
+          # CT235: Q73-only four-round ABBA/BAAB paired cold complete source solver.
+          # This does NOT assert matched rho/frontier-IC or a speedup.
+          cargo test --locked --release --test ct226_native_genus4_transferred_ic ct235_ -- --nocapture --test-threads=1 2>&1 | tee /tmp/ct235-native.log
+          test "$(grep -c 'CT235_SINGLE_JSON' /tmp/ct235-native.log)" -eq 16
+          grep 'CT235_SINGLE_JSON' /tmp/ct235-native.log

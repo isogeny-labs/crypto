@@ -1,0 +1,84 @@
+{
+  "algorithm": "exact generic 4+4 signed point-sum MITM, not index calculus",
+  "all_256_masks_replayed": 256,
+  "all_mask_distinct_group_points": 256,
+  "all_mask_total_probes": 2176,
+  "base_x": [
+    0,
+    1,
+    2,
+    3,
+    5,
+    6,
+    8,
+    9
+  ],
+  "blinded_distinct_secret_labels_test_only": 1024,
+  "blinded_hits": 0,
+  "blinded_online_group_additions": 16384,
+  "blinded_online_wall_ns": "4321917",
+  "blinded_public_targets": 1024,
+  "blinded_seed": "0x42384d49544d3236",
+  "blinded_total_probes": 16384,
+  "complete_unknown_prime31_logs": 0,
+  "curve_a": 847514846,
+  "curve_b": 2087444724,
+  "fixed_cases": [
+    {
+      "found": true,
+      "label": "fixed_positive",
+      "mask": 0,
+      "probes": 1,
+      "query_group_additions": 1,
+      "query_wall_ns": "459",
+      "r": [
+        1911579686,
+        548820096
+      ],
+      "witness_replayed": true
+    },
+    {
+      "found": false,
+      "label": "fixed_off_support_1",
+      "mask": null,
+      "probes": 16,
+      "query_group_additions": 16,
+      "query_wall_ns": "3667",
+      "r": [
+        625037715,
+        2100627251
+      ],
+      "witness_replayed": false
+    },
+    {
+      "found": false,
+      "label": "fixed_off_support_2",
+      "mask": null,
+      "probes": 16,
+      "query_group_additions": 16,
+      "query_wall_ns": "3375",
+      "r": [
+        1923055775,
+        307731458
+      ],
+      "witness_replayed": false
+    }
+  ],
+  "is_nongeneric_extraction": false,
+  "left_table_entries": 16,
+  "n": 2147446831,
+  "p": 2147483647,
+  "pcc": "unverified",
+  "precompute_group_additions": 128,
+  "precompute_wall_ns": "25584",
+  "public_only_query": true,
+  "reuses_original_native_rust": true,
+  "right_table_distinct_points": 16,
+  "rr9_chart_fixed_negative_1": 0,
+  "rr9_chart_fixed_negative_2": 0,
+  "rr9_chart_fixed_positive": 1,
+  "rr9_chart_negative_1_256mask_wall_ns": "226500",
+  "rr9_chart_negative_2_256mask_wall_ns": "227709",
+  "rr9_chart_positive_256mask_wall_ns": "235875",
+  "schema": "prime31.rr9.b8-generic-mitm-control.v1"
+}

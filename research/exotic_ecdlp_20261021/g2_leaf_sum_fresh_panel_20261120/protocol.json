@@ -1,0 +1,72 @@
+{
+  "combined_output_cap_bytes": 20971520,
+  "flags": [
+    "-g",
+    "2",
+    "-t",
+    "1",
+    "-v",
+    "2",
+    "-m",
+    "256"
+  ],
+  "flint": {
+    "library_directory": "/opt/homebrew/Cellar/flint/3.6.0/lib",
+    "library_path": "/opt/homebrew/Cellar/flint/3.6.0/lib/libflint.24.0.dylib",
+    "sha256": "9dcc2966abb20d94641a704c848d07f57549169c11265e97fc41593ddb0fe445"
+  },
+  "msolve": {
+    "path": "/opt/homebrew/Cellar/msolve/0.11.0/bin/msolve",
+    "sha256": "ebeecabcd328d313e49ec11515f23ad1dfa4b81c497ae1bfef8f60f84e951819",
+    "version": "0.11.0"
+  },
+  "observed_peak_rss_gate_bytes": 1073741824,
+  "preparer_sha256": "81b4b0321e04fdcaeeba6649889bfe29574fafdd98080ce384263581f5710762",
+  "query_indices": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "run_order_rule": "control then leaf_sum for even query index, leaf_sum then control for odd",
+  "runner_sha256": "ff8df3645ad72f38ff4c03df7e15afa23fd6df2120f279e05f5b622098bab43e",
+  "sage_runtime_sha256": "073ca37250b100a7f961de3475da8a4d489f3f2140c15f4c72457816893f3f01",
+  "singleton_index": 2,
+  "sources": {
+    "algebra": {
+      "path": "/Volumes/SSD990/cryptanalysis/experiments/g2-n31-invariant-base-20261009/algebra.json",
+      "sha256": "bfbfe636496f897aa712cb9cdd33128643c97151913f59c717c40b5d9e46b36e"
+    },
+    "boolean_core": {
+      "path": "/Volumes/SSD990/cryptanalysis/experiments/ic-ideas-20261007/boolean_core.py",
+      "sha256": "db32d83571670a032d1487cc697e54bf2b3dc8e977d1a8f50c0c7dc8acad1484"
+    },
+    "old_control": {
+      "path": "/Volumes/SSD990/cryptanalysis/experiments/g2-n31-ordinary-residual-f4-r2-20261010/slice.ms",
+      "sha256": "53839cd5d2834097266db7a557d2dbdd328bf402740677bd2a24660c1e704ba2"
+    },
+    "old_sum": {
+      "path": "/Volumes/SSD990/cryptanalysis/experiments/g2-n31-ordinary-residual-sum-coordinate-20261010/sum_coordinate.ms",
+      "sha256": "cd4f13954d342cae5592921000ee3e91ab5cbd0081751dc8650296cb7487e1aa"
+    },
+    "relations": {
+      "path": "/Volumes/SSD990/cryptanalysis/experiments/g2-n31-group-relations-20261009/relations.json",
+      "sha256": "2c86cbf46a4b0ff7ba0681a412c5c83bc0db3d8876665eb3e136e7cfda5f8eba"
+    },
+    "sage_probes": {
+      "path": "/Volumes/SSD990/cryptanalysis/experiments/ic-ideas-20261007/sage_probes.py",
+      "sha256": "19012fbce4e6ca4a84c21a58051393ffb80427a8a60bfc079874c8fe56595635"
+    },
+    "solver_monitor": {
+      "path": "/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/g2_sparse_equation_basis_20261120/run_solver.py",
+      "sha256": "77c00b909ae912a7e331e293f981a827f43f713463d5ce63e0383255c12b0516"
+    },
+    "sum_builder": {
+      "path": "/Volumes/SSD990/cryptanalysis/experiments/g2-n31-ordinary-residual-sum-coordinate-20261010/build.py",
+      "sha256": "00b93ed65b2bfee8978630c676616246e3f07c82abb1a3d920e8d95bf2803b16"
+    }
+  },
+  "status": "frozen",
+  "wall_cap_seconds_per_arm": 300
+}

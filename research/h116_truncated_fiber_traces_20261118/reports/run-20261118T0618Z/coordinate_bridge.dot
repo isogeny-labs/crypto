@@ -1,0 +1,22 @@
+digraph H116CoordinateBridge {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.35", ranksep="0.42", newrank=true];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, margin="0.10,0.07"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#475569"];
+
+  curve [label="short-Weierstrass curve\nx=z^-2 q^-1", fillcolor="#dbeafe", color="#2563eb"];
+  fixed [label="q=1+A z^4 q^2+B z^6 q^3\nLean proved · native 5/5", fillcolor="#dcfce7", color="#16a34a"];
+  scale [label="(A,B)->(a^4 A,a^6 B)\nq_target(z)=q_source(a z)\nLean proved · native 5/5", fillcolor="#dcfce7", color="#16a34a"];
+  subst [label="double substitution + pole\ncomplete x-ratio prefix\nLean proved · native 5/5", fillcolor="#dcfce7", color="#16a34a"];
+  local [label="derive local parameters from\nV+pi=[t], pi, formal subtraction\nOPEN", fillcolor="#fef3c7", color="#d97706"];
+  jet [label="identify retained recurrence jet\nthen exact digit predicate\nNEXT", fillcolor="#f1f5f9", color="#64748b"];
+  controls [label="negative controls\nwrong scaling 0/5 accepted\nwrong parameter 0/5 accepted", fillcolor="#fee2e2", color="#dc2626"];
+
+  { rank=same; curve; fixed; scale; }
+  { rank=same; subst; local; jet; }
+  curve -> fixed -> scale;
+  scale -> subst;
+  subst -> local -> jet;
+  controls -> scale [style=dashed, label="first difference 4"];
+  controls -> subst [style=dashed, label="first difference 4"];
+}
+
