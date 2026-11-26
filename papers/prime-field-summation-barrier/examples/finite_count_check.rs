@@ -179,4 +179,18 @@ fn audited_indexing_family_small_arity_fractions() {
     }
 }
 
+#[test]
+fn prime_cyclic_groups_have_no_smaller_nontrivial_homomorphic_bucket() {
+    for prime_order in [5_u128, 7, 11, 13, 17, 19] {
+        for bucket_order in 1..prime_order {
+            // A homomorphism Z/nZ -> Z/hZ is determined by the image of 1,
+            // which must satisfy n*a = 0 modulo h.  Coprimality forces a=0.
+            let valid_images = (0..bucket_order)
+                .filter(|image| (prime_order * image) % bucket_order == 0)
+                .count();
+            assert_eq!(valid_images, 1);
+        }
+    }
+}
+
 fn main() {}

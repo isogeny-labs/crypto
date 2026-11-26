@@ -44,6 +44,7 @@ The status of the program is:
 | Theorem 18 | unconditional in the stated static-provenance model | product-tree preprocessing plus fully adaptive query branching |
 | Proposition 19 | exact reduction plus literature audit | split-tree recovery is group \(k\)SUM-Indexing; current indexing upper bounds remain above one-half after relation accounting |
 | Theorem 20 | exact exponent criterion | piecewise sub-rho conditions for preprocessing exponent \(s\) and amortized batch-query exponent \(t\) |
+| Theorem 21 | unconditional quotient obstruction | exact homomorphic buckets, affine algebraic-group linearizations, and low-degree isogeny quotients cannot compress the prime-order subgroup |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1667,6 +1668,57 @@ Dinur--Golovnev family all remain on the non-sub-rho side; the last lies in the
 first branch and has \(s+t=m+1/2\).  A barrier theorem may therefore prove the
 corresponding piecewise inequalities for an explicitly closed elliptic
 group-indexing model. [pcc:unverified]
+
+### Theorem 21 (no proper exact homomorphic bucket quotient)
+
+Let \(G\subseteq E(\mathbb F_p)\) be cyclic of prime order \(n\), and let
+\(\psi:G\to H\) be a group homomorphism used as an exact bucket label for
+partial sums.  Then exactly one of the following holds:
+
+1. \(\psi\) is trivial, so the compatibility test
+   \(\psi(A)+\psi(B)=\psi(T)\) rejects no candidate pair; or
+2. \(\psi\) is injective, so \(|H|\ge n\) and the label distinguishes every
+   element of \(G\).
+
+In particular there is no nontrivial exact homomorphic bucket map from \(G\)
+to a group of size \(o(n)\).
+
+Two algebraic consequences hold.
+
+- Every algebraic-group morphism from the elliptic curve \(E\) to
+  \(\mathbb G_a\) or \(\mathbb G_m\) is trivial.  Thus no global rational
+  parameter that is regular everywhere can transport elliptic addition to
+  field addition or multiplication and simultaneously supply a smaller exact
+  convolution domain.
+- If \(\phi:E\to E'\) is an isogeny of degree \(d<n\), then
+  \(\phi|_G\) is injective.  Hence a bounded- or sub-\(n\)-degree isogeny does
+  not merge prime-order factor-base sums into smaller exact buckets.  Any
+  isogeny whose kernel contains \(G\) has degree at least \(n\).
+
+#### Proof
+
+The kernel of \(\psi\) is a subgroup of the prime-order group \(G\), hence is
+either \(\{O\}\) or \(G\).  These are respectively the injective and trivial
+cases.  An injective map forces \(|H|\ge n\).
+
+A morphism \(E\to\mathbb G_a\) is a global regular function on the proper
+geometrically integral curve \(E\), hence is constant.  The same is true for
+a morphism \(E\to\mathbb G_m\), since composing with
+\(\mathbb G_m\hookrightarrow\mathbb A^1\) is a global regular function.
+A constant group morphism is the identity element.
+
+Finally, \(\ker(\phi)\cap G\) is again either \(\{O\}\) or \(G\).  In the
+second case the kernel scheme has at least \(n\) distinct geometric points,
+so \(\deg\phi\ge n\).  Therefore \(d<n\) forces trivial intersection and
+injectivity on \(G\). \(\square\)
+
+This theorem rules out exact additive/multiplicative coset labels,
+globally compatible rational linearizations, and low-degree isogeny fibres as
+the missing compact generator.  It does not cover non-homomorphic hashing,
+one-sided filters with false positives, target-dependent rational functions,
+or data structures that exploit coordinates without preserving addition.
+Those mechanisms remain inside the indexing boundary of Proposition 19.
+[pcc:unverified]
 
 ### Exact remaining computational gap
 
