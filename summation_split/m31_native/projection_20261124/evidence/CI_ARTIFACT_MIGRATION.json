@@ -1,0 +1,99 @@
+{
+  "schema": "m31-projection-github-ci-snapshot/v1",
+  "source_commit": "9ce6aa69200ad155e5512d11e04b27c628f8fc56",
+  "run_id": 45441435994,
+  "job_id": 138613342662,
+  "url": "https://github.com/isogeny-labs/crypto/actions/runs/45441435994/job/138613342662",
+  "name": "migrate",
+  "conclusion": "failure",
+  "steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 1
+    },
+    {
+      "name": "Require a push token that starts CI on the new commit",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 2
+    },
+    {
+      "name": "Checkout trusted artifact tool and policy",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 3
+    },
+    {
+      "name": "Checkout prefetch helper from the workflow revision",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 4
+    },
+    {
+      "name": "Checkout exact PR head without data blobs",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 5
+    },
+    {
+      "name": "Require the trusted artifact destination and policy",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 6
+    },
+    {
+      "name": "Prefetch changed Git blobs in bounded batches",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 7
+    },
+    {
+      "name": "Upload changed data and replay remote bytes",
+      "status": "completed",
+      "conclusion": "failure",
+      "number": 8
+    },
+    {
+      "name": "Commit pointers and remove tracked data from the PR branch",
+      "status": "completed",
+      "conclusion": "skipped",
+      "number": 9
+    },
+    {
+      "name": "Post Checkout exact PR head without data blobs",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 16
+    },
+    {
+      "name": "Post Checkout prefetch helper from the workflow revision",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 17
+    },
+    {
+      "name": "Post Checkout trusted artifact tool and policy",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 18
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 19
+    }
+  ],
+  "log_excerpts": [
+    "2026-11-24T16:49:13.7124576Z artifacts: head-object store/sha256/a6/a61cf6887d76c675608f5d4f5b2e71aebf9cbb556c6ce7abd797adbde81cd800: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)",
+    "2026-11-24T16:49:13.7326798Z ##[error]Process completed with exit code 2."
+  ],
+  "interpretation": "S3 HeadObject returned 403 for the earlier preserved prepared-input archive. The response alone does not distinguish an inaccessible object from an absent key without list access. No artifact pointer commit occurred in this job.",
+  "other_observed_check": {
+    "name": "review",
+    "conclusion": "skipped"
+  },
+  "full_ci_pass": false
+}

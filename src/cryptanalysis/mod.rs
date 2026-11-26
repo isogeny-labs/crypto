@@ -388,6 +388,7 @@ pub mod prime_root_trace;
 pub mod prime_signed_mitm;
 pub mod prime_small_x;
 pub mod prime_summation_roots;
+pub mod prime_swu_sym;
 pub mod q_curve;
 pub mod quantum_estimator;
 pub mod quartic_folds;

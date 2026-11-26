@@ -14,7 +14,7 @@ use crate::cryptanalysis::{
     },
 };
 use num_bigint::BigUint;
-use std::{collections::BTreeMap, time::Instant};
+use std::{collections::BTreeMap, sync::OnceLock, time::Instant};
 
 #[derive(Clone, Debug, Default)]
 pub struct TraceZeroLinearizedReport {
@@ -32,6 +32,127 @@ pub struct TraceZeroLinearizedReport {
 }
 
 type WordMask = [u64; 3];
+
+/// Direct addressing for small polynomial-coordinate windows, with the general
+/// ordered dictionary retained for arbitrary factor bases. Both expose keys in
+/// exactly the original lexicographic order and retain every supplied index.
+enum BaseIndex {
+    Dense(Vec<IndexBucket>),
+    Tree(BTreeMap<WordMask, Vec<usize>>),
+}
+#[derive(Clone)]
+enum IndexBucket {
+    Inline { len: usize, ids: [usize; 2] },
+    Spill(Vec<usize>),
+}
+impl IndexBucket {
+    const EMPTY: Self = Self::Inline {
+        len: 0,
+        ids: [0; 2],
+    };
+    #[inline]
+    fn as_slice(&self) -> &[usize] {
+        match self {
+            Self::Inline { len, ids } => &ids[..*len],
+            Self::Spill(ids) => ids,
+        }
+    }
+    #[inline]
+    fn push(&mut self, i: usize) {
+        match self {
+            Self::Inline { len, ids } if *len < 2 => {
+                ids[*len] = i;
+                *len += 1;
+            }
+            Self::Inline { ids, .. } => {
+                let mut out = Vec::with_capacity(4);
+                out.extend_from_slice(ids);
+                out.push(i);
+                *self = Self::Spill(out);
+            }
+            Self::Spill(ids) => ids.push(i),
+        }
+    }
+}
+enum BaseEntry<'a> {
+    Dense(&'a mut IndexBucket),
+    Tree(std::collections::btree_map::Entry<'a, WordMask, Vec<usize>>),
+}
+impl BaseIndex {
+    fn new(base: &[BinaryPoint]) -> Self {
+        if base.len() >= 64 {
+            let maximum = base.iter().try_fold(0u64, |maximum, p| {
+                let BinaryPoint::Affine { x, .. } = p else {
+                    return None;
+                };
+                let bits = x.raw_bits();
+                let low = bits.first().copied().unwrap_or(0);
+                (low < 65536 && bits.iter().skip(1).all(|&w| w == 0)).then_some(maximum.max(low))
+            });
+            if let Some(maximum) = maximum {
+                let slots = (maximum as usize + 1).next_power_of_two();
+                // Bound empty-bucket storage as well as the coordinate width.
+                if slots <= base.len().saturating_mul(8) {
+                    return Self::Dense(vec![IndexBucket::EMPTY; slots]);
+                }
+            }
+        }
+        Self::Tree(BTreeMap::new())
+    }
+    #[inline]
+    fn entry(&mut self, key: WordMask) -> BaseEntry<'_> {
+        match self {
+            Self::Dense(buckets) => {
+                debug_assert_eq!((key[0], key[1]), (0, 0));
+                BaseEntry::Dense(&mut buckets[key[2] as usize])
+            }
+            Self::Tree(tree) => BaseEntry::Tree(tree.entry(key)),
+        }
+    }
+    #[inline]
+    fn get(&self, key: &WordMask) -> Option<&[usize]> {
+        match self {
+            Self::Dense(buckets) => {
+                if key[0] != 0 || key[1] != 0 || key[2] >= buckets.len() as u64 {
+                    return None;
+                }
+                let ids = buckets[key[2] as usize].as_slice();
+                (!ids.is_empty()).then_some(ids)
+            }
+            Self::Tree(tree) => tree.get(key).map(Vec::as_slice),
+        }
+    }
+    fn keys(&self) -> Vec<WordMask> {
+        match self {
+            Self::Dense(buckets) => buckets
+                .iter()
+                .enumerate()
+                .filter(|(_, ids)| !ids.as_slice().is_empty())
+                .map(|(x, _)| [0, 0, x as u64])
+                .collect(),
+            Self::Tree(tree) => tree.keys().copied().collect(),
+        }
+    }
+}
+impl BaseEntry<'_> {
+    #[inline]
+    fn first(&self) -> Option<usize> {
+        match self {
+            Self::Dense(ids) => ids.as_slice().first().copied(),
+            Self::Tree(std::collections::btree_map::Entry::Occupied(entry)) => {
+                entry.get().first().copied()
+            }
+            Self::Tree(std::collections::btree_map::Entry::Vacant(_)) => None,
+        }
+    }
+    #[inline]
+    fn push(self, i: usize) {
+        match self {
+            Self::Dense(ids) => ids.push(i),
+            Self::Tree(entry) => entry.or_default().push(i),
+        }
+    }
+}
 
 fn words(x: &F2mElement) -> WordMask {
     let mut a = [0; 3];
@@ -117,13 +238,14 @@ impl AdjointMap {
     }
 }
 
-/// Four-bit combination tables for the first sixteen projected equations.
+/// Byte combination tables for the first sixteen projected equations.
 /// Four 16-bit coefficient rows share each word; RHS bits remain separate.
 /// This evaluates the existing F2-linear maps, without changing their order.
 struct PackedRowMap {
     coefficients: Vec<[u64; 4]>,
     rhs: Vec<u16>,
     rows: usize,
+    bits: usize,
 }
 impl PackedRowMap {
     fn new(equations: &[Vec<WordMask>], rhs: &[WordMask], n: u32) -> Option<Self> {
@@ -132,14 +254,16 @@ impl PackedRowMap {
             return None;
         }
         let rows = equations.len().min(16);
-        let groups = (n as usize).div_ceil(4);
-        let mut coefficients = vec![[0; 4]; groups * 16];
-        let mut rhs_table = vec![0u16; groups * 16];
+        let bits = if n <= 96 { 4 } else { 8 };
+        let entries = 1usize << bits;
+        let groups = (n as usize).div_ceil(bits);
+        let mut coefficients = vec![[0; 4]; groups * entries];
+        let mut rhs_table = vec![0u16; groups * entries];
         for group in 0..groups {
-            let mut basis = [[0u64; 4]; 4];
-            let mut rhs_basis = [0u16; 4];
-            for b in 0..4 {
-                let bit = group * 4 + b;
+            let mut basis = [[0u64; 4]; 8];
+            let mut rhs_basis = [0u16; 8];
+            for b in 0..bits {
+                let bit = group * bits + b;
                 if bit >= n as usize {
                     continue;
                 }
@@ -151,35 +275,163 @@ impl PackedRowMap {
                     rhs_basis[b] |= (((rhs[row][bit / 64] >> (bit % 64)) & 1) as u16) << row;
                 }
             }
-            for value in 1usize..16 {
-                let prev = group * 16 + (value & (value - 1));
+            for value in 1usize..entries {
+                let prev = group * entries + (value & (value - 1));
                 let b = value.trailing_zeros() as usize;
-                coefficients[group * 16 + value] =
+                coefficients[group * entries + value] =
                     std::array::from_fn(|i| coefficients[prev][i] ^ basis[b][i]);
-                rhs_table[group * 16 + value] = rhs_table[prev] ^ rhs_basis[b];
+                rhs_table[group * entries + value] = rhs_table[prev] ^ rhs_basis[b];
             }
         }
         Some(Self {
             coefficients,
             rhs: rhs_table,
             rows,
+            bits,
         })
     }
     fn evaluate(&self, z: WordMask, target: WordMask) -> ([u64; 4], u16) {
+        if self.bits == 4 && self.coefficients.len() == 21 * 16 {
+            return self.evaluate_fixed::<4, 21>(z, target);
+        }
+        if self.bits == 8 && self.coefficients.len() == 17 * 256 {
+            return self.evaluate_fixed::<8, 17>(z, target);
+        }
+        if self.bits == 4 {
+            self.evaluate_bits::<4>(z, target)
+        } else {
+            self.evaluate_bits::<8>(z, target)
+        }
+    }
+    #[inline(always)]
+    fn evaluate_fixed<const BITS: usize, const GROUPS: usize>(
+        &self,
+        z: WordMask,
+        target: WordMask,
+    ) -> ([u64; 4], u16) {
+        let entries = 1usize << BITS;
+        debug_assert_eq!(self.coefficients.len(), GROUPS * entries);
+        debug_assert_eq!(self.rhs.len(), GROUPS * entries);
         let mut coefficients = [0; 4];
         let mut rhs = 0;
-        for (group, table) in self.coefficients.chunks_exact(16).enumerate() {
-            let shift = (group % 16) * 4;
-            let zi = ((z[group / 16] >> shift) & 15) as usize;
-            let ti = ((target[group / 16] >> shift) & 15) as usize;
-            let c = table[zi];
+        for group in 0..GROUPS {
+            let shift = (group % (64 / BITS)) * BITS;
+            let zi = ((z[group / (64 / BITS)] >> shift) as usize) & (entries - 1);
+            let ti = ((target[group / (64 / BITS)] >> shift) as usize) & (entries - 1);
+            // SAFETY: private constructor makes equal-length tables. The
+            // selected fixed layout has GROUPS groups; each index<entries.
+            let c = unsafe { self.coefficients.get_unchecked(group * entries + zi) };
             for i in 0..4 {
                 coefficients[i] ^= c[i];
             }
-            rhs ^= self.rhs[group * 16 + ti];
+            rhs ^= unsafe { *self.rhs.get_unchecked(group * entries + ti) };
         }
         (coefficients, rhs)
     }
+    #[inline]
+    fn evaluate_bits<const BITS: usize>(&self, z: WordMask, target: WordMask) -> ([u64; 4], u16) {
+        let mut coefficients = [0; 4];
+        let mut rhs = 0;
+        let entries = 1usize << BITS;
+        let groups_per_word = 64 / BITS;
+        // Extract each field word once; only the last word may have fewer
+        // than eight byte tables. No dynamic field-word index per byte.
+        for (word, tables) in self
+            .coefficients
+            .chunks(groups_per_word * entries)
+            .enumerate()
+        {
+            let mut zi = z[word];
+            let mut ti = target[word];
+            for (group, table) in tables.chunks_exact(entries).enumerate() {
+                let c = table[(zi as usize) & (entries - 1)];
+                for i in 0..4 {
+                    coefficients[i] ^= c[i];
+                }
+                rhs ^= self.rhs
+                    [(word * groups_per_word + group) * entries + ((ti as usize) & (entries - 1))];
+                zi >>= BITS;
+                ti >>= BITS;
+            }
+        }
+        (coefficients, rhs)
+    }
+}
+
+/// Eliminate a packed prefix in original row order. Each inserted pivot is
+/// applied to every later row in parallel; already-consumed lanes may change
+/// because their original pivots have been saved. Rank and the first
+/// contradiction/full-rank index are the same as sequential elimination.
+#[cfg(target_arch = "x86_64")]
+unsafe fn eliminate_packed_prefix(
+    coefficients: [u64; 4],
+    targets: u16,
+    width: usize,
+    rows: usize,
+    pivots: &mut [u64; 64],
+) -> (usize, usize, bool) {
+    use std::arch::x86_64::*;
+    debug_assert!(width < 16 && rows <= 16);
+    let zero = _mm_setzero_si128();
+    let rhs = _mm_set1_epi16((1u16 << width) as i16);
+    let t = _mm_set1_epi16(targets as i16);
+    let mask0 = _mm_setr_epi16(1, 2, 4, 8, 16, 32, 64, 128);
+    let mask1 = _mm_setr_epi16(256, 512, 1024, 2048, 4096, 8192, 16384, -32768);
+    let mut lo = _mm_xor_si128(
+        _mm_loadu_si128(coefficients.as_ptr().cast()),
+        _mm_andnot_si128(_mm_cmpeq_epi16(_mm_and_si128(t, mask0), zero), rhs),
+    );
+    let mut hi = _mm_xor_si128(
+        _mm_loadu_si128(coefficients.as_ptr().add(2).cast()),
+        _mm_andnot_si128(_mm_cmpeq_epi16(_mm_and_si128(t, mask1), zero), rhs),
+    );
+    let coefficient_mask = (1u64 << width) - 1;
+    let mut rank = 0;
+    macro_rules! consume {
+        ($j:literal, $v:ident, $lane:literal $(, $pending:ident)*) => {{
+            if $j >= rows {
+                return (rank, rows, false);
+            }
+            let row = _mm_extract_epi16::<$lane>($v) as u64;
+            let c = row & coefficient_mask;
+            if c == 0 {
+                if row >> width != 0 {
+                    return (rank, $j + 1, true);
+                }
+            } else {
+                let bit = 63 - c.leading_zeros() as usize;
+                pivots[bit] = row;
+                rank += 1;
+                if rank == width {
+                    return (rank, $j + 1, false);
+                }
+                // Only registers with unconsumed rows need propagation.
+                $(
+                    let bitmask = _mm_set1_epi16((1u16 << bit) as i16);
+                    let pivot = _mm_set1_epi16(row as i16);
+                    let mask = _mm_cmpeq_epi16(_mm_and_si128($pending, bitmask), bitmask);
+                    $pending = _mm_xor_si128($pending, _mm_and_si128(mask, pivot));
+                )*
+            }
+        }};
+    }
+    consume!(0, lo, 0, lo, hi);
+    consume!(1, lo, 1, lo, hi);
+    consume!(2, lo, 2, lo, hi);
+    consume!(3, lo, 3, lo, hi);
+    consume!(4, lo, 4, lo, hi);
+    consume!(5, lo, 5, lo, hi);
+    consume!(6, lo, 6, lo, hi);
+    consume!(7, lo, 7, hi);
+    consume!(8, hi, 0, hi);
+    consume!(9, hi, 1, hi);
+    consume!(10, hi, 2, hi);
+    consume!(11, hi, 3, hi);
+    consume!(12, hi, 4, hi);
+    consume!(13, hi, 5, hi);
+    consume!(14, hi, 6, hi);
+    consume!(15, hi, 7);
+    (rank, rows, false)
 }
 
 #[cfg_attr(test, derive(Debug, PartialEq, Eq))]
@@ -200,6 +452,9 @@ struct ProductProjection {
     halves: Vec<F2mElement>,
     w_support: WordMask,
     row_map: Option<PackedRowMap>,
+    half_combinations: Vec<[[u64; 3]; 16]>,
+    tail_equations: OnceLock<Vec<Vec<WordMask>>>,
+    adjoint: bool,
 }
 impl ProductProjection {
     fn reduce_with(pivots: &[(usize, WordMask)], mut a: WordMask) -> WordMask {
@@ -259,7 +514,8 @@ impl ProductProjection {
                     .expect("odd field")
             })
             .collect();
-        let mut equations = vec![vec![[0; 3]; xs.len() + 1]; coordinates.len()];
+        let eager_rows = coordinates.len().min(16);
+        let mut equations = vec![vec![[0; 3]; xs.len() + 1]; eager_rows];
         if let Some(map) = adjoint.then(|| AdjointMap::new(c)).flatten() {
             for (row, mask) in equations.iter_mut().zip(&rhs) {
                 let numerator = map.forward(*mask);
@@ -272,7 +528,7 @@ impl ProductProjection {
                 let mut multiple = words(h);
                 for bit in 0..c.m as usize {
                     let image = Self::reduce_with(&pivots, multiple);
-                    for (j, &coord) in coordinates.iter().enumerate() {
+                    for (j, &coord) in coordinates.iter().take(eager_rows).enumerate() {
                         if image[coord / 64] & (1u64 << (coord % 64)) != 0 {
                             equations[j][i][bit / 64] |= 1u64 << (bit % 64);
                         }
@@ -291,6 +547,19 @@ impl ProductProjection {
             }
         }
         let row_map = PackedRowMap::new(&equations, &rhs, c.m);
+        let half_combinations = halves
+            .chunks(4)
+            .map(|chunk| {
+                let mut table = [[0; 3]; 16];
+                for value in 1usize..16 {
+                    let bit = value.trailing_zeros() as usize;
+                    let image = chunk.get(bit).map(words).unwrap_or([0; 3]);
+                    let previous = table[value & (value - 1)];
+                    table[value] = std::array::from_fn(|i| previous[i] ^ image[i]);
+                }
+                table
+            })
+            .collect();
         Self {
             equations,
             rhs,
@@ -298,6 +567,9 @@ impl ProductProjection {
             halves,
             w_support,
             row_map,
+            half_combinations,
+            tail_equations: OnceLock::new(),
+            adjoint,
         }
     }
 
@@ -326,86 +598,164 @@ impl ProductProjection {
         let zw = z;
         let offset = field.add(y, field.mul(z, field.half(z)));
         let target = offset;
-        let packed = self.row_map.as_ref().map(|m| m.evaluate(zw, target));
-        for (j, (columns, rhs)) in self.equations.iter().zip(&self.rhs).enumerate() {
-            let mut row =
-                if let (Some(map), Some((coefficients, targets))) = (&self.row_map, &packed) {
-                    if j < map.rows {
-                        ((coefficients[j / 4] >> ((j % 4) * 16)) & 0xffff)
-                            | (((targets >> j) & 1) as u64) << width
-                    } else {
-                        columns
-                            .iter()
-                            .enumerate()
-                            .fold(parity(rhs, &target) << width, |r, (i, col)| {
-                                r | (parity(col, &zw) << i)
-                            })
+        // Keep packed lookup and the generic parity fallback in separate
+        // loops; no repeated Option/zip/row-map branch in the hot prefix.
+        macro_rules! insert_row {
+            ($row:expr, $j:expr) => {{
+                let mut row = $row;
+                loop {
+                    let coefficients = row & coefficient_mask;
+                    if coefficients == 0 {
+                        if row >> width != 0 {
+                            return (ProjectedResult::Inconsistent, $j + 1);
+                        }
+                        break;
                     }
-                } else {
-                    columns
-                        .iter()
-                        .enumerate()
-                        .fold(parity(rhs, &target) << width, |r, (i, col)| {
-                            r | (parity(col, &zw) << i)
-                        })
+                    let bit = 63 - coefficients.leading_zeros() as usize;
+                    if pivots[bit] == 0 {
+                        pivots[bit] = row;
+                        rank += 1;
+                        break;
+                    }
+                    row ^= pivots[bit];
+                }
+                if rank == width {
+                    return self.finish_unique(xs, c, zw, offset, field, &pivots, $j + 1);
+                }
+            }};
+        }
+        let packed_rows = if let Some(map) = &self.row_map {
+            let (coefficients, mut targets) = map.evaluate(zw, target);
+            let mut consumed_by_vector = false;
+            #[cfg(target_arch = "x86_64")]
+            if width < 16 {
+                // SAFETY: SSE2 is mandatory on x86-64; four words contain
+                // exactly sixteen16-bit lanes, width<16 and map.rows<=16.
+                let (head_rank, used, inconsistent) = unsafe {
+                    eliminate_packed_prefix(coefficients, targets, width, map.rows, &mut pivots)
                 };
-            loop {
-                let coefficients = row & coefficient_mask;
-                if coefficients == 0 {
-                    if row >> width != 0 {
-                        return (ProjectedResult::Inconsistent, j + 1);
-                    }
-                    break;
+                if inconsistent {
+                    return (ProjectedResult::Inconsistent, used);
                 }
-                let bit = 63 - coefficients.leading_zeros() as usize;
-                if pivots[bit] == 0 {
-                    pivots[bit] = row;
-                    rank += 1;
-                    break;
+                rank = head_rank;
+                if rank == width {
+                    return self.finish_unique(xs, c, zw, offset, field, &pivots, used);
                 }
-                row ^= pivots[bit];
+                consumed_by_vector = true;
             }
-            if rank == width {
-                // These independent rows force one coefficient vector. Check
-                // ALL remaining W conditions with one exact remainder test.
-                let mut solution = 0u64;
-                for (i, &pivot) in pivots.iter().enumerate().take(width) {
-                    if ((pivot >> width) ^ ((pivot & solution).count_ones() as u64)) & 1 != 0 {
-                        solution |= 1u64 << i;
+            if !consumed_by_vector {
+                for j in 0..map.rows {
+                    let row = ((coefficients[j / 4] >> ((j % 4) * 16)) & 0xffff)
+                        | (((targets & 1) as u64) << width);
+                    targets >>= 1;
+                    insert_row!(row, j);
+                }
+            }
+            map.rows
+        } else {
+            0
+        };
+        for j in packed_rows..self.equations.len() {
+            let row = self.equations[j]
+                .iter()
+                .enumerate()
+                .fold(parity(&self.rhs[j], &target) << width, |r, (i, col)| {
+                    r | (parity(col, &zw) << i)
+                });
+            insert_row!(row, j);
+        }
+        let start = self.equations.len();
+        for (index, columns) in self.coefficient_tail(c, field).iter().enumerate() {
+            let j = start + index;
+            let row = columns
+                .iter()
+                .enumerate()
+                .fold(parity(&self.rhs[j], &target) << width, |r, (i, col)| {
+                    r | (parity(col, &zw) << i)
+                });
+            insert_row!(row, j);
+        }
+        (ProjectedResult::Deficient, self.rhs.len())
+    }
+    /// Only rank-deficient prefixes need further coefficient maps. The exact
+    /// W remainder in finish_unique already checks all omitted coordinates.
+    fn coefficient_tail(&self, c: &BinaryCurve, field: &WordField) -> &Vec<Vec<WordMask>> {
+        self.tail_equations.get_or_init(|| {
+            let masks = &self.rhs[self.equations.len()..];
+            let mut rows = vec![vec![[0; 3]; self.halves.len() + 1]; masks.len()];
+            if let Some(map) = self.adjoint.then(|| AdjointMap::new(c)).flatten() {
+                for (row, mask) in rows.iter_mut().zip(masks) {
+                    let numerator = map.forward(*mask);
+                    for (i, h) in self.halves.iter().enumerate() {
+                        row[i] = map.inverse(field.mul(numerator, words(h)));
                     }
                 }
-                let mut h = if solution & (1u64 << xs.len()) != 0 {
-                    [1, 0, 0]
-                } else {
-                    [0; 3]
-                };
-                for (i, hi) in self.halves.iter().enumerate() {
-                    if solution & (1u64 << i) != 0 {
-                        h = field.add(h, words(hi));
+            } else {
+                for (i, h) in self.halves.iter().enumerate() {
+                    let mut multiple = words(h);
+                    for bit in 0..c.m as usize {
+                        for (row, mask) in rows.iter_mut().zip(masks) {
+                            row[i][bit / 64] |= parity(mask, &multiple) << (bit % 64);
+                        }
+                        multiple = field.times_x(multiple);
                     }
                 }
-                let product_words = field.add(offset, field.mul(z, h));
-                if product_words
-                    .iter()
-                    .zip(&self.w_support)
-                    .any(|(v, s)| *v & !*s != 0)
-                    || Self::reduce_with(&self.w_pivots, product_words) != [0; 3]
-                {
-                    return (ProjectedResult::Inconsistent, j + 1);
-                }
-                let mut u = F2mElement::zero(c.m);
-                for (i, x) in xs.iter().enumerate() {
-                    if solution & (1u64 << i) != 0 {
-                        u = u.add(x);
-                    }
-                }
-                return (
-                    ProjectedResult::Unique(u, F2mElement::from_words(&product_words, c.m)),
-                    j + 1,
-                );
+            }
+            for (row, mask) in rows.iter_mut().zip(masks) {
+                row[self.halves.len()] = *mask;
+            }
+            rows
+        })
+    }
+    fn finish_unique(
+        &self,
+        xs: &[F2mElement],
+        c: &BinaryCurve,
+        z: WordMask,
+        offset: WordMask,
+        field: &WordField,
+        pivots: &[u64; 64],
+        rows: usize,
+    ) -> (ProjectedResult, usize) {
+        let width = xs.len() + 1;
+        // These independent rows force one coefficient vector. Check
+        // ALL remaining W conditions with one exact remainder test.
+        let mut solution = 0u64;
+        for (i, &pivot) in pivots.iter().enumerate().take(width) {
+            if ((pivot >> width) ^ ((pivot & solution).count_ones() as u64)) & 1 != 0 {
+                solution |= 1u64 << i;
             }
         }
-        (ProjectedResult::Deficient, self.equations.len())
+        let mut h = if solution & (1u64 << xs.len()) != 0 {
+            [1, 0, 0]
+        } else {
+            [0; 3]
+        };
+        let mut coefficients = solution;
+        for table in &self.half_combinations {
+            let term = table[(coefficients & 15) as usize];
+            h = field.add(h, term);
+            coefficients >>= 4;
+        }
+        let product_words = field.add(offset, field.mul(z, h));
+        if product_words
+            .iter()
+            .zip(&self.w_support)
+            .any(|(v, s)| *v & !*s != 0)
+            || Self::reduce_with(&self.w_pivots, product_words) != [0; 3]
+        {
+            return (ProjectedResult::Inconsistent, rows);
+        }
+        let mut u = F2mElement::zero(c.m);
+        for (i, x) in xs.iter().enumerate() {
+            if solution & (1u64 << i) != 0 {
+                u = u.add(x);
+            }
+        }
+        (
+            ProjectedResult::Unique(u, F2mElement::from_words(&product_words, c.m)),
+            rows,
+        )
     }
 }
 
@@ -668,7 +1018,7 @@ pub fn decompose_trace_zero_linearized(
     }
     let c = v.curve();
     let compact = (c.m >= 31 && base.len() >= 64).then(|| WordField::new(c));
-    let mut by_x: BTreeMap<WordMask, Vec<usize>> = BTreeMap::new();
+    let mut by_x = BaseIndex::new(base);
     for (i, p) in base.iter().enumerate() {
         let BinaryPoint::Affine { x: fx, y: fy } = p else {
             out.relation.reason = Some("invalid linearized target/base");
@@ -679,12 +1029,22 @@ pub fn decompose_trace_zero_linearized(
             return out;
         }
         let x = x_key(fx);
-        let known_sign = by_x.get(&x).is_some_and(|ids| {
-            let BinaryPoint::Affine { y: known, .. } = &base[ids[0]] else {
+        // Hold one entry search across admission instead of finding the
+        // same key again for insertion. No entry is inserted until admitted.
+        let entry = by_x.entry(x);
+        let known_sign = if let Some(first) = entry.first() {
+            let BinaryPoint::Affine { y: known, .. } = &base[first] else {
                 unreachable!()
             };
-            fy == known || *fy == known.add(fx)
-        });
+            fy == known
+                || if let Some(f) = &compact {
+                    words(fy) == f.add(words(known), words(fx))
+                } else {
+                    *fy == known.add(fx)
+                }
+        } else {
+            false
+        };
         // is_in_4e performs the field-width and curve-equation checks itself.
         // Once one ordinate is admitted, its identical/opposite lift is also
         // admitted; every supplied sign/index is still retained below.
@@ -696,9 +1056,9 @@ pub fn decompose_trace_zero_linearized(
             out.relation.reason = Some("invalid linearized target/base");
             return out;
         }
-        by_x.entry(x).or_default().push(i);
+        entry.push(i);
     }
-    let xs = word_basis(by_x.keys().map(|w| [w[2], w[1], w[0]]), c.m);
+    let xs = word_basis(by_x.keys().into_iter().map(|w| [w[2], w[1], w[0]]), c.m);
     let products: Vec<_> = xs
         .iter()
         .enumerate()
@@ -910,6 +1270,94 @@ pub fn decompose_trace_zero_linearized(
 mod tests {
     use super::*;
 
+    #[test]
+    fn direct_index_preserves_tree_keys_duplicates_and_first_indices() {
+        let base: Vec<_> = (0..256u32)
+            .map(|i| BinaryPoint::Affine {
+                x: F2mElement::from_biguint(&((i * 73) % 127).into(), 131),
+                y: F2mElement::zero(131),
+            })
+            .collect();
+        let mut dense = BaseIndex::new(&base);
+        assert!(matches!(dense, BaseIndex::Dense(_)));
+        let mut tree = BaseIndex::Tree(BTreeMap::new());
+        for (i, p) in base.iter().enumerate() {
+            let BinaryPoint::Affine { x, .. } = p else {
+                unreachable!()
+            };
+            let key = x_key(x);
+            let a = dense.entry(key);
+            let b = tree.entry(key);
+            assert_eq!(a.first(), b.first());
+            a.push(i);
+            b.push(i);
+        }
+        assert_eq!(dense.keys(), tree.keys());
+        for x in 0..257u64 {
+            assert_eq!(dense.get(&[0, 0, x]), tree.get(&[0, 0, x]));
+        }
+        for key in [[0, 1, 0], [1, 0, 0], [0, 0, u64::MAX]] {
+            assert_eq!(dense.get(&key), tree.get(&key));
+        }
+    }
+
+    #[test]
+    fn direct_index_bounds_storage_and_falls_back_for_other_shapes() {
+        let point = |x: u64| BinaryPoint::Affine {
+            x: F2mElement::from_biguint(&x.into(), 131),
+            y: F2mElement::zero(131),
+        };
+        assert!(matches!(
+            BaseIndex::new(&vec![point(1); 63]),
+            BaseIndex::Tree(_)
+        ));
+        assert!(matches!(
+            BaseIndex::new(&vec![point(65536); 64]),
+            BaseIndex::Tree(_)
+        ));
+        assert!(matches!(
+            BaseIndex::new(&vec![point(65535); 64]),
+            BaseIndex::Tree(_)
+        ));
+        assert!(matches!(
+            BaseIndex::new(&vec![BinaryPoint::Infinity; 64]),
+            BaseIndex::Tree(_)
+        ));
+        let high = BinaryPoint::Affine {
+            x: F2mElement::from_bit_positions(&[64], 131),
+            y: F2mElement::zero(131),
+        };
+        assert!(matches!(
+            BaseIndex::new(&vec![high; 64]),
+            BaseIndex::Tree(_)
+        ));
+        let BaseIndex::Dense(buckets) = BaseIndex::new(&vec![point(255); 64]) else {
+            panic!("exact storage boundary should qualify")
+        };
+        assert_eq!(buckets.len(), 256);
+        // Actual d12 trace-zero windows reach polynomial degree12, with about
+        // 2000 admitted signed points, and therefore need8192 direct slots.
+        let BaseIndex::Dense(buckets) = BaseIndex::new(&vec![point(0x1ffc); 1994]) else {
+            panic!("actual d12 occupancy must select direct addressing")
+        };
+        assert_eq!(buckets.len(), 8192);
+    }
+
+    #[test]
+    fn direct_index_two_common_signs_stay_inline_and_extra_indices_spill_in_order() {
+        let mut bucket = IndexBucket::EMPTY;
+        for i in [7, 1] {
+            bucket.push(i);
+        }
+        assert!(matches!(bucket, IndexBucket::Inline { len: 2, .. }));
+        assert_eq!(bucket.as_slice(), &[7, 1]);
+        for i in [7, 4, 2] {
+            bucket.push(i);
+        }
+        assert!(matches!(bucket, IndexBucket::Spill(_)));
+        assert_eq!(bucket.as_slice(), &[7, 1, 7, 4, 2]);
+    }
+
     fn adjoint_curve(n: u32) -> BinaryCurve {
         BinaryCurve {
             m: n,
@@ -985,10 +1433,183 @@ mod tests {
                 let old = ProductProjection::build(&xs, &ws, &c, &field, false);
                 let new = ProductProjection::build(&xs, &ws, &c, &field, true);
                 assert_eq!(old.equations, new.equations, "n{n}/d{d}");
+                assert_eq!(
+                    old.coefficient_tail(&c, &field),
+                    new.coefficient_tail(&c, &field),
+                    "tail n{n}/d{d}"
+                );
                 assert_eq!(old.rhs, new.rhs);
                 assert_eq!(old.w_pivots, new.w_pivots);
                 assert_eq!(old.halves, new.halves);
                 assert_eq!(old.w_support, new.w_support);
+            }
+        }
+    }
+
+    #[test]
+    fn omitted_coefficient_maps_remain_lazy_and_complete_deficient_fallback() {
+        for n in [83, 131] {
+            let c = adjoint_curve(n);
+            let field = WordField::new(&c);
+            let xs: Vec<_> = (1..=12)
+                .map(|i| F2mElement::from_bit_positions(&[i], n))
+                .collect();
+            let p = ProductProjection::new_with_field(&xs, &[], &c, &field);
+            assert_eq!(p.equations.len(), 16);
+            assert!(p.tail_equations.get().is_none());
+            assert_eq!(
+                p.solve_compact(&xs, &c, [0; 3], [0; 3], &field),
+                (ProjectedResult::Deficient, n as usize)
+            );
+            assert_eq!(p.tail_equations.get().unwrap().len(), n as usize - 16);
+        }
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    #[test]
+    fn vector_prefix_matches_scalar_rank_and_stopping_row_on_arbitrary_matrices() {
+        let mut seed = 0xabc20261124u64;
+        for width in 1..16 {
+            for rows in [0, 1, 7, 16] {
+                for sample in 0..128 {
+                    let mut values = [0u64; 16];
+                    let mut coefficients = [0u64; 4];
+                    let mut targets = 0u16;
+                    let mask = (1u64 << width) - 1;
+                    for j in 0..rows {
+                        seed ^= seed << 13;
+                        seed ^= seed >> 7;
+                        seed ^= seed << 17;
+                        let row = if sample == 0 {
+                            0
+                        } else if sample == 1 {
+                            1u64 << width
+                        } else {
+                            seed & ((1u64 << (width + 1)) - 1)
+                        };
+                        values[j] = row;
+                        coefficients[j / 4] |= (row & mask) << (16 * (j % 4));
+                        targets |= ((row >> width) as u16) << j;
+                    }
+                    let mut scalar = [0u64; 64];
+                    let mut rank = 0;
+                    let mut used = rows;
+                    let mut inconsistent = false;
+                    'outer: for (j, mut row) in values.into_iter().take(rows).enumerate() {
+                        loop {
+                            let c = row & mask;
+                            if c == 0 {
+                                if row >> width != 0 {
+                                    used = j + 1;
+                                    inconsistent = true;
+                                    break 'outer;
+                                }
+                                break;
+                            }
+                            let bit = 63 - c.leading_zeros() as usize;
+                            if scalar[bit] == 0 {
+                                scalar[bit] = row;
+                                rank += 1;
+                                break;
+                            }
+                            row ^= scalar[bit];
+                        }
+                        if rank == width {
+                            used = j + 1;
+                            break;
+                        }
+                    }
+                    let mut vector = [0u64; 64];
+                    let actual = unsafe {
+                        eliminate_packed_prefix(coefficients, targets, width, rows, &mut vector)
+                    };
+                    assert_eq!(
+                        actual,
+                        (rank, used, inconsistent),
+                        "w{width}/rows{rows}/sample{sample}"
+                    );
+                    if rank == width && !inconsistent {
+                        let mut solution = 0u64;
+                        for (i, pivot) in vector.iter().enumerate().take(width) {
+                            if ((pivot >> width) ^ ((pivot & solution).count_ones() as u64)) & 1
+                                != 0
+                            {
+                                solution |= 1u64 << i;
+                            }
+                        }
+                        for row in values.into_iter().take(used) {
+                            assert_eq!((row & solution).count_ones() as u64 & 1, row >> width);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn packed_prefix_preserves_generic_first_contradiction_and_unique_result() {
+        let mut seed = 0x10_2026_1124u64;
+        for n in [83, 131] {
+            let c = adjoint_curve(n);
+            let field = WordField::new(&c);
+            for d in [1, 4, 12, 17] {
+                let xs: Vec<_> = (1..=d)
+                    .map(|i| F2mElement::from_bit_positions(&[i], n))
+                    .collect();
+                let ws = word_basis(
+                    xs.iter().enumerate().flat_map(|(i, x)| {
+                        xs[i..].iter().map(|y| words(&x.mul(y, &c.irreducible)))
+                    }),
+                    n,
+                );
+                let fast = ProductProjection::new_with_field(&xs, &ws, &c, &field);
+                let mut scalar = ProductProjection::new_with_field(&xs, &ws, &c, &field);
+                scalar.row_map = None;
+                for _ in 0..128 {
+                    let mut draw = || {
+                        seed ^= seed << 13;
+                        seed ^= seed >> 7;
+                        seed ^= seed << 17;
+                        seed
+                    };
+                    let z = words(&F2mElement::from_words(&[draw(), draw(), draw()], n));
+                    let y = words(&F2mElement::from_words(&[draw(), draw(), draw()], n));
+                    assert_eq!(
+                        fast.solve_compact(&xs, &c, z, y, &field),
+                        scalar.solve_compact(&xs, &c, z, y, &field),
+                        "n{n}/d{d}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn four_bit_half_combinations_preserve_all_small_coefficient_vectors() {
+        for n in [83, 131] {
+            let c = adjoint_curve(n);
+            let field = WordField::new(&c);
+            for d in [3, 4, 7, 12] {
+                let xs: Vec<_> = (1..=d)
+                    .map(|i| F2mElement::from_bit_positions(&[i], n))
+                    .collect();
+                let p = ProductProjection::new_with_field(&xs, &[], &c, &field);
+                for coefficient in 0usize..1 << d {
+                    let mut actual = [0; 3];
+                    for (chunk, table) in p.half_combinations.iter().enumerate() {
+                        let term = table[(coefficient >> (4 * chunk)) & 15];
+                        for i in 0..3 {
+                            actual[i] ^= term[i];
+                        }
+                    }
+                    let mut expected = F2mElement::zero(n);
+                    for (i, h) in p.halves.iter().enumerate() {
+                        if coefficient >> i & 1 != 0 {
+                            expected = expected.add(h);
+                        }
+                    }
+                    assert_eq!(actual, words(&expected));
+                }
             }
         }
     }
@@ -1010,7 +1631,10 @@ mod tests {
                 let rhs: Vec<_> = (0..21).map(|_| [draw(), draw(), draw()]).collect();
                 let map = PackedRowMap::new(&equations, &rhs, n).unwrap();
                 assert_eq!(map.rows, 16);
-                assert_eq!(map.coefficients.len(), (n as usize).div_ceil(4) * 16);
+                assert_eq!(
+                    map.coefficients.len(),
+                    (n as usize).div_ceil(map.bits) * (1 << map.bits)
+                );
                 let mut pairs = vec![([0; 3], [0; 3])];
                 for bit in 0..n as usize {
                     let mut e = [0; 3];
