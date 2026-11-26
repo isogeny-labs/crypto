@@ -63,6 +63,14 @@ One-sided-error filters, target-specific functions, and joint encodings remain
 open.
 `[pcc:unverified]`
 
+Theorem 22 quantifies the remaining one-sided separate-label case.  If either
+partial-sum side is compressed into fewer labels, collisions in its label
+fibres clone genuine triples into distinct false accepted triples.  The exact
+lower bound is controlled by the fibre-size second moment; over a uniform
+target batch it becomes a corresponding expected verification cost.  The
+result still does not cover joint encodings, target-dependent labels, or
+non-enumerating witness recovery. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint
@@ -104,11 +112,13 @@ They do not verify an asymptotic lower bound or an algebraic solver model.
 
 Native replay on 2026-11-26 used the `rust:1.83-alpine` container image at
 digest `sha256:0ac946ed7597a9f053a1be2ce38c09aa88b3d7079a91ea491493615294b1f699`:
-seven tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
+eight tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
 optimization against direct minimization and verifies the exact `m=3,4,5`
 fractions in the indexing-family audit plus the finite cyclic-group kernel of
 Theorem 21, including exhaustive arbitrary label algebras through order seven
-and exact separate-label predicates for small groups.
+and exact separate-label predicates for small groups. It also checks the
+one-sided false-positive lower bound of Theorem 22 on bounded cyclic-group
+fixtures.
 `[pcc:unverified]`
 
 ## Owed before review-ready status

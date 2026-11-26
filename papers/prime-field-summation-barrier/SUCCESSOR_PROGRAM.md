@@ -45,6 +45,7 @@ The status of the program is:
 | Proposition 19 | exact reduction plus literature audit | split-tree recovery is group \(k\)SUM-Indexing; current indexing upper bounds remain above one-half after relation accounting |
 | Theorem 20 | exact exponent criterion | piecewise sub-rho conditions for preprocessing exponent \(s\) and amortized batch-query exponent \(t\) |
 | Theorem 21 | unconditional bucket/quotient obstruction | arbitrary exact separate-label predicates, exact compositional buckets, affine algebraic-group linearizations, and low-degree isogeny quotients cannot compress the prime-order subgroup |
+| Theorem 22 | unconditional one-sided label trade-off | compressing either partial-sum label set forces a quantified false-verification blowup |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1787,6 +1788,82 @@ factor through separate labels, or data structures that exploit coordinates
 without preserving addition.
 Those mechanisms remain inside the indexing boundary of Proposition 19.
 [pcc:unverified]
+
+### Theorem 22 (one-sided separate labels force false verification)
+
+Let \(G\) be a finite group, written additively, and let
+\(A,B\subseteq G\) be finite nonempty sets.  Suppose
+
+\[
+\lambda_A:A\to L_A,\qquad
+\lambda_B:B\to L_B,\qquad
+\lambda_T:G\to L_T
+\]
+
+are label maps and \(R\subseteq L_A\times L_B\times L_T\) is a one-sided
+addition predicate: for every \(a\in A\) and \(b\in B\),
+
+\[
+R\bigl(\lambda_A(a),\lambda_B(b),\lambda_T(a+b)\bigr)
+\]
+
+holds.  Let \(F\) be the number of false accepted triples
+\((a,b,t)\in A\times B\times G\) with \(t\ne a+b\).  Put
+\(k_A=|\operatorname{im}\lambda_A|\) and
+\(k_B=|\operatorname{im}\lambda_B|\).  Then
+
+\[
+\begin{split}
+F&\ge |B|\left(\sum_{C\in A/\lambda_A}|C|^2-|A|\right)
+ \ge |B|\left(\frac{|A|^2}{k_A}-|A|\right),\\
+F&\ge |A|\left(\sum_{D\in B/\lambda_B}|D|^2-|B|\right)
+ \ge |A|\left(\frac{|B|^2}{k_B}-|B|\right).
+\end{split}
+\]
+
+Consequently \(F\) is at least the maximum of the two right-hand sides.  If
+\(B_q\) independent uniform targets in \(G\) are queried and the filter
+enumerates and explicitly verifies every accepted candidate pair, then its [pcc:unverified]
+expected number of false verifications is at least
+
+\[
+\frac{B_q}{|G|}F.
+\]
+
+#### Proof
+
+Fix \(b\in B\), a fibre \(C\) of \(\lambda_A\), and distinct ordered
+elements \(a,a'\in C\).  The true triple \((a,b,a+b)\) is accepted.  The
+triple \((a',b,a+b)\) has exactly the same three labels, so it is also
+accepted, but it is false by cancellation.  The map
+
+\[
+(b,a,a')\longmapsto(a',b,a+b)
+\]
+
+is injective: the image supplies \(b\) and \(a+b\), hence determines \(a\),
+and also supplies \(a'\).  These collisions therefore contribute
+
+\[
+|B|\sum_C |C|(|C|-1)
+=|B|\left(\sum_C|C|^2-|A|\right)
+\]
+
+distinct false triples.  Cauchy--Schwarz gives
+\(\sum_C|C|^2\ge |A|^2/k_A\).  The analogous argument, fixing
+\(a\in A\) and colliding two elements of a \(\lambda_B\)-fibre, proves the [pcc:unverified]
+second bound.  Finally, each false triple has one target coordinate, so a
+uniform query selects it with probability \(1/|G|\); linearity of expectation
+over the batch gives \(B_qF/|G|\). \(\square\)
+
+The theorem is unconditional for one-sided predicates that factor through
+separate, target-independent labels and enumerate all accepted pairs.  It
+quantifies the false-positive escape hatch left by Theorem 21: compressing a
+partial-sum side below its cardinality necessarily creates a second-moment
+verification cost.  It does not cover joint encodings, target-specific label
+maps, signed algebraic summaries whose intermediate terms cancel, or
+algorithms that recover witnesses without enumerating accepted pairs.  Those
+remain within the general preprocessing/query problem. [pcc:unverified]
 
 ### Exact remaining computational gap
 

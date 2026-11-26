@@ -285,4 +285,86 @@ fn smaller_separate_labels_cannot_decide_addition_exactly() {
     }
 }
 
+fn one_sided_false_count(
+    group_order: usize,
+    left: &[usize],
+    right: &[usize],
+    left_labels: &[usize],
+    right_labels: &[usize],
+) -> usize {
+    let mut accepted_label_triples = BTreeSet::new();
+    for &a in left {
+        for &b in right {
+            accepted_label_triples.insert((
+                left_labels[a],
+                right_labels[b],
+                (a + b) % group_order,
+            ));
+        }
+    }
+
+    let mut false_count = 0;
+    for &a in left {
+        for &b in right {
+            for target in 0..group_order {
+                let labels = (left_labels[a], right_labels[b], target);
+                if target != (a + b) % group_order
+                    && accepted_label_triples.contains(&labels)
+                {
+                    false_count += 1;
+                }
+            }
+        }
+    }
+    false_count
+}
+
+fn collision_lower_bound(set: &[usize], labels: &[usize], other_size: usize) -> usize {
+    let label_count = set
+        .iter()
+        .map(|&element| labels[element])
+        .max()
+        .map_or(0, |maximum| maximum + 1);
+    let mut fibre_sizes = vec![0_usize; label_count];
+    for &element in set {
+        fibre_sizes[labels[element]] += 1;
+    }
+    other_size
+        * fibre_sizes
+            .iter()
+            .map(|size| size * size.saturating_sub(1))
+            .sum::<usize>()
+}
+
+#[test]
+fn one_sided_separate_labels_force_false_candidates() {
+    let fixtures = [
+        (7_usize, 5_usize, 4_usize, 2_usize, 3_usize),
+        (11, 7, 6, 3, 2),
+        (13, 9, 8, 4, 3),
+    ];
+
+    for (group_order, left_size, right_size, left_buckets, right_buckets) in fixtures {
+        let left: Vec<_> = (0..left_size).collect();
+        let right: Vec<_> = (0..right_size).collect();
+        let left_labels: Vec<_> = (0..group_order)
+            .map(|element| element % left_buckets)
+            .collect();
+        let right_labels: Vec<_> = (0..group_order)
+            .map(|element| element % right_buckets)
+            .collect();
+
+        let false_count = one_sided_false_count(
+            group_order,
+            &left,
+            &right,
+            &left_labels,
+            &right_labels,
+        );
+        let left_bound = collision_lower_bound(&left, &left_labels, right.len());
+        let right_bound = collision_lower_bound(&right, &right_labels, left.len());
+        assert!(false_count >= left_bound.max(right_bound));
+    }
+}
+
 fn main() {}
