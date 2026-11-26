@@ -157,13 +157,13 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261121T0437Z-jv-cover-f4-round4-confirm",
+  "latest_record": "20261125T2239Z-trace2e-k1-23",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
-    "invalid": 8,
-    "measured": 323,
-    "open": 53
+    "invalid": 11,
+    "measured": 348,
+    "open": 58
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -427,6 +427,310 @@
       ],
       "problem": "dlpwai:static-dh-p224-shape",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 21360464.0,
+      "latest": 21360464.0,
+      "latest_derived": {},
+      "metric": "complete_cold_profile_ir",
+      "points": [
+        {
+          "commit": "e65dc230265e",
+          "date": "2026-11-24",
+          "derived": {},
+          "n": 2,
+          "record": "20261124T0212Z-ecc2k-cold50x-current-profile",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            21360464.0,
+            21360464.0
+          ],
+          "summary": "Descriptive fixed query profile only; both Ir21360464. Persistent local envelope, complete raw retained, unsigned.",
+          "value": 21360464.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 21566178.0,
+      "latest": 14688697.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 31.8901,
+        "improvement_vs_previous_percent": 8.3871
+      },
+      "metric": "complete_cold_query_ir",
+      "points": [
+        {
+          "commit": "b6c4fc82f683",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261124T0227Z-ecc2k-cold50x-dense-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            21566178.0,
+            21566178.0
+          ],
+          "summary": "All120 rows retained; first index regresses and fails50x plus all no-regression guards. Complete separate arithmetic replay and original source identity retained.",
+          "value": 21566178.0
+        },
+        {
+          "commit": "bd865aacc0c2",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 7.2308,
+            "improvement_vs_previous_percent": 7.2308
+          },
+          "n": 5,
+          "record": "20261124T0233Z-ecc2k-cold50x-inline-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            20006773.0,
+            20006773.0
+          ],
+          "summary": "Complete frozen120-row inline index component gains6.28% whole and9.71% oracle against matched previous best, all six controls pass,80 tuples replay. Requested50x unmet. Complete raw/binaries include rejected prior panel and invalid pilots; unsigned local custody only.",
+          "value": 20006773.0
+        },
+        {
+          "commit": "f3ae17d0d3c3",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 19.8401,
+            "improvement_vs_previous_percent": 13.5921
+          },
+          "n": 5,
+          "record": "20261124T0314Z-ecc2k-cold15m-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            17287437.0,
+            17287437.0
+          ],
+          "summary": "First candidate misses15M and one n83 oracle guard; all raw rows retained. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 17287437.0
+        },
+        {
+          "commit": "1837c3ffa516",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 25.6547,
+            "improvement_vs_previous_percent": 7.2538
+          },
+          "n": 5,
+          "record": "20261124T0331Z-ecc2k-cold15m-candidate2-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            16033438.0,
+            16033438.0
+          ],
+          "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 16033438.0
+        },
+        {
+          "commit": "781e12c34c58",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 31.8901,
+            "improvement_vs_previous_percent": 8.3871
+          },
+          "n": 5,
+          "record": "20261124T0350Z-ecc2k-cold15m-candidate3-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            14688697.0,
+            14688697.0
+          ],
+          "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 14688697.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 12458426.0,
+      "latest": 10024047.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 19.54,
+        "improvement_vs_previous_percent": 11.8282
+      },
+      "metric": "complete_oracle_ir",
+      "points": [
+        {
+          "commit": "bd865aacc0c2",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 5,
+          "record": "20261124T0233Z-ecc2k-cold50x-inline-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            12458426.0,
+            12458426.0
+          ],
+          "summary": "Complete frozen120-row inline index component gains6.28% whole and9.71% oracle against matched previous best, all six controls pass,80 tuples replay. Requested50x unmet. Complete raw/binaries include rejected prior panel and invalid pilots; unsigned local custody only.",
+          "value": 12458426.0
+        },
+        {
+          "commit": "f3ae17d0d3c3",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 1.3915,
+            "improvement_vs_previous_percent": 1.3915
+          },
+          "n": 5,
+          "record": "20261124T0314Z-ecc2k-cold15m-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            12285072.0,
+            12285072.0
+          ],
+          "summary": "First candidate misses15M and one n83 oracle guard; all raw rows retained. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 12285072.0
+        },
+        {
+          "commit": "1837c3ffa516",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 8.7463,
+            "improvement_vs_previous_percent": 7.4587
+          },
+          "n": 5,
+          "record": "20261124T0331Z-ecc2k-cold15m-candidate2-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            11368770.0,
+            11368770.0
+          ],
+          "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 11368770.0
+        },
+        {
+          "commit": "781e12c34c58",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 19.54,
+            "improvement_vs_previous_percent": 11.8282
+          },
+          "n": 5,
+          "record": "20261124T0350Z-ecc2k-cold15m-candidate3-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            10024047.0,
+            10024047.0
+          ],
+          "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 10024047.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "ir"
+    },
+    {
+      "better": "neutral",
+      "first": 16.0,
+      "latest": 16.0,
+      "latest_derived": {},
+      "metric": "engineering_calls",
+      "points": [
+        {
+          "commit": "2e9a7b71fff2",
+          "date": "2026-11-24",
+          "derived": {},
+          "n": 1,
+          "record": "20261124T0233Z-ecc2k-cold50x-inline-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Three phase calibrations and16 engineering calls pass; full separately frozen primary reports actual effect,50x remains unmet.",
+          "value": 16.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 17273580.0,
+      "latest": 14689119.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 14.9619,
+        "improvement_vs_previous_percent": 8.3057
+      },
+      "metric": "pilot_complete_cold_query_ir",
+      "points": [
+        {
+          "commit": "14819dcac965",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1,
+          "record": "20261124T0312Z-ecc2k-cold15m-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            17273580.0,
+            17273580.0
+          ],
+          "summary": "First candidate misses15M and one n83 oracle guard; all raw rows retained. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 17273580.0
+        },
+        {
+          "commit": "4b2821dba553",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 7.2592,
+            "improvement_vs_previous_percent": 7.2592
+          },
+          "n": 1,
+          "record": "20261124T0327Z-ecc2k-cold15m-candidate2-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            16019656.0,
+            16019656.0
+          ],
+          "summary": "Second candidate misses15M; six control guards pass. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 16019656.0
+        },
+        {
+          "commit": "56102c19bf36",
+          "date": "2026-11-24",
+          "derived": {
+            "improvement_vs_first_percent": 14.9619,
+            "improvement_vs_previous_percent": 8.3057
+          },
+          "n": 1,
+          "record": "20261124T0347Z-ecc2k-cold15m-candidate3-v3-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            14689119.0,
+            14689119.0
+          ],
+          "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
+          "value": 14689119.0
+        }
+      ],
+      "problem": "ecc2k130-index-calculus-cold-query",
+      "unit": "ir"
     },
     {
       "better": "higher",
@@ -29441,6 +29745,62 @@
     },
     {
       "better": "lower",
+      "first": 2.7797,
+      "latest": 2.7797,
+      "latest_derived": {
+        "value_over_reference": 2.7797
+      },
+      "metric": "ic_over_ideal_rho_gae1_p131101_sge",
+      "points": [
+        {
+          "commit": "4faca82a6f06",
+          "date": "2026-11-24",
+          "derived": {
+            "value_over_reference": 2.7797
+          },
+          "n": 10,
+          "record": "20261124T0719Z-quartic-diem-la",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            2.0226,
+            3.8009
+          ],
+          "summary": "IMPROVEMENT (frozen rule): SGE+coordinate Wiedemann cuts quartic Diem 2LP GAE_1 to 0.371x [0.340,0.406] of 2lp-sfb; IC/rho at 131101 w=1 7.75 -> 2.78 [pcc:unverified]",
+          "value": 2.7797
+        }
+      ],
+      "problem": "ic:quartic-diem-2lp-la",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.37143894684049666,
+      "latest": 0.37143894684049666,
+      "latest_derived": {},
+      "metric": "paired_gae1_sge_over_sfb_pooled",
+      "points": [
+        {
+          "commit": "4faca82a6f06",
+          "date": "2026-11-24",
+          "derived": {},
+          "n": 40,
+          "record": "20261124T0719Z-quartic-diem-la",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.34009051047614247,
+            0.4056869768510189
+          ],
+          "summary": "IMPROVEMENT (frozen rule): SGE+coordinate Wiedemann cuts quartic Diem 2LP GAE_1 to 0.371x [0.340,0.406] of 2lp-sfb; IC/rho at 131101 w=1 7.75 -> 2.78 [pcc:unverified]",
+          "value": 0.37143894684049666
+        }
+      ],
+      "problem": "ic:quartic-diem-2lp-la",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 46.3,
       "latest": 46.3,
       "latest_derived": {},
@@ -30149,6 +30509,306 @@
       ],
       "problem": "ic:split-prime-p2-twist-coset-toy",
       "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 0.9997,
+      "latest": 0.9998,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.01,
+        "improvement_vs_previous_percent": 0.01
+      },
+      "metric": "ratio_explicit_over_trace2e",
+      "points": [
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-17",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K1-17: native binary-subspace select=trace2e (D=6) costs 0.824 [0.801, 0.848] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9997
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 0.03,
+            "improvement_vs_previous_percent": 0.03
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K0-19: native binary-subspace select=trace2e (D=7) costs 0.763 [0.680, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.0
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.01,
+            "improvement_vs_previous_percent": -0.04
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K1-19: native binary-subspace select=trace2e (D=7) costs 0.765 [0.684, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9996
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.0,
+            "improvement_vs_previous_percent": 0.01
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K0-23: native binary-subspace select=trace2e (D=8) costs 0.679 [0.600, 0.769] of binary-subspace D=7 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9997
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 0.01,
+            "improvement_vs_previous_percent": 0.01
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9998
+        }
+      ],
+      "problem": "ic:trace2e-builder",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.2132,
+      "latest": 1.2606,
+      "latest_derived": {
+        "improvement_vs_first_percent": 3.907,
+        "improvement_vs_previous_percent": -14.4079
+      },
+      "metric": "ratio_subspace_over_trace2e",
+      "points": [
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-17",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1792,
+            1.2484
+          ],
+          "summary": "K1-17: native binary-subspace select=trace2e (D=6) costs 0.824 [0.801, 0.848] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.2132
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 7.9871,
+            "improvement_vs_previous_percent": 7.9871
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1669,
+            1.4706
+          ],
+          "summary": "K0-19: native binary-subspace select=trace2e (D=7) costs 0.763 [0.680, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.3101
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 7.6904,
+            "improvement_vs_previous_percent": -0.2748
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1669,
+            1.462
+          ],
+          "summary": "K1-19: native binary-subspace select=trace2e (D=7) costs 0.765 [0.684, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.3065
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 21.398,
+            "improvement_vs_previous_percent": 12.7287
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.3004,
+            1.6667
+          ],
+          "summary": "K0-23: native binary-subspace select=trace2e (D=8) costs 0.679 [0.600, 0.769] of binary-subspace D=7 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.4728
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 3.907,
+            "improvement_vs_previous_percent": -14.4079
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1682,
+            1.3605
+          ],
+          "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.2606
+        }
+      ],
+      "problem": "ic:trace2e-builder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 10.467,
+      "latest": 12.984,
+      "latest_derived": {
+        "improvement_vs_first_percent": -24.047,
+        "improvement_vs_previous_percent": 10.9892,
+        "value_over_reference": 31.286747
+      },
+      "metric": "s_trace2e",
+      "points": [
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.041908
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-17",
+          "reference": 2.076,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K1-17: native binary-subspace select=trace2e (D=6) costs 0.824 [0.801, 0.848] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 10.467
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -26.3113,
+            "improvement_vs_previous_percent": -26.3113,
+            "value_over_reference": 17.304974
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-19",
+          "reference": 0.764,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K0-19: native binary-subspace select=trace2e (D=7) costs 0.763 [0.680, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 13.221
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -8.2354,
+            "improvement_vs_previous_percent": 14.3106,
+            "value_over_reference": 20.560799
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-19",
+          "reference": 0.551,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K1-19: native binary-subspace select=trace2e (D=7) costs 0.765 [0.684, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 11.329
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -39.3618,
+            "improvement_vs_previous_percent": -28.7581,
+            "value_over_reference": 35.928571
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-23",
+          "reference": 0.406,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K0-23: native binary-subspace select=trace2e (D=8) costs 0.679 [0.600, 0.769] of binary-subspace D=7 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 14.587
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -24.047,
+            "improvement_vs_previous_percent": 10.9892,
+            "value_over_reference": 31.286747
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-23",
+          "reference": 0.415,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 12.984
+        }
+      ],
+      "problem": "ic:trace2e-builder",
+      "unit": "S"
     },
     {
       "better": "lower",
@@ -31202,6 +31862,299 @@
       ],
       "problem": "kernel:ecbench_wallfix_prs",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 21360373.0,
+      "latest": 21360373.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_cold_ir",
+      "points": [
+        {
+          "commit": "0a2e495ef2d5",
+          "date": "2026-11-24",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T2351Z-ecc2k-cold50-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            21360373.0,
+            21360373.0
+          ],
+          "summary": "Fixed n131 uniform final21360373Ir,51.48% below unchanged original44023404 (matched baseline44038338:51.50%). Oracle23.62% lower.120 matched rows/all controls pass;80 tuple replays. Producer unsigned; integration/custody/admission/historical gates pending.",
+          "value": 21360373.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-cold50",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 13811466.0,
+      "latest": 13811466.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_oracle_ir",
+      "points": [
+        {
+          "commit": "0a2e495ef2d5",
+          "date": "2026-11-24",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T2351Z-ecc2k-cold50-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            13811466.0,
+            13811466.0
+          ],
+          "summary": "Fixed n131 uniform final21360373Ir,51.48% below unchanged original44023404 (matched baseline44038338:51.50%). Oracle23.62% lower.120 matched rows/all controls pass;80 tuple replays. Producer unsigned; integration/custody/admission/historical gates pending.",
+          "value": 13811466.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-cold50",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 6623882.0,
+      "latest": 6623882.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_setup_ir",
+      "points": [
+        {
+          "commit": "0a2e495ef2d5",
+          "date": "2026-11-24",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T2351Z-ecc2k-cold50-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            6623882.0,
+            6623882.0
+          ],
+          "summary": "Fixed n131 uniform final21360373Ir,51.48% below unchanged original44023404 (matched baseline44038338:51.50%). Oracle23.62% lower.120 matched rows/all controls pass;80 tuple replays. Producer unsigned; integration/custody/admission/historical gates pending.",
+          "value": 6623882.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-cold50",
+      "unit": "ir"
+    },
+    {
+      "better": "neutral",
+      "first": 16.0,
+      "latest": 16.0,
+      "latest_derived": {},
+      "metric": "pilot_calls",
+      "points": [
+        {
+          "commit": "0bc9d5a2f217",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": null,
+          "record": "20261123T2323Z-ecc2k-cold50-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "16-call engineering pilot and three-binary calibration valid; candidate1 misses50% target (45.9443% lower in its uniform pilot). Zero primary rows; superseded by separately profiled candidate2, not an excluded primary subset.",
+          "value": 16.0
+        },
+        {
+          "commit": "07c8c78a708d",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": null,
+          "record": "20261123T2338Z-ecc2k-cold50-candidate2-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Candidate2 16-call engineering preflight and three calibrations valid;49.1996% uniform pilot reduction is below50%. Primary120 rows unattempted; candidate3 tests the unchanged goal with one index visit.",
+          "value": 16.0
+        },
+        {
+          "commit": "0c3c7a031991",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": null,
+          "record": "20261123T2348Z-ecc2k-cold50-candidate3-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "All16 engineering calls and three calibrations pass. Single n131 uniform pilot clears50% at51.5124%; this record does not establish the final primary result.",
+          "value": 16.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-cold50",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 34987635.0,
+      "latest": 23781983.0,
+      "latest_derived": {},
+      "metric": "whole_cold_ir",
+      "points": [
+        {
+          "commit": "ad5f91c4b439",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 2,
+          "record": "20261123T2303Z-ecc2k-cold50-incumbent-profile",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            34987635.0,
+            34987635.0
+          ],
+          "summary": "Two identical source-bound incumbent profiles identify exact input conversion and arithmetic hotspots; no gain or50% conclusion.",
+          "value": 34987635.0
+        },
+        {
+          "commit": "e64469e6aea1",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 2,
+          "record": "20261123T2329Z-ecc2k-cold50-residual-profile",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            23781983.0,
+            23781983.0
+          ],
+          "summary": "Two fixed absolute candidate1 profiles identify multiplication/reduction interfaces; source/protocol before data, exact manifest-command bookkeeping imported afterwards. No gain comparison.",
+          "value": 23781983.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-cold50",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 44038405.0,
+      "latest": 44038405.0,
+      "latest_derived": {},
+      "metric": "baseline_profile_complete_ir",
+      "points": [
+        {
+          "commit": "065176db5621",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 2,
+          "record": "20261123T1852Z-ecc2k-halftrace-baseline-profile",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            44038405.0,
+            44038405.0
+          ],
+          "summary": "Two identical-source baseline A/A cold profiles; known query output matches native; hotspot diagnosis only, unsigned producer evidence.",
+          "value": 44038405.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-halftrace-setup",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 34999782.0,
+      "latest": 34999782.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_cold_ir",
+      "points": [
+        {
+          "commit": "8453eb6263d6",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T1918Z-ecc2k-halftrace-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            34999782.0,
+            34999782.0
+          ],
+          "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
+          "value": 34999782.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-halftrace-setup",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 18107673.0,
+      "latest": 18107673.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_oracle_ir",
+      "points": [
+        {
+          "commit": "8453eb6263d6",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T1918Z-ecc2k-halftrace-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            18107673.0,
+            18107673.0
+          ],
+          "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
+          "value": 18107673.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-halftrace-setup",
+      "unit": "ir"
+    },
+    {
+      "better": "lower",
+      "first": 15966306.0,
+      "latest": 15966306.0,
+      "latest_derived": {},
+      "metric": "n131_uniform_setup_ir",
+      "points": [
+        {
+          "commit": "8453eb6263d6",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": 5,
+          "record": "20261123T1918Z-ecc2k-halftrace-primary",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            15966306.0,
+            15966306.0
+          ],
+          "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
+          "value": 15966306.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-halftrace-setup",
+      "unit": "ir"
+    },
+    {
+      "better": "neutral",
+      "first": 12.0,
+      "latest": 12.0,
+      "latest_derived": {},
+      "metric": "pilot_calls",
+      "points": [
+        {
+          "commit": "8d3905a93a51",
+          "date": "2026-11-23",
+          "derived": {},
+          "n": null,
+          "record": "20261123T1913Z-ecc2k-halftrace-preflight",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Both partition calibrations and12-call engineering pilot complete; fixed source/cases/criteria retained. No primary gain conclusion.",
+          "value": 12.0
+        }
+      ],
+      "problem": "kernel:ecc2k130-ic-halftrace-setup",
+      "unit": "count"
     },
     {
       "better": "lower",

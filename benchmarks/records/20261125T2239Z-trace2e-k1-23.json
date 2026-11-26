@@ -1,0 +1,137 @@
+{
+  "branch": "claude/trace2e-builder",
+  "closed_utc": "2026-11-25T22:41:36+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--spec",
+        "research/trace2e_builder_20261125/specs/t2e-K1-23.json",
+        "--out",
+        "research/trace2e_builder_20261125/sessions/K1-23"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-25T22:39:48+00:00",
+      "wall_s": 5.416
+    }
+  ],
+  "commit": "77301e80e7b5b95c28d3083a72a0f7c057a2149e",
+  "commit_dirty": false,
+  "created_utc": "2026-11-25T22:39:48+00:00",
+  "curve_uid": "EC1N23Ce1heec6a3619e3f",
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39"
+  },
+  "id": "20261125T2239Z-trace2e-k1-23",
+  "metrics": [
+    {
+      "baseline": 16.367,
+      "better": "lower",
+      "n": 32,
+      "name": "s_trace2e",
+      "note": "ic-t2e8 = binary-subspace:dimension=8,select=trace2e, mitm m=2; baseline ic-sub8 = binary-subspace dimension 8 (workspace C1 frozen D); reference rho.signed_frobenius; local L0/L1 host, operation counts only",
+      "reference": 0.415,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 12.984
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 32,
+      "name": "ratio_subspace_over_trace2e",
+      "note": "ic-sub8 / ic-t2e8: inverse of ecbench compare (linearised-t 95%); order holds across the 5a band",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1682,
+        1.3605
+      ],
+      "unit": "ratio",
+      "value": 1.2606
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 32,
+      "name": "ratio_explicit_over_trace2e",
+      "note": "ic-cut (explicit-x stand-in, same abscissa set) / ic-t2e: instrument equivalence, 1.0 expected",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0,
+        1.0
+      ],
+      "unit": "ratio",
+      "value": 0.9998
+    }
+  ],
+  "problem": "ic:trace2e-builder",
+  "raw": [
+    {
+      "bytes": 1985816,
+      "path": "research/trace2e_builder_20261125/sessions/K1-23/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/96/96215ca35dbd2efbb5c8a0e5fc58e64cf5cd00ede94e53887da11e3e83c7294d",
+      "sha256": "96215ca35dbd2efbb5c8a0e5fc58e64cf5cd00ede94e53887da11e3e83c7294d",
+      "uploaded": false
+    },
+    {
+      "bytes": 3405,
+      "path": "research/trace2e_builder_20261125/sessions/K1-23/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b1/b1b08d40e63f67e452248aeb2c80e2465db3ca8c60d4cf065458652e0f0269f6",
+      "sha256": "b1b08d40e63f67e452248aeb2c80e2465db3ca8c60d4cf065458652e0f0269f6",
+      "uploaded": false
+    },
+    {
+      "bytes": 2105,
+      "path": "research/trace2e_builder_20261125/sessions/K1-23/spec.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0b/0b8afbd99a3f039a588eccdd3a9649c28191214d9270fa42aac58bb0603c660b",
+      "sha256": "0b8afbd99a3f039a588eccdd3a9649c28191214d9270fa42aac58bb0603c660b",
+      "uploaded": false
+    },
+    {
+      "bytes": 57918,
+      "path": "research/trace2e_builder_20261125/sessions/K1-23/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6d/6de51d5df70afe1a7c4adee8ba5e5e6102e7c3337b58dc9d2e12c43b2c4cd455",
+      "sha256": "6de51d5df70afe1a7c4adee8ba5e5e6102e7c3337b58dc9d2e12c43b2c4cd455",
+      "uploaded": false
+    },
+    {
+      "bytes": 3754,
+      "path": "research/trace2e_builder_20261125/sessions/K1-23/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b9/b9424110212dbfd54ff2dd944e9569162141f9279ddb56be780574608c35e7e7",
+      "sha256": "b9424110212dbfd54ff2dd944e9569162141f9279ddb56be780574608c35e7e7",
+      "uploaded": false
+    },
+    {
+      "bytes": 21447,
+      "path": "research/trace2e_builder_20261125/sessions/K1-23.audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ca/ca02d26de3922e25cbdca57ddf25bd97d58f79c5566bbd3c4bdec33f6a014a0f",
+      "sha256": "ca02d26de3922e25cbdca57ddf25bd97d58f79c5566bbd3c4bdec33f6a014a0f",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace2e_builder_20261125/reports/trace2e_report.pdf",
+    "png": [],
+    "svg": [
+      "research/trace2e_builder_20261125/figures/trace2e.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "trace2e-k1-23",
+  "status": "measured",
+  "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+  "validation": null
+}
